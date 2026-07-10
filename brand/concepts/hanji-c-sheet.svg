@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 컨셉 C: 한지 낱장 — 먹빛 바탕 위 닥종이 문서 한 장 -->
+  <defs>
+    <filter id="fiberC" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.014 0.3" numOctaves="2" seed="7"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.27  0 0 0 0 0.22  0 0 0 0 0.15  0 0 0 0.9 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="#262016"/>
+
+  <g transform="rotate(-2.5 256 256)">
+    <!-- 찢은 결(데클) 가장자리의 낱장 -->
+    <path d="M132 104
+             C 190 92, 250 100, 318 94
+             C 352 92, 372 98, 378 104
+             C 386 160, 380 220, 386 276
+             C 390 330, 382 372, 378 410
+             C 320 420, 260 412, 196 418
+             C 168 420, 146 414, 134 408
+             C 126 356, 132 300, 126 248
+             C 122 200, 130 150, 132 104 Z"
+          fill="#F5EEDC"/>
+    <path d="M132 104
+             C 190 92, 250 100, 318 94
+             C 352 92, 372 98, 378 104
+             C 386 160, 380 220, 386 276
+             C 390 330, 382 372, 378 410
+             C 320 420, 260 412, 196 418
+             C 168 420, 146 414, 134 408
+             C 126 356, 132 300, 126 248
+             C 122 200, 130 150, 132 104 Z"
+          filter="url(#fiberC)" opacity="0.12"/>
+
+    <!-- 문서 내용: 붓 제목 + 본문 행 -->
+    <rect x="164" y="152" width="148" height="26" rx="13" fill="#453927"/>
+    <rect x="164" y="212" width="196" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <rect x="164" y="246" width="172" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <rect x="164" y="280" width="188" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <!-- 낙관 -->
+    <g transform="rotate(-5 322 350)">
+      <rect x="300" y="328" width="44" height="44" rx="9" fill="#B13A2A"/>
+      <rect x="311" y="339" width="22" height="22" rx="4" fill="none" stroke="#F5EEDC" stroke-width="4"/>
+    </g>
+  </g>
+</svg>

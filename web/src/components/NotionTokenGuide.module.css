@@ -1,0 +1,1385 @@
+.guide {
+  display: grid;
+  gap: 8px;
+}
+
+.player {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--bg-app);
+}
+
+.progressRow {
+  display: flex;
+  gap: 5px;
+}
+
+.progressSegment {
+  flex: 1;
+  height: 12px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.progressSegment span {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--bg-hover);
+  overflow: hidden;
+  position: relative;
+}
+
+.progressSegment[data-state="done"] span::after,
+.progressSegment[data-state="active"] span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent-blue);
+}
+
+.progressSegment[data-state="active"] span::after {
+  transform: translateX(-100%);
+  animation: guideProgressFill linear forwards;
+  animation-duration: var(--guide-scene-ms, 3000ms);
+}
+
+.player[data-playing] .progressSegment[data-state="active"] span::after {
+  animation-play-state: running;
+}
+
+.player:not([data-playing]) .progressSegment[data-state="active"] span::after {
+  animation-play-state: paused;
+}
+
+@keyframes guideProgressFill {
+  to {
+    transform: translateX(0);
+  }
+}
+
+.stage {
+  display: grid;
+}
+
+/*
+ * The "screen recording". Colors come from --rec-* variables so the replica
+ * matches the real Notion developer portal in BOTH app themes: light defaults
+ * below, dark overrides at the bottom of this file keyed on the app's
+ * :root[data-theme="dark"] attribute.
+ */
+.recording {
+  --rec-bg: #ffffff;
+  --rec-surface: #ffffff;
+  --rec-sidebar: #f8f8f7;
+  --rec-chrome: #ececeb;
+  --rec-url-bg: rgba(0, 0, 0, 0.05);
+  --rec-url-text: rgba(28, 27, 26, 0.45);
+  --rec-border: rgba(0, 0, 0, 0.09);
+  --rec-text: rgba(28, 27, 26, 0.92);
+  --rec-text2: rgba(28, 27, 26, 0.62);
+  --rec-text3: rgba(28, 27, 26, 0.42);
+  --rec-input-bg: rgba(0, 0, 0, 0.028);
+  --rec-input-border: rgba(0, 0, 0, 0.13);
+  --rec-hover: rgba(0, 0, 0, 0.06);
+  --rec-menu-bg: #ffffff;
+  --rec-menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --rec-backdrop: rgba(15, 15, 15, 0.25);
+  --rec-blue: #2383e2;
+  --rec-badge-bg: rgba(35, 131, 226, 0.12);
+  --rec-badge-text: #2383e2;
+  --rec-selected-bg: rgba(35, 131, 226, 0.06);
+  --rec-ripple: rgba(0, 0, 0, 0.5);
+  --rec-tooltip-bg: #1f1f1f;
+  --rec-tooltip-text: #ffffff;
+  --rec-skeleton: rgba(0, 0, 0, 0.06);
+  --rec-chip-bg: rgba(0, 0, 0, 0.08);
+  --rec-chip-text: rgba(28, 27, 26, 0.72);
+  --rec-frame-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+
+  position: relative;
+  width: 100%;
+  /* Locked size: the frame must stay identical across every scene and wherever
+   * the walkthrough is placed in the dialog — content never resizes it. */
+  height: 304px;
+  min-height: 304px;
+  max-height: 304px;
+  border: 1px solid var(--rec-border);
+  border-radius: 8px;
+  background: var(--rec-bg);
+  color: var(--rec-text);
+  box-shadow: var(--rec-frame-shadow);
+  overflow: hidden;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 0 10px;
+  background: var(--rec-chrome);
+  border-bottom: 1px solid var(--rec-border);
+}
+
+.trafficLights {
+  display: inline-flex;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.trafficLights i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.trafficLights i:nth-child(1) {
+  background: #ff5f57;
+}
+
+.trafficLights i:nth-child(2) {
+  background: #febc2e;
+}
+
+.trafficLights i:nth-child(3) {
+  background: #28c840;
+}
+
+.chromeUrl {
+  flex: 1;
+  max-width: 300px;
+  margin: 0 auto;
+  padding: 2px 10px;
+  border-radius: 5px;
+  background: var(--rec-url-bg);
+  color: var(--rec-url-text);
+  font-size: 9.5px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- cursor + click feedback ----
+ * Each scene's cursor lives INSIDE its click target (anchored at the target's
+ * center) and animates in via transform, so the pointer lands exactly on the
+ * target at every container width. */
+
+.cursor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.cursorArrow {
+  display: block;
+  animation: guideCursorPress 0.22s ease-in-out var(--press-at, 999999ms) 1;
+  transform-origin: 22% 12%;
+}
+
+@keyframes guideCursorPress {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.8);
+  }
+}
+
+.clickRipple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 2px solid var(--rec-ripple);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: guideClickRipple 0.42s ease-out var(--click-at, 999999ms) 1;
+}
+
+@keyframes guideClickRipple {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.35);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+.cursorScene1 {
+  --press-at: 2050ms;
+  animation: guideCursor1 0.8s cubic-bezier(0.3, 0.9, 0.35, 1) 0.5s both;
+}
+
+@keyframes guideCursor1 {
+  from {
+    transform: translate(-190px, 150px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+.cursorScene2 {
+  --press-at: 2050ms;
+  animation: guideCursor2 0.8s cubic-bezier(0.3, 0.9, 0.35, 1) 0.5s both;
+}
+
+@keyframes guideCursor2 {
+  from {
+    transform: translate(-220px, -185px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+.cursorScene3 {
+  --press-at: 1500ms;
+  animation: guideCursor3 0.7s cubic-bezier(0.3, 0.9, 0.35, 1) 0.4s both;
+}
+
+@keyframes guideCursor3 {
+  from {
+    transform: translate(-250px, -75px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+/* Anchored to the integration row in the connect submenu; waypoints are fixed
+ * pixel offsets to the ··· button and the "Add connections" menu item (all
+ * three are right-anchored siblings, so the offsets hold at any width). */
+.cursorScene4 {
+  --press-at: 2200ms;
+  animation: guideCursor4 3s linear both;
+}
+
+@keyframes guideCursor4 {
+  0% {
+    transform: translate(-70px, 55px);
+  }
+
+  16% {
+    transform: translate(241px, -191px);
+  }
+
+  30% {
+    transform: translate(241px, -191px);
+  }
+
+  44% {
+    transform: translate(176px, -96px);
+  }
+
+  58% {
+    transform: translate(176px, -96px);
+  }
+
+  72% {
+    transform: translate(-3px, -3px);
+  }
+
+  100% {
+    transform: translate(-3px, -3px);
+  }
+}
+
+.cursorIntro {
+  --press-at: 1600ms;
+  animation: guideCursorIntro 0.8s cubic-bezier(0.3, 0.9, 0.35, 1) 0.5s both;
+}
+
+@keyframes guideCursorIntro {
+  from {
+    transform: translate(-120px, 120px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+.cursorScene5 {
+  --press-at: 1400ms;
+  animation: guideCursor5 0.7s cubic-bezier(0.3, 0.9, 0.35, 1) 0.4s both;
+}
+
+@keyframes guideCursor5 {
+  from {
+    transform: translate(-210px, -70px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+.cursorScene6 {
+  --press-at: 1700ms;
+  animation: guideCursor6 0.8s cubic-bezier(0.3, 0.9, 0.35, 1) 0.5s both;
+}
+
+@keyframes guideCursor6 {
+  from {
+    transform: translate(-180px, -96px);
+  }
+
+  to {
+    transform: translate(-3px, -3px);
+  }
+}
+
+/* ---- scene 1: developers / connections list ---- */
+
+.devShell {
+  position: relative;
+  display: flex;
+  height: calc(100% - 26px);
+}
+
+.devSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 0 0 118px;
+  padding: 10px 10px 0;
+  border-right: 1px solid var(--rec-border);
+  background: var(--rec-sidebar);
+}
+
+.devBack {
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.devBrand {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 6px;
+  color: var(--rec-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.devLogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--rec-text2);
+  border-radius: 3px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.devNav {
+  display: grid;
+  gap: 1px;
+}
+
+.devNav span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3.5px 6px;
+  border-radius: 4px;
+  color: var(--rec-text2);
+  font-size: 9.5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.devNav span[data-active] {
+  background: var(--rec-hover);
+  color: var(--rec-text);
+}
+
+.navBadge {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--rec-badge-bg);
+  color: var(--rec-badge-text);
+  font-size: 7.5px;
+  font-style: normal;
+}
+
+.devMain {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.devHeading {
+  display: grid;
+  gap: 2px;
+}
+
+.devHeading strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.devHeading span {
+  color: var(--rec-text3);
+  font-size: 9px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.devHeading .textLink {
+  color: var(--rec-blue);
+}
+
+.devToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 8px 0 6px;
+}
+
+.toolbarIcon {
+  color: var(--rec-text3);
+  font-size: 11px;
+}
+
+.notionPrimary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 3.5px 9px;
+  border-radius: 5px;
+  background: var(--rec-blue);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.devTableHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 8px;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--rec-border);
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.devTableHead span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.devRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px 2px;
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.integrationAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: #9065b0;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.rowText {
+  display: grid;
+  min-width: 0;
+}
+
+.rowText strong {
+  font-size: 10px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rowText span {
+  color: var(--rec-text3);
+  font-size: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wsCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--rec-text2);
+  font-size: 9px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.wsCell i,
+.wsMiniChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 13px;
+  height: 13px;
+  padding: 0 1px;
+  border-radius: 3px;
+  background: var(--rec-chip-bg);
+  color: var(--rec-chip-text);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.plainCell {
+  color: var(--rec-text2);
+  font-size: 9px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ownerCell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--rec-text2);
+  font-size: 9px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ownerAvatar {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #7f6df2, #382f8f);
+}
+
+/* ---- scene 2: new-connection modal ---- */
+
+.modalBackdrop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: calc(100% - 26px);
+  background: var(--rec-backdrop);
+}
+
+.notionModal {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  width: min(392px, 94%);
+  padding: 12px 14px;
+  border: 1px solid var(--rec-border);
+  border-radius: 8px;
+  background: var(--rec-surface);
+  box-shadow: var(--rec-menu-shadow);
+}
+
+.modalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modalHead span {
+  color: var(--rec-text3);
+  font-size: 10px;
+}
+
+.modalDesc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  margin: 0;
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.fieldLabel {
+  color: var(--rec-text2);
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.notionInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 5px;
+  background: var(--rec-input-bg);
+  color: var(--rec-text3);
+  font-size: 9.5px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.caret {
+  width: 1px;
+  height: 11px;
+  background: var(--rec-text);
+  animation: guideCaretBlink 1s steps(1) infinite;
+}
+
+@keyframes guideCaretBlink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.authOption {
+  display: flex;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 6px;
+}
+
+.authOptionSelected {
+  border-color: var(--rec-blue);
+  background: var(--rec-selected-bg);
+}
+
+.radioDot {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  margin-top: 1px;
+  border: 1.5px solid var(--rec-text3);
+  border-radius: 50%;
+}
+
+.authOptionSelected .radioDot {
+  border-color: var(--rec-blue);
+  box-shadow: inset 0 0 0 3px var(--rec-blue);
+}
+
+.authText {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.authText strong {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--rec-text);
+}
+
+.authText span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  color: var(--rec-text3);
+  font-size: 8px;
+}
+
+.authOption:not(.authOptionSelected) .authText span {
+  -webkit-line-clamp: 1;
+}
+
+.wsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wsRowText {
+  display: grid;
+  min-width: 0;
+}
+
+.wsRowText strong {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.wsRowText span {
+  color: var(--rec-text3);
+  font-size: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wsSelect {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 5px;
+  color: var(--rec-text);
+  font-size: 9.5px;
+  font-weight: 500;
+}
+
+.wsSelect i {
+  color: var(--rec-text3);
+  font-style: normal;
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.modalFooter > span:first-child {
+  color: var(--rec-text3);
+  font-size: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- scene 3: token detail ---- */
+
+.detailShell {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  height: calc(100% - 26px);
+  padding: 12px 16px;
+}
+
+.breadcrumb {
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.detailTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.detailTabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.detailTabs span {
+  padding: 2.5px 8px;
+  border-radius: 999px;
+  color: var(--rec-text2);
+  font-size: 8.5px;
+  white-space: nowrap;
+}
+
+.detailTabs span[data-active] {
+  background: var(--rec-hover);
+  color: var(--rec-text);
+  font-weight: 600;
+}
+
+.detailSection {
+  display: grid;
+  gap: 2px;
+}
+
+.detailSection strong {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.detailSection p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.detailFields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.detailField {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tokenInput {
+  color: var(--rec-text2);
+}
+
+.tokenDots {
+  flex: 1;
+  overflow: hidden;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.tokenIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  color: var(--rec-text2);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.copyIcon {
+  background: var(--rec-hover);
+}
+
+.copiedBubble {
+  position: absolute;
+  top: -24px;
+  right: -2px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--rec-tooltip-bg);
+  color: var(--rec-tooltip-text);
+  font-size: 8.5px;
+  font-weight: 600;
+  opacity: 0;
+  animation: guideCopied 1.3s ease-out 1.65s forwards;
+}
+
+@keyframes guideCopied {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---- scene 4: connect the page ---- */
+
+.pageShell {
+  position: relative;
+  height: calc(100% - 26px);
+}
+
+.pageTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--rec-border);
+}
+
+.pageCrumb {
+  color: var(--rec-text);
+  font-size: 9.5px;
+}
+
+.pageActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--rec-text2);
+  font-size: 9.5px;
+}
+
+.pageActions i {
+  font-style: normal;
+}
+
+.pageMoreButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--rec-hover);
+  color: var(--rec-text);
+}
+
+.pageBody {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 18px 40px;
+}
+
+.pageBody strong {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.skeletonLine {
+  height: 7px;
+  border-radius: 3px;
+  background: var(--rec-skeleton);
+}
+
+.pageMenu {
+  position: absolute;
+  top: 32px;
+  right: 12px;
+  z-index: 3;
+  display: grid;
+  gap: 1px;
+  width: 148px;
+  padding: 5px;
+  border: 1px solid var(--rec-border);
+  border-radius: 7px;
+  background: var(--rec-menu-bg);
+  box-shadow: var(--rec-menu-shadow);
+  opacity: 0;
+  animation: guideMenuIn 0.16s ease-out 0.85s forwards;
+}
+
+.pageMenuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 7px;
+  border-radius: 4px;
+  color: var(--rec-text2);
+  font-size: 9.5px;
+}
+
+.pageMenuItem i {
+  color: var(--rec-text3);
+  font-style: normal;
+}
+
+.pageMenuItemHover {
+  background: var(--rec-hover);
+}
+
+.pageMenuDivider {
+  height: 1px;
+  margin: 3px 2px;
+  background: var(--rec-border);
+}
+
+.pageMenuLabel {
+  padding: 1px 7px;
+  color: var(--rec-text3);
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.connectSubmenu {
+  position: absolute;
+  top: 58%;
+  right: 168px;
+  z-index: 4;
+  display: grid;
+  gap: 4px;
+  width: 188px;
+  padding: 6px;
+  border: 1px solid var(--rec-border);
+  border-radius: 7px;
+  background: var(--rec-menu-bg);
+  box-shadow: var(--rec-menu-shadow);
+  opacity: 0;
+  animation: guideMenuIn 0.16s ease-out 1.5s forwards;
+}
+
+.submenuSearch {
+  padding: 4px 7px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 5px;
+  background: var(--rec-input-bg);
+  color: var(--rec-text3);
+  font-size: 8.5px;
+}
+
+.submenuRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--rec-hover);
+  color: var(--rec-text);
+  font-size: 9.5px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.submenuRow .integrationAvatar {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+}
+
+@keyframes guideMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---- scenes 5-6: back in the Hanji import dialog ---- */
+
+.hanjiPanel {
+  position: relative;
+  display: grid;
+  gap: 11px;
+  align-content: start;
+  height: calc(100% - 26px);
+  padding: 16px 18px;
+}
+
+.hanjiHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hanjiBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rec-hover);
+  color: var(--rec-text2);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.hanjiHead strong {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.hanjiField {
+  display: grid;
+  gap: 5px;
+}
+
+.introCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 13px;
+  border: 1px solid var(--rec-border);
+  border-radius: 8px;
+  background: var(--rec-input-bg);
+}
+
+.introText {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.introText strong {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.introText span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  color: var(--rec-text3);
+  font-size: 9px;
+}
+
+.introButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 7px 13px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 6px;
+  background: var(--rec-surface);
+  color: var(--rec-text);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hanjiTokenField {
+  min-height: 30px;
+  color: var(--rec-text);
+  font-size: 11px;
+  letter-spacing: 0.3px;
+}
+
+.scopeOpt {
+  display: flex;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--rec-input-border);
+  border-radius: 7px;
+}
+
+.scopeOptSelected {
+  position: relative;
+  border-color: var(--rec-blue);
+  background: var(--rec-selected-bg);
+}
+
+.scopeOptSelected .radioDot {
+  border-color: var(--rec-blue);
+  box-shadow: inset 0 0 0 3px var(--rec-blue);
+}
+
+.scopeOpt .authText strong {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+}
+
+.scopeOpt .authText span {
+  -webkit-line-clamp: 2;
+  font-size: 9px;
+}
+
+.recBadge {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--rec-badge-bg);
+  color: var(--rec-badge-text);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ---- dark app theme: swap the recording to the dark Notion portal ---- */
+
+:global(:root[data-theme="dark"]) .recording {
+  --rec-bg: #191919;
+  --rec-surface: #252525;
+  --rec-sidebar: #1c1c1c;
+  --rec-chrome: #262626;
+  --rec-url-bg: rgba(255, 255, 255, 0.07);
+  --rec-url-text: rgba(255, 255, 255, 0.45);
+  --rec-border: rgba(255, 255, 255, 0.09);
+  --rec-text: rgba(255, 255, 255, 0.9);
+  --rec-text2: rgba(255, 255, 255, 0.55);
+  --rec-text3: rgba(255, 255, 255, 0.4);
+  --rec-input-bg: rgba(255, 255, 255, 0.045);
+  --rec-input-border: rgba(255, 255, 255, 0.12);
+  --rec-hover: rgba(255, 255, 255, 0.08);
+  --rec-menu-bg: #252525;
+  --rec-menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --rec-backdrop: rgba(0, 0, 0, 0.45);
+  --rec-badge-bg: rgba(35, 131, 226, 0.25);
+  --rec-badge-text: #529cce;
+  --rec-selected-bg: rgba(35, 131, 226, 0.08);
+  --rec-ripple: rgba(255, 255, 255, 0.85);
+  --rec-tooltip-bg: #f1f1f1;
+  --rec-tooltip-text: #1f1f1f;
+  --rec-skeleton: rgba(255, 255, 255, 0.08);
+  --rec-chip-bg: rgba(255, 255, 255, 0.14);
+  --rec-chip-text: rgba(255, 255, 255, 0.75);
+  --rec-frame-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- caption + controls ---- */
+
+.captionRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.caption {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  margin: 0;
+  min-width: 0;
+  /* Reserve space for the tallest scene caption (measured 89px across en/ko)
+   * so the box's bottom edge never shifts as scenes cycle. */
+  min-height: 89px;
+  align-content: start;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.caption strong {
+  color: var(--text-secondary);
+}
+
+.caption span {
+  color: var(--text-tertiary);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.stepCounter {
+  margin-right: 2px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: var(--bg-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    display: none;
+  }
+
+  .clickRipple,
+  .caret,
+  .copiedBubble,
+  .pageMenu,
+  .connectSubmenu,
+  .progressSegment[data-state="active"] span::after {
+    animation: none;
+  }
+
+  .copiedBubble,
+  .pageMenu,
+  .connectSubmenu {
+    opacity: 1;
+  }
+
+  .progressSegment[data-state="active"] span::after {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .devSidebar {
+    display: none;
+  }
+
+  .recording {
+    height: 276px;
+    min-height: 276px;
+    max-height: 276px;
+  }
+
+  .introCard {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .introButton {
+    align-self: flex-start;
+  }
+
+  .captionRow {
+    flex-direction: column;
+  }
+
+  .controls {
+    align-self: flex-end;
+  }
+}

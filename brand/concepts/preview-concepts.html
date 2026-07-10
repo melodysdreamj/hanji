@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Hanji 아이콘 컨셉 비교 (A–E)</title>
+<style>
+  body { margin:0; font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; background:#EDEAE2; color:#2A2620; }
+  header { padding:26px 32px 6px; }
+  header h1 { font-size:20px; margin:0 0 6px; }
+  header p { margin:0; color:#6B655A; font-size:13px; }
+  section { margin:20px 32px; }
+  section h2 { font-size:15px; margin:0 0 2px; }
+  section p.desc { margin:0 0 12px; font-size:12.5px; color:#6B655A; }
+  .strips { display:flex; gap:14px; flex-wrap:wrap; }
+  .strip { border-radius:12px; padding:18px 22px; display:flex; align-items:flex-end; gap:22px; flex:1; min-width:340px; }
+  .strip.light { background:#FBFAF6; border:1px solid #DDD6C6; }
+  .strip.dark  { background:#17130D; border:1px solid #302A20; }
+  .cell { text-align:center; }
+  .cell small { display:block; margin-top:6px; font-size:10.5px; color:#8A8478; }
+  .strip.dark .cell small { color:#7A7264; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Hanji 아이콘 컨셉 비교</h1>
+  <p>각 컨셉을 라이트/다크 배경에서 144 · 64 · 32px로 비교합니다. 32px 칸이 파비콘 생존성 테스트입니다.</p>
+</header>
+<div id="root"></div>
+
+<template id="tA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+  <rect x="68" y="68" width="376" height="376" rx="24" fill="none" stroke="#453927" stroke-width="16"/>
+  <path d="M162 76 V436 M256 76 V436 M350 76 V436 M76 162 H436 M76 256 H436 M76 350 H436" stroke="#453927" stroke-width="9" fill="none"/>
+  <g transform="rotate(-6 393 393)"><rect x="362" y="362" width="62" height="62" rx="12" fill="#B13A2A"/><rect x="378" y="378" width="30" height="30" rx="5" fill="none" stroke="#F5EEDC" stroke-width="5.5"/></g>
+</svg>
+</template>
+
+<template id="tB">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+  <g transform="rotate(-3 256 256)">
+    <rect x="106" y="106" width="300" height="300" rx="26" fill="#B13A2A"/>
+    <g fill="#F5EEDC">
+      <rect x="216" y="148" width="80" height="20" rx="10" transform="rotate(5 256 158)"/>
+      <rect x="166" y="196" width="180" height="22" rx="11"/>
+      <circle cx="256" cy="306" r="64" fill="none" stroke="#F5EEDC" stroke-width="22"/>
+    </g>
+  </g>
+</svg>
+</template>
+
+<template id="tC">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#262016"/>
+  <g transform="rotate(-2.5 256 256)">
+    <path d="M132 104 C 190 92, 250 100, 318 94 C 352 92, 372 98, 378 104 C 386 160, 380 220, 386 276 C 390 330, 382 372, 378 410 C 320 420, 260 412, 196 418 C 168 420, 146 414, 134 408 C 126 356, 132 300, 126 248 C 122 200, 130 150, 132 104 Z" fill="#F5EEDC"/>
+    <rect x="164" y="152" width="148" height="26" rx="13" fill="#453927"/>
+    <rect x="164" y="212" width="196" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <rect x="164" y="246" width="172" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <rect x="164" y="280" width="188" height="12" rx="6" fill="#453927" opacity="0.5"/>
+    <g transform="rotate(-5 322 350)"><rect x="300" y="328" width="44" height="44" rx="9" fill="#B13A2A"/><rect x="311" y="339" width="22" height="22" rx="4" fill="none" stroke="#F5EEDC" stroke-width="4"/></g>
+  </g>
+</svg>
+</template>
+
+<template id="tD">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+  <g fill="#332A1E">
+    <path d="M228 88 C252 78, 282 80, 296 90 C292 106, 276 114, 256 114 C240 114, 230 102, 228 88 Z"/>
+    <path d="M148 170 C210 156, 310 154, 366 164 C368 172, 366 180, 362 186 C300 176, 210 180, 152 192 C148 186, 146 178, 148 170 Z"/>
+    <path fill-rule="evenodd" d="M342 320 a86 86 0 1 0 -172 0 a86 86 0 1 0 172 0 Z M320 314 a60 60 0 1 1 -120 0 a60 60 0 1 1 120 0 Z"/>
+  </g>
+  <g transform="rotate(-6 398 398)"><rect x="378" y="378" width="40" height="40" rx="8" fill="#B13A2A"/></g>
+</svg>
+</template>
+
+<template id="tE">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs><clipPath id="roundE"><rect width="512" height="512" rx="116"/></clipPath></defs>
+  <g clip-path="url(#roundE)">
+    <polygon points="0,0 222,0 213,195 0,186" fill="#6E7E94"/>
+    <polygon points="222,0 512,0 512,150 216,132" fill="#F2EAD6"/>
+    <polygon points="216,132 512,150 512,312 208,301" fill="#CFA968"/>
+    <polygon points="0,186 213,195 208,301 0,296" fill="#AC4030"/>
+    <polygon points="0,296 158,304 172,512 0,512" fill="#F2EAD6"/>
+    <polygon points="158,304 346,306 334,512 172,512" fill="#BE8E7F"/>
+    <polygon points="346,306 512,312 512,512 334,512" fill="#93A183"/>
+    <g fill="none" stroke="#4A3E2E" stroke-width="13" stroke-linecap="round">
+      <path d="M222 0 L208 301"/>
+      <path d="M0 186 L213 195"/>
+      <path d="M216 132 L512 150"/>
+      <path d="M0 296 L208 301 L346 306 L512 312"/>
+      <path d="M158 304 L172 512"/>
+      <path d="M346 306 L334 512"/>
+    </g>
+    <g fill="none" stroke="#E9DCBB" stroke-width="2.4" stroke-dasharray="9 13" opacity="0.6">
+      <path d="M222 0 L208 301"/>
+      <path d="M0 186 L213 195"/>
+      <path d="M216 132 L512 150"/>
+      <path d="M0 296 L208 301 L346 306 L512 312"/>
+      <path d="M158 304 L172 512"/>
+      <path d="M346 306 L334 512"/>
+    </g>
+    <rect x="9" y="9" width="494" height="494" rx="108" fill="none" stroke="#E9DCBB" stroke-width="2.4" stroke-dasharray="9 13" opacity="0.5"/>
+  </g>
+</svg>
+</template>
+
+<script>
+const concepts = [
+  ["tA", "A. 창호 문살 + 낙관 (기존안)", "한지 창호의 井字 격자가 블록 그리드로도 읽히는 안. 정갈하고 중립적."],
+  ["tB", "B. 낙관", "도장 그 자체. ㅎ을 음각으로 새겨 가장 대담하고 원거리 식별성이 좋음."],
+  ["tC", "C. 한지 낱장", "먹빛 바탕 위 데클(찢은 결) 가장자리의 문서 한 장. '문서 앱'이라는 기능이 가장 직관적으로 전달됨."],
+  ["tD", "D. 붓글씨 ㅎ", "먹 캘리그래피 ㅎ + 낙관 점. 한글 정체성이 가장 뚜렷하고 친근한 마스코트성."],
+  ["tE", "E. 조각보", "천연염색 조각이 한 보자기로 이어지는 패치워크. '블록들이 모여 하나의 문서'라는 제품 은유가 가장 강함."],
+];
+const root = document.getElementById("root");
+for (const [tid, title, desc] of concepts) {
+  const sec = document.createElement("section");
+  sec.innerHTML = `<h2>${title}</h2><p class="desc">${desc}</p>`;
+  const strips = document.createElement("div");
+  strips.className = "strips";
+  for (const mode of ["light", "dark"]) {
+    const strip = document.createElement("div");
+    strip.className = `strip ${mode}`;
+    for (const size of [144, 64, 32]) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const svg = document.getElementById(tid).content.firstElementChild.cloneNode(true);
+      svg.setAttribute("width", size);
+      svg.setAttribute("height", size);
+      cell.appendChild(svg);
+      const label = document.createElement("small");
+      label.textContent = size + "px";
+      cell.appendChild(label);
+      strip.appendChild(cell);
+    }
+    strips.appendChild(strip);
+  }
+  sec.appendChild(strips);
+  root.appendChild(sec);
+}
+</script>
+</body>
+</html>

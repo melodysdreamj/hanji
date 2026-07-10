@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 200">
+  <!-- Hanji 가로형 로고 락업: 마크 + 세리프 워드마크 (배포 시 텍스트 아웃라인 변환 권장) -->
+  <style>
+    .paper { fill: #F5EEDC; }
+    .ink   { stroke: #453927; }
+    .type  { fill: #453927; }
+    @media (prefers-color-scheme: dark) {
+      .ink  { stroke: #453927; }
+      .type { fill: #EFE6CF; }
+    }
+  </style>
+
+  <!-- 마크 (파비콘 기하 확대) -->
+  <g>
+    <rect class="paper" x="16" y="24" width="152" height="152" rx="34"/>
+    <rect class="ink" x="40" y="48" width="104" height="104" rx="13" fill="none" stroke-width="11"/>
+    <path class="ink" d="M92 48 V152 M40 100 H144" fill="none" stroke-width="11"/>
+    <rect x="103" y="111" width="31" height="31" rx="7" fill="#B13A2A" transform="rotate(-6 118.5 126.5)"/>
+  </g>
+
+  <!-- 워드마크 -->
+  <text class="type" x="204" y="128" font-size="104" letter-spacing="1"
+        font-family="'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Noto Serif KR',Georgia,serif">Hanji</text>
+  <text class="type" x="208" y="170" font-size="26" letter-spacing="10" opacity="0.62"
+        font-family="'Noto Serif KR','Apple SD Gothic Neo',serif">한지 · 韓紙</text>
+</svg>

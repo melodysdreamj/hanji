@@ -1,0 +1,620 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 34;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.panel {
+  position: fixed;
+  z-index: 35;
+  top: 52px;
+  left: calc(var(--sidebar-width) + 12px);
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - var(--sidebar-width) - 24px));
+  max-height: calc(100vh - 68px);
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+  transform-origin: top left;
+  animation: updatesPanelIn 160ms cubic-bezier(0.16, 0.82, 0.32, 1);
+}
+
+.panel[data-placement="topbar"] {
+  right: 12px;
+  left: auto;
+  width: min(380px, calc(100vw - 24px));
+  transform-origin: top right;
+  animation-name: updatesPanelInRight;
+}
+
+/* Inline placement: the feed lives inside the sidebar column and swaps the page
+   tree (Notion-style inbox), so it drops all floating-overlay chrome and fills
+   the flex slot the tree normally occupies. */
+.panel[data-placement="sidebar-inline"] {
+  position: static;
+  z-index: auto;
+  inset: auto;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  max-height: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform-origin: top center;
+  animation: sidebarInboxIn 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Exit: reverse the enter slide so closing the inbox reads as the feed leaving,
+   not a hard cut back to the tree. Driven by the `exiting` prop / deferred unmount. */
+.panel[data-placement="sidebar-inline"][data-closing="true"] {
+  animation: sidebarInboxOut 190ms cubic-bezier(0.4, 0, 0.7, 0.2) forwards;
+}
+
+.panel[data-placement="sidebar-inline"] .header {
+  padding: 8px 8px 6px;
+}
+
+.panel[data-placement="sidebar-inline"] .tabs {
+  padding: 0 8px 8px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Soft-fade the right edge so the scrollable filter tabs read as "more this way"
+     instead of a hard clip against the narrow sidebar column. */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 14px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 14px), transparent);
+}
+
+.panel[data-placement="sidebar-inline"] .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* The sidebar column is narrower than the floating panel, so the filter tabs use
+   tighter hit areas and scroll horizontally under a soft fade instead of clipping. */
+.panel[data-placement="sidebar-inline"] .tab {
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.panel[data-placement="sidebar-inline"] .list {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 6px 6px 12px;
+}
+
+/* Slide the panel out from the sidebar edge instead of hard-popping into place,
+   matching Notion's inbox reveal. Enter-only: the panel unmounts on close. */
+@keyframes updatesPanelIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes updatesPanelInRight {
+  from {
+    opacity: 0;
+    transform: translateX(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The inline inbox swaps in place of the page tree: a quiet fade + short rightward
+   settle reads as the sidebar content changing, not a window appearing. */
+@keyframes sidebarInboxIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sidebarInboxOut {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panel[data-placement="sidebar-inline"],
+  .panel[data-placement="sidebar-inline"][data-closing="true"] {
+    animation: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 8px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.title {
+  color: var(--text-default);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.markRead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.markRead span {
+  white-space: nowrap;
+}
+
+.markRead:hover,
+.markRead:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.markRead:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.markRead:disabled:hover,
+.markRead:disabled:focus-visible {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.close svg {
+  display: block;
+}
+
+.close:hover,
+.close:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  outline: none;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px 9px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tab span:last-child {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tab:hover,
+.tab:focus-visible,
+.tab[aria-selected="true"] {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.historyArea {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--bg-hover) 30%, transparent);
+}
+
+.historyStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+}
+
+.historyText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+  color: var(--text-default);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.historyText span:last-child {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historyActions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.historyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.historyButton:hover,
+.historyButton:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.historyButton:disabled {
+  cursor: default;
+  opacity: 0.38;
+}
+
+.historyButton:disabled:hover,
+.historyButton:disabled:focus-visible {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.versionList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 8px 8px;
+}
+
+.versionRow {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 5px;
+  color: var(--text-default);
+  text-align: left;
+}
+
+.versionRow:hover,
+.versionRow:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+
+.versionRow[data-current="true"] {
+  background: var(--bg-app);
+}
+
+.versionRow:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.versionRow:disabled:hover,
+.versionRow:disabled:focus-visible {
+  background: transparent;
+}
+
+.versionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+}
+
+.versionRow[data-current="true"] .versionIcon {
+  color: var(--text-secondary);
+}
+
+.versionText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.versionTitle {
+  overflow: hidden;
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.versionMeta {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.empty {
+  padding: 18px 8px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.section + .section {
+  margin-top: 8px;
+}
+
+.sectionLabel {
+  padding: 8px 8px 4px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 6px;
+  color: var(--text-default);
+  text-align: left;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+
+.item[data-unread="true"] {
+  background: color-mix(in srgb, var(--accent-blue) 7%, transparent);
+}
+
+.item[data-unread="true"]:hover,
+.item[data-unread="true"]:focus-visible {
+  background: color-mix(in srgb, var(--accent-blue) 11%, var(--bg-hover));
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--bg-active);
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.itemTop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.actor {
+  overflow: hidden;
+  min-width: 0;
+  max-width: 150px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unreadDot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent-blue);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  color: var(--text-default);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.badge[data-kind="comment"] {
+  background: var(--c-bg-yellow);
+  color: var(--c-yellow);
+}
+
+.badge[data-kind="mention"] {
+  background: var(--c-bg-blue);
+  color: var(--c-blue);
+}
+
+.badge[data-kind="linked"] {
+  background: var(--c-bg-purple);
+  color: var(--c-purple);
+}
+
+.badge[data-kind="edited"] {
+  background: var(--c-bg-gray);
+  color: var(--c-gray);
+}
+
+.badge[data-kind="system"] {
+  background: var(--c-bg-orange);
+  color: var(--c-orange);
+}
+
+.itemTitle {
+  overflow: hidden;
+  color: var(--text-default);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemPreview {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .panel {
+    top: 48px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: calc(100vh - 60px);
+  }
+}
+
+@media (max-width: 420px) {
+  .markRead {
+    width: 26px;
+    padding: 0;
+  }
+
+  .markRead span {
+    display: none;
+  }
+
+  .historyStrip {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .historyActions {
+    justify-content: flex-end;
+  }
+}

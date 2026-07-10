@@ -1,0 +1,274 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design tokens — a Notion-like visual language (own implementation)
+   ============================================================ */
+:root {
+  /* Typography */
+  --font-ui: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-serif: Lyon-Text, Georgia, ui-serif, serif;
+  --font-mono: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono",
+    Courier, monospace;
+
+  /* Text colors */
+  --text-default: rgb(44, 44, 43);
+  --text-secondary: rgb(125, 122, 117);
+  --text-tertiary: rgb(161, 158, 153);
+  --text-placeholder: rgb(145, 142, 137);
+  --text-on-dark: rgba(255, 255, 255, 0.9);
+  /* Compatibility aliases used by component modules. Keep every global
+     semantic token defined so an unsupported var() never invalidates an
+     entire declaration in either theme. */
+  --text-primary: var(--text-default);
+  --text-disabled: var(--text-tertiary);
+
+  /* Surfaces */
+  --bg-app: #ffffff;
+  --bg-sidebar: rgb(247, 247, 245);
+  --bg-hover: rgba(55, 53, 47, 0.06);
+  --bg-active: rgba(55, 53, 47, 0.08);
+  --bg-selected: rgba(35, 131, 226, 0.14);
+  --bg-overlay: rgba(15, 15, 15, 0.05);
+  --bg-soft: rgb(247, 246, 243);
+  --bg-muted: rgba(247, 246, 243, 0.55);
+  --bg-muted-strong: rgba(247, 246, 243, 0.7);
+  --bg-floating-control: rgba(255, 255, 255, 0.94);
+  --bg-floating-control-hover: #ffffff;
+  --bg-table-header: rgb(247, 246, 243);
+  --bg-default: var(--bg-app);
+  --bg-secondary: var(--bg-soft);
+  --surface-default: var(--bg-app);
+  --surface-hover: var(--bg-hover);
+
+  /* Borders / dividers */
+  --border-default: rgb(230, 229, 227);
+  --border-strong: rgb(212, 211, 207);
+  --border-input: rgba(15, 15, 15, 0.1);
+  --border-subtle: var(--border-default);
+
+  /* Accent */
+  --accent-blue: rgb(35, 131, 226);
+  --accent-blue-hover: rgb(0, 117, 211);
+  --danger: var(--c-red);
+  --focus-ring: rgba(35, 131, 226, 0.38);
+  --page-find-match-bg: rgba(255, 212, 0, 0.38);
+  --page-find-active-bg: rgba(255, 176, 0, 0.72);
+
+  /* Block / callout palette (Notion-style named colors) */
+  --c-default: rgb(44, 44, 43);
+  --c-gray: rgb(120, 119, 116);
+  --c-brown: rgb(159, 107, 83);
+  --c-orange: rgb(217, 115, 13);
+  --c-yellow: rgb(203, 145, 47);
+  --c-green: rgb(68, 131, 97);
+  --c-blue: rgb(51, 126, 169);
+  --c-purple: rgb(144, 101, 176);
+  --c-pink: rgb(193, 76, 138);
+  --c-red: rgb(212, 76, 71);
+
+  --c-bg-gray: rgb(241, 241, 239);
+  --c-bg-brown: rgb(244, 238, 238);
+  --c-bg-orange: rgb(251, 236, 221);
+  --c-bg-yellow: rgb(251, 243, 219);
+  --c-bg-green: rgb(237, 243, 236);
+  --c-bg-blue: rgb(231, 243, 248);
+  --c-bg-purple: rgba(244, 240, 247, 0.8);
+  --c-bg-pink: rgba(249, 238, 243, 0.8);
+  --c-bg-red: rgb(253, 235, 236);
+
+  /* Shadows */
+  --shadow-menu: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px,
+    rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+  --shadow-sm: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px,
+    rgba(15, 15, 15, 0.1) 0px 2px 4px;
+  --shadow-small: var(--shadow-sm);
+  --shadow-popover: var(--shadow-menu);
+
+  /* Layout metrics */
+  --sidebar-width: 270px;
+  --sidebar-effective-width: 0px;
+  --content-max: 900px;
+  --content-pad: 96px;
+  --topbar-height: 45px;
+  --radius: 6px;
+}
+
+/* ============================================================
+   Dark theme — Notion-accurate token overrides. Applied via
+   <html data-theme="dark"> (set by the FOUC script in layout.tsx).
+   ============================================================ */
+[data-theme="dark"] {
+  --text-default: rgb(240, 239, 237);
+  --text-secondary: rgb(184, 181, 175);
+  --text-tertiary: rgb(148, 144, 137);
+  --text-placeholder: rgb(154, 150, 143);
+  --text-on-dark: rgb(240, 239, 237);
+
+  --bg-app: rgb(25, 25, 25);
+  --bg-sidebar: rgb(32, 32, 32);
+  --bg-hover: rgba(255, 255, 255, 0.065);
+  --bg-active: rgba(255, 255, 255, 0.105);
+  --bg-selected: rgba(35, 131, 226, 0.26);
+  --bg-overlay: rgba(0, 0, 0, 0.42);
+  --bg-soft: rgba(255, 255, 255, 0.065);
+  --bg-muted: rgba(255, 255, 255, 0.045);
+  --bg-muted-strong: rgba(255, 255, 255, 0.06);
+  --bg-floating-control: rgba(37, 37, 37, 0.96);
+  --bg-floating-control-hover: rgb(47, 47, 47);
+  --bg-table-header: rgba(255, 255, 255, 0.065);
+
+  --border-default: rgb(62, 62, 60);
+  --border-strong: rgb(107, 105, 100);
+  --border-input: rgb(104, 102, 96);
+
+  --accent-blue: rgb(35, 131, 226);
+  --accent-blue-hover: rgb(76, 154, 232);
+  --page-find-match-bg: rgba(255, 212, 0, 0.32);
+  --page-find-active-bg: rgba(255, 176, 0, 0.62);
+
+  --c-default: rgb(240, 239, 237);
+  --c-gray: rgb(155, 155, 155);
+  --c-brown: rgb(186, 133, 111);
+  --c-orange: rgb(199, 125, 72);
+  --c-yellow: rgb(202, 152, 73);
+  --c-green: rgb(82, 158, 114);
+  --c-blue: rgb(94, 135, 201);
+  --c-purple: rgb(157, 104, 211);
+  --c-pink: rgb(209, 87, 150);
+  --c-red: rgb(223, 84, 82);
+
+  --c-bg-gray: rgb(64, 64, 62);
+  --c-bg-brown: rgb(103, 73, 58);
+  --c-bg-orange: rgb(127, 83, 50);
+  --c-bg-yellow: rgb(121, 98, 54);
+  --c-bg-green: rgb(55, 95, 73);
+  --c-bg-blue: rgb(39, 92, 123);
+  --c-bg-purple: rgb(87, 65, 108);
+  --c-bg-pink: rgb(111, 64, 88);
+  --c-bg-red: rgb(119, 66, 59);
+
+  --shadow-menu: rgba(0, 0, 0, 0.16) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.24) 0px 3px 8px, rgba(0, 0, 0, 0.32) 0px 10px 28px;
+  --shadow-sm: rgba(0, 0, 0, 0.16) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.22) 0px 2px 5px;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-mono);
+}
+
+/* ============================================================
+   Base reset
+   ============================================================ */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden; /* app owns its own scroll areas */
+}
+::selection {
+  background: var(--bg-selected);
+}
+.blockLinkTarget {
+  border-radius: 4px;
+  animation: block-link-target 1.8s ease;
+}
+@keyframes block-link-target {
+  0%,
+  65% {
+    background: rgba(35, 131, 226, 0.12);
+    box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.08);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* Notion-style thin scrollbars */
+.nscroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(55, 53, 47, 0.2) transparent;
+}
+.nscroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.nscroll::-webkit-scrollbar-thumb {
+  background: rgba(55, 53, 47, 0.18);
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.nscroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(55, 53, 47, 0.3);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
+[data-theme="dark"] .nscroll {
+  scrollbar-color: rgba(255, 255, 255, 0.26) transparent;
+}
+[data-theme="dark"] .nscroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  background-clip: padding-box;
+}
+[data-theme="dark"] .nscroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  background-clip: padding-box;
+}
+
+/* Reusable interaction primitive */
+.nrow {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+}
+.nrow:hover {
+  background: var(--bg-hover);
+}

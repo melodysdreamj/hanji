@@ -1,0 +1,195 @@
+.screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg-app);
+}
+
+.panel {
+  width: min(100%, 360px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--text-default);
+  color: var(--bg-app);
+  font-weight: 700;
+  line-height: 1;
+  object-fit: cover;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.brand p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.externalAuth {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.externalAuth::before {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-bottom: 4px;
+  background: var(--border-subtle);
+}
+
+.authTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--bg-hover);
+}
+
+.authTab {
+  height: 30px;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.authTab[aria-selected="true"] {
+  background: var(--bg-app);
+  color: var(--text-default);
+  box-shadow: var(--shadow-small);
+}
+
+.authTab:disabled {
+  cursor: default;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-size: 15px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: rgba(35, 131, 226, 0.55);
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.15);
+}
+
+.primary,
+.secondary,
+.linkButton,
+.devButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.primary {
+  background: var(--text-default);
+  color: var(--bg-app);
+}
+
+.secondary {
+  background: var(--bg-hover);
+  color: var(--text-default);
+}
+
+.primary:disabled,
+.secondary:disabled,
+.linkButton:disabled,
+.devButton:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.linkButton {
+  width: fit-content;
+  height: 30px;
+  padding: 0;
+  color: var(--text-secondary);
+}
+
+.linkButton:hover:not(:disabled) {
+  color: var(--text-default);
+}
+
+.notice {
+  display: grid;
+  gap: 8px;
+}
+
+.notice strong {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.notice p,
+.error {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.error {
+  margin-top: 14px;
+  color: var(--c-red);
+}
+
+.devButton {
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-hover);
+  color: var(--text-default);
+}
+
+.devButton:hover:not(:disabled) {
+  background: var(--bg-active);
+  color: var(--text-default);
+}

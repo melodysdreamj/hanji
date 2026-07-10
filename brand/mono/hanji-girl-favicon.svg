@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 한지 소녀 파비콘 — 앞머리+눈+입술 클로즈업 (16px 생존용) -->
+  <defs><clipPath id="r"><rect width="512" height="512" rx="116"/></clipPath></defs>
+  <g clip-path="url(#r)">
+    <rect width="512" height="512" fill="#FFFFFF"/>
+    <!-- 앞머리 -->
+    <path d="M0 0 H512 V156 C400 208, 112 208, 0 156 Z" fill="#0B0B0B"/>
+    <!-- 감은 눈 -->
+    <g fill="none" stroke="#0B0B0B" stroke-width="30" stroke-linecap="round">
+      <path d="M120 322 C152 274, 216 274, 248 322"/>
+      <path d="M264 322 C296 274, 360 274, 392 322"/>
+    </g>
+    <!-- 입술 -->
+    <path d="M216 400 C232 380, 248 388, 256 394 C264 388, 280 380, 296 400
+             C280 424, 232 424, 216 400 Z" fill="#0B0B0B"/>
+  </g>
+</svg>

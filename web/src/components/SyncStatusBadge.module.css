@@ -1,0 +1,46 @@
+.badge {
+  position: fixed;
+  bottom: 14px;
+  /* Bottom-right: the bottom-left corner belongs to the sidebar's New page
+     row (finding H2 — the pill covered it); the content area's bottom-right
+     stays empty. */
+  right: 14px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-default, rgba(120, 119, 116, 0.25));
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(15, 15, 15, 0.08);
+  font-family: inherit;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+}
+
+.badge[data-offline="true"] .dot {
+  background: var(--text-tertiary);
+}
+
+/* Server unreachable while the browser reports online: clickable retry. */
+.badge[data-degraded="true"] {
+  pointer-events: auto;
+  cursor: pointer;
+  border-color: var(--accent-red, #eb5757);
+  color: var(--accent-red, #eb5757);
+}
+
+.badge[data-degraded="true"] .dot {
+  background: var(--accent-red, #eb5757);
+}

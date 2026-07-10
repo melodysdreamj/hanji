@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 컨셉 B: 낙관 — 한지 위에 찍힌 도장, ㅎ 음각 -->
+  <defs>
+    <filter id="fiberB" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.28" numOctaves="2" seed="11"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.27  0 0 0 0 0.22  0 0 0 0 0.15  0 0 0 0.9 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <filter id="stampB" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.16" numOctaves="2" seed="4"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.96  0 0 0 0 0.93  0 0 0 0 0.86  0 0 0 0.5 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+  <rect width="512" height="512" rx="116" filter="url(#fiberB)" opacity="0.10"/>
+
+  <g transform="rotate(-3 256 256)">
+    <rect x="106" y="106" width="300" height="300" rx="26" fill="#B13A2A"/>
+    <!-- 인주 얼룩 질감 -->
+    <rect x="106" y="106" width="300" height="300" rx="26" filter="url(#stampB)" opacity="0.14"/>
+    <!-- ㅎ 음각 -->
+    <g fill="#F5EEDC">
+      <rect x="216" y="148" width="80" height="20" rx="10" transform="rotate(5 256 158)"/>
+      <rect x="166" y="196" width="180" height="22" rx="11"/>
+      <circle cx="256" cy="306" r="64" fill="none" stroke="#F5EEDC" stroke-width="22"/>
+    </g>
+  </g>
+</svg>

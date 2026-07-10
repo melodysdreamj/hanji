@@ -1,0 +1,46 @@
+<style>
+  #favicon-size-preview { display: grid; gap: 1rem; }
+  #favicon-size-preview .favicon-row { display: flex; flex-wrap: wrap; align-items: end; gap: 1.25rem; }
+  #favicon-size-preview figure { display: grid; justify-items: center; gap: .5rem; margin: 0; }
+  #favicon-size-preview .favicon-stage { display: grid; place-items: center; min-width: 88px; min-height: 88px; background: var(--muted); }
+  #favicon-size-preview img { display: block; image-rendering: auto; }
+  #favicon-size-preview figcaption { color: var(--muted-foreground); }
+</style>
+<section id="favicon-size-preview" aria-label="Favicon size preview">
+  <div class="favicon-row" aria-label="Actual favicon sizes">
+    <figure>
+      <div class="favicon-stage"><img src="favicon-16.png" width="16" height="16" alt="16 pixel favicon preview"></div>
+      <figcaption class="text-small">16 × 16</figcaption>
+    </figure>
+    <figure>
+      <div class="favicon-stage"><img src="favicon-32.png" width="32" height="32" alt="32 pixel favicon preview"></div>
+      <figcaption class="text-small">32 × 32</figcaption>
+    </figure>
+    <figure>
+      <div class="favicon-stage"><img src="favicon-48.png" width="48" height="48" alt="48 pixel favicon preview"></div>
+      <figcaption class="text-small">48 × 48</figcaption>
+    </figure>
+    <figure>
+      <div class="favicon-stage"><img src="favicon-64.png" width="64" height="64" alt="64 pixel favicon preview"></div>
+      <figcaption class="text-small">64 × 64</figcaption>
+    </figure>
+  </div>
+  <div class="favicon-row" aria-label="Six times magnified detail preview">
+    <figure>
+      <img src="favicon-16.png" width="96" height="96" alt="16 pixel favicon magnified six times">
+      <figcaption class="text-small">16px 확대</figcaption>
+    </figure>
+    <figure>
+      <img src="favicon-32.png" width="96" height="96" alt="32 pixel favicon magnified three times">
+      <figcaption class="text-small">32px 확대</figcaption>
+    </figure>
+    <figure>
+      <img src="favicon-48.png" width="96" height="96" alt="48 pixel favicon magnified twice">
+      <figcaption class="text-small">48px 확대</figcaption>
+    </figure>
+    <figure>
+      <img src="favicon-64.png" width="96" height="96" alt="64 pixel favicon magnified one and a half times">
+      <figcaption class="text-small">64px 확대</figcaption>
+    </figure>
+  </div>
+</section>

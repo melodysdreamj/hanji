@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Magpie 파비콘 — 머리 클로즈업 크롭 (16px 생존용) -->
+  <rect width="512" height="512" rx="116" fill="#0B0B0B"/>
+  <circle cx="232" cy="272" r="152" fill="#FFFFFF"/>
+  <polygon points="352,232 480,272 352,308" fill="#FFFFFF"/>
+  <circle cx="262" cy="236" r="27" fill="#0B0B0B"/>
+</svg>

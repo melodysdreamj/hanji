@@ -1,0 +1,96 @@
+.stack {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 140;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(420px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: rgb(32, 32, 32);
+  color: white;
+  box-shadow: 0 8px 24px rgba(15, 15, 15, 0.22);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+  animation: toastIn 140ms ease-out;
+}
+.toast:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.52);
+  outline-offset: 2px;
+}
+.message {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.action {
+  flex: 0 0 auto;
+  min-height: 24px;
+  margin: -2px -4px -2px 0;
+  padding: 0 5px;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  pointer-events: auto;
+}
+.action:hover,
+.action:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+.dismiss {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin: -2px -5px -2px -4px;
+  padding: 0;
+  place-items: center;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 18px;
+  line-height: 1;
+}
+.dismiss:hover,
+.dismiss:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  outline: none;
+}
+
+.toast[data-tone="success"] {
+  background: rgb(35, 91, 70);
+}
+
+.toast[data-tone="error"] {
+  background: rgb(143, 50, 48);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

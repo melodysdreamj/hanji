@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "edgebase.config.ts",
+    "config/**/*.ts",
+    "lib/**/*.ts",
+    "functions/**/*.ts"
+  ],
+  "exclude": [
+    ".edgebase",
+    ".wrangler",
+    "coverage",
+    "dist",
+    "node_modules"
+  ]
+}

@@ -1,0 +1,18 @@
+[extend]
+useDefault = true
+
+# Scan the public working tree in CI, not generated dependencies/runtime data
+# or the separate private-development repository that shares this worktree.
+[[allowlists]]
+description = "Generated, local-runtime, and private-development paths"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)(?:dist|coverage|build|out)/''',
+  '''(^|/)\.edgebase/''',
+  '''(^|/)\.next/''',
+  '''^\.git(?:-private|-backups)?/''',
+  '''^\.claude/''',
+  '''(^|/)\.dev\.vars$''',
+  '''(^|/)\.env\.(?:development|local)$''',
+  '''^docs/''',
+]

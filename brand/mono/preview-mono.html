@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>흑백(모노크롬) 브랜드 컨셉 — MAGPIE / SWAN</title>
+<style>
+  body { margin:0; font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; background:#EFEFEF; color:#111; }
+  header { padding:26px 32px 6px; }
+  header h1 { font-size:20px; margin:0 0 6px; letter-spacing:.5px; }
+  header p { margin:0; color:#666; font-size:13px; }
+  section { margin:22px 32px; }
+  section h2 { font-size:14px; margin:0 0 2px; letter-spacing:2px; }
+  section p.desc { margin:0 0 12px; font-size:12.5px; color:#666; }
+  .strips { display:flex; gap:14px; flex-wrap:wrap; }
+  .strip { border-radius:12px; padding:18px 22px; display:flex; align-items:flex-end; gap:22px; flex:1; min-width:340px; }
+  .strip.light { background:#FFFFFF; border:1px solid #DDD; }
+  .strip.dark  { background:#0B0B0B; }
+  .cell { text-align:center; }
+  .cell small { display:block; margin-top:6px; font-size:10.5px; color:#999; }
+  .wordmark { margin:22px 32px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MAGPIE / SWAN — 흑백 미니멀 컨셉</h1>
+  <p>까치(전령·수집·흑백 깃털)와 백조(흑조/백조 이중성). 32px 칸이 파비콘 생존성 테스트입니다.</p>
+</header>
+<div id="root"></div>
+
+<div class="wordmark">
+  <h2 style="font-size:14px; letter-spacing:2px;">WORDMARK</h2>
+  <svg width="460" viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="margin-top:8px;">
+    <rect width="660" height="200" rx="28" fill="#0B0B0B"/>
+    <g transform="translate(30,44) scale(0.24) rotate(-12 272 300)">
+      <g fill="#FFFFFF">
+        <polygon points="224,266 48,352 76,400 232,330"/>
+        <rect x="196" y="228" width="190" height="112" rx="56"/>
+        <circle cx="354" cy="248" r="34"/>
+        <circle cx="398" cy="232" r="56"/>
+        <polygon points="440,216 490,231 440,244"/>
+      </g>
+      <circle cx="408" cy="220" r="9.5" fill="#0B0B0B"/>
+      <rect x="246" y="256" width="108" height="17" rx="8.5" fill="#0B0B0B"/>
+      <rect x="246" y="284" width="78" height="17" rx="8.5" fill="#0B0B0B"/>
+    </g>
+    <text x="190" y="126" font-size="72" letter-spacing="18" fill="#FFFFFF"
+          font-family="Futura,'Avenir Next','Century Gothic',Montserrat,'Helvetica Neue',sans-serif"
+          font-weight="500">MAGPIE</text>
+  </svg>
+</div>
+
+<template id="tMag">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#0B0B0B"/>
+  <g transform="rotate(-12 272 300)">
+    <g fill="#FFFFFF">
+      <polygon points="224,266 48,352 76,400 232,330"/>
+      <rect x="196" y="228" width="190" height="112" rx="56"/>
+      <circle cx="354" cy="248" r="34"/>
+      <circle cx="398" cy="232" r="56"/>
+      <polygon points="440,216 490,231 440,244"/>
+    </g>
+    <circle cx="408" cy="220" r="9.5" fill="#0B0B0B"/>
+    <rect x="246" y="256" width="108" height="17" rx="8.5" fill="#0B0B0B"/>
+    <rect x="246" y="284" width="78" height="17" rx="8.5" fill="#0B0B0B"/>
+  </g>
+</svg>
+</template>
+
+<template id="tMagInv">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#FFFFFF"/>
+  <g transform="rotate(-12 272 300)">
+    <g fill="#0B0B0B">
+      <polygon points="224,266 48,352 76,400 232,330"/>
+      <rect x="196" y="228" width="190" height="112" rx="56"/>
+      <circle cx="354" cy="248" r="34"/>
+      <circle cx="398" cy="232" r="56"/>
+      <polygon points="440,216 490,231 440,244"/>
+    </g>
+    <circle cx="408" cy="220" r="9.5" fill="#FFFFFF"/>
+    <rect x="246" y="256" width="108" height="17" rx="8.5" fill="#FFFFFF"/>
+    <rect x="246" y="284" width="78" height="17" rx="8.5" fill="#FFFFFF"/>
+  </g>
+</svg>
+</template>
+
+<template id="tMagFav">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#0B0B0B"/>
+  <circle cx="232" cy="272" r="152" fill="#FFFFFF"/>
+  <polygon points="352,232 480,272 352,308" fill="#FFFFFF"/>
+  <circle cx="262" cy="236" r="27" fill="#0B0B0B"/>
+</svg>
+</template>
+
+<template id="tSwan">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#FFFFFF"/>
+  <g transform="translate(14,0)">
+  <ellipse cx="282" cy="352" rx="150" ry="80" fill="#0B0B0B"/>
+  <rect x="0" y="400" width="512" height="112" fill="#FFFFFF"/>
+  <path d="M352 312 C 420 292, 420 220, 372 190 C 340 170, 330 132, 356 108"
+        fill="none" stroke="#0B0B0B" stroke-width="46" stroke-linecap="round"/>
+  <circle cx="356" cy="108" r="34" fill="#0B0B0B"/>
+  <polygon points="330,96 282,116 330,128" fill="#0B0B0B"/>
+  <circle cx="352" cy="102" r="6" fill="#FFFFFF"/>
+  <rect x="150" y="416" width="120" height="10" rx="5" fill="#0B0B0B"/>
+  <rect x="300" y="416" width="88" height="10" rx="5" fill="#0B0B0B"/>
+  </g>
+</svg>
+</template>
+
+<script>
+const concepts = [
+  ["tMag", "MAGPIE — 메인 (블랙)", "까치: 소식을 전하는 길조(전령) + 흑백 깃털 + 반짝이는 것을 모으는 수집가. 날개의 두 줄은 문서의 텍스트 행."],
+  ["tMagInv", "MAGPIE — 인버스 (화이트)", "라이트 서피스용 반전판."],
+  ["tMagFav", "MAGPIE — 파비콘 크롭", "16px 생존용 머리 클로즈업."],
+  ["tSwan", "SWAN — 대안", "흑조/백조의 흑백 이중성. 네임스페이스가 가장 깨끗한 대안."],
+];
+const root = document.getElementById("root");
+for (const [tid, title, desc] of concepts) {
+  const sec = document.createElement("section");
+  sec.innerHTML = `<h2>${title}</h2><p class="desc">${desc}</p>`;
+  const strips = document.createElement("div");
+  strips.className = "strips";
+  for (const mode of ["light", "dark"]) {
+    const strip = document.createElement("div");
+    strip.className = `strip ${mode}`;
+    for (const size of [144, 64, 32]) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const svg = document.getElementById(tid).content.firstElementChild.cloneNode(true);
+      svg.setAttribute("width", size);
+      svg.setAttribute("height", size);
+      cell.appendChild(svg);
+      const label = document.createElement("small");
+      label.textContent = size + "px";
+      cell.appendChild(label);
+      strip.appendChild(cell);
+    }
+    strips.appendChild(strip);
+  }
+  sec.appendChild(strips);
+  root.appendChild(sec);
+}
+</script>
+</body>
+</html>

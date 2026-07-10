@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Hanji favicon: 16~64px 대응 단순화 버전, OS 다크모드 자동 전환 -->
+  <style>
+    .paper { fill: #F5EEDC; }
+    .ink   { stroke: #453927; }
+    .seal  { fill: #B13A2A; }
+    @media (prefers-color-scheme: dark) {
+      .paper { fill: #221C12; }
+      .ink   { stroke: #EFE6CF; }
+      .seal  { fill: #C6503A; }
+    }
+  </style>
+  <rect class="paper" width="32" height="32" rx="7"/>
+  <rect class="ink" x="5" y="5" width="22" height="22" rx="3" fill="none" stroke-width="2.4"/>
+  <path class="ink" d="M16 5 V27 M5 16 H27" fill="none" stroke-width="2.4"/>
+  <rect class="seal" x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" transform="rotate(-6 22.2 22.2)"/>
+</svg>

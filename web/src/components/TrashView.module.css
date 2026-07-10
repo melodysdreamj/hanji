@@ -1,0 +1,309 @@
+.empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.empty svg {
+  color: var(--text-tertiary);
+  flex: 0 0 auto;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.surface {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 320px;
+  height: 32px;
+  padding: 0 9px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  color: var(--text-tertiary);
+}
+
+.search input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-default);
+  font-size: 14px;
+}
+
+.search input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.toolbarEnd {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.count {
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.emptyTrash {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 5px;
+  color: var(--c-red);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.emptyTrash:hover,
+.emptyTrash:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding: 4px 6px 4px 8px;
+  border-radius: var(--radius);
+}
+
+.row:hover,
+.row:focus-within {
+  background: var(--bg-hover);
+}
+
+.page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+  height: 32px;
+  color: var(--text-default);
+  text-align: left;
+}
+.page:focus-visible {
+  outline: none;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pageText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.meta {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.actions button {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.actions button:hover,
+.actions button:focus-visible {
+  background: var(--bg-active);
+  outline: none;
+}
+
+.restore {
+  color: var(--accent-blue);
+}
+
+.delete {
+  color: var(--c-red);
+}
+
+.noResults {
+  padding: 18px 8px;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+}
+
+.confirmBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 15, 0.18);
+}
+
+.confirmDialog {
+  position: relative;
+  width: min(420px, calc(100vw - 32px));
+  margin: 18vh auto 0;
+  padding: 18px;
+  border-radius: 8px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+}
+
+.confirmTitle {
+  color: var(--text-default);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.confirmDialog p {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.confirmDialog strong {
+  color: var(--text-default);
+  font-weight: 600;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.confirmActions button {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.confirmActions button:hover,
+.confirmActions button:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.confirmActions .confirmDelete {
+  background: var(--c-red);
+  color: #fff;
+}
+
+.confirmActions .confirmDelete:hover,
+.confirmActions .confirmDelete:focus-visible {
+  background: #c93f3b;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 8px;
+  }
+
+  .page {
+    width: 100%;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+    max-width: 100%;
+    padding-left: 28px;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .search {
+    max-width: none;
+    width: 100%;
+  }
+
+  .toolbarEnd {
+    justify-content: space-between;
+  }
+
+  .count {
+    align-self: center;
+  }
+}
