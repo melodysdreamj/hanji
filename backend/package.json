@@ -127,12 +127,12 @@
   "devDependencies": {
     "@edge-base/cli": "0.3.8",
     "@edge-base/shared": "0.3.8",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^9.39.4",
-    "globals": "^16.5.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.62.1",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.63.0",
     "vitest": "^4.1.9"
   },
   "dependencies": {
