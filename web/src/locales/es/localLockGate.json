@@ -1,0 +1,10 @@
+{
+  "title": "Desbloquear datos locales",
+  "description": "Los datos sin conexión en este dispositivo están bloqueados con una contraseña. Al desbloquear, se reactivan el uso sin conexión y el guardado.",
+  "passphrasePlaceholder": "Contraseña",
+  "unlock": "Desbloquear",
+  "continueOnline": "Continuar solo en línea",
+  "continueOnlineHint": "\"Continuar solo en línea\" mantiene selladas las ediciones sin conexión bloqueadas de este dispositivo: permanecen en este dispositivo y no se sincronizarán hasta que las desbloquees con la contraseña correcta.",
+  "wrongPassphrase": "Esa contraseña no es correcta.",
+  "unsupportedBrowser": "El bloqueo local no está disponible en este navegador."
+}

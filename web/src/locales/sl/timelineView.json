@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "Add a date property",
+    "description": "Timeline views need a start date property to draw pages across time."
+  },
+  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "zoom": {
+    "ariaLabel": "Timeline zoom",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month"
+  },
+  "dependencies": {
+    "label": "Dependencies:",
+    "hint": "add a relation property",
+    "relationPropertyAriaLabel": "Dependency relation property"
+  },
+  "toolbar": {
+    "today": "Today",
+    "previousRange": "Previous range",
+    "nextRange": "Next range",
+    "newPage": "New",
+    "newPageIn": "New page in {{dbTitle}}"
+  },
+  "table": {
+    "ariaLabel": "Timeline table",
+    "nameHeader": "Name"
+  },
+  "bar": {
+    "openAriaLabel": "Open {{title}}",
+    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
+    "openNoDateAriaLabel": "Open {{title}}, no date"
+  },
+  "lanes": {
+    "noItemsInRange": "No items in this range.",
+    "noDatedItems": "No dated items yet.",
+    "jumpTo": "Jump to {{date}}"
+  },
+  "noDate": {
+    "heading": "No date ({{count}})"
+  },
+  "options": {
+    "none": "None",
+    "untitled": "Untitled"
+  }
+}

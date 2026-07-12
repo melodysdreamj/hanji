@@ -1,0 +1,73 @@
+{
+  "title": "评论",
+  "closeAria": "关闭评论",
+  "subtitle": {
+    "block": "块讨论",
+    "page": "页面讨论"
+  },
+  "status": {
+    "aria": "评论状态",
+    "open": "未解决",
+    "resolved": "已解决"
+  },
+  "anchor": {
+    "commentingOn": "正在评论",
+    "commentingOnSelectedText": "正在评论所选文本",
+    "selectedBlock": "所选块",
+    "onSelectedText": "关于所选文本",
+    "onSelectedBlock": "关于所选块",
+    "onABlock": "关于某个块"
+  },
+  "composer": {
+    "addBlockComment": "添加块评论",
+    "addPageComment": "添加页面评论",
+    "blockPlaceholder": "评论此块……",
+    "pagePlaceholder": "添加评论……",
+    "submit": "评论"
+  },
+  "mention": {
+    "commentPeopleAria": "评论提及的人员",
+    "replyPeopleAria": "回复提及的人员",
+    "trigger": "提及人员",
+    "noMatches": "没有匹配的人员",
+    "title": "提及 {{name}}",
+    "person": "人员",
+    "you": "你",
+    "organizationPerson": "组织人员",
+    "roleInOrganization": "组织中的 {{role}}"
+  },
+  "list": {
+    "threadsAria": "评论主题",
+    "empty": "暂无评论",
+    "noOpen": "没有未解决的评论",
+    "noResolved": "没有已解决的评论"
+  },
+  "card": {
+    "commentAria": "{{author}} 的评论，{{time}}",
+    "commentAriaResolved": "{{author}} 的评论，{{time}}，已解决",
+    "replyAria": "{{author}} 的回复，{{time}}",
+    "repliesAria": "{{count}} 条回复",
+    "edited": "（已编辑）",
+    "emptyComment": "（空评论）",
+    "emptyReply": "（空回复）",
+    "justNow": "刚刚"
+  },
+  "actions": {
+    "reply": "回复",
+    "showInPage": "在页面中显示",
+    "resolve": "解决",
+    "reopen": "重新打开",
+    "edit": "编辑"
+  },
+  "reply": {
+    "placeholder": "回复……"
+  },
+  "edit": {
+    "aria": "编辑评论"
+  },
+  "delete": {
+    "commentConfirm": "删除此评论？",
+    "threadConfirm_one": "删除此评论及其回复？",
+    "threadConfirm_other": "删除此评论及其 {{count}} 条回复？"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "更换封面",
+    "reposition": "重新定位",
+    "remove": "移除",
+    "uploadFile": "上传文件",
+    "uploading": "上传中…",
+    "submit": "提交",
+    "savePosition": "保存位置"
+  },
+  "tabs": {
+    "gallery": "图库",
+    "upload": "上传",
+    "link": "链接"
+  },
+  "link": {
+    "placeholder": "粘贴图片链接",
+    "invalid": "请粘贴 http 或 https 图片链接。"
+  },
+  "upload": {
+    "error": "无法上传该图片。",
+    "defaultFileName": "封面图片"
+  },
+  "reposition": {
+    "hint": "拖动图片以重新定位"
+  },
+  "progress": {
+    "preparing": "准备上传",
+    "finalizing": "完成中",
+    "complete": "完成",
+    "uploading": "上传中"
+  },
+  "toast": {
+    "removed": "已移除封面",
+    "restored": "已恢复封面",
+    "undo": "撤销"
+  },
+  "aria": {
+    "pageCover": "页面封面",
+    "coverVerticalPosition": "封面垂直位置",
+    "positionFromTop": "距顶部 {{position}}%",
+    "closeCoverMenu": "关闭封面菜单",
+    "changePageCover": "更换页面封面",
+    "repositionPageCover": "重新定位页面封面",
+    "removePageCover": "移除页面封面",
+    "changeCoverDialog": "更换封面",
+    "coverSource": "封面来源",
+    "selectCover": "选择封面 {{number}}",
+    "uploadFromDevice": "从此设备上传封面图片",
+    "uploadingFile": "正在上传 {{fileName}}",
+    "coverImageLink": "封面图片链接"
+  }
+}

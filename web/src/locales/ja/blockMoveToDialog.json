@@ -1,0 +1,31 @@
+{
+  "title": "ブロックを移動先",
+  "search": {
+    "label": "移動先を検索",
+    "placeholder": "ページを検索..."
+  },
+  "dialog": {
+    "closeLabel": "移動ダイアログを閉じる"
+  },
+  "results": {
+    "listLabel": "移動先",
+    "empty": "ページが見つかりません。",
+    "destinationLabel": "ブロックを{{label}}、{{path}}に移動"
+  },
+  "create": {
+    "label": "「{{query}}」を作成",
+    "optionLabel": "ページ「{{query}}」を作成してブロックをここに移動",
+    "hint": "新しいページ - ブロックをここに移動"
+  },
+  "locked": {
+    "page": "ロックされたページ"
+  },
+  "untitled": "無題",
+  "toast": {
+    "locked": "ページはロックされています",
+    "movedBlock": "ブロックを移動しました",
+    "movedBlocks": "ブロックを移動しました",
+    "movedBlocksCount": "{{blockCount}}個のブロックを移動しました",
+    "moveFailed": "ブロックを移動できませんでした"
+  }
+}

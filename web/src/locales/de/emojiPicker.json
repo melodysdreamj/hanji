@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "Icon-Auswahl schließen",
+    "label": "Icon wählen"
+  },
+  "tabs": {
+    "groupLabel": "Icon-Typ",
+    "emoji": "Emoji",
+    "image": "Bild"
+  },
+  "remove": {
+    "label": "Entfernen",
+    "ariaLabel": "Icon entfernen"
+  },
+  "emoji": {
+    "searchPlaceholder": "Filtern…",
+    "searchLabel": "Icons suchen",
+    "random": "Zufällig",
+    "randomLabel": "Ein zufälliges Icon auswählen",
+    "recentLabel": "Zuletzt verwendete zuerst",
+    "gridLabelRecent": "Icons, zuletzt verwendete zuerst",
+    "gridLabel": "Icons",
+    "optionLabel": "Icon {{emoji}} wählen",
+    "noResults": "Keine Icons passen zu „{{query}}“. Versuchen Sie ein anderes Wort oder leeren Sie den Filter."
+  },
+  "custom": {
+    "previewPlaceholder": "Bild",
+    "linkPlaceholder": "Bildlink einfügen",
+    "linkLabel": "Bild-Icon-Link",
+    "apply": "Anwenden",
+    "upload": "Datei hochladen",
+    "uploading": "Wird hochgeladen...",
+    "uploadingLabel": "{{fileName}} wird hochgeladen",
+    "uploadFailed": "Dieses Bild konnte nicht hochgeladen werden.",
+    "fallbackFileName": "Icon-Bild"
+  },
+  "uploadProgress": {
+    "preparing": "Upload wird vorbereitet",
+    "finalizing": "Wird abgeschlossen",
+    "complete": "Abgeschlossen",
+    "uploading": "Wird hochgeladen"
+  }
+}

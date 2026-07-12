@@ -1,0 +1,16 @@
+{
+  "title": "가져온 사용자",
+  "body": "노션에서 가져온 사람은 관리자가 워크스페이스 계정에 매핑하기 전까지 원본 참조로 유지됩니다.",
+  "scan": "가져온 사용자 찾기",
+  "scanning": "스캔 중…",
+  "rescan": "다시 스캔",
+  "empty": "매핑되지 않은 가져온 사용자가 없습니다.",
+  "keepPlaceholder": "가져온 참조로 유지",
+  "usage": "값 {{values}}개 · 멘션 {{mentions}}개",
+  "apply": "매핑 적용",
+  "applying": "적용 중…",
+  "applied": "사용자 {{people}}명을 행/페이지 {{pages}}개, 블록 {{blocks}}개에 매핑했습니다.",
+  "failed": "사용자 매핑에 실패했습니다.",
+  "suggested": "추천",
+  "mapAria": "{{label}} 매핑"
+}

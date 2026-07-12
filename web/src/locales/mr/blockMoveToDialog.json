@@ -1,0 +1,31 @@
+{
+  "title": "Move block to",
+  "search": {
+    "label": "Search move destinations",
+    "placeholder": "Search pages..."
+  },
+  "dialog": {
+    "closeLabel": "Close move dialog"
+  },
+  "results": {
+    "listLabel": "Move destinations",
+    "empty": "No pages found.",
+    "destinationLabel": "Move block to {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "Create \"{{query}}\"",
+    "optionLabel": "Create page \"{{query}}\" and move block here",
+    "hint": "New page - move block here"
+  },
+  "locked": {
+    "page": "Locked page"
+  },
+  "untitled": "Untitled",
+  "toast": {
+    "locked": "Page is locked",
+    "movedBlock": "Moved block",
+    "movedBlocks": "Moved blocks",
+    "movedBlocksCount": "Moved {{blockCount}} blocks",
+    "moveFailed": "Couldn't move block"
+  }
+}

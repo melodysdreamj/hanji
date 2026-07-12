@@ -1,0 +1,25 @@
+{
+  "labels": {
+    "title": "タイトル",
+    "rich_text": "テキスト",
+    "number": "数値",
+    "select": "選択",
+    "multi_select": "複数選択",
+    "status": "ステータス",
+    "date": "日付",
+    "person": "担当者",
+    "files": "ファイル & メディア",
+    "checkbox": "チェックボックス",
+    "url": "URL",
+    "email": "メール",
+    "phone": "電話",
+    "formula": "数式",
+    "relation": "リレーション",
+    "rollup": "ロールアップ",
+    "created_time": "作成日時",
+    "created_by": "作成者",
+    "last_edited_time": "最終更新日時",
+    "last_edited_by": "最終更新者",
+    "unique_id": "ID"
+  }
+}

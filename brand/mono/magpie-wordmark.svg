@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 200">
+  <!-- MAGPIE 워드마크 — 패션 브랜드식 광자간 대문자 (배포 시 아웃라인 변환 권장) -->
+  <rect width="660" height="200" rx="28" fill="#0B0B0B"/>
+  <g transform="translate(30,44) scale(0.24) rotate(-12 272 300)">
+    <g fill="#FFFFFF">
+      <polygon points="206,282 62,360 74,384 212,322"/>
+      <rect x="196" y="228" width="190" height="112" rx="56"/>
+      <circle cx="398" cy="232" r="56"/>
+      <polygon points="450,214 496,230 450,246"/>
+    </g>
+    <circle cx="408" cy="220" r="9.5" fill="#0B0B0B"/>
+    <rect x="246" y="256" width="108" height="17" rx="8.5" fill="#0B0B0B"/>
+    <rect x="246" y="284" width="78" height="17" rx="8.5" fill="#0B0B0B"/>
+  </g>
+  <text x="190" y="126" font-size="72" letter-spacing="18" fill="#FFFFFF"
+        font-family="Futura,'Avenir Next','Century Gothic',Montserrat,'Helvetica Neue',sans-serif"
+        font-weight="500">MAGPIE</text>
+</svg>

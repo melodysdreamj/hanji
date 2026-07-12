@@ -1,0 +1,10 @@
+{
+  "emptyDesc": "このデータベースにはまだページがありません。",
+  "emptyTitle": "ページがまだありません",
+  "newInline": "新規",
+  "newPage": "新規ページ",
+  "newPageIn": "{{dbTitle}}に新規ページ",
+  "noResultsDesc": "現在のフィルターや検索に一致するページがありません。",
+  "noResultsTitle": "結果がありません",
+  "openRow": "{{title}}を開く"
+}

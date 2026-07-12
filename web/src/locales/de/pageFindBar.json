@@ -1,0 +1,14 @@
+{
+  "dialog": {
+    "label": "Auf Seite suchen"
+  },
+  "input": {
+    "label": "Auf Seite suchen",
+    "placeholder": "Auf Seite suchen"
+  },
+  "actions": {
+    "previous": "Vorherige Übereinstimmung",
+    "next": "Nächste Übereinstimmung",
+    "close": "Suche schließen"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "新しいワークスペース",
+  "name": {
+    "label": "ワークスペース名",
+    "placeholder": "Acme Inc."
+  },
+  "startLabel": "開始方法",
+  "options": {
+    "blank": {
+      "title": "空のワークスペース",
+      "body": "スターターページ付きの空の状態で開始します。"
+    },
+    "notion": {
+      "title": "Notion からインポート",
+      "body": "ワークスペースを作成してから、Notion のワークスペースを移行します。"
+    },
+    "hanji": {
+      "title": "別の Hanji からインポート",
+      "body": "ワークスペースを作成してから、別の Hanji サーバーまたはファイルからワークスペースを取り込みます。"
+    }
+  },
+  "create": "ワークスペースを作成",
+  "creating": "作成中…",
+  "error": {
+    "couldntCreate": "ワークスペースを作成できませんでした。"
+  }
+}

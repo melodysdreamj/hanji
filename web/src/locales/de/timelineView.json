@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "Datumseigenschaft hinzufügen",
+    "description": "Zeitachsenansichten benötigen eine Startdatum-Eigenschaft, um Seiten über die Zeit darzustellen."
+  },
+  "endDateHint": "Füge eine Enddatum-Eigenschaft hinzu, um Bereiche statt einzelner Tagesbalken darzustellen.",
+  "zoom": {
+    "ariaLabel": "Zeitachsen-Zoom",
+    "day": "Tag",
+    "week": "Woche",
+    "month": "Monat"
+  },
+  "dependencies": {
+    "label": "Abhängigkeiten:",
+    "hint": "Verknüpfungseigenschaft hinzufügen",
+    "relationPropertyAriaLabel": "Abhängigkeits-Verknüpfungseigenschaft"
+  },
+  "toolbar": {
+    "today": "Heute",
+    "previousRange": "Vorheriger Bereich",
+    "nextRange": "Nächster Bereich",
+    "newPage": "Neu",
+    "newPageIn": "Neue Seite in {{dbTitle}}"
+  },
+  "table": {
+    "ariaLabel": "Zeitachsen-Tabelle",
+    "nameHeader": "Name"
+  },
+  "bar": {
+    "openAriaLabel": "{{title}} öffnen",
+    "openAriaLabelWithDates": "{{title}} öffnen, {{start}} bis {{end}}",
+    "openNoDateAriaLabel": "{{title}} öffnen, kein Datum"
+  },
+  "lanes": {
+    "noItemsInRange": "Keine Elemente in diesem Bereich.",
+    "noDatedItems": "Noch keine datierten Elemente.",
+    "jumpTo": "Zu {{date}} springen"
+  },
+  "noDate": {
+    "heading": "Kein Datum ({{count}})"
+  },
+  "options": {
+    "none": "Keine",
+    "untitled": "Ohne Titel"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "diagramLabel": "Mermaid 图表",
+  "emptyPreview": "图表预览",
+  "sourceDescription": "图表源代码：{{source}}",
+  "syntaxError": "图表存在语法错误。",
+  "syntaxErrorDetails": "显示详情"
+}

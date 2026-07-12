@@ -1,0 +1,14 @@
+{
+  "couldntRestorePage": "Não foi possível restaurar a página",
+  "emptyBodyPrompt": "Pressione Enter para começar a escrever nesta página vazia.",
+  "inTrashTopBarTitle": "Na Lixeira",
+  "notFoundTopBarTitle": "Não encontrado",
+  "openWorkspace": "Abrir espaço de trabalho",
+  "pageInTrash": "Esta página está na Lixeira.",
+  "pageInTrashDetail": "Restaure-a antes de abrir ou editar seu conteúdo.",
+  "pageUnavailable": "Página indisponível.",
+  "pageUnavailableDetail": "Esta página pode ter sido excluída, movida ou compartilhada com uma conta diferente.",
+  "restorePage": "Restaurar página",
+  "restoredPage": "Página restaurada",
+  "loadingPageContent": "Carregando conteúdo da página"
+}

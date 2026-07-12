@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "create": "Crear",
+    "delete": "Eliminar",
+    "clearAll": "Borrar todo",
+    "done": "Listo",
+    "add": "Añadir"
+  },
+  "labels": {
+    "untitled": "Sin título"
+  },
+  "generated": {
+    "copyName": "Copia de {{name}}",
+    "columnName": "Columna {{number}}",
+    "importedDatabase": "Base de datos importada",
+    "uploadedFile": "Archivo subido",
+    "image": "Imagen",
+    "propertyNames": {
+      "name": "Nombre",
+      "status": "Estado",
+      "select": "Selección",
+      "date": "Fecha"
+    },
+    "statusOptions": {
+      "todo": "No iniciado",
+      "doing": "En progreso",
+      "done": "Completado"
+    },
+    "selectOptions": {
+      "first": "Opción 1",
+      "second": "Opción 2"
+    },
+    "viewNames": {
+      "table": "Tabla"
+    }
+  }
+}

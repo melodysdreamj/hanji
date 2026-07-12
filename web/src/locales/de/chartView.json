@@ -1,0 +1,31 @@
+{
+  "aggregates": {
+    "count": "Anzahl",
+    "sum": "Summe",
+    "average": "Durchschnitt",
+    "min": "Min",
+    "max": "Max"
+  },
+  "chartAria": "{{name}} Diagramm",
+  "chartType": "Diagrammtyp",
+  "chartTypes": {
+    "bar": "Balken",
+    "horizontal_bar": "Horizontaler Balken",
+    "line": "Linie",
+    "donut": "Donut"
+  },
+  "checked": "Aktiviert",
+  "empty": "Leer",
+  "legend": "Diagrammlegende",
+  "monthLabel": "{{month}} {{year}}",
+  "noData": "Keine Daten",
+  "noDataDesc": "Keine Zeilen entsprechen den aktuellen Filtern oder der Suche.",
+  "noGroupProperty": "Noch nichts zum Darstellen",
+  "noGroupPropertyDesc": "Eine Auswahl-, Status-, Personen-, Kontrollkästchen- oder Datumseigenschaft hinzufügen, um dieses Diagramm zu gruppieren.",
+  "total": "Gesamt",
+  "unchecked": "Nicht aktiviert",
+  "untitledProperty": "Ohne Titel",
+  "valueProperty": "Werteigenschaft",
+  "xAxis": "X-Achse",
+  "yAxis": "Y-Achse"
+}

@@ -1,0 +1,44 @@
+{
+  "empty": {
+    "title": "날짜 속성 추가",
+    "description": "캘린더 보기에서 페이지를 달력에 배치하려면 날짜 속성이 필요합니다.",
+    "addDateButton": "날짜"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "캘린더 기준",
+    "today": "오늘",
+    "previousWeek": "이전 주",
+    "previousMonth": "이전 달",
+    "nextWeek": "다음 주",
+    "nextMonth": "다음 달"
+  },
+  "weekdays": {
+    "sun": "일",
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토"
+  },
+  "gridAriaLabel": "{{title}} 캘린더",
+  "cell": {
+    "ariaLabel": "{{date}}, 항목 {{count}}개",
+    "newRowAriaLabel": "{{date}}에 새 행 추가",
+    "newRowTitle": "새로 만들기",
+    "showLess": "간략히 보기",
+    "showMore": "+{{count}}개 더보기"
+  },
+  "card": {
+    "openAriaLabel": "{{title}} 열기",
+    "openAriaLabelWithDate": "{{title}} 열기, {{date}} 일정",
+    "openNoDateAriaLabel": "{{title}} 열기, 날짜 없음"
+  },
+  "noDate": {
+    "heading": "날짜 없음 ({{count}})"
+  },
+  "property": {
+    "untitled": "제목 없음",
+    "dateDefaultName": "날짜"
+  }
+}

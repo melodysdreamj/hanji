@@ -1,0 +1,76 @@
+{
+  "toolbar": {
+    "ariaLabel": "Textformatierung"
+  },
+  "turnInto": {
+    "label": "Umwandeln in",
+    "options": {
+      "text": "Text",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "heading4": "Überschrift 4",
+      "toDoList": "To-do-Liste",
+      "bulletedList": "Aufzählungsliste",
+      "numberedList": "Nummerierte Liste",
+      "toggleList": "Klappliste",
+      "quote": "Zitat",
+      "callout": "Hinweis",
+      "code": "Code"
+    }
+  },
+  "marks": {
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "underline": "Unterstrichen",
+    "strikethrough": "Durchgestrichen",
+    "code": "Code",
+    "link": "Link"
+  },
+  "comment": {
+    "label": "Kommentar"
+  },
+  "colorButton": {
+    "ariaLabel": "Textfarbe: {{color}}",
+    "title": "Farbe: {{color}}"
+  },
+  "colors": {
+    "mixed": "Gemischt",
+    "text": {
+      "heading": "Textfarbe",
+      "default": "Standard",
+      "gray": "Grau",
+      "brown": "Braun",
+      "orange": "Orange",
+      "yellow": "Gelb",
+      "green": "Grün",
+      "blue": "Blau",
+      "purple": "Lila",
+      "pink": "Rosa",
+      "red": "Rot"
+    },
+    "background": {
+      "heading": "Hintergrundfarbe",
+      "gray": "Grauer Hintergrund",
+      "brown": "Brauner Hintergrund",
+      "orange": "Oranger Hintergrund",
+      "yellow": "Gelber Hintergrund",
+      "green": "Grüner Hintergrund",
+      "blue": "Blauer Hintergrund",
+      "purple": "Lila Hintergrund",
+      "pink": "Rosa Hintergrund",
+      "red": "Roter Hintergrund"
+    }
+  },
+  "linkEditor": {
+    "ariaLabel": "Link bearbeiten",
+    "placeholder": "Link einfügen",
+    "urlAriaLabel": "Link-URL",
+    "apply": "Verlinken",
+    "open": "Link öffnen",
+    "copy": "Link kopieren",
+    "copied": "Kopiert",
+    "copiedLink": "Link kopiert",
+    "remove": "Entfernen"
+  }
+}

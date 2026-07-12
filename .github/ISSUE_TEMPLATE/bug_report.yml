@@ -1,0 +1,34 @@
+name: Bug report
+description: Something broke or behaves differently from Hanji expectations.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: Steps to reproduce, expected behavior, actual behavior.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Web UI (editor, databases, sharing, settings)
+        - Backend (API, auth, import/export)
+        - MCP server
+        - Build / CI / packaging
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser, Node.js version, and how you run the stack (local dev, Docker, hosted).
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Console output, server logs, or screenshots. Redact tokens and personal data.

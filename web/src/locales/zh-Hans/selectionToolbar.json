@@ -1,0 +1,76 @@
+{
+  "toolbar": {
+    "ariaLabel": "文本格式"
+  },
+  "turnInto": {
+    "label": "转换为",
+    "options": {
+      "text": "文本",
+      "heading1": "一级标题",
+      "heading2": "二级标题",
+      "heading3": "三级标题",
+      "heading4": "四级标题",
+      "toDoList": "待办列表",
+      "bulletedList": "项目符号列表",
+      "numberedList": "编号列表",
+      "toggleList": "折叠列表",
+      "quote": "引用",
+      "callout": "标注",
+      "code": "代码"
+    }
+  },
+  "marks": {
+    "bold": "加粗",
+    "italic": "斜体",
+    "underline": "下划线",
+    "strikethrough": "删除线",
+    "code": "代码",
+    "link": "链接"
+  },
+  "comment": {
+    "label": "评论"
+  },
+  "colorButton": {
+    "ariaLabel": "文本颜色：{{color}}",
+    "title": "颜色：{{color}}"
+  },
+  "colors": {
+    "mixed": "混合",
+    "text": {
+      "heading": "文本颜色",
+      "default": "默认",
+      "gray": "灰色",
+      "brown": "棕色",
+      "orange": "橙色",
+      "yellow": "黄色",
+      "green": "绿色",
+      "blue": "蓝色",
+      "purple": "紫色",
+      "pink": "粉色",
+      "red": "红色"
+    },
+    "background": {
+      "heading": "背景颜色",
+      "gray": "灰色背景",
+      "brown": "棕色背景",
+      "orange": "橙色背景",
+      "yellow": "黄色背景",
+      "green": "绿色背景",
+      "blue": "蓝色背景",
+      "purple": "紫色背景",
+      "pink": "粉色背景",
+      "red": "红色背景"
+    }
+  },
+  "linkEditor": {
+    "ariaLabel": "编辑链接",
+    "placeholder": "粘贴链接",
+    "urlAriaLabel": "链接 URL",
+    "apply": "链接",
+    "open": "打开链接",
+    "copy": "复制链接",
+    "copied": "已复制",
+    "copiedLink": "已复制链接",
+    "remove": "移除"
+  }
+}

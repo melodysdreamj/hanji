@@ -1,0 +1,77 @@
+.DS_Store
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output and generated caches
+dist/
+**/dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# EdgeBase / Cloudflare local state
+.edgebase/
+**/.edgebase/
+.wrangler/
+**/.wrangler/
+.wrangler.generated.*
+edgebase.d.ts
+
+# Environment and local-only config
+.env
+.env.*
+!.env.example
+!.env.*.example
+.dev.vars
+**/.dev.vars
+*.local
+*.local.*
+.claude/
+
+# Private agent/development operating context is tracked by .git-private
+/.git-private/
+/AGENTS.md
+/backend/AGENTS.md
+/web/AGENTS.md
+/CLAUDE.md
+/backend/CLAUDE.md
+/web/CLAUDE.md
+/docs/project-operating-loop.md
+/docs/confirmed-contracts.md
+/docs/contract-candidates.md
+/docs/work-ledger.md
+/docs/notion-reference-loop.md
+/docs/edgebase-first-roadmap.md
+/docs/notion-feature-matrix.md
+/docs/visual-parity-audit.md
+/docs/license-and-monetization.md
+/docs/private-repo-setup.md
+/docs/workspace-do-migration.md
+/docs/local-first-roadmap.md
+/docs/native-export-import-plan.md
+
+# Package manager and runtime logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Local Git metadata backups created while flattening this workspace
+.git-backups/
+
+# Private sponsors service (collection/KV/deploy layer) — private git only.
+/sponsors-service/
+
+# Local image-generation experiments
+/output/
+
+# Local AI-session artifacts
+/.codex/
+/.claude/
+
+# VitePress docs site build output
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/

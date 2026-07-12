@@ -1,0 +1,39 @@
+{
+  "trash": "Lixeira",
+  "empty": "As páginas que você exclui vão para cá. Nada na lixeira.",
+  "searchTrash": "Pesquisar na lixeira",
+  "deletedPages": "Páginas excluídas",
+  "noSearchMatches": "Nenhuma página excluída corresponde à sua pesquisa.",
+  "pageCount_one": "{{count}} página",
+  "pageCount_other": "{{count}} páginas",
+  "deletedJustNow": "Excluída agora há pouco",
+  "deletedOn": "Excluída em {{date}}",
+  "actions": {
+    "restore": "Restaurar",
+    "deleteForever": "Excluir para sempre",
+    "emptyTrash": "Esvaziar lixeira"
+  },
+  "aria": {
+    "openFromTrash": "Abrir {{title}} da lixeira",
+    "restorePage": "Restaurar {{title}}",
+    "deletePageForever": "Excluir {{title}} para sempre",
+    "cancelPermanentDelete": "Cancelar exclusão permanente",
+    "cancelEmptyTrash": "Cancelar esvaziamento da lixeira"
+  },
+  "confirm": {
+    "deleteTitle": "Excluir para sempre?",
+    "deleteBodyPrefix": "Isso excluirá permanentemente ",
+    "deleteBodySuffix": ". Você não pode desfazer esta ação.",
+    "emptyTitle": "Esvaziar a lixeira?",
+    "emptyBody_one": "Isso excluirá permanentemente todas as {{count}} página da lixeira. Você não pode desfazer esta ação.",
+    "emptyBody_other": "Isso excluirá permanentemente todas as {{count}} páginas da lixeira. Você não pode desfazer esta ação."
+  },
+  "toast": {
+    "deletedForever": "Excluída para sempre",
+    "couldntDelete": "Não foi possível excluir a página",
+    "restored": "Página restaurada",
+    "couldntRestore": "Não foi possível restaurar a página",
+    "emptied": "Lixeira esvaziada",
+    "couldntEmpty": "Não foi possível esvaziar a lixeira"
+  }
+}

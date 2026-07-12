@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "Changer la couverture",
+    "reposition": "Repositionner",
+    "remove": "Supprimer",
+    "uploadFile": "Téléverser un fichier",
+    "uploading": "Téléversement...",
+    "submit": "Valider",
+    "savePosition": "Enregistrer la position"
+  },
+  "tabs": {
+    "gallery": "Galerie",
+    "upload": "Téléverser",
+    "link": "Lien"
+  },
+  "link": {
+    "placeholder": "Collez le lien de l'image",
+    "invalid": "Collez un lien d'image http ou https."
+  },
+  "upload": {
+    "error": "Impossible de téléverser cette image.",
+    "defaultFileName": "Image de couverture"
+  },
+  "reposition": {
+    "hint": "Faites glisser l'image pour la repositionner"
+  },
+  "progress": {
+    "preparing": "Préparation du téléversement",
+    "finalizing": "Finalisation",
+    "complete": "Terminé",
+    "uploading": "Téléversement"
+  },
+  "toast": {
+    "removed": "Couverture supprimée",
+    "restored": "Couverture restaurée",
+    "undo": "Annuler"
+  },
+  "aria": {
+    "pageCover": "Couverture de page",
+    "coverVerticalPosition": "Position verticale de la couverture",
+    "positionFromTop": "{{position}} % depuis le haut",
+    "closeCoverMenu": "Fermer le menu de couverture",
+    "changePageCover": "Changer la couverture de page",
+    "repositionPageCover": "Repositionner la couverture de page",
+    "removePageCover": "Supprimer la couverture de page",
+    "changeCoverDialog": "Changer la couverture",
+    "coverSource": "Source de la couverture",
+    "selectCover": "Sélectionner la couverture {{number}}",
+    "uploadFromDevice": "Téléverser une image de couverture depuis cet appareil",
+    "uploadingFile": "Téléversement de {{fileName}}",
+    "coverImageLink": "Lien de l'image de couverture"
+  }
+}

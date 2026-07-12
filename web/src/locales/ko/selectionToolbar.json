@@ -1,0 +1,76 @@
+{
+  "toolbar": {
+    "ariaLabel": "텍스트 서식"
+  },
+  "turnInto": {
+    "label": "전환",
+    "options": {
+      "text": "텍스트",
+      "heading1": "제목 1",
+      "heading2": "제목 2",
+      "heading3": "제목 3",
+      "heading4": "제목 4",
+      "toDoList": "할 일 목록",
+      "bulletedList": "글머리 기호 목록",
+      "numberedList": "번호 매기기 목록",
+      "toggleList": "토글 목록",
+      "quote": "인용",
+      "callout": "콜아웃",
+      "code": "코드"
+    }
+  },
+  "marks": {
+    "bold": "굵게",
+    "italic": "기울임꼴",
+    "underline": "밑줄",
+    "strikethrough": "취소선",
+    "code": "코드",
+    "link": "링크"
+  },
+  "comment": {
+    "label": "댓글"
+  },
+  "colorButton": {
+    "ariaLabel": "글자 색: {{color}}",
+    "title": "색: {{color}}"
+  },
+  "colors": {
+    "mixed": "혼합",
+    "text": {
+      "heading": "글자 색",
+      "default": "기본",
+      "gray": "회색",
+      "brown": "갈색",
+      "orange": "주황색",
+      "yellow": "노란색",
+      "green": "초록색",
+      "blue": "파란색",
+      "purple": "보라색",
+      "pink": "분홍색",
+      "red": "빨간색"
+    },
+    "background": {
+      "heading": "배경색",
+      "gray": "회색 배경",
+      "brown": "갈색 배경",
+      "orange": "주황색 배경",
+      "yellow": "노란색 배경",
+      "green": "초록색 배경",
+      "blue": "파란색 배경",
+      "purple": "보라색 배경",
+      "pink": "분홍색 배경",
+      "red": "빨간색 배경"
+    }
+  },
+  "linkEditor": {
+    "ariaLabel": "링크 편집",
+    "placeholder": "링크 붙여넣기",
+    "urlAriaLabel": "링크 URL",
+    "apply": "링크",
+    "open": "링크 열기",
+    "copy": "링크 복사",
+    "copied": "복사됨",
+    "copiedLink": "링크 복사됨",
+    "remove": "제거"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "模板",
+  "close": "关闭模板",
+  "categories": "模板分类",
+  "all": "全部",
+  "searchPlaceholder": "搜索模板",
+  "gridLabel": "{{category}} 模板",
+  "empty": "未找到模板。",
+  "use": "使用",
+  "applying": "应用中...",
+  "adding": "添加中...",
+  "applied": "已应用模板",
+  "added": "已添加模板",
+  "failed": "无法使用模板。",
+  "pageNotFound": "未找到页面。"
+}

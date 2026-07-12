@@ -1,0 +1,79 @@
+{
+  "filters": {
+    "all": "Tout",
+    "unread": "Non lus",
+    "comments": "Commentaires",
+    "mentions": "Mentions",
+    "edits": "Modifications"
+  },
+  "header": {
+    "closeUpdates": "Fermer les mises à jour",
+    "markAllRead": "Tout marquer comme lu",
+    "markAllReadAria": "Marquer toutes les mises à jour comme lues",
+    "pageHistory": "Historique de la page",
+    "recentUpdates_one": "{{count}} mise à jour récente",
+    "recentUpdates_other": "{{count}} mises à jour récentes",
+    "unreadOfTotal": "{{unread}} non lues sur {{total}} mises à jour",
+    "updateType": "Type de mise à jour",
+    "updates": "Mises à jour",
+    "modeUpdates": "Mises à jour",
+    "modeChats": "Discussions",
+    "inboxMode": "Mode boîte de réception"
+  },
+  "time": {
+    "justNow": "À l'instant",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} bloc",
+    "blockCount_other": "{{count}} blocs",
+    "currentVersion": "Version actuelle",
+    "currentVersionOnly": "Version actuelle uniquement",
+    "next": "Suivant",
+    "nextVersion": "Version suivante",
+    "noVersionPrevious": "Aucune version précédente",
+    "noVersionNext": "Aucune version suivante",
+    "pageLocked": "Page verrouillée",
+    "previous": "Précédent",
+    "previousSnapshots_one": "{{count}} instantané précédent",
+    "previousSnapshots_other": "{{count}} instantanés précédents",
+    "previousVersion": "Version précédente",
+    "restoredPrevious": "Version précédente restaurée",
+    "restoredNext": "Version suivante restaurée",
+    "restoredVersions": "{{count}} versions restaurées",
+    "versionCount_one": "{{count}} version",
+    "versionCount_other": "{{count}} versions",
+    "versionsAgo": "il y a {{count}} versions",
+    "versionsAhead": "{{count}} versions en avance",
+    "versionsAria": "Versions"
+  },
+  "badges": {
+    "comment": "Commentaire",
+    "edited": "Modifié",
+    "linked": "Lié",
+    "member": "Membre",
+    "mention": "Mention",
+    "reply": "Réponse",
+    "replyMention": "Mention de réponse",
+    "shared": "Partagé",
+    "system": "Système"
+  },
+  "rows": {
+    "byActor": "par {{name}}",
+    "emptyComment": "Commentaire vide",
+    "forYou": "pour vous",
+    "notification": "Notification",
+    "referenceMention": "A mentionné {{title}} · {{preview}}",
+    "referenceLink": "Lié à {{title}} · {{preview}}",
+    "unreadDot": "Non lu",
+    "workspaceUpdate": "Mise à jour de l'espace de travail"
+  },
+  "empty": {
+    "allCaughtUp": "Vous êtes à jour.",
+    "loadingUpdates": "Chargement des mises à jour…",
+    "noFilteredUpdatesYet": "Aucun {{filter}} pour le moment.",
+    "noPageHistoryYet": "Aucun historique de page pour le moment.",
+    "noUpdatesYet": "Aucune mise à jour pour le moment."
+  }
+}

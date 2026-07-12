@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "Añadir una propiedad de fecha",
+    "description": "Las vistas de cronología necesitan una propiedad de fecha de inicio para dibujar las páginas a lo largo del tiempo."
+  },
+  "endDateHint": "Añade una propiedad de fecha de fin para dibujar rangos en lugar de barras de un solo día.",
+  "zoom": {
+    "ariaLabel": "Zoom de cronología",
+    "day": "Día",
+    "week": "Semana",
+    "month": "Mes"
+  },
+  "dependencies": {
+    "label": "Dependencias:",
+    "hint": "añadir una propiedad de relación",
+    "relationPropertyAriaLabel": "Propiedad de relación de dependencia"
+  },
+  "toolbar": {
+    "today": "Hoy",
+    "previousRange": "Rango anterior",
+    "nextRange": "Rango siguiente",
+    "newPage": "Nuevo",
+    "newPageIn": "Nueva página en {{dbTitle}}"
+  },
+  "table": {
+    "ariaLabel": "Tabla de cronología",
+    "nameHeader": "Nombre"
+  },
+  "bar": {
+    "openAriaLabel": "Abrir {{title}}",
+    "openAriaLabelWithDates": "Abrir {{title}}, de {{start}} a {{end}}",
+    "openNoDateAriaLabel": "Abrir {{title}}, sin fecha"
+  },
+  "lanes": {
+    "noItemsInRange": "No hay elementos en este rango.",
+    "noDatedItems": "Aún no hay elementos con fecha.",
+    "jumpTo": "Ir a {{date}}"
+  },
+  "noDate": {
+    "heading": "Sin fecha ({{count}})"
+  },
+  "options": {
+    "none": "Ninguno",
+    "untitled": "Sin título"
+  }
+}

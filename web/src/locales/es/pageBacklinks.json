@@ -1,0 +1,23 @@
+{
+  "toggle": {
+    "count_one": "{{count}} enlace inverso",
+    "count_other": "{{count}} enlaces inversos"
+  },
+  "header": {
+    "title": "Menciones enlazadas"
+  },
+  "summary": {
+    "mention_one": "{{count}} mención",
+    "mention_other": "{{count}} menciones",
+    "link_one": "{{count}} enlace",
+    "link_other": "{{count}} enlaces"
+  },
+  "kind": {
+    "mention": "Mención",
+    "link": "Enlace"
+  },
+  "more": {
+    "count_one": "{{count}} enlace inverso más",
+    "count_other": "{{count}} enlaces inversos más"
+  }
+}

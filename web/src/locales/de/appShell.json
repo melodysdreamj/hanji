@@ -1,0 +1,30 @@
+{
+  "acceptInvitation": "Einladung annehmen",
+  "acceptingInvitation": "Beitritt…",
+  "invitationBody": "Nimm die Einladung an, um diesen Arbeitsbereich zu deinem Konto hinzuzufügen.",
+  "invitationTitle": "Diesem Arbeitsbereich beitreten?",
+  "joinedWorkspace": "Arbeitsbereich beigetreten",
+  "couldntAcceptInvitation": "Einladung konnte nicht angenommen werden.",
+  "notNow": "Nicht jetzt",
+  "loadingWorkspace": "Dein Arbeitsbereich wird geladen…",
+  "workspaceLoadTrouble": "Hanji hat Probleme beim Laden dieses Arbeitsbereichs.",
+  "pageUnavailable": "Seite nicht verfügbar.",
+  "workspaceUnavailable": "Arbeitsbereich nicht verfügbar.",
+  "somethingWentWrong": "Etwas ist schiefgelaufen.",
+  "tryAgain": "Erneut versuchen",
+  "openDefaultWorkspace": "Standard-Arbeitsbereich öffnen",
+  "copiedLink": "Link kopiert",
+  "couldntCopyLink": "Link konnte nicht kopiert werden",
+  "darkMode": "Dunkelmodus",
+  "lightMode": "Hellmodus",
+  "pendingInvitesTitle": "Arbeitsbereich-Einladungen",
+  "pendingInviteRole": "als {{role}}",
+  "skipToMain": "Zum Hauptinhalt springen",
+  "navigationComplete": "Zu {{destination}} navigiert",
+  "route": {
+    "home": "Startseite",
+    "trash": "Papierkorb",
+    "settings": "Einstellungen",
+    "sharedPage": "Geteilte Seite"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Plantillas",
+  "close": "Cerrar plantillas",
+  "categories": "Categorías de plantillas",
+  "all": "Todas",
+  "searchPlaceholder": "Buscar plantillas",
+  "gridLabel": "Plantillas de {{category}}",
+  "empty": "No se encontraron plantillas.",
+  "use": "Usar",
+  "applying": "Aplicando...",
+  "adding": "Añadiendo...",
+  "applied": "Plantilla aplicada",
+  "added": "Plantilla añadida",
+  "failed": "No se pudo usar la plantilla.",
+  "pageNotFound": "Página no encontrada."
+}

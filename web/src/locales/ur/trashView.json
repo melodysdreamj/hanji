@@ -1,0 +1,39 @@
+{
+  "trash": "Trash",
+  "empty": "Pages you delete land here. Nothing in the trash.",
+  "searchTrash": "Search trash",
+  "deletedPages": "Deleted pages",
+  "noSearchMatches": "No deleted pages match your search.",
+  "pageCount_one": "{{count}} page",
+  "pageCount_other": "{{count}} pages",
+  "deletedJustNow": "Deleted just now",
+  "deletedOn": "Deleted {{date}}",
+  "actions": {
+    "restore": "Restore",
+    "deleteForever": "Delete forever",
+    "emptyTrash": "Empty trash"
+  },
+  "aria": {
+    "openFromTrash": "Open {{title}} from trash",
+    "restorePage": "Restore {{title}}",
+    "deletePageForever": "Delete {{title}} forever",
+    "cancelPermanentDelete": "Cancel permanent delete",
+    "cancelEmptyTrash": "Cancel emptying trash"
+  },
+  "confirm": {
+    "deleteTitle": "Delete forever?",
+    "deleteBodyPrefix": "This will permanently delete ",
+    "deleteBodySuffix": ". You can't undo this action.",
+    "emptyTitle": "Empty trash?",
+    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
+    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+  },
+  "toast": {
+    "deletedForever": "Deleted forever",
+    "couldntDelete": "Couldn't delete page",
+    "restored": "Restored page",
+    "couldntRestore": "Couldn't restore page",
+    "emptied": "Trash emptied",
+    "couldntEmpty": "Couldn't empty trash"
+  }
+}

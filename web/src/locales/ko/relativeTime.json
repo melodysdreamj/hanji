@@ -1,0 +1,13 @@
+{
+  "justNow": "방금",
+  "editedJustNow": "방금 편집됨",
+  "editedMinutesAgo": "{{minutes}}분 전 편집됨",
+  "editedHoursAgo": "{{hours}}시간 전 편집됨",
+  "editedDaysAgo": "{{days}}일 전 편집됨",
+  "editedOn": "{{date}} 편집됨",
+  "noEdits": "편집 기록 없음",
+  "noEditsYet": "아직 편집 기록 없음",
+  "todayAt": "오늘 {{time}}",
+  "yesterdayAt": "어제 {{time}}",
+  "dateAt": "{{date}} {{time}}"
+}

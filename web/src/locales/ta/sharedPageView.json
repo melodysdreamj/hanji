@@ -1,0 +1,7 @@
+{
+  "title": "Shared page",
+  "loading": "Loading shared page",
+  "unavailable": "This shared page is unavailable.",
+  "notFound": "Shared page was not found.",
+  "outsideShare": "The page is not part of this public share."
+}

@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "Fermer le sélecteur d'icônes",
+    "label": "Choisir une icône"
+  },
+  "tabs": {
+    "groupLabel": "Type d'icône",
+    "emoji": "Emoji",
+    "image": "Image"
+  },
+  "remove": {
+    "label": "Retirer",
+    "ariaLabel": "Retirer l'icône"
+  },
+  "emoji": {
+    "searchPlaceholder": "Filtrer…",
+    "searchLabel": "Rechercher des icônes",
+    "random": "Aléatoire",
+    "randomLabel": "Choisir une icône au hasard",
+    "recentLabel": "Récemment utilisés en premier",
+    "gridLabelRecent": "Icônes, récemment utilisés en premier",
+    "gridLabel": "Icônes",
+    "optionLabel": "Choisir l'icône {{emoji}}",
+    "noResults": "Aucune icône ne correspond à « {{query}} ». Essayez un autre mot ou effacez le filtre."
+  },
+  "custom": {
+    "previewPlaceholder": "Image",
+    "linkPlaceholder": "Collez le lien de l'image",
+    "linkLabel": "Lien de l'icône image",
+    "apply": "Appliquer",
+    "upload": "Importer un fichier",
+    "uploading": "Importation...",
+    "uploadingLabel": "Importation de {{fileName}}",
+    "uploadFailed": "Impossible d'importer cette image.",
+    "fallbackFileName": "Image d'icône"
+  },
+  "uploadProgress": {
+    "preparing": "Préparation de l'import",
+    "finalizing": "Finalisation",
+    "complete": "Terminé",
+    "uploading": "Importation"
+  }
+}

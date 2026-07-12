@@ -1,0 +1,7 @@
+{
+  "diagramLabel": "Diagramme Mermaid",
+  "emptyPreview": "Aperçu du diagramme",
+  "sourceDescription": "Source du diagramme : {{source}}",
+  "syntaxError": "Le diagramme contient une erreur de syntaxe.",
+  "syntaxErrorDetails": "Afficher les détails"
+}

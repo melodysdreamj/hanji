@@ -1,0 +1,109 @@
+{
+  "region": "Notion-Token-Anleitung",
+  "play": "Abspielen",
+  "pause": "Pause",
+  "prev": "Vorheriger Schritt",
+  "next": "Nächster Schritt",
+  "stepLabel": "Schritt {{n}} von {{total}}",
+  "scenes": [
+    {
+      "title": "Token-Seite über Hanji öffnen",
+      "caption": "Klicken Sie in Hanji auf „Notion-Token-Seite öffnen“, um das Entwicklerportal von Notion in einem neuen Tab zu öffnen."
+    },
+    {
+      "title": "Verbindung erstellen",
+      "caption": "Klicken Sie auf notion.so/profile/integrations (Verbindungen) auf „New connection“."
+    },
+    {
+      "title": "Arbeitsbereich wählen, Token erstellen",
+      "caption": "Wählen Sie „Access token“, und legen Sie fest, auf welchen Notion-Arbeitsbereich dieses Token zutreffen soll — ein Token gehört immer zu genau einem Arbeitsbereich."
+    },
+    {
+      "title": "Zugriffstoken kopieren",
+      "caption": "Kopieren Sie das ntn_…-Token und fügen Sie es in das Token-Feld unten ein."
+    },
+    {
+      "title": "Mit Ihren Seiten verbinden",
+      "caption": "Öffnen Sie in Notion jede Seite auf oberster Ebene → ··· → Connections → fügen Sie diese Verbindung hinzu. Unterseiten werden automatisch einbezogen — kommen Sie danach zurück und scannen Sie."
+    },
+    {
+      "title": "Token in Hanji einfügen",
+      "caption": "Fügen Sie in Hanji das kopierte Token in das Feld „Notion-API-Token“ ein."
+    },
+    {
+      "title": "Importumfang wählen",
+      "caption": "Importieren Sie den gesamten Arbeitsbereich, oder wählen Sie „Bestimmte Seiten“, um nur die von Ihnen ausgewählten Seiten und Datenbanken zu importieren."
+    }
+  ],
+  "mock": {
+    "url": "app.notion.com/developers/connections",
+    "hanjiTitle": "Hanji · Import",
+    "inkIntroTitle": "Mit einem Notion-API-Token importieren",
+    "inkIntroDesc": "Für lokales Hosting ist das Einfügen eines in Notion erstellten Tokens die zuverlässigste Einrichtung.",
+    "inkMakeToken": "Notion-Token-Seite öffnen",
+    "inkStep1Title": "Notion-Token vorbereiten",
+    "inkTokenLabel": "Notion-API-Token",
+    "inkTokenValue": "ntn_••••••••",
+    "inkStep2Title": "Importumfang wählen",
+    "scopeAllTitle": "Gesamter Arbeitsbereich",
+    "scopeAllRec": "Empfohlen",
+    "scopeAllDesc": "Alles, worauf die Verbindung zugreifen kann. Datenbankbeziehungen zwischen Seiten bleiben erhalten.",
+    "scopeSomeTitle": "Bestimmte Seiten",
+    "scopeSomeDesc": "Zugängliche Elemente auf oberster Ebene scannen und nur die von Ihnen ausgewählten Seiten/Datenbanken importieren.",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "backLink": "‹ Zurück zu Notion",
+    "devTitle": "Entwickler",
+    "nav": [
+      "Loslegen",
+      "Worker",
+      "Persönliche Zugriffstokens",
+      "Verbindungen"
+    ],
+    "navNew": "Neu",
+    "listTitle": "Verbindungen",
+    "listSubtitle": "Notions öffentliche und private API-Verbindungen erstellen und verwalten.",
+    "learnMore": "Mehr erfahren",
+    "newConnection": "+ New connection",
+    "colConnection": "Verbindung",
+    "colWorkspaces": "Installierbare Arbeitsbereiche:",
+    "colAuthType": "Authentifizierungstyp",
+    "colOwner": "Besitzer",
+    "integrationName": "Hanji",
+    "capabilities": "Inhalte lesen, Inhalte aktualisieren und einfügen sowie Benutzerinformationen lesen",
+    "workspaceName": "Mein Arbeitsbereich",
+    "authTypeCell": "Zugriffstoken",
+    "ownerName": "Sie",
+    "modalTitle": "Neue Verbindung",
+    "modalDesc": "Erstellen Sie eine Verbindung, um Apps, Agents und Workflows bei Notion zu authentifizieren. Wählen Sie einen Geltungsbereich für einen einzelnen oder mehrere Arbeitsbereiche.",
+    "nameLabel": "Verbindungsname",
+    "namePlaceholder": "Meine Verbindung",
+    "authMethod": "Authentifizierungsmethode",
+    "accessToken": "Zugriffstoken",
+    "accessTokenDesc": "Ein statisches, auf den Arbeitsbereich begrenztes API-Token, das zwischen Mitwirkenden geteilt wird und eigene Berechtigungseinstellungen hat. Auf 1 Arbeitsbereich begrenzt und kann nicht im Marketplace gelistet werden.",
+    "oauth": "OAuth",
+    "oauthDesc": "Benutzerbezogenes OAuth 2.0; Berechtigungen sind auf den angemeldeten Benutzer beschränkt. Unterstützt mehrere Arbeitsbereiche.",
+    "wsLabel": "Installierbare Arbeitsbereiche:",
+    "wsDesc": "Dieses Token gilt für den ausgewählten Arbeitsbereich.",
+    "terms": "Mit dem Erstellen einer Verbindung stimmen Sie den Entwicklerbedingungen von Notion zu.",
+    "createButton": "Verbindung erstellen",
+    "breadcrumb": "Verbindungen  ›  Verbindung verwalten",
+    "detailTabs": [
+      "Konfiguration",
+      "Inhaltsberechtigungen",
+      "Webhooks",
+      "Besitzer"
+    ],
+    "tokenSectionTitle": "API-Integrations-Token",
+    "tokenSectionDesc": "Verwenden Sie dieses Token, um API-Anfragen für diesen Arbeitsbereich zu authentifizieren. Jeder, der das Token hat, kann im Namen der Verbindung handeln, also halten Sie es geheim.",
+    "tokenFieldLabel": "Zugriffstoken",
+    "tokenValue": "••••••••••••••••••••••••••••",
+    "copied": "Kopiert",
+    "pageTitle": "Team-Handbuch",
+    "share": "Teilen",
+    "menuCopyLink": "Link kopieren",
+    "menuDuplicate": "Duplizieren",
+    "menuConnectionsLabel": "Verbindungen",
+    "menuAddConnection": "Verbindungen hinzufügen",
+    "searchPlaceholder": "Nach Verbindungen suchen…"
+  }
+}

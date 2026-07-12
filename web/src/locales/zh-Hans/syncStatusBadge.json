@@ -1,0 +1,10 @@
+{
+  "offline": "离线",
+  "offlinePending_one": "离线 · {{count}} 项更改待处理",
+  "offlinePending_other": "离线 · {{count}} 项更改待处理",
+  "syncing": "同步中 · {{count}}",
+  "unreachable": "无法连接到服务器",
+  "unreachablePending_one": "无法连接到服务器 · {{count}} 项更改待处理",
+  "unreachablePending_other": "无法连接到服务器 · {{count}} 项更改待处理",
+  "retryHint": "点击立即重试"
+}

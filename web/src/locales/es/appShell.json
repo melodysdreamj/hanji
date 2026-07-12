@@ -1,0 +1,30 @@
+{
+  "acceptInvitation": "Aceptar invitación",
+  "acceptingInvitation": "Uniéndose…",
+  "invitationBody": "Acepta la invitación para añadir este espacio de trabajo a tu cuenta.",
+  "invitationTitle": "¿Unirse a este espacio de trabajo?",
+  "joinedWorkspace": "Te uniste al espacio de trabajo",
+  "couldntAcceptInvitation": "No se pudo aceptar la invitación.",
+  "notNow": "Ahora no",
+  "loadingWorkspace": "Cargando tu espacio de trabajo…",
+  "workspaceLoadTrouble": "Hanji tiene problemas para cargar este espacio de trabajo.",
+  "pageUnavailable": "Página no disponible.",
+  "workspaceUnavailable": "Espacio de trabajo no disponible.",
+  "somethingWentWrong": "Algo salió mal.",
+  "tryAgain": "Intentar de nuevo",
+  "openDefaultWorkspace": "Abrir espacio de trabajo predeterminado",
+  "copiedLink": "Enlace copiado",
+  "couldntCopyLink": "No se pudo copiar el enlace",
+  "darkMode": "Modo oscuro",
+  "lightMode": "Modo claro",
+  "pendingInvitesTitle": "Invitaciones de espacio de trabajo",
+  "pendingInviteRole": "como {{role}}",
+  "skipToMain": "Saltar al contenido principal",
+  "navigationComplete": "Navegaste a {{destination}}",
+  "route": {
+    "home": "Inicio",
+    "trash": "Papelera",
+    "settings": "Configuración",
+    "sharedPage": "Página compartida"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "filters": {
+    "all": "Todos",
+    "unread": "Sin leer",
+    "comments": "Comentarios",
+    "mentions": "Menciones",
+    "edits": "Ediciones"
+  },
+  "header": {
+    "closeUpdates": "Cerrar actualizaciones",
+    "markAllRead": "Marcar todo como leído",
+    "markAllReadAria": "Marcar todas las actualizaciones como leídas",
+    "pageHistory": "Historial de página",
+    "recentUpdates_one": "{{count}} actualización reciente",
+    "recentUpdates_other": "{{count}} actualizaciones recientes",
+    "unreadOfTotal": "{{unread}} sin leer de {{total}} actualizaciones",
+    "updateType": "Tipo de actualización",
+    "updates": "Actualizaciones",
+    "modeUpdates": "Actualizaciones",
+    "modeChats": "Chats",
+    "inboxMode": "Modo bandeja de entrada"
+  },
+  "time": {
+    "justNow": "Justo ahora",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} bloque",
+    "blockCount_other": "{{count}} bloques",
+    "currentVersion": "Versión actual",
+    "currentVersionOnly": "Solo versión actual",
+    "next": "Siguiente",
+    "nextVersion": "Versión siguiente",
+    "noVersionPrevious": "No hay versión anterior",
+    "noVersionNext": "No hay versión siguiente",
+    "pageLocked": "Página bloqueada",
+    "previous": "Anterior",
+    "previousSnapshots_one": "{{count}} instantánea anterior",
+    "previousSnapshots_other": "{{count}} instantáneas anteriores",
+    "previousVersion": "Versión anterior",
+    "restoredPrevious": "Versión anterior restaurada",
+    "restoredNext": "Versión siguiente restaurada",
+    "restoredVersions": "{{count}} versiones restauradas",
+    "versionCount_one": "{{count}} versión",
+    "versionCount_other": "{{count}} versiones",
+    "versionsAgo": "hace {{count}} versiones",
+    "versionsAhead": "{{count}} versiones por delante",
+    "versionsAria": "Versiones"
+  },
+  "badges": {
+    "comment": "Comentario",
+    "edited": "Editado",
+    "linked": "Enlazado",
+    "member": "Miembro",
+    "mention": "Mención",
+    "reply": "Respuesta",
+    "replyMention": "Mención en respuesta",
+    "shared": "Compartido",
+    "system": "Sistema"
+  },
+  "rows": {
+    "byActor": "por {{name}}",
+    "emptyComment": "Comentario vacío",
+    "forYou": "para ti",
+    "notification": "Notificación",
+    "referenceMention": "Mencionó {{title}} · {{preview}}",
+    "referenceLink": "Enlazado a {{title}} · {{preview}}",
+    "unreadDot": "Sin leer",
+    "workspaceUpdate": "Actualización del espacio de trabajo"
+  },
+  "empty": {
+    "allCaughtUp": "Estás al día.",
+    "loadingUpdates": "Cargando actualizaciones...",
+    "noFilteredUpdatesYet": "Aún no hay {{filter}}.",
+    "noPageHistoryYet": "Aún no hay historial de página.",
+    "noUpdatesYet": "Aún no hay actualizaciones."
+  }
+}

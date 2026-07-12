@@ -1,0 +1,83 @@
+.wrap {
+  height: calc(100vh - var(--topbar-height));
+  overflow-y: auto;
+}
+
+.redirecting {
+  height: 100vh;
+  background: var(--bg-app);
+}
+
+.inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 64px var(--content-pad) 24vh;
+}
+
+.greeting {
+  margin: 0 0 22px;
+  color: var(--text-default);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.emptyDoc {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 70px var(--content-pad) 30vh;
+}
+
+.workspaceIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 86px;
+  height: 82px;
+  margin-bottom: 2px;
+  color: var(--text-secondary);
+  font-size: 78px;
+  line-height: 1;
+}
+
+.emptyDoc h1 {
+  margin: 0;
+  color: var(--text-default);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.newPageButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  margin-top: 16px;
+  margin-left: -8px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  color: var(--text-tertiary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.newPageButton:hover,
+.newPageButton:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    padding: 42px 24px 24vh;
+  }
+
+  .emptyDoc {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

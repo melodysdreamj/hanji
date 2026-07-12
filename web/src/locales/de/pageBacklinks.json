@@ -1,0 +1,23 @@
+{
+  "toggle": {
+    "count_one": "{{count}} Rückverweis",
+    "count_other": "{{count}} Rückverweise"
+  },
+  "header": {
+    "title": "Verknüpfte Erwähnungen"
+  },
+  "summary": {
+    "mention_one": "{{count}} Erwähnung",
+    "mention_other": "{{count}} Erwähnungen",
+    "link_one": "{{count}} Link",
+    "link_other": "{{count}} Links"
+  },
+  "kind": {
+    "mention": "Erwähnung",
+    "link": "Link"
+  },
+  "more": {
+    "count_one": "{{count}} weiterer Rückverweis",
+    "count_other": "{{count}} weitere Rückverweise"
+  }
+}

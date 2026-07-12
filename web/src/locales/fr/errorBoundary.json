@@ -1,0 +1,7 @@
+{
+  "title": "Une erreur est survenue lors de l'affichage de ce contenu.",
+  "detail": "Réessayez. Si le problème persiste, rechargez l'application et partagez la référence ci-dessous.",
+  "reference": "Référence : {{reference}}",
+  "reload": "Recharger l'application",
+  "retry": "Réessayer"
+}

@@ -1,0 +1,44 @@
+{
+  "empty": {
+    "title": "Datumseigenschaft hinzufügen",
+    "description": "Kalenderansichten benötigen eine Datumseigenschaft, um Seiten im Monat zu platzieren.",
+    "addDateButton": "Datum"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Kalender nach",
+    "today": "Heute",
+    "previousWeek": "Vorherige Woche",
+    "previousMonth": "Vorheriger Monat",
+    "nextWeek": "Nächste Woche",
+    "nextMonth": "Nächster Monat"
+  },
+  "weekdays": {
+    "sun": "So",
+    "mon": "Mo",
+    "tue": "Di",
+    "wed": "Mi",
+    "thu": "Do",
+    "fri": "Fr",
+    "sat": "Sa"
+  },
+  "gridAriaLabel": "{{title}} Kalender",
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} Einträge",
+    "newRowAriaLabel": "Neue Zeile am {{date}}",
+    "newRowTitle": "Neu",
+    "showLess": "Weniger anzeigen",
+    "showMore": "+{{count}} weitere"
+  },
+  "card": {
+    "openAriaLabel": "{{title}} öffnen",
+    "openAriaLabelWithDate": "{{title}} öffnen, geplant am {{date}}",
+    "openNoDateAriaLabel": "{{title}} öffnen, kein Datum"
+  },
+  "noDate": {
+    "heading": "Kein Datum ({{count}})"
+  },
+  "property": {
+    "untitled": "Ohne Titel",
+    "dateDefaultName": "Datum"
+  }
+}

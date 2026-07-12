@@ -1,0 +1,19 @@
+{
+  "toggle": {
+    "count_other": "백링크 {{count}}개"
+  },
+  "header": {
+    "title": "링크된 멘션"
+  },
+  "summary": {
+    "mention_other": "멘션 {{count}}개",
+    "link_other": "링크 {{count}}개"
+  },
+  "kind": {
+    "mention": "멘션",
+    "link": "링크"
+  },
+  "more": {
+    "count_other": "백링크 {{count}}개 더 보기"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "offline": "オフライン",
+  "offlinePending_one": "オフライン · {{count}}件の保留中の変更",
+  "offlinePending_other": "オフライン · {{count}}件の保留中の変更",
+  "syncing": "同期中 · {{count}}",
+  "unreachable": "サーバーに接続できません",
+  "unreachablePending_one": "サーバーに接続できません · {{count}}件の保留中の変更",
+  "unreachablePending_other": "サーバーに接続できません · {{count}}件の保留中の変更",
+  "retryHint": "クリックして今すぐ再試行"
+}

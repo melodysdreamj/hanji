@@ -1,0 +1,31 @@
+{
+  "aggregates": {
+    "count": "Count",
+    "sum": "Sum",
+    "average": "Average",
+    "min": "Min",
+    "max": "Max"
+  },
+  "chartAria": "{{name}} chart",
+  "chartType": "Chart type",
+  "chartTypes": {
+    "bar": "Bar",
+    "horizontal_bar": "Horizontal bar",
+    "line": "Line",
+    "donut": "Donut"
+  },
+  "checked": "Checked",
+  "empty": "Empty",
+  "legend": "Chart legend",
+  "monthLabel": "{{month}} {{year}}",
+  "noData": "No data",
+  "noDataDesc": "No rows match the current filters or search.",
+  "noGroupProperty": "Nothing to chart yet",
+  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
+  "total": "Total",
+  "unchecked": "Unchecked",
+  "untitledProperty": "Untitled",
+  "valueProperty": "Value property",
+  "xAxis": "X-axis",
+  "yAxis": "Y-axis"
+}

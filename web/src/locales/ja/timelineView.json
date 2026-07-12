@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "日付プロパティを追加",
+    "description": "タイムラインビューでは、ページを時間軸に沿って描画するために開始日プロパティが必要です。"
+  },
+  "endDateHint": "終了日プロパティを追加すると、1日のみのバーではなく期間として描画できます。",
+  "zoom": {
+    "ariaLabel": "タイムラインのズーム",
+    "day": "日",
+    "week": "週",
+    "month": "月"
+  },
+  "dependencies": {
+    "label": "依存関係:",
+    "hint": "リレーションプロパティを追加",
+    "relationPropertyAriaLabel": "依存関係のリレーションプロパティ"
+  },
+  "toolbar": {
+    "today": "今日",
+    "previousRange": "前の期間",
+    "nextRange": "次の期間",
+    "newPage": "新規",
+    "newPageIn": "{{dbTitle}}に新規ページ"
+  },
+  "table": {
+    "ariaLabel": "タイムラインテーブル",
+    "nameHeader": "名前"
+  },
+  "bar": {
+    "openAriaLabel": "{{title}}を開く",
+    "openAriaLabelWithDates": "{{title}}を開く、{{start}}から{{end}}まで",
+    "openNoDateAriaLabel": "{{title}}を開く、日付なし"
+  },
+  "lanes": {
+    "noItemsInRange": "この期間にアイテムはありません。",
+    "noDatedItems": "日付付きアイテムはまだありません。",
+    "jumpTo": "{{date}}へジャンプ"
+  },
+  "noDate": {
+    "heading": "日付なし({{count}})"
+  },
+  "options": {
+    "none": "なし",
+    "untitled": "無題"
+  }
+}

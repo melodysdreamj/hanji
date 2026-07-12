@@ -1,0 +1,17 @@
+{
+  "name": "hanji-root",
+  "private": true,
+  "description": "Root tooling for the Hanji docs site (the product packages are backend/, web/, mcp/)",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "verify:namespace": "node scripts/verify-hanji-namespace.mjs",
+    "verify:namespace:generated": "node scripts/verify-hanji-namespace.mjs --generated",
+    "test:namespace": "node --test scripts/verify-hanji-namespace.test.mjs scripts/migrate-hanji-local-namespace.test.mjs"
+  },
+  "devDependencies": {
+    "vitepress": "2.0.0-alpha.18"
+  }
+}

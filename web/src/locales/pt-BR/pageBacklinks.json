@@ -1,0 +1,23 @@
+{
+  "toggle": {
+    "count_one": "{{count}} backlink",
+    "count_other": "{{count}} backlinks"
+  },
+  "header": {
+    "title": "Menções vinculadas"
+  },
+  "summary": {
+    "mention_one": "{{count}} menção",
+    "mention_other": "{{count}} menções",
+    "link_one": "{{count}} link",
+    "link_other": "{{count}} links"
+  },
+  "kind": {
+    "mention": "Menção",
+    "link": "Link"
+  },
+  "more": {
+    "count_one": "mais {{count}} backlink",
+    "count_other": "mais {{count}} backlinks"
+  }
+}

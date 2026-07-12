@@ -1,0 +1,10 @@
+{
+  "title": "Desbloquear dados locais",
+  "description": "Os dados offline neste dispositivo estão bloqueados com uma frase secreta. Desbloquear reativa o uso offline e o salvamento.",
+  "passphrasePlaceholder": "Frase secreta",
+  "unlock": "Desbloquear",
+  "continueOnline": "Continuar apenas online",
+  "continueOnlineHint": "\"Continuar apenas online\" mantém as edições offline bloqueadas deste dispositivo lacradas — elas permanecem neste dispositivo e não serão sincronizadas até que você as desbloqueie com a frase secreta correta.",
+  "wrongPassphrase": "Essa frase secreta está incorreta.",
+  "unsupportedBrowser": "O bloqueio local não está disponível neste navegador."
+}

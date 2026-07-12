@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "Fechar seletor de ícones",
+    "label": "Escolher ícone"
+  },
+  "tabs": {
+    "groupLabel": "Tipo de ícone",
+    "emoji": "Emoji",
+    "image": "Imagem"
+  },
+  "remove": {
+    "label": "Remover",
+    "ariaLabel": "Remover ícone"
+  },
+  "emoji": {
+    "searchPlaceholder": "Filtrar…",
+    "searchLabel": "Pesquisar ícones",
+    "random": "Aleatório",
+    "randomLabel": "Escolher um ícone aleatório",
+    "recentLabel": "Usados recentemente primeiro",
+    "gridLabelRecent": "Ícones, usados recentemente primeiro",
+    "gridLabel": "Ícones",
+    "optionLabel": "Escolher ícone {{emoji}}",
+    "noResults": "Nenhum ícone corresponde a “{{query}}”. Tente outra palavra ou limpe o filtro."
+  },
+  "custom": {
+    "previewPlaceholder": "Imagem",
+    "linkPlaceholder": "Cole o link da imagem",
+    "linkLabel": "Link do ícone de imagem",
+    "apply": "Aplicar",
+    "upload": "Enviar arquivo",
+    "uploading": "Enviando...",
+    "uploadingLabel": "Enviando {{fileName}}",
+    "uploadFailed": "Não foi possível enviar essa imagem.",
+    "fallbackFileName": "Imagem do ícone"
+  },
+  "uploadProgress": {
+    "preparing": "Preparando envio",
+    "finalizing": "Finalizando",
+    "complete": "Concluído",
+    "uploading": "Enviando"
+  }
+}

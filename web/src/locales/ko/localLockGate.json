@@ -1,0 +1,10 @@
+{
+  "title": "로컬 데이터 잠금 해제",
+  "description": "이 기기의 오프라인 데이터가 암호로 잠겨 있어요. 잠금을 해제하면 오프라인 사용과 저장이 다시 활성화됩니다.",
+  "passphrasePlaceholder": "암호",
+  "unlock": "잠금 해제",
+  "continueOnline": "온라인 전용으로 계속",
+  "continueOnlineHint": "'온라인 전용으로 계속'을 선택하면 이 기기의 잠긴 오프라인 편집 내용은 봉인된 채 남아 있고, 올바른 암호로 잠금을 해제하기 전까지 동기화되지 않아요.",
+  "wrongPassphrase": "암호가 올바르지 않아요.",
+  "unsupportedBrowser": "이 브라우저에서는 로컬 잠금을 사용할 수 없어요."
+}

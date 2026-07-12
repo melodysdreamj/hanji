@@ -1,0 +1,16 @@
+{
+  "title": "Importierte Personen",
+  "body": "Aus Notion importierte Personen bleiben als Quellverweise, bis ein Administrator sie Arbeitsbereichskonten zuordnet.",
+  "scan": "Importierte Personen finden",
+  "scanning": "Wird gescannt…",
+  "rescan": "Erneut scannen",
+  "empty": "Es wurden keine nicht zugeordneten importierten Personen gefunden.",
+  "keepPlaceholder": "Als importierten Verweis behalten",
+  "usage": "{{values}} Werte · {{mentions}} Erwähnungen",
+  "apply": "Zuordnung anwenden",
+  "applying": "Wird angewendet…",
+  "applied": "{{people}} Personen in {{pages}} Zeilen/Seiten und {{blocks}} Blöcken zugeordnet.",
+  "failed": "Personenzuordnung fehlgeschlagen.",
+  "suggested": "vorgeschlagen",
+  "mapAria": "{{label}} zuordnen"
+}

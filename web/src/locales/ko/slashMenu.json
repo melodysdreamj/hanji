@@ -1,0 +1,15 @@
+{
+  "blockCommands": "블록 명령",
+  "closeBlockCommands": "블록 명령 닫기",
+  "groups": {
+    "Basic": "기본 블록",
+    "Media": "미디어",
+    "Database": "데이터베이스",
+    "Advanced": "고급 블록"
+  },
+  "itemStatus": "{{label}}, {{total}}개 중 {{position}}번째. Enter 키를 눌러 삽입하세요.",
+  "listStatus": "블록 명령 {{total}}개를 사용할 수 있어요.",
+  "noBlocks": "블록을 찾을 수 없어요",
+  "noBlocksFor": "\"{{query}}\"에 해당하는 블록을 찾을 수 없어요",
+  "recentlyUsed": "최근 사용한 블록"
+}

@@ -1,0 +1,39 @@
+{
+  "trash": "回收站",
+  "empty": "你删除的页面会出现在这里。回收站为空。",
+  "searchTrash": "搜索回收站",
+  "deletedPages": "已删除的页面",
+  "noSearchMatches": "没有符合搜索条件的已删除页面。",
+  "pageCount_one": "{{count}} 个页面",
+  "pageCount_other": "{{count}} 个页面",
+  "deletedJustNow": "刚刚删除",
+  "deletedOn": "于 {{date}} 删除",
+  "actions": {
+    "restore": "恢复",
+    "deleteForever": "永久删除",
+    "emptyTrash": "清空回收站"
+  },
+  "aria": {
+    "openFromTrash": "从回收站中打开 {{title}}",
+    "restorePage": "恢复 {{title}}",
+    "deletePageForever": "永久删除 {{title}}",
+    "cancelPermanentDelete": "取消永久删除",
+    "cancelEmptyTrash": "取消清空回收站"
+  },
+  "confirm": {
+    "deleteTitle": "永久删除？",
+    "deleteBodyPrefix": "这将永久删除 ",
+    "deleteBodySuffix": "。此操作无法撤销。",
+    "emptyTitle": "清空回收站？",
+    "emptyBody_one": "这将永久删除回收站中的全部 {{count}} 个页面。此操作无法撤销。",
+    "emptyBody_other": "这将永久删除回收站中的全部 {{count}} 个页面。此操作无法撤销。"
+  },
+  "toast": {
+    "deletedForever": "已永久删除",
+    "couldntDelete": "无法删除页面",
+    "restored": "已恢复页面",
+    "couldntRestore": "无法恢复页面",
+    "emptied": "回收站已清空",
+    "couldntEmpty": "无法清空回收站"
+  }
+}

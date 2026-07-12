@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Swan 대안 마크 — 흑조/백조의 흑백 이중성, S커브 목 -->
+  <rect width="512" height="512" rx="116" fill="#FFFFFF"/>
+  <g transform="translate(14,0)">
+  <!-- 몸통 (수면에서 잘림) -->
+  <ellipse cx="282" cy="352" rx="150" ry="80" fill="#0B0B0B"/>
+  <rect x="0" y="400" width="512" height="112" fill="#FFFFFF"/>
+  <!-- 목: S커브 -->
+  <path d="M352 312 C 420 292, 420 220, 372 190 C 340 170, 330 132, 356 108"
+        fill="none" stroke="#0B0B0B" stroke-width="46" stroke-linecap="round"/>
+  <!-- 머리와 부리 -->
+  <circle cx="356" cy="108" r="34" fill="#0B0B0B"/>
+  <polygon points="330,96 282,116 330,128" fill="#0B0B0B"/>
+  <circle cx="352" cy="102" r="6" fill="#FFFFFF"/>
+  <!-- 물결 -->
+  <rect x="150" y="416" width="120" height="10" rx="5" fill="#0B0B0B"/>
+  <rect x="300" y="416" width="88" height="10" rx="5" fill="#0B0B0B"/>
+  </g>
+</svg>

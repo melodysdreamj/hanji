@@ -1,0 +1,30 @@
+{
+  "acceptInvitation": "招待を受ける",
+  "acceptingInvitation": "参加しています…",
+  "invitationBody": "招待を受け入れて、このワークスペースをアカウントに追加してください。",
+  "invitationTitle": "このワークスペースに参加しますか？",
+  "joinedWorkspace": "ワークスペースに参加しました",
+  "couldntAcceptInvitation": "招待を受け入れられませんでした。",
+  "notNow": "後で",
+  "loadingWorkspace": "ワークスペースを読み込んでいます…",
+  "workspaceLoadTrouble": "Hanji はこのワークスペースの読み込みに問題が発生しています。",
+  "pageUnavailable": "ページは利用できません。",
+  "workspaceUnavailable": "ワークスペースは利用できません。",
+  "somethingWentWrong": "問題が発生しました。",
+  "tryAgain": "再試行",
+  "openDefaultWorkspace": "デフォルトのワークスペースを開く",
+  "copiedLink": "リンクをコピーしました",
+  "couldntCopyLink": "リンクをコピーできませんでした",
+  "darkMode": "ダークモード",
+  "lightMode": "ライトモード",
+  "pendingInvitesTitle": "ワークスペースの招待",
+  "pendingInviteRole": "{{role}} として",
+  "skipToMain": "メインコンテンツへスキップ",
+  "navigationComplete": "{{destination}} に移動しました",
+  "route": {
+    "home": "ホーム",
+    "trash": "ゴミ箱",
+    "settings": "設定",
+    "sharedPage": "共有ページ"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "searchActions": "Aktionen suchen",
+  "noMatchingActions": "Keine übereinstimmenden Aktionen",
+  "untitledDatabaseRow": "Datenbankzeile ohne Titel",
+  "sections": {
+    "page": "Seite",
+    "style": "Stil"
+  },
+  "aria": {
+    "closeDatabaseRowActions": "Datenbankzeilen-Aktionen schließen",
+    "closePageActions": "Seitenaktionen schließen",
+    "databaseRowActionsFor": "Datenbankzeilen-Aktionen für {{title}}",
+    "pageActionsFor": "Seitenaktionen für {{title}}",
+    "openIn": "Öffnen in",
+    "customizePage": "Seite anpassen",
+    "backlinksDisplay": "Backlinks-Anzeige",
+    "pageCommentsDisplay": "Seitenkommentare-Anzeige",
+    "pageFont": "Seiten-Schriftart"
+  },
+  "actions": {
+    "addToFavorites": "Zu Favoriten hinzufügen",
+    "removeFromFavorites": "Aus Favoriten entfernen",
+    "editIcon": "Symbol bearbeiten",
+    "editProperties": "Eigenschaften bearbeiten",
+    "openIn": "Öffnen in",
+    "sidePeek": "Seitliche Vorschau",
+    "centerPeek": "Zentrierte Vorschau",
+    "fullPage": "Ganze Seite",
+    "openInNewTab": "In neuem Tab öffnen",
+    "comments": "Kommentare",
+    "copyLink": "Link kopieren",
+    "duplicate": "Duplizieren",
+    "moveTo": "Verschieben nach",
+    "moveToTrash": "In den Papierkorb verschieben",
+    "rename": "Umbenennen",
+    "addPageInside": "Seite darin hinzufügen",
+    "exportAsMarkdown": "Als Markdown exportieren",
+    "exportAsHanjiFile": "Als Hanji-Datei exportieren",
+    "importMarkdown": "Markdown importieren",
+    "importing": "Wird importiert...",
+    "unlockPage": "Seite entsperren",
+    "lockPage": "Seite sperren",
+    "pageHistory": "Seitenverlauf",
+    "removeVerification": "Verifizierung entfernen",
+    "verifyPage": "Seite verifizieren",
+    "customizePage": "Seite anpassen",
+    "undo": "Rückgängig"
+  },
+  "customize": {
+    "summaryDefault": "Standard",
+    "summaryCustomized": "Angepasst",
+    "backlinks": "Backlinks",
+    "pageComments": "Seitenkommentare"
+  },
+  "displayOptions": {
+    "default": "Standard",
+    "expanded": "Erweitert",
+    "off": "Aus"
+  },
+  "fonts": {
+    "default": "Standard",
+    "serif": "Serif",
+    "mono": "Mono"
+  },
+  "style": {
+    "smallText": "Kleiner Text",
+    "fullWidth": "Volle Breite"
+  },
+  "meta": {
+    "created": "Erstellt",
+    "createdBy": "Erstellt von",
+    "lastEdited": "Zuletzt bearbeitet",
+    "editedBy": "Bearbeitet von",
+    "verified": "Verifiziert",
+    "verifiedPrefix": "Verifiziert · {{label}}",
+    "words": "Wörter",
+    "characters": "Zeichen",
+    "blocks": "Blöcke"
+  },
+  "toast": {
+    "copiedLink": "Link kopiert",
+    "couldntCopyLink": "Link konnte nicht kopiert werden",
+    "exportedMarkdown": "Markdown exportiert",
+    "couldntExportMarkdown": "Markdown konnte nicht exportiert werden",
+    "exportedHanjiFile": "Als Hanji-Datei exportiert.",
+    "exportedHanjiFileWithWarnings": "Als Hanji-Datei exportiert — Anhänge als Platzhalter belassen.",
+    "couldntExportHanjiFile": "Hanji-Datei konnte nicht exportiert werden.",
+    "importedBlocks_one": "{{count}} Block importiert",
+    "importedBlocks_other": "{{count}} Blöcke importiert",
+    "nothingToImport": "Nichts zu importieren",
+    "couldntImportMarkdown": "Markdown konnte nicht importiert werden",
+    "verificationRemoved": "Verifizierung entfernt",
+    "pageVerified": "Seite verifiziert",
+    "removedFromFavorites": "Aus Favoriten entfernt",
+    "addedToFavorites": "Zu Favoriten hinzugefügt",
+    "couldntUpdateFavorites": "Favoriten konnten nicht aktualisiert werden",
+    "couldntDuplicatePage": "Seite konnte nicht dupliziert werden",
+    "duplicatedPage": "Seite dupliziert",
+    "pageLocked": "Seite gesperrt",
+    "pageUnlocked": "Seite entsperrt",
+    "movedToTrash": "In den Papierkorb verschoben",
+    "restoredPage": "Seite wiederhergestellt",
+    "couldntRestorePage": "Seite konnte nicht wiederhergestellt werden",
+    "couldntMoveToTrash": "Verschieben in den Papierkorb fehlgeschlagen"
+  }
+}

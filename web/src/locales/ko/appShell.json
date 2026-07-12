@@ -1,0 +1,30 @@
+{
+  "acceptInvitation": "초대 수락",
+  "acceptingInvitation": "참여 중…",
+  "invitationBody": "초대를 수락해 이 워크스페이스를 계정에 추가하세요.",
+  "invitationTitle": "이 워크스페이스에 참여할까요?",
+  "joinedWorkspace": "워크스페이스에 참여했습니다",
+  "couldntAcceptInvitation": "초대를 수락하지 못했습니다.",
+  "notNow": "나중에",
+  "loadingWorkspace": "워크스페이스를 불러오는 중…",
+  "workspaceLoadTrouble": "Hanji이 이 워크스페이스를 불러오지 못하고 있습니다.",
+  "pageUnavailable": "페이지를 사용할 수 없습니다.",
+  "workspaceUnavailable": "워크스페이스를 사용할 수 없습니다.",
+  "somethingWentWrong": "문제가 발생했습니다.",
+  "tryAgain": "다시 시도",
+  "openDefaultWorkspace": "기본 워크스페이스 열기",
+  "copiedLink": "링크를 복사했습니다",
+  "couldntCopyLink": "링크를 복사하지 못했습니다",
+  "darkMode": "다크 모드",
+  "lightMode": "라이트 모드",
+  "pendingInvitesTitle": "워크스페이스 초대",
+  "pendingInviteRole": "{{role}} 권한",
+  "skipToMain": "본문으로 건너뛰기",
+  "navigationComplete": "{{destination}}(으)로 이동했습니다",
+  "route": {
+    "home": "홈",
+    "trash": "휴지통",
+    "settings": "설정",
+    "sharedPage": "공유 페이지"
+  }
+}

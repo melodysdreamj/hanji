@@ -1,0 +1,105 @@
+{
+  "searchActions": "작업을 검색하세요",
+  "noMatchingActions": "일치하는 작업이 없습니다",
+  "untitledDatabaseRow": "제목 없는 데이터베이스 행",
+  "sections": {
+    "page": "페이지",
+    "style": "스타일"
+  },
+  "aria": {
+    "closeDatabaseRowActions": "데이터베이스 행 작업 닫기",
+    "closePageActions": "페이지 작업 닫기",
+    "databaseRowActionsFor": "{{title}}의 데이터베이스 행 작업",
+    "pageActionsFor": "{{title}}의 페이지 작업",
+    "openIn": "다음에서 열기",
+    "customizePage": "페이지 사용자 지정",
+    "backlinksDisplay": "백링크 표시",
+    "pageCommentsDisplay": "페이지 댓글 표시",
+    "pageFont": "페이지 글꼴"
+  },
+  "actions": {
+    "addToFavorites": "즐겨찾기에 추가",
+    "removeFromFavorites": "즐겨찾기에서 제거",
+    "editIcon": "아이콘 편집",
+    "editProperties": "속성 편집",
+    "openIn": "다음에서 열기",
+    "sidePeek": "사이드 미리 보기",
+    "centerPeek": "가운데 미리 보기",
+    "fullPage": "전체 페이지",
+    "openInNewTab": "새 탭에서 열기",
+    "comments": "댓글",
+    "copyLink": "링크 복사",
+    "duplicate": "복제",
+    "moveTo": "옮기기",
+    "moveToTrash": "휴지통으로 이동",
+    "rename": "이름 바꾸기",
+    "addPageInside": "안에 페이지 추가",
+    "exportAsMarkdown": "마크다운으로 내보내기",
+    "exportAsHanjiFile": "Hanji 파일로 내보내기",
+    "importMarkdown": "마크다운 가져오기",
+    "importing": "가져오는 중...",
+    "unlockPage": "페이지 잠금 해제",
+    "lockPage": "페이지 잠금",
+    "pageHistory": "페이지 기록",
+    "removeVerification": "인증 제거",
+    "verifyPage": "페이지 인증",
+    "customizePage": "페이지 사용자 지정",
+    "undo": "실행 취소"
+  },
+  "customize": {
+    "summaryDefault": "기본값",
+    "summaryCustomized": "사용자 지정됨",
+    "backlinks": "백링크",
+    "pageComments": "페이지 댓글"
+  },
+  "displayOptions": {
+    "default": "기본값",
+    "expanded": "펼침",
+    "off": "끄기"
+  },
+  "fonts": {
+    "default": "기본값",
+    "serif": "세리프",
+    "mono": "모노"
+  },
+  "style": {
+    "smallText": "작은 텍스트",
+    "fullWidth": "전체 너비"
+  },
+  "meta": {
+    "created": "생성일",
+    "createdBy": "만든 사람",
+    "lastEdited": "마지막 편집",
+    "editedBy": "편집한 사람",
+    "verified": "인증됨",
+    "verifiedPrefix": "인증됨 · {{label}}",
+    "words": "단어",
+    "characters": "글자",
+    "blocks": "블록"
+  },
+  "toast": {
+    "copiedLink": "링크 복사됨",
+    "couldntCopyLink": "링크를 복사하지 못했습니다",
+    "exportedMarkdown": "마크다운을 내보냈습니다",
+    "couldntExportMarkdown": "마크다운을 내보내지 못했습니다",
+    "exportedHanjiFile": "Hanji 파일로 내보냈습니다.",
+    "exportedHanjiFileWithWarnings": "Hanji 파일로 내보냈습니다 — 첨부 파일은 자리 표시자로 남았습니다.",
+    "couldntExportHanjiFile": "Hanji 파일을 내보내지 못했습니다.",
+    "importedBlocks_other": "블록 {{count}}개를 가져왔습니다",
+    "nothingToImport": "가져올 내용이 없습니다",
+    "couldntImportMarkdown": "마크다운을 가져오지 못했습니다",
+    "verificationRemoved": "인증이 해제되었습니다",
+    "pageVerified": "페이지가 인증되었습니다",
+    "removedFromFavorites": "즐겨찾기에서 제거됨",
+    "addedToFavorites": "즐겨찾기에 추가됨",
+    "couldntUpdateFavorites": "즐겨찾기를 업데이트하지 못했습니다",
+    "couldntDuplicatePage": "페이지를 복제하지 못했습니다",
+    "duplicatedPage": "페이지를 복제했습니다",
+    "pageLocked": "페이지가 잠겼습니다",
+    "pageUnlocked": "페이지 잠금이 해제되었습니다",
+    "movedToTrash": "휴지통으로 이동됨",
+    "restoredPage": "페이지를 복원했습니다",
+    "couldntRestorePage": "페이지를 복원하지 못했습니다",
+    "couldntMoveToTrash": "휴지통으로 이동하지 못했습니다"
+  }
+}

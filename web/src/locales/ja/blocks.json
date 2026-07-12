@@ -1,0 +1,316 @@
+{
+  "defs": {
+    "paragraph": {
+      "label": "テキスト",
+      "description": "プレーンテキストで書き始めるだけです。",
+      "placeholder": "'/' でコマンドを表示"
+    },
+    "child_page": {
+      "label": "ページ",
+      "description": "このページ内にサブページを作成します。"
+    },
+    "link_to_page": {
+      "label": "ページへのリンク",
+      "description": "既存のページにリンクします。"
+    },
+    "heading_1": {
+      "label": "見出し1",
+      "description": "大きなセクション見出し。",
+      "placeholder": "見出し1"
+    },
+    "toggle_heading_1": {
+      "label": "トグル見出し1",
+      "description": "ネストしたコンテンツを折りたためる大きな見出し。",
+      "placeholder": "トグル見出し1"
+    },
+    "heading_2": {
+      "label": "見出し2",
+      "description": "中くらいのセクション見出し。",
+      "placeholder": "見出し2"
+    },
+    "toggle_heading_2": {
+      "label": "トグル見出し2",
+      "description": "ネストしたコンテンツを折りたためる中見出し。",
+      "placeholder": "トグル見出し2"
+    },
+    "heading_3": {
+      "label": "見出し3",
+      "description": "小さなセクション見出し。",
+      "placeholder": "見出し3"
+    },
+    "toggle_heading_3": {
+      "label": "トグル見出し3",
+      "description": "ネストしたコンテンツを折りたためる小見出し。",
+      "placeholder": "トグル見出し3"
+    },
+    "heading_4": {
+      "label": "見出し4",
+      "description": "コンパクトなセクション見出し。",
+      "placeholder": "見出し4"
+    },
+    "toggle_heading_4": {
+      "label": "トグル見出し4",
+      "description": "ネストしたコンテンツを折りたためるコンパクトな見出し。",
+      "placeholder": "トグル見出し4"
+    },
+    "to_do": {
+      "label": "To-doリスト",
+      "description": "チェックボックスでタスクを管理します。",
+      "placeholder": "To-do"
+    },
+    "bulleted_list_item": {
+      "label": "箇条書きリスト",
+      "description": "シンプルな箇条書きリストを作成します。",
+      "placeholder": "リスト"
+    },
+    "numbered_list_item": {
+      "label": "番号付きリスト",
+      "description": "番号付きリストを作成します。",
+      "placeholder": "リスト"
+    },
+    "toggle": {
+      "label": "トグルリスト",
+      "description": "コンテンツの表示/非表示を切り替えられます。",
+      "placeholder": "トグル"
+    },
+    "quote": {
+      "label": "引用",
+      "description": "引用をキャプチャします。",
+      "placeholder": "空の引用"
+    },
+    "callout": {
+      "label": "コールアウト",
+      "description": "文章を際立たせます。",
+      "placeholder": "何か入力してください…"
+    },
+    "divider": {
+      "label": "区切り線",
+      "description": "ブロックを視覚的に区切ります。"
+    },
+    "code": {
+      "label": "コード",
+      "description": "コードスニペットをキャプチャします。",
+      "placeholder": "コードを書くか、スニペットを貼り付け…"
+    },
+    "equation": {
+      "label": "数式",
+      "description": "数式を表示します。"
+    },
+    "table_of_contents": {
+      "label": "目次",
+      "description": "このページの見出しへのリンクを表示します。"
+    },
+    "synced_block": {
+      "label": "同期ブロック",
+      "description": "ページ間でコンテンツを再利用します。"
+    },
+    "button": {
+      "label": "ボタン",
+      "description": "ワンクリックで再利用可能なコンテンツを挿入します。"
+    },
+    "tab": {
+      "label": "タブ",
+      "description": "コンテンツをラベル付きのタブにまとめます。",
+      "placeholder": "タブ"
+    },
+    "breadcrumb": {
+      "label": "パンくずリスト",
+      "description": "このページの場所を表示します。"
+    },
+    "action_duplicate": {
+      "label": "複製",
+      "description": "このブロックの完全なコピーを作成します。"
+    },
+    "action_move_to": {
+      "label": "移動先",
+      "description": "このブロックを別のページに移動します。"
+    },
+    "action_delete": {
+      "description": "このブロックを削除します。"
+    },
+    "action_turn_into": {
+      "label": "変換",
+      "description": "このブロックのタイプを変更します。"
+    },
+    "action_color": {
+      "label": "カラー",
+      "description": "このブロックのテキストまたは背景の色を変更します。"
+    },
+    "simple_table": {
+      "label": "テーブル",
+      "description": "このページにシンプルなテーブルを追加します。"
+    },
+    "column_list_2": {
+      "label": "2列",
+      "description": "ブロックを横並びに配置します。"
+    },
+    "column_list_3": {
+      "label": "3列",
+      "description": "ブロックを3列に配置します。"
+    },
+    "column_list_4": {
+      "label": "4列",
+      "description": "ブロックを4列に配置します。"
+    },
+    "column_list_5": {
+      "label": "5列",
+      "description": "ブロックを5列に配置します。"
+    },
+    "image": {
+      "label": "画像",
+      "description": "アップロードまたはリンクで埋め込みます。"
+    },
+    "video": {
+      "label": "動画",
+      "description": "リンクで動画を埋め込みます。"
+    },
+    "audio": {
+      "label": "音声",
+      "description": "リンクで音声を埋め込みます。"
+    },
+    "bookmark": {
+      "label": "Webブックマーク",
+      "description": "Webリンクをカードとして保存します。"
+    },
+    "embed": {
+      "label": "埋め込み",
+      "description": "リンクからコンテンツを埋め込みます。"
+    },
+    "file": {
+      "label": "ファイル",
+      "description": "このページにファイルリンクを添付します。"
+    },
+    "child_database": {
+      "label": "データベース - フルページ",
+      "description": "新しいデータベースをサブページとして追加します。"
+    },
+    "child_database_table": {
+      "label": "テーブル - フルページ",
+      "description": "フルページのデータベースをテーブルとして追加します。"
+    },
+    "child_database_board": {
+      "label": "ボード - フルページ",
+      "description": "フルページのかんばんボードを追加します。"
+    },
+    "child_database_list": {
+      "label": "リスト - フルページ",
+      "description": "フルページのデータベースをリストとして追加します。"
+    },
+    "child_database_timeline": {
+      "label": "タイムライン - フルページ",
+      "description": "フルページのデータベースタイムラインを追加します。"
+    },
+    "child_database_calendar": {
+      "label": "カレンダー - フルページ",
+      "description": "フルページのカレンダーデータベースを追加します。"
+    },
+    "child_database_gallery": {
+      "label": "ギャラリー - フルページ",
+      "description": "フルページのデータベースギャラリーを追加します。"
+    },
+    "inline_database": {
+      "label": "データベース - インライン",
+      "description": "このページ内にデータベースを追加します。"
+    },
+    "inline_database_table": {
+      "label": "テーブルビュー",
+      "description": "インラインデータベースをテーブルとして追加します。"
+    },
+    "inline_database_board": {
+      "label": "ボードビュー",
+      "description": "インラインのかんばんボードを追加します。"
+    },
+    "inline_database_list": {
+      "label": "リストビュー",
+      "description": "インラインデータベースをリストとして追加します。"
+    },
+    "inline_database_timeline": {
+      "label": "タイムラインビュー",
+      "description": "インラインデータベースタイムラインを追加します。"
+    },
+    "inline_database_calendar": {
+      "label": "カレンダービュー",
+      "description": "インラインのカレンダーデータベースを追加します。"
+    },
+    "inline_database_gallery": {
+      "label": "ギャラリービュー",
+      "description": "インラインのデータベースギャラリーを追加します。"
+    },
+    "color_default": {
+      "label": "デフォルト",
+      "description": "このブロックのテキストまたは背景の色を削除します。"
+    },
+    "color_gray": {
+      "label": "グレー",
+      "description": "このブロックにグレーを適用します。"
+    },
+    "color_brown": {
+      "label": "ブラウン",
+      "description": "このブロックにブラウンを適用します。"
+    },
+    "color_orange": {
+      "label": "オレンジ",
+      "description": "このブロックにオレンジを適用します。"
+    },
+    "color_yellow": {
+      "label": "イエロー",
+      "description": "このブロックにイエローを適用します。"
+    },
+    "color_green": {
+      "label": "グリーン",
+      "description": "このブロックにグリーンを適用します。"
+    },
+    "color_blue": {
+      "label": "ブルー",
+      "description": "このブロックにブルーを適用します。"
+    },
+    "color_purple": {
+      "label": "パープル",
+      "description": "このブロックにパープルを適用します。"
+    },
+    "color_pink": {
+      "label": "ピンク",
+      "description": "このブロックにピンクを適用します。"
+    },
+    "color_red": {
+      "label": "レッド",
+      "description": "このブロックにレッドを適用します。"
+    },
+    "color_gray_background": {
+      "label": "グレーの背景",
+      "description": "このブロックにグレーの背景を適用します。"
+    },
+    "color_brown_background": {
+      "label": "ブラウンの背景",
+      "description": "このブロックにブラウンの背景を適用します。"
+    },
+    "color_orange_background": {
+      "label": "オレンジの背景",
+      "description": "このブロックにオレンジの背景を適用します。"
+    },
+    "color_yellow_background": {
+      "label": "イエローの背景",
+      "description": "このブロックにイエローの背景を適用します。"
+    },
+    "color_green_background": {
+      "label": "グリーンの背景",
+      "description": "このブロックにグリーンの背景を適用します。"
+    },
+    "color_blue_background": {
+      "label": "ブルーの背景",
+      "description": "このブロックにブルーの背景を適用します。"
+    },
+    "color_purple_background": {
+      "label": "パープルの背景",
+      "description": "このブロックにパープルの背景を適用します。"
+    },
+    "color_pink_background": {
+      "label": "ピンクの背景",
+      "description": "このブロックにピンクの背景を適用します。"
+    },
+    "color_red_background": {
+      "label": "レッドの背景",
+      "description": "このブロックにレッドの背景を適用します。"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "empty": "Nenhuma conversa ainda. Comente em uma página ou mencione alguém para iniciar uma.",
+  "leave": "Sair",
+  "leaveAria": "Sair da conversa em {{title}}",
+  "open": "Abrir a conversa em {{title}}",
+  "participants_one": "{{count}} participante",
+  "participants_other": "{{count}} participantes",
+  "untitled": "Sem título",
+  "loading": "Carregando conversas…"
+}

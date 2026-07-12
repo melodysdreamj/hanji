@@ -1,0 +1,30 @@
+Hanji Corresponding Source Offer
+================================
+
+The source code for the unmodified upstream Hanji release is available at:
+
+https://github.com/melodysdreamj/hanji
+
+This artifact also includes LICENSE (GNU AGPL-3.0) and LICENSE-EXCEPTION (the
+custom Hanji Sponsor Banner Exception 2.0). The running web interface displays
+separate links to the source and both license texts on every screen.
+
+If a modified build does not qualify for the Sponsor Banner Exception and is
+distributed or operated under plain AGPL-3.0, its distributor must replace the
+runtime legal links with public HTTPS URLs for that build's exact Corresponding
+Source and matching license texts:
+
+HANJI_SOURCE_URL
+HANJI_AGPL_LICENSE_URL
+HANJI_SPONSOR_EXCEPTION_URL
+
+Hanji's strict release/deploy preflight requires all three values to be
+explicit public HTTPS URLs and verifies that each target is reachable. The
+ordinary local release preflight remains network-independent.
+
+A qualifying build that relies on the Sponsor Banner Exception may keep its
+modifications closed and may use the upstream source URL for the pre-existing
+Hanji Materials, while preserving links to both license texts as required by
+the exception. Do not use the upstream URL as the Corresponding Source for a
+nonqualifying modified deployment. This notice is operational guidance and is
+not legal advice.

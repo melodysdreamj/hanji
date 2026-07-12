@@ -1,0 +1,13 @@
+{
+  "justNow": "Agora mesmo",
+  "editedJustNow": "Editado agora mesmo",
+  "editedMinutesAgo": "Editado há {{minutes}}min",
+  "editedHoursAgo": "Editado há {{hours}}h",
+  "editedDaysAgo": "Editado há {{days}}d",
+  "editedOn": "Editado em {{date}}",
+  "noEdits": "Sem edições",
+  "noEditsYet": "Ainda sem edições",
+  "todayAt": "Hoje às {{time}}",
+  "yesterdayAt": "Ontem às {{time}}",
+  "dateAt": "{{date}} às {{time}}"
+}

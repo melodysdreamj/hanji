@@ -1,0 +1,13 @@
+{
+  "databaseLockedSave": "Diese Datenbank ist gesperrt, daher konnten Ihre Änderungen nicht gespeichert werden.",
+  "databaseRowsLoadFailed": "Datenbankzeilen konnten nicht geladen werden. Bitte versuchen Sie es in einem Moment erneut.",
+  "editAccessDeniedSave": "Sie haben keinen Bearbeitungszugriff, daher konnten Ihre Änderungen nicht gespeichert werden.",
+  "lockedSave": "Die Seite oder Datenbank ist gesperrt, daher konnten Ihre Änderungen nicht gespeichert werden.",
+  "pageLockedSave": "Diese Seite ist gesperrt, daher konnten Ihre Änderungen nicht gespeichert werden.",
+  "pageMissingSave": "Die Seite wurde nicht gefunden, daher konnten Ihre Änderungen nicht gespeichert werden.",
+  "saveFailed": "Ihre Änderungen konnten nicht gespeichert werden.",
+  "sessionExpired": "Ihre Sitzung ist abgelaufen oder die Anfrage konnte nicht authentifiziert werden. Bitte versuchen Sie es erneut.",
+  "blockConflictSave": "Dieser Block wurde auf einem anderen Gerät bearbeitet, daher wurde Ihre Offline-Änderung nicht angewendet.",
+  "blockConflictKeepMine": "Meine Version anwenden",
+  "blockMoveCommentsSkipped": "Der Block wurde verschoben, aber seine Kommentare konnten nicht mit verschoben werden."
+}

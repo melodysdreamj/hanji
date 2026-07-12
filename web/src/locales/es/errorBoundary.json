@@ -1,0 +1,7 @@
+{
+  "title": "Algo salió mal al mostrar este contenido.",
+  "detail": "Inténtalo de nuevo. Si el problema continúa, recarga la aplicación y comparte la referencia a continuación.",
+  "reference": "Referencia: {{reference}}",
+  "reload": "Recargar aplicación",
+  "retry": "Reintentar"
+}

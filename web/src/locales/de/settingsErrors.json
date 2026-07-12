@@ -1,0 +1,24 @@
+{
+  "rateLimited": "Derzeit zu viele Anfragen. Bitte versuchen Sie es in einem Moment erneut.",
+  "requestFailed": "Wir konnten diese Anfrage nicht abschließen. Bitte versuchen Sie es erneut.",
+  "backend": {
+    "workspaceAdminRequired": "Administratorzugriff auf den Arbeitsbereich ist erforderlich.",
+    "workspaceOwnerRequired": "Eigentümerzugriff auf den Arbeitsbereich ist erforderlich.",
+    "onlyOwnersAssignAdmin": "Nur Arbeitsbereichseigentümer können die Administratorrolle zuweisen.",
+    "onlyOwnersManageAdmins": "Nur Arbeitsbereichseigentümer können Administratoren verwalten.",
+    "onlyOwnersRemoveAdmins": "Nur Arbeitsbereichseigentümer können Administratoren entfernen.",
+    "ownersCannotChangeRole": "Die Rolle des Arbeitsbereichseigentümers kann hier nicht geändert werden. Übertragen Sie zuerst das Eigentum.",
+    "ownersCannotBeRemoved": "Der Arbeitsbereichseigentümer kann nicht entfernt werden. Übertragen Sie zuerst das Eigentum.",
+    "cannotChangeOwnRole": "Sie können Ihre eigene Arbeitsbereichsrolle nicht ändern.",
+    "cannotRemoveSelf": "Sie können sich nicht selbst aus dem Arbeitsbereich entfernen.",
+    "onlyAssignableRoles": "Es können nur die Rollen Administrator, Mitglied und Gast zugewiesen werden.",
+    "memberNotFound": "Dieses Arbeitsbereichsmitglied wurde nicht gefunden.",
+    "invitationNotFound": "Diese Einladung wurde nicht gefunden.",
+    "transferTargetMustBeMember": "Wählen Sie ein anderes Mitglied aus, auf das das Eigentum übertragen wird.",
+    "emailRequired": "E-Mail ist erforderlich.",
+    "emailInvalid": "Diese E-Mail-Adresse scheint nicht korrekt zu sein.",
+    "externalGuestDisabled": "Externe Gasteinladungen sind durch die Organisationsrichtlinie deaktiviert.",
+    "verifiedDomainRequired": "Organisationsmitglieder müssen eine verifizierte Organisationsdomäne verwenden.",
+    "workspaceUrlInUse": "Diese Arbeitsbereich-URL wird bereits verwendet."
+  }
+}

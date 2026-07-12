@@ -1,0 +1,16 @@
+{
+  "title": "Modèles",
+  "close": "Fermer les modèles",
+  "categories": "Catégories de modèles",
+  "all": "Tous",
+  "searchPlaceholder": "Rechercher des modèles",
+  "gridLabel": "Modèles {{category}}",
+  "empty": "Aucun modèle trouvé.",
+  "use": "Utiliser",
+  "applying": "Application…",
+  "adding": "Ajout…",
+  "applied": "Modèle appliqué",
+  "added": "Modèle ajouté",
+  "failed": "Impossible d'utiliser le modèle.",
+  "pageNotFound": "Page introuvable."
+}

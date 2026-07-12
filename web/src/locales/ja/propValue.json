@@ -1,0 +1,11 @@
+{
+  "relationLoading": "リレーション項目を読み込んでいます",
+  "relationUnavailable": "リレーション項目は利用できません",
+  "unavailable": "利用できません",
+  "checkbox": {
+    "checked": "オン",
+    "unchecked": "オフ"
+  },
+  "openRelation": "{{title}} を開く",
+  "openOrDownloadFile": "{{name}} を開くまたはダウンロード"
+}

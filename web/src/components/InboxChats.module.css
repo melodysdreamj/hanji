@@ -1,0 +1,111 @@
+/* Messenger-style room list inside the Updates panel (chats mode). */
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.room {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.roomBody {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+.roomBody:hover,
+.roomBody:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+
+.roomTitleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.roomTitle {
+  color: var(--text-default);
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room[data-unread="true"] .roomTitle::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: #eb5757;
+  vertical-align: middle;
+}
+
+.roomTime {
+  flex: none;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.roomMeta {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roomPreview {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leave {
+  flex: none;
+  align-self: center;
+  margin-right: 8px;
+  padding: 3px 8px;
+  border-radius: var(--radius);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  opacity: 0;
+}
+
+.room:hover .leave,
+.leave:focus-visible {
+  opacity: 1;
+}
+
+.leave:hover,
+.leave:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.empty {
+  padding: 20px 14px;
+  color: var(--text-tertiary);
+  font-size: 13.5px;
+  line-height: 1.5;
+}

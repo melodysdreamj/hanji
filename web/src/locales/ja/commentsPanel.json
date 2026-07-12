@@ -1,0 +1,73 @@
+{
+  "title": "コメント",
+  "closeAria": "コメントを閉じる",
+  "subtitle": {
+    "block": "ブロックのディスカッション",
+    "page": "ページのディスカッション"
+  },
+  "status": {
+    "aria": "コメントのステータス",
+    "open": "未解決",
+    "resolved": "解決済み"
+  },
+  "anchor": {
+    "commentingOn": "コメント先",
+    "commentingOnSelectedText": "選択したテキストにコメント",
+    "selectedBlock": "選択したブロック",
+    "onSelectedText": "選択したテキスト",
+    "onSelectedBlock": "選択したブロック",
+    "onABlock": "ブロック"
+  },
+  "composer": {
+    "addBlockComment": "ブロックコメントを追加",
+    "addPageComment": "ページコメントを追加",
+    "blockPlaceholder": "このブロックにコメント...",
+    "pagePlaceholder": "コメントを追加...",
+    "submit": "コメント"
+  },
+  "mention": {
+    "commentPeopleAria": "コメントでメンションする人",
+    "replyPeopleAria": "返信でメンションする人",
+    "trigger": "ユーザーをメンション",
+    "noMatches": "該当する人がいません",
+    "title": "{{name}} さんをメンション",
+    "person": "ユーザー",
+    "you": "あなた",
+    "organizationPerson": "組織のユーザー",
+    "roleInOrganization": "組織の {{role}}"
+  },
+  "list": {
+    "threadsAria": "コメントスレッド",
+    "empty": "まだコメントがありません",
+    "noOpen": "未解決のコメントはありません",
+    "noResolved": "解決済みのコメントはありません"
+  },
+  "card": {
+    "commentAria": "{{author}} のコメント、{{time}}",
+    "commentAriaResolved": "{{author}} のコメント、{{time}}、解決済み",
+    "replyAria": "{{author}} の返信、{{time}}",
+    "repliesAria": "{{count}} 件の返信",
+    "edited": "（編集済み）",
+    "emptyComment": "（空のコメント）",
+    "emptyReply": "（空の返信）",
+    "justNow": "たった今"
+  },
+  "actions": {
+    "reply": "返信",
+    "showInPage": "ページで表示",
+    "resolve": "解決",
+    "reopen": "再開",
+    "edit": "編集"
+  },
+  "reply": {
+    "placeholder": "返信..."
+  },
+  "edit": {
+    "aria": "コメントを編集"
+  },
+  "delete": {
+    "commentConfirm": "このコメントを削除しますか？",
+    "threadConfirm_one": "このコメントと返信を削除しますか？",
+    "threadConfirm_other": "このコメントと {{count}} 件の返信を削除しますか？"
+  }
+}

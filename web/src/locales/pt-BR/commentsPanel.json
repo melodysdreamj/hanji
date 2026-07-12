@@ -1,0 +1,73 @@
+{
+  "title": "Comentários",
+  "closeAria": "Fechar comentários",
+  "subtitle": {
+    "block": "Discussão do bloco",
+    "page": "Discussão da página"
+  },
+  "status": {
+    "aria": "Status do comentário",
+    "open": "Aberto",
+    "resolved": "Resolvido"
+  },
+  "anchor": {
+    "commentingOn": "Comentando sobre",
+    "commentingOnSelectedText": "Comentando sobre o texto selecionado",
+    "selectedBlock": "Bloco selecionado",
+    "onSelectedText": "No texto selecionado",
+    "onSelectedBlock": "No bloco selecionado",
+    "onABlock": "Em um bloco"
+  },
+  "composer": {
+    "addBlockComment": "Adicionar um comentário no bloco",
+    "addPageComment": "Adicionar um comentário na página",
+    "blockPlaceholder": "Comentar neste bloco...",
+    "pagePlaceholder": "Adicionar um comentário...",
+    "submit": "Comentar"
+  },
+  "mention": {
+    "commentPeopleAria": "Menção a pessoas no comentário",
+    "replyPeopleAria": "Menção a pessoas na resposta",
+    "trigger": "Mencionar pessoas",
+    "noMatches": "Nenhuma pessoa correspondente",
+    "title": "Mencionar {{name}}",
+    "person": "Pessoa",
+    "you": "Você",
+    "organizationPerson": "Pessoa da organização",
+    "roleInOrganization": "{{role}} na organização"
+  },
+  "list": {
+    "threadsAria": "Tópicos de comentário",
+    "empty": "Nenhum comentário ainda",
+    "noOpen": "Nenhum comentário aberto",
+    "noResolved": "Nenhum comentário resolvido"
+  },
+  "card": {
+    "commentAria": "Comentário de {{author}}, {{time}}",
+    "commentAriaResolved": "Comentário de {{author}}, {{time}}, resolvido",
+    "replyAria": "Resposta de {{author}}, {{time}}",
+    "repliesAria": "{{count}} respostas",
+    "edited": "(editado)",
+    "emptyComment": "(comentário vazio)",
+    "emptyReply": "(resposta vazia)",
+    "justNow": "Agora mesmo"
+  },
+  "actions": {
+    "reply": "Responder",
+    "showInPage": "Mostrar na página",
+    "resolve": "Resolver",
+    "reopen": "Reabrir",
+    "edit": "Editar"
+  },
+  "reply": {
+    "placeholder": "Responder..."
+  },
+  "edit": {
+    "aria": "Editar comentário"
+  },
+  "delete": {
+    "commentConfirm": "Excluir este comentário?",
+    "threadConfirm_one": "Excluir este comentário e sua resposta?",
+    "threadConfirm_other": "Excluir este comentário e suas {{count}} respostas?"
+  }
+}

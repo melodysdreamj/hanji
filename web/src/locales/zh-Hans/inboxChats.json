@@ -1,0 +1,10 @@
+{
+  "empty": "暂无对话。在页面上评论或提及某人即可开始对话。",
+  "leave": "离开",
+  "leaveAria": "离开 {{title}} 上的对话",
+  "open": "打开 {{title}} 上的对话",
+  "participants_one": "{{count}} 位参与者",
+  "participants_other": "{{count}} 位参与者",
+  "untitled": "无标题",
+  "loading": "正在加载对话…"
+}

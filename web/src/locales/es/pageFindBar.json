@@ -1,0 +1,14 @@
+{
+  "dialog": {
+    "label": "Buscar en la página"
+  },
+  "input": {
+    "label": "Buscar en la página",
+    "placeholder": "Buscar en la página"
+  },
+  "actions": {
+    "previous": "Coincidencia anterior",
+    "next": "Coincidencia siguiente",
+    "close": "Cerrar búsqueda"
+  }
+}

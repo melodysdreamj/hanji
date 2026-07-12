@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "addBlockBelow": "Añadir bloque debajo",
+    "dragHint": "Arrastra para mover. Haz clic para abrir el menú.",
+    "openBlockActions": "Abrir acciones del bloque",
+    "closeBlockActions": "Cerrar acciones del bloque"
+  },
+  "menu": {
+    "ariaLabel": "Acciones del bloque",
+    "deleteMany": "Eliminar {{num}} bloques",
+    "duplicate": "Duplicar",
+    "duplicateMany": "Duplicar {{num}} bloques",
+    "turnInto": "Convertir en",
+    "copy": "Copiar",
+    "copyMany": "Copiar {{num}} bloques",
+    "copied": "Copiado",
+    "copyLinkToBlock": "Copiar enlace al bloque",
+    "copiedBlockLink": "Enlace del bloque copiado",
+    "moveTo": "Mover a",
+    "moveToMany": "Mover a {{num}} bloques",
+    "moveUp": "Mover hacia arriba",
+    "moveUpMany": "Mover hacia arriba {{num}} bloques",
+    "moveDown": "Mover hacia abajo",
+    "moveDownMany": "Mover hacia abajo {{num}} bloques",
+    "comment": "Comentar",
+    "commentMany": "Comentar {{num}} bloques",
+    "addCaption": "Añadir leyenda",
+    "removeCaption": "Quitar leyenda",
+    "unsyncSyncedBlock": "Desincronizar bloque sincronizado",
+    "copySyncedBlock": "Copiar bloque sincronizado",
+    "color": "Color",
+    "mixed": "Mixto",
+    "textFallback": "Texto"
+  },
+  "turnMenu": {
+    "chooseType": "Elige un tipo de bloque"
+  },
+  "colorMenu": {
+    "textColor": "Color de texto",
+    "backgroundColor": "Color de fondo"
+  },
+  "colors": {
+    "default": "Predeterminado",
+    "gray": "Gris",
+    "brown": "Marrón",
+    "orange": "Naranja",
+    "yellow": "Amarillo",
+    "green": "Verde",
+    "blue": "Azul",
+    "purple": "Morado",
+    "pink": "Rosa",
+    "red": "Rojo",
+    "gray_background": "Fondo gris",
+    "brown_background": "Fondo marrón",
+    "orange_background": "Fondo naranja",
+    "yellow_background": "Fondo amarillo",
+    "green_background": "Fondo verde",
+    "blue_background": "Fondo azul",
+    "purple_background": "Fondo morado",
+    "pink_background": "Fondo rosa",
+    "red_background": "Fondo rojo"
+  },
+  "notifications": {
+    "duplicatedBlock": "Bloque duplicado",
+    "duplicatedBlocks": "{{num}} bloques duplicados",
+    "undo": "Deshacer",
+    "undidDuplicate": "Duplicación deshecha",
+    "nothingToUndo": "Nada que deshacer",
+    "deletedBlock": "Bloque eliminado",
+    "deletedBlocks": "{{num}} bloques eliminados",
+    "restoredBlock": "Bloque restaurado",
+    "copiedToClipboard": "Copiado al portapapeles",
+    "couldNotCopy": "No se pudo copiar",
+    "couldNotCopyLink": "No se pudo copiar el enlace",
+    "clearedColor": "Color borrado",
+    "changedColor": "Color cambiado",
+    "changedBlockType": "Tipo de bloque cambiado"
+  },
+  "comments": {
+    "selectedBlocksQuote": "{{num}} bloques seleccionados"
+  },
+  "moveDialog": {
+    "title": "Mover {{num}} bloques a"
+  },
+  "edited": {
+    "justNow": "Última edición justo ahora",
+    "minutesAgo": "Última edición hace {{minutes}} min",
+    "hoursAgo": "Última edición hace {{hours}} h",
+    "daysAgo": "Última edición hace {{days}} d",
+    "on": "Última edición el {{date}}"
+  }
+}

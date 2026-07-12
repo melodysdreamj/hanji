@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "Adicionar uma propriedade de data",
+    "description": "As visualizações de linha do tempo precisam de uma propriedade de data de início para desenhar as páginas ao longo do tempo."
+  },
+  "endDateHint": "Adicione uma propriedade de data de término para desenhar intervalos em vez de barras de um único dia.",
+  "zoom": {
+    "ariaLabel": "Zoom da linha do tempo",
+    "day": "Dia",
+    "week": "Semana",
+    "month": "Mês"
+  },
+  "dependencies": {
+    "label": "Dependências:",
+    "hint": "adicionar uma propriedade de relação",
+    "relationPropertyAriaLabel": "Propriedade de relação de dependência"
+  },
+  "toolbar": {
+    "today": "Hoje",
+    "previousRange": "Intervalo anterior",
+    "nextRange": "Próximo intervalo",
+    "newPage": "Novo",
+    "newPageIn": "Nova página em {{dbTitle}}"
+  },
+  "table": {
+    "ariaLabel": "Tabela da linha do tempo",
+    "nameHeader": "Nome"
+  },
+  "bar": {
+    "openAriaLabel": "Abrir {{title}}",
+    "openAriaLabelWithDates": "Abrir {{title}}, {{start}} a {{end}}",
+    "openNoDateAriaLabel": "Abrir {{title}}, sem data"
+  },
+  "lanes": {
+    "noItemsInRange": "Nenhum item neste intervalo.",
+    "noDatedItems": "Nenhum item com data ainda.",
+    "jumpTo": "Ir para {{date}}"
+  },
+  "noDate": {
+    "heading": "Sem data ({{count}})"
+  },
+  "options": {
+    "none": "Nenhum",
+    "untitled": "Sem título"
+  }
+}

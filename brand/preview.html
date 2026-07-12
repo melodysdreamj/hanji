@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Hanji 브랜드 미리보기</title>
+<style>
+  body { margin:0; font-family:-apple-system,"Apple SD Gothic Neo",sans-serif; background:#EDEAE2; color:#2A2620; }
+  h1 { font-size:20px; margin:28px 32px 4px; }
+  p.sub { margin:0 32px 20px; color:#6B655A; font-size:13px; }
+  .row { display:flex; gap:16px; padding:0 32px 24px; flex-wrap:wrap; }
+  .panel { border-radius:14px; padding:24px 28px; flex:1; min-width:380px; }
+  .panel.light { background:#FBFAF6; border:1px solid #DDD6C6; }
+  .panel.dark  { background:#17130D; border:1px solid #302A20; color:#D8D0BE; }
+  .panel h2 { font-size:13px; font-weight:600; opacity:.65; margin:0 0 16px; letter-spacing:.5px; }
+  .items { display:flex; align-items:flex-end; gap:28px; flex-wrap:wrap; }
+  .item { text-align:center; }
+  .item span { display:block; margin-top:8px; font-size:11px; opacity:.6; }
+  .tab { display:flex; align-items:center; gap:8px; background:#E4E0D4; border-radius:8px 8px 0 0; padding:8px 14px; width:210px; font-size:12px; color:#3A352C; }
+  .panel.dark .tab { background:#2A241A; color:#CFC7B4; }
+</style>
+</head>
+<body>
+
+<h1>Hanji — 대표 아이콘</h1>
+<p class="sub">한지 창호 문살(井字살) 격자 + 낙관. 격자는 블록/데이터베이스 그리드의 은유이기도 합니다.</p>
+<div class="row">
+  <div class="panel light">
+    <h2>LIGHT</h2>
+    <div class="items">
+      <div class="item">
+        <svg width="160" height="160" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="f1" x="-5%" y="-5%" width="110%" height="110%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.28" numOctaves="2" seed="11"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.27  0 0 0 0 0.22  0 0 0 0 0.15  0 0 0 0.9 0"/>
+            <feComposite operator="in" in2="SourceGraphic"/>
+          </filter></defs>
+          <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+          <rect width="512" height="512" rx="116" filter="url(#f1)" opacity="0.10"/>
+          <rect x="12" y="12" width="488" height="488" rx="106" fill="none" stroke="#E3D6B8" stroke-width="3"/>
+          <rect x="68" y="68" width="376" height="376" rx="24" fill="none" stroke="#453927" stroke-width="16"/>
+          <path d="M162 76 V436 M256 76 V436 M350 76 V436 M76 162 H436 M76 256 H436 M76 350 H436" stroke="#453927" stroke-width="9" fill="none"/>
+          <g transform="rotate(-6 393 393)"><rect x="362" y="362" width="62" height="62" rx="12" fill="#B13A2A"/><rect x="378" y="378" width="30" height="30" rx="5" fill="none" stroke="#F5EEDC" stroke-width="5.5"/></g>
+        </svg>
+        <span>160px</span>
+      </div>
+      <div class="item">
+        <svg width="96" height="96" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+          <rect x="68" y="68" width="376" height="376" rx="24" fill="none" stroke="#453927" stroke-width="16"/>
+          <path d="M162 76 V436 M256 76 V436 M350 76 V436 M76 162 H436 M76 256 H436 M76 350 H436" stroke="#453927" stroke-width="9" fill="none"/>
+          <g transform="rotate(-6 393 393)"><rect x="362" y="362" width="62" height="62" rx="12" fill="#B13A2A"/><rect x="378" y="378" width="30" height="30" rx="5" fill="none" stroke="#F5EEDC" stroke-width="5.5"/></g>
+        </svg>
+        <span>96px</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel dark">
+    <h2>DARK 배경 위</h2>
+    <div class="items">
+      <div class="item">
+        <svg width="160" height="160" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+          <rect x="68" y="68" width="376" height="376" rx="24" fill="none" stroke="#453927" stroke-width="16"/>
+          <path d="M162 76 V436 M256 76 V436 M350 76 V436 M76 162 H436 M76 256 H436 M76 350 H436" stroke="#453927" stroke-width="9" fill="none"/>
+          <g transform="rotate(-6 393 393)"><rect x="362" y="362" width="62" height="62" rx="12" fill="#B13A2A"/><rect x="378" y="378" width="30" height="30" rx="5" fill="none" stroke="#F5EEDC" stroke-width="5.5"/></g>
+        </svg>
+        <span>크림 종이가 다크 배경에서 그대로 성립</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h1>파비콘 (16 / 32 / 64px)</h1>
+<p class="sub">단순화한 2×2 문살. SVG 내부 미디어쿼리로 OS 다크모드 자동 전환.</p>
+<div class="row">
+  <div class="panel light">
+    <h2>LIGHT</h2>
+    <div class="items">
+      <div class="item">
+        <svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="7" fill="#F5EEDC"/>
+          <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#B13A2A" transform="rotate(-6 22.2 22.2)"/>
+        </svg><span>64</span>
+      </div>
+      <div class="item">
+        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="7" fill="#F5EEDC"/>
+          <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#B13A2A" transform="rotate(-6 22.2 22.2)"/>
+        </svg><span>32</span>
+      </div>
+      <div class="item">
+        <svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="7" fill="#F5EEDC"/>
+          <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#453927" stroke-width="2.4"/>
+          <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#B13A2A" transform="rotate(-6 22.2 22.2)"/>
+        </svg><span>16</span>
+      </div>
+      <div class="item">
+        <div class="tab">
+          <svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="7" fill="#F5EEDC"/>
+            <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#453927" stroke-width="2.4"/>
+            <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#453927" stroke-width="2.4"/>
+            <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#B13A2A" transform="rotate(-6 22.2 22.2)"/>
+          </svg>
+          Hanji — 새 페이지
+        </div>
+        <span>브라우저 탭 목업</span>
+      </div>
+    </div>
+  </div>
+  <div class="panel dark">
+    <h2>DARK (자동 전환 팔레트)</h2>
+    <div class="items">
+      <div class="item">
+        <svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="7" fill="#221C12"/>
+          <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+          <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+          <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#C6503A" transform="rotate(-6 22.2 22.2)"/>
+        </svg><span>64</span>
+      </div>
+      <div class="item">
+        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="7" fill="#221C12"/>
+          <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+          <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+          <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#C6503A" transform="rotate(-6 22.2 22.2)"/>
+        </svg><span>32</span>
+      </div>
+      <div class="item">
+        <div class="tab">
+          <svg width="15" height="15" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="7" fill="#221C12"/>
+            <rect x="5" y="5" width="22" height="22" rx="3" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+            <path d="M16 5 V27 M5 16 H27" fill="none" stroke="#EFE6CF" stroke-width="2.4"/>
+            <rect x="18.8" y="18.8" width="6.8" height="6.8" rx="1.7" fill="#C6503A" transform="rotate(-6 22.2 22.2)"/>
+          </svg>
+          Hanji — 새 페이지
+        </div>
+        <span>브라우저 탭 목업</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h1>가로형 로고 락업</h1>
+<p class="sub">세리프 워드마크 + 한지·韓紙 부제. 배포 시 텍스트는 아웃라인(패스) 변환 권장.</p>
+<div class="row">
+  <div class="panel light">
+    <h2>LIGHT</h2>
+    <svg width="420" viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="24" width="152" height="152" rx="34" fill="#F5EEDC"/>
+      <rect x="40" y="48" width="104" height="104" rx="13" fill="none" stroke="#453927" stroke-width="11"/>
+      <path d="M92 48 V152 M40 100 H144" fill="none" stroke="#453927" stroke-width="11"/>
+      <rect x="103" y="111" width="31" height="31" rx="7" fill="#B13A2A" transform="rotate(-6 118.5 126.5)"/>
+      <text x="204" y="128" font-size="104" letter-spacing="1" fill="#453927" font-family="'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Noto Serif KR',Georgia,serif">Hanji</text>
+      <text x="208" y="170" font-size="26" letter-spacing="10" opacity="0.62" fill="#453927" font-family="'Noto Serif KR','Apple SD Gothic Neo',serif">한지 · 韓紙</text>
+    </svg>
+  </div>
+  <div class="panel dark">
+    <h2>DARK</h2>
+    <svg width="420" viewBox="0 0 580 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="16" y="24" width="152" height="152" rx="34" fill="#F5EEDC"/>
+      <rect x="40" y="48" width="104" height="104" rx="13" fill="none" stroke="#453927" stroke-width="11"/>
+      <path d="M92 48 V152 M40 100 H144" fill="none" stroke="#453927" stroke-width="11"/>
+      <rect x="103" y="111" width="31" height="31" rx="7" fill="#B13A2A" transform="rotate(-6 118.5 126.5)"/>
+      <text x="204" y="128" font-size="104" letter-spacing="1" fill="#EFE6CF" font-family="'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua','Noto Serif KR',Georgia,serif">Hanji</text>
+      <text x="208" y="170" font-size="26" letter-spacing="10" opacity="0.62" fill="#EFE6CF" font-family="'Noto Serif KR','Apple SD Gothic Neo',serif">한지 · 韓紙</text>
+    </svg>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "filters": {
+    "all": "전체",
+    "unread": "안 읽음",
+    "comments": "댓글",
+    "mentions": "멘션",
+    "edits": "편집"
+  },
+  "header": {
+    "closeUpdates": "업데이트 닫기",
+    "markAllRead": "모두 읽음으로 표시",
+    "markAllReadAria": "모든 업데이트를 읽음으로 표시",
+    "pageHistory": "페이지 기록",
+    "recentUpdates_other": "최근 업데이트 {{count}}개",
+    "unreadOfTotal": "업데이트 {{total}}개 중 {{unread}}개 안 읽음",
+    "updateType": "업데이트 유형",
+    "updates": "업데이트",
+    "modeUpdates": "알림",
+    "modeChats": "대화",
+    "inboxMode": "수신함 모드"
+  },
+  "time": {
+    "justNow": "방금 전",
+    "today": "오늘",
+    "yesterday": "어제"
+  },
+  "versions": {
+    "blockCount_other": "블록 {{count}}개",
+    "currentVersion": "현재 버전",
+    "currentVersionOnly": "현재 버전만 있어요",
+    "next": "다음",
+    "nextVersion": "다음 버전",
+    "noVersionPrevious": "이전 버전이 없어요",
+    "noVersionNext": "다음 버전이 없어요",
+    "pageLocked": "페이지 잠김",
+    "previous": "이전",
+    "previousSnapshots_other": "이전 스냅샷 {{count}}개",
+    "previousVersion": "이전 버전",
+    "restoredPrevious": "이전 버전으로 복원했어요",
+    "restoredNext": "다음 버전으로 복원했어요",
+    "restoredVersions": "버전 {{count}}개를 복원했어요",
+    "versionCount_other": "버전 {{count}}개",
+    "versionsAgo": "{{count}}개 이전 버전",
+    "versionsAhead": "{{count}}개 다음 버전",
+    "versionsAria": "버전 목록"
+  },
+  "badges": {
+    "comment": "댓글",
+    "edited": "편집됨",
+    "linked": "링크됨",
+    "member": "멤버",
+    "mention": "멘션",
+    "reply": "답글",
+    "replyMention": "답글 멘션",
+    "shared": "공유됨",
+    "system": "시스템"
+  },
+  "rows": {
+    "byActor": "{{name}}님",
+    "emptyComment": "빈 댓글",
+    "forYou": "나에게",
+    "notification": "알림",
+    "referenceMention": "{{title}} 멘션 · {{preview}}",
+    "referenceLink": "{{title}} 링크 · {{preview}}",
+    "unreadDot": "안 읽음",
+    "workspaceUpdate": "워크스페이스 업데이트"
+  },
+  "empty": {
+    "allCaughtUp": "모든 업데이트를 확인했어요.",
+    "loadingUpdates": "업데이트를 불러오는 중...",
+    "noFilteredUpdatesYet": "아직 {{filter}} 항목이 없어요.",
+    "noPageHistoryYet": "아직 페이지 기록이 없어요.",
+    "noUpdatesYet": "아직 업데이트가 없어요."
+  }
+}

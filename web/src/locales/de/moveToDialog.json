@@ -1,0 +1,34 @@
+{
+  "title": "Verschieben nach",
+  "workspaceRoot": {
+    "label": "Arbeitsbereich-Stamm",
+    "path": "Oberste Ebene"
+  },
+  "search": {
+    "label": "Verschiebeziele suchen",
+    "placeholder": "Seiten suchen..."
+  },
+  "dialog": {
+    "closeLabel": "Verschieben-Dialog schließen"
+  },
+  "results": {
+    "listLabel": "Verschiebeziele",
+    "empty": "Keine Seiten gefunden.",
+    "destinationLabel": "Verschieben nach {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "„{{title}}“ erstellen",
+    "optionLabel": "Seite {{title}} erstellen und hierher verschieben",
+    "hint": "Neue Seite auf oberster Ebene – hierher verschieben"
+  },
+  "locked": {
+    "parent": "Gesperrter übergeordneter Block",
+    "page": "Gesperrte Seite"
+  },
+  "toast": {
+    "lockedParent": "Seite befindet sich in einem gesperrten übergeordneten Block",
+    "locked": "Seite ist gesperrt",
+    "moved": "Seite verschoben",
+    "moveFailed": "Seite konnte nicht verschoben werden"
+  }
+}

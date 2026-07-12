@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "Ajouter une propriété de date",
+    "description": "Les vues chronologiques nécessitent une propriété de date de début pour afficher les pages dans le temps."
+  },
+  "endDateHint": "Ajoutez une propriété de date de fin pour afficher des plages au lieu de barres d'un jour.",
+  "zoom": {
+    "ariaLabel": "Zoom de la chronologie",
+    "day": "Jour",
+    "week": "Semaine",
+    "month": "Mois"
+  },
+  "dependencies": {
+    "label": "Dépendances :",
+    "hint": "ajouter une propriété de relation",
+    "relationPropertyAriaLabel": "Propriété de relation de dépendance"
+  },
+  "toolbar": {
+    "today": "Aujourd'hui",
+    "previousRange": "Plage précédente",
+    "nextRange": "Plage suivante",
+    "newPage": "Nouveau",
+    "newPageIn": "Nouvelle page dans {{dbTitle}}"
+  },
+  "table": {
+    "ariaLabel": "Tableau chronologique",
+    "nameHeader": "Nom"
+  },
+  "bar": {
+    "openAriaLabel": "Ouvrir {{title}}",
+    "openAriaLabelWithDates": "Ouvrir {{title}}, du {{start}} au {{end}}",
+    "openNoDateAriaLabel": "Ouvrir {{title}}, aucune date"
+  },
+  "lanes": {
+    "noItemsInRange": "Aucun élément dans cette plage.",
+    "noDatedItems": "Aucun élément daté pour le moment.",
+    "jumpTo": "Aller à {{date}}"
+  },
+  "noDate": {
+    "heading": "Aucune date ({{count}})"
+  },
+  "options": {
+    "none": "Aucun",
+    "untitled": "Sans titre"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "dialog": {
+    "label": "ページ内を検索"
+  },
+  "input": {
+    "label": "ページ内を検索",
+    "placeholder": "ページ内を検索"
+  },
+  "actions": {
+    "previous": "前の一致",
+    "next": "次の一致",
+    "close": "検索を閉じる"
+  }
+}

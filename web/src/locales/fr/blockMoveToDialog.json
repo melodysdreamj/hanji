@@ -1,0 +1,31 @@
+{
+  "title": "Déplacer le bloc vers",
+  "search": {
+    "label": "Rechercher des destinations de déplacement",
+    "placeholder": "Rechercher des pages…"
+  },
+  "dialog": {
+    "closeLabel": "Fermer la boîte de dialogue de déplacement"
+  },
+  "results": {
+    "listLabel": "Destinations de déplacement",
+    "empty": "Aucune page trouvée.",
+    "destinationLabel": "Déplacer le bloc vers {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "Créer « {{query}} »",
+    "optionLabel": "Créer la page « {{query}} » et y déplacer le bloc",
+    "hint": "Nouvelle page - déplacer le bloc ici"
+  },
+  "locked": {
+    "page": "Page verrouillée"
+  },
+  "untitled": "Sans titre",
+  "toast": {
+    "locked": "La page est verrouillée",
+    "movedBlock": "Bloc déplacé",
+    "movedBlocks": "Blocs déplacés",
+    "movedBlocksCount": "{{blockCount}} blocs déplacés",
+    "moveFailed": "Impossible de déplacer le bloc"
+  }
+}

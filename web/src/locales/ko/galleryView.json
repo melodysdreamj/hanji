@@ -1,0 +1,10 @@
+{
+  "emptyDesc": "이 데이터베이스에는 아직 페이지가 없습니다.",
+  "emptyTitle": "아직 페이지가 없습니다",
+  "newInline": "새 페이지",
+  "newPage": "새 페이지",
+  "newPageIn": "새 페이지 추가 ({{dbTitle}})",
+  "noResultsDesc": "현재 필터나 검색과 일치하는 페이지가 없습니다",
+  "noResultsTitle": "검색 결과가 없습니다",
+  "openRow": "{{title}} 열기"
+}

@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "关闭图标选择器",
+    "label": "选择图标"
+  },
+  "tabs": {
+    "groupLabel": "图标类型",
+    "emoji": "表情",
+    "image": "图片"
+  },
+  "remove": {
+    "label": "移除",
+    "ariaLabel": "移除图标"
+  },
+  "emoji": {
+    "searchPlaceholder": "筛选…",
+    "searchLabel": "搜索图标",
+    "random": "随机",
+    "randomLabel": "随机选择一个图标",
+    "recentLabel": "最近使用的优先",
+    "gridLabelRecent": "图标，最近使用的优先",
+    "gridLabel": "图标",
+    "optionLabel": "选择 {{emoji}} 图标",
+    "noResults": "没有匹配“{{query}}”的图标。请尝试其他关键词或清除筛选。"
+  },
+  "custom": {
+    "previewPlaceholder": "图片",
+    "linkPlaceholder": "粘贴图片链接",
+    "linkLabel": "图片图标链接",
+    "apply": "应用",
+    "upload": "上传文件",
+    "uploading": "上传中...",
+    "uploadingLabel": "正在上传 {{fileName}}",
+    "uploadFailed": "无法上传该图片。",
+    "fallbackFileName": "图标图片"
+  },
+  "uploadProgress": {
+    "preparing": "准备上传",
+    "finalizing": "完成中",
+    "complete": "完成",
+    "uploading": "上传中"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "searchActions": "操作を検索",
+  "noMatchingActions": "一致する操作はありません",
+  "untitledDatabaseRow": "無題のデータベース行",
+  "sections": {
+    "page": "ページ",
+    "style": "スタイル"
+  },
+  "aria": {
+    "closeDatabaseRowActions": "データベース行の操作を閉じる",
+    "closePageActions": "ページの操作を閉じる",
+    "databaseRowActionsFor": "{{title}} のデータベース行の操作",
+    "pageActionsFor": "{{title}} のページの操作",
+    "openIn": "開く",
+    "customizePage": "ページをカスタマイズ",
+    "backlinksDisplay": "バックリンクの表示",
+    "pageCommentsDisplay": "ページコメントの表示",
+    "pageFont": "ページのフォント"
+  },
+  "actions": {
+    "addToFavorites": "お気に入りに追加",
+    "removeFromFavorites": "お気に入りから削除",
+    "editIcon": "アイコンを編集",
+    "editProperties": "プロパティを編集",
+    "openIn": "開く",
+    "sidePeek": "サイドピーク",
+    "centerPeek": "センターピーク",
+    "fullPage": "フルページ",
+    "openInNewTab": "新しいタブで開く",
+    "comments": "コメント",
+    "copyLink": "リンクをコピー",
+    "duplicate": "複製",
+    "moveTo": "移動先",
+    "moveToTrash": "ゴミ箱に移動",
+    "rename": "名前を変更",
+    "addPageInside": "内部にページを追加",
+    "exportAsMarkdown": "Markdown としてエクスポート",
+    "exportAsHanjiFile": "Hanji ファイルとしてエクスポート",
+    "importMarkdown": "Markdownをインポート",
+    "importing": "インポート中...",
+    "unlockPage": "ページのロックを解除",
+    "lockPage": "ページをロック",
+    "pageHistory": "ページの履歴",
+    "removeVerification": "確認を解除",
+    "verifyPage": "ページを確認",
+    "customizePage": "ページをカスタマイズ",
+    "undo": "元に戻す"
+  },
+  "customize": {
+    "summaryDefault": "デフォルト",
+    "summaryCustomized": "カスタマイズ済み",
+    "backlinks": "バックリンク",
+    "pageComments": "ページのコメント"
+  },
+  "displayOptions": {
+    "default": "デフォルト",
+    "expanded": "展開",
+    "off": "オフ"
+  },
+  "fonts": {
+    "default": "デフォルト",
+    "serif": "セリフ",
+    "mono": "モノ"
+  },
+  "style": {
+    "smallText": "小さなテキスト",
+    "fullWidth": "全幅"
+  },
+  "meta": {
+    "created": "作成日時",
+    "createdBy": "作成者",
+    "lastEdited": "最終編集",
+    "editedBy": "編集者",
+    "verified": "確認済み",
+    "verifiedPrefix": "確認済み · {{label}}",
+    "words": "単語数",
+    "characters": "文字数",
+    "blocks": "ブロック数"
+  },
+  "toast": {
+    "copiedLink": "リンクをコピーしました",
+    "couldntCopyLink": "リンクをコピーできませんでした",
+    "exportedMarkdown": "Markdownをエクスポートしました",
+    "couldntExportMarkdown": "Markdownをエクスポートできませんでした",
+    "exportedHanjiFile": "Hanjiファイルとしてエクスポートしました。",
+    "exportedHanjiFileWithWarnings": "Hanjiファイルとしてエクスポートしました — 添付ファイルはプレースホルダーとして残されています。",
+    "couldntExportHanjiFile": "Hanjiファイルをエクスポートできませんでした。",
+    "importedBlocks_one": "{{count}}個のブロックをインポートしました",
+    "importedBlocks_other": "{{count}}個のブロックをインポートしました",
+    "nothingToImport": "インポートするものがありません",
+    "couldntImportMarkdown": "Markdownをインポートできませんでした",
+    "verificationRemoved": "確認を解除しました",
+    "pageVerified": "ページを確認しました",
+    "removedFromFavorites": "お気に入りから削除しました",
+    "addedToFavorites": "お気に入りに追加しました",
+    "couldntUpdateFavorites": "お気に入りを更新できませんでした",
+    "couldntDuplicatePage": "ページを複製できませんでした",
+    "duplicatedPage": "ページを複製しました",
+    "pageLocked": "ページをロックしました",
+    "pageUnlocked": "ページのロックを解除しました",
+    "movedToTrash": "ゴミ箱に移動しました",
+    "restoredPage": "ページを復元しました",
+    "couldntRestorePage": "ページを復元できませんでした",
+    "couldntMoveToTrash": "ゴミ箱に移動できませんでした"
+  }
+}

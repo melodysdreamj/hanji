@@ -1,0 +1,27 @@
+{
+  "title": "Nouvel espace de travail",
+  "name": {
+    "label": "Nom de l'espace de travail",
+    "placeholder": "Acme Inc."
+  },
+  "startLabel": "Démarrer à partir de",
+  "options": {
+    "blank": {
+      "title": "Espace de travail vide",
+      "body": "Démarrer à vide avec les pages de démarrage."
+    },
+    "notion": {
+      "title": "Importer depuis Notion",
+      "body": "Créer l'espace de travail, puis y migrer un espace de travail Notion."
+    },
+    "hanji": {
+      "title": "Importer depuis un autre Hanji",
+      "body": "Créer l'espace de travail, puis importer un espace de travail depuis un autre serveur ou fichier Hanji."
+    }
+  },
+  "create": "Créer l'espace de travail",
+  "creating": "Création…",
+  "error": {
+    "couldntCreate": "Impossible de créer l'espace de travail."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "diagramLabel": "Mermaid 다이어그램",
+  "emptyPreview": "다이어그램 미리보기",
+  "sourceDescription": "다이어그램 원본: {{source}}",
+  "syntaxError": "다이어그램에 문법 오류가 있어요.",
+  "syntaxErrorDetails": "자세히 보기"
+}

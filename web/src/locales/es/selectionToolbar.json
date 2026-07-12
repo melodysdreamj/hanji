@@ -1,0 +1,76 @@
+{
+  "toolbar": {
+    "ariaLabel": "Formato de texto"
+  },
+  "turnInto": {
+    "label": "Convertir en",
+    "options": {
+      "text": "Texto",
+      "heading1": "Encabezado 1",
+      "heading2": "Encabezado 2",
+      "heading3": "Encabezado 3",
+      "heading4": "Encabezado 4",
+      "toDoList": "Lista de tareas",
+      "bulletedList": "Lista con viñetas",
+      "numberedList": "Lista numerada",
+      "toggleList": "Lista plegable",
+      "quote": "Cita",
+      "callout": "Llamada",
+      "code": "Código"
+    }
+  },
+  "marks": {
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "underline": "Subrayado",
+    "strikethrough": "Tachado",
+    "code": "Código",
+    "link": "Enlace"
+  },
+  "comment": {
+    "label": "Comentario"
+  },
+  "colorButton": {
+    "ariaLabel": "Color de texto: {{color}}",
+    "title": "Color: {{color}}"
+  },
+  "colors": {
+    "mixed": "Mixto",
+    "text": {
+      "heading": "Color de texto",
+      "default": "Predeterminado",
+      "gray": "Gris",
+      "brown": "Marrón",
+      "orange": "Naranja",
+      "yellow": "Amarillo",
+      "green": "Verde",
+      "blue": "Azul",
+      "purple": "Morado",
+      "pink": "Rosa",
+      "red": "Rojo"
+    },
+    "background": {
+      "heading": "Color de fondo",
+      "gray": "Fondo gris",
+      "brown": "Fondo marrón",
+      "orange": "Fondo naranja",
+      "yellow": "Fondo amarillo",
+      "green": "Fondo verde",
+      "blue": "Fondo azul",
+      "purple": "Fondo morado",
+      "pink": "Fondo rosa",
+      "red": "Fondo rojo"
+    }
+  },
+  "linkEditor": {
+    "ariaLabel": "Editar enlace",
+    "placeholder": "Pegar enlace",
+    "urlAriaLabel": "URL del enlace",
+    "apply": "Enlazar",
+    "open": "Abrir enlace",
+    "copy": "Copiar enlace",
+    "copied": "Copiado",
+    "copiedLink": "Enlace copiado",
+    "remove": "Quitar"
+  }
+}

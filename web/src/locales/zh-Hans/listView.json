@@ -1,0 +1,10 @@
+{
+  "emptyDesc": "此数据库尚无页面。",
+  "emptyTitle": "暂无页面",
+  "newInline": "新建",
+  "newPage": "新建页面",
+  "newPageIn": "在 {{dbTitle}} 中新建页面",
+  "noResultsDesc": "没有页面匹配当前筛选或搜索条件。",
+  "noResultsTitle": "无结果",
+  "openRow": "打开 {{title}}"
+}

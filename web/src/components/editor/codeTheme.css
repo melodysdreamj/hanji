@@ -1,0 +1,84 @@
+/* highlight.js themes. The base (light) theme always loads; the dark variant is
+   scoped under [data-theme="dark"] so it only applies in dark mode. Both files
+   define .hljs token classes, so we wrap the dark one in a scope selector via a
+   layer-free nested override below. */
+@import "highlight.js/styles/github.css";
+
+/* Dark-theme token colors (github-dark), scoped to the app's dark mode. The
+   values mirror highlight.js/styles/github-dark.css but are namespaced under
+   [data-theme="dark"] so they don't leak into light mode. */
+[data-theme="dark"] .hljs {
+  color: #e6edf3;
+  background: transparent;
+}
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .hljs-punctuation {
+  color: #8b949e;
+}
+[data-theme="dark"] .hljs-attr,
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-meta .hljs-keyword,
+[data-theme="dark"] .hljs-selector-tag,
+[data-theme="dark"] .hljs-keyword {
+  color: #ff7b72;
+}
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .hljs-literal,
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-doctag {
+  color: #79c0ff;
+}
+[data-theme="dark"] .hljs-params {
+  color: #c9d1d9;
+}
+[data-theme="dark"] .hljs-function {
+  color: #d2a8ff;
+}
+[data-theme="dark"] .hljs-class .hljs-title,
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-title.class_,
+[data-theme="dark"] .hljs-title.function_ {
+  color: #d2a8ff;
+}
+[data-theme="dark"] .hljs-tag,
+[data-theme="dark"] .hljs-name,
+[data-theme="dark"] .hljs-selector-id,
+[data-theme="dark"] .hljs-selector-class {
+  color: #7ee787;
+}
+[data-theme="dark"] .hljs-regexp,
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+[data-theme="dark"] .hljs-built_in,
+[data-theme="dark"] .hljs-symbol {
+  color: #ffa657;
+}
+[data-theme="dark"] .hljs-section,
+[data-theme="dark"] .hljs-bullet {
+  color: #f2cc60;
+}
+[data-theme="dark"] .hljs-emphasis {
+  color: #c9d1d9;
+  font-style: italic;
+}
+[data-theme="dark"] .hljs-strong {
+  color: #c9d1d9;
+  font-weight: 600;
+}
+[data-theme="dark"] .hljs-addition {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+[data-theme="dark"] .hljs-deletion {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+
+/* The hljs theme sets a `background` on `.hljs` we don't want (the code block
+   already has its own surface). Keep highlighted code transparent. */
+.hljs {
+  background: transparent;
+  padding: 0;
+}

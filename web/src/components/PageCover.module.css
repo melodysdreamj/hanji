@@ -1,0 +1,285 @@
+.cover {
+  position: relative;
+  width: 100%;
+  height: 30vh;
+  min-height: 140px;
+  max-height: 280px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.cover[data-compact="true"] {
+  height: 28vh;
+  min-height: 128px;
+  max-height: 240px;
+}
+.cover[data-repositioning="true"] {
+  cursor: ns-resize;
+}
+.cover[data-repositioning="true"]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent-blue);
+}
+.actions {
+  position: absolute;
+  right: 20px;
+  bottom: 12px;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.cover:hover .actions,
+.cover:focus-within .actions,
+.cover[data-menu-open="true"] .actions,
+.cover[data-repositioning="true"] .actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+.actions > button,
+.repositionBar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: var(--bg-floating-control);
+  box-shadow: 0 1px 2px rgba(15, 15, 15, 0.14);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.actions > button:hover,
+.actions > button:focus-visible,
+.repositionBar button:hover,
+.repositionBar button:focus-visible {
+  background: var(--bg-floating-control-hover);
+  color: var(--text-default);
+  outline: none;
+}
+.actions > .dangerAction {
+  color: rgba(224, 62, 62, 0.82);
+}
+.actions > .dangerAction:hover,
+.actions > .dangerAction:focus-visible {
+  color: rgb(224, 62, 62);
+}
+.menuScrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.menu {
+  position: absolute;
+  right: 0;
+  bottom: 38px;
+  z-index: 4;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+  color: var(--text-default);
+}
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-default);
+}
+.tabs button {
+  height: 30px;
+  padding: 0 8px;
+  border-bottom: 2px solid transparent;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.tabs button:hover,
+.tabs button:focus-visible,
+.tabs button[data-active="true"] {
+  color: var(--text-default);
+  outline: none;
+}
+.tabs button[data-active="true"] {
+  border-bottom-color: var(--text-default);
+}
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.coverTile {
+  height: 58px;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: inset 0 0 0 1px rgba(15, 15, 15, 0.08);
+}
+.coverTile:hover,
+.coverTile:focus-visible,
+.coverTile[data-selected="true"] {
+  border-color: var(--accent-blue);
+  outline: none;
+}
+.uploadPane,
+.linkPane {
+  padding: 4px 0 2px;
+}
+.uploadPane input {
+  display: none;
+}
+.uploadPane button,
+.linkPane button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: var(--text-default);
+  color: var(--bg-app);
+  font-size: 13px;
+  font-weight: 500;
+}
+.uploadPane button:hover,
+.uploadPane button:focus-visible,
+.linkPane button:hover,
+.linkPane button:focus-visible {
+  opacity: 0.88;
+  outline: none;
+}
+.uploadPane button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.uploadPane p {
+  margin: 8px 0 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.uploadProgress {
+  display: grid;
+  gap: 5px;
+  margin-top: 9px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.uploadProgressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.uploadProgressHeader strong {
+  overflow: hidden;
+  color: var(--text-default);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uploadProgressName {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uploadProgressTrack {
+  position: relative;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-hover);
+}
+.uploadProgressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  transition: width 0.16s ease;
+}
+.linkPane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.linkPane input {
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  outline: none;
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-size: 13px;
+}
+.linkPane input:focus-visible {
+  border-color: var(--accent-blue);
+}
+.linkError {
+  grid-column: 1 / -1;
+  color: rgb(224, 62, 62);
+  font-size: 12px;
+}
+.repositionBar {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  padding: 6px 8px 6px 12px;
+  border-radius: 5px;
+  background: rgba(25, 25, 25, 0.86);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.repositionBar span {
+  flex: 1 1 auto;
+}
+.repositionBar button {
+  flex: 0 0 auto;
+  background: var(--bg-floating-control);
+  color: var(--text-default);
+}
+
+@media (max-width: 760px) {
+  .actions {
+    right: 12px;
+    bottom: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100% - 24px);
+  }
+  .repositionBar {
+    left: 12px;
+    right: 12px;
+    justify-content: space-between;
+    transform: none;
+    white-space: normal;
+  }
+  .menu {
+    right: -4px;
+    width: min(420px, calc(100vw - 24px));
+  }
+  .galleryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
