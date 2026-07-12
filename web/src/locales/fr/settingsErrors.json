@@ -1,0 +1,24 @@
+{
+  "rateLimited": "Trop de requêtes pour le moment. Veuillez réessayer dans un instant.",
+  "requestFailed": "Nous n'avons pas pu traiter cette demande. Veuillez réessayer.",
+  "backend": {
+    "workspaceAdminRequired": "Un accès administrateur de l'espace de travail est requis.",
+    "workspaceOwnerRequired": "Un accès propriétaire de l'espace de travail est requis.",
+    "onlyOwnersAssignAdmin": "Seuls les propriétaires de l'espace de travail peuvent attribuer le rôle d'administrateur.",
+    "onlyOwnersManageAdmins": "Seuls les propriétaires de l'espace de travail peuvent gérer les administrateurs.",
+    "onlyOwnersRemoveAdmins": "Seuls les propriétaires de l'espace de travail peuvent retirer des administrateurs.",
+    "ownersCannotChangeRole": "Le rôle du propriétaire de l'espace de travail ne peut pas être modifié ici. Transférez d'abord la propriété.",
+    "ownersCannotBeRemoved": "Le propriétaire de l'espace de travail ne peut pas être retiré. Transférez d'abord la propriété.",
+    "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle dans l'espace de travail.",
+    "cannotRemoveSelf": "Vous ne pouvez pas vous retirer de l'espace de travail.",
+    "onlyAssignableRoles": "Seuls les rôles administrateur, membre et invité peuvent être attribués.",
+    "memberNotFound": "Ce membre de l'espace de travail est introuvable.",
+    "invitationNotFound": "Cette invitation est introuvable.",
+    "transferTargetMustBeMember": "Choisissez un autre membre à qui transférer la propriété.",
+    "emailRequired": "L'adresse e-mail est requise.",
+    "emailInvalid": "Cette adresse e-mail ne semble pas valide.",
+    "externalGuestDisabled": "Les invitations d'invités externes sont désactivées par la politique de l'organisation.",
+    "verifiedDomainRequired": "Les membres de l'organisation doivent utiliser un domaine d'organisation vérifié.",
+    "workspaceUrlInUse": "Cette URL d'espace de travail est déjà utilisée."
+  }
+}

@@ -1,0 +1,153 @@
+/* Chart view (database "chart" layout) UI.
+   Owned by ChartView only; database.module.css is owned elsewhere.
+   Everything is driven by the global color tokens so the light and dark
+   themes ([data-theme]) both resolve without chart-specific overrides. */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 4px 0 12px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.toolbarLabel {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.select {
+  width: 168px;
+}
+
+.canvasWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  max-width: 920px;
+  height: auto;
+}
+
+.gridline {
+  stroke: var(--border-default);
+  stroke-width: 1;
+}
+
+.axisLine {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.tickText {
+  fill: var(--text-tertiary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.axisText {
+  fill: var(--text-secondary);
+  font-size: 11.5px;
+}
+
+.bar:hover {
+  opacity: 0.82;
+}
+
+.line {
+  fill: none;
+  stroke: var(--accent-blue);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.point {
+  fill: var(--accent-blue);
+  stroke: var(--bg-app);
+  stroke-width: 1.5;
+}
+
+.donutWrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  padding: 10px 4px;
+}
+
+.donutCanvas {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+}
+
+.donutPlaceholder {
+  stroke: var(--border-default);
+}
+
+.donutSegment:hover {
+  opacity: 0.82;
+}
+
+.donutTotal {
+  fill: var(--text-default);
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.donutTotalLabel {
+  fill: var(--text-tertiary);
+  font-size: 11px;
+}
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  color: var(--text-default);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendChip {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 3px;
+}
+
+.legendLabel {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendValue {
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}

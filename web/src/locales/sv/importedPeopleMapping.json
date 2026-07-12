@@ -1,0 +1,16 @@
+{
+  "title": "Imported people",
+  "body": "People imported from Notion stay as source references until an admin maps them to workspace accounts.",
+  "scan": "Find imported people",
+  "scanning": "Scanning…",
+  "rescan": "Rescan",
+  "empty": "No unmapped imported people were found.",
+  "keepPlaceholder": "Keep as imported reference",
+  "usage": "{{values}} values · {{mentions}} mentions",
+  "apply": "Apply mapping",
+  "applying": "Applying…",
+  "applied": "Mapped {{people}} people across {{pages}} rows/pages and {{blocks}} blocks.",
+  "failed": "Person mapping failed.",
+  "suggested": "suggested",
+  "mapAria": "Map {{label}}"
+}

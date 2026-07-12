@@ -1,0 +1,109 @@
+{
+  "region": "Notion トークンの手順",
+  "play": "再生",
+  "pause": "一時停止",
+  "prev": "前のステップ",
+  "next": "次のステップ",
+  "stepLabel": "ステップ {{n}} / {{total}}",
+  "scenes": [
+    {
+      "title": "Hanji からトークンページを開く",
+      "caption": "Hanji で「Notion トークンページを開く」をクリックすると、Notion の開発者ポータルが新しいタブで開きます。"
+    },
+    {
+      "title": "接続を作成",
+      "caption": "notion.so/profile/integrations（接続）で「新規接続」をクリックします。"
+    },
+    {
+      "title": "ワークスペースを選択してトークンを作成",
+      "caption": "「アクセストークン」を選択し、このトークンを適用する Notion ワークスペースを選びます — トークンは常に1つのワークスペースに属します。"
+    },
+    {
+      "title": "アクセストークンをコピー",
+      "caption": "ntn_… トークンをコピーして、下のトークン欄に貼り付けます。"
+    },
+    {
+      "title": "ページに接続を追加",
+      "caption": "Notion で、各最上位ページを開き → ··· → 接続 → この接続を追加します。サブページは自動的に含まれます — 戻ってスキャンしてください。"
+    },
+    {
+      "title": "Hanji にトークンを貼り付け",
+      "caption": "Hanji に戻り、コピーしたトークンを「Notion API トークン」欄に貼り付けます。"
+    },
+    {
+      "title": "インポート対象を選択",
+      "caption": "ワークスペース全体をインポートするか、「特定のページ」を選択して選んだページとデータベースだけを取り込みます。"
+    }
+  ],
+  "mock": {
+    "url": "app.notion.com/developers/connections",
+    "hanjiTitle": "Hanji · インポート",
+    "inkIntroTitle": "Notion API トークンでインポート",
+    "inkIntroDesc": "ローカルホスティングでは、Notion で作成したトークンを貼り付けるのが最も信頼できるセットアップです。",
+    "inkMakeToken": "Notion トークンページを開く",
+    "inkStep1Title": "Notion トークンを準備",
+    "inkTokenLabel": "Notion API トークン",
+    "inkTokenValue": "ntn_••••••••",
+    "inkStep2Title": "インポート対象を選択",
+    "scopeAllTitle": "ワークスペース全体",
+    "scopeAllRec": "推奨",
+    "scopeAllDesc": "接続がアクセスできるすべてのもの。ページ間のデータベースリレーションも維持されます。",
+    "scopeSomeTitle": "特定のページ",
+    "scopeSomeDesc": "アクセス可能な最上位アイテムをスキャンし、選択したページ/データベースだけをインポートします。",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "backLink": "‹ Notion に戻る",
+    "devTitle": "開発者",
+    "nav": [
+      "はじめに",
+      "Worker",
+      "個人アクセストークン",
+      "接続"
+    ],
+    "navNew": "新規",
+    "listTitle": "接続",
+    "listSubtitle": "Notion の公開・非公開 API 接続を作成・管理します。",
+    "learnMore": "詳細を表示",
+    "newConnection": "+ 新規接続",
+    "colConnection": "接続",
+    "colWorkspaces": "インストール可能なワークスペース:",
+    "colAuthType": "認証タイプ",
+    "colOwner": "オーナー",
+    "integrationName": "Hanji",
+    "capabilities": "コンテンツの読み取り、コンテンツの更新と挿入、ユーザー情報の読み取り",
+    "workspaceName": "マイワークスペース",
+    "authTypeCell": "アクセストークン",
+    "ownerName": "あなた",
+    "modalTitle": "新しい接続",
+    "modalDesc": "Notionでアプリ、エージェント、ワークフローを認証するための接続を作成します。単一ワークスペースまたは複数ワークスペースのスコープを選択してください。",
+    "nameLabel": "接続名",
+    "namePlaceholder": "マイ接続",
+    "authMethod": "認証方法",
+    "accessToken": "アクセストークン",
+    "accessTokenDesc": "コラボレーター間で共有される静的なワークスペーススコープのAPIトークンで、独自の機能設定を持ちます。1つのワークスペースに限定され、Marketplaceに公開することはできません。",
+    "oauth": "OAuth",
+    "oauthDesc": "ユーザースコープのOAuth 2.0。権限はログイン中のユーザーに限定されます。複数のワークスペースをサポートします。",
+    "wsLabel": "インストール可能なワークスペース:",
+    "wsDesc": "このトークンは選択したワークスペースに適用されます。",
+    "terms": "接続を作成することで、Notionのデベロッパー規約に同意したことになります。",
+    "createButton": "接続を作成",
+    "breadcrumb": "接続  ›  接続を管理",
+    "detailTabs": [
+      "設定",
+      "コンテンツの機能",
+      "Webhooks",
+      "オーナー"
+    ],
+    "tokenSectionTitle": "API統合トークン",
+    "tokenSectionDesc": "このワークスペースのAPIリクエストを認証するには、このトークンを使用します。トークンを持つ人は誰でも接続として操作できるため、秘密に保ってください。",
+    "tokenFieldLabel": "アクセストークン",
+    "tokenValue": "••••••••••••••••••••••••••••",
+    "copied": "コピーしました",
+    "pageTitle": "チームハンドブック",
+    "share": "共有",
+    "menuCopyLink": "リンクをコピー",
+    "menuDuplicate": "複製",
+    "menuConnectionsLabel": "接続",
+    "menuAddConnection": "接続を追加",
+    "searchPlaceholder": "接続を検索…"
+  }
+}

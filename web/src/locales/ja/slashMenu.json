@@ -1,0 +1,15 @@
+{
+  "blockCommands": "ブロックコマンド",
+  "closeBlockCommands": "ブロックコマンドを閉じる",
+  "groups": {
+    "Basic": "基本ブロック",
+    "Media": "メディア",
+    "Database": "データベース",
+    "Advanced": "高度なブロック"
+  },
+  "itemStatus": "{{label}}、{{total}}件中{{position}}件目。Enterキーで挿入。",
+  "listStatus": "{{total}}件のブロックコマンドが利用可能です。",
+  "noBlocks": "ブロックが見つかりません",
+  "noBlocksFor": "「{{query}}」のブロックが見つかりません",
+  "recentlyUsed": "最近使用したもの"
+}

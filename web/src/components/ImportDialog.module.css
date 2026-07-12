@@ -1,0 +1,1565 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 255;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: rgba(15, 15, 15, 0.22);
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(640px, calc(100vw - 32px));
+  height: min(620px, calc(100vh - 48px));
+  margin: 36px auto 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 14px 0 20px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.header h2 {
+  margin: 0;
+  color: var(--text-default);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  color: var(--text-tertiary);
+}
+
+.close:hover,
+.close:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  outline: none;
+}
+
+.close:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.nav {
+  min-width: 0;
+  padding: 10px 8px;
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-sidebar);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navItem:hover,
+.navItem:focus-visible,
+.navItem[data-active="true"] {
+  background: var(--bg-active);
+  color: var(--text-default);
+  outline: none;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 174px;
+  padding: 22px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.dropzone[data-active="true"] {
+  border-color: var(--accent-blue);
+  background: rgba(35, 131, 226, 0.08);
+}
+
+.dropzone[data-busy="true"] {
+  opacity: 0.76;
+}
+
+.dropIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  background: var(--bg-app);
+  color: var(--text-tertiary);
+  box-shadow: var(--shadow-sm);
+}
+
+.dropzone strong {
+  color: var(--text-default);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.importProgress {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 280px);
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.importProgress > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.importProgressTrack {
+  position: relative;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-hover);
+}
+
+.importProgressTrack span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -35%;
+  width: 35%;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  animation: importProgressSlide 1.05s ease-in-out infinite;
+}
+
+@keyframes importProgressSlide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(385%);
+  }
+}
+
+.primary {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  background: var(--text-default);
+  color: var(--bg-app);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.primary:hover,
+.primary:focus-visible {
+  opacity: 0.88;
+  outline: none;
+}
+
+.primary:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.secondary {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.secondary:hover,
+.secondary:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.secondary:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.externalButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.externalButton:hover,
+.externalButton:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.textLink:hover,
+.textLink:focus-visible {
+  color: var(--text-default);
+  outline: none;
+  text-decoration: underline;
+}
+
+.destBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+
+.destRoute {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.destRoute strong {
+  overflow: hidden;
+  color: var(--text-default);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destNote {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.stepCard {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+
+/* ─── Notion import wizard chrome ─── */
+.wizardSteps {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.wizardStep {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-weight: 500;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+.wizardStep:hover:not(:disabled),
+.wizardStep:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+
+.wizardStep[data-active="true"] {
+  background: var(--bg-hover);
+  color: var(--text-default);
+}
+
+.wizardStep[data-done="true"] {
+  color: var(--text-secondary);
+}
+
+.wizardStep:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.wizardStepBadge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--bg-active);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.wizardStep[data-active="true"] .wizardStepBadge {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.wizardStep[data-done="true"] .wizardStepBadge {
+  background: rgba(68, 131, 97, 0.18);
+  color: var(--c-green);
+}
+
+.wizardFooter {
+  /* Pinned to the dialog bottom like a real wizard: the panel scrolls its step
+     content underneath, the footer's Back/Next stay reachable. Negative side
+     margins cancel the panel padding so the pinned bar spans edge to edge. */
+  position: sticky;
+  z-index: 1;
+  bottom: -18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: auto -18px -18px;
+  padding: 10px 18px 14px;
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-app);
+}
+
+/* The footer's Back/primary buttons must keep their (localized) label on one
+   line and never be squeezed by a long hint — otherwise "이전"/"Zurück"/etc.
+   wrap to two lines and the primary label truncates. Only the hint flexes. */
+.wizardFooter > button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.wizardHint {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+/* ─── Installer-style run panel ─── */
+.runCurrent {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.runCurrent strong {
+  min-width: 0;
+  flex: 1 1 auto;
+  /* Keep the current-item title on a single line so the panel doesn't jump
+     between one and two lines as item names of varying length stream past. */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-default);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.runPercent {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.runLog {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  /* Fixed height so the panel doesn't jump as log lines stream in — the box
+     stays a constant size from the first line and scrolls internally. */
+  height: 150px;
+  padding: 8px 10px;
+  overflow-y: auto;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bg-hover) 40%, transparent);
+  overscroll-behavior: contain;
+}
+
+.runLogLine {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.runLogTime {
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.runLogText {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runLogCount {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.runLogLine[data-empty="true"] .runLogText {
+  color: var(--text-tertiary);
+}
+
+.stepCard[data-live="true"] {
+  border-color: rgba(35, 131, 226, 0.35);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.stepHeader strong {
+  color: var(--text-default);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.stepBadge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--bg-active);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.stepCard[data-done="true"] .stepBadge {
+  background: rgba(68, 131, 97, 0.18);
+  color: var(--c-green);
+}
+
+.stepDone {
+  overflow: hidden;
+  margin-left: auto;
+  color: var(--c-green);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stepHint {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.stepHint[data-tone="ok"] {
+  color: var(--text-secondary);
+}
+
+.tokenDetails {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+}
+
+.tokenDetails summary {
+  min-height: 30px;
+  padding: 6px 9px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 500;
+  list-style: none;
+}
+
+.tokenDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.tokenDetails summary::before {
+  content: "▸";
+  margin-right: 6px;
+  color: var(--text-tertiary);
+}
+
+.tokenDetails[open] summary::before {
+  content: "▾";
+}
+
+.tokenDetails:not([open]) .tokenFields {
+  display: none;
+}
+
+.tokenDetails summary:focus-visible {
+  outline: 2px solid rgba(35, 131, 226, 0.28);
+  outline-offset: 1px;
+}
+
+.tokenGuide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+}
+
+.tokenGuideCopy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.tokenGuideCopy strong {
+  color: var(--text-default);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.tokenGuideCopy p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tokenGuideActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tokenFields {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(150px, 0.5fr);
+  align-items: end;
+  gap: 10px;
+}
+
+.tokenFields > div,
+.tokenFields > .stepHint {
+  grid-column: 1 / -1;
+}
+
+.tokenInstructions {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.tokenInstructions summary {
+  min-height: 26px;
+  cursor: pointer;
+  color: var(--text-default);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  list-style: none;
+}
+
+.tokenInstructions summary::-webkit-details-marker {
+  display: none;
+}
+
+.tokenInstructions summary::before {
+  content: "▸";
+  margin-right: 6px;
+  color: var(--text-tertiary);
+}
+
+.tokenInstructions[open] summary::before {
+  content: "▾";
+}
+
+.tokenInstructions summary:focus-visible {
+  outline: 2px solid rgba(35, 131, 226, 0.28);
+  outline-offset: 1px;
+}
+
+.tokenInstructions ol {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 6px;
+  padding-left: 18px;
+}
+
+.tokenInstructions li {
+  padding-left: 2px;
+}
+
+.scopeGroup {
+  display: grid;
+  gap: 6px;
+}
+
+.scopeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+  cursor: pointer;
+}
+
+.scopeOption[data-selected="true"] {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px rgba(35, 131, 226, 0.35);
+}
+
+.scopeOption input {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  accent-color: var(--accent-blue);
+}
+
+.optionRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+  cursor: pointer;
+}
+
+.optionRow:hover,
+.optionRow:focus-within {
+  background: var(--bg-hover);
+}
+
+.optionRow input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  accent-color: var(--accent-blue);
+}
+
+.optionText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.optionText strong {
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.optionText span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.scopeText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scopeTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.scopeTitle em {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(35, 131, 226, 0.14);
+  color: var(--accent-blue);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.scopeDesc {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rootPicker {
+  display: grid;
+  gap: 8px;
+}
+
+.rootScanRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rootScanRow > button {
+  flex: 0 0 auto;
+}
+
+.rootScanSummary {
+  min-width: 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.rootScanProgressBar {
+  position: relative;
+  overflow: hidden;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--bg-hover);
+}
+
+.rootScanProgressBar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 42%;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  animation: rootScanProgress 1.1s ease-in-out infinite;
+}
+
+.rootScanEmptyNotice {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.rootScanEmptyNotice p {
+  margin: 0;
+}
+
+.rootScanEmptyNotice ol {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 3px;
+  list-style: decimal;
+}
+
+.rootScanEmptyNotice ol li {
+  list-style: inherit;
+}
+
+.rootScanEmptyTitle {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+@keyframes rootScanProgress {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  55% {
+    transform: translateX(95%);
+  }
+
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.rootList {
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+}
+
+.rootListHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.rootListHeader strong {
+  color: var(--text-default);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.rootListHeader span {
+  margin-right: auto;
+  color: var(--text-tertiary);
+}
+
+.inlineButton {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.inlineButton:hover,
+.inlineButton:focus-visible {
+  color: var(--text-default);
+  text-decoration: underline;
+}
+
+.inlineButton:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+  text-decoration: none;
+}
+
+.rootCandidateList {
+  display: grid;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.rootCandidate {
+  display: grid;
+  grid-template-columns: auto 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 7px 9px;
+  cursor: pointer;
+}
+
+.rootCandidate + .rootCandidate {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.rootCandidate:hover,
+.rootCandidate:focus-within {
+  background: var(--bg-hover);
+}
+
+.rootCandidate[data-selected="true"] {
+  background: color-mix(in srgb, var(--accent-blue) 9%, transparent);
+}
+
+.rootCandidate input {
+  margin: 0;
+  accent-color: var(--accent-blue);
+}
+
+.rootCandidate:has(input:disabled) {
+  cursor: default;
+}
+
+.rootCandidateIcon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  color: var(--text-tertiary);
+  background: var(--bg-hover);
+}
+
+.rootCandidateText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rootCandidateText strong,
+.rootCandidateText span {
+  overflow-wrap: anywhere;
+}
+
+.rootCandidateText strong {
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.rootCandidateText span {
+  color: var(--text-tertiary);
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+.manualRootFallback {
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-app);
+}
+
+.manualRootFallback summary {
+  padding: 7px 9px;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.manualRootFallback .field {
+  padding: 0 9px 9px;
+}
+
+.statusPill {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-active);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.statusPill[data-status="ready"],
+.statusPill[data-status="completed"] {
+  background: rgba(68, 131, 97, 0.16);
+  color: var(--c-green);
+}
+
+.statusPill[data-status="failed"],
+.statusPill[data-status="cancelled"] {
+  background: rgba(212, 76, 71, 0.14);
+  color: var(--c-red);
+}
+
+.statusPill[data-status="discovering"],
+.statusPill[data-status="queued"] {
+  background: rgba(35, 131, 226, 0.14);
+  color: var(--accent-blue);
+}
+
+.progressSteps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progressStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--bg-app);
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.progressStepDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+.progressStep[data-status="running"] {
+  color: var(--text-default);
+}
+
+.progressStep[data-status="running"] .progressStepDot {
+  background: var(--accent-blue);
+  animation: progressStepPulse 1.1s ease-in-out infinite;
+}
+
+.progressStep[data-status="completed"] {
+  color: var(--text-secondary);
+}
+
+.progressStep[data-status="completed"] .progressStepDot {
+  background: var(--c-green);
+}
+
+.progressStep[data-status="failed"] .progressStepDot,
+.progressStep[data-status="cancelled"] .progressStepDot {
+  background: var(--c-red);
+}
+
+@keyframes progressStepPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.progressTrack {
+  position: relative;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-hover);
+}
+
+.progressTrack > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  transition: width 0.5s ease;
+}
+
+.progressTrack > span[data-indeterminate="true"] {
+  left: -35%;
+  width: 35%;
+  animation: importProgressSlide 1.05s ease-in-out infinite;
+}
+
+.statGrid {
+  display: grid;
+  gap: 6px;
+}
+
+.statBlock {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.statLabel {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.statValue {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.actionBar {
+  position: sticky;
+  bottom: -18px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -4px -18px -18px;
+  padding: 12px 18px 14px;
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-app);
+}
+
+.actionBarHint {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notionForm {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+
+.field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.field span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+  color: var(--text-default);
+  font: inherit;
+  font-size: 13px;
+}
+
+.field input,
+.field select {
+  height: 32px;
+  padding: 0 9px;
+}
+
+.field select {
+  appearance: none;
+}
+
+.field textarea {
+  min-height: 68px;
+  resize: vertical;
+  padding: 8px 9px;
+  line-height: 1.35;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent-blue);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.16);
+}
+
+.connectionPicker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.notionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jobSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid rgba(35, 131, 226, 0.22);
+  border-radius: 6px;
+  background: rgba(35, 131, 226, 0.08);
+}
+
+.jobSummary strong {
+  color: var(--text-default);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.jobSummary span {
+  color: var(--text-secondary);
+  font-size: 12.5px;
+}
+
+.reportPanel {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+
+.reportMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.planWrites {
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reportMetrics span {
+  min-height: 22px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--bg-app);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.reportGroups {
+  display: grid;
+  gap: 6px;
+}
+
+.reportGroup {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+}
+
+.reportGroup summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 28px;
+  padding: 5px 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.reportGroup summary::-webkit-details-marker {
+  display: none;
+}
+
+.reportGroup summary:focus-visible {
+  outline: 2px solid rgba(35, 131, 226, 0.28);
+  outline-offset: 1px;
+}
+
+.reportGroup summary span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reportGroup summary span:last-child {
+  min-width: 20px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+  text-align: center;
+  font-size: 11.5px;
+}
+
+.reportIssues {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px 8px;
+  list-style: none;
+}
+
+.reportIssues li {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobs {
+  display: grid;
+  gap: 6px;
+}
+
+.jobRow {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 7px 8px;
+  border-radius: var(--radius);
+}
+
+.jobRow:hover {
+  background: var(--bg-hover);
+}
+
+.jobActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.jobIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.jobText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.jobText strong,
+.jobText span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobText strong {
+  color: var(--text-default);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.jobText span,
+.emptyJobs {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.emptyJobs {
+  min-height: 34px;
+  padding: 10px 8px;
+}
+
+.formats {
+  display: grid;
+  gap: 6px;
+}
+
+.formatRow {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 7px 8px;
+  border-radius: var(--radius);
+}
+
+.formatRow:hover {
+  background: var(--bg-hover);
+}
+
+.formatIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.formatText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.formatText strong,
+.formatText span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formatText strong {
+  color: var(--text-default);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.formatText span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.trailingIcon {
+  color: var(--text-tertiary);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .dialog {
+    height: min(590px, calc(100vh - 24px));
+    margin-top: 12px;
+  }
+
+  .body {
+    grid-template-columns: 1fr;
+  }
+
+  .nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .navItem {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .actionBar {
+    bottom: -14px;
+    margin: -4px -14px -14px;
+    padding: 10px 14px 12px;
+  }
+
+  .dropzone {
+    min-height: 154px;
+  }
+
+  .connectionPicker {
+    grid-template-columns: 1fr;
+  }
+
+  .tokenGuide {
+    grid-template-columns: 1fr;
+  }
+
+  .tokenGuideActions {
+    justify-content: flex-start;
+  }
+
+  .tokenFields {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}

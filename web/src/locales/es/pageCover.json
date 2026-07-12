@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "Cambiar portada",
+    "reposition": "Reposicionar",
+    "remove": "Quitar",
+    "uploadFile": "Subir archivo",
+    "uploading": "Subiendo...",
+    "submit": "Enviar",
+    "savePosition": "Guardar posición"
+  },
+  "tabs": {
+    "gallery": "Galería",
+    "upload": "Subir",
+    "link": "Enlace"
+  },
+  "link": {
+    "placeholder": "Pega el enlace de la imagen",
+    "invalid": "Pega un enlace de imagen http o https."
+  },
+  "upload": {
+    "error": "No se pudo subir esa imagen.",
+    "defaultFileName": "Imagen de portada"
+  },
+  "reposition": {
+    "hint": "Arrastra la imagen para reposicionarla"
+  },
+  "progress": {
+    "preparing": "Preparando la subida",
+    "finalizing": "Finalizando",
+    "complete": "Completado",
+    "uploading": "Subiendo"
+  },
+  "toast": {
+    "removed": "Portada quitada",
+    "restored": "Portada restaurada",
+    "undo": "Deshacer"
+  },
+  "aria": {
+    "pageCover": "Portada de la página",
+    "coverVerticalPosition": "Posición vertical de la portada",
+    "positionFromTop": "{{position}}% desde arriba",
+    "closeCoverMenu": "Cerrar menú de portada",
+    "changePageCover": "Cambiar portada de la página",
+    "repositionPageCover": "Reposicionar portada de la página",
+    "removePageCover": "Quitar portada de la página",
+    "changeCoverDialog": "Cambiar portada",
+    "coverSource": "Origen de la portada",
+    "selectCover": "Seleccionar portada {{number}}",
+    "uploadFromDevice": "Subir imagen de portada desde este dispositivo",
+    "uploadingFile": "Subiendo {{fileName}}",
+    "coverImageLink": "Enlace de imagen de portada"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "已导入的人员",
+  "body": "从 Notion 导入的人员将保留为来源引用，直到管理员将他们映射到工作区账户。",
+  "scan": "查找已导入的人员",
+  "scanning": "扫描中…",
+  "rescan": "重新扫描",
+  "empty": "未发现未映射的已导入人员。",
+  "keepPlaceholder": "保留为导入引用",
+  "usage": "{{values}} 个值 · {{mentions}} 次提及",
+  "apply": "应用映射",
+  "applying": "应用中…",
+  "applied": "已为 {{people}} 位人员完成映射，涉及 {{pages}} 个行/页面和 {{blocks}} 个块。",
+  "failed": "人员映射失败。",
+  "suggested": "建议",
+  "mapAria": "映射 {{label}}"
+}

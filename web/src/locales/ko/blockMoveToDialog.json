@@ -1,0 +1,31 @@
+{
+  "title": "블록 이동 위치",
+  "search": {
+    "label": "이동할 위치 검색",
+    "placeholder": "페이지 검색..."
+  },
+  "dialog": {
+    "closeLabel": "이동 대화상자 닫기"
+  },
+  "results": {
+    "listLabel": "이동 위치 목록",
+    "empty": "페이지를 찾을 수 없습니다.",
+    "destinationLabel": "{{label}}(으)로 블록 이동, {{path}}"
+  },
+  "create": {
+    "label": "\"{{query}}\" 만들기",
+    "optionLabel": "\"{{query}}\" 페이지를 만들고 블록을 여기로 이동",
+    "hint": "새 페이지 - 여기로 블록 이동"
+  },
+  "locked": {
+    "page": "잠긴 페이지"
+  },
+  "untitled": "제목 없음",
+  "toast": {
+    "locked": "페이지가 잠겨 있습니다",
+    "movedBlock": "블록을 이동했습니다",
+    "movedBlocks": "블록을 이동했습니다",
+    "movedBlocksCount": "블록 {{blockCount}}개를 이동했습니다",
+    "moveFailed": "블록을 이동할 수 없습니다"
+  }
+}

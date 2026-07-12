@@ -1,0 +1,15 @@
+{
+  "blockCommands": "Comandos de bloque",
+  "closeBlockCommands": "Cerrar comandos de bloque",
+  "groups": {
+    "Basic": "Bloques básicos",
+    "Media": "Multimedia",
+    "Database": "Base de datos",
+    "Advanced": "Bloques avanzados"
+  },
+  "itemStatus": "{{label}}, {{position}} de {{total}}. Presiona Enter para insertar.",
+  "listStatus": "{{total}} comandos de bloque disponibles.",
+  "noBlocks": "No se encontraron bloques",
+  "noBlocksFor": "No se encontraron bloques para \"{{query}}\"",
+  "recentlyUsed": "Usados recientemente"
+}

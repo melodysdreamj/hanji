@@ -1,0 +1,16 @@
+{
+  "title": "템플릿",
+  "close": "템플릿 닫기",
+  "categories": "템플릿 카테고리",
+  "all": "전체",
+  "searchPlaceholder": "템플릿 검색",
+  "gridLabel": "{{category}} 템플릿",
+  "empty": "템플릿을 찾을 수 없습니다.",
+  "use": "사용",
+  "applying": "적용 중...",
+  "adding": "추가 중...",
+  "applied": "템플릿을 적용했습니다",
+  "added": "템플릿을 추가했습니다",
+  "failed": "템플릿을 사용할 수 없습니다.",
+  "pageNotFound": "페이지를 찾을 수 없습니다."
+}

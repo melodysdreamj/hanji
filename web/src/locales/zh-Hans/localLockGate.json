@@ -1,0 +1,10 @@
+{
+  "title": "解锁本地数据",
+  "description": "此设备上的离线数据已通过密码短语锁定。解锁后将重新开启离线使用和回写保存功能。",
+  "passphrasePlaceholder": "密码短语",
+  "unlock": "解锁",
+  "continueOnline": "仅继续在线使用",
+  "continueOnlineHint": "「仅继续在线使用」将保持此设备上锁定的离线编辑处于封存状态——它们仍保留在本设备上，直到您使用正确的密码短语解锁前都不会同步。",
+  "wrongPassphrase": "密码短语不正确。",
+  "unsupportedBrowser": "此浏览器不支持本地锁定功能。"
+}

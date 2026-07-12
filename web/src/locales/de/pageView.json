@@ -1,0 +1,14 @@
+{
+  "couldntRestorePage": "Seite konnte nicht wiederhergestellt werden",
+  "emptyBodyPrompt": "Enter drücken, um auf dieser leeren Seite zu schreiben.",
+  "inTrashTopBarTitle": "Im Papierkorb",
+  "notFoundTopBarTitle": "Nicht gefunden",
+  "openWorkspace": "Arbeitsbereich öffnen",
+  "pageInTrash": "Diese Seite befindet sich im Papierkorb.",
+  "pageInTrashDetail": "Stellen Sie sie wieder her, bevor Sie ihren Inhalt öffnen oder bearbeiten.",
+  "pageUnavailable": "Seite nicht verfügbar.",
+  "pageUnavailableDetail": "Diese Seite wurde möglicherweise gelöscht, verschoben oder mit einem anderen Konto geteilt.",
+  "restorePage": "Seite wiederherstellen",
+  "restoredPage": "Seite wiederhergestellt",
+  "loadingPageContent": "Seiteninhalt wird geladen"
+}

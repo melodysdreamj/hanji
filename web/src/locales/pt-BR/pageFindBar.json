@@ -1,0 +1,14 @@
+{
+  "dialog": {
+    "label": "Localizar na página"
+  },
+  "input": {
+    "label": "Localizar na página",
+    "placeholder": "Localizar na página"
+  },
+  "actions": {
+    "previous": "Ocorrência anterior",
+    "next": "Próxima ocorrência",
+    "close": "Fechar localização"
+  }
+}

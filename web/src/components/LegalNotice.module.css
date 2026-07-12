@@ -1,0 +1,87 @@
+.notice {
+  position: fixed;
+  right: 10px;
+  bottom: 8px;
+  z-index: 2147483000;
+  display: flex;
+  max-width: min(720px, calc(100vw - 20px));
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--bg-floating-control);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-default);
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.notice a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.notice a:hover,
+.notice a:focus-visible {
+  color: var(--text-default);
+}
+
+.separator {
+  color: var(--text-tertiary);
+}
+
+/* Inline variant: sits in normal document flow (e.g. sidebar footer, sign-in
+   screen) instead of floating over content. Small and muted so it stays out of
+   the way while keeping the required AGPL / Sponsor Banner Exception notice
+   accessible. */
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 4px;
+  padding: 4px 8px 2px;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  line-height: 1.25;
+  opacity: 0.75;
+  text-align: center;
+}
+
+/* Left-aligned variant: lines the notice up with the left-aligned column it
+   sits under (e.g. the sidebar footer action rows). padding-left matches the
+   footer action-row inset so the text starts under their icon column. */
+.alignStart {
+  justify-content: flex-start;
+  padding-left: 6px;
+  text-align: left;
+}
+
+.inline a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.inline a:hover,
+.inline a:focus-visible {
+  color: var(--text-default);
+}
+
+@media (max-width: 600px) {
+  .notice {
+    right: 6px;
+    bottom: 6px;
+    left: 6px;
+    max-width: none;
+    flex-wrap: wrap;
+    row-gap: 1px;
+    padding-inline: 7px;
+  }
+}

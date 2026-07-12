@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "search": "Search",
+    "create": "Create",
+    "delete": "Delete",
+    "clearAll": "Clear all",
+    "done": "Done",
+    "add": "Add"
+  },
+  "labels": {
+    "untitled": "Untitled"
+  },
+  "generated": {
+    "copyName": "{{name}} copy",
+    "columnName": "Column {{number}}",
+    "importedDatabase": "Imported database",
+    "uploadedFile": "Uploaded file",
+    "image": "Image",
+    "propertyNames": {
+      "name": "Name",
+      "status": "Status",
+      "select": "Select",
+      "date": "Date"
+    },
+    "statusOptions": {
+      "todo": "Not started",
+      "doing": "In progress",
+      "done": "Done"
+    },
+    "selectOptions": {
+      "first": "Option 1",
+      "second": "Option 2"
+    },
+    "viewNames": {
+      "table": "Table"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "title": "移动到",
+  "workspaceRoot": {
+    "label": "工作区根目录",
+    "path": "顶层"
+  },
+  "search": {
+    "label": "搜索移动目标",
+    "placeholder": "搜索页面…"
+  },
+  "dialog": {
+    "closeLabel": "关闭移动对话框"
+  },
+  "results": {
+    "listLabel": "移动目标",
+    "empty": "未找到页面。",
+    "destinationLabel": "移动到 {{label}}，{{path}}"
+  },
+  "create": {
+    "label": "创建「{{title}}」",
+    "optionLabel": "创建页面 {{title}} 并移动到此处",
+    "hint": "新建顶层页面 - 移动到此处"
+  },
+  "locked": {
+    "parent": "已锁定的父级",
+    "page": "已锁定的页面"
+  },
+  "toast": {
+    "lockedParent": "页面位于已锁定的父级中",
+    "locked": "页面已锁定",
+    "moved": "已移动页面",
+    "moveFailed": "无法移动页面"
+  }
+}

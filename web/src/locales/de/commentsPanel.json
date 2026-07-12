@@ -1,0 +1,73 @@
+{
+  "title": "Kommentare",
+  "closeAria": "Kommentare schließen",
+  "subtitle": {
+    "block": "Block-Diskussion",
+    "page": "Seiten-Diskussion"
+  },
+  "status": {
+    "aria": "Kommentarstatus",
+    "open": "Offen",
+    "resolved": "Gelöst"
+  },
+  "anchor": {
+    "commentingOn": "Kommentieren auf",
+    "commentingOnSelectedText": "Kommentieren auf ausgewähltem Text",
+    "selectedBlock": "Ausgewählter Block",
+    "onSelectedText": "Auf ausgewähltem Text",
+    "onSelectedBlock": "Auf ausgewähltem Block",
+    "onABlock": "Auf einem Block"
+  },
+  "composer": {
+    "addBlockComment": "Einen Block-Kommentar hinzufügen",
+    "addPageComment": "Einen Seiten-Kommentar hinzufügen",
+    "blockPlaceholder": "Diesen Block kommentieren...",
+    "pagePlaceholder": "Kommentar hinzufügen...",
+    "submit": "Kommentieren"
+  },
+  "mention": {
+    "commentPeopleAria": "Kommentar Personen erwähnen",
+    "replyPeopleAria": "Antwort Personen erwähnen",
+    "trigger": "Personen erwähnen",
+    "noMatches": "Keine passenden Personen",
+    "title": "{{name}} erwähnen",
+    "person": "Person",
+    "you": "Du",
+    "organizationPerson": "Organisationsperson",
+    "roleInOrganization": "{{role}} in Organisation"
+  },
+  "list": {
+    "threadsAria": "Kommentarthreads",
+    "empty": "Noch keine Kommentare",
+    "noOpen": "Keine offenen Kommentare",
+    "noResolved": "Keine gelösten Kommentare"
+  },
+  "card": {
+    "commentAria": "{{author}} Kommentar, {{time}}",
+    "commentAriaResolved": "{{author}} Kommentar, {{time}}, gelöst",
+    "replyAria": "{{author}} Antwort, {{time}}",
+    "repliesAria": "{{count}} Antworten",
+    "edited": "(bearbeitet)",
+    "emptyComment": "(leerer Kommentar)",
+    "emptyReply": "(leere Antwort)",
+    "justNow": "Gerade eben"
+  },
+  "actions": {
+    "reply": "Antworten",
+    "showInPage": "Auf Seite anzeigen",
+    "resolve": "Lösen",
+    "reopen": "Erneut öffnen",
+    "edit": "Bearbeiten"
+  },
+  "reply": {
+    "placeholder": "Antworten..."
+  },
+  "edit": {
+    "aria": "Kommentar bearbeiten"
+  },
+  "delete": {
+    "commentConfirm": "Diesen Kommentar löschen?",
+    "threadConfirm_one": "Diesen Kommentar und seine Antwort löschen?",
+    "threadConfirm_other": "Diesen Kommentar und seine {{count}} Antworten löschen?"
+  }
+}

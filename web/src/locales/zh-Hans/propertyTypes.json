@@ -1,0 +1,25 @@
+{
+  "labels": {
+    "title": "标题",
+    "rich_text": "文本",
+    "number": "数字",
+    "select": "单选",
+    "multi_select": "多选",
+    "status": "状态",
+    "date": "日期",
+    "person": "人员",
+    "files": "文件与媒体",
+    "checkbox": "复选框",
+    "url": "URL",
+    "email": "电子邮箱",
+    "phone": "电话",
+    "formula": "公式",
+    "relation": "关联",
+    "rollup": "汇总",
+    "created_time": "创建时间",
+    "created_by": "创建人",
+    "last_edited_time": "最后编辑时间",
+    "last_edited_by": "最后编辑人",
+    "unique_id": "ID"
+  }
+}

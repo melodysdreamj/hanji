@@ -1,0 +1,27 @@
+{
+  "searchPlaceholder": "검색하거나 이동하기...",
+  "quickFind": "빠른 찾기",
+  "closeSearch": "검색 닫기",
+  "quickFindResults": "빠른 찾기 결과",
+  "sections": {
+    "recentlyViewed": "최근 본 항목",
+    "recentSearches": "최근 검색",
+    "pages": "페이지",
+    "pageContent": "페이지 내용",
+    "favorites": "즐겨찾기"
+  },
+  "inPage": "페이지 내",
+  "searchingDetail": "검색 중...",
+  "searchAgain": "다시 검색",
+  "searchingPageContent": "페이지 내용 검색 중...",
+  "noResultsFor": "\"{{query}}\"에 대한 결과가 없어요",
+  "noPagesFound": "페이지를 찾을 수 없어요",
+  "creating": "만드는 중...",
+  "newPage": "새 페이지 \"{{query}}\"",
+  "couldntCreatePage": "페이지를 만들지 못했어요",
+  "hints": {
+    "select": "선택",
+    "open": "열기",
+    "newTab": "새 탭"
+  }
+}

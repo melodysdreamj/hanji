@@ -1,0 +1,109 @@
+{
+  "region": "Passo a passo do token do Notion",
+  "play": "Reproduzir",
+  "pause": "Pausar",
+  "prev": "Etapa anterior",
+  "next": "Próxima etapa",
+  "stepLabel": "Etapa {{n}} de {{total}}",
+  "scenes": [
+    {
+      "title": "Abra a página de token a partir do Hanji",
+      "caption": "No Hanji, clique em “Abrir página de token do Notion” para abrir o portal de desenvolvedores do Notion em uma nova aba."
+    },
+    {
+      "title": "Criar uma conexão",
+      "caption": "Em notion.so/profile/integrations (Conexões), clique em “Nova conexão”."
+    },
+    {
+      "title": "Escolha o espaço de trabalho e crie o token",
+      "caption": "Escolha “Token de acesso” e selecione a qual espaço de trabalho do Notion este token se aplica — um token sempre pertence a exatamente um espaço de trabalho."
+    },
+    {
+      "title": "Copiar o token de acesso",
+      "caption": "Copie o token ntn_… e cole no campo de token abaixo."
+    },
+    {
+      "title": "Conecte-o às suas páginas",
+      "caption": "No Notion, abra cada página de nível superior → ··· → Conexões → adicione esta conexão. As subpáginas são incluídas automaticamente — depois volte e faça a verificação."
+    },
+    {
+      "title": "Cole o token no Hanji",
+      "caption": "De volta ao Hanji, cole o token copiado no campo “Token da API do Notion”."
+    },
+    {
+      "title": "Escolha o que importar",
+      "caption": "Importe todo o espaço de trabalho ou escolha “Páginas específicas” para trazer apenas as páginas e bancos de dados selecionados."
+    }
+  ],
+  "mock": {
+    "url": "app.notion.com/developers/connections",
+    "hanjiTitle": "Hanji · Importar",
+    "inkIntroTitle": "Importar com um token da API do Notion",
+    "inkIntroDesc": "Para hospedagem local, colar um token criado no Notion é a configuração mais confiável.",
+    "inkMakeToken": "Abrir página de token do Notion",
+    "inkStep1Title": "Preparar token do Notion",
+    "inkTokenLabel": "Token da API do Notion",
+    "inkTokenValue": "ntn_••••••••",
+    "inkStep2Title": "Escolha o que importar",
+    "scopeAllTitle": "Espaço de trabalho inteiro",
+    "scopeAllRec": "Recomendado",
+    "scopeAllDesc": "Tudo o que a conexão pode acessar. As relações de banco de dados entre páginas permanecem intactas.",
+    "scopeSomeTitle": "Páginas específicas",
+    "scopeSomeDesc": "Verifique os itens de nível superior acessíveis e importe apenas as páginas/bancos de dados selecionados.",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "backLink": "‹ Voltar ao Notion",
+    "devTitle": "Desenvolvedores",
+    "nav": [
+      "Começar",
+      "Worker",
+      "Tokens de acesso pessoal",
+      "Conexões"
+    ],
+    "navNew": "Novo",
+    "listTitle": "Conexões",
+    "listSubtitle": "Crie e gerencie as conexões de API públicas e privadas do Notion.",
+    "learnMore": "Saiba mais",
+    "newConnection": "+ Nova conexão",
+    "colConnection": "Conexão",
+    "colWorkspaces": "Espaços de trabalho instaláveis:",
+    "colAuthType": "Tipo de autenticação",
+    "colOwner": "Proprietário",
+    "integrationName": "Hanji",
+    "capabilities": "Ler conteúdo, atualizar e inserir conteúdo e ler informações de usuário",
+    "workspaceName": "Meu espaço de trabalho",
+    "authTypeCell": "Token de acesso",
+    "ownerName": "Você",
+    "modalTitle": "Nova conexão",
+    "modalDesc": "Crie uma conexão para autenticar apps, agentes e fluxos de trabalho com o Notion. Escolha um escopo de espaço de trabalho único ou de vários espaços de trabalho.",
+    "nameLabel": "Nome da conexão",
+    "namePlaceholder": "Minha conexão",
+    "authMethod": "Método de autenticação",
+    "accessToken": "Token de acesso",
+    "accessTokenDesc": "Um token de API estático, com escopo de espaço de trabalho, compartilhado entre colaboradores, com suas próprias configurações de capacidades. Limitado a 1 espaço de trabalho e não pode ser listado no Marketplace.",
+    "oauth": "OAuth",
+    "oauthDesc": "OAuth 2.0 com escopo de usuário; as permissões são limitadas ao usuário conectado. Suporta vários espaços de trabalho.",
+    "wsLabel": "Espaços de trabalho instaláveis:",
+    "wsDesc": "Este token se aplica ao espaço de trabalho selecionado.",
+    "terms": "Ao criar uma conexão, você concorda com os termos de desenvolvedor do Notion.",
+    "createButton": "Criar conexão",
+    "breadcrumb": "Conexões  ›  Gerenciar conexão",
+    "detailTabs": [
+      "Configuração",
+      "Capacidades de conteúdo",
+      "Webhooks",
+      "Proprietários"
+    ],
+    "tokenSectionTitle": "Token de integração da API",
+    "tokenSectionDesc": "Use este token para autenticar requisições de API para este espaço de trabalho. Qualquer pessoa com o token pode agir em nome da conexão, portanto mantenha-o em segredo.",
+    "tokenFieldLabel": "Token de acesso",
+    "tokenValue": "••••••••••••••••••••••••••••",
+    "copied": "Copiado",
+    "pageTitle": "Manual da Equipe",
+    "share": "Compartilhar",
+    "menuCopyLink": "Copiar link",
+    "menuDuplicate": "Duplicar",
+    "menuConnectionsLabel": "Conexões",
+    "menuAddConnection": "Adicionar conexões",
+    "searchPlaceholder": "Pesquisar conexões…"
+  }
+}

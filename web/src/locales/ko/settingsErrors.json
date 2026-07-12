@@ -1,0 +1,24 @@
+{
+  "rateLimited": "요청이 잠시 몰렸어요. 잠시 후 다시 시도해 주세요.",
+  "requestFailed": "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.",
+  "backend": {
+    "workspaceAdminRequired": "워크스페이스 관리자 권한이 필요해요.",
+    "workspaceOwnerRequired": "워크스페이스 소유자 권한이 필요해요.",
+    "onlyOwnersAssignAdmin": "관리자 역할은 워크스페이스 소유자만 부여할 수 있어요.",
+    "onlyOwnersManageAdmins": "관리자는 워크스페이스 소유자만 관리할 수 있어요.",
+    "onlyOwnersRemoveAdmins": "관리자는 워크스페이스 소유자만 제거할 수 있어요.",
+    "ownersCannotChangeRole": "워크스페이스 소유자의 역할은 여기서 바꿀 수 없어요. 먼저 소유권을 이전해 주세요.",
+    "ownersCannotBeRemoved": "워크스페이스 소유자는 제거할 수 없어요. 먼저 소유권을 이전해 주세요.",
+    "cannotChangeOwnRole": "자신의 워크스페이스 역할은 바꿀 수 없어요.",
+    "cannotRemoveSelf": "자기 자신은 워크스페이스에서 제거할 수 없어요.",
+    "onlyAssignableRoles": "관리자, 멤버, 게스트 역할만 부여할 수 있어요.",
+    "memberNotFound": "해당 워크스페이스 멤버를 찾을 수 없어요.",
+    "invitationNotFound": "해당 초대를 찾을 수 없어요.",
+    "transferTargetMustBeMember": "소유권은 다른 멤버에게만 이전할 수 있어요.",
+    "emailRequired": "이메일을 입력해 주세요.",
+    "emailInvalid": "이메일 주소가 올바르지 않아요.",
+    "externalGuestDisabled": "조직 정책상 외부 게스트 초대가 비활성화되어 있어요.",
+    "verifiedDomainRequired": "조직 멤버는 인증된 조직 도메인 이메일을 사용해야 해요.",
+    "workspaceUrlInUse": "이미 사용 중인 워크스페이스 URL이에요."
+  }
+}

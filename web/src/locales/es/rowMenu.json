@@ -1,0 +1,106 @@
+{
+  "searchActions": "Buscar acciones",
+  "noMatchingActions": "Sin acciones coincidentes",
+  "untitledDatabaseRow": "fila de base de datos sin título",
+  "sections": {
+    "page": "Página",
+    "style": "Estilo"
+  },
+  "aria": {
+    "closeDatabaseRowActions": "Cerrar acciones de fila de base de datos",
+    "closePageActions": "Cerrar acciones de página",
+    "databaseRowActionsFor": "Acciones de fila de base de datos para {{title}}",
+    "pageActionsFor": "Acciones de página para {{title}}",
+    "openIn": "Abrir en",
+    "customizePage": "Personalizar página",
+    "backlinksDisplay": "Visualización de enlaces inversos",
+    "pageCommentsDisplay": "Visualización de comentarios de página",
+    "pageFont": "Fuente de página"
+  },
+  "actions": {
+    "addToFavorites": "Añadir a Favoritos",
+    "removeFromFavorites": "Quitar de Favoritos",
+    "editIcon": "Editar icono",
+    "editProperties": "Editar propiedades",
+    "openIn": "Abrir en",
+    "sidePeek": "Vista lateral",
+    "centerPeek": "Vista centrada",
+    "fullPage": "Página completa",
+    "openInNewTab": "Abrir en nueva pestaña",
+    "comments": "Comentarios",
+    "copyLink": "Copiar enlace",
+    "duplicate": "Duplicar",
+    "moveTo": "Mover a",
+    "moveToTrash": "Mover a Papelera",
+    "rename": "Cambiar nombre",
+    "addPageInside": "Añadir página dentro",
+    "exportAsMarkdown": "Exportar como Markdown",
+    "exportAsHanjiFile": "Exportar como archivo Hanji",
+    "importMarkdown": "Importar Markdown",
+    "importing": "Importando...",
+    "unlockPage": "Desbloquear página",
+    "lockPage": "Bloquear página",
+    "pageHistory": "Historial de página",
+    "removeVerification": "Quitar verificación",
+    "verifyPage": "Verificar página",
+    "customizePage": "Personalizar página",
+    "undo": "Deshacer"
+  },
+  "customize": {
+    "summaryDefault": "Predeterminado",
+    "summaryCustomized": "Personalizado",
+    "backlinks": "Enlaces inversos",
+    "pageComments": "Comentarios de página"
+  },
+  "displayOptions": {
+    "default": "Predeterminado",
+    "expanded": "Expandido",
+    "off": "Desactivado"
+  },
+  "fonts": {
+    "default": "Predeterminada",
+    "serif": "Serif",
+    "mono": "Mono"
+  },
+  "style": {
+    "smallText": "Texto pequeño",
+    "fullWidth": "Ancho completo"
+  },
+  "meta": {
+    "created": "Creado",
+    "createdBy": "Creado por",
+    "lastEdited": "Última edición",
+    "editedBy": "Editado por",
+    "verified": "Verificado",
+    "verifiedPrefix": "Verificado · {{label}}",
+    "words": "Palabras",
+    "characters": "Caracteres",
+    "blocks": "Bloques"
+  },
+  "toast": {
+    "copiedLink": "Enlace copiado",
+    "couldntCopyLink": "No se pudo copiar el enlace",
+    "exportedMarkdown": "Markdown exportado",
+    "couldntExportMarkdown": "No se pudo exportar Markdown",
+    "exportedHanjiFile": "Exportado como archivo Hanji.",
+    "exportedHanjiFileWithWarnings": "Exportado como archivo Hanji — los archivos adjuntos quedaron como marcadores de posición.",
+    "couldntExportHanjiFile": "No se pudo exportar el archivo Hanji.",
+    "importedBlocks_one": "{{count}} bloque importado",
+    "importedBlocks_other": "{{count}} bloques importados",
+    "nothingToImport": "Nada que importar",
+    "couldntImportMarkdown": "No se pudo importar Markdown",
+    "verificationRemoved": "Verificación eliminada",
+    "pageVerified": "Página verificada",
+    "removedFromFavorites": "Eliminado de Favoritos",
+    "addedToFavorites": "Añadido a Favoritos",
+    "couldntUpdateFavorites": "No se pudieron actualizar los Favoritos",
+    "couldntDuplicatePage": "No se pudo duplicar la página",
+    "duplicatedPage": "Página duplicada",
+    "pageLocked": "Página bloqueada",
+    "pageUnlocked": "Página desbloqueada",
+    "movedToTrash": "Movido a Papelera",
+    "restoredPage": "Página restaurada",
+    "couldntRestorePage": "No se pudo restaurar la página",
+    "couldntMoveToTrash": "No se pudo mover a Papelera"
+  }
+}

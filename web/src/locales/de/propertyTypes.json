@@ -1,0 +1,25 @@
+{
+  "labels": {
+    "title": "Titel",
+    "rich_text": "Text",
+    "number": "Zahl",
+    "select": "Auswahl",
+    "multi_select": "Mehrfachauswahl",
+    "status": "Status",
+    "date": "Datum",
+    "person": "Person",
+    "files": "Dateien & Medien",
+    "checkbox": "Kontrollkästchen",
+    "url": "URL",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "formula": "Formel",
+    "relation": "Verknüpfung",
+    "rollup": "Rollup",
+    "created_time": "Erstellungszeit",
+    "created_by": "Erstellt von",
+    "last_edited_time": "Zuletzt bearbeitet",
+    "last_edited_by": "Zuletzt bearbeitet von",
+    "unique_id": "ID"
+  }
+}

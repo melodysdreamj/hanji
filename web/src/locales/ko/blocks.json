@@ -1,0 +1,316 @@
+{
+  "defs": {
+    "paragraph": {
+      "label": "텍스트",
+      "description": "일반 텍스트로 바로 글을 써 보세요.",
+      "placeholder": "명령어를 사용하려면 '/'를 입력하세요"
+    },
+    "child_page": {
+      "label": "페이지",
+      "description": "이 페이지 안에 하위 페이지를 만들어요."
+    },
+    "link_to_page": {
+      "label": "페이지 링크",
+      "description": "기존 페이지로 연결해요."
+    },
+    "heading_1": {
+      "label": "제목1",
+      "description": "큰 섹션 제목이에요.",
+      "placeholder": "제목1"
+    },
+    "toggle_heading_1": {
+      "label": "토글 제목1",
+      "description": "내용을 접을 수 있는 큰 제목이에요.",
+      "placeholder": "토글 제목1"
+    },
+    "heading_2": {
+      "label": "제목2",
+      "description": "중간 크기 섹션 제목이에요.",
+      "placeholder": "제목2"
+    },
+    "toggle_heading_2": {
+      "label": "토글 제목2",
+      "description": "내용을 접을 수 있는 중간 크기 제목이에요.",
+      "placeholder": "토글 제목2"
+    },
+    "heading_3": {
+      "label": "제목3",
+      "description": "작은 섹션 제목이에요.",
+      "placeholder": "제목3"
+    },
+    "toggle_heading_3": {
+      "label": "토글 제목3",
+      "description": "내용을 접을 수 있는 작은 제목이에요.",
+      "placeholder": "토글 제목3"
+    },
+    "heading_4": {
+      "label": "제목4",
+      "description": "가장 작은 섹션 제목이에요.",
+      "placeholder": "제목4"
+    },
+    "toggle_heading_4": {
+      "label": "토글 제목4",
+      "description": "내용을 접을 수 있는 가장 작은 제목이에요.",
+      "placeholder": "토글 제목4"
+    },
+    "to_do": {
+      "label": "할 일 목록",
+      "description": "체크박스로 할 일을 관리해요.",
+      "placeholder": "할 일"
+    },
+    "bulleted_list_item": {
+      "label": "글머리 기호 목록",
+      "description": "간단한 글머리 기호 목록을 만들어요.",
+      "placeholder": "목록"
+    },
+    "numbered_list_item": {
+      "label": "번호 매기기 목록",
+      "description": "번호가 붙는 목록을 만들어요.",
+      "placeholder": "목록"
+    },
+    "toggle": {
+      "label": "토글 목록",
+      "description": "토글로 내용을 접었다 펼 수 있어요.",
+      "placeholder": "토글"
+    },
+    "quote": {
+      "label": "인용",
+      "description": "인용문을 담아 보세요.",
+      "placeholder": "빈 인용문"
+    },
+    "callout": {
+      "label": "콜아웃",
+      "description": "글을 눈에 띄게 강조해요.",
+      "placeholder": "내용을 입력하세요…"
+    },
+    "divider": {
+      "label": "구분선",
+      "description": "블록 사이를 시각적으로 나눠요."
+    },
+    "code": {
+      "label": "코드",
+      "description": "코드 스니펫을 담아요.",
+      "placeholder": "코드를 작성하거나 스니펫을 붙여넣으세요…"
+    },
+    "equation": {
+      "label": "수식",
+      "description": "수학 수식을 표시해요."
+    },
+    "table_of_contents": {
+      "label": "목차",
+      "description": "이 페이지의 제목으로 가는 링크를 보여줘요."
+    },
+    "synced_block": {
+      "label": "동기화 블록",
+      "description": "여러 페이지에서 콘텐츠를 재사용해요."
+    },
+    "button": {
+      "label": "버튼",
+      "description": "클릭 한 번으로 콘텐츠를 삽입해요."
+    },
+    "tab": {
+      "label": "탭",
+      "description": "콘텐츠를 탭으로 묶어 정리해요.",
+      "placeholder": "탭"
+    },
+    "breadcrumb": {
+      "label": "이동 경로",
+      "description": "이 페이지의 위치를 보여줘요."
+    },
+    "action_duplicate": {
+      "label": "복제",
+      "description": "이 블록의 사본을 만들어요."
+    },
+    "action_move_to": {
+      "label": "옮기기",
+      "description": "이 블록을 다른 페이지로 옮겨요."
+    },
+    "action_delete": {
+      "description": "이 블록을 삭제해요."
+    },
+    "action_turn_into": {
+      "label": "전환",
+      "description": "이 블록의 유형을 바꿔요."
+    },
+    "action_color": {
+      "label": "색",
+      "description": "블록의 글자색이나 배경색을 바꿔요."
+    },
+    "simple_table": {
+      "label": "표",
+      "description": "이 페이지에 간단한 표를 추가해요."
+    },
+    "column_list_2": {
+      "label": "2개의 열",
+      "description": "블록을 나란히 배치해요."
+    },
+    "column_list_3": {
+      "label": "3개의 열",
+      "description": "블록을 3개의 열로 배치해요."
+    },
+    "column_list_4": {
+      "label": "4개의 열",
+      "description": "블록을 4개의 열로 배치해요."
+    },
+    "column_list_5": {
+      "label": "5개의 열",
+      "description": "블록을 5개의 열로 배치해요."
+    },
+    "image": {
+      "label": "이미지",
+      "description": "업로드하거나 링크로 임베드해요."
+    },
+    "video": {
+      "label": "동영상",
+      "description": "링크로 동영상을 임베드해요."
+    },
+    "audio": {
+      "label": "오디오",
+      "description": "링크로 오디오를 임베드해요."
+    },
+    "bookmark": {
+      "label": "웹 북마크",
+      "description": "웹 링크를 카드로 저장해요."
+    },
+    "embed": {
+      "label": "임베드",
+      "description": "링크의 콘텐츠를 임베드해요."
+    },
+    "file": {
+      "label": "파일",
+      "description": "이 페이지에 파일 링크를 첨부해요."
+    },
+    "child_database": {
+      "label": "데이터베이스 - 전체 페이지",
+      "description": "하위 페이지로 새 데이터베이스를 추가해요."
+    },
+    "child_database_table": {
+      "label": "표 - 전체 페이지",
+      "description": "전체 페이지 데이터베이스를 표로 추가해요."
+    },
+    "child_database_board": {
+      "label": "보드 - 전체 페이지",
+      "description": "전체 페이지 칸반 보드를 추가해요."
+    },
+    "child_database_list": {
+      "label": "목록 - 전체 페이지",
+      "description": "전체 페이지 데이터베이스를 목록으로 추가해요."
+    },
+    "child_database_timeline": {
+      "label": "타임라인 - 전체 페이지",
+      "description": "전체 페이지 데이터베이스 타임라인을 추가해요."
+    },
+    "child_database_calendar": {
+      "label": "캘린더 - 전체 페이지",
+      "description": "전체 페이지 캘린더 데이터베이스를 추가해요."
+    },
+    "child_database_gallery": {
+      "label": "갤러리 - 전체 페이지",
+      "description": "전체 페이지 데이터베이스 갤러리를 추가해요."
+    },
+    "inline_database": {
+      "label": "데이터베이스 - 인라인",
+      "description": "이 페이지 안에 데이터베이스를 추가해요."
+    },
+    "inline_database_table": {
+      "label": "표 보기",
+      "description": "인라인 데이터베이스를 표로 추가해요."
+    },
+    "inline_database_board": {
+      "label": "보드 보기",
+      "description": "인라인 칸반 보드를 추가해요."
+    },
+    "inline_database_list": {
+      "label": "목록 보기",
+      "description": "인라인 데이터베이스를 목록으로 추가해요."
+    },
+    "inline_database_timeline": {
+      "label": "타임라인 보기",
+      "description": "인라인 데이터베이스 타임라인을 추가해요."
+    },
+    "inline_database_calendar": {
+      "label": "캘린더 보기",
+      "description": "인라인 캘린더 데이터베이스를 추가해요."
+    },
+    "inline_database_gallery": {
+      "label": "갤러리 보기",
+      "description": "인라인 데이터베이스 갤러리를 추가해요."
+    },
+    "color_default": {
+      "label": "기본",
+      "description": "블록의 글자색과 배경색을 제거해요."
+    },
+    "color_gray": {
+      "label": "회색",
+      "description": "이 블록에 회색을 적용해요."
+    },
+    "color_brown": {
+      "label": "갈색",
+      "description": "이 블록에 갈색을 적용해요."
+    },
+    "color_orange": {
+      "label": "주황색",
+      "description": "이 블록에 주황색을 적용해요."
+    },
+    "color_yellow": {
+      "label": "노란색",
+      "description": "이 블록에 노란색을 적용해요."
+    },
+    "color_green": {
+      "label": "초록색",
+      "description": "이 블록에 초록색을 적용해요."
+    },
+    "color_blue": {
+      "label": "파란색",
+      "description": "이 블록에 파란색을 적용해요."
+    },
+    "color_purple": {
+      "label": "보라색",
+      "description": "이 블록에 보라색을 적용해요."
+    },
+    "color_pink": {
+      "label": "분홍색",
+      "description": "이 블록에 분홍색을 적용해요."
+    },
+    "color_red": {
+      "label": "빨간색",
+      "description": "이 블록에 빨간색을 적용해요."
+    },
+    "color_gray_background": {
+      "label": "회색 배경",
+      "description": "이 블록에 회색 배경을 적용해요."
+    },
+    "color_brown_background": {
+      "label": "갈색 배경",
+      "description": "이 블록에 갈색 배경을 적용해요."
+    },
+    "color_orange_background": {
+      "label": "주황색 배경",
+      "description": "이 블록에 주황색 배경을 적용해요."
+    },
+    "color_yellow_background": {
+      "label": "노란색 배경",
+      "description": "이 블록에 노란색 배경을 적용해요."
+    },
+    "color_green_background": {
+      "label": "초록색 배경",
+      "description": "이 블록에 초록색 배경을 적용해요."
+    },
+    "color_blue_background": {
+      "label": "파란색 배경",
+      "description": "이 블록에 파란색 배경을 적용해요."
+    },
+    "color_purple_background": {
+      "label": "보라색 배경",
+      "description": "이 블록에 보라색 배경을 적용해요."
+    },
+    "color_pink_background": {
+      "label": "분홍색 배경",
+      "description": "이 블록에 분홍색 배경을 적용해요."
+    },
+    "color_red_background": {
+      "label": "빨간색 배경",
+      "description": "이 블록에 빨간색 배경을 적용해요."
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "テンプレート",
+  "close": "テンプレートを閉じる",
+  "categories": "テンプレートカテゴリー",
+  "all": "すべて",
+  "searchPlaceholder": "テンプレートを検索",
+  "gridLabel": "{{category}}のテンプレート",
+  "empty": "テンプレートが見つかりません。",
+  "use": "使用",
+  "applying": "適用中...",
+  "adding": "追加中...",
+  "applied": "テンプレートを適用しました",
+  "added": "テンプレートを追加しました",
+  "failed": "テンプレートを使用できませんでした。",
+  "pageNotFound": "ページが見つかりません。"
+}

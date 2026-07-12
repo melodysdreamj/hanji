@@ -1,0 +1,10 @@
+{
+  "empty": "Aucune conversation pour le moment. Commentez une page ou mentionnez quelqu'un pour en démarrer une.",
+  "leave": "Quitter",
+  "leaveAria": "Quitter la conversation sur {{title}}",
+  "open": "Ouvrir la conversation sur {{title}}",
+  "participants_one": "{{count}} participant",
+  "participants_other": "{{count}} participants",
+  "untitled": "Sans titre",
+  "loading": "Chargement des conversations…"
+}

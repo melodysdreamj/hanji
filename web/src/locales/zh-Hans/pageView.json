@@ -1,0 +1,14 @@
+{
+  "couldntRestorePage": "无法恢复页面",
+  "emptyBodyPrompt": "按 Enter 开始在此空白页面上书写。",
+  "inTrashTopBarTitle": "在回收站中",
+  "notFoundTopBarTitle": "未找到",
+  "openWorkspace": "打开工作区",
+  "pageInTrash": "此页面在回收站中。",
+  "pageInTrashDetail": "请先恢复页面，再打开或编辑其内容。",
+  "pageUnavailable": "页面不可用。",
+  "pageUnavailableDetail": "此页面可能已被删除、移动，或与另一个账户共享。",
+  "restorePage": "恢复页面",
+  "restoredPage": "已恢复页面",
+  "loadingPageContent": "正在加载页面内容"
+}

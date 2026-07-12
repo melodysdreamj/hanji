@@ -1,0 +1,10 @@
+{
+  "emptyDesc": "Diese Datenbank hat noch keine Seiten.",
+  "emptyTitle": "Noch keine Seiten",
+  "newInline": "Neu",
+  "newPage": "Neue Seite",
+  "newPageIn": "Neue Seite in {{dbTitle}}",
+  "noResultsDesc": "Keine Seiten entsprechen den aktuellen Filtern oder der Suche.",
+  "noResultsTitle": "Keine Ergebnisse",
+  "openRow": "{{title}} öffnen"
+}

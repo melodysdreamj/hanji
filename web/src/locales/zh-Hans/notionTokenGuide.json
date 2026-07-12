@@ -1,0 +1,109 @@
+{
+  "region": "Notion 令牌操作指引",
+  "play": "播放",
+  "pause": "暂停",
+  "prev": "上一步",
+  "next": "下一步",
+  "stepLabel": "第 {{n}} 步，共 {{total}} 步",
+  "scenes": [
+    {
+      "title": "从 Hanji 打开令牌页面",
+      "caption": "在 Hanji 中，点击「打开 Notion 令牌页面」，在新标签页中打开 Notion 的开发者门户。"
+    },
+    {
+      "title": "创建连接",
+      "caption": "在 notion.so/profile/integrations（连接）页面，点击「新建连接」。"
+    },
+    {
+      "title": "选择工作区，创建令牌",
+      "caption": "选择「访问令牌」，然后选择此令牌适用的 Notion 工作区——一个令牌始终只属于一个工作区。"
+    },
+    {
+      "title": "复制访问令牌",
+      "caption": "复制 ntn_… 令牌，并将其粘贴到下方的令牌输入框中。"
+    },
+    {
+      "title": "将连接关联到您的页面",
+      "caption": "在 Notion 中，打开每个顶层页面 → ··· → 连接 → 添加此连接。子页面会自动包含在内——完成后返回并扫描。"
+    },
+    {
+      "title": "将令牌粘贴到 Hanji",
+      "caption": "回到 Hanji，将您复制的令牌粘贴到「Notion API 令牌」字段中。"
+    },
+    {
+      "title": "选择要导入的内容",
+      "caption": "导入整个工作区，或选择「特定页面」以仅导入您选择的页面和数据库。"
+    }
+  ],
+  "mock": {
+    "url": "app.notion.com/developers/connections",
+    "hanjiTitle": "Hanji · 导入",
+    "inkIntroTitle": "使用 Notion API 令牌导入",
+    "inkIntroDesc": "对于本地部署，粘贴您在 Notion 中创建的令牌是最可靠的设置方式。",
+    "inkMakeToken": "打开 Notion 令牌页面",
+    "inkStep1Title": "准备 Notion 令牌",
+    "inkTokenLabel": "Notion API 令牌",
+    "inkTokenValue": "ntn_••••••••",
+    "inkStep2Title": "选择要导入的内容",
+    "scopeAllTitle": "整个工作区",
+    "scopeAllRec": "推荐",
+    "scopeAllDesc": "此连接可访问的所有内容。页面之间的数据库关联将保持不变。",
+    "scopeSomeTitle": "特定页面",
+    "scopeSomeDesc": "扫描可访问的顶层项目，然后仅导入您选择的页面/数据库。",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "backLink": "‹ 返回 Notion",
+    "devTitle": "开发者",
+    "nav": [
+      "入门",
+      "Worker",
+      "个人访问令牌",
+      "连接"
+    ],
+    "navNew": "新建",
+    "listTitle": "连接",
+    "listSubtitle": "创建和管理 Notion 的公共与私有 API 连接。",
+    "learnMore": "了解更多",
+    "newConnection": "+ 新建连接",
+    "colConnection": "连接",
+    "colWorkspaces": "可安装的工作区：",
+    "colAuthType": "认证类型",
+    "colOwner": "所有者",
+    "integrationName": "Hanji",
+    "capabilities": "读取内容、更新和插入内容，以及读取用户信息",
+    "workspaceName": "我的工作区",
+    "authTypeCell": "访问令牌",
+    "ownerName": "您",
+    "modalTitle": "新建连接",
+    "modalDesc": "创建一个连接，以便为应用、智能体和工作流进行 Notion 认证。可选择单工作区或多工作区范围。",
+    "nameLabel": "连接名称",
+    "namePlaceholder": "我的连接",
+    "authMethod": "认证方式",
+    "accessToken": "访问令牌",
+    "accessTokenDesc": "一种静态的、工作区范围的 API 令牌，可在协作者之间共享，并具有独立的权限设置。仅限 1 个工作区，且不能在应用市场上架。",
+    "oauth": "OAuth",
+    "oauthDesc": "用户范围的 OAuth 2.0；权限仅限当前登录用户。支持多个工作区。",
+    "wsLabel": "可安装的工作区：",
+    "wsDesc": "此令牌适用于所选工作区。",
+    "terms": "创建连接即表示您同意 Notion 的开发者条款。",
+    "createButton": "创建连接",
+    "breadcrumb": "连接  ›  管理连接",
+    "detailTabs": [
+      "配置",
+      "内容能力",
+      "Webhooks",
+      "所有者"
+    ],
+    "tokenSectionTitle": "API 集成令牌",
+    "tokenSectionDesc": "使用此令牌为此工作区的 API 请求进行认证。任何持有该令牌的人都可以代表此连接执行操作，因此请妥善保管。",
+    "tokenFieldLabel": "访问令牌",
+    "tokenValue": "••••••••••••••••••••••••••••",
+    "copied": "已复制",
+    "pageTitle": "团队手册",
+    "share": "分享",
+    "menuCopyLink": "复制链接",
+    "menuDuplicate": "复制副本",
+    "menuConnectionsLabel": "连接",
+    "menuAddConnection": "添加连接",
+    "searchPlaceholder": "搜索连接…"
+  }
+}

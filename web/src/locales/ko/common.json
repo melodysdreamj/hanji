@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "cancel": "취소",
+    "save": "저장",
+    "close": "닫기",
+    "search": "검색",
+    "create": "만들기",
+    "delete": "삭제",
+    "clearAll": "모두 지우기",
+    "done": "완료",
+    "add": "추가"
+  },
+  "labels": {
+    "untitled": "제목 없음"
+  },
+  "generated": {
+    "copyName": "{{name}} 사본",
+    "columnName": "열 {{number}}",
+    "importedDatabase": "가져온 데이터베이스",
+    "uploadedFile": "업로드한 파일",
+    "image": "이미지",
+    "propertyNames": {
+      "name": "이름",
+      "status": "상태",
+      "select": "선택",
+      "date": "날짜"
+    },
+    "statusOptions": {
+      "todo": "시작 전",
+      "doing": "진행 중",
+      "done": "완료"
+    },
+    "selectOptions": {
+      "first": "옵션 1",
+      "second": "옵션 2"
+    },
+    "viewNames": {
+      "table": "표"
+    }
+  }
+}

@@ -1,0 +1,316 @@
+{
+  "defs": {
+    "paragraph": {
+      "label": "Text",
+      "description": "Beginne einfach mit Klartext zu schreiben.",
+      "placeholder": "'/' für Befehle eingeben"
+    },
+    "child_page": {
+      "label": "Seite",
+      "description": "Erstelle eine Unterseite innerhalb dieser Seite."
+    },
+    "link_to_page": {
+      "label": "Link zur Seite",
+      "description": "Verlinke eine vorhandene Seite."
+    },
+    "heading_1": {
+      "label": "Überschrift 1",
+      "description": "Große Abschnittsüberschrift.",
+      "placeholder": "Überschrift 1"
+    },
+    "toggle_heading_1": {
+      "label": "Umschalt-Überschrift 1",
+      "description": "Große Überschrift, die verschachtelte Inhalte verbergen kann.",
+      "placeholder": "Umschalt-Überschrift 1"
+    },
+    "heading_2": {
+      "label": "Überschrift 2",
+      "description": "Mittlere Abschnittsüberschrift.",
+      "placeholder": "Überschrift 2"
+    },
+    "toggle_heading_2": {
+      "label": "Umschalt-Überschrift 2",
+      "description": "Mittlere Überschrift, die verschachtelte Inhalte verbergen kann.",
+      "placeholder": "Umschalt-Überschrift 2"
+    },
+    "heading_3": {
+      "label": "Überschrift 3",
+      "description": "Kleine Abschnittsüberschrift.",
+      "placeholder": "Überschrift 3"
+    },
+    "toggle_heading_3": {
+      "label": "Umschalt-Überschrift 3",
+      "description": "Kleine Überschrift, die verschachtelte Inhalte ausblenden kann.",
+      "placeholder": "Umschaltüberschrift 3"
+    },
+    "heading_4": {
+      "label": "Überschrift 4",
+      "description": "Kompakte Abschnittsüberschrift.",
+      "placeholder": "Überschrift 4"
+    },
+    "toggle_heading_4": {
+      "label": "Umschaltüberschrift 4",
+      "description": "Kompakte Überschrift, die verschachtelte Inhalte ausblenden kann.",
+      "placeholder": "Umschaltüberschrift 4"
+    },
+    "to_do": {
+      "label": "To-do-Liste",
+      "description": "Aufgaben mit einem Kontrollkästchen verfolgen.",
+      "placeholder": "To-do"
+    },
+    "bulleted_list_item": {
+      "label": "Aufzählungsliste",
+      "description": "Eine einfache Aufzählungsliste erstellen.",
+      "placeholder": "Liste"
+    },
+    "numbered_list_item": {
+      "label": "Nummerierte Liste",
+      "description": "Eine nummerierte Liste erstellen.",
+      "placeholder": "Liste"
+    },
+    "toggle": {
+      "label": "Umschaltliste",
+      "description": "Umschalter können Inhalte aus- und einblenden.",
+      "placeholder": "Umschalter"
+    },
+    "quote": {
+      "label": "Zitat",
+      "description": "Ein Zitat erfassen.",
+      "placeholder": "Leeres Zitat"
+    },
+    "callout": {
+      "label": "Hinweis",
+      "description": "Text hervorheben.",
+      "placeholder": "Etwas eingeben…"
+    },
+    "divider": {
+      "label": "Trennlinie",
+      "description": "Blöcke visuell trennen."
+    },
+    "code": {
+      "label": "Code",
+      "description": "Ein Code-Snippet erfassen.",
+      "placeholder": "Code schreiben oder ein Snippet einfügen…"
+    },
+    "equation": {
+      "label": "Formel",
+      "description": "Eine mathematische Formel anzeigen."
+    },
+    "table_of_contents": {
+      "label": "Inhaltsverzeichnis",
+      "description": "Links zu Überschriften auf dieser Seite anzeigen."
+    },
+    "synced_block": {
+      "label": "Synchronisierter Block",
+      "description": "Inhalte seitenübergreifend wiederverwenden."
+    },
+    "button": {
+      "label": "Schaltfläche",
+      "description": "Wiederverwendbare Inhalte mit einem Klick einfügen."
+    },
+    "tab": {
+      "label": "Registerkarten",
+      "description": "Inhalte in beschriftete Registerkarten gruppieren.",
+      "placeholder": "Registerkarten"
+    },
+    "breadcrumb": {
+      "label": "Brotkrumen",
+      "description": "Anzeigen, wo sich diese Seite befindet."
+    },
+    "action_duplicate": {
+      "label": "Duplizieren",
+      "description": "Eine exakte Kopie dieses Blocks erstellen."
+    },
+    "action_move_to": {
+      "label": "Verschieben nach",
+      "description": "Diesen Block auf eine andere Seite verschieben."
+    },
+    "action_delete": {
+      "description": "Diesen Block löschen."
+    },
+    "action_turn_into": {
+      "label": "Umwandeln in",
+      "description": "Den Typ dieses Blocks ändern."
+    },
+    "action_color": {
+      "label": "Farbe",
+      "description": "Die Text- oder Hintergrundfarbe dieses Blocks ändern."
+    },
+    "simple_table": {
+      "label": "Tabelle",
+      "description": "Eine einfache Tabelle zu dieser Seite hinzufügen."
+    },
+    "column_list_2": {
+      "label": "2 Spalten",
+      "description": "Blöcke nebeneinander anordnen."
+    },
+    "column_list_3": {
+      "label": "3 Spalten",
+      "description": "Blöcke in drei Spalten anordnen."
+    },
+    "column_list_4": {
+      "label": "4 Spalten",
+      "description": "Blöcke in vier Spalten anordnen."
+    },
+    "column_list_5": {
+      "label": "5 Spalten",
+      "description": "Blöcke in fünf Spalten anordnen."
+    },
+    "image": {
+      "label": "Bild",
+      "description": "Hochladen oder per Link einbetten."
+    },
+    "video": {
+      "label": "Video",
+      "description": "Ein Video per Link einbetten."
+    },
+    "audio": {
+      "label": "Audio",
+      "description": "Audio per Link einbetten."
+    },
+    "bookmark": {
+      "label": "Lesezeichen",
+      "description": "Einen Weblink als Karte speichern."
+    },
+    "embed": {
+      "label": "Einbetten",
+      "description": "Inhalte aus einem Link einbetten."
+    },
+    "file": {
+      "label": "Datei",
+      "description": "Einen Dateilink an diese Seite anfügen."
+    },
+    "child_database": {
+      "label": "Datenbank – Ganze Seite",
+      "description": "Eine neue Datenbank als Unterseite hinzufügen."
+    },
+    "child_database_table": {
+      "label": "Tabelle – Ganze Seite",
+      "description": "Eine ganzseitige Datenbank als Tabelle hinzufügen."
+    },
+    "child_database_board": {
+      "label": "Board – Ganze Seite",
+      "description": "Ein ganzseitiges Kanban-Board hinzufügen."
+    },
+    "child_database_list": {
+      "label": "Liste – Ganze Seite",
+      "description": "Eine ganzseitige Datenbank als Liste hinzufügen."
+    },
+    "child_database_timeline": {
+      "label": "Zeitleiste – Ganze Seite",
+      "description": "Eine ganzseitige Datenbank-Zeitleiste hinzufügen."
+    },
+    "child_database_calendar": {
+      "label": "Kalender – Ganze Seite",
+      "description": "Eine ganzseitige Kalender-Datenbank hinzufügen."
+    },
+    "child_database_gallery": {
+      "label": "Galerie – Ganze Seite",
+      "description": "Eine ganzseitige Datenbank-Galerie hinzufügen."
+    },
+    "inline_database": {
+      "label": "Datenbank – Inline",
+      "description": "Eine Datenbank innerhalb dieser Seite hinzufügen."
+    },
+    "inline_database_table": {
+      "label": "Tabellenansicht",
+      "description": "Eine Inline-Datenbank als Tabelle hinzufügen."
+    },
+    "inline_database_board": {
+      "label": "Board-Ansicht",
+      "description": "Ein Inline-Kanban-Board hinzufügen."
+    },
+    "inline_database_list": {
+      "label": "Listenansicht",
+      "description": "Eine Inline-Datenbank als Liste hinzufügen."
+    },
+    "inline_database_timeline": {
+      "label": "Zeitleistenansicht",
+      "description": "Eine Inline-Datenbank-Zeitleiste hinzufügen."
+    },
+    "inline_database_calendar": {
+      "label": "Kalenderansicht",
+      "description": "Eine Inline-Kalender-Datenbank hinzufügen."
+    },
+    "inline_database_gallery": {
+      "label": "Galerieansicht",
+      "description": "Eine Inline-Datenbank-Galerie hinzufügen."
+    },
+    "color_default": {
+      "label": "Standard",
+      "description": "Text- oder Hintergrundfarbe aus diesem Block entfernen."
+    },
+    "color_gray": {
+      "label": "Grau",
+      "description": "Grau auf diesen Block anwenden."
+    },
+    "color_brown": {
+      "label": "Braun",
+      "description": "Braun auf diesen Block anwenden."
+    },
+    "color_orange": {
+      "label": "Orange",
+      "description": "Orange auf diesen Block anwenden."
+    },
+    "color_yellow": {
+      "label": "Gelb",
+      "description": "Gelb auf diesen Block anwenden."
+    },
+    "color_green": {
+      "label": "Grün",
+      "description": "Grün auf diesen Block anwenden."
+    },
+    "color_blue": {
+      "label": "Blau",
+      "description": "Blau auf diesen Block anwenden."
+    },
+    "color_purple": {
+      "label": "Lila",
+      "description": "Lila auf diesen Block anwenden."
+    },
+    "color_pink": {
+      "label": "Rosa",
+      "description": "Rosa auf diesen Block anwenden."
+    },
+    "color_red": {
+      "label": "Rot",
+      "description": "Rot auf diesen Block anwenden."
+    },
+    "color_gray_background": {
+      "label": "Grauer Hintergrund",
+      "description": "Grauen Hintergrund auf diesen Block anwenden."
+    },
+    "color_brown_background": {
+      "label": "Brauner Hintergrund",
+      "description": "Braunen Hintergrund auf diesen Block anwenden."
+    },
+    "color_orange_background": {
+      "label": "Oranger Hintergrund",
+      "description": "Orangen Hintergrund auf diesen Block anwenden."
+    },
+    "color_yellow_background": {
+      "label": "Gelber Hintergrund",
+      "description": "Gelben Hintergrund auf diesen Block anwenden."
+    },
+    "color_green_background": {
+      "label": "Grüner Hintergrund",
+      "description": "Grünen Hintergrund auf diesen Block anwenden."
+    },
+    "color_blue_background": {
+      "label": "Blauer Hintergrund",
+      "description": "Blauen Hintergrund auf diesen Block anwenden."
+    },
+    "color_purple_background": {
+      "label": "Lila Hintergrund",
+      "description": "Lila Hintergrund auf diesen Block anwenden."
+    },
+    "color_pink_background": {
+      "label": "Rosa Hintergrund",
+      "description": "Rosa Hintergrund auf diesen Block anwenden."
+    },
+    "color_red_background": {
+      "label": "Roter Hintergrund",
+      "description": "Roten Hintergrund auf diesen Block anwenden."
+    }
+  }
+}

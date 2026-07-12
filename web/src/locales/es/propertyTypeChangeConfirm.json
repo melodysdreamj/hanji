@@ -1,0 +1,6 @@
+{
+  "title": "¿Cambiar el tipo de propiedad?",
+  "message": "\"{{propName}}\" ya tiene valores. Cambiar su tipo a {{typeLabel}} puede mostrar los valores existentes de forma diferente o perderlos.",
+  "cancelAria": "Cancelar cambio de tipo de propiedad",
+  "confirm": "Cambiar tipo"
+}

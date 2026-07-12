@@ -1,0 +1,10 @@
+{
+  "emptyDesc": "Este banco de dados ainda não tem páginas.",
+  "emptyTitle": "Nenhuma página ainda",
+  "newInline": "Novo",
+  "newPage": "Nova página",
+  "newPageIn": "Nova página em {{dbTitle}}",
+  "noResultsDesc": "Nenhuma página corresponde aos filtros ou à pesquisa atual.",
+  "noResultsTitle": "Nenhum resultado",
+  "openRow": "Abrir {{title}}"
+}

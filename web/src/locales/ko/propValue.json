@@ -1,0 +1,11 @@
+{
+  "relationLoading": "관계 항목 불러오는 중",
+  "relationUnavailable": "관계 항목을 표시할 수 없음",
+  "unavailable": "사용할 수 없음",
+  "checkbox": {
+    "checked": "선택됨",
+    "unchecked": "선택 안 됨"
+  },
+  "openRelation": "{{title}} 열기",
+  "openOrDownloadFile": "{{name}} 열기 또는 다운로드"
+}

@@ -1,0 +1,21 @@
+{
+  // Type safety net for the untyped .mjs server: `npm run typecheck` runs tsc
+  // over the JS sources (checkJs) with inference-level checking. noImplicitAny
+  // stays off (the codebase is unannotated JSDoc-free JS); the gate still
+  // catches misspelled properties, wrong call shapes against the MCP SDK/zod
+  // types, and unsound narrowing. Ratchet toward stricter flags as JSDoc
+  // annotations grow.
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "target": "es2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.mjs", "scripts/**/*.mjs", "tests/**/*.mjs"]
+}

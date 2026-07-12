@@ -1,0 +1,14 @@
+{
+  "couldntRestorePage": "페이지를 복원하지 못했어요",
+  "emptyBodyPrompt": "Enter 키를 눌러 빈 페이지에 입력을 시작하세요.",
+  "inTrashTopBarTitle": "휴지통에 있음",
+  "notFoundTopBarTitle": "찾을 수 없음",
+  "openWorkspace": "워크스페이스 열기",
+  "pageInTrash": "이 페이지는 휴지통에 있어요.",
+  "pageInTrashDetail": "내용을 열거나 편집하려면 먼저 복원하세요.",
+  "pageUnavailable": "페이지를 열 수 없어요.",
+  "pageUnavailableDetail": "페이지가 삭제되었거나 이동되었거나 다른 계정과 공유되었을 수 있어요.",
+  "restorePage": "페이지 복원",
+  "restoredPage": "페이지를 복원했어요",
+  "loadingPageContent": "페이지 콘텐츠를 불러오는 중"
+}

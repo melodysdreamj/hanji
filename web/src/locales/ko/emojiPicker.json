@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "아이콘 선택기 닫기",
+    "label": "아이콘 선택"
+  },
+  "tabs": {
+    "groupLabel": "아이콘 유형",
+    "emoji": "이모지",
+    "image": "이미지"
+  },
+  "remove": {
+    "label": "제거",
+    "ariaLabel": "아이콘 제거"
+  },
+  "emoji": {
+    "searchPlaceholder": "필터…",
+    "searchLabel": "아이콘 검색",
+    "random": "랜덤",
+    "randomLabel": "랜덤 아이콘 선택",
+    "recentLabel": "최근 사용 항목 먼저",
+    "gridLabelRecent": "아이콘, 최근 사용 항목 먼저",
+    "gridLabel": "아이콘",
+    "optionLabel": "{{emoji}} 아이콘 선택",
+    "noResults": "“{{query}}”과(와) 일치하는 아이콘이 없습니다. 다른 단어로 검색하거나 필터를 지우세요."
+  },
+  "custom": {
+    "previewPlaceholder": "이미지",
+    "linkPlaceholder": "이미지 링크 붙여넣기",
+    "linkLabel": "이미지 아이콘 링크",
+    "apply": "적용",
+    "upload": "파일 업로드",
+    "uploading": "업로드 중...",
+    "uploadingLabel": "{{fileName}} 업로드 중",
+    "uploadFailed": "이미지를 업로드할 수 없습니다.",
+    "fallbackFileName": "아이콘 이미지"
+  },
+  "uploadProgress": {
+    "preparing": "업로드 준비 중",
+    "finalizing": "마무리 중",
+    "complete": "완료",
+    "uploading": "업로드 중"
+  }
+}

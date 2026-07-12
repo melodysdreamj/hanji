@@ -1,0 +1,27 @@
+{
+  "searchPlaceholder": "Pesquisar ou ir para...",
+  "quickFind": "Busca rápida",
+  "closeSearch": "Fechar pesquisa",
+  "quickFindResults": "Resultados da busca rápida",
+  "sections": {
+    "recentlyViewed": "Visualizados recentemente",
+    "recentSearches": "Pesquisas recentes",
+    "pages": "Páginas",
+    "pageContent": "Conteúdo da página",
+    "favorites": "Favoritos"
+  },
+  "inPage": "na página",
+  "searchingDetail": "Pesquisando...",
+  "searchAgain": "Pesquisar novamente",
+  "searchingPageContent": "Pesquisando conteúdo da página...",
+  "noResultsFor": "Nenhum resultado para \"{{query}}\"",
+  "noPagesFound": "Nenhuma página encontrada",
+  "creating": "Criando...",
+  "newPage": "Nova página \"{{query}}\"",
+  "couldntCreatePage": "Não foi possível criar a página",
+  "hints": {
+    "select": "Selecionar",
+    "open": "Abrir",
+    "newTab": "Nova aba"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "カバーを変更",
+    "reposition": "位置を調整",
+    "remove": "削除",
+    "uploadFile": "ファイルをアップロード",
+    "uploading": "アップロード中...",
+    "submit": "送信",
+    "savePosition": "位置を保存"
+  },
+  "tabs": {
+    "gallery": "ギャラリー",
+    "upload": "アップロード",
+    "link": "リンク"
+  },
+  "link": {
+    "placeholder": "画像リンクを貼り付け",
+    "invalid": "httpまたはhttpsの画像リンクを貼り付けてください。"
+  },
+  "upload": {
+    "error": "その画像をアップロードできませんでした。",
+    "defaultFileName": "カバー画像"
+  },
+  "reposition": {
+    "hint": "画像をドラッグして位置を調整"
+  },
+  "progress": {
+    "preparing": "アップロードを準備中",
+    "finalizing": "完了処理中",
+    "complete": "完了",
+    "uploading": "アップロード中"
+  },
+  "toast": {
+    "removed": "カバーを削除しました",
+    "restored": "カバーを復元しました",
+    "undo": "元に戻す"
+  },
+  "aria": {
+    "pageCover": "ページカバー",
+    "coverVerticalPosition": "カバーの垂直位置",
+    "positionFromTop": "上から{{position}}%",
+    "closeCoverMenu": "カバーメニューを閉じる",
+    "changePageCover": "ページカバーを変更",
+    "repositionPageCover": "ページカバーの位置を調整",
+    "removePageCover": "ページカバーを削除",
+    "changeCoverDialog": "カバーを変更",
+    "coverSource": "カバーのソース",
+    "selectCover": "カバー{{number}}を選択",
+    "uploadFromDevice": "このデバイスからカバー画像をアップロード",
+    "uploadingFile": "{{fileName}}をアップロード中",
+    "coverImageLink": "カバー画像のリンク"
+  }
+}

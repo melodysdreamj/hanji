@@ -1,0 +1,34 @@
+{
+  "title": "Mover a",
+  "workspaceRoot": {
+    "label": "Raíz del espacio de trabajo",
+    "path": "Nivel superior"
+  },
+  "search": {
+    "label": "Buscar destinos de movimiento",
+    "placeholder": "Buscar páginas..."
+  },
+  "dialog": {
+    "closeLabel": "Cerrar diálogo de movimiento"
+  },
+  "results": {
+    "listLabel": "Destinos de movimiento",
+    "empty": "No se encontraron páginas.",
+    "destinationLabel": "Mover a {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "Crear \"{{title}}\"",
+    "optionLabel": "Crear página {{title}} y mover aquí",
+    "hint": "Nueva página de nivel superior - mover aquí"
+  },
+  "locked": {
+    "parent": "Elemento padre bloqueado",
+    "page": "Página bloqueada"
+  },
+  "toast": {
+    "lockedParent": "La página está en un elemento padre bloqueado",
+    "locked": "La página está bloqueada",
+    "moved": "Página movida",
+    "moveFailed": "No se pudo mover la página"
+  }
+}

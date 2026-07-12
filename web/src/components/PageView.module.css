@@ -1,0 +1,324 @@
+.scroll {
+  height: calc(100vh - var(--topbar-height));
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.doc {
+  --page-font-family: var(--font-ui);
+  --page-font-size: 16px;
+  --page-title-size: 40px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--content-pad) 30vh;
+  font-family: var(--page-font-family);
+}
+.doc[data-has-cover="false"] {
+  padding-top: 12px;
+}
+.doc[data-font="serif"] {
+  --page-font-family: var(--font-serif);
+}
+.doc[data-font="mono"] {
+  --page-font-family: var(--font-mono);
+}
+.doc[data-small-text="true"] {
+  --page-font-size: 14px;
+  --page-title-size: 36px;
+}
+.doc[data-full-width="true"] {
+  max-width: none;
+  margin: 0;
+  padding-left: var(--content-pad);
+  padding-right: var(--content-pad);
+}
+@media (min-width: 900px) {
+  .doc[data-has-wide-root-content="false"][data-full-width="false"][data-has-inline-database="true"],
+  .doc[data-has-wide-root-content="false"][data-full-width="false"]:has(
+      [data-block-type="inline_database"]
+    ),
+  .doc[data-has-wide-root-content="false"][data-full-width="false"]:has(
+      [data-block-type="paragraph"] + [data-block-type="inline_database"]
+    ),
+  .doc[data-has-wide-root-content="false"][data-full-width="false"]:has(
+      [data-block-type="quote"] + [data-block-type="inline_database"]
+    ) {
+    max-width: min(948px, calc(100vw - (var(--content-pad) * 2)));
+  }
+}
+.doc[data-has-wide-root-content="true"][data-full-width="true"] {
+  --page-wide-pad: clamp(96px, 7.5vw, 152px);
+  --page-title-size: 40px;
+  padding-left: var(--page-wide-pad);
+  padding-right: var(--page-wide-pad);
+}
+/* Full-page databases use a wider canvas. */
+.doc[data-kind="database"] {
+  --database-page-pad: clamp(56px, 5vw, 64px);
+  max-width: 1500px;
+  padding-left: var(--database-page-pad);
+  padding-right: var(--database-page-pad);
+}
+.doc[data-kind="database"][data-full-width="true"] {
+  max-width: none;
+  padding-left: var(--database-page-pad);
+  padding-right: var(--database-page-pad);
+}
+@media (max-width: 1100px) {
+  .doc[data-kind="database"] {
+    --database-page-pad: 56px;
+  }
+}
+.contentFallback {
+  min-height: 180px;
+}
+.missing {
+  max-width: 720px;
+  margin: 80px auto;
+  padding: 0 24px;
+  color: var(--text-secondary);
+}
+.missing strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-default);
+  font-size: 18px;
+  font-weight: 600;
+}
+.missing p {
+  margin: 0 0 16px;
+}
+.missingActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.restoreButton {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 5px;
+  background: var(--text-default);
+  color: var(--bg-app);
+  font-size: 14px;
+  font-weight: 500;
+}
+.restoreButton:hover,
+.restoreButton:focus-visible {
+  opacity: 0.9;
+  outline: none;
+}
+.findBar {
+  position: fixed;
+  top: calc(var(--topbar-height) + 8px);
+  right: 18px;
+  z-index: 190;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: min(390px, calc(100vw - 32px));
+  min-height: 36px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+  color: var(--text-secondary);
+}
+.findInputWrap {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  gap: 7px;
+  padding: 0 7px;
+  color: var(--text-tertiary);
+}
+.findInputWrap input {
+  width: 100%;
+  min-width: 0;
+  height: 28px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-default);
+  font-size: 14px;
+  line-height: 20px;
+}
+.findInputWrap input::placeholder {
+  color: var(--text-tertiary);
+}
+.findCount {
+  flex: 0 0 auto;
+  min-width: 42px;
+  padding: 0 4px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: right;
+}
+.findButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+}
+.findButton:hover,
+.findButton:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+.findButton:disabled {
+  color: var(--text-tertiary);
+  cursor: default;
+  opacity: 0.45;
+}
+.findButton:disabled:hover {
+  background: transparent;
+  color: var(--text-tertiary);
+}
+.presence {
+  position: fixed;
+  top: calc(var(--topbar-height) + 10px);
+  right: 18px;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 34px;
+  max-width: min(320px, calc(100vw - 36px));
+  height: 30px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bg-app) 92%, transparent);
+  box-shadow: var(--shadow-menu);
+  color: var(--text-secondary);
+  pointer-events: auto;
+}
+.presenceDot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #548164;
+}
+.presence[data-status="connecting"] .presenceDot,
+.presence[data-status="reconnecting"] .presenceDot {
+  background: #d9730d;
+}
+.presence[data-status="auth_lost"] .presenceDot,
+.presence[data-status="kicked"] .presenceDot,
+.presence[data-status="disconnected"] .presenceDot {
+  background: #e03e3e;
+}
+.presenceStack {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+}
+.presenceAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: -5px;
+  border: 2px solid var(--bg-app);
+  border-radius: 999px;
+  background: var(--presence-color, #337ea9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+.presenceAvatar:first-child {
+  margin-left: 0;
+}
+.presenceMore {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+.presenceActivity {
+  min-width: 0;
+  max-width: 180px;
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.presence[data-variant="topbar"] {
+  position: static;
+  z-index: auto;
+  gap: 0;
+  min-width: 0;
+  max-width: 76px;
+  height: 28px;
+  padding: 0 2px 0 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.presence[data-variant="topbar"] .presenceStack {
+  height: 28px;
+}
+.presence[data-variant="topbar"] .presenceAvatar {
+  width: 22px;
+  height: 22px;
+  margin-left: -6px;
+  border-width: 1.5px;
+  border-color: var(--bg-app);
+  font-size: 9px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--border-default) 72%, transparent);
+}
+.presence[data-variant="topbar"] .presenceAvatar:first-child {
+  margin-left: 0;
+}
+
+@media (max-width: 760px) {
+  .doc {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .doc[data-full-width="true"] {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .doc[data-has-wide-root-content="true"][data-full-width="true"] {
+    --page-title-size: 40px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .doc[data-kind="database"] {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .presence {
+    right: 10px;
+    max-width: calc(100vw - 20px);
+  }
+  .presenceActivity {
+    max-width: 94px;
+  }
+  .findBar {
+    top: calc(var(--topbar-height) + 6px);
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
+  .presence {
+    top: calc(var(--topbar-height) + 8px);
+    right: 10px;
+    height: 28px;
+    padding: 2px 5px;
+  }
+  .presenceAvatar {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+}

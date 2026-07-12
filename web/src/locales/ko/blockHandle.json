@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "addBlockBelow": "아래에 블록 추가",
+    "dragHint": "드래그하여 이동. 클릭하여 메뉴 열기.",
+    "openBlockActions": "블록 작업 열기",
+    "closeBlockActions": "블록 작업 닫기"
+  },
+  "menu": {
+    "ariaLabel": "블록 작업",
+    "deleteMany": "블록 {{num}}개 삭제",
+    "duplicate": "복제",
+    "duplicateMany": "블록 {{num}}개 복제",
+    "turnInto": "전환",
+    "copy": "복사",
+    "copyMany": "블록 {{num}}개 복사",
+    "copied": "복사됨",
+    "copyLinkToBlock": "블록 링크 복사",
+    "copiedBlockLink": "블록 링크 복사됨",
+    "moveTo": "이동",
+    "moveToMany": "블록 {{num}}개 이동",
+    "moveUp": "위로 이동",
+    "moveUpMany": "블록 {{num}}개 위로 이동",
+    "moveDown": "아래로 이동",
+    "moveDownMany": "블록 {{num}}개 아래로 이동",
+    "comment": "댓글",
+    "commentMany": "블록 {{num}}개에 댓글",
+    "addCaption": "캡션 추가",
+    "removeCaption": "캡션 제거",
+    "unsyncSyncedBlock": "동기화 블록 동기화 해제",
+    "copySyncedBlock": "동기화 블록 복사",
+    "color": "색",
+    "mixed": "혼합",
+    "textFallback": "텍스트"
+  },
+  "turnMenu": {
+    "chooseType": "블록 유형 선택"
+  },
+  "colorMenu": {
+    "textColor": "글자 색",
+    "backgroundColor": "배경 색"
+  },
+  "colors": {
+    "default": "기본",
+    "gray": "회색",
+    "brown": "갈색",
+    "orange": "주황색",
+    "yellow": "노란색",
+    "green": "초록색",
+    "blue": "파란색",
+    "purple": "보라색",
+    "pink": "분홍색",
+    "red": "빨간색",
+    "gray_background": "회색 배경",
+    "brown_background": "갈색 배경",
+    "orange_background": "주황색 배경",
+    "yellow_background": "노란색 배경",
+    "green_background": "초록색 배경",
+    "blue_background": "파란색 배경",
+    "purple_background": "보라색 배경",
+    "pink_background": "분홍색 배경",
+    "red_background": "빨간색 배경"
+  },
+  "notifications": {
+    "duplicatedBlock": "블록을 복제했습니다",
+    "duplicatedBlocks": "블록 {{num}}개를 복제했습니다",
+    "undo": "실행 취소",
+    "undidDuplicate": "복제를 취소했습니다",
+    "nothingToUndo": "취소할 작업이 없습니다",
+    "deletedBlock": "블록을 삭제했습니다",
+    "deletedBlocks": "블록 {{num}}개를 삭제했습니다",
+    "restoredBlock": "블록을 복원했습니다",
+    "copiedToClipboard": "클립보드에 복사했습니다",
+    "couldNotCopy": "복사하지 못했습니다",
+    "couldNotCopyLink": "링크를 복사하지 못했습니다",
+    "clearedColor": "색을 지웠습니다",
+    "changedColor": "색을 변경했습니다",
+    "changedBlockType": "블록 유형을 변경했습니다"
+  },
+  "comments": {
+    "selectedBlocksQuote": "선택한 블록 {{num}}개"
+  },
+  "moveDialog": {
+    "title": "블록 {{num}}개를 이동할 위치"
+  },
+  "edited": {
+    "justNow": "방금 편집함",
+    "minutesAgo": "{{minutes}}분 전 편집함",
+    "hoursAgo": "{{hours}}시간 전 편집함",
+    "daysAgo": "{{days}}일 전 편집함",
+    "on": "{{date}} 편집함"
+  }
+}

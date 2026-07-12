@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "Change cover",
+    "reposition": "Reposition",
+    "remove": "Remove",
+    "uploadFile": "Upload file",
+    "uploading": "Uploading...",
+    "submit": "Submit",
+    "savePosition": "Save position"
+  },
+  "tabs": {
+    "gallery": "Gallery",
+    "upload": "Upload",
+    "link": "Link"
+  },
+  "link": {
+    "placeholder": "Paste image link",
+    "invalid": "Paste an http or https image link."
+  },
+  "upload": {
+    "error": "Could not upload that image.",
+    "defaultFileName": "Cover image"
+  },
+  "reposition": {
+    "hint": "Drag image to reposition"
+  },
+  "progress": {
+    "preparing": "Preparing upload",
+    "finalizing": "Finalizing",
+    "complete": "Complete",
+    "uploading": "Uploading"
+  },
+  "toast": {
+    "removed": "Removed cover",
+    "restored": "Restored cover",
+    "undo": "Undo"
+  },
+  "aria": {
+    "pageCover": "Page cover",
+    "coverVerticalPosition": "Cover vertical position",
+    "positionFromTop": "{{position}}% from top",
+    "closeCoverMenu": "Close cover menu",
+    "changePageCover": "Change page cover",
+    "repositionPageCover": "Reposition page cover",
+    "removePageCover": "Remove page cover",
+    "changeCoverDialog": "Change cover",
+    "coverSource": "Cover source",
+    "selectCover": "Select cover {{number}}",
+    "uploadFromDevice": "Upload cover image from this device",
+    "uploadingFile": "Uploading {{fileName}}",
+    "coverImageLink": "Cover image link"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "filters": {
+    "all": "全部",
+    "unread": "未读",
+    "comments": "评论",
+    "mentions": "提及",
+    "edits": "编辑"
+  },
+  "header": {
+    "closeUpdates": "关闭更新",
+    "markAllRead": "全部标为已读",
+    "markAllReadAria": "将所有更新标为已读",
+    "pageHistory": "页面历史",
+    "recentUpdates_one": "{{count}} 条最近更新",
+    "recentUpdates_other": "{{count}} 条最近更新",
+    "unreadOfTotal": "{{total}} 条更新中有 {{unread}} 条未读",
+    "updateType": "更新类型",
+    "updates": "更新",
+    "modeUpdates": "更新",
+    "modeChats": "聊天",
+    "inboxMode": "收件箱模式"
+  },
+  "time": {
+    "justNow": "刚刚",
+    "today": "今天",
+    "yesterday": "昨天"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} 个块",
+    "blockCount_other": "{{count}} 个块",
+    "currentVersion": "当前版本",
+    "currentVersionOnly": "仅当前版本",
+    "next": "下一个",
+    "nextVersion": "下一版本",
+    "noVersionPrevious": "没有上一版本",
+    "noVersionNext": "没有下一版本",
+    "pageLocked": "页面已锁定",
+    "previous": "上一个",
+    "previousSnapshots_one": "{{count}} 个历史快照",
+    "previousSnapshots_other": "{{count}} 个历史快照",
+    "previousVersion": "上一版本",
+    "restoredPrevious": "已恢复上一版本",
+    "restoredNext": "已恢复下一版本",
+    "restoredVersions": "已恢复 {{count}} 个版本",
+    "versionCount_one": "{{count}} 个版本",
+    "versionCount_other": "{{count}} 个版本",
+    "versionsAgo": "{{count}} 个版本之前",
+    "versionsAhead": "超前 {{count}} 个版本",
+    "versionsAria": "版本"
+  },
+  "badges": {
+    "comment": "评论",
+    "edited": "已编辑",
+    "linked": "已链接",
+    "member": "成员",
+    "mention": "提及",
+    "reply": "回复",
+    "replyMention": "回复提及",
+    "shared": "已分享",
+    "system": "系统"
+  },
+  "rows": {
+    "byActor": "由 {{name}}",
+    "emptyComment": "空评论",
+    "forYou": "给你",
+    "notification": "通知",
+    "referenceMention": "提及了 {{title}} · {{preview}}",
+    "referenceLink": "链接到 {{title}} · {{preview}}",
+    "unreadDot": "未读",
+    "workspaceUpdate": "工作区更新"
+  },
+  "empty": {
+    "allCaughtUp": "全部已处理完毕。",
+    "loadingUpdates": "正在加载更新…",
+    "noFilteredUpdatesYet": "暂无{{filter}}。",
+    "noPageHistoryYet": "暂无页面历史。",
+    "noUpdatesYet": "暂无更新。"
+  }
+}

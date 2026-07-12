@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "날짜 속성 추가",
+    "description": "타임라인 뷰는 페이지를 시간축에 표시할 시작일 속성이 필요합니다."
+  },
+  "endDateHint": "종료일 속성을 추가하면 하루짜리 막대 대신 기간으로 표시됩니다.",
+  "zoom": {
+    "ariaLabel": "타임라인 확대/축소",
+    "day": "일",
+    "week": "주",
+    "month": "월"
+  },
+  "dependencies": {
+    "label": "의존 관계:",
+    "hint": "관계형 속성을 추가하세요",
+    "relationPropertyAriaLabel": "의존 관계 속성"
+  },
+  "toolbar": {
+    "today": "오늘",
+    "previousRange": "이전 범위",
+    "nextRange": "다음 범위",
+    "newPage": "새 페이지",
+    "newPageIn": "새 페이지 추가 ({{dbTitle}})"
+  },
+  "table": {
+    "ariaLabel": "타임라인 표",
+    "nameHeader": "이름"
+  },
+  "bar": {
+    "openAriaLabel": "{{title}} 열기",
+    "openAriaLabelWithDates": "{{title}} 열기, {{start}}부터 {{end}}까지",
+    "openNoDateAriaLabel": "{{title}} 열기, 날짜 없음"
+  },
+  "lanes": {
+    "noItemsInRange": "이 범위에 항목이 없습니다.",
+    "noDatedItems": "아직 날짜가 있는 항목이 없습니다.",
+    "jumpTo": "{{date}}로 이동"
+  },
+  "noDate": {
+    "heading": "날짜 없음 ({{count}})"
+  },
+  "options": {
+    "none": "없음",
+    "untitled": "제목 없음"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭",
+    "search": "搜索",
+    "create": "创建",
+    "delete": "删除",
+    "clearAll": "全部清除",
+    "done": "完成",
+    "add": "添加"
+  },
+  "labels": {
+    "untitled": "无标题"
+  },
+  "generated": {
+    "copyName": "{{name}} 副本",
+    "columnName": "第 {{number}} 列",
+    "importedDatabase": "导入的数据库",
+    "uploadedFile": "上传的文件",
+    "image": "图片",
+    "propertyNames": {
+      "name": "名称",
+      "status": "状态",
+      "select": "选择",
+      "date": "日期"
+    },
+    "statusOptions": {
+      "todo": "未开始",
+      "doing": "进行中",
+      "done": "已完成"
+    },
+    "selectOptions": {
+      "first": "选项 1",
+      "second": "选项 2"
+    },
+    "viewNames": {
+      "table": "表格"
+    }
+  }
+}

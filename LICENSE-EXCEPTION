@@ -1,0 +1,182 @@
+Hanji Sponsor Banner Exception, version 2.0 (2026-07-11)
+
+This Exception is an additional permission under section 7 of the GNU Affero
+General Public License, version 3 ("AGPL-3.0"), granted by each Hanji copyright
+holder for the portions of the Hanji software for which that holder can grant
+copyright permission (the "Hanji Materials"). Use of this Exception is
+optional. The Hanji Materials remain available under AGPL-3.0 whether or not
+you rely on this Exception. For a copy legitimately received with this version
+of the Exception, its additional permissions are granted for the term of the
+applicable copyright and are irrevocable while its stated conditions are met.
+
+1. Definitions.
+
+   a. "Canonical Sponsor Feed" means the sponsor-feed endpoint configured by
+      default in the Hanji release you received, a successor endpoint publicly
+      designated by the Hanji project, or a mirror expressly authorized by the
+      Hanji copyright holders. An operator-selected or replacement feed is not
+      a Canonical Sponsor Feed merely because it uses the same data format.
+
+   b. "Faithful Sponsor Relay" means the sponsor-feed functionality shipped
+      with Hanji that retrieves the Canonical Sponsor Feed — or, when the
+      deployment is configured for offline operation, reads the Bundled Sponsor
+      Snapshot — and relays its sponsor names and links without substitution,
+      suppression, reordering, or addition. Transport security checks, safe URL
+      normalization, bounded parsing, caching, and limiting the result to the
+      shipped number of sponsor slots do not make a relay unfaithful.
+
+   c. "Sponsor Banner Feature" means both the Faithful Sponsor Relay and the
+      sign-in-screen sponsor banner component that renders its result, in
+      substantially their shipped form, presentation, and placement. The
+      shipped banner may present the relayed sponsors individually or in
+      rotation — for example, a single sponsor chosen when the sign-in screen
+      loads — and such presentation is part of its shipped form; qualification
+      does not require any particular number of sponsors to be visible at once.
+
+   d. A "Qualifying Version" is the Hanji Materials, with or without
+      modifications or combination with other code, in which the Sponsor
+      Banner Feature is present, functional, enabled by default for the
+      deployment and for new users, and not removed, replaced, redirected,
+      disabled, suppressed, obscured, or made materially less prominent than
+      its shipped form.
+
+   e. "Object Code" and "Corresponding Source" have the meanings given in
+      AGPL-3.0. Object Code expressly includes compiled, minified, transpiled,
+      or bundled browser code such as JavaScript, CSS, WebAssembly, source
+      maps when supplied, and other frontend assets generated from source.
+
+   f. "Bundled Sponsor Snapshot" means the sponsor snapshot data file shipped
+      in the Hanji release you received, used unmodified. It lets a deployment
+      show sponsors without making the network request to the Canonical Sponsor
+      Feed (for example on a closed network, or to avoid the outbound request).
+      An operator-edited, replaced, or externally-substituted snapshot is not a
+      Bundled Sponsor Snapshot, exactly as a replacement feed is not a
+      Canonical Sponsor Feed.
+
+2. Qualifying operation.
+
+   A version qualifies only while it retrieves the Canonical Sponsor Feed
+   through the Faithful Sponsor Relay and runs the Sponsor Banner Feature,
+   unmodified in its sponsor fetch-and-display behavior, on the ordinary
+   sign-in screen, so that the feed's sponsors are shown to users through that
+   shipped feature. Qualification depends on keeping that sponsor fetch-and-
+   display code present, unmodified in behavior, and enabled by default — not
+   on any particular number of sponsors being visible at once or on a
+   particular visual arrangement. A deployment-wide setting, policy,
+   stylesheet, routing change, proxy, or other mechanism that hides, bypasses,
+   replaces, modifies, or disables the feature prevents qualification.
+
+   A deployment may instead operate in an offline mode that displays the
+   Bundled Sponsor Snapshot through the Sponsor Banner Feature rather than
+   retrieving the Canonical Sponsor Feed over the network; such a version
+   qualifies while it displays that snapshot unmodified through the feature.
+   Editing, replacing, or externally substituting the Bundled Sponsor Snapshot
+   is unfaithful and prevents qualification, exactly as substituting the live
+   feed would.
+
+   An empty response from the Canonical Sponsor Feed, or a temporary feed or
+   network failure outside the operator's reasonable control, does not by
+   itself prevent qualification, provided that the canonical configuration and the
+   unmodified fetch-and-display path remain enabled, the operator does not
+   cause or prolong the failure, and normal display resumes automatically when
+   the Canonical Sponsor Feed becomes available.
+
+3. Conditional additional permission.
+
+   For a Qualifying Version, and only to the extent that a Hanji copyright
+   holder has authority over the relevant Hanji Materials, that holder grants
+   you worldwide, royalty-free, non-exclusive additional permission,
+   notwithstanding the source-code, whole-work licensing, and no-further-
+   restrictions conditions of AGPL-3.0 sections 5(b), 5(c), 6, 10, and 13, to:
+
+   a. make, run, copy, and modify the Qualifying Version privately without
+      disclosing or licensing your modifications under AGPL-3.0;
+
+   b. make the Qualifying Version available for interaction over a network,
+      including as a private service, public service, or commercial hosted
+      service, without offering or providing its Corresponding Source;
+
+   c. propagate and convey the Qualifying Version, in modified source form or
+      Object Code form, including executable packages, container images, and
+      frontend browser bundles, without offering or providing its Corresponding
+      Source or Installation Information;
+
+   d. link, combine, or incorporate the Hanji Materials with independent code,
+      libraries, modules, services, or other materials under any license,
+      including proprietary terms, and make, run, propagate, convey, or provide
+      the resulting combined work as a network service; and
+
+   e. apply terms of your choice, including proprietary terms, to your own
+      modifications and independent code, keep them confidential, and charge a
+      fee for copies, hosting, support, or other services.
+
+   You are not required by AGPL-3.0 to license your modifications, independent
+   code, or the combined work as a whole under AGPL-3.0, or to disclose their
+   source, solely because you exercise the permissions in this section. This
+   Exception does not relicense the pre-existing Hanji Materials themselves:
+   each recipient receives those materials directly from their copyright
+   holders under AGPL-3.0 with this Exception. Terms applied to modifications
+   or independent code must not state or imply that the pre-existing Hanji
+   Materials are proprietary, and must not purport to restrict a recipient's
+   direct AGPL-3.0 rights in those pre-existing Hanji Materials standing alone.
+
+4. Conditions on conveyance.
+
+   When you convey a Qualifying Version under this Exception, you must:
+
+   a. keep the Sponsor Banner Feature in that conveyed version and provide
+      recipients with this same Exception;
+
+   b. preserve applicable copyright and license notices for the Hanji
+      Materials; and
+
+   c. include, in accompanying documentation or an accessible legal-notices
+      surface, a notice that the product includes Hanji Materials available
+      under AGPL-3.0 with the Hanji Sponsor Banner Exception, together with a
+      copy of or working link to AGPL-3.0 and this Exception.
+
+   These conditions do not require you to disclose your modifications,
+   independent code, credentials, customer data, or other proprietary material.
+
+5. Automatic AGPL fallback.
+
+   If a version does not satisfy, or ceases to satisfy, sections 1 and 2, the
+   additional permission in section 3 does not apply to continued operation,
+   propagation, or conveyance of that version. No separate notice from a Hanji
+   copyright holder is required. Plain AGPL-3.0 then governs the Hanji
+   Materials and the covered work, including its Corresponding Source
+   obligations. Activities completed while the version qualified remain
+   authorized, but ongoing network operation and new conveyance must qualify
+   again, comply with AGPL-3.0, or be covered by a separate commercial license.
+
+6. AGPL baseline and removal.
+
+   This Exception adds permission and does not restrict any right available
+   under AGPL-3.0. You may remove this Exception from your copy and use,
+   modify, host, or convey the covered work under plain AGPL-3.0. Removing the
+   Sponsor Banner Feature is therefore permitted under AGPL-3.0 when all
+   applicable AGPL-3.0 obligations are satisfied.
+
+7. Third-party rights, trademarks, and endorsement.
+
+   This Exception grants rights only in material for which a participating
+   Hanji copyright holder can grant them. It does not override third-party
+   licenses. It grants no trademark right and no right to imply endorsement by
+   the Hanji project or any sponsor, except the limited display of names, links,
+   and marks supplied by the Canonical Sponsor Feed through the Sponsor Banner
+   Feature.
+
+8. Commercial license.
+
+   A deployment or distributor that wants to remove, replace, disable, or
+   obscure the Sponsor Banner Feature while keeping modifications or a combined
+   work proprietary may contact the Hanji copyright holders for a separate
+   commercial license.
+
+9. No warranty; legal review.
+
+   This Exception does not add any warranty, support obligation, or liability
+   beyond AGPL-3.0. It is a custom additional permission and has not been
+   separately approved by the Open Source Initiative. Obtain advice from
+   qualified counsel before relying on it for a commercial deployment or
+   distribution.

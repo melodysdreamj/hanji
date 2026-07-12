@@ -1,0 +1,30 @@
+{
+  "acceptInvitation": "Accept invitation",
+  "acceptingInvitation": "Joining…",
+  "invitationBody": "Accept the invitation to add this workspace to your account.",
+  "invitationTitle": "Join this workspace?",
+  "joinedWorkspace": "Joined workspace",
+  "couldntAcceptInvitation": "Couldn't accept invitation.",
+  "notNow": "Not now",
+  "loadingWorkspace": "Loading your workspace…",
+  "workspaceLoadTrouble": "Hanji is having trouble loading this workspace.",
+  "pageUnavailable": "Page unavailable.",
+  "workspaceUnavailable": "Workspace unavailable.",
+  "somethingWentWrong": "Something went wrong.",
+  "tryAgain": "Try again",
+  "openDefaultWorkspace": "Open default workspace",
+  "copiedLink": "Copied link",
+  "couldntCopyLink": "Couldn't copy link",
+  "darkMode": "Dark mode",
+  "lightMode": "Light mode",
+  "pendingInvitesTitle": "Workspace invitations",
+  "pendingInviteRole": "as {{role}}",
+  "skipToMain": "Skip to main content",
+  "navigationComplete": "Navigated to {{destination}}",
+  "route": {
+    "home": "Home",
+    "trash": "Trash",
+    "settings": "Settings",
+    "sharedPage": "Shared page"
+  }
+}

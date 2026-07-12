@@ -1,0 +1,7 @@
+{
+  "period": {
+    "am": "오전",
+    "pm": "오후"
+  },
+  "notionTimestamp": "{{year}}년 {{month}}월 {{day}}일 {{period}} {{hour12}}:{{minutes}}"
+}

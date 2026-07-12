@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 200">
+  <!-- HANJI 워드마크 — 소녀 마크 + 광자간 대문자 (배포 시 아웃라인 변환 권장) -->
+  <rect width="660" height="200" rx="28" fill="#0B0B0B"/>
+  <g transform="translate(24,18) scale(0.32)">
+    <rect width="512" height="512" rx="116" fill="#FFFFFF"/>
+    <path fill="#0B0B0B" d="M124 220
+      L124 372
+      C124 398, 140 410, 160 408
+      C176 406, 184 396, 186 382
+      C196 392, 306 394, 326 382
+      C328 396, 336 406, 352 408
+      C372 410, 388 398, 388 372
+      L388 220
+      C388 140, 330 92, 256 92
+      C182 92, 124 140, 124 220 Z"/>
+    <path d="M180 236 C 210 250, 302 250, 332 236
+             C 332 316, 306 362, 256 368
+             C 206 362, 180 316, 180 236 Z" fill="#FFFFFF"/>
+    <g fill="none" stroke="#0B0B0B" stroke-linecap="round">
+      <path d="M206 266 C214 260, 226 260, 234 264" stroke-width="6"/>
+      <path d="M278 264 C286 260, 298 260, 306 266" stroke-width="6"/>
+      <path d="M198 296 C208 282, 230 282, 240 296" stroke-width="11"/>
+      <path d="M272 296 C282 282, 304 282, 314 296" stroke-width="11"/>
+      <path d="M198 296 L190 290" stroke-width="8"/>
+      <path d="M314 296 L322 290" stroke-width="8"/>
+      <path d="M257 312 C254 320, 252 324, 250 328" stroke-width="6"/>
+    </g>
+    <path d="M240 346 C246 338, 252 341, 256 344 C260 341, 268 338, 272 346
+             C266 356, 246 356, 240 346 Z" fill="#0B0B0B"/>
+    <path d="M186 138 C218 110, 270 102, 308 114" fill="none"
+          stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+    <rect x="132" y="248" width="34" height="9" rx="4.5" fill="#FFFFFF"/>
+    <rect x="132" y="266" width="24" height="9" rx="4.5" fill="#FFFFFF"/>
+  </g>
+  <text x="220" y="126" font-size="72" letter-spacing="18" fill="#FFFFFF"
+        font-family="Futura,'Avenir Next','Century Gothic',Montserrat,'Helvetica Neue',sans-serif"
+        font-weight="500">HANJI</text>
+</svg>

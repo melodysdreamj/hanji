@@ -1,0 +1,37 @@
+{
+  "trash": "휴지통",
+  "empty": "삭제한 페이지가 여기에 표시됩니다. 휴지통이 비어 있습니다.",
+  "searchTrash": "휴지통 검색",
+  "deletedPages": "삭제된 페이지",
+  "noSearchMatches": "검색과 일치하는 삭제된 페이지가 없습니다.",
+  "pageCount_other": "페이지 {{count}}개",
+  "deletedJustNow": "방금 삭제됨",
+  "deletedOn": "{{date}}에 삭제됨",
+  "actions": {
+    "restore": "복원",
+    "deleteForever": "영구 삭제",
+    "emptyTrash": "휴지통 비우기"
+  },
+  "aria": {
+    "openFromTrash": "휴지통에서 {{title}} 열기",
+    "restorePage": "{{title}} 복원",
+    "deletePageForever": "{{title}} 영구 삭제",
+    "cancelPermanentDelete": "영구 삭제 취소",
+    "cancelEmptyTrash": "휴지통 비우기 취소"
+  },
+  "confirm": {
+    "deleteTitle": "영구 삭제할까요?",
+    "deleteBodyPrefix": "",
+    "deleteBodySuffix": "을(를) 영구적으로 삭제합니다. 이 작업은 되돌릴 수 없습니다.",
+    "emptyTitle": "휴지통을 비울까요?",
+    "emptyBody_other": "휴지통에 있는 페이지 {{count}}개를 영구적으로 삭제합니다. 이 작업은 되돌릴 수 없습니다."
+  },
+  "toast": {
+    "deletedForever": "영구 삭제됨",
+    "couldntDelete": "페이지를 삭제하지 못했습니다",
+    "restored": "페이지를 복원했습니다",
+    "couldntRestore": "페이지를 복원하지 못했습니다",
+    "emptied": "휴지통을 비웠습니다",
+    "couldntEmpty": "휴지통을 비우지 못했습니다"
+  }
+}

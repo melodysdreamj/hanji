@@ -1,0 +1,10 @@
+{
+  "offline": "Hors ligne",
+  "offlinePending_one": "Hors ligne · {{count}} modification en attente",
+  "offlinePending_other": "Hors ligne · {{count}} modifications en attente",
+  "syncing": "Synchronisation · {{count}}",
+  "unreachable": "Serveur injoignable",
+  "unreachablePending_one": "Serveur injoignable · {{count}} modification en attente",
+  "unreachablePending_other": "Serveur injoignable · {{count}} modifications en attente",
+  "retryHint": "Cliquez pour réessayer maintenant"
+}

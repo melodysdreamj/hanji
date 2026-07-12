@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 컨셉 D: 붓글씨 ㅎ — 먹 캘리그래피, Hanji의 첫 자모 -->
+  <defs>
+    <filter id="fiberD" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.28" numOctaves="2" seed="11"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.27  0 0 0 0 0.22  0 0 0 0 0.15  0 0 0 0.9 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="#F5EEDC"/>
+  <rect width="512" height="512" rx="116" filter="url(#fiberD)" opacity="0.10"/>
+
+  <g fill="#332A1E">
+    <!-- 점획 -->
+    <path d="M228 88 C252 78, 282 80, 296 90 C292 106, 276 114, 256 114 C240 114, 230 102, 228 88 Z"/>
+    <!-- 가로획 (왼쪽이 굵고 오른쪽으로 갈수록 가늘어짐) -->
+    <path d="M148 170 C210 156, 310 154, 366 164 C368 172, 366 180, 362 186 C300 176, 210 180, 152 192 C148 186, 146 178, 148 170 Z"/>
+    <!-- ㅇ — 두께가 변하는 붓 원 -->
+    <path fill-rule="evenodd" d="M342 320 a86 86 0 1 0 -172 0 a86 86 0 1 0 172 0 Z
+                                 M320 314 a60 60 0 1 1 -120 0 a60 60 0 1 1 120 0 Z"/>
+  </g>
+
+  <!-- 낙관 -->
+  <g transform="rotate(-6 398 398)">
+    <rect x="378" y="378" width="40" height="40" rx="8" fill="#B13A2A"/>
+  </g>
+</svg>

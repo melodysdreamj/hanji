@@ -1,0 +1,820 @@
+import { i18next } from "@/i18n";
+import type { BlockContent, BlockType, ViewType } from "@/lib/types";
+export { TEXT_BLOCKS } from "./textBlockTypes";
+
+export type SlashAction =
+  | "duplicate"
+  | "delete"
+  | "move_to"
+  | "turn_into"
+  | "color"
+  | "set_color";
+
+export interface BlockDef {
+  id?: string;
+  type: BlockType;
+  /** English source label; user-facing display resolves via i18next (see
+   * blockDefLabel). Kept for direct English reads and cross-language search. */
+  label: string;
+  /** English source description; see label. */
+  description: string;
+  /** sidebar/slash icon glyph */
+  glyph: string;
+  group: "Basic" | "Media" | "Database" | "Advanced";
+  keywords: string[];
+  /** Korean search keywords — matched in addition to `keywords` in any locale. */
+  koKeywords?: string[];
+  placeholder?: string;
+  /** continue this list/style on Enter (lists & to_do) */
+  continues?: boolean;
+  columnCount?: number;
+  databaseView?: Extract<ViewType, "table" | "board" | "list" | "gallery" | "calendar" | "timeline">;
+  action?: SlashAction;
+  colorToken?: string;
+  hiddenWhenEmpty?: boolean;
+}
+
+/** i18next key for a block def's label. `action_delete` reuses the shared
+ * common action label. */
+function blockLabelKey(def: BlockDef): string {
+  const key = blockDefKey(def);
+  return key === "action_delete" ? "common:actions.delete" : `blocks:defs.${key}.label`;
+}
+
+/** Display label for a block def in the active UI language. */
+export function blockDefLabel(def: BlockDef): string {
+  return i18next.t(blockLabelKey(def));
+}
+
+/** Display description for a block def in the active UI language. */
+export function blockDefDescription(def: BlockDef): string {
+  return i18next.t(`blocks:defs.${blockDefKey(def)}.description`);
+}
+
+/** Display placeholder for a block def in the active UI language. */
+export function blockDefPlaceholder(def: BlockDef): string {
+  if (!def.placeholder) return "";
+  return i18next.t(`blocks:defs.${blockDefKey(def)}.placeholder`);
+}
+
+const COLOR_SLASH_DEFS: BlockDef[] = [
+  { token: "default", label: "Default", keywords: ["default", "clear color", "remove color"], koKeywords: ["기본", "색 제거"] },
+  { token: "gray", label: "Gray", keywords: ["gray", "grey", "text color"], koKeywords: ["회색", "글자색"] },
+  { token: "brown", label: "Brown", keywords: ["brown", "text color"], koKeywords: ["갈색", "글자색"] },
+  { token: "orange", label: "Orange", keywords: ["orange", "text color"], koKeywords: ["주황색", "글자색"] },
+  { token: "yellow", label: "Yellow", keywords: ["yellow", "text color"], koKeywords: ["노란색", "글자색"] },
+  { token: "green", label: "Green", keywords: ["green", "text color"], koKeywords: ["초록색", "글자색"] },
+  { token: "blue", label: "Blue", keywords: ["blue", "text color"], koKeywords: ["파란색", "글자색"] },
+  { token: "purple", label: "Purple", keywords: ["purple", "text color"], koKeywords: ["보라색", "글자색"] },
+  { token: "pink", label: "Pink", keywords: ["pink", "text color"], koKeywords: ["분홍색", "글자색"] },
+  { token: "red", label: "Red", keywords: ["red", "text color"], koKeywords: ["빨간색", "글자색"] },
+  { token: "gray_background", label: "Gray background", keywords: ["gray background", "grey background", "highlight"], koKeywords: ["회색 배경", "강조"] },
+  { token: "brown_background", label: "Brown background", keywords: ["brown background", "highlight"], koKeywords: ["갈색 배경", "강조"] },
+  { token: "orange_background", label: "Orange background", keywords: ["orange background", "highlight"], koKeywords: ["주황색 배경", "강조"] },
+  { token: "yellow_background", label: "Yellow background", keywords: ["yellow background", "highlight"], koKeywords: ["노란색 배경", "강조"] },
+  { token: "green_background", label: "Green background", keywords: ["green background", "highlight"], koKeywords: ["초록색 배경", "강조"] },
+  { token: "blue_background", label: "Blue background", keywords: ["blue background", "highlight"], koKeywords: ["파란색 배경", "강조"] },
+  { token: "purple_background", label: "Purple background", keywords: ["purple background", "highlight"], koKeywords: ["보라색 배경", "강조"] },
+  { token: "pink_background", label: "Pink background", keywords: ["pink background", "highlight"], koKeywords: ["분홍색 배경", "강조"] },
+  { token: "red_background", label: "Red background", keywords: ["red background", "highlight"], koKeywords: ["빨간색 배경", "강조"] },
+].map(({ token, label, keywords, koKeywords }) => ({
+  id: `color_${token}`,
+  type: "paragraph" as BlockType,
+  label,
+  description:
+    token === "default"
+      ? "Remove text or background color from this block."
+      : `Apply ${label.toLowerCase()} to this block.`,
+  glyph: "A",
+  group: "Advanced" as const,
+  keywords: ["color", "colour", "background", ...keywords],
+  koKeywords: ["색", "색상", "배경", ...koKeywords],
+  action: "set_color" as const,
+  colorToken: token,
+  hiddenWhenEmpty: true,
+}));
+
+export const BLOCK_DEFS: BlockDef[] = [
+  {
+    type: "paragraph",
+    label: "Text",
+    description: "Just start writing with plain text.",
+    glyph: "¶",
+    group: "Basic",
+    keywords: ["text", "paragraph", "plain"],
+    koKeywords: ["텍스트", "글", "본문", "문단"],
+    placeholder: "Type '/' for commands",
+  },
+  {
+    type: "child_page",
+    label: "Page",
+    description: "Create a sub-page inside this page.",
+    glyph: "▣",
+    group: "Basic",
+    keywords: ["page", "subpage", "child", "document"],
+    koKeywords: ["페이지", "하위 페이지", "문서"],
+  },
+  {
+    type: "link_to_page",
+    label: "Link to page",
+    description: "Link to an existing page.",
+    glyph: "↗",
+    group: "Basic",
+    keywords: ["page", "link", "reference", "existing", "mention"],
+    koKeywords: ["페이지", "링크", "연결", "멘션"],
+  },
+  {
+    type: "heading_1",
+    label: "Heading 1",
+    description: "Big section heading.",
+    glyph: "H₁",
+    group: "Basic",
+    keywords: ["h1", "heading", "title", "big"],
+    koKeywords: ["제목", "제목1", "헤딩", "큰 제목"],
+    placeholder: "Heading 1",
+  },
+  {
+    type: "toggle_heading_1",
+    label: "Toggle heading 1",
+    description: "Large heading that can hide nested content.",
+    glyph: "▸H₁",
+    group: "Advanced",
+    keywords: ["toggle", "heading", "h1", "collapse", "section"],
+    koKeywords: ["토글", "제목", "접기", "섹션"],
+    placeholder: "Toggle heading 1",
+  },
+  {
+    type: "heading_2",
+    label: "Heading 2",
+    description: "Medium section heading.",
+    glyph: "H₂",
+    group: "Basic",
+    keywords: ["h2", "heading", "subtitle"],
+    koKeywords: ["제목", "제목2", "부제목"],
+    placeholder: "Heading 2",
+  },
+  {
+    type: "toggle_heading_2",
+    label: "Toggle heading 2",
+    description: "Medium heading that can hide nested content.",
+    glyph: "▸H₂",
+    group: "Advanced",
+    keywords: ["toggle", "heading", "h2", "collapse", "section"],
+    koKeywords: ["토글", "제목", "접기", "섹션"],
+    placeholder: "Toggle heading 2",
+  },
+  {
+    type: "heading_3",
+    label: "Heading 3",
+    description: "Small section heading.",
+    glyph: "H₃",
+    group: "Basic",
+    keywords: ["h3", "heading"],
+    koKeywords: ["제목", "제목3"],
+    placeholder: "Heading 3",
+  },
+  {
+    type: "toggle_heading_3",
+    label: "Toggle heading 3",
+    description: "Small heading that can hide nested content.",
+    glyph: "▸H₃",
+    group: "Advanced",
+    keywords: ["toggle", "heading", "h3", "collapse", "section"],
+    koKeywords: ["토글", "제목", "접기", "섹션"],
+    placeholder: "Toggle heading 3",
+  },
+  {
+    type: "heading_4",
+    label: "Heading 4",
+    description: "Compact section heading.",
+    glyph: "H₄",
+    group: "Basic",
+    keywords: ["h4", "heading", "small"],
+    koKeywords: ["제목", "제목4", "작은 제목"],
+    placeholder: "Heading 4",
+  },
+  {
+    type: "toggle_heading_4",
+    label: "Toggle heading 4",
+    description: "Compact heading that can hide nested content.",
+    glyph: "▸H₄",
+    group: "Advanced",
+    keywords: ["toggle", "heading", "h4", "collapse", "section"],
+    koKeywords: ["토글", "제목", "접기", "섹션"],
+    placeholder: "Toggle heading 4",
+  },
+  {
+    type: "to_do",
+    label: "To-do list",
+    description: "Track tasks with a checkbox.",
+    glyph: "☑",
+    group: "Basic",
+    keywords: ["todo", "task", "checkbox", "check"],
+    koKeywords: ["할 일", "체크", "체크박스", "작업"],
+    placeholder: "To-do",
+    continues: true,
+  },
+  {
+    type: "bulleted_list_item",
+    label: "Bulleted list",
+    description: "Create a simple bulleted list.",
+    glyph: "•",
+    group: "Basic",
+    keywords: ["bullet", "list", "unordered", "ul"],
+    koKeywords: ["글머리", "글머리 기호", "목록", "리스트"],
+    placeholder: "List",
+    continues: true,
+  },
+  {
+    type: "numbered_list_item",
+    label: "Numbered list",
+    description: "Create a list with numbering.",
+    glyph: "1.",
+    group: "Basic",
+    keywords: ["number", "ordered", "list", "ol"],
+    koKeywords: ["번호", "번호 목록", "순서", "목록"],
+    placeholder: "List",
+    continues: true,
+  },
+  {
+    type: "toggle",
+    label: "Toggle list",
+    description: "Toggles can hide and show content.",
+    glyph: "▸",
+    group: "Basic",
+    keywords: ["toggle", "collapse", "expand", "details"],
+    koKeywords: ["토글", "접기", "펼치기"],
+    placeholder: "Toggle",
+  },
+  {
+    type: "quote",
+    label: "Quote",
+    description: "Capture a quote.",
+    glyph: "❝",
+    group: "Basic",
+    keywords: ["quote", "blockquote"],
+    koKeywords: ["인용", "인용문", "인용구"],
+    placeholder: "Empty quote",
+  },
+  {
+    type: "callout",
+    label: "Callout",
+    description: "Make writing stand out.",
+    glyph: "💡",
+    group: "Basic",
+    keywords: ["callout", "note", "info", "tip"],
+    koKeywords: ["콜아웃", "강조", "메모", "알림"],
+    placeholder: "Type something…",
+  },
+  {
+    type: "divider",
+    label: "Divider",
+    description: "Visually divide blocks.",
+    glyph: "—",
+    group: "Basic",
+    keywords: ["divider", "separator", "line", "hr"],
+    koKeywords: ["구분선", "분리선", "가로선", "줄"],
+  },
+  {
+    type: "code",
+    label: "Code",
+    description: "Capture a code snippet.",
+    glyph: "</>",
+    group: "Media",
+    keywords: ["code", "snippet", "mono"],
+    koKeywords: ["코드", "스니펫", "프로그래밍"],
+    placeholder: "Write code, or paste a snippet…",
+  },
+  {
+    type: "equation",
+    label: "Equation",
+    description: "Display a math equation.",
+    glyph: "∑",
+    group: "Advanced",
+    keywords: ["equation", "math", "latex", "formula"],
+    koKeywords: ["수식", "수학", "라텍스", "공식"],
+  },
+  {
+    type: "table_of_contents",
+    label: "Table of contents",
+    description: "Show links to headings in this page.",
+    glyph: "☰",
+    group: "Advanced",
+    keywords: ["toc", "contents", "outline", "headings", "table"],
+    koKeywords: ["목차", "개요", "차례"],
+  },
+  {
+    type: "synced_block",
+    label: "Synced block",
+    description: "Reuse content across pages.",
+    glyph: "↔",
+    group: "Advanced",
+    keywords: ["synced", "sync", "reuse", "linked", "copy"],
+    koKeywords: ["동기화", "싱크", "재사용", "연결"],
+  },
+  {
+    type: "button",
+    label: "Button",
+    description: "Insert reusable content with one click.",
+    glyph: "▣",
+    group: "Advanced",
+    keywords: ["button", "template", "action", "insert"],
+    koKeywords: ["버튼", "템플릿", "동작"],
+  },
+  {
+    type: "tab",
+    label: "Tabs",
+    description: "Group content into labeled tabs.",
+    glyph: "▤",
+    group: "Advanced",
+    keywords: ["tab", "tabs", "section", "organize", "container"],
+    koKeywords: ["탭", "섹션", "정리"],
+    placeholder: "Tabs",
+  },
+  {
+    type: "breadcrumb",
+    label: "Breadcrumb",
+    description: "Show where this page lives.",
+    glyph: "›",
+    group: "Advanced",
+    keywords: ["breadcrumb", "path", "navigation", "page", "parent"],
+    koKeywords: ["이동 경로", "경로", "탐색", "내비게이션"],
+  },
+  {
+    id: "action_duplicate",
+    type: "paragraph",
+    label: "Duplicate",
+    description: "Create an exact copy of this block.",
+    glyph: "⧉",
+    group: "Advanced",
+    keywords: ["duplicate", "copy", "clone"],
+    koKeywords: ["복제", "복사"],
+    action: "duplicate",
+  },
+  {
+    id: "action_move_to",
+    type: "paragraph",
+    label: "Move to",
+    description: "Move this block to another page.",
+    glyph: "↗",
+    group: "Advanced",
+    keywords: ["move", "moveto", "move to", "page"],
+    koKeywords: ["옮기기", "이동"],
+    action: "move_to",
+  },
+  {
+    id: "action_delete",
+    type: "paragraph",
+    label: "Delete",
+    description: "Delete this block.",
+    glyph: "⌫",
+    group: "Advanced",
+    keywords: ["delete", "remove", "trash"],
+    koKeywords: ["삭제", "제거", "지우기"],
+    action: "delete",
+  },
+  {
+    id: "action_turn_into",
+    type: "paragraph",
+    label: "Turn into",
+    description: "Change this block's type.",
+    glyph: "↪",
+    group: "Advanced",
+    keywords: ["turn", "turn into", "convert", "change type"],
+    koKeywords: ["전환", "변환", "바꾸기", "유형 변경"],
+    action: "turn_into",
+  },
+  {
+    id: "action_color",
+    type: "paragraph",
+    label: "Color",
+    description: "Change this block's text or background color.",
+    glyph: "A",
+    group: "Advanced",
+    keywords: ["color", "colour", "background", "highlight", "default"],
+    koKeywords: ["색", "색상", "배경", "강조"],
+    action: "color",
+  },
+  ...COLOR_SLASH_DEFS,
+  {
+    type: "simple_table",
+    label: "Table",
+    description: "Add a simple table to this page.",
+    glyph: "▤",
+    group: "Basic",
+    keywords: ["table", "simple", "grid", "cells"],
+    koKeywords: ["표", "테이블", "그리드", "셀"],
+  },
+  {
+    id: "column_list_2",
+    type: "column_list",
+    label: "2 columns",
+    description: "Place blocks side by side.",
+    glyph: "▥▥",
+    group: "Advanced",
+    keywords: ["column", "columns", "layout", "two", "side"],
+    koKeywords: ["열", "단", "레이아웃", "2단"],
+    columnCount: 2,
+  },
+  {
+    id: "column_list_3",
+    type: "column_list",
+    label: "3 columns",
+    description: "Arrange blocks in three columns.",
+    glyph: "▥▥▥",
+    group: "Advanced",
+    keywords: ["column", "columns", "layout", "three", "side"],
+    koKeywords: ["열", "단", "레이아웃", "3단"],
+    columnCount: 3,
+  },
+  {
+    id: "column_list_4",
+    type: "column_list",
+    label: "4 columns",
+    description: "Arrange blocks in four columns.",
+    glyph: "▥▥▥▥",
+    group: "Advanced",
+    keywords: ["column", "columns", "layout", "four", "side"],
+    koKeywords: ["열", "단", "레이아웃", "4단"],
+    columnCount: 4,
+  },
+  {
+    id: "column_list_5",
+    type: "column_list",
+    label: "5 columns",
+    description: "Arrange blocks in five columns.",
+    glyph: "▥▥▥▥▥",
+    group: "Advanced",
+    keywords: ["column", "columns", "layout", "five", "side"],
+    koKeywords: ["열", "단", "레이아웃", "5단"],
+    columnCount: 5,
+  },
+  {
+    type: "image",
+    label: "Image",
+    description: "Upload or embed with a link.",
+    glyph: "▧",
+    group: "Media",
+    keywords: ["image", "photo", "picture", "media", "embed"],
+    koKeywords: ["이미지", "사진", "그림", "미디어"],
+  },
+  {
+    type: "video",
+    label: "Video",
+    description: "Embed a video with a link.",
+    glyph: "▶",
+    group: "Media",
+    keywords: ["video", "movie", "media", "mp4", "embed"],
+    koKeywords: ["동영상", "비디오", "영상", "미디어"],
+  },
+  {
+    type: "audio",
+    label: "Audio",
+    description: "Embed audio with a link.",
+    glyph: "♫",
+    group: "Media",
+    keywords: ["audio", "sound", "music", "mp3", "media"],
+    koKeywords: ["오디오", "소리", "음악", "음성"],
+  },
+  {
+    type: "bookmark",
+    label: "Web bookmark",
+    description: "Save a web link as a card.",
+    glyph: "🔖",
+    group: "Media",
+    keywords: ["bookmark", "link", "url", "web", "preview"],
+    koKeywords: ["북마크", "링크", "주소", "웹"],
+  },
+  {
+    type: "embed",
+    label: "Embed",
+    description: "Embed content from a link.",
+    glyph: "▣",
+    group: "Media",
+    keywords: ["embed", "iframe", "website", "link", "url"],
+    koKeywords: ["임베드", "삽입", "웹사이트", "링크"],
+  },
+  {
+    type: "file",
+    label: "File",
+    description: "Attach a file link to this page.",
+    glyph: "▭",
+    group: "Media",
+    keywords: ["file", "attachment", "download", "pdf", "document"],
+    koKeywords: ["파일", "첨부", "다운로드", "문서"],
+  },
+  {
+    type: "child_database",
+    label: "Database - Full page",
+    description: "Add a new database as a sub-page.",
+    glyph: "▦",
+    group: "Database",
+    keywords: ["database", "table", "board", "db", "grid"],
+    koKeywords: ["데이터베이스", "표", "보드"],
+  },
+  {
+    id: "child_database_table",
+    type: "child_database",
+    label: "Table - Full page",
+    description: "Add a full-page database as a table.",
+    glyph: "▦",
+    group: "Database",
+    keywords: ["database", "full", "page", "table", "view", "grid"],
+    koKeywords: ["데이터베이스", "전체 페이지", "표", "보기"],
+    databaseView: "table",
+  },
+  {
+    id: "child_database_board",
+    type: "child_database",
+    label: "Board - Full page",
+    description: "Add a full-page kanban board.",
+    glyph: "▤",
+    group: "Database",
+    keywords: ["database", "full", "page", "board", "kanban", "status"],
+    koKeywords: ["데이터베이스", "전체 페이지", "보드", "칸반"],
+    databaseView: "board",
+  },
+  {
+    id: "child_database_list",
+    type: "child_database",
+    label: "List - Full page",
+    description: "Add a full-page database as a list.",
+    glyph: "≣",
+    group: "Database",
+    keywords: ["database", "full", "page", "list", "view"],
+    koKeywords: ["데이터베이스", "전체 페이지", "목록", "보기"],
+    databaseView: "list",
+  },
+  {
+    id: "child_database_timeline",
+    type: "child_database",
+    label: "Timeline - Full page",
+    description: "Add a full-page database timeline.",
+    glyph: "⊞",
+    group: "Database",
+    keywords: ["database", "full", "page", "timeline", "roadmap", "date"],
+    koKeywords: ["데이터베이스", "전체 페이지", "타임라인", "로드맵", "날짜"],
+    databaseView: "timeline",
+  },
+  {
+    id: "child_database_calendar",
+    type: "child_database",
+    label: "Calendar - Full page",
+    description: "Add a full-page calendar database.",
+    glyph: "▩",
+    group: "Database",
+    keywords: ["database", "full", "page", "calendar", "date"],
+    koKeywords: ["데이터베이스", "전체 페이지", "캘린더", "달력", "날짜"],
+    databaseView: "calendar",
+  },
+  {
+    id: "child_database_gallery",
+    type: "child_database",
+    label: "Gallery - Full page",
+    description: "Add a full-page database gallery.",
+    glyph: "▥",
+    group: "Database",
+    keywords: ["database", "full", "page", "gallery", "cards"],
+    koKeywords: ["데이터베이스", "전체 페이지", "갤러리", "카드"],
+    databaseView: "gallery",
+  },
+  {
+    type: "inline_database",
+    label: "Database - Inline",
+    description: "Add a database inside this page.",
+    glyph: "▥",
+    group: "Database",
+    keywords: ["database", "inline", "table", "board", "db", "grid"],
+    koKeywords: ["데이터베이스", "인라인", "표", "보드"],
+  },
+  {
+    id: "inline_database_table",
+    type: "inline_database",
+    label: "Table view",
+    description: "Add an inline database as a table.",
+    glyph: "▦",
+    group: "Database",
+    keywords: ["database", "inline", "table", "view", "grid"],
+    koKeywords: ["데이터베이스", "인라인", "표", "보기"],
+    databaseView: "table",
+  },
+  {
+    id: "inline_database_board",
+    type: "inline_database",
+    label: "Board view",
+    description: "Add an inline kanban board.",
+    glyph: "▤",
+    group: "Database",
+    keywords: ["database", "inline", "board", "kanban", "status"],
+    koKeywords: ["데이터베이스", "인라인", "보드", "칸반"],
+    databaseView: "board",
+  },
+  {
+    id: "inline_database_list",
+    type: "inline_database",
+    label: "List view",
+    description: "Add an inline database as a list.",
+    glyph: "≣",
+    group: "Database",
+    keywords: ["database", "inline", "list", "view"],
+    koKeywords: ["데이터베이스", "인라인", "목록", "보기"],
+    databaseView: "list",
+  },
+  {
+    id: "inline_database_timeline",
+    type: "inline_database",
+    label: "Timeline view",
+    description: "Add an inline database timeline.",
+    glyph: "⊞",
+    group: "Database",
+    keywords: ["database", "inline", "timeline", "roadmap", "date"],
+    koKeywords: ["데이터베이스", "인라인", "타임라인", "로드맵", "날짜"],
+    databaseView: "timeline",
+  },
+  {
+    id: "inline_database_calendar",
+    type: "inline_database",
+    label: "Calendar view",
+    description: "Add an inline calendar database.",
+    glyph: "▩",
+    group: "Database",
+    keywords: ["database", "inline", "calendar", "date"],
+    koKeywords: ["데이터베이스", "인라인", "캘린더", "달력", "날짜"],
+    databaseView: "calendar",
+  },
+  {
+    id: "inline_database_gallery",
+    type: "inline_database",
+    label: "Gallery view",
+    description: "Add an inline database gallery.",
+    glyph: "▥",
+    group: "Database",
+    keywords: ["database", "inline", "gallery", "cards"],
+    koKeywords: ["데이터베이스", "인라인", "갤러리", "카드"],
+    databaseView: "gallery",
+  },
+];
+
+function blockDefKey(def: Pick<BlockDef, "id" | "type">) {
+  return def.id ?? def.type;
+}
+
+const SLASH_ORDER_KEYS = [
+  "paragraph",
+  "child_page",
+  "to_do",
+  "heading_1",
+  "heading_2",
+  "heading_3",
+  "heading_4",
+  "simple_table",
+  "bulleted_list_item",
+  "numbered_list_item",
+  "toggle",
+  "quote",
+  "divider",
+  "link_to_page",
+  "callout",
+  "image",
+  "bookmark",
+  "video",
+  "audio",
+  "code",
+  "file",
+  "embed",
+  "inline_database_table",
+  "inline_database_board",
+  "inline_database_gallery",
+  "inline_database_list",
+  "inline_database_calendar",
+  "inline_database_timeline",
+  "inline_database",
+  "child_database_table",
+  "child_database_board",
+  "child_database_gallery",
+  "child_database_list",
+  "child_database_calendar",
+  "child_database_timeline",
+  "child_database",
+  "table_of_contents",
+  "breadcrumb",
+  "action_duplicate",
+  "action_move_to",
+  "action_delete",
+  "action_turn_into",
+  "action_color",
+  "button",
+  "tab",
+  "synced_block",
+  "equation",
+  "toggle_heading_1",
+  "toggle_heading_2",
+  "toggle_heading_3",
+  "toggle_heading_4",
+  "column_list_2",
+  "column_list_3",
+  "column_list_4",
+  "column_list_5",
+] as const;
+
+const SLASH_ORDER = new Map<string, number>(
+  SLASH_ORDER_KEYS.map((key, index) => [key, index])
+);
+
+function slashOrder(def: BlockDef, fallback: number) {
+  return SLASH_ORDER.get(blockDefKey(def)) ?? SLASH_ORDER_KEYS.length + fallback;
+}
+
+const DEF_MAP: Record<string, BlockDef> = {};
+for (const def of BLOCK_DEFS) {
+  DEF_MAP[def.type] ??= def;
+}
+
+export function getDef(type: BlockType): BlockDef {
+  return DEF_MAP[type] ?? DEF_MAP["paragraph"];
+}
+
+/** Slash-menu results for a query (label + keyword match). */
+export function matchBlocks(query: string): BlockDef[] {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    return BLOCK_DEFS.filter((def) => !def.hiddenWhenEmpty)
+      .map((def, index) => ({ def, index }))
+      .sort((a, b) => slashOrder(a.def, a.index) - slashOrder(b.def, b.index))
+      .map((item) => item.def);
+  }
+  const tokens = q.split(/\s+/).filter(Boolean);
+  return BLOCK_DEFS.map((def, index) => ({
+    def,
+    index,
+    rank: blockSearchRank(def, q, tokens),
+  }))
+    .filter((item) => Number.isFinite(item.rank))
+    .sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        slashOrder(a.def, a.index) - slashOrder(b.def, b.index)
+    )
+    .map((item) => item.def);
+}
+
+/** Every searchable keyword for a def — EN and ko match in any locale. */
+export function blockDefSearchKeywords(def: BlockDef): string[] {
+  return def.koKeywords ? [...def.keywords, ...def.koKeywords] : def.keywords;
+}
+
+function blockSearchRank(def: BlockDef, query: string, tokens: string[]) {
+  // English and Korean labels/keywords/descriptions all match regardless of
+  // the active locale, so mixed-language teams can filter either way.
+  const labels = [def.label, i18next.t(blockLabelKey(def), { lng: "ko" })].map(
+    (label) => label.toLowerCase()
+  );
+  const descriptions = [
+    def.description,
+    i18next.t(`blocks:defs.${blockDefKey(def)}.description`, { lng: "ko" }),
+  ].map((description) => description.toLowerCase());
+  const keywords = blockDefSearchKeywords(def).map((keyword) => keyword.toLowerCase());
+  const haystack = `${labels.join(" ")} ${descriptions.join(" ")} ${keywords.join(" ")}`;
+
+  if (labels.some((label) => label === query)) return 0;
+  if (labels.some((label) => label.startsWith(query))) return 1;
+  if (keywords.some((keyword) => keyword === query)) return 2;
+  if (keywords.some((keyword) => keyword.startsWith(query))) return 3;
+  if (labels.some((label) => label.includes(query))) return 4;
+  if (haystack.includes(query)) return 5;
+  if (tokens.length > 1 && tokens.every((token) => haystack.includes(token))) return 6;
+  return Number.POSITIVE_INFINITY;
+}
+
+/** Markdown-style shortcuts: trigger text (before a space) → block type. */
+export const MD_SHORTCUTS: { trigger: string; type: BlockType; content?: Partial<BlockContent> }[] = [
+  { trigger: "#", type: "heading_1" },
+  { trigger: "##", type: "heading_2" },
+  { trigger: "###", type: "heading_3" },
+  { trigger: "####", type: "heading_4" },
+  { trigger: "-", type: "bulleted_list_item" },
+  { trigger: "*", type: "bulleted_list_item" },
+  { trigger: "+", type: "bulleted_list_item" },
+  { trigger: "1.", type: "numbered_list_item" },
+  { trigger: "1)", type: "numbered_list_item" },
+  { trigger: "[]", type: "to_do", content: { checked: false } },
+  { trigger: "[ ]", type: "to_do", content: { checked: false } },
+  { trigger: "[x]", type: "to_do", content: { checked: true } },
+  { trigger: "[X]", type: "to_do", content: { checked: true } },
+  { trigger: "- [ ]", type: "to_do", content: { checked: false } },
+  { trigger: "* [ ]", type: "to_do", content: { checked: false } },
+  { trigger: "- [x]", type: "to_do", content: { checked: true } },
+  { trigger: "- [X]", type: "to_do", content: { checked: true } },
+  { trigger: "* [x]", type: "to_do", content: { checked: true } },
+  { trigger: "* [X]", type: "to_do", content: { checked: true } },
+  { trigger: ">#", type: "toggle_heading_1" },
+  { trigger: ">##", type: "toggle_heading_2" },
+  { trigger: ">###", type: "toggle_heading_3" },
+  { trigger: ">####", type: "toggle_heading_4" },
+  { trigger: ">", type: "toggle" },
+  { trigger: '"', type: "quote" },
+  { trigger: "```", type: "code" },
+  { trigger: "$$", type: "equation" },
+  { trigger: "---", type: "divider" },
+  { trigger: "***", type: "divider" },
+];

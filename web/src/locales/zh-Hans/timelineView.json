@@ -1,0 +1,46 @@
+{
+  "empty": {
+    "title": "添加日期属性",
+    "description": "时间线视图需要开始日期属性才能在时间轴上绘制页面。"
+  },
+  "endDateHint": "添加结束日期属性以绘制范围，而非单日条形。",
+  "zoom": {
+    "ariaLabel": "时间线缩放",
+    "day": "天",
+    "week": "周",
+    "month": "月"
+  },
+  "dependencies": {
+    "label": "依赖项：",
+    "hint": "添加关联属性",
+    "relationPropertyAriaLabel": "依赖关联属性"
+  },
+  "toolbar": {
+    "today": "今天",
+    "previousRange": "上一范围",
+    "nextRange": "下一范围",
+    "newPage": "新建",
+    "newPageIn": "在 {{dbTitle}} 中新建页面"
+  },
+  "table": {
+    "ariaLabel": "时间线表格",
+    "nameHeader": "名称"
+  },
+  "bar": {
+    "openAriaLabel": "打开 {{title}}",
+    "openAriaLabelWithDates": "打开 {{title}}，{{start}} 至 {{end}}",
+    "openNoDateAriaLabel": "打开 {{title}}，无日期"
+  },
+  "lanes": {
+    "noItemsInRange": "此范围内没有项目。",
+    "noDatedItems": "暂无带日期的项目。",
+    "jumpTo": "跳转到 {{date}}"
+  },
+  "noDate": {
+    "heading": "无日期（{{count}}）"
+  },
+  "options": {
+    "none": "无",
+    "untitled": "无标题"
+  }
+}

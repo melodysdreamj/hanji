@@ -1,0 +1,39 @@
+{
+  "trash": "Corbeille",
+  "empty": "Les pages que vous supprimez arrivent ici. La corbeille est vide.",
+  "searchTrash": "Rechercher dans la corbeille",
+  "deletedPages": "Pages supprimées",
+  "noSearchMatches": "Aucune page supprimée ne correspond à votre recherche.",
+  "pageCount_one": "{{count}} page",
+  "pageCount_other": "{{count}} pages",
+  "deletedJustNow": "Supprimé à l'instant",
+  "deletedOn": "Supprimé le {{date}}",
+  "actions": {
+    "restore": "Restaurer",
+    "deleteForever": "Supprimer définitivement",
+    "emptyTrash": "Vider la corbeille"
+  },
+  "aria": {
+    "openFromTrash": "Ouvrir {{title}} depuis la corbeille",
+    "restorePage": "Restaurer {{title}}",
+    "deletePageForever": "Supprimer définitivement {{title}}",
+    "cancelPermanentDelete": "Annuler la suppression définitive",
+    "cancelEmptyTrash": "Annuler le vidage de la corbeille"
+  },
+  "confirm": {
+    "deleteTitle": "Supprimer définitivement ?",
+    "deleteBodyPrefix": "Cette action supprimera définitivement ",
+    "deleteBodySuffix": ". Vous ne pouvez pas annuler cette action.",
+    "emptyTitle": "Vider la corbeille ?",
+    "emptyBody_one": "Cette action supprimera définitivement les {{count}} page de la corbeille. Vous ne pouvez pas annuler cette action.",
+    "emptyBody_other": "Cette action supprimera définitivement les {{count}} pages de la corbeille. Vous ne pouvez pas annuler cette action."
+  },
+  "toast": {
+    "deletedForever": "Supprimé définitivement",
+    "couldntDelete": "Impossible de supprimer la page",
+    "restored": "Page restaurée",
+    "couldntRestore": "Impossible de restaurer la page",
+    "emptied": "Corbeille vidée",
+    "couldntEmpty": "Impossible de vider la corbeille"
+  }
+}

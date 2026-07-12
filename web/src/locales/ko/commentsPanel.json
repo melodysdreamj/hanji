@@ -1,0 +1,72 @@
+{
+  "title": "댓글",
+  "closeAria": "댓글 닫기",
+  "subtitle": {
+    "block": "블록 토론",
+    "page": "페이지 토론"
+  },
+  "status": {
+    "aria": "댓글 상태",
+    "open": "열림",
+    "resolved": "해결됨"
+  },
+  "anchor": {
+    "commentingOn": "댓글 대상",
+    "commentingOnSelectedText": "선택한 텍스트에 댓글 남기기",
+    "selectedBlock": "선택한 블록",
+    "onSelectedText": "선택한 텍스트에 남긴 댓글",
+    "onSelectedBlock": "선택한 블록에 남긴 댓글",
+    "onABlock": "블록에 남긴 댓글"
+  },
+  "composer": {
+    "addBlockComment": "블록 댓글 추가",
+    "addPageComment": "페이지 댓글 추가",
+    "blockPlaceholder": "이 블록에 댓글 남기기...",
+    "pagePlaceholder": "댓글 추가...",
+    "submit": "댓글 달기"
+  },
+  "mention": {
+    "commentPeopleAria": "댓글에서 멘션할 사람",
+    "replyPeopleAria": "답글에서 멘션할 사람",
+    "trigger": "사람 멘션",
+    "noMatches": "일치하는 사람이 없어요",
+    "title": "{{name}}님 멘션",
+    "person": "사람",
+    "you": "나",
+    "organizationPerson": "조직 구성원",
+    "roleInOrganization": "조직 내 {{role}}"
+  },
+  "list": {
+    "threadsAria": "댓글 스레드",
+    "empty": "아직 댓글이 없어요",
+    "noOpen": "열린 댓글이 없어요",
+    "noResolved": "해결된 댓글이 없어요"
+  },
+  "card": {
+    "commentAria": "{{author}}님의 댓글, {{time}}",
+    "commentAriaResolved": "{{author}}님의 댓글, {{time}}, 해결됨",
+    "replyAria": "{{author}}님의 답글, {{time}}",
+    "repliesAria": "답글 {{count}}개",
+    "edited": "(수정됨)",
+    "emptyComment": "(빈 댓글)",
+    "emptyReply": "(빈 답글)",
+    "justNow": "방금 전"
+  },
+  "actions": {
+    "reply": "답글",
+    "showInPage": "페이지에서 보기",
+    "resolve": "해결",
+    "reopen": "다시 열기",
+    "edit": "수정"
+  },
+  "reply": {
+    "placeholder": "답글 입력..."
+  },
+  "edit": {
+    "aria": "댓글 수정"
+  },
+  "delete": {
+    "commentConfirm": "이 댓글을 삭제할까요?",
+    "threadConfirm_other": "이 댓글과 답글 {{count}}개를 함께 삭제할까요?"
+  }
+}

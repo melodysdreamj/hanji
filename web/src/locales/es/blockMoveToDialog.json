@@ -1,0 +1,31 @@
+{
+  "title": "Mover bloque a",
+  "search": {
+    "label": "Buscar destinos de movimiento",
+    "placeholder": "Buscar páginas..."
+  },
+  "dialog": {
+    "closeLabel": "Cerrar diálogo de movimiento"
+  },
+  "results": {
+    "listLabel": "Destinos de movimiento",
+    "empty": "No se encontraron páginas.",
+    "destinationLabel": "Mover bloque a {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "Crear \"{{query}}\"",
+    "optionLabel": "Crear página \"{{query}}\" y mover el bloque aquí",
+    "hint": "Página nueva - mover el bloque aquí"
+  },
+  "locked": {
+    "page": "Página bloqueada"
+  },
+  "untitled": "Sin título",
+  "toast": {
+    "locked": "La página está bloqueada",
+    "movedBlock": "Bloque movido",
+    "movedBlocks": "Bloques movidos",
+    "movedBlocksCount": "{{blockCount}} bloques movidos",
+    "moveFailed": "No se pudo mover el bloque"
+  }
+}

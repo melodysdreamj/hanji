@@ -1,0 +1,34 @@
+{
+  "title": "Déplacer vers",
+  "workspaceRoot": {
+    "label": "Racine de l'espace de travail",
+    "path": "Niveau supérieur"
+  },
+  "search": {
+    "label": "Rechercher des destinations de déplacement",
+    "placeholder": "Rechercher des pages..."
+  },
+  "dialog": {
+    "closeLabel": "Fermer la boîte de dialogue de déplacement"
+  },
+  "results": {
+    "listLabel": "Destinations de déplacement",
+    "empty": "Aucune page trouvée.",
+    "destinationLabel": "Déplacer vers {{label}}, {{path}}"
+  },
+  "create": {
+    "label": "Créer « {{title}} »",
+    "optionLabel": "Créer la page {{title}} et déplacer ici",
+    "hint": "Nouvelle page de premier niveau - déplacer ici"
+  },
+  "locked": {
+    "parent": "Parent verrouillé",
+    "page": "Page verrouillée"
+  },
+  "toast": {
+    "lockedParent": "La page se trouve dans un parent verrouillé",
+    "locked": "La page est verrouillée",
+    "moved": "Page déplacée",
+    "moveFailed": "Impossible de déplacer la page"
+  }
+}

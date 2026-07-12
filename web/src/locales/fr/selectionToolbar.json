@@ -1,0 +1,76 @@
+{
+  "toolbar": {
+    "ariaLabel": "Mise en forme du texte"
+  },
+  "turnInto": {
+    "label": "Convertir en",
+    "options": {
+      "text": "Texte",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "heading4": "Titre 4",
+      "toDoList": "Liste de tâches",
+      "bulletedList": "Liste à puces",
+      "numberedList": "Liste numérotée",
+      "toggleList": "Liste déroulante",
+      "quote": "Citation",
+      "callout": "Encadré",
+      "code": "Code"
+    }
+  },
+  "marks": {
+    "bold": "Gras",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "strikethrough": "Barré",
+    "code": "Code",
+    "link": "Lien"
+  },
+  "comment": {
+    "label": "Commenter"
+  },
+  "colorButton": {
+    "ariaLabel": "Couleur du texte : {{color}}",
+    "title": "Couleur : {{color}}"
+  },
+  "colors": {
+    "mixed": "Mixte",
+    "text": {
+      "heading": "Couleur du texte",
+      "default": "Par défaut",
+      "gray": "Gris",
+      "brown": "Marron",
+      "orange": "Orange",
+      "yellow": "Jaune",
+      "green": "Vert",
+      "blue": "Bleu",
+      "purple": "Violet",
+      "pink": "Rose",
+      "red": "Rouge"
+    },
+    "background": {
+      "heading": "Couleur d'arrière-plan",
+      "gray": "Arrière-plan gris",
+      "brown": "Arrière-plan marron",
+      "orange": "Arrière-plan orange",
+      "yellow": "Arrière-plan jaune",
+      "green": "Arrière-plan vert",
+      "blue": "Arrière-plan bleu",
+      "purple": "Arrière-plan violet",
+      "pink": "Arrière-plan rose",
+      "red": "Arrière-plan rouge"
+    }
+  },
+  "linkEditor": {
+    "ariaLabel": "Modifier le lien",
+    "placeholder": "Coller le lien",
+    "urlAriaLabel": "URL du lien",
+    "apply": "Lier",
+    "open": "Ouvrir le lien",
+    "copy": "Copier le lien",
+    "copied": "Copié",
+    "copiedLink": "Lien copié",
+    "remove": "Retirer"
+  }
+}

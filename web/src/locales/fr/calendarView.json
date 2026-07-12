@@ -1,0 +1,44 @@
+{
+  "empty": {
+    "title": "Ajouter une propriété de date",
+    "description": "Les vues calendrier nécessitent une propriété de date pour placer les pages sur le mois.",
+    "addDateButton": "Date"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Calendrier par",
+    "today": "Aujourd'hui",
+    "previousWeek": "Semaine précédente",
+    "previousMonth": "Mois précédent",
+    "nextWeek": "Semaine suivante",
+    "nextMonth": "Mois suivant"
+  },
+  "weekdays": {
+    "sun": "Dim",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Jeu",
+    "fri": "Ven",
+    "sat": "Sam"
+  },
+  "gridAriaLabel": "Calendrier {{title}}",
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} éléments",
+    "newRowAriaLabel": "Nouvelle ligne le {{date}}",
+    "newRowTitle": "Nouveau",
+    "showLess": "Afficher moins",
+    "showMore": "+{{count}} de plus"
+  },
+  "card": {
+    "openAriaLabel": "Ouvrir {{title}}",
+    "openAriaLabelWithDate": "Ouvrir {{title}}, prévu le {{date}}",
+    "openNoDateAriaLabel": "Ouvrir {{title}}, sans date"
+  },
+  "noDate": {
+    "heading": "Sans date ({{count}})"
+  },
+  "property": {
+    "untitled": "Sans titre",
+    "dateDefaultName": "Date"
+  }
+}

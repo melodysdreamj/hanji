@@ -1,0 +1,13 @@
+{
+  "databaseLockedSave": "此数据库已锁定，因此您的更改无法保存。",
+  "databaseRowsLoadFailed": "无法加载数据库行。请稍后重试。",
+  "editAccessDeniedSave": "您没有编辑权限，因此您的更改无法保存。",
+  "lockedSave": "页面或数据库已锁定，因此您的更改无法保存。",
+  "pageLockedSave": "此页面已锁定，因此您的更改无法保存。",
+  "pageMissingSave": "找不到该页面，因此您的更改无法保存。",
+  "saveFailed": "您的更改无法保存。",
+  "sessionExpired": "您的会话已过期或请求无法通过身份验证。请重试。",
+  "blockConflictSave": "此块已在另一台设备上编辑，因此您的离线更改未被应用。",
+  "blockConflictKeepMine": "应用我的版本",
+  "blockMoveCommentsSkipped": "块已移动，但其评论无法随之移动。"
+}

@@ -1,0 +1,31 @@
+{
+  "aggregates": {
+    "count": "件数",
+    "sum": "合計",
+    "average": "平均",
+    "min": "最小",
+    "max": "最大"
+  },
+  "chartAria": "{{name}} チャート",
+  "chartType": "チャートの種類",
+  "chartTypes": {
+    "bar": "棒グラフ",
+    "horizontal_bar": "横棒グラフ",
+    "line": "折れ線グラフ",
+    "donut": "ドーナツグラフ"
+  },
+  "checked": "オン",
+  "empty": "空",
+  "legend": "チャート凡例",
+  "monthLabel": "{{year}}年{{month}}",
+  "noData": "データがありません",
+  "noDataDesc": "現在のフィルターまたは検索に一致する行がありません。",
+  "noGroupProperty": "まだチャート化する項目がありません",
+  "noGroupPropertyDesc": "セレクト、ステータス、担当者、チェックボックス、または日付プロパティを追加してこのチャートをグループ化してください。",
+  "total": "合計",
+  "unchecked": "オフ",
+  "untitledProperty": "無題",
+  "valueProperty": "値のプロパティ",
+  "xAxis": "X軸",
+  "yAxis": "Y軸"
+}

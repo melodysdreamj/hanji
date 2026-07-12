@@ -1,0 +1,27 @@
+{
+  "searchPlaceholder": "搜索或跳转到...",
+  "quickFind": "快速查找",
+  "closeSearch": "关闭搜索",
+  "quickFindResults": "快速查找结果",
+  "sections": {
+    "recentlyViewed": "最近查看",
+    "recentSearches": "最近搜索",
+    "pages": "页面",
+    "pageContent": "页面内容",
+    "favorites": "收藏"
+  },
+  "inPage": "在页面中",
+  "searchingDetail": "搜索中...",
+  "searchAgain": "再次搜索",
+  "searchingPageContent": "正在搜索页面内容...",
+  "noResultsFor": "未找到 \"{{query}}\" 的相关结果",
+  "noPagesFound": "未找到页面",
+  "creating": "创建中...",
+  "newPage": "新页面 \"{{query}}\"",
+  "couldntCreatePage": "无法创建页面",
+  "hints": {
+    "select": "选择",
+    "open": "打开",
+    "newTab": "新标签页"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "dialog": {
+    "backdropLabel": "Cerrar selector de iconos",
+    "label": "Elegir icono"
+  },
+  "tabs": {
+    "groupLabel": "Tipo de icono",
+    "emoji": "Emoji",
+    "image": "Imagen"
+  },
+  "remove": {
+    "label": "Quitar",
+    "ariaLabel": "Quitar icono"
+  },
+  "emoji": {
+    "searchPlaceholder": "Filtrar…",
+    "searchLabel": "Buscar iconos",
+    "random": "Aleatorio",
+    "randomLabel": "Elegir un icono al azar",
+    "recentLabel": "Usados recientemente primero",
+    "gridLabelRecent": "Iconos, usados recientemente primero",
+    "gridLabel": "Iconos",
+    "optionLabel": "Elegir icono {{emoji}}",
+    "noResults": "Ningún icono coincide con “{{query}}”. Prueba con otra palabra o borra el filtro."
+  },
+  "custom": {
+    "previewPlaceholder": "Imagen",
+    "linkPlaceholder": "Pegar enlace de imagen",
+    "linkLabel": "Enlace de icono de imagen",
+    "apply": "Aplicar",
+    "upload": "Subir archivo",
+    "uploading": "Subiendo...",
+    "uploadingLabel": "Subiendo {{fileName}}",
+    "uploadFailed": "No se pudo subir esa imagen.",
+    "fallbackFileName": "Imagen de icono"
+  },
+  "uploadProgress": {
+    "preparing": "Preparando subida",
+    "finalizing": "Finalizando",
+    "complete": "Completado",
+    "uploading": "Subiendo"
+  }
+}

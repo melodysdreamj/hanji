@@ -1,0 +1,79 @@
+{
+  "filters": {
+    "all": "すべて",
+    "unread": "未読",
+    "comments": "コメント",
+    "mentions": "メンション",
+    "edits": "編集"
+  },
+  "header": {
+    "closeUpdates": "更新を閉じる",
+    "markAllRead": "すべて既読にする",
+    "markAllReadAria": "すべての更新を既読にする",
+    "pageHistory": "ページの履歴",
+    "recentUpdates_one": "{{count}} 件の最近の更新",
+    "recentUpdates_other": "{{count}} 件の最近の更新",
+    "unreadOfTotal": "{{total}} 件中 {{unread}} 件の未読",
+    "updateType": "更新の種類",
+    "updates": "更新",
+    "modeUpdates": "更新",
+    "modeChats": "チャット",
+    "inboxMode": "受信箱モード"
+  },
+  "time": {
+    "justNow": "たった今",
+    "today": "今日",
+    "yesterday": "昨日"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} ブロック",
+    "blockCount_other": "{{count}} ブロック",
+    "currentVersion": "現在のバージョン",
+    "currentVersionOnly": "現在のバージョンのみ",
+    "next": "次へ",
+    "nextVersion": "次のバージョン",
+    "noVersionPrevious": "前のバージョンはありません",
+    "noVersionNext": "次のバージョンはありません",
+    "pageLocked": "ページはロックされています",
+    "previous": "前へ",
+    "previousSnapshots_one": "{{count}} 件の前のスナップショット",
+    "previousSnapshots_other": "{{count}} 件の前のスナップショット",
+    "previousVersion": "前のバージョン",
+    "restoredPrevious": "前のバージョンを復元しました",
+    "restoredNext": "次のバージョンを復元しました",
+    "restoredVersions": "{{count}} 件のバージョンを復元しました",
+    "versionCount_one": "{{count}} バージョン",
+    "versionCount_other": "{{count}} バージョン",
+    "versionsAgo": "{{count}} バージョン前",
+    "versionsAhead": "{{count}} バージョン先",
+    "versionsAria": "バージョン"
+  },
+  "badges": {
+    "comment": "コメント",
+    "edited": "編集",
+    "linked": "リンク",
+    "member": "メンバー",
+    "mention": "メンション",
+    "reply": "返信",
+    "replyMention": "返信のメンション",
+    "shared": "共有",
+    "system": "システム"
+  },
+  "rows": {
+    "byActor": "{{name}} が実行",
+    "emptyComment": "空のコメント",
+    "forYou": "あなた宛て",
+    "notification": "通知",
+    "referenceMention": "{{title}} · {{preview}} をメンション",
+    "referenceLink": "{{title}} · {{preview}} にリンク",
+    "unreadDot": "未読",
+    "workspaceUpdate": "ワークスペースの更新"
+  },
+  "empty": {
+    "allCaughtUp": "すべて確認済みです。",
+    "loadingUpdates": "更新を読み込んでいます...",
+    "noFilteredUpdatesYet": "まだ {{filter}} はありません。",
+    "noPageHistoryYet": "まだページの履歴はありません。",
+    "noUpdatesYet": "まだ更新はありません。"
+  }
+}

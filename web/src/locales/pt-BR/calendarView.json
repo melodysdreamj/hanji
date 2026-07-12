@@ -1,0 +1,44 @@
+{
+  "empty": {
+    "title": "Adicione uma propriedade de data",
+    "description": "As visualizações de calendário precisam de uma propriedade de data para posicionar páginas no mês.",
+    "addDateButton": "Data"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Calendário por",
+    "today": "Hoje",
+    "previousWeek": "Semana anterior",
+    "previousMonth": "Mês anterior",
+    "nextWeek": "Próxima semana",
+    "nextMonth": "Próximo mês"
+  },
+  "weekdays": {
+    "sun": "Dom",
+    "mon": "Seg",
+    "tue": "Ter",
+    "wed": "Qua",
+    "thu": "Qui",
+    "fri": "Sex",
+    "sat": "Sáb"
+  },
+  "gridAriaLabel": "Calendário de {{title}}",
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} itens",
+    "newRowAriaLabel": "Nova linha em {{date}}",
+    "newRowTitle": "Novo",
+    "showLess": "Mostrar menos",
+    "showMore": "+{{count}} mais"
+  },
+  "card": {
+    "openAriaLabel": "Abrir {{title}}",
+    "openAriaLabelWithDate": "Abrir {{title}}, agendado para {{date}}",
+    "openNoDateAriaLabel": "Abrir {{title}}, sem data"
+  },
+  "noDate": {
+    "heading": "Sem data ({{count}})"
+  },
+  "property": {
+    "untitled": "Sem título",
+    "dateDefaultName": "Data"
+  }
+}

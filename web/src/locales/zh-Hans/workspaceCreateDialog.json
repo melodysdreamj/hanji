@@ -1,0 +1,27 @@
+{
+  "title": "新建工作区",
+  "name": {
+    "label": "工作区名称",
+    "placeholder": "Acme Inc."
+  },
+  "startLabel": "开始方式",
+  "options": {
+    "blank": {
+      "title": "空白工作区",
+      "body": "以初始页面开始，内容为空。"
+    },
+    "notion": {
+      "title": "从 Notion 导入",
+      "body": "创建工作区，然后将一个 Notion 工作区迁移至此。"
+    },
+    "hanji": {
+      "title": "从其他 Hanji 导入",
+      "body": "创建工作区，然后从其他 Hanji 服务器或文件中拉取一个工作区。"
+    }
+  },
+  "create": "创建工作区",
+  "creating": "创建中…",
+  "error": {
+    "couldntCreate": "无法创建工作区。"
+  }
+}

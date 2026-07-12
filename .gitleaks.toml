@@ -1,0 +1,32 @@
+[extend]
+useDefault = true
+
+# Public Hanji history must never contain preserved customer/workspace material.
+# Keep known private operational identifiers as an explicit privacy tripwire in
+# addition to the default credential rules. The rule-specific allowlist only
+# prevents the regex declaration below from matching itself.
+[[rules]]
+id = "forbidden-private-operational-data"
+description = "Known private operational/customer identifier in public source"
+regex = '''(?i)(?:\bnovacare\b|노바케어|\bnaum\b)'''
+tags = ["privacy", "personal-data"]
+
+[[rules.allowlists]]
+paths = ['''^\.gitleaks\.toml$''']
+
+[[rules]]
+id = "forbidden-private-operational-path"
+description = "Known private operational/customer path in public source"
+path = '''(?i)(?:novacare|노바케어|(?:^|[-_/])naum(?:[-_/]|$))'''
+tags = ["privacy", "personal-data"]
+
+# Generated dependency/build output is not part of the public source tree. Do
+# not allowlist secret-bearing local/private paths here: if one is ever
+# accidentally committed, the public-history scan must fail loudly.
+[[allowlists]]
+description = "Generated dependency and build output"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)(?:dist|coverage|build|out)/''',
+  '''(^|/)\.next/''',
+]

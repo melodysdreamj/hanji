@@ -1,0 +1,16 @@
+{
+  "title": "Personnes importées",
+  "body": "Les personnes importées depuis Notion restent des références source jusqu'à ce qu'un administrateur les associe à des comptes de l'espace de travail.",
+  "scan": "Rechercher les personnes importées",
+  "scanning": "Analyse en cours…",
+  "rescan": "Réanalyser",
+  "empty": "Aucune personne importée non associée n'a été trouvée.",
+  "keepPlaceholder": "Conserver comme référence importée",
+  "usage": "{{values}} valeurs · {{mentions}} mentions",
+  "apply": "Appliquer l'association",
+  "applying": "Application en cours…",
+  "applied": "{{people}} personnes associées sur {{pages}} lignes/pages et {{blocks}} blocs.",
+  "failed": "Échec de l'association des personnes.",
+  "suggested": "suggéré",
+  "mapAria": "Associer {{label}}"
+}

@@ -1,0 +1,24 @@
+{
+  "rateLimited": "当前请求过多，请稍后重试。",
+  "requestFailed": "我们无法完成该请求，请重试。",
+  "backend": {
+    "workspaceAdminRequired": "需要工作区管理员权限。",
+    "workspaceOwnerRequired": "需要工作区所有者权限。",
+    "onlyOwnersAssignAdmin": "只有工作区所有者可以分配管理员角色。",
+    "onlyOwnersManageAdmins": "只有工作区所有者可以管理管理员。",
+    "onlyOwnersRemoveAdmins": "只有工作区所有者可以移除管理员。",
+    "ownersCannotChangeRole": "无法在此处更改工作区所有者的角色。请先转移所有权。",
+    "ownersCannotBeRemoved": "无法移除工作区所有者。请先转移所有权。",
+    "cannotChangeOwnRole": "无法更改自己的工作区角色。",
+    "cannotRemoveSelf": "无法将自己从工作区中移除。",
+    "onlyAssignableRoles": "只能分配管理员、成员和访客角色。",
+    "memberNotFound": "未找到该工作区成员。",
+    "invitationNotFound": "未找到该邀请。",
+    "transferTargetMustBeMember": "请选择其他成员作为所有权转移对象。",
+    "emailRequired": "必须填写邮箱。",
+    "emailInvalid": "该邮箱地址格式有误。",
+    "externalGuestDisabled": "组织策略已禁用外部访客邀请。",
+    "verifiedDomainRequired": "组织成员必须使用已验证的组织域名。",
+    "workspaceUrlInUse": "该工作区 URL 已被使用。"
+  }
+}

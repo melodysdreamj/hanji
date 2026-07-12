@@ -1,0 +1,31 @@
+{
+  "aggregates": {
+    "count": "计数",
+    "sum": "求和",
+    "average": "平均值",
+    "min": "最小值",
+    "max": "最大值"
+  },
+  "chartAria": "{{name}} 图表",
+  "chartType": "图表类型",
+  "chartTypes": {
+    "bar": "柱状图",
+    "horizontal_bar": "条形图",
+    "line": "折线图",
+    "donut": "环形图"
+  },
+  "checked": "已勾选",
+  "empty": "空",
+  "legend": "图表图例",
+  "monthLabel": "{{year}} 年 {{month}} 月",
+  "noData": "无数据",
+  "noDataDesc": "没有行匹配当前的筛选或搜索。",
+  "noGroupProperty": "暂无可用于图表的内容",
+  "noGroupPropertyDesc": "添加一个选择、状态、人员、复选框或日期属性以对此图表进行分组。",
+  "total": "总计",
+  "unchecked": "未勾选",
+  "untitledProperty": "无标题",
+  "valueProperty": "值属性",
+  "xAxis": "X 轴",
+  "yAxis": "Y 轴"
+}

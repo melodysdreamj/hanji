@@ -1,0 +1,14 @@
+{
+  "couldntRestorePage": "Impossible de restaurer la page",
+  "emptyBodyPrompt": "Appuyez sur Entrée pour commencer à écrire sur cette page vide.",
+  "inTrashTopBarTitle": "Dans la corbeille",
+  "notFoundTopBarTitle": "Introuvable",
+  "openWorkspace": "Ouvrir l'espace de travail",
+  "pageInTrash": "Cette page est dans la corbeille.",
+  "pageInTrashDetail": "Restaurez-la avant d'ouvrir ou de modifier son contenu.",
+  "pageUnavailable": "Page indisponible.",
+  "pageUnavailableDetail": "Cette page a peut-être été supprimée, déplacée ou partagée avec un autre compte.",
+  "restorePage": "Restaurer la page",
+  "restoredPage": "Page restaurée",
+  "loadingPageContent": "Chargement du contenu de la page"
+}

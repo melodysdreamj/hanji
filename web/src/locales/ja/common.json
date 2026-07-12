@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "cancel": "キャンセル",
+    "save": "保存",
+    "close": "閉じる",
+    "search": "検索",
+    "create": "作成",
+    "delete": "削除",
+    "clearAll": "すべて消去",
+    "done": "完了",
+    "add": "追加"
+  },
+  "labels": {
+    "untitled": "無題"
+  },
+  "generated": {
+    "copyName": "{{name}} のコピー",
+    "columnName": "列 {{number}}",
+    "importedDatabase": "インポートしたデータベース",
+    "uploadedFile": "アップロードしたファイル",
+    "image": "画像",
+    "propertyNames": {
+      "name": "名前",
+      "status": "ステータス",
+      "select": "セレクト",
+      "date": "日付"
+    },
+    "statusOptions": {
+      "todo": "未開始",
+      "doing": "進行中",
+      "done": "完了"
+    },
+    "selectOptions": {
+      "first": "オプション 1",
+      "second": "オプション 2"
+    },
+    "viewNames": {
+      "table": "テーブル"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "Neuer Arbeitsbereich",
+  "name": {
+    "label": "Arbeitsbereichsname",
+    "placeholder": "Acme Inc."
+  },
+  "startLabel": "Starten von",
+  "options": {
+    "blank": {
+      "title": "Leerer Arbeitsbereich",
+      "body": "Leer mit den Startseiten beginnen."
+    },
+    "notion": {
+      "title": "Aus Notion importieren",
+      "body": "Arbeitsbereich erstellen und dann einen Notion-Arbeitsbereich migrieren."
+    },
+    "hanji": {
+      "title": "Aus anderem Hanji importieren",
+      "body": "Arbeitsbereich erstellen und dann einen Arbeitsbereich von einem anderen Hanji-Server oder einer Datei abrufen."
+    }
+  },
+  "create": "Arbeitsbereich erstellen",
+  "creating": "Wird erstellt…",
+  "error": {
+    "couldntCreate": "Arbeitsbereich konnte nicht erstellt werden."
+  }
+}

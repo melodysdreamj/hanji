@@ -1,0 +1,9 @@
+{
+  "empty": "아직 대화가 없습니다. 페이지에 댓글을 달거나 누군가를 멘션해 시작하세요.",
+  "leave": "나가기",
+  "leaveAria": "{{title}} 대화에서 나가기",
+  "open": "{{title}} 대화 열기",
+  "participants_other": "참여자 {{count}}명",
+  "untitled": "제목 없음",
+  "loading": "대화를 불러오는 중…"
+}

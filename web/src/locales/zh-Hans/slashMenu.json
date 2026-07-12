@@ -1,0 +1,15 @@
+{
+  "blockCommands": "块命令",
+  "closeBlockCommands": "关闭块命令",
+  "groups": {
+    "Basic": "基础块",
+    "Media": "媒体",
+    "Database": "数据库",
+    "Advanced": "高级块"
+  },
+  "itemStatus": "{{label}}，第 {{position}} 项，共 {{total}} 项。按 Enter 插入。",
+  "listStatus": "共有 {{total}} 个块命令可用。",
+  "noBlocks": "未找到块",
+  "noBlocksFor": "未找到与 \"{{query}}\" 匹配的块",
+  "recentlyUsed": "最近使用"
+}

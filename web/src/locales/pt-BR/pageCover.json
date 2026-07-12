@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "changeCover": "Alterar capa",
+    "reposition": "Reposicionar",
+    "remove": "Remover",
+    "uploadFile": "Enviar arquivo",
+    "uploading": "Enviando...",
+    "submit": "Enviar",
+    "savePosition": "Salvar posição"
+  },
+  "tabs": {
+    "gallery": "Galeria",
+    "upload": "Enviar",
+    "link": "Link"
+  },
+  "link": {
+    "placeholder": "Cole o link da imagem",
+    "invalid": "Cole um link de imagem http ou https."
+  },
+  "upload": {
+    "error": "Não foi possível enviar essa imagem.",
+    "defaultFileName": "Imagem da capa"
+  },
+  "reposition": {
+    "hint": "Arraste a imagem para reposicionar"
+  },
+  "progress": {
+    "preparing": "Preparando envio",
+    "finalizing": "Finalizando",
+    "complete": "Concluído",
+    "uploading": "Enviando"
+  },
+  "toast": {
+    "removed": "Capa removida",
+    "restored": "Capa restaurada",
+    "undo": "Desfazer"
+  },
+  "aria": {
+    "pageCover": "Capa da página",
+    "coverVerticalPosition": "Posição vertical da capa",
+    "positionFromTop": "{{position}}% do topo",
+    "closeCoverMenu": "Fechar menu de capa",
+    "changePageCover": "Alterar capa da página",
+    "repositionPageCover": "Reposicionar capa da página",
+    "removePageCover": "Remover capa da página",
+    "changeCoverDialog": "Alterar capa",
+    "coverSource": "Fonte da capa",
+    "selectCover": "Selecionar capa {{number}}",
+    "uploadFromDevice": "Enviar imagem de capa deste dispositivo",
+    "uploadingFile": "Enviando {{fileName}}",
+    "coverImageLink": "Link da imagem da capa"
+  }
+}

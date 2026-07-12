@@ -1,0 +1,13 @@
+{
+  "databaseLockedSave": "데이터베이스가 잠겨 있어 변경 사항을 저장하지 못했어요.",
+  "databaseRowsLoadFailed": "데이터베이스 행을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  "editAccessDeniedSave": "편집 권한이 없어 변경 사항을 저장하지 못했어요.",
+  "lockedSave": "페이지나 데이터베이스가 잠겨 있어 변경 사항을 저장하지 못했어요.",
+  "pageLockedSave": "페이지가 잠겨 있어 변경 사항을 저장하지 못했어요.",
+  "pageMissingSave": "페이지를 찾을 수 없어 변경 사항을 저장하지 못했어요.",
+  "saveFailed": "변경 사항을 저장하지 못했어요.",
+  "sessionExpired": "세션이 만료되었거나 인증 요청이 실패했습니다. 다시 시도해 주세요.",
+  "blockConflictSave": "다른 기기에서 이 블록이 수정되어 오프라인 변경을 적용하지 못했어요.",
+  "blockConflictKeepMine": "내 변경 적용",
+  "blockMoveCommentsSkipped": "블록은 이동했지만 댓글은 함께 옮기지 못했어요."
+}

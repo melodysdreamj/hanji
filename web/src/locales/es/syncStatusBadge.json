@@ -1,0 +1,10 @@
+{
+  "offline": "Sin conexión",
+  "offlinePending_one": "Sin conexión · {{count}} cambio pendiente",
+  "offlinePending_other": "Sin conexión · {{count}} cambios pendientes",
+  "syncing": "Sincronizando · {{count}}",
+  "unreachable": "No se puede conectar con el servidor",
+  "unreachablePending_one": "No se puede conectar con el servidor · {{count}} cambio pendiente",
+  "unreachablePending_other": "No se puede conectar con el servidor · {{count}} cambios pendientes",
+  "retryHint": "Haz clic para reintentar ahora"
+}

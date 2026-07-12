@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "addBlockBelow": "Block darunter hinzufügen",
+    "dragHint": "Ziehen zum Verschieben. Klicken zum Öffnen des Menüs.",
+    "openBlockActions": "Blockaktionen öffnen",
+    "closeBlockActions": "Blockaktionen schließen"
+  },
+  "menu": {
+    "ariaLabel": "Blockaktionen",
+    "deleteMany": "{{num}} Blöcke löschen",
+    "duplicate": "Duplizieren",
+    "duplicateMany": "{{num}} Blöcke duplizieren",
+    "turnInto": "Umwandeln in",
+    "copy": "Kopieren",
+    "copyMany": "{{num}} Blöcke kopieren",
+    "copied": "Kopiert",
+    "copyLinkToBlock": "Link zum Block kopieren",
+    "copiedBlockLink": "Blocklink kopiert",
+    "moveTo": "Verschieben nach",
+    "moveToMany": "{{num}} Blöcke verschieben nach",
+    "moveUp": "Nach oben verschieben",
+    "moveUpMany": "{{num}} Blöcke nach oben verschieben",
+    "moveDown": "Nach unten verschieben",
+    "moveDownMany": "{{num}} Blöcke nach unten verschieben",
+    "comment": "Kommentar",
+    "commentMany": "{{num}} Blöcke kommentieren",
+    "addCaption": "Beschriftung hinzufügen",
+    "removeCaption": "Beschriftung entfernen",
+    "unsyncSyncedBlock": "Synchronisierung des Blocks aufheben",
+    "copySyncedBlock": "Synchronisierten Block kopieren",
+    "color": "Farbe",
+    "mixed": "Gemischt",
+    "textFallback": "Text"
+  },
+  "turnMenu": {
+    "chooseType": "Blocktyp wählen"
+  },
+  "colorMenu": {
+    "textColor": "Textfarbe",
+    "backgroundColor": "Hintergrundfarbe"
+  },
+  "colors": {
+    "default": "Standard",
+    "gray": "Grau",
+    "brown": "Braun",
+    "orange": "Orange",
+    "yellow": "Gelb",
+    "green": "Grün",
+    "blue": "Blau",
+    "purple": "Lila",
+    "pink": "Rosa",
+    "red": "Rot",
+    "gray_background": "Grauer Hintergrund",
+    "brown_background": "Brauner Hintergrund",
+    "orange_background": "Oranger Hintergrund",
+    "yellow_background": "Gelber Hintergrund",
+    "green_background": "Grüner Hintergrund",
+    "blue_background": "Blauer Hintergrund",
+    "purple_background": "Lila Hintergrund",
+    "pink_background": "Rosa Hintergrund",
+    "red_background": "Roter Hintergrund"
+  },
+  "notifications": {
+    "duplicatedBlock": "Block dupliziert",
+    "duplicatedBlocks": "{{num}} Blöcke dupliziert",
+    "undo": "Rückgängig",
+    "undidDuplicate": "Duplikat rückgängig gemacht",
+    "nothingToUndo": "Nichts rückgängig zu machen",
+    "deletedBlock": "Block gelöscht",
+    "deletedBlocks": "{{num}} Blöcke gelöscht",
+    "restoredBlock": "Block wiederhergestellt",
+    "copiedToClipboard": "In die Zwischenablage kopiert",
+    "couldNotCopy": "Kopieren nicht möglich",
+    "couldNotCopyLink": "Link konnte nicht kopiert werden",
+    "clearedColor": "Farbe entfernt",
+    "changedColor": "Farbe geändert",
+    "changedBlockType": "Blocktyp geändert"
+  },
+  "comments": {
+    "selectedBlocksQuote": "{{num}} ausgewählte Blöcke"
+  },
+  "moveDialog": {
+    "title": "{{num}} Blöcke verschieben nach"
+  },
+  "edited": {
+    "justNow": "Zuletzt gerade eben bearbeitet",
+    "minutesAgo": "Zuletzt vor {{minutes}} Min. bearbeitet",
+    "hoursAgo": "Zuletzt vor {{hours}} Std. bearbeitet",
+    "daysAgo": "Zuletzt vor {{days}} Tg. bearbeitet",
+    "on": "Zuletzt bearbeitet am {{date}}"
+  }
+}

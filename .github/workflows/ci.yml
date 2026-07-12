@@ -1,0 +1,525 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  namespace-guard:
+    name: Hanji namespace guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Reject unapproved pre-Hanji namespaces
+        run: npm run verify:namespace
+      - name: Test namespace guard and local migration
+        run: npm run test:namespace
+
+  backend-unit:
+    name: Backend unit tests and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Audit dependencies
+        working-directory: backend
+        run: npm audit --audit-level=high
+      - name: Run unit tests (coverage-gated)
+        working-directory: backend
+        run: npm run test:coverage
+      - name: Typecheck
+        working-directory: backend
+        run: npm run typecheck
+      - name: Release and auth-session guard tests
+        working-directory: backend
+        run: npm run test:release-preflight
+      - name: Lint
+        working-directory: backend
+        run: npm run lint
+
+  mcp-checks:
+    name: MCP lint, unit tests, stdio smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+      - name: Install dependencies
+        working-directory: mcp
+        run: npm ci
+      - name: Audit dependencies
+        working-directory: mcp
+        run: npm audit --audit-level=high
+      - name: Syntax check
+        working-directory: mcp
+        run: npm run check
+      - name: Typecheck (tsc checkJs)
+        working-directory: mcp
+        run: npm run typecheck
+      - name: Lint
+        working-directory: mcp
+        run: npm run lint
+      - name: Unit tests
+        working-directory: mcp
+        run: npm test
+      - name: Stdio smoke
+        working-directory: mcp
+        run: npm run smoke
+
+  web-checks:
+    name: Web typecheck, lint, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+      - name: Audit dependencies
+        working-directory: web
+        run: npm audit --audit-level=high
+      - name: Unit tests (coverage-gated)
+        working-directory: web
+        run: npm run test:coverage
+      - name: Lint
+        working-directory: web
+        run: npm run lint
+      - name: i18n staleness guard (targets current with English source)
+        working-directory: web
+        run: npm run i18n:status
+      - name: Typecheck and build
+        working-directory: web
+        run: npm run build
+      - name: Guard generated Hanji namespace
+        run: npm run verify:namespace:generated
+      - name: Enforce initial and lazy bundle budgets
+        run: node scripts/verify-web-bundle-budget.mjs
+
+  # Packaging: builds the deployable EdgeBase app bundle (SPA + functions) and
+  # asserts the frontend is mounted at / with SPA fallback and the required
+  # backend functions are bundled. No live runtime — pure build/pack, so it is a
+  # deterministic gate that catches packaging regressions before deploy.
+  packaging:
+    name: EdgeBase packaging and Docker runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Verify EdgeBase app packaging
+        working-directory: backend
+        run: npm run verify:bundle -- --skip-local-edgebase-check
+      - name: Verify Docker image and runtime
+        working-directory: backend
+        run: >-
+          npm run verify:docker-runtime --
+          --skip-web-build
+          --skip-local-edgebase-check
+          --docker-tag hanji-edgebase-ci:${{ github.sha }}
+          --keep-docker-image
+      - name: Generate container SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: hanji-edgebase-ci:${{ github.sha }}
+          format: cyclonedx
+          output: hanji-edgebase-sbom.cdx.json
+          exit-code: '0'
+      - name: Record all HIGH and CRITICAL container findings
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: hanji-edgebase-ci:${{ github.sha }}
+          format: json
+          output: hanji-edgebase-vulnerabilities.json
+          exit-code: '0'
+          ignore-unfixed: 'false'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          scanners: vuln
+          skip-setup-trivy: 'true'
+          timeout: 10m0s
+      - name: Upload container security evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hanji-edgebase-container-security-${{ github.sha }}
+          path: |
+            hanji-edgebase-sbom.cdx.json
+            hanji-edgebase-vulnerabilities.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Block HIGH and CRITICAL container vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: hanji-edgebase-ci:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          # Distro entries without a vendor fix cannot be remediated. Every
+          # HIGH/CRITICAL finding with an available fix remains blocking.
+          ignore-unfixed: 'true'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          scanners: vuln
+          skip-setup-trivy: 'true'
+          timeout: 10m0s
+      - name: Remove scanned Docker image
+        if: always()
+        run: docker image rm --force hanji-edgebase-ci:${{ github.sha }} || true
+      - name: Verify portable pack runtime
+        working-directory: backend
+        run: npm run verify:pack-runtime -- --skip-web-build --skip-local-edgebase-check
+
+  # Live-runtime smokes: boots the real EdgeBase dev runtime (workerd) with the
+  # built SPA and runs the browser-free product-API verification scripts that
+  # cover the highest-risk flows (import, permissions, collaboration, database
+  # lifecycle, sharing, formula parity). Screenshot/visual-baseline smokes stay
+  # manual (the Notion-parity baseline is still moving); the stable
+  # interaction-level browser smokes are gated by the ui-smokes job below.
+  api-smokes:
+    name: Product API smokes (live dev runtime)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HANJI_EDGEBASE_URL: http://127.0.0.1:8787
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Build web bundle
+        working-directory: web
+        run: npm run build
+      - name: Start EdgeBase dev runtime
+        working-directory: backend
+        env:
+          WRANGLER_SEND_METRICS: "false"
+        run: |
+          export JWT_USER_SECRET=$(openssl rand -hex 32)
+          export JWT_ADMIN_SECRET=$(openssl rand -hex 32)
+          export SERVICE_KEY=$(openssl rand -hex 32)
+          # CI master account (matches the smoke-harness fallback credentials)
+          export HANJI_MASTER_EMAIL=master@hanji.local
+          export HANJI_MASTER_PASSWORD='HanjiMaster!2026'
+          # Keep stdin open: wrangler dev exits when its stdin reaches EOF.
+          ( tail -f /dev/null | npm run dev > "$RUNNER_TEMP/edgebase-dev.log" 2>&1 & )
+      - name: Wait for runtime health
+        id: runtime
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf --max-time 2 "$HANJI_EDGEBASE_URL/api/health" > /dev/null; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "EdgeBase dev runtime did not become healthy" >&2
+          tail -n 100 "$RUNNER_TEMP/edgebase-dev.log" >&2
+          exit 1
+      - name: Runtime bundle smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:runtime
+      - name: Notion import smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:notion-import
+      - name: Multi-user permission smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:permissions
+      - name: Collaboration smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:collaboration
+      - name: Database row lifecycle smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-row-lifecycle
+      - name: Public share smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:sharing
+      - name: Database query parity smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-query-parity
+      - name: Database relations smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-relations
+      - name: Database templates smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-templates
+      - name: Enterprise controls smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:enterprise-controls
+      - name: File lifecycle smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:files
+      - name: Import/export smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:import-export
+      - name: Native export/import round-trip smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:native-export-import
+      - name: Workspace membership smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:memberships
+      - name: Notification smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:notifications
+      - name: MCP hosted OAuth smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:mcp-hosted-oauth
+      - name: Notion API compat smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:notion-api-compat
+      - name: Dump runtime log on failure
+        if: failure()
+        run: tail -n 200 "$RUNNER_TEMP/edgebase-dev.log" || true
+      - name: Upload runtime log on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-smokes-runtime-log
+          path: ${{ runner.temp }}/edgebase-dev.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # Interaction-level Playwright smokes against the live dev runtime. This is
+  # the stable, deterministic subset of scripts/*-ui-smoke*.mjs — selected by
+  # running the full candidate set locally (2026-07-09) and keeping the
+  # passers; screenshot/visual-baseline smokes stay manual. Playwright is
+  # installed outside the repo and injected via PLAYWRIGHT_MODULE_DIR (all
+  # gated scripts and scripts/lib/harness.mjs honor it). If a smoke proves
+  # env-flaky here (block-editor's focus-flow has a flaky history), prefer
+  # narrowing that script's scope over dropping the gate.
+  ui-smokes:
+    name: UI smokes (Playwright, live dev runtime)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HANJI_EDGEBASE_URL: http://127.0.0.1:8787
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Install Playwright and Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/playwright"
+          cd "$RUNNER_TEMP/playwright"
+          npm init -y > /dev/null
+          npm install --save-exact --ignore-scripts playwright@1.61.1
+          echo "PLAYWRIGHT_MODULE_DIR=$RUNNER_TEMP/playwright/node_modules/playwright" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Build web bundle
+        working-directory: web
+        env:
+          # The dev-guest-login smoke needs the guest button compiled into the
+          # SPA; locally this comes from web/.env.local, which CI doesn't have.
+          VITE_ALLOW_ANONYMOUS_BOOTSTRAP: "true"
+        run: npm run build
+      - name: Start EdgeBase dev runtime
+        working-directory: backend
+        env:
+          WRANGLER_SEND_METRICS: "false"
+        run: |
+          export JWT_USER_SECRET=$(openssl rand -hex 32)
+          export JWT_ADMIN_SECRET=$(openssl rand -hex 32)
+          export SERVICE_KEY=$(openssl rand -hex 32)
+          # CI master account (matches the smoke-harness fallback credentials)
+          export HANJI_MASTER_EMAIL=master@hanji.local
+          export HANJI_MASTER_PASSWORD='HanjiMaster!2026'
+          export HANJI_ALLOW_DEV_GUEST_LOGIN=true
+          # Keep stdin open: wrangler dev exits when its stdin reaches EOF.
+          ( tail -f /dev/null | npm run dev > "$RUNNER_TEMP/edgebase-dev.log" 2>&1 & )
+      - name: Wait for runtime health
+        id: runtime
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf --max-time 2 "$HANJI_EDGEBASE_URL/api/health" > /dev/null; then
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "EdgeBase dev runtime did not become healthy" >&2
+          tail -n 100 "$RUNNER_TEMP/edgebase-dev.log" >&2
+          exit 1
+      - name: Dev guest login smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:dev-guest-login -- --timeout-ms 60000
+      - name: Password and MFA auth UI smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:auth-ui -- --timeout-ms 60000
+      - name: Admin provisioning and in-app invitation smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:admin-provisioning
+      - name: Workspace creation dialog smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:workspace-create-dialog
+      - name: Imported person mapping smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:person-mapping
+      - name: Inbox unread badge smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:inbox-badge
+      - name: Sponsors pipeline smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:sponsors
+      - name: Inbox chat rooms smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:inbox-chats
+      - name: Stale session recovery smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:stale-session-ui
+      - name: Block editor smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:block-editor-ui -- --timeout-ms 60000
+      - name: Block reorder smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:block-reorder-ui -- --timeout-ms 60000
+      - name: Database views smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-views-ui -- --timeout-ms 60000
+      - name: Database property menu smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-property-menu -- --timeout-ms 60000
+      - name: Database property resize smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-property-resize -- --timeout-ms 60000
+      - name: Search smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:search-ui -- --timeout-ms 60000
+      - name: Trash smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:trash-ui -- --timeout-ms 60000
+      - name: Updates smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:updates-ui -- --timeout-ms 60000
+      - name: Comments smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:comments-ui -- --timeout-ms 60000
+      - name: Page chrome smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:page-chrome-ui -- --timeout-ms 60000
+      - name: Page tree smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:page-tree-ui -- --timeout-ms 60000
+      - name: Database row peek smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-row-peek -- --timeout-ms 60000
+      - name: Durable outbox smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        # Local-first replay is a data-durability contract. Any phase failure
+        # must block release instead of being reduced to a warning.
+        run: npm run verify:durable-outbox -- --timeout-ms 60000
+      - name: Popover layer audit
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:popover-layer-audit
+      - name: Dump runtime log on failure
+        if: failure()
+        run: tail -n 200 "$RUNNER_TEMP/edgebase-dev.log" || true
+      - name: Upload UI failure evidence
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ui-smokes-failure-evidence
+          path: |
+            ${{ runner.temp }}/edgebase-dev.log
+            .edgebase/ui-discovery
+          if-no-files-found: ignore
+          retention-days: 7

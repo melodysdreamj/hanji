@@ -1,0 +1,14 @@
+{
+  "dialog": {
+    "label": "Rechercher dans la page"
+  },
+  "input": {
+    "label": "Rechercher dans la page",
+    "placeholder": "Rechercher dans la page"
+  },
+  "actions": {
+    "previous": "Correspondance précédente",
+    "next": "Correspondance suivante",
+    "close": "Fermer la recherche"
+  }
+}

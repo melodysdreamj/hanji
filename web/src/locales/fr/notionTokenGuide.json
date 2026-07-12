@@ -1,0 +1,109 @@
+{
+  "region": "Guide du jeton Notion",
+  "play": "Lire",
+  "pause": "Pause",
+  "prev": "Étape précédente",
+  "next": "Étape suivante",
+  "stepLabel": "Étape {{n}} sur {{total}}",
+  "scenes": [
+    {
+      "title": "Ouvrir la page du jeton depuis Hanji",
+      "caption": "Dans Hanji, cliquez sur « Ouvrir la page du jeton Notion » pour ouvrir le portail développeur de Notion dans un nouvel onglet."
+    },
+    {
+      "title": "Créer une connexion",
+      "caption": "Sur notion.so/profile/integrations (Connexions), cliquez sur « Nouvelle connexion »."
+    },
+    {
+      "title": "Choisir l'espace de travail, créer le jeton",
+      "caption": "Choisissez « Jeton d'accès », puis sélectionnez l'espace de travail Notion auquel ce jeton s'applique — un jeton appartient toujours à un seul espace de travail."
+    },
+    {
+      "title": "Copier le jeton d'accès",
+      "caption": "Copiez le jeton ntn_… et collez-le dans le champ de jeton ci-dessous."
+    },
+    {
+      "title": "Le connecter à vos pages",
+      "caption": "Dans Notion, ouvrez chaque page de premier niveau → ··· → Connexions → ajoutez cette connexion. Les sous-pages sont incluses automatiquement — revenez ensuite analyser."
+    },
+    {
+      "title": "Coller le jeton dans Hanji",
+      "caption": "De retour dans Hanji, collez le jeton que vous avez copié dans le champ « Jeton d'API Notion »."
+    },
+    {
+      "title": "Choisir ce qu'il faut importer",
+      "caption": "Importez l'espace de travail entier, ou choisissez « Pages spécifiques » pour importer uniquement les pages et bases de données que vous sélectionnez."
+    }
+  ],
+  "mock": {
+    "url": "app.notion.com/developers/connections",
+    "hanjiTitle": "Hanji · Importation",
+    "inkIntroTitle": "Importer avec un jeton d'API Notion",
+    "inkIntroDesc": "Pour un hébergement local, coller un jeton que vous créez dans Notion est la configuration la plus fiable.",
+    "inkMakeToken": "Ouvrir la page du jeton Notion",
+    "inkStep1Title": "Préparer le jeton Notion",
+    "inkTokenLabel": "Jeton d'API Notion",
+    "inkTokenValue": "ntn_••••••••",
+    "inkStep2Title": "Choisir ce qu'il faut importer",
+    "scopeAllTitle": "Espace de travail entier",
+    "scopeAllRec": "Recommandé",
+    "scopeAllDesc": "Tout ce à quoi la connexion peut accéder. Les relations de base de données entre les pages restent intactes.",
+    "scopeSomeTitle": "Pages spécifiques",
+    "scopeSomeDesc": "Analyser les éléments de premier niveau accessibles, puis importer uniquement les pages/bases de données que vous sélectionnez.",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "backLink": "‹ Retour à Notion",
+    "devTitle": "Développeurs",
+    "nav": [
+      "Premiers pas",
+      "Worker",
+      "Jetons d'accès personnels",
+      "Connexions"
+    ],
+    "navNew": "Nouveau",
+    "listTitle": "Connexions",
+    "listSubtitle": "Créez et gérez les connexions API publiques et privées de Notion.",
+    "learnMore": "En savoir plus",
+    "newConnection": "+ Nouvelle connexion",
+    "colConnection": "Connexion",
+    "colWorkspaces": "Espaces de travail installables :",
+    "colAuthType": "Type d'authentification",
+    "colOwner": "Propriétaire",
+    "integrationName": "Hanji",
+    "capabilities": "Lire le contenu, mettre à jour et insérer du contenu, et lire les informations utilisateur",
+    "workspaceName": "Mon espace de travail",
+    "authTypeCell": "Jeton d'accès",
+    "ownerName": "Vous",
+    "modalTitle": "Nouvelle connexion",
+    "modalDesc": "Créez une connexion pour authentifier des applications, des agents et des flux de travail avec Notion. Choisissez une portée sur un ou plusieurs espaces de travail.",
+    "nameLabel": "Nom de la connexion",
+    "namePlaceholder": "Ma connexion",
+    "authMethod": "Méthode d'authentification",
+    "accessToken": "Jeton d'accès",
+    "accessTokenDesc": "Un jeton d'API statique, limité à un espace de travail, partagé entre les collaborateurs, avec ses propres paramètres de capacités. Limité à 1 espace de travail et ne peut pas être inscrit sur le Marketplace.",
+    "oauth": "OAuth",
+    "oauthDesc": "OAuth 2.0 limité à l'utilisateur ; les autorisations sont limitées à l'utilisateur connecté. Prend en charge plusieurs espaces de travail.",
+    "wsLabel": "Espaces de travail installables :",
+    "wsDesc": "Ce jeton s'applique à l'espace de travail sélectionné.",
+    "terms": "En créant une connexion, vous acceptez les conditions de développeur de Notion.",
+    "createButton": "Créer la connexion",
+    "breadcrumb": "Connexions  ›  Gérer la connexion",
+    "detailTabs": [
+      "Configuration",
+      "Capacités de contenu",
+      "Webhooks",
+      "Propriétaires"
+    ],
+    "tokenSectionTitle": "Jeton d'intégration API",
+    "tokenSectionDesc": "Utilisez ce jeton pour authentifier les requêtes API de cet espace de travail. Toute personne disposant du jeton peut agir au nom de la connexion, alors gardez-le secret.",
+    "tokenFieldLabel": "Jeton d'accès",
+    "tokenValue": "••••••••••••••••••••••••••••",
+    "copied": "Copié",
+    "pageTitle": "Manuel de l'équipe",
+    "share": "Partager",
+    "menuCopyLink": "Copier le lien",
+    "menuDuplicate": "Dupliquer",
+    "menuConnectionsLabel": "Connexions",
+    "menuAddConnection": "Ajouter des connexions",
+    "searchPlaceholder": "Rechercher des connexions…"
+  }
+}

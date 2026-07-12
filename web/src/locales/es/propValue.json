@@ -1,0 +1,11 @@
+{
+  "relationLoading": "Cargando elementos de la relación",
+  "relationUnavailable": "Elementos de la relación no disponibles",
+  "unavailable": "No disponible",
+  "checkbox": {
+    "checked": "Marcado",
+    "unchecked": "Sin marcar"
+  },
+  "openRelation": "Abrir {{title}}",
+  "openOrDownloadFile": "Abrir o descargar {{name}}"
+}

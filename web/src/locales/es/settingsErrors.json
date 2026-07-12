@@ -1,0 +1,24 @@
+{
+  "rateLimited": "Demasiadas solicitudes en este momento. Inténtalo de nuevo en un momento.",
+  "requestFailed": "No pudimos completar esa solicitud. Inténtalo de nuevo.",
+  "backend": {
+    "workspaceAdminRequired": "Se requiere acceso de administrador del espacio de trabajo.",
+    "workspaceOwnerRequired": "Se requiere acceso de propietario del espacio de trabajo.",
+    "onlyOwnersAssignAdmin": "Solo los propietarios del espacio de trabajo pueden asignar el rol de administrador.",
+    "onlyOwnersManageAdmins": "Solo los propietarios del espacio de trabajo pueden gestionar administradores.",
+    "onlyOwnersRemoveAdmins": "Solo los propietarios del espacio de trabajo pueden eliminar administradores.",
+    "ownersCannotChangeRole": "El rol del propietario del espacio de trabajo no se puede cambiar aquí. Transfiere la propiedad primero.",
+    "ownersCannotBeRemoved": "El propietario del espacio de trabajo no se puede eliminar. Transfiere la propiedad primero.",
+    "cannotChangeOwnRole": "No puedes cambiar tu propio rol en el espacio de trabajo.",
+    "cannotRemoveSelf": "No puedes eliminarte del espacio de trabajo.",
+    "onlyAssignableRoles": "Solo se pueden asignar los roles de administrador, miembro e invitado.",
+    "memberNotFound": "Ese miembro del espacio de trabajo no se encontró.",
+    "invitationNotFound": "Esa invitación no se encontró.",
+    "transferTargetMustBeMember": "Elige otro miembro para transferirle la propiedad.",
+    "emailRequired": "Se requiere el correo electrónico.",
+    "emailInvalid": "Esa dirección de correo electrónico no parece correcta.",
+    "externalGuestDisabled": "Las invitaciones de invitados externos están desactivadas por la política de la organización.",
+    "verifiedDomainRequired": "Los miembros de la organización deben usar un dominio verificado de la organización.",
+    "workspaceUrlInUse": "Esa URL del espacio de trabajo ya está en uso."
+  }
+}

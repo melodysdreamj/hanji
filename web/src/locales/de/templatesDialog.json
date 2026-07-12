@@ -1,0 +1,16 @@
+{
+  "title": "Vorlagen",
+  "close": "Vorlagen schließen",
+  "categories": "Vorlagenkategorien",
+  "all": "Alle",
+  "searchPlaceholder": "Vorlagen durchsuchen",
+  "gridLabel": "{{category}} Vorlagen",
+  "empty": "Keine Vorlagen gefunden.",
+  "use": "Verwenden",
+  "applying": "Wird angewendet...",
+  "adding": "Wird hinzugefügt...",
+  "applied": "Vorlage angewendet",
+  "added": "Vorlage hinzugefügt",
+  "failed": "Vorlage konnte nicht verwendet werden.",
+  "pageNotFound": "Seite nicht gefunden."
+}

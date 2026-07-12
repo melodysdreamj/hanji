@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Magpie(까치) 흑백 지오메트릭 마크 — 날개의 두 줄은 문서의 텍스트 행 -->
+  <rect width="512" height="512" rx="116" fill="#0B0B0B"/>
+  <g transform="rotate(-12 272 300)">
+    <g fill="#FFFFFF">
+      <!-- 꼬리: 까치의 시그니처, 길고 넓게 -->
+      <polygon points="224,266 48,352 76,400 232,330"/>
+      <!-- 몸통 -->
+      <rect x="196" y="228" width="190" height="112" rx="56"/>
+      <!-- 목 연결 -->
+      <circle cx="354" cy="248" r="34"/>
+      <!-- 머리 -->
+      <circle cx="398" cy="232" r="56"/>
+      <!-- 부리 -->
+      <polygon points="440,216 490,231 440,244"/>
+    </g>
+    <!-- 눈 -->
+    <circle cx="408" cy="220" r="9.5" fill="#0B0B0B"/>
+    <!-- 접은 날개 = 텍스트 두 행 -->
+    <rect x="246" y="256" width="108" height="17" rx="8.5" fill="#0B0B0B"/>
+    <rect x="246" y="284" width="78" height="17" rx="8.5" fill="#0B0B0B"/>
+  </g>
+</svg>

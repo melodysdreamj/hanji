@@ -1,0 +1,31 @@
+{
+  "aggregates": {
+    "count": "개수",
+    "sum": "합계",
+    "average": "평균",
+    "min": "최소",
+    "max": "최대"
+  },
+  "chartAria": "{{name}} 차트",
+  "chartType": "차트 유형",
+  "chartTypes": {
+    "bar": "세로 막대",
+    "horizontal_bar": "가로 막대",
+    "line": "선",
+    "donut": "도넛"
+  },
+  "checked": "체크됨",
+  "empty": "비어 있음",
+  "legend": "차트 범례",
+  "monthLabel": "{{year}}년 {{month}}월",
+  "noData": "데이터 없음",
+  "noDataDesc": "현재 필터나 검색과 일치하는 행이 없어요.",
+  "noGroupProperty": "차트로 표시할 속성이 없어요",
+  "noGroupPropertyDesc": "선택, 상태, 사람, 체크박스 또는 날짜 속성을 추가해 주세요.",
+  "total": "합계",
+  "unchecked": "체크 해제",
+  "untitledProperty": "제목 없음",
+  "valueProperty": "값 속성",
+  "xAxis": "X축",
+  "yAxis": "Y축"
+}

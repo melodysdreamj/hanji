@@ -1,0 +1,92 @@
+{
+  "buttons": {
+    "addBlockBelow": "Adicionar bloco abaixo",
+    "dragHint": "Arraste para mover. Clique para abrir o menu.",
+    "openBlockActions": "Abrir ações do bloco",
+    "closeBlockActions": "Fechar ações do bloco"
+  },
+  "menu": {
+    "ariaLabel": "Ações do bloco",
+    "deleteMany": "Excluir {{num}} blocos",
+    "duplicate": "Duplicar",
+    "duplicateMany": "Duplicar {{num}} blocos",
+    "turnInto": "Transformar em",
+    "copy": "Copiar",
+    "copyMany": "Copiar {{num}} blocos",
+    "copied": "Copiado",
+    "copyLinkToBlock": "Copiar link do bloco",
+    "copiedBlockLink": "Link do bloco copiado",
+    "moveTo": "Mover para",
+    "moveToMany": "Mover para {{num}} blocos",
+    "moveUp": "Mover para cima",
+    "moveUpMany": "Mover {{num}} blocos para cima",
+    "moveDown": "Mover para baixo",
+    "moveDownMany": "Mover {{num}} blocos para baixo",
+    "comment": "Comentar",
+    "commentMany": "Comentar {{num}} blocos",
+    "addCaption": "Adicionar legenda",
+    "removeCaption": "Remover legenda",
+    "unsyncSyncedBlock": "Dessincronizar bloco sincronizado",
+    "copySyncedBlock": "Copiar bloco sincronizado",
+    "color": "Cor",
+    "mixed": "Misturada",
+    "textFallback": "Texto"
+  },
+  "turnMenu": {
+    "chooseType": "Escolha um tipo de bloco"
+  },
+  "colorMenu": {
+    "textColor": "Cor do texto",
+    "backgroundColor": "Cor de fundo"
+  },
+  "colors": {
+    "default": "Padrão",
+    "gray": "Cinza",
+    "brown": "Marrom",
+    "orange": "Laranja",
+    "yellow": "Amarelo",
+    "green": "Verde",
+    "blue": "Azul",
+    "purple": "Roxo",
+    "pink": "Rosa",
+    "red": "Vermelho",
+    "gray_background": "Fundo cinza",
+    "brown_background": "Fundo marrom",
+    "orange_background": "Fundo laranja",
+    "yellow_background": "Fundo amarelo",
+    "green_background": "Fundo verde",
+    "blue_background": "Fundo azul",
+    "purple_background": "Fundo roxo",
+    "pink_background": "Fundo rosa",
+    "red_background": "Fundo vermelho"
+  },
+  "notifications": {
+    "duplicatedBlock": "Bloco duplicado",
+    "duplicatedBlocks": "{{num}} blocos duplicados",
+    "undo": "Desfazer",
+    "undidDuplicate": "Duplicação desfeita",
+    "nothingToUndo": "Nada para desfazer",
+    "deletedBlock": "Bloco excluído",
+    "deletedBlocks": "{{num}} blocos excluídos",
+    "restoredBlock": "Bloco restaurado",
+    "copiedToClipboard": "Copiado para a área de transferência",
+    "couldNotCopy": "Não foi possível copiar",
+    "couldNotCopyLink": "Não foi possível copiar o link",
+    "clearedColor": "Cor removida",
+    "changedColor": "Cor alterada",
+    "changedBlockType": "Tipo de bloco alterado"
+  },
+  "comments": {
+    "selectedBlocksQuote": "{{num}} blocos selecionados"
+  },
+  "moveDialog": {
+    "title": "Mover {{num}} blocos para"
+  },
+  "edited": {
+    "justNow": "Última edição agora há pouco",
+    "minutesAgo": "Última edição há {{minutes}}min",
+    "hoursAgo": "Última edição há {{hours}}h",
+    "daysAgo": "Última edição há {{days}}d",
+    "on": "Última edição em {{date}}"
+  }
+}
