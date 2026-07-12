@@ -2406,7 +2406,11 @@ async function assertDatabaseViewShellVisualContract(page, seed, view) {
   );
   assert(
     metrics.openButtonCount >= 1 &&
-      metrics.openButtonLabels.some((label) => label === `Open ${seed.rowTitles[view.rowIndex]}`),
+      // Each view appends its own context to the open affordance's accessible
+      // name (Board: "in <column>", Calendar: ", scheduled for <date>", ...),
+      // so match the "Open <title>" prefix rather than the full string.
+      metrics.openButtonLabels.some((label) =>
+        label.startsWith(`Open ${seed.rowTitles[view.rowIndex]}`)),
     `${view.name} should show seeded database rows as openable items, got ${metrics.openButtonLabels.join(', ') || 'none'}`,
   );
   assert(
@@ -3045,7 +3049,11 @@ async function assertMobileDatabaseViewVisualContract(page, seed, view) {
 
   assert(
     metrics.openButtonCount >= 1 &&
-      metrics.openButtonLabels.some((label) => label === `Open ${seed.rowTitles[view.rowIndex]}`),
+      // Each view appends its own context to the open affordance's accessible
+      // name (Board: "in <column>", Calendar: ", scheduled for <date>", ...),
+      // so match the "Open <title>" prefix rather than the full string.
+      metrics.openButtonLabels.some((label) =>
+        label.startsWith(`Open ${seed.rowTitles[view.rowIndex]}`)),
     `mobile ${view.name} should show seeded database rows as openable items, got ${metrics.openButtonLabels.join(', ') || 'none'}`,
   );
   assert(
@@ -3520,7 +3528,9 @@ function assertDatabaseViewSurfaceInventory(inventory) {
   }
 
   assert(
-    local.body.openButtons.some((button) => button.label === `Open ${local.expectedRowTitle}`),
+    local.body.openButtons.some((button) =>
+      // Views append per-view context ("in <column>", ", scheduled for ...").
+      button.label.startsWith(`Open ${local.expectedRowTitle}`)),
     `${target.view} inventory should expose the expected open row/card: ${JSON.stringify(local.body.openButtons)}`,
   );
 
