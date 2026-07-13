@@ -758,12 +758,14 @@ export function watchBrowserErrors(page, {
     );
     if (initialSignedOutWindowOpen && initialSignedOutStatuses.has(genericStatus)) {
       const consoleUrl = message.location?.().url;
+      let verifiedAuthRefreshLocation = false;
       if (consoleUrl) {
         try {
           if (new URL(consoleUrl).pathname !== '/api/auth/refresh') {
             record(message.text());
             return;
           }
+          verifiedAuthRefreshLocation = true;
         } catch {
           record(message.text());
           return;
@@ -782,7 +784,11 @@ export function watchBrowserErrors(page, {
         // Chromium may emit the console event just before Playwright's response
         // event. Hold it until the matching refresh response arrives or the
         // caller closes the initial-auth window.
-        pendingGenericAuthError = { message: diagnostic, status: genericStatus };
+        pendingGenericAuthError = {
+          message: diagnostic,
+          status: genericStatus,
+          verifiedAuthRefreshLocation,
+        };
       } else {
         record(diagnostic);
       }
@@ -835,7 +841,14 @@ export function watchBrowserErrors(page, {
       // cannot consume the initial signed-out allowance.
       if (typeof page.waitForTimeout === 'function') await page.waitForTimeout(75);
       else await new Promise((resolve) => setTimeout(resolve, 0));
-      if (pendingGenericAuthError) record(pendingGenericAuthError.message);
+      // A resource console event can identify the exact refresh endpoint even
+      // when Playwright does not surface the matching response event (observed
+      // on GitHub's Chromium runner). In that case the URL-scoped, one-shot
+      // allowance is still unambiguous. Messages without that location remain
+      // fatal unless they were paired with the real response above.
+      if (pendingGenericAuthError && !pendingGenericAuthError.verifiedAuthRefreshLocation) {
+        record(pendingGenericAuthError.message);
+      }
       initialSignedOutWindowOpen = false;
       initialSignedOutAllowanceAvailable = false;
       pendingSignedOutRefreshStatus = null;

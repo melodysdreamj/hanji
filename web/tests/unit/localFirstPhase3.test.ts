@@ -62,6 +62,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe("offline pins and LRU eviction", () => {
@@ -113,6 +114,10 @@ describe("offline pins and LRU eviction", () => {
   });
 
   it("evicts the oldest unpinned block tables beyond the cap and keeps pinned ones", async () => {
+    // Make the LRU boundary deterministic even when a fast or virtualized CI
+    // clock returns the same millisecond (or briefly steps backwards) across
+    // the queued IndexedDB writes.
+    const now = vi.spyOn(Date, "now").mockReturnValue(1_000);
     // Oldest two entries: one pinned, one not.
     cacheReplaceTable(TEST_USER, "blocks:pinned", [
       { id: "b-pinned", value: makeBlock("pinned", "b-pinned", "pinned text") },
@@ -125,6 +130,7 @@ describe("offline pins and LRU eviction", () => {
     await recordCacheIdleForTests();
     await setOfflinePin(TEST_USER, "pinned", true);
 
+    now.mockReturnValue(2_000);
     for (let i = 0; i < MAX_CACHED_BLOCK_PAGES - 1; i += 1) {
       stampBlocksCached(TEST_USER, `page-${i}`);
     }
