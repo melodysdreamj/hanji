@@ -152,6 +152,7 @@ async function assertPageTreeUi(browser, baseUrl, seed) {
       assertSidebarWorkspaceHeaderLayout(page),
     );
     await step('verify sidebar top action layout contract', () => assertSidebarTopActionLayout(page));
+    await step('keep member management out of sidebar promo cards', () => assertNoSidebarMemberCard(page));
     await step('verify sidebar footer action layout contract', () => assertSidebarFooterActionLayout(page));
     await step('discover collapsed page tree caret layout issues', () =>
       assertCollapsedTreeDisclosureLayout(page, seed),
@@ -1448,6 +1449,22 @@ async function assertSidebarWorkspaceHeaderLayout(page) {
   await page.mouse.move(1000, 700);
 }
 
+async function assertNoSidebarMemberCard(page) {
+  const metrics = await page.evaluate(() => {
+    const sidebar = document.querySelector('aside[aria-label="Sidebar"]');
+    return {
+      sidebarPresent: sidebar instanceof HTMLElement,
+      collaborationAreaPresent: Boolean(sidebar?.querySelector('[data-sidebar-collaboration]')),
+      memberCardPresent: Boolean(sidebar?.querySelector('[data-sidebar-member-invite]')),
+    };
+  });
+  assert(metrics.sidebarPresent, `sidebar should be present for the member-card contract: ${JSON.stringify(metrics)}`);
+  assert(
+    !metrics.collaborationAreaPresent && !metrics.memberCardPresent,
+    `workspace membership belongs in the workspace console, not a persistent sidebar card: ${JSON.stringify(metrics)}`,
+  );
+}
+
 async function assertSidebarFooterActionLayout(page) {
   const metrics = await page.evaluate(() => {
     const sidebar = document.querySelector('aside[aria-label="Sidebar"]');
@@ -2090,7 +2107,7 @@ function sidebarReferenceInventory() {
         'child rows advance by a compact consistent indentation step',
       ],
       localDeviationPolicy:
-        'Use Hanji labels and responsive tokens, but preserve the reference surface inventory and reveal rules.',
+        'Use Hanji labels and responsive tokens, preserve the reference surface inventory and reveal rules, and keep member management in the workspace console instead of a persistent sidebar promo card.',
     },
   };
 }
@@ -2301,6 +2318,8 @@ async function collectSidebarSurfaceInventory(page, seed) {
           mobile: sidebar instanceof HTMLElement ? sidebar.getAttribute('data-mobile') : null,
           open: sidebar instanceof HTMLElement ? sidebar.getAttribute('data-open') : null,
           rect: readRect(sidebar),
+          collaborationAreaPresent: Boolean(sidebar?.querySelector('[data-sidebar-collaboration]')),
+          memberCardPresent: Boolean(sidebar?.querySelector('[data-sidebar-member-invite]')),
         },
         topRail: readTopRail(),
         sectionOrder,
@@ -2334,6 +2353,10 @@ function assertSidebarSurfaceInventory(inventory) {
   const privateSection = local.sections.private;
   assertTopRailInventory(inventory);
   assertSectionHeaderInventory(inventory);
+  assert(
+    !local.sidebar.collaborationAreaPresent && !local.sidebar.memberCardPresent,
+    `sidebar inventory should keep member management in the workspace console, not a promo card: ${JSON.stringify(local.sidebar)}`,
+  );
   assert(privateSection.present, `sidebar inventory must include the Private section: ${JSON.stringify(inventory)}`);
   // The private section header renders as "Pages" since the i18n label sweep
   // (Sidebar labels.private, commit 0cdac3bf).

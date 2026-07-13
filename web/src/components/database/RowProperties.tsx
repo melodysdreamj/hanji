@@ -20,10 +20,28 @@ import type { DbProperty, DbView, Page, PropertyConfig, PropertyType } from "@/l
 import { useStore } from "@/lib/store";
 import { pageHref } from "@/lib/navigation";
 import { positionBetween } from "@/lib/ids";
-import { CheckIcon, ChevronDown, ChevronUp, FileText, Plus, Search, Settings } from "../icons";
+import {
+  ArrowLeft,
+  CheckIcon,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  CommentIcon,
+  Copy,
+  EyeIcon,
+  EyeSlashIcon,
+  FileText,
+  LayoutIcon,
+  Pencil,
+  Plus,
+  PropertiesIcon,
+  Search,
+  Settings,
+  Trash,
+  X,
+} from "../icons";
 import { PropValue } from "./PropValue";
 import { PropertyCell } from "./PropertyCell";
-import { NotionSelect } from "./NotionSelect";
 import { PropertyTypeConfig } from "./PropertyTypeConfig";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
 import { usePropertyTypeChangeConfirm } from "./PropertyTypeChangeConfirm";
@@ -98,6 +116,29 @@ function isSystemProperty(prop: DbProperty) {
   );
 }
 
+function canDuplicateProperty(prop: DbProperty) {
+  return prop.type !== "title" && prop.type !== "relation";
+}
+
+function canCommentOnProperty(row: Page, prop: DbProperty) {
+  if (isEmptyRowProperty(row, prop)) return false;
+  return ![
+    "formula",
+    "rollup",
+    "unique_id",
+    "created_time",
+    "last_edited_time",
+    "created_by",
+    "last_edited_by",
+  ].includes(prop.type);
+}
+
+function replaceLocalizedTerm(template: string, source: string, replacement: string) {
+  const index = template.toLowerCase().indexOf(source.toLowerCase());
+  if (index < 0) return `${replacement} · ${template}`;
+  return `${template.slice(0, index)}${replacement}${template.slice(index + source.length)}`;
+}
+
 export function orderRowPanelProperties(props: DbProperty[], view?: DbView) {
   const rowOrder = view?.config?.rowPagePropertyOrder;
   if (rowOrder && rowOrder.length > 0) return orderPropertiesByIds(props, rowOrder);
@@ -127,12 +168,16 @@ export function RowProperties({
   showBackReferences?: boolean;
   showPropertyControls?: boolean;
 }) {
-  const { t } = useTranslation(["rowProperties", "common"]);
+  const { t } = useTranslation(["rowProperties", "common", "tableView", "databaseView", "rowMenu"]);
   const [addOpen, setAddOpen] = useState(false);
   const [addSearch, setAddSearch] = useState("");
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [customizeSearch, setCustomizeSearch] = useState("");
   const [propertyMenuId, setPropertyMenuId] = useState<string | null>(null);
+  const [propertyMenuPanel, setPropertyMenuPanel] = useState<
+    "main" | "rename" | "edit" | "type" | "visibility"
+  >("main");
+  const [propertyTypeSearch, setPropertyTypeSearch] = useState("");
   const [propertyMenuPlacement, setPropertyMenuPlacement] = useState<"above" | "below">("below");
   const [showHiddenPropertiesFor, setShowHiddenPropertiesFor] = useState<string | null>(null);
   const [draggingPropertyId, setDraggingPropertyId] = useState<string | null>(null);
@@ -153,6 +198,7 @@ export function RowProperties({
   const updateProperty = useStore((s) => s.updateProperty);
   const updateView = useStore((s) => s.updateView);
   const deleteProperty = useStore((s) => s.deleteProperty);
+  const openComments = useStore((s) => s.openComments);
   const notify = useStore((s) => s.notify);
   const props = useStore(useShallow((s) => s.dbProperties(dbId)));
   const pagesById = useStore(useShallow((s) => s.pagesById));
@@ -172,6 +218,11 @@ export function RowProperties({
     ? rowProps
     : visibleProps.slice(0, DEFAULT_VISIBLE_ROW_PROPERTY_COUNT);
   const hiddenCount = hiddenProps.length + overflowProps.length;
+  const customizeLayoutLabel = replaceLocalizedTerm(
+    t("rowMenu:actions.customizePage"),
+    t("rowMenu:sections.page"),
+    t("databaseView:layout")
+  );
   const canOpenPropertyMenus = !readOnly;
   const canShowPropertyManagementControls = !readOnly && showPropertyControls;
   const showCustomizeMenuOnly = !canShowPropertyManagementControls && customizeOpen && canOpenPropertyMenus;
@@ -206,6 +257,7 @@ export function RowProperties({
     if (!openCustomizeTick || !canOpenPropertyMenus) return;
     setAddOpen(false);
     setPropertyMenuId(null);
+    setPropertyMenuPanel("main");
     setCustomizeOpen(true);
     window.requestAnimationFrame(() => {
       customizeSearchRef.current?.focus({ preventScroll: true });
@@ -247,6 +299,7 @@ export function RowProperties({
     if (canOpenPropertyMenus) return;
     const frame = window.requestAnimationFrame(() => {
       setPropertyMenuId(null);
+      setPropertyMenuPanel("main");
       menuReturnRef.current = null;
     });
     return () => window.cancelAnimationFrame(frame);
@@ -299,7 +352,7 @@ export function RowProperties({
   }
 
   async function duplicatePropertyWithFeedback(prop: DbProperty) {
-    if (!canOpenPropertyMenus || prop.type === "title" || isSystemProperty(prop)) return;
+    if (!canOpenPropertyMenus || !canDuplicateProperty(prop)) return;
     try {
       const physical = [...props].sort((a, b) => a.position - b.position);
       const physicalIndex = physical.findIndex((item) => item.id === prop.id);
@@ -339,6 +392,7 @@ export function RowProperties({
 
       notify(t("rowProperties:duplicatedProperty"), "success");
       setPropertyMenuId(null);
+      setPropertyMenuPanel("main");
       window.requestAnimationFrame(() => menuReturnRef.current?.focus());
     } catch {
       notify(t("rowProperties:duplicatePropertyFailed"), "error");
@@ -356,6 +410,7 @@ export function RowProperties({
       }
       notify(t("rowProperties:deletedProperty"), "success");
       setPropertyMenuId(null);
+      setPropertyMenuPanel("main");
       window.requestAnimationFrame(() => menuReturnRef.current?.focus());
     } catch {
       notify(t("rowProperties:deletePropertyFailed"), "error");
@@ -366,6 +421,8 @@ export function RowProperties({
     setAddOpen(false);
     setCustomizeOpen(false);
     setPropertyMenuId(null);
+    setPropertyMenuPanel("main");
+    setPropertyTypeSearch("");
     setAddSearch("");
     setCustomizeSearch("");
     if (restoreFocus) {
@@ -395,6 +452,14 @@ export function RowProperties({
     if (e.key === "Escape") {
       e.preventDefault();
       e.stopPropagation();
+      if (propertyMenuPanel === "type") {
+        setPropertyMenuPanel("edit");
+        return;
+      }
+      if (propertyMenuPanel !== "main") {
+        setPropertyMenuPanel("main");
+        return;
+      }
       closeMenus(true);
       return;
     }
@@ -478,13 +543,6 @@ export function RowProperties({
     updateProperty(sourceId, {
       position: positionBetween(next[finalIndex - 1]?.position, next[finalIndex + 1]?.position),
     });
-  }
-
-  function moveProperty(id: string, direction: -1 | 1) {
-    const index = rowProps.findIndex((prop) => prop.id === id);
-    const target = rowProps[index + direction];
-    if (index < 0 || !target) return;
-    reorderProperty(id, target.id, direction < 0 ? "before" : "after");
   }
 
   function updatePropertyDisplay(prop: DbProperty, patch: NonNullable<DbProperty["config"]>) {
@@ -591,7 +649,6 @@ export function RowProperties({
         <div className={styles.rowPropertiesEmpty}>{t("rowProperties:noVisibleProperties")}</div>
       )}
       {displayedProps.map((prop) => {
-        const rowPropIndex = rowProps.findIndex((item) => item.id === prop.id);
         const propertyIsEmpty = isEmptyRowProperty(row, prop);
         return (
           <div
@@ -658,7 +715,9 @@ export function RowProperties({
                   setPropertyMenuPlacement(spaceBelow < 360 && rect.top > spaceBelow ? "above" : "below");
                   setAddOpen(false);
                   setCustomizeOpen(false);
-                  setPropertyMenuId((current) => (current === prop.id ? null : prop.id));
+                  setPropertyMenuPanel("main");
+                  setPropertyTypeSearch("");
+                  setPropertyMenuId(propertyMenuId === prop.id ? null : prop.id);
                 }}
               >
                 <span className={styles.rowPropertyGlyph} aria-hidden="true">
@@ -711,106 +770,294 @@ export function RowProperties({
                   ref={propertyMenuRef}
                   className={styles.rowPropertyMenu}
                   data-placement={propertyMenuPlacement}
+                  data-panel={propertyMenuPanel}
+                  data-property-type={prop.type}
                   role="menu"
                   tabIndex={-1}
                   aria-label={t("rowProperties:propertyOptions", { name: prop.name })}
                   onKeyDown={(e) => onMenuKeyDown(e, propertyMenuRef.current)}
                 >
-                  <label className={styles.propertyHeaderField}>
-                    <span>{t("rowProperties:name")}</span>
-                      <input
-                        value={prop.name}
+                  {propertyMenuPanel === "main" && (
+                    <>
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitem"
                         autoFocus
-                        onChange={(e) => updateProperty(prop.id, { name: e.target.value })}
-                        onKeyDown={(e) => {
-                          if (isComposingKeyEvent(e)) return;
-                          if (e.key !== "Escape" && e.key !== "Enter") return;
-                          e.preventDefault();
-                          closeMenus(true);
+                        onClick={() => setPropertyMenuPanel("rename")}
+                      >
+                        <Pencil size={16} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{t("rowMenu:actions.rename")}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitem"
+                        onClick={() => setPropertyMenuPanel("edit")}
+                      >
+                        <PropertiesIcon size={16} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{t("tableView:editProperty")}</span>
+                      </button>
+                      {canCommentOnProperty(row, prop) && (
+                        <button
+                          type="button"
+                          className={styles.propertyHeaderItem}
+                          data-row-menu-item
+                          role="menuitem"
+                          onClick={() => {
+                            closeMenus();
+                            openComments(row.id);
+                          }}
+                        >
+                          <CommentIcon size={16} aria-hidden="true" />
+                          <span className={styles.propertyHeaderItemText}>{t("databaseView:comments")}</span>
+                        </button>
+                      )}
+                      <div className={styles.propertyHeaderDivider} />
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitem"
+                        aria-haspopup="menu"
+                        onClick={() => setPropertyMenuPanel("visibility")}
+                      >
+                        <EyeIcon size={16} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{t("databaseView:propertyVisibility")}</span>
+                        <ChevronRight className={styles.propertyHeaderChevron} size={14} aria-hidden="true" />
+                      </button>
+                      {canDuplicateProperty(prop) && (
+                        <button
+                          type="button"
+                          className={styles.propertyHeaderItem}
+                          data-row-menu-item
+                          role="menuitem"
+                          onClick={() => void duplicatePropertyWithFeedback(prop)}
+                        >
+                          <Copy size={16} aria-hidden="true" />
+                          <span className={styles.propertyHeaderItemText}>{t("rowProperties:duplicateProperty")}</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitem"
+                        disabled={prop.type === "title"}
+                        onClick={() => void deletePropertyWithFeedback(prop)}
+                      >
+                        <Trash size={16} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{t("rowProperties:deleteProperty")}</span>
+                      </button>
+                      <div className={styles.propertyHeaderDivider} />
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitem"
+                        onClick={() => {
+                          setPropertyMenuId(null);
+                          setPropertyMenuPanel("main");
+                          setCustomizeOpen(true);
                         }}
-                      />
-                  </label>
-                  <div className={styles.propertyHeaderField}>
-                    <span>{t("rowProperties:type")}</span>
-                    <NotionSelect
-                      ariaLabel={t("rowProperties:propertyType")}
-                      value={prop.type}
-                      disabled={prop.type === "title" || isSystemProperty(prop)}
-                      options={editablePropertyTypes(prop.type)}
-                      onChange={(value) => {
-                        const type = value as PropertyType;
-                        confirmPropertyTypeChange(prop, type, () => {
-                          updateProperty(prop.id, {
-                            type,
-                            config: configForType(type, prop.config, dbId),
-                          });
-                        });
-                      }}
-                    />
-                  </div>
-                  <label className={styles.propertyHeaderField}>
-                    <span>{t("rowProperties:description")}</span>
-                    <textarea
-                      value={prop.description ?? ""}
-                      placeholder={t("rowProperties:addDescription")}
-                      rows={2}
-                      onChange={(e) =>
-                        updateProperty(prop.id, { description: e.target.value || undefined })
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key !== "Escape") return;
-                        e.preventDefault();
-                        closeMenus(true);
-                      }}
-                    />
-                  </label>
-                  <PropertyTypeConfig prop={prop} onClose={() => closeMenus(true)} />
-                  <div className={styles.propertyHeaderRow}>
-                    <button
-                      type="button"
-                      className={styles.propertyHeaderItem}
-                      data-row-menu-item
-                      disabled={rowPropIndex <= 0}
-                      onClick={() => moveProperty(prop.id, -1)}
-                    >
-                      {t("rowProperties:moveUp")}
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.propertyHeaderItem}
-                      data-row-menu-item
-                      disabled={rowPropIndex < 0 || rowPropIndex >= rowProps.length - 1}
-                      onClick={() => moveProperty(prop.id, 1)}
-                    >
-                      {t("rowProperties:moveDown")}
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.propertyHeaderItem}
-                    data-row-menu-item
-                    role="menuitem"
-                    onClick={() => {
-                      updatePropertyDisplay(prop, {
-                        hideInPagePanel: !prop.config?.hideInPagePanel,
-                      });
-                      setPropertyMenuId(null);
-                      window.requestAnimationFrame(() => menuReturnRef.current?.focus());
-                    }}
-                  >
-                    <span>{prop.config?.hideInPagePanel ? t("rowProperties:showProperty") : t("rowProperties:hideProperty")}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.propertyHeaderItem}
-                    data-row-menu-item
-                    role="menuitem"
-                    disabled={prop.type === "title" || isSystemProperty(prop)}
-                    onClick={() => void duplicatePropertyWithFeedback(prop)}
-                  >
-                    {t("rowProperties:duplicateProperty")}
-                  </button>
-                  {canHideWhenEmpty(prop) && (
+                      >
+                        <LayoutIcon size={16} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{customizeLayoutLabel}</span>
+                      </button>
+                    </>
+                  )}
+                  {propertyMenuPanel === "rename" && (
+                    <div className={styles.propertyHeaderPanel}>
+                      <div className={styles.propertyHeaderPanelHead}>
+                        <button
+                          type="button"
+                          aria-label={t("tableView:backToPropertyMenu")}
+                          onClick={() => setPropertyMenuPanel("main")}
+                        >
+                          <ArrowLeft size={16} aria-hidden="true" />
+                        </button>
+                        <strong>{t("rowMenu:actions.rename")}</strong>
+                        <button type="button" aria-label={t("rowProperties:closePropertyMenu")} onClick={() => closeMenus(true)}>
+                          <X size={15} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <label className={styles.propertyHeaderField}>
+                        <span>{t("rowProperties:name")}</span>
+                        <input
+                          value={prop.name}
+                          autoFocus
+                          onChange={(e) => updateProperty(prop.id, { name: e.target.value })}
+                          onKeyDown={(e) => {
+                            if (isComposingKeyEvent(e)) return;
+                            if (e.key !== "Escape" && e.key !== "Enter") return;
+                            e.preventDefault();
+                            closeMenus(true);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  )}
+                  {propertyMenuPanel === "edit" && (
+                    <div className={`${styles.propertyHeaderPanel} ${styles.rowPropertyEditPanel}`}>
+                      <div className={styles.rowPropertyEditIdentity}>
+                        <span className={styles.rowPropertyEditIcon} aria-hidden="true">
+                          <PropertyTypeIcon type={prop.type} size={18} />
+                        </span>
+                        <input
+                          value={prop.name}
+                          aria-label={t("rowProperties:name")}
+                          autoFocus
+                          onChange={(e) => updateProperty(prop.id, { name: e.target.value })}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.rowPropertyEditType}
+                        data-row-menu-item
+                        role="menuitem"
+                        disabled={prop.type === "title" || isSystemProperty(prop)}
+                        onClick={() => {
+                          setPropertyTypeSearch("");
+                          setPropertyMenuPanel("type");
+                        }}
+                      >
+                        <span>{t("rowProperties:type")}</span>
+                        <span>
+                          <PropertyTypeIcon type={prop.type} size={15} aria-hidden="true" />
+                          {propertyTypeLabel(prop.type)}
+                        </span>
+                        {!isSystemProperty(prop) && <ChevronRight size={14} aria-hidden="true" />}
+                      </button>
+                      <PropertyTypeConfig prop={prop} onClose={() => closeMenus(true)} />
+                      <div className={styles.propertyHeaderDivider} />
+                      {canDuplicateProperty(prop) && (
+                        <button
+                          type="button"
+                          className={styles.propertyHeaderItem}
+                          data-row-menu-item
+                          role="menuitem"
+                          onClick={() => void duplicatePropertyWithFeedback(prop)}
+                        >
+                          <Copy size={15} aria-hidden="true" />
+                          <span className={styles.propertyHeaderItemText}>{t("rowProperties:duplicateProperty")}</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={`${styles.propertyHeaderItem} ${styles.propertyDanger}`}
+                        data-row-menu-item
+                        role="menuitem"
+                        onClick={() => void deletePropertyWithFeedback(prop)}
+                      >
+                        <Trash size={15} aria-hidden="true" />
+                        <span className={styles.propertyHeaderItemText}>{t("rowProperties:deleteProperty")}</span>
+                      </button>
+                    </div>
+                  )}
+                  {propertyMenuPanel === "type" && (
+                    <div className={styles.propertyHeaderPanel}>
+                      <div className={styles.propertyHeaderPanelHead}>
+                        <button
+                          type="button"
+                          aria-label={t("tableView:backToPropertyMenu")}
+                          onClick={() => setPropertyMenuPanel("edit")}
+                        >
+                          <ArrowLeft size={16} aria-hidden="true" />
+                        </button>
+                        <strong>{t("rowProperties:type")}</strong>
+                        <button type="button" aria-label={t("rowProperties:closePropertyMenu")} onClick={() => closeMenus(true)}>
+                          <X size={15} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <div className={styles.propertyHeaderTypeSearch}>
+                        <Search size={14} aria-hidden="true" />
+                        <input
+                          value={propertyTypeSearch}
+                          autoFocus
+                          placeholder={t("tableView:searchPropertyTypes")}
+                          aria-label={t("tableView:searchPropertyTypes")}
+                          onChange={(e) => setPropertyTypeSearch(e.target.value)}
+                        />
+                      </div>
+                      <div className={styles.propertyHeaderTypeList}>
+                        {editablePropertyTypes(prop.type)
+                          .filter((type) => {
+                            const query = propertyTypeSearch.trim().toLowerCase();
+                            return !query || `${type.label} ${type.value}`.toLowerCase().includes(query);
+                          })
+                          .map((type) => (
+                            <button
+                              key={type.value}
+                              type="button"
+                              className={styles.propertyHeaderTypeOption}
+                              data-active={type.value === prop.type ? "true" : undefined}
+                              onClick={() => {
+                                const nextType = type.value as PropertyType;
+                                confirmPropertyTypeChange(prop, nextType, () => {
+                                  updateProperty(prop.id, {
+                                    type: nextType,
+                                    config: configForType(nextType, prop.config, dbId),
+                                  });
+                                  setPropertyMenuPanel("edit");
+                                  setPropertyTypeSearch("");
+                                });
+                              }}
+                            >
+                              <span aria-hidden="true">
+                                <PropertyTypeIcon type={type.value as PropertyType} size={15} />
+                              </span>
+                              <span>{type.label}</span>
+                              {type.value === prop.type ? <CheckIcon size={14} aria-hidden="true" /> : null}
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                  {propertyMenuPanel === "visibility" && (
+                    <div className={styles.propertyHeaderPanel}>
+                      <div className={styles.propertyHeaderPanelHead}>
+                        <button
+                          type="button"
+                          aria-label={t("tableView:backToPropertyMenu")}
+                          onClick={() => setPropertyMenuPanel("main")}
+                        >
+                          <ArrowLeft size={16} aria-hidden="true" />
+                        </button>
+                        <strong>{t("databaseView:propertyVisibility")}</strong>
+                        <button type="button" aria-label={t("rowProperties:closePropertyMenu")} onClick={() => closeMenus(true)}>
+                          <X size={15} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.propertyHeaderItem}
+                        data-row-menu-item
+                        role="menuitemcheckbox"
+                        aria-checked={!prop.config?.hideInPagePanel}
+                        autoFocus
+                        onClick={() =>
+                          updatePropertyDisplay(prop, {
+                            hideInPagePanel: !prop.config?.hideInPagePanel,
+                          })
+                        }
+                      >
+                        {prop.config?.hideInPagePanel ? (
+                          <EyeSlashIcon size={15} aria-hidden="true" />
+                        ) : (
+                          <EyeIcon size={15} aria-hidden="true" />
+                        )}
+                        <span className={styles.propertyHeaderItemText}>
+                          {prop.config?.hideInPagePanel
+                            ? t("rowProperties:showProperty")
+                            : t("rowProperties:hideProperty")}
+                        </span>
+                        <span className={styles.propertyHeaderCheck} aria-hidden="true">
+                          {!prop.config?.hideInPagePanel ? <CheckIcon size={14} /> : null}
+                        </span>
+                      </button>
+                      {canHideWhenEmpty(prop) && (
                     <button
                       type="button"
                       className={styles.propertyHeaderItem}
@@ -821,27 +1068,17 @@ export function RowProperties({
                         updatePropertyDisplay(prop, {
                           hideWhenEmpty: !prop.config?.hideWhenEmpty,
                         });
-                        setPropertyMenuId(null);
-                        window.requestAnimationFrame(() => menuReturnRef.current?.focus());
                       }}
                     >
-                      <span aria-hidden="true">
+                      <EyeSlashIcon size={15} aria-hidden="true" />
+                      <span className={styles.propertyHeaderItemText}>{t("rowProperties:hideWhenEmpty")}</span>
+                      <span className={styles.propertyHeaderCheck} aria-hidden="true">
                         {prop.config?.hideWhenEmpty ? <CheckIcon size={14} /> : null}
                       </span>
-                      <span>{t("rowProperties:hideWhenEmpty")}</span>
                     </button>
+                      )}
+                    </div>
                   )}
-                  <div className={styles.propertyHeaderDivider} />
-                  <button
-                    type="button"
-                    className={`${styles.propertyHeaderItem} ${styles.propertyDanger}`}
-                    data-row-menu-item
-                    role="menuitem"
-                    disabled={prop.type === "title"}
-                    onClick={() => void deletePropertyWithFeedback(prop)}
-                  >
-                    {t("rowProperties:deleteProperty")}
-                  </button>
                 </div>
               </>
             )}

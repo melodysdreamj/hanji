@@ -5,7 +5,13 @@ ARG HANJI_BUILD_SHA=unknown
 # workerd requires glibc, so use Debian slim instead of Alpine. Keep npm pinned
 # to a release that removes the fixable HIGH findings bundled by the base image.
 # The runtime invokes Wrangler directly and does not install an unused pnpm CLI.
-RUN npm install -g npm@12.0.1 && npm install -g wrangler@4.103.0
+# Workerd uses the system trust store for outbound HTTPS requests such as the
+# Notion API, so the otherwise-minimal image must retain the public CA bundle.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    npm install -g npm@12.0.1 && \
+    npm install -g wrangler@4.103.0
 
 WORKDIR /app
 
@@ -31,11 +37,13 @@ ENV HOST=0.0.0.0
 ENV PERSIST_DIR=/data
 ENV WRANGLER_CONFIG=wrangler.toml
 ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true
-ENV LOCAL_PROTOCOL=https
+ENV LOCAL_PROTOCOL=http
 ENV EDGEBASE_UID=10001
 ENV EDGEBASE_GID=10001
 ENV HOME=/home/edgebase
 ENV HANJI_BUILD_SHA=$HANJI_BUILD_SHA
+
+VOLUME ["/data"]
 
 EXPOSE 8787
 

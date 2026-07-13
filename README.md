@@ -108,8 +108,7 @@ real. Editing the frontend? Also run `npm --prefix web run dev` for hot reload a
 ### Docker — self-host with HTTPS at `https://localhost:8443`
 
 Needs **Docker** (daemon running). The source-build path creates the image,
-issues a locally-trusted certificate, and prints the sign-in URL plus one-time
-setup code:
+issues a locally-trusted certificate, and prints the sign-in URL:
 
 ```bash
 bash scripts/selfhost-docker.sh up --build
@@ -118,10 +117,17 @@ bash scripts/selfhost-docker.sh up --build
 Open the URL and choose the first administrator email/password in the browser.
 Manage it with the `status`, `logs`, or `down` subcommand, for example
 `bash scripts/selfhost-docker.sh status`. For a no-warning certificate, install
-[mkcert](https://github.com/FiloSottile/mkcert) first. The release design also
-supports pulling the same amd64/arm64 image from GHCR in Synology/NAS Container
-Manager; the public image and multi-architecture manifest are not published
-yet, so the pinned source build is the working path today.
+[mkcert](https://github.com/FiloSottile/mkcert) first. The same amd64/arm64
+release image can be pulled from GHCR in Synology/NAS Container Manager as
+`ghcr.io/melodysdreamj/hanji:0.1.0-alpha.2`.
+
+The release image itself defaults to HTTP on container port `8787`. In Docker
+Desktop, publish that port and open `http://localhost:<host-port>`; on Synology,
+keep the container HTTP port private and let DSM's reverse proxy provide public
+HTTPS. The image declares `/data`, so Docker creates a volume automatically,
+opens the first-administrator installer in the browser without a terminal code,
+and includes the public CA bundle needed for outbound HTTPS imports such as
+Notion.
 
 ### Cloudflare _(in progress)_ — deploy to your own Workers domain
 
@@ -230,6 +236,11 @@ one-command path. [docs/deployment.md](docs/deployment.md) separates the
 registry-image/NAS path from source/custom builds and covers HTTPS,
 reverse-proxy, Cloudflare, and portable-pack deployment.
 
+Publishing a host port is required for browser access. Mapping `/data` is not
+required for the first run because Docker creates an anonymous volume, but a
+named volume or dedicated host directory is recommended for clear backups and
+container replacement.
+
 **Data & backups (Docker).** Everything you create lives in the `hanji-data`
 Docker volume (mounted at `/data`) — pages, databases, uploaded files, and all.
 Put it elsewhere with `--data /your/host/path` (an absolute path to bind-mount)
@@ -240,8 +251,9 @@ with their old `.edgebase/docker/hanji.env` so its cryptographic values are
 copied into `/data` before retiring that file. The TLS certificate volume can
 regenerate on its own.
 
-Docker normally creates its first administrator through the setup-code-protected
-web installer. `HANJI_MASTER_EMAIL` / `HANJI_MASTER_PASSWORD` remain the
+Docker normally creates its first administrator entirely in the browser, with
+no terminal code or mandatory environment file. `HANJI_MASTER_EMAIL` /
+`HANJI_MASTER_PASSWORD` remain the
 noninteractive path for Cloudflare, portable packs, and advanced Docker
 automation. See [docs/deployment.md](docs/deployment.md).
 

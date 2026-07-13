@@ -91,6 +91,11 @@ const OAUTH_PROVIDERS = Object.fromEntries(
 );
 const ALLOWED_OAUTH_PROVIDERS = Object.keys(OAUTH_PROVIDERS);
 const ALLOW_DEV_GUEST_LOGIN = envFlag('HANJI_ALLOW_DEV_GUEST_LOGIN');
+const BROWSER_SETUP_ENABLED = envFlag('HANJI_BROWSER_SETUP');
+const TRUST_SELF_HOSTED_PROXY =
+  envValue('HANJI_TRUST_SELF_HOSTED_PROXY') === undefined
+    ? BROWSER_SETUP_ENABLED
+    : envFlag('HANJI_TRUST_SELF_HOSTED_PROXY');
 
 interface Workspace {
   id: string;
@@ -418,9 +423,7 @@ const appTables = {
         },
 
         // One-time first-run web setup claim. The fixed `global` row closes
-        // concurrent installer races before the auth account is created. The
-        // setup code itself is never stored in the database; Docker keeps it
-        // in the private persistent runtime file under /data.
+        // concurrent installer races before the auth account is created.
         instance_setup: {
           schema: {
             state: { type: 'string', required: true },
@@ -1682,10 +1685,10 @@ export default defineConfig({
   // without an explicit access rule deny-by-default in local, packaged, and
   // deployed runtimes instead of silently bypassing authorization in dev.
   release: true,
-  // Off by default: forwarded client/protocol headers are spoofable when the
-  // container port is reachable directly. NAS/reverse-proxy operators may opt
-  // in after restricting the upstream port to that trusted proxy.
-  trustSelfHostedProxy: envFlag('HANJI_TRUST_SELF_HOSTED_PROXY'),
+  // The Docker appliance enables its browser installer and trusted proxy mode
+  // together so NAS/Desktop users do not need to discover proxy env flags.
+  // Other runtimes remain fail-closed unless they opt in explicitly.
+  trustSelfHostedProxy: TRUST_SELF_HOSTED_PROXY,
 
   frontend: {
     directory: '../web/dist',
@@ -1754,6 +1757,10 @@ export default defineConfig({
       maxActiveSessions: 5,
       cookie: {
         enabled: true,
+        // Docker Desktop reaches a container through bridge/NAT even when the
+        // browser address is plain-HTTP localhost. Keep the refresh credential
+        // HttpOnly while allowing that one browser-local image path.
+        allowInsecureLocalhost: BROWSER_SETUP_ENABLED,
         name: 'hanji-refresh',
         legacyNames: [LEGACY_REFRESH_COOKIE_BASE_NAME_DELETE_ONLY],
         sameSite: 'strict',

@@ -26,10 +26,52 @@ test('the release container base image is pinned to an immutable multi-arch dige
     /npm install -g npm@\d+\.\d+\.\d+/,
     'the npm bundled in the base image must be upgraded to an exact patched version',
   );
+  assert.match(
+    dockerfile,
+    /apt-get install -y --no-install-recommends ca-certificates/,
+    'the runtime image must trust public HTTPS APIs through the system CA bundle',
+  );
+  assert.match(dockerfile, /ENV LOCAL_PROTOCOL=http/);
+  assert.match(dockerfile, /VOLUME \["\/data"\]/);
   assert.doesNotMatch(
     dockerfile,
     /corepack\s+(?:enable|prepare)|pnpm@/,
     'the runtime image must not install the unused pnpm toolchain',
+  );
+});
+
+test('the container enables browser-only setup without a terminal setup secret', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+  const edgebaseConfig = read('backend/edgebase.config.ts');
+  const launcher = read('scripts/selfhost-docker.sh');
+  const persistedSecretList = entrypoint.match(/const secretNames = \[([\s\S]*?)\];/)?.[1] ?? '';
+
+  assert.match(entrypoint, /process\.env\.HANJI_BROWSER_SETUP \|\|= 'true'/);
+  assert.match(entrypoint, /process\.env\.LOCAL_PROTOCOL \|\| 'http'/);
+  assert.match(edgebaseConfig, /allowInsecureLocalhost:\s*BROWSER_SETUP_ENABLED/);
+  assert.match(edgebaseConfig, /trustSelfHostedProxy:\s*TRUST_SELF_HOSTED_PROXY/);
+  assert.match(
+    edgebaseConfig,
+    /envValue\('HANJI_TRUST_SELF_HOSTED_PROXY'\) === undefined[\s\S]*?BROWSER_SETUP_ENABLED/,
+  );
+  assert.doesNotMatch(persistedSecretList, /HANJI_SETUP_TOKEN/);
+  assert.doesNotMatch(entrypoint, /console\.log\([^\n]*first-run setup code/i);
+  assert.doesNotMatch(launcher, /HANJI_SETUP_TOKEN|Code:\s+%s/);
+});
+
+test('a registry-pulled image refuses to start when Docker persistence is nearly full', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+
+  assert.match(entrypoint, /statfsSync\(persistDir\)/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB \|\| '524288'/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB must be a non-negative integer/);
+  assert.match(
+    entrypoint,
+    /Docker persistence storage is too full[\s\S]*?Free Docker disk space and restart\. The \/data volume was kept\./,
+  );
+  assert.ok(
+    entrypoint.indexOf('statfsSync(persistDir)') < entrypoint.indexOf('mkdirSync(secretDir'),
+    'the disk guard must run before the entrypoint writes persistent secrets',
   );
 });
 
@@ -98,6 +140,27 @@ test('deploy uses strict live-link preflight while ordinary local packaging stay
     String(webPackage.scripts?.build ?? ''),
     /verify-hanji-namespace\.mjs --generated/,
     'every deploy, pack, and packaging path that builds the web app must reject old names in generated output',
+  );
+});
+
+test('release versions and published EdgeBase pins stay aligned', () => {
+  const backendPackage = JSON.parse(read('backend/package.json'));
+  const webPackage = JSON.parse(read('web/package.json'));
+  const mcpPackage = JSON.parse(read('mcp/package.json'));
+  const edgebaseVersion = backendPackage.devDependencies?.['@edge-base/cli'];
+
+  assert.equal(webPackage.version, backendPackage.version);
+  assert.equal(mcpPackage.version, backendPackage.version);
+  assert.match(backendPackage.version, /^\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/);
+  assert.match(edgebaseVersion ?? '', /^\d+\.\d+\.\d+$/);
+  assert.equal(backendPackage.devDependencies?.['@edge-base/shared'], edgebaseVersion);
+  assert.equal(webPackage.dependencies?.['@edge-base/web'], edgebaseVersion);
+
+  const dockerBuild = read('scripts/build-hanji-docker-image.mjs');
+  assert.doesNotMatch(
+    dockerBuild,
+    /cpSync|join\(backendDir, ['"]docker-context['"]\)/,
+    'Hanji must rely on the pinned EdgeBase Docker context contract instead of copying support files a second time',
   );
 });
 

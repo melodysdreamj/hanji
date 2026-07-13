@@ -77,7 +77,6 @@ const UpdatesPanel = lazy(() =>
 type SidebarSection = "favorites" | "shared" | "private";
 
 const SIDEBAR_SECTION_COLLAPSED_KEY = "hanji:sidebar-section-collapsed";
-const SIDEBAR_INVITE_CARD_DISMISSED_KEY = "hanji:sidebar-invite-card-dismissed";
 const SIDEBAR_TOP_RAIL_ICON_SIZE = 19;
 const PRIVATE_SECTION_INITIAL_LIMIT = 12;
 
@@ -232,10 +231,6 @@ export function Sidebar({
   const notify = useStore((s) => s.notify);
   const createWorkspace = useStore((s) => s.createWorkspace);
   const switchWorkspace = useStore((s) => s.switchWorkspace);
-  const [inviteCardDismissed, setInviteCardDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(SIDEBAR_INVITE_CARD_DISMISSED_KEY) === "1";
-  });
 
   // Inbox unread dot. There is no realtime notification push yet, so the dot
   // refreshes on workspace change, when the tab regains focus/visibility
@@ -347,7 +342,6 @@ export function Sidebar({
   const workspaceRole = workspaceMemberShareRole({ workspace, currentMember, userId });
   const canCreateRootPage = canCreateWorkspacePage({ workspace, currentMember, userId });
   const canUseFooterNewPage = canCreateRootPage;
-  const canInviteMembers = workspaceRole === "full_access";
   const canManageWorkspaceSettings =
     workspaceRole === "full_access" || organizationRole === "owner" || organizationRole === "admin";
   const canOpenAdminConsole =
@@ -513,7 +507,6 @@ export function Sidebar({
     switchToDarkMode: t("sidebar:switchToDarkMode"),
     switchToLightMode: t("sidebar:switchToLightMode"),
     logOut: t("sidebar:logOut"),
-    dismissInviteCard: t("sidebar:dismissInviteCard"),
     resizeSidebar: t("sidebar:resizeSidebar"),
     favoritePages: t("sidebar:favoritePages"),
     favorites: t("sidebar:favorites"),
@@ -521,8 +514,6 @@ export function Sidebar({
     import: t("sidebar:import"),
     inbox: t("sidebar:inbox"),
     inboxUnread: t("sidebar:inboxUnread"),
-    inviteMembers: t("sidebar:inviteMembers"),
-    inviteMembersDescription: t("sidebar:inviteMembersDescription"),
     newPage: t("sidebar:newPage"),
     openPrivateLibrary: t("sidebar:openPrivateLibrary"),
     openPrivateOptions: t("sidebar:openPrivateOptions"),
@@ -598,20 +589,6 @@ export function Sidebar({
   function openSettingsRoute() {
     if (mobile && open) onToggle();
     router.push(settingsHrefFromCurrentRoute());
-  }
-
-  function openMemberInviteRoute() {
-    if (mobile && open) onToggle();
-    router.push(canOpenAdminConsole ? workspaceConsoleHref("members") : settingsHrefFromCurrentRoute("members"));
-  }
-
-  function dismissInviteCard() {
-    setInviteCardDismissed(true);
-    try {
-      window.localStorage.setItem(SIDEBAR_INVITE_CARD_DISMISSED_KEY, "1");
-    } catch {
-      // Local storage is optional; the current session state is enough.
-    }
   }
 
   async function signOut() {
@@ -1567,35 +1544,6 @@ export function Sidebar({
             </section>
           )}
         </div>
-
-        {canInviteMembers && !inviteCardDismissed && (
-          <div className={styles.collaborationArea} data-sidebar-collaboration>
-            <div className={styles.inviteCard} data-sidebar-member-invite>
-              <button
-                type="button"
-                className={styles.inviteCardMain}
-                onClick={openMemberInviteRoute}
-                data-sidebar-member-invite-action
-              >
-                <span className={styles.inviteIcon} aria-hidden="true">
-                  <UserIcon size={16} />
-                </span>
-                <span className={styles.inviteCopy}>
-                  <span className={styles.inviteTitle}>{labels.inviteMembers}</span>
-                  <span className={styles.inviteDescription}>{labels.inviteMembersDescription}</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className={styles.inviteDismiss}
-                onClick={dismissInviteCard}
-                aria-label={labels.dismissInviteCard}
-              >
-                x
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className={styles.footer} data-sidebar-footer>
           <button

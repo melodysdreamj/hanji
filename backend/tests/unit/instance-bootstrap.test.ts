@@ -5,7 +5,6 @@ import {
   isSetupBlocked,
   normalizeMasterEmail,
   planMasterBootstrap,
-  setupCodeMatches,
   validSetupPassword,
 } from '../../functions/instance-bootstrap';
 import { fakeDb } from './helpers/fake-db';
@@ -25,14 +24,6 @@ describe('normalizeMasterEmail', () => {
 });
 
 describe('web setup credential guards', () => {
-  it('compares only sufficiently strong configured setup codes', () => {
-    const code = '0123456789abcdef0123456789abcdef';
-    expect(setupCodeMatches(code, code)).toBe(true);
-    expect(setupCodeMatches(`${code}x`, code)).toBe(false);
-    expect(setupCodeMatches(code.slice(0, -1), code)).toBe(false);
-    expect(setupCodeMatches('short', 'short')).toBe(false);
-  });
-
   it('requires a normal strong account password', () => {
     expect(validSetupPassword('Hanji-Setup!2026')).toBe(true);
     expect(validSetupPassword('no-symbol-2026')).toBe(false);
@@ -285,7 +276,6 @@ describe('development guest bootstrap flag', () => {
 });
 
 describe('first-run web setup', () => {
-  const setupCode = '0123456789abcdef0123456789abcdef';
   const email = 'owner@example.com';
   const password = 'Hanji-Owner!2026';
 
@@ -294,9 +284,9 @@ describe('first-run web setup', () => {
       request: new Request('https://hanji.example.com/api/functions/instance-bootstrap', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'completeSetup', setupCode, email, password }),
+        body: JSON.stringify({ action: 'completeSetup', email, password }),
       }),
-      env: { HANJI_SETUP_TOKEN: setupCode },
+      env: { HANJI_BROWSER_SETUP: 'true' },
       admin: {
         db: () => appDb,
         auth: {
@@ -312,10 +302,10 @@ describe('first-run web setup', () => {
     };
   }
 
-  it('advertises setup without disclosing its code', async () => {
+  it('advertises browser-only setup without requiring a terminal code', async () => {
     const response = await handlerOf(GET)({
       request: new Request('https://hanji.example.com/api/functions/instance-bootstrap'),
-      env: { HANJI_SETUP_TOKEN: setupCode },
+      env: { HANJI_BROWSER_SETUP: 'true' },
       admin: {
         db: () => fakeDb({ instance_settings: [] }),
         auth: {
@@ -329,11 +319,11 @@ describe('first-run web setup', () => {
 
     expect(payload).toMatchObject({
       setupAvailable: true,
-      setupCodeRequired: true,
+      setupCodeRequired: false,
       setupBlocked: false,
       masterConfigured: false,
     });
-    expect(JSON.stringify(payload)).not.toContain(setupCode);
+    expect(payload).not.toHaveProperty('setupCode');
   });
 
   it('creates exactly one confirmed master and closes setup', async () => {
@@ -368,16 +358,11 @@ describe('first-run web setup', () => {
     });
   });
 
-  it('rejects a wrong code and an already-populated instance', async () => {
+  it('rejects a runtime without browser setup and an already-populated instance', async () => {
     const appDb = fakeDb({ instance_settings: [], instance_setup: [] });
-    const wrong = context(appDb);
-    wrong.request = new Request('https://hanji.example.com/api/functions/instance-bootstrap', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ action: 'completeSetup', setupCode: `${setupCode}x`, email, password }),
-    });
-    const wrongResponse = await handlerOf(POST)(wrong);
-    expect((wrongResponse as Response).status).toBe(403);
+    const disabled = { ...context(appDb), env: {} };
+    const disabledResponse = await handlerOf(POST)(disabled);
+    expect((disabledResponse as Response).status).toBe(409);
     expect(appDb.tables.instance_setup).toHaveLength(0);
 
     const occupied = context(appDb, [{ id: 'existing-user', email: 'existing@example.com' }]);

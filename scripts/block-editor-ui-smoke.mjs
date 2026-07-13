@@ -2,14 +2,20 @@
 
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { installBrowserSession, permanentlyDeletePage } from './lib/harness.mjs';
+import {
+  assertNoBrowserErrors,
+  installBrowserSession,
+  newCheckedPage,
+  permanentlyDeletePage,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const DEFAULT_TIMEOUT_MS = 20_000;
+const FILE_DROP_SCREENSHOT_DIR = join(root, '.edgebase', 'ui-discovery', 'file-drop');
 const SHORTCUT_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
 const options = parseArgs(process.argv.slice(2));
@@ -42,7 +48,7 @@ async function main() {
   try {
     await assertBlockEditorUi(browser, appUrl, apiUrl, seed);
     if (options.onlyFileDrop) {
-      console.log('PASS block editor external file drops upload through block rows and empty media cards.');
+      console.log('PASS block editor external file drops preserve block/canvas placement, order, progress, and media-card upload behavior.');
     } else if (options.onlyFocusFlow) {
       console.log('PASS block creation focus and Enter continuation work across representative block types.');
     } else if (options.onlySlashPageTitle) {
@@ -77,15 +83,21 @@ async function main() {
 }
 
 async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
-  const { context, page, errors } = await newCheckedPage(browser);
+  const { context, page, errors } = await newCheckedPage(browser, {}, { includeConsoleLocation: true });
   await seedSession(context, seed);
 
   try {
     await step('open seeded editor page', () => openPage(page, appUrl, seed));
     if (options.onlyFileDrop) {
       await step('drop an external file onto a block row', () => assertFileDropUpload(page, apiUrl, seed));
+      await step('drop multiple files between blocks through the editor canvas', () =>
+        assertEditorCanvasFileDrop(page, apiUrl, seed)
+      );
       await step('drop a video file onto an empty video card', () => assertMediaPlaceholderDropUpload(page, apiUrl, seed));
-      assertNoBrowserErrors(errors, 'block editor file drop flow');
+      assertNoBrowserErrors(
+        errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+        'block editor file drop flow',
+      );
       return;
     }
     if (options.onlyFocusFlow) {
@@ -684,6 +696,7 @@ async function assertFileDropUpload(page, baseUrl, seed) {
   await group.evaluate((element) => {
     const row = element.querySelector('[data-type]');
     if (!(row instanceof HTMLElement)) throw new Error('file drop row is missing');
+    const rect = row.getBoundingClientRect();
     const data = new DataTransfer();
     data.items.add(
       new File([new Uint8Array([0x78, 0x01, 0x73, 0x0d])], 'dragged-installer.dmg', {
@@ -696,6 +709,8 @@ async function assertFileDropUpload(page, baseUrl, seed) {
           bubbles: true,
           cancelable: true,
           dataTransfer: data,
+          clientX: rect.left + Math.min(80, rect.width / 2),
+          clientY: rect.top + rect.height / 2,
         }),
       );
     }
@@ -712,6 +727,228 @@ async function assertFileDropUpload(page, baseUrl, seed) {
       block.content.url.includes('/api/storage/files/'),
     'dragged DMG file upload',
   );
+}
+
+async function assertEditorCanvasFileDrop(page, baseUrl, seed) {
+  const autoScroll = await page.evaluate(() => {
+    const editor = document.querySelector('[data-editor-page]');
+    if (!(editor instanceof HTMLElement)) throw new Error('editor canvas is missing');
+    let scrollContainer = editor.parentElement;
+    while (scrollContainer) {
+      const style = getComputedStyle(scrollContainer);
+      if (
+        /(auto|scroll|overlay)/.test(style.overflowY) &&
+        scrollContainer.scrollHeight > scrollContainer.clientHeight + 1
+      ) {
+        break;
+      }
+      scrollContainer = scrollContainer.parentElement;
+    }
+    const scrollingElement = document.scrollingElement;
+    const maxScroll = scrollContainer
+      ? scrollContainer.scrollHeight - scrollContainer.clientHeight
+      : Math.max(0, (scrollingElement?.scrollHeight ?? 0) - window.innerHeight);
+    if (maxScroll <= 2) return { supported: false, before: 0, after: 0, maxScroll };
+    const start = Math.min(24, Math.max(0, maxScroll - 40));
+    if (scrollContainer) scrollContainer.scrollTop = start;
+    else window.scrollTo(0, start);
+    const viewport = scrollContainer?.getBoundingClientRect();
+    const before = scrollContainer?.scrollTop ?? window.scrollY;
+    const data = new DataTransfer();
+    data.items.add(new File([new Uint8Array([1])], 'auto-scroll-probe.txt', { type: 'text/plain' }));
+    editor.dispatchEvent(
+      new DragEvent('dragover', {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: data,
+        clientX: Math.max(1, editor.getBoundingClientRect().left + 8),
+        clientY: (viewport?.bottom ?? window.innerHeight) - 1,
+      }),
+    );
+    const after = scrollContainer?.scrollTop ?? window.scrollY;
+    editor.dispatchEvent(new DragEvent('dragleave', { bubbles: true, cancelable: true, dataTransfer: data }));
+    return { supported: true, before, after, maxScroll };
+  });
+  assert(
+    !autoScroll.supported || autoScroll.after > autoScroll.before,
+    `editor file drag must auto-scroll near the viewport edge; ${JSON.stringify(autoScroll)}`,
+  );
+
+  const anchorGroup = blockGroup(page, seed.blockIds.fileDrop);
+  await anchorGroup.scrollIntoViewIfNeeded();
+  await page.keyboard.press('Escape');
+  const dragGeometry = await anchorGroup.evaluate((element) => {
+    const row = element.querySelector(':scope > [data-type]');
+    const editor = element.closest('[data-editor-page]');
+    if (!(row instanceof HTMLElement) || !(editor instanceof HTMLElement)) {
+      throw new Error('editor canvas file-drop anchor is missing');
+    }
+    const rect = row.getBoundingClientRect();
+    const data = new DataTransfer();
+    const pngBytes = Uint8Array.from(
+      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+      (character) => character.charCodeAt(0),
+    );
+    data.items.add(new File([pngBytes], 'canvas-image.png', { type: 'image/png' }));
+    data.items.add(
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a])], 'canvas-notes.pdf', {
+        type: 'application/pdf',
+      }),
+    );
+    const clientX = rect.left + Math.min(96, rect.width / 2);
+    const clientY = rect.bottom + 4;
+    globalThis.__hanjiEditorFileDropSmoke = { clientX, clientY };
+    for (const type of ['dragenter', 'dragover']) {
+      editor.dispatchEvent(
+        new DragEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: data,
+          clientX,
+          clientY,
+        }),
+      );
+    }
+    return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, width: rect.width };
+  });
+
+  const indicator = page.locator('[data-editor-file-drop-indicator="after"]');
+  await indicator.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const indicatorGeometry = await indicator.boundingBox();
+  assert(indicatorGeometry, 'editor canvas file-drop insertion line must have geometry');
+  assert(
+    Math.abs(indicatorGeometry.y - dragGeometry.bottom) <= 3,
+    `file-drop insertion line must track the anchor boundary; line=${JSON.stringify(indicatorGeometry)} anchor=${JSON.stringify(dragGeometry)}`,
+  );
+  assert(
+    indicatorGeometry.height >= 1 && indicatorGeometry.height <= 3,
+    `file-drop insertion line must stay quiet and compact; height=${indicatorGeometry.height}`,
+  );
+  assert(
+    indicatorGeometry.width >= dragGeometry.width * 0.9,
+    `file-drop insertion line must span the block row; line=${indicatorGeometry.width}, row=${dragGeometry.width}`,
+  );
+
+  mkdirSync(FILE_DROP_SCREENSHOT_DIR, { recursive: true });
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-canvas-insertion-line.png') });
+  writeFileSync(
+    join(FILE_DROP_SCREENSHOT_DIR, 'editor-canvas-insertion-line.json'),
+    `${JSON.stringify(
+      {
+        reference: 'current Notion-normalized quiet insertion-line contract',
+        state: 'external image and file hovering between two populated blocks',
+        anchor: dragGeometry,
+        indicator: indicatorGeometry,
+        placement: 'after',
+        files: ['canvas-image.png', 'canvas-notes.pdf'],
+        autoScroll,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  const storageRoute = '**/api/storage/files/**';
+  let delayedStorageUpload = false;
+  const delayFirstStorageUpload = async (route) => {
+    if (!delayedStorageUpload && route.request().method() === 'POST') {
+      delayedStorageUpload = true;
+      await delay(700);
+    }
+    await route.continue();
+  };
+  await page.route(storageRoute, delayFirstStorageUpload);
+  const dropResult = await page.evaluate(() => {
+    const transfer = globalThis.__hanjiEditorFileDropSmoke;
+    const editor = document.querySelector('[data-editor-page]');
+    if (!transfer || !(editor instanceof HTMLElement)) throw new Error('editor canvas drop transfer is missing');
+    const data = new DataTransfer();
+    const pngBytes = Uint8Array.from(
+      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+      (character) => character.charCodeAt(0),
+    );
+    data.items.add(new File([pngBytes], 'canvas-image.png', { type: 'image/png' }));
+    data.items.add(
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a])], 'canvas-notes.pdf', {
+        type: 'application/pdf',
+      }),
+    );
+    const event = new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: data,
+      clientX: transfer.clientX,
+      clientY: transfer.clientY,
+    });
+    editor.dispatchEvent(event);
+    delete globalThis.__hanjiEditorFileDropSmoke;
+    return { defaultPrevented: event.defaultPrevented, fileCount: data.files.length, types: Array.from(data.types) };
+  });
+  assert(
+    dropResult.defaultPrevented && dropResult.fileCount === 2 && dropResult.types.includes('Files'),
+    `editor canvas drop event must be accepted with both files; ${JSON.stringify(dropResult)}`,
+  );
+
+  const progressCard = page.locator('[data-editor-file-upload]').first();
+  await progressCard.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const progressGeometry = await progressCard.boundingBox();
+  const progressText = ((await progressCard.textContent()) ?? '').trim();
+  const progressValue = await progressCard.getByRole('progressbar').getAttribute('aria-valuenow');
+  const viewportWidth = page.viewportSize()?.width ?? 1280;
+  assert(progressGeometry, 'editor file upload progress must have geometry');
+  assert(
+    progressGeometry.width <= 340 && progressGeometry.x + progressGeometry.width <= viewportWidth,
+    `editor file upload progress must stay compact and inside the viewport; ${JSON.stringify(progressGeometry)}`,
+  );
+  assert(progressText.includes('canvas-image.png'), `upload progress must name the active file; text=${progressText}`);
+  assert(Number.isFinite(Number(progressValue)), `upload progress must expose a numeric value; value=${progressValue}`);
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-upload-progress.png') });
+  writeFileSync(
+    join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-upload-progress.json'),
+    `${JSON.stringify(
+      {
+        state: 'first of two dropped files uploading',
+        geometry: progressGeometry,
+        text: progressText,
+        percent: Number(progressValue),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  await page.unroute(storageRoute, delayFirstStorageUpload);
+
+  const blocks = await waitForBlocks(
+    baseUrl,
+    seed,
+    (current) => {
+      const image = current.find((block) => block.content?.fileName === 'canvas-image.png');
+      const file = current.find((block) => block.content?.fileName === 'canvas-notes.pdf');
+      return (
+        image?.type === 'image' &&
+        file?.type === 'file' &&
+        image.content?.url?.includes('/api/storage/files/') &&
+        file.content?.url?.includes('/api/storage/files/')
+      );
+    },
+    'editor canvas multi-file drop',
+  );
+  const topLevel = blocks
+    .filter((block) => block.parentId == null)
+    .sort((a, b) => Number(a.position ?? 0) - Number(b.position ?? 0));
+  const anchorIndex = topLevel.findIndex((block) => block.id === seed.blockIds.fileDrop);
+  const imageIndex = topLevel.findIndex((block) => block.content?.fileName === 'canvas-image.png');
+  const fileIndex = topLevel.findIndex((block) => block.content?.fileName === 'canvas-notes.pdf');
+  const followingIndex = topLevel.findIndex((block) => block.id === seed.blockIds.richInlinePaste);
+  assert(
+    anchorIndex >= 0 && imageIndex === anchorIndex + 1 && fileIndex === imageIndex + 1 && followingIndex === fileIndex + 1,
+    `editor canvas drop must preserve insertion point and file order; indices=${JSON.stringify({ anchorIndex, imageIndex, fileIndex, followingIndex })}`,
+  );
+  await page.getByText('canvas-notes.pdf', { exact: true }).waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-drop-complete.png') });
 }
 
 async function assertMediaPlaceholderDropUpload(page, baseUrl, seed) {
@@ -3001,32 +3238,6 @@ async function seedSession(context, seed) {
   });
 }
 
-async function newCheckedPage(browser) {
-  const context = await browser.newContext();
-  // Smokes own their sign-in state: keep the dev runtime's master
-  // auto-login (HANJI_MASTER_DEV_AUTOLOGIN) from racing this script.
-  await context.addInitScript(() => {
-    try {
-      window.localStorage.setItem('hanji:disable-master-autologin', '1');
-    } catch {
-      // Storage unavailable: the smoke controls auth through its own flow.
-    }
-  });
-  const page = await context.newPage();
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
-  return { context, page, errors };
-}
-
-function assertNoBrowserErrors(errors, label) {
-  if (errors.length) {
-    throw new Error(`Browser errors while checking ${label}:\n- ${errors.join('\n- ')}`);
-  }
-}
-
 function isExpectedExternalEmbedBrowserMessage(message) {
   return (
     message.includes('Failed to load resource:') ||
@@ -3264,7 +3475,7 @@ Options:
   --url <url>             App URL. Defaults to HANJI_EDGEBASE_URL or ${DEFAULT_BASE_URL}.
   --api-url <url>         EdgeBase API URL. Defaults to HANJI_EDGEBASE_API_URL or ${DEFAULT_BASE_URL}.
   --timeout-ms <number>   Browser/action timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
-  --only-file-drop        Check only external file drag/drop onto a block row.
+  --only-file-drop        Check external file drops on block rows, canvas boundaries, and media cards.
   --only-focus-flow       Check block creation focus and Enter continuation only.
   --only-embed-caption-slash
                           Check default-hidden embed captions and next-line slash continuation.

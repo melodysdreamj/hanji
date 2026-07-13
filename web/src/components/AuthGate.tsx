@@ -271,7 +271,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [resetToken, setResetToken] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [resetPasswordConfirm, setResetPasswordConfirm] = useState("");
-  const [setupCode, setSetupCode] = useState("");
   const [setupPasswordConfirm, setSetupPasswordConfirm] = useState("");
   const [authActionResult, setAuthActionResult] = useState<string | null>(null);
   const [mfaChallenge, setMfaChallenge] = useState<MfaChallenge | null>(null);
@@ -667,10 +666,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   async function submitInstanceSetup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (setupCode.trim().length < 24) {
-      setError(t("authGate:setupCodeRequired"));
-      return;
-    }
     if (!EMAIL_RE.test(normalizedEmail)) {
       setError(t("authGate:enterValidEmail"));
       return;
@@ -692,7 +687,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       await initializeInstanceRemote({
-        setupCode: setupCode.trim(),
         email: normalizedEmail,
         password,
         displayName: displayName.trim() || undefined,
@@ -701,7 +695,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       if (result.status === "mfa_required") {
         throw new Error("A new setup account unexpectedly requires MFA.");
       }
-      setSetupCode("");
       setSetupPasswordConfirm("");
       setPassword("");
       setStep("signed-in");
@@ -709,9 +702,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       const status = typeof err === "object" && err !== null
         ? (err as { status?: unknown }).status
         : undefined;
-      if (status === 403) {
-        setError(t("authGate:setupInvalidCode"));
-      } else if (status === 409) {
+      if (status === 409) {
         const current = await fetchInstanceBootstrapRemote();
         if (!current?.setupAvailable) setStep("email");
         setError(t("authGate:setupAlreadyComplete"));
@@ -885,19 +876,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               <strong>{t("authGate:setupTitle")}</strong>
               <p>{t("authGate:setupBody")}</p>
             </div>
-            <label className={styles.label} htmlFor="setup-code">{t("authGate:setupCode")}</label>
-            <input
-              id="setup-code"
-              className={styles.input}
-              type="password"
-              autoComplete="one-time-code"
-              value={setupCode}
-              onChange={(event) => setSetupCode(event.target.value)}
-              placeholder={t("authGate:setupCodePlaceholder")}
-              disabled={busy}
-              autoFocus
-            />
-            <p className={styles.fieldHelp}>{t("authGate:setupCodeHint")}</p>
             <label className={styles.label} htmlFor="setup-display-name">{t("authGate:name")}</label>
             <input
               id="setup-display-name"
@@ -908,6 +886,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               onChange={(event) => setDisplayName(event.target.value)}
               placeholder={t("authGate:namePlaceholder")}
               disabled={busy}
+              autoFocus
             />
             <label className={styles.label} htmlFor="setup-email">{t("authGate:administratorEmail")}</label>
             <input

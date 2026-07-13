@@ -32,6 +32,7 @@ import {
 } from "@/lib/collaborationCrdt";
 import { pageHref } from "@/lib/navigation";
 import { pageDisplayTitle } from "@/lib/pageTitle";
+import { uploadWorkspaceFile } from "@/lib/storage";
 import { hasStoredFileReference } from "@/lib/storedFileReferences";
 import {
   PAGE_CRDT_UPDATE_RECEIVED_EVENT,
@@ -78,6 +79,17 @@ import {
   selectEditableRange,
   selectionOffsetsIn,
 } from "./focus";
+import {
+  blockUploadErrorMessage,
+  blockUploadProgressLabel,
+  blockUploadScope,
+  dataTransferHasFiles,
+  droppedFiles,
+  fileBlockType,
+  fileDragAutoScrollDelta,
+  type BlockUploadProgress,
+  type FileDropPlacement,
+} from "./fileDrop";
 import { coalesce, concatSpans, spansToHtml } from "./richtext";
 import { BlockItem } from "./BlockItem";
 import { BlockIcon } from "./BlockIcon";
@@ -347,6 +359,11 @@ export interface EditorOps {
   moveSelectedBlocksTo: (id: string, targetId: string, placement: "before" | "after" | "inside") => boolean;
   copySelectedBlocksTo: (id: string, targetId: string, placement: "before" | "after" | "inside") => Block[];
   moveSelectedBlocksToPage: (id: string, targetPageId: string) => Promise<boolean>;
+  uploadDroppedFiles: (
+    files: File[],
+    targetId: string | null,
+    placement: FileDropPlacement
+  ) => Promise<void>;
   insertAfter: (id: string, type?: BlockType) => Block | undefined;
   insertChildBlock: (parentId: string, type?: BlockType) => Block | undefined;
   replaceWithBlocks: (id: string, blocks: PastedBlock[]) => void;
@@ -685,6 +702,47 @@ function EditorContentLoadingFallback() {
   );
 }
 
+type EditorFileDropIndicator = {
+  targetId: string | null;
+  placement: FileDropPlacement;
+  top: number;
+  left: number;
+  width: number;
+};
+
+function EditorFileUploadProgress({
+  blockId,
+  progress,
+}: {
+  blockId: string;
+  progress: BlockUploadProgress;
+}) {
+  return (
+    <div
+      className={styles.editorFileUploadProgress}
+      data-editor-file-upload={blockId}
+      role="status"
+      aria-live="polite"
+    >
+      <div className={styles.editorFileUploadProgressHeader}>
+        <strong>{blockUploadProgressLabel(progress)}</strong>
+        <span>{progress.percent}%</span>
+      </div>
+      <div className={styles.editorFileUploadProgressName}>{progress.fileName}</div>
+      <div
+        className={styles.editorFileUploadProgressTrack}
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress.percent}
+        aria-label={i18next.t("blockItem:uploadingFile", { fileName: progress.fileName })}
+      >
+        <span style={{ width: `${progress.percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export function Editor({
   pageId,
   collaborationStatus,
@@ -734,6 +792,10 @@ export function Editor({
   const [dismissedStarterBlockId, setDismissedStarterBlockId] = useState<string | null>(null);
   const [blockActionMenuFor, setBlockActionMenuFor] = useState<string | null>(null);
   const [moveDialogFor, setMoveDialogFor] = useState<string | null>(null);
+  const [fileDropIndicator, setFileDropIndicator] = useState<EditorFileDropIndicator | null>(null);
+  const [fileUploadProgressByBlock, setFileUploadProgressByBlock] = useState<
+    Record<string, BlockUploadProgress>
+  >({});
   // The moving endpoint of a Shift+Arrow selection (handler-only, never read in render).
   const selectionFocusRef = useRef<string | null>(null);
   // Mutable state of an in-progress rubber-band drag (viewport coords). Held in a
@@ -2216,6 +2278,260 @@ export function Editor({
     focusPageEnd();
   }
 
+  function updateFileUploadProgress(blockId: string, progress: BlockUploadProgress | null) {
+    setFileUploadProgressByBlock((current) => {
+      if (!progress) {
+        if (!(blockId in current)) return current;
+        const next = { ...current };
+        delete next[blockId];
+        return next;
+      }
+      return { ...current, [blockId]: progress };
+    });
+  }
+
+  function insertDroppedFileBlock(
+    anchorId: string | null,
+    placement: Exclude<FileDropPlacement, "replace">,
+    type: Extract<BlockType, "image" | "video" | "audio" | "file">,
+    fileName: string
+  ) {
+    const st = useStore.getState();
+    const anchor = anchorId ? blockById(anchorId) : undefined;
+    const parentId = anchor?.parentId ?? null;
+    const list = siblings(parentId);
+    const anchorIndex = anchor ? list.findIndex((candidate) => candidate.id === anchor.id) : -1;
+    const before =
+      anchorIndex < 0
+        ? list.at(-1)
+        : placement === "before"
+          ? list[anchorIndex - 1]
+          : anchor;
+    const after =
+      anchorIndex < 0
+        ? undefined
+        : placement === "before"
+          ? anchor
+          : list[anchorIndex + 1];
+    let inserted: Block | undefined;
+    flushSync(() => {
+      inserted = st.addBlockLocal({
+        pageId,
+        parentId,
+        type,
+        content: { fileName, caption: [] },
+        plainText: fileName,
+        position: positionBetween(before?.position, after?.position),
+        persist: false,
+      });
+    });
+    return inserted;
+  }
+
+  async function uploadDroppedFiles(
+    incomingFiles: File[],
+    targetId: string | null,
+    initialPlacement: FileDropPlacement
+  ) {
+    if (readOnly) return;
+    const files = incomingFiles.filter((file) => file.size > 0);
+    if (files.length === 0) return;
+
+    let anchorId = targetId;
+    let placement = initialPlacement;
+    let replaceCurrent = placement === "replace" && !!targetId;
+    let uploadedCount = 0;
+    let lastUploadedId: string | null = null;
+
+    for (const file of files) {
+      const type = fileBlockType(file);
+      let uploadBlockId = anchorId;
+      let insertedForUpload: Block | undefined;
+
+      if (!replaceCurrent) {
+        const inserted = insertDroppedFileBlock(
+          anchorId,
+          placement === "before" ? "before" : "after",
+          type,
+          file.name
+        );
+        if (!inserted) continue;
+        uploadBlockId = inserted.id;
+        insertedForUpload = inserted;
+      }
+      if (!uploadBlockId) continue;
+
+      const fallbackName = file.name || type;
+      updateFileUploadProgress(uploadBlockId, {
+        phase: "preparing",
+        percent: 0,
+        fileName: fallbackName,
+      });
+
+      try {
+        if (insertedForUpload) {
+          await useStore.getState().persistBlockCreateBatch([insertedForUpload]);
+        }
+        const uploaded = await uploadWorkspaceFile(
+          file,
+          blockUploadScope(type),
+          { pageId, blockId: uploadBlockId },
+          {
+            onProgress: (progress) =>
+              updateFileUploadProgress(uploadBlockId!, { ...progress, fileName: fallbackName }),
+          }
+        );
+        const plainText = file.name || uploaded.name || type;
+        useStore.getState().updateBlock(uploadBlockId, {
+          type,
+          content: {
+            url: uploaded.url,
+            fileName: file.name || uploaded.name || plainText,
+            caption: [],
+          },
+          plainText,
+        });
+        uploadedCount += 1;
+        lastUploadedId = uploadBlockId;
+        anchorId = uploadBlockId;
+        placement = "after";
+        replaceCurrent = false;
+      } catch (error) {
+        if (insertedForUpload) {
+          await useStore.getState().deleteBlock(uploadBlockId).catch(() => {});
+        }
+        useStore.getState().notify(blockUploadErrorMessage(error, file.name), "error");
+      } finally {
+        updateFileUploadProgress(uploadBlockId, null);
+      }
+    }
+
+    if (uploadedCount > 0 && lastUploadedId) {
+      setSelectedBlockId(lastUploadedId);
+      useStore.getState().notify(
+        uploadedCount === 1
+          ? i18next.t("blockItem:uploadedFile")
+          : i18next.t("blockItem:uploadedFiles", { count: uploadedCount }),
+        "success"
+      );
+    }
+  }
+
+  function editorCanvasFileDropTarget(clientY: number): EditorFileDropIndicator {
+    const root = editorRef.current;
+    if (!root) {
+      return { targetId: null, placement: "after", top: 0, left: 0, width: 0 };
+    }
+    const rootRect = root.getBoundingClientRect();
+    const rows = Array.from(root.children)
+      .filter((element): element is HTMLElement => element instanceof HTMLElement)
+      .map((group) => {
+        const targetId = group.dataset.blockId;
+        const row = group.querySelector<HTMLElement>(":scope > [data-type]");
+        return targetId && row ? { targetId, rect: row.getBoundingClientRect() } : null;
+      })
+      .filter((entry): entry is { targetId: string; rect: DOMRect } => !!entry)
+      .sort((a, b) => a.rect.top - b.rect.top);
+
+    if (rows.length === 0) {
+      return {
+        targetId: null,
+        placement: "after",
+        top: Math.max(2, clientY - rootRect.top),
+        left: 0,
+        width: rootRect.width,
+      };
+    }
+
+    const first = rows[0];
+    if (clientY <= first.rect.top + first.rect.height * 0.5) {
+      return {
+        targetId: first.targetId,
+        placement: "before",
+        top: first.rect.top - rootRect.top,
+        left: first.rect.left - rootRect.left,
+        width: first.rect.width,
+      };
+    }
+
+    for (let index = 0; index < rows.length - 1; index += 1) {
+      const current = rows[index];
+      const next = rows[index + 1];
+      if (clientY <= next.rect.top + next.rect.height * 0.5) {
+        return {
+          targetId: current.targetId,
+          placement: "after",
+          top: current.rect.bottom - rootRect.top,
+          left: current.rect.left - rootRect.left,
+          width: current.rect.width,
+        };
+      }
+    }
+
+    const last = rows.at(-1)!;
+    const lastBlock = blockById(last.targetId);
+    const replaceLast = isEmptyParagraph(lastBlock) && siblings(last.targetId).length === 0;
+    return {
+      targetId: last.targetId,
+      placement: replaceLast ? "replace" : "after",
+      top: last.rect.bottom - rootRect.top,
+      left: last.rect.left - rootRect.left,
+      width: last.rect.width,
+    };
+  }
+
+  function autoScrollFileDrag(clientY: number) {
+    const root = editorRef.current;
+    if (!root) return;
+    let scrollContainer: HTMLElement | null = root.parentElement;
+    while (scrollContainer) {
+      const style = window.getComputedStyle(scrollContainer);
+      if (
+        /(auto|scroll|overlay)/.test(style.overflowY) &&
+        scrollContainer.scrollHeight > scrollContainer.clientHeight + 1
+      ) {
+        break;
+      }
+      scrollContainer = scrollContainer.parentElement;
+    }
+    const viewport = scrollContainer?.getBoundingClientRect();
+    const delta = fileDragAutoScrollDelta(
+      clientY,
+      viewport?.top ?? 0,
+      viewport?.bottom ?? window.innerHeight
+    );
+    if (delta === 0) return;
+    if (scrollContainer) scrollContainer.scrollBy({ top: delta });
+    else window.scrollBy({ top: delta });
+  }
+
+  function onEditorFileDragOverCapture(e: React.DragEvent<HTMLDivElement>) {
+    if (readOnly || !dataTransferHasFiles(e.dataTransfer)) return;
+    autoScrollFileDrag(e.clientY);
+    if ((e.target as HTMLElement).closest("[data-block-id]")) setFileDropIndicator(null);
+  }
+
+  function onEditorFileDragOver(e: React.DragEvent<HTMLDivElement>) {
+    if (readOnly || !dataTransferHasFiles(e.dataTransfer)) return;
+    if ((e.target as HTMLElement).closest("[data-block-id]")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+    setFileDropIndicator(editorCanvasFileDropTarget(e.clientY));
+  }
+
+  function onEditorFileDrop(e: React.DragEvent<HTMLDivElement>) {
+    if (readOnly || !dataTransferHasFiles(e.dataTransfer)) return;
+    if ((e.target as HTMLElement).closest("[data-block-id]")) return;
+    const files = droppedFiles(e.dataTransfer);
+    if (files.length === 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const target = fileDropIndicator ?? editorCanvasFileDropTarget(e.clientY);
+    setFileDropIndicator(null);
+    void uploadDroppedFiles(files, target.targetId, target.placement);
+  }
+
   // Update the multi-selection to every block row whose DOM rect intersects the
   // given viewport rectangle. Runs only from pointer handlers.
   function selectBlocksInRect(rect: {
@@ -3478,6 +3794,8 @@ export function Editor({
       return true;
     },
 
+    uploadDroppedFiles,
+
     insertAfter(id, type = "paragraph") {
       if (readOnly) return undefined;
       const st = useStore.getState();
@@ -4298,6 +4616,8 @@ export function Editor({
         opsRef.current.copySelectedBlocksTo(id, targetId, placement),
       moveSelectedBlocksToPage: (id, targetPageId) =>
         opsRef.current.moveSelectedBlocksToPage(id, targetPageId),
+      uploadDroppedFiles: (files, targetId, placement) =>
+        opsRef.current.uploadDroppedFiles(files, targetId, placement),
       insertAfter: (id, type) => opsRef.current.insertAfter(id, type),
       insertChildBlock: (parentId, type) => opsRef.current.insertChildBlock(parentId, type),
       replaceWithBlocks: (id, pasted) => opsRef.current.replaceWithBlocks(id, pasted),
@@ -4345,10 +4665,18 @@ export function Editor({
       data-editor-page={pageId}
       data-page-starter-visible={pageStarterVisible ? "true" : undefined}
       data-empty-body-prompt-visible={emptyBodyPromptVisible ? "true" : undefined}
+      data-file-drop-active={fileDropIndicator ? "true" : undefined}
       role="region"
       aria-label={t("editor:content.pageBody")}
       onMouseDown={onEditorBlankMouseDown}
       onPointerDown={onEditorPointerDown}
+      onDragOverCapture={onEditorFileDragOverCapture}
+      onDragOver={onEditorFileDragOver}
+      onDragLeave={(e) => {
+        if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+        setFileDropIndicator(null);
+      }}
+      onDrop={onEditorFileDrop}
     >
       {contentLoadingVisible && <EditorContentLoadingFallback />}
       {blocks.map((b) => (
@@ -4367,6 +4695,18 @@ export function Editor({
           }
         />
       ))}
+      {fileDropIndicator && (
+        <div
+          className={styles.editorFileDropIndicator}
+          data-editor-file-drop-indicator={fileDropIndicator.placement}
+          aria-hidden="true"
+          style={{
+            top: fileDropIndicator.top,
+            left: fileDropIndicator.left,
+            width: fileDropIndicator.width,
+          }}
+        />
+      )}
       {pageStarterVisible && pagePlaceholderBlockId && (
         <PageStarter
           ops={ops}
@@ -4375,6 +4715,17 @@ export function Editor({
         />
       )}
       <div className={styles.editorTail} data-editor-tail aria-hidden="true" />
+      {Object.keys(fileUploadProgressByBlock).length > 0 && (
+        <div className={styles.editorFileUploadQueue}>
+          {Object.entries(fileUploadProgressByBlock).map(([blockId, progress]) => (
+            <EditorFileUploadProgress
+              key={blockId}
+              blockId={blockId}
+              progress={progress}
+            />
+          ))}
+        </div>
+      )}
       {marquee && (
         <div
           className={styles.selectionMarquee}

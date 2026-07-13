@@ -245,7 +245,6 @@ export interface InstanceBootstrapStatus {
   masterReady: boolean;
   setupBlocked: boolean;
   setupAvailable: boolean;
-  setupCodeRequired: boolean;
   setupInProgress: boolean;
 }
 
@@ -267,7 +266,6 @@ export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapS
       masterReady: json.masterReady === true,
       setupBlocked: json.setupBlocked === true,
       setupAvailable: json.setupAvailable === true,
-      setupCodeRequired: json.setupCodeRequired === true,
       setupInProgress: json.setupInProgress === true,
     };
   } catch {
@@ -276,13 +274,12 @@ export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapS
 }
 
 export interface InitializeInstanceInput {
-  setupCode: string;
   email: string;
   password: string;
   displayName?: string;
 }
 
-/** Complete the one-time, setup-code-protected first administrator claim. */
+/** Complete the one-time, durable first-administrator claim. */
 export async function initializeInstanceRemote(input: InitializeInstanceInput): Promise<void> {
   const response = await fetch(`${EDGEBASE_URL}/api/functions/instance-bootstrap`, {
     method: "POST",
@@ -1331,6 +1328,8 @@ export interface ApplyNotionImportJobInput {
   notionToken?: string;
   connectionId?: string;
   importPagesFullWidth?: boolean;
+  applyPageBatchSize?: number;
+  applyDatabaseBatchSize?: number;
 }
 
 export interface NotionImportAppliedMapping {
@@ -1342,11 +1341,13 @@ export interface NotionImportAppliedMapping {
 export async function applyNotionImportJobRemote(input: string | ApplyNotionImportJobInput): Promise<NotionImportJobResult & {
   applied?: Record<string, number>;
   mappings?: NotionImportAppliedMapping[];
+  partial?: boolean;
 }> {
   const body = typeof input === "string" ? { jobId: input } : input;
   return getClient().functions.post<NotionImportJobResult & {
     applied?: Record<string, number>;
     mappings?: NotionImportAppliedMapping[];
+    partial?: boolean;
   }>("notion-import", {
     action: "apply",
     ...body,
