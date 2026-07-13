@@ -19,6 +19,32 @@ import {
 import { fakeDb, type Row } from './helpers/fake-db';
 import { callFunction, expectErrorResponse, handlerOf } from './helpers/function-context';
 
+const notionImportSource = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../functions/notion-import.ts'),
+  'utf8',
+);
+
+describe('Notion incremental discovery live progress', () => {
+  it('persists the current pending-enrichment count during a chunk', () => {
+    expect(notionImportSource).toContain('pendingEnrichment: snapshot.pendingEnrichment');
+    expect(notionImportSource).toContain("item.notionObject === 'page' && !hasPageSnapshot(item)");
+  });
+});
+
+describe('Notion import completion markers', () => {
+  it('hands relation remapping the page only after block-completion markers are durable', () => {
+    const pageCreation = notionImportSource.indexOf('const insertedBlocks = await insertPageBlocksFromSnapshot(');
+    const completion = notionImportSource.indexOf('page = await markImportedBlocksComplete(db, page);', pageCreation);
+    const pageContext = notionImportSource.indexOf('importedPageBlockContexts.push({ page, notionId: item.notionId });', completion);
+    const rowContext = notionImportSource.indexOf('importedRowContexts.push({ page, dataSourceId: sourceId, notionId: item.notionId });', completion);
+
+    expect(pageCreation).toBeGreaterThanOrEqual(0);
+    expect(completion).toBeGreaterThan(pageCreation);
+    expect(pageContext).toBeGreaterThan(completion);
+    expect(rowContext).toBeGreaterThan(completion);
+  });
+});
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const isoAgo = (ms: number) => new Date(Date.now() - ms).toISOString();
 
@@ -479,6 +505,34 @@ describe('apply lease and mapping idempotency', () => {
     };
   }
 
+  it('reads first-generation import rows without issuing a nullable generation filter', async () => {
+    const legacyItem = discoveredPage();
+    const getList = vi.fn(async () => ({ items: [legacyItem], hasMore: false }));
+    const query = {
+      where: vi.fn(() => {
+        throw new Error('nullable generation filter must not be issued');
+      }),
+      page: vi.fn(() => query),
+      limit: vi.fn(() => query),
+      getList,
+    };
+    const table = {
+      where: vi.fn((field: string) => {
+        expect(field).toBe('jobId');
+        return query;
+      }),
+    };
+
+    const items = await listActiveNotionImportItems(
+      { table: vi.fn(() => table) } as never,
+      job('job-1') as unknown as NotionImportJob,
+    );
+
+    expect(items).toEqual([legacyItem]);
+    expect(query.where).not.toHaveBeenCalled();
+    expect(getList).toHaveBeenCalledTimes(1);
+  });
+
   it('allows only one concurrent apply and creates one native graph', async () => {
     const db = workspaceDb({
       notion_import_jobs: [job('job-1')],
@@ -502,6 +556,38 @@ describe('apply lease and mapping idempotency', () => {
     expect(new Set(db.tables.notion_import_mappings.map((mapping) => mapping.mappingKey)).size).toBe(2);
     expect(db.tables.notion_import_apply_locks).toHaveLength(0);
     expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+  });
+
+  it('cancels a stranded discovery and removes its job-scoped lease immediately', async () => {
+    const discoveringJob = job('job-1', {
+      status: 'discovering',
+      phase: 'api_search',
+      progress: { currentStatus: 'running' },
+    });
+    const db = workspaceDb({
+      notion_import_jobs: [discoveringJob],
+      notion_import_apply_locks: [{
+        id: 'job-1',
+        workspaceId: 'ws-1',
+        jobId: 'job-1',
+        leaseId: 'stranded-lease',
+        actorId: 'owner-1',
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      }],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'cancel',
+      jobId: 'job-1',
+      workspaceId: 'ws-1',
+    });
+
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0]).toMatchObject({
+      status: 'cancelled',
+      phase: 'cancelled',
+    });
+    expect(db.tables.notion_import_apply_locks).toHaveLength(0);
   });
 
   it('applies only the active generation when stale rows remain physically present', async () => {
@@ -1939,11 +2025,32 @@ describe('discovery progress writes cannot land after the terminal update (#11)'
 
   it('single-flights discovery and never overwrites a concurrent cancel', () => {
     expect(source).toContain("acquireNotionApplyLease(db, job, actorId, 'discover')");
+    expect(source).toContain('NOTION_DISCOVER_LEASE_TTL_MS = 90 * 1000');
+    expect(source).toContain("'already being discovered'");
     expect(source).toContain("updateNotionJobIfStatus(db, job.id, 'discovering'");
     const cancelStart = source.indexOf('async function cancelJob(');
     const cancelEnd = source.indexOf('async function retryJob(', cancelStart);
     const cancelBody = source.slice(cancelStart, cancelEnd);
     expect(cancelBody).toContain('updateNotionJobIfStatus(db, job.id, job.status');
+    expect(cancelBody).toContain("db.table<NotionImportApplyLock>('notion_import_apply_locks').delete(job.id)");
+  });
+
+  it('declares the persisted lease purpose used by discovery lock transactions', () => {
+    const configSource = readFileSync(
+      resolve(dirname(fileURLToPath(import.meta.url)), '../../edgebase.config.ts'),
+      'utf8',
+    );
+    const lockStart = configSource.indexOf('notion_import_apply_locks:');
+    const lockEnd = configSource.indexOf('// ─── Comments', lockStart);
+    expect(configSource.slice(lockStart, lockEnd)).toContain(
+      "purpose: { type: 'string', default: 'apply' }",
+    );
+  });
+
+  it('keeps selected-root discovery recursive across linked graph references', () => {
+    expect(source).not.toContain('if (rootScopedDiscovery) return;');
+    expect(source).toMatch(/for \(const target of dataSourceSnapshot\.relationTargetReferences\)/);
+    expect(source).toMatch(/for \(const pageId of notionPageIdsFromViewFilters/);
   });
 
   it('applies a finite deadline to every imported-file fetch', () => {

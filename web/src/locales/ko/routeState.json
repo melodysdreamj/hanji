@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "주소가 올바르지 않습니다.",
+  "invalidBody": "링크에 빠졌거나 잘못된 문자가 없는지 확인한 뒤 다시 시도하세요.",
+  "notFoundTitle": "페이지를 찾을 수 없습니다.",
+  "notFoundBody": "이 주소와 일치하는 Hanji 페이지가 없습니다. 페이지가 이동했거나 삭제되었을 수 있습니다.",
+  "sharedTitle": "공유 링크가 올바르지 않습니다.",
+  "sharedBody": "공유 링크 전체가 정확히 복사되었는지 확인한 뒤 다시 시도하세요.",
+  "openHome": "Hanji 홈 열기"
+}

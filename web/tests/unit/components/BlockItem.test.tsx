@@ -288,6 +288,61 @@ describe("BlockItem keyboard behaviors", () => {
     expect(pageBlocks()[0].plainText).toBe("Hello world");
   });
 
+  it("selects a preceding embed after removing its empty paragraph, then deletes it", async () => {
+    const { container } = renderEditor([
+      makeBlock(PAGE_ID, {
+        id: "embed-before-empty",
+        type: "embed",
+        position: 0,
+        content: { url: "https://example.com/embed" },
+      }),
+      textBlock(PAGE_ID, "empty-after-embed", "", { position: 1 }),
+    ]);
+    const emptyParagraph = editableFor("Text block text");
+    placeCaretAt(emptyParagraph, 0);
+
+    fireEvent.keyDown(emptyParagraph, { key: "Backspace" });
+
+    await waitFor(() => expect(pageBlocks().map((block) => block.id)).toEqual(["embed-before-empty"]));
+    const selectedEmbed = container.querySelector<HTMLElement>(
+      '[data-block-id="embed-before-empty"] [data-selected="true"]'
+    );
+    expect(selectedEmbed).toBeTruthy();
+
+    fireEvent.keyDown(selectedEmbed!, { key: "Backspace" });
+
+    await waitFor(() =>
+      expect(pageBlocks().some((block) => block.id === "embed-before-empty")).toBe(false)
+    );
+    expect(pageBlocks()).toHaveLength(1);
+    expect(pageBlocks()[0].type).toBe("paragraph");
+    expect(pageBlocks()[0].plainText ?? "").toBe("");
+  });
+
+  it("selects a preceding non-text block without deleting a non-empty paragraph", () => {
+    const { container } = renderEditor([
+      makeBlock(PAGE_ID, {
+        id: "divider-before-text",
+        type: "divider",
+        position: 0,
+      }),
+      textBlock(PAGE_ID, "text-after-divider", "Keep this text", { position: 1 }),
+    ]);
+    const paragraph = editableFor("Text block text");
+    placeCaretAt(paragraph, 0);
+
+    fireEvent.keyDown(paragraph, { key: "Backspace" });
+
+    expect(pageBlocks().map((block) => block.id)).toEqual([
+      "divider-before-text",
+      "text-after-divider",
+    ]);
+    expect(pageBlocks()[1].plainText).toBe("Keep this text");
+    expect(
+      container.querySelector('[data-block-id="divider-before-text"] [data-selected="true"]')
+    ).toBeTruthy();
+  });
+
   it("opens the slash menu when the caret follows a slash and filters commands", () => {
     renderEditor([textBlock(PAGE_ID, "b1", "", { position: 0 })]);
     const editable = editableFor("Text block text");

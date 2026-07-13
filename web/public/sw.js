@@ -9,9 +9,11 @@
 //   assets are content-hashed, so cache-first is safe; non-hashed statics
 //   converge on the next online load.
 //
-// The build-generated precache includes the app shell, entry graph, and boot
-// locale chunks. A first successful online visit is therefore reloadable
-// offline as soon as the worker finishes installation.
+// Installation fetches only the build-generated boot graph. The complete
+// product graph warms after activation through a client message or an online
+// navigation, and only then atomically replaces the offline shell. This keeps
+// installation responsive without ever publishing a shell whose lazy chunks
+// are incomplete.
 
 const CACHE_PREFIX = "hanji-sw-";
 // Compatibility only: validate and hand off pre-Hanji immutable assets. If
@@ -21,6 +23,9 @@ const LEGACY_CACHE_PREFIX = "notionlike-sw-";
 const CACHE = `${CACHE_PREFIX}v2`;
 const SHELL_KEY = "/__hanji_shell__";
 const PRECACHE_MANIFEST_KEY = "/__hanji_precache__";
+const BOOT_MANIFEST_KEY = "/__hanji_boot__";
+const BOOT_CACHE_PREFIX = `${CACHE_PREFIX}boot-`;
+const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
 // Upper bound on runtime-cached hashed assets. Content-hashed files are
 // immutable, so previous releases' lazy chunks are harmless (and necessary for
 // offline-pinned pages after a deploy) — we keep them and only evict the oldest
@@ -28,23 +33,36 @@ const PRECACHE_MANIFEST_KEY = "/__hanji_precache__";
 const MAX_RUNTIME_ASSETS = 500;
 
 self.addEventListener("install", (event) => {
-  // Do not activate an incompletely installed worker: an offline-ready marker
-  // is written only after every generated dependency is present.
-  event.waitUntil(ensurePrecache().then(() => self.skipWaiting()));
+  // The install gate is deliberately small: validate and stage only the boot
+  // graph. The active full-shell marker is untouched until the background
+  // product-graph warm has completed atomically.
+  event.waitUntil(precacheBoot().then(() => self.skipWaiting()));
 });
 
-let precacheInFlight;
+let fullPrecacheInFlight;
 
-function ensurePrecache() {
-  if (!precacheInFlight) {
-    precacheInFlight = precache().finally(() => {
-      precacheInFlight = undefined;
+function ensureFullPrecache() {
+  if (!fullPrecacheInFlight) {
+    fullPrecacheInFlight = precacheFull().finally(() => {
+      fullPrecacheInFlight = undefined;
     });
   }
-  return precacheInFlight;
+  return fullPrecacheInFlight;
 }
 
-async function precache() {
+function safeManifestAssets(value) {
+  return Array.isArray(value)
+    ? value.filter(
+        (url) =>
+          typeof url === "string" &&
+          url.startsWith("/") &&
+          !url.startsWith("//") &&
+          !url.startsWith("/api/")
+      )
+    : [];
+}
+
+async function fetchPrecacheManifest() {
   const response = await fetch("/sw-precache.json", { cache: "no-cache" });
   if (
     !response.ok
@@ -53,25 +71,113 @@ async function precache() {
   ) {
     throw new Error("Offline manifest is unavailable.");
   }
-  const manifest = await response.json();
-  const assets = Array.isArray(manifest.assets)
-    ? manifest.assets.filter(
-        (url) =>
-          typeof url === "string" &&
-          url.startsWith("/") &&
-          !url.startsWith("//") &&
-          !url.startsWith("/api/")
-      )
-    : [];
-  if (!manifest.version || assets.length === 0) {
+  const raw = await response.json();
+  const assets = safeManifestAssets(raw.assets);
+  // Compatibility with a manifest emitted before the two-phase schema: such
+  // a build still installs safely, but its whole graph remains the boot set.
+  const requestedBootAssets = Array.isArray(raw.bootAssets) ? raw.bootAssets : assets;
+  const bootAssets = safeManifestAssets(requestedBootAssets).filter((url) => assets.includes(url));
+  if (
+    typeof raw.version !== "string" ||
+    !/^[A-Za-z0-9_-]{1,64}$/.test(raw.version) ||
+    assets.length === 0 ||
+    bootAssets.length === 0 ||
+    !assets.includes("/") ||
+    !bootAssets.includes("/")
+  ) {
     throw new Error("Offline manifest is invalid.");
   }
+  return { ...raw, version: raw.version, assets, bootAssets };
+}
+
+function bootCacheName(version) {
+  return `${BOOT_CACHE_PREFIX}${version}`;
+}
+
+async function currentBootCacheName(cache) {
+  const response = await cache.match(BOOT_MANIFEST_KEY);
+  if (!response) return undefined;
+  try {
+    const marker = await response.json();
+    if (
+      marker.bootComplete === true &&
+      typeof marker.version === "string" &&
+      /^[A-Za-z0-9_-]{1,64}$/.test(marker.version)
+    ) {
+      return bootCacheName(marker.version);
+    }
+  } catch {
+    // An unreadable marker does not preserve an arbitrary cache namespace.
+  }
+  return undefined;
+}
+
+async function fetchAndValidateAsset(url) {
+  const response = await fetch(url, { cache: "no-cache" });
+  if (!response.ok || !isExpectedPrecacheResponse(url, response)) {
+    throw new Error(`Offline asset failed: ${url}`);
+  }
+  return response;
+}
+
+async function precacheBoot() {
+  const manifest = await fetchPrecacheManifest();
   const cache = await caches.open(CACHE);
   const installed = await cache.match(PRECACHE_MANIFEST_KEY);
   if (installed) {
     try {
       const current = await installed.json();
-      if (current.complete === true && current.version === manifest.version) return;
+      if (current.complete === true && current.version === manifest.version) {
+        await cache.delete(BOOT_MANIFEST_KEY).catch(() => undefined);
+        await caches.delete(bootCacheName(manifest.version)).catch(() => undefined);
+        return;
+      }
+    } catch {
+      // Stage a fresh boot graph below.
+    }
+  }
+
+  const cacheName = bootCacheName(manifest.version);
+  await caches.delete(cacheName);
+  const boot = await caches.open(cacheName);
+  try {
+    for (let offset = 0; offset < manifest.bootAssets.length; offset += 16) {
+      await Promise.all(
+        manifest.bootAssets.slice(offset, offset + 16).map(async (url) => {
+          await boot.put(url, await fetchAndValidateAsset(url));
+        })
+      );
+    }
+    await cache.put(
+      BOOT_MANIFEST_KEY,
+      new Response(
+        JSON.stringify({
+          version: manifest.version,
+          bootAssets: manifest.bootAssets,
+          bootComplete: true,
+        }),
+        { headers: { "content-type": "application/json" } }
+      )
+    );
+  } catch (error) {
+    await caches.delete(cacheName).catch(() => undefined);
+    throw error;
+  }
+}
+
+async function precacheFull() {
+  const manifest = await fetchPrecacheManifest();
+  const { assets } = manifest;
+  const cache = await caches.open(CACHE);
+  const installed = await cache.match(PRECACHE_MANIFEST_KEY);
+  if (installed) {
+    try {
+      const current = await installed.json();
+      if (current.complete === true && current.version === manifest.version) {
+        await cache.delete(BOOT_MANIFEST_KEY).catch(() => undefined);
+        await caches.delete(bootCacheName(manifest.version)).catch(() => undefined);
+        return;
+      }
     } catch {
       // Replace an unreadable/incomplete marker below.
     }
@@ -85,15 +191,18 @@ async function precache() {
   await caches.delete(stagingName);
   await caches.delete(rollbackName);
   const staging = await caches.open(stagingName);
+  const boot = await caches.open(bootCacheName(manifest.version));
+  const bootAssetSet = new Set(manifest.bootAssets);
   try {
     for (let offset = 0; offset < assets.length; offset += 16) {
       await Promise.all(
         assets.slice(offset, offset + 16).map(async (url) => {
-          const res = await fetch(url, { cache: "no-cache" });
-          if (!res.ok || !isExpectedPrecacheResponse(url, res)) {
-            throw new Error(`Offline asset failed: ${url}`);
+          const bootResponse = bootAssetSet.has(url) ? await boot.match(url) : undefined;
+          if (bootResponse && isExpectedPrecacheResponse(url, bootResponse)) {
+            await staging.put(url, bootResponse);
+            return;
           }
-          await staging.put(url, res);
+          await staging.put(url, await fetchAndValidateAsset(url));
         })
       );
     }
@@ -177,6 +286,8 @@ async function precache() {
     // Growth trimming is not part of the release switch. A failed eviction is
     // safe to retry later and must not roll back an already coherent graph.
     await trimRuntimeAssets(cache, new Set(assets)).catch(() => undefined);
+    await cache.delete(BOOT_MANIFEST_KEY).catch(() => undefined);
+    await caches.delete(bootCacheName(manifest.version)).catch(() => undefined);
   } finally {
     await caches.delete(stagingName);
     await caches.delete(rollbackName);
@@ -187,13 +298,20 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
+      const pendingBootCache = await currentBootCacheName(cache);
       for (const key of await caches.keys()) {
         // CacheStorage is shared with product-data caches such as offline
         // attachments. This worker owns only its app-shell namespace, so an
         // activate must never purge caches created by another subsystem.
         if (key.startsWith(LEGACY_CACHE_PREFIX)) {
           await handoffLegacyCache(key, cache);
-        } else if (key.startsWith(CACHE_PREFIX) && key !== CACHE) await caches.delete(key);
+        } else if (
+          key.startsWith(CACHE_PREFIX) &&
+          key !== CACHE &&
+          key !== pendingBootCache
+        ) {
+          await caches.delete(key);
+        }
       }
       // Do NOT purge hashed /assets/* by the new release's keep-set. Hashed
       // filenames are content-addressed (immutable), so a previous release's
@@ -219,6 +337,14 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.origin !== self.location.origin) return;
+  if (event.data?.type !== WARM_OFFLINE_MESSAGE) return;
+  // A message event extends the worker lifetime without delaying install or
+  // activation. The warm remains all-or-nothing at the active shell boundary.
+  event.waitUntil(ensureFullPrecache().catch(() => undefined));
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -230,10 +356,10 @@ self.addEventListener("fetch", (event) => {
     // cache their JSON/file/private response under the shared shell key.
     if (!isAppNavigationPath(url.pathname)) return;
     event.respondWith(navigationNetworkFirst(request));
-    // sw.js itself may be byte-identical between application builds. Refresh
-    // the versioned manifest on online navigations so new hashed chunks still
-    // become offline-ready without relying on a worker reinstall.
-    event.waitUntil(ensurePrecache().catch(() => undefined));
+    // sw.js itself may be byte-identical between application builds. Warm the
+    // complete versioned graph behind the live response so new hashed chunks
+    // become offline-ready without delaying navigation or worker activation.
+    event.waitUntil(ensureFullPrecache().catch(() => undefined));
     return;
   }
   // Cache-first is restricted to content-hashed build output (plus the

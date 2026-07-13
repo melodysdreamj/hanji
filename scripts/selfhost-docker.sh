@@ -2,28 +2,31 @@
 # Hanji self-hosted Docker launcher.
 #
 # One command brings up the whole app over HTTPS on localhost. It builds the
-# EdgeBase image if needed, generates persistent secrets + a master account on
-# first run, issues a locally-trusted certificate (via mkcert when available,
-# otherwise a self-signed one), and runs the container with TLS so release-mode
-# cookie sign-in works. Re-running reuses the same secrets, cert, and data.
+# EdgeBase image if needed, issues a locally-trusted certificate (via mkcert
+# when available, otherwise a self-signed one), and runs the container with TLS
+# so release-mode cookie sign-in works. The image persists its own runtime
+# secrets under /data; a fresh instance asks for its logged setup code and first
+# administrator in the browser. Re-running reuses the same secrets, cert, and
+# data.
 #
 # Usage:
 #   scripts/selfhost-docker.sh up [--port N] [--email you@example.com]
-#                                 [--password PW] [--build] [--http]
+#                                 [--password PW] [--build]
+#                                 [--http --origin https://hanji.example.com]
 #   scripts/selfhost-docker.sh down
 #   scripts/selfhost-docker.sh logs
 #   scripts/selfhost-docker.sh status
 #
 # Flags:
 #   --port N       Host/container port (default 8443).
-#   --email EMAIL  Master account email (default master@example.com).
-#   --password PW  Master account password (default: generated and printed).
+#   --email EMAIL  Advanced/legacy env-provisioned master account email.
+#   --password PW  Advanced/legacy master password (generated if omitted).
 #   --data SRC     Where /data lives: a Docker volume name (default hanji-data)
 #                  or an absolute host path to bind-mount for the data.
 #   --build        Force a fresh image build even if one exists.
-#   --http         Serve plain HTTP instead of HTTPS. Only for running behind a
-#                  separate TLS-terminating proxy; browser sign-in on
-#                  http://localhost fails in release mode.
+#   --http         Serve plain HTTP on 127.0.0.1 only, behind a TLS-terminating
+#                  proxy. Requires --origin with the public HTTPS URL.
+#   --origin URL   Public HTTPS origin for --http proxy mode.
 #
 # Environment:
 #   HANJI_DOCKER_MIN_FREE_KB  Persistence free-space floor (default 524288).
@@ -44,6 +47,8 @@ SCHEME=https
 FORCE_BUILD=0
 MASTER_EMAIL=""
 MASTER_PASSWORD=""
+PUBLIC_ORIGIN=""
+ENV_ENABLED=0
 DATA_TARGET="$VOLUME"
 DATA_KIND=volume
 MIN_PERSIST_FREE_KB=${HANJI_DOCKER_MIN_FREE_KB:-524288}
@@ -64,18 +69,25 @@ ensure_image() {
   if [ "$FORCE_BUILD" -eq 1 ] || ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     log "Building web bundle + EdgeBase Docker image ($IMAGE)…"
     npm --prefix "$ROOT/web" run build
-    ( cd "$ROOT/backend" && npx edgebase docker build -t "$IMAGE" )
+    node "$ROOT/scripts/build-hanji-docker-image.mjs" --tag "$IMAGE"
     ok "Image built: $IMAGE"
   else
     ok "Reusing existing image: $IMAGE (pass --build to rebuild)"
   fi
 }
 
-ensure_env() {
+prepare_env() {
   mkdir -p "$STATE_DIR"
   chmod 700 "$STATE_DIR"
-  if [ ! -f "$ENV_FILE" ]; then
-    log "Generating secrets + master account → $ENV_FILE"
+  if [ -f "$ENV_FILE" ]; then
+    ENV_ENABLED=1
+    ok "Reusing legacy/advanced environment: $ENV_FILE"
+    if [ -n "$MASTER_EMAIL$MASTER_PASSWORD" ]; then
+      warn "--email/--password ignored; $ENV_FILE already exists."
+    fi
+  elif [ -n "$MASTER_EMAIL$MASTER_PASSWORD" ]; then
+    ENV_ENABLED=1
+    log "Creating advanced env-provisioned master account → $ENV_FILE"
     email=${MASTER_EMAIL:-master@example.com}
     # Keep generated bootstrap credentials above a 128-bit random floor. The
     # password is printed only once and persisted in the mode-0600 env file.
@@ -92,16 +104,15 @@ HANJI_MASTER_EMAIL=$email
 HANJI_MASTER_PASSWORD=$password
 HANJI_AUTH_EMAIL_FROM=no-reply@example.com
 EOF
-    ok "Secrets written (master: $email)"
+    ok "Advanced environment written (master: $email)"
   else
-    ok "Reusing existing secrets: $ENV_FILE"
-    if [ -n "$MASTER_EMAIL$MASTER_PASSWORD" ]; then
-      warn "--email/--password ignored; delete $ENV_FILE to regenerate the account."
-    fi
+    ok "Using image-managed secrets and browser first-run setup."
   fi
-  # Repair permissions on older state created before the launcher enforced a
-  # private umask. Docker's --env-file must never be readable by other users.
-  chmod 600 "$ENV_FILE"
+  if [ "$ENV_ENABLED" -eq 1 ]; then
+    # Repair permissions on older state created before the launcher enforced a
+    # private umask. Docker's --env-file must never be readable by other users.
+    chmod 600 "$ENV_FILE"
+  fi
 }
 
 # Sets global CERT_ARGS (docker args for the cert mount) and TLS_NOTE.
@@ -126,7 +137,7 @@ ensure_cert() {
     docker volume create "$CERT_VOLUME" >/dev/null
     docker run --rm --user 0:0 --entrypoint sh \
       -v "$CERT_DIR:/source:ro" -v "$CERT_VOLUME:/target" "$IMAGE" -c \
-      'set -eu; cp /source/cert.pem /target/cert.pem; cp /source/key.pem /target/key.pem; chown 100:101 /target/cert.pem /target/key.pem; chmod 644 /target/cert.pem; chmod 600 /target/key.pem'
+      'set -eu; cp /source/cert.pem /target/cert.pem; cp /source/key.pem /target/key.pem; chown 10001:10001 /target/cert.pem /target/key.pem; chmod 644 /target/cert.pem; chmod 600 /target/key.pem'
     CERT_ARGS="-v $CERT_VOLUME:/certs:ro -e HTTPS_CERT_PATH=/certs/cert.pem -e HTTPS_KEY_PATH=/certs/key.pem"
     TLS_NOTE="mkcert certificate mounted. If the browser still warns, run: mkcert -install  (then fully reload)."
   else
@@ -198,6 +209,19 @@ validate_up_options() {
     fi
   fi
 
+  if [ "$SCHEME" = http ]; then
+    [ -n "$PUBLIC_ORIGIN" ] || die "--http requires --origin https://your-hanji-host."
+    case "$PUBLIC_ORIGIN" in
+      https://*) ;;
+      *) die "--origin must be an https:// URL." ;;
+    esac
+    if ! PASSKEY_RP_ID=$(node -e 'const u=new URL(process.argv[1]);if(u.username||u.password||u.pathname!=="/"||u.search||u.hash)process.exit(1);process.stdout.write(u.hostname)' "$PUBLIC_ORIGIN" 2>/dev/null); then
+      die "--origin must contain only a valid public HTTPS origin (no path, query, or credentials)."
+    fi
+  elif [ -n "$PUBLIC_ORIGIN" ]; then
+    die "--origin is only used together with --http."
+  fi
+
   # Resolve where /data lives: an absolute host path (bind mount) or a Docker
   # volume name (no slashes). Reject ambiguous relative paths.
   case "$DATA_TARGET" in
@@ -212,41 +236,72 @@ validate_up_options() {
 cmd_up() {
   need_docker
   ensure_image
-  ensure_env
+  prepare_env
   ensure_cert
 
   [ "$SCHEME" = https ] && proto=https || proto=http
-  origin="$proto://localhost:$PORT"
+  internal_origin="$proto://localhost:$PORT"
+  if [ "$SCHEME" = http ]; then
+    origin="$PUBLIC_ORIGIN"
+    publish="127.0.0.1:$PORT:$PORT"
+    proxy_args="-e HANJI_TRUST_SELF_HOSTED_PROXY=true"
+    passkey_rp_id="$PASSKEY_RP_ID"
+  else
+    origin="$internal_origin"
+    publish="$PORT:$PORT"
+    proxy_args=""
+    passkey_rp_id=localhost
+  fi
 
   log "Starting container '$CONTAINER' on $origin"
   docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
   # shellcheck disable=SC2086  # CERT_ARGS is an intentional word list
-  docker run -d --name "$CONTAINER" \
-    -p "$PORT:$PORT" -e PORT="$PORT" \
-    -v "$DATA_TARGET:/data" \
-    --env-file "$ENV_FILE" \
-    -e LOCAL_PROTOCOL="$SCHEME" \
-    -e HANJI_APP_ORIGIN="$origin" \
-    -e HANJI_PASSKEY_RP_ID=localhost \
-    -e HANJI_PASSKEY_ORIGINS="$origin" \
-    $CERT_ARGS \
-    --restart unless-stopped "$IMAGE" >/dev/null
+  if [ "$ENV_ENABLED" -eq 1 ]; then
+    docker run -d --name "$CONTAINER" \
+      -p "$publish" -e PORT="$PORT" \
+      -v "$DATA_TARGET:/data" \
+      --env-file "$ENV_FILE" \
+      -e LOCAL_PROTOCOL="$SCHEME" \
+      -e HANJI_APP_ORIGIN="$origin" \
+      -e HANJI_PASSKEY_RP_ID="$passkey_rp_id" \
+      -e HANJI_PASSKEY_ORIGINS="$origin" \
+      $proxy_args \
+      $CERT_ARGS \
+      --restart unless-stopped "$IMAGE" >/dev/null
+  else
+    docker run -d --name "$CONTAINER" \
+      -p "$publish" -e PORT="$PORT" \
+      -v "$DATA_TARGET:/data" \
+      -e LOCAL_PROTOCOL="$SCHEME" \
+      -e HANJI_APP_ORIGIN="$origin" \
+      -e HANJI_PASSKEY_RP_ID="$passkey_rp_id" \
+      -e HANJI_PASSKEY_ORIGINS="$origin" \
+      $proxy_args \
+      $CERT_ARGS \
+      --restart unless-stopped "$IMAGE" >/dev/null
+  fi
 
   check_persist_capacity
   if ! wait_health; then
     docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
     die "Hanji did not become ready. The data volume was kept."
   fi
-  # Pre-provision the master account so first sign-in works immediately.
+  # Trigger/read the bootstrap state. Env-provisioned legacy installs must be
+  # ready now; image-managed installs either offer setup or are already usable.
   bootstrap_body="$STATE_DIR/.instance-bootstrap-$$.json"
   umask 077
   : > "$bootstrap_body"
   trap 'rm -f "$bootstrap_body"' 0 1 2 15
-  bootstrap_code=$(curl -sk --connect-timeout 2 --max-time 10 -o "$bootstrap_body" -w '%{http_code}' "$origin/api/functions/instance-bootstrap" 2>/dev/null || echo 000)
+  bootstrap_code=$(curl -sk --connect-timeout 2 --max-time 10 -o "$bootstrap_body" -w '%{http_code}' "$internal_origin/api/functions/instance-bootstrap" 2>/dev/null || echo 000)
   bootstrap_ready=1
-  grep -Eq '"masterConfigured"[[:space:]]*:[[:space:]]*true' "$bootstrap_body" || bootstrap_ready=0
-  grep -Eq '"masterReady"[[:space:]]*:[[:space:]]*true' "$bootstrap_body" || bootstrap_ready=0
-  grep -Eq '"setupBlocked"[[:space:]]*:[[:space:]]*false' "$bootstrap_body" || bootstrap_ready=0
+  if [ "$ENV_ENABLED" -eq 1 ]; then
+    grep -Eq '"masterConfigured"[[:space:]]*:[[:space:]]*true' "$bootstrap_body" || bootstrap_ready=0
+    grep -Eq '"masterReady"[[:space:]]*:[[:space:]]*true' "$bootstrap_body" || bootstrap_ready=0
+  else
+    grep -Eq '"setupBlocked"[[:space:]]*:[[:space:]]*false' "$bootstrap_body" || bootstrap_ready=0
+  fi
+  setup_available=0
+  grep -Eq '"setupAvailable"[[:space:]]*:[[:space:]]*true' "$bootstrap_body" && setup_available=1
   rm -f "$bootstrap_body"
   trap - 0 1 2 15
   if [ "$bootstrap_code" != 200 ] || [ "$bootstrap_ready" -ne 1 ]; then
@@ -258,7 +313,7 @@ cmd_up() {
       reset_hint="scripts/selfhost-docker.sh down && rm -rf $DATA_TARGET"
     fi
     if [ "$bootstrap_code" = 200 ]; then
-      warn "Master-account bootstrap did not complete."
+      warn "Instance bootstrap did not become usable."
       warn "Most often the existing /data ($DATA_TARGET) was first set up with"
       warn "different master credentials than the ones in $ENV_FILE."
       warn "Start fresh (this DELETES that data):  $reset_hint"
@@ -267,13 +322,23 @@ cmd_up() {
     die "Master-account bootstrap was not ready (HTTP $bootstrap_code). The data was kept."
   fi
 
-  email=$(grep '^HANJI_MASTER_EMAIL=' "$ENV_FILE" | cut -d= -f2-)
-  password=$(grep '^HANJI_MASTER_PASSWORD=' "$ENV_FILE" | cut -d= -f2-)
   printf '\n'
   ok "Hanji is up."
   printf '  URL:      %s\n' "$origin"
-  printf '  Email:    %s\n' "$email"
-  printf '  Password: %s\n' "$password"
+  if [ "$ENV_ENABLED" -eq 1 ]; then
+    email=$(grep '^HANJI_MASTER_EMAIL=' "$ENV_FILE" | cut -d= -f2-)
+    password=$(grep '^HANJI_MASTER_PASSWORD=' "$ENV_FILE" | cut -d= -f2-)
+    printf '  Email:    %s\n' "$email"
+    printf '  Password: %s\n' "$password"
+  elif [ "$setup_available" -eq 1 ]; then
+    setup_code=$(docker exec "$CONTAINER" node -e \
+      'const fs=require("fs");const p=(process.env.PERSIST_DIR||"/data")+"/.hanji/runtime-secrets.json";process.stdout.write(JSON.parse(fs.readFileSync(p,"utf8")).HANJI_SETUP_TOKEN||"")')
+    [ -n "$setup_code" ] || die "Could not read the first-run setup code from the container."
+    printf '  Setup:    open the URL and create the first server administrator.\n'
+    printf '  Code:     %s\n' "$setup_code"
+  else
+    printf '  Setup:    existing instance detected; sign in with its administrator account.\n'
+  fi
   [ -n "$TLS_NOTE" ] && printf '  TLS:      %s\n' "$TLS_NOTE"
   printf '  Manage:   scripts/selfhost-docker.sh {logs|status|down}\n\n'
 }
@@ -290,6 +355,7 @@ while [ $# -gt 0 ]; do
     --email)    [ $# -ge 2 ] || die "--email requires a value."; MASTER_EMAIL=$2; shift 2 ;;
     --password) [ $# -ge 2 ] || die "--password requires a value."; MASTER_PASSWORD=$2; shift 2 ;;
     --data)     [ $# -ge 2 ] || die "--data requires a value."; DATA_TARGET=$2; shift 2 ;;
+    --origin)   [ $# -ge 2 ] || die "--origin requires a value."; PUBLIC_ORIGIN=$2; shift 2 ;;
     --build)    FORCE_BUILD=1; shift ;;
     --http)     SCHEME=http; shift ;;
     -h|--help)  sed -n '2,30p' "$0"; exit 0 ;;

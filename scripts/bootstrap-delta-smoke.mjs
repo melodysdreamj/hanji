@@ -7,6 +7,7 @@
 import { randomUUID } from 'node:crypto';
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -27,6 +28,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('bootstrap delta smoke');
 }
 
 async function main() {

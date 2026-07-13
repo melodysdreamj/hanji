@@ -1,13 +1,25 @@
 .screen {
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
-  place-items: center;
+  grid-auto-rows: max-content;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: safe center;
+  justify-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 24px;
   background: var(--bg-app);
 }
 
 .panel {
   width: min(100%, 360px);
+  min-width: 0;
 }
 
 .brand {
@@ -21,10 +33,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: var(--text-default);
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: transparent;
   color: var(--bg-app);
   font-weight: 700;
   line-height: 1;
@@ -76,7 +88,7 @@
 }
 
 .authTab {
-  height: 30px;
+  min-height: 36px;
   border-radius: calc(var(--radius) - 2px);
   color: var(--text-secondary);
   font-size: 13px;
@@ -123,7 +135,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
+  min-height: 40px;
   border-radius: var(--radius);
   font-size: 14px;
   font-weight: 550;
@@ -149,7 +161,7 @@
 
 .linkButton {
   width: fit-content;
-  height: 30px;
+  min-height: 40px;
   padding: 0;
   color: var(--text-secondary);
 }
@@ -175,6 +187,13 @@
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.45;
+}
+
+.fieldHelp {
+  margin: -3px 0 2px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .error {
@@ -227,4 +246,36 @@
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: bottom;
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+@media (max-height: 560px) {
+  .screen {
+    align-content: start;
+    padding-block: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
+  }
+
+  .brand {
+    margin-bottom: 16px;
+  }
+
+  .sponsorBanner {
+    margin-top: 12px;
+  }
+}
+
+@media (pointer: coarse) {
+  .authTab,
+  .primary,
+  .secondary,
+  .linkButton,
+  .devButton {
+    min-height: 44px;
+  }
 }

@@ -54,6 +54,22 @@ describe('Hanji namespace guard', () => {
     assert.deepEqual(new Set(violations.map((item) => item.path)), new Set(['src/product.ts']));
   });
 
+  it('scans released locale catalogs but leaves hidden translation targets to i18n checks', () => {
+    const files = [
+      'web/src/locales/en/importDialog.json',
+      'web/src/locales/id/importDialog.json',
+    ];
+    const oldName = ['Notion', 'Like'].join('');
+    const root = fixture({
+      [files[0]]: JSON.stringify({ label: oldName }),
+      [files[1]]: JSON.stringify({ label: oldName }),
+    });
+
+    const violations = findHanjiNamespaceViolations({ root, files });
+    assert.equal(violations.length, 1);
+    assert.equal(violations[0].path, files[0]);
+  });
+
   it('allows only the exact read-only compatibility declarations', () => {
     const path = 'mcp/src/legacy-product-compat.mjs';
     const valid = `const LEGACY_URI_SCHEME = "${formerPrimary}";\n`;

@@ -5,7 +5,14 @@ import { randomUUID } from 'node:crypto';
 import { existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { permanentlyDeletePage, ensurePasswordAuthForm } from './lib/harness.mjs';
+import {
+  deleteSmokeUser,
+  deleteSmokeUserByEmail,
+  deleteSmokeWorkspace,
+  ensurePasswordAuthForm,
+  masterCredentials,
+  permanentlyDeletePage,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
@@ -38,14 +45,23 @@ async function main() {
     ...(executablePath ? { executablePath } : {}),
   });
 
+  let runError;
   try {
     await assertEmailSharedPageUi(browser, appUrl, apiUrl, seed);
     console.log(
       'PASS direct email page sharing opens through AuthGate with comment access, read-only content, root/cached-workspace bootstrap, workspace discovery, workspace/organization directory denial, edit/share-management denial, and no private sibling page/block/comment/file/search leakage.',
     );
+  } catch (error) {
+    runError = error;
+    throw error;
   } finally {
     await browser.close().catch(() => {});
-    await cleanupSeed(apiUrl, seed).catch(() => {});
+    try {
+      await cleanupSeed(apiUrl, seed);
+    } catch (cleanupError) {
+      if (!runError) throw cleanupError;
+      console.warn(`Page email-share smoke cleanup also failed: ${errorMessage(cleanupError)}`);
+    }
   }
 }
 
@@ -408,6 +424,7 @@ async function seedEmailSharedPage(apiUrl) {
 
   return {
     ownerAccessToken: owner.accessToken,
+    ownerUserId: owner.userId,
     workspaceId,
     pageId,
     blockId,
@@ -429,25 +446,76 @@ async function seedEmailSharedPage(apiUrl) {
 }
 
 async function cleanupSeed(apiUrl, seed) {
-  if (!seed?.ownerAccessToken) return;
-  if (seed.permissionId) {
-    await callFunction(apiUrl, seed.ownerAccessToken, 'share-mutation', {
-      action: 'removePermission',
-      permissionId: seed.permissionId,
-    }).catch(() => {});
+  const failures = [];
+  const attempt = async (operation) => {
+    try {
+      await operation();
+    } catch (error) {
+      failures.push(error);
+    }
+  };
+  if (seed?.ownerAccessToken) {
+    if (seed.permissionId) {
+      await attempt(async () => {
+        await callFunction(apiUrl, seed.ownerAccessToken, 'share-mutation', {
+          action: 'removePermission',
+          permissionId: seed.permissionId,
+        });
+      });
+    }
+    if (seed.hiddenUploadId) {
+      await attempt(async () => {
+        await callFunction(apiUrl, seed.ownerAccessToken, 'file-mutation', {
+          action: 'delete',
+          uploadId: seed.hiddenUploadId,
+        });
+      });
+    }
+    if (seed.pageId) {
+      await attempt(() => permanentlyDeletePage(apiUrl, seed.ownerAccessToken, seed.pageId, { call: callFunction }));
+    }
+    if (seed.hiddenPageId) {
+      await attempt(() => permanentlyDeletePage(apiUrl, seed.ownerAccessToken, seed.hiddenPageId, { call: callFunction }));
+    }
+    await attempt(async () => {
+      const list = await callFunction(apiUrl, seed.ownerAccessToken, 'workspace-mutation', { action: 'list' });
+      for (const workspace of Array.isArray(list?.workspaces) ? list.workspaces : []) {
+        if (workspace?.id && workspace?.name) {
+          await deleteSmokeWorkspace(apiUrl, seed.ownerAccessToken, workspace, { call: callFunction });
+        }
+      }
+    });
   }
-  if (seed.hiddenUploadId) {
-    await callFunction(apiUrl, seed.ownerAccessToken, 'file-mutation', {
-      action: 'delete',
-      uploadId: seed.hiddenUploadId,
-    }).catch(() => {});
+  await attempt(async () => {
+    const invitee = await signInWithPassword(apiUrl, seed.inviteeEmail, seed.inviteePassword).catch(() => null);
+    if (invitee?.accessToken) {
+      const list = await callFunction(apiUrl, invitee.accessToken, 'workspace-mutation', { action: 'list' });
+      for (const workspace of Array.isArray(list?.workspaces) ? list.workspaces : []) {
+        if (workspace?.id && workspace?.name) {
+          await deleteSmokeWorkspace(apiUrl, invitee.accessToken, workspace, { call: callFunction });
+        }
+      }
+    }
+  });
+  let adminAccessToken = '';
+  await attempt(async () => {
+    const master = masterCredentials();
+    const admin = await signInWithPassword(apiUrl, master.email, master.password);
+    adminAccessToken = admin.accessToken;
+  });
+  if (adminAccessToken) {
+    await attempt(() => deleteSmokeUserByEmail(apiUrl, adminAccessToken, seed.inviteeEmail, { call: callFunction }));
+    if (seed.ownerUserId) {
+      await attempt(() => deleteSmokeUser(apiUrl, adminAccessToken, seed.ownerUserId, { call: callFunction }));
+    }
   }
-  if (seed.pageId) {
-    await permanentlyDeletePage(apiUrl, seed.ownerAccessToken, seed.pageId, { call: callFunction }).catch(() => {});
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Page email-share smoke did not fully clean up its synthetic accounts.');
   }
-  if (seed.hiddenPageId) {
-    await permanentlyDeletePage(apiUrl, seed.ownerAccessToken, seed.hiddenPageId, { call: callFunction }).catch(() => {});
-  }
+}
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function step(page, label, fn) {

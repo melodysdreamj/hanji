@@ -45,9 +45,11 @@ email one-time codes, and passkeys are currently disabled at the config level
 (deferred on the roadmap). Settings includes an Account Security section for
 authenticator-app enrollment, recovery-code display, session review, TOTP
 disable, and self-service password change; admin-issued temporary passwords
-force a password change on first sign-in. Workspace invitation links open a
-signed-in accept screen, so invited users can create or use an account and join
-with the invited guest/member/admin role from the SPA.
+force a password change on first sign-in. Accounts exist at the server level:
+an instance administrator provisions them when public signup is closed, and a
+workspace owner or administrator then adds an existing account by exact email
+or user id. Unknown email addresses are handled as blind no-ops, so the member
+form does not reveal whether an account exists.
 
 Browser user sessions use EdgeBase's opt-in HttpOnly-cookie refresh transport.
 On HTTPS the rotating credential is a host-only `__Host-` cookie with `Path=/`,

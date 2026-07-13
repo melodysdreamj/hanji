@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
-import { permanentlyDeletePage, permanentlyDeleteDatabaseRow } from './lib/harness.mjs';
+import {
+  deleteSmokeAccounts,
+  masterCredentials,
+  permanentlyDeleteDatabaseRow,
+  permanentlyDeletePage,
+} from './lib/harness.mjs';
 
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const DEFAULT_TIMEOUT_MS = 8_000;
@@ -60,7 +65,8 @@ try {
 } finally {
   await cleanup().catch((error) => {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`WARN cleanup failed: ${message}`);
+    console.error(`FAIL cleanup failed: ${message}`);
+    process.exitCode ||= 1;
   });
 }
 
@@ -1553,7 +1559,7 @@ async function main() {
   console.log('\nPASS multi-user page and database permission flow works through product APIs.');
 }
 
-async function cleanup() {
+async function cleanupResources() {
   if (!owner?.token) return;
   const baseUrl = normalizeBaseUrl(options.url);
 
@@ -1753,6 +1759,22 @@ async function cleanup() {
   }
 }
 
+async function cleanup() {
+  const failures = [];
+  await cleanupResources().catch((error) => failures.push(error));
+  await cleanupPasswordAccounts().catch((error) => failures.push(error));
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Multi-user permission smoke cleanup was incomplete.');
+  }
+}
+
+async function cleanupPasswordAccounts() {
+  if (!emailShareUser?.token || !emailShareUser?.userId) return;
+  const baseUrl = normalizeBaseUrl(options.url);
+  const adminToken = await signInMaster(baseUrl);
+  await deleteSmokeAccounts(baseUrl, adminToken, [emailShareUser], { call: callFunction });
+}
+
 function parseArgs(args) {
   const parsed = {
     url: DEFAULT_BASE_URL,
@@ -1844,6 +1866,19 @@ async function signUpWithPassword(baseUrl, email, password, displayName) {
   assert(typeof token === 'string' && token, 'password signup must return an access token');
   assert(typeof userId === 'string' && userId, 'password signup must return a user id');
   return { token, userId, email, password };
+}
+
+async function signInMaster(baseUrl) {
+  const credentials = masterCredentials();
+  const response = await fetchWithTimeout(resolveUrl(baseUrl, '/api/auth/signin'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+  const body = await readJson(response);
+  assert(response.ok, `master sign-in returned HTTP ${response.status}: ${JSON.stringify(body)}`);
+  assert(typeof body?.accessToken === 'string' && body.accessToken, 'master sign-in must return an access token');
+  return body.accessToken;
 }
 
 async function callFunction(baseUrl, token, name, body) {

@@ -113,6 +113,9 @@ const NOTION_IMPORT_JOB_RETENTION_DAYS_MAX = 365;
 const NOTION_IMPORT_JOB_KEEP_MAX = 25;
 const NOTION_IMPORT_JOB_PRUNE_BATCH_MAX = 12;
 const NOTION_APPLY_LEASE_TTL_MS = 30 * 60 * 1000;
+// Incremental discovery calls are bounded to a small wall-clock slice. Keep a
+// crashed worker from blocking resume for the apply lease's full 30 minutes.
+const NOTION_DISCOVER_LEASE_TTL_MS = 90 * 1000;
 const NOTION_APPLY_LEASE_CAS_ATTEMPTS = 8;
 const NOTION_ENRICHMENT_BATCH_SIZE = 500;
 const NOTION_ENRICHMENT_BATCH_SIZE_MAX = 5_000;
@@ -1575,7 +1578,10 @@ function mcpViewRecord(rawView: Record<string, unknown>, viewId: string | undefi
     type: optionalString(rawView.type) ?? 'table',
     data_source_id: dataSourceId,
     visible_properties: displayProperties,
-    property_order: displayProperties,
+    // Keep the two serialized view fields independent. The bounded snapshot
+    // guard intentionally rejects object aliases, even when JSON.stringify
+    // would duplicate the shared array into valid JSON.
+    property_order: displayProperties ? [...displayProperties] : undefined,
     sorts: rawSorts
       .filter((sort): sort is Record<string, unknown> => !!sort && typeof sort === 'object')
       .map((sort) => ({
@@ -8106,6 +8112,7 @@ async function collectDataSourceSnapshot(
 type DiscoveryProgressSnapshot = {
   phase: 'search' | 'enrich';
   discovered: number;
+  pendingEnrichment: number;
   enrichedPages: number;
   enrichedDataSources: number;
   enrichableTotal: number;
@@ -8741,9 +8748,16 @@ async function discoverNotionGraph(
     for (const item of itemsById.values()) {
       byType[item.notionObject] = (byType[item.notionObject] ?? 0) + 1;
     }
+    const pendingEnrichment = Array.from(itemsById.values()).filter(
+      (item) =>
+        (item.notionObject === 'page' && !hasPageSnapshot(item)) ||
+        (item.notionObject === 'data_source' && !hasDataSourceSnapshot(item)) ||
+        (item.notionObject === 'database' && !retrievedDatabaseIds.has(item.notionId)),
+    ).length;
     options.onProgress?.({
       phase,
       discovered: itemsById.size,
+      pendingEnrichment,
       enrichedPages: enrichedPageIds.size,
       enrichedDataSources: enrichedDataSourceIds.size,
       enrichableTotal,
@@ -9135,7 +9149,12 @@ export async function listActiveNotionImportItems(
 ) {
   const generation = importItemGeneration(job);
   const byJob = db.table<NotionImportItem>('notion_import_items').where('jobId', '==', job.id);
-  const narrowed = typeof byJob.where === 'function'
+  // Legacy/first incremental jobs use SQL NULL for their generation. Keep the
+  // indexed generation filter for concrete generations, but materialize the
+  // bounded job rows before matching NULL: some SDK/runtime query adapters
+  // omit a nullable optional field from the serialized filter and otherwise
+  // return an empty set even though the durable rows are present.
+  const narrowed = generation !== null && typeof byJob.where === 'function'
     ? byJob.where('itemGeneration', '==', generation)
     : byJob;
   const rows = await listAll(narrowed, NOTION_IMPORT_ITEM_SAFETY_LIMIT);
@@ -13975,8 +13994,9 @@ async function ensureImportedPageWorkspaceIndexes(
   }
 }
 
-function applyLeaseExpiresAt() {
-  return new Date(Date.now() + NOTION_APPLY_LEASE_TTL_MS).toISOString();
+function applyLeaseExpiresAt(purpose: 'apply' | 'discover' = 'apply') {
+  const ttl = purpose === 'discover' ? NOTION_DISCOVER_LEASE_TTL_MS : NOTION_APPLY_LEASE_TTL_MS;
+  return new Date(Date.now() + ttl).toISOString();
 }
 
 function isApplyLeaseConflict(error: unknown) {
@@ -14005,7 +14025,7 @@ async function acquireNotionApplyLease(
           : 'Notion import job is already being applied.',
       );
     }
-    const expiresAt = applyLeaseExpiresAt();
+    const expiresAt = applyLeaseExpiresAt(purpose);
     try {
       if (existing) {
         await db.transact([
@@ -15066,10 +15086,6 @@ async function applyJobCore(
       page = await copyImportedRowFileProperties(fileCopyContext, page, sourceMapping.localId, metadata.properties, propMap, item);
     }
     page = await preserveImportedPageTimestamps(db, page, item);
-    importedPageBlockContexts.push({ page, notionId: item.notionId });
-    if (isRow && sourceId && propMap && sourceMapping?.localId) {
-      importedRowContexts.push({ page, dataSourceId: sourceId, notionId: item.notionId });
-    }
     const insertedBlocks = await insertPageBlocksFromSnapshot(
       db,
       page.id,
@@ -15083,6 +15099,14 @@ async function applyJobCore(
     );
     created.blocks += insertedBlocks.length;
     page = await markImportedBlocksComplete(db, page);
+    // Later relation remapping writes the complete page-properties object.
+    // Register the page only after the durable completion markers are present,
+    // otherwise a row remap can overwrite them with this pre-import snapshot
+    // and make a subsequent repair incorrectly refuse its existing blocks.
+    importedPageBlockContexts.push({ page, notionId: item.notionId });
+    if (isRow && sourceId && propMap && sourceMapping?.localId) {
+      importedRowContexts.push({ page, dataSourceId: sourceId, notionId: item.notionId });
+    }
     pagesTouchedThisRun += 1;
     // Time-based cadence (~1s) so the UI's live feed moves like an installer
     // even when individual pages are slow; %50 keeps a floor on huge fast runs.
@@ -16349,6 +16373,7 @@ async function discoverJobUnderLease(
           discovered: snapshot.discovered,
           totalKnown: snapshot.discovered,
           byType: snapshot.byType,
+          pendingEnrichment: snapshot.pendingEnrichment,
           recent: snapshot.recent,
         },
       }),
@@ -16606,6 +16631,14 @@ async function cancelJob(db: DbRef, body: Record<string, unknown>, actorId: stri
     if (!current) throw new Error('Notion import job was not found.');
     return { job: cleanJob(current) };
   }
+  // A worker restart can strand a discovery lease after its request has
+  // vanished. Cancellation is the user's explicit terminal fence, so remove
+  // that job-scoped lease immediately instead of making a restart/retry wait
+  // for its TTL. An old request cannot publish after the status CAS above.
+  await bestEffort(
+    'notion-import cancel stale lease',
+    db.table<NotionImportApplyLock>('notion_import_apply_locks').delete(job.id),
+  );
   await recordWorkspaceAudit(db, {
     workspaceId: job.workspaceId,
     actorId,
@@ -16747,6 +16780,7 @@ export const POST = defineFunction({
           'must be ready before apply',
           'is cancelled',
           'already being applied',
+          'already being discovered',
           'Duplicate Notion import mapping',
         ],
       },

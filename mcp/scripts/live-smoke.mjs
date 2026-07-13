@@ -7,6 +7,10 @@ import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  deleteSmokeAccounts,
+  signInSmokeAdmin,
+} from "../../scripts/lib/harness.mjs";
 import { hanjiEnv, withoutHanjiProductEnv } from "../src/legacy-product-compat.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -16,6 +20,7 @@ const DEFAULT_TOOL_TIMEOUT_MS = positiveInteger(
   hanjiEnv("HANJI_MCP_SMOKE_TOOL_TIMEOUT_MS"),
   30_000,
 );
+const smokeAccounts = [];
 
 function positiveInteger(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
@@ -260,6 +265,7 @@ async function signUpForMcp(label, email, password) {
   if (typeof userId !== "string" || !userId) {
     throw new Error(`${label} signup did not return a user id.`);
   }
+  smokeAccounts.push({ token: accessToken, userId, email });
   return { accessToken, userId, email };
 }
 
@@ -276,29 +282,10 @@ function serverEnv(auth) {
 await assertBackendReachable();
 const smokeSeed = Date.now();
 const smokeRunId = `${smokeSeed}-${randomUUID().slice(0, 8)}`;
-const primaryAuth = await signUpForMcp(
-  "primary MCP user",
-  `mcp-live-primary-${smokeRunId}@example.com`,
-  `McpLive${smokeSeed}!aA1`,
-);
-
-const transport = new StdioClientTransport({
-  command: process.execPath,
-  args: [serverPath],
-  cwd: root,
-  stderr: "pipe",
-  env: serverEnv(primaryAuth),
-});
-
+let primaryAuth = null;
+let transport = null;
+let client = null;
 let stderr = "";
-transport.stderr?.on("data", (chunk) => {
-  stderr += chunk.toString();
-});
-
-const client = new Client(
-  { name: "hanji-mcp-live-smoke", version: "0.1.0" },
-  { capabilities: {} },
-);
 
 const createdWorkspaceIds = [];
 const createdPageIds = [];
@@ -308,7 +295,6 @@ const createdPermissionIds = [];
 let notificationSourceClient = null;
 let notificationSourceTransport = null;
 let notificationSourceStderr = "";
-let notificationSourceAuth = null;
 let policyClient = null;
 let policyTransport = null;
 let policyStderr = "";
@@ -346,31 +332,36 @@ async function callToolResult(name, args = {}, timeoutMs = DEFAULT_TOOL_TIMEOUT_
   return { result, text: textContent(result) };
 }
 
-async function assertWorkspaceAdminToolsDenied(callToolResultFn, workspaceId, label, inviteEmail) {
+function isAccessDenial(text) {
+  return ["Forbidden", "access required", "edit access", "HTTP 403", "HTTP 404"]
+    .some((marker) => text.includes(marker));
+}
+
+function assertAccessDenial(text, label) {
+  if (!isAccessDenial(text)) {
+    throw new Error(`${label} returned an unexpected error:\n${text}`);
+  }
+}
+
+async function assertWorkspaceAdminToolsDenied(callToolResultFn, workspaceId, label, memberEmail) {
   const membersAttempt = await callToolResultFn("list_workspace_members", { workspaceId });
   if (!membersAttempt.result.isError) {
     throw new Error(`${label} list_workspace_members unexpectedly succeeded:\n${membersAttempt.text}`);
   }
-  if (
-    !membersAttempt.text.includes("Workspace access required") &&
-    !membersAttempt.text.includes("Forbidden")
-  ) {
+  if (!isAccessDenial(membersAttempt.text)) {
     throw new Error(`${label} list_workspace_members denial returned an unexpected error:\n${membersAttempt.text}`);
   }
 
-  const inviteAttempt = await callToolResultFn("invite_workspace_member", {
+  const addMemberAttempt = await callToolResultFn("add_workspace_member", {
     workspaceId,
-    email: inviteEmail,
+    email: memberEmail,
     role: "guest",
   });
-  if (!inviteAttempt.result.isError) {
-    throw new Error(`${label} invite_workspace_member unexpectedly succeeded:\n${inviteAttempt.text}`);
+  if (!addMemberAttempt.result.isError) {
+    throw new Error(`${label} add_workspace_member unexpectedly succeeded:\n${addMemberAttempt.text}`);
   }
-  if (
-    !inviteAttempt.text.includes("Workspace access required") &&
-    !inviteAttempt.text.includes("Forbidden")
-  ) {
-    throw new Error(`${label} invite_workspace_member denial returned an unexpected error:\n${inviteAttempt.text}`);
+  if (!isAccessDenial(addMemberAttempt.text)) {
+    throw new Error(`${label} add_workspace_member denial returned an unexpected error:\n${addMemberAttempt.text}`);
   }
 }
 
@@ -400,7 +391,7 @@ async function callBackendFunction(name, body = {}, timeoutMs = DEFAULT_TOOL_TIM
 
 async function startNotificationSourceClient() {
   const seed = `${Date.now()}-${randomUUID().slice(0, 8)}`;
-  notificationSourceAuth = await signUpForMcp(
+  const auth = await signUpForMcp(
     "notification source MCP user",
     `mcp-live-source-${seed}@example.com`,
     `McpLiveSource${Date.now()}!aA1`,
@@ -410,7 +401,7 @@ async function startNotificationSourceClient() {
     args: [serverPath],
     cwd: root,
     stderr: "pipe",
-    env: serverEnv(notificationSourceAuth),
+    env: serverEnv(auth),
   });
 
   notificationSourceTransport.stderr?.on("data", (chunk) => {
@@ -422,6 +413,7 @@ async function startNotificationSourceClient() {
     { capabilities: {} },
   );
   await withTimeout(notificationSourceClient.connect(notificationSourceTransport), "MCP notification source connect");
+  return auth;
 }
 
 async function callNotificationSourceTool(name, args = {}, timeoutMs = DEFAULT_TOOL_TIMEOUT_MS) {
@@ -666,7 +658,32 @@ function removeTrackedWorkspace(workspaceId) {
   if (index >= 0) createdWorkspaceIds.splice(index, 1);
 }
 
+async function cleanupSmokeAccounts() {
+  if (smokeAccounts.length === 0) return;
+  const adminToken = await signInSmokeAdmin(baseUrl, { timeoutMs: 8000 });
+  await deleteSmokeAccounts(baseUrl, adminToken, smokeAccounts);
+}
+
 try {
+  primaryAuth = await signUpForMcp(
+    "primary MCP user",
+    `mcp-live-primary-${smokeRunId}@example.com`,
+    `McpLive${smokeSeed}!aA1`,
+  );
+  transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [serverPath],
+    cwd: root,
+    stderr: "pipe",
+    env: serverEnv(primaryAuth),
+  });
+  transport.stderr?.on("data", (chunk) => {
+    stderr += chunk.toString();
+  });
+  client = new Client(
+    { name: "hanji-mcp-live-smoke", version: "0.1.0" },
+    { capabilities: {} },
+  );
   await withTimeout(client.connect(transport), "MCP connect");
   const text = await callTool("get_workspace");
   for (const expected of ["Current fallback workspace:", "current fallback id:", "current fallback pages:"]) {
@@ -1746,13 +1763,14 @@ try {
   const members = await callTool("list_workspace_members");
   const currentUserId = matchRequired(members, /user id:\s*([^\s]+)/, "current MCP user id");
 
-  await startNotificationSourceClient();
+  const notificationSourceSession = await startNotificationSourceClient();
   const notificationSourceMembers = await callNotificationSourceTool("list_workspace_members");
   const notificationSourceUserId = matchRequired(
     notificationSourceMembers,
     /user id:\s*([^\s]+)/,
     "notification source MCP user id",
   );
+  const notificationSourceEmail = notificationSourceSession.email;
 
   const profileName = `MCP live smoke profile ${suffix}`;
   const profileEmail = `mcp-live-profile-${suffix}@example.com`;
@@ -1772,30 +1790,33 @@ try {
   assertIncludes(peopleSearch, profileEmail, "search_organization_people response");
   assertIncludes(peopleSearch, currentUserId, "search_organization_people response");
 
-  const invitationEmail = `mcp-live-invite-${suffix}@example.com`;
-  const invitedByEmail = await callTool("invite_workspace_member", {
+  const addedByEmail = await callTool("add_workspace_member", {
     workspaceId,
-    email: invitationEmail,
-    displayName: "MCP live smoke invite",
+    email: notificationSourceEmail,
+    displayName: "MCP live smoke existing account",
     role: "guest",
   });
-  assertIncludes(invitedByEmail, invitationEmail, "invite_workspace_member email response");
-  assertIncludes(invitedByEmail, "email delivery:", "invite_workspace_member email response");
-  const invitationToken = matchRequired(invitedByEmail, /accept token:\s*([^\s]+)/, "workspace invitation token");
-
-  const acceptedInvitation = await callNotificationSourceTool("accept_workspace_invitation", {
-    token: invitationToken,
-    email: invitationEmail,
-  });
-  assertIncludes(acceptedInvitation, notificationSourceUserId, "accept_workspace_invitation response");
-  assertIncludes(acceptedInvitation, "Guest", "accept_workspace_invitation response");
-  const filteredInvitationAcceptAudit = await callTool("get_organization_directory", {
+  assertIncludes(addedByEmail, notificationSourceEmail, "add_workspace_member exact-email response");
+  assertIncludes(addedByEmail, notificationSourceUserId, "add_workspace_member exact-email response");
+  assertIncludes(addedByEmail, "Guest", "add_workspace_member exact-email response");
+  const filteredMemberAddAudit = await callTool("get_organization_directory", {
     organizationId,
-    auditAction: "workspace_invitation.accept",
+    auditAction: "workspace_member.add",
     auditLimit: 5,
   });
-  assertIncludes(filteredInvitationAcceptAudit, "audit action filter: workspace_invitation.accept", "filtered invitation accept audit response");
-  assertIncludes(filteredInvitationAcceptAudit, "Workspace Invitation Accept", "filtered invitation accept audit response");
+  assertIncludes(filteredMemberAddAudit, "audit action filter: workspace_member.add", "filtered workspace member add audit response");
+  assertIncludes(filteredMemberAddAudit, "Workspace Member Add", "filtered workspace member add audit response");
+
+  const unknownAccountEmail = `mcp-live-unknown-account-${suffix}@example.com`;
+  const blindUnknownAccountAdd = await callTool("add_workspace_member", {
+    workspaceId,
+    email: unknownAccountEmail,
+    displayName: "MCP live smoke unknown account",
+    role: "member",
+  });
+  assertNotIncludes(blindUnknownAccountAdd, unknownAccountEmail, "add_workspace_member blind unknown-account response");
+  const membersAfterBlindAdd = await callTool("list_workspace_members", { workspaceId });
+  assertNotIncludes(membersAfterBlindAdd, unknownAccountEmail, "list_workspace_members after blind unknown-account add");
 
   const transferredWorkspaceOwner = await callTool("transfer_workspace_owner", {
     workspaceId,
@@ -1813,38 +1834,14 @@ try {
   assertIncludes(restoredWorkspaceOwner, currentUserId, "transfer_workspace_owner restore response");
   assertIncludes(restoredWorkspaceOwner, "Owner", "transfer_workspace_owner restore response");
 
-  const revokedEmail = `mcp-live-revoked-${suffix}@example.com`;
-  const revokableInvitation = await callTool("invite_workspace_member", {
-    workspaceId,
-    email: revokedEmail,
-    displayName: "MCP live smoke revoked invite",
-    role: "member",
-  });
-  assertIncludes(revokableInvitation, revokedEmail, "invite_workspace_member revokable response");
-  const invitationId = matchRequired(revokableInvitation, /invitation id:\s*([^\s]+)/, "workspace invitation id");
-
-  const revokedInvitation = await callTool("revoke_workspace_invitation", {
-    workspaceId,
-    invitationId,
-  });
-  assertNotIncludes(revokedInvitation, revokedEmail, "revoke_workspace_invitation response");
-  const filteredInvitationRevokeAudit = await callTool("get_organization_directory", {
-    organizationId,
-    auditAction: "workspace_invitation.revoke",
-    auditLimit: 5,
-  });
-  assertIncludes(filteredInvitationRevokeAudit, "audit action filter: workspace_invitation.revoke", "filtered invitation revoke audit response");
-  assertIncludes(filteredInvitationRevokeAudit, "Workspace Invitation Revoke", "filtered invitation revoke audit response");
-  assertIncludes(filteredInvitationRevokeAudit, revokedEmail, "filtered invitation revoke audit response");
-
-  const invitedUser = await callTool("invite_workspace_member", {
+  const addedUser = await callTool("add_workspace_member", {
     workspaceId,
     userId: notificationSourceUserId,
     displayName: "MCP live smoke member",
     role: "guest",
   });
-  assertIncludes(invitedUser, notificationSourceUserId, "invite_workspace_member user response");
-  assertIncludes(invitedUser, "Guest", "invite_workspace_member user response");
+  assertIncludes(addedUser, notificationSourceUserId, "add_workspace_member user response");
+  assertIncludes(addedUser, "Guest", "add_workspace_member user response");
 
   const updatedUserRole = await callTool("update_workspace_member_role", {
     workspaceId,
@@ -2039,14 +2036,7 @@ try {
       `direct view add_comment unexpectedly succeeded:\n${directPageViewCommentAttempt.text}`,
     );
   }
-  if (
-    !directPageViewCommentAttempt.text.includes("Forbidden") &&
-    !directPageViewCommentAttempt.text.includes("Page access required")
-  ) {
-    throw new Error(
-      `direct page view add_comment denial returned an unexpected error:\n${directPageViewCommentAttempt.text}`,
-    );
-  }
+  assertAccessDenial(directPageViewCommentAttempt.text, "direct page view add_comment denial");
 
   const directPageCommentAccess = await callNotificationSourceTool("update_page_access", {
     permissionId: notificationPermissionId,
@@ -2097,7 +2087,7 @@ try {
       `direct edit grant_page_access unexpectedly succeeded:\n${directPageShareAttempt.text}`,
     );
   }
-  assertIncludes(directPageShareAttempt.text, "Forbidden", "direct page edit grant_page_access denial");
+  assertAccessDenial(directPageShareAttempt.text, "direct page edit grant_page_access denial");
   await assertWorkspaceAdminToolsDenied(
     callToolResult,
     notificationWorkspaceId,
@@ -2154,14 +2144,7 @@ try {
       `integration principal view add_comment unexpectedly succeeded:\n${integrationPrincipalCommentAttempt.text}`,
     );
   }
-  if (
-    !integrationPrincipalCommentAttempt.text.includes("Forbidden") &&
-    !integrationPrincipalCommentAttempt.text.includes("Page access required")
-  ) {
-    throw new Error(
-      `integration principal view add_comment denial returned an unexpected error:\n${integrationPrincipalCommentAttempt.text}`,
-    );
-  }
+  assertAccessDenial(integrationPrincipalCommentAttempt.text, "integration principal view add_comment denial");
 
   const directEmailChildTitle = `MCP direct email child page ${suffix}`;
   const directEmailChildBody = `MCP direct email inherited child body ${suffix}`;
@@ -2285,15 +2268,7 @@ try {
       `direct email comment access add_content unexpectedly succeeded:\n${directEmailEditAttempt.text}`,
     );
   }
-  if (
-    !directEmailEditAttempt.text.includes("Forbidden") &&
-    !directEmailEditAttempt.text.includes("edit access") &&
-    !directEmailEditAttempt.text.includes("Page access required")
-  ) {
-    throw new Error(
-      `direct email comment access add_content denial returned an unexpected error:\n${directEmailEditAttempt.text}`,
-    );
-  }
+  assertAccessDenial(directEmailEditAttempt.text, "direct email comment access add_content denial");
   const directEmailRowWriteAttempt = await callEmailShareToolResult("add_database_row", {
     databaseId: directEmailDatabaseId,
     title: `MCP direct email denied row ${suffix}`,
@@ -2303,15 +2278,7 @@ try {
       `direct email comment access add_database_row unexpectedly succeeded:\n${directEmailRowWriteAttempt.text}`,
     );
   }
-  if (
-    !directEmailRowWriteAttempt.text.includes("Forbidden") &&
-    !directEmailRowWriteAttempt.text.includes("edit access") &&
-    !directEmailRowWriteAttempt.text.includes("Page access required")
-  ) {
-    throw new Error(
-      `direct email comment access add_database_row denial returned an unexpected error:\n${directEmailRowWriteAttempt.text}`,
-    );
-  }
+  assertAccessDenial(directEmailRowWriteAttempt.text, "direct email comment access add_database_row denial");
 
   const directEmailRevokedAccess = await callNotificationSourceTool("revoke_page_access", {
     permissionId: directEmailPermissionId,
@@ -2340,14 +2307,7 @@ try {
       `direct email get_page after revoke unexpectedly succeeded:\n${directEmailPageAfterRevoke.text}`,
     );
   }
-  if (
-    !directEmailPageAfterRevoke.text.includes("Forbidden") &&
-    !directEmailPageAfterRevoke.text.includes("Page access required")
-  ) {
-    throw new Error(
-      `direct email get_page after revoke returned an unexpected error:\n${directEmailPageAfterRevoke.text}`,
-    );
-  }
+  assertAccessDenial(directEmailPageAfterRevoke.text, "direct email get_page after revoke");
   const directEmailSearchAfterRevoke = await callEmailShareTool("search_pages", {
     query: directEmailRowTitle,
   });
@@ -2445,10 +2405,19 @@ try {
   createdFileUploadTargets.set(uploadId, { workspaceId, uploadId });
   assertIncludes(preparedUpload, "status: pending", "prepare_file_upload response");
 
+  const uploadForm = new FormData();
+  uploadForm.append("file", new Blob([fileBody], { type: "text/plain" }), uploadKey);
+  uploadForm.append("key", uploadKey);
+  uploadForm.append("customMetadata", JSON.stringify({
+    uploadId,
+    workspaceId,
+    pageId,
+    blockId: "",
+    originalName: `mcp-live-smoke-${suffix}.txt`,
+  }));
   const uploaded = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: { "content-type": "text/plain" },
-    body: fileBody,
+    method: "POST",
+    body: uploadForm,
   });
   if (!uploaded.ok) {
     throw new Error(`signed file upload failed (HTTP ${uploaded.status})`);
@@ -2788,15 +2757,7 @@ try {
       `direct database view add_database_row unexpectedly succeeded:\n${directDatabaseViewWriteAttempt.text}`,
     );
   }
-  if (
-    !directDatabaseViewWriteAttempt.text.includes("Forbidden") &&
-    !directDatabaseViewWriteAttempt.text.includes("Page access required") &&
-    !directDatabaseViewWriteAttempt.text.includes("Workspace access required")
-  ) {
-    throw new Error(
-      `direct database view add_database_row denial returned an unexpected error:\n${directDatabaseViewWriteAttempt.text}`,
-    );
-  }
+  assertAccessDenial(directDatabaseViewWriteAttempt.text, "direct database view add_database_row denial");
 
   const directDatabaseEditAccess = await callTool("update_page_access", {
     permissionId: directDatabasePermissionId,
@@ -2848,11 +2809,7 @@ try {
       `direct database edit grant_page_access unexpectedly succeeded:\n${directDatabaseEditShareAttempt.text}`,
     );
   }
-  assertIncludes(
-    directDatabaseEditShareAttempt.text,
-    "Forbidden",
-    "direct database edit grant_page_access denial",
-  );
+  assertAccessDenial(directDatabaseEditShareAttempt.text, "direct database edit grant_page_access denial");
   await assertWorkspaceAdminToolsDenied(
     callNotificationSourceToolResult,
     workspaceId,
@@ -3293,6 +3250,10 @@ try {
   await closeEmailShareClient().catch(() => {});
   await closeNotificationSourceClient().catch(() => {});
   cleanupTempPolicyFiles();
-  await client.close().catch(() => {});
-  await transport.close().catch(() => {});
+  await client?.close().catch(() => {});
+  await transport?.close().catch(() => {});
+  await cleanupSmokeAccounts().catch((error) => {
+    console.error(`FAIL MCP smoke account cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+    process.exitCode ||= 1;
+  });
 }

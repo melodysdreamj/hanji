@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, openSync, readdirSync, statSync, writeSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { rotateFile } from './lib/log-rotation.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = join(root, 'backend');
@@ -11,6 +12,8 @@ const webDir = join(root, 'web');
 const webDistIndex = join(webDir, 'dist', 'index.html');
 const logDir = join(root, '.edgebase', 'dev');
 const logPath = join(logDir, 'edgebase-dev-refresh.log');
+const MAX_RUNTIME_LOG_BYTES = 5 * 1024 * 1024;
+const MAX_RUNTIME_LOG_BACKUPS = 3;
 const defaultBaseUrl = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const screenSessionName = process.env.HANJI_EDGEBASE_DEV_SCREEN ?? 'hanji-edgebase-dev';
 const webBuildInputs = [
@@ -156,6 +159,13 @@ async function stopPortRuntimeIfOwned() {
 
 async function startDetachedRuntime() {
   mkdirSync(logDir, { recursive: true });
+  const rotated = rotateFile(logPath, {
+    maxBytes: MAX_RUNTIME_LOG_BYTES,
+    maxBackups: MAX_RUNTIME_LOG_BACKUPS,
+  });
+  if (rotated) {
+    console.log(`Rotated runtime log after ${MAX_RUNTIME_LOG_BYTES} bytes (kept ${MAX_RUNTIME_LOG_BACKUPS} backups).`);
+  }
   const out = openSync(logPath, 'a');
   writeSync(out, `\n\n--- refresh ${new Date().toISOString()} ---\n`);
 
@@ -165,6 +175,11 @@ async function startDetachedRuntime() {
     env: {
       ...process.env,
       HANJI_ALLOW_DEV_GUEST_LOGIN: process.env.HANJI_ALLOW_DEV_GUEST_LOGIN ?? 'true',
+      // Request logs are high-volume during the visual suite and previously
+      // grew this detached log past 100 MiB. Keep warnings/errors here; a
+      // caller can opt back into verbose Wrangler output explicitly.
+      WRANGLER_LOG: process.env.WRANGLER_LOG ?? 'warn',
+      WRANGLER_WRITE_LOGS: process.env.WRANGLER_WRITE_LOGS ?? 'false',
     },
     stdio: ['ignore', out, out],
   });

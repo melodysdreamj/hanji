@@ -10,6 +10,7 @@
 // for backend/functions/import-export.ts native actions + lib/native-document.ts.
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   assert,
   assertRuntimeReachable,
@@ -40,6 +41,7 @@ try {
   process.exitCode = 1;
 } finally {
   await cleanup().catch((error) => console.error(`WARN cleanup failed: ${error?.message ?? error}`));
+  await finalizeRegisteredSmokeAccounts('native export/import smoke');
 }
 
 async function main() {

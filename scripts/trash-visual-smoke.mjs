@@ -11,6 +11,7 @@ import {
   assertRuntimeReachable,
   captureBrowserSession,
   callFunction,
+  finalizeRegisteredSmokeAccounts,
   installBrowserSession,
   loadPlaywright,
   newCheckedPage,
@@ -38,6 +39,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('trash visual smoke');
 }
 
 async function main() {

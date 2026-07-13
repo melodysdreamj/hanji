@@ -95,6 +95,34 @@ describe('master provisioning signup fence', () => {
       'Master account provisioning must complete before signup',
     );
   });
+
+  it('keeps public signup fenced until web setup records its master', async () => {
+    const pendingDb = fakeDb({ instance_settings: [] });
+    const setupContext = {
+      data: { after: { email: 'new-user@example.com' } },
+      env: { HANJI_SETUP_TOKEN: 'unit-test-setup-token' },
+      admin: {
+        db: () => pendingDb,
+        auth: { async listUsers() { return { users: [{ id: 'setup-user' }] }; } },
+      },
+    };
+    await expect(handlerOf(signupPolicy)(setupContext)).rejects.toThrow(
+      'Master account provisioning must complete before signup',
+    );
+
+    const readyDb = fakeDb({
+      instance_settings: [{
+        id: 'global',
+        masterUserId: 'setup-user',
+        masterEmail: 'owner@example.com',
+        signupPolicy: 'public',
+      }],
+    });
+    await expect(handlerOf(signupPolicy)({
+      ...setupContext,
+      admin: { ...setupContext.admin, db: () => readyDb },
+    })).resolves.toBeUndefined();
+  });
 });
 
 describe('server-level signup policy', () => {

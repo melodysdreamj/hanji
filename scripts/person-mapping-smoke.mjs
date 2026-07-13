@@ -6,6 +6,8 @@
 import {
   assert,
   assertRuntimeReachable,
+  deleteSmokeUser,
+  deleteSmokeWorkspace,
   normalizeBaseUrl,
   resolveUrl,
   masterCredentials,
@@ -38,17 +40,28 @@ async function main() {
   await assertRuntimeReachable(BASE);
   const suffix = Date.now();
   const master = await signin(MASTER_EMAIL, MASTER_PASSWORD);
+  let createdUserId = '';
+  let createdWorkspace = null;
+  let runError = null;
+
+  try {
 
   // Workspace + member that the imported identity will map onto.
   const memberEmail = `mapped-target-${suffix}@example.com`;
   const created = await api(
     '/api/functions/instance-admin',
-    { action: 'createUser', email: memberEmail, displayName: `Mapped Target ${suffix}` },
+    {
+      action: 'createUser',
+      email: memberEmail,
+      displayName: `Mapped Target ${suffix}`,
+      query: memberEmail,
+    },
     master,
   );
   assert(created.status === 200, `createUser failed: ${JSON.stringify(created.json).slice(0, 160)}`);
   const targetUserId = (created.json.users ?? []).find((user) => user.email === memberEmail)?.id;
   assert(targetUserId, 'created user id should be listed');
+  createdUserId = targetUserId;
 
   const ws = await api(
     '/api/functions/workspace-mutation',
@@ -57,6 +70,7 @@ async function main() {
   );
   const workspaceId = ws.json.workspace?.id;
   assert(workspaceId, 'workspace should be created');
+  createdWorkspace = ws.json.workspace;
   const invited = await api(
     '/api/functions/workspace-mutation',
     { action: 'inviteMember', workspaceId, userId: targetUserId, email: memberEmail, role: 'member' },
@@ -181,8 +195,32 @@ async function main() {
   );
   console.log('PASS apply rewrites row values and mention spans, keeps provenance, and clears the list.');
 
-  await api('/api/functions/workspace-mutation', { action: 'deleteWorkspace', workspaceId }, master).catch(() => {});
   console.log('PASS person mapping flow works end to end.');
+  } catch (error) {
+    runError = error;
+  } finally {
+    const cleanupErrors = [];
+    if (createdWorkspace) {
+      try {
+        await deleteSmokeWorkspace(BASE, master, createdWorkspace);
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (createdUserId) {
+      try {
+        await deleteSmokeUser(BASE, master, createdUserId);
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      const cleanupError = new Error(`person-mapping smoke cleanup failed: ${cleanupErrors.join('; ')}`);
+      if (!runError) runError = cleanupError;
+      else console.error(`WARN ${cleanupError.message}`);
+    }
+  }
+  if (runError) throw runError;
 }
 
 try {

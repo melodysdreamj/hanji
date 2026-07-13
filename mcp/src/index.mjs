@@ -2337,17 +2337,15 @@ function workspaceMemberLabel(member) {
 
 function workspaceMemberLines(result) {
   const members = result.members ?? [];
-  const invitations = result.invitations ?? [];
   const workspace = result.workspace ?? {};
   const lines = [
     "# Workspace Members",
     `workspace: ${workspace.name || "unknown"}`,
     `workspace id: ${workspace.id || result.workspaceId || "unknown"}`,
     `members: ${members.length}`,
-    `pending invitations: ${invitations.length}`,
   ];
-  if (members.length === 0 && invitations.length === 0) {
-    lines.push("", "No members or pending invitations found.");
+  if (members.length === 0) {
+    lines.push("", "No workspace members found.");
     return lines;
   }
   for (const member of members) {
@@ -2358,22 +2356,6 @@ function workspaceMemberLines(result) {
       `  user id: ${member.userId}`,
       member.email ? `  email: ${member.email}` : null,
       member.createdBy ? `  created by: ${member.createdBy}` : null,
-    );
-  }
-  for (const invitation of invitations) {
-    lines.push(
-      "",
-      `- ${invitation.displayName || invitation.email || "Pending invitation"} (${workspaceMemberRoleLabel(invitation.role)})`,
-      `  invitation id: ${invitation.id}`,
-      `  email: ${invitation.email}`,
-      `  status: ${invitation.status || "pending"}`,
-      `  email delivery: ${invitation.emailDeliveryStatus || "unsent"}`,
-      invitation.emailDeliveredAt ? `  email delivered at: ${invitation.emailDeliveredAt}` : null,
-      invitation.emailMessageId ? `  email message id: ${invitation.emailMessageId}` : null,
-      result.invitation?.id === invitation.id && invitation.token
-        ? `  accept token: ${invitation.token}`
-        : null,
-      invitation.createdBy ? `  created by: ${invitation.createdBy}` : null,
     );
   }
   return lines.filter(Boolean);
@@ -4623,16 +4605,16 @@ server.registerTool(
 );
 
 server.registerTool(
-  "invite_workspace_member",
+  "add_workspace_member",
   {
-    title: "Invite workspace member",
+    title: "Add workspace member",
     description:
-      "Invite an email address, add a known user id, or update an existing workspace member through the backend workspace API.",
+      "Add an existing server account to a workspace, or update an existing workspace member, through the backend workspace API. An unknown email is handled as a blind no-op so this tool cannot be used to discover whether an account exists.",
     inputSchema: {
       workspaceId: z.string().optional(),
       userId: z.string().optional().describe("Known EdgeBase user id to add to the workspace"),
       displayName: z.string().optional(),
-      email: z.string().optional().describe("Email address to invite when userId is not known"),
+      email: z.string().optional().describe("Exact email of an existing server account when userId is not known"),
       role: z.enum(WORKSPACE_MEMBER_ROLES).optional(),
     },
   },
@@ -4640,36 +4622,13 @@ server.registerTool(
     try {
       if (!userId && !email) throw new Error("Provide userId or email.");
       const workspace = workspaceId ? { id: workspaceId } : await eb.workspace();
-      const result = await eb.inviteWorkspaceMember({
+      const result = await eb.addWorkspaceMember({
         workspaceId: workspace.id,
         userId,
         displayName,
         email,
         role,
       });
-      return ok(workspaceMemberLines(result).join("\n"));
-    } catch (e) {
-      return fail(e);
-    }
-  }
-);
-
-server.registerTool(
-  "accept_workspace_invitation",
-  {
-    title: "Accept workspace invitation",
-    description:
-      "Accept a pending workspace email invitation through the backend workspace API. The invitation token usually comes from an invite link.",
-    inputSchema: {
-      token: z.string().optional(),
-      invitationId: z.string().optional(),
-      email: z.string().optional().describe("Optional email check for the invitation being accepted"),
-    },
-  },
-  async ({ token, invitationId, email }) => {
-    try {
-      if (!token && !invitationId) throw new Error("Provide token or invitationId.");
-      const result = await eb.acceptWorkspaceInvitation({ token, invitationId, email });
       return ok(workspaceMemberLines(result).join("\n"));
     } catch (e) {
       return fail(e);
@@ -4698,33 +4657,6 @@ server.registerTool(
       const result = await eb.updateMyWorkspaceProfile({
         workspaceId: workspace.id,
         displayName,
-        email,
-      });
-      return ok(workspaceMemberLines(result).join("\n"));
-    } catch (e) {
-      return fail(e);
-    }
-  }
-);
-
-server.registerTool(
-  "revoke_workspace_invitation",
-  {
-    title: "Revoke workspace invitation",
-    description: "Revoke a pending workspace email invitation through the backend workspace API.",
-    inputSchema: {
-      workspaceId: z.string().optional(),
-      invitationId: z.string().optional(),
-      email: z.string().optional(),
-    },
-  },
-  async ({ workspaceId, invitationId, email }) => {
-    try {
-      if (!invitationId && !email) throw new Error("Provide invitationId or email.");
-      const workspace = workspaceId ? { id: workspaceId } : await eb.workspace();
-      const result = await eb.removeWorkspaceInvitation({
-        workspaceId: workspace.id,
-        invitationId,
         email,
       });
       return ok(workspaceMemberLines(result).join("\n"));
@@ -5129,15 +5061,16 @@ server.registerTool(
     description:
       "Exchange a Notion OAuth callback code and signed state for an encrypted Notion import connection.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       code: z.string().describe("Authorization code returned by Notion"),
       state: z.string().describe("Signed state returned by Notion"),
       redirectUri: z.string().optional().describe("Redirect URI used in the authorization request"),
       name: z.string().optional().describe("Optional connection name override"),
     },
   },
-  async ({ code, state, redirectUri, name }) => {
+  async ({ workspaceId, code, state, redirectUri, name }) => {
     try {
-      const result = await eb.completeNotionOAuthConnection({ code, state, redirectUri, name });
+      const result = await eb.completeNotionOAuthConnection({ workspaceId, code, state, redirectUri, name });
       return ok(notionImportConnectionSummary(result.connection));
     } catch (e) {
       return fail(e);
@@ -5201,12 +5134,13 @@ server.registerTool(
     title: "Revoke Notion import connection",
     description: "Revoke a stored Notion API import connection and remove its encrypted credential.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       connectionId: z.string().describe("Notion import connection id"),
     },
   },
-  async ({ connectionId }) => {
+  async ({ workspaceId, connectionId }) => {
     try {
-      const result = await eb.revokeNotionImportConnection(connectionId);
+      const result = await eb.revokeNotionImportConnection({ workspaceId, connectionId });
       return ok(notionImportConnectionSummary(result.connection));
     } catch (e) {
       return fail(e);
@@ -5302,12 +5236,13 @@ server.registerTool(
     title: "Get Notion import job",
     description: "Inspect a Notion API import job and its discovered Notion items.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Notion import job id"),
     },
   },
-  async ({ jobId }) => {
+  async ({ workspaceId, jobId }) => {
     try {
-      const result = await eb.getNotionImportJob(jobId);
+      const result = await eb.getNotionImportJob({ workspaceId, jobId });
       return ok(notionImportJobSummary(result.job) + notionImportItemPreview(result.items));
     } catch (e) {
       return fail(e);
@@ -5322,12 +5257,13 @@ server.registerTool(
     description:
       "Dry-run a ready Notion API import job and return estimated local writes plus conversion issues before applying it.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Ready Notion import job id"),
     },
   },
-  async ({ jobId }) => {
+  async ({ workspaceId, jobId }) => {
     try {
-      const result = await eb.planNotionImportJob(jobId);
+      const result = await eb.planNotionImportJob({ workspaceId, jobId });
       return ok(notionImportJobSummary(result.job) + "\n\n" + notionImportPlanSummary(result.plan));
     } catch (e) {
       return fail(e);
@@ -5342,6 +5278,7 @@ server.registerTool(
     description:
       "Run the Notion API discovery pass for an existing import job with a one-time token or stored connection id.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Notion import job id"),
       notionToken: z.string().optional().describe("One-time Notion API token; not stored"),
       connectionId: z.string().optional().describe("Stored Notion import connection id"),
@@ -5354,6 +5291,7 @@ server.registerTool(
     },
   },
   async ({
+    workspaceId,
     jobId,
     notionToken,
     connectionId,
@@ -5366,6 +5304,7 @@ server.registerTool(
   }) => {
     try {
       const result = await eb.discoverNotionImportJob({
+        workspaceId,
         jobId,
         notionToken,
         connectionId,
@@ -5389,12 +5328,13 @@ server.registerTool(
     title: "Cancel Notion import job",
     description: "Cancel a queued or active Notion API import job.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Notion import job id"),
     },
   },
-  async ({ jobId }) => {
+  async ({ workspaceId, jobId }) => {
     try {
-      const result = await eb.cancelNotionImportJob(jobId);
+      const result = await eb.cancelNotionImportJob({ workspaceId, jobId });
       return ok(notionImportJobSummary(result.job));
     } catch (e) {
       return fail(e);
@@ -5409,12 +5349,13 @@ server.registerTool(
     description:
       "Apply a ready Notion API import job into local Hanji pages, canonical databases, views, rows, blocks, file uploads, and durable mappings.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Ready Notion import job id"),
     },
   },
-  async ({ jobId }) => {
+  async ({ workspaceId, jobId }) => {
     try {
-      const result = await eb.applyNotionImportJob(jobId);
+      const result = await eb.applyNotionImportJob({ workspaceId, jobId });
       const applied = result.applied ?? {};
       return ok(
         notionImportJobSummary(result.job) +
@@ -5440,12 +5381,13 @@ server.registerTool(
     description:
       "Retry copying skipped Notion file references from a completed import job into EdgeBase storage without creating a new import job.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Completed Notion import job id"),
     },
   },
-  async ({ jobId }) => {
+  async ({ workspaceId, jobId }) => {
     try {
-      const result = await eb.retryNotionImportFileCopies(jobId);
+      const result = await eb.retryNotionImportFileCopies({ workspaceId, jobId });
       const retry = result.fileRetry ?? {};
       return ok(
         notionImportJobSummary(result.job) +
@@ -5466,6 +5408,7 @@ server.registerTool(
     description:
       "Create a retry job from a previous Notion API import job. Provide a token to run discovery immediately.",
     inputSchema: {
+      workspaceId: z.string().optional().describe("Workspace id; defaults to the current workspace"),
       jobId: z.string().describe("Previous Notion import job id"),
       notionToken: z.string().optional().describe("Optional Notion API token for immediate discovery; not stored"),
       connectionId: z.string().optional().describe("Optional stored Notion import connection id for immediate discovery"),
@@ -5476,9 +5419,10 @@ server.registerTool(
       maxViewPages: z.number().optional().describe("Number of view-list pages to read per data source, max 3"),
     },
   },
-  async ({ jobId, notionToken, connectionId, maxDiscoveryPages, maxEnrichedItems, maxChildrenPages, maxDataSourceQueryPages, maxViewPages }) => {
+  async ({ workspaceId, jobId, notionToken, connectionId, maxDiscoveryPages, maxEnrichedItems, maxChildrenPages, maxDataSourceQueryPages, maxViewPages }) => {
     try {
       const result = await eb.retryNotionImportJob({
+        workspaceId,
         jobId,
         notionToken,
         connectionId,

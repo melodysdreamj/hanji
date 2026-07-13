@@ -59,8 +59,11 @@ test('self-host bootstrap fails closed on low disk or incomplete product readine
   assert.match(source, /chmod 700 "\$STATE_DIR"/);
   assert.match(source, /chmod 600 "\$ENV_FILE"/);
   assert.match(source, /chmod 600 "\$CERT_DIR\/key\.pem"/);
-  assert.match(source, /chown 100:101 \/target\/cert\.pem \/target\/key\.pem/);
+  assert.match(source, /chown 10001:10001 \/target\/cert\.pem \/target\/key\.pem/);
   assert.match(source, /chmod 600 \/target\/key\.pem/);
+  assert.match(source, /127\.0\.0\.1:\$PORT:\$PORT/);
+  assert.match(source, /HANJI_TRUST_SELF_HOSTED_PROXY=true/);
+  assert.match(source, /--http requires --origin https:\/\/your-hanji-host/);
   assert.doesNotMatch(source, /chmod 644 "\$CERT_DIR\/key\.pem"/);
   assert.doesNotMatch(source, /wait_health\s*\|\|\s*true/);
   assert.match(source, /docker rm -f "\$CONTAINER".*The data volume was kept/s);
@@ -90,6 +93,21 @@ test('self-host launcher rejects unsafe options before contacting Docker', () =>
       env: { HANJI_DOCKER_MIN_FREE_KB: 'invalid' },
       message: 'HANJI_DOCKER_MIN_FREE_KB must be a non-negative integer',
     },
+    {
+      args: ['up', '--http'],
+      env: {},
+      message: '--http requires --origin',
+    },
+    {
+      args: ['up', '--http', '--origin', 'http://hanji.example.com'],
+      env: {},
+      message: '--origin must be an https:// URL',
+    },
+    {
+      args: ['up', '--origin', 'https://hanji.example.com'],
+      env: {},
+      message: '--origin is only used together with --http',
+    },
   ];
 
   for (const entry of cases) {
@@ -110,15 +128,15 @@ test('i18n release guard rejects catalogs that only copy the English source', ()
   assert.match(source, /untranslatedCopy/);
   assert.match(source, /UNTRANSLATED_COPY/);
   assert.match(source, /catalogTopologyProblems/);
-  assert.match(source, /REQUIRED_RELEASED_LANGUAGES/);
+  assert.match(source, /REQUIRED_COMPLETE_LANGUAGES/);
   assert.match(source, /catalog directory has no runtime wrapper/);
-  assert.match(source, /catalog directory is absent from the selector/);
+  assert.match(source, /released language is absent from the selector/);
   assert.match(source, /interpolationMismatch/);
   assert.match(source, /shapeMismatch/);
   assert.match(source, /a\.orphan\.length/);
   assert.match(source, /INTENTIONAL_INTERPOLATION_VARIANTS/);
   assert.match(source, /INTERPOLATION/);
-  assert.match(source, /every released target is translated and current/);
+  assert.match(source, /required en\/ko coverage is current/);
 });
 
 test('browser smokes use EdgeBase origin-namespaced auth storage', () => {
@@ -316,7 +334,7 @@ test('release env template declares safe hosted values and neutralizes disabled 
   assert.doesNotMatch(source, /HANJI_MCP_(?:PUBLIC_ORIGIN|RESOURCE|SCOPES)/);
 });
 
-test('production browser client is same-origin and Vite overrides stay development-only', () => {
+test('production browser client is same-origin and anonymous bootstrap still needs explicit local runtime gates', () => {
   const clientSource = readFileSync(resolve(repoRoot, 'web/src/lib/edgebase.ts'), 'utf8');
   const authSource = readFileSync(resolve(repoRoot, 'web/src/components/AuthGate.tsx'), 'utf8');
 
@@ -324,12 +342,13 @@ test('production browser client is same-origin and Vite overrides stay developme
   assert.match(clientSource, /const EDGEBASE_URL = runtimeOrigin/);
   assert.match(
     clientSource,
-    /import\.meta\.env\.DEV\s*&&\s*import\.meta\.env\.VITE_ALLOW_ANONYMOUS_BOOTSTRAP/,
+    /const ALLOW_ANONYMOUS_BOOTSTRAP\s*=\s*import\.meta\.env\.VITE_ALLOW_ANONYMOUS_BOOTSTRAP\s*===\s*["']true["']/,
   );
   assert.match(
     authSource,
-    /import\.meta\.env\.DEV\s*&&\s*import\.meta\.env\.VITE_ALLOW_ANONYMOUS_BOOTSTRAP/,
+    /import\.meta\.env\.VITE_ALLOW_ANONYMOUS_BOOTSTRAP\s*===\s*["']true["']\s*&&\s*isLocalDevelopmentOrigin\(\)/,
   );
+  assert.match(clientSource, /!ALLOW_ANONYMOUS_BOOTSTRAP\s*\|\|\s*!isLocalDevelopmentOrigin\(\)/);
 });
 
 test('strict release rejects browser-exposed variables from production-loaded Vite env files', () => {

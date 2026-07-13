@@ -60,7 +60,7 @@ const highRiskChecks = [
     why: 'Database source picker uses viewport coordinates from block insertion points.',
     requirements: [
       requirement('web/src/components/editor/BlockItem.tsx', /function DatabaseSourcePicker[\s\S]*?createPortal\(picker,\s*document\.body\)/, 'database source picker portals to document.body'),
-      requirement('web/src/components/editor/BlockItem.tsx', /editorFloatingBackdrop[\s\S]*?aria-label="Close database source picker"/, 'database source picker backdrop uses the editor floating layer'),
+      requirement('web/src/components/editor/BlockItem.tsx', /function DatabaseSourcePicker[\s\S]*?className=\{`\$\{styles\.menuBackdrop\} \$\{styles\.editorFloatingBackdrop\}`\}[\s\S]*?databaseSource\.closePicker/, 'database source picker backdrop uses the editor floating layer'),
     ],
   },
   {

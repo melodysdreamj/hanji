@@ -5,6 +5,7 @@ import {
   type DbRef as SettingsDbRef,
 } from '../lib/instance-settings';
 import { hanjiEnvFlag, hanjiEnvValue } from '../lib/hanji-compat';
+import { getExisting, type TransactDb } from '../lib/table-utils';
 
 // Master-account bootstrap. The deployment command/environment provides
 // HANJI_MASTER_EMAIL / HANJI_MASTER_PASSWORD; this endpoint
@@ -12,8 +13,9 @@ import { hanjiEnvFlag, hanjiEnvValue } from '../lib/hanji-compat';
 // tells the client whether the instance is usable at all:
 //  - master env configured  -> ensure account, never blocked
 //  - no master env, but the instance already has users -> normal sign-in
-//  - no master env, zero users, no dev-guest escape -> setup blocked; the
-//    operator must restart the server with master credentials.
+//  - no master env, zero users, setup token configured -> first-run web setup
+//  - no master env/token, zero users, no dev-guest escape -> setup blocked;
+//    the operator must provide an initialization mechanism.
 // The endpoint never returns the configured credentials. Request URL/Host
 // metadata cannot prove that the network peer is loopback (proxies and direct
 // clients can supply it), so even development convenience flows must use the
@@ -33,21 +35,46 @@ interface AuthAdmin {
     displayName?: string;
     role?: string;
   }): Promise<Record<string, unknown>>;
+  updateUser?(userId: string, data: {
+    password?: string;
+    displayName?: string;
+  }): Promise<Record<string, unknown>>;
 }
 
 interface AuditTableRef {
   insert(data: Record<string, unknown>): Promise<unknown>;
 }
 
+interface SetupRecord {
+  id: string;
+  state: 'pending' | 'complete' | string;
+  email: string;
+  userId?: string | null;
+  claimedAt: string;
+  completedAt?: string | null;
+}
+
+interface SetupTableRef {
+  getOne(id: string): Promise<SetupRecord | null>;
+  update(id: string, data: Partial<SetupRecord>): Promise<SetupRecord>;
+}
+
+type BootstrapDb = SettingsDbRef & TransactDb & {
+  table(name: string): unknown;
+};
+
 interface FunctionContext {
   auth?: { id?: string } | null;
   request?: Request;
   env?: Record<string, unknown>;
   admin: {
-    db(namespace: string): SettingsDbRef & { table<_T>(name: string): unknown };
+    db(namespace: string): BootstrapDb;
     auth?: AuthAdmin;
   };
 }
+
+const SETUP_ID = 'global';
+const SETUP_CODE_MIN_LENGTH = 24;
 
 export function normalizeMasterEmail(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -78,13 +105,41 @@ export function isSetupBlocked(opts: {
   masterConfigured: boolean;
   usersExist: boolean;
   devGuestEnabled: boolean;
+  setupAvailable?: boolean;
 }): boolean {
   if (opts.masterConfigured) return false;
   if (opts.usersExist) return false;
+  if (opts.setupAvailable) return false;
   // Dev/test runtimes with the loopback guest escape keep their existing
   // anonymous bootstrap path; production instances must restart with master
   // credentials before any account can exist.
   return !opts.devGuestEnabled;
+}
+
+export function validSetupPassword(value: unknown): value is string {
+  return typeof value === 'string' &&
+    value.length >= 10 &&
+    value.length <= 256 &&
+    /[A-Z]/.test(value) &&
+    /[a-z]/.test(value) &&
+    /\d/.test(value) &&
+    /[^A-Za-z0-9]/.test(value) &&
+    !/[\s\u0000-\u001f\u007f]/.test(value);
+}
+
+// The setup code is fixed-length random data in normal deployments. Keep the
+// comparison work proportional to the longer input so a remote caller cannot
+// learn a matching prefix from early returns.
+export function setupCodeMatches(provided: unknown, configured: string | null): boolean {
+  if (typeof provided !== 'string' || !configured || configured.length < SETUP_CODE_MIN_LENGTH) {
+    return false;
+  }
+  const length = Math.max(provided.length, configured.length);
+  let difference = provided.length ^ configured.length;
+  for (let index = 0; index < length; index += 1) {
+    difference |= (provided.charCodeAt(index) || 0) ^ (configured.charCodeAt(index) || 0);
+  }
+  return difference === 0;
 }
 
 function userIdFrom(user: Record<string, unknown>) {
@@ -127,7 +182,7 @@ async function findUserByEmail(authAdmin: AuthAdmin, email: string) {
 
 async function recordBootstrapAudit(
   db: FunctionContext['admin'] extends { db(namespace: string): infer D } ? D : never,
-  entry: { userId: string; email: string; created: boolean },
+  entry: { userId: string; email: string; created: boolean; source?: 'master-env' | 'web-setup' },
 ) {
   try {
     await (db.table('instance_audit_events') as AuditTableRef).insert({
@@ -136,7 +191,7 @@ async function recordBootstrapAudit(
       targetType: 'user',
       targetId: entry.userId,
       targetLabel: entry.email,
-      metadata: { createdAccount: entry.created, source: 'master-env' },
+      metadata: { createdAccount: entry.created, source: entry.source ?? 'master-env' },
       occurredAt: new Date().toISOString(),
     });
   } catch (error) {
@@ -145,7 +200,7 @@ async function recordBootstrapAudit(
 }
 
 async function ensureMasterAccount(
-  db: SettingsDbRef & { table<_T>(name: string): unknown },
+  db: BootstrapDb,
   authAdmin: AuthAdmin,
   email: string,
   password: string,
@@ -180,6 +235,123 @@ async function ensureMasterAccount(
   return { userId, created: true };
 }
 
+async function setupRecord(db: BootstrapDb) {
+  return getExisting(db.table('instance_setup') as SetupTableRef, SETUP_ID);
+}
+
+async function claimWebSetup(db: BootstrapDb, email: string) {
+  const existing = await setupRecord(db);
+  if (existing) {
+    if (existing.state === 'pending' && existing.email === email) return existing;
+    throw Object.assign(new Error('This Hanji instance setup has already been claimed.'), { status: 409 });
+  }
+
+  const claimedAt = new Date().toISOString();
+  try {
+    await db.transact([
+      { table: 'instance_setup', op: 'expect', id: SETUP_ID, exists: false },
+      {
+        table: 'instance_setup',
+        op: 'insert',
+        data: { id: SETUP_ID, state: 'pending', email, claimedAt },
+      },
+    ]);
+    return { id: SETUP_ID, state: 'pending', email, claimedAt } satisfies SetupRecord;
+  } catch {
+    const winner = await setupRecord(db);
+    if (winner?.state === 'pending' && winner.email === email) return winner;
+    throw Object.assign(new Error('This Hanji instance setup has already been claimed.'), { status: 409 });
+  }
+}
+
+async function completeWebSetup(
+  db: BootstrapDb,
+  authAdmin: AuthAdmin,
+  email: string,
+  password: string,
+  displayName: string | undefined,
+) {
+  const claim = await claimWebSetup(db, email);
+  let user = await findUserByEmail(authAdmin, email);
+  let created = false;
+  if (!user) {
+    try {
+      user = await authAdmin.createUser({
+        email,
+        password,
+        displayName: displayName || 'Master',
+        role: 'user',
+      });
+      created = true;
+    } catch (error) {
+      // A same-email retry can lose the unique auth insert after sharing the
+      // same durable setup claim. Only that claimed email is trusted here.
+      user = await findUserByEmail(authAdmin, claim.email);
+      if (!user) throw error;
+    }
+  } else if (authAdmin.updateUser) {
+    // Recovery after an ambiguous createUser commit: the durable claim proves
+    // this exact email won while the instance had no users. Make the password
+    // from the retry authoritative before finalizing the master identity.
+    user = await authAdmin.updateUser(userIdFrom(user), {
+      password,
+      ...(displayName ? { displayName } : {}),
+    });
+  }
+  const userId = userIdFrom(user);
+  if (!userId) throw new Error('Master account lookup returned no user id.');
+
+  // Ensure the singleton exists before the cross-table final transaction.
+  // Auth storage and app storage cannot share one transaction, but every app
+  // record below (master/admin settings, completed claim, audit) can.
+  await upsertInstanceSettings(db, {});
+  const settings = await getInstanceSettings(db);
+  const adminIds = Array.isArray(settings.instanceAdminUserIds)
+    ? (settings.instanceAdminUserIds as string[])
+    : [];
+  const completedAt = new Date().toISOString();
+  await db.transact([
+    {
+      table: 'instance_setup',
+      op: 'expect',
+      id: SETUP_ID,
+      where: [['state', '==', 'pending'], ['email', '==', email]],
+      exists: true,
+    },
+    {
+      table: 'instance_settings',
+      op: 'update',
+      id: 'global',
+      data: {
+        instanceAdminUserIds: Array.from(new Set([...adminIds, userId])),
+        masterUserId: userId,
+        masterEmail: email,
+        updatedBy: userId,
+      },
+    },
+    {
+      table: 'instance_setup',
+      op: 'update',
+      id: SETUP_ID,
+      data: { state: 'complete', userId, completedAt },
+    },
+    {
+      table: 'instance_audit_events',
+      op: 'insert',
+      data: {
+        actorId: userId,
+        action: 'instance.master.bootstrap',
+        targetType: 'user',
+        targetId: userId,
+        targetLabel: email,
+        metadata: { createdAccount: created, source: 'web-setup' },
+        occurredAt: completedAt,
+      },
+    },
+  ]);
+  return userId;
+}
+
 export const GET = defineFunction(async (rawContext: unknown) => {
   const context = rawContext as FunctionContext;
   const masterEmail = normalizeMasterEmail(
@@ -187,6 +359,7 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   );
   const masterPassword =
     hanjiEnvValue(context.env, 'HANJI_MASTER_PASSWORD', 'EDGEBASE_MASTER_PASSWORD') ?? null;
+  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
   const devGuestEnabled = hanjiEnvFlag(
     context.env,
     'HANJI_ALLOW_DEV_GUEST_LOGIN',
@@ -231,10 +404,23 @@ export const GET = defineFunction(async (rawContext: unknown) => {
     }
   }
 
+  let pendingSetup = false;
+  if (!plan.masterConfigured && setupToken && !settings.masterUserId) {
+    try {
+      pendingSetup = (await setupRecord(db))?.state === 'pending';
+    } catch {
+      pendingSetup = false;
+    }
+  }
+  const setupAvailable = Boolean(
+    !plan.masterConfigured && !settings.masterUserId && setupToken &&
+      setupToken.length >= SETUP_CODE_MIN_LENGTH && (!usersExist || pendingSetup),
+  );
   const setupBlocked = isSetupBlocked({
     masterConfigured: plan.masterConfigured,
     usersExist,
     devGuestEnabled,
+    setupAvailable,
   });
 
   return Response.json(
@@ -244,6 +430,9 @@ export const GET = defineFunction(async (rawContext: unknown) => {
       masterReady,
       masterError,
       setupBlocked,
+      setupAvailable,
+      setupCodeRequired: setupAvailable,
+      setupInProgress: pendingSetup,
       // Kept for older web bundles. The credential-returning flow was removed:
       // URL/Host loopback checks do not authenticate the actual network peer.
       devAutoLoginAvailable: false,
@@ -252,20 +441,110 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   );
 });
 
-// Compatibility tombstone for older web bundles. This action deliberately
-// never reads or returns the master environment credentials.
 export const POST = defineFunction(async (rawContext: unknown) => {
   const context = rawContext as FunctionContext;
   const body = (await context.request?.json().catch(() => ({}))) as Record<string, unknown>;
-  if (body.action !== 'claimDevAutoLogin') {
+  if (body.action === 'claimDevAutoLogin') {
+    return Response.json(
+      {
+        ok: false,
+        granted: false,
+        message: 'Master dev auto-login has been removed. Sign in with the configured account.',
+      },
+      { status: 403, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  if (body.action !== 'completeSetup') {
     return Response.json({ ok: false, message: 'Unknown instance bootstrap action.' }, { status: 400 });
   }
-  return Response.json(
-    {
-      ok: false,
-      granted: false,
-      message: 'Master dev auto-login has been removed. Sign in with the configured account.',
-    },
-    { status: 403, headers: { 'Cache-Control': 'no-store' } },
+
+  const configuredMasterEmail = normalizeMasterEmail(
+    hanjiEnvValue(context.env, 'HANJI_MASTER_EMAIL', 'EDGEBASE_MASTER_EMAIL'),
   );
+  const configuredMasterPassword =
+    hanjiEnvValue(context.env, 'HANJI_MASTER_PASSWORD', 'EDGEBASE_MASTER_PASSWORD') ?? null;
+  if (configuredMasterEmail && configuredMasterPassword) {
+    return Response.json(
+      { ok: false, message: 'This instance uses environment-provisioned master setup.' },
+      { status: 409, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
+  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
+  if (!setupCodeMatches(body.setupCode, setupToken)) {
+    return Response.json(
+      { ok: false, message: 'The setup code is invalid.' },
+      { status: 403, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  const email = normalizeMasterEmail(body.email);
+  if (!email) {
+    return Response.json(
+      { ok: false, message: 'Enter a valid administrator email.' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  if (!validSetupPassword(body.password)) {
+    return Response.json(
+      { ok: false, message: 'Password must be 10-256 characters with upper and lower case letters, a number, and a symbol.' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  const displayName = typeof body.displayName === 'string' && body.displayName.trim()
+    ? body.displayName.trim().slice(0, 100)
+    : undefined;
+  const db = context.admin.db('app');
+  const authAdmin = context.admin.auth;
+  if (!authAdmin) {
+    return Response.json(
+      { ok: false, message: 'Instance auth admin is unavailable.' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+
+  try {
+    const settings = await getInstanceSettings(db);
+    if (settings.masterUserId) {
+      return Response.json(
+        { ok: false, message: 'This Hanji instance is already initialized.' },
+        { status: 409, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+    const existingClaim = await setupRecord(db);
+    if (!existingClaim) {
+      let usersExist: boolean;
+      try {
+        const probe = await authAdmin.listUsers({ limit: 1 });
+        usersExist = (probe.users ?? []).length > 0;
+      } catch (error) {
+        usersExist = !isMissingAuthSchemaError(error);
+      }
+      if (usersExist) {
+        return Response.json(
+          { ok: false, message: 'This Hanji instance is already initialized.' },
+          { status: 409, headers: { 'Cache-Control': 'no-store' } },
+        );
+      }
+    }
+    await completeWebSetup(db, authAdmin, email, body.password, displayName);
+    return Response.json(
+      { ok: true },
+      { status: 201, headers: { 'Cache-Control': 'no-store' } },
+    );
+  } catch (error) {
+    console.error('[instance-bootstrap] web setup failed:', error);
+    const status = typeof error === 'object' && error !== null &&
+      typeof (error as { status?: unknown }).status === 'number'
+      ? (error as { status: number }).status
+      : 500;
+    return Response.json(
+      {
+        ok: false,
+        message: status === 409
+          ? 'This Hanji instance setup has already been claimed.'
+          : 'Instance setup failed. Check the server logs and try again.',
+      },
+      { status, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 });

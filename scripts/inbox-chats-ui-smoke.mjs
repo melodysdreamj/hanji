@@ -6,12 +6,15 @@
 import {
   assert,
   assertRuntimeReachable,
+  deleteSmokeUser,
+  deleteSmokeWorkspace,
   loadPlaywright,
   newCheckedPage,
   normalizeBaseUrl,
   resolveChromeExecutable,
   resolveUrl,
   setDefaultTimeoutMs,
+  waitForStableRoute,
   masterCredentials,
 } from './lib/harness.mjs';
 import { randomUUID } from 'node:crypto';
@@ -61,16 +64,27 @@ async function main() {
   await assertRuntimeReachable(BASE);
   const suffix = Date.now();
   const master = await signin(MASTER_EMAIL, MASTER_PASSWORD);
+  let createdUserId = '';
+  let createdWorkspace = null;
+  let runError = null;
+
+  try {
 
   const memberEmail = `chat-member-${suffix}@example.com`;
   const created = await api(
     '/api/functions/instance-admin',
-    { action: 'createUser', email: memberEmail, displayName: `Chat Member ${suffix}` },
+    {
+      action: 'createUser',
+      email: memberEmail,
+      displayName: `Chat Member ${suffix}`,
+      query: memberEmail,
+    },
     master,
   );
   const tempPassword = created.json.temporaryPassword;
   const memberId = (created.json.users ?? []).find((user) => user.email === memberEmail)?.id;
   assert(tempPassword && memberId, 'member should be provisioned');
+  createdUserId = memberId;
   const memberToken = await signin(memberEmail, tempPassword);
   await api('/api/functions/account-state', { action: 'clearMustChangePassword' }, memberToken);
 
@@ -82,6 +96,7 @@ async function main() {
   const workspaceId = ws.json.workspace?.id;
   const slug = ws.json.workspace?.domain;
   assert(workspaceId && slug, 'workspace should exist');
+  createdWorkspace = ws.json.workspace;
   await api(
     '/api/functions/workspace-mutation',
     { action: 'inviteMember', workspaceId, userId: memberId, email: memberEmail, role: 'member' },
@@ -119,6 +134,7 @@ async function main() {
       state: 'visible',
       timeout: TIMEOUT_MS,
     });
+    await waitForStableRoute(tab, { timeoutMs: TIMEOUT_MS });
 
     // Deterministically land in Chats mode: the rail button TOGGLES the
     // inbox, so only click it when the mode switch is not already visible.
@@ -136,7 +152,7 @@ async function main() {
     await rooms.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
     const room = rooms.locator('li').filter({ hasText: pageTitle }).first();
     await room.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-    console.log('PASS a mention surfaces the page as a chat room for the invitee.');
+    console.log('PASS a mention surfaces the page as a chat room for the added member.');
 
     // Opening the room opens the page's comment thread.
     await room.getByRole('button').first().click({ timeout: TIMEOUT_MS });
@@ -167,6 +183,7 @@ async function main() {
       state: 'visible',
       timeout: TIMEOUT_MS,
     });
+    await waitForStableRoute(tab, { timeoutMs: TIMEOUT_MS });
     await openChats();
     await tab
       .locator('[data-testid="inbox-chat-rooms"] li')
@@ -177,9 +194,33 @@ async function main() {
     await context.close();
   } finally {
     await browser.close().catch(() => {});
-    await api('/api/functions/workspace-mutation', { action: 'deleteWorkspace', workspaceId }, master).catch(() => {});
   }
   console.log('PASS inbox chat rooms flow works end to end.');
+  } catch (error) {
+    runError = error;
+  } finally {
+    const cleanupErrors = [];
+    if (createdWorkspace) {
+      try {
+        await deleteSmokeWorkspace(BASE, master, createdWorkspace, { timeoutMs: TIMEOUT_MS });
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (createdUserId) {
+      try {
+        await deleteSmokeUser(BASE, master, createdUserId, { timeoutMs: TIMEOUT_MS });
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      const cleanupError = new Error(`inbox-chats smoke cleanup failed: ${cleanupErrors.join('; ')}`);
+      if (!runError) runError = cleanupError;
+      else console.error(`WARN ${cleanupError.message}`);
+    }
+  }
+  if (runError) throw runError;
 }
 
 try {

@@ -49,6 +49,21 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("AppShell accessibility navigation", () => {
+  it("keeps an already-open inbox through the initial mount, then closes it on navigation", async () => {
+    useStore.setState({ updatesOpen: true });
+    render(
+      <AppShell>
+        <RouteControl />
+      </AppShell>
+    );
+
+    await waitFor(() => expect(useStore.getState().updatesOpen).toBe(true));
+
+    fireEvent.click(screen.getByRole("button", { name: "Go to trash" }));
+
+    await waitFor(() => expect(useStore.getState().updatesOpen).toBe(false));
+  });
+
   it("links the skip control to a focusable main and focuses/announces route changes", async () => {
     render(
       <AppShell>

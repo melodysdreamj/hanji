@@ -9,6 +9,7 @@ import { i18next } from "@/i18n";
 import { useStore } from "@/lib/store";
 
 const DISABLE_KEY = "hanji.sw.disabled";
+const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
 
 function swDisabled(): boolean {
   try {
@@ -44,6 +45,10 @@ function watchForUpdates(registration: ServiceWorkerRegistration) {
   registration.addEventListener("updatefound", () => track(registration.installing));
 }
 
+function warmOfflineAssets(registration: ServiceWorkerRegistration) {
+  registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE });
+}
+
 export function registerServiceWorker() {
   if (typeof window === "undefined") return;
   if (!("serviceWorker" in navigator)) return;
@@ -56,9 +61,18 @@ export function registerServiceWorker() {
     return;
   }
   window.addEventListener("load", () => {
+    const warmActiveWorker = () => {
+      void navigator.serviceWorker.ready
+        .then((registration) => warmOfflineAssets(registration))
+        .catch(() => {});
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", warmActiveWorker);
     navigator.serviceWorker
       .register("/sw.js")
-      .then((registration) => watchForUpdates(registration))
+      .then((registration) => {
+        watchForUpdates(registration);
+        warmActiveWorker();
+      })
       .catch(() => {
         // Offline support is progressive; registration failure is non-fatal.
       });

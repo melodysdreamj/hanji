@@ -1,7 +1,7 @@
 "use client";
 
-import { lazy, Suspense, type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "@/lib/router";
+import { lazy, Suspense, type CSSProperties, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { isPublicSharePath, routeInfoFromPath, usePathname, useRouter } from "@/lib/router";
 import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { absolutePageUrl, pageHref } from "@/lib/navigation";
@@ -46,13 +46,15 @@ function isTextEntryTarget(target: EventTarget | null) {
 }
 
 function pageIdFromPath(pathname: string) {
-  const match = pathname.match(/^\/(?:p|database)\/([^/?#]+)/);
-  return match ? decodeURIComponent(match[1]) : undefined;
+  const route = routeInfoFromPath(pathname);
+  if (route.kind === "page") return route.pageId;
+  if (route.kind === "database") return route.databaseId;
+  return undefined;
 }
 
 function workspaceSlugFromPath(pathname: string) {
-  const match = pathname.match(/^\/workspace\/([^/?#]+)/);
-  return match ? decodeURIComponent(match[1]) : undefined;
+  const route = routeInfoFromPath(pathname);
+  return route.kind === "workspace" ? route.workspaceSlug : undefined;
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -84,11 +86,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [moveDialogPageId, setMoveDialogPageId] = useState<string | null>(null);
   const pathname = usePathname();
-  const publicShareRoute = pathname.startsWith("/share/");
+  const publicShareRoute = isPublicSharePath(pathname);
   const workspaceSlug = workspaceSlugFromPath(pathname);
   const activePageId = pageIdFromPath(pathname);
   const mainRef = useRef<HTMLElement>(null);
   const previousPathnameRef = useRef(pathname);
+  const navigationCleanupPathnameRef = useRef(pathname);
 
   async function retryWorkspaceLoad() {
     setError(null);
@@ -201,8 +204,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setSidebarCollapsed(next);
   }, [setSidebarCollapsed, sidebarCollapsed]);
 
-  // Close the mobile drawer on any navigation.
-  useEffect(() => {
+  // Close transient panels after an actual navigation. On the first mount this
+  // effect can run after a user has already opened Inbox, especially on a
+  // slower freshly-authenticated runtime; do not treat that initial render as
+  // navigation and immediately close the panel again.
+  useLayoutEffect(() => {
+    if (navigationCleanupPathnameRef.current === pathname) return;
+    navigationCleanupPathnameRef.current = pathname;
     setSidebarOpen(false);
     closeComments();
     setUpdatesOpen(false);

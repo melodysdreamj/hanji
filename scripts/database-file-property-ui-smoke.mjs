@@ -6,6 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   browserAuthStorageKeys,
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -44,6 +45,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('database file property UI smoke');
 }
 
 async function main() {

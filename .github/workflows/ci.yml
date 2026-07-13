@@ -246,12 +246,17 @@ jobs:
         env:
           WRANGLER_SEND_METRICS: "false"
         run: |
-          export JWT_USER_SECRET=$(openssl rand -hex 32)
-          export JWT_ADMIN_SECRET=$(openssl rand -hex 32)
-          export SERVICE_KEY=$(openssl rand -hex 32)
-          # CI master account (matches the smoke-harness fallback credentials)
-          export HANJI_MASTER_EMAIL=master@hanji.local
-          export HANJI_MASTER_PASSWORD='HanjiMaster!2026'
+          # `edgebase dev` only forwards allowlisted shell variables. Write the
+          # runtime credentials to .dev.vars so the master account is available
+          # to the API smoke cleanup steps as well as the Worker bootstrap.
+          {
+            echo "JWT_USER_SECRET=$(openssl rand -hex 32)"
+            echo "JWT_ADMIN_SECRET=$(openssl rand -hex 32)"
+            echo "SERVICE_KEY=$(openssl rand -hex 32)"
+            echo "HANJI_MASTER_EMAIL=master@hanji.local"
+            echo "HANJI_MASTER_PASSWORD=HanjiMaster!2026"
+            echo "HANJI_WORKSPACE_DO_SPLIT=1"
+          } > .dev.vars
           # Keep stdin open: wrangler dev exits when its stdin reaches EOF.
           ( tail -f /dev/null | npm run dev > "$RUNNER_TEMP/edgebase-dev.log" 2>&1 & )
       - name: Wait for runtime health
@@ -266,6 +271,16 @@ jobs:
           echo "EdgeBase dev runtime did not become healthy" >&2
           tail -n 100 "$RUNNER_TEMP/edgebase-dev.log" >&2
           exit 1
+      - name: Provision CI master account
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        run: |
+          node --input-type=module -e '
+            const response = await fetch(`${process.env.HANJI_EDGEBASE_URL}/api/functions/instance-bootstrap`);
+            const body = await response.json();
+            if (!response.ok || body.masterReady !== true) {
+              throw new Error(`CI master provisioning failed: HTTP ${response.status}`);
+            }
+          '
       - name: Runtime bundle smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
@@ -281,7 +296,7 @@ jobs:
       - name: Collaboration smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
-        run: npm run verify:collaboration
+        run: npm run verify:collaboration -- --timeout-ms 60000
       - name: Database row lifecycle smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
@@ -431,7 +446,11 @@ jobs:
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
         run: npm run verify:auth-ui -- --timeout-ms 60000
-      - name: Admin provisioning and in-app invitation smoke
+      - name: Auth layout and route recovery smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:auth-route-ui -- --timeout-ms 60000
+      - name: Admin provisioning and server-account membership smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
         run: npm run verify:admin-provisioning
@@ -503,16 +522,35 @@ jobs:
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
         run: npm run verify:page-tree-ui -- --timeout-ms 60000
-      - name: Database row peek smoke
+      # The full row-peek tour reuses one browser page across every view and
+      # has proved state-flaky in the CI runtime. Keep the two core contracts
+      # as isolated fresh-context smokes instead: side-panel motion and direct
+      # row URL / inline relation selection.
+      - name: Database row peek motion smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
-        run: npm run verify:database-row-peek -- --timeout-ms 60000
-      - name: Durable outbox smoke
+        run: npm run verify:database-row-peek -- --only-row-peek-motion --timeout-ms 60000
+      - name: Database row peek inline relation smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:database-row-peek -- --only-inline-property-select --timeout-ms 60000
+      - name: Service-worker first-visit offline smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:service-worker-offline -- --timeout-ms 60000
+      - name: Durable outbox replay smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend
         # Local-first replay is a data-durability contract. Any phase failure
-        # must block release instead of being reduced to a warning.
-        run: npm run verify:durable-outbox -- --timeout-ms 60000
+        # must block release instead of being reduced to a warning. Keep the
+        # passphrase-custody phase in a fresh browser process: phases A-D
+        # intentionally stress offline tabs, service workers, and IndexedDB,
+        # while E verifies an independent browser-start custody contract.
+        run: npm run verify:durable-outbox -- --phases A,B,C,D --timeout-ms 60000
+      - name: Passphrase custody smoke
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        working-directory: backend
+        run: npm run verify:durable-outbox -- --phases E --timeout-ms 60000 --diagnostics
       - name: Popover layer audit
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend

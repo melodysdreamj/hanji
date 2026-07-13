@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "This address is incomplete.",
+  "invalidBody": "Check the link for missing or malformed characters, then try again.",
+  "notFoundTitle": "Page not found.",
+  "notFoundBody": "This address does not match a Hanji page. The page may have moved or no longer exist.",
+  "sharedTitle": "This shared link is invalid.",
+  "sharedBody": "Check that the full shared link was copied correctly, then try again.",
+  "openHome": "Open Hanji home"
+}

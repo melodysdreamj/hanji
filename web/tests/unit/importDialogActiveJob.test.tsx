@@ -64,12 +64,14 @@ import {
   beginNotionOAuthConnectionRemote,
   discoverNotionImportJobRemote,
   fetchRuntimeConfigRemote,
+  listNotionImportConnectionsRemote,
   listNotionImportJobsRemote,
 } from "@/lib/edgebase";
 import { useStore } from "@/lib/store";
 import { resetStore, seedUser } from "./components/storeTestUtils";
 
 const listJobsMock = vi.mocked(listNotionImportJobsRemote);
+const listConnectionsMock = vi.mocked(listNotionImportConnectionsRemote);
 
 const readyJob = {
   id: "job-ready-1",
@@ -87,11 +89,18 @@ const liveJob = {
   status: "discovering",
   notionWorkspaceName: "Live Workspace",
   counts: {},
-  progress: { percent: 30, step: "discover", steps: [] },
+  progress: { percent: 30, step: "discover", steps: [], searchComplete: true },
   connectionId: "connection-1",
   connectionKind: "internal_integration",
   rootNotionPageIds: [],
   rootNotionDataSourceIds: [],
+};
+
+const manualTokenLiveJob = {
+  ...liveJob,
+  connectionId: undefined,
+  connectionKind: "manual_token",
+  progress: { percent: 15, step: "discover", steps: [] },
 };
 
 async function openNotionSource() {
@@ -108,6 +117,15 @@ beforeEach(() => {
   seedUser();
   useStore.setState({ workspace: { id: "ws-1", name: "My Workspace" } as never });
   listJobsMock.mockResolvedValue({ jobs: [] } as never);
+  listConnectionsMock.mockResolvedValue({
+    connections: [{
+      id: "connection-1",
+      name: "Stored connection",
+      connectionKind: "internal_integration",
+      status: "active",
+    }],
+    connectionStorageAvailable: true,
+  } as never);
 });
 
 afterEach(() => {
@@ -194,6 +212,34 @@ describe("ImportDialog active-job selection on reopen", () => {
         notionToken: undefined,
         connectionId: "connection-1",
         continueFromCursor: true,
+        incremental: true,
+      });
+    });
+  });
+
+  it("asks for a one-time token after reload instead of pretending the orphaned job is still running", async () => {
+    listJobsMock.mockResolvedValue({ jobs: [manualTokenLiveJob] } as never);
+    listConnectionsMock.mockResolvedValue({
+      connections: [],
+      connectionStorageAvailable: true,
+    } as never);
+    await openNotionSource();
+
+    await waitFor(() => expect(listJobsMock).toHaveBeenCalled());
+    expect(vi.mocked(discoverNotionImportJobRemote)).not.toHaveBeenCalled();
+    const tokenInput = await screen.findByLabelText("Notion API token");
+    expect(tokenInput).toBeTruthy();
+
+    fireEvent.change(tokenInput, { target: { value: "ntn_resume-token" } });
+    fireEvent.click(await screen.findByRole("button", { name: "Resume discovery" }));
+
+    await waitFor(() => {
+      expect(vi.mocked(discoverNotionImportJobRemote)).toHaveBeenCalledWith({
+        jobId: "job-live-1",
+        workspaceId: "ws-1",
+        notionToken: "ntn_resume-token",
+        connectionId: undefined,
+        continueFromCursor: false,
         incremental: true,
       });
     });

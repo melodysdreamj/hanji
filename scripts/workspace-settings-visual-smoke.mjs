@@ -4,7 +4,13 @@ import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { browserAuthStorageKeys, masterCredentials } from './lib/harness.mjs';
+import {
+  browserAuthStorageKeys,
+  deleteSmokeUser,
+  deleteSmokeWorkspace,
+  masterCredentials,
+  signInSmokeAdmin,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
@@ -40,6 +46,7 @@ async function main() {
     ...(executablePath ? { executablePath } : {}),
   });
 
+  let runError;
   try {
     await captureSettingsVariant(browser, appUrl, seed, {
       prefix: 'desktop',
@@ -431,8 +438,16 @@ async function main() {
     ]) {
       console.log(`Screenshot: ${join(options.screenshotDir, `${name}.png`)}`);
     }
+  } catch (error) {
+    runError = error;
+    throw error;
   } finally {
-    await cleanupSeed(apiUrl, seed).catch(() => {});
+    try {
+      await cleanupSeed(apiUrl, seed);
+    } catch (cleanupError) {
+      if (!runError) throw cleanupError;
+      console.warn(`Workspace settings smoke cleanup also failed: ${errorMessage(cleanupError)}`);
+    }
     await browser.close().catch(() => {});
   }
 }
@@ -995,22 +1010,39 @@ async function seedWorkspaceSettings(baseUrl) {
     domain,
     email,
     password,
+    userId: owner.userId,
   };
 }
 
 async function cleanupSeed(baseUrl, seed) {
-  if (!seed?.accessToken) return;
-  const list = await callFunction(baseUrl, seed.accessToken, 'workspace-mutation', {
-    action: 'list',
-  }).catch(() => null);
-  const workspaces = Array.isArray(list?.workspaces) ? list.workspaces : [];
-  for (const workspace of workspaces) {
-    if (!workspace?.id) continue;
-    await callFunction(baseUrl, seed.accessToken, 'workspace-mutation', {
-      action: 'deleteWorkspace',
-      workspaceId: workspace.id,
-    }).catch(() => {});
+  const failures = [];
+  try {
+    if (seed?.accessToken) {
+      const list = await callFunction(baseUrl, seed.accessToken, 'workspace-mutation', { action: 'list' });
+      for (const workspace of Array.isArray(list?.workspaces) ? list.workspaces : []) {
+        if (workspace?.id && workspace?.name) {
+          await deleteSmokeWorkspace(baseUrl, seed.accessToken, workspace, { call: callFunction });
+        }
+      }
+    }
+  } catch (error) {
+    failures.push(error);
   }
+  try {
+    if (seed?.userId) {
+      const adminToken = await signInSmokeAdmin(baseUrl, { timeoutMs: options.timeoutMs });
+      await deleteSmokeUser(baseUrl, adminToken, seed.userId, { call: callFunction });
+    }
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Workspace settings smoke did not fully clean up its synthetic account.');
+  }
+}
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function seedSession(context, seed, theme = 'light') {

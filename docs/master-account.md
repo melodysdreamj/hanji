@@ -1,8 +1,28 @@
 # Master Account
 
-Every Hanji deployment starts from a master account provided by the launch
-command/environment. The server provisions it automatically and it doubles as
-the first instance administrator.
+Every Hanji deployment starts with one master account, which is also the first
+instance administrator. Docker users normally create it in the first-run web
+installer. Automated/hosted deployments can still provision it from the
+environment.
+
+## Docker first-run installer
+
+A fresh Docker volume receives a random setup code and all runtime secrets on
+the container's first start. Run `docker logs hanji`, open Hanji, and enter the
+code with the administrator email and password you want. The code:
+
+- is generated inside the container and persisted in `/data/.hanji/` with mode
+  `0600`;
+- is never included in the image, Docker configuration, browser bootstrap
+  response, URL, or public database;
+- can claim only an instance with no existing account and no confirmed master;
+- becomes inert permanently after the first administrator is confirmed.
+
+The server records a durable setup claim before creating the auth account, so
+concurrent setup requests cannot create two masters. A same-email retry can
+recover if the process stopped between auth creation and app-database
+finalization. Public signup stays fenced until the master/admin record is
+complete.
 
 ## Environment variables
 
@@ -11,8 +31,8 @@ the first instance administrator.
 | `HANJI_MASTER_EMAIL` | Master account email. It must be unused unless `instance_settings` already confirms that exact master identity. Changing it provisions a new account on the next request (the old account keeps existing). |
 | `HANJI_MASTER_PASSWORD` | Used only when the account is first created. Later password changes in Account Security are never overwritten by this value. |
 
-Put the values in the environment (dev script, `.dev.vars`, Docker env,
-`.env.release` → Cloudflare secrets). Passing the literal password as a shell
+Use these values for dev automation, Cloudflare, portable packs, or an advanced
+Docker deployment that deliberately bypasses the web installer. Passing the literal password as a shell
 argument would leave it in shell history — reference an environment variable
 instead (e.g. `HANJI_MASTER_PASSWORD="$MASTER_PASSWORD"`).
 
@@ -29,12 +49,11 @@ instead (e.g. `HANJI_MASTER_PASSWORD="$MASTER_PASSWORD"`).
 - **Email collision**: an ordinary account with the configured email is never
   promoted. Provisioning fails closed and logs the collision; choose a new,
   unused master email (or use an already-confirmed master identity) and retry.
-- **Fresh instance without master env**: the instance refuses to initialize.
-  The sign-in screen shows a "server is not initialized" notice and the
-  `beforeSignUp` hook rejects account creation until the server is restarted
-  with master credentials. Instances that already have users are unaffected,
-  and loopback dev/test runtimes with `HANJI_ALLOW_DEV_GUEST_LOGIN=true`
-  keep their anonymous bootstrap escape.
+- **Fresh Docker instance without master env**: when the image-generated setup
+  code is available, the sign-in screen becomes the first-run installer. When
+  neither a setup code nor master env exists (for example an incompletely
+  configured portable/hosted runtime), initialization still fails closed.
+  Existing instances and loopback dev/test runtimes keep their prior behavior.
 - **Dev**: `node scripts/setup-dev-env.mjs` asks for the master email and
   password on first setup and writes them into `backend/.dev.vars` /
   `.env.development` (no credentials are hardcoded in the repo). The dev
@@ -61,9 +80,9 @@ instead (e.g. `HANJI_MASTER_PASSWORD="$MASTER_PASSWORD"`).
 
 ## Security notes
 
-- The master ensure never trusts caller input; it runs entirely from
-  environment values, so the public `instance-bootstrap` endpoint cannot be
-  used to escalate.
+- Environment bootstrap never trusts caller identity. Web bootstrap accepts
+  caller input only after a constant-work comparison with the high-entropy
+  setup code and a durable single-winner claim.
 - The legacy `HANJI_INSTANCE_ADMIN_EMAILS` and
   `EDGEBASE_INSTANCE_ADMIN_EMAILS` allowlists are ignored and rejected by
   release preflight because password-signup emails are unverified. Bootstrap

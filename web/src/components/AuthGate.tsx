@@ -10,6 +10,7 @@ import {
   fetchInstanceBootstrapRemote,
   fetchMustChangePasswordRemote,
   fetchRuntimeConfigRemote,
+  initializeInstanceRemote,
   oauthProviderOptions,
   recordAuthAttemptRemote,
   requestPasswordResetRemote,
@@ -27,7 +28,7 @@ import {
   verifyMfaTotpRemote,
 } from "@/lib/edgebase";
 import { useTranslation } from "react-i18next";
-import { usePathname, useRouter } from "@/lib/router";
+import { isPublicSharePath, usePathname, useRouter } from "@/lib/router";
 import { i18next } from "@/i18n";
 import { loginRoll } from "@/lib/builtWith";
 import { useCreditRoll } from "@/lib/useCreditRoll";
@@ -44,6 +45,7 @@ type AuthStep =
   | "password-reset"
   | "auth-action-result"
   | "signed-in"
+  | "setup"
   | "setup-blocked";
 
 function SponsorBanner() {
@@ -252,7 +254,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation(["authGate", "common"]);
   const pathname = usePathname();
   const router = useRouter();
-  const publicShareRoute = pathname.startsWith("/share/");
+  const publicShareRoute = isPublicSharePath(pathname);
   const magicLinkRoute = pathname === "/auth/magic-link";
   const oauthCallbackRoute = pathname === "/auth/callback";
   const passwordResetRoute = pathname === "/auth/reset-password";
@@ -269,16 +271,18 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [resetToken, setResetToken] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [resetPasswordConfirm, setResetPasswordConfirm] = useState("");
+  const [setupCode, setSetupCode] = useState("");
+  const [setupPasswordConfirm, setSetupPasswordConfirm] = useState("");
   const [authActionResult, setAuthActionResult] = useState<string | null>(null);
   const [mfaChallenge, setMfaChallenge] = useState<MfaChallenge | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaMode, setMfaMode] = useState<MfaMode>("totp");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The production-style bundle used by local CI has `DEV === false`; the
+  // local origin plus the server-provided runtime flag remain the authority.
   const localBootstrapCandidate =
-    import.meta.env.DEV &&
-    import.meta.env.VITE_ALLOW_ANONYMOUS_BOOTSTRAP === "true" &&
-    isLocalDevelopmentOrigin();
+    import.meta.env.VITE_ALLOW_ANONYMOUS_BOOTSTRAP === "true" && isLocalDevelopmentOrigin();
   const [runtimeAllowsLocalBootstrap, setRuntimeAllowsLocalBootstrap] = useState(false);
   const canUseLocalBootstrap = localBootstrapCandidate && runtimeAllowsLocalBootstrap;
   const normalizedEmail = useMemo(() => email.trim().toLowerCase(), [email]);
@@ -581,6 +585,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         // plain form. Master credentials never cross this public endpoint.
         const status = await fetchInstanceBootstrapRemote();
         if (!mounted) return;
+        if (status?.setupAvailable) {
+          setPasswordMode("signup");
+          setStep("setup");
+          return;
+        }
         if (status?.setupBlocked) {
           setStep("setup-blocked");
           return;
@@ -650,6 +659,65 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       const message = authErrorMessage(err);
       recordAuthAttempt(method, "verify", "failure", message);
       setError(message);
+    } finally {
+      explicitAuthInFlightRef.current = Math.max(0, explicitAuthInFlightRef.current - 1);
+      setBusy(false);
+    }
+  }
+
+  async function submitInstanceSetup(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (setupCode.trim().length < 24) {
+      setError(t("authGate:setupCodeRequired"));
+      return;
+    }
+    if (!EMAIL_RE.test(normalizedEmail)) {
+      setError(t("authGate:enterValidEmail"));
+      return;
+    }
+    if (
+      password.length < 10 ||
+      !(/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password))
+    ) {
+      setError(password.length < 10 ? t("authGate:passwordTooShort") : t("authGate:passwordComplexity"));
+      return;
+    }
+    if (password !== setupPasswordConfirm) {
+      setError(t("authGate:passwordMismatch"));
+      return;
+    }
+
+    explicitAuthInFlightRef.current += 1;
+    setBusy(true);
+    setError(null);
+    try {
+      await initializeInstanceRemote({
+        setupCode: setupCode.trim(),
+        email: normalizedEmail,
+        password,
+        displayName: displayName.trim() || undefined,
+      });
+      const result = await signInWithPasswordRemote(normalizedEmail, password);
+      if (result.status === "mfa_required") {
+        throw new Error("A new setup account unexpectedly requires MFA.");
+      }
+      setSetupCode("");
+      setSetupPasswordConfirm("");
+      setPassword("");
+      setStep("signed-in");
+    } catch (err) {
+      const status = typeof err === "object" && err !== null
+        ? (err as { status?: unknown }).status
+        : undefined;
+      if (status === 403) {
+        setError(t("authGate:setupInvalidCode"));
+      } else if (status === 409) {
+        const current = await fetchInstanceBootstrapRemote();
+        if (!current?.setupAvailable) setStep("email");
+        setError(t("authGate:setupAlreadyComplete"));
+      } else {
+        setError(t("authGate:setupFailed"));
+      }
     } finally {
       explicitAuthInFlightRef.current = Math.max(0, explicitAuthInFlightRef.current - 1);
       setBusy(false);
@@ -802,16 +870,85 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     <main className={styles.screen}>
       <section className={styles.panel} aria-busy={busy}>
         <div className={styles.brand}>
-          {/* 36px mark: the silhouette reads at small sizes; the detailed
-              illustration is reserved for >=128px surfaces (PWA icons, hero). */}
-          <img className={styles.mark} src="/mark-128.png" alt="" aria-hidden="true" />
+          {/* The sign-in header is a primary brand surface, so use the full app
+              icon instead of the tightly cropped small-size mark. */}
+          <img className={styles.mark} src="/icon-192.png" alt="" aria-hidden="true" />
           <div>
             <h1>Hanji</h1>
             <p>{t("authGate:tagline")}</p>
           </div>
         </div>
 
-        {step === "setup-blocked" ? (
+        {step === "setup" ? (
+          <form className={styles.form} onSubmit={submitInstanceSetup} data-testid="instance-setup">
+            <div className={styles.notice}>
+              <strong>{t("authGate:setupTitle")}</strong>
+              <p>{t("authGate:setupBody")}</p>
+            </div>
+            <label className={styles.label} htmlFor="setup-code">{t("authGate:setupCode")}</label>
+            <input
+              id="setup-code"
+              className={styles.input}
+              type="password"
+              autoComplete="one-time-code"
+              value={setupCode}
+              onChange={(event) => setSetupCode(event.target.value)}
+              placeholder={t("authGate:setupCodePlaceholder")}
+              disabled={busy}
+              autoFocus
+            />
+            <p className={styles.fieldHelp}>{t("authGate:setupCodeHint")}</p>
+            <label className={styles.label} htmlFor="setup-display-name">{t("authGate:name")}</label>
+            <input
+              id="setup-display-name"
+              className={styles.input}
+              type="text"
+              autoComplete="name"
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder={t("authGate:namePlaceholder")}
+              disabled={busy}
+            />
+            <label className={styles.label} htmlFor="setup-email">{t("authGate:administratorEmail")}</label>
+            <input
+              id="setup-email"
+              className={styles.input}
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder={t("authGate:emailPlaceholder")}
+              disabled={busy}
+            />
+            <label className={styles.label} htmlFor="setup-password">{t("authGate:password")}</label>
+            <input
+              id="setup-password"
+              className={styles.input}
+              type="password"
+              autoComplete="new-password"
+              aria-describedby="setup-password-help"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={busy}
+            />
+            <p id="setup-password-help" className={styles.fieldHelp}>
+              {t("authGate:passwordRequirements")}
+            </p>
+            <label className={styles.label} htmlFor="setup-password-confirm">{t("authGate:confirmPassword")}</label>
+            <input
+              id="setup-password-confirm"
+              className={styles.input}
+              type="password"
+              autoComplete="new-password"
+              value={setupPasswordConfirm}
+              onChange={(event) => setSetupPasswordConfirm(event.target.value)}
+              disabled={busy}
+            />
+            <button className={styles.primary} type="submit" disabled={busy}>
+              {busy ? t("authGate:setupWorking") : t("authGate:setupCta")}
+            </button>
+          </form>
+        ) : step === "setup-blocked" ? (
           <div className={styles.notice} role="alert" data-testid="setup-blocked">
             <strong>{t("authGate:setupBlockedTitle")}</strong>
             <p>{t("authGate:setupBlockedBody")}</p>
@@ -872,11 +1009,15 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               className={styles.input}
               type="password"
               autoComplete="new-password"
+              aria-describedby="auth-reset-password-help"
               value={resetPassword}
               onChange={(event) => setResetPassword(event.target.value)}
               disabled={busy}
               autoFocus
             />
+            <p id="auth-reset-password-help" className={styles.fieldHelp}>
+              {t("authGate:passwordRequirements")}
+            </p>
             <label className={styles.label} htmlFor="auth-reset-password-confirm">{t("authGate:confirmPassword")}</label>
             <input
               id="auth-reset-password-confirm"
@@ -995,11 +1136,17 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                 className={styles.input}
                 type="password"
                 autoComplete={passwordMode === "signup" ? "new-password" : "current-password"}
+                aria-describedby={passwordMode === "signup" ? "auth-password-help" : undefined}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder={t("authGate:password")}
                 disabled={busy}
               />
+              {passwordMode === "signup" ? (
+                <p id="auth-password-help" className={styles.fieldHelp}>
+                  {t("authGate:passwordRequirements")}
+                </p>
+              ) : null}
               <button className={styles.primary} type="submit" disabled={busy}>
                 {passwordMode === "signup" ? t("authGate:createAccount") : t("authGate:continue")}
               </button>
@@ -1122,7 +1269,7 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
     <main className={styles.screen}>
       <section className={styles.panel} aria-busy={busy}>
         <div className={styles.brand}>
-          <img className={styles.mark} src="/mark-128.png" alt="" aria-hidden="true" />
+          <img className={styles.mark} src="/icon-192.png" alt="" aria-hidden="true" />
           <div>
             <h1>Hanji</h1>
             <p>{t("authGate:tagline")}</p>
@@ -1157,10 +1304,14 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
               className={styles.input}
               type="password"
               autoComplete="new-password"
+              aria-describedby="must-change-password-help"
               value={nextPassword}
               onChange={(event) => setNextPassword(event.target.value)}
               disabled={busy}
             />
+            <p id="must-change-password-help" className={styles.fieldHelp}>
+              {t("authGate:passwordRequirements")}
+            </p>
             <label className={styles.label} htmlFor="must-change-confirm">
               {t("authGate:confirmPassword")}
             </label>

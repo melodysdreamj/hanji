@@ -432,6 +432,33 @@ describe('mcpFetchPayloads request budgets', () => {
       text: `<database url="database://${databaseId}">${dataSources}${views}</database>`,
     })).toThrow(/mcpFetches exceeds 5000 view assignments/);
   }, 5_000);
+
+  it('builds independent visible-property and property-order arrays for MCP views', () => {
+    const databaseId = '22222222-2222-2222-2222-222222222222';
+    const dataSourceId = '11111111-1111-1111-1111-111111111111';
+    const [dataSource] = parseMcpFetchItems({
+      text: [
+        `<database url="database://${databaseId}">`,
+        `<data-source url="collection://${dataSourceId}">`,
+        '<data-source-state>{"name":"Synthetic","schema":{"Name":{"type":"title"}}}</data-source-state>',
+        '</data-source>',
+        `<view url="view://33333333-3333-3333-3333-333333333333">${JSON.stringify({
+          dataSourceUrl: `collection://${dataSourceId}`,
+          displayProperties: ['Name'],
+          name: 'Table',
+          type: 'table',
+        })}</view>`,
+        '</database>',
+      ].join(''),
+    });
+
+    const snapshot = dataSource.metadata?.dataSourceSnapshot as {
+      views?: Array<{ visible_properties?: string[]; property_order?: string[] }>;
+    };
+    expect(snapshot.views?.[0]?.visible_properties).toEqual(['Name']);
+    expect(snapshot.views?.[0]?.property_order).toEqual(['Name']);
+    expect(snapshot.views?.[0]?.property_order).not.toBe(snapshot.views?.[0]?.visible_properties);
+  });
 });
 
 describe('Notion import whole-request JSON shape guard', () => {

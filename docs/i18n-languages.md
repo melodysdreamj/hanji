@@ -4,23 +4,34 @@ Target languages for Hanji's UI localization. English (`en`) is the **source of
 truth**; every other language is a translation catalog under
 `web/src/locales/<code>/`.
 
-## Status
+## Selectable now
 
-- ✅ **Korean** (`ko`) — original market, fully translated
+- ✅ **Korean** (`ko`) — original market and release-completeness gate
 - ✅ **English** (`en`) — source of truth / international default
-- ✅ **Japanese** (`ja`) — Wave 1, translated
-- ✅ **Chinese Simplified** (`zh-Hans`) — Wave 1, translated
-- ✅ **Spanish** (`es`) — Wave 1, translated
-- ✅ **French** (`fr`) — Wave 1, translated
-- ✅ **German** (`de`) — Wave 1, translated
-- ✅ **Portuguese (Brazil)** (`pt-BR`) — Wave 1, translated
-- ⏳ **50 languages below** — infrastructure ready (folders, wrappers, selector
-  options, English fallback catalogs) but **not yet translated**. Users can
-  select them; the UI falls back to English until translation is done. The i18n
-  guard skips the untranslated-copy check for these.
+- ✅ **Japanese** (`ja`) — Wave 1 translation baseline
+- ✅ **Chinese Simplified** (`zh-Hans`) — Wave 1 translation baseline
+- ✅ **Spanish** (`es`) — Wave 1 translation baseline
+- ✅ **French** (`fr`) — Wave 1 translation baseline
+- ✅ **German** (`de`) — Wave 1 translation baseline
+- ✅ **Portuguese (Brazil)** (`pt-BR`) — Wave 1 translation baseline
+
+Only these eight languages appear in Settings. English and Korean gate every
+new or changed source string in CI. The other Wave 1 catalogs have a translated
+baseline, but newly added strings may temporarily fall back to English until
+their next translation pass.
+
+The 50 additional targets below keep their folders and runtime wrappers so
+translation can proceed incrementally, but they stay hidden from Settings and
+browser auto-detection until their translation is ready. Their current English
+fallback scaffolds are not presented as released language support.
 
 Locale is navigator-driven with an optional in-app override
 (Settings → Preferences → Language); English is the ultimate fallback.
+Browser locale normalization preserves released script/region variants:
+`ko-KR` uses `ko`, `zh-CN`/`zh-SG` use `zh-Hans`, and `pt-BR` uses its regional
+catalog. Traditional Chinese locales (`zh-TW`, `zh-HK`, `zh-MO`, `zh-Hant`)
+fall back to the next requested language or English instead of silently showing
+Simplified Chinese until `zh-Hant` is translated and released.
 
 ## How a language gets added
 
@@ -32,13 +43,14 @@ The infrastructure supports **any number** of languages — there is no cap.
 2. Add a small `web/src/locales/<code>.ts` wrapper mirroring `en.ts`; Vite
    auto-discovers these wrappers and keeps each complete language in one lazy
    chunk.
-3. Add the code and endonym to `web/src/i18n/languages.ts`. The release guard
-   requires catalog directory, runtime wrapper, and selector entry to agree, so
-   a translated-but-unreachable language cannot pass CI.
-4. Run `npm --prefix web run i18n:status` to see every missing/stale key.
-5. Translate the JSON namespaces (mirror the `en/` structure and keep
+3. Run `npm --prefix web run i18n:status` to see every missing/stale key.
+4. Translate the JSON namespaces (mirror the `en/` structure and keep
    `{{interpolation}}` placeholders).
-6. Run `npm --prefix web run i18n:sync <code>` to stamp it caught-up.
+5. Run `npm --prefix web run i18n:sync <code>` to stamp it caught-up.
+6. Only after the catalog is ready, add the code and endonym to
+   `web/src/i18n/languages.ts`. The release guard requires each selectable
+   language to have a catalog and runtime wrapper and rejects unreleased target
+   scaffolds from the selector.
 
 Do **not** leave Korean that is data-matching logic translated as a label
 (search keywords/aliases, status-name comparisons, CJK-width regex) — those stay
@@ -48,8 +60,9 @@ literal; see the `i18n react-i18next catalog` notes.
 
 - **CJK (already handled):** the i18n system already covers CJK plural rules
   (`_other` only), character-width, and per-locale search keywords.
-- **RTL (needs layout work):** Arabic/Hebrew/Persian/Urdu require right-to-left
-  layout support, not just translation — schedule these as their own wave.
+- **RTL (needs layout work):** the document `dir` policy is implemented and
+  tested, but Arabic/Hebrew/Persian/Urdu still require a full right-to-left UI
+  layout pass before any of them is exposed — schedule these as their own wave.
 - **Latin / Cyrillic / Indic (translation-only):** only per-language plural
   rules differ; no code work.
 
@@ -157,9 +170,9 @@ all meaningful digital markets; the full list ≈ maximum accessibility.
 
 | | Count |
 |---|---|
-| Shipped (`ko`, `en`) | 2 |
-| Target list above | 56 |
-| **Total** | **~58** |
+| Selectable now | 8 |
+| Hidden translation targets | 50 |
+| **Catalog/runtime total** | **58** |
 
 The technical ceiling is higher — i18next/CLDR supports 100+ locales, and
 regional variants (`en-GB`, `fr-CA`, `es-419`, …) could extend it further. The

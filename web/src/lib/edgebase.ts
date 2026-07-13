@@ -85,8 +85,11 @@ const OAUTH_PROVIDER_LABELS: Record<string, string> = {
 };
 
 const COLLABORATION_CLIENT_ID_KEY = "hanji.collaborationClientId";
-const ALLOW_ANONYMOUS_BOOTSTRAP =
-  import.meta.env.DEV && import.meta.env.VITE_ALLOW_ANONYMOUS_BOOTSTRAP === "true";
+// A CI bundle is built through `vite build`, which makes `import.meta.env.DEV`
+// false even though it is served only by a local EdgeBase runtime. Keep the
+// explicit opt-in in the bundle, then require the local-origin and server
+// runtime gates in `anonymousBootstrapAvailableRemote` below.
+const ALLOW_ANONYMOUS_BOOTSTRAP = import.meta.env.VITE_ALLOW_ANONYMOUS_BOOTSTRAP === "true";
 const UPSTREAM_REPOSITORY_URL = "https://github.com/melodysdreamj/hanji";
 
 export interface LegalLinks {
@@ -241,6 +244,9 @@ export interface InstanceBootstrapStatus {
   masterConfigured: boolean;
   masterReady: boolean;
   setupBlocked: boolean;
+  setupAvailable: boolean;
+  setupCodeRequired: boolean;
+  setupInProgress: boolean;
 }
 
 /**
@@ -260,10 +266,37 @@ export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapS
       masterConfigured: json.masterConfigured === true,
       masterReady: json.masterReady === true,
       setupBlocked: json.setupBlocked === true,
+      setupAvailable: json.setupAvailable === true,
+      setupCodeRequired: json.setupCodeRequired === true,
+      setupInProgress: json.setupInProgress === true,
     };
   } catch {
     return null;
   }
+}
+
+export interface InitializeInstanceInput {
+  setupCode: string;
+  email: string;
+  password: string;
+  displayName?: string;
+}
+
+/** Complete the one-time, setup-code-protected first administrator claim. */
+export async function initializeInstanceRemote(input: InitializeInstanceInput): Promise<void> {
+  const response = await fetch(`${EDGEBASE_URL}/api/functions/instance-bootstrap`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify({ action: "completeSetup", ...input }),
+  });
+  const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
+  if (response.ok) return;
+  const error = Object.assign(
+    new Error(typeof payload.message === "string" ? payload.message : "Instance setup failed."),
+    { status: response.status },
+  );
+  throw error;
 }
 
 /** True when the signed-in account holds an admin-issued temporary password. */
@@ -1336,6 +1369,7 @@ export async function retryNotionImportJobRemote(input: {
   maxDataSourceQueryPages?: number;
   maxViewPages?: number;
   importPagesFullWidth?: boolean;
+  deferDiscovery?: boolean;
   locale?: "en" | "ko";
 }): Promise<NotionImportJobResult> {
   return getClient().functions.post<NotionImportJobResult>("notion-import", {

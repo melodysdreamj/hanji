@@ -9,6 +9,7 @@ dist/
 **/dist/
 build/
 coverage/
+/.cache/
 *.tsbuildinfo
 
 # EdgeBase / Cloudflare local state

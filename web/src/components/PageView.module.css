@@ -77,12 +77,16 @@
   padding: 0 24px;
   color: var(--text-secondary);
 }
-.missing strong {
+.missing strong,
+.missingHeading {
   display: block;
   margin-bottom: 6px;
   color: var(--text-default);
   font-size: 18px;
   font-weight: 600;
+}
+.missingHeading {
+  margin-top: 0;
 }
 .missing p {
   margin: 0 0 16px;
@@ -93,13 +97,19 @@
   gap: 8px;
 }
 .restoreButton {
-  height: 32px;
+  min-height: 40px;
   padding: 0 12px;
   border-radius: 5px;
   background: var(--text-default);
   color: var(--bg-app);
   font-size: 14px;
   font-weight: 500;
+}
+
+@media (pointer: coarse) {
+  .restoreButton {
+    min-height: 44px;
+  }
 }
 .restoreButton:hover,
 .restoreButton:focus-visible {

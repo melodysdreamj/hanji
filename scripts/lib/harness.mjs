@@ -22,6 +22,7 @@ const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 
 let defaultTimeoutMs = 8_000;
+const registeredSmokeAccounts = new Map();
 
 /**
  * Set the module-wide default request timeout. Call once after parsing script
@@ -114,6 +115,10 @@ export function masterCredentials() {
   };
 }
 
+/**
+ * @param {string} baseUrl
+ * @param {{ timeoutMs?: number }} [options]
+ */
 export async function signIn(baseUrl, { timeoutMs } = {}) {
   const response = await fetchWithTimeout(resolveUrl(baseUrl, '/api/auth/signin/anonymous'), {
     method: 'POST',
@@ -128,6 +133,12 @@ export async function signIn(baseUrl, { timeoutMs } = {}) {
   assert(typeof token === 'string' && token, 'anonymous sign-in must return an access token');
   assert(typeof refreshToken === 'string' && refreshToken, 'anonymous sign-in must return a refresh token');
   assert(typeof userId === 'string' && userId, 'anonymous sign-in must return a user id');
+  const canonicalBaseUrl = normalizeBaseUrl(baseUrl);
+  registeredSmokeAccounts.set(`${canonicalBaseUrl}\n${userId}`, {
+    baseUrl: canonicalBaseUrl,
+    token,
+    userId,
+  });
   return { token, accessToken: token, refreshToken, userId, user: body.user };
 }
 
@@ -150,6 +161,17 @@ export function browserAuthStorageKeys(authOrigin, authNamespace) {
   };
 }
 
+/**
+ * @param {any} context
+ * @param {any} session
+ * @param {{
+ *   appOrigin?: string,
+ *   authOrigin?: string,
+ *   authNamespace?: string,
+ *   workspaceId?: string,
+ *   localStorage?: Record<string, string>,
+ * }} [options]
+ */
 export async function installBrowserSession(
   context,
   session,
@@ -259,6 +281,13 @@ export async function captureBrowserSession(
   return cookies;
 }
 
+/**
+ * @param {string} baseUrl
+ * @param {string | undefined} token
+ * @param {string} name
+ * @param {unknown} body
+ * @param {{ timeoutMs?: number, headers?: Record<string, string> }} [options]
+ */
 export async function postFunction(baseUrl, token, name, body, { timeoutMs, headers } = {}) {
   return fetchWithTimeout(resolveUrl(baseUrl, `/api/functions/${name}`), {
     method: 'POST',
@@ -319,6 +348,234 @@ export async function permanentlyDeleteDatabaseRow(baseUrl, token, id, options =
   return callPermanentMutation(call, baseUrl, token, 'database-row-mutation', { action: 'delete', id }, callOptions);
 }
 
+/**
+ * Delete a temporary workspace through the product API, including any starter
+ * pages and related content. Workspace deletion is intentionally fail-closed
+ * for non-empty workspaces unless the current name is confirmed, so smoke
+ * cleanup must carry the exact fixture name it created.
+ */
+export async function deleteSmokeWorkspace(
+  baseUrl,
+  token,
+  workspace,
+  { call = callFunction, ...callOptions } = {},
+) {
+  const workspaceId = workspace?.id ?? workspace?.workspaceId;
+  const workspaceName = workspace?.name;
+  assert(typeof workspaceId === 'string' && workspaceId, 'smoke workspace cleanup requires an id');
+  assert(typeof workspaceName === 'string' && workspaceName, 'smoke workspace cleanup requires its exact name');
+  let emptied = false;
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const listed = await callPermanentMutation(call, baseUrl, token, 'page-query', {
+      action: 'pages',
+      workspaceId,
+      includeTrash: true,
+    }, callOptions);
+    const pages = (Array.isArray(listed?.pages) ? listed.pages : []).filter(
+      (page) => page?.workspaceId === workspaceId,
+    );
+    if (pages.length === 0) {
+      emptied = true;
+      break;
+    }
+    const roots = pages.filter(
+      (page) => page?.id && (page.parentType === 'workspace' || page.parentId == null),
+    );
+    assert(roots.length > 0, `smoke workspace ${workspaceId} has no deletable root pages`);
+    let deletionInProgress = false;
+    for (const page of roots) {
+      try {
+        await permanentlyDeletePage(baseUrl, token, page.id, { call, ...callOptions });
+      } catch (error) {
+        if (!String(error instanceof Error ? error.message : error).includes('Target deletion is already in progress')) {
+          throw error;
+        }
+        deletionInProgress = true;
+      }
+    }
+    if (deletionInProgress) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  if (!emptied) {
+    const listed = await callPermanentMutation(call, baseUrl, token, 'page-query', {
+      action: 'pages',
+      workspaceId,
+      includeTrash: true,
+    }, callOptions);
+    emptied = !(Array.isArray(listed?.pages) ? listed.pages : []).some(
+      (page) => page?.workspaceId === workspaceId,
+    );
+  }
+  assert(emptied, `smoke workspace ${workspaceId} still has pages after cleanup`);
+  return callPermanentMutation(call, baseUrl, token, 'workspace-mutation', {
+    action: 'deleteWorkspace',
+    workspaceId,
+    confirmWorkspaceName: workspaceName,
+  }, callOptions);
+}
+
+/** Delete a synthetic account created by a smoke through instance-admin. */
+export async function deleteSmokeUser(
+  baseUrl,
+  adminToken,
+  userId,
+  { call = callFunction, ...callOptions } = {},
+) {
+  assert(typeof userId === 'string' && userId, 'smoke user cleanup requires a user id');
+  return call(baseUrl, adminToken, 'instance-admin', {
+    action: 'deleteUser',
+    userId,
+  }, callOptions);
+}
+
+/** Find an exact synthetic email match, then delete that account by stable id. */
+export async function deleteSmokeUserByEmail(
+  baseUrl,
+  adminToken,
+  email,
+  { call = callFunction, ...callOptions } = {},
+) {
+  assert(typeof email === 'string' && email, 'smoke user cleanup requires an email');
+  const result = await call(baseUrl, adminToken, 'instance-admin', {
+    action: 'searchUsers',
+    query: email,
+    limit: 10,
+  }, callOptions);
+  const user = (Array.isArray(result?.users) ? result.users : []).find(
+    (candidate) => candidate?.email?.toLowerCase() === email.toLowerCase(),
+  );
+  if (!user?.id) return { deleted: false };
+  await deleteSmokeUser(baseUrl, adminToken, user.id, { call, ...callOptions });
+  return { deleted: true, userId: user.id };
+}
+
+/**
+ * Delete synthetic password accounts without touching workspaces they can only
+ * access through membership or direct sharing. Each owned workspace is emptied
+ * and deleted first; every account deletion is still attempted if another
+ * account's cleanup fails.
+ */
+export async function deleteSmokeAccounts(
+  baseUrl,
+  adminToken,
+  accounts,
+  { call = callFunction, ...callOptions } = {},
+) {
+  const failures = [];
+  const uniqueAccounts = Array.from(
+    new Map(
+      (Array.isArray(accounts) ? accounts : [])
+        .filter((account) => typeof account?.userId === 'string' && account.userId)
+        .map((account) => [account.userId, account]),
+    ).values(),
+  );
+  for (const account of uniqueAccounts) {
+    let owned = [];
+    try {
+      assert(typeof account?.token === 'string' && account.token, `smoke account ${account.userId} cleanup requires its token`);
+      const listed = await call(baseUrl, account.token, 'workspace-mutation', { action: 'list' }, callOptions);
+      const explicitOwnedIds = new Set(
+        Array.isArray(account.ownedWorkspaceIds) ? account.ownedWorkspaceIds.filter(Boolean) : [],
+      );
+      owned = (Array.isArray(listed?.workspaces) ? listed.workspaces : []).filter(
+        (workspace) => workspace?.ownerId === account.userId || explicitOwnedIds.has(workspace?.id),
+      );
+    } catch (error) {
+      failures.push(error);
+    }
+    for (const workspace of owned) {
+      try {
+        await deleteSmokeWorkspace(baseUrl, account.token, workspace, { call, ...callOptions });
+      } catch (error) {
+        failures.push(error);
+      }
+    }
+  }
+  for (const account of uniqueAccounts) {
+    try {
+      await deleteSmokeUser(baseUrl, adminToken, account.userId, { call, ...callOptions });
+    } catch (error) {
+      failures.push(error);
+    }
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Smoke accounts were not fully cleaned up.');
+  }
+  return { deletedUserIds: uniqueAccounts.map((account) => account.userId) };
+}
+
+export async function signInSmokeAdmin(baseUrl, { timeoutMs = defaultTimeoutMs } = {}) {
+  const response = await fetchWithTimeout(resolveUrl(baseUrl, '/api/auth/signin'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(masterCredentials()),
+  }, { timeoutMs });
+  const body = await readJson(response);
+  assert(response.ok, `master sign-in for smoke cleanup returned HTTP ${response.status}`);
+  assert(typeof body?.accessToken === 'string' && body.accessToken, 'master sign-in for smoke cleanup must return an access token');
+  return body.accessToken;
+}
+
+/**
+ * Delete only anonymous accounts created by this module in the current Node
+ * process. Callers must invoke this explicitly from their top-level `finally`;
+ * async process-exit hooks are intentionally avoided because Node does not run
+ * them reliably for uncaught exceptions, explicit exits, or external signals.
+ */
+export async function cleanupRegisteredSmokeAccounts(
+  { call = callFunction, signInAdmin = signInSmokeAdmin, ...callOptions } = {},
+) {
+  const failures = [];
+  const deletedUserIds = [];
+  const byBaseUrl = new Map();
+  for (const [key, account] of registeredSmokeAccounts) {
+    const group = byBaseUrl.get(account.baseUrl) ?? [];
+    group.push({ key, account });
+    byBaseUrl.set(account.baseUrl, group);
+  }
+
+  for (const [baseUrl, entries] of byBaseUrl) {
+    let adminToken;
+    try {
+      adminToken = await signInAdmin(baseUrl, callOptions);
+      assert(typeof adminToken === 'string' && adminToken, 'smoke cleanup admin sign-in must return an access token');
+    } catch (error) {
+      failures.push(error);
+      continue;
+    }
+    for (const { key, account } of entries) {
+      try {
+        await deleteSmokeAccounts(baseUrl, adminToken, [account], { call, ...callOptions });
+        registeredSmokeAccounts.delete(key);
+        deletedUserIds.push(account.userId);
+      } catch (error) {
+        failures.push(error);
+      }
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Registered anonymous smoke accounts were not fully cleaned up.');
+  }
+  return {
+    deletedUserIds,
+    remainingUserIds: Array.from(registeredSmokeAccounts.values(), (account) => account.userId),
+  };
+}
+
+/** Report cleanup failures and make an otherwise-successful smoke fail. */
+export async function finalizeRegisteredSmokeAccounts(label = 'smoke') {
+  try {
+    return await cleanupRegisteredSmokeAccounts();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`FAIL ${label} anonymous account cleanup failed: ${message}`);
+    process.exitCode ||= 1;
+    return { deletedUserIds: [], cleanupError: error };
+  }
+}
+
 /** Unauthenticated product-function call. Throws on non-2xx responses. */
 export async function callPublicFunction(baseUrl, name, body, options = {}) {
   const response = await postFunction(baseUrl, undefined, name, body, options);
@@ -360,7 +617,8 @@ export async function expectPublicFunctionStatus(baseUrl, name, body, status, op
  */
 export async function loadPlaywright({ label = 'this smoke script' } = {}) {
   try {
-    return await import('playwright');
+    const optionalPlaywrightPackage = 'playwright';
+    return await import(optionalPlaywrightPackage);
   } catch {
     // Continue with local workspace fallbacks below.
   }
@@ -383,6 +641,32 @@ export async function loadPlaywright({ label = 'this smoke script' } = {}) {
   throw new Error(
     `Playwright is required for ${label}. Install it in this repo, set PLAYWRIGHT_MODULE_DIR, or use the local EdgeBase workspace dependencies.`,
   );
+}
+
+/**
+ * Wait until a browser route stops changing. Auth/bootstrap can redirect a
+ * freshly signed-in page to its first workspace page just after its shell is
+ * visible; interaction smokes should not race that automatic navigation.
+ */
+export async function waitForStableRoute(page, {
+  timeoutMs = defaultTimeoutMs,
+  stableForMs = 750,
+  pollIntervalMs = 50,
+} = {}) {
+  const startedAt = Date.now();
+  let lastUrl = page.url();
+  let stableSince = startedAt;
+  while (Date.now() - startedAt < timeoutMs) {
+    await page.waitForTimeout(pollIntervalMs);
+    const currentUrl = page.url();
+    if (currentUrl !== lastUrl) {
+      lastUrl = currentUrl;
+      stableSince = Date.now();
+      continue;
+    }
+    if (Date.now() - stableSince >= stableForMs) return lastUrl;
+  }
+  throw new Error(`route did not stabilize within ${timeoutMs}ms (last URL: ${lastUrl})`);
 }
 
 export function edgeBasePlaywrightCandidates() {
@@ -429,6 +713,18 @@ function authRefreshFailureStatus(response, allowedStatuses) {
  * Later/repeated failures stay fatal. The legacy 401 option remains the safe
  * default; callers exercising an intentionally invalid Origin may opt into
  * `[400, 401]` for that one context.
+ */
+/**
+ * @param {any} page
+ * @param {{
+ *   errors?: string[],
+ *   prefix?: string,
+ *   includeConsoleLocation?: boolean,
+ *   captureConnectionRefused?: boolean,
+ *   captureFunctionResponses?: boolean,
+ *   allowInitialSignedOutRefresh401?: boolean,
+ *   allowInitialSignedOutRefreshStatuses?: number[],
+ * }} [options]
  */
 export function watchBrowserErrors(page, {
   errors = [],

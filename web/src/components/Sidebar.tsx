@@ -568,8 +568,10 @@ export function Sidebar({
 
   function openInbox() {
     // The inbox swaps the sidebar content in place (Notion-style) on both desktop
-    // and the mobile drawer, so the rail button just toggles the inline feed.
-    setUpdatesOpen(!updatesOpen);
+    // and the mobile drawer. Read the current store value at click time rather
+    // than the render-time closure: a just-finished route cleanup can otherwise
+    // make a fresh click write the same false value back and leave Inbox closed.
+    setUpdatesOpen(!useStore.getState().updatesOpen);
   }
 
   function settingsHrefFromCurrentRoute(section?: "members") {

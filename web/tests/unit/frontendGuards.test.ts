@@ -144,8 +144,15 @@ describe("frontend structural guards", () => {
     const precacheGenerator = source("scripts/generate-sw-precache.mjs");
     expect(precacheGenerator).toContain('html.matchAll(/<script[^>]+src=');
     const serviceWorker = source("public/sw.js");
+    const serviceWorkerClient = source("src/lib/serviceWorker.ts");
     expect(serviceWorker).toContain("precachedShellAssetNetworkFirst(request)");
     expect(serviceWorker).toContain("manifest.assets.includes(pathname)");
+    expect(serviceWorker).toContain("event.waitUntil(precacheBoot().then(() => self.skipWaiting()))");
+    expect(serviceWorker).toContain('const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets"');
+    expect(serviceWorker).toContain(
+      "event.waitUntil(ensureFullPrecache().catch(() => undefined))",
+    );
+    expect(serviceWorkerClient).toContain("registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE })");
 
     const manifest = JSON.parse(source("public/manifest.webmanifest")) as {
       id?: string;

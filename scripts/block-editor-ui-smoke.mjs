@@ -2,7 +2,7 @@
 
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installBrowserSession, permanentlyDeletePage } from './lib/harness.mjs';
@@ -51,6 +51,8 @@ async function main() {
       console.log('PASS pasted external URLs default to mention conversion with fetched title and favicon.');
     } else if (options.onlyEmbedCaptionSlash) {
       console.log('PASS embed blocks hide empty captions by default and continue writing in the next paragraph.');
+    } else if (options.onlyNonTextBackspace) {
+      console.log('PASS Backspace removes an empty paragraph, selects the preceding non-text block, then deletes it.');
     } else if (options.onlyImeFlow) {
       console.log('PASS IME Enter commits composed text and continues to the next block without copying the composing tail.');
     } else if (options.onlyEmptyListEnter) {
@@ -123,6 +125,16 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
       assertNoBrowserErrors(
         errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
         'block editor default-hidden embed caption flow',
+      );
+      return;
+    }
+    if (options.onlyNonTextBackspace) {
+      await step('select and delete an embed through the two-step Backspace flow', () =>
+        assertNonTextBackspaceSelectsThenDeletes(page, apiUrl, seed)
+      );
+      assertNoBrowserErrors(
+        errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+        'block editor non-text Backspace flow',
       );
       return;
     }
@@ -213,7 +225,13 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
     await step('exit empty lists and nested containers without losing the caret', () =>
       assertEmptyListEnterEscapes(page, apiUrl, seed)
     );
-    assertNoBrowserErrors(errors, 'block editor UI flow');
+    // The complete flow intentionally renders external embeds and link
+    // previews. Their third-party resources can return 404 independently of
+    // Hanji; the focused embed flows apply this same filter.
+    assertNoBrowserErrors(
+      errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+      'block editor UI flow',
+    );
   } finally {
     await context.close().catch(() => {});
   }
@@ -265,6 +283,48 @@ async function assertPlainTextInput(page, baseUrl, seed) {
     (block) => block?.type === 'paragraph' && block?.plainText === seed.plainText,
     'plain text paragraph',
   );
+}
+
+async function assertNonTextBackspaceSelectsThenDeletes(page, baseUrl, seed) {
+  const captureDir = join(root, '.edgebase', 'ui-discovery', 'non-text-backspace');
+  mkdirSync(captureDir, { recursive: true });
+  const emptyParagraph = blockTextBox(page, seed.blockIds.backspaceEmpty, 'Text block text');
+  await emptyParagraph.click({ timeout: options.timeoutMs });
+  await page.keyboard.press('Backspace');
+
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (blocks) =>
+      blocks.some((block) => block.id === seed.blockIds.backspaceEmbed) &&
+      !blocks.some((block) => block.id === seed.blockIds.backspaceEmpty),
+    'first Backspace removes only the empty paragraph after an embed',
+  );
+  await page.waitForFunction(
+    (embedId) => {
+      const group = document.querySelector(`[data-block-id="${CSS.escape(embedId)}"]`);
+      const selectedRow = group?.querySelector(':scope > [data-selected="true"]');
+      return selectedRow instanceof HTMLElement && document.activeElement === selectedRow;
+    },
+    seed.blockIds.backspaceEmbed,
+    { timeout: options.timeoutMs },
+  );
+  await blockGroup(page, seed.blockIds.backspaceEmbed).screenshot({
+    path: join(captureDir, 'local-after-first-backspace-selected.png'),
+  });
+
+  await page.keyboard.press('Backspace');
+
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (blocks) => !blocks.some((block) => block.id === seed.blockIds.backspaceEmbed),
+    'second Backspace deletes the selected embed block',
+  );
+  await page.screenshot({
+    path: join(captureDir, 'local-after-second-backspace-deleted.png'),
+    fullPage: true,
+  });
 }
 
 async function assertSelectionReplacedOnEnterAndPaste(page, baseUrl, seed) {
@@ -2551,6 +2611,8 @@ async function seedEditorPage(baseUrl) {
     focusImage: randomUUID(),
     focusBookmark: randomUUID(),
     focusEmbed: randomUUID(),
+    backspaceEmbed: randomUUID(),
+    backspaceEmpty: randomUUID(),
     focusToc: randomUUID(),
     focusButton: randomUUID(),
     emptyBulletExit: randomUUID(),
@@ -2789,6 +2851,24 @@ async function seedEditorPage(baseUrl) {
       content: { rich: [] },
       plainText: '',
       position: 1,
+    },
+    {
+      id: blockIds.backspaceEmbed,
+      pageId,
+      parentId: null,
+      type: 'embed',
+      content: { url: 'https://example.com/embed-backspace' },
+      plainText: 'https://example.com/embed-backspace',
+      position: nestedStart + 5,
+    },
+    {
+      id: blockIds.backspaceEmpty,
+      pageId,
+      parentId: null,
+      type: 'paragraph',
+      content: { rich: [] },
+      plainText: '',
+      position: nestedStart + 6,
     },
   );
   const createdBlocks = await callFunction(baseUrl, session.accessToken, 'block-mutation', {
@@ -3068,6 +3148,7 @@ function parseArgs(args) {
     onlyEmptyListEnter: false,
     onlyImeFlow: false,
     onlyMarkdownShortcuts: false,
+    onlyNonTextBackspace: false,
       onlyPastedUrlMention: false,
       onlySelectionToolbar: false,
       onlySelectionEdit: false,
@@ -3118,6 +3199,10 @@ function parseArgs(args) {
     }
     if (arg === '--only-markdown-shortcuts') {
       parsed.onlyMarkdownShortcuts = true;
+      continue;
+    }
+    if (arg === '--only-non-text-backspace') {
+      parsed.onlyNonTextBackspace = true;
       continue;
     }
     if (arg === '--only-selection-toolbar') {
@@ -3192,6 +3277,8 @@ Options:
                           Check only external URL paste-to-mention metadata behavior.
   --only-markdown-shortcuts
                           Check only Markdown and symbol typing shortcuts.
+  --only-non-text-backspace
+                          Check two-step Backspace selection/deletion after a non-text block.
   --only-selection-toolbar
                           Check selected-text toolbar persistence after inline formatting clicks.
   --only-tabs             Check slash-created tabs and IME-safe tab rename Enter handling only.

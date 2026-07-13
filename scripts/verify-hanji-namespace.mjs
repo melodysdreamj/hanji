@@ -10,6 +10,16 @@ const formerPrimaryLower = ['notion', 'like'].join('');
 const formerSecondaryLower = ['ink', 'line'].join('');
 const formerPrimaryUpperPrefix = `${formerPrimaryLower.toUpperCase()}_`;
 const formerPrimaryHeaderPrefix = `X-${['Notion', 'like'].join('')}-`;
+const releasedLocalePrefixes = [
+  'web/src/locales/en/',
+  'web/src/locales/ko/',
+  'web/src/locales/ja/',
+  'web/src/locales/zh-Hans/',
+  'web/src/locales/es/',
+  'web/src/locales/fr/',
+  'web/src/locales/de/',
+  'web/src/locales/pt-BR/',
+];
 
 const exactAllowedCompatibilityLines = new Map([
   [
@@ -178,6 +188,11 @@ function isAllowedGeneratedUse(path, source, absoluteIndex) {
   });
 }
 
+function isPendingTranslationCatalog(path) {
+  return path.startsWith('web/src/locales/') &&
+    !releasedLocalePrefixes.some((prefix) => path.startsWith(prefix));
+}
+
 export function findHanjiNamespaceViolations({
   root = repoRoot,
   files = candidateFiles(root),
@@ -185,6 +200,11 @@ export function findHanjiNamespaceViolations({
 } = {}) {
   const violations = [];
   for (const path of files) {
+    // Hidden translation targets intentionally catch up in separate translation
+    // passes and are not part of a product release. Their structural integrity is
+    // still checked by i18n-status; namespace enforcement resumes when a locale
+    // becomes selectable and is added to releasedLocalePrefixes above.
+    if (!generated && isPendingTranslationCatalog(path)) continue;
     const absolute = resolve(root, path);
     let source;
     try {

@@ -119,17 +119,6 @@ async function main() {
     '--api-url',
     baseUrl,
   ]);
-  await runStep('workspace invite UI smoke', 'npm', [
-    '--prefix',
-    'backend',
-    'run',
-    'verify:workspace-invite-ui',
-    '--',
-    '--url',
-    appUrl,
-    '--api-url',
-    baseUrl,
-  ]);
   await runStep('trash UI state smoke', 'npm', ['--prefix', 'backend', 'run', 'verify:trash-ui']);
   await runStep('page chrome UI smoke', 'npm', ['--prefix', 'backend', 'run', 'verify:page-chrome-ui']);
   await runStep('page tree UI smoke', 'npm', ['--prefix', 'backend', 'run', 'verify:page-tree-ui']);

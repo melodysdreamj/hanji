@@ -4,51 +4,105 @@ Hanji deploys as an EdgeBase app: the backend serves both the API and the
 built SPA from one origin. Build the SPA first (`npm --prefix web run build`),
 then use the EdgeBase deploy targets below.
 
+## Two Docker installation paths
+
+### Registry image (recommended for end users and NAS)
+
+The target release image is `ghcr.io/melodysdreamj/hanji`. The public package
+is not available yet; once it is published, the intended release install is:
+
+```bash
+docker run -d \
+  --name hanji \
+  --restart unless-stopped \
+  -p 8443:8787 \
+  -v hanji-data:/data \
+  ghcr.io/melodysdreamj/hanji:latest
+docker logs hanji                 # copy the first-run setup code
+```
+
+Then open `https://localhost:8443`, accept/trust the initial self-signed
+certificate, and create the first server administrator in the browser. No JWT,
+service, import-encryption, MCP OAuth, master-email, or master-password env file
+is required. The image generates those runtime secrets on first start and
+stores them under `/data/.hanji/`.
+
+**Publication status:** the image-only runtime is verified locally on the
+development host, and the source build pins the published EdgeBase 0.4.3
+packages. No public GHCR image or multi-architecture manifest exists yet. The
+release workflow is prepared to build native `linux/amd64` and `linux/arm64`
+digests, test first-admin/persistence and vulnerabilities against each exact
+digest, then attach tags, SBOM/provenance, and require anonymous pullability.
+That hosted workflow has not run yet. Until a successful release exists, use
+the source build below; do not expect the pull command above to succeed.
+On the first GHCR run, the repository owner must confirm that the new package
+is linked to this repository and has **Public** visibility. The workflow's final
+anonymous-manifest check remains red until an unauthenticated NAS can pull it.
+
+### Source/custom build
+
+Clone the repository and run:
+
+```bash
+bash scripts/selfhost-docker.sh up --build
+```
+
+This builds `hanji:latest` from the checked-out source, provisions HTTPS, starts
+the same image contract, and prints the URL plus first-run setup code. Use this
+path when changing Hanji, auditing the exact source, or testing an unreleased
+revision. The repository build helper prepares the portable EdgeBase context
+and adds Hanji's appliance entrypoint, so this path does not depend on an
+unpublished local EdgeBase link. An existing legacy
+`.edgebase/docker/hanji.env` remains supported;
+the first start on the new image imports its cryptographic values into `/data`
+before that env file is retired.
+
 ## Master account on every runtime
 
-The interactive setup script is a local-dev convenience. On every non-dev
-deployment the master account travels as **environment variables** — the
-server provisions it on first boot, exactly like dev:
+Docker uses the browser installer by default. Environment provisioning remains
+the noninteractive automation path:
 
-- **Docker**: put `HANJI_MASTER_EMAIL` / `HANJI_MASTER_PASSWORD` in
-  the `--env-file` you pass to `edgebase docker run` (alongside the JWT/
-  SERVICE secrets).
+- **Docker automation (optional)**: put `HANJI_MASTER_EMAIL` /
+  `HANJI_MASTER_PASSWORD` in an env file. The image still persists missing
+  cryptographic keys under `/data`.
 - **Cloudflare**: set them in `backend/.env.release` — the deploy preflight
   (`npm --prefix backend run preflight:deploy`) refuses to deploy without
   them, and `edgebase deploy` syncs them to Cloudflare secrets.
 - **Portable pack**: export them in the process environment before starting
   the packed runtime.
 
-A fresh instance started **without** master credentials refuses to
-initialize: the sign-in screen explains how to restart with them, and account
-creation is rejected server-side. The password is only consulted when the
-account is first created — rotate it later in Account Security. Details:
+A fresh Docker instance without master credentials offers setup only when its
+image-generated setup code is available. Other fresh runtimes without either
+mechanism refuse initialization. The password is only consulted when the
+account is first created. Details:
 [master-account.md](master-account.md).
 
 ## Self-hosted HTTPS (Docker / pack)
 
-### One command (recommended)
+### One source-build command
 
 ```bash
 scripts/selfhost-docker.sh up
 ```
 
-This builds the image, generates persistent secrets + a master account, issues
-a locally-trusted certificate (via `mkcert` when installed, otherwise a
-self-signed one), runs the container over HTTPS, verifies that the persistence
+This builds the image, lets the image generate persistent secrets, issues an
+HTTPS certificate (`mkcert`-trusted when available, otherwise self-signed),
+runs the container over HTTPS, verifies that the persistence
 volume has at least 512 MiB free, waits for both runtime and product-database
-readiness, provisions the master account, and only then prints the URL and
-credentials. A failed capacity, readiness, or bootstrap check removes the
+readiness, and then prints the URL and first-run setup code. The browser creates
+the master account. A failed capacity, readiness, or bootstrap check removes the
 unhealthy container but keeps its data volume. Re-running reuses the same
-secrets, certificate, and `hanji-data` volume. The certificate's private key
+runtime secrets, certificate, and `hanji-data` volume. The certificate's private key
 stays mode `0600` in both the gitignored host state and the Docker-managed
 `hanji-certs` volume; it is never made world-readable just to cross a host UID
 boundary. Override with `--port N`,
-`--email`, `--password`, `--build` (force image rebuild), or `--http` (plain
-HTTP for a proxy-terminated setup); manage the container with the `down`,
+`--email`, `--password`, or `--build` (force image rebuild). For a
+proxy-terminated setup, use `--http --origin https://hanji.example.com`; this
+binds the upstream to `127.0.0.1`, enables the explicit proxy-trust gate, and
+uses the supplied public HTTPS origin. Manage the container with the `down`,
 `logs`, and `status` subcommands. Advanced operators can change the free-space
-floor with `HANJI_DOCKER_MIN_FREE_KB`. All state lives in the gitignored
-`.edgebase/docker/`.
+floor with `HANJI_DOCKER_MIN_FREE_KB`. TLS helper state lives in the gitignored
+`.edgebase/docker/`; product data and runtime secrets live in `/data`.
 For a browser padlock with no warning, run `mkcert -install` once (it modifies
 your OS trust store and asks for your password). The rest of this section
 explains the underlying mechanism and the manual path.
@@ -62,8 +116,8 @@ fails sign-in with `400 "Cookie authentication requires HTTPS in release mode."`
 (`insecure-cookie-config`). The fix is to serve HTTPS — the same model Synology
 DSM and similar appliances use — not to disable release mode.
 
-The Docker image can terminate TLS in-process. Add to the `--env-file` you pass
-to `docker run` / `edgebase docker run`:
+The Docker image terminates TLS in-process by default. For a custom address,
+set the public-origin/passkey values explicitly:
 
 ```bash
 LOCAL_PROTOCOL=https
@@ -79,11 +133,43 @@ For a stable, OS-trustable certificate that survives restarts, mount your own
 and set `HTTPS_CERT_PATH` / `HTTPS_KEY_PATH` (e.g. under the `/data` volume).
 
 If you instead terminate TLS at a reverse proxy and forward HTTP upstream, set
-`trustSelfHostedProxy: true` in `edgebase.config.ts` and have the proxy send
+`LOCAL_PROTOCOL=http`, `HANJI_TRUST_SELF_HOSTED_PROXY=true`,
+`HANJI_APP_ORIGIN=https://hanji.example.com`, `HANJI_PASSKEY_RP_ID` to the
+external hostname, and `HANJI_PASSKEY_ORIGINS` to that HTTPS origin. Bind the
+upstream port to `127.0.0.1` or a private Docker network, and have the proxy send
 `X-Forwarded-Proto: https`; only then is a forwarded HTTP request treated as
-secure. The port-mapped container never sees a loopback client IP, so the
-local-development exemption does not apply to a self-hosted runtime — HTTPS is
-the only supported path for browser sign-in.
+secure. The launcher applies this boundary with
+`--http --origin https://hanji.example.com`. The local-development exemption
+does not apply to a self-hosted runtime — a trusted HTTPS origin is required
+for browser sign-in.
+
+## Synology Container Manager
+
+Synology DSM can use the same registry image once it is published:
+
+1. Confirm the NAS reports `x86_64` or `aarch64`. Published releases will target
+   `linux/amd64` and `linux/arm64`; older 32-bit ARM models are unsupported.
+2. In **Container Manager → Registry**, add/download
+   `ghcr.io/melodysdreamj/hanji:latest` (or enter the full image name when DSM
+   does not list GHCR search results).
+3. Mount a dedicated `/volume1/docker/hanji` directory to container `/data`,
+   enable automatic restart, and map an unused host port to container `8787`.
+   The image prepares that dedicated mount for its fixed non-root runtime user
+   on startup; do not map a directory shared with other applications.
+4. Prefer Synology Reverse Proxy with a valid HTTPS certificate. Use HTTP only
+   on the private upstream and set `LOCAL_PROTOCOL=http`,
+   `HANJI_TRUST_SELF_HOSTED_PROXY=true`, `HANJI_APP_ORIGIN` and
+   `HANJI_PASSKEY_ORIGINS` to the public HTTPS URL, and
+   `HANJI_PASSKEY_RP_ID` to its hostname. Do not expose that upstream port
+   publicly. Direct container HTTPS is also possible but self-signed by default
+   and is best suited to initial evaluation.
+5. Open the container log, copy the first-run setup code, visit the Hanji URL,
+   and create the administrator.
+
+For updates, download the new image and recreate only the container with the
+same `/data` mapping. Never delete that directory/volume during an update.
+Back up `/data` as one unit; it now contains pages, databases, uploaded files,
+runtime secrets, and the setup-completion state.
 
 ## Release environment gate
 

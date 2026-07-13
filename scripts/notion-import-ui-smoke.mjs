@@ -7,6 +7,7 @@ import {
   assertNoBrowserErrors,
   assertRuntimeReachable,
   callFunction,
+  finalizeRegisteredSmokeAccounts,
   loadPlaywright,
   newCheckedPage,
   normalizeBaseUrl,
@@ -34,6 +35,8 @@ try {
     console.error('Start the local EdgeBase runtime with HANJI_NOTION_API_BASE pointing at the mock API base.');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('Notion import UI smoke');
 }
 
 async function main() {
@@ -73,6 +76,20 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
   try {
     await step('open app', () => openApp(page, appUrl));
     await step('open Notion import tab', () => openNotionImportTab(page));
+    if (options.resumeOnly) {
+      await step('resume a reloaded one-time-token job only after token re-entry', () => (
+        assertManualTokenReloadResume(page, apiUrl, seed)
+      ));
+      const storedConnectionChecked = await step(
+        'reload-resume a stored Notion connection automatically',
+        () => assertStoredConnectionReloadResume(page, apiUrl, seed),
+      );
+      assertNoBrowserErrors(
+        filterExpectedBrowserErrors(errors, { storedConnectionChecked }),
+        'Notion import resume UI flow',
+      );
+      return;
+    }
     await step('show Notion token setup guidance', () => assertTokenSetupGuidanceUi(page));
     await step('scan accessible Notion roots from UI', () => assertRootScanUi(page));
     await step('discover and apply import through the wizard', async () => {
@@ -122,7 +139,10 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
     // derivation), not here — driving a close+reopen through this Playwright flow
     // proved flaky (the reopened dialog intermittently failed to resolve), and a
     // flaky assertion in a CI-gated smoke is worse than a precise unit guard.
-    const storedConnectionChecked = await step('save and use stored Notion connection from UI', () => (
+    await step('resume a reloaded one-time-token job only after token re-entry', () => (
+      assertManualTokenReloadResume(page, apiUrl, seed)
+    ));
+    const storedConnectionChecked = await step('save, use, and reload-resume a stored Notion connection from UI', () => (
       assertStoredTokenConnectionUi(page, apiUrl, seed)
     ));
     assertNoBrowserErrors(filterExpectedBrowserErrors(errors, { storedConnectionChecked }), 'Notion import UI flow');
@@ -142,15 +162,17 @@ async function openApp(page, baseUrl) {
   });
 }
 
-async function openNotionImportTab(page) {
+async function openNotionImportTab(page, { expectTokenInput = true } = {}) {
   await page.getByRole('button', { name: 'Import' }).last().click({ timeout: options.timeoutMs });
   const dialog = page.getByRole('dialog', { name: 'Import' });
   await dialog.waitFor({ state: 'visible', timeout: options.timeoutMs });
   await dialog.getByRole('button', { name: 'Notion' }).click({ timeout: options.timeoutMs });
-  await dialog.getByLabel('Notion API token').waitFor({
-    state: 'visible',
-    timeout: options.timeoutMs,
-  });
+  if (expectTokenInput) {
+    await dialog.getByLabel('Notion API token').waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+  }
 }
 
 async function expectRunStatus(page, expected) {
@@ -233,6 +255,39 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
   assert(job.report?.credentialSource === 'connection', 'Stored connection discovery report must record the credential source');
   await expectRunStatus(page, 'Ready');
 
+  // Simulate the durable state left behind when the browser or local runtime
+  // disappears between chunks: create a deferred job through the product API,
+  // then reload the SPA. The remounted dialog must use the job's exact stored
+  // connection and drive it to Ready without asking for or retaining a token.
+  const deferred = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+    action: 'create',
+    workspaceId: seed.workspaceId,
+    connectionKind: connection.connectionKind,
+    connectionId: connection.id,
+    rootNotionPageIds: [],
+    rootNotionDataSourceIds: [],
+    deferDiscovery: true,
+  });
+  assert(
+    deferred.job?.id && (deferred.job.status === 'queued' || deferred.job.status === 'discovering'),
+    'Stored-connection reload fixture must persist an active deferred job',
+  );
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+  await page.getByRole('button', { name: 'Import' }).last().waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+  await openNotionImportTab(page, { expectTokenInput: false });
+  const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
+    candidate.id === deferred.job.id &&
+    candidate.status === 'ready' &&
+    candidate.connectionId === connection.id &&
+    candidate.options?.credentialSource === 'connection' &&
+    candidate.options?.tokenStored === false
+  ), 'reloaded stored-connection discovery job');
+  assert(resumed.report?.credentialSource === 'connection', 'Reloaded discovery must keep the stored connection authority');
+  await expectRunStatus(page, 'Ready');
+
   await gotoWizardStep(dialog, 1);
   await picker.selectOption({ value: connection.id }, { timeout: options.timeoutMs });
   await dialog.getByRole('button', { name: 'Remove' }).click({ timeout: options.timeoutMs });
@@ -242,6 +297,123 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
     candidate.hasStoredCredential === false
   ), 'revoked stored connection');
   await expectSelectNotToHaveValue(picker, connection.id);
+  return true;
+}
+
+async function assertManualTokenReloadResume(page, apiUrl, seed) {
+  // A request-scoped token is intentionally absent from the durable job. A
+  // reload must therefore stop at Connect and ask for the original token; it
+  // must never guess, persist, or auto-run with an unrelated credential.
+  const deferred = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+    action: 'create',
+    workspaceId: seed.workspaceId,
+    connectionKind: 'manual_token',
+    notionToken: 'ntn_mock-notion-token',
+    rootNotionPageIds: [],
+    rootNotionDataSourceIds: [],
+    deferDiscovery: true,
+  });
+  assert(
+    deferred.job?.id &&
+      (deferred.job.status === 'queued' || deferred.job.status === 'discovering') &&
+      !deferred.job.connectionId &&
+      deferred.job.options?.tokenStored === false,
+    'Manual-token reload fixture must persist an active job without credential material',
+  );
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+  await page.getByRole('button', { name: 'Import' }).last().waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+  await openNotionImportTab(page);
+  const dialog = page.getByRole('dialog', { name: 'Import' });
+  await dialog.getByLabel('Notion API token').waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await page.getByText(
+    'Reconnect the saved integration or enter the original Notion token to resume this discovery.',
+    { exact: true },
+  ).waitFor({ state: 'visible', timeout: options.timeoutMs });
+
+  // Give the automatic stored-connection path enough time to reveal an
+  // accidental request. The durable job must still be active and untouched.
+  await delay(500);
+  const paused = await waitForImportJob(apiUrl, seed, (candidate) => candidate.id === deferred.job.id, 'manual-token paused job');
+  assert(
+    paused.status === 'queued' || paused.status === 'discovering',
+    `Manual-token job unexpectedly advanced without token re-entry: ${paused.status}`,
+  );
+
+  await dialog.getByLabel('Notion API token').fill('ntn_mock-notion-token', { timeout: options.timeoutMs });
+  // The credential step owns an explicit resume action for this orphaned job;
+  // it must not route through Scope and accidentally create a second import.
+  await dialog.getByRole('button', { name: 'Resume discovery', exact: true }).click({ timeout: options.timeoutMs });
+  const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
+    candidate.id === deferred.job.id &&
+    candidate.status === 'ready' &&
+    !candidate.connectionId &&
+    candidate.options?.credentialSource === 'request' &&
+    candidate.options?.tokenStored === false
+  ), 'manual-token resumed job');
+  assert(resumed.report?.credentialSource === 'request', 'Manual resume must use only the re-entered request token');
+  await expectRunStatus(page, 'Ready');
+}
+
+async function assertStoredConnectionReloadResume(page, apiUrl, seed) {
+  const connectionName = `Reload resume connection ${Date.now()}`;
+  const created = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+    action: 'createConnection',
+    workspaceId: seed.workspaceId,
+    name: connectionName,
+    connectionKind: 'internal_integration',
+    notionToken: 'ntn_mock-notion-token',
+  });
+  const connection = created.connection;
+  assert(
+    connection?.id && connection.hasStoredCredential === true,
+    'Stored-connection reload fixture must create encrypted credential metadata',
+  );
+
+  try {
+    const deferred = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+      action: 'create',
+      workspaceId: seed.workspaceId,
+      connectionKind: connection.connectionKind,
+      connectionId: connection.id,
+      rootNotionPageIds: [],
+      rootNotionDataSourceIds: [],
+      deferDiscovery: true,
+    });
+    assert(
+      deferred.job?.id && (deferred.job.status === 'queued' || deferred.job.status === 'discovering'),
+      'Stored-connection reload fixture must persist an active deferred job',
+    );
+
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+    await page.getByRole('button', { name: 'Import' }).last().waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    await openNotionImportTab(page, { expectTokenInput: false });
+    const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
+      candidate.id === deferred.job.id &&
+      candidate.status === 'ready' &&
+      candidate.connectionId === connection.id &&
+      candidate.options?.credentialSource === 'connection' &&
+      candidate.options?.tokenStored === false
+    ), 'reloaded stored-connection discovery job');
+    assert(
+      resumed.report?.credentialSource === 'connection',
+      'Reloaded discovery must keep the exact stored connection authority',
+    );
+    await expectRunStatus(page, 'Ready');
+  } finally {
+    await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+      action: 'revokeConnection',
+      workspaceId: seed.workspaceId,
+      connectionId: connection.id,
+    }).catch(() => {});
+  }
+
   return true;
 }
 
@@ -309,11 +481,20 @@ async function assertRootScanUi(page) {
   await dialog.getByRole('button', { name: 'Next', exact: true }).click({ timeout: options.timeoutMs });
   await dialog.getByLabel('Specific pages').check({ timeout: options.timeoutMs });
   await dialog.getByRole('button', { name: 'Scan accessible roots' }).click({ timeout: options.timeoutMs });
-  await dialog.getByText('Scanning... 1 root candidate · 1 item checked · 1 request', { exact: true }).waitFor({
-    state: 'visible',
-    timeout: options.timeoutMs,
-  });
-  await dialog.getByText('Mock first page', { exact: true }).waitFor({ state: 'visible', timeout: options.timeoutMs });
+  // Do not require one exact transient progress frame: a fast runtime can
+  // commit both mock search pages between browser paints. The settled candidate
+  // and aggregate assertions below prove the same scan without a timing race.
+  try {
+    await dialog.getByText('Mock first page', { exact: true }).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+  } catch (error) {
+    const dialogText = await dialog.textContent({ timeout: 1000 }).catch(() => '');
+    throw new Error(
+      `Root scan did not return the mock candidate. Dialog: ${JSON.stringify((dialogText ?? '').slice(0, 1200))}. ${error.message}`,
+    );
+  }
   await dialog.getByText('Mock shared database', { exact: true }).waitFor({ state: 'visible', timeout: options.timeoutMs });
   const childVisible = await dialog.getByText('Mock child page', { exact: true }).isVisible().catch(() => false);
   assert(!childVisible, 'Root scan should not show children whose accessible parent is already listed.');
@@ -686,6 +867,7 @@ function parseArgs(args) {
     expectStoredConnection: process.env.HANJI_EXPECT_STORED_NOTION_CONNECTION === '1',
     headed: false,
     mockNotionApiBase: DEFAULT_MOCK_NOTION_API_BASE,
+    resumeOnly: false,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     url: DEFAULT_BASE_URL,
   };
@@ -707,6 +889,10 @@ function parseArgs(args) {
     if (arg === '--mock-notion-api-base') {
       parsed.mockNotionApiBase = resolveValue(args, i, arg);
       i += 1;
+      continue;
+    }
+    if (arg === '--resume-only') {
+      parsed.resumeOnly = true;
       continue;
     }
     if (arg === '--api-url') {
@@ -751,6 +937,7 @@ Options:
   --url <url>                     App URL. Defaults to HANJI_EDGEBASE_URL or ${DEFAULT_BASE_URL}.
   --api-url <url>                 EdgeBase API URL. Defaults to HANJI_EDGEBASE_API_URL or ${DEFAULT_API_URL}.
   --mock-notion-api-base <url>    Mock Notion API base. Defaults to ${DEFAULT_MOCK_NOTION_API_BASE}.
+  --resume-only                   Run only persisted-job reload/resume checks.
   --timeout-ms <number>           Browser/action timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
   --expect-stored-connection      Fail if encrypted stored Notion connections are not configured.
   --headed                        Show the browser while running.

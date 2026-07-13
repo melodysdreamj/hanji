@@ -47,6 +47,14 @@ const ROADMAP_PAGE = {
   position: 2,
 };
 const PAGES = [DATABASE_PAGE, ROADMAP_PAGE];
+const NOTION_IMPORT_JOB = {
+  id: "notion-job-1",
+  workspaceId: "ws-1",
+  status: "ready",
+  phase: "discovery_complete",
+  counts: {},
+  progress: {},
+};
 const DB_PROPERTIES = [
   { id: "prop-title", databaseId: "db-1", name: "Name", type: "title", position: 0, config: {} },
   {
@@ -100,7 +108,43 @@ function route(method, path, body) {
     if (body?.action === "list") {
       return { status: 200, json: { workspaces: [WORKSPACE, SECOND_WORKSPACE] } };
     }
+    if (body?.action === "addMember") {
+      return {
+        status: 200,
+        json: {
+          workspace: WORKSPACE,
+          members: [{
+            id: "member-2",
+            userId: "user-2",
+            email: body.email,
+            displayName: body.displayName,
+            role: body.role,
+          }],
+          // A legacy row may still exist for cleanup compatibility, but the
+          // current MCP membership surface must not revive invitation UX.
+          invitations: [{ id: "legacy-invitation", email: "legacy@example.com", status: "pending" }],
+        },
+      };
+    }
     if (body?.action === "recordMcpClientAction") return { status: 200, json: { ok: true } };
+  }
+  if (method === "POST" && path === "/api/functions/notion-import") {
+    return {
+      status: 200,
+      json: {
+        job: NOTION_IMPORT_JOB,
+        connection: {
+          id: "notion-connection-1",
+          workspaceId: "ws-1",
+          name: "Smoke Notion connection",
+          status: "active",
+        },
+        items: [],
+        plan: { status: "ready", canApply: true, estimatedWrites: {}, conversion: { summary: {} } },
+        applied: {},
+        fileRetry: {},
+      },
+    };
   }
   if (method === "POST" && path === "/api/functions/page-query") {
     if (body?.action === "page") {
@@ -252,6 +296,58 @@ try {
   assert.equal(listResult.structuredContent?.workspaces?.[0]?.notionTeamspaceId, "ws-1");
   assert.match(textOf(listResult), /Smoke Workspace/, "list_workspaces text mentions workspace name");
   assert.match(textOf(listResult), /workspaces: 2/, "list_workspaces text counts workspaces");
+
+  // ── workspace membership: existing-account direct add ───────────
+  const addMemberResult = await callTool("add_workspace_member", {
+    workspaceId: "ws-1",
+    email: "existing-member@example.com",
+    displayName: "Existing Member",
+    role: "member",
+  });
+  assert.equal(addMemberResult.isError ?? false, false, "add_workspace_member should not error");
+  const addMemberReq = findRequest("/api/functions/workspace-mutation", "addMember");
+  assert.ok(addMemberReq, "add_workspace_member hits workspace-mutation addMember");
+  assertMcpHeaders(addMemberReq);
+  assert.deepEqual(addMemberReq.body, {
+    action: "addMember",
+    workspaceId: "ws-1",
+    displayName: "Existing Member",
+    email: "existing-member@example.com",
+    role: "member",
+  }, "add_workspace_member request body");
+  assert.match(textOf(addMemberResult), /Existing Member \(Member\)/, "add_workspace_member text includes the member");
+  assert.doesNotMatch(textOf(addMemberResult), /invitation|legacy@example\.com/i, "member output hides legacy invitation rows");
+
+  // ── Notion import jobs: job-id calls inherit workspace routing ───
+  const notionJobCalls = [
+    ["get_notion_import_job", "get"],
+    ["plan_notion_import_job", "plan"],
+    ["discover_notion_import_job", "discover"],
+    ["cancel_notion_import_job", "cancel"],
+    ["apply_notion_import_job", "apply"],
+    ["retry_notion_import_file_copies", "retryFileCopies"],
+    ["retry_notion_import_job", "retry"],
+  ];
+  for (const [toolName, action] of notionJobCalls) {
+    const result = await callTool(toolName, { jobId: NOTION_IMPORT_JOB.id });
+    assert.equal(result.isError ?? false, false, `${toolName} should not error`);
+    const request = findRequest("/api/functions/notion-import", action);
+    assert.ok(request, `${toolName} hits notion-import ${action}`);
+    assertMcpHeaders(request);
+    assert.equal(request.body.jobId, NOTION_IMPORT_JOB.id, `${toolName} forwards jobId`);
+    assert.equal(request.body.workspaceId, WORKSPACE.id, `${toolName} defaults workspaceId from the current workspace`);
+  }
+  for (const [toolName, action, args] of [
+    ["complete_notion_oauth_connection", "completeOAuthConnection", { code: "smoke-code", state: "smoke-state" }],
+    ["revoke_notion_import_connection", "revokeConnection", { connectionId: "notion-connection-1" }],
+  ]) {
+    const result = await callTool(toolName, args);
+    assert.equal(result.isError ?? false, false, `${toolName} should not error`);
+    const request = findRequest("/api/functions/notion-import", action);
+    assert.ok(request, `${toolName} hits notion-import ${action}`);
+    assertMcpHeaders(request);
+    assert.equal(request.body.workspaceId, WORKSPACE.id, `${toolName} defaults workspaceId from the current workspace`);
+  }
 
   // ── database read: describe_database ──────────────────────────────
   const describeResult = await callTool("describe_database", { databaseId: "db-1" });
@@ -408,8 +504,8 @@ try {
 
   console.log(
     `MCP tool-invocation smoke ok: ${requests.length} backend requests asserted across ` +
-      "list_workspaces, describe_database, query_database, search_pages, create_page, " +
-      "list_comments escaping, create_view validation, and error paths",
+      "list_workspaces, add_workspace_member, describe_database, query_database, search_pages, create_page, " +
+      "Notion-import job routing, list_comments escaping, create_view validation, and error paths",
   );
 } catch (error) {
   if (stderr.trim()) console.error(stderr.trim());
