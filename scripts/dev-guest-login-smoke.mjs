@@ -107,8 +107,6 @@ async function assertDevGuestLogin(browser, baseUrl, apiUrl, theme) {
           : 'AuthGate did not render the expected development guest login surface.',
       );
     }
-    await endInitialSignedOutRefreshWindow();
-
     await assertAuthButtonContract(page, guestButton);
     await page.screenshot({
       path: join(
@@ -120,6 +118,12 @@ async function assertDevGuestLogin(browser, baseUrl, apiUrl, theme) {
 
     await guestButton.click({ timeout: options.timeoutMs });
     await expectWorkspaceLoaded(page);
+    // GitHub Chromium can deliver the generic console half of the initial
+    // signed-out refresh after the guest transition has already started, and
+    // sometimes without a matching Playwright response event. Keep the narrow
+    // one-shot /api/auth/refresh allowance open until successful authentication
+    // proves that the delayed 401 belonged to the pre-login bootstrap.
+    await endInitialSignedOutRefreshWindow();
     await page.screenshot({
       path: join(
         options.screenshotDir,

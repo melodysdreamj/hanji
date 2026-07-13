@@ -849,8 +849,9 @@ export function watchBrowserErrors(page, {
     errors,
     async endInitialSignedOutRefreshWindow() {
       // Let the browser deliver the response/console pair before sealing the
-      // window. Callers await this before any sign-in click, so later failures
-      // cannot consume the initial signed-out allowance.
+      // window. The caller owns this boundary: a login smoke may close it only
+      // after successful authentication proves a delayed 401 belonged to the
+      // pre-login bootstrap.
       if (typeof page.waitForTimeout === 'function') await page.waitForTimeout(75);
       else await new Promise((resolve) => setTimeout(resolve, 0));
       // A resource console event can identify the exact refresh endpoint even
