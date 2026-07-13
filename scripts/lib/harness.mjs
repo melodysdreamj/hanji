@@ -748,6 +748,7 @@ export function watchBrowserErrors(page, {
   let initialSignedOutAllowanceAvailable = initialSignedOutStatuses.size > 0;
   let pendingSignedOutRefreshStatus = null;
   let pendingGenericAuthError = null;
+  let lateInitialConsoleStatus = null;
   const record = (message) => errors.push(prefix ? `${prefix}${message}` : message);
 
   page.on('pageerror', (error) => record(error.message));
@@ -756,20 +757,31 @@ export function watchBrowserErrors(page, {
     const genericStatus = Number(
       message.text().match(GENERIC_HTTP_FAILURE_CONSOLE_PATTERN)?.[1] ?? Number.NaN,
     );
+    const consoleUrl = message.location?.().url;
+    let verifiedAuthRefreshLocation = false;
+    if (consoleUrl) {
+      try {
+        verifiedAuthRefreshLocation = new URL(consoleUrl).pathname === '/api/auth/refresh';
+      } catch {
+        // The normal error path below preserves malformed console locations.
+      }
+    }
+    if (
+      !initialSignedOutWindowOpen
+      && lateInitialConsoleStatus === genericStatus
+      && verifiedAuthRefreshLocation
+    ) {
+      // Playwright can surface the console half of an already-observed initial
+      // refresh failure after the caller seals the signed-out window. Consume
+      // only that exact URL/status pair once; later or unrelated errors remain
+      // fatal.
+      lateInitialConsoleStatus = null;
+      return;
+    }
     if (initialSignedOutWindowOpen && initialSignedOutStatuses.has(genericStatus)) {
-      const consoleUrl = message.location?.().url;
-      let verifiedAuthRefreshLocation = false;
-      if (consoleUrl) {
-        try {
-          if (new URL(consoleUrl).pathname !== '/api/auth/refresh') {
-            record(message.text());
-            return;
-          }
-          verifiedAuthRefreshLocation = true;
-        } catch {
-          record(message.text());
-          return;
-        }
+      if (consoleUrl && !verifiedAuthRefreshLocation) {
+        record(message.text());
+        return;
       }
       const location = includeConsoleLocation ? message.location() : null;
       const source = location?.url ? ` (${location.url}:${location.lineNumber})` : '';
@@ -849,6 +861,11 @@ export function watchBrowserErrors(page, {
       if (pendingGenericAuthError && !pendingGenericAuthError.verifiedAuthRefreshLocation) {
         record(pendingGenericAuthError.message);
       }
+      // Preserve only an exact endpoint response that arrived before the
+      // window closed but whose generic Chromium console event is still in
+      // flight. This is not a new allowance: it is the unmatched half of the
+      // already-observed initial refresh failure.
+      lateInitialConsoleStatus = pendingSignedOutRefreshStatus;
       initialSignedOutWindowOpen = false;
       initialSignedOutAllowanceAvailable = false;
       pendingSignedOutRefreshStatus = null;
