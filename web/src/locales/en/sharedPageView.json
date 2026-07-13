@@ -3,5 +3,12 @@
   "loading": "Loading shared page",
   "unavailable": "This shared page is unavailable.",
   "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "outsideShare": "The page is not part of this public share.",
+  "tryAgain": "Try again",
+  "errors": {
+    "not-found": "This link may have expired, been unpublished, or been copied incorrectly.",
+    "rate-limited": "This shared page is receiving too many requests. Wait a moment and try again.",
+    "offline": "Check your connection, then try opening the shared page again.",
+    "unavailable": "Hanji could not open this shared page right now. Try again in a moment."
+  }
 }

@@ -1,0 +1,262 @@
+name: Publish container image
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Container tag to publish (for example edge or 1.0.0-rc.1)
+        required: true
+        default: edge
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: container-release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: ghcr.io/melodysdreamj/hanji
+
+jobs:
+  platform-runtime:
+    name: Verify ${{ matrix.platform }} digest
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    environment: container-release
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            arch: amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            web/package-lock.json
+      - name: Validate requested release tag
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          else
+            [[ "$RELEASE_TAG" =~ ^[0-9A-Za-z_][0-9A-Za-z._-]{0,127}$ ]]
+          fi
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+      - name: Audit release dependencies
+        run: npm --prefix web audit --audit-level=high && npm --prefix backend audit --audit-level=high
+      - name: Build the released frontend
+        working-directory: web
+        run: npm run build
+      - name: Prepare the portable Docker context
+        run: node scripts/build-hanji-docker-image.mjs --context-only --tag release-context
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-') }}
+            type=sha,format=long
+          labels: |
+            org.opencontainers.image.title=Hanji
+            org.opencontainers.image.description=A self-hostable Notion-style workspace
+            org.opencontainers.image.source=https://github.com/melodysdreamj/hanji
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=AGPL-3.0-only
+      - id: build
+        name: Build and push the untagged platform digest
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: backend/.edgebase/targets/docker-context
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            HANJI_BUILD_SHA=${{ github.sha }}
+          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          provenance: mode=max
+          sbom: true
+      - name: Verify the exact digest's first-admin and persistence contract
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: >-
+          node scripts/verify-edgebase-packaging.mjs
+          --runtime-image "$IMAGE_NAME@$DIGEST"
+          --skip-local-edgebase-check
+      - name: Generate platform SBOM
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: cyclonedx
+          output: hanji-${{ matrix.arch }}-sbom.cdx.json
+          exit-code: '0'
+      - name: Record all platform HIGH and CRITICAL findings
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: json
+          output: hanji-${{ matrix.arch }}-vulnerabilities.json
+          exit-code: '0'
+          ignore-unfixed: 'false'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          scanners: vuln
+          skip-setup-trivy: 'true'
+          timeout: 10m0s
+      - name: Preserve digest for manifest assembly
+        shell: bash
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${DIGEST#sha256:}"
+      - name: Upload verified digest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hanji-digest-${{ matrix.arch }}-${{ github.sha }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload platform security evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hanji-container-${{ matrix.arch }}-${{ github.sha }}
+          path: |
+            hanji-${{ matrix.arch }}-sbom.cdx.json
+            hanji-${{ matrix.arch }}-vulnerabilities.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Block fixable platform HIGH and CRITICAL findings
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: 'true'
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          scanners: vuln
+          skip-setup-trivy: 'true'
+          timeout: 10m0s
+      - name: Remove verified platform image
+        if: always()
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: docker image rm --force "$IMAGE_NAME@$DIGEST" || true
+
+  publish:
+    name: Tag and attest the verified manifest
+    needs: platform-runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: container-release
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-') }}
+            type=sha,format=long
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: hanji-digest-*-${{ github.sha }}
+          path: /tmp/digests
+          merge-multiple: true
+      - id: manifest
+        name: Create tags only from verified platform digests
+        shell: bash
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          mapfile -t digest_files < <(find /tmp/digests -type f | sort)
+          [[ "${#digest_files[@]}" -eq 2 ]]
+          refs=()
+          for file in "${digest_files[@]}"; do
+            refs+=("$IMAGE_NAME@sha256:$(basename "$file")")
+          done
+          tag_args=()
+          while IFS= read -r tag; do
+            [[ -n "$tag" ]] && tag_args+=(-t "$tag")
+          done <<< "$TAGS"
+          [[ "${#tag_args[@]}" -ge 2 ]]
+          docker buildx imagetools create "${tag_args[@]}" "${refs[@]}"
+          first_tag=${TAGS%%$'\n'*}
+          docker buildx imagetools inspect "$first_tag" > manifest.txt
+          digest=$(awk '$1 == "Digest:" { print $2; exit }' manifest.txt)
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      - name: Publish GitHub build provenance
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.manifest.outputs.digest }}
+          push-to-registry: true
+      - name: Verify the published manifest platforms
+        shell: bash
+        env:
+          DIGEST: ${{ steps.manifest.outputs.digest }}
+        run: |
+          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > manifest.txt
+          grep -q 'linux/amd64' manifest.txt
+          grep -q 'linux/arm64' manifest.txt
+      - name: Require anonymous pullability before calling the image public
+        shell: bash
+        env:
+          DIGEST: ${{ steps.manifest.outputs.digest }}
+        run: |
+          docker logout ghcr.io
+          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > anonymous-manifest.txt
+          grep -q 'linux/amd64' anonymous-manifest.txt
+          grep -q 'linux/arm64' anonymous-manifest.txt

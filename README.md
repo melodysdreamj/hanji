@@ -107,17 +107,21 @@ real. Editing the frontend? Also run `npm --prefix web run dev` for hot reload a
 
 ### Docker — self-host with HTTPS at `https://localhost:8443`
 
-Needs **Docker** (daemon running). One command builds the image, generates
-secrets and a master account, issues a locally-trusted certificate, runs the
-container, and prints the sign-in URL and master credentials:
+Needs **Docker** (daemon running). The source-build path creates the image,
+issues a locally-trusted certificate, and prints the sign-in URL plus one-time
+setup code:
 
 ```bash
-bash scripts/selfhost-docker.sh up
+bash scripts/selfhost-docker.sh up --build
 ```
 
-Manage it with `bash scripts/selfhost-docker.sh status | logs | down`. For a
-no-warning certificate, install [mkcert](https://github.com/FiloSottile/mkcert)
-first.
+Open the URL and choose the first administrator email/password in the browser.
+Manage it with the `status`, `logs`, or `down` subcommand, for example
+`bash scripts/selfhost-docker.sh status`. For a no-warning certificate, install
+[mkcert](https://github.com/FiloSottile/mkcert) first. The release design also
+supports pulling the same amd64/arm64 image from GHCR in Synology/NAS Container
+Manager; the public image and multi-architecture manifest are not published
+yet, so the pinned source build is the working path today.
 
 ### Cloudflare _(in progress)_ — deploy to your own Workers domain
 
@@ -220,51 +224,55 @@ Pages workflow has completed; until then, use the in-repository links below.
 
 ## Deploying
 
-For a self-hosted container, [`scripts/selfhost-docker.sh up`](scripts/selfhost-docker.sh)
-is the one-command path (build → secrets → HTTPS cert → run); see
-[docs/deployment.md](docs/deployment.md) for it, the manual Docker build, the
-reverse-proxy TLS option, and Cloudflare/portable-pack deploys.
+For a source-built self-hosted container,
+[`scripts/selfhost-docker.sh up --build`](scripts/selfhost-docker.sh) is the
+one-command path. [docs/deployment.md](docs/deployment.md) separates the
+registry-image/NAS path from source/custom builds and covers HTTPS,
+reverse-proxy, Cloudflare, and portable-pack deployment.
 
 **Data & backups (Docker).** Everything you create lives in the `hanji-data`
 Docker volume (mounted at `/data`) — pages, databases, uploaded files, and all.
 Put it elsewhere with `--data /your/host/path` (an absolute path to bind-mount)
 or `--data my-volume` (a named volume). For a full backup, keep that data **and**
-`.edgebase/docker/hanji.env` (the gitignored secrets — JWT keys, master account,
-and the import-encryption key); the TLS certificate volume regenerates on its own.
+the image-managed secrets stored inside `/data/.hanji/`; backing up the whole
+volume/directory covers both. Legacy installs should start the new image once
+with their old `.edgebase/docker/hanji.env` so its cryptographic values are
+copied into `/data` before retiring that file. The TLS certificate volume can
+regenerate on its own.
 
-The master account travels as `HANJI_MASTER_EMAIL` /
-`HANJI_MASTER_PASSWORD` environment variables on every runtime — Docker
-env-file, Cloudflare deploy secrets, or the packed runtime's process
-environment — and the server provisions it on first boot. A fresh instance
-started without them refuses to initialize. See
-[docs/deployment.md](docs/deployment.md).
+Docker normally creates its first administrator through the setup-code-protected
+web installer. `HANJI_MASTER_EMAIL` / `HANJI_MASTER_PASSWORD` remain the
+noninteractive path for Cloudflare, portable packs, and advanced Docker
+automation. See [docs/deployment.md](docs/deployment.md).
 
 ## Status & roadmap
 
-Hanji is an active build. Here's an honest, area-by-area status — what's done,
-what's in progress, and what's still on the roadmap.
+Hanji is an active beta, suitable for local evaluation and early self-hosted
+adoption. The table distinguishes a tested core workflow from an area that is
+still closing important parity or production-readiness gaps.
 
 | Area | Status | On the horizon |
 | --- | :---: | --- |
-| Block editor — all core blocks, slash menu, Markdown, marks, undo/redo | ✅ Done | internal cleanups, vertical-caret polish |
-| Databases — table/board/list/gallery/calendar/timeline, relations, rollups, formulas | ✅ Done | large-workspace query scale (index push-down) |
-| Notion-API import | ✅ Done | tighter relation/rollup/people fidelity |
-| Comments, mentions, notifications & inbox | ✅ Done | — |
-| Page & organization permissions, public web sharing | ✅ Done | — |
-| Full-text search (CJK-aware) | ✅ Done | — |
-| Self-hosted auth — password + TOTP MFA, recovery, master account, invites | ✅ Done | — |
-| MCP server — OAuth-scoped, product-API-backed | ✅ Done | broader tool coverage |
-| Deploy — local dev & Docker | ✅ Done | production-hardening passes |
-| Deploy — Cloudflare Workers | 🚧 In progress | finishing the hosted deploy path |
-| Realtime collaboration — CRDT text merge, presence | 🚧 In progress | concurrent structural edits, reconnect |
-| SSO (SAML / OIDC) & SCIM provisioning | 🚧 In progress | real-IdP verification |
+| Block editor — core blocks, slash menu, Markdown, marks, undo/redo | 🧪 Beta | edge-case editing and vertical-caret polish |
+| Databases — table/board/list/gallery/calendar/timeline, relations, rollups, formulas | 🧪 Beta | deeper view behavior and large-workspace query scale |
+| Notion-API import | 🧪 Beta | tighter relation/rollup/people fidelity and large-import scale |
+| Comments, mentions, notifications & inbox | 🧪 Beta | broader notification kinds and grouping |
+| Page & organization permissions, public web sharing | 🧪 Beta | remaining policy surfaces and denial-state UX |
+| Full-text search (CJK-aware) | 🧪 Beta | ranking and keyboard edge cases |
+| Self-hosted auth — password + TOTP MFA, recovery, server accounts | 🧪 Beta | delivered-mail and hosted-runtime verification |
+| MCP server — scoped, product-API-backed | 🧪 Beta | hosted OAuth/runtime proof and broader production edge cases |
+| Deploy — local dev & Docker | ✅ Available | production-hardening and upgrade/restore rehearsals |
+| Deploy — Cloudflare Workers | 🚧 Hardening | first public hosted-runtime proof |
+| Realtime collaboration — CRDT text merge, presence | 🧪 Beta | structural reconnect and production-grade selection mapping |
+| SSO (SAML / OIDC) & SCIM provisioning | 🚧 Hardening | real-IdP verification |
 | Native mobile apps | 🗺️ Planned | responsive web today |
 | Data migration / versioning story | 🗺️ Planned | — |
 
-<sub>✅ done and usable · 🚧 in progress, being built or hardened · 🗺️ planned, not built yet</sub>
+<sub>✅ available = core workflow tested · 🧪 beta = usable with known gaps · 🚧 hardening = implemented but missing release evidence · 🗺️ planned = not built yet</sub>
 
-> Not represented as production-ready until a hosted deployment has passed the
-> deployment and runtime verification gates with production secrets configured.
+> No area is labeled production-verified yet. That label is reserved until a
+> hosted deployment passes the deployment, runtime, mail, backup/restore, and
+> upgrade gates with production configuration.
 
 ## License
 

@@ -237,7 +237,22 @@ describe('hosted MCP advertised async task status URL', () => {
       pages: [{ properties: { title: 'Unsupported write probe' } }],
     }, admin);
     const task = created.structuredContent?.async_task as Record<string, unknown> | undefined;
-    expect(task).toMatchObject({ status: 'failed' });
+    expect(task).toMatchObject({
+      status: 'failed',
+      error: {
+        object: 'create_pages_result',
+        status: 'failed',
+        pages: [],
+        succeeded_count: 0,
+        failed_index: 0,
+        failed_message: expect.stringContaining('content mutations are not available in this release'),
+        retry_guidance: {
+          strategy: 'retry_remaining_pages_only',
+          start_index: 0,
+          remaining_count: 1,
+        },
+      },
+    });
     expect(typeof task?.status_url).toBe('string');
     const statusUrl = new URL(String(task?.status_url));
     expect(statusUrl.origin).toBe(ORIGIN);
@@ -256,7 +271,20 @@ describe('hosted MCP advertised async task status URL', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('cache-control')).toBe('no-store');
     const payload = await response.json() as { async_task?: Record<string, unknown> };
-    expect(payload.async_task).toMatchObject({ id: task?.id, status: 'failed' });
+    expect(payload.async_task).toMatchObject({
+      id: task?.id,
+      status: 'failed',
+      error: {
+        object: 'create_pages_result',
+        status: 'failed',
+        failed_message: expect.stringContaining('content mutations are not available in this release'),
+        retry_guidance: {
+          strategy: 'retry_remaining_pages_only',
+          start_index: 0,
+          remaining_count: 1,
+        },
+      },
+    });
     expect(JSON.stringify(payload)).not.toContain(ENV.HANJI_MCP_OAUTH_SECRET);
     expect(JSON.stringify(payload)).not.toContain(accessToken);
 

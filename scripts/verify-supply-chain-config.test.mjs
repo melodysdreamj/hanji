@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -40,8 +41,8 @@ test('local dev allowlists config flags without exposing the parent shell to the
 
   assert.match(
     devScript,
-    /EDGEBASE_CONFIG_ENV_ALLOWLIST=HANJI_ALLOW_DEV_GUEST_LOGIN/,
-    'the config-time guest flag must be explicitly allowlisted',
+    /EDGEBASE_CONFIG_ENV_ALLOWLIST=\$\{EDGEBASE_CONFIG_ENV_ALLOWLIST:-HANJI_ALLOW_DEV_GUEST_LOGIN\}/,
+    'the config-time guest flag must remain the explicit default allowlist while permitting a caller to add named keys',
   );
   for (const [label, source] of [
     ['backend dev command', devScript],
@@ -54,6 +55,31 @@ test('local dev allowlists config flags without exposing the parent shell to the
       `${label} must not expose the complete parent process environment`,
     );
   }
+});
+
+test('live CI runtimes provision smoke credentials through worker-visible dev vars', () => {
+  const ci = read('.github/workflows/ci.yml');
+  const runtimeSteps = ci.match(
+    /- name: Start EdgeBase dev runtime\n[\s\S]*?(?=\n      - name:)/g,
+  ) ?? [];
+
+  assert.equal(runtimeSteps.length, 2, 'expected API and UI live-runtime jobs');
+  for (const step of runtimeSteps) {
+    assert.match(step, /echo "HANJI_MASTER_EMAIL=master@hanji\.local"/);
+    assert.match(step, /echo "HANJI_MASTER_PASSWORD=HanjiMaster!2026"/);
+    assert.match(step, /\} > \.dev\.vars/);
+    assert.doesNotMatch(step, /export HANJI_MASTER_(?:EMAIL|PASSWORD)=/);
+  }
+  assert.match(
+    ci,
+    /name: Provision CI master account[\s\S]*?api\/functions\/instance-bootstrap[\s\S]*?body\.masterReady !== true/,
+    'API smokes must trigger and verify the lazy environment-provisioned master bootstrap before cleanup',
+  );
+  assert.match(
+    ci,
+    /name: Build web bundle[\s\S]*?VITE_ALLOW_ANONYMOUS_BOOTSTRAP: "true"/,
+    'the production-style UI bundle must explicitly opt into the local-only guest smoke surface',
+  );
 });
 
 test('deploy uses strict live-link preflight while ordinary local packaging stays offline', () => {
@@ -225,6 +251,69 @@ test('packaging keeps the verified image for an SBOM and a blocking vulnerabilit
     ci.split(imageReference).length - 1 >= 5,
     'the build, SBOM, report, scan, and cleanup steps must address the same image',
   );
+
+  const ignoredTrivyCache = spawnSync(
+    'git',
+    ['check-ignore', '--verbose', '--no-index', '.cache/trivy/db/trivy.db'],
+    { cwd: root, encoding: 'utf8' },
+  );
+  assert.equal(
+    ignoredTrivyCache.status,
+    0,
+    'Trivy repository cache must stay outside public Git candidates scanned by release preflight',
+  );
+  assert.match(
+    ignoredTrivyCache.stdout,
+    /^\.gitignore:\d+:\/\.cache\//,
+    'the repository .gitignore must own the Trivy cache exclusion',
+  );
+});
+
+test('packed runtime file cleanup uses the credentials that provisioned that runtime', () => {
+  const packagingScript = read('scripts/verify-edgebase-packaging.mjs');
+  const smokeStart = packagingScript.indexOf("run('pack runtime file/storage smoke'");
+  const smokeEnd = packagingScript.indexOf('    } catch (error)', smokeStart);
+  assert.ok(smokeStart >= 0 && smokeEnd > smokeStart, 'expected the packed runtime file smoke call');
+
+  const smokeCall = packagingScript.slice(smokeStart, smokeEnd);
+  assert.match(smokeCall, /HANJI_MASTER_EMAIL:\s*runtimeEnv\.HANJI_MASTER_EMAIL/);
+  assert.match(smokeCall, /HANJI_MASTER_PASSWORD:\s*runtimeEnv\.HANJI_MASTER_PASSWORD/);
+  assert.match(
+    packagingScript,
+    /function run\(label, command, args, cwd, env = \{\}\)[\s\S]*?env: \{ \.\.\.process\.env, \.\.\.env, CI: '1' \}/,
+    'the subprocess runner must apply scoped environment overrides',
+  );
+});
+
+test('container releases verify and publish both supported architectures with provenance', () => {
+  const workflow = read('.github/workflows/container-release.yml');
+  const packagingScript = read('scripts/verify-edgebase-packaging.mjs');
+
+  assert.match(workflow, /tags:\n\s+- 'v\*\.\*\.\*'/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.match(workflow, /platform: linux\/amd64[\s\S]*runner: ubuntu-24\.04/);
+  assert.match(workflow, /platform: linux\/arm64[\s\S]*runner: ubuntu-24\.04-arm/);
+  assert.match(workflow, /platforms: \$\{\{ matrix\.platform \}\}/);
+  assert.match(workflow, /--runtime-image "\$IMAGE_NAME@\$DIGEST"/);
+  assert.match(workflow, /packages: write/);
+  assert.match(workflow, /id-token: write/);
+  assert.match(workflow, /attestations: write/);
+  assert.match(workflow, /push-by-digest=true,name-canonical=true,push=true/);
+  assert.match(workflow, /Create tags only from verified platform digests/);
+  assert.match(workflow, /docker buildx imagetools create/);
+  assert.match(workflow, /actions\/download-artifact@[0-9a-f]{40}/);
+  assert.match(workflow, /provenance: mode=max/);
+  assert.match(workflow, /sbom: true/);
+  assert.match(workflow, /actions\/attest-build-provenance@[0-9a-f]{40}/);
+  assert.match(workflow, /Require anonymous pullability before calling the image public/);
+  assert.match(workflow, /docker buildx imagetools inspect/);
+  assert.equal(
+    workflow.match(/type=raw,value=latest,enable=\$\{\{ startsWith\(github\.ref, 'refs\/tags\/v'\) && !contains\(github\.ref_name, '-'\) \}\}/g)?.length,
+    2,
+    'prerelease tags must never overwrite latest',
+  );
+  assert.match(packagingScript, /arg === '--runtime-image'/);
+  assert.match(packagingScript, /verifyRegistryFirstRun\(options\.runtimeImage\)/);
 });
 
 test('every deployable frontend artifact carries the license, exception, and source offer', () => {

@@ -5,7 +5,12 @@ import { webcrypto } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { watchBrowserErrors } from './lib/harness.mjs';
+import {
+  deleteSmokeUserByEmail,
+  deleteSmokeWorkspace,
+  masterCredentials,
+  watchBrowserErrors,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
@@ -41,6 +46,7 @@ async function main() {
   const { chromium } = await loadPlaywright();
   const browser = await launchBrowser(chromium);
 
+  let runError;
   try {
     await assertPasswordOnlySignInSurface(browser, appUrl, 'light');
     await assertPasswordOnlySignInSurface(browser, appUrl, 'dark');
@@ -54,9 +60,17 @@ async function main() {
     console.log(`Password-only auth screenshot: ${join(options.screenshotDir, passwordOnlyAuthScreenshotName('light'))}`);
     console.log(`Dark password-only auth screenshot: ${join(options.screenshotDir, passwordOnlyAuthScreenshotName('dark'))}`);
     console.log(`Password reset screenshot: ${join(options.screenshotDir, 'password-reset-auth.png')}`);
+  } catch (error) {
+    runError = error;
+    throw error;
   } finally {
     await browser.close().catch(() => {});
-    await cleanupSeed(apiUrl, seed).catch(() => {});
+    try {
+      await cleanupSeed(apiUrl, seed);
+    } catch (cleanupError) {
+      if (!runError) throw cleanupError;
+      console.warn(`Auth smoke cleanup also failed: ${errorMessage(cleanupError)}`);
+    }
   }
 }
 
@@ -108,6 +122,18 @@ async function assertPasswordOnlySignInSurface(browser, baseUrl, theme) {
     });
     await page.getByRole('button', { name: 'Continue', exact: true }).waitFor({ state: 'visible', timeout: options.timeoutMs });
     await page.getByRole('button', { name: 'Create account' }).waitFor({ state: 'visible', timeout: options.timeoutMs });
+    const brandIcon = page.locator('img[src="/icon-192.png"]');
+    assert(await brandIcon.count() === 1, 'AuthGate should use the full app icon exactly once.');
+    const brandIconBox = await brandIcon.boundingBox();
+    assert(
+      brandIconBox?.width === 48 && brandIconBox?.height === 48,
+      `AuthGate app icon should render at 48x48px: ${JSON.stringify(brandIconBox)}`,
+    );
+    const brandIconBackground = await brandIcon.evaluate((element) => getComputedStyle(element).backgroundColor);
+    assert(
+      brandIconBackground === 'rgba(0, 0, 0, 0)',
+      `AuthGate app icon should not show a background through its transparent corners: ${brandIconBackground}`,
+    );
     for (const [label, locator] of [
       ['email-code tab', page.getByText('Email code', { exact: true })],
       ['send-code button', page.getByRole('button', { name: 'Send code' })],
@@ -235,19 +261,37 @@ async function seedStaleWorkspaceCache(page) {
 }
 
 async function cleanupSeed(baseUrl, seed) {
-  const session = await signInWithPasswordAndMaybeMfa(baseUrl, seed).catch(() => null);
-  if (!session?.accessToken) return;
-  const list = await callFunction(baseUrl, session.accessToken, 'workspace-mutation', {
-    action: 'list',
-  }).catch(() => null);
-  const workspaces = Array.isArray(list?.workspaces) ? list.workspaces : [];
-  for (const workspace of workspaces) {
-    if (!workspace?.id) continue;
-    await callFunction(baseUrl, session.accessToken, 'workspace-mutation', {
-      action: 'deleteWorkspace',
-      workspaceId: workspace.id,
-    }).catch(() => {});
+  const failures = [];
+  try {
+    const session = await signInWithPasswordAndMaybeMfa(baseUrl, seed).catch(() => null);
+    if (session?.accessToken) {
+      const list = await callFunction(baseUrl, session.accessToken, 'workspace-mutation', {
+        action: 'list',
+      });
+      const workspaces = Array.isArray(list?.workspaces) ? list.workspaces : [];
+      for (const workspace of workspaces) {
+        if (!workspace?.id || !workspace?.name) continue;
+        await deleteSmokeWorkspace(baseUrl, session.accessToken, workspace, { call: callFunction });
+      }
+    }
+  } catch (error) {
+    failures.push(error);
   }
+  try {
+    const master = masterCredentials();
+    const admin = await signInWithPassword(baseUrl, master.email, master.password);
+    assert(admin?.accessToken, 'master cleanup sign-in did not return an access token.');
+    await deleteSmokeUserByEmail(baseUrl, admin.accessToken, seed.email, { call: callFunction });
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Auth smoke did not fully clean up its synthetic account.');
+  }
+}
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function enrollTotp(baseUrl, seed) {

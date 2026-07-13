@@ -86,6 +86,27 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("WorkspaceSettingsDialog account console", () => {
+  it("uses one compact native language selector for released translations", async () => {
+    render(<WorkspaceSettingsDialog />);
+    await flushEffects();
+
+    const languageSelect = screen.getByRole("combobox", { name: "Language" });
+    const options = Array.from(languageSelect.querySelectorAll("option"));
+    expect(options.map((option) => option.value)).toEqual([
+      "system",
+      "ko",
+      "en",
+      "ja",
+      "zh-Hans",
+      "es",
+      "fr",
+      "de",
+      "pt-BR",
+    ]);
+    expect(languageSelect.tabIndex).toBe(0);
+    expect(screen.queryByRole("radiogroup", { name: "Language" })).toBeNull();
+  });
+
   it("shows the signed-in email and account id when the workspace member profile has no email", async () => {
     render(<WorkspaceSettingsDialog />);
     await flushEffects();

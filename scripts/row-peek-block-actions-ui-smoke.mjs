@@ -6,6 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   browserAuthStorageKeys,
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   assert,
   assertNoBrowserErrors,
@@ -36,6 +37,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('row peek block actions UI smoke');
 }
 
 async function main() {

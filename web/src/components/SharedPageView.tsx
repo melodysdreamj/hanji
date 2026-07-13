@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getSharedPageRemote } from "@/lib/edgebase";
 import { useSearchParams } from "@/lib/router";
+import { sharedPageErrorKind, type SharedPageErrorKind } from "@/lib/sharedPageErrors";
 import { useStore } from "@/lib/store";
 import { PageView } from "./PageView";
 import { TopBar } from "./TopBar";
@@ -12,13 +13,14 @@ import styles from "./PageView.module.css";
 type SharedPageState =
   | { status: "loading"; pageId?: undefined; error?: undefined }
   | { status: "ready"; rootPageId: string; pageIds: Set<string>; error?: undefined }
-  | { status: "error"; pageId?: undefined; error: string };
+  | { status: "error"; pageId?: undefined; error: SharedPageErrorKind };
 
 export function SharedPageView({ token }: { token: string }) {
   const { t } = useTranslation(["sharedPageView", "common"]);
   const applySharedPageSnapshot = useStore((s) => s.applySharedPageSnapshot);
   const searchParams = useSearchParams();
   const [state, setState] = useState<SharedPageState>({ status: "loading" });
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,13 +40,13 @@ export function SharedPageView({ token }: { token: string }) {
         if (cancelled) return;
         setState({
           status: "error",
-          error: error instanceof Error ? error.message : t("sharedPageView:notFound"),
+          error: sharedPageErrorKind(error),
         });
       });
     return () => {
       cancelled = true;
     };
-  }, [applySharedPageSnapshot, t, token]);
+  }, [applySharedPageSnapshot, retryKey, token]);
 
   if (state.status === "loading") {
     return (
@@ -59,9 +61,21 @@ export function SharedPageView({ token }: { token: string }) {
     return (
       <>
         <TopBar title={t("sharedPageView:title")} />
-        <div className={styles.missing}>
+        <div className={styles.missing} role="alert">
           <strong>{t("sharedPageView:unavailable")}</strong>
-          <p>{state.error}</p>
+          <p>{t(`sharedPageView:errors.${state.error}`)}</p>
+          <div className={styles.missingActions}>
+            <button
+              type="button"
+              className={styles.restoreButton}
+              onClick={() => {
+                setState({ status: "loading" });
+                setRetryKey((current) => current + 1);
+              }}
+            >
+              {t("sharedPageView:tryAgain")}
+            </button>
+          </div>
         </div>
       </>
     );

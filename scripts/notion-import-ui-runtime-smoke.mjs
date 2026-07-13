@@ -18,6 +18,15 @@ const DEFAULT_NOTION_OAUTH_CLIENT_SECRET =
   process.env.HANJI_NOTION_OAUTH_CLIENT_SECRET ?? 'mock-notion-oauth-secret';
 const DEFAULT_NOTION_OAUTH_STATE_SECRET =
   process.env.HANJI_NOTION_OAUTH_STATE_SECRET ?? DEFAULT_NOTION_IMPORT_SECRET;
+const NOTION_UI_RUNTIME_ENV_KEYS = [
+  'HANJI_ALLOW_DEV_GUEST_LOGIN',
+  'HANJI_NOTION_API_BASE',
+  'HANJI_NOTION_IMPORT_SECRET',
+  'HANJI_NOTION_OAUTH_ENABLED',
+  'HANJI_NOTION_OAUTH_CLIENT_ID',
+  'HANJI_NOTION_OAUTH_CLIENT_SECRET',
+  'HANJI_NOTION_OAUTH_STATE_SECRET',
+];
 
 const options = parseArgs(process.argv.slice(2));
 const apiUrl = normalizeBaseUrl(options.apiUrl);
@@ -82,6 +91,14 @@ async function run(label, command, args, env) {
 function strictNotionRuntimeEnv() {
   return {
     ...process.env,
+    // EdgeBase intentionally isolates the ambient shell from config evaluation
+    // and Worker bindings. The default backend dev command now honors an
+    // explicit inherited allowlist, so this managed smoke names only the test
+    // values its mock Notion runtime needs.
+    EDGEBASE_CONFIG_ENV_ALLOWLIST: Array.from(new Set([
+      ...(process.env.EDGEBASE_CONFIG_ENV_ALLOWLIST ?? '').split(',').map((key) => key.trim()).filter(Boolean),
+      ...NOTION_UI_RUNTIME_ENV_KEYS,
+    ])).join(','),
     HANJI_EDGEBASE_URL: apiUrl,
     HANJI_EDGEBASE_API_URL: apiUrl,
     HANJI_NOTION_API_BASE: mockNotionApiBase,

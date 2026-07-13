@@ -100,7 +100,11 @@ async function openDatabase(page, baseUrl, seed) {
 
 async function resizeProperty(page, baseUrl, seed, propertyKey, deltaX, expectedMinWidth) {
   const name = seed.propertyNames[propertyKey];
-  const handle = propertyHeader(page, name).getByRole('button', { name: 'Resize column' });
+  const handle = propertyHeader(page, name).getByRole('button', {
+    // The resize control's accessible name includes the current column width
+    // so keyboard users hear the value they are about to change.
+    name: new RegExp(`^Resize ${escapeRegExp(name)} column(?:,|$)`),
+  });
   await handle.waitFor({ state: 'visible', timeout: options.timeoutMs });
   const box = await handle.boundingBox({ timeout: options.timeoutMs });
   assert(box, `resize handle for ${name} must have a bounding box`);
@@ -116,6 +120,10 @@ async function resizeProperty(page, baseUrl, seed, propertyKey, deltaX, expected
 
   await expectPropertyWidth(page, name, expectedMinWidth);
   return await waitForPropertyWidth(baseUrl, seed, propertyKey, expectedMinWidth, `${name} resized width`);
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function propertyHeader(page, propertyName) {

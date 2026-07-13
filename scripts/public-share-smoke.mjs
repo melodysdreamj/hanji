@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -68,6 +69,7 @@ try {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`WARN cleanup failed: ${message}`);
   });
+  await finalizeRegisteredSmokeAccounts('public share smoke');
 }
 
 async function main() {

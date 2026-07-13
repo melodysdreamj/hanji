@@ -3,6 +3,7 @@
 import { createRequire } from 'node:module';
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -42,6 +43,7 @@ try {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`WARN cleanup failed: ${message}`);
   });
+  await finalizeRegisteredSmokeAccounts('collaboration smoke');
 }
 
 async function main() {
@@ -1104,4 +1106,3 @@ Options:
   --timeout-ms <number>   Per-request timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
 `);
 }
-

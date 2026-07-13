@@ -18,7 +18,10 @@ test('file delete/download tools require deterministic workspace routing', () =>
 
 test('live file smoke uploads and finalizes bytes before delete/download checks', () => {
   assert.match(indexSource, /"complete_file_upload"/);
-  assert.match(liveSmokeSource, /method: "PUT"/);
+  assert.match(liveSmokeSource, /const uploadForm = new FormData\(\)/);
+  assert.match(liveSmokeSource, /uploadForm\.append\("file", new Blob/);
+  assert.match(liveSmokeSource, /uploadForm\.append\("customMetadata"/);
+  assert.match(liveSmokeSource, /method: "POST"/);
   assert.match(liveSmokeSource, /callTool\("complete_file_upload", \{ uploadId, key: uploadKey \}\)/);
   assert.match(
     liveSmokeSource,

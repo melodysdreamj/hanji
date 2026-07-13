@@ -319,13 +319,11 @@ const WORKSPACE_ADMIN_ACTIONS = new Set([
   "createWorkspace",
   "deleteWorkspace",
   "members",
-  "inviteMember",
+  "addMember",
   "updateMyProfile",
   "updateMemberRole",
   "transferWorkspaceOwner",
   "removeMember",
-  "removeInvitation",
-  "acceptInvitation",
 ]);
 
 function scopesForOperation(path, body) {
@@ -583,7 +581,7 @@ function assertMcpAccessPolicy(path, { method = "GET", body } = {}) {
 
   if (policy.allowedWorkspaceIds.size && path === "/functions/workspace-mutation") {
     const action = actionOf(body);
-    if (["createWorkspace", "acceptInvitation"].includes(action)) {
+    if (action === "createWorkspace") {
       throw new Error(
         `MCP access policy denied ${action}. New workspace access cannot be pre-authorized by the workspace allowlist.`,
       );
@@ -947,6 +945,28 @@ async function ensureWorkspace() {
   return workspacePromise;
 }
 
+function notionImportOptions(input) {
+  return typeof input === "string" ? { jobId: input } : { ...(input ?? {}) };
+}
+
+async function notionImportWorkspaceId(workspaceId) {
+  if (typeof workspaceId === "string" && workspaceId.trim()) return workspaceId.trim();
+  const workspace = await ensureWorkspace();
+  if (typeof workspace?.id !== "string" || !workspace.id.trim()) {
+    throw new Error("A workspace id is required for Notion import routing.");
+  }
+  return workspace.id.trim();
+}
+
+async function notionImportJobRequest(action, input) {
+  const opts = notionImportOptions(input);
+  const workspaceId = await notionImportWorkspaceId(opts.workspaceId);
+  return api("/functions/notion-import", {
+    method: "POST",
+    body: { ...opts, action, workspaceId },
+  });
+}
+
 export const eb = {
   mcpAccessPolicy: () => publicMcpPolicy(),
   newId: () => globalThis.crypto.randomUUID(),
@@ -1243,17 +1263,11 @@ export const eb = {
       body: { action: "members", workspaceId: workspace.id },
     });
   },
-  async inviteWorkspaceMember(opts = {}) {
+  async addWorkspaceMember(opts = {}) {
     const workspace = opts.workspaceId ? { id: opts.workspaceId } : await ensureWorkspace();
     return api("/functions/workspace-mutation", {
       method: "POST",
-      body: { action: "inviteMember", ...opts, workspaceId: workspace.id },
-    });
-  },
-  async acceptWorkspaceInvitation(opts = {}) {
-    return api("/functions/workspace-mutation", {
-      method: "POST",
-      body: { action: "acceptInvitation", ...opts },
+      body: { action: "addMember", ...opts, workspaceId: workspace.id },
     });
   },
   async updateMyWorkspaceProfile(opts = {}) {
@@ -1282,13 +1296,6 @@ export const eb = {
     return api("/functions/workspace-mutation", {
       method: "POST",
       body: { action: "removeMember", ...opts, workspaceId: workspace.id },
-    });
-  },
-  async removeWorkspaceInvitation(opts = {}) {
-    const workspace = opts.workspaceId ? { id: opts.workspaceId } : await ensureWorkspace();
-    return api("/functions/workspace-mutation", {
-      method: "POST",
-      body: { action: "removeInvitation", ...opts, workspaceId: workspace.id },
     });
   },
   async createDatabase(opts = {}) {
@@ -1520,9 +1527,10 @@ export const eb = {
     });
   },
   async completeNotionOAuthConnection(opts = {}) {
+    const workspaceId = await notionImportWorkspaceId(opts.workspaceId);
     return api("/functions/notion-import", {
       method: "POST",
-      body: { action: "completeOAuthConnection", ...opts },
+      body: { ...opts, action: "completeOAuthConnection", workspaceId },
     });
   },
   async createNotionImportConnection(opts = {}) {
@@ -1539,10 +1547,12 @@ export const eb = {
       body: { action: "listConnections", ...opts, workspaceId: workspace.id },
     });
   },
-  async revokeNotionImportConnection(connectionId) {
+  async revokeNotionImportConnection(input) {
+    const opts = typeof input === "string" ? { connectionId: input } : { ...(input ?? {}) };
+    const workspaceId = await notionImportWorkspaceId(opts.workspaceId);
     return api("/functions/notion-import", {
       method: "POST",
-      body: { action: "revokeConnection", connectionId },
+      body: { ...opts, action: "revokeConnection", workspaceId },
     });
   },
   async createNotionImportJob(opts = {}) {
@@ -1559,47 +1569,26 @@ export const eb = {
       body: { action: "list", ...opts, workspaceId: workspace.id },
     });
   },
-  async getNotionImportJob(jobId) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "get", jobId },
-    });
+  async getNotionImportJob(input) {
+    return notionImportJobRequest("get", input);
   },
-  async planNotionImportJob(jobId) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "plan", jobId },
-    });
+  async planNotionImportJob(input) {
+    return notionImportJobRequest("plan", input);
   },
   async discoverNotionImportJob(opts = {}) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "discover", ...opts },
-    });
+    return notionImportJobRequest("discover", opts);
   },
-  async cancelNotionImportJob(jobId) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "cancel", jobId },
-    });
+  async cancelNotionImportJob(input) {
+    return notionImportJobRequest("cancel", input);
   },
-  async applyNotionImportJob(jobId) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "apply", jobId },
-    });
+  async applyNotionImportJob(input) {
+    return notionImportJobRequest("apply", input);
   },
-  async retryNotionImportFileCopies(jobId) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "retryFileCopies", jobId },
-    });
+  async retryNotionImportFileCopies(input) {
+    return notionImportJobRequest("retryFileCopies", input);
   },
   async retryNotionImportJob(opts = {}) {
-    return api("/functions/notion-import", {
-      method: "POST",
-      body: { action: "retry", ...opts },
-    });
+    return notionImportJobRequest("retry", opts);
   },
   async exportPageMarkdown(pageId) {
     return api("/functions/import-export", {

@@ -28,6 +28,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -57,6 +58,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('local-first UI visual smoke');
 }
 
 async function main() {

@@ -69,9 +69,11 @@ Verifies the deployable EdgeBase app surfaces — see
 | --- | --- |
 | `verify:runtime` | Same-origin EdgeBase health, Hanji health function, direct SPA URLs, reload-safe fallback routes, and built frontend assets |
 | `verify:auth-ui` | Password account creation, password sign-in, TOTP enrollment, and MFA challenge sign-in through the AuthGate UI |
+| `verify:auth-route-ui` | Short landscape signup scrolling/touch targets plus safe malformed shared-link routing |
+| `verify:service-worker-offline` | Fast boot-graph install, non-blocking full-graph warm, atomic offline marker, and a cache-only reload after network loss |
 | `verify:dev-guest-login` | The visible guest shortcut and workspace bootstrap path on `localhost`, `127.0.0.1`, or `[::1]` (needs `VITE_ALLOW_ANONYMOUS_BOOTSTRAP=true`) |
 | `verify:security-settings-ui` | Settings Security surface: TOTP setup, recovery-code display, session review, TOTP disable |
-| `verify:workspace-invite-ui` | Workspace invitation onboarding through the SPA, including creating the invited account from an invite URL and accepting a guest workspace role |
+| `verify:admin-provisioning` | Instance-admin account provisioning, forced first-sign-in password change, existing-account workspace member add, blind unknown-email handling, and membership persistence |
 | `verify:page-email-share-ui` | Direct email page sharing through the SPA: account creation from `/p/:pageId`, Shared sidebar placement, read-only content, comment access |
 
 All run as `npm --prefix backend run <command>`.
@@ -173,7 +175,7 @@ tokens, verifies MCP read-only/workspace/database allowlist narrowing,
 verifies `mcp.client_action` audit events for mutating MCP calls, and
 exercises workspace discovery, workspace list/create/delete, organization
 policy update, workspace-scoped page create/list/search/delete, workspace
-profile/member invitation flow, page creation/content read, content
+profile/existing-account member-add flow, page creation/content read, content
 append/replace, page move/duplicate/trash/restore/delete, comments,
 cross-user notification list/read state, Share to web, explicit page access,
 file upload grant creation, file listing/reporting/deletion, database

@@ -2,9 +2,11 @@
 
 import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, usePathname, useSearchParams } from "@/lib/router";
+import { routeInfoFromPath, usePathname, useRouter, useSearchParams } from "@/lib/router";
 import { AppShell } from "./AppShell";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { TopBar } from "./TopBar";
+import pageStyles from "./PageView.module.css";
 
 const HomeView = lazy(() =>
   import("./HomeView").then(({ HomeView }) => ({ default: HomeView }))
@@ -43,14 +45,54 @@ function SettingsRouteView() {
 
 function RoutedView() {
   const pathname = usePathname();
-  const params = useParams();
+  const route = routeInfoFromPath(pathname);
 
-  if (pathname === "/trash") return <TrashView />;
-  if (pathname === "/settings" || pathname === "/account") return <SettingsRouteView />;
-  if (params.pageId) return <PageView pageId={params.pageId} />;
-  if (params.databaseId) return <PageView pageId={params.databaseId} />;
-  if (params.shareId) return <SharedPageView token={params.shareId} />;
-  return <HomeView />;
+  if (route.kind === "trash") return <TrashView />;
+  if (route.kind === "settings" || route.kind === "account") return <SettingsRouteView />;
+  if (route.kind === "page") return <PageView pageId={route.pageId} />;
+  if (route.kind === "database") return <PageView pageId={route.databaseId} />;
+  if (route.kind === "share") return <SharedPageView token={route.shareId} />;
+  if (route.kind === "home" || route.kind === "workspace") return <HomeView />;
+  return (
+    <RouteProblem
+      kind={route.kind === "unknown" ? "not-found" : route.routeKind === "share" ? "shared" : "invalid"}
+    />
+  );
+}
+
+function RouteProblem({ kind }: { kind: "invalid" | "not-found" | "shared" }) {
+  const { t } = useTranslation(["routeState", "common"]);
+  const router = useRouter();
+  const title =
+    kind === "shared"
+      ? t("routeState:sharedTitle")
+      : kind === "not-found"
+        ? t("routeState:notFoundTitle")
+        : t("routeState:invalidTitle");
+  const body =
+    kind === "shared"
+      ? t("routeState:sharedBody")
+      : kind === "not-found"
+        ? t("routeState:notFoundBody")
+        : t("routeState:invalidBody");
+  return (
+    <>
+      <TopBar title={title} />
+      <div className={pageStyles.missing} data-surface="route-problem" role="status">
+        <h1 className={pageStyles.missingHeading}>{title}</h1>
+        <p>{body}</p>
+        <div className={pageStyles.missingActions}>
+          <button
+            type="button"
+            className={pageStyles.restoreButton}
+            onClick={() => router.replace("/")}
+          >
+            {t("routeState:openHome")}
+          </button>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default function AuthenticatedProduct() {

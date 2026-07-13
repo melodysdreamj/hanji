@@ -6,7 +6,7 @@ with Contributions from any person. It is for your protection as a Contributor
 as well as the Project's, and it does **not** change your right to use your own
 Contributions for any other purpose.
 
-By signing (see [CONTRIBUTING.md](../CONTRIBUTING.md) — a one-time comment on your
+By signing (see [CONTRIBUTING.md](https://github.com/melodysdreamj/hanji/blob/main/CONTRIBUTING.md) — a one-time comment on your
 pull request), you accept the terms below for your present and future
 Contributions to the Project. Except for the licenses granted here, you reserve
 all right, title, and interest in and to your Contributions — **you keep the

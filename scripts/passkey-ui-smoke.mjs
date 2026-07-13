@@ -4,7 +4,12 @@ import { createRequire } from 'node:module';
 import { existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ensurePasswordAuthForm } from './lib/harness.mjs';
+import {
+  deleteSmokeUserByEmail,
+  deleteSmokeWorkspace,
+  ensurePasswordAuthForm,
+  masterCredentials,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
@@ -42,12 +47,21 @@ async function main() {
   const { chromium } = await loadPlaywright();
   const browser = await launchBrowser(chromium);
 
+  let runError;
   try {
     await assertPasskeyLifecycle(browser, appUrl, seed);
     console.log('PASS passkey registration, passkey sign-in, and passkey removal work through the browser UI with a virtual authenticator.');
+  } catch (error) {
+    runError = error;
+    throw error;
   } finally {
     await browser.close().catch(() => {});
-    await cleanupSeed(apiUrl, seed).catch(() => {});
+    try {
+      await cleanupSeed(apiUrl, seed);
+    } catch (cleanupError) {
+      if (!runError) throw cleanupError;
+      console.warn(`Passkey smoke cleanup also failed: ${errorMessage(cleanupError)}`);
+    }
   }
 }
 
@@ -160,19 +174,35 @@ async function clickPasswordTab(page) {
 }
 
 async function cleanupSeed(baseUrl, seed) {
-  const session = await signInWithPassword(baseUrl, seed.email, seed.password).catch(() => null);
-  if (!session?.accessToken) return;
-  const list = await callFunction(baseUrl, session.accessToken, 'workspace-mutation', {
-    action: 'list',
-  }).catch(() => null);
-  const workspaces = Array.isArray(list?.workspaces) ? list.workspaces : [];
-  for (const workspace of workspaces) {
-    if (!workspace?.id) continue;
-    await callFunction(baseUrl, session.accessToken, 'workspace-mutation', {
-      action: 'deleteWorkspace',
-      workspaceId: workspace.id,
-    }).catch(() => {});
+  const failures = [];
+  try {
+    const session = await signInWithPassword(baseUrl, seed.email, seed.password).catch(() => null);
+    if (session?.accessToken) {
+      const list = await callFunction(baseUrl, session.accessToken, 'workspace-mutation', { action: 'list' });
+      for (const workspace of Array.isArray(list?.workspaces) ? list.workspaces : []) {
+        if (workspace?.id && workspace?.name) {
+          await deleteSmokeWorkspace(baseUrl, session.accessToken, workspace, { call: callFunction });
+        }
+      }
+    }
+  } catch (error) {
+    failures.push(error);
   }
+  try {
+    const master = masterCredentials();
+    const admin = await signInWithPassword(baseUrl, master.email, master.password);
+    assert(admin?.accessToken, 'master cleanup sign-in did not return an access token.');
+    await deleteSmokeUserByEmail(baseUrl, admin.accessToken, seed.email, { call: callFunction });
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Passkey smoke did not fully clean up its synthetic account.');
+  }
+}
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 async function step(page, label, fn) {

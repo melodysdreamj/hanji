@@ -1,6 +1,6 @@
 {
   "name": "hanji-web",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "private": true,
   "license": "AGPL-3.0-only",
   "engines": {
@@ -19,7 +19,7 @@
     "i18n:sync": "node ../scripts/i18n-status.mjs --sync"
   },
   "dependencies": {
-    "@edge-base/web": "0.4.2",
+    "@edge-base/web": "0.4.3",
     "@phosphor-icons/react": "^2.1.10",
     "highlight.js": "^11.11.1",
     "i18next": "^26.3.6",

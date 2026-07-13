@@ -13,6 +13,8 @@
 import {
   assert,
   assertRuntimeReachable,
+  deleteSmokeUser,
+  deleteSmokeWorkspace,
   loadPlaywright,
   newCheckedPage,
   normalizeBaseUrl,
@@ -53,110 +55,166 @@ async function main() {
   await assertRuntimeReachable(BASE);
   const suffix = Date.now();
   const userEmail = `provisioned-${suffix}@example.com`;
+  let masterToken = '';
+  let createdUserId = '';
+  let userCleanupToken = '';
+  let createdWorkspace = null;
+  let runError = null;
 
-  // 1. Master provisions the account.
-  const masterToken = await signin(MASTER_EMAIL, MASTER_PASSWORD);
-  const created = await api(
-    '/api/functions/instance-admin',
-    { action: 'createUser', email: userEmail, displayName: `Provisioned ${suffix}` },
-    masterToken,
-  );
-  assert(created.status === 200, `createUser expected 200, got ${created.status}: ${JSON.stringify(created.json).slice(0, 200)}`);
-  const tempPassword = created.json.temporaryPassword;
-  assert(typeof tempPassword === 'string' && tempPassword.length >= 10, 'createUser should return a temporary password');
-  console.log('PASS instance-admin createUser returns a one-time temporary password.');
-
-  const userToken = await signin(userEmail, tempPassword);
-  const flags = await api('/api/functions/account-state', { action: 'get' }, userToken);
-  assert(flags.json.mustChangePassword === true, 'admin-created account should carry mustChangePassword');
-  console.log('PASS account-state reports mustChangePassword for the provisioned account.');
-
-  // 2. Forced password change through the UI.
-  const { chromium } = await loadPlaywright({ label: 'admin-provisioning smoke' });
-  const browser = await chromium.launch({ executablePath: resolveChromeExecutable() });
-  const newPassword = `Provisioned!${suffix}aA`;
   try {
-    const { context, page } = await newCheckedPage(browser);
-    await page.goto(resolveUrl(BASE, '/'), { waitUntil: 'domcontentloaded' });
-    const passwordField = page.getByLabel('Password', { exact: true }).first();
-    await passwordField.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-    await page.getByRole('textbox', { name: 'Email' }).fill(userEmail);
-    await passwordField.fill(tempPassword);
-    await page.getByRole('button', { name: 'Continue', exact: true }).click({ timeout: TIMEOUT_MS });
-
-    const mustChange = page.locator('[data-testid="must-change-password"]');
-    await mustChange.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-    console.log('PASS temporary-password sign-in lands on the forced password-change screen.');
-
-    await page.locator('#must-change-current').fill(tempPassword);
-    await page.locator('#must-change-next').fill(newPassword);
-    await page.locator('#must-change-confirm').fill(newPassword);
-    await mustChange.getByRole('button').last().click({ timeout: TIMEOUT_MS });
-    await page.locator('button[aria-label="Open workspace menu"]').waitFor({
-      state: 'visible',
-      timeout: TIMEOUT_MS,
-    });
-    console.log('PASS forced password change unlocks the workspace shell.');
-
-    const refreshedToken = await signin(userEmail, newPassword);
-    const cleared = await api('/api/functions/account-state', { action: 'get' }, refreshedToken);
-    assert(cleared.json.mustChangePassword === false, 'flag should clear after the password change');
-    console.log('PASS mustChangePassword clears after the change.');
-
-    // 3. Server-level membership: the master adds the provisioned account to a
-    //    workspace directly (no invitation email, no accept step). An email that
-    //    matches an existing account is resolved and added immediately.
-    const workspace = await api(
-      '/api/functions/workspace-mutation',
-      { action: 'createWorkspace', name: `Member target ${suffix}` },
+    // 1. Master provisions the account.
+    masterToken = await signin(MASTER_EMAIL, MASTER_PASSWORD);
+    const created = await api(
+      '/api/functions/instance-admin',
+      {
+        action: 'createUser',
+        email: userEmail,
+        displayName: `Provisioned ${suffix}`,
+        query: userEmail,
+      },
       masterToken,
     );
-    const workspaceId = workspace.json.workspace?.id;
-    assert(workspaceId, `createWorkspace failed: ${JSON.stringify(workspace.json).slice(0, 200)}`);
+    assert(created.status === 200, `createUser expected 200, got ${created.status}: ${JSON.stringify(created.json).slice(0, 200)}`);
+    createdUserId = (created.json.users ?? []).find(
+      (user) => String(user.email ?? '').toLowerCase() === userEmail,
+    )?.id ?? '';
+    assert(createdUserId, 'createUser response should include the synthetic account id for cleanup');
+    const tempPassword = created.json.temporaryPassword;
+    assert(typeof tempPassword === 'string' && tempPassword.length >= 10, 'createUser should return a temporary password');
+    console.log('PASS instance-admin createUser returns a one-time temporary password.');
 
-    const added = await api(
-      '/api/functions/workspace-mutation',
-      { action: 'addMember', workspaceId, email: userEmail, role: 'member' },
-      masterToken,
-    );
-    assert(added.status === 200, `addMember expected 200, got ${added.status}: ${JSON.stringify(added.json).slice(0, 200)}`);
-    assert(
-      (added.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === userEmail),
-      `addMember should resolve the account email into membership: ${JSON.stringify(added.json).slice(0, 200)}`,
-    );
-    console.log('PASS addMember resolves an existing account email into workspace membership.');
+    userCleanupToken = await signin(userEmail, tempPassword);
+    const flags = await api('/api/functions/account-state', { action: 'get' }, userCleanupToken);
+    assert(flags.json.mustChangePassword === true, 'admin-created account should carry mustChangePassword');
+    console.log('PASS account-state reports mustChangePassword for the provisioned account.');
 
-    // A blind add for an unknown email returns 200 but creates nothing, so the
-    // caller cannot tell a real account apart from a typo.
-    const ghostEmail = `ghost-${suffix}@example.com`;
-    const ghost = await api(
-      '/api/functions/workspace-mutation',
-      { action: 'addMember', workspaceId, email: ghostEmail, role: 'member' },
-      masterToken,
-    );
-    assert(ghost.status === 200, `blind addMember expected 200, got ${ghost.status}: ${JSON.stringify(ghost.json).slice(0, 200)}`);
-    assert(
-      !(ghost.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === ghostEmail),
-      'blind add for an unknown email must not create a member',
-    );
-    console.log('PASS addMember is a blind no-op for an unknown email.');
+    // 2. Forced password change through the UI.
+    const { chromium } = await loadPlaywright({ label: 'admin-provisioning smoke' });
+    const browser = await chromium.launch({ executablePath: resolveChromeExecutable() });
+    const newPassword = `Provisioned!${suffix}aA`;
+    try {
+      const { context, page } = await newCheckedPage(browser);
+      await page.goto(resolveUrl(BASE, '/'), { waitUntil: 'domcontentloaded' });
+      const passwordField = page.getByLabel('Password', { exact: true }).first();
+      await passwordField.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
+      await page.getByRole('textbox', { name: 'Email' }).fill(userEmail);
+      await passwordField.fill(tempPassword);
+      await page.getByRole('button', { name: 'Continue', exact: true }).click({ timeout: TIMEOUT_MS });
 
-    const members = await api(
-      '/api/functions/workspace-mutation',
-      { action: 'members', workspaceId },
-      masterToken,
-    );
-    assert(
-      (members.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === userEmail),
-      'added account should be a workspace member',
-    );
-    console.log('PASS server-level membership lands without an invitation flow.');
-    await context.close();
+      const mustChange = page.locator('[data-testid="must-change-password"]');
+      await mustChange.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
+      console.log('PASS temporary-password sign-in lands on the forced password-change screen.');
+
+      await page.locator('#must-change-current').fill(tempPassword);
+      await page.locator('#must-change-next').fill(newPassword);
+      await page.locator('#must-change-confirm').fill(newPassword);
+      await mustChange.getByRole('button').last().click({ timeout: TIMEOUT_MS });
+      await page.locator('button[aria-label="Open workspace menu"]').waitFor({
+        state: 'visible',
+        timeout: TIMEOUT_MS,
+      });
+      console.log('PASS forced password change unlocks the workspace shell.');
+
+      userCleanupToken = await signin(userEmail, newPassword);
+      const cleared = await api('/api/functions/account-state', { action: 'get' }, userCleanupToken);
+      assert(cleared.json.mustChangePassword === false, 'flag should clear after the password change');
+      console.log('PASS mustChangePassword clears after the change.');
+
+      // 3. Server-level membership: the master adds the provisioned account to a
+      //    workspace directly (no invitation email and no accept step). An email that
+      //    matches an existing account is resolved and added immediately.
+      const workspace = await api(
+        '/api/functions/workspace-mutation',
+        { action: 'createWorkspace', name: `Member target ${suffix}` },
+        masterToken,
+      );
+      const workspaceId = workspace.json.workspace?.id;
+      assert(workspaceId, `createWorkspace failed: ${JSON.stringify(workspace.json).slice(0, 200)}`);
+      createdWorkspace = workspace.json.workspace;
+
+      const added = await api(
+        '/api/functions/workspace-mutation',
+        { action: 'addMember', workspaceId, email: userEmail, role: 'member' },
+        masterToken,
+      );
+      assert(added.status === 200, `addMember expected 200, got ${added.status}: ${JSON.stringify(added.json).slice(0, 200)}`);
+      assert(
+        (added.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === userEmail),
+        `addMember should resolve the account email into membership: ${JSON.stringify(added.json).slice(0, 200)}`,
+      );
+      console.log('PASS addMember resolves an existing account email into workspace membership.');
+
+      // A blind add for an unknown email returns 200 but creates nothing, so the
+      // caller cannot tell a real account apart from a typo.
+      const ghostEmail = `ghost-${suffix}@example.com`;
+      const ghost = await api(
+        '/api/functions/workspace-mutation',
+        { action: 'addMember', workspaceId, email: ghostEmail, role: 'member' },
+        masterToken,
+      );
+      assert(ghost.status === 200, `blind addMember expected 200, got ${ghost.status}: ${JSON.stringify(ghost.json).slice(0, 200)}`);
+      assert(
+        !(ghost.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === ghostEmail),
+        'blind add for an unknown email must not create a member',
+      );
+      console.log('PASS addMember is a blind no-op for an unknown email.');
+
+      const members = await api(
+        '/api/functions/workspace-mutation',
+        { action: 'members', workspaceId },
+        masterToken,
+      );
+      assert(
+        (members.json.members ?? []).some((member) => (member.email ?? '').toLowerCase() === userEmail),
+        'added account should be a workspace member',
+      );
+      console.log('PASS existing server account is added as a workspace member without an invitation flow.');
+      await context.close();
+    } finally {
+      await browser.close().catch(() => {});
+    }
+
+    console.log('PASS admin provisioning + forced password change + server-account membership works end to end.');
+  } catch (error) {
+    runError = error;
   } finally {
-    await browser.close().catch(() => {});
+    const cleanupErrors = [];
+    if (userCleanupToken && createdUserId) {
+      try {
+        const list = await api(
+          '/api/functions/workspace-mutation',
+          { action: 'list' },
+          userCleanupToken,
+        );
+        for (const workspace of list.json.workspaces ?? []) {
+          if (workspace?.ownerId !== createdUserId) continue;
+          await deleteSmokeWorkspace(BASE, userCleanupToken, workspace, { timeoutMs: TIMEOUT_MS });
+        }
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (masterToken && createdWorkspace) {
+      try {
+        await deleteSmokeWorkspace(BASE, masterToken, createdWorkspace, { timeoutMs: TIMEOUT_MS });
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (masterToken && createdUserId) {
+      try {
+        await deleteSmokeUser(BASE, masterToken, createdUserId, { timeoutMs: TIMEOUT_MS });
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      const cleanupError = new Error(`admin-provisioning smoke cleanup failed: ${cleanupErrors.join('; ')}`);
+      if (!runError) runError = cleanupError;
+      else console.error(`WARN ${cleanupError.message}`);
+    }
   }
-
-  console.log('PASS admin provisioning + forced password change + in-app invitation flow works end to end.');
+  if (runError) throw runError;
 }
 
 try {

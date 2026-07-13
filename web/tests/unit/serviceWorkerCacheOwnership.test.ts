@@ -75,8 +75,12 @@ async function runRejectedShellInstall(shellResponse: Response) {
 }
 
 describe("service-worker cache ownership", () => {
-  it("keeps the active shell intact when a versioned precache refresh is incomplete", async () => {
-    const listeners = new Map<string, (event: { waitUntil: (value: Promise<unknown>) => void }) => void>();
+  it("installs only the boot graph, then keeps the active shell intact when background warm is incomplete", async () => {
+    type WorkerEvent = {
+      data?: { type?: string };
+      waitUntil: (value: Promise<unknown>) => void;
+    };
+    const listeners = new Map<string, (event: WorkerEvent) => void>();
     const stores = new Map<string, Map<string, Response>>();
     const active = new Map<string, Response>([
       ["/__hanji_shell__", new Response("old shell", { headers: { "content-type": "text/html" } })],
@@ -114,18 +118,24 @@ describe("service-worker cache ownership", () => {
     const fetchMock = vi.fn(async (input: string) => {
       if (input === "/sw-precache.json") {
         return new Response(
-          JSON.stringify({ version: "new", assets: ["/", "/assets/app.js", "/assets/fail.js"] }),
+          JSON.stringify({
+            version: "new",
+            assets: ["/", "/assets/app.js", "/assets/fail.js"],
+            bootAssets: ["/", "/assets/app.js"],
+          }),
           { status: 200, headers: { "content-type": "application/json" } }
         );
       }
       if (input === "/assets/fail.js") return new Response("fail", { status: 503 });
       return new Response(input === "/" ? "new shell" : "new asset", {
         status: 200,
-        headers: input === "/" ? { "content-type": "text/html" } : undefined,
+        headers: {
+          "content-type": input === "/" ? "text/html" : "application/javascript",
+        },
       });
     });
     const self = {
-      addEventListener: (type: string, listener: (event: { waitUntil: (value: Promise<unknown>) => void }) => void) => {
+      addEventListener: (type: string, listener: (event: WorkerEvent) => void) => {
         listeners.set(type, listener);
       },
       clients: { claim: vi.fn(async () => undefined) },
@@ -145,17 +155,168 @@ describe("service-worker cache ownership", () => {
     let installation!: Promise<unknown>;
     install({ waitUntil: (value) => { installation = value; } });
 
-    await expect(installation).rejects.toThrow(/Offline asset failed/);
+    await expect(installation).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalledWith("/assets/fail.js", expect.anything());
+    await expect(active.get("/__hanji_shell__")?.clone().text()).resolves.toBe("old shell");
+    await expect(active.get("/__hanji_precache__")?.clone().json()).resolves.toMatchObject({
+      version: "old",
+      complete: true,
+    });
+    await expect(active.get("/__hanji_boot__")?.clone().json()).resolves.toMatchObject({
+      version: "new",
+      bootComplete: true,
+      bootAssets: ["/", "/assets/app.js"],
+    });
+    expect(stores.get("hanji-sw-boot-new")?.has("/")).toBe(true);
+    expect(stores.get("hanji-sw-boot-new")?.has("/assets/app.js")).toBe(true);
+
+    const message = listeners.get("message");
+    if (!message) throw new Error("message listener was not registered");
+    let warming!: Promise<unknown>;
+    message({
+      origin: "https://hanji.example",
+      data: { type: "hanji:warm-offline-assets" },
+      waitUntil: (value) => { warming = value; },
+    });
+    await expect(warming).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith("/assets/fail.js", { cache: "no-cache" });
     await expect(active.get("/__hanji_shell__")?.text()).resolves.toBe("old shell");
     await expect(active.get("/__hanji_precache__")?.json()).resolves.toMatchObject({
       version: "old",
       complete: true,
     });
     expect(stores.has("hanji-sw-stage-new")).toBe(false);
+    expect(stores.has("hanji-sw-boot-new")).toBe(true);
   });
 
-  it("rolls back mutable assets, shell, and marker when the active-cache commit fails", async () => {
-    const listeners = new Map<string, (event: { waitUntil: (value: Promise<unknown>) => void }) => void>();
+  it("atomically promotes a complete background graph and reuses the staged boot responses", async () => {
+    type WorkerEvent = {
+      data?: { type?: string };
+      waitUntil: (value: Promise<unknown>) => void;
+    };
+    const listeners = new Map<string, (event: WorkerEvent) => void>();
+    const oldLazy = "/assets/OldLazy-Abc123Xy.js";
+    const active = new Map<string, Response>([
+      ["/theme-init.js", new Response("old theme", { headers: { "content-type": "application/javascript" } })],
+      ["/__hanji_shell__", new Response("old shell", { headers: { "content-type": "text/html" } })],
+      [
+        "/__hanji_precache__",
+        new Response(JSON.stringify({ version: "old", assets: ["/", oldLazy], complete: true }), {
+          headers: { "content-type": "application/json" },
+        }),
+      ],
+      [oldLazy, new Response("old lazy", { headers: { "content-type": "application/javascript" } })],
+    ]);
+    const stores = new Map<string, Map<string, Response>>([["hanji-sw-v2", active]]);
+    const pathOf = (input: string | Request) =>
+      typeof input === "string" ? input : new URL(input.url).pathname;
+    const cacheFor = (name: string) => {
+      let entries = stores.get(name);
+      if (!entries) {
+        entries = new Map();
+        stores.set(name, entries);
+      }
+      return {
+        delete: async (input: string | Request) => entries!.delete(pathOf(input)),
+        keys: async () => [...entries!.keys()].map((path) => new Request(`https://hanji.example${path}`)),
+        match: async (input: string | Request) => entries!.get(pathOf(input))?.clone(),
+        put: async (input: string | Request, response: Response) => {
+          entries!.set(pathOf(input), response.clone());
+        },
+      };
+    };
+    const caches = {
+      delete: vi.fn(async (name: string) => stores.delete(name)),
+      keys: vi.fn(async () => [...stores.keys()]),
+      open: vi.fn(async (name: string) => cacheFor(name)),
+    };
+    const manifest = {
+      version: "new",
+      assets: ["/", "/theme-init.js", "/assets/app-Abc123Xy.js", "/assets/lazy-Def456Uv.js"],
+      bootAssets: ["/", "/theme-init.js"],
+    };
+    const fetchMock = vi.fn(async (input: string) => {
+      if (input === "/sw-precache.json") {
+        return new Response(JSON.stringify(manifest), {
+          headers: { "content-type": "application/json" },
+        });
+      }
+      if (input === "/") {
+        return new Response("new shell", { headers: { "content-type": "text/html" } });
+      }
+      return new Response(`new ${input}`, {
+        headers: { "content-type": "application/javascript" },
+      });
+    });
+    const self = {
+      addEventListener: (type: string, listener: (event: WorkerEvent) => void) => {
+        listeners.set(type, listener);
+      },
+      clients: { claim: vi.fn(async () => undefined) },
+      location: { origin: "https://hanji.example" },
+      skipWaiting: vi.fn(),
+    };
+    runInNewContext(readFileSync(resolve(webRoot, "public/sw.js"), "utf8"), {
+      Request,
+      Response,
+      URL,
+      caches,
+      fetch: fetchMock,
+      self,
+    });
+
+    const install = listeners.get("install");
+    if (!install) throw new Error("install listener was not registered");
+    let installation!: Promise<unknown>;
+    install({ waitUntil: (value) => { installation = value; } });
+    await installation;
+
+    expect(fetchMock.mock.calls.map(([input]) => input)).toEqual([
+      "/sw-precache.json",
+      "/",
+      "/theme-init.js",
+    ]);
+    await expect(active.get("/__hanji_shell__")?.clone().text()).resolves.toBe("old shell");
+    expect(active.has("/__hanji_boot__")).toBe(true);
+
+    const message = listeners.get("message");
+    if (!message) throw new Error("message listener was not registered");
+    let warming!: Promise<unknown>;
+    message({
+      origin: "https://hanji.example",
+      data: { type: "hanji:warm-offline-assets" },
+      waitUntil: (value) => { warming = value; },
+    });
+    await warming;
+
+    expect(fetchMock.mock.calls.filter(([input]) => input === "/")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([input]) => input === "/theme-init.js")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([input]) => input === "/assets/app-Abc123Xy.js")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([input]) => input === "/assets/lazy-Def456Uv.js")).toHaveLength(1);
+    await expect(active.get("/__hanji_shell__")?.clone().text()).resolves.toBe("new shell");
+    await expect(active.get("/__hanji_precache__")?.clone().json()).resolves.toMatchObject({
+      version: "new",
+      assets: manifest.assets,
+      bootAssets: manifest.bootAssets,
+      complete: true,
+    });
+    await expect(active.get("/theme-init.js")?.clone().text()).resolves.toBe("new /theme-init.js");
+    expect(active.has("/assets/app-Abc123Xy.js")).toBe(true);
+    expect(active.has("/assets/lazy-Def456Uv.js")).toBe(true);
+    expect(active.has(oldLazy)).toBe(true);
+    expect(active.has("/__hanji_boot__")).toBe(false);
+    expect(stores.has("hanji-sw-boot-new")).toBe(false);
+    expect(stores.has("hanji-sw-stage-new")).toBe(false);
+    expect(stores.has("hanji-sw-rollback-new")).toBe(false);
+  });
+
+  it("rolls back a background-warmed release when the active-cache commit fails", async () => {
+    type WorkerEvent = {
+      data?: { type?: string };
+      waitUntil: (value: Promise<unknown>) => void;
+    };
+    const listeners = new Map<string, (event: WorkerEvent) => void>();
     const stores = new Map<string, Map<string, Response>>();
     const oldMarker = { version: "old", assets: ["/", "/theme-init.js"], complete: true };
     const active = new Map<string, Response>([
@@ -197,6 +358,7 @@ describe("service-worker cache ownership", () => {
         return new Response(JSON.stringify({
           version: "new",
           assets: ["/", "/theme-init.js", "/assets/app-Abc123Xy.js"],
+          bootAssets: ["/", "/theme-init.js"],
         }), { status: 200, headers: { "content-type": "application/json" } });
       }
       if (input === "/") {
@@ -208,7 +370,7 @@ describe("service-worker cache ownership", () => {
       });
     });
     const self = {
-      addEventListener: (type: string, listener: (event: { waitUntil: (value: Promise<unknown>) => void }) => void) => {
+      addEventListener: (type: string, listener: (event: WorkerEvent) => void) => {
         listeners.set(type, listener);
       },
       clients: { claim: vi.fn(async () => undefined) },
@@ -228,13 +390,24 @@ describe("service-worker cache ownership", () => {
     let installation!: Promise<unknown>;
     install({ waitUntil: (value) => { installation = value; } });
 
-    await expect(installation).rejects.toThrow("synthetic active-cache quota failure");
+    await expect(installation).resolves.toBeUndefined();
+    const message = listeners.get("message");
+    if (!message) throw new Error("message listener was not registered");
+    let warming!: Promise<unknown>;
+    message({
+      origin: "https://hanji.example",
+      data: { type: "hanji:warm-offline-assets" },
+      waitUntil: (value) => { warming = value; },
+    });
+    await expect(warming).resolves.toBeUndefined();
+    expect(rejectShellCommitOnce).toBe(false);
     await expect(active.get("/theme-init.js")?.text()).resolves.toBe("old theme");
     await expect(active.get("/__hanji_shell__")?.text()).resolves.toBe("old shell");
     await expect(active.get("/__hanji_precache__")?.json()).resolves.toEqual(oldMarker);
     expect(active.has("/assets/app-Abc123Xy.js")).toBe(false);
     expect(stores.has("hanji-sw-stage-new")).toBe(false);
     expect(stores.has("hanji-sw-rollback-new")).toBe(false);
+    expect(stores.has("hanji-sw-boot-new")).toBe(true);
   });
 
   it("rejects a non-HTML 200 response instead of promoting it to the offline shell", async () => {
@@ -247,7 +420,7 @@ describe("service-worker cache ownership", () => {
 
     await expect(installation).rejects.toThrow("Offline asset failed: /");
     await expect(active.get("/__hanji_shell__")?.text()).resolves.toBe("old shell");
-    expect(stores.has("hanji-sw-stage-new")).toBe(false);
+    expect(stores.has("hanji-sw-boot-new")).toBe(false);
   });
 
   it("rejects a cross-origin final response instead of caching redirected shell content", async () => {
@@ -260,7 +433,7 @@ describe("service-worker cache ownership", () => {
 
     await expect(installation).rejects.toThrow("Offline asset failed: /");
     await expect(active.get("/__hanji_shell__")?.text()).resolves.toBe("old shell");
-    expect(stores.has("hanji-sw-stage-new")).toBe(false);
+    expect(stores.has("hanji-sw-boot-new")).toBe(false);
   });
 
   it("deletes stale app-shell caches without touching offline attachments", async () => {

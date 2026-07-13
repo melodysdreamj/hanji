@@ -1,11 +1,76 @@
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import {
   browserAuthStorageKeys,
   captureBrowserSession,
+  cleanupRegisteredSmokeAccounts,
+  deleteSmokeAccounts,
+  deleteSmokeUser,
+  deleteSmokeUserByEmail,
+  deleteSmokeWorkspace,
   installBrowserSession,
+  signIn,
   watchBrowserErrors,
 } from './lib/harness.mjs';
+
+const LOCAL_ANONYMOUS_SIGNIN_RESIDUALS = [
+  '../mcp/scripts/tool-invocation-smoke.mjs',
+  './backlinks-visual-smoke.mjs',
+  './basic-blocks-visual-smoke.mjs',
+  './block-actions-ui-smoke.mjs',
+  './block-actions-visual-smoke.mjs',
+  './block-drag-ui-smoke.mjs',
+  './block-editor-ui-smoke.mjs',
+  './block-reorder-ui-smoke.mjs',
+  './comment-ui-smoke.mjs',
+  './comments-panel-visual-smoke.mjs',
+  './database-board-drag-ui-smoke.mjs',
+  './database-calendar-drag-ui-smoke.mjs',
+  './database-filter-matrix-smoke.mjs',
+  './database-imported-view-config-ui-smoke.mjs',
+  './database-permission-ui-smoke.mjs',
+  './database-property-drag-ui-smoke.mjs',
+  './database-property-edit-smoke.mjs',
+  './database-property-menu-ui-smoke.mjs',
+  './database-property-resize-ui-smoke.mjs',
+  './database-property-visual-smoke.mjs',
+  './database-relation-smoke.mjs',
+  './database-row-drag-ui-smoke.mjs',
+  './database-row-peek-smoke.mjs',
+  './database-row-peek-visual-smoke.mjs',
+  './database-template-smoke.mjs',
+  './database-timeline-drag-ui-smoke.mjs',
+  './database-toolbar-visual-smoke.mjs',
+  './database-view-tabs-visual-smoke.mjs',
+  './database-view-ui-smoke.mjs',
+  './dialog-visual-smoke.mjs',
+  './enterprise-controls-smoke.mjs',
+  './file-smoke.mjs',
+  './identity-lookup-ui-smoke.mjs',
+  './import-export-smoke.mjs',
+  './mentions-visual-smoke.mjs',
+  './multi-user-permission-smoke.mjs',
+  './nested-blocks-visual-smoke.mjs',
+  './notification-smoke.mjs',
+  './notion-import-live-smoke.mjs',
+  './page-chrome-ui-smoke.mjs',
+  './page-email-share-ui-smoke.mjs',
+  './page-tree-ui-smoke.mjs',
+  './populated-page-visual-smoke.mjs',
+  './presence-ui-smoke.mjs',
+  './public-share-visual-smoke.mjs',
+  './search-dialog-visual-smoke.mjs',
+  './search-ui-smoke.mjs',
+  './share-dialog-visual-smoke.mjs',
+  './slash-menu-visual-smoke.mjs',
+  './table-render-perf.mjs',
+  './templates-dialog-visual-smoke.mjs',
+  './updates-ui-smoke.mjs',
+  './workspace-membership-smoke.mjs',
+  './workspace-switcher-ui-smoke.mjs',
+  './workspace-switcher-visual-smoke.mjs',
+];
 
 test('browser auth storage keys mirror the EdgeBase origin namespace', () => {
   assert.deepEqual(browserAuthStorageKeys('http://127.0.0.1:8787'), {
@@ -17,6 +82,152 @@ test('browser auth storage keys mirror the EdgeBase origin namespace', () => {
     browserAuthStorageKeys('https://ignored.example', 'product-a').refreshTokenKey,
     'edgebase:product-a:refresh-token',
   );
+});
+
+test('non-anonymous smoke account creators keep durable finally cleanup guards', () => {
+  const files = [
+    './admin-provisioning-ui-smoke.mjs',
+    './auth-ui-smoke.mjs',
+    './file-smoke.mjs',
+    './first-workspace-visual-smoke.mjs',
+    './inbox-badge-ui-smoke.mjs',
+    './inbox-chats-ui-smoke.mjs',
+    './mcp-hosted-oauth-smoke.mjs',
+    './multi-user-permission-smoke.mjs',
+    './page-email-share-ui-smoke.mjs',
+    './passkey-ui-smoke.mjs',
+    './person-mapping-smoke.mjs',
+    './security-settings-ui-smoke.mjs',
+    './workspace-membership-smoke.mjs',
+    './workspace-settings-visual-smoke.mjs',
+    '../mcp/scripts/live-smoke.mjs',
+  ];
+  for (const path of files) {
+    const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+    assert.match(source, /finally\s*\{/, `${path} must run cleanup from finally`);
+    assert.match(
+      source,
+      /deleteSmokeAccounts|deleteSmokeWorkspace/,
+      `${path} must delete owned synthetic workspaces`,
+    );
+    assert.match(
+      source,
+      /deleteSmokeAccounts|deleteSmokeUser(?:ByEmail)?/,
+      `${path} must delete synthetic accounts by stable id`,
+    );
+  }
+});
+
+test('shared anonymous sign-in users explicitly finalize the current-process registry', () => {
+  const users = [];
+  for (const name of readdirSync(new URL('.', import.meta.url))) {
+    if (!name.endsWith('-smoke.mjs')) continue;
+    const path = `./${name}`;
+    const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+    const harnessImport = source.match(
+      /import\s*\{([^}]*)\}\s*from\s*['"]\.\/lib\/harness\.mjs['"];/,
+    );
+    const imported = (harnessImport?.[1] ?? '')
+      .split(',')
+      .map((entry) => entry.trim().split(/\s+as\s+/)[0]);
+    if (!imported.includes('signIn')) continue;
+    users.push(path);
+    assert(imported.includes('finalizeRegisteredSmokeAccounts'), `${path} must import the registry finalizer`);
+    assert.match(source, /finally\s*\{[\s\S]*finalizeRegisteredSmokeAccounts\s*\(/, `${path} must finalize from top-level finally`);
+  }
+  assert.equal(users.length, 19, `unexpected shared anonymous sign-in inventory: ${JSON.stringify(users)}`);
+});
+
+test('local anonymous sign-in copies cannot grow outside the audited residual list', () => {
+  const discovered = [];
+  for (const name of readdirSync(new URL('.', import.meta.url))) {
+    if (!name.endsWith('.mjs') || name.endsWith('.test.mjs')) continue;
+    const path = `./${name}`;
+    const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+    if (source.includes('/api/auth/signin/anonymous')) discovered.push(path);
+  }
+  const mcpPath = '../mcp/scripts/tool-invocation-smoke.mjs';
+  if (readFileSync(new URL(mcpPath, import.meta.url), 'utf8').includes('/api/auth/signin/anonymous')) {
+    discovered.push(mcpPath);
+  }
+  assert.deepEqual(discovered.sort(), [...LOCAL_ANONYMOUS_SIGNIN_RESIDUALS].sort());
+});
+
+test('shared anonymous sign-in cleanup targets only accounts registered by this process', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    accessToken: 'anonymous-token',
+    refreshToken: 'anonymous-refresh',
+    user: { id: 'anonymous-user-1' },
+  }), { status: 201, headers: { 'content-type': 'application/json' } });
+  try {
+    await signIn('http://127.0.0.1:8787');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  const calls = [];
+  const result = await cleanupRegisteredSmokeAccounts({
+    signInAdmin: async (baseUrl) => {
+      assert.equal(baseUrl, 'http://127.0.0.1:8787');
+      return 'admin-token';
+    },
+    call: async (_baseUrl, token, name, body) => {
+      calls.push({ token, name, body });
+      if (name === 'workspace-mutation' && body.action === 'list') {
+        return {
+          workspaces: [
+            { id: 'owned', name: 'Anonymous smoke workspace', ownerId: 'anonymous-user-1' },
+            { id: 'shared', name: 'Preserved workspace', ownerId: 'preexisting-user' },
+          ],
+        };
+      }
+      if (name === 'page-query') return { pages: [] };
+      return {};
+    },
+  });
+  assert.deepEqual(result, { deletedUserIds: ['anonymous-user-1'], remainingUserIds: [] });
+  assert.equal(calls.some((call) => call.body.workspaceId === 'shared'), false);
+  assert.deepEqual(calls.filter((call) => call.name === 'instance-admin'), [{
+    token: 'admin-token',
+    name: 'instance-admin',
+    body: { action: 'deleteUser', userId: 'anonymous-user-1' },
+  }]);
+
+  const empty = await cleanupRegisteredSmokeAccounts({
+    signInAdmin: async () => { throw new Error('must not sign in with an empty registry'); },
+  });
+  assert.deepEqual(empty, { deletedUserIds: [], remainingUserIds: [] });
+});
+
+test('shared anonymous registry survives a cleanup credential failure for an explicit retry', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    accessToken: 'anonymous-token-2',
+    refreshToken: 'anonymous-refresh-2',
+    user: { id: 'anonymous-user-2' },
+  }), { status: 201, headers: { 'content-type': 'application/json' } });
+  try {
+    await signIn('http://127.0.0.1:8787');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  await assert.rejects(
+    cleanupRegisteredSmokeAccounts({
+      signInAdmin: async () => { throw new Error('admin unavailable'); },
+    }),
+    /Registered anonymous smoke accounts were not fully cleaned up/,
+  );
+  const retried = await cleanupRegisteredSmokeAccounts({
+    signInAdmin: async () => 'admin-token',
+    call: async (_baseUrl, _token, name, body) => {
+      if (name === 'workspace-mutation' && body.action === 'list') return { workspaces: [] };
+      assert.equal(body.userId, 'anonymous-user-2');
+      return {};
+    },
+  });
+  assert.deepEqual(retried, { deletedUserIds: ['anonymous-user-2'], remainingUserIds: [] });
 });
 
 test('browser smoke sessions migrate once, then move only the HttpOnly cookie between contexts', async () => {
@@ -187,6 +398,221 @@ test('browser diagnostics can narrowly allow an initial invalid-Origin refresh 4
 
   await page.emit('console', generic400);
   assert.deepEqual(errors, [generic400.text()]);
+});
+
+test('smoke cleanup deletes non-empty workspaces with an exact-name confirmation', async () => {
+  const calls = [];
+  let pageListCalls = 0;
+  const result = await deleteSmokeWorkspace(
+    'http://127.0.0.1:8787',
+    'owner-token',
+    { id: 'workspace-1', name: 'Synthetic workspace' },
+    {
+      call: async (...args) => {
+        calls.push(args);
+        if (args[2] === 'page-query') {
+          pageListCalls += 1;
+          return pageListCalls === 1
+            ? { pages: [{ id: 'page-1', workspaceId: 'workspace-1', parentType: 'workspace', parentId: null }] }
+            : { pages: [] };
+        }
+        return { deletedId: 'workspace-1' };
+      },
+      timeoutMs: 1234,
+    },
+  );
+  assert.deepEqual(result, { deletedId: 'workspace-1' });
+  assert.deepEqual(calls.map((call) => [call[2], call[3]]), [
+    ['page-query', { action: 'pages', workspaceId: 'workspace-1', includeTrash: true }],
+    ['page-mutation', { action: 'trash', id: 'page-1' }],
+    ['page-mutation', { action: 'delete', id: 'page-1' }],
+    ['page-query', { action: 'pages', workspaceId: 'workspace-1', includeTrash: true }],
+    ['workspace-mutation', {
+      action: 'deleteWorkspace',
+      workspaceId: 'workspace-1',
+      confirmWorkspaceName: 'Synthetic workspace',
+    }],
+  ]);
+  assert(calls.every((call) => call[4]?.timeoutMs === 1234));
+});
+
+test('smoke workspace cleanup tolerates an already-running page deletion', async () => {
+  let pageListCalls = 0;
+  const calls = [];
+  await deleteSmokeWorkspace(
+    'http://127.0.0.1:8787',
+    'owner-token',
+    { id: 'workspace-1', name: 'Synthetic workspace' },
+    {
+      call: async (_baseUrl, _token, name, body) => {
+        calls.push([name, body]);
+        if (name === 'page-query') {
+          pageListCalls += 1;
+          return pageListCalls === 1
+            ? { pages: [{ id: 'page-1', workspaceId: 'workspace-1', parentType: 'workspace' }] }
+            : { pages: [] };
+        }
+        if (name === 'page-mutation' && body.action === 'trash') {
+          throw new Error('page-mutation returned HTTP 409: Target deletion is already in progress.');
+        }
+        return {};
+      },
+    },
+  );
+  assert.deepEqual(calls.at(-1), [
+    'workspace-mutation',
+    { action: 'deleteWorkspace', workspaceId: 'workspace-1', confirmWorkspaceName: 'Synthetic workspace' },
+  ]);
+});
+
+test('smoke cleanup deletes synthetic users only by their stable id', async () => {
+  const calls = [];
+  await deleteSmokeUser('http://127.0.0.1:8787', 'admin-token', 'user-1', {
+    call: async (...args) => {
+      calls.push(args);
+      return { users: [] };
+    },
+  });
+  assert.deepEqual(calls, [[
+    'http://127.0.0.1:8787',
+    'admin-token',
+    'instance-admin',
+    { action: 'deleteUser', userId: 'user-1' },
+    {},
+  ]]);
+});
+
+test('smoke cleanup resolves an exact synthetic email before deleting the stable user id', async () => {
+  const calls = [];
+  const result = await deleteSmokeUserByEmail(
+    'http://127.0.0.1:8787',
+    'admin-token',
+    'auth-smoke@example.com',
+    {
+      call: async (...args) => {
+        calls.push(args);
+        const body = args[3];
+        if (body.action === 'searchUsers') {
+          return {
+            users: [
+              { id: 'wrong', email: 'auth-smoke-extra@example.com' },
+              { id: 'user-2', email: 'AUTH-SMOKE@example.com' },
+            ],
+          };
+        }
+        return { users: [] };
+      },
+      timeoutMs: 1234,
+    },
+  );
+  assert.deepEqual(result, { deleted: true, userId: 'user-2' });
+  assert.deepEqual(calls, [
+    [
+      'http://127.0.0.1:8787',
+      'admin-token',
+      'instance-admin',
+      { action: 'searchUsers', query: 'auth-smoke@example.com', limit: 10 },
+      { timeoutMs: 1234 },
+    ],
+    [
+      'http://127.0.0.1:8787',
+      'admin-token',
+      'instance-admin',
+      { action: 'deleteUser', userId: 'user-2' },
+      { timeoutMs: 1234 },
+    ],
+  ]);
+});
+
+test('smoke account cleanup deletes only owned workspaces before stable-id accounts', async () => {
+  const calls = [];
+  const result = await deleteSmokeAccounts(
+    'http://127.0.0.1:8787',
+    'admin-token',
+    [{ token: 'user-token', userId: 'user-1' }],
+    {
+      call: async (baseUrl, token, name, body) => {
+        calls.push({ token, name, body });
+        if (name === 'workspace-mutation' && body.action === 'list') {
+          return {
+            workspaces: [
+              { id: 'owned-1', name: 'Owned', ownerId: 'user-1' },
+              { id: 'shared-1', name: 'Shared', ownerId: 'someone-else' },
+            ],
+          };
+        }
+        if (name === 'page-query') return { pages: [] };
+        return {};
+      },
+    },
+  );
+  assert.deepEqual(result, { deletedUserIds: ['user-1'] });
+  assert.equal(calls.some((call) => call.body.workspaceId === 'shared-1'), false);
+  assert.deepEqual(
+    calls.filter((call) => call.name === 'workspace-mutation').map((call) => call.body),
+    [
+      { action: 'list' },
+      { action: 'deleteWorkspace', workspaceId: 'owned-1', confirmWorkspaceName: 'Owned' },
+    ],
+  );
+  assert.deepEqual(calls.at(-1), {
+    token: 'admin-token',
+    name: 'instance-admin',
+    body: { action: 'deleteUser', userId: 'user-1' },
+  });
+});
+
+test('smoke account cleanup keeps workspace and account deletion attempts independent', async () => {
+  const deletedWorkspaceIds = [];
+  const deletedUserIds = [];
+  await assert.rejects(
+    deleteSmokeAccounts(
+      'http://127.0.0.1:8787',
+      'admin-token',
+      [{ token: 'user-token', userId: 'user-1' }],
+      {
+        call: async (_baseUrl, _token, name, body) => {
+          if (name === 'workspace-mutation' && body.action === 'list') {
+            return {
+              workspaces: [
+                { id: 'owned-1', name: 'First', ownerId: 'user-1' },
+                { id: 'owned-2', name: 'Second', ownerId: 'user-1' },
+              ],
+            };
+          }
+          if (name === 'page-query') return { pages: [] };
+          if (name === 'workspace-mutation' && body.action === 'deleteWorkspace') {
+            deletedWorkspaceIds.push(body.workspaceId);
+            if (body.workspaceId === 'owned-1') throw new Error('first workspace delete failed');
+          }
+          if (name === 'instance-admin' && body.action === 'deleteUser') {
+            deletedUserIds.push(body.userId);
+          }
+          return {};
+        },
+      },
+    ),
+    /Smoke accounts were not fully cleaned up/,
+  );
+  assert.deepEqual(deletedWorkspaceIds, ['owned-1', 'owned-2']);
+  assert.deepEqual(deletedUserIds, ['user-1']);
+});
+
+test('smoke cleanup leaves accounts alone when no exact synthetic email exists', async () => {
+  const calls = [];
+  const result = await deleteSmokeUserByEmail(
+    'http://127.0.0.1:8787',
+    'admin-token',
+    'missing@example.com',
+    {
+      call: async (...args) => {
+        calls.push(args);
+        return { users: [{ id: 'nearby', email: 'missing-extra@example.com' }] };
+      },
+    },
+  );
+  assert.deepEqual(result, { deleted: false });
+  assert.equal(calls.length, 1);
 });
 
 function fakeContext(cookies) {

@@ -67,6 +67,8 @@ describe('seedDefaultWorkspacePages', () => {
     const todo = blocks[2];
     expect(todo.content).toEqual({ rich: [{ text: '첫 문서 만들기' }], checked: false });
     expect(todo.plainText).toBe('첫 문서 만들기');
+    expect(blocks[3].plainText).toBe('서버에 등록된 계정을 추가하고 권한 확인하기');
+    expect(blocks.map((block) => block.plainText).join('\n')).not.toContain('초대');
   });
 
   it('seeds an English starter page when requested', async () => {
@@ -75,6 +77,8 @@ describe('seedDefaultWorkspacePages', () => {
     expect(inserted[0].title).toBe('Welcome to Hanji!');
     expect(db.tables.blocks[0].plainText).toContain('Hanji is an open-source workspace');
     expect(db.tables.blocks[1].plainText).toBe('Get started');
+    expect(db.tables.blocks[3].plainText).toBe('Add an existing server account and review permissions');
+    expect(db.tables.blocks.map((block) => block.plainText).join('\n')).not.toContain('Invite');
   });
 
   it('gives every seeded record a unique id', async () => {

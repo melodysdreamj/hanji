@@ -19,6 +19,153 @@ import {
 import { fakeDb, type Row } from './helpers/fake-db';
 import { callFunction, expectErrorResponse, handlerOf } from './helpers/function-context';
 
+const notionImportSource = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../functions/notion-import.ts'),
+  'utf8',
+);
+
+describe('Notion incremental discovery live progress', () => {
+  it('persists the current pending-enrichment count during a chunk', () => {
+    expect(notionImportSource).toContain('pendingEnrichment: snapshot.pendingEnrichment');
+    expect(notionImportSource).toContain("item.notionObject === 'page' && !hasPageSnapshot(item)");
+  });
+});
+
+describe('Notion import completion markers', () => {
+  it('hands relation remapping the page only after block-completion markers are durable', () => {
+    const pageCreation = notionImportSource.indexOf('const insertedBlocks = await insertPageBlocksFromSnapshot(');
+    const completion = notionImportSource.indexOf('page = await markImportedBlocksComplete(db, page);', pageCreation);
+    const pageContext = notionImportSource.indexOf('importedPageBlockContexts.push({ page, notionId: item.notionId });', completion);
+    const rowContext = notionImportSource.indexOf('importedRowContexts.push({ page, dataSourceId: sourceId, notionId: item.notionId });', completion);
+
+    expect(pageCreation).toBeGreaterThanOrEqual(0);
+    expect(completion).toBeGreaterThan(pageCreation);
+    expect(pageContext).toBeGreaterThan(completion);
+    expect(rowContext).toBeGreaterThan(completion);
+  });
+});
+
+describe('Notion import staging-root recovery', () => {
+  it('unwraps a completed localized staging root into ordinary Pages', async () => {
+    const completedJob = job('job-completed', {
+      status: 'completed',
+      phase: 'applied',
+      rootNotionPageIds: ['notion-selected-root'],
+    });
+    const db = workspaceDb({
+      notion_import_jobs: [completedJob],
+      notion_import_mappings: [
+        {
+          id: 'mapping-root',
+          workspaceId: 'ws-1',
+          jobId: 'job-completed',
+          notionId: 'notion-import-root:job-completed',
+          notionType: 'import_root',
+          localId: 'staging-root',
+          localType: 'page',
+          relationKind: 'import_root',
+        },
+        {
+          id: 'mapping-selected',
+          workspaceId: 'ws-1',
+          jobId: 'job-completed',
+          notionId: 'notion-selected-root',
+          notionType: 'page',
+          localId: 'selected-page',
+          localType: 'page',
+          relationKind: 'page',
+        },
+        {
+          id: 'mapping-supporting-db',
+          workspaceId: 'ws-1',
+          jobId: 'job-completed',
+          notionId: 'notion-supporting-db',
+          notionType: 'data_source',
+          localId: 'supporting-db',
+          localType: 'database',
+          relationKind: 'canonical_data_source',
+        },
+      ],
+      pages: [
+        {
+          id: 'staging-root', workspaceId: 'ws-1', parentType: 'workspace', kind: 'page',
+          title: 'Localized staging title', properties: { notionImportJobId: 'job-completed' },
+        },
+        {
+          id: 'selected-page', workspaceId: 'ws-1', parentId: 'staging-root', parentType: 'page',
+          kind: 'page', title: 'Selected page', isFavorite: true, inTrash: true,
+          trashedAt: '2026-07-13T00:00:00.000Z',
+        },
+        {
+          id: 'supporting-db', workspaceId: 'ws-1', parentId: 'staging-root', parentType: 'page',
+          kind: 'database', title: 'Supporting database',
+        },
+      ],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'repairPageIndexes',
+      workspaceId: 'ws-1',
+    }) as { unwrapped?: number; moved?: number };
+
+    expect(result).toEqual(expect.objectContaining({ unwrapped: 1, moved: 2 }));
+    expect(db.tables.pages.some((page) => page.id === 'staging-root')).toBe(false);
+    expect(db.tables.notion_import_mappings.some((mapping) => mapping.id === 'mapping-root')).toBe(false);
+    expect(db.tables.page_workspace_index.some((row) => row.id === 'staging-root')).toBe(false);
+    expect(db.tables.pages.find((page) => page.id === 'selected-page')).toEqual(
+      expect.objectContaining({
+        parentId: null,
+        parentType: 'workspace',
+        isFavorite: false,
+        inTrash: false,
+        trashedAt: null,
+      }),
+    );
+    expect(db.tables.pages.find((page) => page.id === 'supporting-db')).toEqual(
+      expect.objectContaining({ parentId: 'selected-page', parentType: 'page' }),
+    );
+  });
+
+  it('moves failed partial-import pages to Trash instead of exposing them', async () => {
+    const db = workspaceDb({
+      notion_import_jobs: [job('job-failed', { status: 'failed', phase: 'apply_failed' })],
+      notion_import_mappings: [
+        {
+          id: 'failed-root-mapping', workspaceId: 'ws-1', jobId: 'job-failed',
+          notionId: 'notion-import-root:job-failed', notionType: 'import_root',
+          localId: 'failed-root', localType: 'page', relationKind: 'import_root',
+        },
+        {
+          id: 'failed-child-mapping', workspaceId: 'ws-1', jobId: 'job-failed',
+          notionId: 'failed-child-notion', notionType: 'page',
+          localId: 'failed-child', localType: 'page', relationKind: 'page',
+        },
+      ],
+      pages: [
+        {
+          id: 'failed-root', workspaceId: 'ws-1', parentType: 'workspace', kind: 'page',
+          title: 'Failed staging root', isFavorite: false,
+        },
+        {
+          id: 'failed-child', workspaceId: 'ws-1', parentId: 'failed-root', parentType: 'page',
+          kind: 'page', title: 'Partial child', isFavorite: true,
+        },
+      ],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'repairPageIndexes',
+      workspaceId: 'ws-1',
+    }) as { trashed?: number };
+
+    expect(result.trashed).toBe(2);
+    expect(db.tables.pages).toEqual([
+      expect.objectContaining({ id: 'failed-root', inTrash: true, isFavorite: false }),
+      expect.objectContaining({ id: 'failed-child', inTrash: true, isFavorite: false }),
+    ]);
+  });
+});
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const isoAgo = (ms: number) => new Date(Date.now() - ms).toISOString();
 
@@ -479,6 +626,34 @@ describe('apply lease and mapping idempotency', () => {
     };
   }
 
+  it('reads first-generation import rows without issuing a nullable generation filter', async () => {
+    const legacyItem = discoveredPage();
+    const getList = vi.fn(async () => ({ items: [legacyItem], hasMore: false }));
+    const query = {
+      where: vi.fn(() => {
+        throw new Error('nullable generation filter must not be issued');
+      }),
+      page: vi.fn(() => query),
+      limit: vi.fn(() => query),
+      getList,
+    };
+    const table = {
+      where: vi.fn((field: string) => {
+        expect(field).toBe('jobId');
+        return query;
+      }),
+    };
+
+    const items = await listActiveNotionImportItems(
+      { table: vi.fn(() => table) } as never,
+      job('job-1') as unknown as NotionImportJob,
+    );
+
+    expect(items).toEqual([legacyItem]);
+    expect(query.where).not.toHaveBeenCalled();
+    expect(getList).toHaveBeenCalledTimes(1);
+  });
+
   it('allows only one concurrent apply and creates one native graph', async () => {
     const db = workspaceDb({
       notion_import_jobs: [job('job-1')],
@@ -497,11 +672,44 @@ describe('apply lease and mapping idempotency', () => {
     expect(failures).toHaveLength(1);
     await expectErrorResponse(failures[0], 409, 'already being applied');
     expect(results.filter((result) => !(result instanceof Response))).toHaveLength(1);
-    expect(db.tables.pages).toHaveLength(2); // one import root + one imported page
-    expect(db.tables.notion_import_mappings).toHaveLength(2);
-    expect(new Set(db.tables.notion_import_mappings.map((mapping) => mapping.mappingKey)).size).toBe(2);
+    expect(db.tables.pages).toHaveLength(1); // imported page; staging root is removed
+    expect(db.tables.pages[0]).toEqual(expect.objectContaining({ parentType: 'workspace', isFavorite: false }));
+    expect(db.tables.notion_import_mappings).toHaveLength(1);
+    expect(new Set(db.tables.notion_import_mappings.map((mapping) => mapping.mappingKey)).size).toBe(1);
     expect(db.tables.notion_import_apply_locks).toHaveLength(0);
     expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+  });
+
+  it('cancels a stranded discovery and removes its job-scoped lease immediately', async () => {
+    const discoveringJob = job('job-1', {
+      status: 'discovering',
+      phase: 'api_search',
+      progress: { currentStatus: 'running' },
+    });
+    const db = workspaceDb({
+      notion_import_jobs: [discoveringJob],
+      notion_import_apply_locks: [{
+        id: 'job-1',
+        workspaceId: 'ws-1',
+        jobId: 'job-1',
+        leaseId: 'stranded-lease',
+        actorId: 'owner-1',
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      }],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'cancel',
+      jobId: 'job-1',
+      workspaceId: 'ws-1',
+    });
+
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0]).toMatchObject({
+      status: 'cancelled',
+      phase: 'cancelled',
+    });
+    expect(db.tables.notion_import_apply_locks).toHaveLength(0);
   });
 
   it('applies only the active generation when stale rows remain physically present', async () => {
@@ -534,12 +742,9 @@ describe('apply lease and mapping idempotency', () => {
     });
 
     expect(result).not.toBeInstanceOf(Response);
-    expect(db.tables.pages.map((page) => page.title)).toEqual([
-      'Imported from Notion',
-      'Fresh imported page',
-    ]);
+    expect(db.tables.pages.map((page) => page.title)).toEqual(['Fresh imported page']);
     expect(db.tables.pages.some((page) => page.title === 'Stale imported page')).toBe(false);
-    expect(db.tables.notion_import_mappings).toHaveLength(2);
+    expect(db.tables.notion_import_mappings).toHaveLength(1);
     expect(db.tables.notion_import_jobs[0].status).toBe('completed');
   });
 
@@ -574,10 +779,7 @@ describe('apply lease and mapping idempotency', () => {
     });
 
     expect(result).not.toBeInstanceOf(Response);
-    expect(db.tables.pages.map((page) => page.title)).toEqual([
-      'Notion에서 가져옴',
-      '연결된 데이터베이스',
-    ]);
+    expect(db.tables.pages.map((page) => page.title)).toEqual(['연결된 데이터베이스']);
     expect(db.tables.db_properties).toEqual([
       expect.objectContaining({ name: '이름', type: 'title' }),
     ]);
@@ -622,10 +824,7 @@ describe('apply lease and mapping idempotency', () => {
     });
 
     expect(result).not.toBeInstanceOf(Response);
-    expect(db.tables.pages.map((page) => page.title)).toEqual([
-      'Notion에서 가져옴',
-      '가져온 데이터베이스',
-    ]);
+    expect(db.tables.pages.map((page) => page.title)).toEqual(['가져온 데이터베이스']);
     expect(db.tables.db_properties).toEqual([
       expect.objectContaining({ name: '이름', type: 'title' }),
     ]);
@@ -1939,11 +2138,32 @@ describe('discovery progress writes cannot land after the terminal update (#11)'
 
   it('single-flights discovery and never overwrites a concurrent cancel', () => {
     expect(source).toContain("acquireNotionApplyLease(db, job, actorId, 'discover')");
+    expect(source).toContain('NOTION_DISCOVER_LEASE_TTL_MS = 90 * 1000');
+    expect(source).toContain("'already being discovered'");
     expect(source).toContain("updateNotionJobIfStatus(db, job.id, 'discovering'");
     const cancelStart = source.indexOf('async function cancelJob(');
     const cancelEnd = source.indexOf('async function retryJob(', cancelStart);
     const cancelBody = source.slice(cancelStart, cancelEnd);
     expect(cancelBody).toContain('updateNotionJobIfStatus(db, job.id, job.status');
+    expect(cancelBody).toContain("db.table<NotionImportApplyLock>('notion_import_apply_locks').delete(job.id)");
+  });
+
+  it('declares the persisted lease purpose used by discovery lock transactions', () => {
+    const configSource = readFileSync(
+      resolve(dirname(fileURLToPath(import.meta.url)), '../../edgebase.config.ts'),
+      'utf8',
+    );
+    const lockStart = configSource.indexOf('notion_import_apply_locks:');
+    const lockEnd = configSource.indexOf('// ─── Comments', lockStart);
+    expect(configSource.slice(lockStart, lockEnd)).toContain(
+      "purpose: { type: 'string', default: 'apply' }",
+    );
+  });
+
+  it('keeps selected-root discovery recursive across linked graph references', () => {
+    expect(source).not.toContain('if (rootScopedDiscovery) return;');
+    expect(source).toMatch(/for \(const target of dataSourceSnapshot\.relationTargetReferences\)/);
+    expect(source).toMatch(/for \(const pageId of notionPageIdsFromViewFilters/);
   });
 
   it('applies a finite deadline to every imported-file fetch', () => {
@@ -2022,6 +2242,24 @@ describe('responseBodyWithExactByteCount', () => {
   it('passes through a stream whose actual size matches Content-Length', async () => {
     const response = new Response(responseBodyWithExactByteCount(stream([1, 2], [3]), 3, 10));
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+  });
+
+  it('restores a Workers fixed-length stream after validating Content-Length', async () => {
+    const lengths: Array<number | bigint> = [];
+    class TestFixedLengthStream extends TransformStream<Uint8Array, Uint8Array> {
+      constructor(length: number | bigint) {
+        super();
+        lengths.push(length);
+      }
+    }
+    const response = new Response(responseBodyWithExactByteCount(
+      stream([1, 2], [3]),
+      3,
+      10,
+      TestFixedLengthStream,
+    ));
+    expect(new Uint8Array(await response.arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]));
+    expect(lengths).toEqual([3]);
   });
 
   it('aborts before storage can ingest bytes beyond the claimed length', async () => {

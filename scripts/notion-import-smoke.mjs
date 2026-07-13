@@ -6,6 +6,7 @@ import {
   assertRuntimeReachable,
   callFunction,
   expectFunctionStatus,
+  finalizeRegisteredSmokeAccounts,
   normalizeBaseUrl,
   postFunction,
   readJson,
@@ -66,6 +67,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('Notion import smoke');
 }
 
 async function main() {
@@ -98,6 +101,17 @@ async function main() {
     workspaceId,
   }, 403);
   console.log('PASS Notion import connections are listed through workspace permissions without exposing credentials.');
+
+  if (options.onlySelectedRootRecursion) {
+    assert(mockNotionApi, '--only-selected-root-recursion requires --mock-notion-api-base');
+    await verifyMockNotionSearchFailureRootFallback(
+      baseUrl,
+      owner.token,
+      workspaceId,
+      organizationId,
+    );
+    return;
+  }
 
   if (mockNotionApi) {
     await verifyMockNotionStoredConnection(baseUrl, owner.token, workspaceId, organizationId, options.expectStoredConnection);
@@ -591,8 +605,16 @@ async function main() {
   assert(rootPage.page?.createdAt === NOTION_IMPORT_CREATED_TIME, 'Imported pages must preserve Notion created_time metadata');
   assert(rootPage.page?.updatedAt === NOTION_IMPORT_EDITED_TIME, 'Imported pages must preserve Notion last_edited_time metadata');
   assert(
-    rootPage.page?.isFavorite === true,
-    'Explicit Notion import root pages should be anchored in Favorites because the Notion API does not expose favorite state',
+    rootPage.page?.isFavorite !== true,
+    'Explicit Notion import roots must remain ordinary pages instead of inventing Notion favorite state',
+  );
+  assert(
+    rootPage.page?.parentType === 'workspace' && !rootPage.page?.parentId,
+    'Explicit Notion import roots must be exposed directly in Pages without a synthetic wrapper',
+  );
+  assert(
+    !applied.mappings?.some((mapping) => mapping.relationKind === 'import_root'),
+    'Completed Notion imports must remove their synthetic staging-root mapping',
   );
   assert(
     rootPage.page?.fullWidth === true,
@@ -3907,6 +3929,14 @@ async function verifyMockNotionSearchFailureRootFallback(baseUrl, token, workspa
     'Mock explicit root discovery must enrich the requested root page',
   );
   assert(
+    created.items?.some((item) =>
+      item.notionId === 'mock-rich-mentioned-ds' &&
+      item.notionObject === 'data_source' &&
+      item.phase === 'data_source_snapshot'
+    ),
+    'Mock explicit root discovery must recursively enrich linked data sources from the selected root',
+  );
+  assert(
     !created.job?.report?.missingPermissions?.some((issue) => issue.code === 'search_unavailable'),
     'Mock explicit root discovery should not depend on workspace search',
   );
@@ -3920,7 +3950,7 @@ async function verifyMockNotionSearchFailureRootFallback(baseUrl, token, workspa
       event.metadata?.searchPagesFetched === 0,
     message: 'Explicit root Notion discovery must skip workspace search and record scoped discovery audit metadata',
   });
-  console.log('PASS Notion import discovery scopes explicit root pages without importing the broader workspace graph.');
+  console.log('PASS Notion explicit-root discovery skips workspace search and recursively follows linked graph references.');
 }
 
 async function verifyMockNotionMissingExplicitRootFails(baseUrl, token, workspaceId, organizationId) {
@@ -5016,6 +5046,7 @@ function parseArgs(args) {
     mockNotionApiBase: DEFAULT_MOCK_NOTION_API_BASE,
     timeoutMs: DEFAULT_TIMEOUT_MS,
     expectStoredConnection: DEFAULT_EXPECT_STORED_CONNECTION,
+    onlySelectedRootRecursion: false,
   };
 
   for (let i = 0; i < args.length; i += 1) {
@@ -5044,6 +5075,10 @@ function parseArgs(args) {
     }
     if (arg === '--expect-stored-connection') {
       parsed.expectStoredConnection = true;
+      continue;
+    }
+    if (arg === '--only-selected-root-recursion') {
+      parsed.onlySelectedRootRecursion = true;
       continue;
     }
     throw new Error(`Unknown argument: ${arg}`);
@@ -5075,6 +5110,9 @@ Options:
   --expect-stored-connection
                           Require encrypted stored Notion connection checks to pass.
                           The EdgeBase runtime must have HANJI_NOTION_IMPORT_SECRET configured.
+  --only-selected-root-recursion
+                          Verify only that an explicit root recursively discovers its linked data source.
+                          Requires --mock-notion-api-base and a runtime pointed at the same mock URL.
   --timeout-ms <number>   Per-request timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
 `);
 }

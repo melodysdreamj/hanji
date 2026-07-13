@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Emits dist/sw-precache.json after the Vite build: the app shell plus the
-// entry assets referenced by dist/index.html and the en/ko language catalog
-// chunks needed before React mounts. This makes the first visit
-// offline-reloadable without downloading every optional locale up front.
+// Emits dist/sw-precache.json after the Vite build with two explicit graphs:
+// bootAssets for fast service-worker installation, and assets for the complete
+// product graph warmed after activation. The worker publishes a new offline
+// shell only after the latter has been staged atomically.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
@@ -98,7 +98,15 @@ writeFileSync(
   resolve(dist, 'sw-precache.json'),
   JSON.stringify(manifest, null, 2) + '\n'
 );
+const rawBytes = (urls) => urls.reduce((total, url) => {
+  const file = url === '/' ? resolve(dist, 'index.html') : resolve(dist, url.slice(1));
+  return total + readFileSync(file).byteLength;
+}, 0);
+const bootBytes = rawBytes(manifest.bootAssets);
+const totalBytes = rawBytes(manifest.assets);
 console.log(
-  'sw-precache.json: ' + manifest.assets.length + ' offline entries / ' +
-    manifest.bootAssets.length + ' boot entries (' + bootLanguageEntries.length + ' language chunks)'
+  'sw-precache.json: install ' + manifest.bootAssets.length + ' entries / ' + bootBytes +
+    ' raw bytes; background ' + (manifest.assets.length - manifest.bootAssets.length) +
+    ' entries / ' + (totalBytes - bootBytes) + ' raw bytes; full ' + manifest.assets.length +
+    ' entries / ' + totalBytes + ' raw bytes (' + bootLanguageEntries.length + ' boot language chunks)'
 );

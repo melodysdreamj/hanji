@@ -35,6 +35,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { useRouter } from "@/lib/router";
 import { pageHref } from "@/lib/navigation";
+import { notionDiscoveryShouldContinue } from "@/lib/notionImportResume";
+import { estimateImportRunMetrics } from "@/lib/importRunMetrics";
 import {
   activePersistentGeneratedLabels,
   persistentGeneratedLabels,
@@ -359,7 +361,6 @@ function buildImportLabels(t: Translate) {
       speed: t("importDialog:installer.speed"),
       itemsPerSecond: (rate: string) => t("importDialog:installer.itemsPerSecond", { rate }),
       foundCount: (count: number) => t("importDialog:installer.foundCount", { count }),
-      remaining: t("importDialog:installer.remaining"),
       activityLog: t("importDialog:installer.activityLog"),
       waitingForProgress: t("importDialog:installer.waitingForProgress"),
       searching: t("importDialog:installer.searching"),
@@ -682,28 +683,6 @@ function writeSummaryText(job: NotionImportJob, labels: ImportDialogLabels) {
     .join(" · ");
 }
 
-function jobPercent(job: NotionImportJob) {
-  // Incremental discovery has no honest percent: the total keeps growing as new
-  // references are found, so any "enriched / total" ratio dips when a burst of
-  // databases is discovered. Show an INDETERMINATE ("working") bar instead while
-  // it's discovering — the monotonic "processed" count + live log convey real
-  // progress. A determinate percent returns for the apply phase and everything
-  // else.
-  if (isIncrementalDiscovering(job)) return undefined;
-  const progress = job.progress ?? {};
-  return typeof progress.percent === "number" && Number.isFinite(progress.percent)
-    ? Math.max(0, Math.min(100, Math.round(progress.percent)))
-    : undefined;
-}
-
-// True for an in-progress incremental discovery (the only job kind that carries
-// `pendingEnrichment`). A normal one-shot discover never sets it.
-function isIncrementalDiscovering(job: NotionImportJob): boolean {
-  if (job.status !== "discovering") return false;
-  const pending = (job.progress as { pendingEnrichment?: unknown } | undefined)?.pendingEnrichment;
-  return typeof pending === "number" && Number.isFinite(pending);
-}
-
 // Items whose snapshot has been captured = discovered total − still-pending.
 // Monotonic: finding a new reference bumps both total and pending (no change);
 // enriching one drops pending (count goes up). Never decreases.
@@ -716,10 +695,12 @@ function processedItemCount(job: NotionImportJob): number | undefined {
 
 function progressSummaryText(job: NotionImportJob, labels: ImportDialogLabels) {
   const progress = job.progress ?? {};
-  const percent = jobPercent(job);
-  // Once the job is finished, the last step label ("Applying...") is stale.
+  // Once the job is finished, the last step label ("Applying...") is stale;
+  // the status pill/current line owns the settled state. Percentages are
+  // deliberately not surfaced because discovery grows its own total and apply
+  // phases have very different costs, so a determinate value is false precision.
   if (job.status === "completed" || job.status === "failed" || job.status === "cancelled") {
-    return percent !== undefined ? `${percent}%` : "";
+    return "";
   }
   // Localize through the step KEY — the backend's currentLabel is English-only.
   const stepKey = typeof progress.currentStep === "string" ? progress.currentStep : "";
@@ -730,8 +711,6 @@ function progressSummaryText(job: NotionImportJob, labels: ImportDialogLabels) {
       : typeof progress.step === "string" && progress.step.trim()
         ? progress.step.trim().replace(/_/g, " ")
         : "");
-  if (percent !== undefined && label) return `${percent}% · ${label}`;
-  if (percent !== undefined) return `${percent}%`;
   return label;
 }
 
@@ -965,6 +944,7 @@ export function ImportDialog({
   const [notionStep, setNotionStep] = useState(1);
   const notionStepJobKeyRef = useRef("");
   const autoResumeJobIdRef = useRef("");
+  const credentialPromptJobIdRef = useRef("");
   // 1s clock for the installer-style run panel (elapsed time keeps counting
   // between polls).
   const [runNowMs, setRunNowMs] = useState(() => Date.now());
@@ -1146,19 +1126,24 @@ export function ImportDialog({
     };
   }, [source, workspace?.id, refreshNotionImportState]);
 
-  // One-shot self-heal: older/interrupted imports may have created pages without
-  // their central page_workspace_index row, so /p/:id deep links 404. Re-derive
-  // the index from this workspace's import mappings once per workspace per open.
+  // One-shot self-heal for legacy/interrupted imports: rebuild page routing,
+  // unwrap completed staging roots, and hide failed partial output.
   const repairedWorkspacesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     const workspaceId = workspace?.id;
     if (source !== "notion" || !workspaceId) return;
     if (repairedWorkspacesRef.current.has(workspaceId)) return;
     repairedWorkspacesRef.current.add(workspaceId);
-    void repairNotionImportPageIndexesRemote(workspaceId).catch(() => {
-      repairedWorkspacesRef.current.delete(workspaceId);
-    });
-  }, [source, workspace?.id]);
+    void repairNotionImportPageIndexesRemote(workspaceId)
+      .then((result) => {
+        if ((result.unwrapped ?? 0) > 0 || (result.trashed ?? 0) > 0) {
+          return refreshWorkspacePages();
+        }
+      })
+      .catch(() => {
+        repairedWorkspacesRef.current.delete(workspaceId);
+      });
+  }, [refreshWorkspacePages, source, workspace?.id]);
 
   useEffect(() => {
     if (source !== "notion" || !workspace?.id) return;
@@ -1496,12 +1481,11 @@ export function ImportDialog({
       notify(L.rootPagesRequired, "error");
       return;
     }
-    // Entire-workspace discovery on a real (non-retry) run is the case that can
-    // enumerate hundreds of items and take minutes. Stream it (create-deferred +
-    // get polling) so the wizard shows live progress instead of freezing behind
-    // one long inline-discovery request. Specific-pages and retry stay on the
-    // single-call path (short, or reuse an existing job's cursor state).
-    const useStreamingDiscovery = !retryJobId && notionScope === "workspace";
+    // Every fresh API discovery uses bounded incremental calls. A selected root
+    // can still fan out to hundreds of pages in a large imported homepage,
+    // so treating page-scoped imports as a short inline request makes a dev
+    // worker restart lose the whole in-memory graph.
+    const useStreamingDiscovery = !retryJobId;
     setNotionBusy(true);
     try {
       const selectedConnection = connectionId
@@ -1515,6 +1499,8 @@ export function ImportDialog({
             : "manual_token",
           connectionId,
           token,
+          rootNotionPageIds: pageRootIds,
+          rootNotionDataSourceIds: dataSourceRootIds,
         });
         if (connectionId) setNotionToken("");
         return;
@@ -1526,6 +1512,7 @@ export function ImportDialog({
             notionToken: token || undefined,
             connectionId,
             importPagesFullWidth: notionImportPagesFullWidth,
+            deferDiscovery: true,
           })
         : await createNotionImportJobRemote({
             workspaceId: workspace.id,
@@ -1540,6 +1527,17 @@ export function ImportDialog({
             locale: productLocale,
           });
       const itemCount = result.items?.length ?? itemCountFromJob(result.job);
+      if (retryJobId && result.job.status === "queued") {
+        await runStreamingNotionDiscovery({
+          workspaceId: workspace.id,
+          connectionKind: result.job.connectionKind,
+          connectionId,
+          token,
+          resumeJob: result.job,
+        });
+        if (connectionId) setNotionToken("");
+        return;
+      }
       await refreshNotionImportStateFresh();
       setNotionResult({ job: result.job, itemCount });
       notify(
@@ -1554,21 +1552,17 @@ export function ImportDialog({
     }
   }
 
-  // Run entire-workspace discovery as one server call, but STREAM its progress
-  // to the wizard. The old flow awaited a single long create() that ran discovery
-  // inline, and the client only surfaced the job after it fully finished — so a
-  // large workspace sat frozen on the scope step for minutes. Instead: create a
-  // deferred (instant) job so the wizard advances to the run panel immediately,
-  // fire the full discovery without blocking the UI, and poll get() ~1.2s to feed
-  // live percent / counts / activity into the panel. The server writes a throttled
-  // progress snapshot every ~1s and those reads return in milliseconds even while
-  // discovery runs (verified), so the installer-style log flows the whole time.
+  // Stream both workspace-wide and selected-root discovery through bounded
+  // incremental calls. A single selected root can fan out to a large graph, so
+  // it needs the same durable progress and restart boundary as a whole workspace.
   async function runStreamingNotionDiscovery(args: {
     workspaceId: string;
     connectionKind: NotionImportConnection["connectionKind"];
     connectionId?: string;
     token: string;
     resumeJob?: NotionImportJob;
+    rootNotionPageIds?: string[];
+    rootNotionDataSourceIds?: string[];
   }) {
     try {
       const created = args.resumeJob
@@ -1578,8 +1572,8 @@ export function ImportDialog({
             connectionKind: args.connectionKind,
             connectionId: args.connectionId,
             notionToken: args.token || undefined,
-            rootNotionPageIds: [],
-            rootNotionDataSourceIds: [],
+            rootNotionPageIds: args.rootNotionPageIds ?? [],
+            rootNotionDataSourceIds: args.rootNotionDataSourceIds ?? [],
             importPagesFullWidth: notionImportPagesFullWidth,
             locale: productLocale,
             deferDiscovery: true,
@@ -1641,7 +1635,9 @@ export function ImportDialog({
 
       let discoverError: unknown = null;
       try {
-        let firstChunk = !args.resumeJob;
+        let continueFromCursor = args.resumeJob
+          ? notionDiscoveryShouldContinue(args.resumeJob)
+          : false;
         // A single discover chunk can transiently fail (e.g. a 503 if the
         // Durable Object is briefly saturated). Retry the same chunk a few
         // times with backoff instead of tearing down the whole multi-minute
@@ -1655,19 +1651,26 @@ export function ImportDialog({
               workspaceId: args.workspaceId,
               notionToken: args.token || undefined,
               connectionId: args.connectionId,
-              continueFromCursor: !firstChunk,
+              continueFromCursor,
               incremental: true,
             });
             consecutiveErrors = 0;
           } catch (chunkError) {
             consecutiveErrors += 1;
+            const record = chunkError && typeof chunkError === "object"
+              ? chunkError as { code?: unknown; status?: unknown }
+              : null;
+            const status = Number(record?.status ?? record?.code);
+            if (status === 409) throw chunkError;
             if (consecutiveErrors >= NOTION_DISCOVER_MAX_RETRIES) throw chunkError;
             await new Promise((resolve) =>
               setTimeout(resolve, Math.min(8000, 1000 * consecutiveErrors))
             );
             continue; // retry the same chunk; cursor/seed state is unchanged
           }
-          firstChunk = false;
+          // Every successful chunk persists either a cursor, a completed-search
+          // marker, or both. Later calls continue from that durable boundary.
+          continueFromCursor = true;
           job = res.job;
           setNotionResult({ job, itemCount: itemCountFromJob(job) });
           // Done when the job flips to ready (no search remaining AND nothing
@@ -1982,6 +1985,9 @@ export function ImportDialog({
       notify(L.importApplied, "success");
       if (token) setNotionToken("");
     } catch (error) {
+      // A failed apply moves its partial product pages to Trash server-side;
+      // refresh immediately so stale staging entries disappear from the tree.
+      void refreshWorkspacePages().catch(() => {});
       notify(error instanceof Error ? error.message : L.cantApply, "error");
     } finally {
       setNotionBusy(false);
@@ -2132,17 +2138,15 @@ export function ImportDialog({
       );
     }
     const runRecent = activeRecent;
-    const percent = activePercent;
     const startedAt =
       progressStepStartedAt(job, mode === "apply" ? "apply" : "discover") ??
       (typeof job.createdAt === "string" ? job.createdAt : undefined);
     const elapsed = elapsedText(startedAt, runNowMs);
-    // Throughput and remaining-time straight off the persisted activity ring —
-    // pure derivation, refreshed by the ~1s poll.
+    // Throughput straight off the persisted activity ring — pure derivation,
+    // refreshed by the ~1s poll.
     // Speed = overall average throughput (items done ÷ total elapsed), not a
     // recent-window rate. The windowed rate swung wildly (0.6 → 0.3 …) as heavy
-    // items passed; the running average is stable and honest. Remaining time is
-    // derived from that same rate.
+    // items passed; the running average is stable and honest.
     const elapsedSecs = startedAt
       ? Math.max(0, ((runNowMs ?? Date.now()) - new Date(startedAt).getTime()) / 1000)
       : 0;
@@ -2153,26 +2157,33 @@ export function ImportDialog({
           ? lastEntry.count
           : undefined
         : processedItemCount(job);
-    const totalForRemaining =
-      mode === "apply"
-        ? typeof lastEntry?.total === "number"
-          ? lastEntry.total
-          : undefined
-        : discoveredTotalOf(job);
+    const completionKinds = mode === "apply"
+      ? new Set(["create_page", "create_row", "create_database"])
+      : new Set(["read_page", "read_data_source"]);
+    const completionTimesMs = logEntries
+      .filter((entry) => completionKinds.has(entry.kind) && typeof entry.at === "string")
+      .map((entry) => new Date(entry.at as string).getTime())
+      .filter(Number.isFinite);
     let rateText = "";
-    let remainingText = "";
-    if (activeLive && elapsedSecs >= 1 && typeof doneCount === "number" && doneCount > 0) {
-      const rate = doneCount / elapsedSecs;
-      if (rate > 0) {
-        rateText = L.installer.itemsPerSecond(rate >= 10 ? String(Math.round(rate)) : rate.toFixed(1));
-        if (typeof totalForRemaining === "number" && totalForRemaining > doneCount) {
-          remainingText = formatDuration((totalForRemaining - doneCount) / rate);
-        }
-      }
+    const runMetrics = activeLive
+      ? estimateImportRunMetrics({
+          doneCount,
+          elapsedSeconds: elapsedSecs,
+          nowMs: runNowMs,
+          completionTimesMs,
+        })
+      : undefined;
+    if (runMetrics) {
+      const rate = runMetrics.rate;
+      const formattedRate = rate >= 10
+        ? String(Math.round(rate))
+        : rate >= 0.1
+          ? rate.toFixed(1)
+          : rate.toFixed(2);
+      rateText = L.installer.itemsPerSecond(formattedRate);
     }
     const latest = runRecent[runRecent.length - 1];
-    // Live: narrate the newest activity. Settled: the status label — the
-    // percent readout on the right already covers the numbers.
+    // Live: narrate the newest activity. Settled: show the plain status label.
     const currentLine =
       activeLive && latest
         ? L.installer.activity(latest.kind, latest.title, latest.count, latest.total)
@@ -2197,21 +2208,13 @@ export function ImportDialog({
 
         <div className={styles.runCurrent} role="status">
           <strong>{currentLine}</strong>
-          {percent !== undefined ? <span className={styles.runPercent}>{percent}%</span> : null}
         </div>
 
-        <div
-          className={styles.progressTrack}
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-        >
-          <span
-            style={percent !== undefined ? { width: `${percent}%` } : undefined}
-            data-indeterminate={percent === undefined && activeLive ? "true" : undefined}
-          />
-        </div>
+        {activeLive ? (
+          <div className={styles.progressTrack} role="progressbar" aria-label={currentLine}>
+            <span data-indeterminate="true" />
+          </div>
+        ) : null}
 
         <div className={styles.statGrid}>
           <div className={styles.statBlock}>
@@ -2258,12 +2261,6 @@ export function ImportDialog({
             <div className={styles.statBlock}>
               <span className={styles.statLabel}>{L.installer.speed}</span>
               <span className={styles.statValue}>{rateText}</span>
-            </div>
-          ) : null}
-          {remainingText ? (
-            <div className={styles.statBlock}>
-              <span className={styles.statLabel}>{L.installer.remaining}</span>
-              <span className={styles.statValue}>{remainingText}</span>
             </div>
           ) : null}
         </div>
@@ -2373,7 +2370,6 @@ export function ImportDialog({
     notionJobs.find((job) => isLiveNotionJob(job)) ??
     null;
   const activeItemCount = notionResult ? notionResult.itemCount : activeJob ? itemCountFromJob(activeJob) : 0;
-  const activePercent = activeJob ? jobPercent(activeJob) : undefined;
   const activeSteps = activeJob ? progressStepsOf(activeJob) : [];
   const activeApplied = activeJob ? appliedStats(activeJob) : undefined;
   const activeDiscovered = activeJob ? discoveredEntries(activeJob, L) : [];
@@ -2392,6 +2388,9 @@ export function ImportDialog({
   const activeRecentStamp = activeRecent.length
     ? `${activeRecent[activeRecent.length - 1].at ?? ""}:${activeRecent.length}`
     : "";
+  const manualResumeRequired = Boolean(
+    activeJob && isLiveNotionJob(activeJob) && !activeJob.connectionId && notionStep === 1,
+  );
   const wizardStepUnlocked = (step: number) => {
     if (step <= 2) return true;
     if (step === 3) return Boolean(activeJob);
@@ -2414,17 +2413,32 @@ export function ImportDialog({
   }, [source, activeJob, applyStarted]);
 
   // A stored connection can resume an interrupted/reloaded discovery without
-  // asking for the secret again. The runner itself deliberately ignores dialog
-  // dismissal, so closing the modal no longer freezes a live job.
+  // asking for the secret again. A one-time token is deliberately never
+  // persisted: after a full reload (where no module-scoped runner survives),
+  // return to Connect and ask for the token instead of leaving a stalled job on
+  // a progress panel that still looks live. Closing/reopening just the dialog
+  // keeps the existing runner and therefore needs no credential prompt.
   useEffect(() => {
     if (
       source !== "notion" ||
       !activeJob ||
       !isLiveNotionJob(activeJob) ||
-      !activeJob.connectionId ||
       notionBusy ||
       autoResumeJobIdRef.current === activeJob.id
     ) {
+      return;
+    }
+    const runnerKey = workspace?.id ? `${workspace.id}:${activeJob.id}` : "";
+    if (!activeJob.connectionId) {
+      if (
+        runnerKey &&
+        !notionDiscoveryRunnerCompletions.has(runnerKey) &&
+        credentialPromptJobIdRef.current !== activeJob.id
+      ) {
+        credentialPromptJobIdRef.current = activeJob.id;
+        setNotionStep(1);
+        notify(L.resumeNeedsCredential, "default");
+      }
       return;
     }
     autoResumeJobIdRef.current = activeJob.id;
@@ -2432,7 +2446,7 @@ export function ImportDialog({
     // resumeNotionDiscovery intentionally owns the long-running lifecycle;
     // re-running this effect for callback identity changes would duplicate it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source, activeJob?.id, activeJob?.status, activeJob?.connectionId, notionBusy]);
+  }, [source, activeJob?.id, activeJob?.status, activeJob?.connectionId, notionBusy, workspace?.id]);
 
   // Tick the run panel clock while a job is live so elapsed time counts up
   // between polls.
@@ -3135,10 +3149,16 @@ export function ImportDialog({
                   <button
                     type="button"
                     className={styles.primary}
-                    disabled={!hasCredential}
-                    onClick={() => setNotionStep(2)}
+                    disabled={notionBusy || (manualResumeRequired ? !notionToken.trim() : !hasCredential)}
+                    onClick={() => {
+                      if (manualResumeRequired && activeJob) {
+                        void resumeNotionDiscovery(activeJob);
+                        return;
+                      }
+                      setNotionStep(2);
+                    }}
                   >
-                    {L.wizard.next}
+                    {notionBusy ? L.discovering : manualResumeRequired ? L.resumeImport : L.wizard.next}
                   </button>
                 ) : null}
                 {notionStep === 2 ? (

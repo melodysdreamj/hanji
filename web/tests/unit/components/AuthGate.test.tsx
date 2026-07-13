@@ -7,6 +7,9 @@ const authState = vi.hoisted(() => ({
   listener: undefined as ((userId: string) => void) | undefined,
   unsubscribe: vi.fn(),
   fetchSponsorsRemote: vi.fn<() => Promise<{ sponsors: Array<{ name: string; url: string | null }>; disabled: boolean }>>(),
+  fetchInstanceBootstrapRemote: vi.fn(),
+  initializeInstanceRemote: vi.fn(),
+  signInWithPasswordRemote: vi.fn(),
   restoreAuthSessionRemote: vi.fn<() => Promise<string>>(),
   requestPasswordResetRemote: vi.fn<(email: string) => Promise<void>>(),
   resetPasswordRemote: vi.fn<(token: string, password: string) => Promise<void>>(),
@@ -21,7 +24,7 @@ vi.mock("@/lib/edgebase", () => ({
   clearMustChangePasswordRemote: vi.fn(async () => undefined),
   completeOAuthCallbackRemote: vi.fn(async () => ""),
   currentUserId: vi.fn(() => authState.currentUserId),
-  fetchInstanceBootstrapRemote: vi.fn(async () => null),
+  fetchInstanceBootstrapRemote: authState.fetchInstanceBootstrapRemote,
   fetchMustChangePasswordRemote: vi.fn(async () => false),
   fetchSponsorsRemote: authState.fetchSponsorsRemote,
   fetchRuntimeConfigRemote: vi.fn(async () => ({
@@ -34,6 +37,7 @@ vi.mock("@/lib/edgebase", () => ({
       sponsorExceptionUrl: "https://example.com/exception",
     },
   })),
+  initializeInstanceRemote: authState.initializeInstanceRemote,
   oauthProviderOptions: vi.fn((providers: string[]) =>
     providers.map((provider) => ({ provider, label: provider }))),
   DEFAULT_LEGAL_LINKS: {
@@ -45,7 +49,7 @@ vi.mock("@/lib/edgebase", () => ({
   requestPasswordResetRemote: authState.requestPasswordResetRemote,
   resetPasswordRemote: authState.resetPasswordRemote,
   restoreAuthSessionRemote: authState.restoreAuthSessionRemote,
-  signInWithPasswordRemote: vi.fn(),
+  signInWithPasswordRemote: authState.signInWithPasswordRemote,
   signUpWithPasswordRemote: vi.fn(),
   signInAnonymouslyForBootstrap: vi.fn(),
   startOAuthSignInRemote: vi.fn(),
@@ -61,7 +65,7 @@ vi.mock("@/lib/edgebase", () => ({
   verifyMfaTotpRemote: vi.fn(),
 }));
 
-import { AuthGate } from "@/components/AuthGate";
+import { AuthGate, authErrorMessage } from "@/components/AuthGate";
 import { fetchRuntimeConfigRemote, subscribeAuthStateRemote } from "@/lib/edgebase";
 
 const subscribeAuthStateRemoteMock = vi.mocked(subscribeAuthStateRemote);
@@ -75,6 +79,12 @@ beforeEach(() => {
   authState.unsubscribe.mockReset();
   authState.fetchSponsorsRemote.mockReset();
   authState.fetchSponsorsRemote.mockResolvedValue({ sponsors: [], disabled: false });
+  authState.fetchInstanceBootstrapRemote.mockReset();
+  authState.fetchInstanceBootstrapRemote.mockResolvedValue(null);
+  authState.initializeInstanceRemote.mockReset();
+  authState.initializeInstanceRemote.mockResolvedValue(undefined);
+  authState.signInWithPasswordRemote.mockReset();
+  authState.signInWithPasswordRemote.mockResolvedValue({ status: "signed_in", userId: "setup-master" });
   authState.restoreAuthSessionRemote.mockReset();
   authState.restoreAuthSessionRemote.mockImplementation(async () => authState.currentUserId);
   authState.requestPasswordResetRemote.mockReset();
@@ -106,6 +116,112 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("AuthGate auth-state subscription", () => {
+  it("offers setup-code-protected first-run administrator creation", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockResolvedValue("");
+    authState.fetchInstanceBootstrapRemote.mockResolvedValue({
+      masterConfigured: false,
+      masterReady: false,
+      setupBlocked: false,
+      setupAvailable: true,
+      setupCodeRequired: true,
+      setupInProgress: false,
+    });
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(await screen.findByTestId("instance-setup")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Create account" })).toBeNull();
+    fireEvent.change(screen.getByLabelText("Setup code"), {
+      target: { value: "0123456789abcdef0123456789abcdef" },
+    });
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Owner" } });
+    fireEvent.change(screen.getByLabelText("Administrator email"), {
+      target: { value: "Owner@Example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create administrator and continue" }));
+
+    await screen.findByTestId("private-workspace");
+    expect(authState.initializeInstanceRemote).toHaveBeenCalledWith({
+      setupCode: "0123456789abcdef0123456789abcdef",
+      email: "owner@example.com",
+      password: "Hanji-Owner!2026",
+      displayName: "Owner",
+    });
+    expect(authState.signInWithPasswordRemote).toHaveBeenCalledWith(
+      "owner@example.com",
+      "Hanji-Owner!2026",
+    );
+  });
+
+  it("keeps first-run setup on screen when password confirmation differs", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockResolvedValue("");
+    authState.fetchInstanceBootstrapRemote.mockResolvedValue({
+      masterConfigured: false,
+      masterReady: false,
+      setupBlocked: false,
+      setupAvailable: true,
+      setupCodeRequired: true,
+      setupInProgress: false,
+    });
+    render(<AuthGate><div>Private workspace</div></AuthGate>);
+    await screen.findByTestId("instance-setup");
+    fireEvent.change(screen.getByLabelText("Setup code"), {
+      target: { value: "0123456789abcdef0123456789abcdef" },
+    });
+    fireEvent.change(screen.getByLabelText("Administrator email"), {
+      target: { value: "owner@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "Different!2026a" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create administrator and continue" }));
+
+    expect(await screen.findByText("The new passwords do not match.")).toBeTruthy();
+    expect(authState.initializeInstanceRemote).not.toHaveBeenCalled();
+  });
+
+  it("directs closed-signup users to server account provisioning, not invitations", () => {
+    const message = authErrorMessage({
+      slug: "hook_rejected",
+      message: "Signup is restricted by server policy.",
+    });
+
+    expect(message).toContain("create your server account");
+    expect(message).not.toMatch(/invit/i);
+  });
+
+  it("describes the password requirements before account creation", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockResolvedValue("");
+
+    render(
+      <AuthGate>
+        <div>Private workspace</div>
+      </AuthGate>,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "Create account" }));
+    const password = screen.getByLabelText("Password");
+    const help = screen.getByText(/Use 10 or more characters/i);
+    expect(password.getAttribute("aria-describedby")).toBe(help.id);
+    expect(screen.getByRole("button", { name: "Sign in instead" })).toBeTruthy();
+  });
+
   it("renders social sign-in buttons from the backend runtime capability", async () => {
     authState.currentUserId = "";
     authState.restoreAuthSessionRemote.mockResolvedValue("");

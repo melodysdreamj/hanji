@@ -317,7 +317,7 @@ async function importedDatabaseRowOrdering(
     const neededNotionIds = new Set(jobMappings.map((mapping) => mapping.notionId));
     const activeItemsQuery = () => {
       const byJob = db.table<NotionImportItem>('notion_import_items').where('jobId', '==', jobId);
-      return typeof byJob.where === 'function'
+      return activeItemGeneration !== null && typeof byJob.where === 'function'
         ? byJob.where('itemGeneration', '==', activeItemGeneration)
         : byJob;
     };

@@ -1,13 +1,13 @@
 {
   "name": "hanji-backend",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "private": true,
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "build:web": "npm --prefix ../web run build",
     "build:app": "npm run build:web && edgebase build-app --output dist/edgebase-app",
-    "dev": "EDGEBASE_CONFIG_ENV_ALLOWLIST=HANJI_ALLOW_DEV_GUEST_LOGIN HANJI_ALLOW_DEV_GUEST_LOGIN=true HANJI_RATE_LIMIT_PROFILE=development edgebase dev",
+    "dev": "EDGEBASE_CONFIG_ENV_ALLOWLIST=${EDGEBASE_CONFIG_ENV_ALLOWLIST:-HANJI_ALLOW_DEV_GUEST_LOGIN} HANJI_ALLOW_DEV_GUEST_LOGIN=true HANJI_RATE_LIMIT_PROFILE=development edgebase dev",
     "dev:refresh": "node ../scripts/refresh-edgebase-dev.mjs",
     "test": "vitest run",
     "test:release-preflight": "node --test ../scripts/verify-release-config.test.mjs ../scripts/harness-auth-session.test.mjs ../scripts/verify-supply-chain-config.test.mjs",
@@ -31,6 +31,7 @@
     "verify:pack": "node ../scripts/verify-edgebase-packaging.mjs --pack",
     "verify:pack-runtime": "node ../scripts/verify-edgebase-packaging.mjs --pack-runtime",
     "verify:auth-ui": "node ../scripts/auth-ui-smoke.mjs",
+    "verify:auth-route-ui": "node ../scripts/auth-route-ui-smoke.mjs",
     "verify:admin-provisioning": "node ../scripts/admin-provisioning-ui-smoke.mjs",
     "verify:workspace-create-dialog": "node ../scripts/workspace-create-dialog-ui-smoke.mjs",
     "verify:person-mapping": "node ../scripts/person-mapping-smoke.mjs",
@@ -54,6 +55,7 @@
     "verify:bootstrap-delta": "node ../scripts/bootstrap-delta-smoke.mjs",
     "verify:local-first-ui-visual": "node ../scripts/local-first-ui-visual-smoke.mjs",
     "verify:durable-outbox": "node ../scripts/durable-outbox-ui-smoke.mjs",
+    "verify:service-worker-offline": "node ../scripts/service-worker-offline-ui-smoke.mjs",
     "verify:comments-ui": "node ../scripts/comment-ui-smoke.mjs",
     "verify:comments-panel-visual": "node ../scripts/comments-panel-visual-smoke.mjs",
     "verify:page-email-share-ui": "node ../scripts/page-email-share-ui-smoke.mjs",
@@ -133,8 +135,8 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "@edge-base/cli": "0.4.2",
-    "@edge-base/shared": "0.4.2",
+    "@edge-base/cli": "0.4.3",
+    "@edge-base/shared": "0.4.3",
     "@eslint/js": "^9.39.4",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.4",

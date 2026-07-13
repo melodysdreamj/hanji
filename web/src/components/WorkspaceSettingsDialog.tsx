@@ -1209,6 +1209,7 @@ export function WorkspaceSettingsDialog({
   const workspaceSectionId = useId();
   const deleteWorkspaceSectionId = useId();
   const appearanceSectionId = useId();
+  const languageSelectId = useId();
   const profileSectionId = useId();
   const securitySectionId = useId();
   const mcpSectionId = useId();
@@ -3833,32 +3834,30 @@ export function WorkspaceSettingsDialog({
               </div>
             </div>
             <div className={styles.field}>
-              <span>{LABELS.languageField}</span>
-              <div
-                className={styles.languageOptions}
-                role="radiogroup"
+              <label htmlFor={languageSelectId}>{LABELS.languageField}</label>
+              <select
+                id={languageSelectId}
+                className={styles.languageSelect}
                 aria-label={t("workspaceSettingsDialog:ariaLanguage")}
+                value={languagePref}
+                onChange={(event) => {
+                  const nextLanguage = event.currentTarget.value;
+                  setLanguagePreference(nextLanguage);
+                  setLanguagePref(nextLanguage);
+                }}
               >
                 {[
                   { value: "system", label: LABELS.languageSystem },
                   ...LANGUAGE_OPTIONS,
                 ].map((option) => (
-                  <button
+                  <option
                     key={option.value}
-                    type="button"
-                    className={styles.languageOption}
-                    role="radio"
-                    aria-checked={languagePref === option.value}
-                    data-active={languagePref === option.value ? "true" : undefined}
-                    onClick={() => {
-                      setLanguagePreference(option.value);
-                      setLanguagePref(option.value);
-                    }}
+                    value={option.value}
                   >
                     {option.label}
-                  </button>
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
             <SupportSection />
           </section>

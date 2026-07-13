@@ -2,6 +2,7 @@
 
 import { randomUUID } from 'node:crypto';
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   assert,
   assertNoBrowserErrors,
@@ -32,6 +33,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('trash UI smoke');
 }
 
 async function main() {

@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+import {
+  deleteSmokeAccounts,
+  masterCredentials,
+} from './lib/harness.mjs';
+
 const DEFAULT_BASE_URL = process.env.HANJI_SMOKE_BASE_URL ?? "http://127.0.0.1:8787";
 
 function argValue(name, fallback) {
@@ -64,6 +69,7 @@ const connectionsUrl = resolveUrl(baseUrl, "/api/functions/mcp-connections");
 const mcpUrl = resolveUrl(baseUrl, "/api/functions/mcp");
 const registerUrl = resolveUrl(baseUrl, "/api/functions/mcp-oauth-register");
 const tokenUrl = resolveUrl(baseUrl, "/api/functions/mcp-oauth-token");
+const smokeAccounts = [];
 
 const protectedResource = await fetchJson(protectedResourceUrl, {
   headers: { Accept: "application/json" },
@@ -105,6 +111,7 @@ assert(challenge.includes("resource_metadata="), "unauthenticated /mcp must incl
 assert(challenge.includes(protectedResourceUrl), "challenge must point to hosted MCP protected resource metadata");
 
 let seed = null;
+let smokeFailed = false;
 try {
   seed = await seedAccountAndWorkspace(baseUrl);
   const connection = await callFunction(connectionsUrl, seed.accessToken, {
@@ -167,8 +174,16 @@ try {
     seed.workspaceId,
     seed.accessToken,
   );
+} catch (error) {
+  smokeFailed = true;
+  throw error;
 } finally {
-  if (seed) await cleanupSeed(baseUrl, seed).catch(() => {});
+  if (smokeAccounts.length > 0) {
+    await cleanupSmokeAccounts(baseUrl).catch((error) => {
+      if (!smokeFailed) throw error;
+      console.error(`WARN hosted MCP account cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+    });
+  }
 }
 
 console.log(`PASS hosted MCP OAuth discovery, browser bridge, scoped grants, read/query tools, supported duplicate/move/view/comment mutations, and explicit fail-closed primary compatibility writes at ${baseUrl}`);
@@ -304,16 +319,20 @@ async function verifyHostedMcpCoreTools(accessToken, workspaceId, productAccessT
     "advertised async status URL must return the completed failed primary-write task",
   );
   assert(
-    advertisedTask.async_task?.error?.message?.includes("content mutations are not available in this release"),
-    "advertised async status URL must preserve the explicit fail-closed boundary",
+    advertisedTask.async_task?.error?.object === "create_pages_result"
+      && advertisedTask.async_task?.error?.failed_message?.includes("content mutations are not available in this release")
+      && advertisedTask.async_task?.error?.retry_guidance?.strategy === "retry_remaining_pages_only",
+    "advertised async status URL must preserve the structured fail-closed boundary and retry guidance",
   );
   const createdPagePolled = await mcpTool(accessToken, "notion-get-async-task", {
     task_id: createdPageTask.async_task?.id,
   });
   assert(createdPagePolled.async_task?.status === "failed", "notion-create-pages must record a failed async task");
   assert(
-    createdPagePolled.async_task?.error?.message?.includes("content mutations are not available in this release"),
-    "notion-create-pages failed task must explain the canonical content-mutation boundary",
+    createdPagePolled.async_task?.error?.object === "create_pages_result"
+      && createdPagePolled.async_task?.error?.failed_message?.includes("content mutations are not available in this release")
+      && createdPagePolled.async_task?.error?.retry_guidance?.strategy === "retry_remaining_pages_only",
+    "notion-create-pages failed task must explain the canonical boundary and retain retry guidance",
   );
 
   // Seed content through the canonical product mutation APIs. Hosted MCP keeps
@@ -725,11 +744,12 @@ async function runAuthorizationCodeFlow(seed, options = {}) {
 
 async function seedAccountAndWorkspace(baseUrl) {
   const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const email = `mcp-hosted-smoke-${suffix}@example.com`;
   const signup = await fetchJson(resolveUrl(baseUrl, "/api/auth/signup"), {
     method: "POST",
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     body: JSON.stringify({
-      email: `mcp-hosted-smoke-${suffix}@example.com`,
+      email,
       password: `McpHostedSmoke${suffix}!aA1`,
       data: { displayName: "Hosted MCP Smoke" },
     }),
@@ -737,6 +757,12 @@ async function seedAccountAndWorkspace(baseUrl) {
   assert(signup.response.ok || signup.response.status === 201, `signup returned HTTP ${signup.response.status}`);
   assert(typeof signup.json?.accessToken === "string", "signup must return accessToken");
   assert(typeof signup.json?.refreshToken === "string", "signup must return refreshToken");
+  assert(typeof signup.json?.user?.id === "string", "signup must return user.id");
+  smokeAccounts.push({
+    token: signup.json.accessToken,
+    userId: signup.json.user.id,
+    email,
+  });
 
   const bootstrap = await callFunction(resolveUrl(baseUrl, "/api/functions/workspace-bootstrap"), signup.json.accessToken, {});
   assert(bootstrap.response.ok, `workspace-bootstrap returned HTTP ${bootstrap.response.status}`);
@@ -744,23 +770,39 @@ async function seedAccountAndWorkspace(baseUrl) {
   return {
     accessToken: signup.json.accessToken,
     refreshToken: signup.json.refreshToken,
+    userId: signup.json.user.id,
+    email,
     workspaceId: bootstrap.json.workspace.id,
   };
 }
 
-async function cleanupSeed(baseUrl, seed) {
-  const list = await callFunction(resolveUrl(baseUrl, "/api/functions/workspace-mutation"), seed.accessToken, {
-    action: "list",
+async function cleanupSmokeAccounts(baseUrl) {
+  const adminToken = await signInMaster(baseUrl);
+  await deleteSmokeAccounts(
+    baseUrl,
+    adminToken,
+    smokeAccounts,
+    { call: productCall },
+  );
+}
+
+async function signInMaster(baseUrl) {
+  const signin = await fetchJson(resolveUrl(baseUrl, "/api/auth/signin"), {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(masterCredentials()),
   });
-  if (!list.response.ok) return;
-  const workspaces = Array.isArray(list.json?.workspaces) ? list.json.workspaces : [];
-  for (const workspace of workspaces) {
-    if (!workspace?.id) continue;
-    await callFunction(resolveUrl(baseUrl, "/api/functions/workspace-mutation"), seed.accessToken, {
-      action: "deleteWorkspace",
-      workspaceId: workspace.id,
-    }).catch(() => {});
+  assert(signin.response.ok, `master sign-in returned HTTP ${signin.response.status}: ${signin.text}`);
+  assert(typeof signin.json?.accessToken === "string", "master sign-in must return accessToken");
+  return signin.json.accessToken;
+}
+
+async function productCall(baseUrl, token, name, body) {
+  const result = await callFunction(resolveUrl(baseUrl, `/api/functions/${name}`), token, body);
+  if (!result.response.ok) {
+    throw new Error(`${name} returned HTTP ${result.response.status}: ${result.text}`);
   }
+  return result.json;
 }
 
 async function callFunction(url, token, body) {

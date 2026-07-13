@@ -3019,8 +3019,8 @@ export function Editor({
         focusEditable(prev.id, "end");
         return true;
       }
-      st.captureBlockHistory(pageId);
       if (TEXT_BLOCKS.has(prev.type) && prev.type !== "divider") {
+        st.captureBlockHistory(pageId);
         const prevSpans = prev.content?.rich ?? [];
         const merged = concatSpans(prevSpans, curSpans);
         st.updateBlock(
@@ -3040,9 +3040,17 @@ export function Editor({
         void st.deleteBlock(id, { history: false });
         focusEditable(prev.id, spansToPlainText(prevSpans).length);
       } else {
-        moveChildren(id, prev.id);
-        void st.deleteBlock(id, { history: false });
-        focusEditable(prev.id, "end");
+        // Non-text blocks cannot absorb paragraph content. Notion moves from
+        // the caret to a whole-block selection instead: an empty paragraph is
+        // removed first, then a second Backspace/Delete removes the selected
+        // media/embed/table/etc. A non-empty paragraph must stay intact while
+        // the preceding block becomes selected.
+        if (spansToPlainText(curSpans).length === 0) {
+          st.captureBlockHistory(pageId);
+          moveChildren(id, prev.id);
+          void st.deleteBlock(id, { history: false });
+        }
+        setSelectedBlockId(prev.id);
       }
       return true;
     },

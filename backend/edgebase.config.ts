@@ -417,6 +417,21 @@ const appTables = {
           },
         },
 
+        // One-time first-run web setup claim. The fixed `global` row closes
+        // concurrent installer races before the auth account is created. The
+        // setup code itself is never stored in the database; Docker keeps it
+        // in the private persistent runtime file under /data.
+        instance_setup: {
+          schema: {
+            state: { type: 'string', required: true },
+            email: { type: 'string', required: true },
+            userId: { type: 'string' },
+            claimedAt: { type: 'datetime', required: true },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [{ fields: ['state'] }, { fields: ['email'] }],
+        },
+
         // Per-account product flags keyed by auth user id (row id = userId).
         // mustChangePassword marks admin-issued temporary credentials; the
         // client forces a password change before the workspace UI unlocks.
@@ -1187,6 +1202,7 @@ const appTables = {
             },
             leaseId: { type: 'string', required: true },
             actorId: { type: 'string', required: true },
+            purpose: { type: 'string', default: 'apply' }, // apply | discover
             expiresAt: { type: 'datetime', required: true },
           },
           indexes: [
@@ -1666,6 +1682,10 @@ export default defineConfig({
   // without an explicit access rule deny-by-default in local, packaged, and
   // deployed runtimes instead of silently bypassing authorization in dev.
   release: true,
+  // Off by default: forwarded client/protocol headers are spoofable when the
+  // container port is reachable directly. NAS/reverse-proxy operators may opt
+  // in after restricting the upstream port to that trusted proxy.
+  trustSelfHostedProxy: envFlag('HANJI_TRUST_SELF_HOSTED_PROXY'),
 
   frontend: {
     directory: '../web/dist',

@@ -5,6 +5,8 @@ import {
   isSetupBlocked,
   normalizeMasterEmail,
   planMasterBootstrap,
+  setupCodeMatches,
+  validSetupPassword,
 } from '../../functions/instance-bootstrap';
 import { fakeDb } from './helpers/fake-db';
 import { handlerOf } from './helpers/function-context';
@@ -19,6 +21,24 @@ describe('normalizeMasterEmail', () => {
     expect(normalizeMasterEmail('a@b')).toBeNull();
     expect(normalizeMasterEmail('')).toBeNull();
     expect(normalizeMasterEmail(undefined)).toBeNull();
+  });
+});
+
+describe('web setup credential guards', () => {
+  it('compares only sufficiently strong configured setup codes', () => {
+    const code = '0123456789abcdef0123456789abcdef';
+    expect(setupCodeMatches(code, code)).toBe(true);
+    expect(setupCodeMatches(`${code}x`, code)).toBe(false);
+    expect(setupCodeMatches(code.slice(0, -1), code)).toBe(false);
+    expect(setupCodeMatches('short', 'short')).toBe(false);
+  });
+
+  it('requires a normal strong account password', () => {
+    expect(validSetupPassword('Hanji-Setup!2026')).toBe(true);
+    expect(validSetupPassword('no-symbol-2026')).toBe(false);
+    expect(validSetupPassword('NO-LOWER!2026')).toBe(false);
+    expect(validSetupPassword('Short!1a')).toBe(false);
+    expect(validSetupPassword('Hanji Setup!2026')).toBe(false);
   });
 });
 
@@ -264,6 +284,125 @@ describe('development guest bootstrap flag', () => {
   });
 });
 
+describe('first-run web setup', () => {
+  const setupCode = '0123456789abcdef0123456789abcdef';
+  const email = 'owner@example.com';
+  const password = 'Hanji-Owner!2026';
+
+  function context(appDb: ReturnType<typeof fakeDb>, users: Array<Record<string, unknown>> = []) {
+    return {
+      request: new Request('https://hanji.example.com/api/functions/instance-bootstrap', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'completeSetup', setupCode, email, password }),
+      }),
+      env: { HANJI_SETUP_TOKEN: setupCode },
+      admin: {
+        db: () => appDb,
+        auth: {
+          async getUser() { return {}; },
+          async listUsers() { return { users }; },
+          async createUser(data: Record<string, unknown>) {
+            const created = { id: 'setup-master', ...data };
+            users.push(created);
+            return created;
+          },
+        },
+      },
+    };
+  }
+
+  it('advertises setup without disclosing its code', async () => {
+    const response = await handlerOf(GET)({
+      request: new Request('https://hanji.example.com/api/functions/instance-bootstrap'),
+      env: { HANJI_SETUP_TOKEN: setupCode },
+      admin: {
+        db: () => fakeDb({ instance_settings: [] }),
+        auth: {
+          async getUser() { return {}; },
+          async listUsers() { return { users: [] }; },
+          async createUser() { return {}; },
+        },
+      },
+    });
+    const payload = await (response as Response).json() as Record<string, unknown>;
+
+    expect(payload).toMatchObject({
+      setupAvailable: true,
+      setupCodeRequired: true,
+      setupBlocked: false,
+      masterConfigured: false,
+    });
+    expect(JSON.stringify(payload)).not.toContain(setupCode);
+  });
+
+  it('creates exactly one confirmed master and closes setup', async () => {
+    const appDb = fakeDb({
+      instance_settings: [],
+      instance_setup: [],
+      instance_audit_events: [],
+    });
+    const users: Array<Record<string, unknown>> = [];
+    const first = await handlerOf(POST)(context(appDb, users));
+    const second = await handlerOf(POST)(context(appDb, users));
+
+    expect((first as Response).status).toBe(201);
+    expect((second as Response).status).toBe(409);
+    expect(users).toHaveLength(1);
+    expect(users[0]).toMatchObject({ email, displayName: 'Master', role: 'user' });
+    expect(appDb.tables.instance_settings[0]).toMatchObject({
+      id: 'global',
+      masterUserId: 'setup-master',
+      masterEmail: email,
+      instanceAdminUserIds: ['setup-master'],
+    });
+    expect(appDb.tables.instance_setup[0]).toMatchObject({
+      id: 'global',
+      state: 'complete',
+      email,
+      userId: 'setup-master',
+    });
+    expect(appDb.tables.instance_audit_events[0]).toMatchObject({
+      action: 'instance.master.bootstrap',
+      metadata: { createdAccount: true, source: 'web-setup' },
+    });
+  });
+
+  it('rejects a wrong code and an already-populated instance', async () => {
+    const appDb = fakeDb({ instance_settings: [], instance_setup: [] });
+    const wrong = context(appDb);
+    wrong.request = new Request('https://hanji.example.com/api/functions/instance-bootstrap', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'completeSetup', setupCode: `${setupCode}x`, email, password }),
+    });
+    const wrongResponse = await handlerOf(POST)(wrong);
+    expect((wrongResponse as Response).status).toBe(403);
+    expect(appDb.tables.instance_setup).toHaveLength(0);
+
+    const occupied = context(appDb, [{ id: 'existing-user', email: 'existing@example.com' }]);
+    const occupiedResponse = await handlerOf(POST)(occupied);
+    expect((occupiedResponse as Response).status).toBe(409);
+    expect(appDb.tables.instance_setup).toHaveLength(0);
+  });
+
+  it('never reopens setup when durable settings already record a master', async () => {
+    const appDb = fakeDb({
+      instance_settings: [{
+        id: 'global',
+        masterUserId: 'existing-master',
+        masterEmail: 'existing@example.com',
+        instanceAdminUserIds: ['existing-master'],
+      }],
+      instance_setup: [],
+    });
+    const response = await handlerOf(POST)(context(appDb, []));
+
+    expect((response as Response).status).toBe(409);
+    expect(appDb.tables.instance_setup).toHaveLength(0);
+  });
+});
+
 describe('isSetupBlocked', () => {
   it('never blocks when master credentials are configured', () => {
     expect(
@@ -286,6 +425,17 @@ describe('isSetupBlocked', () => {
   it('keeps the loopback dev-guest escape usable for fresh dev/test runtimes', () => {
     expect(
       isSetupBlocked({ masterConfigured: false, usersExist: false, devGuestEnabled: true }),
+    ).toBe(false);
+  });
+
+  it('offers first-run web setup instead of the operator-blocked state', () => {
+    expect(
+      isSetupBlocked({
+        masterConfigured: false,
+        usersExist: false,
+        devGuestEnabled: false,
+        setupAvailable: true,
+      }),
     ).toBe(false);
   });
 });

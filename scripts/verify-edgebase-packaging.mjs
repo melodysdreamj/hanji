@@ -22,6 +22,8 @@ const webDir = join(root, 'web');
 const localEdgebaseLinkScript = join(root, 'scripts', 'link-local-edgebase.mjs');
 const releasePreflightScript = join(root, 'scripts', 'verify-release-config.mjs');
 const fileSmokeScript = join(root, 'scripts', 'file-smoke.mjs');
+const harnessScript = join(root, 'scripts', 'lib', 'harness.mjs');
+const dockerBuildScript = join(root, 'scripts', 'build-hanji-docker-image.mjs');
 const edgebaseBin = join(
   backendDir,
   'node_modules',
@@ -73,6 +75,12 @@ if (!options.skipLocalEdgebaseCheck) {
   run('local EdgeBase link check', process.execPath, [localEdgebaseLinkScript, '--check'], root);
 }
 
+if (options.runtimeImage) {
+  await verifyRegistryFirstRun(options.runtimeImage);
+  console.log('\nPASS image-only appliance runtime verification complete.');
+  process.exit(0);
+}
+
 if (!options.skipWebBuild) {
   run('web static build', 'npm', ['run', 'build'], webDir);
 }
@@ -112,10 +120,10 @@ if (options.docker) {
   let imageBuilt = false;
   try {
     run(
-      'EdgeBase docker build',
-      edgebaseBin,
-      ['docker', 'build', '--tag', options.dockerTag],
-      backendDir,
+      'Hanji Docker build',
+      process.execPath,
+      [dockerBuildScript, '--tag', options.dockerTag],
+      root,
     );
     imageBuilt = true;
     const dockerBundleOutput = join(backendDir, '.edgebase', 'targets', 'docker-app');
@@ -143,6 +151,7 @@ function parseArgs(args) {
     docker: false,
     dockerRuntime: false,
     keepDockerImage: false,
+    runtimeImage: '',
     skipLocalEdgebaseCheck: false,
     dockerPort: '',
     dockerTag: `hanji-edgebase-verify:${Date.now()}`,
@@ -188,6 +197,11 @@ function parseArgs(args) {
     }
     if (arg === '--keep-docker-image') {
       parsed.keepDockerImage = true;
+      continue;
+    }
+    if (arg === '--runtime-image') {
+      parsed.runtimeImage = resolveValue(args, i, arg);
+      i += 1;
       continue;
     }
     if (arg === '--docker-tag') {
@@ -239,6 +253,7 @@ Options:
   --docker                  Build and verify the EdgeBase Docker app bundle.
   --docker-runtime          Build, run, and verify the Docker container.
   --docker-tag <tag>        Docker image tag. Defaults to a timestamped tag.
+  --runtime-image <tag>     Verify an already-built image's first-run and persistence contract.
   --keep-docker-image       Keep the verified image for a subsequent scan.
   --docker-port <port>      Host port for runtime verification. Defaults to a free port.
   --bundle-output <path>    build-app output path. Defaults to a temp directory.
@@ -246,11 +261,11 @@ Options:
 `);
 }
 
-function run(label, command, args, cwd) {
+function run(label, command, args, cwd, env = {}) {
   console.log(`\n> ${label}`);
   const result = spawnSync(command, args, {
     cwd,
-    env: { ...process.env, CI: '1' },
+    env: { ...process.env, ...env, CI: '1' },
     stdio: 'inherit',
   });
 
@@ -317,13 +332,21 @@ function verifyDockerContext(label, contextDir) {
     `${label}: Docker build context is missing the EdgeBase app bundle`,
   );
   const dockerfile = readFileSync(dockerfilePath, 'utf8');
+  const entrypointPath = join(contextDir, 'edgebase-entrypoint.mjs');
+  assert(existsSync(entrypointPath), `${label}: Docker build context is missing the app entrypoint`);
+  const entrypoint = readFileSync(entrypointPath, 'utf8');
   assert(
     dockerfile.includes('ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true'),
     `${label}: Dockerfile must forward container environment variables to Wrangler`,
   );
   assert(
-    dockerfile.includes('rm -f /app/.dev.vars'),
+    entrypoint.includes("rmSync('/app/.dev.vars', { force: true })") ||
+      dockerfile.includes('rm -f /app/.dev.vars'),
     `${label}: Dockerfile must remove .dev.vars before enabling process-env bindings`,
+  );
+  assert(
+    entrypoint.includes("runtime-secrets.json") && entrypoint.includes("mode: 0o600"),
+    `${label}: Dockerfile must persist private image-managed runtime secrets`,
   );
   console.log(`PASS ${label}: Docker build context includes the generated app bundle.`);
 }
@@ -517,7 +540,7 @@ function printDockerLogs(containerName) {
 
 async function verifyDockerRuntime(options) {
   const port = options.dockerPort || String(await findFreePort());
-  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const suffix = `${Date.now()}-${randomBytes(5).toString('hex')}`;
   const containerName = `hanji-edgebase-verify-${suffix}`;
   const volumeName = `hanji-edgebase-verify-${suffix}`;
   const envFile = join(tmpdir(), `hanji-edgebase-verify-${suffix}.env`);
@@ -530,6 +553,7 @@ async function verifyDockerRuntime(options) {
       `JWT_USER_SECRET=${randomBytes(32).toString('hex')}`,
       `JWT_ADMIN_SECRET=${randomBytes(32).toString('hex')}`,
       `SERVICE_KEY=${randomBytes(32).toString('hex')}`,
+      'LOCAL_PROTOCOL=http',
       'HANJI_BUILD_SHA=docker-env-propagation-proof',
       // Master account travels as container env on Docker deployments (the
       // interactive setup script is a local-dev convenience only). The verify
@@ -581,6 +605,12 @@ async function verifyDockerRuntime(options) {
       // API smoke inside the container so it exercises the same local-only
       // policy as a directly operated self-hosted instance.
       const containerSmokePath = '/tmp/hanji-file-smoke.mjs';
+      run('prepare shared smoke harness directory in Docker runtime', 'docker', [
+        'exec', containerName, 'mkdir', '-p', '/tmp/lib',
+      ], root);
+      run('copy shared smoke harness into Docker runtime', 'docker', [
+        'cp', harnessScript, `${containerName}:/tmp/lib/harness.mjs`,
+      ], root);
       run('copy file/storage smoke into Docker runtime', 'docker', [
         'cp',
         fileSmokeScript,
@@ -597,6 +627,8 @@ async function verifyDockerRuntime(options) {
         '12000',
         '--password-signup',
       ], root);
+      await verifyRegistryFirstRun(options.dockerTag);
+      await verifyBindMountPersistence(options.dockerTag);
     } catch (error) {
       console.error('\nDocker runtime logs before file/storage smoke failure:');
       printDockerLogs(containerName);
@@ -610,9 +642,207 @@ async function verifyDockerRuntime(options) {
   }
 }
 
+async function verifyBindMountPersistence(imageTag) {
+  const port = String(await findFreePort());
+  const suffix = `${Date.now()}-${randomBytes(5).toString('hex')}`;
+  const containerName = `hanji-bind-verify-${suffix}`;
+  const bindDir = join(backendDir, '.edgebase', 'targets', `hanji-bind-verify-${suffix}`);
+  const baseUrl = `http://127.0.0.1:${port}`;
+  mkdirSync(bindDir, { recursive: true, mode: 0o755 });
+
+  const start = () => run('bind-mount Docker run (host-owned /data)', 'docker', [
+    'run', '-d',
+    '--name', containerName,
+    '-p', `127.0.0.1:${port}:8787`,
+    '-e', 'LOCAL_PROTOCOL=http',
+    '-v', `${bindDir}:/data`,
+    imageTag,
+  ], root);
+
+  try {
+    start();
+    await waitForDockerRuntimeReady(baseUrl, containerName);
+    const processList = spawnSync(
+      'docker',
+      ['top', containerName, '-eo', 'pid,user,group,comm,args'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    assert(processList.status === 0, 'could not inspect bind-mount runtime processes');
+    assert(
+      processList.stdout.split('\n').some((line) => line.includes('10001') && line.includes('edgebase-entrypoint.mjs')),
+      'bind-mount runtime did not drop the application process to uid 10001',
+    );
+    const secret = readContainerRuntimeSecret(containerName, 'JWT_USER_SECRET');
+    run('remove bind-mount container for persistence replay', 'docker', ['rm', '-f', containerName], root);
+    start();
+    await waitForDockerRuntimeReady(baseUrl, containerName);
+    assert(
+      readContainerRuntimeSecret(containerName, 'JWT_USER_SECRET') === secret,
+      'bind-mount runtime rotated its secret after container recreation',
+    );
+    console.log('PASS dedicated host bind mounts are prepared, run as uid 10001, and survive recreation.');
+  } catch (error) {
+    console.error('\nBind-mount Docker logs before failure:');
+    printDockerLogs(containerName);
+    throw error;
+  } finally {
+    runQuiet('bind-mount Docker cleanup container', 'docker', ['rm', '-f', containerName]);
+    if (typeof process.getuid === 'function' && typeof process.getgid === 'function') {
+      runQuiet('bind-mount ownership cleanup', 'docker', [
+        'run', '--rm', '--user', '0:0', '--entrypoint', 'chown',
+        '-v', `${bindDir}:/data`, imageTag,
+        '-R', `${process.getuid()}:${process.getgid()}`, '/data',
+      ]);
+    }
+    rmSync(bindDir, { recursive: true, force: true });
+  }
+}
+
+async function verifyRegistryFirstRun(imageTag) {
+  const port = String(await findFreePort());
+  const suffix = `${Date.now()}-${randomBytes(5).toString('hex')}`;
+  const containerName = `hanji-registry-verify-${suffix}`;
+  const volumeName = `hanji-registry-verify-${suffix}`;
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const email = `registry-owner-${suffix}@example.test`;
+  const password = `Registry-${suffix}-Owner!7`;
+
+  const start = () => run('registry-style Docker run (no secret/master env)', 'docker', [
+    'run', '-d',
+    '--name', containerName,
+    '-p', `127.0.0.1:${port}:8787`,
+    '-e', 'LOCAL_PROTOCOL=http',
+    '-v', `${volumeName}:/data`,
+    imageTag,
+  ], root);
+
+  try {
+    start();
+    await waitForDockerRuntimeReady(baseUrl, containerName);
+
+    const inspect = spawnSync('docker', ['inspect', containerName, '--format', '{{json .Config.Env}}'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    assert(inspect.status === 0, 'registry runtime Docker inspect failed');
+    for (const name of [
+      'JWT_USER_SECRET',
+      'JWT_ADMIN_SECRET',
+      'SERVICE_KEY',
+      'HANJI_NOTION_IMPORT_SECRET',
+      'HANJI_MCP_OAUTH_SECRET',
+      'HANJI_SETUP_TOKEN',
+    ]) {
+      assert(!inspect.stdout.includes(`${name}=`), `registry runtime leaked generated ${name} into Docker config env`);
+    }
+
+    const statusBefore = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`);
+    assert(statusBefore.response.ok, 'registry runtime bootstrap status failed');
+    assert(statusBefore.json.setupAvailable === true, 'fresh registry runtime did not offer web setup');
+    assert(statusBefore.json.setupCodeRequired === true, 'fresh registry runtime did not require its setup code');
+    assert(!('setupCode' in statusBefore.json), 'registry runtime exposed its setup code over HTTP');
+
+    const setupCode = readContainerRuntimeSecret(containerName, 'HANJI_SETUP_TOKEN');
+    assert(setupCode.length >= 24, 'registry runtime setup code was not persisted under /data');
+
+    const wrong = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        action: 'completeSetup',
+        setupCode: `${setupCode}x`,
+        email,
+        password,
+      }),
+    });
+    assert(wrong.response.status === 403, `wrong registry setup code returned HTTP ${wrong.response.status}`);
+
+    const initialized = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ action: 'completeSetup', setupCode, email, password }),
+    });
+    assert(initialized.response.status === 201, `registry setup returned HTTP ${initialized.response.status}: ${JSON.stringify(initialized.json)}`);
+    await assertPasswordSignin(baseUrl, email, password, 'registry first-run');
+
+    const persistedUserSecret = readContainerRuntimeSecret(containerName, 'JWT_USER_SECRET');
+    run('remove registry-style container for persistence replay', 'docker', ['rm', '-f', containerName], root);
+    start();
+    await waitForDockerRuntimeReady(baseUrl, containerName);
+    assert(
+      readContainerRuntimeSecret(containerName, 'JWT_USER_SECRET') === persistedUserSecret,
+      'registry runtime rotated its /data-persisted JWT secret after recreation',
+    );
+    const statusAfter = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`);
+    assert(statusAfter.response.ok, 'recreated registry runtime bootstrap status failed');
+    assert(statusAfter.json.setupAvailable === false, 'recreated registry runtime reopened first-run setup');
+    assert(statusAfter.json.setupBlocked === false, 'recreated registry runtime became setup-blocked');
+    await assertPasswordSignin(baseUrl, email, password, 'recreated registry runtime');
+    console.log('PASS registry-style image generates private secrets, claims the first admin, and preserves both across recreation.');
+  } catch (error) {
+    console.error('\nRegistry-style Docker logs before failure:');
+    printDockerLogs(containerName);
+    throw error;
+  } finally {
+    runQuiet('registry Docker cleanup container', 'docker', ['rm', '-f', containerName]);
+    runQuiet('registry Docker cleanup volume', 'docker', ['volume', 'rm', '-f', volumeName]);
+  }
+}
+
+function readContainerRuntimeSecret(containerName, name) {
+  const script = [
+    'const fs=require("fs")',
+    'const p=(process.env.PERSIST_DIR||"/data")+"/.hanji/runtime-secrets.json"',
+    `process.stdout.write(String(JSON.parse(fs.readFileSync(p,"utf8"))[${JSON.stringify(name)}]||""))`,
+  ].join(';');
+  const result = spawnSync('docker', ['exec', containerName, 'node', '-e', script], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  assert(result.status === 0, `could not read persisted ${name} inside registry runtime`);
+  return result.stdout.trim();
+}
+
+async function fetchJsonResponse(url, options = {}) {
+  const response = await fetch(url, { ...options, signal: AbortSignal.timeout(15_000) });
+  const text = await response.text();
+  let json = {};
+  try {
+    json = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`${url} did not return JSON: ${text.slice(0, 200)}`);
+  }
+  return { response, json };
+}
+
+async function assertPasswordSignin(baseUrl, email, password, label) {
+  const { response, json } = await fetchJsonResponse(`${baseUrl}/api/auth/signin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  assert(response.ok, `${label} sign-in returned HTTP ${response.status}: ${JSON.stringify(json)}`);
+  assert(typeof json.accessToken === 'string' && json.accessToken, `${label} sign-in returned no access token`);
+}
+
+async function waitForDockerRuntimeReady(baseUrl, containerName) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < 45_000) {
+    try {
+      const response = await fetch(`${baseUrl}/api/health`, { signal: AbortSignal.timeout(1_500) });
+      if (response.ok) return;
+    } catch {
+      // Continue until ready or timeout.
+    }
+    await delay(500);
+  }
+  printDockerLogs(containerName);
+  throw new Error('registry-style Docker runtime did not become ready within 45000ms.');
+}
+
 async function verifyPackRuntime(options) {
   const port = String(await findFreePort());
-  const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const suffix = `${Date.now()}-${randomBytes(5).toString('hex')}`;
   const dataDir = join(tmpdir(), `hanji-edgebase-pack-data-${suffix}`);
   const persistDir = join(tmpdir(), `hanji-edgebase-pack-persist-${suffix}`);
   const runScript = join(options.packOutput, process.platform === 'win32' ? 'run.cmd' : 'run.sh');
@@ -698,7 +928,10 @@ async function verifyPackRuntime(options) {
         '--timeout-ms',
         '12000',
         '--password-signup',
-      ], root);
+      ], root, {
+        HANJI_MASTER_EMAIL: runtimeEnv.HANJI_MASTER_EMAIL,
+        HANJI_MASTER_PASSWORD: runtimeEnv.HANJI_MASTER_PASSWORD,
+      });
     } catch (error) {
       console.error('\nPack runtime logs before file/storage smoke failure:');
       console.error(logs.slice(-80).join('\n') || '(no runtime logs captured)');

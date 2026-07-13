@@ -7,6 +7,7 @@ import {
   callFunction,
   expectFunctionStatus,
   fetchWithTimeout,
+  finalizeRegisteredSmokeAccounts,
   normalizeBaseUrl,
   permanentlyDeletePage,
   permanentlyDeleteDatabaseRow,
@@ -41,6 +42,7 @@ try {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`WARN cleanup failed: ${message}`);
   });
+  await finalizeRegisteredSmokeAccounts('database row lifecycle smoke');
 }
 
 async function main() {

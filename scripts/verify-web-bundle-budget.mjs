@@ -21,6 +21,8 @@ const limits = {
   lazyRaw: numberEnv('HANJI_BUDGET_LAZY_JS_RAW', 750_000),
   lazyGzip: numberEnv('HANJI_BUDGET_LAZY_JS_GZIP', 260_000),
   bootJsRequests: numberEnv('HANJI_BUDGET_BOOT_JS_REQUESTS', 16),
+  installPrecacheEntries: numberEnv('HANJI_BUDGET_INSTALL_PRECACHE_ENTRIES', 32),
+  installPrecacheRaw: numberEnv('HANJI_BUDGET_INSTALL_PRECACHE_RAW', 2_000_000),
   offlinePrecacheEntries: numberEnv('HANJI_BUDGET_OFFLINE_PRECACHE_ENTRIES', 256),
   offlinePrecacheRaw: numberEnv('HANJI_BUDGET_OFFLINE_PRECACHE_RAW', 12_000_000),
 };
@@ -81,6 +83,29 @@ for (const asset of offlineAssets) {
   if (!existsSync(assetPath)) throw new Error(`Offline precache asset is missing: ${asset}`);
   offlinePrecacheRaw += statSync(assetPath).size;
 }
+let installPrecacheRaw = 0;
+for (const asset of bootAssets) {
+  if (asset === '/') {
+    installPrecacheRaw += statSync(indexPath).size;
+    continue;
+  }
+  if (typeof asset !== 'string' || !asset.startsWith('/')) {
+    throw new Error(`Install precache contains an invalid path: ${String(asset)}`);
+  }
+  const assetPath = join(distDir, asset.slice(1));
+  if (!existsSync(assetPath)) throw new Error(`Install precache asset is missing: ${asset}`);
+  installPrecacheRaw += statSync(assetPath).size;
+}
+if (bootAssets.length > limits.installPrecacheEntries) {
+  throw new Error(
+    `Install precache has ${bootAssets.length} entries; budget is ${limits.installPrecacheEntries}.`,
+  );
+}
+if (installPrecacheRaw > limits.installPrecacheRaw) {
+  throw new Error(
+    `Install precache totals ${installPrecacheRaw} raw bytes; budget is ${limits.installPrecacheRaw}.`,
+  );
+}
 if (offlinePrecacheRaw > limits.offlinePrecacheRaw) {
   throw new Error(
     `Offline precache totals ${offlinePrecacheRaw} raw bytes; budget is ${limits.offlinePrecacheRaw}.`,
@@ -133,7 +158,8 @@ if (initialTotalGzip > limits.initialTotalGzip) {
 
 console.log(
   `PASS web bundle budget: ${initialNames.size} boot and ${jsFiles.length - initialNames.size} lazy chunks; ` +
-    `${initialTotalGzip} initial gzip bytes; ${offlineAssets.length} offline entries / ` +
+    `${initialTotalGzip} initial gzip bytes; install ${bootAssets.length} entries / ` +
+    `${installPrecacheRaw} raw bytes; full offline ${offlineAssets.length} entries / ` +
     `${offlinePrecacheRaw} raw bytes.`,
 );
 

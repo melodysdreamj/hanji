@@ -3,6 +3,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   browserAuthStorageKeys,
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -32,6 +33,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('database view tabs drag UI smoke');
 }
 
 async function main() {

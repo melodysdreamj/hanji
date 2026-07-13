@@ -13,8 +13,12 @@
 // necessarily produce failed-fetch noise.
 
 import { randomUUID } from 'node:crypto';
+import { mkdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
+  finalizeRegisteredSmokeAccounts,
   permanentlyDeletePage,
   DEFAULT_BASE_URL,
   assert,
@@ -27,8 +31,11 @@ import {
   resolveChromeExecutable,
   resolveUrl,
   signIn,
+  watchBrowserErrors,
 } from './lib/harness.mjs';
 
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const FAILURE_SHOT_DIR = join(root, '.edgebase', 'ui-discovery', 'durable-outbox');
 const options = parseArgs(process.argv.slice(2));
 
 try {
@@ -40,6 +47,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('durable outbox smoke');
 }
 
 async function main() {
@@ -57,30 +66,40 @@ async function main() {
 
   const seeds = [];
   try {
-    const seedA = await seedPage(apiUrl);
-    seeds.push(seedA);
-    await assertOfflineEditSurvivesTabClose(browser, appUrl, apiUrl, seedA);
-    console.log('PASS A: offline edit survived tab close and replayed from a fresh tab.');
+    if (options.phases.has('A')) {
+      const seedA = await seedPage(apiUrl);
+      seeds.push(seedA);
+      await assertOfflineEditSurvivesTabClose(browser, appUrl, apiUrl, seedA);
+      console.log('PASS A: offline edit survived tab close and replayed from a fresh tab.');
+    }
 
-    const seedB = await seedPage(apiUrl);
-    seeds.push(seedB);
-    await assertReconnectFlushesWithoutReload(browser, appUrl, apiUrl, seedB);
-    console.log('PASS B: reconnect flushed the queued edit in place and the sync badge drained.');
+    if (options.phases.has('B')) {
+      const seedB = await seedPage(apiUrl);
+      seeds.push(seedB);
+      await assertReconnectFlushesWithoutReload(browser, appUrl, apiUrl, seedB);
+      console.log('PASS B: reconnect flushed the queued edit in place and the sync badge drained.');
+    }
 
-    const seedC = await seedPage(apiUrl);
-    seeds.push(seedC);
-    await assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, seedC);
-    console.log('PASS C: offline boot rendered from the record cache and the edit replayed once online.');
+    if (options.phases.has('C')) {
+      const seedC = await seedPage(apiUrl);
+      seeds.push(seedC);
+      await assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, seedC);
+      console.log('PASS C: offline boot rendered from the record cache and the edit replayed once online.');
+    }
 
-    const seedD = await seedPage(apiUrl);
-    seeds.push(seedD);
-    await assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seedD);
-    console.log('PASS D: fully offline reload served by the service worker + record cache, then replayed.');
+    if (options.phases.has('D')) {
+      const seedD = await seedPage(apiUrl);
+      seeds.push(seedD);
+      await assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seedD);
+      console.log('PASS D: fully offline reload served by the service worker + record cache, then replayed.');
+    }
 
-    const seedE = await seedPage(apiUrl);
-    seeds.push(seedE);
-    await assertPassphraseCustodyGate(browser, appUrl, seedE);
-    console.log('PASS E: passphrase custody — unlock gates offline data; wrong pass refused; skip stays network-only.');
+    if (options.phases.has('E')) {
+      const seedE = await seedPage(apiUrl);
+      seeds.push(seedE);
+      await assertPassphraseCustodyGate(browser, appUrl, seedE);
+      console.log('PASS E: passphrase custody — unlock gates offline data; wrong pass refused; skip stays network-only.');
+    }
 
     console.log('\nPASS durable outbox + record cache local-first flows.');
   } finally {
@@ -153,12 +172,13 @@ async function assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, s
 
   // Warm the record cache (bootstrap payload + page blocks write-through).
   const warm = await context.newPage();
-  await openSeededPage(warm, appUrl, seed);
+  await openSeededPage(warm, appUrl, seed, 'phase-c-warm');
   await pollUntil(
     () => countCachedBlocks(warm, seed.recordsDbName, `blocks:${seed.pageId}`),
     (count) => count > 0,
     'record cache to contain the visited page blocks'
   );
+  await logAuthState(context, warm, 'phase-c-warm-ready');
   await warm.close();
 
   // Offline boot: assets still served, every API call aborted.
@@ -184,12 +204,27 @@ async function assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, s
     (count) => count > 0,
     'outbox entry for the offline-boot edit'
   );
-  await offline.close();
+  await logAuthState(context, offline, 'phase-c-offline-edit-ready');
 
+  // Phase A already proves that an outbox edit survives a closed tab and
+  // replays from a fresh one. Keep Phase C focused on its distinct contract:
+  // an app that *booted from the record cache while offline* must resume and
+  // replay in place when the API returns. Reusing this page also keeps the
+  // assertion independent of cross-tab cookie-refresh lock recovery, which is
+  // an SDK-level contract covered in EdgeBase's cookie-auth test suite.
   await context.unroute('**/api/**');
-  const online = await context.newPage();
-  await openSeededPage(online, appUrl, seed);
+  await offline.evaluate(() => window.dispatchEvent(new Event('online')));
   await pollServerBlockText(apiUrl, seed, (text) => text.includes(seed.marks.offlineBoot));
+  await pollUntil(
+    () => countOutboxEntries(offline, seed.outboxDbName),
+    (count) => count === 0,
+    'phase-C outbox to drain after online replay'
+  );
+  mkdirSync(FAILURE_SHOT_DIR, { recursive: true });
+  await offline.screenshot({
+    path: join(FAILURE_SHOT_DIR, 'phase-c-online-replay-success.png'),
+    fullPage: false,
+  });
   await context.close();
 }
 
@@ -198,32 +233,13 @@ async function assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, s
 async function assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seed) {
   const context = await newSeededContext(browser, seed);
 
-  // First visit registers the worker, which precaches the shell + entry
-  // assets from sw-precache.json — no warm reload needed for offline
-  // readiness (the record cache fills from this same visit).
+  // First visit registers the worker. Install stages only the boot graph; the
+  // active client then asks it to warm the complete product graph in a
+  // non-blocking message event. Wait for the full atomic marker before taking
+  // the network away (the record cache fills from this same visit).
   const warm = await context.newPage();
   await openSeededPage(warm, appUrl, seed);
-  await pollUntil(
-    () =>
-      warm.evaluate(async () => {
-        const registration = await navigator.serviceWorker?.getRegistration();
-        if (!registration?.active) return false;
-        const marker = await caches.match('/__hanji_precache__');
-        if (!marker) return false;
-        const manifest = await marker.json();
-        if (manifest.complete !== true || typeof manifest.version !== 'string') return false;
-        const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
-        const required = [
-          '/theme-init.js',
-          assets.find((path) => /\/PageView-[^/]+\.js$/.test(path)),
-          assets.find((path) => /\/Editor-[^/]+\.js$/.test(path)),
-        ].filter(Boolean);
-        if (required.length !== 3) return false;
-        return (await Promise.all(required.map((path) => caches.match(path)))).every(Boolean);
-      }),
-    (ready) => ready === true,
-    'service worker to activate and precache the shell'
-  );
+  await waitForOfflineShell(warm);
   const cdp = await context.newCDPSession(warm);
   await cdp.send('Network.clearBrowserCache');
   await cdp.detach();
@@ -264,11 +280,11 @@ async function assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seed) {
     (count) => count > 0,
     'outbox entry for the offline-reload edit'
   );
-  await offline.close();
 
+  // Phase A owns cross-tab crash/reopen replay. This phase isolates the
+  // service-worker contract: a fully offline reload must retain its cached
+  // page and flush the edit once that same client comes back online.
   await context.setOffline(false);
-  const online = await context.newPage();
-  await openSeededPage(online, appUrl, seed);
   await pollServerBlockText(apiUrl, seed, (text) => text.includes(seed.marks.swReload));
   await context.close();
 }
@@ -289,8 +305,7 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
     waitUntil: 'domcontentloaded',
     timeout: options.timeoutMs,
   });
-  const gate = first.getByTestId('local-lock-gate');
-  await gate.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const gate = await waitForLockGate(first, 'phase-e-online-unlock');
   await first.getByTestId('local-lock-passphrase').fill(PASS);
   await first.getByTestId('local-lock-unlock').click();
   await gate.waitFor({ state: 'hidden', timeout: options.timeoutMs });
@@ -308,18 +323,24 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
     (count) => count > 0,
     'sealed record cache to fill after unlock'
   );
+  // Phase E owns passphrase custody, not the SDK's separate cookie-refresh
+  // leader-election contract. Precache the complete shell, then make the
+  // browser explicitly offline so the SDK legitimately restores only its
+  // non-secret user-id marker and the product must still require this key.
+  await waitForOfflineShell(first);
+  await logAuthState(context, first, 'phase-e-online-unlock-ready');
   await first.close();
 
-  // Session 2 (API dead): wrong pass refused; right pass opens the sealed
+  // Session 2 (fully offline): wrong pass refused; right pass opens the sealed
   // caches and the offline boot renders through the unlock→retry flow.
-  await context.route('**/api/**', (route) => route.abort());
+  await context.setOffline(true);
   const second = await context.newPage();
   await second.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
     waitUntil: 'domcontentloaded',
     timeout: options.timeoutMs,
   });
-  const gate2 = second.getByTestId('local-lock-gate');
-  await gate2.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const gate2 = await waitForLockGate(second, 'phase-e-offline-unlock');
+  await logAuthState(context, second, 'phase-e-offline-unlock-gate');
   await second.getByTestId('local-lock-passphrase').fill('totally-wrong');
   await second.getByTestId('local-lock-unlock').click();
   await second
@@ -331,16 +352,17 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
   await second
     .locator(`[data-block-id="${seed.blockId}"]`)
     .waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await logAuthState(context, second, 'phase-e-offline-unlock-ready');
   await second.close();
 
-  // Session 3 (API dead, SKIP): custody holds — no unlock, no local data.
+  // Session 3 (fully offline, SKIP): custody holds — no unlock, no local data.
   const third = await context.newPage();
   await third.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
     waitUntil: 'domcontentloaded',
     timeout: options.timeoutMs,
   });
-  const gate3 = third.getByTestId('local-lock-gate');
-  await gate3.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await logAuthState(context, third, 'phase-e-offline-skip-boot');
+  const gate3 = await waitForLockGate(third, 'phase-e-offline-skip');
   await third.getByTestId('local-lock-skip').click();
   await gate3.waitFor({ state: 'hidden', timeout: options.timeoutMs });
   await pollUntil(
@@ -350,7 +372,7 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
     'skipped locked session to stay without local content'
   );
   await third.close();
-  await context.unroute('**/api/**');
+  await context.setOffline(false);
   await context.close();
 }
 
@@ -379,6 +401,71 @@ async function newSeededContext(browser, seed, extraLocalStorage = {}) {
     return originalClose(...args);
   };
   return context;
+}
+
+async function waitForLockGate(page, label) {
+  const gate = page.getByTestId('local-lock-gate');
+  try {
+    await gate.waitFor({ state: 'visible', timeout: options.timeoutMs });
+    return gate;
+  } catch (error) {
+    mkdirSync(FAILURE_SHOT_DIR, { recursive: true });
+    const screenshotPath = join(FAILURE_SHOT_DIR, `${label}-failure.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: false }).catch(() => {});
+    const snapshot = await page.evaluate(() => ({
+      bodyText: (document.body?.innerText ?? '').slice(0, 2_000),
+      encryptionMode: window.localStorage.getItem('hanji.encryption.mode'),
+      hasRememberedUser: Boolean(window.localStorage.getItem('hanji.lastUserId')),
+      authStorage: Object.keys(window.localStorage)
+        .filter((key) => key.startsWith('edgebase:'))
+        .map((key) => ({
+          key,
+          kind: key.endsWith(':cookie-session')
+            ? 'cookie-session'
+            : key.endsWith(':refresh-token')
+              ? 'refresh-token'
+              : key.endsWith(':refresh-lock')
+                ? 'refresh-lock'
+                : 'metadata',
+        })),
+      readyState: document.readyState,
+      testIds: [...document.querySelectorAll('[data-testid]')]
+        .slice(0, 100)
+        .map((element) => element.getAttribute('data-testid')),
+      title: document.title,
+      url: location.href,
+    })).catch((diagnosticError) => ({ diagnosticError: String(diagnosticError) }));
+    console.error(`\nDIAGNOSTIC ${label}: ${JSON.stringify({
+      screenshotPath,
+      snapshot,
+    }, null, 2)}`);
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`${label}: local lock gate did not become visible (${detail})`);
+  }
+}
+
+async function waitForOfflineShell(page) {
+  await pollUntil(
+    () =>
+      page.evaluate(async () => {
+        const registration = await navigator.serviceWorker?.getRegistration();
+        if (!registration?.active) return false;
+        const marker = await caches.match('/__hanji_precache__');
+        if (!marker) return false;
+        const manifest = await marker.json();
+        if (manifest.complete !== true || typeof manifest.version !== 'string') return false;
+        const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
+        const required = [
+          '/theme-init.js',
+          assets.find((path) => /\/PageView-[^/]+\.js$/.test(path)),
+          assets.find((path) => /\/Editor-[^/]+\.js$/.test(path)),
+        ].filter(Boolean);
+        if (required.length !== 3) return false;
+        return (await Promise.all(required.map((path) => caches.match(path)))).every(Boolean);
+      }),
+    (ready) => ready === true,
+    'service worker to activate and precache the shell'
+  );
 }
 
 async function typeIntoSeedBlock(page, seed, text) {
@@ -480,18 +567,121 @@ async function pollUntil(read, accept, label) {
   throw new Error(`Timed out waiting for ${label} (last: ${JSON.stringify(last)})`);
 }
 
-async function openSeededPage(page, appUrl, seed) {
-  await page.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
-    waitUntil: 'domcontentloaded',
-    timeout: options.timeoutMs,
+async function logAuthState(context, page, label) {
+  if (!options.diagnostics) return;
+  const storage = await page.evaluate(() => Object.keys(window.localStorage)
+    .filter((key) => key.startsWith('edgebase:'))
+    .map((key) => ({
+      key,
+      kind: key.endsWith(':cookie-session')
+        ? 'cookie-session'
+        : key.endsWith(':refresh-token')
+          ? 'refresh-token'
+          : key.endsWith(':refresh-lock')
+            ? 'refresh-lock'
+            : 'metadata',
+    })));
+  const cookies = await context.cookies(
+    resolveUrl(normalizeBaseUrl(options.apiUrl), '/api/auth/refresh'),
+  );
+  console.log(`  DIAGNOSTIC ${label}: ${JSON.stringify({
+    cookies: cookies.map((cookie) => ({
+      domain: cookie.domain,
+      httpOnly: cookie.httpOnly,
+      name: cookie.name,
+      path: cookie.path,
+      sameSite: cookie.sameSite,
+    })),
+    storage,
+  })}`);
+}
+
+async function openSeededPage(page, appUrl, seed, label = 'seeded-page') {
+  const errors = [];
+  const network = [];
+  watchBrowserErrors(page, {
+    errors,
+    captureConnectionRefused: true,
+    captureFunctionResponses: true,
+    includeConsoleLocation: true,
   });
-  await page.getByRole('region', { name: 'Page body' }).waitFor({
-    state: 'visible',
-    timeout: options.timeoutMs,
+  page.on('response', (response) => {
+    if (!response.url().includes('/api/')) return;
+    network.push(`${response.status()} ${new URL(response.url()).pathname}`);
   });
-  await page
-    .locator(`[data-block-id="${seed.blockId}"]`)
-    .waitFor({ state: 'visible', timeout: options.timeoutMs });
+  page.on('requestfailed', (request) => {
+    network.push(
+      `FAILED ${request.method()} ${new URL(request.url()).pathname}: ` +
+        `${request.failure()?.errorText ?? 'unknown'}`,
+    );
+  });
+  try {
+    await page.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
+      waitUntil: 'domcontentloaded',
+      timeout: options.timeoutMs,
+    });
+    await page.getByRole('region', { name: 'Page body' }).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    await page
+      .locator(`[data-block-id="${seed.blockId}"]`)
+      .waitFor({ state: 'visible', timeout: options.timeoutMs });
+  } catch (error) {
+    mkdirSync(FAILURE_SHOT_DIR, { recursive: true });
+    const screenshotPath = join(FAILURE_SHOT_DIR, `${label}-failure.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: false }).catch(() => {});
+    const dom = await page.evaluate(() => ({
+      authStorage: Object.keys(window.localStorage)
+        .filter((key) => key.startsWith('edgebase:'))
+        .map((key) => ({
+          key,
+          kind: key.endsWith(':cookie-session')
+            ? 'cookie-session'
+            : key.endsWith(':refresh-token')
+              ? 'refresh-token'
+              : 'metadata',
+        })),
+      bodyText: (document.body?.innerText ?? '').slice(0, 2_000),
+      rootHtml: (document.querySelector('#root')?.innerHTML ?? '').slice(0, 4_000),
+      regions: [...document.querySelectorAll('[role="region"]')].map((element) => ({
+        ariaLabel: element.getAttribute('aria-label'),
+        text: (element.textContent ?? '').slice(0, 300),
+      })),
+      testIds: [...document.querySelectorAll('[data-testid]')]
+        .slice(0, 100)
+        .map((element) => element.getAttribute('data-testid')),
+      title: document.title,
+      url: location.href,
+    })).catch((diagnosticError) => ({ diagnosticError: String(diagnosticError) }));
+    const authCookies = await page.context().cookies(
+      resolveUrl(normalizeBaseUrl(options.apiUrl), '/api/auth/refresh'),
+    ).then((cookies) => cookies.map((cookie) => ({
+      domain: cookie.domain,
+      httpOnly: cookie.httpOnly,
+      name: cookie.name,
+      path: cookie.path,
+      sameSite: cookie.sameSite,
+    }))).catch((cookieError) => [{ error: String(cookieError) }]);
+    const seedSnapshot = await callFunction(
+      normalizeBaseUrl(options.apiUrl),
+      seed.accessToken,
+      'page-query',
+      { action: 'blocks', pageId: seed.pageId },
+    ).then((value) => ({
+      blockCount: Array.isArray(value?.blocks) ? value.blocks.length : null,
+      seededBlockPresent: value?.blocks?.some((block) => block.id === seed.blockId) ?? false,
+    })).catch((snapshotError) => ({ error: String(snapshotError) }));
+    console.error(`\nDIAGNOSTIC ${label}: ${JSON.stringify({
+      dom,
+      errors: errors.slice(-30),
+      authCookies,
+      network: network.slice(-60),
+      screenshotPath,
+      seedSnapshot,
+    }, null, 2)}`);
+    throw error;
+  }
 }
 
 async function seedPage(baseUrl) {
@@ -554,15 +744,25 @@ async function cleanupSeed(baseUrl, seed) {
 function parseArgs(args) {
   const parsed = {
     apiUrl: process.env.HANJI_EDGEBASE_API_URL ?? DEFAULT_BASE_URL,
+    diagnostics: false,
     headed: false,
+    phases: new Set(['A', 'B', 'C', 'D', 'E']),
     timeoutMs: 20_000,
     url: DEFAULT_BASE_URL,
   };
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
     if (arg === '--headed') parsed.headed = true;
+    else if (arg === '--diagnostics') parsed.diagnostics = true;
     else if (arg === '--url') parsed.url = args[++i] ?? parsed.url;
     else if (arg === '--api-url') parsed.apiUrl = args[++i] ?? parsed.apiUrl;
+    else if (arg === '--phases') {
+      const phases = (args[++i] ?? '')
+        .split(',')
+        .map((phase) => phase.trim().toUpperCase())
+        .filter((phase) => /^[A-E]$/.test(phase));
+      if (phases.length > 0) parsed.phases = new Set(phases);
+    }
     else if (arg === '--timeout-ms') parsed.timeoutMs = Number(args[++i] ?? parsed.timeoutMs) || parsed.timeoutMs;
   }
   return parsed;

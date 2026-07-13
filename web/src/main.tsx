@@ -6,11 +6,9 @@ import "./app/globals.css";
 import { startLocalBundleFreshnessWatch } from "@/lib/devBundleFreshness";
 import { registerServiceWorker } from "@/lib/serviceWorker";
 import { applyTheme, getThemePref } from "@/lib/theme";
-import { isKoreanLocale } from "@/lib/i18n";
 import { initI18n } from "@/i18n";
 
 applyTheme(getThemePref());
-document.documentElement.lang = isKoreanLocale() ? "ko" : "en";
 startLocalBundleFreshnessWatch();
 registerServiceWorker();
 

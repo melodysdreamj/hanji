@@ -56,10 +56,8 @@ const requiredTools = [
   "create_workspace",
   "delete_workspace",
   "list_workspace_members",
-  "invite_workspace_member",
-  "accept_workspace_invitation",
+  "add_workspace_member",
   "update_my_workspace_profile",
-  "revoke_workspace_invitation",
   "update_workspace_member_role",
   "transfer_workspace_owner",
   "remove_workspace_member",
@@ -181,6 +179,14 @@ try {
   const missing = requiredTools.filter((tool) => !toolNames.has(tool));
   if (missing.length) {
     throw new Error(`Missing required MCP tools: ${missing.join(", ")}`);
+  }
+  const removedInvitationTools = [
+    "invite_workspace_member",
+    "accept_workspace_invitation",
+    "revoke_workspace_invitation",
+  ].filter((tool) => toolNames.has(tool));
+  if (removedInvitationTools.length) {
+    throw new Error(`Removed workspace-invitation MCP tools are still advertised: ${removedInvitationTools.join(", ")}`);
   }
   const resourceResult = await withTimeout(client.listResources(), "MCP listResources");
   const resourceUris = new Set((resourceResult.resources ?? []).map((resource) => resource.uri));

@@ -118,7 +118,7 @@ delegate to Hanji's canonical stored-file lifecycle.
 | `get_mcp_access_policy` | Show the local read-only and allowlist policy applied to this MCP process |
 | `list_workspaces` | List workspaces accessible to the current MCP user |
 | `list_organizations` | List organizations/accounts accessible to the current MCP user |
-| `get_organization_directory` | List organization members, profile membership summaries, workspaces, domains, and optionally filtered recent admin-visible audit events, including workspace invitation/member lifecycle events |
+| `get_organization_directory` | List organization members, profile membership summaries, workspaces, domains, and optionally filtered recent admin-visible audit events, including workspace member lifecycle events and retained historical audit records |
 | `search_organization_people` | Search organization people profiles by name, email, user id, role, or workspace membership |
 | `update_organization_settings` | Update organization workspace creation, domain signup, storage limit, and sharing policy through product APIs |
 | `transfer_organization_owner` | Transfer organization ownership to an active organization member |
@@ -135,11 +135,9 @@ delegate to Hanji's canonical stored-file lifecycle.
 | `remove_organization_domain` | Remove an organization email domain through product APIs |
 | `create_workspace` | Create a new owner workspace without switching the current MCP workspace |
 | `delete_workspace` | Delete an owner-only empty workspace |
-| `list_workspace_members` | List workspace members and pending invitations, including email delivery status |
-| `invite_workspace_member` | Invite an email address with product email delivery status, or add/update a known user |
-| `accept_workspace_invitation` | Accept a pending workspace invitation by token or id |
+| `list_workspace_members` | List current workspace members |
+| `add_workspace_member` | Add an existing server account by exact email or known user id, or update an existing member; an unknown email is a blind no-op |
 | `update_my_workspace_profile` | Update the current user's workspace name/email profile |
-| `revoke_workspace_invitation` | Revoke a pending workspace email invitation |
 | `transfer_workspace_owner` | Transfer workspace ownership to another existing member |
 | `update_workspace_member_role` | Change a workspace member role |
 | `remove_workspace_member` | Remove a user from the workspace |
@@ -248,12 +246,13 @@ organization directory with profile summaries, create/update/delete organization
 groups and add/remove group members,
 add/verify/remove organization domains, update
 organization workspace creation, domain signup, storage limit, and sharing policy, expose recent organization
-audit output and audit filtering for organization, workspace invitation, and
-workspace member lifecycle events, expose organization member removal, expose organization and workspace owner transfer,
+audit output and audit filtering for organization and workspace member
+lifecycle events, expose organization member removal, expose organization and workspace owner transfer,
 list/create/delete empty workspaces,
 create/list/search/delete a page inside a non-default workspace,
-update the current workspace profile, invite/accept/revoke email invitations,
-add/update/remove known members, create/read/cleanup pages, append/replace page content,
+update the current workspace profile, add an existing account by exact email,
+prove unknown-email blind no-op behavior, add/update/remove known members,
+create/read/cleanup pages, append/replace page content,
 verify user-id and email-principal direct page sharing with non-workspace-member
 MCP clients,
 move/duplicate/trash/restore/delete pages, organization member removal with content ownership reassignment,

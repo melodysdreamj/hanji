@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
-import { permanentlyDeletePage } from './lib/harness.mjs';
+import {
+  deleteSmokeAccounts,
+  masterCredentials,
+  permanentlyDeletePage,
+} from './lib/harness.mjs';
 
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const DEFAULT_TIMEOUT_MS = 8_000;
@@ -28,6 +32,7 @@ let lifecycleBlockId = '';
 let offboardingContentPageId = '';
 let offboardingContentBlockId = '';
 let offboardingContentCommentId = '';
+const passwordAccounts = [];
 
 try {
   await main();
@@ -41,7 +46,8 @@ try {
 } finally {
   await cleanup().catch((error) => {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`WARN cleanup failed: ${message}`);
+    console.error(`FAIL cleanup failed: ${message}`);
+    process.exitCode ||= 1;
   });
 }
 
@@ -1091,7 +1097,7 @@ async function main() {
   console.log('\nPASS server-level workspace membership add and guest add denial work through product APIs.');
 }
 
-async function cleanup() {
+async function cleanupResources() {
   if (!owner?.token || !workspaceId) return;
   const baseUrl = normalizeBaseUrl(options.url);
   if (temporaryOrganizationOwnerToken && originalOrganizationOwnerMemberId && organizationId) {
@@ -1183,6 +1189,22 @@ async function cleanup() {
     lifecyclePageId = '';
     lifecycleBlockId = '';
   }
+}
+
+async function cleanup() {
+  const failures = [];
+  await cleanupResources().catch((error) => failures.push(error));
+  await cleanupPasswordAccounts().catch((error) => failures.push(error));
+  if (failures.length > 0) {
+    throw new AggregateError(failures, 'Workspace membership smoke cleanup was incomplete.');
+  }
+}
+
+async function cleanupPasswordAccounts() {
+  if (passwordAccounts.length === 0) return;
+  const baseUrl = normalizeBaseUrl(options.url);
+  const adminToken = await signInMaster(baseUrl);
+  await deleteSmokeAccounts(baseUrl, adminToken, passwordAccounts, { call: callFunction });
 }
 
 async function deleteWorkspaceThroughProductApi(baseUrl, token, targetWorkspaceId) {
@@ -1312,7 +1334,18 @@ async function signUpWithPassword(baseUrl, email, password, displayName) {
   assert(response.status === 201, `/api/auth/signup returned HTTP ${response.status}: ${JSON.stringify(json)}`);
   assert(typeof json?.accessToken === 'string' && json.accessToken, 'password signup must return an access token');
   assert(typeof json?.user?.id === 'string' && json.user.id, 'password signup must return a user id');
-  return { token: json.accessToken, userId: json.user.id, response: json };
+  const account = { token: json.accessToken, userId: json.user.id, email, response: json };
+  passwordAccounts.push(account);
+  return account;
+}
+
+async function signInMaster(baseUrl) {
+  const credentials = masterCredentials();
+  const response = await postAuthPassword(baseUrl, '/api/auth/signin', credentials);
+  const json = await readJson(response);
+  assert(response.ok, `master sign-in returned HTTP ${response.status}: ${JSON.stringify(json)}`);
+  assert(typeof json?.accessToken === 'string' && json.accessToken, 'master sign-in must return an access token');
+  return json.accessToken;
 }
 
 async function expectAuthSignupStatus(baseUrl, email, password, displayName, status) {

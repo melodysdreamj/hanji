@@ -9,7 +9,7 @@
 // Modes:
 //   (default)        Report MISSING / STALE / ORPHAN keys per target language.
 //                    Coverage (MISSING/STALE/ORPHAN) only gates CI for the
-//                    REQUIRED_RELEASED_LANGUAGES (en source + ko). Every other
+//                    REQUIRED_COMPLETE_LANGUAGES (en source + ko). Every other
 //                    language is reported but non-gating on coverage, so new
 //                    strings ship in en+ko and the rest catch up later (runtime
 //                    falls back to English). Structural corruption
@@ -43,11 +43,12 @@ const localesDir = resolve(here, "..", "web", "src", "locales");
 const languageOptionsPath = resolve(here, "..", "web", "src", "i18n", "languages.ts");
 const SOURCE = "en";
 const META = "_meta.json";
-const REQUIRED_RELEASED_LANGUAGES = ["en", "ko"];
+const REQUIRED_COMPLETE_LANGUAGES = ["en", "ko"];
 // Languages that have been genuinely translated (not just English copies).
 // The UNTRANSLATED_COPY guard only fires for these; other languages are
 // infrastructure-ready but pending translation per docs/i18n-languages.md.
 const TRANSLATED_LANGUAGES = new Set(["ko", "ja", "zh-Hans", "es", "fr", "de", "pt-BR"]);
+const SELECTABLE_LANGUAGES = new Set([SOURCE, ...TRANSLATED_LANGUAGES]);
 const INTENTIONAL_INTERPOLATION_VARIANTS = new Map([
   ["ko", new Set([
     // Korean builds a date from numeric year/month/day instead of the English
@@ -153,21 +154,26 @@ function catalogTopologyProblems() {
       .map((match) => match[1]),
   );
   const problems = [];
-  for (const language of REQUIRED_RELEASED_LANGUAGES) {
+  for (const language of REQUIRED_COMPLETE_LANGUAGES) {
     if (!directories.has(language)) problems.push(`required catalog directory is missing: ${language}`);
     if (!wrappers.has(language)) problems.push(`required runtime wrapper is missing: ${language}.ts`);
     if (!options.has(language)) problems.push(`required language selector option is missing: ${language}`);
   }
   for (const language of directories) {
     if (!wrappers.has(language)) problems.push(`catalog directory has no runtime wrapper: ${language}.ts`);
-    if (!options.has(language)) problems.push(`catalog directory is absent from the selector: ${language}`);
   }
   for (const language of wrappers) {
     if (!directories.has(language)) problems.push(`runtime wrapper has no catalog directory: ${language}.ts`);
-    if (!options.has(language)) problems.push(`runtime language is absent from the selector: ${language}`);
   }
   for (const language of options) {
     if (!wrappers.has(language)) problems.push(`language selector option has no runtime wrapper: ${language}`);
+    if (!directories.has(language)) problems.push(`language selector option has no catalog directory: ${language}`);
+    if (!SELECTABLE_LANGUAGES.has(language)) {
+      problems.push(`language selector exposes a translation target that is not released: ${language}`);
+    }
+  }
+  for (const language of SELECTABLE_LANGUAGES) {
+    if (!options.has(language)) problems.push(`released language is absent from the selector: ${language}`);
   }
   return problems;
 }
@@ -261,7 +267,7 @@ function report(asJson) {
     // ship in en+ko without touching every other locale; the rest catch up
     // later (runtime falls back to English). Structural corruption still gates
     // every language — a broken shape/interpolation is a bug, not a lag.
-    const gatesCoverage = REQUIRED_RELEASED_LANGUAGES.includes(lang);
+    const gatesCoverage = REQUIRED_COMPLETE_LANGUAGES.includes(lang);
     problems +=
       (gatesCoverage ? a.missing.length + a.stale.length + a.orphan.length : 0) +
       a.shapeMismatch.length +
@@ -304,7 +310,9 @@ function report(asJson) {
     );
     process.exit(1);
   }
-  console.log(`\n✓ i18n guard: ${total} source keys; every released target is translated and current.`);
+  console.log(
+    `\n✓ i18n guard: ${total} source keys; required en/ko coverage is current and selectable catalog topology is valid.`,
+  );
 }
 
 function sync(which) {

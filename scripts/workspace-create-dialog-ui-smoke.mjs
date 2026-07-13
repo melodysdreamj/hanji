@@ -6,6 +6,7 @@
 import {
   assert,
   assertRuntimeReachable,
+  deleteSmokeWorkspace,
   loadPlaywright,
   newCheckedPage,
   normalizeBaseUrl,
@@ -92,15 +93,19 @@ async function main() {
   await assertRuntimeReachable(BASE);
   const token = await signinToken();
   const suffix = Date.now();
+  const createdWorkspaces = [];
+  const createdWorkspaceNames = new Set();
 
   const { chromium } = await loadPlaywright({ label: 'workspace-create-dialog smoke' });
   const browser = await chromium.launch({ executablePath: resolveChromeExecutable() });
+  let runError = null;
   try {
     const { context, page } = await newCheckedPage(browser);
     await signInThroughUi(page);
 
     // Case 1: blank keeps starter pages.
     const blankName = `Create blank ${suffix}`;
+    createdWorkspaceNames.add(blankName);
     let dialog = await openCreateDialog(page);
     await createFromDialog(page, dialog, blankName, /Blank workspace|빈 워크스페이스/);
     await page
@@ -108,12 +113,14 @@ async function main() {
       .filter({ hasText: blankName })
       .waitFor({ state: 'visible', timeout: TIMEOUT_MS });
     const blank = await workspacePages(token, blankName);
+    createdWorkspaces.push(blank.workspace);
     assert(blank.pages.length > 0, 'blank workspace should keep the starter pages');
     console.log(`PASS blank choice creates a workspace with ${blank.pages.length} starter pages.`);
 
     // Case 2: Notion import choice skips starter pages and opens the import
     // dialog on the Notion tab.
     const notionName = `Create notion ${suffix}`;
+    createdWorkspaceNames.add(notionName);
     dialog = await openCreateDialog(page);
     await createFromDialog(page, dialog, notionName, /Import from Notion|노션에서 가져오기/);
     const importDialog = page.getByRole('dialog').filter({ hasText: /Import|가져오기/ }).first();
@@ -125,11 +132,13 @@ async function main() {
     );
     await page.keyboard.press('Escape');
     const notion = await workspacePages(token, notionName);
+    createdWorkspaces.push(notion.workspace);
     assert(notion.pages.length === 0, `import choice should skip starter pages, got ${notion.pages.length}`);
     console.log('PASS Notion choice skips starter pages and lands the import dialog on Notion.');
 
     // Case 3: Hanji import choice lands on the Hanji tab.
     const hanjiName = `Create hanji ${suffix}`;
+    createdWorkspaceNames.add(hanjiName);
     dialog = await openCreateDialog(page);
     await createFromDialog(page, dialog, hanjiName, /Import from another Hanji|다른 한지에서 가져오기/);
     const importDialog2 = page.getByRole('dialog').filter({ hasText: /Import|가져오기/ }).first();
@@ -139,11 +148,40 @@ async function main() {
       /Hanji|한지/.test(await activeTab2.first().innerText()),
       'import dialog should open on the Hanji tab',
     );
+    const hanji = await workspacePages(token, hanjiName);
+    createdWorkspaces.push(hanji.workspace);
     console.log('PASS Hanji choice lands the import dialog on the Hanji tab.');
     await context.close();
+  } catch (error) {
+    runError = error;
   } finally {
     await browser.close().catch(() => {});
+    const cleanupErrors = [];
+    const workspaceList = await api(
+      '/api/functions/workspace-mutation',
+      { action: 'list' },
+      token,
+    ).catch(() => ({ status: 0, json: {} }));
+    for (const workspace of workspaceList.json.workspaces ?? []) {
+      if (createdWorkspaceNames.has(workspace?.name)) createdWorkspaces.push(workspace);
+    }
+    const uniqueWorkspaces = Array.from(
+      new Map(createdWorkspaces.map((workspace) => [workspace.id, workspace])).values(),
+    );
+    for (const workspace of uniqueWorkspaces.reverse()) {
+      try {
+        await deleteSmokeWorkspace(BASE, token, workspace, { timeoutMs: TIMEOUT_MS });
+      } catch (error) {
+        cleanupErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      const cleanupError = new Error(`workspace-create smoke cleanup failed: ${cleanupErrors.join('; ')}`);
+      if (!runError) runError = cleanupError;
+      else console.error(`WARN ${cleanupError.message}`);
+    }
   }
+  if (runError) throw runError;
   console.log('PASS workspace creation dialog flow works end to end.');
 }
 
