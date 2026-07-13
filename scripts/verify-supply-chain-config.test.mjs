@@ -199,6 +199,46 @@ test('every external GitHub Action is pinned to a full commit with a version com
   }
 });
 
+test('checkout and setup-node stay on reviewed Node 24 action releases', () => {
+  const expected = new Map([
+    [
+      'actions/checkout',
+      {
+        sha: '9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0',
+        version: 'v7.0.0',
+      },
+    ],
+    [
+      'actions/setup-node',
+      {
+        sha: '48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e',
+        version: 'v6.4.0',
+      },
+    ],
+  ]);
+  const counts = new Map([...expected.keys()].map((action) => [action, 0]));
+
+  for (const workflowFile of readdirSync(workflowsDir)) {
+    if (!workflowFile.endsWith('.yml') && !workflowFile.endsWith('.yaml')) continue;
+    const lines = readFileSync(join(workflowsDir, workflowFile), 'utf8').split('\n');
+    for (const [index, line] of lines.entries()) {
+      const parsed = line.match(
+        /^\s*(?:-\s*)?uses:\s*(actions\/(?:checkout|setup-node))@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
+      );
+      if (!parsed) continue;
+      const [, action, sha, version] = parsed;
+      const pin = expected.get(action);
+      assert.equal(sha, pin.sha, `${workflowFile}:${index + 1} must use ${action} ${pin.version}`);
+      assert.equal(version, pin.version, `${workflowFile}:${index + 1} version comment must match the reviewed pin`);
+      counts.set(action, counts.get(action) + 1);
+    }
+  }
+
+  for (const [action, count] of counts) {
+    assert.ok(count > 0, `expected at least one ${action} use`);
+  }
+});
+
 test('dependency advisories are gated and docs build code has no deployment token', () => {
   const ci = read('.github/workflows/ci.yml');
   const docs = read('.github/workflows/docs.yml');
