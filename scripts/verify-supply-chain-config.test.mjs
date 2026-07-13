@@ -199,8 +199,15 @@ test('every external GitHub Action is pinned to a full commit with a version com
   }
 });
 
-test('checkout and setup-node stay on reviewed Node 24 action releases', () => {
+test('GitHub-maintained workflow actions stay on reviewed Node 24-compatible releases', () => {
   const expected = new Map([
+    [
+      'actions/attest-build-provenance',
+      {
+        sha: '0f67c3f4856b2e3261c31976d6725780e5e4c373',
+        version: 'v4.1.1',
+      },
+    ],
     [
       'actions/checkout',
       {
@@ -209,10 +216,45 @@ test('checkout and setup-node stay on reviewed Node 24 action releases', () => {
       },
     ],
     [
+      'actions/configure-pages',
+      {
+        sha: '45bfe0192ca1faeb007ade9deae92b16b8254a0d',
+        version: 'v6.0.0',
+      },
+    ],
+    [
+      'actions/deploy-pages',
+      {
+        sha: 'cd2ce8fcbc39b97be8ca5fce6e763baed58fa128',
+        version: 'v5.0.0',
+      },
+    ],
+    [
+      'actions/download-artifact',
+      {
+        sha: '3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c',
+        version: 'v8.0.1',
+      },
+    ],
+    [
       'actions/setup-node',
       {
         sha: '48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e',
         version: 'v6.4.0',
+      },
+    ],
+    [
+      'actions/upload-artifact',
+      {
+        sha: '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a',
+        version: 'v7.0.1',
+      },
+    ],
+    [
+      'actions/upload-pages-artifact',
+      {
+        sha: 'fc324d3547104276b827a68afc52ff2a11cc49c9',
+        version: 'v5.0.0',
       },
     ],
   ]);
@@ -223,11 +265,12 @@ test('checkout and setup-node stay on reviewed Node 24 action releases', () => {
     const lines = readFileSync(join(workflowsDir, workflowFile), 'utf8').split('\n');
     for (const [index, line] of lines.entries()) {
       const parsed = line.match(
-        /^\s*(?:-\s*)?uses:\s*(actions\/(?:checkout|setup-node))@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
+        /^\s*(?:-\s*)?uses:\s*(actions\/[a-z0-9-]+)@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
       );
       if (!parsed) continue;
       const [, action, sha, version] = parsed;
       const pin = expected.get(action);
+      assert.ok(pin, `${workflowFile}:${index + 1} must add ${action} to the reviewed action pins`);
       assert.equal(sha, pin.sha, `${workflowFile}:${index + 1} must use ${action} ${pin.version}`);
       assert.equal(version, pin.version, `${workflowFile}:${index + 1} version comment must match the reviewed pin`);
       counts.set(action, counts.get(action) + 1);
