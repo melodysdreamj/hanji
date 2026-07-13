@@ -199,7 +199,7 @@ test('every external GitHub Action is pinned to a full commit with a version com
   }
 });
 
-test('GitHub-maintained workflow actions stay on reviewed Node 24-compatible releases', () => {
+test('GitHub-maintained JavaScript actions stay on reviewed Node 24-compatible releases', () => {
   const expected = new Map([
     [
       'actions/attest-build-provenance',
@@ -257,6 +257,20 @@ test('GitHub-maintained workflow actions stay on reviewed Node 24-compatible rel
         version: 'v5.0.0',
       },
     ],
+    [
+      'github/codeql-action/analyze',
+      {
+        sha: '99df26d4f13ea111d4ec1a7dddef6063f76b97e9',
+        version: 'v4.37.0',
+      },
+    ],
+    [
+      'github/codeql-action/init',
+      {
+        sha: '99df26d4f13ea111d4ec1a7dddef6063f76b97e9',
+        version: 'v4.37.0',
+      },
+    ],
   ]);
   const counts = new Map([...expected.keys()].map((action) => [action, 0]));
 
@@ -265,7 +279,7 @@ test('GitHub-maintained workflow actions stay on reviewed Node 24-compatible rel
     const lines = readFileSync(join(workflowsDir, workflowFile), 'utf8').split('\n');
     for (const [index, line] of lines.entries()) {
       const parsed = line.match(
-        /^\s*(?:-\s*)?uses:\s*(actions\/[a-z0-9-]+)@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
+        /^\s*(?:-\s*)?uses:\s*((?:actions\/[a-z0-9-]+|github\/codeql-action\/(?:init|analyze)))@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
       );
       if (!parsed) continue;
       const [, action, sha, version] = parsed;
@@ -280,6 +294,29 @@ test('GitHub-maintained workflow actions stay on reviewed Node 24-compatible rel
   for (const [action, count] of counts) {
     assert.ok(count > 0, `expected at least one ${action} use`);
   }
+});
+
+test('CLA Assistant runs its reviewed immutable bundle on Node 24', () => {
+  const cla = read('.github/workflows/cla.yml');
+
+  assert.match(
+    cla,
+    /uses: actions\/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6\.4\.0[\s\S]*?node-version: 24/,
+  );
+  assert.match(cla, /CLA_ACTION_SHA: ca4a40a7d1004f18d9960b404b97e5f30a505a08/);
+  assert.match(
+    cla,
+    /CLA_ACTION_SHA256: a44111084c0d4782206c04b4276292f7fec6d1f7a33525512fbeef3242079dfb/,
+  );
+  assert.match(
+    cla,
+    /raw\.githubusercontent\.com\/contributor-assistant\/github-action\/\$\{CLA_ACTION_SHA\}\/dist\/index\.js/,
+  );
+  assert.match(cla, /sha256sum --check --status/);
+  assert.match(cla, /'INPUT_LOCK-PULLREQUEST-AFTERMERGE=true'/);
+  assert.match(cla, /'INPUT_SUGGEST-RECHECK=true'/);
+  assert.match(cla, /node "\$action_path"/);
+  assert.doesNotMatch(cla, /uses: contributor-assistant\/github-action@/);
 });
 
 test('dependency advisories are gated and docs build code has no deployment token', () => {

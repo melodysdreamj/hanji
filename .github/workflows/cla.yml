@@ -11,11 +11,9 @@ name: CLA Assistant
 #      (Settings → Secrets and variables → Actions → New repository secret).
 #   3. The bot stores signatures on the `cla-signatures` branch (created on first
 #      signature). Nothing lands on `main`.
-# `contributor-assistant/github-action` is pinned to a full commit SHA (with the
-# human-readable version in a trailing comment), as the supply-chain guard
-# requires. To bump it, resolve the new tag to its SHA
-# (`gh api repos/contributor-assistant/github-action/commits/<tag> --jq .sha`)
-# and update both the SHA and the comment.
+# `contributor-assistant/github-action` has not yet published a Node 24 action.
+# Run its immutable v2.6.1 bundle with Node 24 instead. Both the source commit
+# and downloaded bundle checksum are guarded by the supply-chain tests below.
 
 on:
   issue_comment:
@@ -31,22 +29,38 @@ permissions:
 
 jobs:
   cla:
+    if: >-
+      (github.event.comment.body == 'recheck' ||
+       github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') ||
+      github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
-      - name: CLA Assistant
-        if: >-
-          (github.event.comment.body == 'recheck' ||
-           github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') ||
-          github.event_name == 'pull_request_target'
-        uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08 # v2.6.1
+      - name: Use Node.js 24
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+
+      - name: CLA Assistant v2.6.1 on Node.js 24
         env:
+          CLA_ACTION_SHA: ca4a40a7d1004f18d9960b404b97e5f30a505a08
+          CLA_ACTION_SHA256: a44111084c0d4782206c04b4276292f7fec6d1f7a33525512fbeef3242079dfb
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Classic PAT with `repo` scope, stored as a repo secret (see header).
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        with:
-          path-to-signatures: 'signatures/cla.json'
-          path-to-document: 'https://github.com/melodysdreamj/hanji/blob/main/docs/CLA.md'
-          branch: 'cla-signatures'
-          allowlist: 'melodysdreamj,*[bot]'
-          custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
-          custom-allsigned-prcomment: 'All contributors have signed the CLA — thank you!'
+        run: |
+          action_path="$RUNNER_TEMP/contributor-assistant-${CLA_ACTION_SHA}.js"
+          curl --fail --silent --show-error --location \
+            "https://raw.githubusercontent.com/contributor-assistant/github-action/${CLA_ACTION_SHA}/dist/index.js" \
+            --output "$action_path"
+          echo "${CLA_ACTION_SHA256}  ${action_path}" | sha256sum --check --status
+          env \
+            'INPUT_PATH-TO-SIGNATURES=signatures/cla.json' \
+            'INPUT_PATH-TO-DOCUMENT=https://github.com/melodysdreamj/hanji/blob/main/docs/CLA.md' \
+            'INPUT_BRANCH=cla-signatures' \
+            'INPUT_ALLOWLIST=melodysdreamj,*[bot]' \
+            'INPUT_CUSTOM-PR-SIGN-COMMENT=I have read the CLA Document and I hereby sign the CLA' \
+            'INPUT_CUSTOM-ALLSIGNED-PRCOMMENT=All contributors have signed the CLA — thank you!' \
+            'INPUT_USE-DCO-FLAG=false' \
+            'INPUT_LOCK-PULLREQUEST-AFTERMERGE=true' \
+            'INPUT_SUGGEST-RECHECK=true' \
+            node "$action_path"
