@@ -1270,8 +1270,13 @@ export async function listNotionImportJobsRemote(input: {
 
 export async function repairNotionImportPageIndexesRemote(
   workspaceId: string
-): Promise<{ repaired: number }> {
-  return getClient().functions.post<{ repaired: number }>("notion-import", {
+): Promise<{ repaired: number; unwrapped?: number; moved?: number; trashed?: number }> {
+  return getClient().functions.post<{
+    repaired: number;
+    unwrapped?: number;
+    moved?: number;
+    trashed?: number;
+  }>("notion-import", {
     action: "repairPageIndexes",
     workspaceId,
   });

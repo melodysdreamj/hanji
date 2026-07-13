@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isPromotableSyntheticNotionImportChild,
+  isSyntheticNotionImportRootPage,
   syntheticNotionImportRootLandingPage,
 } from "@/lib/importedNotionUi";
 import type { Page } from "@/lib/types";
@@ -19,6 +20,20 @@ function makePage(id: string, patch: Partial<Page> = {}): Page {
 }
 
 describe("synthetic Notion import UI helpers", () => {
+  it("recognizes generated import roots independently of the display language", () => {
+    const localizedRoot = makePage("root-localized", {
+      title: "Localized generated import root",
+      properties: { notionImportJobId: "job-localized", notionWorkspaceId: "notion-ws" },
+    });
+    const ordinaryImportedPage = makePage("ordinary", {
+      title: "Imported page",
+      properties: { notionImportJobId: "job-localized", notionPageId: "notion-page" },
+    });
+
+    expect(isSyntheticNotionImportRootPage(localizedRoot)).toBe(true);
+    expect(isSyntheticNotionImportRootPage(ordinaryImportedPage)).toBe(false);
+  });
+
   it("redirects a hidden import root to its favorited imported homepage", () => {
     const root = makePage("root", {
       title: "Imported from Notion",

@@ -605,8 +605,16 @@ async function main() {
   assert(rootPage.page?.createdAt === NOTION_IMPORT_CREATED_TIME, 'Imported pages must preserve Notion created_time metadata');
   assert(rootPage.page?.updatedAt === NOTION_IMPORT_EDITED_TIME, 'Imported pages must preserve Notion last_edited_time metadata');
   assert(
-    rootPage.page?.isFavorite === true,
-    'Explicit Notion import root pages should be anchored in Favorites because the Notion API does not expose favorite state',
+    rootPage.page?.isFavorite !== true,
+    'Explicit Notion import roots must remain ordinary pages instead of inventing Notion favorite state',
+  );
+  assert(
+    rootPage.page?.parentType === 'workspace' && !rootPage.page?.parentId,
+    'Explicit Notion import roots must be exposed directly in Pages without a synthetic wrapper',
+  );
+  assert(
+    !applied.mappings?.some((mapping) => mapping.relationKind === 'import_root'),
+    'Completed Notion imports must remove their synthetic staging-root mapping',
   );
   assert(
     rootPage.page?.fullWidth === true,

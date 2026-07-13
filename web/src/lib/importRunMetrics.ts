@@ -1,6 +1,5 @@
 export type ImportRunMetrics = {
   rate: number;
-  remainingSeconds?: number;
 };
 
 const MIN_COMPLETED_SAMPLES = 5;
@@ -8,19 +7,16 @@ const MIN_ELAPSED_SECONDS = 10;
 const MIN_SAMPLE_WINDOW_SECONDS = 15;
 
 /**
- * Avoid presenting an ETA from the first one or two imported objects. Notion
- * objects vary sharply in cost, and the first page also includes setup work;
- * extrapolating that sample made the UI jump from minutes to seconds while a
- * perfectly healthy import was running.
+ * Avoid presenting speed from the first one or two imported objects. Notion
+ * objects vary sharply in cost, and the first page also includes setup work.
  */
 export function estimateImportRunMetrics(input: {
   doneCount?: number;
-  totalCount?: number;
   elapsedSeconds: number;
   nowMs?: number;
   completionTimesMs?: number[];
 }): ImportRunMetrics | undefined {
-  const { doneCount, totalCount, elapsedSeconds, completionTimesMs } = input;
+  const { doneCount, elapsedSeconds, completionTimesMs } = input;
   if (
     typeof doneCount !== "number" ||
     !Number.isFinite(doneCount) ||
@@ -49,9 +45,5 @@ export function estimateImportRunMetrics(input: {
   }
   if (!Number.isFinite(rate) || rate <= 0) return undefined;
 
-  const remaining =
-    typeof totalCount === "number" && Number.isFinite(totalCount) && totalCount > doneCount
-      ? (totalCount - doneCount) / rate
-      : undefined;
-  return { rate, ...(remaining !== undefined ? { remainingSeconds: remaining } : {}) };
+  return { rate };
 }

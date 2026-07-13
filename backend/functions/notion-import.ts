@@ -32,6 +32,10 @@ import {
   reserveOrganizationStorage,
   type StorageQuotaReservation,
 } from '../lib/storage-quota';
+import {
+  collectPermanentRoutingIndexPlan,
+  deletePermanentRoutingIndexes,
+} from '../lib/permanent-routing-index-delete';
 
 import {
   bestEffort,
@@ -238,6 +242,7 @@ export interface Page {
   properties?: Record<string, unknown>;
   isFavorite?: boolean;
   inTrash?: boolean;
+  trashedAt?: string | null;
   position?: number;
   createdBy?: string;
   lastEditedBy?: string;
@@ -4552,9 +4557,16 @@ export function responseBodyWithExactByteCount(
   body: ReadableStream<Uint8Array>,
   expectedBytes: number,
   maxBytes: number,
+  FixedLengthStreamCtor = (
+    globalThis as typeof globalThis & {
+      FixedLengthStream?: new (
+        length: number | bigint,
+      ) => ReadableWritablePair<Uint8Array, Uint8Array>;
+    }
+  ).FixedLengthStream,
 ) {
   let total = 0;
-  return body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+  const validated = body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
     transform(chunk, controller) {
       total += chunk.byteLength;
       if (total > maxBytes) throw new Error('source file is too large');
@@ -4565,6 +4577,15 @@ export function responseBodyWithExactByteCount(
       if (total !== expectedBytes) throw new Error('source file size did not match Content-Length');
     },
   }));
+  // R2 rejects an ordinary ReadableStream even when the source response
+  // advertised Content-Length. The validation TransformStream above strips
+  // the runtime's fixed-length brand, so restore it at the storage boundary.
+  // Node-based unit tests do not expose this Workers runtime primitive and use
+  // the validated stream directly; unknown-length responses are buffered into
+  // an ArrayBuffer before reaching this branch.
+  return FixedLengthStreamCtor
+    ? validated.pipeThrough(new FixedLengthStreamCtor(expectedBytes))
+    : validated;
 }
 
 async function fetchFileForImport(reference: NotionFileReference) {
@@ -9854,6 +9875,7 @@ async function ensureImportRoot(
       actorId,
       properties: {
         notionImportJobId: job.id,
+        notionImportRoot: true,
         notionWorkspaceId: job.notionWorkspaceId,
       },
     }),
@@ -9886,6 +9908,129 @@ async function ensureImportRoot(
   mappingsByNotionId.set(rootNotionId, mapping);
   await ensurePageWorkspaceIndex(admin, pageId, job.workspaceId);
   return pageId;
+}
+
+/**
+ * The import root is staging scaffolding, not a user page. Once apply is
+ * complete, expose the selected Notion roots at the requested Hanji parent and
+ * remove the wrapper. Supporting database pages discovered alongside a
+ * selected page stay grouped beneath the first selected root instead of
+ * leaking into the workspace root as unrelated sidebar entries.
+ */
+async function unwrapImportRoot(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  job: NotionImportJob,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+) {
+  const rootNotionId = importRootNotionId(job.id);
+  const rootMapping = mappingForNotionId(mappingsByNotionId, rootNotionId);
+  if (!rootMapping || rootMapping.relationKind !== 'import_root') {
+    return { unwrapped: 0, moved: 0 };
+  }
+  const pages = db.table<Page>('pages');
+  const rootPage = await getExisting(pages, rootMapping.localId);
+  if (!rootPage) {
+    await bestEffort(
+      'notion-import orphan root mapping.delete',
+      db.table<NotionImportMapping>('notion_import_mappings').delete(rootMapping.id),
+    );
+    mappingsByNotionId.delete(rootMapping.notionId);
+    return { unwrapped: 0, moved: 0 };
+  }
+
+  const directChildren = await listAll(
+    pages.where('parentId', '==', rootPage.id),
+    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  );
+  const requestedRootIds = new Set(
+    [
+      ...(job.rootNotionPageIds ?? []),
+      ...(job.rootNotionDataSourceIds ?? []),
+    ]
+      .map(normalizedNotionId)
+      .filter(Boolean),
+  );
+  const selectedLocalIds = new Set(
+    Array.from(mappingsByNotionId.values())
+      .filter((mapping) => requestedRootIds.has(normalizedNotionId(mapping.notionId)))
+      .filter((mapping) => mapping.localType === 'page' || mapping.localType === 'database')
+      .map((mapping) => mapping.localId),
+  );
+  const primarySelectedRoot = directChildren.find((page) => selectedLocalIds.has(page.id));
+  const targetParentId = job.parentPageId || null;
+  const targetParentType = targetParentId ? 'page' : 'workspace';
+
+  const moveOps = directChildren.map((page): TransactOperation => {
+    const isSelectedRoot = selectedLocalIds.has(page.id);
+    const keepWithSelectedRoot = !isSelectedRoot && primarySelectedRoot;
+    return {
+      table: 'pages',
+      op: 'update',
+      id: page.id,
+      data: {
+        parentId: keepWithSelectedRoot ? primarySelectedRoot.id : targetParentId,
+        parentType: keepWithSelectedRoot ? 'page' : targetParentType,
+        // Legacy users often trashed the visibly-generated wrapper to get it
+        // out of Pages; that cascaded to the real imported children. During
+        // this one-time unwrap, restore those children as the product pages.
+        inTrash: false,
+        trashedAt: null,
+        ...(isSelectedRoot ? { isFavorite: false } : {}),
+      },
+    };
+  });
+  for (let offset = 0; offset < moveOps.length; offset += MAX_RAW_TRANSACT_OPS) {
+    await db.transact(moveOps.slice(offset, offset + MAX_RAW_TRANSACT_OPS));
+  }
+
+  const routingPlan = await collectPermanentRoutingIndexPlan(admin, job.workspaceId, [rootPage.id]);
+  await deletePermanentRoutingIndexes(routingPlan);
+  await db.transact([
+    { table: 'notion_import_mappings', op: 'delete', id: rootMapping.id },
+    { table: 'pages', op: 'delete', id: rootPage.id },
+  ]);
+  mappingsByNotionId.delete(rootMapping.notionId);
+  return { unwrapped: 1, moved: directChildren.length };
+}
+
+// Failed/cancelled apply output is incomplete product state. Move every mapped
+// page to Trash (reversible) so neither a localized staging wrapper nor partial
+// children leak into Pages, Favorites, or search after a retry.
+async function trashIncompleteImportPages(
+  db: DbRef,
+  job: NotionImportJob,
+  mappings?: NotionImportMapping[],
+) {
+  const jobMappings = mappings ?? await listAll(
+    db.table<NotionImportMapping>('notion_import_mappings').where('jobId', '==', job.id),
+    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  );
+  const pageIds = Array.from(new Set(
+    jobMappings
+      .filter((mapping) => mapping.localType === 'page' || mapping.localType === 'database')
+      .map((mapping) => mapping.localId)
+      .filter(Boolean),
+  ));
+  const pages = db.table<Page>('pages');
+  const trashedAt = nowIso();
+  let trashed = 0;
+  for (let offset = 0; offset < pageIds.length; offset += MAX_RAW_TRANSACT_OPS) {
+    const rows = await Promise.all(
+      pageIds.slice(offset, offset + MAX_RAW_TRANSACT_OPS).map((pageId) => getExisting(pages, pageId)),
+    );
+    const operations = rows
+      .filter((page): page is Page => !!page && !page.inTrash)
+      .map((page): TransactOperation => ({
+        table: 'pages',
+        op: 'update',
+        id: page.id,
+        data: { inTrash: true, trashedAt, isFavorite: false },
+      }));
+    if (operations.length) await db.transact(operations);
+    trashed += operations.length;
+  }
+  return trashed;
 }
 
 function rowDataSourceId(item: NotionImportItem, dataSourceIds: Set<string>) {
@@ -14207,6 +14352,13 @@ async function applyJob(
       // Record the failure on the job so apply progress can't stay stuck at
       // `running` forever. discoverJob already does this for its own failures.
       await markApplyJobFailed(db, actorId, body, error);
+      const failedJob = await getExisting(jobs, job.id).catch(() => null);
+      if (failedJob?.status === 'failed') {
+        await bestEffort(
+          'notion-import trash incomplete product pages',
+          trashIncompleteImportPages(db, failedJob),
+        );
+      }
     }
     if (cleanupFailure) {
       const failedJob = await getExisting(jobs, job.id).catch(() => null);
@@ -14306,9 +14458,6 @@ async function applyJobCore(
     : 0;
   const mappingsByNotionId = existingMappings;
   const rootPageId = await ensureImportRoot(db, admin, job, mappingsByNotionId, actorId);
-  const rootNotionPageIdSet = new Set(
-    (job.rootNotionPageIds ?? []).map((id) => normalizedNotionId(id)).filter(Boolean),
-  );
   const dataSourceItems = items.filter((item) => item.notionObject === 'data_source');
   const dataSourceIds = new Set(dataSourceItems.map((item) => item.notionId));
   const propertyMappingsByDataSource = new Map<string, Map<string, string>>();
@@ -14952,8 +15101,6 @@ async function applyJobCore(
     const metadata = itemMetadata(item);
     const chrome = importedPageChromeFromItem(item);
     const initialChrome = initialImportedPageChrome(chrome);
-    const isExplicitRootPage =
-      !isRow && rootNotionPageIdSet.has(normalizedNotionId(item.notionId));
     const resolvedParent = isRow
       ? {}
       : resolveImportedPageParentFromNotionBlocks(item, mappingsByNotionId, blockOwnerContextsByNotionId);
@@ -15063,7 +15210,9 @@ async function applyJobCore(
         cover: initialChrome.cover,
         coverPosition: initialChrome.coverPosition,
         fullWidth: !isRow && importedPageShouldUseFullWidth(item, importPagesFullWidth),
-        isFavorite: isExplicitRootPage,
+        // Notion's favorite state is not available through the API. Do not
+        // invent it: selected roots become ordinary pages after staging unwrap.
+        isFavorite: false,
         position: resolvedParent.position ?? created.pages + created.rows + 1,
         actorId,
         ...importedItemTimestamps(item),
@@ -15304,6 +15453,7 @@ async function applyJobCore(
     await db.table<DbTemplate>('db_templates').update(templateContext.template.id, patch);
   }
 
+  await unwrapImportRoot(db, admin, job, mappingsByNotionId);
   const allMappings = Array.from(mappingsByNotionId.values());
   const finishedAt = nowIso();
   const conversion = finalizeConversionReport(conversionReport);
@@ -15919,10 +16069,36 @@ async function repairImportPageIndexes(
     db.table<NotionImportMapping>('notion_import_mappings').where('workspaceId', '==', workspaceId),
     NOTION_IMPORT_ITEM_SAFETY_LIMIT,
   );
+  const jobs = await listAll(
+    db.table<NotionImportJob>('notion_import_jobs').where('workspaceId', '==', workspaceId),
+    500,
+  );
+  const mappingsByJob = new Map<string, NotionImportMapping[]>();
+  for (const mapping of mappings) {
+    const group = mappingsByJob.get(mapping.jobId) ?? [];
+    group.push(mapping);
+    mappingsByJob.set(mapping.jobId, group);
+  }
+  let unwrapped = 0;
+  let moved = 0;
+  let trashed = 0;
+  for (const job of jobs) {
+    const jobMappings = mappingsByJob.get(job.id) ?? [];
+    if (!jobMappings.some((mapping) => mapping.relationKind === 'import_root')) continue;
+    if (job.status === 'completed') {
+      const byNotionId = new Map(jobMappings.map((mapping) => [mapping.notionId, mapping]));
+      const result = await unwrapImportRoot(db, admin, job, byNotionId);
+      unwrapped += result.unwrapped;
+      moved += result.moved;
+    } else if (job.status === 'failed' || job.status === 'cancelled') {
+      trashed += await trashIncompleteImportPages(db, job, jobMappings);
+    }
+  }
   const seen = new Set<string>();
   let repaired = 0;
   for (const mapping of mappings) {
     if (
+      mapping.relationKind !== 'import_root' &&
       (mapping.localType === 'page' || mapping.localType === 'database') &&
       typeof mapping.localId === 'string' &&
       mapping.localId.length > 0 &&
@@ -15933,7 +16109,7 @@ async function repairImportPageIndexes(
       repaired += 1;
     }
   }
-  return { repaired };
+  return { repaired, unwrapped, moved, trashed };
 }
 
 async function getJob(db: DbRef, body: Record<string, unknown>, actorId: string) {

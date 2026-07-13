@@ -3,9 +3,7 @@ import type { Page } from "./types";
 export function isSyntheticNotionImportRootPage(page: Page) {
   const properties = page.properties ?? {};
   return (
-    page.parentType === "workspace" &&
     page.kind === "page" &&
-    page.title.startsWith("Imported from Notion") &&
     typeof properties.notionImportJobId === "string" &&
     typeof properties.notionPageId !== "string" &&
     typeof properties.notionDatabaseId !== "string" &&

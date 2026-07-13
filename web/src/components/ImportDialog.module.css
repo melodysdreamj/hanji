@@ -443,13 +443,6 @@
   font-weight: 600;
 }
 
-.runPercent {
-  flex: 0 0 auto;
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-
 .runLog {
   display: grid;
   align-content: start;
@@ -1119,10 +1112,9 @@
   top: 0;
   bottom: 0;
   left: 0;
-  width: 0;
+  width: 35%;
   border-radius: inherit;
   background: var(--accent-blue);
-  transition: width 0.5s ease;
 }
 
 .progressTrack > span[data-indeterminate="true"] {

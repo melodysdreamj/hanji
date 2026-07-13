@@ -107,6 +107,15 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
       // and the wizard auto-advances to the discover run panel.
       await dialog.locator('[data-run-panel="discover"]').waitFor({ state: 'visible', timeout: options.timeoutMs });
       await expectRunStatus(page, 'Ready');
+      const discoverPanel = dialog.locator('[data-run-panel="discover"]');
+      assert(
+        await discoverPanel.getByRole('progressbar').count() === 0,
+        'Ready Notion discovery must not retain a determinate progress bar',
+      );
+      assert(
+        !/\b\d{1,3}%\b/.test((await discoverPanel.textContent()) ?? ''),
+        'Ready Notion discovery must not display a percentage',
+      );
       // The installer-style live feed carries the discovery activity ring.
       await dialog.locator('[aria-label="Live activity"]').getByText(/Search finished|Reading page/).first().waitFor({
         state: 'visible',
@@ -122,6 +131,15 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
       await dialog.getByRole('button', { name: 'Apply import', exact: true }).click({ timeout: options.timeoutMs });
       await dialog.locator('[data-run-panel="apply"]').waitFor({ state: 'visible', timeout: options.timeoutMs });
       await expectRunStatus(page, 'Complete');
+      const applyPanel = dialog.locator('[data-run-panel="apply"]');
+      assert(
+        await applyPanel.getByRole('progressbar').count() === 0,
+        'Completed Notion apply must not retain a determinate progress bar',
+      );
+      assert(
+        !/\b\d{1,3}%\b/.test((await applyPanel.textContent()) ?? ''),
+        'Completed Notion apply must not display a percentage',
+      );
       // The live feed now carries apply activity, and the footer resolves to a
       // Done action (workspace-scope imports have no single root page to open).
       await dialog.locator('[aria-label="Live activity"]').getByText(/Created (page|row|database)/).first().waitFor({
