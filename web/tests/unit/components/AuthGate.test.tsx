@@ -116,7 +116,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("AuthGate auth-state subscription", () => {
-  it("offers setup-code-protected first-run administrator creation", async () => {
+  it("offers browser-only first-run administrator creation", async () => {
     authState.currentUserId = "";
     authState.restoreAuthSessionRemote.mockResolvedValue("");
     authState.fetchInstanceBootstrapRemote.mockResolvedValue({
@@ -124,7 +124,6 @@ describe("AuthGate auth-state subscription", () => {
       masterReady: false,
       setupBlocked: false,
       setupAvailable: true,
-      setupCodeRequired: true,
       setupInProgress: false,
     });
 
@@ -136,9 +135,7 @@ describe("AuthGate auth-state subscription", () => {
 
     expect(await screen.findByTestId("instance-setup")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Create account" })).toBeNull();
-    fireEvent.change(screen.getByLabelText("Setup code"), {
-      target: { value: "0123456789abcdef0123456789abcdef" },
-    });
+    expect(screen.queryByLabelText("Setup code")).toBeNull();
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Owner" } });
     fireEvent.change(screen.getByLabelText("Administrator email"), {
       target: { value: "Owner@Example.com" },
@@ -153,7 +150,6 @@ describe("AuthGate auth-state subscription", () => {
 
     await screen.findByTestId("private-workspace");
     expect(authState.initializeInstanceRemote).toHaveBeenCalledWith({
-      setupCode: "0123456789abcdef0123456789abcdef",
       email: "owner@example.com",
       password: "Hanji-Owner!2026",
       displayName: "Owner",
@@ -172,14 +168,10 @@ describe("AuthGate auth-state subscription", () => {
       masterReady: false,
       setupBlocked: false,
       setupAvailable: true,
-      setupCodeRequired: true,
       setupInProgress: false,
     });
     render(<AuthGate><div>Private workspace</div></AuthGate>);
     await screen.findByTestId("instance-setup");
-    fireEvent.change(screen.getByLabelText("Setup code"), {
-      target: { value: "0123456789abcdef0123456789abcdef" },
-    });
     fireEvent.change(screen.getByLabelText("Administrator email"), {
       target: { value: "owner@example.com" },
     });

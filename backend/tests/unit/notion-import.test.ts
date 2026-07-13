@@ -19,10 +19,15 @@ import {
   NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
   pruneStaleImportJobs,
   notionAccessibleRootCandidates,
+  notionApplyLeaseCanBeRecovered,
+  notionAppliedCountsFromMappings,
   notionConnectionStorageAvailable,
+  notionDiscoveryEnrichmentCandidates,
+  notionDiscoveryItemNeedsEnrichment,
   localStoredFileReference,
   normalizedNotionId,
   notionEnrichmentShouldStop,
+  notionEnrichmentWaveSize,
   notionRichTextSpans,
   notionTitle,
   parseSnapshotItems,
@@ -287,6 +292,122 @@ describe('notionEnrichmentShouldStop', () => {
         deadlineMs: Number.POSITIVE_INFINITY,
       })
     ).toBe(false);
+  });
+});
+
+describe('Notion apply lease recovery', () => {
+  const nowMs = Date.parse('2026-07-13T10:30:00.000Z');
+
+  it('lets the same actor reclaim an apply lease after its heartbeat is stale', () => {
+    expect(notionApplyLeaseCanBeRecovered({
+      requestedPurpose: 'apply',
+      existingPurpose: 'apply',
+      actorId: 'owner-1',
+      existingActorId: 'owner-1',
+      updatedAt: '2026-07-13T10:24:59.000Z',
+      nowMs,
+    })).toBe(true);
+  });
+
+  it('does not steal fresh, other-actor, or discovery leases', () => {
+    const base = {
+      requestedPurpose: 'apply' as const,
+      existingPurpose: 'apply' as const,
+      actorId: 'owner-1',
+      existingActorId: 'owner-1',
+      updatedAt: '2026-07-13T10:29:00.000Z',
+      nowMs,
+    };
+    expect(notionApplyLeaseCanBeRecovered(base)).toBe(false);
+    expect(notionApplyLeaseCanBeRecovered({
+      ...base,
+      existingActorId: 'owner-2',
+      updatedAt: '2026-07-13T10:20:00.000Z',
+    })).toBe(false);
+    expect(notionApplyLeaseCanBeRecovered({
+      ...base,
+      existingPurpose: 'discover',
+      updatedAt: '2026-07-13T10:20:00.000Z',
+    })).toBe(false);
+  });
+});
+
+describe('resumed Notion apply counts', () => {
+  it('reconstructs durable totals without double-counting database aliases or the staging root', () => {
+    expect(notionAppliedCountsFromMappings([
+      { localId: 'root-1', localType: 'page', relationKind: 'import_root' },
+      { localId: 'db-1', localType: 'database', relationKind: 'canonical_data_source' },
+      { localId: 'db-1', localType: 'database', relationKind: 'database_container' },
+      { localId: 'db-2', localType: 'database', relationKind: 'database_placeholder' },
+      { localId: 'prop-1', localType: 'db_property', relationKind: 'database_property' },
+      { localId: 'view-1', localType: 'db_view', relationKind: 'database_view' },
+      { localId: 'template-1', localType: 'db_template', relationKind: 'database_template' },
+      { localId: 'page-1', localType: 'page', relationKind: 'page' },
+      { localId: 'row-1', localType: 'page', relationKind: 'database_row' },
+    ])).toEqual({
+      pages: 1,
+      databases: 2,
+      properties: 1,
+      views: 1,
+      templates: 1,
+      rows: 1,
+      mappings: 8,
+    });
+  });
+});
+
+describe('incremental Notion enrichment candidates', () => {
+  it('selects the pending linked-database tail after hundreds of completed items', () => {
+    const completed = Array.from({ length: 912 }, (_, index): DiscoveredNotionItem => ({
+      notionId: `page-${index}`,
+      notionObject: 'page',
+      status: 'discovered',
+      phase: 'page_snapshot',
+      metadata: { pageSnapshot: { childBlocks: [] } },
+    }));
+    const pending = Array.from({ length: 73 }, (_, index): DiscoveredNotionItem => ({
+      notionId: `database-${index}`,
+      notionObject: 'database',
+      status: 'referenced',
+      phase: 'linked_block_reference',
+      metadata: { discoveredFrom: 'linked_block' },
+    }));
+
+    const candidates = notionDiscoveryEnrichmentCandidates([...completed, ...pending], 500);
+    expect(candidates).toHaveLength(73);
+    expect(candidates.every((item) => item.notionObject === 'database')).toBe(true);
+  });
+
+  it('treats retrieved and explicitly unavailable database reads as terminal but retries transient failures', () => {
+    expect(notionDiscoveryItemNeedsEnrichment({
+      notionId: 'database-pending',
+      notionObject: 'database',
+      metadata: {},
+    })).toBe(true);
+    expect(notionDiscoveryItemNeedsEnrichment({
+      notionId: 'database-retrieved',
+      notionObject: 'database',
+      metadata: { database: { id: 'database-retrieved' }, databaseFetchStatus: 'retrieved' },
+    })).toBe(false);
+    expect(notionDiscoveryItemNeedsEnrichment({
+      notionId: 'database-unavailable',
+      notionObject: 'database',
+      metadata: { databaseFetchStatus: 'unavailable' },
+      error: 'Database is not shared with the integration.',
+    })).toBe(false);
+    expect(notionDiscoveryItemNeedsEnrichment({
+      notionId: 'database-retryable',
+      notionObject: 'database',
+      metadata: { databaseFetchStatus: 'retryable_error' },
+      error: 'Notion API request failed with 503.',
+    })).toBe(true);
+  });
+
+  it('starts no more than one concurrency wave within the remaining budget', () => {
+    expect(notionEnrichmentWaveSize({ remaining: 73, enrichBudget: 25, concurrency: 4 })).toBe(4);
+    expect(notionEnrichmentWaveSize({ remaining: 3, enrichBudget: 25, concurrency: 4 })).toBe(3);
+    expect(notionEnrichmentWaveSize({ remaining: 73, enrichBudget: 2, concurrency: 4 })).toBe(2);
+    expect(notionEnrichmentWaveSize({ remaining: 73, enrichBudget: 0, concurrency: 4 })).toBe(0);
   });
 });
 

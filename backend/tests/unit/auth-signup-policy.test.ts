@@ -100,7 +100,7 @@ describe('master provisioning signup fence', () => {
     const pendingDb = fakeDb({ instance_settings: [] });
     const setupContext = {
       data: { after: { email: 'new-user@example.com' } },
-      env: { HANJI_SETUP_TOKEN: 'unit-test-setup-token' },
+      env: { HANJI_BROWSER_SETUP: 'true' },
       admin: {
         db: () => pendingDb,
         auth: { async listUsers() { return { users: [{ id: 'setup-user' }] }; } },

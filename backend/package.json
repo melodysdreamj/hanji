@@ -1,6 +1,6 @@
 {
   "name": "hanji-backend",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "private": true,
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -135,8 +135,8 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "@edge-base/cli": "0.4.3",
-    "@edge-base/shared": "0.4.3",
+    "@edge-base/cli": "0.4.4",
+    "@edge-base/shared": "0.4.4",
     "@eslint/js": "^9.39.4",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.4",

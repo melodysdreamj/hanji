@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
@@ -48,23 +48,6 @@ const bundle = createAppBundle(backendDir, {
 });
 _internals.finalizeDockerWrangler(backendDir, bundle.outputDir);
 const contextDir = _internals.prepareDockerBuildContext(backendDir, bundle.outputDir);
-
-// EdgeBase 0.4.3 creates a synthetic context but does not yet copy optional
-// project-owned support files. Keep this bounded compatibility step beside the
-// Hanji image build; the reusable behavior also lives in the EdgeBase source.
-const supportDir = join(backendDir, 'docker-context');
-const reserved = new Set(['dockerfile', '.dockerignore', '.edgebase']);
-if (existsSync(supportDir)) {
-  for (const entry of readdirSync(supportDir)) {
-    if (reserved.has(entry.toLowerCase())) continue;
-    cpSync(join(supportDir, entry), join(contextDir, entry), {
-      recursive: true,
-      force: true,
-      dereference: false,
-      verbatimSymlinks: true,
-    });
-  }
-}
 
 if (contextOnly) {
   console.log(contextDir);

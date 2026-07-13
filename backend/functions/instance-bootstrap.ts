@@ -13,8 +13,8 @@ import { getExisting, type TransactDb } from '../lib/table-utils';
 // tells the client whether the instance is usable at all:
 //  - master env configured  -> ensure account, never blocked
 //  - no master env, but the instance already has users -> normal sign-in
-//  - no master env, zero users, setup token configured -> first-run web setup
-//  - no master env/token, zero users, no dev-guest escape -> setup blocked;
+//  - no master env, zero users, Docker browser setup enabled -> first-run web setup
+//  - no master env/browser setup, zero users, no dev-guest escape -> setup blocked;
 //    the operator must provide an initialization mechanism.
 // The endpoint never returns the configured credentials. Request URL/Host
 // metadata cannot prove that the network peer is loopback (proxies and direct
@@ -74,8 +74,6 @@ interface FunctionContext {
 }
 
 const SETUP_ID = 'global';
-const SETUP_CODE_MIN_LENGTH = 24;
-
 export function normalizeMasterEmail(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const email = value.trim().toLowerCase();
@@ -125,21 +123,6 @@ export function validSetupPassword(value: unknown): value is string {
     /\d/.test(value) &&
     /[^A-Za-z0-9]/.test(value) &&
     !/[\s\u0000-\u001f\u007f]/.test(value);
-}
-
-// The setup code is fixed-length random data in normal deployments. Keep the
-// comparison work proportional to the longer input so a remote caller cannot
-// learn a matching prefix from early returns.
-export function setupCodeMatches(provided: unknown, configured: string | null): boolean {
-  if (typeof provided !== 'string' || !configured || configured.length < SETUP_CODE_MIN_LENGTH) {
-    return false;
-  }
-  const length = Math.max(provided.length, configured.length);
-  let difference = provided.length ^ configured.length;
-  for (let index = 0; index < length; index += 1) {
-    difference |= (provided.charCodeAt(index) || 0) ^ (configured.charCodeAt(index) || 0);
-  }
-  return difference === 0;
 }
 
 function userIdFrom(user: Record<string, unknown>) {
@@ -359,7 +342,7 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   );
   const masterPassword =
     hanjiEnvValue(context.env, 'HANJI_MASTER_PASSWORD', 'EDGEBASE_MASTER_PASSWORD') ?? null;
-  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
+  const browserSetupEnabled = hanjiEnvFlag(context.env, 'HANJI_BROWSER_SETUP');
   const devGuestEnabled = hanjiEnvFlag(
     context.env,
     'HANJI_ALLOW_DEV_GUEST_LOGIN',
@@ -405,7 +388,7 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   }
 
   let pendingSetup = false;
-  if (!plan.masterConfigured && setupToken && !settings.masterUserId) {
+  if (!plan.masterConfigured && browserSetupEnabled && !settings.masterUserId) {
     try {
       pendingSetup = (await setupRecord(db))?.state === 'pending';
     } catch {
@@ -413,8 +396,8 @@ export const GET = defineFunction(async (rawContext: unknown) => {
     }
   }
   const setupAvailable = Boolean(
-    !plan.masterConfigured && !settings.masterUserId && setupToken &&
-      setupToken.length >= SETUP_CODE_MIN_LENGTH && (!usersExist || pendingSetup),
+    !plan.masterConfigured && !settings.masterUserId && browserSetupEnabled &&
+      (!usersExist || pendingSetup),
   );
   const setupBlocked = isSetupBlocked({
     masterConfigured: plan.masterConfigured,
@@ -431,7 +414,9 @@ export const GET = defineFunction(async (rawContext: unknown) => {
       masterError,
       setupBlocked,
       setupAvailable,
-      setupCodeRequired: setupAvailable,
+      // Kept for older clients that know this response field. The Docker
+      // installer is deliberately browser-only and never requires a log code.
+      setupCodeRequired: false,
       setupInProgress: pendingSetup,
       // Kept for older web bundles. The credential-returning flow was removed:
       // URL/Host loopback checks do not authenticate the actual network peer.
@@ -470,11 +455,10 @@ export const POST = defineFunction(async (rawContext: unknown) => {
     );
   }
 
-  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
-  if (!setupCodeMatches(body.setupCode, setupToken)) {
+  if (!hanjiEnvFlag(context.env, 'HANJI_BROWSER_SETUP')) {
     return Response.json(
-      { ok: false, message: 'The setup code is invalid.' },
-      { status: 403, headers: { 'Cache-Control': 'no-store' } },
+      { ok: false, message: 'Browser setup is not enabled for this runtime.' },
+      { status: 409, headers: { 'Cache-Control': 'no-store' } },
     );
   }
   const email = normalizeMasterEmail(body.email);

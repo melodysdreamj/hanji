@@ -748,6 +748,7 @@ export function watchBrowserErrors(page, {
   let initialSignedOutAllowanceAvailable = initialSignedOutStatuses.size > 0;
   let pendingSignedOutRefreshStatus = null;
   let pendingGenericAuthError = null;
+  let lateInitialConsoleStatus = null;
   const record = (message) => errors.push(prefix ? `${prefix}${message}` : message);
 
   page.on('pageerror', (error) => record(error.message));
@@ -756,18 +757,31 @@ export function watchBrowserErrors(page, {
     const genericStatus = Number(
       message.text().match(GENERIC_HTTP_FAILURE_CONSOLE_PATTERN)?.[1] ?? Number.NaN,
     );
+    const consoleUrl = message.location?.().url;
+    let verifiedAuthRefreshLocation = false;
+    if (consoleUrl) {
+      try {
+        verifiedAuthRefreshLocation = new URL(consoleUrl).pathname === '/api/auth/refresh';
+      } catch {
+        // The normal error path below preserves malformed console locations.
+      }
+    }
+    if (
+      !initialSignedOutWindowOpen
+      && lateInitialConsoleStatus === genericStatus
+      && verifiedAuthRefreshLocation
+    ) {
+      // Playwright can surface the console half of an already-observed initial
+      // refresh failure after the caller seals the signed-out window. Consume
+      // only that exact URL/status pair once; later or unrelated errors remain
+      // fatal.
+      lateInitialConsoleStatus = null;
+      return;
+    }
     if (initialSignedOutWindowOpen && initialSignedOutStatuses.has(genericStatus)) {
-      const consoleUrl = message.location?.().url;
-      if (consoleUrl) {
-        try {
-          if (new URL(consoleUrl).pathname !== '/api/auth/refresh') {
-            record(message.text());
-            return;
-          }
-        } catch {
-          record(message.text());
-          return;
-        }
+      if (consoleUrl && !verifiedAuthRefreshLocation) {
+        record(message.text());
+        return;
       }
       const location = includeConsoleLocation ? message.location() : null;
       const source = location?.url ? ` (${location.url}:${location.lineNumber})` : '';
@@ -782,7 +796,11 @@ export function watchBrowserErrors(page, {
         // Chromium may emit the console event just before Playwright's response
         // event. Hold it until the matching refresh response arrives or the
         // caller closes the initial-auth window.
-        pendingGenericAuthError = { message: diagnostic, status: genericStatus };
+        pendingGenericAuthError = {
+          message: diagnostic,
+          status: genericStatus,
+          verifiedAuthRefreshLocation,
+        };
       } else {
         record(diagnostic);
       }
@@ -831,11 +849,24 @@ export function watchBrowserErrors(page, {
     errors,
     async endInitialSignedOutRefreshWindow() {
       // Let the browser deliver the response/console pair before sealing the
-      // window. Callers await this before any sign-in click, so later failures
-      // cannot consume the initial signed-out allowance.
+      // window. The caller owns this boundary: a login smoke may close it only
+      // after successful authentication proves a delayed 401 belonged to the
+      // pre-login bootstrap.
       if (typeof page.waitForTimeout === 'function') await page.waitForTimeout(75);
       else await new Promise((resolve) => setTimeout(resolve, 0));
-      if (pendingGenericAuthError) record(pendingGenericAuthError.message);
+      // A resource console event can identify the exact refresh endpoint even
+      // when Playwright does not surface the matching response event (observed
+      // on GitHub's Chromium runner). In that case the URL-scoped, one-shot
+      // allowance is still unambiguous. Messages without that location remain
+      // fatal unless they were paired with the real response above.
+      if (pendingGenericAuthError && !pendingGenericAuthError.verifiedAuthRefreshLocation) {
+        record(pendingGenericAuthError.message);
+      }
+      // Preserve only an exact endpoint response that arrived before the
+      // window closed but whose generic Chromium console event is still in
+      // flight. This is not a new allowance: it is the unmatched half of the
+      // already-observed initial refresh failure.
+      lateInitialConsoleStatus = pendingSignedOutRefreshStatus;
       initialSignedOutWindowOpen = false;
       initialSignedOutAllowanceAvailable = false;
       pendingSignedOutRefreshStatus = null;

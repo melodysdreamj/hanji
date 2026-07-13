@@ -12,6 +12,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { createServer } from 'node:net';
+import { request as httpRequest } from 'node:http';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -348,6 +349,18 @@ function verifyDockerContext(label, contextDir) {
     entrypoint.includes("runtime-secrets.json") && entrypoint.includes("mode: 0o600"),
     `${label}: Dockerfile must persist private image-managed runtime secrets`,
   );
+  assert(
+    dockerfile.includes('apt-get install -y --no-install-recommends ca-certificates'),
+    `${label}: Dockerfile must include the system CA bundle for outbound HTTPS`,
+  );
+  assert(
+    dockerfile.includes('ENV LOCAL_PROTOCOL=http'),
+    `${label}: Dockerfile must default to reverse-proxy-friendly HTTP ingress`,
+  );
+  assert(
+    dockerfile.includes('VOLUME ["/data"]'),
+    `${label}: Dockerfile must provide an automatic persistent data volume`,
+  );
   console.log(`PASS ${label}: Docker build context includes the generated app bundle.`);
 }
 
@@ -538,6 +551,16 @@ function printDockerLogs(containerName) {
   console.error(output || '(no docker logs captured)');
 }
 
+function assertContainerCaBundle(containerName, label) {
+  run(`${label} system CA bundle`, 'docker', [
+    'exec',
+    containerName,
+    'sh',
+    '-lc',
+    'test -s /etc/ssl/certs/ca-certificates.crt',
+  ], root);
+}
+
 async function verifyDockerRuntime(options) {
   const port = options.dockerPort || String(await findFreePort());
   const suffix = `${Date.now()}-${randomBytes(5).toString('hex')}`;
@@ -598,6 +621,7 @@ async function verifyDockerRuntime(options) {
     await assertSpaFallbackRoutes(baseUrl, 'docker-runtime');
     await assertRuntimeEnvironment(baseUrl, 'docker-env-propagation-proof', 'docker-runtime');
     await assertMasterBootstrap(baseUrl, 'docker-runtime');
+    assertContainerCaBundle(containerName, 'docker-runtime');
     try {
       // Hanji intentionally permits anonymous bootstrap only from a
       // loopback client IP. A host-side request reaches the container through
@@ -654,7 +678,6 @@ async function verifyBindMountPersistence(imageTag) {
     'run', '-d',
     '--name', containerName,
     '-p', `127.0.0.1:${port}:8787`,
-    '-e', 'LOCAL_PROTOCOL=http',
     '-v', `${bindDir}:/data`,
     imageTag,
   ], root);
@@ -711,7 +734,6 @@ async function verifyRegistryFirstRun(imageTag) {
     'run', '-d',
     '--name', containerName,
     '-p', `127.0.0.1:${port}:8787`,
-    '-e', 'LOCAL_PROTOCOL=http',
     '-v', `${volumeName}:/data`,
     imageTag,
   ], root);
@@ -719,6 +741,7 @@ async function verifyRegistryFirstRun(imageTag) {
   try {
     start();
     await waitForDockerRuntimeReady(baseUrl, containerName);
+    assertContainerCaBundle(containerName, 'registry-style Docker runtime');
 
     const inspect = spawnSync('docker', ['inspect', containerName, '--format', '{{json .Config.Env}}'], {
       encoding: 'utf8',
@@ -739,31 +762,28 @@ async function verifyRegistryFirstRun(imageTag) {
     const statusBefore = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`);
     assert(statusBefore.response.ok, 'registry runtime bootstrap status failed');
     assert(statusBefore.json.setupAvailable === true, 'fresh registry runtime did not offer web setup');
-    assert(statusBefore.json.setupCodeRequired === true, 'fresh registry runtime did not require its setup code');
-    assert(!('setupCode' in statusBefore.json), 'registry runtime exposed its setup code over HTTP');
-
-    const setupCode = readContainerRuntimeSecret(containerName, 'HANJI_SETUP_TOKEN');
-    assert(setupCode.length >= 24, 'registry runtime setup code was not persisted under /data');
-
-    const wrong = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        action: 'completeSetup',
-        setupCode: `${setupCode}x`,
-        email,
-        password,
-      }),
-    });
-    assert(wrong.response.status === 403, `wrong registry setup code returned HTTP ${wrong.response.status}`);
+    assert(statusBefore.json.setupCodeRequired === false, 'fresh registry runtime still required a terminal setup code');
+    assert(!('setupCode' in statusBefore.json), 'registry runtime exposed an obsolete setup-code field');
+    assert(
+      !readContainerRuntimeSecret(containerName, 'HANJI_SETUP_TOKEN'),
+      'registry runtime persisted the obsolete terminal setup token',
+    );
 
     const initialized = await fetchJsonResponse(`${baseUrl}/api/functions/instance-bootstrap`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ action: 'completeSetup', setupCode, email, password }),
+      body: JSON.stringify({ action: 'completeSetup', email, password }),
     });
     assert(initialized.response.status === 201, `registry setup returned HTTP ${initialized.response.status}: ${JSON.stringify(initialized.json)}`);
     await assertPasswordSignin(baseUrl, email, password, 'registry first-run');
+    await assertBrowserCookiePasswordSignin(baseUrl, email, password, 'registry localhost browser');
+    await assertBrowserCookiePasswordSignin(
+      baseUrl,
+      email,
+      password,
+      'registry trusted HTTPS proxy browser',
+      'https://hanji.example.test',
+    );
 
     const persistedUserSecret = readContainerRuntimeSecret(containerName, 'JWT_USER_SECRET');
     run('remove registry-style container for persistence replay', 'docker', ['rm', '-f', containerName], root);
@@ -778,7 +798,8 @@ async function verifyRegistryFirstRun(imageTag) {
     assert(statusAfter.json.setupAvailable === false, 'recreated registry runtime reopened first-run setup');
     assert(statusAfter.json.setupBlocked === false, 'recreated registry runtime became setup-blocked');
     await assertPasswordSignin(baseUrl, email, password, 'recreated registry runtime');
-    console.log('PASS registry-style image generates private secrets, claims the first admin, and preserves both across recreation.');
+    await assertBrowserCookiePasswordSignin(baseUrl, email, password, 'recreated registry localhost browser');
+    console.log('PASS registry-style image offers zero-terminal browser setup, claims the first admin, and preserves it across recreation.');
   } catch (error) {
     console.error('\nRegistry-style Docker logs before failure:');
     printDockerLogs(containerName);
@@ -815,6 +836,48 @@ async function fetchJsonResponse(url, options = {}) {
   return { response, json };
 }
 
+async function fetchJsonResponseThroughProxy(upstreamUrl, publicOrigin, options = {}) {
+  const upstream = new URL(upstreamUrl);
+  const payload = options.body ?? '';
+  return new Promise((resolvePromise, reject) => {
+    const request = httpRequest({
+      hostname: upstream.hostname,
+      port: upstream.port,
+      path: `${upstream.pathname}${upstream.search}`,
+      method: options.method ?? 'GET',
+      headers: {
+        ...options.headers,
+        Host: new URL(publicOrigin).host,
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    }, (response) => {
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => {
+        const text = Buffer.concat(chunks).toString('utf8');
+        let json = {};
+        try {
+          json = text ? JSON.parse(text) : {};
+        } catch {
+          reject(new Error(`${upstreamUrl} did not return JSON: ${text.slice(0, 200)}`));
+          return;
+        }
+        resolvePromise({
+          response: {
+            ok: (response.statusCode ?? 500) >= 200 && (response.statusCode ?? 500) < 300,
+            status: response.statusCode ?? 500,
+            headers: new Headers(response.headers),
+          },
+          json,
+        });
+      });
+    });
+    request.setTimeout(15_000, () => request.destroy(new Error('proxy simulation timed out')));
+    request.on('error', reject);
+    request.end(payload);
+  });
+}
+
 async function assertPasswordSignin(baseUrl, email, password, label) {
   const { response, json } = await fetchJsonResponse(`${baseUrl}/api/auth/signin`, {
     method: 'POST',
@@ -823,6 +886,51 @@ async function assertPasswordSignin(baseUrl, email, password, label) {
   });
   assert(response.ok, `${label} sign-in returned HTTP ${response.status}: ${JSON.stringify(json)}`);
   assert(typeof json.accessToken === 'string' && json.accessToken, `${label} sign-in returned no access token`);
+}
+
+async function assertBrowserCookiePasswordSignin(
+  baseUrl,
+  email,
+  password,
+  label,
+  publicOrigin = baseUrl,
+) {
+  const publicUrl = new URL(publicOrigin);
+  const headers = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    Origin: publicOrigin,
+    'X-EdgeBase-Auth-Transport': 'cookie',
+  };
+  if (publicUrl.protocol === 'https:') {
+    headers.Host = publicUrl.host;
+    headers['X-Forwarded-Proto'] = 'https';
+  }
+  const requestOptions = {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ email, password }),
+  };
+  const { response, json } = publicUrl.protocol === 'https:'
+    ? await fetchJsonResponseThroughProxy(
+      `${baseUrl}/api/auth/signin`,
+      publicOrigin,
+      requestOptions,
+    )
+    : await fetchJsonResponse(`${baseUrl}/api/auth/signin`, requestOptions);
+  assert(response.ok, `${label} sign-in returned HTTP ${response.status}: ${JSON.stringify(json)}`);
+  assert(typeof json.accessToken === 'string' && json.accessToken, `${label} returned no access token`);
+  assert(!('refreshToken' in json), `${label} exposed the refresh credential to browser JavaScript`);
+  assert(json.sessionTransport === 'cookie', `${label} did not negotiate HttpOnly cookie transport`);
+  const cookie = response.headers.get('set-cookie') || '';
+  assert(cookie.includes('HttpOnly'), `${label} did not issue an HttpOnly refresh cookie`);
+  if (publicUrl.protocol === 'https:') {
+    assert(cookie.includes('__Host-hanji-refresh='), `${label} did not issue a host-only HTTPS cookie`);
+    assert(cookie.includes('Secure'), `${label} did not mark the HTTPS cookie Secure`);
+  } else {
+    assert(cookie.includes('hanji-refresh='), `${label} did not issue the localhost refresh cookie`);
+    assert(!cookie.includes('Secure'), `${label} issued an unusable Secure cookie over localhost HTTP`);
+  }
 }
 
 async function waitForDockerRuntimeReady(baseUrl, containerName) {

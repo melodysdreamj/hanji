@@ -2,6 +2,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
+const { uploadWorkspaceFileMock } = vi.hoisted(() => ({
+  uploadWorkspaceFileMock: vi.fn(),
+}));
+
 vi.mock("@/lib/edgebase", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/edgebase")>();
   return {
@@ -18,6 +22,11 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
     listCollaborationOperationsRemote: vi.fn(async () => []),
     recordCollaborationOperationRemote: vi.fn(async () => undefined),
   };
+});
+
+vi.mock("@/lib/storage", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/storage")>();
+  return { ...actual, uploadWorkspaceFile: uploadWorkspaceFileMock };
 });
 
 import { Editor } from "@/components/editor/Editor";
@@ -47,6 +56,14 @@ beforeEach(async () => {
   await i18next.changeLanguage("en");
   resetStore();
   seedUser();
+  uploadWorkspaceFileMock.mockReset();
+  uploadWorkspaceFileMock.mockImplementation(async (file: File) => ({
+    key: `blocks/${file.name}`,
+    url: `/api/storage/files/${file.name}`,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+  }));
 });
 afterEach(cleanup);
 
@@ -409,5 +426,170 @@ describe("BlockItem action menu", () => {
     const editable = editableFor("Text block text");
     expect(editable.getAttribute("contenteditable")).toBe("false");
     expect(editable.getAttribute("aria-readonly")).toBe("true");
+  });
+});
+
+describe("Editor external file drops", () => {
+  function transfer(files: File[]) {
+    return { types: ["Files"], files, dropEffect: "none" } as unknown as DataTransfer;
+  }
+
+  function dispatchFileDrag(
+    target: HTMLElement,
+    type: "dragover" | "drop",
+    dataTransfer: DataTransfer,
+    clientY: number
+  ) {
+    const event = new Event(type, { bubbles: true, cancelable: true });
+    Object.defineProperties(event, {
+      dataTransfer: { value: dataTransfer },
+      clientY: { value: clientY },
+    });
+    fireEvent(target, event);
+  }
+
+  function rect(top: number, bottom: number, left = 100, right = 700): DOMRect {
+    return {
+      x: left,
+      y: top,
+      top,
+      bottom,
+      left,
+      right,
+      width: right - left,
+      height: bottom - top,
+      toJSON: () => ({}),
+    };
+  }
+
+  it("replaces an empty paragraph and exposes upload progress while the file is in flight", async () => {
+    let resolveUpload!: (value: {
+      key: string;
+      url: string;
+      name: string;
+      type: string;
+      size: number;
+    }) => void;
+    uploadWorkspaceFileMock.mockImplementation(
+      (
+        file: File,
+        _scope: string,
+        _target: unknown,
+        options?: { onProgress?: (progress: { phase: "uploading"; percent: number }) => void }
+      ) => {
+        options?.onProgress?.({ phase: "uploading", percent: 42 });
+        return new Promise((resolve) => {
+          resolveUpload = resolve;
+        });
+      }
+    );
+
+    const { container } = renderEditor([textBlock(PAGE_ID, "drop-empty", "", { position: 0 })]);
+    const row = container.querySelector<HTMLElement>('[data-block-id="drop-empty"] > [data-type]')!;
+    row.getBoundingClientRect = () => rect(100, 132);
+    const file = new File(["installer"], "dragged-installer.dmg", {
+      type: "application/x-apple-diskimage",
+    });
+    const dataTransfer = transfer([file]);
+
+    fireEvent.dragOver(row, { dataTransfer, clientY: 116 });
+    expect(row.dataset.fileDrop).toBe("replace");
+    fireEvent.drop(row, { dataTransfer, clientY: 116 });
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-editor-file-upload="drop-empty"]')).toBeTruthy();
+    });
+    expect(screen.getByRole("progressbar").getAttribute("aria-valuenow")).toBe("42");
+
+    resolveUpload({
+      key: "blocks/files/dragged-installer.dmg",
+      url: "/api/storage/files/dragged-installer.dmg",
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    });
+    await waitFor(() => {
+      expect(pageBlocks()[0].type).toBe("file");
+      expect(pageBlocks()[0].content?.fileName).toBe(file.name);
+      expect(container.querySelector("[data-editor-file-upload]")).toBeNull();
+    });
+  });
+
+  it("shows a boundary line on blank canvas and preserves multi-file insertion order", async () => {
+    const { container } = renderEditor([
+      textBlock(PAGE_ID, "drop-before", "Before", { position: 1 }),
+      textBlock(PAGE_ID, "drop-after", "After", { position: 2 }),
+    ]);
+    const editor = container.querySelector<HTMLElement>("[data-editor-page]")!;
+    const tail = container.querySelector<HTMLElement>("[data-editor-tail]")!;
+    const beforeRow = container.querySelector<HTMLElement>('[data-block-id="drop-before"] > [data-type]')!;
+    const afterRow = container.querySelector<HTMLElement>('[data-block-id="drop-after"] > [data-type]')!;
+    editor.getBoundingClientRect = () => rect(0, 700, 100, 700);
+    beforeRow.getBoundingClientRect = () => rect(100, 132);
+    afterRow.getBoundingClientRect = () => rect(180, 212);
+
+    const image = new File(["image"], "dragged-image.png", { type: "image/png" });
+    const document = new File(["document"], "dragged-notes.pdf", { type: "application/pdf" });
+    const dataTransfer = transfer([image, document]);
+    dispatchFileDrag(tail, "dragover", dataTransfer, 150);
+    const indicator = container.querySelector<HTMLElement>("[data-editor-file-drop-indicator]");
+    expect(indicator?.dataset.editorFileDropIndicator).toBe("after");
+    expect(indicator?.style.top).toBe("132px");
+
+    dispatchFileDrag(tail, "drop", dataTransfer, 150);
+    await waitFor(() => {
+      expect(pageBlocks().map((block) => block.content?.fileName ?? block.plainText)).toEqual([
+        "Before",
+        "dragged-image.png",
+        "dragged-notes.pdf",
+        "After",
+      ]);
+    });
+    expect(pageBlocks().map((block) => block.type)).toEqual(["paragraph", "image", "file", "paragraph"]);
+    expect(container.querySelector("[data-editor-file-drop-indicator]")).toBeNull();
+  });
+
+  it("removes only a newly inserted placeholder when its upload fails", async () => {
+    uploadWorkspaceFileMock.mockRejectedValueOnce(new Error("synthetic upload failure"));
+    const { container } = renderEditor([
+      textBlock(PAGE_ID, "drop-anchor", "Keep this block", { position: 1 }),
+      textBlock(PAGE_ID, "drop-following", "Keep this too", { position: 2 }),
+    ]);
+    const anchor = container.querySelector<HTMLElement>(
+      '[data-block-id="drop-anchor"] > [data-type]'
+    )!;
+    anchor.getBoundingClientRect = () => rect(100, 140);
+    const file = new File(["failed"], "failed.pdf", { type: "application/pdf" });
+
+    fireEvent.drop(anchor, { dataTransfer: transfer([file]), clientY: 135 });
+
+    await waitFor(() => expect(uploadWorkspaceFileMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(pageBlocks().map((block) => block.plainText)).toEqual([
+        "Keep this block",
+        "Keep this too",
+      ]);
+    });
+  });
+
+  it("does not advertise or accept external file drops in read-only pages", () => {
+    seedPages([makePage({ id: PAGE_ID, title: "Read-only drop page" })]);
+    seedBlocks(PAGE_ID, [textBlock(PAGE_ID, "read-only-drop", "Protected", { position: 0 })]);
+    const { container } = render(
+      <Editor pageId={PAGE_ID} skipRemoteLoad showPageStarter={false} readOnly />
+    );
+    const row = container.querySelector<HTMLElement>(
+      '[data-block-id="read-only-drop"] > [data-type]'
+    )!;
+    row.getBoundingClientRect = () => rect(100, 140);
+    const file = new File(["blocked"], "blocked.pdf", { type: "application/pdf" });
+    const dataTransfer = transfer([file]);
+
+    fireEvent.dragOver(row, { dataTransfer, clientY: 135 });
+    fireEvent.drop(row, { dataTransfer, clientY: 135 });
+
+    expect(row.dataset.fileDrop).toBeUndefined();
+    expect(uploadWorkspaceFileMock).not.toHaveBeenCalled();
+    expect(pageBlocks().map((block) => block.plainText)).toEqual(["Protected"]);
   });
 });

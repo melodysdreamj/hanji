@@ -60,11 +60,11 @@ async function assertInstanceInitialized(context: FunctionContext) {
     // the configured address. The admin path does not pass through beforeSignUp.
     throw new Error(MASTER_PROVISIONING_MESSAGE);
   }
-  // Docker's first-run web installer has the same signup fence as the env
-  // master path. Even after admin.createUser inserts the first auth row, public
-  // signup remains closed until instance settings confirm the claimed master.
-  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN');
-  if (setupToken) {
+  // Docker's browser-only first-run installer has the same signup fence as the
+  // env master path. Even after admin.createUser inserts the first auth row,
+  // public signup remains closed until instance settings confirm the claimed
+  // master. The flag is image-managed and is not an authentication secret.
+  if (hanjiEnvFlag(context.env, 'HANJI_BROWSER_SETUP')) {
     const settings = await getInstanceSettings(context.admin.db('app'));
     if (settings.masterUserId) return;
     throw new Error(MASTER_PROVISIONING_MESSAGE);

@@ -359,6 +359,65 @@ test('browser diagnostics consume only the observed initial signed-out refresh 4
   await consoleFirstWatcher.endInitialSignedOutRefreshWindow();
   assert.deepEqual(consoleFirstErrors, []);
 
+  const locatedConsoleOnlyPage = fakePage();
+  const locatedConsoleOnlyErrors = [];
+  const locatedConsoleOnlyWatcher = watchBrowserErrors(locatedConsoleOnlyPage, {
+    errors: locatedConsoleOnlyErrors,
+    allowInitialSignedOutRefresh401: true,
+  });
+  const locatedRefresh401 = {
+    ...generic401,
+    location: () => ({ url: 'http://127.0.0.1:8787/api/auth/refresh' }),
+  };
+  await locatedConsoleOnlyPage.emit('console', locatedRefresh401);
+  await locatedConsoleOnlyWatcher.endInitialSignedOutRefreshWindow();
+  assert.deepEqual(locatedConsoleOnlyErrors, []);
+  await locatedConsoleOnlyPage.emit('console', locatedRefresh401);
+  assert.deepEqual(locatedConsoleOnlyErrors, [locatedRefresh401.text()]);
+
+  const latePairedConsolePage = fakePage();
+  const latePairedConsoleErrors = [];
+  const latePairedConsoleWatcher = watchBrowserErrors(latePairedConsolePage, {
+    errors: latePairedConsoleErrors,
+    allowInitialSignedOutRefresh401: true,
+  });
+  await latePairedConsolePage.emit(
+    'response',
+    fakeResponse(401, 'http://127.0.0.1:8787/api/auth/refresh'),
+  );
+  await latePairedConsoleWatcher.endInitialSignedOutRefreshWindow();
+  await latePairedConsolePage.emit('console', locatedRefresh401);
+  assert.deepEqual(latePairedConsoleErrors, []);
+  await latePairedConsolePage.emit('console', locatedRefresh401);
+  assert.deepEqual(latePairedConsoleErrors, [locatedRefresh401.text()]);
+
+  const lateWrongLocationPage = fakePage();
+  const lateWrongLocationErrors = [];
+  const lateWrongLocationWatcher = watchBrowserErrors(lateWrongLocationPage, {
+    errors: lateWrongLocationErrors,
+    allowInitialSignedOutRefresh401: true,
+  });
+  await lateWrongLocationPage.emit(
+    'response',
+    fakeResponse(401, 'http://127.0.0.1:8787/api/auth/refresh'),
+  );
+  await lateWrongLocationWatcher.endInitialSignedOutRefreshWindow();
+  await lateWrongLocationPage.emit('console', {
+    ...generic401,
+    location: () => ({ url: 'http://127.0.0.1:8787/api/functions/private' }),
+  });
+  assert.deepEqual(lateWrongLocationErrors, [generic401.text()]);
+
+  const unlocatedConsoleOnlyPage = fakePage();
+  const unlocatedConsoleOnlyErrors = [];
+  const unlocatedConsoleOnlyWatcher = watchBrowserErrors(unlocatedConsoleOnlyPage, {
+    errors: unlocatedConsoleOnlyErrors,
+    allowInitialSignedOutRefresh401: true,
+  });
+  await unlocatedConsoleOnlyPage.emit('console', generic401);
+  await unlocatedConsoleOnlyWatcher.endInitialSignedOutRefreshWindow();
+  assert.deepEqual(unlocatedConsoleOnlyErrors, [generic401.text()]);
+
   const wrongLocationPage = fakePage();
   const wrongLocationErrors = [];
   const wrongLocationWatcher = watchBrowserErrors(wrongLocationPage, {

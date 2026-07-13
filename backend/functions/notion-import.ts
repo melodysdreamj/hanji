@@ -20,7 +20,7 @@ import {
   workspaceAccessRole as sharedWorkspaceAccessRole,
 } from '../lib/page-access';
 import { fetchPublicResource } from '../lib/ssrf-guard';
-import { assertSafeStoredFileType, normalizeFileContentType } from '../lib/file-security';
+import { normalizeFileContentType } from '../lib/file-security';
 import { assertFileTargetsNotDeleting, withFileWorkspaceLease } from '../lib/file-operation-lock';
 import {
   assertNoUnownedStoredFileReferences,
@@ -117,6 +117,12 @@ const NOTION_IMPORT_JOB_RETENTION_DAYS_MAX = 365;
 const NOTION_IMPORT_JOB_KEEP_MAX = 25;
 const NOTION_IMPORT_JOB_PRUNE_BATCH_MAX = 12;
 const NOTION_APPLY_LEASE_TTL_MS = 30 * 60 * 1000;
+// Apply can legitimately run for many minutes, so its lease remains long and
+// is renewed at every durable progress checkpoint. If the owning request dies
+// (for example SQLITE_FULL resets the DO before the finally block can delete
+// the lock), let the same actor reclaim it after the heartbeat has been silent
+// for five minutes instead of blocking recovery for the full 30-minute TTL.
+const NOTION_APPLY_LEASE_STALE_MS = 5 * 60 * 1000;
 // Incremental discovery calls are bounded to a small wall-clock slice. Keep a
 // crashed worker from blocking resume for the apply lease's full 30 minutes.
 const NOTION_DISCOVER_LEASE_TTL_MS = 90 * 1000;
@@ -504,6 +510,25 @@ export interface NotionImportMapping {
   metadata?: Record<string, unknown>;
 }
 
+export function notionAppliedCountsFromMappings(
+  mappings: Pick<NotionImportMapping, 'localId' | 'localType' | 'relationKind'>[],
+) {
+  const productMappings = mappings.filter((mapping) => mapping.relationKind !== 'import_root');
+  return {
+    pages: productMappings.filter((mapping) => mapping.relationKind === 'page').length,
+    databases: new Set(
+      productMappings
+        .filter((mapping) => mapping.localType === 'database')
+        .map((mapping) => mapping.localId),
+    ).size,
+    properties: productMappings.filter((mapping) => mapping.relationKind === 'database_property').length,
+    views: productMappings.filter((mapping) => mapping.relationKind === 'database_view').length,
+    templates: productMappings.filter((mapping) => mapping.relationKind === 'database_template').length,
+    rows: productMappings.filter((mapping) => mapping.relationKind === 'database_row').length,
+    mappings: productMappings.length,
+  };
+}
+
 export interface DiscoveredNotionItem {
   notionId: string;
   notionObject: string;
@@ -837,7 +862,9 @@ function withImportProgress(
     label: importProgressLabels[event.key],
     status: event.status,
     startedAt: event.status === 'running' ? optionalString(existing.startedAt) ?? at : optionalString(existing.startedAt) ?? at,
-    finishedAt: isTerminal ? at : optionalString(existing.finishedAt),
+    // A resumed step is live again. Do not retain an older terminal timestamp:
+    // the run panel otherwise renders a still-running discovery as finished.
+    finishedAt: isTerminal ? at : undefined,
     ...(event.message ? { message: event.message } : {}),
     ...(counts ? { counts } : {}),
   });
@@ -3359,6 +3386,11 @@ async function safeNotionRequest(
     return {
       ok: false as const,
       error: error instanceof Error ? error.message : String(error),
+      status: error instanceof NotionApiError ? error.status : undefined,
+      retryable:
+        error instanceof NotionApiError
+          ? isRetryableNotionStatus(error.status)
+          : true,
     };
   }
 }
@@ -4592,10 +4624,13 @@ async function fetchFileForImport(reference: NotionFileReference) {
   if (!sourceUrlCanBeCopied(reference.url)) {
     throw new Error('unsupported file URL scheme');
   }
-  // Reject by source filename before any network or storage work. The response
-  // MIME is checked again below because either signal can reveal active web
-  // content that would execute if served from Hanji's origin.
-  assertSafeStoredFileType(reference.name, reference.type);
+  // A Notion workspace may contain arbitrary attachment formats, including
+  // SVG, HTML, XML, and source-code files. Preserve their declared MIME in
+  // storage; EdgeBase is the delivery security boundary and serves every
+  // non-passive type as an opaque, sandboxed attachment with nosniff. The
+  // importer still validates MIME syntax, source routing, size, byte count,
+  // storage integrity, ownership, and quota before committing the reference.
+  normalizedImportedContentType(reference.type, 'application/octet-stream');
   // SSRF guard: `data:` URLs are inline payloads (no network fetch), but any
   // http(s) source must resolve to a public host on every redirect hop.
   // fetchPublicResource follows redirects manually and re-validates each one.
@@ -4609,9 +4644,9 @@ async function fetchFileForImport(reference: NotionFileReference) {
   if (contentLength && contentLength > MAX_IMPORTED_FILE_SIZE) {
     throw new Error('source file is too large');
   }
-  const contentType = assertSafeStoredFileType(
-    reference.name,
-    normalizedImportedContentType(response.headers.get('content-type'), reference.type),
+  const contentType = normalizedImportedContentType(
+    response.headers.get('content-type'),
+    reference.type,
   );
   if (response.body && contentLength) {
     return {
@@ -4834,7 +4869,7 @@ async function storeNotionFileReference(
     if (typeof stored.etag !== 'string' || !stored.etag) {
       throw new Error('stored file integrity metadata was not available after copy');
     }
-    const storedContentType = assertSafeStoredFileType(name, stored.contentType);
+    const storedContentType = normalizedImportedContentType(stored.contentType);
     if (storedContentType !== file.contentType) {
       throw new Error('stored file content type did not match the source');
     }
@@ -7859,15 +7894,26 @@ async function collectDatabaseSnapshot(
 ) {
   const response = await safeNotionRequest(token, `/databases/${encodeURIComponent(databaseId)}`, apiVersion, { apiBase, onRetry });
   if (!response.ok) {
-    bag.missingPermissions.push({
-      code: 'database_unavailable',
+    const reportEntry = {
+      code: response.retryable
+        ? 'database_retrieve_retryable_error'
+        : 'database_unavailable',
       notionId: databaseId,
       notionObject: 'database',
       message: response.error,
-    });
-    return undefined;
+    };
+    if (response.retryable) {
+      bag.warnings.push(reportEntry);
+    } else {
+      bag.missingPermissions.push(reportEntry);
+    }
+    return {
+      database: undefined,
+      error: response.error,
+      fetchStatus: response.retryable ? 'retryable_error' as const : 'unavailable' as const,
+    };
   }
-  return response.data;
+  return { database: response.data, error: undefined, fetchStatus: 'retrieved' as const };
 }
 
 async function collectDataSourceTemplates(
@@ -8213,6 +8259,50 @@ export function notionEnrichmentShouldStop(params: {
   return false;
 }
 
+/**
+ * Whether a discovered graph item still needs a source snapshot.
+ *
+ * Database reads can legitimately finish without a snapshot when Notion does
+ * not expose the linked database to the integration. That terminal attempt is
+ * persisted explicitly so a later incremental chunk does not retry the same
+ * inaccessible reference forever.
+ */
+export function notionDiscoveryItemNeedsEnrichment(item: DiscoveredNotionItem): boolean {
+  if (item.notionObject === 'page') {
+    return !item.metadata || item.metadata.pageSnapshot == null;
+  }
+  if (item.notionObject === 'data_source') {
+    return !item.metadata || item.metadata.dataSourceSnapshot == null;
+  }
+  if (item.notionObject === 'database') {
+    const metadata = item.metadata ?? {};
+    const fetchStatus = metadata.databaseFetchStatus;
+    return asRecord(metadata.database) == null && fetchStatus !== 'retrieved' && fetchStatus !== 'unavailable';
+  }
+  return false;
+}
+
+export function notionDiscoveryEnrichmentCandidates(
+  items: DiscoveredNotionItem[],
+  maxItems: number,
+): DiscoveredNotionItem[] {
+  const limit = Number.isFinite(maxItems) ? Math.max(0, Math.floor(maxItems)) : items.length;
+  return items.filter(notionDiscoveryItemNeedsEnrichment).slice(0, limit);
+}
+
+export function notionEnrichmentWaveSize(params: {
+  remaining: number;
+  enrichBudget: number;
+  concurrency: number;
+}): number {
+  const remaining = Math.max(0, Math.floor(params.remaining));
+  const concurrency = Math.max(1, Math.floor(params.concurrency));
+  const budget = Number.isFinite(params.enrichBudget)
+    ? Math.max(0, Math.floor(params.enrichBudget))
+    : remaining;
+  return Math.min(remaining, concurrency, budget);
+}
+
 async function discoverNotionGraph(
   token: string,
   options: {
@@ -8330,7 +8420,7 @@ async function discoverNotionGraph(
   const hasDataSourceSnapshot = (it: DiscoveredNotionItem) =>
     !!it.metadata && it.metadata.dataSourceSnapshot != null;
   const hasDatabaseSnapshot = (it: DiscoveredNotionItem) =>
-    !!it.metadata && asRecord(it.metadata.database) != null;
+    it.notionObject === 'database' && !notionDiscoveryItemNeedsEnrichment(it);
 
   for (const record of results) {
     const notionObject = typeof record.object === 'string' ? record.object : 'unknown';
@@ -8422,7 +8512,13 @@ async function discoverNotionGraph(
 
   const databaseIds = new Set<string>();
   const retrievedDatabaseIds = new Set<string>();
-  const enrichable = Array.from(itemsById.values()).slice(0, options.maxEnrichedItems);
+  // Select pending work rather than slicing the whole graph. On a large graph,
+  // hundreds of completed rows can otherwise occupy the first page forever and
+  // starve later linked-database references.
+  const enrichable = notionDiscoveryEnrichmentCandidates(
+    Array.from(itemsById.values()),
+    options.maxEnrichedItems,
+  );
   const enrichedPageIds = new Set<string>();
   // Per-call enrichment cap. Non-incremental callers leave it Infinity so the
   // graph converges in one pass exactly as before. Incremental callers pass a
@@ -8675,43 +8771,71 @@ async function discoverNotionGraph(
     const pendingDatabaseIds = Array.from(databaseIds)
       .filter((databaseId) => !retrievedDatabaseIds.has(databaseId))
       .slice(0, options.maxEnrichedItems);
-    await mapWithConcurrency(pendingDatabaseIds, options.discoveryConcurrency, async (databaseId) => {
-      retrievedDatabaseIds.add(databaseId);
-      const database = await collectDatabaseSnapshot(token, databaseId, options.apiVersion, bag, options.apiBase, onRetry);
-      putDiscoveredItem(itemsById, {
-        notionId: databaseId,
-        notionObject: 'database',
-        title: database ? notionTitle(database) : undefined,
-        status: database ? 'discovered' : 'referenced',
-        phase: database ? 'database_snapshot' : 'database_reference',
-        metadata: {
-          discoveredFrom: database ? 'database_retrieve' : 'reference',
-          database,
-          dataSources: Array.isArray(database?.data_sources) ? database.data_sources : undefined,
-        },
-        error: database ? null : 'Database details unavailable.',
+    let offset = 0;
+    while (offset < pendingDatabaseIds.length && canEnrich()) {
+      // Start at most one concurrency-sized wave. Re-check the item budget and
+      // wall-clock deadline between waves so a large linked-database tail can
+      // never turn one incremental request into a multi-minute DO request.
+      const waveSize = notionEnrichmentWaveSize({
+        remaining: pendingDatabaseIds.length - offset,
+        enrichBudget,
+        concurrency: options.discoveryConcurrency,
       });
-      if (Array.isArray(database?.data_sources)) {
-        for (const dataSource of database.data_sources) {
-          if (!dataSource || typeof dataSource !== 'object') continue;
-          const dataSourceId = notionObjectId(dataSource as Record<string, unknown>);
-          if (!dataSourceId) continue;
-          putDiscoveredItem(itemsById, {
-            notionId: dataSourceId,
-            notionObject: 'data_source',
-            parentNotionId: databaseId,
-            title: notionTitle(dataSource as Record<string, unknown>),
-            status: 'referenced',
-            phase: 'database_data_source_reference',
-            metadata: {
-              discoveredFrom: 'database_data_sources',
-              databaseId,
-              dataSource,
-            },
-          });
-        }
+      if (waveSize <= 0) break;
+      const wave = pendingDatabaseIds.slice(offset, offset + waveSize);
+      offset += wave.length;
+      for (const databaseId of wave) {
+        retrievedDatabaseIds.add(databaseId);
+        enrichBudget -= 1;
+        enrichedThisCall += 1;
       }
-    });
+      await mapWithConcurrency(wave, options.discoveryConcurrency, async (databaseId) => {
+        const result = await collectDatabaseSnapshot(
+          token,
+          databaseId,
+          options.apiVersion,
+          bag,
+          options.apiBase,
+          onRetry,
+        );
+        const database = result.database;
+        putDiscoveredItem(itemsById, {
+          notionId: databaseId,
+          notionObject: 'database',
+          title: database ? notionTitle(database) : undefined,
+          status: database ? 'discovered' : 'referenced',
+          phase: database ? 'database_snapshot' : 'database_reference',
+          metadata: {
+            discoveredFrom: database ? 'database_retrieve' : 'reference',
+            databaseFetchStatus: result.fetchStatus,
+            database,
+            dataSources: Array.isArray(database?.data_sources) ? database.data_sources : undefined,
+          },
+          error: database ? null : result.error ?? 'Database details unavailable.',
+        });
+        if (Array.isArray(database?.data_sources)) {
+          for (const dataSource of database.data_sources) {
+            if (!dataSource || typeof dataSource !== 'object') continue;
+            const dataSourceId = notionObjectId(dataSource as Record<string, unknown>);
+            if (!dataSourceId) continue;
+            putDiscoveredItem(itemsById, {
+              notionId: dataSourceId,
+              notionObject: 'data_source',
+              parentNotionId: databaseId,
+              title: notionTitle(dataSource as Record<string, unknown>),
+              status: 'referenced',
+              phase: 'database_data_source_reference',
+              metadata: {
+                discoveredFrom: 'database_data_sources',
+                databaseId,
+                dataSource,
+              },
+            });
+          }
+        }
+      });
+      reportProgress('enrich');
+    }
   };
   const enrichPendingDataSources = async () => {
     const dataSourceItems = Array.from(itemsById.values())
@@ -8770,10 +8894,7 @@ async function discoverNotionGraph(
       byType[item.notionObject] = (byType[item.notionObject] ?? 0) + 1;
     }
     const pendingEnrichment = Array.from(itemsById.values()).filter(
-      (item) =>
-        (item.notionObject === 'page' && !hasPageSnapshot(item)) ||
-        (item.notionObject === 'data_source' && !hasDataSourceSnapshot(item)) ||
-        (item.notionObject === 'database' && !retrievedDatabaseIds.has(item.notionId)),
+      notionDiscoveryItemNeedsEnrichment,
     ).length;
     options.onProgress?.({
       phase,
@@ -8787,12 +8908,6 @@ async function discoverNotionGraph(
       recent: recentActivity.slice(),
     });
   };
-  pushImportActivity(recentActivity, {
-    kind: 'search_complete',
-    count: itemsById.size,
-  });
-  reportProgress('search');
-
   // Incremental resume: pre-mark items whose snapshot was already captured on an
   // earlier call so this call's budget is spent only on still-pending work and
   // completed items are never re-fetched.
@@ -8805,6 +8920,18 @@ async function discoverNotionGraph(
       retrievedDatabaseIds.add(item.notionId);
     }
   }
+
+  // Resumed chunks skip search entirely, so do not append another identical
+  // "search complete" line every few seconds. Pre-mark persisted snapshots
+  // before the first progress write so the processed count never jumps
+  // backwards at the start of a chunk.
+  if (!options.skipSearch) {
+    pushImportActivity(recentActivity, {
+      kind: 'search_complete',
+      count: itemsById.size,
+    });
+  }
+  reportProgress('search');
 
   for (const item of enrichable) {
     if (item.notionObject === 'database') databaseIds.add(item.notionId);
@@ -8859,16 +8986,13 @@ async function discoverNotionGraph(
   // snapshot and databases not yet retrieved. In incremental mode a positive
   // count means the client should loop another discover call. In one-shot mode
   // the graph has converged so this is normally 0.
-  const pendingEnrichment = items.filter(
-    (it) =>
-      (it.notionObject === 'page' && !hasPageSnapshot(it)) ||
-      (it.notionObject === 'data_source' && !hasDataSourceSnapshot(it)) ||
-      (it.notionObject === 'database' && !retrievedDatabaseIds.has(it.notionId)),
-  ).length;
-  pushImportActivity(recentActivity, {
-    kind: 'discovery_complete',
-    count: items.length,
-  });
+  const pendingEnrichment = items.filter(notionDiscoveryItemNeedsEnrichment).length;
+  if (!hasMore && pendingEnrichment === 0) {
+    pushImportActivity(recentActivity, {
+      kind: 'discovery_complete',
+      count: items.length,
+    });
+  }
 
   return {
     items,
@@ -9552,6 +9676,28 @@ function baseReport(extra: Record<string, unknown> = {}) {
     missingPermissions: [],
     ...extra,
   };
+}
+
+function mergeImportReportEntries(previous: unknown, current: unknown, limit = 500) {
+  const merged = [
+    ...(Array.isArray(previous) ? previous : []),
+    ...(Array.isArray(current) ? current : []),
+  ];
+  const seen = new Set<string>();
+  const result: unknown[] = [];
+  for (const entry of merged) {
+    let key: string;
+    try {
+      key = JSON.stringify(entry);
+    } catch {
+      key = String(entry);
+    }
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(entry);
+    if (result.length >= limit) break;
+  }
+  return result;
 }
 
 function finalizeConversionReport(report: ImportConversionReport) {
@@ -14152,6 +14298,23 @@ function isApplyLeaseConflict(error: unknown) {
   return code === 409 || /expectation failed|already exists|conflict/i.test(message);
 }
 
+export function notionApplyLeaseCanBeRecovered(params: {
+  requestedPurpose: 'apply' | 'discover';
+  existingPurpose?: 'apply' | 'discover';
+  actorId: string;
+  existingActorId: string;
+  updatedAt?: string;
+  createdAt?: string;
+  nowMs?: number;
+}) {
+  if (params.requestedPurpose !== 'apply') return false;
+  if (params.existingPurpose === 'discover') return false;
+  if (params.actorId !== params.existingActorId) return false;
+  const heartbeatMs = Date.parse(params.updatedAt ?? params.createdAt ?? '');
+  if (!Number.isFinite(heartbeatMs)) return false;
+  return (params.nowMs ?? Date.now()) - heartbeatMs >= NOTION_APPLY_LEASE_STALE_MS;
+}
+
 async function acquireNotionApplyLease(
   db: DbRef,
   job: NotionImportJob,
@@ -14163,7 +14326,18 @@ async function acquireNotionApplyLease(
   for (let attempt = 0; attempt < NOTION_APPLY_LEASE_CAS_ATTEMPTS; attempt += 1) {
     const existing = await getExisting(locks, job.id);
     const now = Date.now();
-    if (existing && new Date(existing.expiresAt).getTime() > now) {
+    const recoverableApplyLease = existing
+      ? notionApplyLeaseCanBeRecovered({
+          requestedPurpose: purpose,
+          existingPurpose: existing.purpose,
+          actorId,
+          existingActorId: existing.actorId,
+          updatedAt: existing.updatedAt,
+          createdAt: existing.createdAt,
+          nowMs: now,
+        })
+      : false;
+    if (existing && new Date(existing.expiresAt).getTime() > now && !recoverableApplyLease) {
       throw new Error(
         existing.purpose === 'discover' || purpose === 'discover'
           ? 'Notion import job is already being discovered.'
@@ -14473,25 +14647,35 @@ async function applyJobCore(
   const storedImportPagesFullWidth = parseOptionalBoolean(asRecord(job.options)?.importPagesFullWidth);
   const importPagesFullWidth = parseOptionalBoolean(body.importPagesFullWidth) ?? storedImportPagesFullWidth;
   const tokenSource = await notionTokenForJob(db, body, job, actorId, env).catch(() => undefined);
+  const durableApplied = notionAppliedCountsFromMappings(Array.from(existingMappings.values()));
+  const previousPartialApplied =
+    asRecord(asRecord(job.progress)?.partialApplied) ??
+    asRecord(asRecord(job.report)?.partialApplied);
+  const previousAppliedCount = (key: string) => {
+    const value = previousPartialApplied?.[key];
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0
+      ? Math.floor(value)
+      : 0;
+  };
   const created = {
-    pages: 0,
-    databases: 0,
-    blocks: 0,
-    properties: 0,
-    views: 0,
-    templates: 0,
-    rows: 0,
-    mappings: 0,
-    remappedProperties: 0,
-    remappedViewRelationFilters: 0,
-    remappedLinkedDatabaseContextFilters: 0,
-    remappedRowRelations: 0,
-    remappedTemplateRelations: 0,
-    remappedLinkBlocks: 0,
-    unresolvedImportReferences: 0,
-    fileCopies: 0,
-    fileCopySkipped: 0,
-    repairedPageParents: 0,
+    pages: durableApplied.pages,
+    databases: durableApplied.databases,
+    blocks: previousAppliedCount('blocks'),
+    properties: durableApplied.properties,
+    views: durableApplied.views,
+    templates: durableApplied.templates,
+    rows: durableApplied.rows,
+    mappings: durableApplied.mappings,
+    remappedProperties: previousAppliedCount('remappedProperties'),
+    remappedViewRelationFilters: previousAppliedCount('remappedViewRelationFilters'),
+    remappedLinkedDatabaseContextFilters: previousAppliedCount('remappedLinkedDatabaseContextFilters'),
+    remappedRowRelations: previousAppliedCount('remappedRowRelations'),
+    remappedTemplateRelations: previousAppliedCount('remappedTemplateRelations'),
+    remappedLinkBlocks: previousAppliedCount('remappedLinkBlocks'),
+    unresolvedImportReferences: previousAppliedCount('unresolvedImportReferences'),
+    fileCopies: previousAppliedCount('fileCopies'),
+    fileCopySkipped: previousAppliedCount('fileCopySkipped'),
+    repairedPageParents: previousAppliedCount('repairedPageParents'),
   };
   const fileCopyContext: NotionFileCopyContext = {
     db,
@@ -16616,6 +16800,7 @@ async function discoverJobUnderLease(
     // done. Non-incremental keeps the original search-only hasMore and 'ready'.
     const incrementalHasMore = discovery.hasMore || discovery.pendingEnrichment > 0;
     const compositeHasMore = incremental ? incrementalHasMore : discovery.hasMore;
+    const discoveryWorkRemaining = incremental && incrementalHasMore;
     // Search is exhausted once a pass finishes with no more search pages (or we
     // already skipped it). Persist it so later resume chunks skip the re-scan.
     const searchComplete = skipSearch || searchAlreadyComplete || discovery.hasMore === false;
@@ -16624,17 +16809,19 @@ async function discoverJobUnderLease(
       status: 'ready',
       // Incremental discovery keeps the job 'discovering' while work remains; the
       // spread overrides the base 'ready' above only when there is more to do.
-      ...(incremental && incrementalHasMore ? { status: 'discovering' } : {}),
-      phase: 'discovery_complete',
+      ...(discoveryWorkRemaining ? { status: 'discovering' } : {}),
+      phase: discoveryWorkRemaining ? 'discovery_enrichment' : 'discovery_complete',
       notionWorkspaceId: discovery.notionWorkspace.id,
       notionWorkspaceName: discovery.notionWorkspace.name,
       counts: totalGraphCounts,
       progress: {
         ...withImportProgress(discoveryProgress, {
           key: 'discover',
-          status: 'completed',
-          legacyStep: 'ready_for_graph_planning',
-          percent: 50,
+          status: discoveryWorkRemaining ? 'running' : 'completed',
+          legacyStep: discoveryWorkRemaining
+            ? 'discovering_accessible_workspace_graph'
+            : 'ready_for_graph_planning',
+          percent: discoveryWorkRemaining ? 48 : 50,
           at: finishedAt,
           counts: {
             discovered: currentDiscoveryItems.length,
@@ -16676,12 +16863,15 @@ async function discoverJobUnderLease(
         discoveredByObject: totalGraphCounts,
         currentDiscoveryByObject: discovery.graphCounts,
         searchDiscoveredByObject: discovery.counts,
-        warnings: discovery.warnings,
-        missingPermissions: discovery.missingPermissions,
-        unsupported: discovery.unsupported,
+        warnings: mergeImportReportEntries(job.report?.warnings, discovery.warnings),
+        missingPermissions: mergeImportReportEntries(
+          job.report?.missingPermissions,
+          discovery.missingPermissions,
+        ),
+        unsupported: mergeImportReportEntries(job.report?.unsupported, discovery.unsupported),
       }),
       error: null,
-      finishedAt,
+      finishedAt: discoveryWorkRemaining ? null : finishedAt,
     });
     if (!updated) {
       const current = await getExisting(jobs, job.id);

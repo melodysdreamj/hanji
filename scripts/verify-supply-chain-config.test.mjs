@@ -26,10 +26,52 @@ test('the release container base image is pinned to an immutable multi-arch dige
     /npm install -g npm@\d+\.\d+\.\d+/,
     'the npm bundled in the base image must be upgraded to an exact patched version',
   );
+  assert.match(
+    dockerfile,
+    /apt-get install -y --no-install-recommends ca-certificates/,
+    'the runtime image must trust public HTTPS APIs through the system CA bundle',
+  );
+  assert.match(dockerfile, /ENV LOCAL_PROTOCOL=http/);
+  assert.match(dockerfile, /VOLUME \["\/data"\]/);
   assert.doesNotMatch(
     dockerfile,
     /corepack\s+(?:enable|prepare)|pnpm@/,
     'the runtime image must not install the unused pnpm toolchain',
+  );
+});
+
+test('the container enables browser-only setup without a terminal setup secret', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+  const edgebaseConfig = read('backend/edgebase.config.ts');
+  const launcher = read('scripts/selfhost-docker.sh');
+  const persistedSecretList = entrypoint.match(/const secretNames = \[([\s\S]*?)\];/)?.[1] ?? '';
+
+  assert.match(entrypoint, /process\.env\.HANJI_BROWSER_SETUP \|\|= 'true'/);
+  assert.match(entrypoint, /process\.env\.LOCAL_PROTOCOL \|\| 'http'/);
+  assert.match(edgebaseConfig, /allowInsecureLocalhost:\s*BROWSER_SETUP_ENABLED/);
+  assert.match(edgebaseConfig, /trustSelfHostedProxy:\s*TRUST_SELF_HOSTED_PROXY/);
+  assert.match(
+    edgebaseConfig,
+    /envValue\('HANJI_TRUST_SELF_HOSTED_PROXY'\) === undefined[\s\S]*?BROWSER_SETUP_ENABLED/,
+  );
+  assert.doesNotMatch(persistedSecretList, /HANJI_SETUP_TOKEN/);
+  assert.doesNotMatch(entrypoint, /console\.log\([^\n]*first-run setup code/i);
+  assert.doesNotMatch(launcher, /HANJI_SETUP_TOKEN|Code:\s+%s/);
+});
+
+test('a registry-pulled image refuses to start when Docker persistence is nearly full', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+
+  assert.match(entrypoint, /statfsSync\(persistDir\)/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB \|\| '524288'/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB must be a non-negative integer/);
+  assert.match(
+    entrypoint,
+    /Docker persistence storage is too full[\s\S]*?Free Docker disk space and restart\. The \/data volume was kept\./,
+  );
+  assert.ok(
+    entrypoint.indexOf('statfsSync(persistDir)') < entrypoint.indexOf('mkdirSync(secretDir'),
+    'the disk guard must run before the entrypoint writes persistent secrets',
   );
 });
 
@@ -101,6 +143,27 @@ test('deploy uses strict live-link preflight while ordinary local packaging stay
   );
 });
 
+test('release versions and published EdgeBase pins stay aligned', () => {
+  const backendPackage = JSON.parse(read('backend/package.json'));
+  const webPackage = JSON.parse(read('web/package.json'));
+  const mcpPackage = JSON.parse(read('mcp/package.json'));
+  const edgebaseVersion = backendPackage.devDependencies?.['@edge-base/cli'];
+
+  assert.equal(webPackage.version, backendPackage.version);
+  assert.equal(mcpPackage.version, backendPackage.version);
+  assert.match(backendPackage.version, /^\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/);
+  assert.match(edgebaseVersion ?? '', /^\d+\.\d+\.\d+$/);
+  assert.equal(backendPackage.devDependencies?.['@edge-base/shared'], edgebaseVersion);
+  assert.equal(webPackage.dependencies?.['@edge-base/web'], edgebaseVersion);
+
+  const dockerBuild = read('scripts/build-hanji-docker-image.mjs');
+  assert.doesNotMatch(
+    dockerBuild,
+    /cpSync|join\(backendDir, ['"]docker-context['"]\)/,
+    'Hanji must rely on the pinned EdgeBase Docker context contract instead of copying support files a second time',
+  );
+});
+
 test('every external GitHub Action is pinned to a full commit with a version comment', () => {
   const workflowFiles = readdirSync(workflowsDir)
     .filter((name) => name.endsWith('.yml') || name.endsWith('.yaml'))
@@ -134,6 +197,126 @@ test('every external GitHub Action is pinned to a full commit with a version com
       assert.ok(versionComment, `${location} must retain the human-readable action version`);
     }
   }
+});
+
+test('GitHub-maintained JavaScript actions stay on reviewed Node 24-compatible releases', () => {
+  const expected = new Map([
+    [
+      'actions/attest-build-provenance',
+      {
+        sha: '0f67c3f4856b2e3261c31976d6725780e5e4c373',
+        version: 'v4.1.1',
+      },
+    ],
+    [
+      'actions/checkout',
+      {
+        sha: '9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0',
+        version: 'v7.0.0',
+      },
+    ],
+    [
+      'actions/configure-pages',
+      {
+        sha: '45bfe0192ca1faeb007ade9deae92b16b8254a0d',
+        version: 'v6.0.0',
+      },
+    ],
+    [
+      'actions/deploy-pages',
+      {
+        sha: 'cd2ce8fcbc39b97be8ca5fce6e763baed58fa128',
+        version: 'v5.0.0',
+      },
+    ],
+    [
+      'actions/download-artifact',
+      {
+        sha: '3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c',
+        version: 'v8.0.1',
+      },
+    ],
+    [
+      'actions/setup-node',
+      {
+        sha: '48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e',
+        version: 'v6.4.0',
+      },
+    ],
+    [
+      'actions/upload-artifact',
+      {
+        sha: '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a',
+        version: 'v7.0.1',
+      },
+    ],
+    [
+      'actions/upload-pages-artifact',
+      {
+        sha: 'fc324d3547104276b827a68afc52ff2a11cc49c9',
+        version: 'v5.0.0',
+      },
+    ],
+    [
+      'github/codeql-action/analyze',
+      {
+        sha: '99df26d4f13ea111d4ec1a7dddef6063f76b97e9',
+        version: 'v4.37.0',
+      },
+    ],
+    [
+      'github/codeql-action/init',
+      {
+        sha: '99df26d4f13ea111d4ec1a7dddef6063f76b97e9',
+        version: 'v4.37.0',
+      },
+    ],
+  ]);
+  const counts = new Map([...expected.keys()].map((action) => [action, 0]));
+
+  for (const workflowFile of readdirSync(workflowsDir)) {
+    if (!workflowFile.endsWith('.yml') && !workflowFile.endsWith('.yaml')) continue;
+    const lines = readFileSync(join(workflowsDir, workflowFile), 'utf8').split('\n');
+    for (const [index, line] of lines.entries()) {
+      const parsed = line.match(
+        /^\s*(?:-\s*)?uses:\s*((?:actions\/[a-z0-9-]+|github\/codeql-action\/(?:init|analyze)))@([0-9a-f]{40})\s+#\s+(v\d+(?:\.\d+){0,2})\s*$/,
+      );
+      if (!parsed) continue;
+      const [, action, sha, version] = parsed;
+      const pin = expected.get(action);
+      assert.ok(pin, `${workflowFile}:${index + 1} must add ${action} to the reviewed action pins`);
+      assert.equal(sha, pin.sha, `${workflowFile}:${index + 1} must use ${action} ${pin.version}`);
+      assert.equal(version, pin.version, `${workflowFile}:${index + 1} version comment must match the reviewed pin`);
+      counts.set(action, counts.get(action) + 1);
+    }
+  }
+
+  for (const [action, count] of counts) {
+    assert.ok(count > 0, `expected at least one ${action} use`);
+  }
+});
+
+test('CLA Assistant runs its reviewed immutable bundle on Node 24', () => {
+  const cla = read('.github/workflows/cla.yml');
+
+  assert.match(
+    cla,
+    /uses: actions\/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6\.4\.0[\s\S]*?node-version: 24/,
+  );
+  assert.match(cla, /CLA_ACTION_SHA: ca4a40a7d1004f18d9960b404b97e5f30a505a08/);
+  assert.match(
+    cla,
+    /CLA_ACTION_SHA256: a44111084c0d4782206c04b4276292f7fec6d1f7a33525512fbeef3242079dfb/,
+  );
+  assert.match(
+    cla,
+    /raw\.githubusercontent\.com\/contributor-assistant\/github-action\/\$\{CLA_ACTION_SHA\}\/dist\/index\.js/,
+  );
+  assert.match(cla, /sha256sum --check --status/);
+  assert.match(cla, /'INPUT_LOCK-PULLREQUEST-AFTERMERGE=true'/);
+  assert.match(cla, /'INPUT_SUGGEST-RECHECK=true'/);
+  assert.match(cla, /node "\$action_path"/);
+  assert.doesNotMatch(cla, /uses: contributor-assistant\/github-action@/);
 });
 
 test('dependency advisories are gated and docs build code has no deployment token', () => {

@@ -5,9 +5,8 @@
 # EdgeBase image if needed, issues a locally-trusted certificate (via mkcert
 # when available, otherwise a self-signed one), and runs the container with TLS
 # so release-mode cookie sign-in works. The image persists its own runtime
-# secrets under /data; a fresh instance asks for its logged setup code and first
-# administrator in the browser. Re-running reuses the same secrets, cert, and
-# data.
+# secrets under /data; a fresh instance asks for its first administrator
+# directly in the browser. Re-running reuses the same secrets, cert, and data.
 #
 # Usage:
 #   scripts/selfhost-docker.sh up [--port N] [--email you@example.com]
@@ -331,11 +330,7 @@ cmd_up() {
     printf '  Email:    %s\n' "$email"
     printf '  Password: %s\n' "$password"
   elif [ "$setup_available" -eq 1 ]; then
-    setup_code=$(docker exec "$CONTAINER" node -e \
-      'const fs=require("fs");const p=(process.env.PERSIST_DIR||"/data")+"/.hanji/runtime-secrets.json";process.stdout.write(JSON.parse(fs.readFileSync(p,"utf8")).HANJI_SETUP_TOKEN||"")')
-    [ -n "$setup_code" ] || die "Could not read the first-run setup code from the container."
     printf '  Setup:    open the URL and create the first server administrator.\n'
-    printf '  Code:     %s\n' "$setup_code"
   else
     printf '  Setup:    existing instance detected; sign in with its administrator account.\n'
   fi

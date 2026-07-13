@@ -1,4 +1,5 @@
 .editor {
+  position: relative;
   padding: 4px 0 40px;
   font-size: var(--page-font-size, 16px);
   line-height: 1.5;
@@ -39,6 +40,74 @@
 }
 .editorTail {
   min-height: 36vh;
+}
+.editorFileDropIndicator {
+  position: absolute;
+  z-index: 4;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent-blue);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-blue) 12%, transparent);
+  pointer-events: none;
+}
+.editorFileUploadQueue {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 120;
+  box-sizing: border-box;
+  width: min(340px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.editorFileUploadProgress {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 10px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--surface-default);
+  color: var(--text-default);
+  box-shadow: var(--shadow-popover);
+}
+.editorFileUploadProgressHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+.editorFileUploadProgressHeader strong {
+  font-weight: 600;
+}
+.editorFileUploadProgressHeader span,
+.editorFileUploadProgressName {
+  color: var(--text-secondary);
+}
+.editorFileUploadProgressName {
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editorFileUploadProgressTrack {
+  height: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg-hover);
+}
+.editorFileUploadProgressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  transition: width 120ms ease;
 }
 .editorContentLoading {
   display: block;
@@ -241,7 +310,9 @@
   opacity: 0.45;
 }
 .blockRow[data-drop="before"]::before,
-.blockRow[data-drop="after"]::after {
+.blockRow[data-drop="after"]::after,
+.blockRow[data-file-drop="before"]::before,
+.blockRow[data-file-drop="after"]::after {
   content: "";
   position: absolute;
   left: 0;
@@ -252,10 +323,12 @@
   background: var(--accent-blue);
   pointer-events: none;
 }
-.blockRow[data-drop="before"]::before {
+.blockRow[data-drop="before"]::before,
+.blockRow[data-file-drop="before"]::before {
   top: -1px;
 }
-.blockRow[data-drop="after"]::after {
+.blockRow[data-drop="after"]::after,
+.blockRow[data-file-drop="after"]::after {
   bottom: -1px;
 }
 .blockRow[data-drop="inside"] .blockBody {
@@ -602,12 +675,7 @@
 .editable:focus-visible {
   outline: none;
 }
-.editable[data-file-drop="true"] {
-  border-radius: 4px;
-  background: rgba(35, 131, 226, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(35, 131, 226, 0.24);
-}
-.blockRow[data-file-drop="true"] > .blockBody {
+.blockRow[data-file-drop="replace"] > .blockBody {
   border-radius: 4px;
   background: rgba(35, 131, 226, 0.08);
   box-shadow: inset 0 0 0 1px rgba(35, 131, 226, 0.24);

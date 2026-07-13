@@ -12,6 +12,7 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/edgebase")>();
   return {
     ...actual,
+    applyNotionImportJobRemote: vi.fn(),
     beginNotionOAuthConnectionRemote: vi.fn(() => new Promise(() => {})),
     fetchRuntimeConfigRemote: vi.fn(async () => ({
       allowAnonymousBootstrap: false,
@@ -61,6 +62,7 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
 import { ImportDialog } from "@/components/ImportDialog";
 import {
   DEFAULT_LEGAL_LINKS,
+  applyNotionImportJobRemote,
   beginNotionOAuthConnectionRemote,
   discoverNotionImportJobRemote,
   fetchRuntimeConfigRemote,
@@ -72,6 +74,7 @@ import { resetStore, seedUser } from "./components/storeTestUtils";
 
 const listJobsMock = vi.mocked(listNotionImportJobsRemote);
 const listConnectionsMock = vi.mocked(listNotionImportConnectionsRemote);
+const applyJobMock = vi.mocked(applyNotionImportJobRemote);
 
 const readyJob = {
   id: "job-ready-1",
@@ -103,6 +106,19 @@ const manualTokenLiveJob = {
   progress: { percent: 15, step: "discover", steps: [] },
 };
 
+const interruptedApplyJob = {
+  ...liveJob,
+  status: "ready",
+  phase: "apply_pages",
+  progress: {
+    percent: 72,
+    currentStep: "apply",
+    currentStatus: "running",
+    applyCursor: { phase: "apply_pages", pageIndex: 20, totalPages: 385 },
+    steps: [],
+  },
+};
+
 async function openNotionSource() {
   render(<ImportDialog onClose={vi.fn()} />);
   fireEvent.click(screen.getByRole("button", { name: "Notion" }));
@@ -126,6 +142,7 @@ beforeEach(() => {
     }],
     connectionStorageAvailable: true,
   } as never);
+  applyJobMock.mockReset();
 });
 
 afterEach(() => {
@@ -218,6 +235,12 @@ describe("ImportDialog active-job selection on reopen", () => {
   });
 
   it("asks for a one-time token after reload instead of pretending the orphaned job is still running", async () => {
+    let finishDiscovery!: (value: Awaited<ReturnType<typeof discoverNotionImportJobRemote>>) => void;
+    vi.mocked(discoverNotionImportJobRemote).mockImplementationOnce(
+      () => new Promise((resolve) => {
+        finishDiscovery = resolve;
+      }),
+    );
     listJobsMock.mockResolvedValue({ jobs: [manualTokenLiveJob] } as never);
     listConnectionsMock.mockResolvedValue({
       connections: [],
@@ -233,6 +256,11 @@ describe("ImportDialog active-job selection on reopen", () => {
     fireEvent.change(tokenInput, { target: { value: "ntn_resume-token" } });
     fireEvent.click(await screen.findByRole("button", { name: "Resume discovery" }));
 
+    // Manual resume keeps the same live job id/status, so it cannot rely on a
+    // later active-job transition to leave Connect. Show progress immediately
+    // while the first bounded discovery request is still pending.
+    expect(await screen.findByLabelText("Live activity")).toBeTruthy();
+
     await waitFor(() => {
       expect(vi.mocked(discoverNotionImportJobRemote)).toHaveBeenCalledWith({
         jobId: "job-live-1",
@@ -243,5 +271,103 @@ describe("ImportDialog active-job selection on reopen", () => {
         incremental: true,
       });
     });
+    await act(async () => {
+      finishDiscovery({
+        job: {
+          ...manualTokenLiveJob,
+          status: "ready",
+          progress: { hasMore: false, percent: 100, steps: [] },
+        },
+        itemCount: 0,
+      } as never);
+    });
+  });
+
+  it("resumes a persisted apply and follows partial responses until completion", async () => {
+    const completed = {
+      ...interruptedApplyJob,
+      status: "completed",
+      phase: "applied",
+      progress: {
+        percent: 100,
+        currentStep: "apply",
+        currentStatus: "completed",
+        steps: [],
+      },
+    };
+    listJobsMock.mockResolvedValue({ jobs: [interruptedApplyJob] } as never);
+    applyJobMock
+      .mockResolvedValueOnce({
+        job: {
+          ...interruptedApplyJob,
+          phase: "apply_database_containers",
+        },
+        applied: { databases: 25 },
+        mappings: [],
+        partial: true,
+      } as never)
+      .mockResolvedValueOnce({
+        job: completed,
+        applied: { pages: 385, databases: 259 },
+        mappings: [],
+      } as never);
+
+    await openNotionSource();
+
+    await waitFor(() => expect(applyJobMock).toHaveBeenCalledTimes(2));
+    expect(applyJobMock).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      workspaceId: "ws-1",
+      jobId: "job-live-1",
+      connectionId: "connection-1",
+      applyDatabaseBatchSize: 25,
+      applyPageBatchSize: 20,
+    }));
+    expect(applyJobMock).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      jobId: "job-live-1",
+      applyDatabaseBatchSize: 25,
+      applyPageBatchSize: 20,
+    }));
+  });
+
+  it("labels a manual-token apply retry as retry instead of discovery", async () => {
+    const manualInterruptedApplyJob = {
+      ...interruptedApplyJob,
+      connectionId: undefined,
+      connectionKind: "manual_token",
+    };
+    const completed = {
+      ...manualInterruptedApplyJob,
+      status: "completed",
+      phase: "applied",
+      progress: {
+        percent: 100,
+        currentStep: "apply",
+        currentStatus: "completed",
+        steps: [],
+      },
+    };
+    listJobsMock.mockResolvedValue({ jobs: [manualInterruptedApplyJob] } as never);
+    listConnectionsMock.mockResolvedValue({
+      connections: [],
+      connectionStorageAvailable: true,
+    } as never);
+    applyJobMock.mockResolvedValue({
+      job: completed,
+      applied: { pages: 385, databases: 259 },
+      mappings: [],
+    } as never);
+
+    await openNotionSource();
+
+    const retry = await screen.findByRole("button", { name: "Retry" });
+    fireEvent.change(await screen.findByPlaceholderText("ntn_..."), {
+      target: { value: "ntn_resume-token" },
+    });
+    fireEvent.click(retry);
+
+    await waitFor(() => expect(applyJobMock).toHaveBeenCalledWith(expect.objectContaining({
+      jobId: "job-live-1",
+      notionToken: "ntn_resume-token",
+    })));
   });
 });
