@@ -1,7 +1,7 @@
 {
   "tagline": "Sign in to your workspace.",
   "providerNotReady": "That social sign-in provider is not ready.",
-  "signupRestricted": "Account creation is restricted by administrator settings. Use an invitation or an allowed organization email.",
+  "signupRestricted": "O administrador do servidor fechou a criação de contas. Peça a um administrador para criar a sua conta no servidor e depois inicie sessão.",
   "emailNotReady": "Email is not ready. Check the Cloudflare Email Service settings.",
   "verificationNotAccepted": "That verification code was not accepted.",
   "recoveryNotAccepted": "That recovery code was not accepted.",
