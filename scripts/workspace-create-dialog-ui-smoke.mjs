@@ -50,10 +50,16 @@ async function signInThroughUi(page) {
   await page.getByRole('textbox', { name: 'Email' }).fill(MASTER_EMAIL);
   await passwordField.fill(MASTER_PASSWORD);
   await page.getByRole('button', { name: 'Continue', exact: true }).click({ timeout: TIMEOUT_MS });
-  await page.locator('button[aria-label="Open workspace menu"]').waitFor({
-    state: 'visible',
-    timeout: TIMEOUT_MS,
-  });
+  const workspaceMenu = page.locator('button[aria-label="Open workspace menu"]');
+  const languageOnboarding = page.locator('[data-testid="language-onboarding"]');
+  const firstSurface = await Promise.race([
+    workspaceMenu.waitFor({ state: 'visible', timeout: TIMEOUT_MS }).then(() => 'workspace'),
+    languageOnboarding.waitFor({ state: 'visible', timeout: TIMEOUT_MS }).then(() => 'language'),
+  ]);
+  if (firstSurface === 'language') {
+    await languageOnboarding.getByRole('button', { name: 'Continue' }).click({ timeout: TIMEOUT_MS });
+    await workspaceMenu.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
+  }
 }
 
 async function openCreateDialog(page) {
