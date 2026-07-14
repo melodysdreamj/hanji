@@ -59,10 +59,11 @@ async function main() {
   await assertRuntimeReachable(apiUrl);
   const { chromium } = await loadPlaywright();
   const executablePath = resolveChromeExecutable();
-  const browser = await chromium.launch({
+  const launchBrowser = () => chromium.launch({
     headless: !options.headed,
     ...(executablePath ? { executablePath } : {}),
   });
+  let browser = await launchBrowser();
 
   const seeds = [];
   try {
@@ -88,6 +89,11 @@ async function main() {
     }
 
     if (options.phases.has('D')) {
+      // D owns the service-worker/CacheStorage contract. Start it in a fresh
+      // browser process so the A-C IndexedDB and network stress cannot delay
+      // worker installation or the atomic complete-graph publication.
+      await browser.close();
+      browser = await launchBrowser();
       const seedD = await seedPage(apiUrl);
       seeds.push(seedD);
       await assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seedD);
@@ -460,21 +466,44 @@ async function waitForOfflineShell(page) {
     () =>
       page.evaluate(async () => {
         const registration = await navigator.serviceWorker?.getRegistration();
-        if (!registration?.active) return false;
+        if (!registration?.active) {
+          return {
+            state: 'waiting-for-active',
+            installing: registration?.installing?.state ?? null,
+            waiting: registration?.waiting?.state ?? null,
+          };
+        }
         const marker = await caches.match('/__hanji_precache__');
-        if (!marker) return false;
+        if (!marker) {
+          const bootMarker = await caches.match('/__hanji_boot__');
+          return {
+            state: 'waiting-for-full-marker',
+            cacheNames: await caches.keys(),
+            bootMarker: bootMarker ? await bootMarker.json() : null,
+          };
+        }
         const manifest = await marker.json();
-        if (manifest.complete !== true || typeof manifest.version !== 'string') return false;
+        if (manifest.complete !== true || typeof manifest.version !== 'string') {
+          return { state: 'incomplete-full-marker', marker: manifest };
+        }
         const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
         const required = [
           '/theme-init.js',
           assets.find((path) => /\/PageView-[^/]+\.js$/.test(path)),
           assets.find((path) => /\/Editor-[^/]+\.js$/.test(path)),
         ].filter(Boolean);
-        if (required.length !== 3) return false;
-        return (await Promise.all(required.map((path) => caches.match(path)))).every(Boolean);
+        if (required.length !== 3) {
+          return { state: 'missing-required-paths', required };
+        }
+        const cached = await Promise.all(required.map((path) => caches.match(path)));
+        return {
+          state: cached.every(Boolean) ? 'ready' : 'waiting-for-required-assets',
+          cached: cached.map(Boolean),
+          required,
+          version: manifest.version,
+        };
       }),
-    (ready) => ready === true,
+    (result) => result?.state === 'ready',
     'service worker to activate and precache the shell'
   );
 }
