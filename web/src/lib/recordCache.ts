@@ -29,6 +29,15 @@ import {
   legacyRecordCacheMigrationMarkerKey,
   migrateLegacyIndexedDbProvenance,
 } from "./legacyNamespace";
+import {
+  databaseRowCacheKeysFromSuffix,
+  recordCacheMeta,
+  recordCacheTables,
+} from "./recordCacheKeys";
+
+// Compatibility export for existing callers. New code should import from the
+// key-schema module so cache ownership remains visible at the call site.
+export { hashRecordCacheKey as hashCacheKey } from "./recordCacheKeys";
 
 // Bump when the shape of any cached value changes; the SDK layer then wipes
 // the store on first use instead of hydrating stale shapes.
@@ -181,7 +190,7 @@ async function evictOldestBlockTables(cache: RecordCache, count: number) {
     .slice(0, count)
     .map(([id]) => id);
   for (const pageId of victims) {
-    await cache.replaceTable(`blocks:${pageId}`, []);
+    await cache.replaceTable(recordCacheTables.blocks(pageId), []);
     delete lru[pageId];
   }
   await cache.setMeta(BLOCKS_LRU_KEY, lru);
@@ -194,7 +203,7 @@ export function stampBlocksCached(userId: string, pageId: string) {
     lru[pageId] = Date.now();
     const pins = ((await cache.getMeta<Record<string, true>>(PINS_KEY)) ?? {}) as Record<string, true>;
     for (const victim of oldestBeyond(lru, new Set(Object.keys(pins)), MAX_CACHED_BLOCK_PAGES)) {
-      await cache.replaceTable(`blocks:${victim}`, []);
+      await cache.replaceTable(recordCacheTables.blocks(victim), []);
       delete lru[victim];
     }
     await cache.setMeta(BLOCKS_LRU_KEY, lru);
@@ -213,9 +222,9 @@ export function stampDatabaseCached(userId: string, dbId: string) {
     const pins = ((await cache.getMeta<Record<string, true>>(PINS_KEY)) ?? {}) as Record<string, true>;
     for (const victim of oldestBeyond(lru, new Set(Object.keys(pins)), MAX_CACHED_DBS)) {
       await dropDatabaseRowCaches(cache, victim);
-      for (const table of ["props", "views", "templates"]) {
-        await cache.replaceTable(`${table}:${victim}`, []);
-      }
+      await cache.replaceTable(recordCacheTables.databaseProperties(victim), []);
+      await cache.replaceTable(recordCacheTables.databaseViews(victim), []);
+      await cache.replaceTable(recordCacheTables.databaseTemplates(victim), []);
       delete lru[victim];
     }
     await cache.setMeta(DB_LRU_KEY, lru);
@@ -231,22 +240,14 @@ export const MAX_CACHED_ROW_QUERIES_PER_DB = 3;
 
 type RowsKeyEntry = { at: number; h: string };
 
-/** Short stable hash for cache table suffixes (query keys can be long). */
-export function hashCacheKey(input: string): string {
-  let hash = 5381;
-  for (let i = 0; i < input.length; i += 1) {
-    hash = ((hash << 5) + hash + input.charCodeAt(i)) | 0;
-  }
-  return (hash >>> 0).toString(36);
-}
-
 async function dropDatabaseRowCaches(cache: RecordCache, dbId: string) {
-  const keysKey = `rowsKeys:${dbId}`;
+  const keysKey = recordCacheMeta.databaseRowQueryRegistry(dbId);
   const list = ((await cache.getMeta<RowsKeyEntry[]>(keysKey)) ?? []) as RowsKeyEntry[];
   for (const entry of list) {
-    await cache.replaceTable(`rowsdata:${dbId}:${entry.h}`, []);
-    await cache.replaceTable(`rowsrelated:${dbId}:${entry.h}`, []);
-    await cache.removeMeta(`rows:${dbId}:${entry.h}`);
+    const keys = databaseRowCacheKeysFromSuffix(dbId, entry.h);
+    await cache.replaceTable(keys.dataTable, []);
+    await cache.replaceTable(keys.relatedPagesTable, []);
+    await cache.removeMeta(keys.meta);
   }
   await cache.removeMeta(keysKey);
 }
@@ -254,7 +255,7 @@ async function dropDatabaseRowCaches(cache: RecordCache, dbId: string) {
 /** Track a cached row query for a db; evict the oldest beyond the cap. */
 export function registerRowsCacheKey(userId: string, dbId: string, suffix: string) {
   enqueue(async (cache) => {
-    const keysKey = `rowsKeys:${dbId}`;
+    const keysKey = recordCacheMeta.databaseRowQueryRegistry(dbId);
     const list = (((await cache.getMeta<RowsKeyEntry[]>(keysKey)) ?? []) as RowsKeyEntry[]).filter(
       (entry) => entry.h !== suffix
     );
@@ -263,9 +264,10 @@ export function registerRowsCacheKey(userId: string, dbId: string, suffix: strin
     while (list.length > MAX_CACHED_ROW_QUERIES_PER_DB) {
       const victim = list.shift();
       if (!victim) break;
-      await cache.replaceTable(`rowsdata:${dbId}:${victim.h}`, []);
-      await cache.replaceTable(`rowsrelated:${dbId}:${victim.h}`, []);
-      await cache.removeMeta(`rows:${dbId}:${victim.h}`);
+      const keys = databaseRowCacheKeysFromSuffix(dbId, victim.h);
+      await cache.replaceTable(keys.dataTable, []);
+      await cache.replaceTable(keys.relatedPagesTable, []);
+      await cache.removeMeta(keys.meta);
     }
     await cache.setMeta(keysKey, list);
   }, userId);

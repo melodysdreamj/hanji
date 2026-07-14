@@ -7,6 +7,7 @@
 // cache's recently-used block tables.
 
 import { cacheListTable, listCachedBlockPageIds } from "./recordCache";
+import { recordCacheTables } from "./recordCacheKeys";
 import { useStore } from "./store";
 import type { Block } from "./types";
 
@@ -48,7 +49,7 @@ export async function searchCachedBlockHits(
     (pageId) => !scannedPages.has(pageId)
   );
   for (const pageId of cachedPageIds.slice(0, MAX_SCANNED_CACHED_PAGES)) {
-    const records = await cacheListTable<Block>(userId, `blocks:${pageId}`);
+    const records = await cacheListTable<Block>(userId, recordCacheTables.blocks(pageId));
     for (const record of records) {
       if (blockMatches(record.value, q)) {
         hits.push({ block: record.value, pageId });

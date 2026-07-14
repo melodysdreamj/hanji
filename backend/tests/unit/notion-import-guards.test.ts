@@ -19,10 +19,23 @@ import {
 import { fakeDb, type Row } from './helpers/fake-db';
 import { callFunction, expectErrorResponse, handlerOf } from './helpers/function-context';
 
-const notionImportSource = readFileSync(
+const notionImportOrchestratorSource = readFileSync(
   resolve(dirname(fileURLToPath(import.meta.url)), '../../functions/notion-import.ts'),
   'utf8',
 );
+const notionImportDiscoverySource = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../lib/notion-import-discovery.ts'),
+  'utf8',
+);
+const notionImportApplySource = readFileSync(
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../lib/notion-import-apply.ts'),
+  'utf8',
+);
+const notionImportSource = [
+  notionImportOrchestratorSource,
+  notionImportDiscoverySource,
+  notionImportApplySource,
+].join('\n');
 
 describe('Notion incremental discovery live progress', () => {
   it('persists the current pending-enrichment count during a chunk', () => {
@@ -2273,10 +2286,7 @@ describe('discovery progress writes cannot land after the terminal update (#11)'
   // discoverJob (not unit-isolable without a live Notion fetch), so pin the
   // ordering contract at the source level: the finalizer must stop new ticks,
   // await the in-flight write, and run before BOTH terminal job updates.
-  const source = readFileSync(
-    resolve(dirname(fileURLToPath(import.meta.url)), '../../functions/notion-import.ts'),
-    'utf8',
-  );
+  const source = notionImportSource;
 
   it('onDiscoveryProgress skips once finalized and tracks the in-flight promise', () => {
     expect(source).toContain('if (progressFinalized || progressWriteInFlight) return;');

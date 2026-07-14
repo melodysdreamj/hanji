@@ -111,13 +111,14 @@ function seedDeadTabEntry(entryKey: string, value: OutboxOp) {
 
 async function outboxSettled() {
   // Mirror and acknowledged-record-cache writes ride separate FIFO promise
-  // chains over real (fake-indexeddb) async work. Alternate twice so a cache
-  // write scheduled after the remote resolves, followed by its outbox ack and
-  // the next serialized generation, has joined before assertions run.
-  await outboxIdleForTests();
-  await recordCacheIdleForTests();
-  await outboxIdleForTests();
-  await recordCacheIdleForTests();
+  // chains over real (fake-indexeddb) async work. The shared lifecycle adds a
+  // deliberate boundary between remote acceptance, cache commit and ack, so
+  // alternate until work enqueued by each boundary has had a chance to join.
+  // This does not wait on a still-pending remote promise.
+  for (let pass = 0; pass < 4; pass += 1) {
+    await outboxIdleForTests();
+    await recordCacheIdleForTests();
+  }
   await outboxIdleForTests();
 }
 

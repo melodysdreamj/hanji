@@ -13,6 +13,53 @@ The executable architecture contract lives in `backend/edgebase.config.ts`, the
 three package manifests, and the verification commands in
 [verification.md](verification.md).
 
+## Responsibility boundaries
+
+Large orchestration files are compatibility seams, not permanent ownership
+boundaries. New behavior belongs in the smallest module that owns the rule, and
+the orchestrator composes that module while preserving the existing public API.
+
+- Client mutations follow one acknowledged lifecycle: optimistic projection and
+  durable enqueue, remote send, authoritative local/cache commit, and only then
+  outbox acknowledgement. `web/src/lib/mutationLifecycle.ts` owns that ordering;
+  `outboxProjection.ts` and `persistedMutationCache.ts` own their respective
+  projections and cache commits.
+- `web/src/lib/recordCacheKeys.ts` is the sole schema for bootstrap, block,
+  database metadata, and row-query cache keys. `recordCache.ts` owns persistence;
+  the store must not construct raw key prefixes.
+- Entity persistence policy, database-view config transforms, and optimistic
+  starter-database schemas live outside the store in focused model modules.
+- `web/src/lib/store.ts` composes stable Zustand state and cross-domain
+  coordination. Page lifecycle, block editing/history, and database
+  schema/row/view/template behavior live in `pageStoreSlice.ts`,
+  `blockStoreSlice.ts`, and `databaseStoreSlice.ts`; callers continue to use
+  the unchanged `useStore` API.
+- `BlockItem.tsx` owns block dispatch and non-text renderers. The contenteditable
+  text lifecycle lives in `TextBlock.tsx`, picker/source menus in
+  `BlockPickerMenus.tsx`, and shared input/media/mention/table rules in focused
+  editor modules.
+- `DatabaseView.tsx` owns view selection and composition. Shared view/template
+  models live in `databaseViewShared.tsx`; toolbar menus and the database
+  template editor live in `DatabaseToolbar.tsx`; filter editors, imported-view
+  compatibility, and labels remain separate policy/UI modules.
+- The EdgeBase Room client distinguishes transport-open, authentication, join,
+  sync, reconnect-wait, and terminal phases internally. The older public
+  connection state remains a compatibility projection of that protocol state.
+- The Notion import function orchestrates jobs while credential encryption,
+  metadata scrubbing, request limits, retrying Notion transport, MCP snapshot
+  parsing/expansion, graph discovery, conversion planning, and apply execution
+  live in focused `backend/lib/notion-import-*.ts` modules.
+- The MCP entrypoint owns shared schemas, handler dependencies, resources, and
+  transport startup. Foundation, database, and Notion-compatible tool
+  registration live in `tool-registry-*.mjs`; formula evaluation, database
+  query/view evaluation, and Notion SQL/DDL/view parsing live in separate
+  runtimes under `mcp/src/`.
+
+Architecture-boundary tests assert these imports and reject moved
+responsibilities reappearing in the orchestrators. Current line-count budgets
+also prevent the original large modules from silently growing; further work
+must extract a responsibility before adding comparable orchestration weight.
+
 ## Data model
 
 Defined in `backend/edgebase.config.ts`, block `app`:

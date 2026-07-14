@@ -399,11 +399,16 @@ describe("frontend structural guards", () => {
 
     const storeFile = "src/lib/store.ts";
     const store = source(storeFile);
-    expect(stringLiterals(storeFile, store).has("Untitled template")).toBe(false);
-    expect(store).toContain('i18next.t("databaseView:copyName"');
-    expect(store).toContain('locale: isKoreanLocale() ? "ko" : "en"');
-    expect(store).toContain("activePersistentGeneratedLabels().copyName(pageDisplayTitle(source))");
-    expect(store).not.toContain('`${pageDisplayTitle(source)} copy`');
+    const storeSurface = [
+      store,
+      source("src/lib/pageStoreSlice.ts"),
+      source("src/lib/databaseStoreSlice.ts"),
+    ].join("\n");
+    expect(stringLiterals(storeFile, storeSurface).has("Untitled template")).toBe(false);
+    expect(storeSurface).toContain('i18next.t("databaseView:copyName"');
+    expect(storeSurface).toContain('locale: isKoreanLocale() ? "ko" : "en"');
+    expect(storeSurface).toContain("activePersistentGeneratedLabels().copyName(pageDisplayTitle(source))");
+    expect(storeSurface).not.toContain('`${pageDisplayTitle(source)} copy`');
 
     const backend = source("../backend/functions/database-mutation.ts");
     expect(backend).toContain("starterDatabaseLabels(locale)");
@@ -444,7 +449,7 @@ describe("frontend structural guards", () => {
     for (const file of [
       "src/components/database/RowProperties.tsx",
       "src/components/database/TableView.tsx",
-      "src/components/database/DatabaseView.tsx",
+      "src/components/database/DatabaseToolbar.tsx",
     ]) {
       const contents = source(file);
       expect(contents, file).toContain("window.confirm(");

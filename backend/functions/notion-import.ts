@@ -3,11 +3,93 @@ import { errorStatus } from '../lib/error-status';
 import {
   HANJI_CURRENT_PAGE_FILTER_KIND,
   HANJI_IMPORTED_ROW_CONTEXT_FILTER_MARKER,
-  hanjiCanonicalEnvValue,
-  hanjiEnvValue,
   hasHanjiImportedRowContextFilterMarker,
   isHanjiCurrentPageFilterValue,
 } from '../lib/hanji-compat';
+import {
+  NOTION_CREDENTIAL_ALGORITHM,
+  NOTION_CREDENTIAL_KEY_ID,
+  NOTION_OAUTH_STATE_MAX_AGE_MS,
+  assertNotionOAuthEnabled,
+  base64EncodeText,
+  decodeNotionOAuthState,
+  decryptNotionCredential,
+  encodeNotionOAuthState,
+  encryptNotionCredential,
+  encryptNotionOAuthCredential,
+  envString,
+  notionApiBase,
+  notionConnectionStorageAvailable,
+  notionOAuthAuthorizeUrl,
+  notionOAuthClientId,
+  notionOAuthClientSecret,
+  notionOAuthRedirectUri,
+  type NotionOAuthStatePayload,
+} from '../lib/notion-import-credentials';
+import {
+  NotionApiError,
+  notionErrorFromResponse,
+  notionIsoTimestamp,
+  notionRequest,
+  safeNotionRequest,
+  type NotionRequestRetryInfo,
+} from '../lib/notion-api-client';
+export {
+  pruneNotionRequestSchedule,
+  reserveNotionRequestSlot,
+} from '../lib/notion-api-client';
+export {
+  notionConnectionStorageAvailable,
+  notionOAuthEnabled,
+  notionOAuthRedirectUri,
+} from '../lib/notion-import-credentials';
+import {
+  isCredentialBearingNotionUrl,
+  sanitizeNotionCredentialMetadata,
+} from '../lib/notion-import-metadata';
+export { sanitizeNotionCredentialMetadata } from '../lib/notion-import-metadata';
+import {
+  NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
+  assertBoundedSnapshotJsonValue,
+  assertNotionImportRequestJsonShape,
+  missingRequestedRootIds,
+  normalizedNotionId,
+  notionImportPayloadTooLarge,
+  parseSnapshotItems,
+  type DiscoveredNotionItem,
+} from '../lib/notion-import-request-limits';
+import {
+  assertBoundedRequestDiscoveredItems,
+  expandSnapshotItems,
+  parseMcpFetchItems,
+} from '../lib/notion-import-mcp-snapshot';
+import {
+  discoverNotionGraphWithRuntime,
+  preflightNotionImportGraphWithRuntime,
+} from '../lib/notion-import-discovery';
+import { applyJobCoreWithRuntime } from '../lib/notion-import-apply';
+import { createNotionImportPlanner } from '../lib/notion-import-plan';
+export {
+  assertBoundedRequestDiscoveredItems,
+  dashedUuid,
+  expandSnapshotItems,
+  mcpFetchPayloads,
+  parseMcpFetchItems,
+} from '../lib/notion-import-mcp-snapshot';
+export {
+  NOTION_IMPORT_MCP_FETCH_PAYLOADS_PER_REQUEST_MAX,
+  NOTION_IMPORT_MCP_TEXT_MAX_BYTES,
+  NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH,
+  NOTION_IMPORT_REQUEST_JSON_MAX_NODES,
+  NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES,
+  NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
+  NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES,
+  assertNotionImportRequestJsonShape,
+  missingRequestedRootIds,
+  normalizedNotionId,
+  parseSnapshotItems,
+  type DiscoveredNotionItem,
+} from '../lib/notion-import-request-limits';
 import {
   boundedDbFromWorkspaceHint,
   ensurePageWorkspaceIndex,
@@ -60,19 +142,6 @@ type NotionImportConnectionKind = 'oauth' | 'personal_access_token' | 'internal_
 type NotionImportConnectionStatus = 'active' | 'revoked' | 'error';
 
 const NOTION_API_VERSION = '2026-03-11';
-const NOTION_API_BASE = 'https://api.notion.com/v1';
-const NOTION_API_BASE_ENV = 'HANJI_NOTION_API_BASE';
-const NOTION_OAUTH_ENABLED_ENV = 'HANJI_NOTION_OAUTH_ENABLED';
-const NOTION_OAUTH_CLIENT_ID_ENV = 'HANJI_NOTION_OAUTH_CLIENT_ID';
-const NOTION_OAUTH_CLIENT_SECRET_ENV = 'HANJI_NOTION_OAUTH_CLIENT_SECRET';
-const NOTION_OAUTH_AUTH_URL_ENV = 'HANJI_NOTION_OAUTH_AUTH_URL';
-const NOTION_OAUTH_REDIRECT_URI_ENV = 'HANJI_NOTION_OAUTH_REDIRECT_URI';
-const NOTION_OAUTH_STATE_SECRET_ENV = 'HANJI_NOTION_OAUTH_STATE_SECRET';
-const NOTION_CONNECTION_SECRET_ENV = 'HANJI_NOTION_IMPORT_SECRET';
-const LEGACY_NOTION_CONNECTION_SECRET_ENV = 'NOTION_IMPORT_SECRET';
-const NOTION_CREDENTIAL_ALGORITHM = 'AES-GCM-SHA256';
-const NOTION_CREDENTIAL_KEY_ID = 'notion-import-v1';
-const NOTION_OAUTH_STATE_MAX_AGE_MS = 15 * 60 * 1000;
 const NOTION_PAGINATION_SAFETY_PAGE_LIMIT = 10_000;
 const NOTION_FILE_COPY_RECOVERY_TTL_MS = 2 * 60 * 60 * 1000;
 // Sane per-fetch pagination defaults. The hard clamp stays
@@ -96,16 +165,6 @@ const NOTION_DISCOVER_CALL_DEADLINE_MS = 12_000;
 const NOTION_ROOT_SCAN_DEFAULT_PAGE_LIMIT = 10;
 const NOTION_ROOT_SCAN_MAX_PAGE_LIMIT = 50;
 const NOTION_IMPORT_ITEM_SAFETY_LIMIT = 100_000;
-export const NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX = 500;
-export const NOTION_IMPORT_MCP_FETCH_PAYLOADS_PER_REQUEST_MAX = 32;
-export const NOTION_IMPORT_MCP_TEXT_MAX_BYTES = 4 * 1024 * 1024;
-const NOTION_IMPORT_MCP_EMBEDDED_JSON_MAX_BYTES = 256 * 1024;
-const NOTION_IMPORT_MCP_EMBEDDED_JSON_AGGREGATE_MAX_BYTES = 4 * 1024 * 1024;
-const NOTION_IMPORT_MCP_VIEW_ASSIGNMENT_WORK_MAX = 5_000;
-export const NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES = 256 * 1024;
-export const NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES = 6 * 1024 * 1024;
-export const NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH = 32;
-export const NOTION_IMPORT_REQUEST_JSON_MAX_NODES = 100_000;
 // Housekeeping for the persisted job engine: there is no user-facing recent-jobs
 // list anymore, so finished/stale job records (and their discovered items) are
 // pruned opportunistically when a workspace lists its jobs. Live jobs (queued /
@@ -148,30 +207,6 @@ const NOTION_IMPORT_BLOCKS_COMPLETE_KEY = '__notionImportBlocksComplete';
 const NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION_KEY = '__notionImportBlockBoundaryRepairVersion';
 const NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION = 5;
 const GENERATED_NOTION_TITLE_PROPERTY_ID = '__hanji_generated_title__';
-const NOTION_REQUEST_MAX_ATTEMPTS = 8;
-const NOTION_REQUEST_RETRY_BASE_DELAY_MS = 1_000;
-const NOTION_REQUEST_RETRY_MAX_DELAY_MS = 30_000;
-// Proactive pacing: Notion's data API allows ~3 requests/second per integration
-// on average. Discovery fans out (concurrency 4) across hundreds of items, so
-// firing every request immediately bursts past that limit and eats multi-minute
-// 429 backoffs — which also rate-limits the token for later runs. Instead, gate
-// every real-API request through a shared per-token scheduler spaced at this
-// minimum interval (~2.8 req/s), staying safely under the limit so 429s become
-// the exception rather than the rule. Only real api.notion.com hosts are paced;
-// the localhost mock API used by smokes is left unthrottled.
-const NOTION_MIN_REQUEST_INTERVAL_MS = 350;
-// A worker isolate may serve many distinct Notion connections over its
-// lifetime. Keep pacing state bounded and never retain the bearer token itself
-// as a Map key. Entries that have been idle for an hour are discarded and the
-// least-recently-scheduled entry is evicted if an isolate ever reaches the hard
-// cap.
-const NOTION_REQUEST_SCHEDULE_TTL_MS = 60 * 60 * 1000;
-const NOTION_REQUEST_SCHEDULE_MAX_ENTRIES = 2_048;
-// Per-attempt ceiling so a socket that connects but never responds is aborted
-// and retried (via the generic non-NotionApiError retry path) instead of
-// hanging on the request's whole subrequest/wall-clock budget. Notion data-API
-// responses are small JSON, so 30s is generous.
-const NOTION_REQUEST_TIMEOUT_MS = 30_000;
 const NOTION_BLOCK_CHILD_DEPTH_LIMIT = 32;
 const NOTION_BLOCK_CHILD_TOTAL_LIMIT = 100_000;
 const NOTION_DISCOVERY_PASS_SAFETY_LIMIT = 1_000;
@@ -180,44 +215,11 @@ const NOTION_DISCOVERY_PASS_SAFETY_LIMIT = 1_000;
 // the initial "25% · Discovering workspace graph" until the whole pass ends.
 const NOTION_DISCOVERY_PROGRESS_INTERVAL_MS = 1_000;
 
-type NotionImportWarning = {
+export type NotionImportWarning = {
   code: string;
   message: string;
   notionId?: string;
   notionObject?: string;
-};
-
-class NotionApiError extends Error {
-  status: number;
-  code?: string;
-  retryAfterMs?: number;
-
-  constructor(message: string, options: { status: number; code?: string; retryAfterMs?: number }) {
-    super(message);
-    this.name = 'NotionApiError';
-    this.status = options.status;
-    this.code = options.code;
-    this.retryAfterMs = options.retryAfterMs;
-  }
-}
-
-type NotionRequestRetryInfo = {
-  path: string;
-  method: 'GET' | 'POST';
-  status?: number;
-  code?: string;
-  attempt: number;
-  nextAttempt: number;
-  delayMs: number;
-  message: string;
-};
-
-type NotionRequestOptions = {
-  method?: 'GET' | 'POST';
-  body?: Record<string, unknown>;
-  query?: Record<string, string | number | boolean | undefined>;
-  apiBase?: string;
-  onRetry?: (info: NotionRequestRetryInfo) => void;
 };
 
 interface Workspace {
@@ -279,7 +281,7 @@ export interface DbProperty {
   position: number;
 }
 
-interface DbView {
+export interface DbView {
   id: string;
   databaseId: string;
   name: string;
@@ -307,7 +309,7 @@ interface TemplateBlock {
   children?: TemplateBlock[];
 }
 
-interface DbTemplate {
+export interface DbTemplate {
   id: string;
   databaseId: string;
   name: string;
@@ -387,27 +389,6 @@ interface NotionTokenSource {
   tokenFingerprint?: string | null;
 }
 
-interface NotionOAuthStatePayload {
-  workspaceId: string;
-  actorId: string;
-  redirectUri: string;
-  name?: string;
-  nonce: string;
-  createdAt: string;
-}
-
-interface NotionStoredOAuthCredential {
-  kind: 'oauth';
-  accessToken: string;
-  refreshToken?: string | null;
-  tokenType?: string | null;
-  issuedAt: string;
-  refreshedAt?: string | null;
-}
-
-type DecryptedNotionCredential =
-  | { kind: 'token'; token: string }
-  | { kind: 'oauth'; accessToken: string; refreshToken?: string | null; tokenType?: string | null };
 
 export interface NotionImportJob {
   id: string;
@@ -529,24 +510,13 @@ export function notionAppliedCountsFromMappings(
   };
 }
 
-export interface DiscoveredNotionItem {
-  notionId: string;
-  notionObject: string;
-  parentNotionId?: string | null;
-  title?: string;
-  status?: string;
-  phase?: string;
-  metadata?: Record<string, unknown>;
-  error?: string | null;
-}
-
-interface DiscoveryWarningBag {
+export interface DiscoveryWarningBag {
   warnings: NotionImportWarning[];
   missingPermissions: NotionImportWarning[];
   unsupported: NotionImportWarning[];
 }
 
-interface ImportConversionReport {
+export interface ImportConversionReport {
   summary: Record<string, number>;
   warnings: NotionImportWarning[];
   unsupported: NotionImportWarning[];
@@ -590,89 +560,13 @@ interface NotionFileReference {
   notionFileCopiedAt?: string | null;
 }
 
-const NOTION_CREDENTIAL_METADATA_KEY_RE =
-  /(?:^|_)(?:access_?token|refresh_?token|token|secret|password|authorization|cookie|credential|api_?key|signature|signed_?url)(?:$|_)/i;
-const NOTION_CREDENTIAL_URL_PARAM_RE =
-  /^(?:access_?token|refresh_?token|token|signature|credential|authorization|jwt|policy|expires?|key-pair-id|x-amz-.+|x-goog-.+)$/i;
-const AZURE_SAS_CONTEXT_URL_PARAMS = new Set([
-  'sv',
-  'se',
-  'sp',
-  'sr',
-  'st',
-  'spr',
-  'skoid',
-  'sktid',
-]);
-
-function isCredentialBearingNotionUrl(value: string) {
-  if (/^data:/i.test(value)) return true;
-  if (!/^https?:\/\//i.test(value)) return false;
-  try {
-    const url = new URL(value);
-    if (url.username || url.password) return true;
-    // URLSearchParams decodes percent-encoded parameter names before exposing
-    // them, and matching below is case-insensitive. Azure Blob SAS uses `sig`
-    // together with keys such as sv/se/sp/sr/st/spr/skoid/sktid. An exact
-    // standalone `sig` is also a bearer signature in common CDN/object-store
-    // schemes, so durable import metadata treats it as secret regardless of
-    // host. This deliberately fails closed: a product URL using exact `sig`
-    // for non-secret state is scrubbed, while lookalike ordinary keys such as
-    // `signal` or `designature` remain intact.
-    const parameterNames = Array.from(url.searchParams.keys(), (key) => key.trim().toLowerCase());
-    const hasExactSignature = parameterNames.includes('sig');
-    const hasAzureSasContext = parameterNames.some((key) => AZURE_SAS_CONTEXT_URL_PARAMS.has(key));
-    if (hasExactSignature && hasAzureSasContext) return true;
-    if (hasExactSignature) return true;
-    return parameterNames.some((key) => NOTION_CREDENTIAL_URL_PARAM_RE.test(key));
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Notion discovery payloads can contain temporary or externally signed file
- * URLs. Preserve the structural metadata needed for import repair while
- * removing bearer material before it is copied into durable product rows (and,
- * after a successful apply, from the import staging rows themselves).
- */
-export function sanitizeNotionCredentialMetadata(value: unknown, depth = 0): unknown {
-  if (value === null || value === undefined) return value;
-  if (depth > 24) return undefined;
-  if (typeof value === 'string') {
-    return isCredentialBearingNotionUrl(value) ? undefined : value;
-  }
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => sanitizeNotionCredentialMetadata(item, depth + 1))
-      .filter((item) => item !== undefined);
-  }
-  if (typeof value !== 'object') return value;
-
-  const out: Record<string, unknown> = {};
-  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
-    const normalized = key.replace(/[^a-z0-9]/gi, '').toLowerCase();
-    if (
-      normalized === 'sourceurl'
-      || normalized === 'notionfile'
-      || normalized === 'notionfileexpirytime'
-      || normalized === 'expirytime'
-      || NOTION_CREDENTIAL_METADATA_KEY_RE.test(key)
-    ) {
-      continue;
-    }
-    const sanitized = sanitizeNotionCredentialMetadata(item, depth + 1);
-    if (sanitized !== undefined) out[key] = sanitized;
-  }
-  return out;
-}
 
 interface NotionFileCopyStats {
   fileCopies: number;
   fileCopySkipped: number;
 }
 
-interface NotionFileCopyContext {
+export interface NotionFileCopyContext {
   db: DbRef;
   admin: AdminDbAccessor;
   job: NotionImportJob;
@@ -710,7 +604,7 @@ interface NotionFileCopyTarget {
   notionPageFileKind?: 'icon' | 'cover';
 }
 
-interface NotionImportPlan {
+export interface NotionImportPlan {
   status: 'ready' | 'blocked';
   generatedAt: string;
   counts: Record<string, number>;
@@ -740,11 +634,11 @@ interface TableRef<T> extends TableQuery<T> {
   where(field: string, op: string, value: unknown): TableQuery<T>;
 }
 
-interface DbRef extends TransactDb {
+export interface DbRef extends TransactDb {
   table<T>(name: string): TableRef<T>;
 }
 
-interface FunctionStorageProxy {
+export interface FunctionStorageProxy {
   bucket?(bucket: string): FunctionStorageProxy;
   put(
     key: string,
@@ -932,1170 +826,6 @@ function parseStringArray(value: unknown): string[] {
     .slice(0, 100);
 }
 
-export function normalizedNotionId(value: unknown) {
-  return typeof value === 'string'
-    ? value.trim().replace(/-/g, '').toLowerCase()
-    : '';
-}
-
-export function missingRequestedRootIds(requestedRootIds: string[], items: DiscoveredNotionItem[]) {
-  if (!requestedRootIds.length) return [];
-  const discoveredIds = new Set(items.map((item) => normalizedNotionId(item.notionId)).filter(Boolean));
-  return requestedRootIds.filter((id) => {
-    const normalized = normalizedNotionId(id);
-    return normalized && !discoveredIds.has(normalized);
-  });
-}
-
-interface NotionImportRequestJsonBudget {
-  bytes: number;
-  nodes: number;
-}
-
-const notionImportUtf8Encoder = new TextEncoder();
-
-function notionImportPayloadTooLarge(reason: string): never {
-  throw new Error(`Notion import request payload is too large: ${reason}.`);
-}
-
-interface NotionImportJsonShapeBudget {
-  nodes: number;
-}
-
-function assertNotionImportJsonShape(
-  value: unknown,
-  budget: NotionImportJsonShapeBudget,
-  baseDepth: number,
-  label: string,
-) {
-  const stack: Array<{ depth: number; value: unknown }> = [{ depth: baseDepth, value }];
-  while (stack.length) {
-    const current = stack.pop()!;
-    if (current.depth > NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds JSON depth ${NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH}`,
-      );
-    }
-    budget.nodes += 1;
-    if (budget.nodes > NOTION_IMPORT_REQUEST_JSON_MAX_NODES) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-      );
-    }
-    if (!current.value || typeof current.value !== 'object') continue;
-    if (Array.isArray(current.value)) {
-      if (
-        current.value.length
-          > NOTION_IMPORT_REQUEST_JSON_MAX_NODES - budget.nodes - stack.length
-      ) {
-        notionImportPayloadTooLarge(
-          `${label} exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-        );
-      }
-      for (let index = current.value.length - 1; index >= 0; index -= 1) {
-        stack.push({ depth: current.depth + 1, value: current.value[index] });
-      }
-      continue;
-    }
-    const record = current.value as Record<string, unknown>;
-    let childCount = 0;
-    for (const key in record) {
-      if (!Object.prototype.hasOwnProperty.call(record, key)) continue;
-      childCount += 1;
-      if (
-        childCount
-          > NOTION_IMPORT_REQUEST_JSON_MAX_NODES - budget.nodes - stack.length
-      ) {
-        notionImportPayloadTooLarge(
-          `${label} exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-        );
-      }
-      stack.push({ depth: current.depth + 1, value: record[key] });
-    }
-  }
-}
-
-export function assertNotionImportRequestJsonShape(value: unknown) {
-  assertNotionImportJsonShape(value, { nodes: 0 }, 0, 'request');
-}
-
-function boundedUtf8Bytes(value: string, maxBytes: number, label: string) {
-  // Every UTF-16 code unit needs at least one UTF-8 byte. Avoid allocating an
-  // encoded copy when the inexpensive lower bound already exceeds the cap.
-  if (value.length > maxBytes) notionImportPayloadTooLarge(`${label} exceeds ${maxBytes} bytes`);
-  const bytes = notionImportUtf8Encoder.encode(value).byteLength;
-  if (bytes > maxBytes) notionImportPayloadTooLarge(`${label} exceeds ${maxBytes} bytes`);
-  return bytes;
-}
-
-function assertBoundedSnapshotJsonValue(
-  value: unknown,
-  budget: NotionImportRequestJsonBudget,
-  label: string,
-) {
-  const stack: Array<{ depth: number; value: unknown }> = [{ depth: 0, value }];
-  const seen = new Set<object>();
-  let itemBytes = 0;
-  const charge = (bytes: number) => {
-    itemBytes += bytes;
-    budget.bytes += bytes;
-    if (itemBytes > NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds ${NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-    if (budget.bytes > NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES) {
-      notionImportPayloadTooLarge(
-        `snapshotItems exceed ${NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-  };
-  const chargeString = (text: string, overhead: number) => {
-    const itemRemaining = NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES - itemBytes - overhead;
-    const aggregateRemaining =
-      NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES - budget.bytes - overhead;
-    if (text.length > itemRemaining) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds ${NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-    if (text.length > aggregateRemaining) {
-      notionImportPayloadTooLarge(
-        `snapshotItems exceed ${NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-    const bytes = notionImportUtf8Encoder.encode(text).byteLength;
-    if (bytes > itemRemaining) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds ${NOTION_IMPORT_SNAPSHOT_ITEM_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-    if (bytes > aggregateRemaining) {
-      notionImportPayloadTooLarge(
-        `snapshotItems exceed ${NOTION_IMPORT_SNAPSHOT_AGGREGATE_MAX_BYTES} estimated JSON bytes`,
-      );
-    }
-    charge(bytes + overhead);
-  };
-
-  while (stack.length) {
-    const current = stack.pop()!;
-    if (current.depth > NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH) {
-      notionImportPayloadTooLarge(
-        `${label} exceeds JSON depth ${NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH}`,
-      );
-    }
-    budget.nodes += 1;
-    if (budget.nodes > NOTION_IMPORT_REQUEST_JSON_MAX_NODES) {
-      notionImportPayloadTooLarge(
-        `snapshotItems exceed ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-      );
-    }
-
-    const candidate = current.value;
-    if (candidate === null) {
-      charge(4);
-      continue;
-    }
-    if (typeof candidate === 'string') {
-      chargeString(candidate, 2);
-      continue;
-    }
-    if (typeof candidate === 'number') {
-      charge(Number.isFinite(candidate) ? String(candidate).length : 4);
-      continue;
-    }
-    if (typeof candidate === 'boolean') {
-      charge(candidate ? 4 : 5);
-      continue;
-    }
-    if (typeof candidate !== 'object') {
-      // JSON request bodies cannot contain these values. Count the serialized
-      // null-equivalent conservatively for direct unit callers.
-      charge(4);
-      continue;
-    }
-    if (seen.has(candidate)) {
-      notionImportPayloadTooLarge(`${label} contains a cyclic or aliased object graph`);
-    }
-    seen.add(candidate);
-    if (Array.isArray(candidate)) {
-      charge(2 + Math.max(0, candidate.length - 1));
-      for (let index = candidate.length - 1; index >= 0; index -= 1) {
-        stack.push({ depth: current.depth + 1, value: candidate[index] });
-      }
-      continue;
-    }
-    const entries = Object.entries(candidate as Record<string, unknown>);
-    charge(2 + Math.max(0, entries.length - 1));
-    for (let index = entries.length - 1; index >= 0; index -= 1) {
-      const [key, child] = entries[index];
-      chargeString(key, 3);
-      stack.push({ depth: current.depth + 1, value: child });
-    }
-  }
-}
-
-function assertOptionalSnapshotString(value: unknown, maxBytes: number, label: string) {
-  if (typeof value === 'string') boundedUtf8Bytes(value, maxBytes, label);
-}
-
-export function parseSnapshotItems(value: unknown): DiscoveredNotionItem[] {
-  if (!Array.isArray(value)) return [];
-  if (value.length > NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX) {
-    notionImportPayloadTooLarge(
-      `snapshotItems has more than ${NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX} entries`,
-    );
-  }
-  const budget: NotionImportRequestJsonBudget = { bytes: 0, nodes: 0 };
-  return value
-    .map((item, index): DiscoveredNotionItem | null => {
-      assertBoundedSnapshotJsonValue(item, budget, `snapshotItems[${index}]`);
-      if (!item || typeof item !== 'object') return null;
-      const record = item as Record<string, unknown>;
-      assertOptionalSnapshotString(record.notionId ?? record.id, 512, `snapshotItems[${index}].notionId`);
-      assertOptionalSnapshotString(record.notionObject ?? record.object, 128, `snapshotItems[${index}].notionObject`);
-      assertOptionalSnapshotString(record.parentNotionId, 512, `snapshotItems[${index}].parentNotionId`);
-      assertOptionalSnapshotString(record.title, 64 * 1024, `snapshotItems[${index}].title`);
-      assertOptionalSnapshotString(record.status, 128, `snapshotItems[${index}].status`);
-      assertOptionalSnapshotString(record.phase, 128, `snapshotItems[${index}].phase`);
-      assertOptionalSnapshotString(record.error, 64 * 1024, `snapshotItems[${index}].error`);
-      const notionId = optionalString(record.notionId ?? record.id);
-      const notionObject = optionalString(record.notionObject ?? record.object);
-      if (!notionId || !notionObject) return null;
-      const metadata = record.metadata && typeof record.metadata === 'object'
-        ? (record.metadata as Record<string, unknown>)
-        : {};
-      return {
-        notionId,
-        notionObject,
-        parentNotionId: optionalString(record.parentNotionId),
-        title: optionalString(record.title),
-        status: optionalString(record.status) ?? 'discovered',
-        phase: optionalString(record.phase) ?? 'snapshot',
-        metadata,
-        error: optionalString(record.error),
-      };
-    })
-    .filter((item): item is DiscoveredNotionItem => !!item);
-}
-
-interface McpFetchPayload {
-  text: string;
-  title?: string;
-  url?: string;
-  metadata?: Record<string, unknown>;
-}
-
-interface McpEmbeddedJsonBudget {
-  bytes: number;
-  shape: NotionImportJsonShapeBudget;
-}
-
-interface McpTransformWorkBudget {
-  viewInspections: number;
-}
-
-interface HtmlTagBlock {
-  attributes: string;
-  content: string;
-  raw: string;
-}
-
-function parseJsonLike(
-  value: string,
-  budget: McpEmbeddedJsonBudget,
-  baseDepth: number,
-  label: string,
-) {
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return undefined;
-  const bytes = boundedUtf8Bytes(
-    trimmed,
-    NOTION_IMPORT_MCP_EMBEDDED_JSON_MAX_BYTES,
-    `${label} embedded JSON`,
-  );
-  budget.bytes += bytes;
-  if (budget.bytes > NOTION_IMPORT_MCP_EMBEDDED_JSON_AGGREGATE_MAX_BYTES) {
-    notionImportPayloadTooLarge(
-      `mcpFetches embedded JSON exceeds ${NOTION_IMPORT_MCP_EMBEDDED_JSON_AGGREGATE_MAX_BYTES} bytes`,
-    );
-  }
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(trimmed) as unknown;
-  } catch {
-    return undefined;
-  }
-  assertNotionImportJsonShape(parsed, budget.shape, baseDepth, 'mcpFetches embedded JSON');
-  return parsed;
-}
-
-function unwrapMcpReference(value: string) {
-  let next = value.trim();
-  if (next.startsWith('{{') && next.endsWith('}}')) next = next.slice(2, -2).trim();
-  return next;
-}
-
-export function dashedUuid(value: string) {
-  const compact = value.replace(/-/g, '').toLowerCase();
-  if (!/^[0-9a-f]{32}$/.test(compact)) return value.trim();
-  return [
-    compact.slice(0, 8),
-    compact.slice(8, 12),
-    compact.slice(12, 16),
-    compact.slice(16, 20),
-    compact.slice(20),
-  ].join('-');
-}
-
-function mcpReferenceId(value: unknown) {
-  if (typeof value !== 'string') return undefined;
-  const cleaned = unwrapMcpReference(value);
-  const schemeMatch = /^(?:collection|view|block|page|database|dataSource):\/\/([0-9a-f-]{32,36})/i.exec(cleaned);
-  if (schemeMatch?.[1]) return dashedUuid(schemeMatch[1]);
-  const collectionPropertyMatch = /^collectionProperty:\/\/([0-9a-f-]{32,36})\//i.exec(cleaned);
-  if (collectionPropertyMatch?.[1]) return dashedUuid(collectionPropertyMatch[1]);
-  const compactMatches = cleaned.match(/[0-9a-f]{32}/gi);
-  if (compactMatches?.length) return dashedUuid(compactMatches[compactMatches.length - 1]);
-  const uuidMatch = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.exec(cleaned);
-  if (uuidMatch?.[0]) return dashedUuid(uuidMatch[0]);
-  const trimmed = cleaned.trim();
-  return trimmed || undefined;
-}
-
-function mcpCollectionPropertyId(value: unknown) {
-  if (typeof value !== 'string') return undefined;
-  const cleaned = unwrapMcpReference(value);
-  const match = /^collectionProperty:\/\/[^/]+\/([^/?#]+)/i.exec(cleaned);
-  return match?.[1] ? safeDecode(match[1]).trim() : undefined;
-}
-
-function mcpCollectionPropertyDataSourceId(value: unknown) {
-  if (typeof value !== 'string') return undefined;
-  const cleaned = unwrapMcpReference(value);
-  const match = /^collectionProperty:\/\/([0-9a-f-]{32,36})\//i.exec(cleaned);
-  return match?.[1] ? dashedUuid(match[1]) : undefined;
-}
-
-function extractTagBlocks(text: string, tag: string): HtmlTagBlock[] {
-  const blocks: HtmlTagBlock[] = [];
-  const pattern = new RegExp(`<${tag}\\b([^>]*)>([\\s\\S]*?)<\\/${tag}>`, 'gi');
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(text))) {
-    if (blocks.length >= NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX) {
-      notionImportPayloadTooLarge(
-        `mcpFetches contains more than ${NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX} <${tag}> blocks`,
-      );
-    }
-    blocks.push({
-      attributes: match[1] ?? '',
-      content: match[2] ?? '',
-      raw: match[0] ?? '',
-    });
-  }
-  return blocks;
-}
-
-function extractSelfClosingTagAttributes(text: string, tag: string) {
-  const blocks: string[] = [];
-  const pattern = new RegExp(`<${tag}\\b([^>]*)\\/?>`, 'gi');
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(text))) {
-    if (blocks.length >= NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX) {
-      notionImportPayloadTooLarge(
-        `mcpFetches contains more than ${NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX} <${tag}> tags`,
-      );
-    }
-    blocks.push(match[1] ?? '');
-  }
-  return blocks;
-}
-
-function tagAttribute(attributes: string, name: string) {
-  const pattern = new RegExp(`${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i');
-  const match = pattern.exec(attributes);
-  const value = match?.[1] ?? match?.[2] ?? match?.[3];
-  return typeof value === 'string' && value.trim() ? unwrapMcpReference(value) : undefined;
-}
-
-function firstTagJson(
-  content: string,
-  tag: string,
-  embeddedJsonBudget: McpEmbeddedJsonBudget,
-) {
-  const block = extractTagBlocks(content, tag)[0];
-  if (!block) return undefined;
-  return parseJsonLike(block.content, embeddedJsonBudget, 0, `mcpFetches <${tag}>`);
-}
-
-function mcpTitleFromText(text: string, label: string) {
-  const pattern = new RegExp(`The title of this ${label} is:\\s*([^\\n<]+)`, 'i');
-  const match = pattern.exec(text);
-  return match?.[1]?.trim();
-}
-
-function mcpRichTextTitle(title: string | undefined) {
-  const text = title?.trim() || 'Untitled';
-  return [
-    {
-      type: 'text',
-      plain_text: text,
-      text: { content: text, link: null },
-      annotations: {
-        bold: false,
-        italic: false,
-        strikethrough: false,
-        underline: false,
-        code: false,
-        color: 'default',
-      },
-    },
-  ];
-}
-
-function collectMcpFetchPayloads(
-  value: unknown,
-  embeddedJsonBudget: McpEmbeddedJsonBudget,
-): McpFetchPayload[] {
-  const values = Array.isArray(value) ? value : value === undefined || value === null ? [] : [value];
-  const payloads: McpFetchPayload[] = [];
-  const stack: Array<{ candidate: unknown; depth: number }> = [];
-  if (values.length > NOTION_IMPORT_REQUEST_JSON_MAX_NODES) {
-    notionImportPayloadTooLarge(
-      `mcpFetches exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-    );
-  }
-  for (let index = values.length - 1; index >= 0; index -= 1) {
-    stack.push({ candidate: values[index], depth: 0 });
-  }
-  let nodes = 0;
-  let textBytes = 0;
-
-  const addPayload = (payload: McpFetchPayload) => {
-    if (payloads.length >= NOTION_IMPORT_MCP_FETCH_PAYLOADS_PER_REQUEST_MAX) {
-      notionImportPayloadTooLarge(
-        `mcpFetches has more than ${NOTION_IMPORT_MCP_FETCH_PAYLOADS_PER_REQUEST_MAX} text payloads`,
-      );
-    }
-    const remaining = NOTION_IMPORT_MCP_TEXT_MAX_BYTES - textBytes;
-    textBytes += boundedUtf8Bytes(payload.text, Math.max(0, remaining), 'mcpFetches text');
-    payloads.push(payload);
-  };
-
-  while (stack.length) {
-    const { candidate, depth } = stack.pop()!;
-    if (depth > NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH) {
-      notionImportPayloadTooLarge(
-        `mcpFetches exceeds JSON depth ${NOTION_IMPORT_REQUEST_JSON_MAX_DEPTH}`,
-      );
-    }
-    nodes += 1;
-    if (nodes > NOTION_IMPORT_REQUEST_JSON_MAX_NODES) {
-      notionImportPayloadTooLarge(
-        `mcpFetches exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-      );
-    }
-    if (candidate === undefined || candidate === null) continue;
-    if (typeof candidate === 'string') {
-      const parsed = parseJsonLike(
-        candidate,
-        embeddedJsonBudget,
-        depth + 1,
-        'mcpFetches wrapper',
-      );
-      if (parsed !== undefined) {
-        stack.push({ candidate: parsed, depth: depth + 1 });
-      } else if (candidate.trim()) {
-        addPayload({ text: candidate });
-      }
-      continue;
-    }
-    if (Array.isArray(candidate)) {
-      if (
-        candidate.length
-          > NOTION_IMPORT_REQUEST_JSON_MAX_NODES - nodes - stack.length
-      ) {
-        notionImportPayloadTooLarge(
-          `mcpFetches exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-        );
-      }
-      for (let index = candidate.length - 1; index >= 0; index -= 1) {
-        stack.push({ candidate: candidate[index], depth: depth + 1 });
-      }
-      continue;
-    }
-    const record = asRecord(candidate);
-    if (!record) continue;
-    const metadata = asRecord(record.metadata);
-    const title = optionalString(record.title ?? metadata?.title);
-    const url = optionalString(record.url ?? metadata?.url);
-    const text =
-      optionalString(record.text) ??
-      optionalString(record.markdown) ??
-      optionalString(record.contentText);
-    if (text) {
-      addPayload({ text, title, url, metadata });
-      continue;
-    }
-    if (Array.isArray(record.content)) {
-      if (
-        record.content.length
-          > NOTION_IMPORT_REQUEST_JSON_MAX_NODES - nodes - stack.length
-      ) {
-        notionImportPayloadTooLarge(
-          `mcpFetches exceeds ${NOTION_IMPORT_REQUEST_JSON_MAX_NODES} JSON nodes`,
-        );
-      }
-      for (let index = record.content.length - 1; index >= 0; index -= 1) {
-        stack.push({ candidate: record.content[index], depth: depth + 1 });
-      }
-      continue;
-    }
-    if (record.result !== undefined && record.result !== null) {
-      stack.push({ candidate: record.result, depth: depth + 1 });
-    }
-  }
-  return payloads;
-}
-
-export function mcpFetchPayloads(value: unknown): McpFetchPayload[] {
-  return collectMcpFetchPayloads(value, {
-    bytes: 0,
-    shape: { nodes: 0 },
-  });
-}
-
-function mcpSchemaNotionType(value: unknown) {
-  const type = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  if (type === 'text') return 'rich_text';
-  if (type === 'file') return 'files';
-  if (type === 'person') return 'people';
-  if (type === 'phone') return 'phone_number';
-  if (SUPPORTED_NOTION_PROPERTY_TYPES.has(type)) return type;
-  return 'rich_text';
-}
-
-function mcpSchemaOptions(prop: Record<string, unknown>) {
-  const source =
-    Array.isArray(prop.options) ? prop.options :
-      Array.isArray(prop.select_options) ? prop.select_options :
-        Array.isArray(prop.selectOptions) ? prop.selectOptions :
-          [];
-  return source
-    .filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-    .map((option) => ({
-      id:
-        optionalString(option.id) ??
-        mcpReferenceId(option.url) ??
-        mcpReferenceId(option.valueUrl) ??
-        newId(),
-      name: optionalString(option.name ?? option.value ?? option.label) ?? 'Option',
-      color: optionColor(option.color),
-    }));
-}
-
-function mcpSchemaPropertyId(prop: Record<string, unknown>, fallback: string) {
-  return (
-    optionalString(prop.id) ??
-    mcpCollectionPropertyId(prop.propertyUrl) ??
-    mcpCollectionPropertyId(prop.url) ??
-    optionalString(prop.code) ??
-    optionalString(prop.key) ??
-    fallback
-  );
-}
-
-function mcpSchemaRelationTarget(prop: Record<string, unknown>) {
-  return (
-    mcpReferenceId(prop.dataSourceUrl) ??
-    mcpReferenceId(prop.data_source_url) ??
-    mcpReferenceId(prop.collectionUrl) ??
-    mcpReferenceId(prop.databaseUrl) ??
-    mcpReferenceId(prop.targetDataSourceUrl) ??
-    mcpReferenceId(prop.target_data_source_url)
-  );
-}
-
-function mcpSchemaPropertyConfig(prop: Record<string, unknown>, notionType: string) {
-  if (notionType === 'number') {
-    return {
-      format: optionalString(prop.number_format ?? prop.numberFormat ?? prop.format) ?? 'number',
-    };
-  }
-  if (notionType === 'select' || notionType === 'multi_select' || notionType === 'status') {
-    return { options: mcpSchemaOptions(prop) };
-  }
-  if (notionType === 'relation') {
-    const target = mcpSchemaRelationTarget(prop);
-    return target ? { data_source_id: target } : {};
-  }
-  if (notionType === 'rollup') {
-    return {
-      relation_property_id:
-        optionalString(prop.relation_property_id) ??
-        mcpCollectionPropertyId(prop.relationPropertyUrl ?? prop.relation_property_url),
-      rollup_property_id:
-        optionalString(prop.rollup_property_id) ??
-        mcpCollectionPropertyId(prop.targetPropertyUrl ?? prop.rollupPropertyUrl ?? prop.rollup_property_url),
-      function: optionalString(prop.function ?? prop.rollupFunction ?? prop.aggregation) ?? 'show_original',
-    };
-  }
-  if (notionType === 'formula') {
-    return {
-      expression: optionalString(prop.expression ?? prop.formula) ?? '',
-      formula_code_url: optionalString(prop.codeUrl ?? prop.formulaCodeUrl),
-    };
-  }
-  return {};
-}
-
-function mcpSchemaProperties(state: Record<string, unknown> | undefined) {
-  const schema = asRecord(state?.schema ?? state?.properties);
-  if (!schema) return {};
-  const properties: Record<string, unknown> = {};
-  for (const [key, rawProp] of Object.entries(schema)) {
-    const prop = asRecord(rawProp);
-    if (!prop) continue;
-    const name = optionalString(prop.name) ?? key;
-    const notionType = mcpSchemaNotionType(prop.type);
-    const id = mcpSchemaPropertyId(prop, name);
-    properties[name] = {
-      id,
-      name,
-      type: notionType,
-      [notionType]: mcpSchemaPropertyConfig(prop, notionType),
-    };
-  }
-  return properties;
-}
-
-function mcpRelationTargetReferencesFromProperties(properties: Record<string, unknown>) {
-  const refs = new Map<string, { id: string; notionObject: 'data_source' }>();
-  for (const property of Object.values(properties)) {
-    const prop = asRecord(property);
-    if (!prop) continue;
-    const notionType = optionalString(prop.type);
-    const config = notionType ? notionPropertyConfig(prop, notionType) : {};
-    const target = notionType === 'relation' ? optionalString(config.data_source_id) : undefined;
-    if (target) refs.set(target, { id: target, notionObject: 'data_source' });
-    const rollupTarget = notionType === 'rollup'
-      ? mcpCollectionPropertyDataSourceId(config.rollup_property_id) ??
-        mcpCollectionPropertyDataSourceId((config.notion as Record<string, unknown> | undefined)?.targetPropertyUrl)
-      : undefined;
-    if (rollupTarget) refs.set(rollupTarget, { id: rollupTarget, notionObject: 'data_source' });
-  }
-  return Array.from(refs.values());
-}
-
-function mcpStringList(value: unknown) {
-  if (!Array.isArray(value)) return undefined;
-  const items = value
-    .map((item) => (typeof item === 'string' ? item.trim() : ''))
-    .filter(Boolean);
-  return items.length ? items : undefined;
-}
-
-function mcpViewRecord(rawView: Record<string, unknown>, viewId: string | undefined, dataSourceId: string) {
-  const displayProperties =
-    mcpStringList(rawView.displayProperties) ??
-    mcpStringList(rawView.visibleProperties) ??
-    mcpStringList(rawView.visible_properties);
-  const rawSorts = Array.isArray(rawView.sorts) ? rawView.sorts : [];
-  return {
-    ...rawView,
-    id: viewId ?? optionalString(rawView.id) ?? newId(),
-    name: optionalString(rawView.name) ?? 'Default view',
-    type: optionalString(rawView.type) ?? 'table',
-    data_source_id: dataSourceId,
-    visible_properties: displayProperties,
-    // Keep the two serialized view fields independent. The bounded snapshot
-    // guard intentionally rejects object aliases, even when JSON.stringify
-    // would duplicate the shared array into valid JSON.
-    property_order: displayProperties ? [...displayProperties] : undefined,
-    sorts: rawSorts
-      .filter((sort): sort is Record<string, unknown> => !!sort && typeof sort === 'object')
-      .map((sort) => ({
-        property: optionalString(sort.property ?? sort.property_id ?? sort.id ?? sort.name),
-        direction: optionalString(sort.direction) ?? 'ascending',
-      }))
-      .filter((sort) => sort.property),
-  };
-}
-
-interface McpParsedView {
-  rawView: Record<string, unknown>;
-  sourceId?: string;
-  viewId?: string;
-}
-
-function parseMcpViews(
-  content: string,
-  embeddedJsonBudget: McpEmbeddedJsonBudget,
-): McpParsedView[] {
-  const views: McpParsedView[] = [];
-  for (const viewBlock of extractTagBlocks(content, 'view')) {
-    const parsed = parseJsonLike(
-      viewBlock.content,
-      embeddedJsonBudget,
-      0,
-      'mcpFetches <view>',
-    );
-    const rawView = asRecord(parsed);
-    if (!rawView) continue;
-    views.push({
-      rawView,
-      sourceId: mcpReferenceId(rawView.dataSourceUrl ?? rawView.data_source_url),
-      viewId: mcpReferenceId(tagAttribute(viewBlock.attributes, 'url')),
-    });
-  }
-  return views;
-}
-
-function mcpViewsForDataSource(
-  parsedViews: McpParsedView[],
-  dataSourceId: string,
-  workBudget: McpTransformWorkBudget,
-) {
-  const normalizedDataSourceId = normalizedNotionId(dataSourceId);
-  const views: Record<string, unknown>[] = [];
-  for (const view of parsedViews) {
-    workBudget.viewInspections += 1;
-    if (workBudget.viewInspections > NOTION_IMPORT_MCP_VIEW_ASSIGNMENT_WORK_MAX) {
-      notionImportPayloadTooLarge(
-        `mcpFetches exceeds ${NOTION_IMPORT_MCP_VIEW_ASSIGNMENT_WORK_MAX} view assignments`,
-      );
-    }
-    if (view.sourceId && normalizedNotionId(view.sourceId) !== normalizedDataSourceId) continue;
-    views.push(mcpViewRecord(view.rawView, view.viewId, dataSourceId));
-  }
-  return views;
-}
-
-function mcpTextSpans(value: unknown) {
-  const text = value === undefined || value === null ? '' : String(value);
-  return mcpRichTextTitle(text);
-}
-
-function mcpRowPageDateParts(rawProperties: Record<string, unknown>, name: string) {
-  const start = optionalString(rawProperties[`date:${name}:start`]);
-  const end = optionalString(rawProperties[`date:${name}:end`]);
-  const isDatetime = rawProperties[`date:${name}:is_datetime`];
-  if (!start && !end && isDatetime === undefined) return undefined;
-  return {
-    start: start ?? end ?? '',
-    end,
-    time_zone: null,
-  };
-}
-
-function mcpRowPageFileValues(value: unknown) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => (typeof item === 'string' ? item.trim() : ''))
-    .filter(Boolean)
-    .map((url) => ({
-      type: 'external',
-      name: fileNameFromUrl(url),
-      external: { url },
-    }));
-}
-
-function mcpRowPagePropertyValue(
-  name: string,
-  value: unknown,
-  sourceProperty: Record<string, unknown> | undefined,
-  rawProperties: Record<string, unknown>,
-) {
-  const notionType = optionalString(sourceProperty?.type) ?? (typeof value === 'number' ? 'number' : 'rich_text');
-  const id = optionalString(sourceProperty?.id) ?? name;
-  if (notionType === 'title' || notionType === 'rich_text') {
-    return { id, type: notionType, [notionType]: mcpTextSpans(value) };
-  }
-  if (notionType === 'number') return { id, type: notionType, number: typeof value === 'number' ? value : Number(value) };
-  if (notionType === 'select' || notionType === 'status') {
-    return {
-      id,
-      type: notionType,
-      [notionType]: value === undefined || value === null || value === '' ? null : { name: String(value) },
-    };
-  }
-  if (notionType === 'multi_select') {
-    const values = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
-    return {
-      id,
-      type: notionType,
-      multi_select: values
-        .map((item) => (typeof item === 'string' ? item.trim() : ''))
-        .filter(Boolean)
-        .map((item) => ({ name: item })),
-    };
-  }
-  if (notionType === 'date') {
-    return { id, type: notionType, date: mcpRowPageDateParts(rawProperties, name) ?? null };
-  }
-  if (notionType === 'relation') {
-    const values = Array.isArray(value) ? value : [];
-    return {
-      id,
-      type: notionType,
-      relation: values
-        .map((item) => mcpReferenceId(item))
-        .filter((item): item is string => !!item)
-        .map((item) => ({ id: item })),
-    };
-  }
-  if (notionType === 'files') return { id, type: notionType, files: mcpRowPageFileValues(value) };
-  if (notionType === 'checkbox') return { id, type: notionType, checkbox: value === true || value === '__YES__' };
-  if (notionType === 'formula') {
-    return {
-      id,
-      type: notionType,
-      formula: { type: 'string', string: value === undefined || value === null ? '' : String(value) },
-    };
-  }
-  if (notionType === 'rollup') {
-    return {
-      id,
-      type: notionType,
-      rollup: { type: 'array', array: [] },
-    };
-  }
-  if (notionType === 'url' || notionType === 'email' || notionType === 'phone_number') {
-    return { id, type: notionType, [notionType]: value === undefined || value === null ? null : String(value) };
-  }
-  return { id, type: 'rich_text', rich_text: mcpTextSpans(value) };
-}
-
-function mcpRowPageProperties(rawProperties: Record<string, unknown>, sourceProperties: Record<string, unknown>) {
-  const out: Record<string, unknown> = {};
-  const sourceNames = new Set(Object.keys(sourceProperties));
-  for (const name of sourceNames) {
-    const sourceProperty = asRecord(sourceProperties[name]);
-    if (!sourceProperty) continue;
-    const hasDirectValue = Object.prototype.hasOwnProperty.call(rawProperties, name);
-    const hasDateValue =
-      optionalString(rawProperties[`date:${name}:start`]) ||
-      optionalString(rawProperties[`date:${name}:end`]) ||
-      rawProperties[`date:${name}:is_datetime`] !== undefined;
-    if (!hasDirectValue && !hasDateValue) continue;
-    out[name] = mcpRowPagePropertyValue(name, rawProperties[name], sourceProperty, rawProperties);
-  }
-  for (const [name, value] of Object.entries(rawProperties)) {
-    if (name === 'url' || name.startsWith('date:') || sourceNames.has(name)) continue;
-    out[name] = mcpRowPagePropertyValue(name, value, undefined, rawProperties);
-  }
-  return out;
-}
-
-function putMcpDataSourceSnapshot(
-  items: Map<string, DiscoveredNotionItem>,
-  dataSourceBlock: HtmlTagBlock,
-  parsedViews: McpParsedView[],
-  payload: McpFetchPayload,
-  databaseId: string | undefined,
-  fallbackTitle: string | undefined,
-  embeddedJsonBudget: McpEmbeddedJsonBudget,
-  workBudget: McpTransformWorkBudget,
-) {
-  const state = asRecord(
-    firstTagJson(dataSourceBlock.content, 'data-source-state', embeddedJsonBudget),
-  );
-  const dataSourceId =
-    mcpReferenceId(tagAttribute(dataSourceBlock.attributes, 'url')) ??
-    mcpReferenceId(state?.url) ??
-    mcpReferenceId(state?.dataSourceUrl);
-  if (!dataSourceId) return undefined;
-  const title =
-    mcpTitleFromText(dataSourceBlock.content, 'Data Source') ??
-    optionalString(state?.name ?? state?.title) ??
-    fallbackTitle ??
-    payload.title ??
-    'Untitled data source';
-  const properties = mcpSchemaProperties(state);
-  const views = mcpViewsForDataSource(parsedViews, dataSourceId, workBudget);
-  const dataSourceRef = {
-    id: dataSourceId,
-    object: 'data_source',
-    name: title,
-    title: mcpRichTextTitle(title),
-  };
-  putDiscoveredItem(items, {
-    notionId: dataSourceId,
-    notionObject: 'data_source',
-    parentNotionId: databaseId,
-    title,
-    status: 'discovered',
-    phase: 'mcp_data_source_snapshot',
-    metadata: {
-      discoveredFrom: 'mcp_fetch',
-      ...(databaseId ? { databaseId } : {}),
-      dataSourceSnapshot: {
-        dataSource: {
-          id: dataSourceId,
-          object: 'data_source',
-          ...(databaseId ? { parent: { type: 'database_id', database_id: databaseId } } : {}),
-          title: mcpRichTextTitle(title),
-          name: title,
-          properties,
-        },
-        rowReferences: [],
-        relationTargetReferences: mcpRelationTargetReferencesFromProperties(properties),
-        views,
-        templates: [],
-        mcpSource: {
-          title: payload.title,
-          url: payload.url,
-          metadata: payload.metadata,
-        },
-      },
-    },
-  });
-  return dataSourceRef;
-}
-
-function putMcpPageSnapshot(
-  items: Map<string, DiscoveredNotionItem>,
-  pageBlock: HtmlTagBlock,
-  payload: McpFetchPayload,
-  embeddedJsonBudget: McpEmbeddedJsonBudget,
-) {
-  const pageUrl = tagAttribute(pageBlock.attributes, 'url') ?? payload.url;
-  const pageId = mcpReferenceId(pageUrl);
-  if (!pageId) return;
-  const parentDataSourceAttributes = extractSelfClosingTagAttributes(pageBlock.content, 'parent-data-source')[0];
-  const dataSourceId = parentDataSourceAttributes
-    ? mcpReferenceId(tagAttribute(parentDataSourceAttributes, 'url'))
-    : undefined;
-  const sourceItem = dataSourceId ? items.get(dataSourceId) : undefined;
-  const sourceProperties = sourceItem ? notionPropertiesFromSnapshot(dataSourceSnapshot(sourceItem)) : {};
-  const rawProperties = asRecord(
-    firstTagJson(pageBlock.content, 'properties', embeddedJsonBudget),
-  ) ?? {};
-  const properties = dataSourceId ? mcpRowPageProperties(rawProperties, sourceProperties) : rawProperties;
-  putDiscoveredItem(items, {
-    notionId: pageId,
-    notionObject: 'page',
-    parentNotionId: dataSourceId,
-    title: payload.title ?? optionalString(rawProperties.title) ?? optionalString(rawProperties.Name),
-    status: 'discovered',
-    phase: dataSourceId ? 'mcp_data_source_row_snapshot' : 'mcp_page_snapshot',
-    metadata: {
-      discoveredFrom: 'mcp_fetch',
-      ...(dataSourceId ? { dataSourceId } : {}),
-      properties,
-      rawMcpProperties: rawProperties,
-      icon: tagAttribute(pageBlock.attributes, 'icon')
-        ? { type: 'emoji', emoji: tagAttribute(pageBlock.attributes, 'icon') }
-        : undefined,
-      pageSnapshot: { childBlocks: [] },
-      mcpSource: {
-        title: payload.title,
-        url: payload.url,
-        metadata: payload.metadata,
-      },
-    },
-  });
-}
-
-function assertRequestDiscoveredItemCount(
-  items: Map<string, DiscoveredNotionItem>,
-  label: string,
-) {
-  if (items.size > NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX) {
-    notionImportPayloadTooLarge(
-      `${label} expands beyond ${NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX} items`,
-    );
-  }
-}
-
-function assertBoundedRequestDiscoveredItems(
-  items: DiscoveredNotionItem[],
-  label: string,
-) {
-  if (items.length > NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX) {
-    notionImportPayloadTooLarge(
-      `${label} has more than ${NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX} items`,
-    );
-  }
-  const budget: NotionImportRequestJsonBudget = { bytes: 0, nodes: 0 };
-  items.forEach((item, index) => {
-    assertBoundedSnapshotJsonValue(item, budget, `${label}[${index}]`);
-  });
-}
-
-export function parseMcpFetchItems(value: unknown): DiscoveredNotionItem[] {
-  const items = new Map<string, DiscoveredNotionItem>();
-  const embeddedJsonBudget: McpEmbeddedJsonBudget = {
-    bytes: 0,
-    shape: { nodes: 0 },
-  };
-  const workBudget: McpTransformWorkBudget = { viewInspections: 0 };
-  const payloads = collectMcpFetchPayloads(value, embeddedJsonBudget);
-  for (const payload of payloads) {
-    const databaseBlocks = extractTagBlocks(payload.text, 'database');
-    for (const databaseBlock of databaseBlocks) {
-      const parsedViews = parseMcpViews(databaseBlock.content, embeddedJsonBudget);
-      const databaseUrl = tagAttribute(databaseBlock.attributes, 'url') ?? payload.url;
-      const databaseId = mcpReferenceId(databaseUrl);
-      if (!databaseId) continue;
-      const databaseTitle =
-        mcpTitleFromText(databaseBlock.content, 'Database') ??
-        payload.title ??
-        'Untitled database';
-      const dataSourceRefs: Record<string, unknown>[] = [];
-
-      for (const dataSourceBlock of extractTagBlocks(databaseBlock.content, 'data-source')) {
-        const dataSourceRef = putMcpDataSourceSnapshot(
-          items,
-          dataSourceBlock,
-          parsedViews,
-          payload,
-          databaseId,
-          databaseTitle,
-          embeddedJsonBudget,
-          workBudget,
-        );
-        if (dataSourceRef) dataSourceRefs.push(dataSourceRef);
-        assertRequestDiscoveredItemCount(items, 'mcpFetches');
-      }
-
-      putDiscoveredItem(items, {
-        notionId: databaseId,
-        notionObject: 'database',
-        title: databaseTitle,
-        status: 'discovered',
-        phase: 'mcp_database_snapshot',
-        metadata: {
-          discoveredFrom: 'mcp_fetch',
-          database: {
-            id: databaseId,
-            object: 'database',
-            title: mcpRichTextTitle(databaseTitle),
-            data_sources: dataSourceRefs,
-          },
-          // Deep-clone so the data-source refs are not aliased under both
-          // `database.data_sources` and `dataSources`. The bounded-request guard
-          // (assertBoundedSnapshotJsonValue) rejects any object reached twice
-          // within one item, so the two fields must own independent subtrees.
-          dataSources: structuredClone(dataSourceRefs),
-          mcpSource: {
-            title: payload.title,
-            url: payload.url,
-            metadata: payload.metadata,
-          },
-        },
-      });
-      assertRequestDiscoveredItemCount(items, 'mcpFetches');
-    }
-    if (databaseBlocks.length === 0) {
-      const parsedViews = parseMcpViews(payload.text, embeddedJsonBudget);
-      for (const dataSourceBlock of extractTagBlocks(payload.text, 'data-source')) {
-        putMcpDataSourceSnapshot(
-          items,
-          dataSourceBlock,
-          parsedViews,
-          payload,
-          undefined,
-          payload.title,
-          embeddedJsonBudget,
-          workBudget,
-        );
-        assertRequestDiscoveredItemCount(items, 'mcpFetches');
-      }
-    }
-  }
-  for (const payload of payloads) {
-    for (const pageBlock of extractTagBlocks(payload.text, 'page')) {
-      putMcpPageSnapshot(items, pageBlock, payload, embeddedJsonBudget);
-      assertRequestDiscoveredItemCount(items, 'mcpFetches');
-    }
-  }
-  const parsed = Array.from(items.values());
-  assertBoundedRequestDiscoveredItems(parsed, 'mcpFetchItems');
-  return parsed;
-}
-
-export function expandSnapshotItems(
-  items: DiscoveredNotionItem[],
-  maxItems = NOTION_IMPORT_ITEM_SAFETY_LIMIT,
-) {
-  if (items.length > maxItems) {
-    notionImportPayloadTooLarge(`snapshot input expands beyond ${maxItems} items`);
-  }
-  const byId = new Map<string, DiscoveredNotionItem>();
-  const assertWithinLimit = () => {
-    if (byId.size > maxItems) {
-      notionImportPayloadTooLarge(`snapshot expansion exceeds ${maxItems} items`);
-    }
-  };
-  for (const item of items) {
-    putDiscoveredItem(byId, item);
-    assertWithinLimit();
-  }
-
-  for (const item of items) {
-    if (item.notionObject !== 'data_source') continue;
-    const snapshot = dataSourceSnapshot(item);
-    const rowReferences = Array.isArray(snapshot?.rowReferences) ? snapshot.rowReferences : [];
-    for (let rowIndex = 0; rowIndex < rowReferences.length; rowIndex += 1) {
-      const row = rowReferences[rowIndex];
-      if (!row || typeof row !== 'object') continue;
-      const rowRecord = row as Record<string, unknown>;
-      const id = optionalString(rowRecord.id);
-      if (!id) continue;
-      putDiscoveredItem(byId, {
-        notionId: id,
-        notionObject: optionalString(rowRecord.object) ?? 'page',
-        parentNotionId: item.notionId,
-        title: optionalString(rowRecord.title),
-        status: 'referenced',
-        phase: 'data_source_row_reference',
-        metadata: {
-          discoveredFrom: 'snapshot_data_source_query',
-          dataSourceId: item.notionId,
-          notionQueryOrder: rowIndex,
-          ...(optionalString(rowRecord.createdTime) ?? optionalString(rowRecord.created_time)
-            ? { createdTime: optionalString(rowRecord.createdTime) ?? optionalString(rowRecord.created_time) }
-            : {}),
-          ...(optionalString(rowRecord.lastEditedTime) ?? optionalString(rowRecord.last_edited_time)
-            ? { lastEditedTime: optionalString(rowRecord.lastEditedTime) ?? optionalString(rowRecord.last_edited_time) }
-            : {}),
-          properties: rowRecord.properties,
-          icon: rowRecord.icon,
-          cover: rowRecord.cover,
-        },
-      });
-      assertWithinLimit();
-    }
-
-    const views = Array.isArray(snapshot?.views) ? snapshot.views : [];
-    for (const view of views) {
-      if (!view || typeof view !== 'object') continue;
-      const viewRecord = view as Record<string, unknown>;
-      const id = notionObjectId(viewRecord);
-      if (!id) continue;
-      putDiscoveredItem(byId, {
-        notionId: id,
-        notionObject: 'view',
-        parentNotionId: item.notionId,
-        title: optionalString(viewRecord.name),
-        status: 'discovered',
-        phase: 'view_snapshot',
-        metadata: {
-          discoveredFrom: 'snapshot_views',
-          dataSourceId: item.notionId,
-          view: viewRecord,
-        },
-      });
-      assertWithinLimit();
-    }
-  }
-
-  return Array.from(byId.values());
-}
-
 function parsePositiveInt(value: unknown, fallback: number, max: number) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
   return Math.max(1, Math.min(max, Math.floor(value)));
@@ -2117,265 +847,6 @@ async function mapWithConcurrency<T>(
   }));
 }
 
-function envString(env: Record<string, unknown> | undefined, key: string) {
-  return hanjiEnvValue(env, key);
-}
-
-export function notionOAuthEnabled(env: Record<string, unknown> | undefined) {
-  return hanjiCanonicalEnvValue(env, NOTION_OAUTH_ENABLED_ENV) === 'true';
-}
-
-function assertNotionOAuthEnabled(env: Record<string, unknown> | undefined) {
-  if (notionOAuthEnabled(env)) return;
-  throw new Error(`${NOTION_OAUTH_ENABLED_ENV}=true is required for Notion OAuth.`);
-}
-
-function notionApiBase(env: Record<string, unknown> | undefined) {
-  return (envString(env, NOTION_API_BASE_ENV) ?? NOTION_API_BASE).replace(/\/+$/, '');
-}
-
-function notionOAuthAuthorizeUrl(env: Record<string, unknown> | undefined) {
-  assertNotionOAuthEnabled(env);
-  return (
-    envString(env, NOTION_OAUTH_AUTH_URL_ENV) ??
-    `${notionApiBase(env)}/oauth/authorize`
-  ).trim();
-}
-
-function notionOAuthClientId(env: Record<string, unknown> | undefined) {
-  assertNotionOAuthEnabled(env);
-  const clientId = envString(env, NOTION_OAUTH_CLIENT_ID_ENV);
-  if (!clientId) throw new Error(`${NOTION_OAUTH_CLIENT_ID_ENV} is required for Notion OAuth.`);
-  return clientId;
-}
-
-function notionOAuthClientSecret(env: Record<string, unknown> | undefined) {
-  assertNotionOAuthEnabled(env);
-  const clientSecret = envString(env, NOTION_OAUTH_CLIENT_SECRET_ENV);
-  if (!clientSecret) throw new Error(`${NOTION_OAUTH_CLIENT_SECRET_ENV} is required for Notion OAuth.`);
-  return clientSecret;
-}
-
-export function notionOAuthRedirectUri(
-  env: Record<string, unknown> | undefined,
-  body: Record<string, unknown>,
-) {
-  assertNotionOAuthEnabled(env);
-  const configured = envString(env, NOTION_OAUTH_REDIRECT_URI_ENV);
-  const requested = optionalString(body.redirectUri);
-  if (configured) {
-    if (requested && requested !== configured) {
-      throw new Error(
-        `redirectUri must exactly match ${NOTION_OAUTH_REDIRECT_URI_ENV}.`,
-      );
-    }
-    return configured;
-  }
-  if (requested) return requested;
-  throw new Error('redirectUri is required for Notion OAuth.');
-}
-
-function notionCredentialSecret(env: Record<string, unknown> | undefined) {
-  return (
-    envString(env, NOTION_CONNECTION_SECRET_ENV) ??
-    envString(env, LEGACY_NOTION_CONNECTION_SECRET_ENV)
-  );
-}
-
-export function notionConnectionStorageAvailable(env: Record<string, unknown> | undefined) {
-  return notionCredentialSecret(env) !== undefined;
-}
-
-function notionOAuthStateSecret(env: Record<string, unknown> | undefined) {
-  assertNotionOAuthEnabled(env);
-  return (
-    envString(env, NOTION_OAUTH_STATE_SECRET_ENV) ??
-    notionCredentialSecret(env) ??
-    notionOAuthClientSecret(env)
-  );
-}
-
-function base64UrlEncode(bytes: Uint8Array) {
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
-function base64UrlDecode(value: string) {
-  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
-  const binary = atob(padded);
-  const out = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) out[index] = binary.charCodeAt(index);
-  return out;
-}
-
-function base64EncodeText(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}
-
-async function hmacSha256(secret: string, data: string) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  return new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data)));
-}
-
-function bytesEqual(a: Uint8Array, b: Uint8Array) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let index = 0; index < a.length; index += 1) diff |= a[index] ^ b[index];
-  return diff === 0;
-}
-
-async function encodeNotionOAuthState(
-  payload: NotionOAuthStatePayload,
-  env: Record<string, unknown> | undefined,
-) {
-  const encodedPayload = base64UrlEncode(new TextEncoder().encode(JSON.stringify(payload)));
-  const signature = base64UrlEncode(await hmacSha256(notionOAuthStateSecret(env), encodedPayload));
-  return `${encodedPayload}.${signature}`;
-}
-
-async function decodeNotionOAuthState(
-  state: string,
-  env: Record<string, unknown> | undefined,
-): Promise<NotionOAuthStatePayload> {
-  const [encodedPayload, encodedSignature, extra] = state.split('.');
-  if (!encodedPayload || !encodedSignature || extra !== undefined) {
-    throw new Error('Notion OAuth state is invalid.');
-  }
-  const expected = await hmacSha256(notionOAuthStateSecret(env), encodedPayload);
-  const actual = base64UrlDecode(encodedSignature);
-  if (!bytesEqual(expected, actual)) throw new Error('Notion OAuth state is invalid.');
-  let payload: Record<string, unknown>;
-  try {
-    payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(encodedPayload))) as Record<string, unknown>;
-  } catch {
-    throw new Error('Notion OAuth state is invalid.');
-  }
-  const workspaceId = requireString(payload.workspaceId, 'workspaceId');
-  const actorId = requireString(payload.actorId, 'actorId');
-  const redirectUri = requireString(payload.redirectUri, 'redirectUri');
-  const nonce = requireString(payload.nonce, 'nonce');
-  const createdAt = requireString(payload.createdAt, 'createdAt');
-  const createdTime = new Date(createdAt).getTime();
-  if (!Number.isFinite(createdTime) || Date.now() - createdTime > NOTION_OAUTH_STATE_MAX_AGE_MS) {
-    throw new Error('Notion OAuth state has expired.');
-  }
-  return {
-    workspaceId,
-    actorId,
-    redirectUri,
-    name: optionalString(payload.name),
-    nonce,
-    createdAt,
-  };
-}
-
-async function credentialCryptoKey(secret: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret));
-  return crypto.subtle.importKey('raw', digest, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
-}
-
-async function encryptNotionCredential(token: string, env: Record<string, unknown> | undefined) {
-  const secret = notionCredentialSecret(env);
-  if (!secret) {
-    throw new Error(`${NOTION_CONNECTION_SECRET_ENV} is required to store Notion import connections.`);
-  }
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await credentialCryptoKey(secret);
-  const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
-    key,
-    new TextEncoder().encode(token),
-  );
-  return JSON.stringify({
-    v: 1,
-    alg: NOTION_CREDENTIAL_ALGORITHM,
-    kid: NOTION_CREDENTIAL_KEY_ID,
-    iv: base64UrlEncode(iv),
-    data: base64UrlEncode(new Uint8Array(encrypted)),
-  });
-}
-
-async function encryptNotionOAuthCredential(
-  input: {
-    accessToken: string;
-    refreshToken?: string | null;
-    tokenType?: string | null;
-    refreshedAt?: string | null;
-  },
-  env: Record<string, unknown> | undefined,
-) {
-  assertNotionOAuthEnabled(env);
-  const payload: NotionStoredOAuthCredential = {
-    kind: 'oauth',
-    accessToken: input.accessToken,
-    refreshToken: input.refreshToken ?? null,
-    tokenType: input.tokenType ?? 'bearer',
-    issuedAt: nowIso(),
-    refreshedAt: input.refreshedAt ?? null,
-  };
-  return encryptNotionCredential(JSON.stringify(payload), env);
-}
-
-async function decryptNotionCredential(
-  connection: NotionImportConnection,
-  env: Record<string, unknown> | undefined,
-): Promise<DecryptedNotionCredential> {
-  const secret = notionCredentialSecret(env);
-  if (!secret) {
-    throw new Error(`${NOTION_CONNECTION_SECRET_ENV} is required to use stored Notion import connections.`);
-  }
-  if (!connection.credentialCiphertext) {
-    throw new Error('Notion import connection has no stored credential.');
-  }
-  let payload: Record<string, unknown>;
-  try {
-    payload = JSON.parse(connection.credentialCiphertext) as Record<string, unknown>;
-  } catch {
-    throw new Error('Notion import connection credential is invalid.');
-  }
-  if (payload.alg !== NOTION_CREDENTIAL_ALGORITHM || payload.kid !== NOTION_CREDENTIAL_KEY_ID) {
-    throw new Error('Notion import connection credential uses an unsupported format.');
-  }
-  const iv = typeof payload.iv === 'string' ? base64UrlDecode(payload.iv) : undefined;
-  const data = typeof payload.data === 'string' ? base64UrlDecode(payload.data) : undefined;
-  if (!iv || !data) throw new Error('Notion import connection credential is incomplete.');
-  const key = await credentialCryptoKey(secret);
-  try {
-    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
-    const plaintext = new TextDecoder().decode(decrypted);
-    try {
-      const parsed = JSON.parse(plaintext) as Partial<NotionStoredOAuthCredential>;
-      if (parsed?.kind === 'oauth' && typeof parsed.accessToken === 'string' && parsed.accessToken.trim()) {
-        return {
-          kind: 'oauth',
-          accessToken: parsed.accessToken.trim(),
-          refreshToken: typeof parsed.refreshToken === 'string' && parsed.refreshToken.trim()
-            ? parsed.refreshToken.trim()
-            : null,
-          tokenType: typeof parsed.tokenType === 'string' && parsed.tokenType.trim()
-            ? parsed.tokenType.trim()
-            : 'bearer',
-        };
-      }
-    } catch {
-      // Existing stored connections encrypted the raw token directly.
-    }
-    return { kind: 'token', token: plaintext };
-  } catch {
-    throw new Error('Notion import connection credential could not be decrypted.');
-  }
-}
 
 async function listAll<T>(query: TableQuery<T>, maxItems = 1000): Promise<T[]> {
   const out: T[] = [];
@@ -3143,256 +1614,6 @@ export function notionAccessibleRootCandidates(records: Record<string, unknown>[
     if (editedDelta !== 0) return editedDelta;
     return a.title.localeCompare(b.title);
   });
-}
-
-function wait(ms: number) {
-  if (!Number.isFinite(ms) || ms <= 0) return Promise.resolve();
-  return new Promise((resolve) => setTimeout(resolve, Math.min(ms, NOTION_REQUEST_RETRY_MAX_DELAY_MS)));
-}
-
-// Shared per-token request scheduler. Discovery/apply fan out concurrently, so a
-// single leaky-bucket clock per token spaces ALL of that token's real-API
-// requests by NOTION_MIN_REQUEST_INTERVAL_MS. The read-then-write of the slot is
-// synchronous (no await between), so concurrent callers can't claim the same
-// slot even under fan-out. Keys are per-isolate HMACs of tokens, so a memory
-// snapshot cannot reveal bearer credentials and distinct integrations still
-// receive distinct budgets. The map is also TTL-pruned and size-bounded.
-const notionRequestSchedule = new Map<string, number>();
-let notionRequestScheduleHmacKey: Promise<CryptoKey> | undefined;
-
-async function notionRequestScheduleKey(token: string) {
-  notionRequestScheduleHmacKey ??= crypto.subtle.generateKey(
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const key = await notionRequestScheduleHmacKey;
-  const digest = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(token));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
-export function pruneNotionRequestSchedule(
-  schedule: Map<string, number>,
-  now: number,
-  ttlMs: number,
-  maxEntries: number,
-) {
-  const staleBefore = now - Math.max(0, ttlMs);
-  for (const [key, nextAt] of schedule) {
-    if (nextAt < staleBefore) schedule.delete(key);
-  }
-
-  const boundedMax = Math.max(0, Math.floor(maxEntries));
-  if (schedule.size <= boundedMax) return;
-  const oldest = Array.from(schedule.entries()).sort((left, right) => left[1] - right[1]);
-  for (let index = 0; index < oldest.length - boundedMax; index += 1) {
-    schedule.delete(oldest[index][0]);
-  }
-}
-
-function notionApiHostIsReal(apiBase: string | undefined) {
-  try {
-    const host = new URL(apiBase ?? NOTION_API_BASE).hostname;
-    return host === 'api.notion.com';
-  } catch {
-    // A malformed base is not the real host; leave it unthrottled.
-    return false;
-  }
-}
-
-// Reserve the next send slot for `token` and return the ms to wait before firing.
-// Pure scheduling math (no I/O) so it is trivially unit-testable.
-export function reserveNotionRequestSlot(
-  schedule: Map<string, number>,
-  token: string,
-  now: number,
-  minIntervalMs: number,
-): number {
-  if (minIntervalMs <= 0) return 0;
-  const previous = schedule.get(token) ?? 0;
-  const slot = Math.max(now, previous);
-  schedule.set(token, slot + minIntervalMs);
-  return Math.max(0, slot - now);
-}
-
-async function throttleNotionRequest(token: string, apiBase: string | undefined) {
-  if (!notionApiHostIsReal(apiBase)) return;
-  const now = Date.now();
-  pruneNotionRequestSchedule(
-    notionRequestSchedule,
-    now,
-    NOTION_REQUEST_SCHEDULE_TTL_MS,
-    NOTION_REQUEST_SCHEDULE_MAX_ENTRIES - 1,
-  );
-  const scheduleKey = await notionRequestScheduleKey(token);
-  const waitMs = reserveNotionRequestSlot(
-    notionRequestSchedule,
-    scheduleKey,
-    now,
-    NOTION_MIN_REQUEST_INTERVAL_MS,
-  );
-  if (waitMs > 0) await wait(waitMs);
-}
-
-function notionIsoTimestamp(value: unknown) {
-  if (typeof value !== 'string' || !value.trim()) return undefined;
-  const time = new Date(value).getTime();
-  if (!Number.isFinite(time)) return undefined;
-  return new Date(time).toISOString();
-}
-
-function retryAfterMs(value: string | null) {
-  if (!value || !value.trim()) return undefined;
-  const seconds = Number(value);
-  if (Number.isFinite(seconds)) return Math.max(0, seconds * 1000);
-  const date = new Date(value).getTime();
-  if (!Number.isFinite(date)) return undefined;
-  return Math.max(0, date - Date.now());
-}
-
-function isRetryableNotionStatus(status: number) {
-  return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
-}
-
-function notionRetryDelay(error: NotionApiError, attempt: number) {
-  if (error.status === 429) {
-    return error.retryAfterMs ?? Math.min(2_000 * (2 ** attempt), NOTION_REQUEST_RETRY_MAX_DELAY_MS);
-  }
-  return error.retryAfterMs ?? Math.min(
-    NOTION_REQUEST_RETRY_BASE_DELAY_MS * (2 ** attempt),
-    NOTION_REQUEST_RETRY_MAX_DELAY_MS,
-  );
-}
-
-function reportNotionRequestRetry(
-  options: NotionRequestOptions,
-  input: {
-    path: string;
-    method: 'GET' | 'POST';
-    attempt: number;
-    delayMs: number;
-    error: unknown;
-  },
-) {
-  if (!options.onRetry) return;
-  const error = input.error;
-  options.onRetry({
-    path: input.path,
-    method: input.method,
-    status: error instanceof NotionApiError ? error.status : undefined,
-    code: error instanceof NotionApiError ? error.code : undefined,
-    attempt: input.attempt + 1,
-    nextAttempt: input.attempt + 2,
-    delayMs: input.delayMs,
-    message: error instanceof Error ? error.message : String(error),
-  });
-}
-
-async function notionErrorFromResponse(response: Response) {
-  let message = `Notion API request failed with ${response.status}.`;
-  let code: string | undefined;
-  try {
-    const error = (await response.json()) as { message?: string; code?: string };
-    if (typeof error.message === 'string' && error.message.trim()) message = error.message.trim();
-    if (typeof error.code === 'string' && error.code.trim()) code = error.code.trim();
-  } catch {
-    try {
-      const text = await response.text();
-      if (text.trim()) message = text.trim();
-    } catch {
-      // ignore body parsing failures
-    }
-  }
-  return new NotionApiError(message, {
-    status: response.status,
-    code,
-    retryAfterMs: retryAfterMs(response.headers.get('Retry-After')),
-  });
-}
-
-async function notionRequest(
-  token: string,
-  path: string,
-  apiVersion: string,
-  options: NotionRequestOptions = {},
-): Promise<Record<string, unknown>> {
-  const url = new URL(`${(options.apiBase ?? NOTION_API_BASE).replace(/\/+$/, '')}${path}`);
-  for (const [key, value] of Object.entries(options.query ?? {})) {
-    if (value !== undefined) url.searchParams.set(key, String(value));
-  }
-  const method = options.method ?? (options.body ? 'POST' : 'GET');
-  const body = options.body ? JSON.stringify(options.body) : undefined;
-  let lastError: unknown;
-
-  for (let attempt = 0; attempt < NOTION_REQUEST_MAX_ATTEMPTS; attempt += 1) {
-    try {
-      // Proactively pace real-API traffic so we stay under Notion's ~3 req/s
-      // limit instead of bursting into 429 backoffs. Retries pass through here
-      // too, so a retried request also respects the shared per-token cadence.
-      await throttleNotionRequest(token, options.apiBase);
-      const response = await fetch(url.toString(), {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': apiVersion,
-        },
-        body,
-        signal: AbortSignal.timeout(NOTION_REQUEST_TIMEOUT_MS),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data && typeof data === 'object' ? (data as Record<string, unknown>) : {};
-      }
-
-      const error = await notionErrorFromResponse(response);
-      lastError = error;
-      if (!isRetryableNotionStatus(error.status) || attempt >= NOTION_REQUEST_MAX_ATTEMPTS - 1) throw error;
-      const delayMs = notionRetryDelay(error, attempt);
-      reportNotionRequestRetry(options, { path, method, attempt, delayMs, error });
-      await wait(delayMs);
-    } catch (error) {
-      lastError = error;
-      if (error instanceof NotionApiError) {
-        if (!isRetryableNotionStatus(error.status) || attempt >= NOTION_REQUEST_MAX_ATTEMPTS - 1) throw error;
-        const delayMs = notionRetryDelay(error, attempt);
-        reportNotionRequestRetry(options, { path, method, attempt, delayMs, error });
-        await wait(delayMs);
-        continue;
-      }
-      if (attempt >= NOTION_REQUEST_MAX_ATTEMPTS - 1) throw error;
-      const delayMs = Math.min(
-        NOTION_REQUEST_RETRY_BASE_DELAY_MS * (2 ** attempt),
-        NOTION_REQUEST_RETRY_MAX_DELAY_MS,
-      );
-      reportNotionRequestRetry(options, { path, method, attempt, delayMs, error });
-      await wait(delayMs);
-    }
-  }
-
-  throw lastError instanceof Error ? lastError : new Error(String(lastError ?? 'Notion API request failed.'));
-}
-
-async function safeNotionRequest(
-  token: string,
-  path: string,
-  apiVersion: string,
-  options: Parameters<typeof notionRequest>[3] = {},
-) {
-  try {
-    return { ok: true as const, data: await notionRequest(token, path, apiVersion, options) };
-  } catch (error) {
-    return {
-      ok: false as const,
-      error: error instanceof Error ? error.message : String(error),
-      status: error instanceof NotionApiError ? error.status : undefined,
-      retryable:
-        error instanceof NotionApiError
-          ? isRetryableNotionStatus(error.status)
-          : true,
-    };
-  }
 }
 
 async function notionOAuthTokenRequest(
@@ -8176,7 +6397,7 @@ async function collectDataSourceSnapshot(
   };
 }
 
-type DiscoveryProgressSnapshot = {
+export type DiscoveryProgressSnapshot = {
   phase: 'search' | 'enrich';
   discovered: number;
   pendingEnrichment: number;
@@ -8302,981 +6523,55 @@ export function notionEnrichmentWaveSize(params: {
     : remaining;
   return Math.min(remaining, concurrency, budget);
 }
+function notionImportDiscoveryRuntime() {
+  return {
+    NOTION_PREFLIGHT_SAMPLE_LIMIT,
+    NOTION_DISCOVERY_PASS_SAFETY_LIMIT,
+    optionalString,
+    mapWithConcurrency,
+    notionTitle,
+    notionParentId,
+    compactNotionMetadata,
+    notionWorkspaceInfo,
+    putDiscoveredItem,
+    hasDiscoveredNotionId,
+    notionObjectId,
+    itemMetadata,
+    notionPropertiesFromSnapshot,
+    asRecord,
+    notionPageIdsFromViewFilters,
+    rawTemplatesFromSnapshot,
+    flattenNotionBlocks,
+    rawTemplateBlocks,
+    linkedNotionTargetReferencesFromBlock,
+    collectPageSnapshot,
+    collectDatabaseSnapshot,
+    collectDataSourceSnapshot,
+    pushImportActivity,
+    notionEnrichmentShouldStop,
+    notionDiscoveryItemNeedsEnrichment,
+    notionDiscoveryEnrichmentCandidates,
+    notionEnrichmentWaveSize,
+    uniqueStrings,
+  };
+}
+export type NotionImportDiscoveryRuntime = ReturnType<typeof notionImportDiscoveryRuntime>;
 
 async function discoverNotionGraph(
-  token: string,
-  options: {
-    apiVersion: string;
-    maxPages: number;
-    maxEnrichedItems: number;
-    maxChildrenPages: number;
-    maxDataSourceQueryPages: number;
-    maxViewPages: number;
-    maxTemplatePages: number;
-    includeMarkdownFallback: boolean;
-    discoveryConcurrency: number;
-    rootNotionPageIds: string[];
-    rootNotionDataSourceIds: string[];
-    startCursor?: string;
-    // Incremental discovery: persisted items merged into the in-memory graph so
-    // a resumed call skips already-enriched work, and a per-call cap on how many
-    // items may be enriched before returning (leaving the rest pending).
-    seedItems?: DiscoveredNotionItem[];
-    enrichmentBudget?: number;
-    perCallDeadlineMs?: number;
-    // Once the workspace /search has been fully paged through, resumed
-    // incremental calls set this so they skip re-scanning the entire search
-    // from page 0 every chunk (which is O(graph) redundant work that balloons
-    // chunk time and re-triggers 503s). Referenced items still surface through
-    // enrichment via seedItems, so search only needs to run to exhaustion once.
-    skipSearch?: boolean;
-    apiBase?: string;
-    // Fired synchronously at search completion and after each item is enriched
-    // so the caller can throttle-persist a live progress snapshot.
-    onProgress?: (snapshot: DiscoveryProgressSnapshot) => void;
-  },
+  token: Parameters<typeof discoverNotionGraphWithRuntime>[0],
+  options: Parameters<typeof discoverNotionGraphWithRuntime>[1],
 ) {
-  // Live-activity ring surfaced through onProgress so the UI can show which
-  // Notion items are being read right now (installer-style feed).
-  const recentActivity: NotionImportActivityEntry[] = [];
-  const bag: DiscoveryWarningBag = {
-    warnings: [],
-    missingPermissions: [],
-    unsupported: [],
-  };
-  const retryWarningsSeen = new Set<string>();
-  const onRetry = (retry: NotionRequestRetryInfo) => {
-    const retryLabel = retry.status ? `HTTP ${retry.status}` : 'network error';
-    const key = `${retry.method}:${retry.path}:${retryLabel}:${retry.nextAttempt}`;
-    if (retryWarningsSeen.has(key)) return;
-    retryWarningsSeen.add(key);
-    if (bag.warnings.length >= 200) return;
-    bag.warnings.push({
-      code: 'notion_api_retry',
-      notionObject: 'api_request',
-      message:
-        `Notion API ${retry.method} ${retry.path} returned ${retryLabel}; ` +
-        `retrying attempt ${retry.nextAttempt}/${NOTION_REQUEST_MAX_ATTEMPTS}.`,
-    });
-  };
-  const me = await notionRequest(token, '/users/me', options.apiVersion, { apiBase: options.apiBase, onRetry });
-  const notionWorkspace = notionWorkspaceInfo(me);
-  const results: Record<string, unknown>[] = [];
-  const searchStartCursor = options.startCursor;
-  let cursor: string | undefined = searchStartCursor;
-  let hasMore = false;
-  let searchPagesFetched = 0;
-  const rootScopedDiscovery =
-    (options.rootNotionPageIds.length > 0 || options.rootNotionDataSourceIds.length > 0) &&
-    !searchStartCursor;
-
-  for (let page = 0; !options.skipSearch && !rootScopedDiscovery && page < options.maxPages; page += 1) {
-    let response: Record<string, unknown>;
-    try {
-      response = await notionRequest(token, '/search', options.apiVersion, {
-        method: 'POST',
-        body: {
-          page_size: 100,
-          ...(cursor ? { start_cursor: cursor } : {}),
-        },
-        apiBase: options.apiBase,
-        onRetry,
-      });
-    } catch (error) {
-      bag.missingPermissions.push({
-        code: 'search_unavailable',
-        notionObject: 'workspace',
-        message: error instanceof Error ? error.message : String(error),
-      });
-      hasMore = false;
-      cursor = undefined;
-      break;
-    }
-    searchPagesFetched += 1;
-    const pageResults = Array.isArray(response.results) ? response.results : [];
-    results.push(...pageResults.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object'));
-    hasMore = response.has_more === true;
-    cursor = typeof response.next_cursor === 'string' ? response.next_cursor : undefined;
-    if (!hasMore || !cursor) break;
-  }
-
-  const counts: Record<string, number> = {};
-  const itemsById = new Map<string, DiscoveredNotionItem>();
-
-  // Incremental resume: merge persisted items (status 'discovered'/'referenced',
-  // with any snapshots already captured on earlier calls) into the in-memory
-  // graph before this call's search results are folded on top. putDiscoveredItem
-  // preserves snapshot phases and does not downgrade 'discovered' to 'referenced'.
-  for (const seed of options.seedItems ?? []) {
-    putDiscoveredItem(itemsById, seed);
-  }
-
-  // An item is "enriched" iff its snapshot metadata is present. These mirror the
-  // exact metadata keys set by enrichPageItem (metadata.pageSnapshot) and
-  // enrichDataSourceItem (metadata.dataSourceSnapshot); collectDatabaseReferences
-  // stores the retrieved database under metadata.database.
-  const hasPageSnapshot = (it: DiscoveredNotionItem) =>
-    !!it.metadata && it.metadata.pageSnapshot != null;
-  const hasDataSourceSnapshot = (it: DiscoveredNotionItem) =>
-    !!it.metadata && it.metadata.dataSourceSnapshot != null;
-  const hasDatabaseSnapshot = (it: DiscoveredNotionItem) =>
-    it.notionObject === 'database' && !notionDiscoveryItemNeedsEnrichment(it);
-
-  for (const record of results) {
-    const notionObject = typeof record.object === 'string' ? record.object : 'unknown';
-    counts[notionObject] = (counts[notionObject] ?? 0) + 1;
-    const notionId = typeof record.id === 'string' ? record.id : newId();
-    putDiscoveredItem(itemsById, {
-      notionId,
-      notionObject,
-      parentNotionId: notionParentId(record),
-      title: notionTitle(record),
-      status: 'discovered',
-      phase: 'search',
-      metadata: {
-        discoveredFrom: 'search',
-        searchObject: record,
-        ...compactNotionMetadata(record),
-      },
-    });
-  }
-
-  for (const rootPageId of options.rootNotionPageIds) {
-    if (hasDiscoveredNotionId(itemsById, rootPageId)) continue;
-    const page = await safeNotionRequest(token, `/pages/${encodeURIComponent(rootPageId)}`, options.apiVersion, {
-      apiBase: options.apiBase,
-      onRetry,
-    });
-    if (page.ok) {
-      const pageNotionId = notionObjectId(page.data) ?? rootPageId;
-      putDiscoveredItem(itemsById, {
-        notionId: pageNotionId,
-        notionObject: typeof page.data.object === 'string' ? page.data.object : 'page',
-        parentNotionId: notionParentId(page.data),
-        title: notionTitle(page.data),
-        status: 'discovered',
-        phase: 'root_page',
-        metadata: {
-          discoveredFrom: 'rootNotionPageIds',
-          page: page.data,
-          ...compactNotionMetadata(page.data),
-        },
-      });
-      counts.root_page = (counts.root_page ?? 0) + 1;
-    } else {
-      bag.missingPermissions.push({
-        code: 'root_page_unavailable',
-        notionId: rootPageId,
-        notionObject: 'page',
-        message: page.error,
-      });
-    }
-  }
-
-  for (const rootDataSourceId of options.rootNotionDataSourceIds) {
-    if (hasDiscoveredNotionId(itemsById, rootDataSourceId)) continue;
-    const dataSource = await safeNotionRequest(
-      token,
-      `/data_sources/${encodeURIComponent(rootDataSourceId)}`,
-      options.apiVersion,
-      {
-        apiBase: options.apiBase,
-        onRetry,
-      },
-    );
-    if (dataSource.ok) {
-      const dataSourceNotionId = notionObjectId(dataSource.data) ?? rootDataSourceId;
-      putDiscoveredItem(itemsById, {
-        notionId: dataSourceNotionId,
-        notionObject: typeof dataSource.data.object === 'string' ? dataSource.data.object : 'data_source',
-        parentNotionId: notionParentId(dataSource.data),
-        title: notionTitle(dataSource.data),
-        status: 'discovered',
-        phase: 'root_data_source',
-        metadata: {
-          discoveredFrom: 'rootNotionDataSourceIds',
-          dataSource: dataSource.data,
-          ...compactNotionMetadata(dataSource.data),
-        },
-      });
-      counts.root_data_source = (counts.root_data_source ?? 0) + 1;
-    } else {
-      bag.missingPermissions.push({
-        code: 'root_data_source_unavailable',
-        notionId: rootDataSourceId,
-        notionObject: 'data_source',
-        message: dataSource.error,
-      });
-    }
-  }
-
-  const databaseIds = new Set<string>();
-  const retrievedDatabaseIds = new Set<string>();
-  // Select pending work rather than slicing the whole graph. On a large graph,
-  // hundreds of completed rows can otherwise occupy the first page forever and
-  // starve later linked-database references.
-  const enrichable = notionDiscoveryEnrichmentCandidates(
-    Array.from(itemsById.values()),
-    options.maxEnrichedItems,
-  );
-  const enrichedPageIds = new Set<string>();
-  // Per-call enrichment cap. Non-incremental callers leave it Infinity so the
-  // graph converges in one pass exactly as before. Incremental callers pass a
-  // small budget; enrichPageItem/enrichDataSourceItem each consume one unit and
-  // early-return once it is spent, leaving the rest pending for a later call.
-  let enrichBudget = options.enrichmentBudget ?? Number.POSITIVE_INFINITY;
-  // Wall-clock bound (see NOTION_DISCOVER_CALL_DEADLINE_MS). Only trips after at
-  // least one item is enriched so a single slow item can't make the client loop
-  // spin without progress. Non-incremental callers leave the deadline Infinity
-  // so convergence in one pass is unchanged.
-  const enrichDeadlineMs = options.perCallDeadlineMs ?? Number.POSITIVE_INFINITY;
-  const enrichStartedAt = Date.now();
-  let enrichedThisCall = 0;
-  const shouldStopEnrichment = () =>
-    notionEnrichmentShouldStop({
-      enrichBudget,
-      enrichedThisCall,
-      elapsedMs: Date.now() - enrichStartedAt,
-      deadlineMs: enrichDeadlineMs,
-    });
-  const canEnrich = () => !shouldStopEnrichment();
-  const putLinkedTargetReferences = (
-    sourcePageId: string,
-    blocks: Record<string, unknown>[],
-  ) => {
-    for (const block of blocks) {
-      for (const target of linkedNotionTargetReferencesFromBlock(block)) {
-        if (target.notionObject === 'database') {
-          databaseIds.add(target.id);
-        }
-        if (target.notionObject === 'block') continue;
-        putDiscoveredItem(itemsById, {
-          notionId: target.id,
-          notionObject: target.notionObject,
-          parentNotionId: sourcePageId,
-          status: 'referenced',
-          phase: target.source === 'rich_text_mention' ? 'rich_text_mention_reference' : 'linked_block_reference',
-          metadata: {
-            discoveredFrom: target.source === 'rich_text_mention' ? 'rich_text_mention' : 'linked_block',
-            sourcePageId,
-            sourceBlockId: notionObjectId(block),
-          },
-        });
-      }
-    }
-  };
-  const enrichPageItem = async (item: DiscoveredNotionItem) => {
-    if (enrichedPageIds.has(item.notionId)) return;
-    if (!canEnrich()) return;
-    enrichedPageIds.add(item.notionId);
-    enrichBudget -= 1;
-    enrichedThisCall += 1;
-    let enrichedItem = item;
-    if (!asRecord(item.metadata?.page)) {
-      const page = await safeNotionRequest(token, `/pages/${encodeURIComponent(item.notionId)}`, options.apiVersion, {
-        apiBase: options.apiBase,
-        onRetry,
-      });
-      if (page.ok) {
-        const pageParent = asRecord(page.data.parent);
-        const pageParentId = notionParentId(page.data);
-        const pageDataSourceId = pageParent?.type === 'data_source_id'
-          ? optionalString(pageParent.data_source_id)
-          : undefined;
-        const pageProperties = asRecord(page.data.properties);
-        enrichedItem = {
-          ...item,
-          parentNotionId: pageParentId ?? item.parentNotionId,
-          title: item.title || notionTitle(page.data),
-          status: 'discovered',
-          metadata: {
-            ...item.metadata,
-            discoveredFrom: item.metadata?.discoveredFrom ?? 'page_reference',
-            page: page.data,
-            ...(pageDataSourceId ? { dataSourceId: pageDataSourceId } : {}),
-            ...(pageProperties ? { properties: pageProperties } : {}),
-            ...compactNotionMetadata(page.data),
-          },
-        };
-      } else {
-        bag.missingPermissions.push({
-          code: 'referenced_page_unavailable',
-          notionId: item.notionId,
-          notionObject: 'page',
-          message: page.error,
-        });
-      }
-    }
-    const pageSnapshot = await collectPageSnapshot(
-      token,
-      enrichedItem,
-      options.apiVersion,
-      options.maxChildrenPages,
-      bag,
-      options.apiBase,
-      onRetry,
-      options.includeMarkdownFallback,
-    );
-    putDiscoveredItem(itemsById, {
-      ...enrichedItem,
-      phase: 'page_snapshot',
-      metadata: {
-        ...enrichedItem.metadata,
-        pageSnapshot,
-      },
-    });
-
-    const childPages = Array.isArray(pageSnapshot.childPages)
-      ? pageSnapshot.childPages as Array<{ id?: unknown; title?: unknown }>
-      : [];
-    const childPageEntries: Array<{ id?: unknown; title?: unknown }> = childPages.length
-      ? childPages
-      : pageSnapshot.childPageIds.map((id: string) => ({ id }));
-    for (const childPage of childPageEntries) {
-      const childPageId = optionalString(childPage.id);
-      if (!childPageId) continue;
-      putDiscoveredItem(itemsById, {
-        notionId: childPageId,
-        notionObject: 'page',
-        parentNotionId: enrichedItem.notionId,
-        title: optionalString(childPage.title),
-        status: 'referenced',
-        phase: 'page_child_reference',
-        metadata: { discoveredFrom: 'page_children', sourcePageId: enrichedItem.notionId },
-      });
-    }
-    for (const childDatabaseId of pageSnapshot.childDatabaseIds) {
-      databaseIds.add(childDatabaseId);
-    }
-    putLinkedTargetReferences(item.notionId, flattenNotionBlocks(pageSnapshot.childBlocks));
-    pushImportActivity(recentActivity, {
-      kind: 'read_page',
-      title: enrichedItem.title || item.title,
-    });
-    reportProgress('enrich');
-  };
-  const enrichedDataSourceIds = new Set<string>();
-  const enrichDataSourceItem = async (item: DiscoveredNotionItem) => {
-    if (enrichedDataSourceIds.has(item.notionId)) return;
-    if (!canEnrich()) return;
-    enrichedDataSourceIds.add(item.notionId);
-    enrichBudget -= 1;
-    enrichedThisCall += 1;
-    const dataSourceSnapshot = await collectDataSourceSnapshot(
-      token,
-      item,
-      options.apiVersion,
-      options.maxDataSourceQueryPages,
-      options.maxViewPages,
-      options.maxTemplatePages,
-      options.maxChildrenPages,
-      bag,
-      options.apiBase,
-      onRetry,
-    );
-    putDiscoveredItem(itemsById, {
-      ...item,
-      phase: 'data_source_snapshot',
-      metadata: {
-        ...item.metadata,
-        dataSourceSnapshot,
-      },
-    });
-
-    const parent = dataSourceSnapshot.dataSource?.parent;
-    if (parent && typeof parent === 'object') {
-      const databaseId = (parent as Record<string, unknown>).database_id;
-      if (typeof databaseId === 'string') databaseIds.add(databaseId);
-    }
-    for (let rowIndex = 0; rowIndex < dataSourceSnapshot.rowReferences.length; rowIndex += 1) {
-      const row = dataSourceSnapshot.rowReferences[rowIndex];
-      if (!row.id) continue;
-      putDiscoveredItem(itemsById, {
-        notionId: row.id,
-        notionObject: String(row.object || 'page'),
-        parentNotionId: item.notionId,
-        title: row.title,
-        status: 'referenced',
-        phase: 'data_source_row_reference',
-        metadata: {
-          discoveredFrom: 'data_source_query',
-          dataSourceId: item.notionId,
-          notionQueryOrder: typeof row.notionQueryOrder === 'number' ? row.notionQueryOrder : rowIndex,
-          ...(row.createdTime ? { createdTime: row.createdTime } : {}),
-          ...(row.lastEditedTime ? { lastEditedTime: row.lastEditedTime } : {}),
-          properties: row.properties,
-          icon: row.icon,
-          cover: row.cover,
-        },
-      });
-    }
-    for (const target of dataSourceSnapshot.relationTargetReferences) {
-      if (target.notionObject === 'database') databaseIds.add(target.id);
-      putDiscoveredItem(itemsById, {
-        notionId: target.id,
-        notionObject: target.notionObject,
-        parentNotionId: item.notionId,
-        status: 'referenced',
-        phase: 'relation_target_reference',
-        metadata: {
-          discoveredFrom: 'data_source_schema',
-          dataSourceId: item.notionId,
-        },
-      });
-    }
-    const sourceProperties = notionPropertiesFromSnapshot(dataSourceSnapshot as Record<string, unknown>);
-    for (let viewOrder = 0; viewOrder < dataSourceSnapshot.views.length; viewOrder += 1) {
-      const view = dataSourceSnapshot.views[viewOrder];
-      const viewId = notionObjectId(view);
-      if (!viewId) continue;
-      putDiscoveredItem(itemsById, {
-        notionId: viewId,
-        notionObject: 'view',
-        parentNotionId: item.notionId,
-        title: typeof view.name === 'string' ? view.name : notionTitle(view),
-        status: 'discovered',
-        phase: 'view_snapshot',
-        metadata: {
-          discoveredFrom: 'views',
-          dataSourceId: item.notionId,
-          viewOrder,
-          view,
-        },
-      });
-      for (const pageId of notionPageIdsFromViewFilters(view, sourceProperties)) {
-        putDiscoveredItem(itemsById, {
-          notionId: pageId,
-          notionObject: 'page',
-          status: 'referenced',
-          phase: 'view_filter_row_reference',
-          metadata: {
-            discoveredFrom: 'view_filter',
-            sourceDataSourceId: item.notionId,
-            sourceViewId: viewId,
-          },
-        });
-      }
-    }
-    for (const template of rawTemplatesFromSnapshot(dataSourceSnapshot as Record<string, unknown>)) {
-      const templateId = notionObjectId(template) ?? item.notionId;
-      putLinkedTargetReferences(templateId, flattenNotionBlocks(rawTemplateBlocks(template)));
-    }
-    pushImportActivity(recentActivity, {
-      kind: 'read_data_source',
-      title: item.title,
-    });
-    reportProgress('enrich');
-  };
-  const collectDatabaseReferences = async () => {
-    const pendingDatabaseIds = Array.from(databaseIds)
-      .filter((databaseId) => !retrievedDatabaseIds.has(databaseId))
-      .slice(0, options.maxEnrichedItems);
-    let offset = 0;
-    while (offset < pendingDatabaseIds.length && canEnrich()) {
-      // Start at most one concurrency-sized wave. Re-check the item budget and
-      // wall-clock deadline between waves so a large linked-database tail can
-      // never turn one incremental request into a multi-minute DO request.
-      const waveSize = notionEnrichmentWaveSize({
-        remaining: pendingDatabaseIds.length - offset,
-        enrichBudget,
-        concurrency: options.discoveryConcurrency,
-      });
-      if (waveSize <= 0) break;
-      const wave = pendingDatabaseIds.slice(offset, offset + waveSize);
-      offset += wave.length;
-      for (const databaseId of wave) {
-        retrievedDatabaseIds.add(databaseId);
-        enrichBudget -= 1;
-        enrichedThisCall += 1;
-      }
-      await mapWithConcurrency(wave, options.discoveryConcurrency, async (databaseId) => {
-        const result = await collectDatabaseSnapshot(
-          token,
-          databaseId,
-          options.apiVersion,
-          bag,
-          options.apiBase,
-          onRetry,
-        );
-        const database = result.database;
-        putDiscoveredItem(itemsById, {
-          notionId: databaseId,
-          notionObject: 'database',
-          title: database ? notionTitle(database) : undefined,
-          status: database ? 'discovered' : 'referenced',
-          phase: database ? 'database_snapshot' : 'database_reference',
-          metadata: {
-            discoveredFrom: database ? 'database_retrieve' : 'reference',
-            databaseFetchStatus: result.fetchStatus,
-            database,
-            dataSources: Array.isArray(database?.data_sources) ? database.data_sources : undefined,
-          },
-          error: database ? null : result.error ?? 'Database details unavailable.',
-        });
-        if (Array.isArray(database?.data_sources)) {
-          for (const dataSource of database.data_sources) {
-            if (!dataSource || typeof dataSource !== 'object') continue;
-            const dataSourceId = notionObjectId(dataSource as Record<string, unknown>);
-            if (!dataSourceId) continue;
-            putDiscoveredItem(itemsById, {
-              notionId: dataSourceId,
-              notionObject: 'data_source',
-              parentNotionId: databaseId,
-              title: notionTitle(dataSource as Record<string, unknown>),
-              status: 'referenced',
-              phase: 'database_data_source_reference',
-              metadata: {
-                discoveredFrom: 'database_data_sources',
-                databaseId,
-                dataSource,
-              },
-            });
-          }
-        }
-      });
-      reportProgress('enrich');
-    }
-  };
-  const enrichPendingDataSources = async () => {
-    const dataSourceItems = Array.from(itemsById.values())
-      .filter((item) => item.notionObject === 'data_source' && !enrichedDataSourceIds.has(item.notionId))
-      .slice(0, options.maxEnrichedItems);
-    await mapWithConcurrency(dataSourceItems, options.discoveryConcurrency, async (item) => {
-      await enrichDataSourceItem(item);
-    });
-  };
-  const enrichPendingRowPages = async () => {
-    const rowPageItems = Array.from(itemsById.values())
-      .filter((item) => {
-        if (item.notionObject !== 'page' || enrichedPageIds.has(item.notionId)) return false;
-        const metadata = itemMetadata(item);
-        return item.phase === 'data_source_row_reference' || typeof metadata.dataSourceId === 'string';
-      })
-      .slice(0, options.maxEnrichedItems);
-    await mapWithConcurrency(rowPageItems, options.discoveryConcurrency, async (item) => {
-      await enrichPageItem(item);
-    });
-  };
-  const enrichPendingReferencedPages = async () => {
-    const pageItems = Array.from(itemsById.values())
-      .filter((item) => {
-        if (item.notionObject !== 'page' || enrichedPageIds.has(item.notionId)) return false;
-        if (item.phase === 'data_source_row_reference') return false;
-        const metadata = itemMetadata(item);
-        return (
-          item.status === 'referenced' ||
-          item.phase === 'page_child_reference' ||
-          item.phase === 'linked_block_reference' ||
-          item.phase === 'rich_text_mention_reference' ||
-          item.phase === 'relation_target_reference' ||
-          typeof metadata.sourcePageId === 'string'
-        );
-      })
-      .slice(0, options.maxEnrichedItems);
-    await mapWithConcurrency(pageItems, options.discoveryConcurrency, async (item) => {
-      await enrichPageItem(item);
-    });
-  };
-  const discoveryStateKey = () =>
-    [
-      itemsById.size,
-      enrichedPageIds.size,
-      enrichedDataSourceIds.size,
-      retrievedDatabaseIds.size,
-    ].join(':');
-
-  // All enrich* state is declared above; safe to close over now. Fires the
-  // caller's throttled progress writer as each item is enriched.
-  const enrichableTotal = enrichable.length;
-  const reportProgress = (phase: DiscoveryProgressSnapshot['phase']) => {
-    const byType: Record<string, number> = {};
-    for (const item of itemsById.values()) {
-      byType[item.notionObject] = (byType[item.notionObject] ?? 0) + 1;
-    }
-    const pendingEnrichment = Array.from(itemsById.values()).filter(
-      notionDiscoveryItemNeedsEnrichment,
-    ).length;
-    options.onProgress?.({
-      phase,
-      discovered: itemsById.size,
-      pendingEnrichment,
-      enrichedPages: enrichedPageIds.size,
-      enrichedDataSources: enrichedDataSourceIds.size,
-      enrichableTotal,
-      searchPagesFetched,
-      byType,
-      recent: recentActivity.slice(),
-    });
-  };
-  // Incremental resume: pre-mark items whose snapshot was already captured on an
-  // earlier call so this call's budget is spent only on still-pending work and
-  // completed items are never re-fetched.
-  for (const item of itemsById.values()) {
-    if (item.notionObject === 'page' && hasPageSnapshot(item)) {
-      enrichedPageIds.add(item.notionId);
-    } else if (item.notionObject === 'data_source' && hasDataSourceSnapshot(item)) {
-      enrichedDataSourceIds.add(item.notionId);
-    } else if (item.notionObject === 'database' && hasDatabaseSnapshot(item)) {
-      retrievedDatabaseIds.add(item.notionId);
-    }
-  }
-
-  // Resumed chunks skip search entirely, so do not append another identical
-  // "search complete" line every few seconds. Pre-mark persisted snapshots
-  // before the first progress write so the processed count never jumps
-  // backwards at the start of a chunk.
-  if (!options.skipSearch) {
-    pushImportActivity(recentActivity, {
-      kind: 'search_complete',
-      count: itemsById.size,
-    });
-  }
-  reportProgress('search');
-
-  for (const item of enrichable) {
-    if (item.notionObject === 'database') databaseIds.add(item.notionId);
-  }
-  await mapWithConcurrency(
-    enrichable.filter((item) => item.notionObject === 'page'),
-    options.discoveryConcurrency,
-    async (item) => {
-      await enrichPageItem(item);
-    },
-  );
-  await mapWithConcurrency(
-    enrichable.filter((item) => item.notionObject === 'data_source'),
-    options.discoveryConcurrency,
-    async (item) => {
-      await enrichDataSourceItem(item);
-    },
-  );
-
-  let discoveryPasses = 0;
-  for (let pass = 0; pass < NOTION_DISCOVERY_PASS_SAFETY_LIMIT; pass += 1) {
-    // Incremental mode: stop looping passes once the per-call enrichment budget
-    // is spent. Un-enriched items simply stay pending for the next discover
-    // call. Non-incremental callers keep an infinite budget so this never trips
-    // and the loop still runs to convergence.
-    if (shouldStopEnrichment()) break;
-    discoveryPasses = pass + 1;
-    const before = discoveryStateKey();
-    await collectDatabaseReferences();
-    await enrichPendingDataSources();
-    await enrichPendingRowPages();
-    await enrichPendingReferencedPages();
-    const after = discoveryStateKey();
-    if (after === before) break;
-  }
-  if (discoveryPasses >= NOTION_DISCOVERY_PASS_SAFETY_LIMIT) {
-    bag.warnings.push({
-      code: 'discovery_pass_safety_limit_reached',
-      notionObject: 'workspace_graph',
-      message:
-        'Notion import reached the internal discovery pass safety limit before the graph stopped changing. ' +
-        'The import may still be incomplete; rerun discovery or narrow the root if needed.',
-    });
-  }
-
-  const items = Array.from(itemsById.values());
-  const graphCounts = items.reduce<Record<string, number>>((acc, item) => {
-    acc[item.notionObject] = (acc[item.notionObject] ?? 0) + 1;
-    return acc;
-  }, {});
-  // Items still awaiting their snapshot: pages/data_sources without a captured
-  // snapshot and databases not yet retrieved. In incremental mode a positive
-  // count means the client should loop another discover call. In one-shot mode
-  // the graph has converged so this is normally 0.
-  const pendingEnrichment = items.filter(notionDiscoveryItemNeedsEnrichment).length;
-  if (!hasMore && pendingEnrichment === 0) {
-    pushImportActivity(recentActivity, {
-      kind: 'discovery_complete',
-      count: items.length,
-    });
-  }
-
-  return {
-    items,
-    counts,
-    graphCounts,
-    recentActivity,
-    warnings: bag.warnings,
-    missingPermissions: bag.missingPermissions,
-    unsupported: bag.unsupported,
-    hasMore,
-    pendingEnrichment,
-    nextCursor: cursor,
-    searchStartCursor,
-    searchPagesFetched,
-    discoveryPasses,
-    notionWorkspace,
-  };
+  return discoverNotionGraphWithRuntime(token, options, notionImportDiscoveryRuntime);
 }
 
 function uniqueStrings(values: Array<string | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => !!value)));
 }
-
 async function preflightNotionImportGraph(
-  token: string,
-  options: {
-    apiVersion: string;
-    rootNotionPageIds: string[];
-    rootNotionDataSourceIds: string[];
-    apiBase?: string;
-  },
+  token: Parameters<typeof preflightNotionImportGraphWithRuntime>[0],
+  options: Parameters<typeof preflightNotionImportGraphWithRuntime>[1],
 ) {
-  const bag: DiscoveryWarningBag = {
-    warnings: [],
-    missingPermissions: [],
-    unsupported: [],
-  };
-  const retryWarningsSeen = new Set<string>();
-  const onRetry = (retry: NotionRequestRetryInfo) => {
-    const retryLabel = retry.status ? `HTTP ${retry.status}` : 'network error';
-    const key = `${retry.method}:${retry.path}:${retryLabel}:${retry.nextAttempt}`;
-    if (retryWarningsSeen.has(key)) return;
-    retryWarningsSeen.add(key);
-    bag.warnings.push({
-      code: 'notion_api_retry',
-      notionObject: 'api_request',
-      message:
-        `Notion API ${retry.method} ${retry.path} returned ${retryLabel}; ` +
-        `retrying attempt ${retry.nextAttempt}/${NOTION_REQUEST_MAX_ATTEMPTS}.`,
-    });
-  };
-  const me = await notionRequest(token, '/users/me', options.apiVersion, { apiBase: options.apiBase, onRetry });
-  const notionWorkspace = notionWorkspaceInfo(me);
-  const roots: Record<string, unknown>[] = [];
-  const directChildPages = new Set<string>();
-  const directDatabaseIds = new Set<string>();
-  const directDataSourceIds = new Set<string>();
-  const rootNotionDataSourceIdSet = new Set(
-    options.rootNotionDataSourceIds.map((id) => normalizedNotionId(id)).filter(Boolean),
-  );
-  for (const dataSourceId of options.rootNotionDataSourceIds) {
-    directDataSourceIds.add(dataSourceId);
-  }
-
-  for (const rootPageId of options.rootNotionPageIds) {
-    const page = await safeNotionRequest(token, `/pages/${encodeURIComponent(rootPageId)}`, options.apiVersion, {
-      apiBase: options.apiBase,
-      onRetry,
-    });
-    const rootReport: Record<string, unknown> = {
-      notionId: rootPageId,
-      notionObject: 'page',
-      readable: page.ok,
-    };
-    if (!page.ok) {
-      bag.missingPermissions.push({
-        code: 'root_page_unavailable',
-        notionId: rootPageId,
-        notionObject: 'page',
-        message: page.error,
-      });
-      roots.push({ ...rootReport, error: page.error });
-      continue;
-    }
-
-    const pageId = notionObjectId(page.data) ?? rootPageId;
-    const children = await safeNotionRequest(
-      token,
-      `/blocks/${encodeURIComponent(pageId)}/children`,
-      options.apiVersion,
-      {
-        query: { page_size: 100 },
-        apiBase: options.apiBase,
-        onRetry,
-      },
-    );
-    let childBlocks: Record<string, unknown>[] = [];
-    if (children.ok) {
-      childBlocks = Array.isArray(children.data.results)
-        ? children.data.results.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-        : [];
-    } else {
-      bag.missingPermissions.push({
-        code: 'page_children_unavailable',
-        notionId: pageId,
-        notionObject: 'page',
-        message: children.error,
-      });
-    }
-
-    const childPageIds = uniqueStrings(
-      childBlocks
-        .filter((block) => block.type === 'child_page')
-        .map((block) => notionObjectId(block)),
-    );
-    const childDatabaseIds = uniqueStrings(
-      childBlocks
-        .filter((block) => block.type === 'child_database')
-        .map((block) => notionObjectId(block)),
-    );
-    const linkedTargets = childBlocks.flatMap((block) => linkedNotionTargetReferencesFromBlock(block));
-    for (const id of childPageIds) directChildPages.add(id);
-    for (const id of childDatabaseIds) directDatabaseIds.add(id);
-    for (const target of linkedTargets) {
-      if (target.notionObject === 'page') directChildPages.add(target.id);
-      if (target.notionObject === 'database') directDatabaseIds.add(target.id);
-      if (target.notionObject === 'data_source') directDataSourceIds.add(target.id);
-    }
-
-    roots.push({
-      ...rootReport,
-      notionId: pageId,
-      title: notionTitle(page.data),
-      parentNotionId: notionParentId(page.data),
-      childBlockSampleCount: childBlocks.length,
-      childrenHasMore: children.ok ? children.data.has_more === true : undefined,
-      directChildPages: childPageIds.slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT),
-      directChildDatabases: childDatabaseIds.slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT),
-      directLinkedTargets: linkedTargets.slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT),
-    });
-  }
-
-  const sampledPages: Record<string, unknown>[] = [];
-  for (const pageId of Array.from(directChildPages).slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT)) {
-    const page = await safeNotionRequest(token, `/pages/${encodeURIComponent(pageId)}`, options.apiVersion, {
-      apiBase: options.apiBase,
-      onRetry,
-    });
-    sampledPages.push({
-      notionId: pageId,
-      readable: page.ok,
-      title: page.ok ? notionTitle(page.data) : undefined,
-      parentNotionId: page.ok ? notionParentId(page.data) : undefined,
-      error: page.ok ? undefined : page.error,
-    });
-    if (!page.ok) {
-      bag.missingPermissions.push({
-        code: 'direct_child_page_unavailable',
-        notionId: pageId,
-        notionObject: 'page',
-        message: page.error,
-      });
-    }
-  }
-
-  const sampledDatabases: Record<string, unknown>[] = [];
-  for (const databaseId of Array.from(directDatabaseIds).slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT)) {
-    const database = await safeNotionRequest(token, `/databases/${encodeURIComponent(databaseId)}`, options.apiVersion, {
-      apiBase: options.apiBase,
-      onRetry,
-    });
-    const dataSources = database.ok && Array.isArray(database.data.data_sources)
-      ? database.data.data_sources.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-      : [];
-    for (const dataSource of dataSources) {
-      const dataSourceId = notionObjectId(dataSource);
-      if (dataSourceId) directDataSourceIds.add(dataSourceId);
-    }
-    sampledDatabases.push({
-      notionId: databaseId,
-      readable: database.ok,
-      title: database.ok ? notionTitle(database.data) : undefined,
-      dataSourceIds: dataSources.map((item) => notionObjectId(item)).filter(Boolean),
-      error: database.ok ? undefined : database.error,
-    });
-    if (!database.ok) {
-      bag.missingPermissions.push({
-        code: 'direct_database_unavailable',
-        notionId: databaseId,
-        notionObject: 'database',
-        message: database.error,
-      });
-    }
-  }
-
-  const sampledDataSources: Record<string, unknown>[] = [];
-  for (const dataSourceId of Array.from(directDataSourceIds).slice(0, NOTION_PREFLIGHT_SAMPLE_LIMIT)) {
-    const isRootDataSource = rootNotionDataSourceIdSet.has(normalizedNotionId(dataSourceId));
-    const dataSource = await safeNotionRequest(token, `/data_sources/${encodeURIComponent(dataSourceId)}`, options.apiVersion, {
-      apiBase: options.apiBase,
-      onRetry,
-    });
-    let queryable = false;
-    let rowSampleCount = 0;
-    let rowsHasMore = false;
-    let queryError: string | undefined;
-    if (dataSource.ok) {
-      const rows = await safeNotionRequest(
-        token,
-        `/data_sources/${encodeURIComponent(dataSourceId)}/query`,
-        options.apiVersion,
-        {
-          method: 'POST',
-          body: { page_size: 10 },
-          apiBase: options.apiBase,
-          onRetry,
-        },
-      );
-      queryable = rows.ok;
-      rowSampleCount = rows.ok && Array.isArray(rows.data.results) ? rows.data.results.length : 0;
-      rowsHasMore = rows.ok ? rows.data.has_more === true : false;
-      queryError = rows.ok ? undefined : rows.error;
-      if (!rows.ok) {
-        bag.missingPermissions.push({
-          code: 'direct_data_source_rows_unavailable',
-          notionId: dataSourceId,
-          notionObject: 'data_source',
-          message: rows.error,
-        });
-      }
-    }
-    sampledDataSources.push({
-      notionId: dataSourceId,
-      root: isRootDataSource,
-      readable: dataSource.ok,
-      title: dataSource.ok ? notionTitle(dataSource.data) : undefined,
-      queryable,
-      rowSampleCount,
-      rowsHasMore,
-      error: dataSource.ok ? queryError : dataSource.error,
-    });
-    if (!dataSource.ok) {
-      bag.missingPermissions.push({
-        code: 'direct_data_source_unavailable',
-        notionId: dataSourceId,
-        notionObject: 'data_source',
-        message: dataSource.error,
-      });
-    }
-  }
-  const sampledRootDataSources = sampledDataSources.filter((dataSource) =>
-    dataSource.root === true,
-  );
-
-  return {
-    notionWorkspace,
-    apiVersion: options.apiVersion,
-    rootNotionPageIds: options.rootNotionPageIds,
-    rootNotionDataSourceIds: options.rootNotionDataSourceIds,
-    roots,
-    sampledPages,
-    sampledDatabases,
-    sampledDataSources,
-    summary: {
-      roots: roots.length,
-      readableRoots: roots.filter((root) => root.readable === true).length,
-      rootDataSources: options.rootNotionDataSourceIds.length,
-      sampledRootDataSources: sampledRootDataSources.length,
-      readableRootDataSources: sampledRootDataSources.filter((dataSource) => dataSource.readable === true).length,
-      queryableRootDataSources: sampledRootDataSources.filter((dataSource) => dataSource.queryable === true).length,
-      sampledPages: sampledPages.length,
-      readableSampledPages: sampledPages.filter((page) => page.readable === true).length,
-      sampledDatabases: sampledDatabases.length,
-      readableSampledDatabases: sampledDatabases.filter((database) => database.readable === true).length,
-      sampledDataSources: sampledDataSources.length,
-      readableSampledDataSources: sampledDataSources.filter((dataSource) => dataSource.readable === true).length,
-      queryableSampledDataSources: sampledDataSources.filter((dataSource) => dataSource.queryable === true).length,
-      warnings: bag.warnings.length,
-      missingPermissions: bag.missingPermissions.length,
-    },
-    warnings: bag.warnings,
-    missingPermissions: bag.missingPermissions,
-    unsupported: bag.unsupported,
-  };
+  return preflightNotionImportGraphWithRuntime(token, options, notionImportDiscoveryRuntime);
 }
 
 function importItemGeneration(job: NotionImportJob) {
@@ -11108,18 +8403,18 @@ export interface ImportedPropertyContext {
   property: DbProperty;
 }
 
-interface ImportedRowContext {
+export interface ImportedRowContext {
   page: Page;
   dataSourceId: string;
   notionId: string;
 }
 
-interface ImportedPageBlockContext {
+export interface ImportedPageBlockContext {
   page: Page;
   notionId: string;
 }
 
-interface ImportedBlockMapping {
+export interface ImportedBlockMapping {
   localId: string;
   pageId: string;
 }
@@ -11132,7 +8427,7 @@ interface ImportedBlockOwnerContext {
   position?: number;
 }
 
-interface ImportedTemplateContext {
+export interface ImportedTemplateContext {
   template: DbTemplate;
   dataSourceId: string;
   notionId?: string;
@@ -13554,488 +10849,74 @@ async function retryFileCopies(
   };
 }
 
-export function rawViewsForPlan(
-  items: NotionImportItem[],
-  dataSourceItem: NotionImportItem,
-  locale: PersistentGeneratedLocale = 'en',
-) {
-  const directViewItems = items
-    .filter((viewItem) => viewItem.notionObject === 'view' && viewItem.parentNotionId === dataSourceItem.notionId)
-    .sort(compareNotionImportViewItems);
-  const snapshotViews = dataSourceSnapshot(dataSourceItem)?.views;
-  const rawViews = directViewItems.length
-    ? directViewItems.map((viewItem) => viewSnapshot(viewItem)).filter((view): view is Record<string, unknown> => !!view)
-    : Array.isArray(snapshotViews)
-      ? snapshotViews.filter((view): view is Record<string, unknown> => !!view && typeof view === 'object')
-      : [];
-  return localizedImportableNotionViews(rawViews, locale);
-}
+const notionImportPlanRuntime = {
+  asRecord,
+  augmentNotionPropertiesFromRowSnapshots,
+  compareNotionImportViewItems,
+  dataSourceSnapshot,
+  emptyConversionReport,
+  finalizeConversionReport,
+  flattenImportablePageBlocksForPlan,
+  formulaPropertyReferences,
+  incrementReport,
+  inferDataSourceForHiddenLinkedDatabase,
+  inspectViewPropertyReferences,
+  itemMetadata,
+  linkedNotionTargetIdsFromBlock,
+  linkedNotionViewIdsFromBlock,
+  localBlockTypeFromNotion,
+  localizedImportableNotionViews,
+  notionFilePropertyReferences,
+  notionObjectId,
+  notionPropertiesFromSnapshot,
+  notionPropertyConfig,
+  notionPropertyReferenceVariants,
+  notionUserReferencesFromPropertyValue,
+  nowIso,
+  optionalString,
+  pageSnapshot,
+  parsePersistentGeneratedLocale,
+  progressObject,
+  pushReportIssue,
+  rawTemplateBlocks,
+  rawTemplatesFromSnapshot,
+  relationTargetNotionId,
+  reportBlockConversion,
+  reportBlockFileReference,
+  reportBlockRichTextUserReferences,
+  reportNotionFileReferences,
+  reportNotionUserReferences,
+  reportPageChromeFileReferences,
+  reportTemplateBlockRichTextUserReferences,
+  reportUnresolvedFormulaPropertyReference,
+  reportUnsupportedFormulaFunctions,
+  reportUnsupportedProperty,
+  reportUnsupportedView,
+  rowDataSourceId,
+  templatePropertiesFromNotion,
+  unsupportedFormulaFunctions,
+  viewPropertyMappingsFromRawProperties,
+  viewSnapshot,
+  withGeneratedTitleProperty,
+};
+export type NotionImportPlanRuntime = typeof notionImportPlanRuntime;
+const {
+  rawViewsForPlan,
+  buildImportPlan,
+  inspectDiscoveryCompletenessForReport,
+  notionPropertyFromRawProperties,
+} = createNotionImportPlanner(notionImportPlanRuntime);
+export { rawViewsForPlan, buildImportPlan };
 
-function inspectMarkdownFallbackForPlan(
-  report: ImportConversionReport,
-  item: NotionImportItem,
-  snapshot: Record<string, unknown> | undefined,
-) {
-  const markdown = snapshot?.markdown;
-  const unknownBlockIds = markdown && typeof markdown === 'object' && Array.isArray((markdown as Record<string, unknown>).unknownBlockIds)
-    ? (markdown as Record<string, unknown>).unknownBlockIds as unknown[]
-    : [];
-  if (unknownBlockIds.length > 0) {
-    incrementReport(report, 'unknownMarkdownBlocks', unknownBlockIds.length);
-    pushReportIssue(report.unsupported, {
-      code: 'markdown_unknown_blocks',
-      notionId: item.notionId,
-      notionObject: 'page',
-      message: `${unknownBlockIds.length} Notion block(s) on "${item.title || item.notionId}" are unknown in the markdown fallback.`,
-    });
-  }
-  if (markdown && typeof markdown === 'object' && (markdown as Record<string, unknown>).truncated === true) {
-    incrementReport(report, 'truncatedMarkdownPages');
-    pushReportIssue(report.warnings, {
-      code: 'markdown_truncated',
-      notionId: item.notionId,
-      notionObject: 'page',
-      message: `Markdown fallback for "${item.title || item.notionId}" is truncated.`,
-    });
-  }
-}
 
-function reportDiscoveryIncomplete(
-  report: ImportConversionReport,
-  issue: NotionImportWarning,
-) {
-  incrementReport(report, 'discoveryIncomplete');
-  pushReportIssue(report.warnings, issue);
-}
 
-function inspectDiscoveryCompletenessForReport(
-  report: ImportConversionReport,
-  job: NotionImportJob,
-  items: NotionImportItem[],
-) {
-  const jobProgress = progressObject(job.progress);
-  const jobReport = progressObject(job.report);
-  const hasMoreFromSearch = jobProgress.hasMore === true || jobReport.hasMoreFromSearch === true;
-  const nextCursor = optionalString(jobProgress.nextCursor) ?? optionalString(jobReport.nextCursor);
-  if (hasMoreFromSearch) {
-    reportDiscoveryIncomplete(report, {
-      code: 'notion_search_has_more',
-      notionObject: 'workspace',
-      message:
-        'Notion workspace search still has more results. Continue discovery before applying if you want a fuller workspace graph.' +
-        (nextCursor ? ` Saved cursor: ${nextCursor}.` : ''),
-    });
-  }
 
-  for (const item of items) {
-    if (item.notionObject === 'page') {
-      const snapshot = pageSnapshot(item);
-      if (snapshot?.childrenHasMore === true) {
-        const next = optionalString(snapshot.childrenNextCursor);
-        reportDiscoveryIncomplete(report, {
-          code: 'page_children_truncated',
-          notionId: item.notionId,
-          notionObject: 'page',
-          message:
-            `Page "${item.title || item.notionId}" has more child blocks than this discovery pass fetched.` +
-            (next ? ` Next children cursor: ${next}.` : ''),
-        });
-      }
-    }
 
-    if (item.notionObject === 'data_source') {
-      const snapshot = dataSourceSnapshot(item);
-      if (snapshot?.rowsHasMore === true) {
-        const next = optionalString(snapshot.rowsNextCursor);
-        reportDiscoveryIncomplete(report, {
-          code: 'data_source_rows_truncated',
-          notionId: item.notionId,
-          notionObject: 'data_source',
-          message:
-            `Data source "${item.title || item.notionId}" has more rows than this discovery pass fetched.` +
-            (next ? ` Next row cursor: ${next}.` : ''),
-        });
-      }
-      if (snapshot?.viewsHasMore === true) {
-        const next = optionalString(snapshot.viewsNextCursor);
-        reportDiscoveryIncomplete(report, {
-          code: 'data_source_views_truncated',
-          notionId: item.notionId,
-          notionObject: 'data_source',
-          message:
-            `Data source "${item.title || item.notionId}" has more views than this discovery pass fetched.` +
-            (next ? ` Next view cursor: ${next}.` : ''),
-        });
-      }
-      if (snapshot?.templatesHasMore === true) {
-        const next = optionalString(snapshot.templatesNextCursor);
-        reportDiscoveryIncomplete(report, {
-          code: 'data_source_templates_truncated',
-          notionId: item.notionId,
-          notionObject: 'data_source',
-          message:
-            `Data source "${item.title || item.notionId}" has more templates than this discovery pass fetched.` +
-            (next ? ` Next template cursor: ${next}.` : ''),
-        });
-      }
-    }
-  }
-}
 
-function inspectLinkedBlockForPlan(
-  report: ImportConversionReport,
-  item: NotionImportItem,
-  rawBlock: Record<string, unknown>,
-  knownNotionIds: Set<string>,
-) {
-  const notionType = typeof rawBlock.type === 'string' ? rawBlock.type : 'paragraph';
-  const localType = localBlockTypeFromNotion(notionType, rawBlock);
-  if (localType !== 'inline_database' && localType !== 'child_page' && localType !== 'link_to_page') return;
 
-  const targetIds = linkedNotionTargetIdsFromBlock(rawBlock);
-  if (targetIds.length && !targetIds.some((targetId) => knownNotionIds.has(targetId))) {
-    incrementReport(report, 'unresolvedLinkedTargets');
-    pushReportIssue(report.unresolvedReferences, {
-      code: 'linked_target_unresolved',
-      notionId: targetIds[0],
-      notionObject: 'block',
-      message: `Linked ${localType === 'inline_database' ? 'database' : 'page'} target on "${item.title || item.notionId}" is not present in the discovered graph.`,
-    });
-  }
 
-  if (localType !== 'inline_database') return;
-  const viewIds = linkedNotionViewIdsFromBlock(rawBlock);
-  if (viewIds.length && !viewIds.some((viewId) => knownNotionIds.has(viewId))) {
-    incrementReport(report, 'unresolvedLinkedViews');
-    pushReportIssue(report.unresolvedReferences, {
-      code: 'linked_view_unresolved',
-      notionId: viewIds[0],
-      notionObject: 'view',
-      message: `Linked database view on "${item.title || item.notionId}" is not present in the discovered graph.`,
-    });
-  }
-}
 
-function inspectFilePropertiesForPlan(
-  report: ImportConversionReport,
-  item: NotionImportItem,
-  rawProperties: unknown,
-) {
-  if (!rawProperties || typeof rawProperties !== 'object') return;
-  for (const [nameOrId, rawValue] of Object.entries(rawProperties as Record<string, unknown>)) {
-    const prop = rawValue && typeof rawValue === 'object' ? rawValue as Record<string, unknown> : {};
-    const notionPropId = typeof prop.id === 'string' ? prop.id : nameOrId;
-    reportNotionFileReferences(
-      report,
-      notionPropId,
-      'property',
-      `file property "${nameOrId}" on "${item.title || item.notionId}"`,
-      notionFilePropertyReferences(rawValue),
-    );
-  }
-}
 
-function inspectNotionUserPropertiesForPlan(
-  report: ImportConversionReport,
-  item: NotionImportItem,
-  rawProperties: unknown,
-  labelPrefix = 'property',
-) {
-  if (!rawProperties || typeof rawProperties !== 'object') return;
-  for (const [nameOrId, rawValue] of Object.entries(rawProperties as Record<string, unknown>)) {
-    const prop = rawValue && typeof rawValue === 'object' ? rawValue as Record<string, unknown> : {};
-    const notionPropId = typeof prop.id === 'string' ? prop.id : nameOrId;
-    reportNotionUserReferences(
-      report,
-      notionPropId,
-      'property',
-      `${labelPrefix} "${nameOrId}" on "${item.title || item.notionId}"`,
-      notionUserReferencesFromPropertyValue(rawValue),
-    );
-  }
-}
-
-function inspectPropertyReferencesForPlan(
-  report: ImportConversionReport,
-  dataSourceId: string,
-  properties: Record<string, unknown>,
-  dataSourceIds: Set<string>,
-  propertiesByDataSource: Map<string, Record<string, unknown>>,
-) {
-  const propertyIds = notionPropertyReferenceIds(properties);
-
-  for (const [nameOrId, rawProperty] of Object.entries(properties)) {
-    const notionProperty = rawProperty && typeof rawProperty === 'object' ? rawProperty as Record<string, unknown> : {};
-    const notionType = typeof notionProperty.type === 'string' ? notionProperty.type : 'rich_text';
-    const config = notionPropertyConfig(notionProperty, notionType);
-    if (notionType === 'relation') {
-      const targetId = relationTargetNotionId(config);
-      if (targetId && !dataSourceIds.has(targetId)) {
-        incrementReport(report, 'unresolvedPropertyReferences');
-        pushReportIssue(report.unresolvedReferences, {
-          code: 'relation_target_unresolved',
-          notionId: targetId,
-          notionObject: 'property',
-          message: `Relation property "${String(notionProperty.name ?? nameOrId)}" points to a data source that is not present in the discovered graph.`,
-        });
-      }
-    }
-    if (notionType === 'rollup') {
-      const relationPropertyId = typeof config.relation_property_id === 'string' ? config.relation_property_id : undefined;
-      const rollupPropertyId = typeof config.rollup_property_id === 'string' ? config.rollup_property_id : undefined;
-      const relationProperty = relationPropertyId
-        ? notionPropertyFromRawProperties(properties, relationPropertyId)
-        : undefined;
-      const relationTargetDataSourceId = relationProperty
-        ? relationTargetNotionId(notionPropertyConfig(relationProperty, 'relation'))
-        : undefined;
-
-      if (relationPropertyId && !propertyIds.has(relationPropertyId)) {
-        incrementReport(report, 'unresolvedPropertyReferences');
-        pushReportIssue(report.unresolvedReferences, {
-          code: 'rollup_property_unresolved',
-          notionId: relationPropertyId,
-          notionObject: 'property',
-          message: `Rollup property "${String(notionProperty.name ?? nameOrId)}" references relation property "${relationPropertyId}" that is not present in data source ${dataSourceId}.`,
-        });
-      }
-
-      if (!rollupPropertyId) continue;
-      const targetProperties = relationTargetDataSourceId
-        ? propertiesByDataSource.get(relationTargetDataSourceId)
-        : undefined;
-      const targetPropertyIds = targetProperties ? notionPropertyReferenceIds(targetProperties) : undefined;
-      const rollupTargetIsKnown = targetPropertyIds
-        ? targetPropertyIds.has(rollupPropertyId)
-        : propertyIds.has(rollupPropertyId);
-      if (rollupTargetIsKnown) continue;
-      incrementReport(report, 'unresolvedPropertyReferences');
-      pushReportIssue(report.unresolvedReferences, {
-        code: 'rollup_property_unresolved',
-        notionId: rollupPropertyId,
-        notionObject: 'property',
-        message:
-          `Rollup property "${String(notionProperty.name ?? nameOrId)}" references target property "${rollupPropertyId}" ` +
-          `that is not present in ${relationTargetDataSourceId ? `related data source ${relationTargetDataSourceId}` : `data source ${dataSourceId}`}.`,
-      });
-    }
-    if (notionType === 'formula') {
-      const expression = typeof config.expression === 'string' ? config.expression : '';
-      const formulaPropertyId = typeof notionProperty.id === 'string' ? notionProperty.id : nameOrId;
-      reportUnsupportedFormulaFunctions(
-        report,
-        dataSourceId,
-        formulaPropertyId,
-        String(notionProperty.name ?? nameOrId),
-        unsupportedFormulaFunctions(expression),
-      );
-      for (const referencedProperty of formulaPropertyReferences(expression)) {
-        if (propertyIds.has(referencedProperty)) continue;
-        reportUnresolvedFormulaPropertyReference(
-          report,
-          dataSourceId,
-          formulaPropertyId,
-          String(notionProperty.name ?? nameOrId),
-          referencedProperty,
-        );
-      }
-    }
-  }
-}
-
-function notionPropertyReferenceIds(properties: Record<string, unknown>) {
-  const propertyIds = new Set<string>();
-  for (const [nameOrId, rawProperty] of Object.entries(properties)) {
-    const notionProperty = rawProperty && typeof rawProperty === 'object' ? rawProperty as Record<string, unknown> : {};
-    const references = [
-      typeof notionProperty.id === 'string' ? notionProperty.id : nameOrId,
-      nameOrId,
-      typeof notionProperty.name === 'string' ? notionProperty.name : undefined,
-    ];
-    for (const reference of references) {
-      for (const candidate of notionPropertyReferenceVariants(reference)) {
-        propertyIds.add(candidate);
-      }
-    }
-  }
-  return propertyIds;
-}
-
-function notionPropertyFromRawProperties(properties: Record<string, unknown>, reference: string) {
-  const references = notionPropertyReferenceVariants(reference);
-  if (references.length === 0) return undefined;
-  for (const [nameOrId, rawProperty] of Object.entries(properties)) {
-    const notionProperty = rawProperty && typeof rawProperty === 'object' ? rawProperty as Record<string, unknown> : {};
-    const notionPropertyId = typeof notionProperty.id === 'string' ? notionProperty.id.trim() : '';
-    const notionPropertyName = typeof notionProperty.name === 'string' ? notionProperty.name.trim() : '';
-    const candidates = [
-      ...notionPropertyReferenceVariants(notionPropertyId),
-      ...notionPropertyReferenceVariants(nameOrId),
-      ...notionPropertyReferenceVariants(notionPropertyName),
-    ];
-    if (references.some((value) => candidates.includes(value))) return notionProperty;
-  }
-  return undefined;
-}
-
-export function buildImportPlan(job: NotionImportJob, items: NotionImportItem[]): NotionImportPlan {
-  const locale = parsePersistentGeneratedLocale(asRecord(job.options)?.locale);
-  const report = emptyConversionReport();
-  const counts = items.reduce<Record<string, number>>((acc, item) => {
-    acc[item.notionObject] = (acc[item.notionObject] ?? 0) + 1;
-    return acc;
-  }, {});
-  const knownNotionIds = new Set(items.map((item) => item.notionId));
-  const databaseItems = items.filter((item) => item.notionObject === 'database');
-  const dataSourceItems = items.filter((item) => item.notionObject === 'data_source');
-  const dataSourceIds = new Set(dataSourceItems.map((item) => item.notionId));
-  const inferredLinkedDatabaseItems = new Map<string, ReturnType<typeof inferDataSourceForHiddenLinkedDatabase>>();
-  const placeholderDatabaseItems = databaseItems.filter((item) => {
-    const metadata = itemMetadata(item);
-    const dataSources = Array.isArray(metadata.dataSources) ? metadata.dataSources : [];
-    const hasMappedSource = dataSources.some((source) => {
-      const id = source && typeof source === 'object'
-        ? notionObjectId(source as Record<string, unknown>)
-        : undefined;
-      return !!id && dataSourceIds.has(id);
-    });
-    if (hasMappedSource) return false;
-    const inferred = inferDataSourceForHiddenLinkedDatabase(item, items, dataSourceItems);
-    if (inferred) {
-      inferredLinkedDatabaseItems.set(item.notionId, inferred);
-      return false;
-    }
-    return true;
-  });
-  const pageItems = items.filter((item) => item.notionObject === 'page');
-  const propertiesByDataSource = new Map<string, Record<string, unknown>>();
-  for (const item of dataSourceItems) {
-    const augmented = augmentNotionPropertiesFromRowSnapshots(
-      notionPropertiesFromSnapshot(dataSourceSnapshot(item)),
-      item.notionId,
-      pageItems,
-    );
-    if (augmented.inferred > 0) incrementReport(report, 'inferredRowSnapshotProperties', augmented.inferred);
-    propertiesByDataSource.set(
-      item.notionId,
-      withGeneratedTitleProperty(augmented.properties, locale),
-    );
-  }
-  let properties = 0;
-  let views = 0;
-  let viewMappings = 0;
-  let templates = 0;
-  let rows = 0;
-  let pages = 0;
-  let blocks = 0;
-
-  inspectDiscoveryCompletenessForReport(report, job, items);
-
-  for (const item of dataSourceItems) {
-    const sourceProperties = propertiesByDataSource.get(item.notionId) ?? {};
-    reportPageChromeFileReferences(report, item);
-    inspectPropertyReferencesForPlan(report, item.notionId, sourceProperties, dataSourceIds, propertiesByDataSource);
-    for (const [nameOrId, rawProperty] of Object.entries(sourceProperties)) {
-      const notionProperty = rawProperty && typeof rawProperty === 'object' ? rawProperty as Record<string, unknown> : {};
-      const notionPropertyId = typeof notionProperty.id === 'string' ? notionProperty.id : nameOrId;
-      const notionType = typeof notionProperty.type === 'string' ? notionProperty.type : 'rich_text';
-      reportUnsupportedProperty(report, item.notionId, notionPropertyId, String(notionProperty.name ?? nameOrId), notionType);
-      properties += 1;
-    }
-    const propertyMappingsForPlan = viewPropertyMappingsFromRawProperties(sourceProperties);
-    const viewsToCreate = rawViewsForPlan(items, item, locale);
-    views += viewsToCreate.length;
-    for (const view of viewsToCreate) {
-      if (typeof view.id === 'string' && view.id.trim()) viewMappings += 1;
-      reportUnsupportedView(report, item.notionId, view);
-      inspectViewPropertyReferences(report, item.notionId, view, propertyMappingsForPlan, sourceProperties);
-    }
-    const rawTemplates = rawTemplatesFromSnapshot(dataSourceSnapshot(item));
-    templates += rawTemplates.length;
-    for (const template of rawTemplates) {
-      inspectNotionUserPropertiesForPlan(report, item, templatePropertiesFromNotion(template), 'template property');
-      for (const block of rawTemplateBlocks(template)) {
-        reportTemplateBlockRichTextUserReferences(report, item, block);
-      }
-    }
-  }
-
-  for (const item of pageItems) {
-    if (rowDataSourceId(item, dataSourceIds)) rows += 1;
-    else pages += 1;
-
-    const snapshot = pageSnapshot(item);
-    reportPageChromeFileReferences(report, item);
-    const childBlocks = Array.isArray(snapshot?.childBlocks) ? snapshot.childBlocks : [];
-    for (const rawBlock of childBlocks) {
-      if (!rawBlock || typeof rawBlock !== 'object') continue;
-      const rawBlockRecord = rawBlock as Record<string, unknown>;
-      reportBlockConversion(report, rawBlockRecord, item);
-      reportBlockRichTextUserReferences(report, item, rawBlockRecord);
-      inspectLinkedBlockForPlan(report, item, rawBlockRecord, knownNotionIds);
-      reportBlockFileReference(report, item, rawBlockRecord);
-    }
-    inspectFilePropertiesForPlan(report, item, itemMetadata(item).properties);
-    inspectNotionUserPropertiesForPlan(report, item, itemMetadata(item).properties);
-    inspectMarkdownFallbackForPlan(report, item, snapshot);
-    const markdown = snapshot?.markdown;
-    const markdownText = markdown && typeof markdown === 'object'
-      ? (markdown as Record<string, unknown>).text
-      : undefined;
-    blocks += flattenImportablePageBlocksForPlan(childBlocks).length || (typeof markdownText === 'string' && markdownText.trim() ? 1 : 0);
-  }
-
-  for (const item of placeholderDatabaseItems) {
-    incrementReport(report, 'placeholderDatabases');
-    pushReportIssue(report.warnings, {
-      code: 'database_source_unavailable',
-      notionId: item.notionId,
-      notionObject: 'database',
-      message:
-        `Notion database "${item.title || item.notionId}" did not expose data sources through the API, ` +
-        'so Hanji will import a placeholder database instead of leaving the linked database broken.',
-    });
-  }
-
-  for (const [notionId, inferred] of inferredLinkedDatabaseItems) {
-    if (!inferred) continue;
-    incrementReport(report, 'inferredLinkedDatabases');
-    const inferredFrom =
-      inferred.inferredFrom === 'view_parent_database_id'
-        ? `Notion view "${inferred.matchedViewId || inferred.matchedLabel}" parent.database_id`
-        : `sibling heading "${inferred.heading}" and view label "${inferred.matchedLabel}"`;
-    pushReportIssue(report.warnings, {
-      code: 'linked_database_source_inferred',
-      notionId,
-      notionObject: 'database',
-      message:
-        `Notion database "${notionId}" does not expose data sources, ` +
-        `so Hanji will link it to imported data source "${inferred.dataSourceItem.title || inferred.dataSourceItem.notionId}" ` +
-        `from ${inferredFrom}.`,
-    });
-  }
-
-  const placeholderDatabases = placeholderDatabaseItems.length;
-  const estimatedWrites = {
-    pages: pages + rows + 1,
-    databases: dataSourceItems.length + placeholderDatabases,
-    rows,
-    blocks,
-    properties: properties + placeholderDatabases,
-    views: views + placeholderDatabases,
-    templates,
-    mappings: dataSourceItems.length + pageItems.length + databaseItems.length + viewMappings + templates + properties,
-  };
-
-  return {
-    status: items.length > 0 && job.status === 'ready' ? 'ready' : 'blocked',
-    generatedAt: nowIso(),
-    counts,
-    estimatedWrites,
-    conversion: finalizeConversionReport(report),
-    canApply: items.length > 0 && job.status === 'ready',
-  };
-}
 
 function itemHasImportablePageBody(item: NotionImportItem) {
   const snapshot = pageSnapshot(item);
@@ -14554,6 +11435,96 @@ async function applyJob(
     await bestEffort('notion-import release apply lease', releaseNotionApplyLease(db, lease));
   }
 }
+function notionImportApplyRuntime() {
+  return {
+    NOTION_API_VERSION,
+    GENERATED_NOTION_TITLE_PROPERTY_ID,
+    notionAppliedCountsFromMappings,
+    withImportProgress,
+    optionalString,
+    parsePositiveInt,
+    listAll,
+    assertWritableJob,
+    notionTokenForJob,
+    cleanJob,
+    assertSafeNotionImportSourceReferences,
+    notionObjectId,
+    itemMetadata,
+    dataSourceSnapshot,
+    viewSnapshot,
+    notionPropertiesFromSnapshot,
+    augmentNotionPropertiesFromRowSnapshots,
+    withGeneratedTitleProperty,
+    notionPropertyMappingId,
+    asRecord,
+    importedPageChromeFromItem,
+    importedPageShouldUseFullWidth,
+    pagePropertiesWithChromeReferences,
+    initialImportedPageChrome,
+    emptyConversionReport,
+    incrementReport,
+    pushReportIssue,
+    reportUnsupportedProperty,
+    reportUnsupportedView,
+    parseOptionalBoolean,
+    assertNotionFileCopyNotDisabled,
+    dbPropertyFromNotion,
+    setViewPropertyMapping,
+    dbViewFromNotion,
+    rawTemplatesFromSnapshot,
+    rawTemplateBlocks,
+    dbTemplateFromNotion,
+    reportTemplateBlockRichTextUserReferences,
+    compareNotionImportViewItems,
+    localizedImportableNotionViews,
+    inferCanonicalDataSourceForHiddenLinkedDatabase,
+    meaningfulImportedTitle,
+    hiddenLinkedDatabaseFallbackTitle,
+    pushImportActivity,
+    importActivityRingOf,
+    listActiveNotionImportItems,
+    scrubAppliedImportCredentialMetadata,
+    finalizeConversionReport,
+    basePage,
+    importedItemTimestamps,
+    preserveImportedPageTimestamps,
+    loadMappings,
+    buildImportedBlockOwnerContexts,
+    resolveImportedPageParentFromNotionBlocks,
+    moveImportedPageToResolvedParent,
+    createMapping,
+    ensureImportRoot,
+    unwrapImportRoot,
+    rowDataSourceId,
+    rowPropertiesForDataSource,
+    copyImportedRowFileProperties,
+    importedRowFilePropertiesNeedCopy,
+    copyImportedPageChromeFiles,
+    existingImportedTemplateFileState,
+    copyImportedTemplateFiles,
+    remapImportedDatabaseProperties,
+    remapImportedTemplateBlocksRichTextMentions,
+    reportRichTextMentionRemap,
+    remapImportedPageBlockRichTextMentions,
+    remapImportedPageLinkBlocks,
+    remapImportedSyncedBlocks,
+    remapImportedRowRelationProperties,
+    remapImportedTemplateRelationProperties,
+    remapImportedDatabaseViewRelationFilters,
+    addImportedLinkedDatabaseRowContextFilters,
+    remapImportedTemplateLinkedDatabaseBlocks,
+    insertPageBlocksFromSnapshot,
+    inspectDiscoveryCompletenessForReport,
+    itemHasImportablePageBody,
+    importedBlocksComplete,
+    markImportedBlocksComplete,
+    replaceImportedBlocksForPage,
+    ensureImportedPageWorkspaceIndexes,
+    renewNotionApplyLease,
+    updateNotionJobIfStatus,
+  };
+}
+export type NotionImportApplyRuntime = ReturnType<typeof notionImportApplyRuntime>;
 
 async function applyJobCore(
   db: DbRef,
@@ -14566,1151 +11537,18 @@ async function applyJobCore(
   applyLease?: { id: string; leaseId: string },
   createdUploadIds: string[] = [],
 ) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  const locale = parsePersistentGeneratedLocale(asRecord(job.options)?.locale);
-  const generatedLabels = persistentGeneratedLabels(locale);
-  const existingMappings = await loadMappings(db, job.id);
-  if (job.status === 'completed') {
-    const mappings = Array.from(existingMappings.values());
-    await ensureImportedPageWorkspaceIndexes(admin, mappings, job.workspaceId);
-    return {
-      job: cleanJob(job),
-      applied: (job.progress as { applied?: Record<string, number> } | undefined)?.applied ?? {},
-      mappings,
-    };
-  }
-  if (job.status !== 'ready') {
-    throw new Error('Notion import job must be ready before apply.');
-  }
-
-  const items = await listActiveNotionImportItems(db, job);
-  if (items.length === 0) {
-    // A discovery that legitimately found nothing (nothing shared with the
-    // integration, or the Notion search was rate-limited into an empty result)
-    // is a user-actionable state, not a server fault — surface a clean 422.
-    throw new Error(
-      'Notion import found no items. Share pages with the integration, or wait a ' +
-        'few minutes if the Notion API rate-limited discovery, then run discovery again.',
-    );
-  }
-  // Re-check durable staging immediately before any page/root write. This is
-  // a defense-in-depth fence for legacy rows and any out-of-band corruption;
-  // only references copied and registered by this apply may become local
-  // stored-file owners.
-  await assertSafeNotionImportSourceReferences(
-    db,
-    items.map((item) => item.metadata),
-  );
-  const itemsByNotionId = new Map(items.map((item) => [item.notionId, item]));
-  const blockOwnerContextsByNotionId = buildImportedBlockOwnerContexts(items);
-
-  const applyPageBatchSize = parsePositiveInt(body.applyPageBatchSize, 0, 500);
-  const applyDatabaseBatchSize = parsePositiveInt(
-    body.applyDatabaseBatchSize,
-    applyPageBatchSize > 0 ? applyPageBatchSize : 50,
-    500,
-  );
-  const existingApplyCursor =
-    asRecord(asRecord(job.progress)?.applyCursor) ??
-    asRecord(asRecord(job.report)?.applyCursor);
-  const existingApplyPhase = optionalString(existingApplyCursor?.phase);
-  const shouldChunkDatabaseContainers =
-    !existingApplyPhase ||
-    existingApplyPhase === 'apply_data_sources' ||
-    existingApplyPhase === 'apply_database_containers';
-  const resumeDatabasePass = existingApplyPhase === 'apply_database_containers'
-    ? optionalString(existingApplyCursor?.databasePass)
-    : undefined;
-  const resumeDatabaseIndex = existingApplyPhase === 'apply_database_containers' &&
-    typeof existingApplyCursor?.databaseIndex === 'number' &&
-    Number.isFinite(existingApplyCursor.databaseIndex)
-    ? Math.max(0, Math.floor(existingApplyCursor.databaseIndex))
-    : 0;
-  const mappingsByNotionId = existingMappings;
-  const rootPageId = await ensureImportRoot(db, admin, job, mappingsByNotionId, actorId);
-  const dataSourceItems = items.filter((item) => item.notionObject === 'data_source');
-  const dataSourceIds = new Set(dataSourceItems.map((item) => item.notionId));
-  const propertyMappingsByDataSource = new Map<string, Map<string, string>>();
-  const propertyRecordsByDataSource = new Map<string, DbProperty[]>();
-  const importedPropertyContexts: ImportedPropertyContext[] = [];
-  const importedRowContexts: ImportedRowContext[] = [];
-  const importedPageBlockContexts: ImportedPageBlockContext[] = [];
-  const importedTemplateContexts: ImportedTemplateContext[] = [];
-  const importedBlockMappingsByNotionId = new Map<string, ImportedBlockMapping>();
-  const conversionReport = emptyConversionReport();
-  inspectDiscoveryCompletenessForReport(conversionReport, job, items);
-  assertNotionFileCopyNotDisabled(body);
-  const storedImportPagesFullWidth = parseOptionalBoolean(asRecord(job.options)?.importPagesFullWidth);
-  const importPagesFullWidth = parseOptionalBoolean(body.importPagesFullWidth) ?? storedImportPagesFullWidth;
-  const tokenSource = await notionTokenForJob(db, body, job, actorId, env).catch(() => undefined);
-  const durableApplied = notionAppliedCountsFromMappings(Array.from(existingMappings.values()));
-  const previousPartialApplied =
-    asRecord(asRecord(job.progress)?.partialApplied) ??
-    asRecord(asRecord(job.report)?.partialApplied);
-  const previousAppliedCount = (key: string) => {
-    const value = previousPartialApplied?.[key];
-    return typeof value === 'number' && Number.isFinite(value) && value >= 0
-      ? Math.floor(value)
-      : 0;
-  };
-  const created = {
-    pages: durableApplied.pages,
-    databases: durableApplied.databases,
-    blocks: previousAppliedCount('blocks'),
-    properties: durableApplied.properties,
-    views: durableApplied.views,
-    templates: durableApplied.templates,
-    rows: durableApplied.rows,
-    mappings: durableApplied.mappings,
-    remappedProperties: previousAppliedCount('remappedProperties'),
-    remappedViewRelationFilters: previousAppliedCount('remappedViewRelationFilters'),
-    remappedLinkedDatabaseContextFilters: previousAppliedCount('remappedLinkedDatabaseContextFilters'),
-    remappedRowRelations: previousAppliedCount('remappedRowRelations'),
-    remappedTemplateRelations: previousAppliedCount('remappedTemplateRelations'),
-    remappedLinkBlocks: previousAppliedCount('remappedLinkBlocks'),
-    unresolvedImportReferences: previousAppliedCount('unresolvedImportReferences'),
-    fileCopies: previousAppliedCount('fileCopies'),
-    fileCopySkipped: previousAppliedCount('fileCopySkipped'),
-    repairedPageParents: previousAppliedCount('repairedPageParents'),
-  };
-  const fileCopyContext: NotionFileCopyContext = {
+  return applyJobCoreWithRuntime(
     db,
     admin,
-    job,
+    body,
     actorId,
+    notionImportApplyRuntime,
     storage,
     request,
-    conversionReport,
-    requireStoredFileCopies: true,
-    notionToken: tokenSource?.token,
-    apiVersion: job.apiVersion || NOTION_API_VERSION,
-    apiBase: notionApiBase(env),
-    stats: created,
+    env,
+    applyLease,
     createdUploadIds,
-  };
-  let currentJob = job;
-  // Apply owns the 55→99% band; pages/rows dominate the work, so their loop
-  // index drives most of it. Container phases get fixed early marks.
-  const applyPercent = (phase: string, cursor: Record<string, unknown>) => {
-    if (phase === 'apply_data_sources') return 56;
-    if (phase === 'apply_database_containers') return 58;
-    if (phase === 'apply_pages') {
-      const index = typeof cursor.pageIndex === 'number' ? cursor.pageIndex : 0;
-      const total = typeof cursor.totalPages === 'number' && cursor.totalPages > 0 ? cursor.totalPages : 0;
-      if (!total) return 60;
-      return Math.min(96, 60 + Math.round((index / total) * 36));
-    }
-    if (phase === 'apply_remap') return 98;
-    return 75;
-  };
-  const applyActivityRing = importActivityRingOf(currentJob.progress as Record<string, unknown> | undefined);
-  let lastApplyProgressWriteMs = 0;
-  const updateApplyProgress = async (
-    phase: string,
-    cursor: Record<string, unknown> = {},
-    activity?: { kind: string; title?: string; count?: number; total?: number },
-  ) => {
-    if (applyLease) await renewNotionApplyLease(db, applyLease);
-    const applyCursor = { phase, ...cursor };
-    if (activity) pushImportActivity(applyActivityRing, activity);
-    const nextJob = await updateNotionJobIfStatus(db, job.id, 'ready', {
-      phase,
-      connectionId: tokenSource?.connectionId ?? currentJob.connectionId,
-      connectionKind: tokenSource?.connection?.connectionKind ?? currentJob.connectionKind,
-      error: null,
-      finishedAt: null,
-      progress: {
-        ...withImportProgress(currentJob.progress, {
-          key: 'apply',
-          status: 'running',
-          legacyStep: phase,
-          percent: applyPercent(phase, cursor),
-          counts: created,
-        }),
-        applyCursor,
-        partialApplied: created,
-        recent: applyActivityRing.slice(),
-      },
-      report: {
-        ...(currentJob.report ?? {}),
-        applyCursor,
-        partialApplied: created,
-      },
-      options: importPagesFullWidth !== undefined
-        ? {
-            ...(currentJob.options ?? {}),
-            importPagesFullWidth,
-          }
-        : currentJob.options,
-    });
-    if (!nextJob) {
-      const latest = await getExisting(jobs, job.id);
-      if (latest?.status === 'cancelled') {
-        throw new Error('Notion import job is cancelled.');
-      }
-      throw new Error('Notion import job state changed while apply was running.');
-    }
-    currentJob = nextJob;
-  };
-
-  await updateApplyProgress('apply_data_sources', {
-    totalDataSources: dataSourceItems.length,
-  });
-
-  for (const item of dataSourceItems) {
-    const existingMapping = mappingsByNotionId.get(item.notionId);
-    let databaseId = existingMapping?.localId;
-    if (!databaseId) {
-      const chrome = importedPageChromeFromItem(item);
-      const initialChrome = initialImportedPageChrome(chrome);
-      let page = await db.table<Page>('pages').insert(
-        basePage({
-          workspaceId: job.workspaceId,
-          parentId: rootPageId,
-          parentType: 'page',
-          kind: 'database',
-          title: item.title || generatedLabels.importedDatabase,
-          icon: initialChrome.icon,
-          iconType: initialChrome.iconType,
-          cover: initialChrome.cover,
-          coverPosition: initialChrome.coverPosition,
-          position: created.databases + 1,
-          actorId,
-          ...importedItemTimestamps(item),
-          properties: pagePropertiesWithChromeReferences({
-            notionImportJobId: job.id,
-            notionDataSourceId: item.notionId,
-          }, chrome),
-        }),
-      );
-      page = await copyImportedPageChromeFiles(fileCopyContext, page, item);
-      page = await preserveImportedPageTimestamps(db, page, item);
-      databaseId = page.id;
-      await createMapping(db, admin, job, mappingsByNotionId, {
-        notionId: item.notionId,
-        notionType: item.notionObject,
-        localId: databaseId,
-        localType: 'database',
-        relationKind: 'canonical_data_source',
-        metadata: { title: item.title },
-      });
-      created.databases += 1;
-      created.mappings += 1;
-      if (Date.now() - lastApplyProgressWriteMs >= 1_000) {
-        lastApplyProgressWriteMs = Date.now();
-        await updateApplyProgress('apply_data_sources', {
-          totalDataSources: dataSourceItems.length,
-        }, {
-          kind: 'create_database',
-          title: item.title || undefined,
-          count: created.databases,
-          total: dataSourceItems.length,
-        });
-      }
-    }
-
-    const propMap = new Map<string, string>();
-    propertyMappingsByDataSource.set(item.notionId, propMap);
-    propertyRecordsByDataSource.set(item.notionId, []);
-    const augmentedProperties = augmentNotionPropertiesFromRowSnapshots(
-      notionPropertiesFromSnapshot(dataSourceSnapshot(item)),
-      item.notionId,
-      items,
-    );
-    if (augmentedProperties.inferred > 0) {
-      incrementReport(conversionReport, 'inferredRowSnapshotProperties', augmentedProperties.inferred);
-    }
-    const properties = withGeneratedTitleProperty(augmentedProperties.properties, locale);
-    const existingDatabaseProperties = databaseId
-      ? await listAll(db.table<DbProperty>('db_properties').where('databaseId', '==', databaseId), 1000)
-      : [];
-    let propIndex = 0;
-    for (const [nameOrId, rawProperty] of Object.entries(properties)) {
-      const notionProperty = rawProperty && typeof rawProperty === 'object' ? rawProperty as Record<string, unknown> : {};
-      const notionPropertyId = typeof notionProperty.id === 'string' ? notionProperty.id : nameOrId;
-      const notionType = typeof notionProperty.type === 'string' ? notionProperty.type : 'rich_text';
-      reportUnsupportedProperty(conversionReport, item.notionId, notionPropertyId, String(notionProperty.name ?? nameOrId), notionType);
-      const existingPropertyMapping = mappingsByNotionId.get(notionPropertyMappingId(item.notionId, notionPropertyId));
-      const existingProperty = existingPropertyMapping
-        ? existingDatabaseProperties.find((property) => property.id === existingPropertyMapping.localId) ??
-          await getExisting(db.table<DbProperty>('db_properties'), existingPropertyMapping.localId)
-        : undefined;
-      if (existingProperty) {
-        setViewPropertyMapping(propMap, notionPropertyId, existingProperty.id);
-        setViewPropertyMapping(propMap, nameOrId, existingProperty.id);
-        setViewPropertyMapping(propMap, existingProperty.name, existingProperty.id);
-        if (notionPropertyId === GENERATED_NOTION_TITLE_PROPERTY_ID) {
-          setViewPropertyMapping(propMap, 'Name', existingProperty.id);
-          setViewPropertyMapping(propMap, 'title', existingProperty.id);
-        }
-        propertyRecordsByDataSource.get(item.notionId)?.push(existingProperty);
-        importedPropertyContexts.push({
-          dataSourceId: item.notionId,
-          notionPropertyId,
-          notionPropertyName: nameOrId,
-          notionProperty: { ...notionProperty, name: notionProperty.name ?? nameOrId },
-          property: existingProperty,
-        });
-        propIndex += 1;
-        continue;
-      }
-      const property = dbPropertyFromNotion(databaseId, notionPropertyId, { ...notionProperty, name: notionProperty.name ?? nameOrId }, propIndex);
-      const inserted = await db.table<DbProperty>('db_properties').insert(property);
-      setViewPropertyMapping(propMap, notionPropertyId, inserted.id);
-      setViewPropertyMapping(propMap, nameOrId, inserted.id);
-      setViewPropertyMapping(propMap, inserted.name, inserted.id);
-      if (notionPropertyId === GENERATED_NOTION_TITLE_PROPERTY_ID) {
-        setViewPropertyMapping(propMap, 'Name', inserted.id);
-        setViewPropertyMapping(propMap, 'title', inserted.id);
-      }
-      propertyRecordsByDataSource.get(item.notionId)?.push(inserted);
-      importedPropertyContexts.push({
-        dataSourceId: item.notionId,
-        notionPropertyId,
-        notionPropertyName: nameOrId,
-        notionProperty: { ...notionProperty, name: notionProperty.name ?? nameOrId },
-        property: inserted,
-      });
-      await createMapping(db, admin, job, mappingsByNotionId, {
-        notionId: notionPropertyMappingId(item.notionId, notionPropertyId),
-        notionType: 'property',
-        localId: inserted.id,
-        localType: 'db_property',
-        relationKind: 'database_property',
-        metadata: {
-          dataSourceId: item.notionId,
-          databaseId,
-          name: inserted.name,
-          notionPropertyId,
-        },
-      });
-      created.properties += 1;
-      created.mappings += 1;
-      propIndex += 1;
-    }
-
-    const directViewItems = items
-      .filter((viewItem) => viewItem.notionObject === 'view' && viewItem.parentNotionId === item.notionId)
-      .sort(compareNotionImportViewItems);
-    const snapshotViews = dataSourceSnapshot(item)?.views;
-    const rawViews = directViewItems.length
-      ? directViewItems.map((viewItem) => viewSnapshot(viewItem)).filter((view): view is Record<string, unknown> => !!view)
-      : Array.isArray(snapshotViews)
-        ? snapshotViews.filter((view): view is Record<string, unknown> => !!view && typeof view === 'object')
-        : [];
-    const viewsToCreate = localizedImportableNotionViews(rawViews, locale);
-    const existingViews = databaseId
-      ? await listAll(db.table<DbView>('db_views').where('databaseId', '==', databaseId), 1000)
-      : [];
-    for (let index = 0; index < viewsToCreate.length; index += 1) {
-      reportUnsupportedView(conversionReport, item.notionId, viewsToCreate[index]);
-      const viewToCreate = viewsToCreate[index];
-      const notionViewId = typeof viewToCreate.id === 'string' ? viewToCreate.id : undefined;
-      const existingViewMapping = notionViewId ? mappingsByNotionId.get(notionViewId) : undefined;
-      if (existingViewMapping && existingViews.some((view) => view.id === existingViewMapping.localId)) {
-        continue;
-      }
-      if (!notionViewId && existingViews.some((view) =>
-        view.name === (optionalString(viewToCreate.name) ?? generatedLabels.viewNames.table) &&
-        view.type === (optionalString(viewToCreate.type) ?? 'table')
-      )) {
-        continue;
-      }
-      const inserted = await db.table<DbView>('db_views').insert(
-        dbViewFromNotion(
-          databaseId,
-          viewToCreate,
-          index,
-          propMap,
-          conversionReport,
-          item.notionId,
-          propertyRecordsByDataSource.get(item.notionId) ?? [],
-        ),
-      );
-      created.views += 1;
-      if (notionViewId) {
-        await createMapping(db, admin, job, mappingsByNotionId, {
-          notionId: notionViewId,
-          notionType: 'view',
-          localId: inserted.id,
-          localType: 'db_view',
-          relationKind: 'database_view',
-          metadata: { dataSourceId: item.notionId },
-        });
-        created.mappings += 1;
-      }
-    }
-
-    const templatesToCreate = rawTemplatesFromSnapshot(dataSourceSnapshot(item));
-    const existingTemplates = databaseId
-      ? await listAll(db.table<DbTemplate>('db_templates').where('databaseId', '==', databaseId), 1000)
-      : [];
-    for (let index = 0; index < templatesToCreate.length; index += 1) {
-      for (const block of rawTemplateBlocks(templatesToCreate[index])) {
-        reportTemplateBlockRichTextUserReferences(conversionReport, item, block);
-      }
-      const notionTemplateId = notionObjectId(templatesToCreate[index]);
-      const existingTemplateMapping = notionTemplateId ? mappingsByNotionId.get(notionTemplateId) : undefined;
-      const existingTemplate = existingTemplateMapping
-        ? existingTemplates.find((template) => template.id === existingTemplateMapping.localId) ??
-          await getExisting(db.table<DbTemplate>('db_templates'), existingTemplateMapping.localId)
-        : undefined;
-      if (existingTemplate) {
-        const fileState = await existingImportedTemplateFileState(
-          fileCopyContext,
-          existingTemplate,
-          templatesToCreate[index],
-          propMap,
-        );
-        if (fileState === 'complete') {
-          importedTemplateContexts.push({
-            template: existingTemplate,
-            dataSourceId: item.notionId,
-            notionId: notionTemplateId,
-          });
-          continue;
-        }
-        const copiedExistingTemplate = await copyImportedTemplateFiles(
-          fileCopyContext,
-          existingTemplate,
-          templatesToCreate[index],
-          propMap,
-          item,
-        );
-        const repairedExistingTemplate = await db.table<DbTemplate>('db_templates').update(
-          existingTemplate.id,
-          {
-            icon: copiedExistingTemplate.icon,
-            properties: copiedExistingTemplate.properties,
-            blocks: copiedExistingTemplate.blocks,
-            updatedAt: nowIso(),
-          },
-        );
-        importedTemplateContexts.push({
-          template: repairedExistingTemplate,
-          dataSourceId: item.notionId,
-          notionId: notionTemplateId,
-        });
-        continue;
-      }
-      const preparedTemplate = dbTemplateFromNotion(
-        databaseId,
-        templatesToCreate[index],
-        propMap,
-        index,
-        conversionReport,
-        item.notionId,
-      );
-      // Template ids are allocated before copy so every upload gets an
-      // independent templateId/databaseId association, but the template row
-      // itself is committed only after icon, file properties, and all nested
-      // file blocks have been copied and verified.
-      const copiedTemplate = await copyImportedTemplateFiles(
-        fileCopyContext,
-        preparedTemplate,
-        templatesToCreate[index],
-        propMap,
-        item,
-      );
-      const inserted = await db.table<DbTemplate>('db_templates').insert(copiedTemplate);
-      importedTemplateContexts.push({
-        template: inserted,
-        dataSourceId: item.notionId,
-        notionId: notionTemplateId,
-      });
-      created.templates += 1;
-      if (notionTemplateId) {
-        await createMapping(db, admin, job, mappingsByNotionId, {
-          notionId: notionTemplateId,
-          notionType: 'template',
-          localId: inserted.id,
-          localType: 'db_template',
-          relationKind: 'database_template',
-          metadata: { dataSourceId: item.notionId, databaseId },
-        });
-        created.mappings += 1;
-      }
-    }
-  }
-  await updateApplyProgress('apply_database_containers', {
-    totalDataSources: dataSourceItems.length,
-  });
-
-  const databaseItems = items.filter((candidate) => candidate.notionObject === 'database');
-  let databaseItemsTouchedThisRun = 0;
-  let databaseIndex = 0;
-  if (resumeDatabasePass !== 'placeholder') {
-    for (const item of databaseItems) {
-      databaseIndex += 1;
-      if (resumeDatabasePass === 'direct' && databaseIndex <= resumeDatabaseIndex) continue;
-      const metadata = itemMetadata(item);
-      const dataSources = Array.isArray(metadata.dataSources) ? metadata.dataSources : [];
-      const firstDataSourceId = dataSources
-        .map((source) => source && typeof source === 'object' ? notionObjectId(source as Record<string, unknown>) : undefined)
-        .find((id): id is string => !!id && !!mappingsByNotionId.get(id));
-      const dataSourceMapping = firstDataSourceId ? mappingsByNotionId.get(firstDataSourceId) : undefined;
-      if (dataSourceMapping && !mappingsByNotionId.has(item.notionId)) {
-        const localDatabase = await getExisting(db.table<Page>('pages'), dataSourceMapping.localId);
-        const existingNotionDatabaseId = optionalString(localDatabase?.properties?.notionDatabaseId);
-        if (localDatabase?.kind === 'database' && !existingNotionDatabaseId) {
-          await db.table<Page>('pages').update(localDatabase.id, {
-            properties: {
-              ...(localDatabase.properties ?? {}),
-              notionDatabaseId: item.notionId,
-              notionDataSourceId: firstDataSourceId,
-            },
-          });
-        }
-        await createMapping(db, admin, job, mappingsByNotionId, {
-          notionId: item.notionId,
-          notionType: 'database',
-          localId: dataSourceMapping.localId,
-          localType: 'database',
-          relationKind: 'database_container',
-          metadata: { dataSourceId: firstDataSourceId },
-        });
-        created.mappings += 1;
-      }
-      databaseItemsTouchedThisRun += 1;
-      if (
-        shouldChunkDatabaseContainers &&
-        applyDatabaseBatchSize > 0 &&
-        databaseItemsTouchedThisRun >= applyDatabaseBatchSize &&
-        databaseIndex < databaseItems.length
-      ) {
-        await updateApplyProgress('apply_database_containers', {
-          totalDataSources: dataSourceItems.length,
-          totalDatabases: databaseItems.length,
-          databasePass: 'direct',
-          databaseIndex,
-          databaseBatchSize: applyDatabaseBatchSize,
-          databasesTouchedThisRun: databaseItemsTouchedThisRun,
-          paused: true,
-        });
-        return {
-          job: cleanJob(currentJob),
-          applied: created,
-          mappings: Array.from(mappingsByNotionId.values()),
-          partial: true,
-        };
-      }
-    }
-  }
-
-  if (shouldChunkDatabaseContainers) {
-    await updateApplyProgress('apply_database_containers', {
-      totalDataSources: dataSourceItems.length,
-      totalDatabases: databaseItems.length,
-      databasePass: 'placeholder',
-      databaseIndex: resumeDatabasePass === 'placeholder' ? resumeDatabaseIndex : 0,
-      databaseBatchSize: applyDatabaseBatchSize,
-    });
-  }
-  databaseIndex = 0;
-  for (const item of databaseItems) {
-    databaseIndex += 1;
-    if (resumeDatabasePass === 'placeholder' && databaseIndex <= resumeDatabaseIndex) continue;
-    if (mappingsByNotionId.has(item.notionId)) continue;
-    const inferredSource = inferCanonicalDataSourceForHiddenLinkedDatabase(item, items, dataSourceItems, mappingsByNotionId);
-    if (inferredSource) {
-      const inferredFrom = inferredSource.inferredFrom ?? 'sibling_heading_view_name';
-      await createMapping(db, admin, job, mappingsByNotionId, {
-        notionId: item.notionId,
-        notionType: 'database',
-        localId: inferredSource.mapping.localId,
-        localType: 'database',
-        relationKind: 'database_container_inferred_from_view_context',
-        metadata: {
-          dataSourceId: inferredSource.dataSourceItem.notionId,
-          inferredFrom,
-          heading: inferredSource.heading,
-          matchedLabel: inferredSource.matchedLabel,
-          ...(inferredSource.matchedViewId ? { selectedViewId: inferredSource.matchedViewId } : {}),
-          ...(inferredSource.matchedViewIds?.length ? { viewIds: inferredSource.matchedViewIds } : {}),
-          sourceUnavailable: true,
-        },
-      });
-      created.mappings += 1;
-      incrementReport(conversionReport, 'inferredLinkedDatabases');
-      const inferredFromText =
-        inferredFrom === 'view_parent_database_id'
-          ? `Notion view "${inferredSource.matchedViewId || inferredSource.matchedLabel}" parent.database_id`
-          : `sibling heading "${inferredSource.heading}" and view label "${inferredSource.matchedLabel}"`;
-      pushReportIssue(conversionReport.warnings, {
-        code: 'linked_database_source_inferred',
-        notionId: item.notionId,
-        notionObject: 'database',
-        message:
-          `Notion database "${item.title || item.notionId}" did not expose data sources, ` +
-          `so Hanji linked it to imported data source "${inferredSource.dataSourceItem.title || inferredSource.dataSourceItem.notionId}" ` +
-          `from ${inferredFromText}.`,
-      });
-      databaseItemsTouchedThisRun += 1;
-      if (
-        shouldChunkDatabaseContainers &&
-        applyDatabaseBatchSize > 0 &&
-        databaseItemsTouchedThisRun >= applyDatabaseBatchSize &&
-        databaseIndex < databaseItems.length
-      ) {
-        await updateApplyProgress('apply_database_containers', {
-          totalDataSources: dataSourceItems.length,
-          totalDatabases: databaseItems.length,
-          databasePass: 'placeholder',
-          databaseIndex,
-          databaseBatchSize: applyDatabaseBatchSize,
-          databasesTouchedThisRun: databaseItemsTouchedThisRun,
-          paused: true,
-        });
-        return {
-          job: cleanJob(currentJob),
-          applied: created,
-          mappings: Array.from(mappingsByNotionId.values()),
-          partial: true,
-        };
-      }
-      continue;
-    }
-    const metadata = itemMetadata(item);
-    const database = asRecord(metadata.database);
-    const chrome = importedPageChromeFromItem(item);
-    const initialChrome = initialImportedPageChrome(chrome);
-    const fallbackTitle = hiddenLinkedDatabaseFallbackTitle(item, items, database, locale);
-    let page = await db.table<Page>('pages').insert(
-      basePage({
-        workspaceId: job.workspaceId,
-        parentId: rootPageId,
-        parentType: 'page',
-        kind: 'database',
-        title: fallbackTitle,
-        icon: initialChrome.icon,
-        iconType: initialChrome.iconType,
-        cover: initialChrome.cover,
-        coverPosition: initialChrome.coverPosition,
-        position: created.databases + 1,
-        actorId,
-        ...importedItemTimestamps(item),
-        properties: pagePropertiesWithChromeReferences({
-          notionImportJobId: job.id,
-          notionDatabaseId: item.notionId,
-          notionLinkedDatabaseSourceUnavailable: true,
-        }, chrome),
-      }),
-    );
-    page = await copyImportedPageChromeFiles(fileCopyContext, page, item);
-    page = await preserveImportedPageTimestamps(db, page, item);
-    const titleProperty = await db.table<DbProperty>('db_properties').insert({
-      id: newId(),
-      databaseId: page.id,
-      name: generatedLabels.propertyNames.name,
-      type: 'title',
-      position: 1,
-      config: {
-        notionDatabaseId: item.notionId,
-        notionSourceUnavailable: true,
-      },
-    });
-    await db.table<DbView>('db_views').insert(
-      dbViewFromNotion(
-        page.id,
-        {
-          name: meaningfulImportedTitle(item.title) || generatedLabels.viewNames.table,
-          type: 'table',
-          sourceUnavailable: true,
-          notionDatabaseId: item.notionId,
-        },
-        0,
-        new Map([
-          ['Name', titleProperty.id],
-          [generatedLabels.propertyNames.name, titleProperty.id],
-          ['title', titleProperty.id],
-        ]),
-        conversionReport,
-        item.notionId,
-      ),
-    );
-    await createMapping(db, admin, job, mappingsByNotionId, {
-      notionId: item.notionId,
-      notionType: 'database',
-      localId: page.id,
-      localType: 'database',
-      relationKind: 'database_placeholder',
-      metadata: {
-        title: item.title,
-        sourceUnavailable: true,
-      },
-    });
-    created.databases += 1;
-    created.properties += 1;
-    created.views += 1;
-    created.mappings += 1;
-    incrementReport(conversionReport, 'placeholderDatabases');
-    pushReportIssue(conversionReport.warnings, {
-      code: 'database_source_unavailable',
-      notionId: item.notionId,
-      notionObject: 'database',
-      message:
-        `Notion database "${item.title || item.notionId}" did not expose data sources through the API, ` +
-        'so Hanji imported a placeholder database instead of leaving the linked database broken.',
-    });
-    databaseItemsTouchedThisRun += 1;
-    if (
-      shouldChunkDatabaseContainers &&
-      applyDatabaseBatchSize > 0 &&
-      databaseItemsTouchedThisRun >= applyDatabaseBatchSize &&
-      databaseIndex < databaseItems.length
-    ) {
-      await updateApplyProgress('apply_database_containers', {
-        totalDataSources: dataSourceItems.length,
-        totalDatabases: databaseItems.length,
-        databasePass: 'placeholder',
-        databaseIndex,
-        databaseBatchSize: applyDatabaseBatchSize,
-        databasesTouchedThisRun: databaseItemsTouchedThisRun,
-        paused: true,
-      });
-      return {
-        job: cleanJob(currentJob),
-        applied: created,
-        mappings: Array.from(mappingsByNotionId.values()),
-        partial: true,
-      };
-    }
-  }
-
-  const pageItems = items.filter((item) => item.notionObject === 'page');
-  let pageIndex = 0;
-  let pagesTouchedThisRun = 0;
-  let pageBatchPaused = false;
-  for (const item of pageItems) {
-    pageIndex += 1;
-    const sourceId = rowDataSourceId(item, dataSourceIds);
-    const sourceMapping = sourceId ? mappingsByNotionId.get(sourceId) : undefined;
-    const parentMapping = item.parentNotionId ? mappingsByNotionId.get(item.parentNotionId) : undefined;
-    const isRow = !!sourceMapping && sourceMapping.localType === 'database';
-    const propMap = sourceId ? propertyMappingsByDataSource.get(sourceId) : undefined;
-    const metadata = itemMetadata(item);
-    const chrome = importedPageChromeFromItem(item);
-    const initialChrome = initialImportedPageChrome(chrome);
-    const resolvedParent = isRow
-      ? {}
-      : resolveImportedPageParentFromNotionBlocks(item, mappingsByNotionId, blockOwnerContextsByNotionId);
-    const existingPageMapping = mappingsByNotionId.get(item.notionId);
-    if (existingPageMapping?.localType === 'page') {
-      let existingPage = await getExisting(db.table<Page>('pages'), existingPageMapping.localId);
-      if (existingPage && !isRow) {
-        const movedPage = await moveImportedPageToResolvedParent(db, existingPage, resolvedParent);
-        if (movedPage !== existingPage) {
-          existingPage = movedPage;
-          created.repairedPageParents += 1;
-        }
-      }
-      if (
-        existingPage &&
-        isRow &&
-        sourceId &&
-        propMap &&
-        sourceMapping?.localId &&
-        importedRowFilePropertiesNeedCopy(existingPage.properties, metadata.properties, propMap)
-      ) {
-        existingPage = await copyImportedRowFileProperties(
-          fileCopyContext,
-          existingPage,
-          sourceMapping.localId,
-          metadata.properties,
-          propMap,
-          item,
-        );
-      }
-      if (
-        existingPage &&
-        itemHasImportablePageBody(item) &&
-        !importedBlocksComplete(existingPage)
-      ) {
-        const replaced = await replaceImportedBlocksForPage(
-          db,
-          existingPage,
-          item,
-          actorId,
-          mappingsByNotionId,
-          conversionReport,
-          fileCopyContext,
-          importedBlockMappingsByNotionId,
-          itemsByNotionId,
-        );
-        created.blocks += replaced.insertedBlocks.length;
-        importedPageBlockContexts.push({ page: replaced.page, notionId: item.notionId });
-        if (isRow && sourceId && propMap && sourceMapping?.localId) {
-          importedRowContexts.push({ page: replaced.page, dataSourceId: sourceId, notionId: item.notionId });
-        }
-        pagesTouchedThisRun += 1;
-        if (applyPageBatchSize > 0 && pagesTouchedThisRun >= applyPageBatchSize) {
-          pageBatchPaused = true;
-        }
-      } else if (existingPage) {
-        importedPageBlockContexts.push({ page: existingPage, notionId: item.notionId });
-        if (isRow && sourceId && propMap && sourceMapping?.localId) {
-          importedRowContexts.push({ page: existingPage, dataSourceId: sourceId, notionId: item.notionId });
-        }
-      }
-      if (pageBatchPaused) {
-        await updateApplyProgress('apply_pages', {
-          pageIndex,
-          totalPages: pageItems.length,
-          pageBatchSize: applyPageBatchSize,
-          pagesTouchedThisRun,
-          paused: true,
-        });
-        return {
-          job: cleanJob(currentJob),
-          applied: created,
-          mappings: Array.from(mappingsByNotionId.values()),
-          partial: true,
-        };
-      }
-      continue;
-    }
-    if (existingPageMapping) continue;
-    const pageProperties = isRow && propMap
-      ? rowPropertiesForDataSource(metadata.properties, propMap, {
-          report: conversionReport,
-          notionId: item.notionId,
-          notionObject: 'page',
-        }, {
-          omitFileValuesNeedingStorage: fileCopyContext.requireStoredFileCopies,
-        })
-      : {
-          notionImportJobId: job.id,
-          notionPageId: item.notionId,
-        };
-    let page = await db.table<Page>('pages').insert(
-      basePage({
-        workspaceId: job.workspaceId,
-        parentId: isRow
-          ? sourceMapping.localId
-          : resolvedParent.parentId
-            ? resolvedParent.parentId
-            : parentMapping?.localType === 'page'
-              ? parentMapping.localId
-            : rootPageId,
-        parentType: isRow ? 'database' : 'page',
-        kind: 'page',
-        title: isRow ? (item.title ?? '') : (item.title || generatedLabels.untitled),
-        icon: initialChrome.icon,
-        iconType: initialChrome.iconType,
-        cover: initialChrome.cover,
-        coverPosition: initialChrome.coverPosition,
-        fullWidth: !isRow && importedPageShouldUseFullWidth(item, importPagesFullWidth),
-        // Notion's favorite state is not available through the API. Do not
-        // invent it: selected roots become ordinary pages after staging unwrap.
-        isFavorite: false,
-        position: resolvedParent.position ?? created.pages + created.rows + 1,
-        actorId,
-        ...importedItemTimestamps(item),
-        properties: pagePropertiesWithChromeReferences(pageProperties, chrome),
-      }),
-    );
-    page = await copyImportedPageChromeFiles(fileCopyContext, page, item);
-    await createMapping(db, admin, job, mappingsByNotionId, {
-      notionId: item.notionId,
-      notionType: 'page',
-      localId: page.id,
-      localType: 'page',
-      relationKind: isRow ? 'database_row' : 'page',
-      metadata: { dataSourceId: sourceId },
-    });
-    created.mappings += 1;
-    if (isRow) created.rows += 1;
-    else created.pages += 1;
-    if (isRow && sourceId && propMap && sourceMapping?.localId) {
-      page = await copyImportedRowFileProperties(fileCopyContext, page, sourceMapping.localId, metadata.properties, propMap, item);
-    }
-    page = await preserveImportedPageTimestamps(db, page, item);
-    const insertedBlocks = await insertPageBlocksFromSnapshot(
-      db,
-      page.id,
-      item,
-      actorId,
-      mappingsByNotionId,
-      conversionReport,
-      fileCopyContext,
-      importedBlockMappingsByNotionId,
-      itemsByNotionId,
-    );
-    created.blocks += insertedBlocks.length;
-    page = await markImportedBlocksComplete(db, page);
-    // Later relation remapping writes the complete page-properties object.
-    // Register the page only after the durable completion markers are present,
-    // otherwise a row remap can overwrite them with this pre-import snapshot
-    // and make a subsequent repair incorrectly refuse its existing blocks.
-    importedPageBlockContexts.push({ page, notionId: item.notionId });
-    if (isRow && sourceId && propMap && sourceMapping?.localId) {
-      importedRowContexts.push({ page, dataSourceId: sourceId, notionId: item.notionId });
-    }
-    pagesTouchedThisRun += 1;
-    // Time-based cadence (~1s) so the UI's live feed moves like an installer
-    // even when individual pages are slow; %50 keeps a floor on huge fast runs.
-    if (pageIndex % 50 === 0 || Date.now() - lastApplyProgressWriteMs >= 1_000) {
-      lastApplyProgressWriteMs = Date.now();
-      await updateApplyProgress('apply_pages', {
-        pageIndex,
-        totalPages: pageItems.length,
-      }, {
-        kind: isRow ? 'create_row' : 'create_page',
-        title: item.title || undefined,
-        count: pageIndex,
-        total: pageItems.length,
-      });
-    }
-    if (applyPageBatchSize > 0 && pagesTouchedThisRun >= applyPageBatchSize) {
-      await updateApplyProgress('apply_pages', {
-        pageIndex,
-        totalPages: pageItems.length,
-        pageBatchSize: applyPageBatchSize,
-        pagesTouchedThisRun,
-        paused: true,
-      });
-      return {
-        job: cleanJob(currentJob),
-        applied: created,
-        mappings: Array.from(mappingsByNotionId.values()),
-        partial: true,
-      };
-    }
-  }
-  await updateApplyProgress('apply_remap', {
-    pageIndex,
-    totalPages: pageItems.length,
-  }, {
-    kind: 'remap_relations',
-    count: pageItems.length,
-  });
-
-  for (const item of pageItems) {
-    const sourceId = rowDataSourceId(item, dataSourceIds);
-    const sourceMapping = sourceId ? mappingsByNotionId.get(sourceId) : undefined;
-    if (sourceMapping?.localType === 'database') continue;
-    const pageMapping = mappingsByNotionId.get(item.notionId);
-    if (pageMapping?.localType !== 'page') continue;
-    const page = await getExisting(db.table<Page>('pages'), pageMapping.localId);
-    if (!page) continue;
-    const resolvedParent = resolveImportedPageParentFromNotionBlocks(item, mappingsByNotionId, blockOwnerContextsByNotionId);
-    const movedPage = await moveImportedPageToResolvedParent(db, page, resolvedParent);
-    if (movedPage !== page) created.repairedPageParents += 1;
-  }
-
-  await remapImportedPageBlockRichTextMentions(
-    db,
-    importedPageBlockContexts,
-    mappingsByNotionId,
-    conversionReport,
   );
-
-  const pageLinkRemap = await remapImportedPageLinkBlocks(
-    db,
-    importedPageBlockContexts,
-    mappingsByNotionId,
-    conversionReport,
-  );
-  created.remappedLinkBlocks = pageLinkRemap.updatedBlocks;
-  created.unresolvedImportReferences += pageLinkRemap.unresolvedTargets;
-
-  await remapImportedSyncedBlocks(
-    db,
-    importedPageBlockContexts,
-    importedBlockMappingsByNotionId,
-    conversionReport,
-  );
-
-  const propertyRemap = await remapImportedDatabaseProperties(
-    db,
-    importedPropertyContexts,
-    propertyMappingsByDataSource,
-    mappingsByNotionId,
-    conversionReport,
-  );
-  created.remappedProperties = propertyRemap.remapped;
-  created.unresolvedImportReferences += propertyRemap.unresolved;
-  if (propertyRemap.unresolved > 0) {
-    incrementReport(conversionReport, 'unresolvedPropertyReferences', propertyRemap.unresolved);
-    pushReportIssue(conversionReport.unresolvedReferences, {
-      code: 'property_reference_unresolved',
-      notionObject: 'property',
-      message: `${propertyRemap.unresolved} relation, rollup, or formula property reference(s) could not be mapped to local IDs.`,
-    });
-  }
-
-  const viewRelationFilterRemap = await remapImportedDatabaseViewRelationFilters(
-    db,
-    dataSourceItems,
-    propertyRecordsByDataSource,
-    mappingsByNotionId,
-    conversionReport,
-  );
-  created.remappedViewRelationFilters = viewRelationFilterRemap.updatedViews;
-  created.unresolvedImportReferences += viewRelationFilterRemap.unresolved;
-
-  for (const rowContext of importedRowContexts) {
-    const relationProps = (propertyRecordsByDataSource.get(rowContext.dataSourceId) ?? [])
-      .filter((prop) => prop.type === 'relation');
-    if (relationProps.length === 0) continue;
-    const properties = remapImportedRowRelationProperties(rowContext.page, relationProps, mappingsByNotionId);
-    if (!properties) continue;
-    await db.table<Page>('pages').update(rowContext.page.id, { properties });
-    created.remappedRowRelations += 1;
-    const unresolved = properties.__notionRelationUnresolved;
-    if (unresolved && typeof unresolved === 'object') {
-      const unresolvedCount = Object.values(unresolved as Record<string, unknown>)
-        .reduce<number>((sum, value) => sum + (Array.isArray(value) ? value.length : 0), 0);
-      created.unresolvedImportReferences += unresolvedCount;
-      if (unresolvedCount > 0) {
-        incrementReport(conversionReport, 'unresolvedRowRelationValues', unresolvedCount);
-        pushReportIssue(conversionReport.unresolvedReferences, {
-          code: 'row_relation_values_unresolved',
-          notionId: rowContext.notionId,
-          notionObject: 'page',
-          message: `${unresolvedCount} relation value(s) on "${rowContext.page.title || rowContext.notionId}" could not be mapped to local row pages.`,
-        });
-      }
-    }
-  }
-
-  const linkedDatabaseContextFilterRemap = await addImportedLinkedDatabaseRowContextFilters(
-    db,
-    importedPageBlockContexts,
-    conversionReport,
-  );
-  created.remappedLinkedDatabaseContextFilters = linkedDatabaseContextFilterRemap.updatedViews;
-
-  for (const templateContext of importedTemplateContexts) {
-    const relationProps = (propertyRecordsByDataSource.get(templateContext.dataSourceId) ?? [])
-      .filter((prop) => prop.type === 'relation');
-    const patch: Partial<DbTemplate> = {};
-    const relationRemap = relationProps.length > 0
-      ? remapImportedTemplateRelationProperties(templateContext.template, relationProps, mappingsByNotionId)
-      : { properties: undefined, unresolved: {} };
-    const properties = relationRemap.properties;
-    if (properties) {
-      patch.properties = properties;
-      templateContext.template.properties = properties;
-      created.remappedTemplateRelations += 1;
-      const unresolved = relationRemap.unresolved;
-      if (unresolved && typeof unresolved === 'object') {
-        const unresolvedCount = Object.values(unresolved as Record<string, unknown>)
-          .reduce<number>((sum, value) => sum + (Array.isArray(value) ? value.length : 0), 0);
-        created.unresolvedImportReferences += unresolvedCount;
-        if (unresolvedCount > 0) {
-          incrementReport(conversionReport, 'unresolvedTemplateRelationValues', unresolvedCount);
-          pushReportIssue(conversionReport.unresolvedReferences, {
-            code: 'template_relation_values_unresolved',
-            notionId: templateContext.notionId,
-            notionObject: 'template',
-            message: `${unresolvedCount} relation default value(s) on imported template "${templateContext.template.name || templateContext.template.id}" could not be mapped to local row pages.`,
-          });
-        }
-      }
-    }
-
-    let templateBlocks = templateContext.template.blocks;
-    const blockMentionRemap = remapImportedTemplateBlocksRichTextMentions(templateBlocks, mappingsByNotionId);
-    if (blockMentionRemap.changed) {
-      templateBlocks = blockMentionRemap.blocks;
-    }
-    reportRichTextMentionRemap(
-      conversionReport,
-      templateContext.notionId,
-      'template',
-      `template "${templateContext.template.name || templateContext.template.id}"`,
-      blockMentionRemap,
-    );
-
-    if (templateBlocks !== templateContext.template.blocks) {
-      templateContext.template.blocks = templateBlocks;
-    }
-    const linkedBlockRemap = await remapImportedTemplateLinkedDatabaseBlocks(
-      db,
-      templateContext,
-      mappingsByNotionId,
-    );
-    if (linkedBlockRemap.changed) {
-      templateBlocks = linkedBlockRemap.blocks;
-      templateContext.template.blocks = linkedBlockRemap.blocks;
-    }
-    if (templateBlocks !== templateContext.template.blocks || blockMentionRemap.changed || linkedBlockRemap.changed) {
-      patch.blocks = templateBlocks;
-    }
-
-    if (Object.keys(patch).length === 0) continue;
-    await db.table<DbTemplate>('db_templates').update(templateContext.template.id, patch);
-  }
-
-  await unwrapImportRoot(db, admin, job, mappingsByNotionId);
-  const allMappings = Array.from(mappingsByNotionId.values());
-  const finishedAt = nowIso();
-  const conversion = finalizeConversionReport(conversionReport);
-  // Apply no longer needs temporary Notion/AWS bearer URLs once every required
-  // file copy has succeeded. Scrub the staging snapshot before declaring the
-  // job complete so a completed import never becomes a credential archive.
-  await scrubAppliedImportCredentialMetadata(db, items);
-  const updated = await updateNotionJobIfStatus(db, job.id, 'ready', {
-    status: 'completed',
-    phase: 'applied',
-    progress: {
-      ...withImportProgress(currentJob.progress, {
-        key: 'apply',
-        status: 'completed',
-        legacyStep: 'applied_to_local_workspace',
-        percent: 100,
-        at: finishedAt,
-        counts: created,
-      }),
-      applied: created,
-    },
-    report: {
-      ...(currentJob.report ?? {}),
-      applied: created,
-      conversion,
-      completedAt: finishedAt,
-    },
-    options: importPagesFullWidth !== undefined
-      ? {
-          ...(currentJob.options ?? {}),
-          importPagesFullWidth,
-        }
-      : currentJob.options,
-    finishedAt,
-  });
-  if (!updated) {
-    const latest = await getExisting(jobs, job.id);
-    if (latest?.status === 'cancelled') {
-      throw new Error('Notion import job is cancelled.');
-    }
-    throw new Error('Notion import job state changed before apply completed.');
-  }
-
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: 'notion_import.apply',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: created,
-    occurredAt: finishedAt,
-  });
-
-  // Imported pages/databases are page rows; write their routing index rows
-  // synchronously so pageId-only entry points resolve the moment apply
-  // returns (the async DB trigger remains the safety net).
-  await ensureImportedPageWorkspaceIndexes(admin, allMappings, job.workspaceId);
-
-  return {
-    job: cleanJob(updated),
-    applied: created,
-    mappings: allMappings,
-  };
 }
 
 async function preflightJob(

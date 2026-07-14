@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "node src/index.mjs",
-    "check": "node --check src/index.mjs && node --check src/edgebase.mjs && node --check src/legacy-product-compat.mjs && node --check scripts/smoke.mjs && node --check scripts/tool-invocation-smoke.mjs",
+    "check": "node --check src/index.mjs && node --check src/edgebase.mjs && node --check src/legacy-product-compat.mjs && node --check src/formula-runtime.mjs && node --check src/database-query-runtime.mjs && node --check src/notion-tool-dsl.mjs && node --check src/tool-registry-foundation.mjs && node --check src/tool-registry-database.mjs && node --check src/tool-registry-notion.mjs && node --check scripts/smoke.mjs && node --check scripts/tool-invocation-smoke.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "node --test tests/*.test.mjs",
