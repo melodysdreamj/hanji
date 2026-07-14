@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Tarkista, että linkissä ei ole puuttuvia tai virheellisiä merkkejä, ja yritä uudelleen.",
+  "invalidTitle": "Osoite on puutteellinen.",
+  "notFoundBody": "Osoitetta vastaavaa Hanji-sivua ei löydy. Sivu on saatettu siirtää tai se on poistettu.",
+  "notFoundTitle": "Sivua ei löydy.",
+  "openHome": "Avaa Hanjin kotisivu",
+  "sharedBody": "Tarkista, että koko jaettu linkki on kopioitu oikein, ja yritä uudelleen.",
+  "sharedTitle": "Jaettu linkki on virheellinen."
+}

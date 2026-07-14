@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "အရေအတွက်",
+    "sum": "စုစုပေါင်း",
+    "average": "ပျမ်းမျှ",
+    "min": "အနည်းဆုံး",
+    "max": "အများဆုံး"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} ဇယား",
+  "chartType": "ဇယားအမျိုးအစား",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "ဘားဇယား",
+    "horizontal_bar": "အလျားလိုက်ဘား",
+    "line": "မျဉ်းဇယား",
+    "donut": "ဒိုးနပ်"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "ခြစ်ထား",
+  "empty": "ဗလာ",
+  "legend": "ဇယားရှင်းလင်းချက်",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "ဒေတာမရှိ",
+  "noDataDesc": "စစ်ထုတ်ချက်များ သို့မဟုတ် ရှာဖွေမှုနှင့် ကိုက်ညီသော အတန်းများ မရှိပါ။",
+  "noGroupProperty": "ဇယားဆွဲရန် ဂုဏ်သတ္တိ မရှိသေး",
+  "noGroupPropertyDesc": "ဤဇယားအုပ်စုဖွဲ့ရန် ရွေးချယ်မှု၊ အခြေအနေ၊ လူ၊ အမှတ်ခြစ် (သို့) ရက်စွဲ ဂုဏ်သတ္တိ ထည့်ပါ။",
+  "total": "စုစုပေါင်း",
+  "unchecked": "ခြစ်မထား",
+  "untitledProperty": "ခေါင်းစဉ်မဲ့",
+  "valueProperty": "တန်ဖိုး အင်္ဂါရပ်",
+  "xAxis": "X-ဝင်ရိုး",
+  "yAxis": "Y-ဝင်ရိုး"
 }

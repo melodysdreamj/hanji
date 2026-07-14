@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "ข้อความ",
+      "description": "เริ่มเขียนด้วยข้อความธรรมดา",
+      "placeholder": "พิมพ์ '/' สำหรับคำสั่ง"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "หน้า",
+      "description": "สร้างหน้าย่อยภายในหน้านี้"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "ลิงก์ไปยังหน้า",
+      "description": "ลิงก์ไปยังหน้าที่มีอยู่."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "หัวข้อ 1",
+      "description": "หัวข้อส่วนขนาดใหญ่.",
+      "placeholder": "หัวข้อ 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "สลับหัวข้อ 1",
+      "description": "หัวข้อใหญ่ที่สามารถซ่อนเนื้อหาภายในได้",
+      "placeholder": "สลับหัวข้อ 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "หัวข้อ 2",
+      "description": "หัวข้อส่วนขนาดกลาง.",
+      "placeholder": "หัวข้อ 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "สลับหัวข้อ 2",
+      "description": "หัวข้อขนาดกลางที่ซ่อนเนื้อหาซ้อนกันได้",
+      "placeholder": "สลับหัวข้อ 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "หัวข้อ 3",
+      "description": "หัวข้อส่วนขนาดเล็ก.",
+      "placeholder": "หัวข้อ 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "สลับหัวข้อ 3",
+      "description": "หัวข้อขนาดเล็กที่ซ่อนเนื้อหาซ้อนกันได้",
+      "placeholder": "สลับหัวข้อ 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "หัวข้อ 4",
+      "description": "หัวข้อส่วนขนาดกะทัดรัด.",
+      "placeholder": "หัวข้อ 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "สลับหัวข้อ 4",
+      "description": "หัวข้อขนาดเล็กที่ซ่อนเนื้อหาที่ซ้อนกันได้",
+      "placeholder": "สลับหัวข้อ 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "รายการสิ่งที่ต้องทำ",
+      "description": "ติดตามงานด้วยกล่องกาเครื่องหมาย",
+      "placeholder": "สิ่งที่ต้องทำ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "รายการสัญลักษณ์",
+      "description": "สร้างรายการสัญลักษณ์",
+      "placeholder": "รายการ"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "รายการแบบมีเลข",
+      "description": "สร้างรายการแบบมีเลขลำดับ",
+      "placeholder": "รายการ"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "รายการสลับ",
+      "description": "สลับสามารถซ่อนและแสดงเนื้อหาได้",
+      "placeholder": "สลับ"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "คำพูด",
+      "description": "บันทึกคำพูด",
+      "placeholder": "คำพูดว่าง"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "คอลเอาต์",
+      "description": "ทำให้ข้อความโดดเด่น",
+      "placeholder": "พิมพ์บางอย่าง…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "เส้นแบ่ง",
+      "description": "แบ่งบล็อกด้วยเส้นแบ่ง"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "โค้ด",
+      "description": "เก็บโค้ดสั้นๆ",
+      "placeholder": "เขียนโค้ด หรือวางโค้ดสั้นๆ…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "สมการ",
+      "description": "แสดงสมการคณิตศาสตร์"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "สารบัญ",
+      "description": "แสดงลิงก์ไปยังหัวข้อในหน้านี้"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "บล็อกที่ซิงค์",
+      "description": "ใช้เนื้อหาซ้ำในหลายหน้า"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ปุ่ม",
+      "description": "แทรกเนื้อหาที่ใช้ซ้ำได้ด้วยคลิกเดียว"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "แท็บ",
+      "description": "จัดกลุ่มเนื้อหาในแท็บที่มีชื่อ",
+      "placeholder": "แท็บ"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "เบรดครัมบ์",
+      "description": "แสดงตำแหน่งของหน้านี้"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ทำซ้ำ",
+      "description": "สร้างสำเนาที่ตรงกันของบล็อกนี้"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ย้ายไป",
+      "description": "ย้ายบล็อกนี้ไปหน้าอื่น"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ลบบล็อกนี้"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "เปลี่ยนเป็น",
+      "description": "เปลี่ยนประเภทของบล็อกนี้"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "สี",
+      "description": "เปลี่ยนสีข้อความหรือสีพื้นหลังของบล็อกนี้"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "ตาราง",
+      "description": "เพิ่มตารางอย่างง่ายในหน้านี้"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 คอลัมน์",
+      "description": "วางบล็อกเคียงข้างกัน"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 คอลัมน์",
+      "description": "จัดเรียงบล็อกเป็นสามคอลัมน์"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 คอลัมน์",
+      "description": "จัดเรียงบล็อกเป็นสี่คอลัมน์"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 คอลัมน์",
+      "description": "จัดเรียงบล็อกเป็นห้าคอลัมน์"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "รูปภาพ",
+      "description": "อัปโหลดหรือฝังด้วยลิงก์."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "วิดีโอ",
+      "description": "ฝังวิดีโอด้วยลิงก์"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "เสียง",
+      "description": "ฝังเสียงผ่านลิงก์"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "บุ๊กมาร์กเว็บ",
+      "description": "บันทึกลิงก์เว็บเป็นการ์ด"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ฝัง",
+      "description": "ฝังเนื้อหาจากลิงก์"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ไฟล์",
+      "description": "แนบลิงก์ไฟล์ไปยังหน้านี้"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ฐานข้อมูล - หน้าเต็ม",
+      "description": "เพิ่มฐานข้อมูลใหม่เป็นหน้าย่อย"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "ตาราง - เต็มหน้า",
+      "description": "เพิ่มฐานข้อมูลแบบเต็มหน้าเป็นตาราง"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "บอร์ด - เต็มหน้า",
+      "description": "เพิ่มบอร์ดคัมบังแบบเต็มหน้า"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "รายการ - เต็มหน้า",
+      "description": "เพิ่มฐานข้อมูลแบบเต็มหน้าเป็นรายการ"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "ไทม์ไลน์ - เต็มหน้า",
+      "description": "เพิ่มไทม์ไลน์ฐานข้อมูลแบบเต็มหน้า"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "ปฏิทิน - เต็มหน้า",
+      "description": "เพิ่มฐานข้อมูลปฏิทินแบบเต็มหน้า"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "แกลเลอรี - เต็มหน้า",
+      "description": "เพิ่มแกลเลอรีฐานข้อมูลแบบเต็มหน้า"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ฐานข้อมูล - อินไลน์",
+      "description": "เพิ่มฐานข้อมูลภายในหน้านี้."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "มุมมองตาราง",
+      "description": "เพิ่มฐานข้อมูลแบบอินไลน์เป็นตาราง."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "มุมมองบอร์ด",
+      "description": "เพิ่มบอร์ดคัมบังแบบอินไลน์."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "มุมมองรายการ",
+      "description": "เพิ่มฐานข้อมูลแบบอินไลน์เป็นรายการ."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "มุมมองไทม์ไลน์",
+      "description": "เพิ่มไทม์ไลน์ฐานข้อมูลแบบอินไลน์."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "มุมมองปฏิทิน",
+      "description": "เพิ่มฐานข้อมูลปฏิทินแบบอินไลน์."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "มุมมองแกลเลอรี",
+      "description": "เพิ่มแกลเลอรีฐานข้อมูลแบบอินไลน์."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "ค่าเริ่มต้น",
+      "description": "ลบสีข้อความหรือสีพื้นหลังของบล็อกนี้"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "สีเทา",
+      "description": "ใช้สีเทากับบล็อกนี้"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "สีน้ำตาล",
+      "description": "ใช้สีน้ำตาลกับบล็อกนี้"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "สีส้ม",
+      "description": "ใช้สีส้มกับบล็อกนี้"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "สีเหลือง",
+      "description": "ใช้สีเหลืองกับบล็อกนี้"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "สีเขียว",
+      "description": "ใช้สีเขียวกับบล็อกนี้"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "สีฟ้า",
+      "description": "ใช้สีฟ้ากับบล็อกนี้"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "สีม่วง",
+      "description": "ใช้สีม่วงกับบล็อกนี้"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "สีชมพู",
+      "description": "ใช้สีชมพูกับบล็อกนี้"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "สีแดง",
+      "description": "ใช้สีแดงกับบล็อกนี้"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "พื้นหลังสีเทา",
+      "description": "ใช้พื้นหลังสีเทากับบล็อกนี้"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "พื้นหลังสีน้ำตาล",
+      "description": "ใช้พื้นหลังสีน้ำตาลกับบล็อกนี้"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "พื้นหลังสีส้ม",
+      "description": "ใช้พื้นหลังสีส้มกับบล็อกนี้"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "พื้นหลังสีเหลือง",
+      "description": "ใช้พื้นหลังสีเหลืองกับบล็อกนี้"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "พื้นหลังสีเขียว",
+      "description": "ใช้พื้นหลังสีเขียวกับบล็อกนี้"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "พื้นหลังสีฟ้า",
+      "description": "ใช้พื้นหลังสีฟ้ากับบล็อกนี้"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "พื้นหลังสีม่วง",
+      "description": "ใช้พื้นหลังสีม่วงกับบล็อกนี้"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "พื้นหลังสีชมพู",
+      "description": "ใช้พื้นหลังสีชมพูกับบล็อกนี้"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "พื้นหลังสีแดง",
+      "description": "ใช้พื้นหลังสีแดงกับบล็อกนี้"
     }
   }
 }

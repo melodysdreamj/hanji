@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Laai verwantskapsitems",
+  "relationUnavailable": "Verwantskapsitems onbeskikbaar",
+  "unavailable": "Onbeskikbaar",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Gemerk",
+    "unchecked": "Ongemerk"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Maak {{title}} oop",
+  "openOrDownloadFile": "Maak oop of laai {{name}} af"
 }

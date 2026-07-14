@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "إغلاق منتقي الأيقونات",
+    "label": "اختيار أيقونة"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "نوع الأيقونة",
+    "emoji": "إيموجي",
+    "image": "صورة"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "إزالة",
+    "ariaLabel": "إزالة الرمز"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "تصفية…",
+    "searchLabel": "بحث الرموز",
+    "random": "عشوائي",
+    "randomLabel": "اختيار أيقونة عشوائية",
+    "recentLabel": "المستخدمة مؤخرًا أولاً",
+    "gridLabelRecent": "أيقونات، الأحدث أولاً",
+    "gridLabel": "أيقونات",
+    "optionLabel": "اختيار أيقونة {{emoji}}",
+    "noResults": "لا توجد أيقونات تطابق “{{query}}”. جرب كلمة مختلفة أو امسح الفلتر."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "صورة",
+    "linkPlaceholder": "لصق رابط الأيقونة",
+    "linkLabel": "رابط صورة أيقونة",
+    "apply": "تطبيق",
+    "upload": "رفع ملف",
+    "uploading": "جارٍ الرفع...",
+    "uploadingLabel": "جارٍ رفع {{fileName}}",
+    "uploadFailed": "تعذر رفع الصورة.",
+    "fallbackFileName": "صورة أيقونة"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "تحضير الرفع",
+    "finalizing": "جارٍ الإنهاء",
+    "complete": "تم",
+    "uploading": "جارٍ الرفع"
   }
 }

@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Shafin da aka raba",
+  "loading": "Ana loda shafin da aka raba",
+  "unavailable": "Wannan shafin da aka raba baya samuwa.",
+  "notFound": "Ba a sami shafin da aka raba ba.",
+  "outsideShare": "Shafin baya cikin wannan rabon jama'a.",
+  "errors": {
+    "not-found": "Wannan hanyar haɗin yanar gizo na iya ƙarewa, an soke bugawa, ko an kwafe ta kuskure.",
+    "offline": "Bincika haɗin yanar gizonku, sannan sake buɗe shafin da aka raba.",
+    "rate-limited": "Wannan shafin da aka raba yana karɓar buƙatu da yawa. Jira ɗan lokaci sannan a sake gwadawa.",
+    "unavailable": "Hanji ba zai iya buɗe wannan shafin da aka raba a yanzu ba. A sake gwadawa bayan ɗan lokaci."
+  },
+  "tryAgain": "Sake gwadawa"
 }

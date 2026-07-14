@@ -2,16 +2,16 @@
   "defs": {
     "paragraph": {
       "label": "Texte",
-      "description": "Commencez simplement à écrire avec du texte brut.",
-      "placeholder": "Saisissez '/' pour les commandes"
+      "description": "Commencez à écrire en texte brut.",
+      "placeholder": "Tapez '/' pour les commandes"
     },
     "child_page": {
       "label": "Page",
-      "description": "Créer une sous-page à l'intérieur de cette page."
+      "description": "Créer une sous-page dans cette page."
     },
     "link_to_page": {
       "label": "Lien vers la page",
-      "description": "Lien vers une page existante."
+      "description": "Créez un lien vers une page existante."
     },
     "heading_1": {
       "label": "Titre 1",
@@ -19,44 +19,44 @@
       "placeholder": "Titre 1"
     },
     "toggle_heading_1": {
-      "label": "Titre dépliable 1",
+      "label": "Titre 1 à bascule",
       "description": "Grand titre pouvant masquer le contenu imbriqué.",
-      "placeholder": "Titre dépliable 1"
+      "placeholder": "Titre 1 à bascule"
     },
     "heading_2": {
       "label": "Titre 2",
-      "description": "Titre de section moyen.",
+      "description": "Titre de section moyenne.",
       "placeholder": "Titre 2"
     },
     "toggle_heading_2": {
-      "label": "Titre dépliable 2",
-      "description": "Titre moyen pouvant masquer le contenu imbriqué.",
-      "placeholder": "Titre dépliable 2"
+      "label": "Titre 2 à bascule",
+      "description": "Titre de taille moyenne pouvant masquer le contenu imbriqué.",
+      "placeholder": "Titre 2 à bascule"
     },
     "heading_3": {
       "label": "Titre 3",
-      "description": "Titre de section petit.",
+      "description": "Titre de petite section.",
       "placeholder": "Titre 3"
     },
     "toggle_heading_3": {
-      "label": "Titre dépliable 3",
-      "description": "Petit titre pouvant masquer du contenu imbriqué.",
-      "placeholder": "Titre dépliable 3"
+      "label": "Titre 3 à bascule",
+      "description": "Petit titre pouvant masquer le contenu imbriqué.",
+      "placeholder": "Titre 3 à bascule"
     },
     "heading_4": {
       "label": "Titre 4",
-      "description": "Titre de section compact.",
+      "description": "Titre de section compacte.",
       "placeholder": "Titre 4"
     },
     "toggle_heading_4": {
-      "label": "Titre dépliable 4",
-      "description": "Titre compact pouvant masquer du contenu imbriqué.",
-      "placeholder": "Titre dépliable 4"
+      "label": "Titre 4 à bascule",
+      "description": "Titre compact pouvant masquer le contenu imbriqué.",
+      "placeholder": "Titre 4 à bascule"
     },
     "to_do": {
       "label": "Liste de tâches",
-      "description": "Suivre des tâches avec une case à cocher.",
-      "placeholder": "Tâche"
+      "description": "Suivre les tâches avec une case à cocher.",
+      "placeholder": "À faire"
     },
     "bulleted_list_item": {
       "label": "Liste à puces",
@@ -65,32 +65,32 @@
     },
     "numbered_list_item": {
       "label": "Liste numérotée",
-      "description": "Créer une liste avec numérotation.",
+      "description": "Créez une liste numérotée.",
       "placeholder": "Liste"
     },
     "toggle": {
-      "label": "Liste dépliable",
-      "description": "Les blocs dépliables peuvent masquer et afficher du contenu.",
-      "placeholder": "Dépliable"
+      "label": "Liste à bascule",
+      "description": "Permet d'afficher ou masquer du contenu.",
+      "placeholder": "Bascule"
     },
     "quote": {
       "label": "Citation",
-      "description": "Capturer une citation.",
+      "description": "Capturez une citation.",
       "placeholder": "Citation vide"
     },
     "callout": {
       "label": "Encadré",
-      "description": "Mettre en valeur un texte.",
-      "placeholder": "Saisissez quelque chose…"
+      "description": "Faire ressortir le texte.",
+      "placeholder": "Tapez quelque chose…"
     },
     "divider": {
       "label": "Séparateur",
-      "description": "Séparer visuellement les blocs."
+      "description": "Diviser visuellement les blocs."
     },
     "code": {
       "label": "Code",
       "description": "Capturer un extrait de code.",
-      "placeholder": "Écrivez du code, ou collez un extrait…"
+      "placeholder": "Écrire du code ou coller un extrait…"
     },
     "equation": {
       "label": "Équation",
@@ -98,11 +98,11 @@
     },
     "table_of_contents": {
       "label": "Table des matières",
-      "description": "Afficher des liens vers les titres de cette page."
+      "description": "Afficher les liens vers les titres de cette page."
     },
     "synced_block": {
       "label": "Bloc synchronisé",
-      "description": "Réutiliser du contenu entre plusieurs pages."
+      "description": "Réutilisez du contenu entre les pages."
     },
     "button": {
       "label": "Bouton",
@@ -110,12 +110,12 @@
     },
     "tab": {
       "label": "Onglets",
-      "description": "Regrouper du contenu dans des onglets étiquetés.",
+      "description": "Regroupez le contenu dans des onglets étiquetés.",
       "placeholder": "Onglets"
     },
     "breadcrumb": {
       "label": "Fil d'Ariane",
-      "description": "Indiquer où se trouve cette page."
+      "description": "Afficher où se trouve cette page."
     },
     "action_duplicate": {
       "label": "Dupliquer",
@@ -129,116 +129,116 @@
       "description": "Supprimer ce bloc."
     },
     "action_turn_into": {
-      "label": "Convertir en",
+      "label": "Transformer en",
       "description": "Changer le type de ce bloc."
     },
     "action_color": {
       "label": "Couleur",
-      "description": "Changer la couleur du texte ou de l'arrière-plan de ce bloc."
+      "description": "Modifier la couleur du texte ou de l'arrière-plan de ce bloc."
     },
     "simple_table": {
       "label": "Tableau",
-      "description": "Ajouter un tableau simple à cette page."
+      "description": "Ajoutez un tableau simple à cette page."
     },
     "column_list_2": {
       "label": "2 colonnes",
-      "description": "Placer des blocs côte à côte."
+      "description": "Placer les blocs côte à côte."
     },
     "column_list_3": {
       "label": "3 colonnes",
-      "description": "Disposer des blocs en trois colonnes."
+      "description": "Disposer les blocs en trois colonnes."
     },
     "column_list_4": {
       "label": "4 colonnes",
-      "description": "Disposer des blocs en quatre colonnes."
+      "description": "Disposer les blocs en quatre colonnes."
     },
     "column_list_5": {
       "label": "5 colonnes",
-      "description": "Disposer des blocs en cinq colonnes."
+      "description": "Disposer les blocs en cinq colonnes."
     },
     "image": {
       "label": "Image",
-      "description": "Télécharger ou intégrer avec un lien."
+      "description": "Téléchargez ou intégrez avec un lien."
     },
     "video": {
       "label": "Vidéo",
-      "description": "Intégrer une vidéo avec un lien."
+      "description": "Intégrer une vidéo par lien."
     },
     "audio": {
       "label": "Audio",
-      "description": "Intégrer de l'audio avec un lien."
+      "description": "Intégrer un fichier audio avec un lien."
     },
     "bookmark": {
-      "label": "Signet web",
+      "label": "Favori web",
       "description": "Enregistrer un lien web sous forme de carte."
     },
     "embed": {
-      "label": "Intégration",
-      "description": "Intégrer du contenu à partir d'un lien."
+      "label": "Intégrer",
+      "description": "Intégrer le contenu d'un lien."
     },
     "file": {
       "label": "Fichier",
-      "description": "Joindre un lien de fichier à cette page."
+      "description": "Attacher un lien de fichier à cette page."
     },
     "child_database": {
       "label": "Base de données - Page entière",
-      "description": "Ajouter une nouvelle base de données en tant que sous-page."
+      "description": "Ajouter une nouvelle base de données comme sous-page."
     },
     "child_database_table": {
-      "label": "Tableau - Page entière",
-      "description": "Ajouter une base de données en page entière sous forme de tableau."
+      "label": "Tableau - Pleine page",
+      "description": "Ajouter une base de données sous forme de tableau pleine page."
     },
     "child_database_board": {
-      "label": "Tableau kanban - Page entière",
-      "description": "Ajouter un tableau kanban en page entière."
+      "label": "Tableau - Pleine page",
+      "description": "Ajouter un tableau Kanban pleine page."
     },
     "child_database_list": {
-      "label": "Liste - Page entière",
-      "description": "Ajouter une base de données en page entière sous forme de liste."
+      "label": "Liste - Pleine page",
+      "description": "Ajouter une base de données sous forme de liste pleine page."
     },
     "child_database_timeline": {
-      "label": "Chronologie - Page entière",
-      "description": "Ajouter une chronologie de base de données en page entière."
+      "label": "Chronologie - Pleine page",
+      "description": "Ajouter une chronologie de base de données pleine page."
     },
     "child_database_calendar": {
-      "label": "Calendrier - Page entière",
-      "description": "Ajouter une base de données calendrier en page entière."
+      "label": "Calendrier - Pleine page",
+      "description": "Ajouter une base de données calendrier pleine page."
     },
     "child_database_gallery": {
-      "label": "Galerie - Page entière",
-      "description": "Ajouter une galerie de base de données en page entière."
+      "label": "Galerie - Pleine page",
+      "description": "Ajouter une galerie de base de données pleine page."
     },
     "inline_database": {
-      "label": "Base de données - Intégrée",
-      "description": "Ajouter une base de données à l'intérieur de cette page."
+      "label": "Base de données - En ligne",
+      "description": "Ajoutez une base de données dans cette page."
     },
     "inline_database_table": {
-      "label": "Vue tableau",
-      "description": "Ajouter une base de données intégrée sous forme de tableau."
+      "label": "Vue Tableau",
+      "description": "Ajoutez une base de données sous forme de tableau en ligne."
     },
     "inline_database_board": {
-      "label": "Vue tableau kanban",
-      "description": "Ajouter un tableau kanban intégré."
+      "label": "Vue Board",
+      "description": "Ajoutez un tableau kanban en ligne."
     },
     "inline_database_list": {
-      "label": "Vue liste",
-      "description": "Ajouter une base de données intégrée sous forme de liste."
+      "label": "Vue Liste",
+      "description": "Ajoutez une base de données sous forme de liste en ligne."
     },
     "inline_database_timeline": {
-      "label": "Vue chronologie",
-      "description": "Ajouter une chronologie de base de données intégrée."
+      "label": "Vue Chronologie",
+      "description": "Ajoutez une chronologie de base de données en ligne."
     },
     "inline_database_calendar": {
-      "label": "Vue calendrier",
-      "description": "Ajouter une base de données calendrier intégrée."
+      "label": "Vue Calendrier",
+      "description": "Ajoutez une base de données calendrier en ligne."
     },
     "inline_database_gallery": {
-      "label": "Vue galerie",
-      "description": "Ajouter une galerie de base de données intégrée."
+      "label": "Vue Galerie",
+      "description": "Ajoutez une galerie de base de données en ligne."
     },
     "color_default": {
-      "label": "Par défaut",
-      "description": "Retirer la couleur du texte ou de l'arrière-plan de ce bloc."
+      "label": "Défaut",
+      "description": "Supprimer la couleur du texte ou du fond de ce bloc."
     },
     "color_gray": {
       "label": "Gris",
@@ -246,11 +246,11 @@
     },
     "color_brown": {
       "label": "Marron",
-      "description": "Appliquer du marron à ce bloc."
+      "description": "Appliquer le marron à ce bloc."
     },
     "color_orange": {
       "label": "Orange",
-      "description": "Appliquer du orange à ce bloc."
+      "description": "Appliquer l'orange à ce bloc."
     },
     "color_yellow": {
       "label": "Jaune",
@@ -258,11 +258,11 @@
     },
     "color_green": {
       "label": "Vert",
-      "description": "Appliquer du vert à ce bloc."
+      "description": "Appliquer le vert à ce bloc."
     },
     "color_blue": {
       "label": "Bleu",
-      "description": "Appliquer du bleu à ce bloc."
+      "description": "Appliquer le bleu à ce bloc."
     },
     "color_purple": {
       "label": "Violet",
@@ -277,40 +277,40 @@
       "description": "Appliquer du rouge à ce bloc."
     },
     "color_gray_background": {
-      "label": "Arrière-plan gris",
-      "description": "Appliquer un arrière-plan gris à ce bloc."
+      "label": "Fond gris",
+      "description": "Appliquer un fond gris à ce bloc."
     },
     "color_brown_background": {
-      "label": "Arrière-plan marron",
-      "description": "Appliquer un arrière-plan marron à ce bloc."
+      "label": "Fond marron",
+      "description": "Appliquer un fond marron à ce bloc."
     },
     "color_orange_background": {
       "label": "Arrière-plan orange",
-      "description": "Appliquer un arrière-plan orange à ce bloc."
+      "description": "Appliquer l'arrière-plan orange à ce bloc."
     },
     "color_yellow_background": {
-      "label": "Arrière-plan jaune",
-      "description": "Appliquer un arrière-plan jaune à ce bloc."
+      "label": "Fond jaune",
+      "description": "Appliquer un fond jaune à ce bloc."
     },
     "color_green_background": {
-      "label": "Arrière-plan vert",
-      "description": "Appliquer un arrière-plan vert à ce bloc."
+      "label": "Fond vert",
+      "description": "Appliquer un fond vert à ce bloc."
     },
     "color_blue_background": {
-      "label": "Arrière-plan bleu",
-      "description": "Appliquer un arrière-plan bleu à ce bloc."
+      "label": "Fond bleu",
+      "description": "Appliquer un fond bleu à ce bloc."
     },
     "color_purple_background": {
-      "label": "Arrière-plan violet",
-      "description": "Appliquer un arrière-plan violet à ce bloc."
+      "label": "Fond violet",
+      "description": "Appliquer un fond violet à ce bloc."
     },
     "color_pink_background": {
-      "label": "Arrière-plan rose",
-      "description": "Appliquer un arrière-plan rose à ce bloc."
+      "label": "Fond rose",
+      "description": "Appliquer l'arrière-plan rose à ce bloc."
     },
     "color_red_background": {
-      "label": "Arrière-plan rouge",
-      "description": "Appliquer un arrière-plan rouge à ce bloc."
+      "label": "Fond rouge",
+      "description": "Appliquer un fond rouge à ce bloc."
     }
   }
 }

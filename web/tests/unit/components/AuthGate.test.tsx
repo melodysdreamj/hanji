@@ -1,13 +1,17 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const authState = vi.hoisted(() => ({
   currentUserId: "user-1",
+  isAnonymous: false,
+  sessionUserIdHint: undefined as string | undefined,
   listener: undefined as ((userId: string) => void) | undefined,
   unsubscribe: vi.fn(),
   fetchSponsorsRemote: vi.fn<() => Promise<{ sponsors: Array<{ name: string; url: string | null }>; disabled: boolean }>>(),
   fetchInstanceBootstrapRemote: vi.fn(),
+  fetchAccountLanguageStateRemote: vi.fn(),
+  saveAccountLanguagePreferenceRemote: vi.fn(),
   initializeInstanceRemote: vi.fn(),
   signInWithPasswordRemote: vi.fn(),
   restoreAuthSessionRemote: vi.fn<() => Promise<string>>(),
@@ -23,7 +27,10 @@ vi.mock("@/lib/edgebase", () => ({
   changePasswordRemote: vi.fn(async () => undefined),
   clearMustChangePasswordRemote: vi.fn(async () => undefined),
   completeOAuthCallbackRemote: vi.fn(async () => ""),
+  currentSessionUserIdHint: vi.fn(() => authState.sessionUserIdHint ?? authState.currentUserId),
   currentUserId: vi.fn(() => authState.currentUserId),
+  currentUserIsAnonymous: vi.fn(() => authState.isAnonymous),
+  fetchAccountLanguageStateRemote: authState.fetchAccountLanguageStateRemote,
   fetchInstanceBootstrapRemote: authState.fetchInstanceBootstrapRemote,
   fetchMustChangePasswordRemote: vi.fn(async () => false),
   fetchSponsorsRemote: authState.fetchSponsorsRemote,
@@ -49,6 +56,7 @@ vi.mock("@/lib/edgebase", () => ({
   requestPasswordResetRemote: authState.requestPasswordResetRemote,
   resetPasswordRemote: authState.resetPasswordRemote,
   restoreAuthSessionRemote: authState.restoreAuthSessionRemote,
+  saveAccountLanguagePreferenceRemote: authState.saveAccountLanguagePreferenceRemote,
   signInWithPasswordRemote: authState.signInWithPasswordRemote,
   signUpWithPasswordRemote: vi.fn(),
   signInAnonymouslyForBootstrap: vi.fn(),
@@ -66,6 +74,7 @@ vi.mock("@/lib/edgebase", () => ({
 }));
 
 import { AuthGate, authErrorMessage } from "@/components/AuthGate";
+import { i18next } from "@/i18n";
 import { fetchRuntimeConfigRemote, subscribeAuthStateRemote } from "@/lib/edgebase";
 
 const subscribeAuthStateRemoteMock = vi.mocked(subscribeAuthStateRemote);
@@ -74,13 +83,28 @@ const fetchRuntimeConfigRemoteMock = vi.mocked(fetchRuntimeConfigRemote);
 beforeEach(() => {
   window.history.replaceState(null, "", "/");
   window.localStorage.clear();
+  window.sessionStorage.clear();
   authState.currentUserId = "user-1";
+  authState.isAnonymous = false;
+  authState.sessionUserIdHint = undefined;
   authState.listener = undefined;
   authState.unsubscribe.mockReset();
   authState.fetchSponsorsRemote.mockReset();
   authState.fetchSponsorsRemote.mockResolvedValue({ sponsors: [], disabled: false });
   authState.fetchInstanceBootstrapRemote.mockReset();
   authState.fetchInstanceBootstrapRemote.mockResolvedValue(null);
+  authState.fetchAccountLanguageStateRemote.mockReset();
+  authState.fetchAccountLanguageStateRemote.mockResolvedValue({
+    languagePreference: "en",
+    languageOnboardingCompleted: true,
+  });
+  authState.saveAccountLanguagePreferenceRemote.mockReset();
+  authState.saveAccountLanguagePreferenceRemote.mockResolvedValue({
+    languagePreference: "en",
+    languageOnboardingCompleted: true,
+  });
+  window.localStorage.setItem("hanji:language:user-1", "en");
+  window.localStorage.setItem("hanji:language:cached-user", "en");
   authState.initializeInstanceRemote.mockReset();
   authState.initializeInstanceRemote.mockResolvedValue(undefined);
   authState.signInWithPasswordRemote.mockReset();
@@ -116,7 +140,67 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("AuthGate auth-state subscription", () => {
-  it("offers setup-code-protected first-run administrator creation", async () => {
+  it("asks an authenticated unconfigured account once and recommends the browser language first", async () => {
+    window.localStorage.removeItem("hanji:language:user-1");
+    authState.fetchAccountLanguageStateRemote.mockResolvedValue({
+      languagePreference: null,
+      languageOnboardingCompleted: false,
+    });
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(await screen.findByTestId("language-onboarding")).toBeTruthy();
+    expect(screen.queryByTestId("private-workspace")).toBeNull();
+    const selector = screen.getByLabelText("Language") as HTMLSelectElement;
+    expect(selector.value).toBe("en");
+    expect(selector.options[0]?.value).toBe("en");
+    expect(selector.options[0]?.textContent).toContain("Recommended");
+
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+
+    await waitFor(() => {
+      expect(authState.saveAccountLanguagePreferenceRemote).toHaveBeenCalledWith("en");
+      expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    });
+    expect(window.localStorage.getItem("hanji:language:user-1")).toBe("en");
+  });
+
+  it("does not show language onboarding to anonymous authenticated sessions", async () => {
+    authState.isAnonymous = true;
+    window.localStorage.clear();
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(await screen.findByTestId("private-workspace")).toBeTruthy();
+    expect(screen.queryByTestId("language-onboarding")).toBeNull();
+    expect(authState.fetchAccountLanguageStateRemote).not.toHaveBeenCalled();
+  });
+
+  it("does not show or fetch account language onboarding on a public share", async () => {
+    window.history.replaceState(null, "", "/share/public-token");
+    authState.currentUserId = "";
+    window.localStorage.clear();
+
+    render(
+      <AuthGate>
+        <div data-testid="public-share">Public share</div>
+      </AuthGate>,
+    );
+
+    expect(screen.getByTestId("public-share")).toBeTruthy();
+    expect(screen.queryByTestId("language-onboarding")).toBeNull();
+    expect(authState.fetchAccountLanguageStateRemote).not.toHaveBeenCalled();
+  });
+
+  it("offers browser-only first-run administrator creation", async () => {
     authState.currentUserId = "";
     authState.restoreAuthSessionRemote.mockResolvedValue("");
     authState.fetchInstanceBootstrapRemote.mockResolvedValue({
@@ -124,7 +208,6 @@ describe("AuthGate auth-state subscription", () => {
       masterReady: false,
       setupBlocked: false,
       setupAvailable: true,
-      setupCodeRequired: true,
       setupInProgress: false,
     });
 
@@ -136,9 +219,7 @@ describe("AuthGate auth-state subscription", () => {
 
     expect(await screen.findByTestId("instance-setup")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Create account" })).toBeNull();
-    fireEvent.change(screen.getByLabelText("Setup code"), {
-      target: { value: "0123456789abcdef0123456789abcdef" },
-    });
+    expect(screen.queryByLabelText("Setup code")).toBeNull();
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Owner" } });
     fireEvent.change(screen.getByLabelText("Administrator email"), {
       target: { value: "Owner@Example.com" },
@@ -153,15 +234,86 @@ describe("AuthGate auth-state subscription", () => {
 
     await screen.findByTestId("private-workspace");
     expect(authState.initializeInstanceRemote).toHaveBeenCalledWith({
-      setupCode: "0123456789abcdef0123456789abcdef",
       email: "owner@example.com",
       password: "Hanji-Owner!2026",
       displayName: "Owner",
-    });
+    }, undefined);
     expect(authState.signInWithPasswordRemote).toHaveBeenCalledWith(
       "owner@example.com",
       "Hanji-Owner!2026",
     );
+  });
+
+  it("consumes a private hosted setup fragment without retaining it in browser history", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockResolvedValue("");
+    window.history.replaceState(null, "", "/#setup_token=private-hosted-token&state=keep");
+    authState.fetchInstanceBootstrapRemote.mockImplementation(async (setupToken?: string) => ({
+      masterConfigured: false,
+      masterReady: false,
+      setupBlocked: false,
+      setupAvailable: setupToken === "private-hosted-token",
+      setupAuthorizationRequired: setupToken !== "private-hosted-token",
+      setupInProgress: false,
+    }));
+
+    render(<AuthGate><div data-testid="private-workspace">Private workspace</div></AuthGate>);
+
+    expect(await screen.findByTestId("instance-setup")).toBeTruthy();
+    expect(window.location.hash).toBe("#state=keep");
+    expect(authState.fetchInstanceBootstrapRemote).toHaveBeenCalledWith("private-hosted-token");
+
+    fireEvent.change(screen.getByLabelText("Administrator email"), {
+      target: { value: "owner@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create administrator and continue" }));
+
+    await screen.findByTestId("private-workspace");
+    expect(authState.initializeInstanceRemote).toHaveBeenCalledWith({
+      email: "owner@example.com",
+      password: "Hanji-Owner!2026",
+      displayName: undefined,
+    }, "private-hosted-token");
+    expect(window.sessionStorage.getItem("hanji:setup:token")).toBeNull();
+  });
+
+  it("discards the hosted setup capability once creation succeeds even when sign-in fails", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockResolvedValue("");
+    authState.signInWithPasswordRemote.mockRejectedValue(new Error("temporary sign-in failure"));
+    window.history.replaceState(null, "", "/#setup_token=private-hosted-token");
+    authState.fetchInstanceBootstrapRemote.mockImplementation(async (setupToken?: string) => ({
+      masterConfigured: false,
+      masterReady: false,
+      setupBlocked: false,
+      setupAvailable: setupToken === "private-hosted-token",
+      setupAuthorizationRequired: setupToken !== "private-hosted-token",
+      setupInProgress: false,
+    }));
+
+    render(<AuthGate><div>Private workspace</div></AuthGate>);
+    await screen.findByTestId("instance-setup");
+    fireEvent.change(screen.getByLabelText("Administrator email"), {
+      target: { value: "owner@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm new password"), {
+      target: { value: "Hanji-Owner!2026" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create administrator and continue" }));
+
+    expect(await screen.findByRole("button", { name: "Continue" })).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toContain("already been set up");
+    expect(window.sessionStorage.getItem("hanji:setup:token")).toBeNull();
+    expect(authState.initializeInstanceRemote).toHaveBeenCalledTimes(1);
   });
 
   it("keeps first-run setup on screen when password confirmation differs", async () => {
@@ -172,14 +324,10 @@ describe("AuthGate auth-state subscription", () => {
       masterReady: false,
       setupBlocked: false,
       setupAvailable: true,
-      setupCodeRequired: true,
       setupInProgress: false,
     });
     render(<AuthGate><div>Private workspace</div></AuthGate>);
     await screen.findByTestId("instance-setup");
-    fireEvent.change(screen.getByLabelText("Setup code"), {
-      target: { value: "0123456789abcdef0123456789abcdef" },
-    });
     fireEvent.change(screen.getByLabelText("Administrator email"), {
       target: { value: "owner@example.com" },
     });
@@ -259,10 +407,10 @@ describe("AuthGate auth-state subscription", () => {
       </AuthGate>,
     );
 
-    const banner = await screen.findByTestId("sponsor-banner");
+    const link = await screen.findByRole("link", { name: "Example sponsor" });
+    const banner = screen.getByTestId("sponsor-banner");
     expect(banner.textContent).toContain("Example sponsor");
     // The sponsor name is the only linked part, pointing at their GitHub.
-    const link = screen.getByRole("link", { name: "Example sponsor" });
     expect(link.getAttribute("href")).toBe("https://github.com/example-sponsor");
     // The banner no longer carries a per-user hide control.
     expect(screen.queryByRole("button", { name: "Hide sponsor banner" })).toBeNull();
@@ -298,7 +446,7 @@ describe("AuthGate auth-state subscription", () => {
     );
 
     expect(await screen.findByLabelText(/Email|이메일/)).toBeTruthy();
-    expect(screen.queryByTestId("sponsor-banner")).toBeNull();
+    await waitFor(() => expect(screen.queryByTestId("sponsor-banner")).toBeNull());
     // The required AGPL / Sponsor Banner Exception notice always stays on the
     // sign-in screen regardless of the banner mode.
     expect(screen.getByTestId("legal-notice")).toBeTruthy();
@@ -369,8 +517,9 @@ describe("AuthGate auth-state subscription", () => {
     expect(screen.queryByText(/Finishing sign-in|로그인 마무리 중/)).toBeNull();
   });
 
-  it("does not render private children from an unverified cached marker", async () => {
+  it("renders a cached workspace immediately, then removes it on definitive auth denial", async () => {
     authState.currentUserId = "cached-user";
+    await i18next.changeLanguage("ko");
     let finishRestore!: (userId: string) => void;
     authState.restoreAuthSessionRemote.mockImplementation(() =>
       new Promise<string>((resolve) => {
@@ -383,14 +532,84 @@ describe("AuthGate auth-state subscription", () => {
         <div data-testid="private-workspace">Private workspace</div>
       </AuthGate>,
     );
-    expect(screen.queryByTestId("private-workspace")).toBeNull();
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    expect(screen.queryByTestId("product-loading-screen")).toBeNull();
     expect(screen.queryByLabelText(/Email|이메일/)).toBeNull();
 
     await act(async () => {
+      authState.currentUserId = "";
+      authState.sessionUserIdHint = "";
       finishRestore("");
     });
     expect(screen.queryByTestId("private-workspace")).toBeNull();
     expect(screen.getByLabelText(/Email|이메일/)).toBeTruthy();
+    await waitFor(() => expect(i18next.resolvedLanguage).toBe("en"));
+  });
+
+  it("keeps the cached workspace on a transient refresh failure while the hint remains", async () => {
+    authState.currentUserId = "";
+    authState.sessionUserIdHint = "cached-user";
+    authState.restoreAuthSessionRemote.mockRejectedValue(new TypeError("network unavailable"));
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    await act(async () => {});
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    expect(screen.queryByLabelText(/Email|이메일/)).toBeNull();
+
+    await act(async () => {
+      authState.listener?.("cached-user");
+    });
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    expect(screen.queryByTestId("product-loading-screen")).toBeNull();
+  });
+
+  it("uses the non-authoritative cookie-session hint before currentUser is online-verified", async () => {
+    authState.currentUserId = "";
+    authState.sessionUserIdHint = "cached-user";
+    let finishRestore!: (userId: string) => void;
+    authState.restoreAuthSessionRemote.mockImplementation(() =>
+      new Promise<string>((resolve) => {
+        finishRestore = resolve;
+      })
+    );
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+    expect(screen.queryByTestId("product-loading-screen")).toBeNull();
+
+    await act(async () => {
+      finishRestore("cached-user");
+    });
+    expect(screen.getByTestId("private-workspace")).toBeTruthy();
+  });
+
+  it("keeps first-visit auth checking to only the mark and one random credit", async () => {
+    authState.currentUserId = "";
+    authState.restoreAuthSessionRemote.mockImplementation(() => new Promise<string>(() => {}));
+
+    render(
+      <AuthGate>
+        <div data-testid="private-workspace">Private workspace</div>
+      </AuthGate>,
+    );
+
+    expect(screen.getByTestId("product-loading-screen")).toBeTruthy();
+    expect(screen.getByTestId("product-loading-mark")).toBeTruthy();
+    expect(screen.getByTestId("product-loading-credit")).toBeTruthy();
+    expect(screen.queryByText(/Finishing sign-in|로그인 마무리 중/)).toBeNull();
+    expect(screen.queryByText(/Checking your login session|로그인 세션을 확인/)).toBeNull();
+    expect(screen.queryByTestId("legal-notice")).toBeNull();
   });
 
   it("revalidates a positive cross-tab marker after the sign-in form is visible", async () => {

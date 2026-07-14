@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "เปลี่ยนหน้าปก",
+    "reposition": "เปลี่ยนตำแหน่ง",
+    "remove": "ลบ",
+    "uploadFile": "อัปโหลดไฟล์",
+    "uploading": "กำลังอัปโหลด...",
+    "submit": "ยืนยัน",
+    "savePosition": "บันทึกตำแหน่ง"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "แกลเลอรี",
+    "upload": "อัปโหลด",
+    "link": "ลิงก์"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "วางลิงก์ภาพ",
+    "invalid": "วางลิงก์ภาพ http หรือ https"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "ไม่สามารถอัปโหลดภาพนั้นได้",
+    "defaultFileName": "ภาพปก"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "ลากภาพเพื่อเปลี่ยนตำแหน่ง"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "กำลังเตรียมอัปโหลด",
+    "finalizing": "กำลังเสร็จสิ้น",
+    "complete": "เสร็จสิ้น",
+    "uploading": "กำลังอัปโหลด"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "ลบปกแล้ว",
+    "restored": "กู้คืนปกแล้ว",
+    "undo": "เลิกทำ"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "ปกหน้า",
+    "coverVerticalPosition": "ตำแหน่งปกแนวตั้ง",
+    "positionFromTop": "{{position}}% จากด้านบน",
+    "closeCoverMenu": "ปิดเมนูปก",
+    "changePageCover": "เปลี่ยนปกหน้า",
+    "repositionPageCover": "เปลี่ยนตำแหน่งปกหน้า",
+    "removePageCover": "ลบปกหน้า",
+    "changeCoverDialog": "เปลี่ยนปก",
+    "coverSource": "แหล่งที่มาปก",
+    "selectCover": "เลือกปก {{number}}",
+    "uploadFromDevice": "อัปโหลดภาพปกจากอุปกรณ์นี้",
+    "uploadingFile": "กำลังอัปโหลด {{fileName}}",
+    "coverImageLink": "ลิงก์ภาพปก"
   }
 }

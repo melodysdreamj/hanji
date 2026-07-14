@@ -1,7 +1,14 @@
 {
-  "title": "Geteilte Seite",
-  "loading": "Geteilte Seite wird geladen",
-  "unavailable": "Diese geteilte Seite ist nicht verfügbar.",
-  "notFound": "Geteilte Seite wurde nicht gefunden.",
-  "outsideShare": "Die Seite ist nicht Teil dieser öffentlichen Freigabe."
+  "title": "Freigegebene Seite",
+  "loading": "Freigegebene Seite wird geladen",
+  "unavailable": "Diese freigegebene Seite ist nicht verfügbar.",
+  "notFound": "Freigegebene Seite nicht gefunden.",
+  "outsideShare": "Die Seite ist nicht Teil dieser öffentlichen Freigabe.",
+  "tryAgain": "Erneut versuchen",
+  "errors": {
+    "not-found": "Dieser Link ist möglicherweise abgelaufen, wurde zurückgezogen oder falsch kopiert.",
+    "rate-limited": "Diese freigegebene Seite erhält zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "offline": "Überprüfen Sie die Verbindung und öffnen Sie die freigegebene Seite erneut.",
+    "unavailable": "Hanji kann diese freigegebene Seite momentan nicht öffnen. Versuchen Sie es gleich noch einmal."
+  }
 }

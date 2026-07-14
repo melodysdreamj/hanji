@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
-  "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+  "create": {
+    "hint": "Ny side - flytt blokk hit",
+    "label": "Opprett \"{{query}}\"",
+    "optionLabel": "Opprett siden \"{{query}}\" og flytt blokk hit"
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
-  },
-  "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
-  },
-  "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "closeLabel": "Lukk flyttdialog"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Låst side"
   },
-  "untitled": "Untitled",
+  "results": {
+    "destinationLabel": "Flytt blokk til {{label}}, {{path}}",
+    "empty": "Ingen sider funnet.",
+    "listLabel": "Flyttdestinasjoner"
+  },
+  "search": {
+    "label": "Søk etter flyttdestinasjoner",
+    "placeholder": "Søk sider..."
+  },
+  "title": "Flytt blokk til",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
-  }
+    "locked": "Siden er låst",
+    "movedBlock": "Blokk flyttet",
+    "movedBlocks": "Blokker flyttet",
+    "movedBlocksCount": "Flyttet {{blockCount}} blokker",
+    "moveFailed": "Kunne ikke flytte blokk"
+  },
+  "untitled": "Uten tittel"
 }

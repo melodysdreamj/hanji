@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "मजकूर स्वरूपण"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "रूपांतर",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "मजकूर",
+      "heading1": "शीर्षक १",
+      "heading2": "शीर्षक २",
+      "heading3": "शीर्षक ३",
+      "heading4": "शीर्षक ४",
+      "toDoList": "करण्याची यादी",
+      "bulletedList": "बुलेटेड यादी",
+      "numberedList": "क्रमांकित यादी",
+      "toggleList": "टॉगल यादी",
+      "quote": "उद्धरण",
+      "callout": "कॉलआउट",
+      "code": "कोड"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ठळक",
+    "italic": "तिरपा",
+    "underline": "अधोरेखित",
+    "strikethrough": "स्ट्राइकथ्रू",
+    "code": "कोड",
+    "link": "दुवा"
   },
   "comment": {
-    "label": "Comment"
+    "label": "टिप्पणी"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "मजकूर रंग: {{color}}",
+    "title": "रंग: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "मिश्रित",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "मजकूर रंग",
+      "default": "डिफॉल्ट",
+      "gray": "राखाडी",
+      "brown": "तपकिरी",
+      "orange": "केशरी",
+      "yellow": "पिवळा",
+      "green": "हिरवा",
+      "blue": "निळा",
+      "purple": "जांभळा",
+      "pink": "गुलाबी",
+      "red": "लाल"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "पार्श्वभूमी रंग",
+      "gray": "राखाडी पार्श्वभूमी",
+      "brown": "तपकिरी पार्श्वभूमी",
+      "orange": "संत्री पार्श्वभूमी",
+      "yellow": "पिवळी पार्श्वभूमी",
+      "green": "हिरवी पार्श्वभूमी",
+      "blue": "निळी पार्श्वभूमी",
+      "purple": "जांभळी पार्श्वभूमी",
+      "pink": "गुलाबी पार्श्वभूमी",
+      "red": "लाल पार्श्वभूमी"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "दुवा संपादित करा",
+    "placeholder": "दुवा पेस्ट करा",
+    "urlAriaLabel": "दुवा URL",
+    "apply": "दुवा",
+    "open": "दुवा उघडा",
+    "copy": "दुवा कॉपी करा",
+    "copied": "कॉपी केले",
+    "copiedLink": "दुवा कॉपी केला",
+    "remove": "काढा"
   }
 }

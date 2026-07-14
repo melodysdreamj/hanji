@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "صفحه اشتراکی",
+  "loading": "در حال بارگذاری صفحه اشتراکی",
+  "unavailable": "این صفحه اشتراکی در دسترس نیست.",
+  "notFound": "صفحه اشتراکی پیدا نشد.",
+  "outsideShare": "این صفحه بخشی از این اشتراک عمومی نیست.",
+  "errors": {
+    "not-found": "این لینک ممکن است منقضی شده، از انتشار خارج شده یا به اشتباه کپی شده باشد.",
+    "offline": "اتصال خود را بررسی کنید، سپس دوباره صفحه اشتراکی را باز کنید.",
+    "rate-limited": "این صفحه اشتراکی تعداد درخواست زیادی دریافت می‌کند. لحظه‌ای صبر کنید و دوباره تلاش کنید.",
+    "unavailable": "Hanji در حال حاضر نمی‌تواند این صفحه اشتراکی را باز کند. لحظه‌ای دیگر تلاش کنید."
+  },
+  "tryAgain": "تلاش دوباره"
 }

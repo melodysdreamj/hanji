@@ -17,7 +17,7 @@
     "destinationLabel": "Déplacer vers {{label}}, {{path}}"
   },
   "create": {
-    "label": "Créer « {{title}} »",
+    "label": "Créer \"{{title}}\"",
     "optionLabel": "Créer la page {{title}} et déplacer ici",
     "hint": "Nouvelle page de premier niveau - déplacer ici"
   },

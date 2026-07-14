@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Ba a iya mayar da shafi",
+  "emptyBodyPrompt": "Danna Enter don fara rubutu a wannan shafin mara komai.",
+  "inTrashTopBarTitle": "A cikin Sharar",
+  "notFoundTopBarTitle": "Ba a samo ba",
+  "openWorkspace": "Bude workspace",
+  "pageInTrash": "Wannan shafi yana cikin Sharar.",
+  "pageInTrashDetail": "Mayar da shi kafin buɗe ko gyara abun cikinsa.",
+  "pageUnavailable": "Shafi baya samuwa.",
+  "pageUnavailableDetail": "Wannan shafi mai yiwuwa an goge shi, an motsa shi, ko an raba shi da wani asusu daban.",
+  "restorePage": "Mayar da shafi",
+  "restoredPage": "An mayar da shafi",
+  "loadingPageContent": "Ana loda abun cikin shafi"
 }

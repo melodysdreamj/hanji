@@ -6,7 +6,10 @@ import {
   changePasswordRemote,
   clearMustChangePasswordRemote,
   completeOAuthCallbackRemote,
+  currentSessionUserIdHint,
   currentUserId,
+  currentUserIsAnonymous,
+  fetchAccountLanguageStateRemote,
   fetchInstanceBootstrapRemote,
   fetchMustChangePasswordRemote,
   fetchRuntimeConfigRemote,
@@ -16,6 +19,7 @@ import {
   requestPasswordResetRemote,
   resetPasswordRemote,
   restoreAuthSessionRemote,
+  saveAccountLanguagePreferenceRemote,
   signInWithPasswordRemote,
   signUpWithPasswordRemote,
   signInAnonymouslyForBootstrap,
@@ -29,11 +33,20 @@ import {
 } from "@/lib/edgebase";
 import { useTranslation } from "react-i18next";
 import { isPublicSharePath, usePathname, useRouter } from "@/lib/router";
-import { i18next } from "@/i18n";
+import {
+  browserLanguage,
+  cacheLanguagePreference,
+  hasCachedLanguagePreference,
+  i18next,
+  resolvedLanguageForPreference,
+} from "@/i18n";
+import { LANGUAGE_OPTIONS } from "@/i18n/languages";
+import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
 import { loginRoll } from "@/lib/builtWith";
 import { useCreditRoll } from "@/lib/useCreditRoll";
 import { CreditLine } from "./CreditLine";
 import { LegalNotice } from "./LegalNotice";
+import { ProductLoadingScreen } from "./ProductLoadingScreen";
 import styles from "./AuthGate.module.css";
 
 type AuthStep =
@@ -78,6 +91,41 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // magic-link email) land back on /auth/* routes, losing the page the user
 // originally asked for. Stash it before leaving and restore it after auth.
 const AUTH_RETURN_PATH_KEY = "hanji:auth:return-to";
+const SETUP_TOKEN_FRAGMENT_KEY = "setup_token";
+const SETUP_TOKEN_SESSION_KEY = "hanji:setup:token";
+
+function consumeSetupToken() {
+  if (typeof window === "undefined") return "";
+  try {
+    const fragment = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+    const params = new URLSearchParams(fragment);
+    const token = params.get(SETUP_TOKEN_FRAGMENT_KEY)?.trim() ?? "";
+    if (token) {
+      window.sessionStorage.setItem(SETUP_TOKEN_SESSION_KEY, token);
+      params.delete(SETUP_TOKEN_FRAGMENT_KEY);
+      const nextFragment = params.toString();
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${window.location.search}${nextFragment ? `#${nextFragment}` : ""}`,
+      );
+      return token;
+    }
+    return window.sessionStorage.getItem(SETUP_TOKEN_SESSION_KEY)?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function forgetSetupToken() {
+  try {
+    window.sessionStorage.removeItem(SETUP_TOKEN_SESSION_KEY);
+  } catch {
+    // Setup already completed; restricted storage needs no further cleanup.
+  }
+}
 
 function stashAuthReturnPath() {
   if (typeof window === "undefined") return;
@@ -261,9 +309,33 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const verifyEmailRoute = pathname === "/auth/verify-email";
   const verifyEmailChangeRoute = pathname === "/auth/verify-email-change";
   const authActionRoute = passwordResetRoute || verifyEmailRoute || verifyEmailChangeRoute;
-  const [step, setStep] = useState<AuthStep>(() =>
-    publicShareRoute ? "signed-in" : "checking"
+  const [setupToken] = useState(consumeSetupToken);
+  const [cachedUserIdAtMount] = useState(() =>
+    publicShareRoute || authActionRoute ? "" : currentSessionUserIdHint()
   );
+  const [step, setStep] = useState<AuthStep>(() =>
+    publicShareRoute || cachedUserIdAtMount ? "signed-in" : "checking"
+  );
+
+  useEffect(() => {
+    // An anonymous sign-in/setup surface is also a completed interactive boot.
+    // Signed-in boots wait for AppShell's cache hydration instead, and public
+    // shares wait for their authoritative snapshot.
+    if (!publicShareRoute && step !== "checking" && step !== "signed-in") {
+      markAppInteractiveForOfflineWarm();
+    }
+  }, [publicShareRoute, step]);
+
+  useEffect(() => {
+    // A stale non-secret session hint can start the first paint with that
+    // account's cached language while the cookie is being revalidated. Once
+    // the server establishes that this is a signed-out surface, switch back to
+    // the browser locale without deleting the account-scoped cache.
+    if (!publicShareRoute && step !== "checking" && step !== "signed-in") {
+      const language = browserLanguage();
+      if (language !== i18next.resolvedLanguage) void i18next.changeLanguage(language);
+    }
+  }, [publicShareRoute, step]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -271,7 +343,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [resetToken, setResetToken] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [resetPasswordConfirm, setResetPasswordConfirm] = useState("");
-  const [setupCode, setSetupCode] = useState("");
   const [setupPasswordConfirm, setSetupPasswordConfirm] = useState("");
   const [authActionResult, setAuthActionResult] = useState<string | null>(null);
   const [mfaChallenge, setMfaChallenge] = useState<MfaChallenge | null>(null);
@@ -317,14 +388,19 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   // listing an unstable function in its deps (which would churn the effect).
   const recordAuthAttemptRef = useRef(recordAuthAttempt);
   const explicitAuthInFlightRef = useRef(0);
-  const validatedAuthUserIdRef = useRef("");
+  // Seed this synchronously for local-first boot. Child effects may start the
+  // cookie refresh before this component's passive effects run; the SDK's
+  // positive refresh event must not bounce an already-rendering cached user
+  // back to the full-screen checking state while that same validation runs.
+  const validatedAuthUserIdRef = useRef(cachedUserIdAtMount);
   useEffect(() => {
     recordAuthAttemptRef.current = recordAuthAttempt;
   });
 
   useEffect(() => {
     if (step === "signed-in" && !publicShareRoute) {
-      validatedAuthUserIdRef.current = currentUserId();
+      const verifiedUserId = currentUserId();
+      if (verifiedUserId) validatedAuthUserIdRef.current = verifiedUserId;
     }
   }, [publicShareRoute, step]);
 
@@ -570,7 +646,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
     let mounted = true;
     explicitAuthInFlightRef.current += 1;
-    setStep("checking");
+    // A non-secret, account-scoped local identity is enough to start cache
+    // hydration while the HttpOnly cookie is revalidated in the background.
+    // A definitive server denial below still wins and removes private UI.
+    if (!cachedUserIdAtMount) setStep("checking");
     (async () => {
       try {
         const userId = await restoreAuthSessionRemote().catch(() => "");
@@ -580,16 +659,27 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           setStep("signed-in");
           return;
         }
+        // Refresh rejection clears EdgeBase's marker; a transport/5xx failure
+        // leaves it intact. Keep the already-mounted cache only in the latter
+        // case, without promoting the hint to authenticated currentUser.
+        if (
+          cachedUserIdAtMount &&
+          currentSessionUserIdHint() === cachedUserIdAtMount
+        ) {
+          setStep("signed-in");
+          return;
+        }
         // Signed out: consult the instance/master bootstrap status before
         // rendering — it decides between the setup-blocked screen and the
         // plain form. Master credentials never cross this public endpoint.
-        const status = await fetchInstanceBootstrapRemote();
+        const status = await fetchInstanceBootstrapRemote(setupToken || undefined);
         if (!mounted) return;
         if (status?.setupAvailable) {
           setPasswordMode("signup");
           setStep("setup");
           return;
         }
+        if (status && setupToken) forgetSetupToken();
         if (status?.setupBlocked) {
           setStep("setup-blocked");
           return;
@@ -603,11 +693,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       mounted = false;
     };
   }, [
+    cachedUserIdAtMount,
     magicLinkRoute,
     oauthCallbackRoute,
     passwordResetRoute,
     publicShareRoute,
     router,
+    setupToken,
     t,
     verifyEmailChangeRoute,
     verifyEmailRoute,
@@ -667,10 +759,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
 
   async function submitInstanceSetup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (setupCode.trim().length < 24) {
-      setError(t("authGate:setupCodeRequired"));
-      return;
-    }
     if (!EMAIL_RE.test(normalizedEmail)) {
       setError(t("authGate:enterValidEmail"));
       return;
@@ -690,30 +778,38 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     explicitAuthInFlightRef.current += 1;
     setBusy(true);
     setError(null);
+    let setupCompleted = false;
     try {
       await initializeInstanceRemote({
-        setupCode: setupCode.trim(),
         email: normalizedEmail,
         password,
         displayName: displayName.trim() || undefined,
-      });
+      }, setupToken || undefined);
+      setupCompleted = true;
+      // The durable administrator claim has succeeded. The bearer capability
+      // has no further purpose even if the following sign-in step fails.
+      forgetSetupToken();
       const result = await signInWithPasswordRemote(normalizedEmail, password);
       if (result.status === "mfa_required") {
         throw new Error("A new setup account unexpectedly requires MFA.");
       }
-      setSetupCode("");
       setSetupPasswordConfirm("");
       setPassword("");
       setStep("signed-in");
     } catch (err) {
+      if (setupCompleted) {
+        setPasswordMode("signin");
+        setStep("email");
+        setError(t("authGate:setupAlreadyComplete"));
+        return;
+      }
       const status = typeof err === "object" && err !== null
         ? (err as { status?: unknown }).status
         : undefined;
-      if (status === 403) {
-        setError(t("authGate:setupInvalidCode"));
-      } else if (status === 409) {
-        const current = await fetchInstanceBootstrapRemote();
+      if (status === 409) {
+        const current = await fetchInstanceBootstrapRemote(setupToken || undefined);
         if (!current?.setupAvailable) setStep("email");
+        if (!current?.setupAvailable) forgetSetupToken();
         setError(t("authGate:setupAlreadyComplete"));
       } else {
         setError(t("authGate:setupFailed"));
@@ -864,7 +960,14 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   if (publicShareRoute) return <>{children}</>;
-  if (step === "signed-in") return <MustChangePasswordGate>{children}</MustChangePasswordGate>;
+  if (step === "signed-in") {
+    return (
+      <MustChangePasswordGate>
+        <LanguagePreferenceGate>{children}</LanguagePreferenceGate>
+      </MustChangePasswordGate>
+    );
+  }
+  if (step === "checking") return <ProductLoadingScreen source="auth" />;
 
   return (
     <main className={styles.screen}>
@@ -885,19 +988,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               <strong>{t("authGate:setupTitle")}</strong>
               <p>{t("authGate:setupBody")}</p>
             </div>
-            <label className={styles.label} htmlFor="setup-code">{t("authGate:setupCode")}</label>
-            <input
-              id="setup-code"
-              className={styles.input}
-              type="password"
-              autoComplete="one-time-code"
-              value={setupCode}
-              onChange={(event) => setSetupCode(event.target.value)}
-              placeholder={t("authGate:setupCodePlaceholder")}
-              disabled={busy}
-              autoFocus
-            />
-            <p className={styles.fieldHelp}>{t("authGate:setupCodeHint")}</p>
             <label className={styles.label} htmlFor="setup-display-name">{t("authGate:name")}</label>
             <input
               id="setup-display-name"
@@ -908,6 +998,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               onChange={(event) => setDisplayName(event.target.value)}
               placeholder={t("authGate:namePlaceholder")}
               disabled={busy}
+              autoFocus
             />
             <label className={styles.label} htmlFor="setup-email">{t("authGate:administratorEmail")}</label>
             <input
@@ -958,11 +1049,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               <code>HANJI_MASTER_PASSWORD=••••••••••</code>
             </p>
             <p>{t("authGate:setupBlockedHint")}</p>
-          </div>
-        ) : step === "checking" ? (
-          <div className={styles.notice} role="status" aria-live="polite">
-            <strong>{t("authGate:finishingSignIn")}</strong>
-            <p>{t("authGate:checkingSession")}</p>
           </div>
         ) : step === "password-reset-request" ? (
           <form className={styles.form} onSubmit={submitPasswordResetRequest}>
@@ -1234,7 +1320,18 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  if (state === "clear") return <>{children}</>;
+  // The flag is account hygiene, not access control. Keep a returning user's
+  // local workspace visible while the probe runs; replace it only when the
+  // server positively reports that a password change is required.
+  const cachedLanguageUserId = currentUserId() || currentSessionUserIdHint();
+  if (
+    state === "checking"
+    && !currentUserIsAnonymous()
+    && !hasCachedLanguagePreference(cachedLanguageUserId)
+  ) {
+    return <ProductLoadingScreen source="auth" />;
+  }
+  if (state !== "required") return <>{children}</>;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1275,13 +1372,7 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
             <p>{t("authGate:tagline")}</p>
           </div>
         </div>
-        {state === "checking" ? (
-          <div className={styles.notice} role="status" aria-live="polite">
-            <strong>{t("authGate:finishingSignIn")}</strong>
-            <p>{t("authGate:checkingSession")}</p>
-          </div>
-        ) : (
-          <form className={styles.form} onSubmit={submit} data-testid="must-change-password">
+        <form className={styles.form} onSubmit={submit} data-testid="must-change-password">
             <strong>{t("authGate:mustChangeTitle")}</strong>
             <p>{t("authGate:mustChangeBody")}</p>
             <label className={styles.label} htmlFor="must-change-current">
@@ -1332,8 +1423,139 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
                 {error}
               </p>
             ) : null}
-          </form>
-        )}
+        </form>
+      </section>
+    </main>
+  );
+}
+
+/**
+ * Prompts a real authenticated account once when it has no durable language
+ * setting. Anonymous/local guest sessions and public shares never mount this
+ * gate. A cached account preference keeps routine returning sign-ins instant;
+ * the server remains authoritative and synchronizes cross-device changes.
+ */
+function LanguagePreferenceGate({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation([
+    "authGate",
+    "workspaceSettingsDialog",
+    "importDialog",
+    "settingsErrors",
+  ]);
+  const userId = currentUserId() || currentSessionUserIdHint();
+  const anonymous = currentUserIsAnonymous();
+  const cached = hasCachedLanguagePreference(userId);
+  const recommendedLanguage = useMemo(() => browserLanguage(), []);
+  const [state, setState] = useState<"checking" | "required" | "clear">(
+    anonymous || cached ? "clear" : "checking",
+  );
+  const [selectedLanguage, setSelectedLanguage] = useState(recommendedLanguage);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const languageOptions = useMemo(() => {
+    const recommended = LANGUAGE_OPTIONS.find((option) => option.value === recommendedLanguage);
+    const rest = LANGUAGE_OPTIONS.filter((option) => option.value !== recommendedLanguage);
+    return recommended ? [recommended, ...rest] : rest;
+  }, [recommendedLanguage]);
+
+  useEffect(() => {
+    if (anonymous || !userId) {
+      setState("clear");
+      return;
+    }
+    let mounted = true;
+    fetchAccountLanguageStateRemote()
+      .then((accountState) => {
+        if (!mounted) return;
+        const preference = accountState.languagePreference;
+        if (!accountState.languageOnboardingCompleted || !preference) {
+          setState("required");
+          return;
+        }
+        cacheLanguagePreference(userId, preference);
+        const nextLanguage = resolvedLanguageForPreference(preference);
+        if (nextLanguage !== i18next.resolvedLanguage && typeof window !== "undefined") {
+          window.location.reload();
+          return;
+        }
+        setState("clear");
+      })
+      .catch(() => {
+        // Language choice must not lock a signed-in user out if the settings
+        // endpoint is temporarily unavailable. Browser language remains the
+        // safe fallback and the server will be checked on the next sign-in.
+        if (mounted) setState("clear");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [anonymous, userId]);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await saveAccountLanguagePreferenceRemote(selectedLanguage);
+      cacheLanguagePreference(userId, selectedLanguage);
+      const nextLanguage = resolvedLanguageForPreference(selectedLanguage);
+      setState("clear");
+      if (nextLanguage !== i18next.resolvedLanguage && typeof window !== "undefined") {
+        window.location.reload();
+      }
+    } catch {
+      setError(t("settingsErrors:requestFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (state === "clear") return <>{children}</>;
+  if (state === "checking") return <ProductLoadingScreen source="auth" />;
+
+  return (
+    <main className={styles.screen} data-testid="language-onboarding">
+      <section className={styles.panel} aria-busy={busy}>
+        <div className={styles.brand}>
+          <img className={styles.mark} src="/icon-192.png" alt="" aria-hidden="true" />
+          <div>
+            <h1>Hanji</h1>
+            <p>{t("workspaceSettingsDialog:preferencesTitle")}</p>
+          </div>
+        </div>
+        <form className={styles.form} onSubmit={submit}>
+          <div className={styles.notice}>
+            <strong>{t("workspaceSettingsDialog:languageField")}</strong>
+            <span className={styles.recommendedBadge}>{t("importDialog:recommended")}</span>
+          </div>
+          <label className={styles.srOnly} htmlFor="account-language">
+            {t("workspaceSettingsDialog:languageField")}
+          </label>
+          <select
+            id="account-language"
+            className={styles.input}
+            value={selectedLanguage}
+            onChange={(event) => setSelectedLanguage(event.currentTarget.value)}
+            disabled={busy}
+            autoFocus
+          >
+            {languageOptions.map((option, index) => (
+              <option key={option.value} value={option.value}>
+                {option.label}{index === 0 ? ` — ${t("importDialog:recommended")}` : ""}
+              </option>
+            ))}
+            <option value="system">{t("workspaceSettingsDialog:languageSystem")}</option>
+          </select>
+          <button className={styles.primary} type="submit" disabled={busy}>
+            {t("authGate:continue")}
+          </button>
+          {error ? (
+            <p className={styles.error} role="alert" aria-live="assertive">
+              {error}
+            </p>
+          ) : null}
+        </form>
       </section>
     </main>
   );

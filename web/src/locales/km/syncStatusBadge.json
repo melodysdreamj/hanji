@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ក្រៅបណ្តាញ",
+  "offlinePending_one": "ក្រៅបណ្តាញ · ការផ្លាស់ប្តូរ {{count}} កំពុងរង់ចាំ",
+  "offlinePending_other": "ក្រៅបណ្តាញ · ការផ្លាស់ប្តូរ {{count}} កំពុងរង់ចាំ",
+  "syncing": "កំពុងធ្វើសមកាលកម្ម · {{count}}",
+  "unreachable": "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេបានទេ",
+  "unreachablePending_one": "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេបានទេ · ការផ្លាស់ប្តូរ {{count}} កំពុងរង់ចាំ",
+  "unreachablePending_other": "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេបានទេ · ការផ្លាស់ប្តូរ {{count}} កំពុងរង់ចាំ",
+  "retryHint": "ចុចដើម្បីព្យាយាមម្តងទៀតឥឡូវនេះ"
 }

@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Informații legale și despre sursă",
+  "noWarranty": "Furnizat fără garanție.",
+  "sourceCode": "Sursă",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Excepție 2.0"
 }

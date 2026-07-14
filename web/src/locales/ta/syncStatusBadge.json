@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ஆஃப்லைன்",
+  "offlinePending_one": "ஆஃப்லைன் · {{count}} மாற்றம் நிலுவையில்",
+  "offlinePending_other": "ஆஃப்லைன் · {{count}} மாற்றங்கள் நிலுவையில்",
+  "syncing": "ஒத்திசைக்கிறது · {{count}}",
+  "unreachable": "சேவையகத்தை அடைய முடியவில்லை",
+  "unreachablePending_one": "சேவையகத்தை அடைய முடியவில்லை · {{count}} மாற்றம் நிலுவையில்",
+  "unreachablePending_other": "சேவையகத்தை அடைய முடியவில்லை · {{count}} மாற்றங்கள் நிலுவையில்",
+  "retryHint": "மீண்டும் முயற்சிக்க கிளிக் செய்க"
 }

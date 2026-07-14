@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "close": "Închide",
+    "search": "Caută",
+    "create": "Creează",
+    "delete": "Șterge",
+    "clearAll": "Șterge tot",
+    "done": "Gata",
+    "add": "Adaugă"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Fără titlu"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Copie {{name}}",
+    "columnName": "Coloana {{number}}",
+    "importedDatabase": "Bază de date importată",
+    "uploadedFile": "Fișier încărcat",
+    "image": "Imagine",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Nume",
+      "status": "Stare",
+      "select": "Selectare",
+      "date": "Dată"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Neînceput",
+      "doing": "În progres",
+      "done": "Terminat"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opțiune 1",
+      "second": "Opțiune 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tabel"
     }
   }
 }

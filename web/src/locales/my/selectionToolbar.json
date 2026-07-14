@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "စာသားဖော်မတ်"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "ပြောင်း",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "စာသား",
+      "heading1": "ခေါင်းစဉ် 1",
+      "heading2": "ခေါင်းစဉ် 2",
+      "heading3": "ခေါင်းစဉ် 3",
+      "heading4": "ခေါင်းစဉ် 4",
+      "toDoList": "လုပ်ရန်စာရင်း",
+      "bulletedList": "ကျည်ဆံစာရင်း",
+      "numberedList": "စာရင်းအမှတ်စဉ်",
+      "toggleList": "ဖွင့်ပိတ်စာရင်း",
+      "quote": "ကိုးကားချက်",
+      "callout": "ခေါ်ထုတ်",
+      "code": "ကုဒ်"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ထူ",
+    "italic": "စောင်း",
+    "underline": "မျဉ်းသား",
+    "strikethrough": "ဖြတ်မျဉ်း",
+    "code": "ကုဒ်",
+    "link": "လင့်"
   },
   "comment": {
-    "label": "Comment"
+    "label": "မှတ်ချက်"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "စာသားအရောင်: {{color}}",
+    "title": "အရောင်: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ရောနှောထားသော",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "စာလုံးအရောင်",
+      "default": "ပုံသေ",
+      "gray": "မီးခိုးရောင်",
+      "brown": "အညိုရောင်",
+      "orange": "လိမ္မော်ရောင်",
+      "yellow": "အဝါရောင်",
+      "green": "အစိမ်းရောင်",
+      "blue": "အပြာရောင်",
+      "purple": "ခရမ်းရောင်",
+      "pink": "ပန်းရောင်",
+      "red": "အနီရောင်"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "နောက်ခံအရောင်",
+      "gray": "မီးခိုးရောင် နောက်ခံ",
+      "brown": "အညိုရောင် နောက်ခံ",
+      "orange": "လိမ္မော်ရောင် နောက်ခံ",
+      "yellow": "အဝါရောင် နောက်ခံ",
+      "green": "အစိမ်းရောင် နောက်ခံ",
+      "blue": "အပြာရောင် နောက်ခံ",
+      "purple": "ခရမ်းရောင် နောက်ခံ",
+      "pink": "ပန်းရောင် နောက်ခံ",
+      "red": "အနီရောင် နောက်ခံ"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "လင့်တည်းဖြတ်",
+    "placeholder": "လင့်ကူးထည့်",
+    "urlAriaLabel": "လင့်လိပ်စာ",
+    "apply": "လင့်",
+    "open": "လင့်ဖွင့်",
+    "copy": "လင့်ကူးယူ",
+    "copied": "ကူးယူပြီး",
+    "copiedLink": "လင့်ကူးယူပြီး",
+    "remove": "ဖယ်ရှား"
   }
 }

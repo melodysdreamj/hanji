@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Avbryt",
+    "save": "Spara",
+    "close": "Stäng",
+    "search": "Sök",
+    "create": "Skapa",
+    "delete": "Ta bort",
+    "clearAll": "Rensa alla",
+    "done": "Klar",
+    "add": "Lägg till"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Namnlös"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} kopia",
+    "columnName": "Kolumn {{number}}",
+    "importedDatabase": "Importerad databas",
+    "uploadedFile": "Uppladdad fil",
+    "image": "Bild",
     "propertyNames": {
-      "name": "Name",
+      "name": "Namn",
       "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "select": "Val",
+      "date": "Datum"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Ej påbörjad",
+      "doing": "Pågående",
+      "done": "Klar"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Alternativ 1",
+      "second": "Alternativ 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tabell"
     }
   }
 }

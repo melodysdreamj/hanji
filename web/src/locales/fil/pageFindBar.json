@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Hanapin sa pahina"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Hanapin sa pahina",
+    "placeholder": "Hanapin sa pahina"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Nakaraang tugma",
+    "next": "Susunod na tugma",
+    "close": "Isara ang paghahanap"
   }
 }

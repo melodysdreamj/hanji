@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Imeshindwa kurejesha ukurasa",
+  "emptyBodyPrompt": "Bonyeza Enter kuanza kuandika kwenye ukurasa huu tupu.",
+  "inTrashTopBarTitle": "Kwenye Taka",
+  "notFoundTopBarTitle": "Haijapatikana",
+  "openWorkspace": "Fungua nafasi ya kazi",
+  "pageInTrash": "Ukurasa huu uko kwenye Taka.",
+  "pageInTrashDetail": "Rejesha kabla ya kufungua au kuhariri maudhui yake.",
+  "pageUnavailable": "Ukurasa haupatikani.",
+  "pageUnavailableDetail": "Ukurasa huu unaweza kuwa umefutwa, kuhamishwa, au kushirikiwa na akaunti tofauti.",
+  "restorePage": "Rejesha ukurasa",
+  "restoredPage": "Ukurasa umerejeshwa",
+  "loadingPageContent": "Inapakia maudhui ya ukurasa"
 }

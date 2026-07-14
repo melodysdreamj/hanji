@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Rechts- und Quellinformationen",
-  "noWarranty": "Ohne Gewährleistung bereitgestellt.",
-  "sourceCode": "Quellcode",
+  "ariaLabel": "Rechtliche Hinweise und Quellinformationen",
+  "noWarranty": "Ohne Gewährleistung.",
+  "sourceCode": "Quelle",
   "agplLicense": "AGPL-3.0",
   "sponsorException": "Ausnahme 2.0"
 }

@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "មូលដ្ឋានទិន្នន័យនេះមិនទាន់មានទំព័រនៅឡើយទេ។",
+  "emptyTitle": "គ្មានទំព័រនៅឡើយទេ",
+  "newInline": "ថ្មី",
+  "newPage": "ទំព័រថ្មី",
+  "newPageIn": "ទំព័រថ្មីក្នុង {{dbTitle}}",
+  "noResultsDesc": "គ្មានទំព័រដែលត្រូវនឹងតម្រង ឬការស្វែងរកបច្ចុប្បន្នទេ។",
+  "noResultsTitle": "គ្មានលទ្ធផល",
+  "openRow": "បើក {{title}}"
 }

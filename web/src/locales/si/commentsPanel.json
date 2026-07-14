@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "අදහස්",
+  "closeAria": "අදහස් වසන්න",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "බ්ලොක් සාකච්ඡාව",
+    "page": "පිටු සාකච්ඡාව"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "අදහස් තත්ත්වය",
+    "open": "විවෘත",
+    "resolved": "විසඳුණු"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "අදහස් දක්වමින්",
+    "commentingOnSelectedText": "තෝරාගත් පෙළ ගැන අදහස් දක්වමින්",
+    "selectedBlock": "තෝරාගත් කොටස",
+    "onSelectedText": "තෝරාගත් පෙළ මත",
+    "onSelectedBlock": "තෝරාගත් කොටස මත",
+    "onABlock": "කොටසක"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "කොටස් අදහසක් එක් කරන්න",
+    "addPageComment": "පිටු අදහසක් එක් කරන්න",
+    "blockPlaceholder": "මෙම කොටස ගැන අදහස් දක්වන්න...",
+    "pagePlaceholder": "අදහසක් එක් කරන්න...",
+    "submit": "අදහස් දක්වන්න"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "අදහසෙහි සඳහන් කිරීමට පුද්ගලයින්",
+    "replyPeopleAria": "පිළිතුරෙහි සඳහන් කිරීමට පුද්ගලයින්",
+    "trigger": "පුද්ගලයින් සඳහන් කරන්න",
+    "noMatches": "ගැලපෙන පුද්ගලයන් නැත",
+    "title": "{{name}} සඳහන් කරන්න",
+    "person": "පුද්ගලයා",
+    "you": "ඔබ",
+    "organizationPerson": "සංවිධාන සාමාජික",
+    "roleInOrganization": "සංවිධානයේ {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "අදහස් නූල්",
+    "empty": "තවම අදහස් නැත",
+    "noOpen": "විවෘත අදහස් නැත",
+    "noResolved": "විසඳුණු අදහස් නැත"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ගේ අදහස, {{time}}",
+    "commentAriaResolved": "{{author}} ගේ අදහස, {{time}}, විසඳා ඇත",
+    "replyAria": "{{author}} ගේ පිළිතුර, {{time}}",
+    "repliesAria": "{{count}} පිළිතුරු",
+    "edited": "(සංස්කරණය)",
+    "emptyComment": "(හිස් අදහස)",
+    "emptyReply": "(හිස් පිළිතුර)",
+    "justNow": "මොහොතකට පෙර"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "පිළිතුරු",
+    "showInPage": "පිටුවේ පෙන්වන්න",
+    "resolve": "විසඳන්න",
+    "reopen": "නැවත විවෘත කරන්න",
+    "edit": "සංස්කරණය"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "පිළිතුර..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "අදහස සංස්කරණය කරන්න"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "මෙම අදහස මකන්නද?",
+    "threadConfirm_one": "මෙම අදහස සහ එහි පිළිතුර මකන්නද?",
+    "threadConfirm_other": "මෙම අදහස සහ එහි පිළිතුරු {{count}} මකන්නද?"
   }
 }

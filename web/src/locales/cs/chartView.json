@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "average": "Průměr",
+    "count": "Počet",
+    "max": "Max",
     "min": "Min",
-    "max": "Max"
+    "sum": "Součet"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} graf",
+  "chartType": "Typ grafu",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Sloupcový",
+    "donut": "Koblihový",
+    "horizontal_bar": "Vodorovný sloupcový",
+    "line": "Čárový"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Zaškrtnuto",
+  "empty": "Prázdné",
+  "legend": "Legenda grafu",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Žádná data",
+  "noDataDesc": "Žádné řádky neodpovídají aktuálním filtrům ani vyhledávání.",
+  "noGroupProperty": "Zatím nic k zobrazení grafu",
+  "noGroupPropertyDesc": "Přidejte vlastnost výběru, stavu, osoby, zaškrtávacího políčka nebo data pro seskupení grafu.",
+  "total": "Celkem",
+  "unchecked": "Nezaškrtnuto",
+  "untitledProperty": "Bez názvu",
+  "valueProperty": "Vlastnost hodnoty",
+  "xAxis": "Osa X",
+  "yAxis": "Osa Y"
 }

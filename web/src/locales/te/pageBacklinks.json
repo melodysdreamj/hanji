@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} బ్యాక్లింక్",
+    "count_other": "{{count}} బ్యాక్లింక్లు"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "లింక్ చేయబడిన మెన్షన్లు"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} మెన్షన్",
+    "mention_other": "{{count}} మెన్షన్లు",
+    "link_one": "{{count}} లింక్",
+    "link_other": "{{count}} లింక్లు"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "మెన్షన్",
+    "link": "లింక్"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} అదనపు బ్యాక్లింక్",
+    "count_other": "{{count}} అదనపు బ్యాక్లింక్లు"
   }
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Chiudi selettore icone",
+    "label": "Scegli icona"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Tipo di icona",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Immagine"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Rimuovi",
+    "ariaLabel": "Rimuovi icona"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtra…",
+    "searchLabel": "Cerca icone",
+    "random": "Casuale",
+    "randomLabel": "Scegli un'icona casuale",
+    "recentLabel": "Prima quelli usati di recente",
+    "gridLabelRecent": "Icone, recenti per prime",
+    "gridLabel": "Icone",
+    "optionLabel": "Scegli icona {{emoji}}",
+    "noResults": "Nessuna icona corrisponde a “{{query}}”. Prova una parola diversa o cancella il filtro."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Immagine",
+    "linkPlaceholder": "Incolla link immagine",
+    "linkLabel": "Link immagine icona",
+    "apply": "Applica",
+    "upload": "Carica file",
+    "uploading": "Caricamento...",
+    "uploadingLabel": "Caricamento {{fileName}}",
+    "uploadFailed": "Impossibile caricare l'immagine.",
+    "fallbackFileName": "Immagine icona"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Preparazione caricamento",
+    "finalizing": "Finalizzazione",
+    "complete": "Completato",
+    "uploading": "Caricamento"
   }
 }

@@ -7,9 +7,9 @@
     "Database": "データベース",
     "Advanced": "高度なブロック"
   },
-  "itemStatus": "{{label}}、{{total}}件中{{position}}件目。Enterキーで挿入。",
-  "listStatus": "{{total}}件のブロックコマンドが利用可能です。",
+  "itemStatus": "{{label}}、{{total}}個中{{position}}番目。Enterキーを押して挿入。",
+  "listStatus": "{{total}}個のブロックコマンドが利用可能です。",
   "noBlocks": "ブロックが見つかりません",
-  "noBlocksFor": "「{{query}}」のブロックが見つかりません",
-  "recentlyUsed": "最近使用したもの"
+  "noBlocksFor": "「{{query}}」に該当するブロックが見つかりません",
+  "recentlyUsed": "最近使用した"
 }

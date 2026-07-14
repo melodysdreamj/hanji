@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "ഈ ഉള്ളടക്കം പ്രദർശിപ്പിക്കുന്നതിൽ പിശക് സംഭവിച്ചു.",
+  "detail": "വീണ്ടും ശ്രമിക്കുക. പ്രശ്നം തുടരുകയാണെങ്കിൽ, ആപ്ലിക്കേഷൻ റീലോഡ് ചെയ്ത് താഴെയുള്ള റഫറൻസ് പങ്കിടുക.",
+  "reference": "റഫറൻസ്: {{reference}}",
+  "reload": "ആപ്ലിക്കേഷൻ റീലോഡ് ചെയ്യുക",
+  "retry": "വീണ്ടും ശ്രമിക്കുക"
 }

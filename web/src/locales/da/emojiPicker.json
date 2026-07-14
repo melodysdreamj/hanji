@@ -1,43 +1,43 @@
 {
+  "custom": {
+    "apply": "Anvend",
+    "fallbackFileName": "Ikonbillede",
+    "linkLabel": "Ikonbillede-link",
+    "linkPlaceholder": "Indsæt billedlink",
+    "previewPlaceholder": "Billede",
+    "upload": "Upload fil",
+    "uploadFailed": "Kunne ikke uploade det billede.",
+    "uploading": "Uploader...",
+    "uploadingLabel": "Uploader {{fileName}}"
+  },
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
-  },
-  "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
-  },
-  "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "backdropLabel": "Luk ikonvælger",
+    "label": "Vælg ikon"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "gridLabel": "Ikoner",
+    "gridLabelRecent": "Ikoner, nyligt brugte først",
+    "noResults": "Ingen ikoner matcher “{{query}}”. Prøv et andet ord eller ryd filteret.",
+    "optionLabel": "Vælg ikon {{emoji}}",
+    "random": "Tilfældig",
+    "randomLabel": "Vælg et tilfældigt ikon",
+    "recentLabel": "Senest brugte først",
+    "searchLabel": "Søg ikoner",
+    "searchPlaceholder": "Filtrér…"
   },
-  "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+  "remove": {
+    "ariaLabel": "Fjern ikon",
+    "label": "Fjern"
+  },
+  "tabs": {
+    "emoji": "Emoji",
+    "groupLabel": "Ikontype",
+    "image": "Billede"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "complete": "Færdig",
+    "finalizing": "Afslutter",
+    "preparing": "Forbereder upload",
+    "uploading": "Uploader"
   }
 }

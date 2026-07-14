@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "లెక్క",
+    "sum": "మొత్తం",
+    "average": "సగటు",
+    "min": "కనిష్టం",
+    "max": "గరిష్టం"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} చార్ట్",
+  "chartType": "చార్ట్ రకం",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "బార్",
+    "horizontal_bar": "హారిజాంటల్ బార్",
+    "line": "లైన్",
+    "donut": "డోనట్"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "చెక్ చేసిన",
+  "empty": "ఖాళీ",
+  "legend": "చార్ట్ లెజెండ్",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "డేటా లేదు",
+  "noDataDesc": "ప్రస్తుత ఫిల్టర్లు లేదా శోధనకు సరిపోలే వరుసలు లేవు.",
+  "noGroupProperty": "చార్ట్ చేయడానికి ఏమీ లేదు",
+  "noGroupPropertyDesc": "ఈ చార్ట్ను గ్రూప్ చేయడానికి సెలెక్ట్, స్టేటస్, వ్యక్తి, చెక్బాక్స్ లేదా తేదీ ప్రాపర్టీని జోడించండి.",
+  "total": "మొత్తం",
+  "unchecked": "చెక్ చేయని",
+  "untitledProperty": "శీర్షిక లేని",
+  "valueProperty": "విలువ ప్రాపర్టీ",
+  "xAxis": "X-అక్షం",
+  "yAxis": "Y-అక్షం"
 }

@@ -2,16 +2,16 @@
   "defs": {
     "paragraph": {
       "label": "Text",
-      "description": "Beginne einfach mit Klartext zu schreiben.",
-      "placeholder": "'/' für Befehle eingeben"
+      "description": "Schreibe einfach mit normalem Text.",
+      "placeholder": "Gib '/' für Befehle ein"
     },
     "child_page": {
       "label": "Seite",
-      "description": "Erstelle eine Unterseite innerhalb dieser Seite."
+      "description": "Unterseite in dieser Seite erstellen."
     },
     "link_to_page": {
-      "label": "Link zur Seite",
-      "description": "Verlinke eine vorhandene Seite."
+      "label": "Seitenlink",
+      "description": "Mit einer vorhandenen Seite verknüpfen."
     },
     "heading_1": {
       "label": "Überschrift 1",
@@ -19,9 +19,9 @@
       "placeholder": "Überschrift 1"
     },
     "toggle_heading_1": {
-      "label": "Umschalt-Überschrift 1",
+      "label": "Toggle-Überschrift 1",
       "description": "Große Überschrift, die verschachtelte Inhalte verbergen kann.",
-      "placeholder": "Umschalt-Überschrift 1"
+      "placeholder": "Toggle-Überschrift 1"
     },
     "heading_2": {
       "label": "Überschrift 2",
@@ -29,9 +29,9 @@
       "placeholder": "Überschrift 2"
     },
     "toggle_heading_2": {
-      "label": "Umschalt-Überschrift 2",
-      "description": "Mittlere Überschrift, die verschachtelte Inhalte verbergen kann.",
-      "placeholder": "Umschalt-Überschrift 2"
+      "label": "Toggle-Überschrift 2",
+      "description": "Mittlere Überschrift, die verschachtelte Inhalte ausblenden kann.",
+      "placeholder": "Toggle-Überschrift 2"
     },
     "heading_3": {
       "label": "Überschrift 3",
@@ -39,9 +39,9 @@
       "placeholder": "Überschrift 3"
     },
     "toggle_heading_3": {
-      "label": "Umschalt-Überschrift 3",
+      "label": "Toggle-Überschrift 3",
       "description": "Kleine Überschrift, die verschachtelte Inhalte ausblenden kann.",
-      "placeholder": "Umschaltüberschrift 3"
+      "placeholder": "Toggle-Überschrift 3"
     },
     "heading_4": {
       "label": "Überschrift 4",
@@ -49,96 +49,96 @@
       "placeholder": "Überschrift 4"
     },
     "toggle_heading_4": {
-      "label": "Umschaltüberschrift 4",
-      "description": "Kompakte Überschrift, die verschachtelte Inhalte ausblenden kann.",
-      "placeholder": "Umschaltüberschrift 4"
+      "label": "Toggle-Überschrift 4",
+      "description": "Kompakte Überschrift, die verschachtelte Inhalte verbergen kann.",
+      "placeholder": "Toggle-Überschrift 4"
     },
     "to_do": {
-      "label": "To-do-Liste",
-      "description": "Aufgaben mit einem Kontrollkästchen verfolgen.",
-      "placeholder": "To-do"
+      "label": "Aufgabenliste",
+      "description": "Aufgaben mit einer Checkbox verfolgen.",
+      "placeholder": "Aufgabe"
     },
     "bulleted_list_item": {
       "label": "Aufzählungsliste",
-      "description": "Eine einfache Aufzählungsliste erstellen.",
+      "description": "Einfache Aufzählungsliste erstellen.",
       "placeholder": "Liste"
     },
     "numbered_list_item": {
       "label": "Nummerierte Liste",
-      "description": "Eine nummerierte Liste erstellen.",
+      "description": "Erstelle eine nummerierte Liste.",
       "placeholder": "Liste"
     },
     "toggle": {
-      "label": "Umschaltliste",
-      "description": "Umschalter können Inhalte aus- und einblenden.",
-      "placeholder": "Umschalter"
+      "label": "Toggle-Liste",
+      "description": "Toggle kann Inhalte ein- und ausblenden.",
+      "placeholder": "Toggle"
     },
     "quote": {
       "label": "Zitat",
-      "description": "Ein Zitat erfassen.",
+      "description": "Zitat erfassen.",
       "placeholder": "Leeres Zitat"
     },
     "callout": {
-      "label": "Hinweis",
+      "label": "Callout",
       "description": "Text hervorheben.",
-      "placeholder": "Etwas eingeben…"
+      "placeholder": "Gib etwas ein…"
     },
     "divider": {
       "label": "Trennlinie",
-      "description": "Blöcke visuell trennen."
+      "description": "Blöcke optisch trennen."
     },
     "code": {
       "label": "Code",
-      "description": "Ein Code-Snippet erfassen.",
-      "placeholder": "Code schreiben oder ein Snippet einfügen…"
+      "description": "Code-Snippet aufnehmen.",
+      "placeholder": "Code schreiben oder Snippet einfügen…"
     },
     "equation": {
       "label": "Formel",
-      "description": "Eine mathematische Formel anzeigen."
+      "description": "Formel anzeigen."
     },
     "table_of_contents": {
       "label": "Inhaltsverzeichnis",
-      "description": "Links zu Überschriften auf dieser Seite anzeigen."
+      "description": "Links zu Überschriften dieser Seite anzeigen."
     },
     "synced_block": {
       "label": "Synchronisierter Block",
       "description": "Inhalte seitenübergreifend wiederverwenden."
     },
     "button": {
-      "label": "Schaltfläche",
-      "description": "Wiederverwendbare Inhalte mit einem Klick einfügen."
+      "label": "Button",
+      "description": "Wiederverwendbaren Inhalt mit einem Klick einfügen."
     },
     "tab": {
-      "label": "Registerkarten",
-      "description": "Inhalte in beschriftete Registerkarten gruppieren.",
-      "placeholder": "Registerkarten"
+      "label": "Tabs",
+      "description": "Gruppiere Inhalte in Tabs.",
+      "placeholder": "Tabs"
     },
     "breadcrumb": {
-      "label": "Brotkrumen",
-      "description": "Anzeigen, wo sich diese Seite befindet."
+      "label": "Breadcrumb",
+      "description": "Zeigt die Position dieser Seite an."
     },
     "action_duplicate": {
       "label": "Duplizieren",
-      "description": "Eine exakte Kopie dieses Blocks erstellen."
+      "description": "Exakte Kopie dieses Blocks erstellen."
     },
     "action_move_to": {
       "label": "Verschieben nach",
-      "description": "Diesen Block auf eine andere Seite verschieben."
+      "description": "Diesen Block in eine andere Seite verschieben."
     },
     "action_delete": {
       "description": "Diesen Block löschen."
     },
     "action_turn_into": {
-      "label": "Umwandeln in",
+      "label": "Umwandeln",
       "description": "Den Typ dieses Blocks ändern."
     },
     "action_color": {
       "label": "Farbe",
-      "description": "Die Text- oder Hintergrundfarbe dieses Blocks ändern."
+      "description": "Text- oder Hintergrundfarbe dieses Blocks ändern."
     },
     "simple_table": {
       "label": "Tabelle",
-      "description": "Eine einfache Tabelle zu dieser Seite hinzufügen."
+      "description": "Füge eine einfache Tabelle hinzu."
     },
     "column_list_2": {
       "label": "2 Spalten",
@@ -162,83 +162,83 @@
     },
     "video": {
       "label": "Video",
-      "description": "Ein Video per Link einbetten."
+      "description": "Video mit einem Link einbetten."
     },
     "audio": {
       "label": "Audio",
-      "description": "Audio per Link einbetten."
+      "description": "Audio mit einem Link einbetten."
     },
     "bookmark": {
-      "label": "Lesezeichen",
-      "description": "Einen Weblink als Karte speichern."
+      "label": "Web-Lesezeichen",
+      "description": "Weblink als Karte speichern."
     },
     "embed": {
       "label": "Einbetten",
-      "description": "Inhalte aus einem Link einbetten."
+      "description": "Inhalte über einen Link einbetten."
     },
     "file": {
       "label": "Datei",
-      "description": "Einen Dateilink an diese Seite anfügen."
+      "description": "Dateilink an diese Seite anhängen."
     },
     "child_database": {
       "label": "Datenbank – Ganze Seite",
-      "description": "Eine neue Datenbank als Unterseite hinzufügen."
+      "description": "Neue Datenbank als Unterseite hinzufügen."
     },
     "child_database_table": {
-      "label": "Tabelle – Ganze Seite",
-      "description": "Eine ganzseitige Datenbank als Tabelle hinzufügen."
+      "label": "Tabelle – Ganzseite",
+      "description": "Ganzseitige Datenbank als Tabelle hinzufügen."
     },
     "child_database_board": {
-      "label": "Board – Ganze Seite",
-      "description": "Ein ganzseitiges Kanban-Board hinzufügen."
+      "label": "Board – Ganzseite",
+      "description": "Ganzseitiges Kanban-Board hinzufügen."
     },
     "child_database_list": {
-      "label": "Liste – Ganze Seite",
-      "description": "Eine ganzseitige Datenbank als Liste hinzufügen."
+      "label": "Liste – Ganzseite",
+      "description": "Ganzseitige Datenbank als Liste hinzufügen."
     },
     "child_database_timeline": {
-      "label": "Zeitleiste – Ganze Seite",
-      "description": "Eine ganzseitige Datenbank-Zeitleiste hinzufügen."
+      "label": "Timeline – Ganzseite",
+      "description": "Ganzseitige Datenbank-Timeline hinzufügen."
     },
     "child_database_calendar": {
-      "label": "Kalender – Ganze Seite",
-      "description": "Eine ganzseitige Kalender-Datenbank hinzufügen."
+      "label": "Kalender – Ganzseite",
+      "description": "Ganzseitige Kalenderdatenbank hinzufügen."
     },
     "child_database_gallery": {
-      "label": "Galerie – Ganze Seite",
-      "description": "Eine ganzseitige Datenbank-Galerie hinzufügen."
+      "label": "Galerie – Ganzseite",
+      "description": "Ganzseitige Datenbankgalerie hinzufügen."
     },
     "inline_database": {
-      "label": "Datenbank – Inline",
-      "description": "Eine Datenbank innerhalb dieser Seite hinzufügen."
+      "label": "Datenbank - Inline",
+      "description": "Datenbank in diese Seite einfügen."
     },
     "inline_database_table": {
       "label": "Tabellenansicht",
-      "description": "Eine Inline-Datenbank als Tabelle hinzufügen."
+      "description": "Inline-Datenbank als Tabelle hinzufügen."
     },
     "inline_database_board": {
       "label": "Board-Ansicht",
-      "description": "Ein Inline-Kanban-Board hinzufügen."
+      "description": "Inline-Kanban-Board hinzufügen."
     },
     "inline_database_list": {
       "label": "Listenansicht",
-      "description": "Eine Inline-Datenbank als Liste hinzufügen."
+      "description": "Inline-Datenbank als Liste hinzufügen."
     },
     "inline_database_timeline": {
       "label": "Zeitleistenansicht",
-      "description": "Eine Inline-Datenbank-Zeitleiste hinzufügen."
+      "description": "Inline-Datenbank-Zeitleiste hinzufügen."
     },
     "inline_database_calendar": {
       "label": "Kalenderansicht",
-      "description": "Eine Inline-Kalender-Datenbank hinzufügen."
+      "description": "Inline-Kalenderdatenbank hinzufügen."
     },
     "inline_database_gallery": {
       "label": "Galerieansicht",
-      "description": "Eine Inline-Datenbank-Galerie hinzufügen."
+      "description": "Inline-Datenbankgalerie hinzufügen."
     },
     "color_default": {
       "label": "Standard",
-      "description": "Text- oder Hintergrundfarbe aus diesem Block entfernen."
+      "description": "Text- oder Hintergrundfarbe von diesem Block entfernen."
     },
     "color_gray": {
       "label": "Grau",
@@ -285,8 +285,8 @@
       "description": "Braunen Hintergrund auf diesen Block anwenden."
     },
     "color_orange_background": {
-      "label": "Oranger Hintergrund",
-      "description": "Orangen Hintergrund auf diesen Block anwenden."
+      "label": "Orangener Hintergrund",
+      "description": "Orangenen Hintergrund auf diesen Block anwenden."
     },
     "color_yellow_background": {
       "label": "Gelber Hintergrund",
@@ -306,7 +306,7 @@
     },
     "color_pink_background": {
       "label": "Rosa Hintergrund",
-      "description": "Rosa Hintergrund auf diesen Block anwenden."
+      "description": "Pinken Hintergrund auf diesen Block anwenden."
     },
     "color_red_background": {
       "label": "Roter Hintergrund",

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Іздеу немесе өту...",
+  "quickFind": "Жылдам іздеу",
+  "closeSearch": "Іздеуді жабу",
+  "quickFindResults": "Жылдам іздеу нәтижелері",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Соңғы қаралғандар",
+    "recentSearches": "Соңғы іздеулер",
+    "pages": "Парақтар",
+    "pageContent": "Парақ мазмұны",
+    "favorites": "Таңдаулылар"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "парақ ішінде",
+  "searchingDetail": "Іздеу...",
+  "searchAgain": "Қайта іздеу",
+  "searchingPageContent": "Парақ мазмұны ізделуде...",
+  "noResultsFor": "\"{{query}}\" бойынша нәтижелер жоқ",
+  "noPagesFound": "Парақтар табылмады",
+  "creating": "Жасалуда...",
+  "newPage": "Жаңа парақ \"{{query}}\"",
+  "couldntCreatePage": "Бетті жасау мүмкін болмады",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Таңдау",
+    "open": "Ашу",
+    "newTab": "Жаңа қойынды"
   }
 }

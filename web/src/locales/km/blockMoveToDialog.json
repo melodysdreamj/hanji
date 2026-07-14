@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ផ្លាស់ទីប្លុកទៅ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ស្វែងរកទីតាំងផ្លាស់ទី",
+    "placeholder": "ស្វែងរកទំព័រ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "បិទប្រអប់ផ្លាស់ទី"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ទីតាំងផ្លាស់ទី",
+    "empty": "រកមិនឃើញទំព័រទេ។",
+    "destinationLabel": "ផ្លាស់ទីប្លុកទៅ {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "បង្កើត \"{{query}}\"",
+    "optionLabel": "បង្កើតទំព័រ \"{{query}}\" ហើយផ្លាស់ទីប្លុកនៅទីនេះ",
+    "hint": "ទំព័រថ្មី - ផ្លាស់ទីប្លុកនៅទីនេះ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "ទំព័រត្រូវបានចាក់សោ"
   },
-  "untitled": "Untitled",
+  "untitled": "គ្មានចំណងជើង",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "ទំព័រត្រូវបានចាក់សោ",
+    "movedBlock": "បានផ្លាស់ទីប្លុក",
+    "movedBlocks": "បានផ្លាស់ទីប្លុក",
+    "movedBlocksCount": "បានផ្លាស់ទី {{blockCount}} ប្លុក",
+    "moveFailed": "មិនអាចផ្លាស់ទីប្លុកបានទេ។"
   }
 }

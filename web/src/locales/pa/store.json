@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "ਇਹ ਡੇਟਾਬੇਸ ਲੌਕ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "databaseRowsLoadFailed": "ਡੇਟਾਬੇਸ ਕਤਾਰਾਂ ਲੋਡ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ। ਕਿਰਪਾ ਕਰਕੇ ਕੁਝ ਪਲਾਂ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "editAccessDeniedSave": "ਤੁਹਾਡੇ ਕੋਲ ਸੰਪਾਦਨ ਪਹੁੰਚ ਨਹੀਂ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "lockedSave": "ਪੰਨਾ ਜਾਂ ਡੇਟਾਬੇਸ ਲੌਕ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "pageLockedSave": "ਇਹ ਪੰਨਾ ਲੌਕ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "pageMissingSave": "ਪੰਨਾ ਨਹੀਂ ਮਿਲਿਆ, ਇਸ ਲਈ ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "saveFailed": "ਤੁਹਾਡੀਆਂ ਤਬਦੀਲੀਆਂ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤੀਆਂ ਜਾ ਸਕੀਆਂ।",
+  "sessionExpired": "ਤੁਹਾਡਾ ਸੈਸ਼ਨ ਖਤਮ ਹੋ ਗਿਆ ਜਾਂ ਬੇਨਤੀ ਪ੍ਰਮਾਣਿਤ ਨਹੀਂ ਹੋ ਸਕੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "blockConflictSave": "ਇਹ ਬਲਾਕ ਕਿਸੇ ਹੋਰ ਡਿਵਾਈਸ 'ਤੇ ਸੰਪਾਦਿਤ ਕੀਤਾ ਗਿਆ ਸੀ, ਇਸ ਲਈ ਤੁਹਾਡੀ ਔਫਲਾਈਨ ਤਬਦੀਲੀ ਲਾਗੂ ਨਹੀਂ ਕੀਤੀ ਗਈ।",
+  "blockConflictKeepMine": "ਮੇਰਾ ਸੰਸਕਰਣ ਲਾਗੂ ਕਰੋ",
+  "blockMoveCommentsSkipped": "ਬਲਾਕ ਚਲਿਆ ਗਿਆ, ਪਰ ਇਸਦੇ ਟਿੱਪਣੀਆਂ ਇਸਦੇ ਨਾਲ ਨਹੀਂ ਚੱਲ ਸਕੇ।"
 }

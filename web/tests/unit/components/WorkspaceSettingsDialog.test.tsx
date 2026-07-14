@@ -11,6 +11,10 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
     currentUserId: vi.fn(() => "melody-user-id"),
     listAuthSessionsRemote: vi.fn(async () => []),
     listMfaFactorsRemote: vi.fn(async () => []),
+    saveAccountLanguagePreferenceRemote: vi.fn(async (languagePreference: string) => ({
+      languagePreference,
+      languageOnboardingCompleted: true,
+    })),
     updateMyWorkspaceProfileRemote: vi.fn(async () => ({
       currentMember: {
         id: "member-guest",
@@ -29,7 +33,9 @@ import {
   changePasswordRemote,
   listAuthSessionsRemote,
   listMfaFactorsRemote,
+  saveAccountLanguagePreferenceRemote,
 } from "@/lib/edgebase";
+import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { useStore } from "@/lib/store";
 import type { WorkspaceMember } from "@/lib/types";
 import { resetStore } from "./storeTestUtils";
@@ -41,6 +47,7 @@ if (typeof Element !== "undefined" && !Element.prototype.scrollTo) {
 const changePasswordRemoteMock = vi.mocked(changePasswordRemote);
 const listAuthSessionsRemoteMock = vi.mocked(listAuthSessionsRemote);
 const listMfaFactorsRemoteMock = vi.mocked(listMfaFactorsRemote);
+const saveAccountLanguagePreferenceRemoteMock = vi.mocked(saveAccountLanguagePreferenceRemote);
 
 const guestMember: WorkspaceMember = {
   id: "member-guest",
@@ -74,11 +81,13 @@ async function flushEffects() {
 }
 
 beforeEach(() => {
+  window.localStorage.clear();
   resetStore();
   seedWorkspace();
   changePasswordRemoteMock.mockClear();
   listAuthSessionsRemoteMock.mockClear();
   listMfaFactorsRemoteMock.mockClear();
+  saveAccountLanguagePreferenceRemoteMock.mockClear();
   listAuthSessionsRemoteMock.mockResolvedValue([]);
   listMfaFactorsRemoteMock.mockResolvedValue([]);
 });
@@ -94,17 +103,24 @@ describe("WorkspaceSettingsDialog account console", () => {
     const options = Array.from(languageSelect.querySelectorAll("option"));
     expect(options.map((option) => option.value)).toEqual([
       "system",
-      "ko",
-      "en",
-      "ja",
-      "zh-Hans",
-      "es",
-      "fr",
-      "de",
-      "pt-BR",
+      ...LANGUAGE_OPTIONS.map((option) => option.value),
     ]);
+    expect(options).toHaveLength(59);
     expect(languageSelect.tabIndex).toBe(0);
     expect(screen.queryByRole("radiogroup", { name: "Language" })).toBeNull();
+  });
+
+  it("saves a changed language to the signed-in account before applying it locally", async () => {
+    render(<WorkspaceSettingsDialog />);
+    await flushEffects();
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Language" }), {
+      target: { value: "en" },
+    });
+    await flushEffects();
+
+    expect(saveAccountLanguagePreferenceRemoteMock).toHaveBeenCalledWith("en");
+    expect(window.localStorage.getItem("hanji:language:melody-user-id")).toBe("en");
   });
 
   it("shows the signed-in email and account id when the workspace member profile has no email", async () => {

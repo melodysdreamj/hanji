@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ট্র্যাশ",
+  "empty": "আপনি যে পৃষ্ঠাগুলি মুছবেন তা এখানে আসে। ট্র্যাশে কিছুই নেই।",
+  "searchTrash": "ট্র্যাশ অনুসন্ধান",
+  "deletedPages": "মুছে ফেলা পৃষ্ঠা",
+  "noSearchMatches": "আপনার অনুসন্ধানের সাথে মিলে এমন কোনো মুছে ফেলা পৃষ্ঠা নেই।",
+  "pageCount_one": "{{count}}টি পৃষ্ঠা",
+  "pageCount_other": "{{count}}টি পৃষ্ঠা",
+  "deletedJustNow": "এইমাত্র মুছে ফেলা হয়েছে",
+  "deletedOn": "{{date}} এ মুছে ফেলা হয়েছে",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "পুনরুদ্ধার করুন",
+    "deleteForever": "চিরতরে মুছুন",
+    "emptyTrash": "ট্র্যাশ খালি করুন"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "ট্র্যাশ থেকে {{title}} খুলুন",
+    "restorePage": "{{title}} পুনরুদ্ধার করুন",
+    "deletePageForever": "{{title}} চিরতরে মুছুন",
+    "cancelPermanentDelete": "স্থায়ী মুছে ফেলা বাতিল করুন",
+    "cancelEmptyTrash": "ট্র্যাশ খালি করা বাতিল করুন"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "চিরতরে মুছে ফেলবেন?",
+    "deleteBodyPrefix": "এটি স্থায়ীভাবে মুছে ফেলবে ",
+    "deleteBodySuffix": ". আপনি এই কাজটি পূর্বাবস্থায় ফেরাতে পারবেন না।",
+    "emptyTitle": "ট্র্যাশ খালি করবেন?",
+    "emptyBody_one": "এটি ট্র্যাশে থাকা {{count}}টি পৃষ্ঠা স্থায়ীভাবে মুছে ফেলবে। আপনি এই কাজটি পূর্বাবস্থায় ফেরাতে পারবেন না।",
+    "emptyBody_other": "এটি ট্র্যাশে থাকা {{count}}টি পৃষ্ঠা স্থায়ীভাবে মুছে ফেলবে। আপনি এই কাজটি পূর্বাবস্থায় ফেরাতে পারবেন না।"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "স্থায়ীভাবে মুছে ফেলা হয়েছে",
+    "couldntDelete": "পৃষ্ঠা মুছে ফেলা যায়নি",
+    "restored": "পৃষ্ঠা পুনরুদ্ধার করা হয়েছে",
+    "couldntRestore": "পৃষ্ঠা পুনরুদ্ধার করা যায়নি",
+    "emptied": "ট্র্যাশ খালি করা হয়েছে",
+    "couldntEmpty": "ট্র্যাশ খালি করা যায়নি"
   }
 }

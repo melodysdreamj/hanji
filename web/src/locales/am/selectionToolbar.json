@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "የጽሑፍ ቅርጸት"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "ወደ ቀይር",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "ጽሑፍ",
+      "heading1": "ርዕስ 1",
+      "heading2": "ርዕስ 2",
+      "heading3": "ርዕስ 3",
+      "heading4": "ርዕስ 4",
+      "toDoList": "የሚከናወኑ ሥራዎች",
+      "bulletedList": "ነጥብ ዝርዝር",
+      "numberedList": "የተቆጠረ ዝርዝር",
+      "toggleList": "የመቀየሪያ ዝርዝር",
+      "quote": "ጥቅስ",
+      "callout": "ካላውት",
+      "code": "ኮድ"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ደማቅ",
+    "italic": "ኢታሊክ",
+    "underline": "ስር መስመር",
+    "strikethrough": "ስትራይክትሩ",
+    "code": "ኮድ",
+    "link": "አገናኝ"
   },
   "comment": {
-    "label": "Comment"
+    "label": "አስተያየት"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "የጽሁፍ ቀለም: {{color}}",
+    "title": "ቀለም: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ድብልቅ",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "የጽሑፍ ቀለም",
+      "default": "ነባሪ",
+      "gray": "ግራጫ",
+      "brown": "ቡናማ",
+      "orange": "ብርቱካንማ",
+      "yellow": "ቢጫ",
+      "green": "አረንጓዴ",
+      "blue": "ሰማያዊ",
+      "purple": "ሐምራዊ",
+      "pink": "ሮዝ",
+      "red": "ቀይ"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "የዳራ ቀለም",
+      "gray": "ግራጫ ዳራ",
+      "brown": "ቡናማ ዳራ",
+      "orange": "ብርቱካናማ ዳራ",
+      "yellow": "ቢጫ ዳራ",
+      "green": "አረንጓዴ ዳራ",
+      "blue": "ሰማያዊ ዳራ",
+      "purple": "ሐምራዊ ዳራ",
+      "pink": "ሮዝ ዳራ",
+      "red": "ቀይ ዳራ"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "አገናኝ አርትዕ",
+    "placeholder": "አገናኝ ለጥፍ",
+    "urlAriaLabel": "የአገናኝ URL",
+    "apply": "አገናኝ",
+    "open": "አገናኝ ክፈት",
+    "copy": "አገናኝ ቅዳ",
+    "copied": "ተቀድቷል",
+    "copiedLink": "አገናኝ ተቀድቷል",
+    "remove": "አስወግድ"
   }
 }

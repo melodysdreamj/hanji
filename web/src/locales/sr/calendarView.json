@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Dodaj svojstvo datuma",
+    "description": "Prikazi kalendara zahtevaju svojstvo datuma za postavljanje stranica na mesec.",
+    "addDateButton": "Datum"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalendar po",
+    "today": "Danas",
+    "previousWeek": "Prethodna nedelja",
+    "previousMonth": "Prethodni mesec",
+    "nextWeek": "Sledeća nedelja",
+    "nextMonth": "Sledeći mesec"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Ned",
+    "mon": "Pon",
+    "tue": "Uto",
+    "wed": "Sre",
+    "thu": "Čet",
+    "fri": "Pet",
+    "sat": "Sub"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} kalendar",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} stavki",
+    "newRowAriaLabel": "Novi red na {{date}}",
+    "newRowTitle": "Novo",
+    "showLess": "Prikaži manje",
+    "showMore": "+{{count}} više"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Otvori {{title}}",
+    "openAriaLabelWithDate": "Otvori {{title}}, zakazano za {{date}}",
+    "openNoDateAriaLabel": "Otvori {{title}}, bez datuma"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Bez datuma ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Bez naslova",
+    "dateDefaultName": "Datum"
   }
 }

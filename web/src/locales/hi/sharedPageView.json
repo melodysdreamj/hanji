@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "साझा पृष्ठ",
+  "loading": "साझा पृष्ठ लोड हो रहा है",
+  "unavailable": "यह साझा पृष्ठ उपलब्ध नहीं है।",
+  "notFound": "साझा पृष्ठ नहीं मिला।",
+  "outsideShare": "यह पृष्ठ इस सार्वजनिक साझाकरण का हिस्सा नहीं है।",
+  "errors": {
+    "not-found": "यह लिंक समाप्त, अप्रकाशित, या गलत कॉपी किया गया हो सकता है।",
+    "offline": "अपना कनेक्शन जाँचें, फिर साझा पृष्ठ को पुनः खोलने का प्रयास करें।",
+    "rate-limited": "इस साझा पृष्ठ पर बहुत अधिक अनुरोध हैं। थोड़ी देर बाद पुनः प्रयास करें।",
+    "unavailable": "Hanji अभी इस साझा पृष्ठ को खोल नहीं सका। कृपया थोड़ी देर में पुनः प्रयास करें।"
+  },
+  "tryAgain": "पुनः प्रयास करें"
 }

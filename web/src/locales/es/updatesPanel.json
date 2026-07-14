@@ -1,7 +1,7 @@
 {
   "filters": {
-    "all": "Todos",
-    "unread": "Sin leer",
+    "all": "Todo",
+    "unread": "No leído",
     "comments": "Comentarios",
     "mentions": "Menciones",
     "edits": "Ediciones"
@@ -17,11 +17,11 @@
     "updateType": "Tipo de actualización",
     "updates": "Actualizaciones",
     "modeUpdates": "Actualizaciones",
-    "modeChats": "Chats",
+    "modeChats": "Charlas",
     "inboxMode": "Modo bandeja de entrada"
   },
   "time": {
-    "justNow": "Justo ahora",
+    "justNow": "Ahora mismo",
     "today": "Hoy",
     "yesterday": "Ayer"
   },
@@ -29,23 +29,23 @@
     "blockCount_one": "{{count}} bloque",
     "blockCount_other": "{{count}} bloques",
     "currentVersion": "Versión actual",
-    "currentVersionOnly": "Solo versión actual",
+    "currentVersionOnly": "Solo la versión actual",
     "next": "Siguiente",
-    "nextVersion": "Versión siguiente",
+    "nextVersion": "Siguiente versión",
     "noVersionPrevious": "No hay versión anterior",
-    "noVersionNext": "No hay versión siguiente",
+    "noVersionNext": "No hay siguiente versión",
     "pageLocked": "Página bloqueada",
     "previous": "Anterior",
-    "previousSnapshots_one": "{{count}} instantánea anterior",
-    "previousSnapshots_other": "{{count}} instantáneas anteriores",
+    "previousSnapshots_one": "{{count}} snapshot anterior",
+    "previousSnapshots_other": "{{count}} snapshots anteriores",
     "previousVersion": "Versión anterior",
     "restoredPrevious": "Versión anterior restaurada",
-    "restoredNext": "Versión siguiente restaurada",
+    "restoredNext": "Siguiente versión restaurada",
     "restoredVersions": "{{count}} versiones restauradas",
     "versionCount_one": "{{count}} versión",
     "versionCount_other": "{{count}} versiones",
-    "versionsAgo": "hace {{count}} versiones",
-    "versionsAhead": "{{count}} versiones por delante",
+    "versionsAgo": "Hace {{count}} versiones",
+    "versionsAhead": "{{count}} versiones adelante",
     "versionsAria": "Versiones"
   },
   "badges": {
@@ -55,7 +55,7 @@
     "member": "Miembro",
     "mention": "Mención",
     "reply": "Respuesta",
-    "replyMention": "Mención en respuesta",
+    "replyMention": "Respuesta con mención",
     "shared": "Compartido",
     "system": "Sistema"
   },
@@ -66,7 +66,7 @@
     "notification": "Notificación",
     "referenceMention": "Mencionó {{title}} · {{preview}}",
     "referenceLink": "Enlazado a {{title}} · {{preview}}",
-    "unreadDot": "Sin leer",
+    "unreadDot": "No leído",
     "workspaceUpdate": "Actualización del espacio de trabajo"
   },
   "empty": {

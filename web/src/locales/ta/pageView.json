@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "பக்கத்தை மீட்டெடுக்க முடியவில்லை",
+  "emptyBodyPrompt": "வெற்றுப் பக்கத்தில் எழுத Enter அழுத்தவும்.",
+  "inTrashTopBarTitle": "குப்பையில்",
+  "notFoundTopBarTitle": "கிடைக்கவில்லை",
+  "openWorkspace": "பணியிடத்தைத் திற",
+  "pageInTrash": "இந்தப் பக்கம் குப்பையில் உள்ளது.",
+  "pageInTrashDetail": "அதன் உள்ளடக்கங்களைத் திறப்பதற்கு அல்லது திருத்துவதற்கு முன் மீட்டெடுக்கவும்.",
+  "pageUnavailable": "பக்கம் கிடைக்கவில்லை.",
+  "pageUnavailableDetail": "இந்தப் பக்கம் நீக்கப்பட்டிருக்கலாம், நகர்த்தப்பட்டிருக்கலாம், அல்லது வேறு கணக்குடன் பகிரப்பட்டிருக்கலாம்.",
+  "restorePage": "பக்கத்தை மீட்டெடு",
+  "restoredPage": "பக்கம் மீட்டெடுக்கப்பட்டது",
+  "loadingPageContent": "பக்க உள்ளடக்கம் ஏற்றப்படுகிறது"
 }

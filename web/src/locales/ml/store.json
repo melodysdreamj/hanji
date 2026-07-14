@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "ഈ ഡാറ്റാബേസ് ലോക്ക് ചെയ്തിരിക്കുന്നു, അതിനാൽ നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "databaseRowsLoadFailed": "ഡാറ്റാബേസ് വരികൾ ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു. ദയവായി അൽപസമയത്തിന് ശേഷം വീണ്ടും ശ്രമിക്കുക.",
+  "editAccessDeniedSave": "നിങ്ങൾക്ക് എഡിറ്റ് ആക്സസ് ഇല്ല, അതിനാൽ നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "lockedSave": "പേജ് അല്ലെങ്കിൽ ഡാറ്റാബേസ് ലോക്ക് ചെയ്തിരിക്കുന്നു, അതിനാൽ നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "pageLockedSave": "ഈ പേജ് ലോക്ക് ചെയ്തിരിക്കുന്നു, അതിനാൽ നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "pageMissingSave": "പേജ് കണ്ടെത്താനായില്ല, അതിനാൽ നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "saveFailed": "നിങ്ങളുടെ മാറ്റങ്ങൾ സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല.",
+  "sessionExpired": "നിങ്ങളുടെ സെഷൻ കാലഹരണപ്പെട്ടു അല്ലെങ്കിൽ അഭ്യർത്ഥന പ്രാമാണീകരിക്കാൻ കഴിഞ്ഞില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+  "blockConflictSave": "ഈ ബ്ലോക്ക് മറ്റൊരു ഉപകരണത്തിൽ എഡിറ്റ് ചെയ്തിരിക്കുന്നു, അതിനാൽ നിങ്ങളുടെ ഓഫ്‌ലൈൻ മാറ്റം പ്രയോഗിച്ചില്ല.",
+  "blockConflictKeepMine": "എന്റെ പതിപ്പ് പ്രയോഗിക്കുക",
+  "blockMoveCommentsSkipped": "ബ്ലോക്ക് നീക്കി, പക്ഷേ അതിന്റെ കമന്റുകൾ ഒപ്പം നീക്കാൻ കഴിഞ്ഞില്ല."
 }

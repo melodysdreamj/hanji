@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Αναζήτηση στη σελίδα"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Αναζήτηση στη σελίδα",
+    "placeholder": "Αναζήτηση στη σελίδα"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Προηγούμενο αποτέλεσμα",
+    "next": "Επόμενο αποτέλεσμα",
+    "close": "Κλείσιμο αναζήτησης"
   }
 }

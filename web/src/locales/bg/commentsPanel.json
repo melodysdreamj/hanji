@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Коментари",
+  "closeAria": "Затвори коментарите",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Дискусия за блок",
+    "page": "Дискусия за страница"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Статус на коментар",
+    "open": "Отворен",
+    "resolved": "Разрешен"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Коментиране на",
+    "commentingOnSelectedText": "Коментиране на избран текст",
+    "selectedBlock": "Избран блок",
+    "onSelectedText": "На избран текст",
+    "onSelectedBlock": "На избран блок",
+    "onABlock": "На блок"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Добави блоков коментар",
+    "addPageComment": "Добави коментар на страницата",
+    "blockPlaceholder": "Коментар за този блок...",
+    "pagePlaceholder": "Добави коментар...",
+    "submit": "Коментирай"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Споменаване на хора в коментар",
+    "replyPeopleAria": "Споменаване на хора в отговор",
+    "trigger": "Споменаване на хора",
+    "noMatches": "Няма съвпадащи хора",
+    "title": "Споменаване на {{name}}",
+    "person": "Човек",
+    "you": "Ти",
+    "organizationPerson": "Член на организация",
+    "roleInOrganization": "{{role}} в организацията"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Нишки от коментари",
+    "empty": "Все още няма коментари",
+    "noOpen": "Няма отворени коментари",
+    "noResolved": "Няма разрешени коментари"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "коментар от {{author}}, {{time}}",
+    "commentAriaResolved": "коментар от {{author}}, {{time}}, разрешен",
+    "replyAria": "отговор от {{author}}, {{time}}",
+    "repliesAria": "{{count}} отговора",
+    "edited": "(редактиран)",
+    "emptyComment": "(празен коментар)",
+    "emptyReply": "(празен отговор)",
+    "justNow": "Току-що"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Отговори",
+    "showInPage": "Покажи в страницата",
+    "resolve": "Разреши",
+    "reopen": "Отвори отново",
+    "edit": "Редактирай"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Отговор..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Редактиране на коментар"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Изтриване на този коментар?",
+    "threadConfirm_one": "Изтриване на този коментар и отговора му?",
+    "threadConfirm_other": "Изтриване на този коментар и неговите {{count}} отговори?"
   }
 }

@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "यो डाटाबेस लक गरिएको छ, त्यसैले तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "databaseRowsLoadFailed": "डाटाबेस पङ्क्तिहरू लोड गर्न सकिएन। कृपया एक क्षण पछि पुन: प्रयास गर्नुहोस्।",
+  "editAccessDeniedSave": "तपाईंसँग सम्पादन पहुँच छैन, त्यसैले तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "lockedSave": "पृष्ठ वा डाटाबेस लक गरिएको छ, त्यसैले तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "pageLockedSave": "यो पृष्ठ लक गरिएको छ, त्यसैले तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "pageMissingSave": "पृष्ठ फेला पार्न सकिएन, त्यसैले तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "saveFailed": "तपाईंको परिवर्तनहरू बचत गर्न सकिएन।",
+  "sessionExpired": "तपाईंको सत्रको म्याद सकियो वा अनुरोध प्रमाणीकरण गर्न सकिएन। कृपया पुन: प्रयास गर्नुहोस्।",
+  "blockConflictSave": "यो ब्लक अर्को यन्त्रमा सम्पादन गरिएको थियो, त्यसैले तपाईंको अफलाइन परिवर्तन लागू भएन।",
+  "blockConflictKeepMine": "मेरो संस्करण लागू गर्नुहोस्",
+  "blockMoveCommentsSkipped": "ब्लक सारियो, तर यसको टिप्पणीहरू सँगै सार्न सकिएन।"
 }

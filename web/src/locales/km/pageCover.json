@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "ផ្លាស់ប្តូរគម្រប",
+    "reposition": "ផ្លាស់ប្តូរទីតាំង",
+    "remove": "លុប",
+    "uploadFile": "បង្ហោះឯកសារ",
+    "uploading": "កំពុងបង្ហោះ...",
+    "submit": "ដាក់ស្នើ",
+    "savePosition": "រក្សាទុកទីតាំង"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "វិចិត្រសាល",
+    "upload": "បង្ហោះ",
+    "link": "តំណភ្ជាប់"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "បិទភ្ជាប់តំណភ្ជាប់រូបភាព",
+    "invalid": "បិទភ្ជាប់តំណភ្ជាប់រូបភាព http ឬ https។"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "មិនអាចបង្ហោះរូបភាពនេះបានទេ។",
+    "defaultFileName": "រូបគម្រប"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "អូសរូបភាពដើម្បីផ្លាស់ប្តូរទីតាំង"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "កំពុងរៀបចំបង្ហោះ",
+    "finalizing": "កំពុងបញ្ចប់",
+    "complete": "រួចរាល់",
+    "uploading": "កំពុងបង្ហោះ"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "បានដកគម្របចេញ",
+    "restored": "បានស្ដារគម្របឡើងវិញ",
+    "undo": "មិនធ្វើវិញ"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "គម្របទំព័រ",
+    "coverVerticalPosition": "ទីតាំងបញ្ឈរគម្រប",
+    "positionFromTop": "{{position}}% ពីកំពូល",
+    "closeCoverMenu": "បិទម៉ឺនុយគម្រប",
+    "changePageCover": "ផ្លាស់ប្តូរគម្របទំព័រ",
+    "repositionPageCover": "ផ្លាស់ប្តូរទីតាំងគម្របទំព័រ",
+    "removePageCover": "ដកគម្របទំព័រចេញ",
+    "changeCoverDialog": "ផ្លាស់ប្តូរគម្រប",
+    "coverSource": "ប្រភពគម្រប",
+    "selectCover": "ជ្រើសរើសគម្រប {{number}}",
+    "uploadFromDevice": "បង្ហោះរូបភាពគម្របពីឧបករណ៍នេះ",
+    "uploadingFile": "កំពុងបង្ហោះ {{fileName}}",
+    "coverImageLink": "តំណភ្ជាប់រូបភាពគម្រប"
   }
 }

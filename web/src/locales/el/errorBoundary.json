@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Κάτι πήγε στραβά κατά την εμφάνιση αυτού του περιεχομένου.",
+  "detail": "Δοκιμάστε ξανά. Αν το πρόβλημα συνεχίζεται, επαναφορτώστε την εφαρμογή και μοιραστείτε την παρακάτω αναφορά.",
+  "reference": "Αναφορά: {{reference}}",
+  "reload": "Επαναφόρτωση εφαρμογής",
+  "retry": "Δοκιμή ξανά"
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "關閉圖示選擇器",
+    "label": "選擇圖示"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "圖示類型",
+    "emoji": "表情符號",
+    "image": "圖片"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "移除",
+    "ariaLabel": "移除圖示"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "篩選…",
+    "searchLabel": "搜尋圖示",
+    "random": "隨機",
+    "randomLabel": "隨機挑選圖示",
+    "recentLabel": "最近使用的優先",
+    "gridLabelRecent": "圖示，最近使用優先",
+    "gridLabel": "圖示",
+    "optionLabel": "選擇 {{emoji}} 圖示",
+    "noResults": "沒有圖示符合“{{query}}”。請嘗試其他詞彙或清除篩選。"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "圖片",
+    "linkPlaceholder": "貼上圖片連結",
+    "linkLabel": "圖示圖片連結",
+    "apply": "套用",
+    "upload": "上傳檔案",
+    "uploading": "上傳中...",
+    "uploadingLabel": "上傳 {{fileName}} 中",
+    "uploadFailed": "無法上傳該圖片。",
+    "fallbackFileName": "圖示圖片"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "正在準備上傳",
+    "finalizing": "正在完成",
+    "complete": "完成",
+    "uploading": "上傳中"
   }
 }

@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "தொகுதி கட்டளைகள்",
+  "closeBlockCommands": "தொகுதி கட்டளைகளை மூடு",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "அடிப்படை தொகுதிகள்",
+    "Media": "ஊடகம்",
+    "Database": "தரவுத்தளம்",
+    "Advanced": "மேம்பட்ட தொகுதிகள்"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, மொத்தம் {{total}} இல் {{position}}. Enter ஐ அழுத்திச் செருகவும்.",
+  "listStatus": "{{total}} தொகுதி கட்டளைகள் கிடைக்கின்றன.",
+  "noBlocks": "தொகுதிகள் எதுவும் காணப்படவில்லை",
+  "noBlocksFor": "\"{{query}}\" க்கான தொகுதிகள் எதுவும் கிடைக்கவில்லை",
+  "recentlyUsed": "சமீபத்தில் பயன்படுத்தியவை"
 }

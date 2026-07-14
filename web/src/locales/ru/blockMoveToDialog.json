@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Переместить блок в",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Поиск мест перемещения",
+    "placeholder": "Поиск страниц..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Закрыть диалог перемещения"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Места перемещения",
+    "empty": "Страницы не найдены.",
+    "destinationLabel": "Переместить блок в {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Создать «{{query}}»",
+    "optionLabel": "Создать страницу «{{query}}» и переместить блок сюда",
+    "hint": "Новая страница - переместить блок сюда"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Страница заблокирована"
   },
-  "untitled": "Untitled",
+  "untitled": "Без названия",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Страница заблокирована",
+    "movedBlock": "Блок перемещен",
+    "movedBlocks": "Блоки перемещены",
+    "movedBlocksCount": "Перемещено {{blockCount}} блоков",
+    "moveFailed": "Не удалось переместить блок"
   }
 }

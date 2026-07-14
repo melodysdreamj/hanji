@@ -7,18 +7,18 @@
     "edits": "Bearbeitungen"
   },
   "header": {
-    "closeUpdates": "Aktualisierungen schließen",
+    "closeUpdates": "Updates schließen",
     "markAllRead": "Alle als gelesen markieren",
-    "markAllReadAria": "Alle Aktualisierungen als gelesen markieren",
+    "markAllReadAria": "Alle Updates als gelesen markieren",
     "pageHistory": "Seitenverlauf",
-    "recentUpdates_one": "{{count}} aktuelle Aktualisierung",
-    "recentUpdates_other": "{{count}} aktuelle Aktualisierungen",
-    "unreadOfTotal": "{{unread}} von {{total}} Aktualisierungen ungelesen",
-    "updateType": "Aktualisierungstyp",
-    "updates": "Aktualisierungen",
-    "modeUpdates": "Aktualisierungen",
+    "recentUpdates_one": "{{count}} aktuelles Update",
+    "recentUpdates_other": "{{count}} aktuelle Updates",
+    "unreadOfTotal": "{{unread}} ungelesen von {{total}} Updates",
+    "updateType": "Update-Typ",
+    "updates": "Updates",
+    "modeUpdates": "Updates",
     "modeChats": "Chats",
-    "inboxMode": "Posteingangsmodus"
+    "inboxMode": "Inbox-Modus"
   },
   "time": {
     "justNow": "Gerade eben",
@@ -30,14 +30,14 @@
     "blockCount_other": "{{count}} Blöcke",
     "currentVersion": "Aktuelle Version",
     "currentVersionOnly": "Nur aktuelle Version",
-    "next": "Weiter",
+    "next": "Nächste",
     "nextVersion": "Nächste Version",
     "noVersionPrevious": "Keine vorherige Version",
     "noVersionNext": "Keine nächste Version",
     "pageLocked": "Seite gesperrt",
-    "previous": "Zurück",
-    "previousSnapshots_one": "{{count}} vorheriger Schnappschuss",
-    "previousSnapshots_other": "{{count}} vorherige Schnappschüsse",
+    "previous": "Vorherige",
+    "previousSnapshots_one": "{{count}} vorheriger Snapshot",
+    "previousSnapshots_other": "{{count}} vorherige Snapshots",
     "previousVersion": "Vorherige Version",
     "restoredPrevious": "Vorherige Version wiederhergestellt",
     "restoredNext": "Nächste Version wiederhergestellt",
@@ -51,7 +51,7 @@
   "badges": {
     "comment": "Kommentar",
     "edited": "Bearbeitet",
-    "linked": "Verknüpft",
+    "linked": "Verlinkt",
     "member": "Mitglied",
     "mention": "Erwähnung",
     "reply": "Antwort",
@@ -65,15 +65,15 @@
     "forYou": "für dich",
     "notification": "Benachrichtigung",
     "referenceMention": "{{title}} erwähnt · {{preview}}",
-    "referenceLink": "Mit {{title}} verknüpft · {{preview}}",
+    "referenceLink": "Link zu {{title}} · {{preview}}",
     "unreadDot": "Ungelesen",
-    "workspaceUpdate": "Arbeitsbereich-Aktualisierung"
+    "workspaceUpdate": "Workspace-Update"
   },
   "empty": {
     "allCaughtUp": "Du bist auf dem neuesten Stand.",
-    "loadingUpdates": "Aktualisierungen werden geladen...",
+    "loadingUpdates": "Updates werden geladen...",
     "noFilteredUpdatesYet": "Noch keine {{filter}}.",
-    "noPageHistoryYet": "Noch kein Seitenverlauf.",
-    "noUpdatesYet": "Noch keine Aktualisierungen."
+    "noPageHistoryYet": "Noch keine Seitenhistorie.",
+    "noUpdatesYet": "Noch keine Updates."
   }
 }

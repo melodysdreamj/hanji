@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "စာမျက်နှာဖွင့်နေသည်",
+  "workspace": "လုပ်ငန်းနေရာ",
+  "emptyWorkspace": "လုပ်ငန်းနေရာလွတ်",
+  "untitled": "ခေါင်းစဉ်မရှိ",
+  "newPage": "စာမျက်နှာအသစ်"
 }

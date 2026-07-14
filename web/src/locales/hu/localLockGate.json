@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Helyi adatok feloldása",
+  "description": "Az eszköz offline adatai jelszóval vannak lezárva. A feloldás visszaállítja az offline használatot és mentést.",
+  "passphrasePlaceholder": "Jelszó",
+  "unlock": "Feloldás",
+  "continueOnline": "Csak online folytatás",
+  "continueOnlineHint": "A „Csak online folytatás” lehetőséggel az eszköz zárolt offline szerkesztései lezárva maradnak – nem szinkronizálódnak, amíg a jelszóval fel nem oldja.",
+  "wrongPassphrase": "A jelszó nem megfelelő.",
+  "unsupportedBrowser": "A helyi zárolás nem elérhető ebben a böngészőben."
 }

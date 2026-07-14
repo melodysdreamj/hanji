@@ -1,10 +1,10 @@
 {
   "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offlinePending_one": "Offline · {{count}} na pagbabago ang nakabinbin",
+  "offlinePending_other": "Offline · {{count}} na pagbabago ang nakabinbin",
+  "syncing": "Nagsi-sync · {{count}}",
+  "unreachable": "Hindi maabot ang server",
+  "unreachablePending_one": "Hindi maabot ang server · {{count}} na pagbabago ang nakabinbin",
+  "unreachablePending_other": "Hindi maabot ang server · {{count}} na pagbabago ang nakabinbin",
+  "retryHint": "I-click upang subukan muli ngayon"
 }

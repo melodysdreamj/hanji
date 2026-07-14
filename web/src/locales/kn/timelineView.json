@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "ದಿನಾಂಕ ಪ್ರಾಪರ್ಟಿ ಸೇರಿಸಿ",
+    "description": "ಟೈಮ್ಲೈನ್ ವೀಕ್ಷಣೆಗಳು ಪುಟಗಳನ್ನು ಸಮಯದುದ್ದಕ್ಕೂ ಸೆಳೆಯಲು ಪ್ರಾರಂಭ ದಿನಾಂಕದ ಪ್ರಾಪರ್ಟಿ ಬೇಕು."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "ಒಂದೇ ದಿನದ ಬಾರ್‌ಗಳ ಬದಲು ವ್ಯಾಪ್ತಿಗಳನ್ನು ಸೆಳೆಯಲು ಅಂತಿಮ ದಿನಾಂಕದ ಪ್ರಾಪರ್ಟಿ ಸೇರಿಸಿ.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "ಟೈಮ್ಲೈನ್ ಜೂಮ್",
+    "day": "ದಿನ",
+    "week": "ವಾರ",
+    "month": "ತಿಂಗಳು"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "ಅವಲಂಬನೆಗಳು:",
+    "hint": "ಸಂಬಂಧದ ಆಸ್ತಿಯನ್ನು ಸೇರಿಸಿ",
+    "relationPropertyAriaLabel": "ಅವಲಂಬನೆ ಸಂಬಂಧ ಆಸ್ತಿ"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ಇಂದು",
+    "previousRange": "ಹಿಂದಿನ ವ್ಯಾಪ್ತಿ",
+    "nextRange": "ಮುಂದಿನ ವ್ಯಾಪ್ತಿ",
+    "newPage": "ಹೊಸ",
+    "newPageIn": "{{dbTitle}} ನಲ್ಲಿ ಹೊಸ ಪುಟ"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "ಟೈಮ್ಲೈನ್ ಕೋಷ್ಟಕ",
+    "nameHeader": "ಹೆಸರು"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ತೆರೆಯಿರಿ",
+    "openAriaLabelWithDates": "{{title}} ತೆರೆಯಿರಿ, {{start}} ರಿಂದ {{end}} ವರೆಗೆ",
+    "openNoDateAriaLabel": "{{title}} ತೆರೆಯಿರಿ, ದಿನಾಂಕವಿಲ್ಲ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "ಈ ವ್ಯಾಪ್ತಿಯಲ್ಲಿ ಐಟಂಗಳಿಲ್ಲ.",
+    "noDatedItems": "ಇನ್ನೂ ದಿನಾಂಕದ ಐಟಂಗಳಿಲ್ಲ.",
+    "jumpTo": "{{date}} ಗೆ ಹೋಗಿ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ದಿನಾಂಕವಿಲ್ಲ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ಯಾವುದೂ ಇಲ್ಲ",
+    "untitled": "ಶೀರ್ಷಿಕೆಯಿಲ್ಲ"
   }
 }

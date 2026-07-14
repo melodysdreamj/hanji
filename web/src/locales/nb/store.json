@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "blockConflictKeepMine": "Bruk min versjon",
+  "blockConflictSave": "Denne blokken ble redigert på en annen enhet, så offline-endringen din ble ikke brukt.",
+  "blockMoveCommentsSkipped": "Blokken ble flyttet, men kommentarene kunne ikke flyttes med den.",
+  "databaseLockedSave": "Denne databasen er låst, så endringene dine kunne ikke lagres.",
+  "databaseRowsLoadFailed": "Kunne ikke laste databaserader. Prøv igjen om et øyeblikk.",
+  "editAccessDeniedSave": "Du har ikke redigeringstilgang, så endringene dine kunne ikke lagres.",
+  "lockedSave": "Siden eller databasen er låst, så endringene dine kunne ikke lagres.",
+  "pageLockedSave": "Denne siden er låst, så endringene dine kunne ikke lagres.",
+  "pageMissingSave": "Siden ble ikke funnet, så endringene dine kunne ikke lagres.",
+  "saveFailed": "Endringene dine kunne ikke lagres.",
+  "sessionExpired": "Sesjonen din utløp eller forespørselen kunne ikke autentiseres. Prøv igjen."
 }

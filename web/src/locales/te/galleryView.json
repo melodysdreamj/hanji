@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "ఈ డేటాబేస్‌లో ఇంకా పేజీలు లేవు.",
+  "emptyTitle": "ఇంకా పేజీలు లేవు",
+  "newInline": "కొత్త",
+  "newPage": "కొత్త పేజీ",
+  "newPageIn": "{{dbTitle}}లో కొత్త పేజీ",
+  "noResultsDesc": "ప్రస్తుత ఫిల్టర్లు లేదా శోధనతో సరిపోలే పేజీలు లేవు.",
+  "noResultsTitle": "ఫలితాలు లేవు",
+  "openRow": "{{title}} తెరవండి"
 }

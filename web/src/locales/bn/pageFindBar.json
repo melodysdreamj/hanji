@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "পৃষ্ঠায় খুঁজুন"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "পৃষ্ঠায় খুঁজুন",
+    "placeholder": "পৃষ্ঠায় খুঁজুন"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "পূর্ববর্তী মিল",
+    "next": "পরবর্তী মিল",
+    "close": "অনুসন্ধান বন্ধ করুন"
   }
 }

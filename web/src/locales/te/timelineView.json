@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "తేదీ ప్రాపర్టీ జోడించు",
+    "description": "టైమ్లైన్ వ్యూలకు పేజీలను సమయంలో చూపించడానికి ప్రారంభ తేదీ ప్రాపర్టీ అవసరం."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "ఒక రోజు బార్లకు బదులుగా పరిధులను చూపించడానికి ముగింపు తేదీ ప్రాపర్టీని జోడించండి.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "టైమ్లైన్ జూమ్",
+    "day": "రోజు",
+    "week": "వారం",
+    "month": "నెల"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "డిపెండెన్సీలు:",
+    "hint": "సంబంధం ప్రాపర్టీని జోడించండి",
+    "relationPropertyAriaLabel": "డిపెండెన్సీ సంబంధం ప్రాపర్టీ"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ఈరోజు",
+    "previousRange": "మునుపటి పరిధి",
+    "nextRange": "తదుపరి పరిధి",
+    "newPage": "కొత్త",
+    "newPageIn": "{{dbTitle}} లో కొత్త పేజీ"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "టైమ్లైన్ పట్టిక",
+    "nameHeader": "పేరు"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} తెరువు",
+    "openAriaLabelWithDates": "{{title}} తెరువు, {{start}} నుండి {{end}} వరకు",
+    "openNoDateAriaLabel": "{{title}} తెరువు, తేదీ లేదు"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "ఈ పరిధిలో అంశాలు లేవు.",
+    "noDatedItems": "ఇంకా తేదీ ఉన్న అంశాలు లేవు.",
+    "jumpTo": "{{date}} కు వెళ్ళు"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "తేదీ లేదు ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ఏదీ లేదు",
+    "untitled": "శీర్షిక లేదు"
   }
 }

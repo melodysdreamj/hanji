@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "நகர்த்தும் இடம்",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "பணியிட மூலம்",
+    "path": "மேல் நிலை"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "நகர்த்தும் இலக்குகளைத் தேடுக",
+    "placeholder": "பக்கங்களைத் தேடுக..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "நகர்த்து உரையாடலை மூடு"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "நகர்த்தும் இலக்குகள்",
+    "empty": "பக்கங்கள் எதுவும் இல்லை.",
+    "destinationLabel": "{{label}}, {{path}} க்கு நகர்த்து"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" உருவாக்கு",
+    "optionLabel": "{{title}} பக்கத்தை உருவாக்கி இங்கே நகர்த்து",
+    "hint": "புதிய மேல் நிலைப் பக்கம் - இங்கே நகர்த்து"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "பூட்டப்பட்ட மூலப் பக்கம்",
+    "page": "பூட்டப்பட்ட பக்கம்"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "பக்கம் பூட்டப்பட்ட மூலப் பக்கத்தில் உள்ளது",
+    "locked": "பக்கம் பூட்டப்பட்டுள்ளது",
+    "moved": "பக்கம் நகர்த்தப்பட்டது",
+    "moveFailed": "பக்கத்தை நகர்த்த முடியவில்லை"
   }
 }

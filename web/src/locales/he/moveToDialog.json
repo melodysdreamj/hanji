@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "העבר אל",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "שורש סביבת העבודה",
+    "path": "עליון"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "חיפוש יעדי העברה",
+    "placeholder": "חפש דפים..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "סגור תיבת דו-שיח להעברה"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "יעדי העברה",
+    "empty": "לא נמצאו דפים.",
+    "destinationLabel": "העבר אל {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "צור את \"{{title}}\"",
+    "optionLabel": "צור דף {{title}} והעבר לכאן",
+    "hint": "דף עליון חדש – העבר לכאן"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "הורה נעול",
+    "page": "דף נעול"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "הדף נמצא בהורה נעול",
+    "locked": "הדף נעול",
+    "moved": "הדף הועבר",
+    "moveFailed": "לא ניתן להעביר את הדף"
   }
 }

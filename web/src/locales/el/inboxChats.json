@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Ακόμα δεν υπάρχουν συνομιλίες. Σχολιάστε σε μια σελίδα ή αναφέρετε κάποιον για να ξεκινήσετε.",
+  "leave": "Αποχώρηση",
+  "leaveAria": "Αποχώρηση από τη συνομιλία στο {{title}}",
+  "open": "Άνοιγμα της συνομιλίας στο {{title}}",
+  "participants_one": "{{count}} συμμετέχων",
+  "participants_other": "{{count}} συμμετέχοντες",
+  "untitled": "Χωρίς τίτλο",
+  "loading": "Φόρτωση συνομιλιών…"
 }

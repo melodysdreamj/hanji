@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ఇంకా సంభాషణలు లేవు. సంభాషణను ప్రారంభించడానికి పేజీలో వ్యాఖ్యానించండి లేదా ఎవరినైనా ప్రస్తావించండి.",
+  "leave": "వదలండి",
+  "leaveAria": "{{title}} సంభాషణను వదలండి",
+  "open": "{{title}} సంభాషణను తెరువు",
+  "participants_one": "{{count}} పాల్గొనే వ్యక్తి",
+  "participants_other": "{{count}} పాల్గొనే వ్యక్తులు",
+  "untitled": "శీర్షిక లేని",
+  "loading": "సంభాషణలు లోడ్ అవుతున్నాయి…"
 }

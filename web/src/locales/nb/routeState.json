@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Sjekk lenken for manglende eller ugyldige tegn, og prøv på nytt.",
+  "invalidTitle": "Denne adressen er ufullstendig.",
+  "notFoundBody": "Denne adressen samsvarer ikke med en Hanji-side. Siden kan ha blitt flyttet eller eksisterer ikke lenger.",
+  "notFoundTitle": "Siden ble ikke funnet.",
+  "openHome": "Åpne Hanji-hjem",
+  "sharedBody": "Sjekk at hele den delte lenken ble kopiert riktig, og prøv på nytt.",
+  "sharedTitle": "Denne delte lenken er ugyldig."
+}

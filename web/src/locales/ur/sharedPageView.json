@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "مشترکہ صفحہ",
+  "loading": "مشترکہ صفحہ لوڈ ہو رہا ہے",
+  "unavailable": "یہ مشترکہ صفحہ دستیاب نہیں ہے۔",
+  "notFound": "مشترکہ صفحہ نہیں ملا۔",
+  "outsideShare": "یہ صفحہ اس عوامی اشتراک کا حصہ نہیں ہے۔",
+  "errors": {
+    "not-found": "یہ لنک شاید ختم ہو گیا ہو، غیر شائع ہو گیا ہو، یا غلط طریقے سے کاپی کیا گیا ہو۔",
+    "offline": "اپنا کنکشن چیک کریں، پھر مشترکہ صفحہ دوبارہ کھولنے کی کوشش کریں۔",
+    "rate-limited": "یہ مشترکہ صفحہ بہت زیادہ درخواستیں وصول کر رہا ہے۔ تھوڑی دیر انتظار کریں اور دوبارہ کوشش کریں۔",
+    "unavailable": "Hanji فی الحال اس مشترکہ صفحہ کو نہیں کھول سکا۔ تھوڑی دیر میں دوبارہ کوشش کریں۔"
+  },
+  "tryAgain": "دوبارہ کوشش کریں"
 }

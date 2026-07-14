@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Kon nie bladsy herstel nie",
+  "emptyBodyPrompt": "Druk Enter om op hierdie leë bladsy te begin skryf.",
+  "inTrashTopBarTitle": "In Asblik",
+  "notFoundTopBarTitle": "Nie gevind nie",
+  "openWorkspace": "Maak werkruimte oop",
+  "pageInTrash": "Hierdie bladsy is in die asblik.",
+  "pageInTrashDetail": "Herstel dit voordat jy die inhoud oopmaak of wysig.",
+  "pageUnavailable": "Bladsy onbeskikbaar.",
+  "pageUnavailableDetail": "Hierdie bladsy is dalk verwyder, geskuif, of met 'n ander rekening gedeel.",
+  "restorePage": "Herstel bladsy",
+  "restoredPage": "Bladsy herstel",
+  "loadingPageContent": "Laai bladsy-inhoud"
 }

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ابحث أو انتقل إلى...",
+  "quickFind": "بحث سريع",
+  "closeSearch": "إغلاق البحث",
+  "quickFindResults": "نتائج البحث السريع",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "تم العرض مؤخرًا",
+    "recentSearches": "عمليات البحث الأخيرة",
+    "pages": "الصفحات",
+    "pageContent": "محتوى الصفحة",
+    "favorites": "المفضلة"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "في الصفحة",
+  "searchingDetail": "جارٍ البحث...",
+  "searchAgain": "ابحث مرة أخرى",
+  "searchingPageContent": "جارٍ البحث في محتوى الصفحة...",
+  "noResultsFor": "لا توجد نتائج لـ \"{{query}}\"",
+  "noPagesFound": "لم يتم العثور على صفحات",
+  "creating": "جارٍ الإنشاء...",
+  "newPage": "صفحة جديدة \"{{query}}\"",
+  "couldntCreatePage": "تعذر إنشاء الصفحة",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "تحديد",
+    "open": "فتح",
+    "newTab": "تبويب جديد"
   }
 }

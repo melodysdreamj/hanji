@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Magdagdag ng date property",
+    "description": "Kailangan ng calendar view ng date property para mailagay ang mga page sa buwan.",
+    "addDateButton": "Petsa"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalendaryo ayon sa",
+    "today": "Ngayon",
+    "previousWeek": "Nakaraang linggo",
+    "previousMonth": "Nakaraang buwan",
+    "nextWeek": "Susunod na linggo",
+    "nextMonth": "Susunod na buwan"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Lin",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Miy",
+    "thu": "Huw",
+    "fri": "Biy",
+    "sat": "Sab"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} na kalendaryo",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} na item",
+    "newRowAriaLabel": "Bagong row sa {{date}}",
+    "newRowTitle": "Bago",
+    "showLess": "Mas kaunti",
+    "showMore": "+{{count}} pa"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buksan ang {{title}}",
+    "openAriaLabelWithDate": "Buksan ang {{title}}, naka-iskedyul sa {{date}}",
+    "openNoDateAriaLabel": "Buksan ang {{title}}, walang petsa"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Walang petsa ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Walang pamagat",
+    "dateDefaultName": "Petsa"
   }
 }

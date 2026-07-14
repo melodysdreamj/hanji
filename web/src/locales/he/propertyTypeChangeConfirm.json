@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "לשנות סוג נכס?",
+  "message": "\"{{propName}}\" כבר מכיל ערכים. שינוי הסוג ל{{typeLabel}} עלול להציג ערכים קיימים בצורה שונה או לאבד אותם.",
+  "cancelAria": "בטל שינוי סוג מאפיין",
+  "confirm": "שנה סוג"
 }

@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Бөлісілген бет",
+  "loading": "Бөлісілген бет жүктелуде",
+  "unavailable": "Бұл бөлісілген бет қолжетімсіз.",
+  "notFound": "Бөлісілген бет табылмады.",
+  "outsideShare": "Бұл бет осы жария бөлісудің бөлігі емес.",
+  "errors": {
+    "not-found": "Сілтеменің мерзімі өтіп кеткен, жарияланбаған немесе қате көшірілген болуы мүмкін.",
+    "offline": "Қосылымыңызды тексеріп, бөлісілген бетті қайта ашып көріңіз.",
+    "rate-limited": "Бөлісілген бет тым көп сұраныс алуда. Біраз күте тұрып, қайталаңыз.",
+    "unavailable": "Hanji дәл қазір бұл бөлісілген бетті аша алмады. Біраздан кейін қайталаңыз."
+  },
+  "tryAgain": "Қайталау"
 }

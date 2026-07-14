@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Memuatkan item hubungan",
+  "relationUnavailable": "Item hubungan tidak tersedia",
+  "unavailable": "Tidak tersedia",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Ditanda",
+    "unchecked": "Tidak ditanda"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Buka {{title}}",
+  "openOrDownloadFile": "Buka atau muat turun {{name}}"
 }

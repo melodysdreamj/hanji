@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Trang chia sẻ",
+  "loading": "Đang tải trang chia sẻ",
+  "unavailable": "Trang chia sẻ này không khả dụng.",
+  "notFound": "Không tìm thấy trang chia sẻ.",
+  "outsideShare": "Trang này không thuộc chia sẻ công khai này.",
+  "tryAgain": "Thử lại",
+  "errors": {
+    "not-found": "Liên kết này có thể đã hết hạn, bị hủy xuất bản hoặc sao chép sai.",
+    "rate-limited": "Trang chia sẻ này đang nhận quá nhiều yêu cầu. Hãy đợi một lát và thử lại.",
+    "offline": "Kiểm tra kết nối, sau đó thử mở lại trang chia sẻ.",
+    "unavailable": "Hanji không thể mở trang chia sẻ này ngay bây giờ. Vui lòng thử lại sau."
+  }
 }

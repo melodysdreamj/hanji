@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "गणना",
+    "sum": "योग",
+    "average": "औसत",
+    "min": "न्यूनतम",
+    "max": "अधिकतम"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} चार्ट",
+  "chartType": "चार्ट प्रकार",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "स्तम्भ",
+    "horizontal_bar": "तेर्सो स्तम्भ",
+    "line": "रेखा",
+    "donut": "डोनट"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "चेक गरिएको",
+  "empty": "खाली",
+  "legend": "चार्ट व्याख्या",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "डाटा छैन",
+  "noDataDesc": "हालको फिल्टर वा खोजसँग मेल खाने कुनै पङ्क्ति छैन।",
+  "noGroupProperty": "चार्ट गर्न केही छैन",
+  "noGroupPropertyDesc": "यो चार्ट समूहीकरण गर्न चयन, स्थिति, व्यक्ति, चेकबक्स, वा मिति सम्पत्ति थप्नुहोस्।",
+  "total": "कुल",
+  "unchecked": "चेक नगरिएको",
+  "untitledProperty": "शीर्षकहीन",
+  "valueProperty": "मान गुण",
+  "xAxis": "X-अक्ष",
+  "yAxis": "Y-अक्ष"
 }

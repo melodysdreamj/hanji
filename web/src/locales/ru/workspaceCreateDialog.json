@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Новое рабочее пространство",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Название рабочего пространства",
+    "placeholder": "Моя компания"
   },
-  "startLabel": "Start from",
+  "startLabel": "Начать с",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Пустое рабочее пространство",
+      "body": "Начать с пустого рабочего пространства со стартовыми страницами."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Импорт из Notion",
+      "body": "Создайте рабочее пространство, затем перенесите в него рабочее пространство Notion."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Импорт из другого Hanji",
+      "body": "Создайте рабочее пространство, затем импортируйте его с другого сервера Hanji или из файла."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Создать рабочее пространство",
+  "creating": "Создание…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Не удалось создать рабочее пространство."
   }
 }

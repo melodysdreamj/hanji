@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Sogeza block kwa",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Tafuta mahali pa kusogeza",
+    "placeholder": "Tafuta kurasa..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Funga dialog ya kusogeza"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Mahali pa kusogeza",
+    "empty": "Hakuna kurasa zilizopatikana.",
+    "destinationLabel": "Sogeza block kwa {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Unda \"{{query}}\"",
+    "optionLabel": "Unda ukurasa \"{{query}}\" na sogeza block hapa",
+    "hint": "Ukurasa mpya - sogeza block hapa"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Ukurasa uliozibwa"
   },
-  "untitled": "Untitled",
+  "untitled": "Haina kichwa",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Ukurasa umezibwa.",
+    "movedBlock": "block imesogezwa.",
+    "movedBlocks": "block zimesogezwa.",
+    "movedBlocksCount": "block {{blockCount}} zimesogezwa.",
+    "moveFailed": "Imeshindwa kusogeza block."
   }
 }

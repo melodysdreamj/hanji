@@ -1,44 +1,44 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
-  },
-  "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
-  },
-  "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
-  },
-  "gridAriaLabel": "{{title}} calendar",
-  "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
-  },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Otevřít {{title}}",
+    "openAriaLabelWithDate": "Otevřít {{title}}, naplánováno na {{date}}",
+    "openNoDateAriaLabel": "Otevřít {{title}}, bez data"
   },
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} položek",
+    "newRowAriaLabel": "Nový řádek na {{date}}",
+    "newRowTitle": "Nový",
+    "showLess": "Zobrazit méně",
+    "showMore": "+{{count}} další"
+  },
+  "empty": {
+    "addDateButton": "Datum",
+    "description": "Zobrazení kalendáře vyžaduje vlastnost data pro umístění stránek do měsíce.",
+    "title": "Přidat vlastnost data"
+  },
+  "gridAriaLabel": "Kalendář {{title}}",
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Bez data ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "dateDefaultName": "Datum",
+    "untitled": "Bez názvu"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Kalendář podle",
+    "nextMonth": "Další měsíc",
+    "nextWeek": "Další týden",
+    "previousMonth": "Předchozí měsíc",
+    "previousWeek": "Předchozí týden",
+    "today": "Dnes"
+  },
+  "weekdays": {
+    "fri": "Pá",
+    "mon": "Po",
+    "sat": "So",
+    "sun": "Ne",
+    "thu": "Čt",
+    "tue": "Út",
+    "wed": "St"
   }
 }

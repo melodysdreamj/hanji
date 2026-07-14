@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "వ్యాఖ్యలు",
+  "closeAria": "వ్యాఖ్యలను మూసివేయి",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "బ్లాక్ చర్చ",
+    "page": "పేజీ చర్చ"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "వ్యాఖ్య స్థితి",
+    "open": "తెరచి",
+    "resolved": "పరిష్కరించబడింది"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "వ్యాఖ్యానిస్తున్న",
+    "commentingOnSelectedText": "ఎంచుకున్న వచనంపై వ్యాఖ్యానిస్తున్న",
+    "selectedBlock": "ఎంచుకున్న బ్లాక్",
+    "onSelectedText": "ఎంచుకున్న వచనంపై",
+    "onSelectedBlock": "ఎంచుకున్న బ్లాక్‌పై",
+    "onABlock": "బ్లాక్‌పై"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "బ్లాక్ వ్యాఖ్యను జోడించు",
+    "addPageComment": "పేజీ వ్యాఖ్యను జోడించు",
+    "blockPlaceholder": "ఈ బ్లాక్‌పై వ్యాఖ్యానించండి...",
+    "pagePlaceholder": "వ్యాఖ్యను జోడించండి...",
+    "submit": "వ్యాఖ్యానించు"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "వ్యాఖ్యలో పేర్కొనే వ్యక్తులు",
+    "replyPeopleAria": "ప్రత్యుత్తరంలో పేర్కొనే వ్యక్తులు",
+    "trigger": "వ్యక్తులను పేర్కొనండి",
+    "noMatches": "సరిపోలిన వ్యక్తులు లేరు",
+    "title": "{{name}}ను పేర్కొనండి",
+    "person": "వ్యక్తి",
+    "you": "మీరు",
+    "organizationPerson": "సంస్థ వ్యక్తి",
+    "roleInOrganization": "సంస్థలో {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "వ్యాఖ్యల థ్రెడ్లు",
+    "empty": "ఇంకా వ్యాఖ్యలు లేవు",
+    "noOpen": "తెరచిన వ్యాఖ్యలు లేవు",
+    "noResolved": "పరిష్కరించిన వ్యాఖ్యలు లేవు"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} వ్యాఖ్య, {{time}}",
+    "commentAriaResolved": "{{author}} వ్యాఖ్య, {{time}}, పరిష్కరించబడింది",
+    "replyAria": "{{author}} ప్రత్యుత్తరం, {{time}}",
+    "repliesAria": "{{count}} ప్రత్యుత్తరాలు",
+    "edited": "(సవరించబడింది)",
+    "emptyComment": "(ఖాళీ వ్యాఖ్య)",
+    "emptyReply": "(ఖాళీ ప్రత్యుత్తరం)",
+    "justNow": "ఇప్పుడే"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ప్రత్యుత్తరం",
+    "showInPage": "పేజీలో చూపించు",
+    "resolve": "పరిష్కరించు",
+    "reopen": "తిరిగి తెరువు",
+    "edit": "సవరించు"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "ప్రత్యుత్తరం..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "వ్యాఖ్యను సవరించండి"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ఈ వ్యాఖ్యను తొలగించాలా?",
+    "threadConfirm_one": "ఈ వ్యాఖ్య మరియు దాని ప్రత్యుత్తరాన్ని తొలగించాలా?",
+    "threadConfirm_other": "ఈ వ్యాఖ్య మరియు దాని {{count}} ప్రత్యుత్తరాలను తొలగించాలా?"
   }
 }

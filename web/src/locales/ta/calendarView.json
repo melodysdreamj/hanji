@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "தேதி சொத்தைச் சேர்",
+    "description": "காலண்டர் பார்வைகளுக்கு பக்கங்களை மாதத்தில் வைக்க தேதி சொத்து தேவை.",
+    "addDateButton": "தேதி"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "காலண்டர் வாரியாக",
+    "today": "இன்று",
+    "previousWeek": "முந்தைய வாரம்",
+    "previousMonth": "முந்தைய மாதம்",
+    "nextWeek": "அடுத்த வாரம்",
+    "nextMonth": "அடுத்த மாதம்"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ஞாயி",
+    "mon": "திங்",
+    "tue": "செவ்",
+    "wed": "புத",
+    "thu": "வியா",
+    "fri": "வெள்",
+    "sat": "சனி"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} காலண்டர்",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} உருப்படிகள்",
+    "newRowAriaLabel": "{{date}} இல் புதிய வரிசை",
+    "newRowTitle": "புதியது",
+    "showLess": "குறைவாகக் காட்டு",
+    "showMore": "+{{count}} மேலும்"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} திற",
+    "openAriaLabelWithDate": "{{title}} திற, {{date}}க்கு திட்டமிடப்பட்டது",
+    "openNoDateAriaLabel": "{{title}} திற, தேதி இல்லை"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "தேதி இல்லை ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "தலைப்பில்லா",
+    "dateDefaultName": "தேதி"
   }
 }

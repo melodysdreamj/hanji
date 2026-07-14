@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ਰੱਦੀ",
+  "empty": "ਜੋ ਪੰਨੇ ਤੁਸੀਂ ਮਿਟਾਉਂਦੇ ਹੋ, ਉਹ ਇੱਥੇ ਆਉਂਦੇ ਹਨ। ਰੱਦੀ ਵਿੱਚ ਕੁਝ ਨਹੀਂ ਹੈ।",
+  "searchTrash": "ਰੱਦੀ ਖੋਜੋ",
+  "deletedPages": "ਮਿਟਾਏ ਗਏ ਪੰਨੇ",
+  "noSearchMatches": "ਤੁਹਾਡੀ ਖੋਜ ਨਾਲ ਮੇਲ ਖਾਂਦੇ ਕੋਈ ਮਿਟਾਏ ਗਏ ਪੰਨੇ ਨਹੀਂ ਹਨ।",
+  "pageCount_one": "{{count}} ਪੰਨਾ",
+  "pageCount_other": "{{count}} ਪੰਨੇ",
+  "deletedJustNow": "ਹੁਣੇ ਮਿਟਾਇਆ",
+  "deletedOn": "{{date}} ਨੂੰ ਮਿਟਾਇਆ ਗਿਆ",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "ਬਹਾਲ ਕਰੋ",
+    "deleteForever": "ਹਮੇਸ਼ਾ ਲਈ ਮਿਟਾਓ",
+    "emptyTrash": "ਰੱਦੀ ਖਾਲੀ ਕਰੋ"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} ਨੂੰ ਰੱਦੀ ਵਿੱਚੋਂ ਖੋਲ੍ਹੋ",
+    "restorePage": "{{title}} ਨੂੰ ਬਹਾਲ ਕਰੋ",
+    "deletePageForever": "{{title}} ਨੂੰ ਹਮੇਸ਼ਾ ਲਈ ਮਿਟਾਓ",
+    "cancelPermanentDelete": "ਸਥਾਈ ਮਿਟਾਉਣਾ ਰੱਦ ਕਰੋ",
+    "cancelEmptyTrash": "ਰੱਦੀ ਖਾਲੀ ਕਰਨਾ ਰੱਦ ਕਰੋ"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "ਸਥਾਈ ਮਿਟਾਓ?",
+    "deleteBodyPrefix": "ਇਹ ਸਥਾਈ ਤੌਰ 'ਤੇ ਮਿਟਾ ਦੇਵੇਗਾ ",
+    "deleteBodySuffix": ". ਤੁਸੀਂ ਇਸ ਕਾਰਵਾਈ ਨੂੰ ਵਾਪਸ ਨਹੀਂ ਲੈ ਸਕਦੇ।",
+    "emptyTitle": "ਰੱਦੀ ਖਾਲੀ ਕਰੋ?",
+    "emptyBody_one": "ਇਹ ਰੱਦੀ ਵਿੱਚ {{count}} ਪੰਨੇ ਨੂੰ ਸਥਾਈ ਤੌਰ 'ਤੇ ਮਿਟਾ ਦੇਵੇਗਾ। ਤੁਸੀਂ ਇਸ ਕਾਰਵਾਈ ਨੂੰ ਵਾਪਸ ਨਹੀਂ ਲੈ ਸਕਦੇ।",
+    "emptyBody_other": "ਇਹ ਰੱਦੀ ਵਿੱਚ {{count}} ਪੰਨਿਆਂ ਨੂੰ ਸਥਾਈ ਤੌਰ 'ਤੇ ਮਿਟਾ ਦੇਵੇਗਾ। ਤੁਸੀਂ ਇਸ ਕਾਰਵਾਈ ਨੂੰ ਵਾਪਸ ਨਹੀਂ ਲੈ ਸਕਦੇ।"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "ਸਥਾਈ ਤੌਰ 'ਤੇ ਮਿਟਾਇਆ ਗਿਆ",
+    "couldntDelete": "ਪੰਨਾ ਮਿਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ",
+    "restored": "ਪੰਨਾ ਬਹਾਲ ਕੀਤਾ ਗਿਆ",
+    "couldntRestore": "ਪੰਨਾ ਬਹਾਲ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ",
+    "emptied": "ਰੱਦੀ ਖਾਲੀ ਕੀਤੀ ਗਈ",
+    "couldntEmpty": "ਰੱਦੀ ਖਾਲੀ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ"
   }
 }

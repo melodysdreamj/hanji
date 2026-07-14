@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Ralat berlaku semasa memaparkan kandungan ini.",
+  "detail": "Cuba lagi. Jika masalah berterusan, muat semula aplikasi dan kongsi rujukan di bawah.",
+  "reference": "Rujukan: {{reference}}",
+  "reload": "Muat semula aplikasi",
+  "retry": "Cuba lagi"
 }

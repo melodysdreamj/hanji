@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Formatiranje teksta"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Pretvori u",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "text": "Tekst",
+      "heading1": "Naslov 1",
+      "heading2": "Naslov 2",
+      "heading3": "Naslov 3",
+      "heading4": "Naslov 4",
+      "toDoList": "Lista obaveza",
+      "bulletedList": "Nenumerisana lista",
+      "numberedList": "Numerisana lista",
+      "toggleList": "Preklopna lista",
+      "quote": "Citat",
       "callout": "Callout",
-      "code": "Code"
+      "code": "Kod"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
+    "bold": "Podebljano",
+    "italic": "Kurziv",
+    "underline": "Podvučeno",
+    "strikethrough": "Precrtano",
+    "code": "Kôd",
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Komentar"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Boja teksta: {{color}}",
+    "title": "Boja: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Mešovito",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Boja teksta",
+      "default": "Podrazumevano",
+      "gray": "Siva",
+      "brown": "Braon",
+      "orange": "Narandžasta",
+      "yellow": "Žuta",
+      "green": "Zelena",
+      "blue": "Plava",
+      "purple": "Ljubičasta",
+      "pink": "Ružičasta",
+      "red": "Crvena"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Boja pozadine",
+      "gray": "Siva pozadina",
+      "brown": "Smeđa pozadina",
+      "orange": "Narandžasta pozadina",
+      "yellow": "Žuta pozadina",
+      "green": "Zelena pozadina",
+      "blue": "Plava pozadina",
+      "purple": "Ljubičasta pozadina",
+      "pink": "Ružičasta pozadina",
+      "red": "Crvena pozadina"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
+    "ariaLabel": "Uredi link",
+    "placeholder": "Nalepi link",
+    "urlAriaLabel": "URL linka",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Otvori link",
+    "copy": "Kopiraj link",
+    "copied": "Kopirano",
+    "copiedLink": "Link kopiran",
+    "remove": "Ukloni"
   }
 }

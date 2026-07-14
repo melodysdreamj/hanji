@@ -483,6 +483,7 @@ export function TopBar({
   const [copiedFor, setCopiedFor] = useState<string | null>(null);
   const [exportingFor, setExportingFor] = useState<string | null>(null);
   const [importingFor, setImportingFor] = useState<string | null>(null);
+  const [duplicatingFor, setDuplicatingFor] = useState<string | null>(null);
   const [offlinePinned, setOfflinePinned] = useState(false);
   const [crumbMenuStyle, setCrumbMenuStyle] = useState<CSSProperties | undefined>();
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -662,6 +663,8 @@ export function TopBar({
       notify(labels.toast.pageAccessRequired, "default");
       return;
     }
+    if (duplicatingFor === target.id) return;
+    setDuplicatingFor(target.id);
     try {
       const copyPage = await duplicatePage(target.id);
       if (!copyPage) {
@@ -672,6 +675,9 @@ export function TopBar({
       router.push(pageHref(copyPage.id));
     } catch {
       notify(labels.toast.couldntDuplicatePage, "error");
+    } finally {
+      setDuplicatingFor((current) => current === target.id ? null : current);
+      setMoreOpenFor((current) => current === target.id ? null : current);
     }
   }
 
@@ -789,6 +795,7 @@ export function TopBar({
   }, []);
 
   const closeMenus = useCallback((restoreFocus = false) => {
+    if (duplicatingFor) return;
     setShareOpenFor(null);
     setMoreOpenFor(null);
     setCrumbMenuOpenFor(null);
@@ -798,7 +805,7 @@ export function TopBar({
     if (restoreFocus) {
       window.requestAnimationFrame(() => activeMenuTriggerRef.current?.focus());
     }
-  }, []);
+  }, [duplicatingFor]);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -1153,7 +1160,6 @@ export function TopBar({
                     e.preventDefault();
                     e.stopPropagation();
                     void duplicateCurrentPage(page);
-                    closeMenus();
                     return;
                   }
                   if (
@@ -1237,14 +1243,12 @@ export function TopBar({
                   className={styles.menuItem}
                   data-menu-item
                   role="menuitem"
-                  disabled={!canEditThisPage}
-                  onClick={() => {
-                    void duplicateCurrentPage(page);
-                    closeMenus();
-                  }}
+                  disabled={!canEditThisPage || duplicatingFor === page.id}
+                  aria-busy={duplicatingFor === page.id || undefined}
+                  onClick={() => void duplicateCurrentPage(page)}
                 >
                   <Copy size={16} aria-hidden="true" />
-                  <span>{labels.duplicate}</span>
+                  <span>{duplicatingFor === page.id ? `${labels.duplicate}…` : labels.duplicate}</span>
                   <span className={styles.itemHint}>⌘D</span>
                 </button>
                 <div className={styles.menuDivider} />

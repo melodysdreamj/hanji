@@ -26,12 +26,25 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_SCREENSHOT_DIR = join(root, '.edgebase', 'ui-discovery', 'database-file-property');
 const FILES_PROP_NAME = '첨부파일';
-const FILE_NAMES = [
-  '제품사용설명서_샘플_SP-0001.pptx',
-  '제품사용설명서_샘플_SP-0001.pdf',
-  '제품사용설명서_샘플_SP-0001_인쇄용_후가공.pdf',
-  'manual_bleed_151x218.pdf',
+const IMAGE_FILE_NAME = 'attachment-preview-image.png';
+const PDF_FILE_NAME = 'attachment-preview-document.pdf';
+const DOWNLOAD_FILE_NAME = 'attachment-download-sample.txt';
+const IMAGE_DATA_URL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAFoCAYAAADHMkpRAAAJLElEQVR42u3WQQEAEBBFwQ0kkAIayKSAUk4qkIHrzmEK/Mt/sfc6AADkEUYAABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAAACEAAAAQgAIAABABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAAACEAAAAQgAIAABABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAAACEABAAAIAIAABABCAAAAIQAAABCAAAAIQAAABCACAAPxX2gR4VkcH+CIABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAdGSAAAQEoAAEEICAABSCAAAQEoAAEBCCAABSAgAAEEIACEBCAAAJQAAICEBCAAlAAAgIQEIACUAACAhAQgAJQAAICEBCAAlAAAgIQEIACUAACAhAQgAJQAAICEBCAAlAAAgIQEIACEEAAAgJQAAIIQEAACkAAAQgIQAEICEAAASgAAQEIIAAFICAAAQSgAAQEICAABaAABAQgIAAFoAAEBCAgAAWgAAQEICAABaAABAQgIAAFoAAEBCAgAAWgAAQEICAABaAjAwQgIAAFIIAABASgAAQQgIAAFICAAAQQgAIQEIAAAlAAAgIQQAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAApAQAACAlAAAghAQAAKQAABCAhAAQggAAEBKAABAQggAAUgIAABBKAABAQggAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAABBCAgAAUgAACEBCAAhAQgE4MEIACEBCAAAJQAAICEEAACkBAAAICUAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAAIIQEAACkAAAQgIQAEIIAABASgAAQEIIAAFICAAAQSgAAQEIIAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgAAQQgIAAFIAAAhAQgAIQQAACAlAAAgIQQAAKQEAAAghAAQgIQAABKAABAQgIQAEoAAEBCAhAASgAAQEICEABKAABAQgIQAEoAAEBCAhAASgAAQEICEABKAABAQgIQAHoyAABCAhAAQggAAEBKAABBCAgAAUgIAABBKAABAQggAAUgIAABBCAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAACEBCAAhBAAAICUAACCEBAAApAQAACCEABCAhAAAEoAAEBCCAABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAEEICAABSCAAAQEoAAEBCCAABSAgAAEEIACEBCAAAJQAAICEBCAAlAAAgIQEIACUAACAhAQgAJQAAICEBCAAlAAAgIQEIACUAACAhAQgAJQAAICEBCAAlAAAgIQEIACEEAAAgJQAAIIQEAACkAAAQgIQAEICEAAASgAAQEIIAAFICAAAQSgAAQEICAABaAABAQgIAAFoAAEBCAgAAWgAAQEICAABaAABAQgIAAFoAAEBCAgAAWgAAQEICAABaAABAQgIAAFIIAABASgAAQQgIAAFIAATgwQgAIQEIAAAlAAAgIQQAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAApAQAACAlAACkBAAAICUAAKQEAAAgJQAApAQAACAlAAAghAQAAKQAABCAhAAQggAAEBKAABAQggAAUgIAABBKAABAQggAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAABBCAgAAUgAACEBCAAhBAAAICUAACAhBAAApAQAACCEABCAhAAAEoAAEBCAhAASgAAQEICEABKAABAQgIQAEoAAEBCAhAASgAAQEICEABKAABAQgIQAEoAAEBCAhAAejIAAEICEABCCAAAQEoAAEEICAABSAgAAEEoAAEBCCAABSAgAAEEIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAAIQEIACEEAAAgJQAAIIQEAACkBAAAIIQAEICEAAASgAAQEIIAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgAAQQgIAAFIIAABASgAAQEoBMDBKAABAQggAAUgIAABBCAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAIQEICAABSAAhAQgIAAFIACEBCAgAAUgAACEBCAAhBAAAICUAACCEBAAApAQAACCEABCAhAAAEoAAEBCCAABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAUgIAABASgABSAgAAEBKAAFICAAAQEoAAEEICAABSCAAAQEoAAEcGKAABSAgAAEEIACEBCAAAJQAAICEEAACkBAAAICUAAKQEAAAgJQAApAQAACAlAACkBAAAICUAACACAAAQAQgAAACEAAAAQgAAACEAAAAQgAIAABABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAAACEABAAAIAIAABABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAAACEABAAAIAIAABABCAAAAIQAAABCAAAAIQAAABCACAAAQAQAACACAAAQAQgAAACEAAAAQgAIAANAIAQCYX2FeU6mkBKewAAAAASUVORK5CYII=';
+const PDF_SMOKE_PATH = '/__hanji_smoke__/attachment-preview-document.pdf';
+const PDF_BYTES = minimalPdfBytes();
+const DOWNLOAD_DATA_URL = 'data:text/plain;base64,SGFuamkgYXR0YWNobWVudCBkb3dubG9hZCBzbW9rZQo=';
+const FILE_FIXTURES = [
+  { name: IMAGE_FILE_NAME, size: 2_405, type: 'image/png', url: IMAGE_DATA_URL },
+  { name: PDF_FILE_NAME, size: PDF_BYTES.byteLength, type: 'application/pdf', url: PDF_SMOKE_PATH },
+  { name: DOWNLOAD_FILE_NAME, size: 31, type: 'text/plain', url: DOWNLOAD_DATA_URL },
+  {
+    name: 'attachment-actions-sample.pptx',
+    size: 331_000,
+    type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    url: 'https://example.com/files/attachment-actions-sample.pptx',
+  },
 ];
+const FILE_NAMES = FILE_FIXTURES.map((file) => file.name);
 
 const options = parseArgs(process.argv.slice(2));
 setDefaultTimeoutMs(options.timeoutMs);
@@ -75,9 +88,19 @@ async function main() {
 async function assertFilePropertyUi(browser, baseUrl, seed) {
   const { context, page, errors } = await newCheckedPage(browser, {
     deviceScaleFactor: 1,
+    serviceWorkers: 'block',
     viewport: { width: 1440, height: 900 },
   });
   await seedSession(context, seed, 'dark');
+  await page.route(`**${PDF_SMOKE_PATH}`, (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/octet-stream',
+    headers: {
+      'Content-Disposition': `attachment; filename="${PDF_FILE_NAME}"`,
+      'X-Content-Type-Options': 'nosniff',
+    },
+    body: PDF_BYTES,
+  }));
 
   try {
     await openDatabase(page, baseUrl, seed);
@@ -100,6 +123,8 @@ async function assertFilePropertyUi(browser, baseUrl, seed) {
       fullPage: false,
     });
 
+    const previewMetrics = await assertAttachmentOpenBehavior(page, context);
+
     await page.getByRole('button', { name: `${FILE_NAMES[0]} file menu` }).click({
       timeout: options.timeoutMs,
     });
@@ -113,7 +138,7 @@ async function assertFilePropertyUi(browser, baseUrl, seed) {
       fullPage: false,
     });
 
-    const metrics = { closedMetrics, menuMetrics, actionMenuMetrics };
+    const metrics = { closedMetrics, menuMetrics, previewMetrics, actionMenuMetrics };
     writeFileSync(join(options.screenshotDir, 'database-file-property-ui.json'), `${JSON.stringify(metrics, null, 2)}\n`);
 
     assert(closedMetrics.rowHeight <= 38, `multi-file table row should stay close to one-line height: ${JSON.stringify(closedMetrics)}`);
@@ -126,12 +151,86 @@ async function assertFilePropertyUi(browser, baseUrl, seed) {
     assert(menuMetrics.itemCount === FILE_NAMES.length, `file menu should list every file: ${JSON.stringify(menuMetrics)}`);
     assert(menuMetrics.rows.every((row) => row.hasDownloadButton), `every file row needs a direct download button: ${JSON.stringify(menuMetrics)}`);
     assert(menuMetrics.rows.every((row) => row.downloadBeforeMenu), `direct download button should sit left of the file menu button: ${JSON.stringify(menuMetrics)}`);
+    assert(previewMetrics.imageDialogVisible, `image attachment should open an in-app preview: ${JSON.stringify(previewMetrics)}`);
+    assert(previewMetrics.imageStayedInPage, `image preview should not open a second tab: ${JSON.stringify(previewMetrics)}`);
+    assert(previewMetrics.imageAboveFilePopover, `image preview should cover the originating file popover: ${JSON.stringify(previewMetrics)}`);
+    assert(previewMetrics.pdfOpenedInNewTab, `PDF attachment should open in a new browser tab: ${JSON.stringify(previewMetrics)}`);
+    assert(previewMetrics.pdfViewerReady, `stored/download-only PDF bytes should be re-typed for the browser PDF reader: ${JSON.stringify(previewMetrics)}`);
+    assert(!previewMetrics.pdfUrl.includes(PDF_SMOKE_PATH), `PDF primary click must not fall back to the forced-download URL: ${JSON.stringify(previewMetrics)}`);
+    assert(previewMetrics.downloadName === DOWNLOAD_FILE_NAME, `other attachments should keep downloading: ${JSON.stringify(previewMetrics)}`);
     assert(actionMenuMetrics.items.includes('Download'), `per-file overflow menu should keep the download action: ${JSON.stringify(actionMenuMetrics)}`);
     assert(actionMenuMetrics.withinViewport, `per-file action menu should stay visible in the viewport: ${JSON.stringify(actionMenuMetrics)}`);
     assertNoBrowserErrors(errors, 'database file property UI flow');
   } finally {
     await context.close().catch(() => {});
   }
+}
+
+async function assertAttachmentOpenBehavior(page, context) {
+  const fileDialog = page.getByRole('dialog', { name: 'Edit files property' });
+  assert(await fileDialog.count() === 1, 'file property popover should remain open for attachment actions');
+  const imageLink = fileDialog.locator(`[data-attachment-kind="image"][aria-label="Open ${IMAGE_FILE_NAME}"]`);
+  assert(await imageLink.count() === 1, 'image attachment should expose one preview link');
+  const pagesBeforeImage = context.pages().length;
+  await imageLink.click({ timeout: options.timeoutMs });
+  const imageDialog = page.getByRole('dialog', { name: 'Image preview' });
+  await imageDialog.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const imageDialogVisible = await imageDialog.isVisible();
+  const imageStayedInPage = context.pages().length === pagesBeforeImage;
+  const imageAboveFilePopover = await page.evaluate(() => {
+    const preview = document.querySelector('[data-attachment-image-preview]');
+    const filePopover = Array.from(document.querySelectorAll('[role="dialog"]')).find(
+      (node) => node.getAttribute('aria-label') === 'Edit files property',
+    );
+    if (!(preview instanceof HTMLElement) || !(filePopover instanceof HTMLElement)) return false;
+    return Number(getComputedStyle(preview).zIndex) > Number(getComputedStyle(filePopover).zIndex);
+  });
+  await page.screenshot({
+    path: join(options.screenshotDir, 'file-image-preview.png'),
+    fullPage: false,
+  });
+  const closePreview = page.getByRole('button', { name: 'Close image preview' });
+  assert(await closePreview.count() === 1, 'image preview should expose one close button');
+  await closePreview.click({ timeout: options.timeoutMs });
+  await imageDialog.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+
+  const pdfLink = fileDialog.locator(`[data-attachment-kind="pdf"][aria-label="Open ${PDF_FILE_NAME}"]`);
+  assert(await pdfLink.count() === 1, 'PDF attachment should expose one new-tab link');
+  const popupPromise = page.waitForEvent('popup', { timeout: options.timeoutMs });
+  await pdfLink.click({ timeout: options.timeoutMs });
+  const pdfPage = await popupPromise;
+  const readyPdfLink = fileDialog.locator(
+    `[data-attachment-kind="pdf"][aria-label="Open ${PDF_FILE_NAME}"][data-pdf-viewer-ready="true"]`,
+  );
+  await readyPdfLink.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const pdfViewerReady = await readyPdfLink.getAttribute('data-pdf-viewer-ready') === 'true';
+  // Headless Chromium does not consistently attach its PDF extension shell to
+  // blob popups (it may leave about:blank or report ERR_ABORTED). The durable
+  // signal is the same-page viewer-ready marker set only after a verified PDF
+  // Blob exists, plus the observed popup and absence of forced-download URL.
+  await pdfPage.waitForTimeout(500);
+  const pdfUrl = pdfPage.url();
+  await pdfPage.screenshot({
+    path: join(options.screenshotDir, 'file-pdf-new-tab.png'),
+    fullPage: false,
+  }).catch(() => {});
+  await pdfPage.close();
+
+  const downloadLink = fileDialog.locator(`[data-attachment-kind="download"][aria-label="Open ${DOWNLOAD_FILE_NAME}"]`);
+  assert(await downloadLink.count() === 1, 'ordinary attachment should expose one download link');
+  const downloadPromise = page.waitForEvent('download', { timeout: options.timeoutMs });
+  await downloadLink.click({ timeout: options.timeoutMs });
+  const download = await downloadPromise;
+
+  return {
+    downloadName: download.suggestedFilename(),
+    imageDialogVisible,
+    imageAboveFilePopover,
+    imageStayedInPage,
+    pdfOpenedInNewTab: pdfPage !== page,
+    pdfViewerReady,
+    pdfUrl,
+  };
 }
 
 async function openDatabase(page, baseUrl, seed) {
@@ -157,10 +256,7 @@ async function collectClosedCellMetrics(page, seed) {
   return page.evaluate(({ rowId, filesPropName, expectedFileCount }) => {
     const row = document.querySelector(`[data-table-row-id="${CSS.escape(rowId)}"]`);
     const cell = row?.querySelector('[data-table-cell][data-col-index="1"]');
-    const trigger = Array.from(cell?.querySelectorAll('[role="button"]') ?? []).find(
-      (node) => node.getAttribute('aria-label') === `Edit ${filesPropName} files`,
-    );
-    const chipContainer = trigger instanceof HTMLElement ? trigger : null;
+    const chipContainer = cell?.querySelector('[data-file-attachments]');
     const chips = Array.from(chipContainer?.children ?? [])
       .filter((node) => node instanceof HTMLElement && node.className.includes('fileChip'));
     const chipTops = chips.map((chip) => Math.round(chip.getBoundingClientRect().top));
@@ -287,12 +383,9 @@ async function seedDatabase(baseUrl) {
     databaseId,
     title: rowTitle,
     properties: {
-      [filesPropId]: FILE_NAMES.map((name, index) => ({
+      [filesPropId]: FILE_FIXTURES.map((file, index) => ({
         id: `file-property-ui-${suffix}-${index}`,
-        name,
-        size: [331_000, 263_000, 259_000, 2_100_000][index],
-        type: index === 0 ? 'application/vnd.openxmlformats-officedocument.presentationml.presentation' : 'application/pdf',
-        url: `https://example.com/files/${encodeURIComponent(name)}`,
+        ...file,
       })),
     },
   });
@@ -306,6 +399,30 @@ async function seedDatabase(baseUrl) {
     rowId,
     rowTitle,
   };
+}
+
+function minimalPdfBytes() {
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    '<< /Length 54 >>\nstream\nBT /F1 18 Tf 72 720 Td (Hanji PDF preview) Tj ET\nendstream',
+  ];
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  for (const [index, object] of objects.entries()) {
+    offsets.push(Buffer.byteLength(pdf, 'ascii'));
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  }
+  const xrefOffset = Buffer.byteLength(pdf, 'ascii');
+  pdf += `xref\n0 ${objects.length + 1}\n`;
+  pdf += '0000000000 65535 f \n';
+  for (const offset of offsets.slice(1)) {
+    pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+  }
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+  return Buffer.from(pdf, 'ascii');
 }
 
 async function cleanupSeed(baseUrl, seed) {

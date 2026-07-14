@@ -4,20 +4,20 @@
     "count_other": "{{count}} backlinks"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Menções ligadas"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} menção",
+    "mention_other": "{{count}} menções",
+    "link_one": "{{count}} ligação",
+    "link_other": "{{count}} ligações"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Menção",
+    "link": "Ligação"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "mais {{count}} backlink",
+    "count_other": "mais {{count}} backlinks"
   }
 }

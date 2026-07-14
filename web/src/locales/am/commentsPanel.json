@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "አስተያየቶች",
+  "closeAria": "አስተያየቶችን ዝጋ",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "የብሎክ ውይይት",
+    "page": "የገጽ ውይይት"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "አስተያየት ሁኔታ",
+    "open": "ክፍት",
+    "resolved": "የተፈታ"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "የአስተያየት ኢላማ",
+    "commentingOnSelectedText": "በተመረጠ ጽሁፍ ላይ አስተያየት",
+    "selectedBlock": "የተመረጠ ብሎክ",
+    "onSelectedText": "በተመረጠ ጽሁፍ ላይ",
+    "onSelectedBlock": "በተመረጠ ብሎክ ላይ",
+    "onABlock": "በብሎክ ላይ"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "የብሎክ አስተያየት ጨምር",
+    "addPageComment": "የገጽ አስተያየት ጨምር",
+    "blockPlaceholder": "በዚህ ብሎክ ላይ አስተያዩ...",
+    "pagePlaceholder": "አስተያየት ጨምር...",
+    "submit": "አስተያየት ላክ"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "በአስተያየት ላይ ሰዎችን ጥቀስ",
+    "replyPeopleAria": "በመልስ ላይ ሰዎችን ጥቀስ",
+    "trigger": "ሰዎችን ጥቀስ",
+    "noMatches": "የሚስማሙ ሰዎች የሉም",
+    "title": "{{name}}ን ጥቀስ",
+    "person": "ሰው",
+    "you": "እርስዎ",
+    "organizationPerson": "የድርጅት አባል",
+    "roleInOrganization": "በድርጅቱ ውስጥ {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "አስተያየት ክሮች",
+    "empty": "ገና አስተያየቶች የሉም",
+    "noOpen": "ክፍት አስተያየቶች የሉም",
+    "noResolved": "የተፈቱ አስተያየቶች የሉም"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} አስተያየት, {{time}}",
+    "commentAriaResolved": "{{author}} አስተያየት, {{time}}, ተፈትቷል",
+    "replyAria": "{{author}} መልስ, {{time}}",
+    "repliesAria": "{{count}} መልሶች",
+    "edited": "(ተስተካክሏል)",
+    "emptyComment": "(ባዶ አስተያየት)",
+    "emptyReply": "(ባዶ መልስ)",
+    "justNow": "አሁን ብቻ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "መልስ",
+    "showInPage": "በገጽ አሳይ",
+    "resolve": "ፍታ",
+    "reopen": "እንደገና ክፈት",
+    "edit": "አርትዕ"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "መልስ..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "አስተያየት አርትዕ"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ይህን አስተያየት ይሰረዙ?",
+    "threadConfirm_one": "ይህን አስተያየት እና መልሱን ሰርዝ?",
+    "threadConfirm_other": "ይህን አስተያየት እና {{count}} መልሶቹን ሰርዝ?"
   }
 }

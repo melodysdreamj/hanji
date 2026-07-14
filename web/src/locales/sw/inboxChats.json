@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Hakuna mazungumzo bado. Toa maoni kwenye ukurasa au mtaje mtu kuanza moja.",
+  "leave": "Ondoka",
+  "leaveAria": "Ondoka kwenye mazungumzo ya {{title}}",
+  "open": "Fungua mazungumzo kwenye {{title}}",
+  "participants_one": "{{count}} mshiriki",
+  "participants_other": "{{count}} washiriki",
+  "untitled": "Bila jina",
+  "loading": "Inapakia mazungumzo…"
 }

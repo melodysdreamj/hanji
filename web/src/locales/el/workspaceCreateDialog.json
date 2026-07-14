@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Νέος χώρος εργασίας",
   "name": {
-    "label": "Workspace name",
+    "label": "Όνομα χώρου εργασίας",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Έναρξη από",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Κενός χώρος εργασίας",
+      "body": "Ξεκινήστε κενό με τις σελίδες έναρξης."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Εισαγωγή από Notion",
+      "body": "Δημιουργήστε τον χώρο εργασίας και, στη συνέχεια, μετεγκαταστήστε έναν χώρο εργασίας του Notion σε αυτόν."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Εισαγωγή από άλλο Hanji",
+      "body": "Δημιουργήστε τον χώρο εργασίας και, στη συνέχεια, εισαγάγετε έναν χώρο εργασίας από άλλον διακομιστή ή αρχείο Hanji."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Δημιουργία χώρου εργασίας",
+  "creating": "Δημιουργία…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Δεν ήταν δυνατή η δημιουργία χώρου εργασίας."
   }
 }

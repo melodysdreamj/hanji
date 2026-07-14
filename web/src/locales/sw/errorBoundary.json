@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Kuna tatizo limetokea kuonyesha maudhui haya.",
+  "detail": "Jaribu tena. Ikiwa tatizo linaendelea, pakia upya programu na ushiriki rejeleo lililo hapa chini.",
+  "reference": "Rejeleo: {{reference}}",
+  "reload": "Pakia upya programu",
+  "retry": "Jaribu tena"
 }

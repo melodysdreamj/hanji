@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "average": "Średnia",
+    "count": "Liczba",
+    "max": "Maks",
     "min": "Min",
-    "max": "Max"
+    "sum": "Suma"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Wykres {{name}}",
+  "chartType": "Typ wykresu",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Słupkowy",
+    "donut": "Donut",
+    "horizontal_bar": "Poziomy słupkowy",
+    "line": "Liniowy"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Zaznaczone",
+  "empty": "Puste",
+  "legend": "Legenda wykresu",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Brak danych",
+  "noDataDesc": "Żadne wiersze nie pasują do bieżących filtrów ani wyszukiwania.",
+  "noGroupProperty": "Brak danych do wykreślenia",
+  "noGroupPropertyDesc": "Dodaj właściwość typu wybór, status, osoba, pole wyboru lub data, aby pogrupować ten wykres.",
+  "total": "Razem",
+  "unchecked": "Niezaznaczone",
+  "untitledProperty": "Bez nazwy",
+  "valueProperty": "Właściwość wartości",
+  "xAxis": "Oś X",
+  "yAxis": "Oś Y"
 }

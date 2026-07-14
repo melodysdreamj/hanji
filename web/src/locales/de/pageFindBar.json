@@ -7,8 +7,8 @@
     "placeholder": "Auf Seite suchen"
   },
   "actions": {
-    "previous": "Vorherige Übereinstimmung",
-    "next": "Nächste Übereinstimmung",
+    "previous": "Vorheriger Treffer",
+    "next": "Nächster Treffer",
     "close": "Suche schließen"
   }
 }

@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "無法還原頁面",
+  "emptyBodyPrompt": "按 Enter 開始在空白頁面輸入。",
+  "inTrashTopBarTitle": "在垃圾桶中",
+  "notFoundTopBarTitle": "找不到",
+  "openWorkspace": "開啟工作區",
+  "pageInTrash": "此頁面在垃圾桶中。",
+  "pageInTrashDetail": "請先還原再開啟或編輯其內容。",
+  "pageUnavailable": "頁面無法使用。",
+  "pageUnavailableDetail": "此頁面可能已被刪除、移動或與其他帳戶共用。",
+  "restorePage": "還原頁面",
+  "restoredPage": "已還原頁面",
+  "loadingPageContent": "正在載入頁面內容"
 }

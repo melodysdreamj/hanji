@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "ടെക്സ്റ്റ്",
+      "description": "പ്ലെയിൻ ടെക്സ്റ്റ് ഉപയോഗിച്ച് എഴുത്ത് ആരംഭിക്കുക.",
+      "placeholder": "കമാൻഡുകൾക്കായി '/' ടൈപ്പ് ചെയ്യുക"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "പേജ്",
+      "description": "ഈ പേജിനുള്ളിൽ ഒരു ഉപപേജ് സൃഷ്ടിക്കുക."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "പേജിലേക്കുള്ള ലിങ്ക്",
+      "description": "നിലവിലുള്ള ഒരു പേജിലേക്ക് ലിങ്ക് ചെയ്യുക."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "തലക്കെട്ട് 1",
+      "description": "വലിയ സെക്ഷൻ തലക്കെട്ട്.",
+      "placeholder": "തലക്കെട്ട് 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ടോഗിൾ ശീർഷകം 1",
+      "description": "ഉള്ളടക്കം മറയ്ക്കാൻ കഴിയുന്ന വലിയ ശീർഷകം.",
+      "placeholder": "ടോഗിൾ ശീർഷകം 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "തലക്കെട്ട് 2",
+      "description": "ഇടത്തരം സെക്ഷൻ തലക്കെട്ട്.",
+      "placeholder": "തലക്കെട്ട് 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ടോഗിൾ ശീർഷകം 2",
+      "description": "ഉൾച്ചേർത്ത ഉള്ളടക്കം മറയ്ക്കാൻ കഴിയുന്ന മീഡിയം ശീർഷകം.",
+      "placeholder": "ടോഗിൾ ശീർഷകം 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "തലക്കെട്ട് 3",
+      "description": "ചെറിയ സെക്ഷൻ തലക്കെട്ട്.",
+      "placeholder": "തലക്കെട്ട് 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ടോഗിൾ ശീർഷകം 3",
+      "description": "ഉൾച്ചേർത്ത ഉള്ളടക്കം മറയ്ക്കാൻ കഴിയുന്ന ചെറിയ ശീർഷകം.",
+      "placeholder": "ടോഗിൾ തലക്കെട്ട് 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "തലക്കെട്ട് 4",
+      "description": "സങ്കോചിത സെക്ഷൻ തലക്കെട്ട്.",
+      "placeholder": "തലക്കെട്ട് 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ടോഗിൾ തലക്കെട്ട് 4",
+      "description": "ഉള്ളടക്കം മറയ്ക്കാൻ കഴിയുന്ന ഒതുക്കമുള്ള തലക്കെട്ട്.",
+      "placeholder": "ടോഗിൾ തലക്കെട്ട് 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "ചെയ്യേണ്ടവ ലിസ്റ്റ്",
+      "description": "ചെക്ക്ബോക്സ് ഉപയോഗിച്ച് ടാസ്കുകൾ ട്രാക്കുചെയ്യുക.",
+      "placeholder": "ചെയ്യേണ്ടവ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "ബുള്ളറ്റ് ലിസ്റ്റ്",
+      "description": "ലളിതമായ ബുള്ളറ്റ് ലിസ്റ്റ് ഉണ്ടാക്കുക.",
+      "placeholder": "ലിസ്റ്റ്"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "എണ്ണപ്പെട്ട ലിസ്റ്റ്",
+      "description": "എണ്ണപ്പെട്ട ലിസ്റ്റ് സൃഷ്ടിക്കുക.",
+      "placeholder": "ലിസ്റ്റ്"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ടോഗിൾ ലിസ്റ്റ്",
+      "description": "ടോഗിളുകൾ ഉള്ളടക്കം മറയ്ക്കാനും കാണിക്കാനും കഴിയും.",
+      "placeholder": "ടോഗിൾ"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "ഉദ്ധരണി",
+      "description": "ഒരു ഉദ്ധരണി ചേർക്കുക.",
+      "placeholder": "ശൂന്യമായ ഉദ്ധരണി"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "കോളൗട്ട്",
+      "description": "എഴുത്ത് ഹൈലൈറ്റ് ചെയ്യുക.",
+      "placeholder": "എന്തെങ്കിലും ടൈപ്പ് ചെയ്യുക..."
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "വിഭജകം",
+      "description": "ബ്ലോക്കുകളെ ദൃശ്യപരമായി വിഭജിക്കുക."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "കോഡ്",
+      "description": "കോഡ് സ്നിപ്പെറ്റ് ക്യാപ്ചർ ചെയ്യുക.",
+      "placeholder": "കോഡ് എഴുതുക, അല്ലെങ്കിൽ സ്നിപ്പെറ്റ് പേസ്റ്റ് ചെയ്യുക…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "സമവാക്യം",
+      "description": "ഒരു ഗണിത സമവാക്യം പ്രദർശിപ്പിക്കുക."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "ഉള്ളടക്ക പട്ടിക",
+      "description": "ഈ പേജിലെ ശീർഷകങ്ങളിലേക്കുള്ള ലിങ്കുകൾ കാണിക്കുക."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "സമന്വയിപ്പിച്ച ബ്ലോക്ക്",
+      "description": "പേജുകളിലുടനീളം ഉള്ളടക്കം വീണ്ടും ഉപയോഗിക്കുക."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ബട്ടൺ",
+      "description": "ഒരു ക്ലിക്കിൽ പുനരുപയോഗിക്കാവുന്ന ഉള്ളടക്കം ചേർക്കുക."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ടാബുകൾ",
+      "description": "ഉള്ളടക്കത്തെ ലേബൽ ചെയ്ത ടാബുകളായി ഗ്രൂപ്പ് ചെയ്യുക.",
+      "placeholder": "ടാബുകൾ"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "ബ്രെഡ്‌ക്രംബ്",
+      "description": "ഈ പേജ് എവിടെയാണെന്ന് കാണിക്കുക."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "തനിപ്പകർപ്പ്",
+      "description": "ഈ ബ്ലോക്കിന്റെ കൃത്യമായ പകർപ്പ് സൃഷ്ടിക്കുക."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "നീക്കുക",
+      "description": "ഈ ബ്ലോക്ക് മറ്റൊരു പേജിലേക്ക് നീക്കുക."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ഈ ബ്ലോക്ക് ഇല്ലാതാക്കുക."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "മാറ്റുക",
+      "description": "ഈ ബ്ലോക്കിന്റെ തരം മാറ്റുക."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "നിറം",
+      "description": "ഈ ബ്ലോക്കിന്റെ വാചകമോ പശ്ചാത്തല നിറമോ മാറ്റുക."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "പട്ടിക",
+      "description": "ഈ പേജിലേക്ക് ഒരു ലളിത പട്ടിക ചേർക്കുക."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 കോളങ്ങൾ",
+      "description": "ബ്ലോക്കുകൾ വശങ്ങളിൽ വിന്യസിക്കുക."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 കോളങ്ങൾ",
+      "description": "ബ്ലോക്കുകൾ മൂന്ന് കോളങ്ങളായി ക്രമീകരിക്കുക."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 കോളങ്ങൾ",
+      "description": "ബ്ലോക്കുകൾ നാല് കോളങ്ങളായി ക്രമീകരിക്കുക."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 കോളങ്ങൾ",
+      "description": "ബ്ലോക്കുകൾ അഞ്ച് കോളങ്ങളായി ക്രമീകരിക്കുക."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "ചിത്രം",
+      "description": "അപ്‌ലോഡ് ചെയ്യുക അല്ലെങ്കിൽ ലിങ്ക് വഴി എംബഡ് ചെയ്യുക."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "വീഡിയോ",
+      "description": "ലിങ്ക് ഉപയോഗിച്ച് വീഡിയോ എംബഡ് ചെയ്യുക."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ഓഡിയോ",
+      "description": "ലിങ്ക് ഉപയോഗിച്ച് ഓഡിയോ എംബെഡ് ചെയ്യുക."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "വെബ് ബുക്ക്‌മാർക്ക്",
+      "description": "ഒരു വെബ് ലിങ്ക് കാർഡായി സംരക്ഷിക്കുക."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "എംബെഡ്",
+      "description": "ഒരു ലിങ്കിൽ നിന്ന് ഉള്ളടക്കം എംബെഡ് ചെയ്യുക."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ഫയൽ",
+      "description": "ഈ പേജിലേക്ക് ഒരു ഫയൽ ലിങ്ക് ചേർക്കുക."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ഡാറ്റാബേസ് - പൂർണ പേജ്",
+      "description": "ഉപപേജായി പുതിയ ഡാറ്റാബേസ് ചേർക്കുക."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "പട്ടിക - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് ഡാറ്റാബേസ് പട്ടികയായി ചേർക്കുക."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ബോർഡ് - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് കാൻബാൻ ബോർഡ് ചേർക്കുക."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "ലിസ്റ്റ് - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് ഡാറ്റാബേസ് ലിസ്റ്റായി ചേർക്കുക."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "ടൈംലൈൻ - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് ഡാറ്റാബേസ് ടൈംലൈൻ ചേർക്കുക."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "കലണ്ടർ - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് കലണ്ടർ ഡാറ്റാബേസ് ചേർക്കുക."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "ഗാലറി - ഫുൾ പേജ്",
+      "description": "ഒരു ഫുൾ-പേജ് ഡാറ്റാബേസ് ഗാലറി ചേർക്കുക."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ഡാറ്റാബേസ് - ഇൻലൈൻ",
+      "description": "ഈ പേജിനുള്ളിൽ ഒരു ഡാറ്റാബേസ് ചേർക്കുക."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "പട്ടിക കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ ഡാറ്റാബേസ് പട്ടികയായി ചേർക്കുക."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "ബോർഡ് കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ കാൻബാൻ ബോർഡ് ചേർക്കുക."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "ലിസ്റ്റ് കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ ഡാറ്റാബേസ് ലിസ്റ്റായി ചേർക്കുക."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "ടൈംലൈൻ കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ ഡാറ്റാബേസ് ടൈംലൈൻ ചേർക്കുക."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "കലണ്ടർ കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ കലണ്ടർ ഡാറ്റാബേസ് ചേർക്കുക."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "ഗാലറി കാഴ്ച",
+      "description": "ഒരു ഇൻലൈൻ ഡാറ്റാബേസ് ഗാലറി ചേർക്കുക."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "സ്ഥിരം",
+      "description": "ഈ ബ്ലോക്കിൽ നിന്ന് ടെക്സ്റ്റും പശ്ചാത്തല നിറവും നീക്കം ചെയ്യുക."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ചാര",
+      "description": "ഈ ബ്ലോക്കിൽ ചാര നിറം പ്രയോഗിക്കുക."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "തവിട്ട്",
+      "description": "ഈ ബ്ലോക്കിന് തവിട്ട് നിറം പ്രയോഗിക്കുക."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ഓറഞ്ച്",
+      "description": "ഈ ബ്ലോക്കിൽ ഓറഞ്ച് നിറം പ്രയോഗിക്കുക."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "മഞ്ഞ",
+      "description": "ഈ ബ്ലോക്കിൽ മഞ്ഞ നിറം പ്രയോഗിക്കുക."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "പച്ച",
+      "description": "ഈ ബ്ലോക്കിൽ പച്ച നിറം പ്രയോഗിക്കുക."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "നീല",
+      "description": "ഈ ബ്ലോക്കിന് നീല നിറം പ്രയോഗിക്കുക."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "പർപ്പിൾ",
+      "description": "ഈ ബ്ലോക്കിൽ പർപ്പിൾ നിറം പ്രയോഗിക്കുക."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "പിങ്ക്",
+      "description": "ഈ ബ്ലോക്കിൽ പിങ്ക് നിറം പ്രയോഗിക്കുക."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ചുവപ്പ്",
+      "description": "ഈ ബ്ലോക്കിൽ ചുവന്ന നിറം പ്രയോഗിക്കുക."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ചാര പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ ചാര പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "തവിട്ട് പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിന് തവിട്ട് പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ഓറഞ്ച് പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ ഓറഞ്ച് പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "മഞ്ഞ പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ മഞ്ഞ പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "പച്ച പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ പച്ച പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "നീല പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിന് നീല പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "പർപ്പിൾ പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ പർപ്പിൾ പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "പിങ്ക് പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ പിങ്ക് പശ്ചാത്തലം പ്രയോഗിക്കുക."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ചുവന്ന പശ്ചാത്തലം",
+      "description": "ഈ ബ്ലോക്കിൽ ചുവന്ന പശ്ചാത്തലം പ്രയോഗിക്കുക."
     }
   }
 }

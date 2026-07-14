@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Išči ali pojdi na...",
+  "quickFind": "Hitro iskanje",
+  "closeSearch": "Zapri iskanje",
+  "quickFindResults": "Rezultati hitrega iskanja",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Nedavno ogledano",
+    "recentSearches": "Nedavna iskanja",
+    "pages": "Strani",
+    "pageContent": "Vsebina strani",
+    "favorites": "Priljubljene"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "v strani",
+  "searchingDetail": "Iskanje...",
+  "searchAgain": "Išči znova",
+  "searchingPageContent": "Iskanje vsebine strani...",
+  "noResultsFor": "Ni rezultatov za \"{{query}}\"",
+  "noPagesFound": "Ni najdenih strani",
+  "creating": "Ustvarjanje...",
+  "newPage": "Nova stran \"{{query}}\"",
+  "couldntCreatePage": "Ustvarjanje strani ni uspelo",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Izberi",
+    "open": "Odpri",
+    "newTab": "Nov zavihek"
   }
 }

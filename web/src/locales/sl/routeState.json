@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Ta naslov je nepopoln.",
+  "sharedTitle": "Ta deljena povezava ni veljavna.",
+  "notFoundBody": "Ta naslov se ne ujema s stranjo Hanji. Stran je bila morda premaknjena ali ne obstaja več.",
+  "invalidBody": "Preverite povezavo za manjkajoče ali nepravilne znake in poskusite znova.",
+  "notFoundTitle": "Stran ni najdena.",
+  "sharedBody": "Preverite, ali je bila celotna deljena povezava pravilno kopirana, in poskusite znova.",
+  "openHome": "Odpri Hanji dom"
+}

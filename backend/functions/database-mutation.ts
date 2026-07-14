@@ -1322,6 +1322,7 @@ function starterDatabaseSchema(
   viewType: StarterViewType,
   rawProperties?: unknown,
   locale?: unknown,
+  viewId?: string,
 ) {
   const labels = starterDatabaseLabels(locale);
   const properties =
@@ -1361,7 +1362,7 @@ function starterDatabaseSchema(
   if (viewType === 'gallery') config.cardSize = 'medium';
 
   const view: DbView = {
-    id: newId(),
+    id: viewId ?? newId(),
     databaseId,
     name: databaseViewLabel(viewType, labels),
     type: viewType,
@@ -1509,7 +1510,13 @@ async function createDatabase(
     createdAt: now,
     updatedAt: now,
   };
-  const { properties, view } = starterDatabaseSchema(id, viewType, body.properties, body.locale);
+  const { properties, view } = starterDatabaseSchema(
+    id,
+    viewType,
+    body.properties,
+    body.locale,
+    optionalString(body.viewId) ?? undefined,
+  );
   await assertNoUnownedStoredFileReferences(db, { icon: page.icon }, { requestUrl });
   const recordStamp = nowIso();
   const stampedProperties = properties.map((property) => ({

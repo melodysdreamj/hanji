@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Споделена страница",
+  "loading": "Зареждане на споделена страница",
+  "unavailable": "Тази споделена страница е недостъпна.",
+  "notFound": "Споделената страница не е намерена.",
+  "outsideShare": "Страницата не е част от това публично споделяне.",
+  "errors": {
+    "not-found": "Връзката може да е изтекла, да е прекратена или да е копирана неправилно.",
+    "offline": "Проверете връзката си и опитайте отново да отворите споделената страница.",
+    "rate-limited": "Твърде много заявки. Изчакайте малко и опитайте отново.",
+    "unavailable": "Hanji не можа да отвори тази споделена страница в момента. Опитайте отново след малко."
+  },
+  "tryAgain": "Опитайте отново"
 }

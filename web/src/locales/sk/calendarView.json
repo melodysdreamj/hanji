@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Pridať vlastnosť dátum",
+    "description": "Zobrazenia kalendára potrebujú vlastnosť dátum na umiestnenie stránok v mesiaci.",
+    "addDateButton": "Dátum"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalendár podľa",
+    "today": "Dnes",
+    "previousWeek": "Minulý týždeň",
+    "previousMonth": "Minulý mesiac",
+    "nextWeek": "Budúci týždeň",
+    "nextMonth": "Budúci mesiac"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Ned",
+    "mon": "Pon",
+    "tue": "Uto",
+    "wed": "Str",
+    "thu": "Štv",
+    "fri": "Pia",
+    "sat": "Sob"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} kalendár",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} položiek",
+    "newRowAriaLabel": "Nový riadok na {{date}}",
+    "newRowTitle": "Nový",
+    "showLess": "Zobraziť menej",
+    "showMore": "+{{count}} viac"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Otvoriť {{title}}",
+    "openAriaLabelWithDate": "Otvoriť {{title}}, naplánované na {{date}}",
+    "openNoDateAriaLabel": "Otvoriť {{title}}, bez dátumu"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Bez dátumu ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Bez názvu",
+    "dateDefaultName": "Dátum"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "កំពុងបើកទំព័រ",
+  "workspace": "វរកស្បែស",
+  "emptyWorkspace": "វរកស្បែសទទេ",
+  "untitled": "គ្មានចំណងជើង",
+  "newPage": "ទំព័រថ្មី"
 }

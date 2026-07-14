@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Хусусият турини ўзгартириш?",
+  "message": "«{{propName}}» қийматларга эга. Турини {{typeLabel}} га ўзгартириш мавжуд қийматларни бошқача кўрсатиши ёки уларни йўқотиши мумкин.",
+  "cancelAria": "Xususiyat turi o'zgarishini bekor qilish",
+  "confirm": "Турни ўзгартириш"
 }

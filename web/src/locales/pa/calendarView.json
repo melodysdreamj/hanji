@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "ਮਿਤੀ ਵਿਸ਼ੇਸ਼ਤਾ ਸ਼ਾਮਲ ਕਰੋ",
+    "description": "ਕੈਲੰਡਰ ਦ੍ਰਿਸ਼ਾਂ ਨੂੰ ਮਹੀਨੇ 'ਤੇ ਪੰਨੇ ਲਗਾਉਣ ਲਈ ਇੱਕ ਮਿਤੀ ਵਿਸ਼ੇਸ਼ਤਾ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ।",
+    "addDateButton": "ਮਿਤੀ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ਕੈਲੰਡਰ ਦੁਆਰਾ",
+    "today": "ਅੱਜ",
+    "previousWeek": "ਪਿਛਲਾ ਹਫ਼ਤਾ",
+    "previousMonth": "ਪਿਛਲਾ ਮਹੀਨਾ",
+    "nextWeek": "ਅਗਲਾ ਹਫ਼ਤਾ",
+    "nextMonth": "ਅਗਲਾ ਮਹੀਨਾ"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ਐਤ",
+    "mon": "ਸੋ",
+    "tue": "ਮੰ",
+    "wed": "ਬੁ",
+    "thu": "ਵੀ",
+    "fri": "ਸ਼ੁ",
+    "sat": "ਸ਼ਨ"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} ਕੈਲੰਡਰ",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ਆਈਟਮਾਂ",
+    "newRowAriaLabel": "{{date}} 'ਤੇ ਨਵੀਂ ਕਤਾਰ",
+    "newRowTitle": "ਨਵਾਂ",
+    "showLess": "ਘੱਟ ਵੇਖਾਓ",
+    "showMore": "+{{count}} ਹੋਰ"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ਖੋਲ੍ਹੋ",
+    "openAriaLabelWithDate": "{{title}} ਖੋਲ੍ਹੋ, {{date}} ਲਈ",
+    "openNoDateAriaLabel": "{{title}} ਖੋਲ੍ਹੋ, ਕੋਈ ਮਿਤੀ ਨਹੀਂ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ਕੋਈ ਮਿਤੀ ਨਹੀਂ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ਸਿਰਲੇਖ ਰਹਿਤ",
+    "dateDefaultName": "ਮਿਤੀ"
   }
 }

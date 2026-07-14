@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "ਟੈਕਸਟ ਫਾਰਮੈਟਿੰਗ"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "ਬਦਲੋ",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "ਟੈਕਸਟ",
+      "heading1": "ਹੈਡਿੰਗ 1",
+      "heading2": "ਹੈਡਿੰਗ 2",
+      "heading3": "ਹੈਡਿੰਗ 3",
+      "heading4": "ਹੈਡਿੰਗ 4",
+      "toDoList": "ਕਰਨ-ਸੂਚੀ",
+      "bulletedList": "ਬੁਲੇਟ ਸੂਚੀ",
+      "numberedList": "ਅੰਕਿਤ ਸੂਚੀ",
+      "toggleList": "ਟੌਗਲ ਸੂਚੀ",
+      "quote": "ਕੋਟ",
+      "callout": "ਕਾਲਆਉਟ",
+      "code": "ਕੋਡ"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ਬੋਲਡ",
+    "italic": "ਇਟਾਲਿਕ",
+    "underline": "ਅੰਡਰਲਾਈਨ",
+    "strikethrough": "ਸਟ੍ਰਾਈਕਥਰੂ",
+    "code": "ਕੋਡ",
+    "link": "ਲਿੰਕ"
   },
   "comment": {
-    "label": "Comment"
+    "label": "ਟਿੱਪਣੀ"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "ਟੈਕਸਟ ਰੰਗ: {{color}}",
+    "title": "ਰੰਗ: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ਮਿਕਸ",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "ਟੈਕਸਟ ਰੰਗ",
+      "default": "ਡਿਫਾਲਟ",
+      "gray": "ਸਲੇਟੀ",
+      "brown": "ਭੂਰਾ",
+      "orange": "ਸੰਤਰੀ",
+      "yellow": "ਪੀਲਾ",
+      "green": "ਹਰਾ",
+      "blue": "ਨੀਲਾ",
+      "purple": "ਜਾਮਨੀ",
+      "pink": "ਗੁਲਾਬੀ",
+      "red": "ਲਾਲ"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "ਪਿਛੋਕੜ ਰੰਗ",
+      "gray": "ਸਲੇਟੀ ਪਿਛੋਕੜ",
+      "brown": "ਭੂਰਾ ਪਿਛੋਕੜ",
+      "orange": "ਸੰਤਰੀ ਪਿਛੋਕੜ",
+      "yellow": "ਪੀਲਾ ਪਿਛੋਕੜ",
+      "green": "ਹਰਾ ਪਿਛੋਕੜ",
+      "blue": "ਨੀਲਾ ਪਿਛੋਕੜ",
+      "purple": "ਜਾਮਣੀ ਪਿਛੋਕੜ",
+      "pink": "ਗੁਲਾਬੀ ਪਿਛੋਕੜ",
+      "red": "ਲਾਲ ਪਿਛੋਕੜ"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "ਲਿੰਕ ਸੰਪਾਦਿਤ ਕਰੋ",
+    "placeholder": "ਲਿੰਕ ਪੇਸਟ ਕਰੋ",
+    "urlAriaLabel": "ਲਿੰਕ URL",
+    "apply": "ਲਿੰਕ",
+    "open": "ਲਿੰਕ ਖੋਲ੍ਹੋ",
+    "copy": "ਲਿੰਕ ਕਾਪੀ ਕਰੋ",
+    "copied": "ਕਾਪੀ ਕੀਤਾ",
+    "copiedLink": "ਲਿੰਕ ਕਾਪੀ ਕੀਤਾ",
+    "remove": "ਹਟਾਓ"
   }
 }

@@ -2,7 +2,7 @@
 // still declare their own `vi.mock("@/lib/edgebase", ...)` before importing
 // this module (vi.mock is hoisted per test file), so the store below is
 // always created against the mocked network layer.
-import { useStore } from "@/lib/store";
+import { resetPendingPersistenceForTests, useStore } from "@/lib/store";
 import { resetPermanentDeleteTombstonesForTests } from "@/lib/permanentDeleteTombstones";
 import type { DbProperty, Page } from "@/lib/types";
 
@@ -21,6 +21,7 @@ const FIXTURE_NOW = new Date().toISOString();
 const initialState = useStore.getState();
 
 export function resetStore() {
+  resetPendingPersistenceForTests();
   useStore.setState({ ...initialState }, true);
   window.localStorage.clear();
   resetPermanentDeleteTombstonesForTests();

@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Umbizo la maandishi"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Geuza kuwa",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Maandishi",
+      "heading1": "Kichwa 1",
+      "heading2": "Kichwa 2",
+      "heading3": "Kichwa 3",
+      "heading4": "Kichwa 4",
+      "toDoList": "Orodha ya kazi",
+      "bulletedList": "Orodha ya vitone",
+      "numberedList": "Orodha yenye namba",
+      "toggleList": "Orodha ya kugeuza",
+      "quote": "Nukuu",
+      "callout": "Wito",
+      "code": "Msimbo"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Koze",
+    "italic": "Italiki",
+    "underline": "Pigia mstari",
+    "strikethrough": "Kipito",
+    "code": "Msimbo",
+    "link": "Kiungo"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Maoni"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Rangi ya maandishi: {{color}}",
+    "title": "Rangi: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Mchanganyiko",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Rangi ya maandishi",
+      "default": "Chaguo-msingi",
+      "gray": "Kijivu",
+      "brown": "Kahawia",
+      "orange": "Chungwa",
+      "yellow": "Njano",
+      "green": "Kijani",
+      "blue": "Bluu",
+      "purple": "Zambarau",
+      "pink": "Pinki",
+      "red": "Nyekundu"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Rangi ya mandharinyuma",
+      "gray": "Mandharinyuma ya kijivu",
+      "brown": "Mandharinyuma ya kahawia",
+      "orange": "Mandharinyuma ya machungwa",
+      "yellow": "Mandharinyuma ya njano",
+      "green": "Mandharinyuma ya kijani",
+      "blue": "Mandharinyuma ya bluu",
+      "purple": "Mandharinyuma ya zambarau",
+      "pink": "Mandharinyuma ya waridi",
+      "red": "Mandharinyuma ya nyekundu"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Hariri kiungo",
+    "placeholder": "Bandika kiungo",
+    "urlAriaLabel": "URL ya kiungo",
+    "apply": "Kiungo",
+    "open": "Fungua kiungo",
+    "copy": "Nakili kiungo",
+    "copied": "Imenakiliwa",
+    "copiedLink": "Kiungo kimenakiliwa",
+    "remove": "Ondoa"
   }
 }

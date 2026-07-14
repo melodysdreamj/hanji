@@ -1,44 +1,44 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
-  },
-  "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
-  },
-  "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
-  },
-  "gridAriaLabel": "{{title}} calendar",
-  "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
-  },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Avaa {{title}}",
+    "openAriaLabelWithDate": "Avaa {{title}}, ajoitettu päivälle {{date}}",
+    "openNoDateAriaLabel": "Avaa {{title}}, ei päivämäärää"
   },
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} kohdetta",
+    "newRowAriaLabel": "Uusi rivi päivälle {{date}}",
+    "newRowTitle": "Uusi",
+    "showLess": "Näytä vähemmän",
+    "showMore": "+{{count}} lisää"
+  },
+  "empty": {
+    "addDateButton": "Päivämäärä",
+    "description": "Kalenterinäkymät tarvitsevat päivämääräominaisuuden sivujen sijoittamiseksi kuukausinäkymään.",
+    "title": "Lisää päivämääräominaisuus"
+  },
+  "gridAriaLabel": "{{title}}-kalenteri",
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Ei päivämäärää ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "dateDefaultName": "Päivämäärä",
+    "untitled": "Nimetön"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Kalenteri",
+    "nextMonth": "Seuraava kuukausi",
+    "nextWeek": "Seuraava viikko",
+    "previousMonth": "Edellinen kuukausi",
+    "previousWeek": "Edellinen viikko",
+    "today": "Tänään"
+  },
+  "weekdays": {
+    "fri": "Pe",
+    "mon": "Ma",
+    "sat": "La",
+    "sun": "Su",
+    "thu": "To",
+    "tue": "Ti",
+    "wed": "Ke"
   }
 }

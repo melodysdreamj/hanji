@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Hľadať alebo prejsť na...",
+  "quickFind": "Rýchle vyhľadávanie",
+  "closeSearch": "Zatvoriť vyhľadávanie",
+  "quickFindResults": "Výsledky rýchleho vyhľadávania",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Naposledy zobrazené",
+    "recentSearches": "Nedávne vyhľadávania",
+    "pages": "Stránky",
+    "pageContent": "Obsah stránky",
+    "favorites": "Obľúbené"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "v stránke",
+  "searchingDetail": "Hľadá sa...",
+  "searchAgain": "Hľadať znova",
+  "searchingPageContent": "Hľadá sa obsah stránky...",
+  "noResultsFor": "Žiadne výsledky pre \"{{query}}\"",
+  "noPagesFound": "Nenašli sa žiadne stránky",
+  "creating": "Vytváranie...",
+  "newPage": "Nová stránka \"{{query}}\"",
+  "couldntCreatePage": "Nepodarilo sa vytvoriť stránku",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Vybrať",
+    "open": "Otvoriť",
+    "newTab": "Nová karta"
   }
 }

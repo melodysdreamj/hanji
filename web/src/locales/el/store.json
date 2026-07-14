@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Αυτή η βάση δεδομένων είναι κλειδωμένη, οπότε οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "databaseRowsLoadFailed": "Δεν ήταν δυνατή η φόρτωση των γραμμών της βάσης δεδομένων. Δοκιμάστε ξανά σε λίγο.",
+  "editAccessDeniedSave": "Δεν έχετε δικαίωμα επεξεργασίας, οπότε οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "lockedSave": "Η σελίδα ή η βάση δεδομένων είναι κλειδωμένη, οπότε οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "pageLockedSave": "Αυτή η σελίδα είναι κλειδωμένη, οπότε οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "pageMissingSave": "Η σελίδα δεν βρέθηκε, οπότε οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "saveFailed": "Οι αλλαγές σας δεν μπόρεσαν να αποθηκευτούν.",
+  "sessionExpired": "Η συνεδρία σας έληξε ή το αίτημα δεν μπόρεσε να πιστοποιηθεί. Δοκιμάστε ξανά.",
+  "blockConflictSave": "Αυτό το μπλοκ επεξεργάστηκε σε άλλη συσκευή, οπότε η αλλαγή σας εκτός σύνδεσης δεν εφαρμόστηκε.",
+  "blockConflictKeepMine": "Εφαρμογή της έκδοσής μου",
+  "blockMoveCommentsSkipped": "Το μπλοκ μετακινήθηκε, αλλά τα σχόλιά του δεν μπόρεσαν να μετακινηθούν μαζί του."
 }

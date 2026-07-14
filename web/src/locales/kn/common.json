@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "ರದ್ದು",
+    "save": "ಉಳಿಸು",
+    "close": "ಮುಚ್ಚಿ",
+    "search": "ಹುಡುಕು",
+    "create": "ರಚಿಸಿ",
+    "delete": "ಅಳಿಸಿ",
+    "clearAll": "ಎಲ್ಲ ತೆರವು",
+    "done": "ಮುಗಿದಿದೆ",
+    "add": "ಸೇರಿಸಿ"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ಶೀರ್ಷಿಕೆಯಿಲ್ಲದ"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} ನಕಲು",
+    "columnName": "ಕಾಲಮ್ {{number}}",
+    "importedDatabase": "ಆಮದು ಡೇಟಾಬೇಸ್",
+    "uploadedFile": "ಅಪ್ಲೋಡ್ ಮಾಡಿದ ಫೈಲ್",
+    "image": "ಚಿತ್ರ",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "ಹೆಸರು",
+      "status": "ಸ್ಥಿತಿ",
+      "select": "ಆಯ್ಕೆ",
+      "date": "ದಿನಾಂಕ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ಪ್ರಾರಂಭಿಸಿಲ್ಲ",
+      "doing": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
+      "done": "ಮುಗಿದಿದೆ"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ಆಯ್ಕೆ 1",
+      "second": "ಆಯ್ಕೆ 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ಟೇಬಲ್"
     }
   }
 }

@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Tong sampah",
+  "empty": "Halaman yang dipadam akan muncul di sini. Tong sampah kosong.",
+  "searchTrash": "Cari dalam tong sampah",
+  "deletedPages": "Halaman dipadam",
+  "noSearchMatches": "Tiada halaman dipadam yang sepadan dengan carian anda.",
+  "pageCount_one": "{{count}} halaman",
+  "pageCount_other": "{{count}} halaman",
+  "deletedJustNow": "Baru sahaja dipadam",
+  "deletedOn": "Dipadam pada {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Pulihkan",
+    "deleteForever": "Padam selama-lamanya",
+    "emptyTrash": "Kosongkan tong sampah"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Buka {{title}} dari tong sampah",
+    "restorePage": "Pulihkan {{title}}",
+    "deletePageForever": "Padam {{title}} selama-lamanya",
+    "cancelPermanentDelete": "Batal padam kekal",
+    "cancelEmptyTrash": "Batal mengosongkan tong sampah"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Padam secara kekal?",
+    "deleteBodyPrefix": "Ini akan memadamkan secara kekal ",
+    "deleteBodySuffix": ". Anda tidak boleh membuat asal tindakan ini.",
+    "emptyTitle": "Kosongkan tong sampah?",
+    "emptyBody_one": "Ini akan memadamkan secara kekal semua {{count}} halaman dalam tong sampah. Anda tidak boleh membuat asal tindakan ini.",
+    "emptyBody_other": "Ini akan memadamkan secara kekal semua {{count}} halaman dalam tong sampah. Anda tidak boleh membuat asal tindakan ini."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Dipadam secara kekal",
+    "couldntDelete": "Tidak dapat memadam halaman",
+    "restored": "Halaman dipulihkan",
+    "couldntRestore": "Tidak dapat memulihkan halaman",
+    "emptied": "Tong sampah dikosongkan",
+    "couldntEmpty": "Tidak dapat mengosongkan tong sampah"
   }
 }

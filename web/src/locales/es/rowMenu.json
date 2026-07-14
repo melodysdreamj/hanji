@@ -1,6 +1,6 @@
 {
   "searchActions": "Buscar acciones",
-  "noMatchingActions": "Sin acciones coincidentes",
+  "noMatchingActions": "No hay acciones que coincidan",
   "untitledDatabaseRow": "fila de base de datos sin título",
   "sections": {
     "page": "Página",
@@ -13,35 +13,35 @@
     "pageActionsFor": "Acciones de página para {{title}}",
     "openIn": "Abrir en",
     "customizePage": "Personalizar página",
-    "backlinksDisplay": "Visualización de enlaces inversos",
-    "pageCommentsDisplay": "Visualización de comentarios de página",
+    "backlinksDisplay": "Mostrar backlinks",
+    "pageCommentsDisplay": "Mostrar comentarios de página",
     "pageFont": "Fuente de página"
   },
   "actions": {
-    "addToFavorites": "Añadir a Favoritos",
-    "removeFromFavorites": "Quitar de Favoritos",
+    "addToFavorites": "Agregar a favoritos",
+    "removeFromFavorites": "Eliminar de favoritos",
     "editIcon": "Editar icono",
     "editProperties": "Editar propiedades",
     "openIn": "Abrir en",
     "sidePeek": "Vista lateral",
-    "centerPeek": "Vista centrada",
+    "centerPeek": "Vista previa centrada",
     "fullPage": "Página completa",
     "openInNewTab": "Abrir en nueva pestaña",
     "comments": "Comentarios",
     "copyLink": "Copiar enlace",
     "duplicate": "Duplicar",
     "moveTo": "Mover a",
-    "moveToTrash": "Mover a Papelera",
-    "rename": "Cambiar nombre",
-    "addPageInside": "Añadir página dentro",
+    "moveToTrash": "Mover a la Papelera",
+    "rename": "Renombrar",
+    "addPageInside": "Agregar página dentro",
     "exportAsMarkdown": "Exportar como Markdown",
-    "exportAsHanjiFile": "Exportar como archivo Hanji",
+    "exportAsHanjiFile": "Exportar como archivo de Hanji",
     "importMarkdown": "Importar Markdown",
     "importing": "Importando...",
     "unlockPage": "Desbloquear página",
     "lockPage": "Bloquear página",
     "pageHistory": "Historial de página",
-    "removeVerification": "Quitar verificación",
+    "removeVerification": "Eliminar verificación",
     "verifyPage": "Verificar página",
     "customizePage": "Personalizar página",
     "undo": "Deshacer"
@@ -49,7 +49,7 @@
   "customize": {
     "summaryDefault": "Predeterminado",
     "summaryCustomized": "Personalizado",
-    "backlinks": "Enlaces inversos",
+    "backlinks": "Backlinks",
     "pageComments": "Comentarios de página"
   },
   "displayOptions": {
@@ -58,7 +58,7 @@
     "off": "Desactivado"
   },
   "fonts": {
-    "default": "Predeterminada",
+    "default": "Predeterminado",
     "serif": "Serif",
     "mono": "Mono"
   },
@@ -80,27 +80,27 @@
   "toast": {
     "copiedLink": "Enlace copiado",
     "couldntCopyLink": "No se pudo copiar el enlace",
-    "exportedMarkdown": "Markdown exportado",
+    "exportedMarkdown": "Exportado como Markdown",
     "couldntExportMarkdown": "No se pudo exportar Markdown",
     "exportedHanjiFile": "Exportado como archivo Hanji.",
-    "exportedHanjiFileWithWarnings": "Exportado como archivo Hanji — los archivos adjuntos quedaron como marcadores de posición.",
-    "couldntExportHanjiFile": "No se pudo exportar el archivo Hanji.",
-    "importedBlocks_one": "{{count}} bloque importado",
-    "importedBlocks_other": "{{count}} bloques importados",
+    "exportedHanjiFileWithWarnings": "Exportado como archivo Hanji — los archivos adjuntos se dejaron como marcadores de posición.",
+    "couldntExportHanjiFile": "No se pudo exportar el archivo de Hanji.",
+    "importedBlocks_one": "Importado {{count}} bloque",
+    "importedBlocks_other": "Importados {{count}} bloques",
     "nothingToImport": "Nada que importar",
     "couldntImportMarkdown": "No se pudo importar Markdown",
     "verificationRemoved": "Verificación eliminada",
     "pageVerified": "Página verificada",
     "removedFromFavorites": "Eliminado de Favoritos",
     "addedToFavorites": "Añadido a Favoritos",
-    "couldntUpdateFavorites": "No se pudieron actualizar los Favoritos",
+    "couldntUpdateFavorites": "No se pudo actualizar Favoritos",
     "couldntDuplicatePage": "No se pudo duplicar la página",
     "duplicatedPage": "Página duplicada",
     "pageLocked": "Página bloqueada",
     "pageUnlocked": "Página desbloqueada",
-    "movedToTrash": "Movido a Papelera",
+    "movedToTrash": "Movido a la Papelera",
     "restoredPage": "Página restaurada",
     "couldntRestorePage": "No se pudo restaurar la página",
-    "couldntMoveToTrash": "No se pudo mover a Papelera"
+    "couldntMoveToTrash": "No se pudo mover a la papelera"
   }
 }

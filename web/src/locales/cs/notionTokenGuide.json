@@ -1,99 +1,109 @@
 {
-  "region": "Notion token walkthrough",
-  "play": "Play",
-  "pause": "Pause",
-  "prev": "Previous step",
-  "next": "Next step",
-  "stepLabel": "Step {{n}} of {{total}}",
-  "scenes": [
-    {
-      "title": "Open the token page from Hanji",
-      "caption": "In Hanji, click “Open Notion token page” to open Notion's developer portal in a new tab."
-    },
-    {
-      "title": "Create a connection",
-      "caption": "On notion.so/profile/integrations (Connections), click “New connection”."
-    },
-    {
-      "title": "Pick the workspace, create the token",
-      "caption": "Choose “Access token”, then pick which Notion workspace this token applies to — a token always belongs to exactly one workspace."
-    },
-    {
-      "title": "Copy the access token",
-      "caption": "Copy the ntn_… token and paste it into the token field below."
-    },
-    {
-      "title": "Connect it to your pages",
-      "caption": "In Notion, open each top-level page → ··· → Connections → add this connection. Subpages are included automatically — then come back and scan."
-    },
-    {
-      "title": "Paste the token into Hanji",
-      "caption": "Back in Hanji, paste the token you copied into the “Notion API token” field."
-    },
-    {
-      "title": "Choose what to import",
-      "caption": "Import the entire workspace, or pick “Specific pages” to bring in only the pages and databases you select."
-    }
-  ],
   "mock": {
-    "url": "app.notion.com/developers/connections",
+    "accessToken": "Přístupový token",
+    "accessTokenDesc": "Statický API token s rozsahem na workspace, sdílený mezi spolupracovníky, s vlastním nastavením oprávnění. Omezen na jeden workspace a nelze jej uvést na Marketplace.",
+    "authMethod": "Metoda ověření",
+    "authTypeCell": "Přístupový token",
+    "backLink": "‹ Zpět na Notion",
+    "breadcrumb": "Připojení  ›  Spravovat připojení",
+    "capabilities": "Číst obsah, aktualizovat a vkládat obsah a číst informace o uživateli",
+    "colAuthType": "Typ ověření",
+    "colConnection": "Připojení",
+    "colOwner": "Vlastník",
+    "colWorkspaces": "Instalovatelné workspace:",
+    "copied": "Zkopírováno",
+    "createButton": "Vytvořit připojení",
+    "detailTabs": [
+      "Konfigurace",
+      "Oprávnění obsahu",
+      "Webhooky",
+      "Vlastníci"
+    ],
+    "devTitle": "Vývojáři",
     "hanjiTitle": "Hanji · Import",
-    "inkIntroTitle": "Import with a Notion API token",
-    "inkIntroDesc": "For local hosting, pasting a token you create in Notion is the most reliable setup.",
-    "inkMakeToken": "Open Notion token page",
-    "inkStep1Title": "Prepare Notion token",
+    "inkIntroDesc": "Pro lokální hostování je nejspolehlivější vložit token vytvořený v Notion.",
+    "inkIntroTitle": "Import pomocí API tokenu Notion",
+    "inkMakeToken": "Otevřít stránku tokenů Notion",
+    "inkStep1Title": "Připravte Notion token",
+    "inkStep2Title": "Vyberte, co importovat",
     "inkTokenLabel": "Notion API token",
     "inkTokenValue": "ntn_••••••••",
-    "inkStep2Title": "Choose what to import",
-    "scopeAllTitle": "Entire workspace",
-    "scopeAllRec": "Recommended",
-    "scopeAllDesc": "Everything the connection can access. Database relations between pages stay intact.",
-    "scopeSomeTitle": "Specific pages",
-    "scopeSomeDesc": "Scan accessible top-level items, then import only the pages/databases you select.",
-    "urlPage": "notion.so/Team-Handbook-82fd91",
-    "backLink": "‹ Back to Notion",
-    "devTitle": "Developers",
-    "nav": ["Get started", "Worker", "Personal access tokens", "Connections"],
-    "navNew": "New",
-    "listTitle": "Connections",
-    "listSubtitle": "Create and manage Notion's public and private API connections.",
-    "learnMore": "Learn more",
-    "newConnection": "+ New connection",
-    "colConnection": "Connection",
-    "colWorkspaces": "Installable workspaces:",
-    "colAuthType": "Auth type",
-    "colOwner": "Owner",
     "integrationName": "Hanji",
-    "capabilities": "Read content, update and insert content, and read user information",
-    "workspaceName": "My Workspace",
-    "authTypeCell": "Access token",
-    "ownerName": "You",
-    "modalTitle": "New connection",
-    "modalDesc": "Create a connection to authenticate apps, agents, and workflows with Notion. Choose a single-workspace or multi-workspace scope.",
-    "nameLabel": "Connection name",
-    "namePlaceholder": "My connection",
-    "authMethod": "Authentication method",
-    "accessToken": "Access token",
-    "accessTokenDesc": "A static, workspace-scoped API token shared between collaborators, with its own capability settings. Limited to 1 workspace and cannot be listed on the Marketplace.",
+    "learnMore": "Další informace",
+    "listSubtitle": "Vytvářejte a spravujte veřejná a soukromá připojení API Notion.",
+    "listTitle": "Připojení",
+    "menuAddConnection": "Přidat připojení",
+    "menuConnectionsLabel": "Připojení",
+    "menuCopyLink": "Kopírovat odkaz",
+    "menuDuplicate": "Duplikovat",
+    "modalDesc": "Vytvořte připojení k ověřování aplikací, agentů a pracovních postupů pomocí Notion. Vyberte rozsah jednoho nebo více pracovních prostorů.",
+    "modalTitle": "Nové připojení",
+    "nameLabel": "Název připojení",
+    "namePlaceholder": "Moje připojení",
+    "nav": [
+      "Začínáme",
+      "Worker",
+      "Osobní přístupové tokeny",
+      "Připojení"
+    ],
+    "navNew": "Nový",
+    "newConnection": "+ Nové připojení",
     "oauth": "OAuth",
-    "oauthDesc": "User-scoped OAuth 2.0; permissions are limited to the logged-in user. Supports multiple workspaces.",
-    "wsLabel": "Installable workspaces:",
-    "wsDesc": "This token applies to the selected workspace.",
-    "terms": "By creating a connection you agree to Notion's developer terms.",
-    "createButton": "Create connection",
-    "breadcrumb": "Connections  ›  Manage connection",
-    "detailTabs": ["Configuration", "Content capabilities", "Webhooks", "Owners"],
-    "tokenSectionTitle": "API integration token",
-    "tokenSectionDesc": "Use this token to authenticate API requests for this workspace. Anyone with the token can act on the connection's behalf, so keep it secret.",
-    "tokenFieldLabel": "Access token",
+    "oauthDesc": "Uživatelsky omezený OAuth 2.0; oprávnění jsou omezena na přihlášeného uživatele. Podporuje více pracovních prostorů.",
+    "ownerName": "Vy",
+    "pageTitle": "Týmová příručka",
+    "scopeAllDesc": "Vše, k čemu má připojení přístup. Relace databází mezi stránkami zůstávají zachovány.",
+    "scopeAllRec": "Doporučeno",
+    "scopeAllTitle": "Celý pracovní prostor",
+    "scopeSomeDesc": "Prohledá přístupné položky nejvyšší úrovně a poté importuje pouze vybrané stránky/databáze.",
+    "scopeSomeTitle": "Konkrétní stránky",
+    "searchPlaceholder": "Hledat připojení…",
+    "share": "Sdílet",
+    "terms": "Vytvořením připojení souhlasíte s vývojářskými podmínkami společnosti Notion.",
+    "tokenFieldLabel": "Přístupový token",
+    "tokenSectionDesc": "Tento token použijte k ověřování API požadavků pro tento pracovní prostor. Každý, kdo má token, může jednat jménem připojení, proto ho uchovávejte v tajnosti.",
+    "tokenSectionTitle": "Token API integrace",
     "tokenValue": "••••••••••••••••••••••••••••",
-    "copied": "Copied",
-    "pageTitle": "Team Handbook",
-    "share": "Share",
-    "menuCopyLink": "Copy link",
-    "menuDuplicate": "Duplicate",
-    "menuConnectionsLabel": "Connections",
-    "menuAddConnection": "Add connections",
-    "searchPlaceholder": "Search for connections…"
-  }
+    "url": "app.notion.com/developers/connections",
+    "urlPage": "notion.so/Team-Handbook-82fd91",
+    "workspaceName": "Můj pracovní prostor",
+    "wsDesc": "Tento token se vztahuje na vybraný pracovní prostor.",
+    "wsLabel": "Instalovatelné pracovní prostory:"
+  },
+  "next": "Další krok",
+  "pause": "Pozastavit",
+  "play": "Přehrát",
+  "prev": "Předchozí krok",
+  "region": "Průvodce tokenem Notion",
+  "scenes": [
+    {
+      "title": "Otevřete stránku tokenu z Hanji",
+      "caption": "V Hanji klikněte na „Otevřít stránku tokenu Notion“ a otevřete vývojářský portál Notion na nové kartě."
+    },
+    {
+      "title": "Vytvořte připojení",
+      "caption": "Na notion.so/profile/integrations (Připojení) klikněte na „Nové připojení“."
+    },
+    {
+      "title": "Vyberte pracovní prostor a vytvořte token",
+      "caption": "Zvolte „Přístupový token“, pak vyberte, ke kterému pracovnímu prostoru Notion tento token patří – token vždy patří právě k jednomu pracovnímu prostoru."
+    },
+    {
+      "title": "Zkopírujte přístupový token",
+      "caption": "Zkopírujte token ntn_… a vložte jej do pole tokenu níže."
+    },
+    {
+      "title": "Připojte jej ke svým stránkám",
+      "caption": "V Notion otevřete každou stránku nejvyšší úrovně → ··· → Připojení → přidejte toto připojení. Podstránky jsou zahrnuty automaticky – poté se vraťte a naskenujte."
+    },
+    {
+      "title": "Vložte token do Hanji",
+      "caption": "V Hanji vložte zkopírovaný token do pole „Token API Notion“."
+    },
+    {
+      "title": "Vyberte, co importovat",
+      "caption": "Importujte celý pracovní prostor, nebo zvolte „Konkrétní stránky“ a importujte pouze vybrané stránky a databáze."
+    }
+  ],
+  "stepLabel": "Krok {{n}} z {{total}}"
 }

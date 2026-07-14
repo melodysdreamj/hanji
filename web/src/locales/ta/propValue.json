@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "தொடர்பு உருப்படிகள் ஏற்றுகிறது",
+  "relationUnavailable": "தொடர்பு உருப்படிகள் கிடைக்கவில்லை",
+  "unavailable": "கிடைக்கவில்லை",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "தேர்ந்தெடுக்கப்பட்டது",
+    "unchecked": "தேர்ந்தெடுக்கப்படாதது"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "{{title}} திறக்கவும்",
+  "openOrDownloadFile": "{{name}} திறக்கவும் அல்லது பதிவிறக்கவும்"
 }

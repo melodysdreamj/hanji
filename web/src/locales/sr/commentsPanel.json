@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komentari",
+  "closeAria": "Затвори коментаре",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Diskusija bloka",
+    "page": "Diskusija stranice"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Status komentara",
+    "open": "Otvoreno",
+    "resolved": "Rešeno"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Коментар на",
+    "commentingOnSelectedText": "Коментар на изабрани текст",
+    "selectedBlock": "Изабрани блок",
+    "onSelectedText": "На изабраном тексту",
+    "onSelectedBlock": "На изабраном блоку",
+    "onABlock": "На блоку"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Додај коментар на блок",
+    "addPageComment": "Додај коментар на страницу",
+    "blockPlaceholder": "Коментар на овај блок...",
+    "pagePlaceholder": "Додај коментар...",
+    "submit": "Коментариши"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Spominjanje ljudi u komentaru",
+    "replyPeopleAria": "Spominjanje ljudi u odgovoru",
+    "trigger": "Spomeni ljude",
+    "noMatches": "Nema odgovarajućih osoba",
+    "title": "Spominjanje {{name}}",
+    "person": "Osoba",
+    "you": "Vi",
+    "organizationPerson": "Osoba iz organizacije",
+    "roleInOrganization": "{{role}} u organizaciji"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Teme komentara",
+    "empty": "Još nema komentara",
+    "noOpen": "Nema otvorenih komentara",
+    "noResolved": "Nema rešenih komentara"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Коментар од {{author}}, {{time}}",
+    "commentAriaResolved": "Коментар од {{author}}, {{time}}, решено",
+    "replyAria": "Одговор од {{author}}, {{time}}",
+    "repliesAria": "{{count}} одговора",
+    "edited": "(уређено)",
+    "emptyComment": "(празан коментар)",
+    "emptyReply": "(празан одговор)",
+    "justNow": "Управо"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Одговори",
+    "showInPage": "Прикажи на страници",
+    "resolve": "Реши",
+    "reopen": "Поново отвори",
+    "edit": "Уреди"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Odgovori..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Uredi komentar"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Избриши овај коментар?",
+    "threadConfirm_one": "Izbriši ovaj komentar i njegov odgovor?",
+    "threadConfirm_other": "Izbriši ovaj komentar i njegovih {{count}} odgovora?"
   }
 }

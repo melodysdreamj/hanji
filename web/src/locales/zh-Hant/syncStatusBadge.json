@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "離線",
+  "offlinePending_one": "離線 · {{count}} 項變更待處理",
+  "offlinePending_other": "離線 · {{count}} 項變更待處理",
+  "syncing": "同步中 · {{count}}",
+  "unreachable": "無法連接伺服器",
+  "unreachablePending_one": "無法連接伺服器 · {{count}} 項變更待處理",
+  "unreachablePending_other": "無法連接伺服器 · {{count}} 項變更待處理",
+  "retryHint": "點擊立即重試"
 }

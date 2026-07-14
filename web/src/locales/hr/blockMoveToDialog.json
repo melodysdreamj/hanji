@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Premjesti blok u",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Pretraži odredišta premještanja",
+    "placeholder": "Pretraži stranice..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Zatvori dijalog premještanja"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Odredišta premještanja",
+    "empty": "Nema pronađenih stranica.",
+    "destinationLabel": "Premjesti blok u {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Kreiraj \"{{query}}\"",
+    "optionLabel": "Kreiraj stranicu \"{{query}}\" i premjesti blok ovdje",
+    "hint": "Nova stranica – premjesti blok ovdje"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Zaključana stranica"
   },
-  "untitled": "Untitled",
+  "untitled": "Bez naslova",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Stranica je zaključana.",
+    "movedBlock": "Blok premješten.",
+    "movedBlocks": "Blokovi premješteni.",
+    "movedBlocksCount": "Premješteno {{blockCount}} blokova",
+    "moveFailed": "Premještanje bloka nije uspjelo."
   }
 }

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "تلاش کریں یا جائیں...",
+  "quickFind": "فوری تلاش",
+  "closeSearch": "تلاش بند کریں",
+  "quickFindResults": "فوری تلاش کے نتائج",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "حال ہی میں دیکھے گئے",
+    "recentSearches": "حالیہ تلاشیں",
+    "pages": "صفحات",
+    "pageContent": "صفحے کا مواد",
+    "favorites": "پسندیدہ"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "صفحے میں",
+  "searchingDetail": "تلاش جاری ہے...",
+  "searchAgain": "دوبارہ تلاش کریں",
+  "searchingPageContent": "صفحے کا مواد تلاش کر رہا ہے...",
+  "noResultsFor": "\"{{query}}\" کے لیے کوئی نتائج نہیں",
+  "noPagesFound": "کوئی صفحہ نہیں ملا",
+  "creating": "تشکیل میں",
+  "newPage": "نیا صفحہ \"{{query}}\"",
+  "couldntCreatePage": "صفحہ بنانے میں ناکام",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "منتخب کریں",
+    "open": "کھولیں",
+    "newTab": "نیا ٹیب"
   }
 }

@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Valittu",
+    "unchecked": "Tyhjä"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openOrDownloadFile": "Avaa tai lataa {{name}}",
+  "openRelation": "Avaa {{title}}",
+  "relationLoading": "Ladataan suhdekohteita",
+  "relationUnavailable": "Suhdekohteita ei saatavilla",
+  "unavailable": "Ei käytettävissä"
 }

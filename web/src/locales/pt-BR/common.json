@@ -7,7 +7,7 @@
     "create": "Criar",
     "delete": "Excluir",
     "clearAll": "Limpar tudo",
-    "done": "Concluído",
+    "done": "Concluir",
     "add": "Adicionar"
   },
   "labels": {
@@ -22,7 +22,7 @@
     "propertyNames": {
       "name": "Nome",
       "status": "Status",
-      "select": "Seleção",
+      "select": "Selecionar",
       "date": "Data"
     },
     "statusOptions": {

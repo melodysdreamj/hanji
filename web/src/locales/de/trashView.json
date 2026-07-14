@@ -1,35 +1,35 @@
 {
   "trash": "Papierkorb",
-  "empty": "Gelöschte Seiten landen hier. Nichts im Papierkorb.",
+  "empty": "Gelöschte Seiten landen hier. Papierkorb ist leer.",
   "searchTrash": "Papierkorb durchsuchen",
   "deletedPages": "Gelöschte Seiten",
-  "noSearchMatches": "Keine gelöschten Seiten entsprechen deiner Suche.",
+  "noSearchMatches": "Keine gelöschten Seiten entsprechen Ihrer Suche.",
   "pageCount_one": "{{count}} Seite",
   "pageCount_other": "{{count}} Seiten",
-  "deletedJustNow": "Gerade eben gelöscht",
-  "deletedOn": "Gelöscht am {{date}}",
+  "deletedJustNow": "Gerade gelöscht",
+  "deletedOn": "Gelöscht {{date}}",
   "actions": {
     "restore": "Wiederherstellen",
-    "deleteForever": "Dauerhaft löschen",
+    "deleteForever": "Endgültig löschen",
     "emptyTrash": "Papierkorb leeren"
   },
   "aria": {
     "openFromTrash": "{{title}} aus dem Papierkorb öffnen",
     "restorePage": "{{title}} wiederherstellen",
-    "deletePageForever": "{{title}} dauerhaft löschen",
-    "cancelPermanentDelete": "Dauerhaftes Löschen abbrechen",
-    "cancelEmptyTrash": "Papierkorb-Leeren abbrechen"
+    "deletePageForever": "{{title}} endgültig löschen",
+    "cancelPermanentDelete": "Endgültiges Löschen abbrechen",
+    "cancelEmptyTrash": "Papierkorb leeren abbrechen"
   },
   "confirm": {
-    "deleteTitle": "Dauerhaft löschen?",
-    "deleteBodyPrefix": "Dies löscht dauerhaft ",
-    "deleteBodySuffix": ". Du kannst diese Aktion nicht rückgängig machen.",
+    "deleteTitle": "Endgültig löschen?",
+    "deleteBodyPrefix": "Dies wird endgültig löschen ",
+    "deleteBodySuffix": ". Sie können diese Aktion nicht rückgängig machen.",
     "emptyTitle": "Papierkorb leeren?",
-    "emptyBody_one": "Dies löscht dauerhaft alle {{count}} Seite im Papierkorb. Du kannst diese Aktion nicht rückgängig machen.",
-    "emptyBody_other": "Dies löscht dauerhaft alle {{count}} Seiten im Papierkorb. Du kannst diese Aktion nicht rückgängig machen."
+    "emptyBody_one": "Dies wird alle {{count}} Seite im Papierkorb endgültig löschen. Sie können diese Aktion nicht rückgängig machen.",
+    "emptyBody_other": "Dies wird alle {{count}} Seiten im Papierkorb endgültig löschen. Sie können diese Aktion nicht rückgängig machen."
   },
   "toast": {
-    "deletedForever": "Dauerhaft gelöscht",
+    "deletedForever": "Endgültig gelöscht",
     "couldntDelete": "Seite konnte nicht gelöscht werden",
     "restored": "Seite wiederhergestellt",
     "couldntRestore": "Seite konnte nicht wiederhergestellt werden",

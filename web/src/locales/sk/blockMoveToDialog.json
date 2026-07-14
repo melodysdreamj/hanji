@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Presunúť blok do",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Vyhľadať ciele presunu",
+    "placeholder": "Hľadať stránky..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Zavrieť dialóg presunu"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Ciele presunu",
+    "empty": "Nenašli sa žiadne stránky.",
+    "destinationLabel": "Presunúť blok do {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Vytvoriť „{{query}}“",
+    "optionLabel": "Vytvoriť stránku „{{query}}“ a presunúť blok sem",
+    "hint": "Nová stránka – presunúť blok sem"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Zamknutá stránka"
   },
-  "untitled": "Untitled",
+  "untitled": "Bez názvu",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Stránka je zamknutá",
+    "movedBlock": "Blok presunutý",
+    "movedBlocks": "Bloky presunuté",
+    "movedBlocksCount": "Presunuté bloky ({{blockCount}})",
+    "moveFailed": "Blok sa nepodarilo presunúť."
   }
 }

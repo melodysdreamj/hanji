@@ -1,16 +1,16 @@
 {
   "empty": {
     "title": "日付プロパティを追加",
-    "description": "カレンダービューには、ページを月に配置するための日付プロパティが必要です。",
+    "description": "カレンダービューでは、ページを月に配置するために日付プロパティが必要です。",
     "addDateButton": "日付"
   },
   "toolbar": {
-    "calendarByAriaLabel": "カレンダー基準",
+    "calendarByAriaLabel": "カレンダーの基準",
     "today": "今日",
-    "previousWeek": "前週",
-    "previousMonth": "前月",
-    "nextWeek": "翌週",
-    "nextMonth": "翌月"
+    "previousWeek": "前の週",
+    "previousMonth": "先月",
+    "nextWeek": "来週",
+    "nextMonth": "来月"
   },
   "weekdays": {
     "sun": "日",
@@ -21,21 +21,21 @@
     "fri": "金",
     "sat": "土"
   },
-  "gridAriaLabel": "{{title}} カレンダー",
+  "gridAriaLabel": "{{title}}のカレンダー",
   "cell": {
     "ariaLabel": "{{date}}、{{count}}件",
-    "newRowAriaLabel": "{{date}}の新しい行",
+    "newRowAriaLabel": "{{date}}に新しい行",
     "newRowTitle": "新規",
-    "showLess": "省略表示",
-    "showMore": "他{{count}}件"
+    "showLess": "表示を減らす",
+    "showMore": "+{{count}}件もっと見る"
   },
   "card": {
-    "openAriaLabel": "{{title}} を開く",
-    "openAriaLabelWithDate": "{{title}} を開く、予定日 {{date}}",
-    "openNoDateAriaLabel": "{{title}} を開く、日付なし"
+    "openAriaLabel": "{{title}}を開く",
+    "openAriaLabelWithDate": "{{title}}を開く、{{date}}に予定",
+    "openNoDateAriaLabel": "{{title}}を開く、日付なし"
   },
   "noDate": {
-    "heading": "日付なし ({{count}})"
+    "heading": "日付なし（{{count}}）"
   },
   "property": {
     "untitled": "無題",

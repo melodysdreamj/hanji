@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Buscar en la página"
+    "label": "Buscar en página"
   },
   "input": {
-    "label": "Buscar en la página",
-    "placeholder": "Buscar en la página"
+    "label": "Buscar en página",
+    "placeholder": "Buscar en página"
   },
   "actions": {
-    "previous": "Coincidencia anterior",
-    "next": "Coincidencia siguiente",
+    "previous": "Anterior coincidencia",
+    "next": "Siguiente coincidencia",
     "close": "Cerrar búsqueda"
   }
 }

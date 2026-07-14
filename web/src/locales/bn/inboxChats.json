@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "এখনো কোনো কথোপকথন নেই। একটি পৃষ্ঠায় মন্তব্য করুন বা কাউকে মেন্টন করে শুরু করুন।",
+  "leave": "ছাড়ুন",
+  "leaveAria": "{{title}}-এ কথোপকথন ছেড়ে দিন",
+  "open": "{{title}}-এ কথোপকথন খুলুন",
+  "participants_one": "{{count}} জন অংশগ্রহণকারী",
+  "participants_other": "{{count}} জন অংশগ্রহণকারী",
+  "untitled": "শিরোনামহীন",
+  "loading": "কথোপকথন লোড হচ্ছে…"
 }

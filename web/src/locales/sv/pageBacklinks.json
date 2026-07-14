@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} bakåtlänk",
+    "count_other": "{{count}} bakåtlänkar"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Länkade omnämnanden"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} omnämnande",
+    "mention_other": "{{count}} omnämnanden",
+    "link_one": "{{count}} länk",
+    "link_other": "{{count}} länkar"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Omnämnande",
+    "link": "Länk"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} mer bakåtlänk",
+    "count_other": "{{count}} fler bakåtlänkar"
   }
 }

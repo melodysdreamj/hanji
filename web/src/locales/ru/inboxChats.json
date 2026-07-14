@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Пока нет бесед. Оставьте комментарий на странице или упомяните кого-либо, чтобы начать.",
+  "leave": "Покинуть",
+  "leaveAria": "Покинуть беседу «{{title}}»",
+  "open": "Открыть беседу «{{title}}»",
+  "participants_one": "{{count}} участник",
+  "participants_other": "{{count}} участников",
+  "untitled": "Без названия",
+  "loading": "Загрузка бесед…"
 }

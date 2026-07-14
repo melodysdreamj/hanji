@@ -3,7 +3,7 @@
     "ariaLabel": "Mise en forme du texte"
   },
   "turnInto": {
-    "label": "Convertir en",
+    "label": "Convertir",
     "options": {
       "text": "Texte",
       "heading1": "Titre 1",
@@ -13,7 +13,7 @@
       "toDoList": "Liste de tâches",
       "bulletedList": "Liste à puces",
       "numberedList": "Liste numérotée",
-      "toggleList": "Liste déroulante",
+      "toggleList": "Liste à bascule",
       "quote": "Citation",
       "callout": "Encadré",
       "code": "Code"
@@ -28,7 +28,7 @@
     "link": "Lien"
   },
   "comment": {
-    "label": "Commenter"
+    "label": "Commentaire"
   },
   "colorButton": {
     "ariaLabel": "Couleur du texte : {{color}}",
@@ -40,7 +40,7 @@
       "heading": "Couleur du texte",
       "default": "Par défaut",
       "gray": "Gris",
-      "brown": "Marron",
+      "brown": "Brun",
       "orange": "Orange",
       "yellow": "Jaune",
       "green": "Vert",
@@ -50,27 +50,27 @@
       "red": "Rouge"
     },
     "background": {
-      "heading": "Couleur d'arrière-plan",
-      "gray": "Arrière-plan gris",
-      "brown": "Arrière-plan marron",
-      "orange": "Arrière-plan orange",
-      "yellow": "Arrière-plan jaune",
-      "green": "Arrière-plan vert",
-      "blue": "Arrière-plan bleu",
-      "purple": "Arrière-plan violet",
-      "pink": "Arrière-plan rose",
-      "red": "Arrière-plan rouge"
+      "heading": "Couleur de fond",
+      "gray": "Fond gris",
+      "brown": "Fond marron",
+      "orange": "Fond orange",
+      "yellow": "Fond jaune",
+      "green": "Fond vert",
+      "blue": "Fond bleu",
+      "purple": "Fond violet",
+      "pink": "Fond rose",
+      "red": "Fond rouge"
     }
   },
   "linkEditor": {
     "ariaLabel": "Modifier le lien",
     "placeholder": "Coller le lien",
     "urlAriaLabel": "URL du lien",
-    "apply": "Lier",
+    "apply": "Lien",
     "open": "Ouvrir le lien",
     "copy": "Copier le lien",
     "copied": "Copié",
     "copiedLink": "Lien copié",
-    "remove": "Retirer"
+    "remove": "Supprimer"
   }
 }

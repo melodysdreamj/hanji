@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Az önce",
+  "editedJustNow": "Az önce düzenlendi",
+  "editedMinutesAgo": "{{minutes}} dakika önce düzenlendi",
+  "editedHoursAgo": "{{hours}} saat önce düzenlendi",
+  "editedDaysAgo": "{{days}} gün önce düzenlendi",
+  "editedOn": "{{date}} düzenlendi",
+  "noEdits": "Düzenleme yok",
+  "noEditsYet": "Henüz düzenleme yok",
+  "todayAt": "Bugün {{time}}",
+  "yesterdayAt": "Dün {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

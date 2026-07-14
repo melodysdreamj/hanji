@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Mga utos ng block",
+  "closeBlockCommands": "Isara ang mga block command",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Mga basic na block",
     "Media": "Media",
     "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Advanced": "Mga advanced na block"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} ng {{total}}. Pindutin ang Enter upang ipasok.",
+  "listStatus": "{{total}} block command ang magagamit.",
+  "noBlocks": "Walang nakitang block",
+  "noBlocksFor": "Walang nakitang block para sa \"{{query}}\"",
+  "recentlyUsed": "Kamakailang ginamit"
 }

@@ -2,14 +2,14 @@
   "blockCommands": "Blockbefehle",
   "closeBlockCommands": "Blockbefehle schließen",
   "groups": {
-    "Basic": "Grundlegende Blöcke",
+    "Basic": "Einfache Blöcke",
     "Media": "Medien",
     "Database": "Datenbank",
     "Advanced": "Erweiterte Blöcke"
   },
-  "itemStatus": "{{label}}, {{position}} von {{total}}. Zum Einfügen Enter drücken.",
+  "itemStatus": "{{label}}, {{position}} von {{total}}. Drücken Sie Enter zum Einfügen.",
   "listStatus": "{{total}} Blockbefehle verfügbar.",
   "noBlocks": "Keine Blöcke gefunden",
-  "noBlocksFor": "Keine Blöcke gefunden für „{{query}}“",
+  "noBlocksFor": "Keine Blöcke für \"{{query}}\" gefunden",
   "recentlyUsed": "Zuletzt verwendet"
 }

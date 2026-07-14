@@ -7,8 +7,8 @@
     "placeholder": "Localizar na página"
   },
   "actions": {
-    "previous": "Ocorrência anterior",
-    "next": "Próxima ocorrência",
-    "close": "Fechar localização"
+    "previous": "Correspondência anterior",
+    "next": "Próxima correspondência",
+    "close": "Fechar busca"
   }
 }

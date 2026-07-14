@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "صفحہ بحال نہیں کر سکے",
+  "emptyBodyPrompt": "اس خالی صفحہ پر لکھنا شروع کرنے کے لیے Enter دبائیں۔",
+  "inTrashTopBarTitle": "کچرا دان میں",
+  "notFoundTopBarTitle": "نہیں ملا",
+  "openWorkspace": "ورک اسپیس کھولیں",
+  "pageInTrash": "یہ صفحہ کچرا دان میں ہے۔",
+  "pageInTrashDetail": "اس کا مواد کھولنے یا ترمیم کرنے سے پہلے اسے بحال کریں۔",
+  "pageUnavailable": "صفحہ دستیاب نہیں۔",
+  "pageUnavailableDetail": "یہ صفحہ حذف، منتقل، یا کسی دوسرے اکاؤنٹ کے ساتھ اشتراک کیا گیا ہو سکتا ہے۔",
+  "restorePage": "صفحہ بحال کریں",
+  "restoredPage": "صفحہ بحال ہوا",
+  "loadingPageContent": "صفحہ کا مواد لوڈ ہو رہا ہے"
 }

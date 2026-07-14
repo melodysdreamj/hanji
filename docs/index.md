@@ -25,7 +25,7 @@ features:
     details: A from-scratch block editor plus table, board, list, gallery, calendar, and timeline database views — every property type from select to formula.
   - icon: 🖥️
     title: Actually self-hosted
-    details: Runs locally, in Docker, or on Cloudflare Workers. Email + password auth with TOTP, a master account from environment variables, and an MCP server for AI agents.
+    details: Runs locally, in Docker, or on Cloudflare Workers. Email + password auth with TOTP, browser first-run administrator setup, and an MCP server for AI agents.
 ---
 
 > Hanji is an independent project. It is not affiliated with, endorsed by, or

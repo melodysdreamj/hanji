@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Tupio",
+  "empty": "Kurasa unazofuta zinaishia hapa. Hakuna kitu kwenye tupio.",
+  "searchTrash": "Tafuta tupio",
+  "deletedPages": "Kurasa zilizofutwa",
+  "noSearchMatches": "Hakuna kurasa zilizofutwa zinazolingana na utafute wako.",
+  "pageCount_one": "ukurasa {{count}}",
+  "pageCount_other": "kurasa {{count}}",
+  "deletedJustNow": "Imeondolewa sasa hivi",
+  "deletedOn": "Imeondolewa {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Rejesha",
+    "deleteForever": "Futa kabisa",
+    "emptyTrash": "Ondoa taka"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Fungua {{title}} kutoka tupio",
+    "restorePage": "Rejesha {{title}}",
+    "deletePageForever": "Futa {{title}} kabisa",
+    "cancelPermanentDelete": "Ghairi kufuta kabisa",
+    "cancelEmptyTrash": "Ghairi kufuta taka"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Futa kabisa?",
+    "deleteBodyPrefix": "Hii itafuta kabisa ",
+    "deleteBodySuffix": ". Huwezi kutendua tendo hili.",
+    "emptyTitle": "Tupio tupu?",
+    "emptyBody_one": "Hii itafuta kabisa ukurasa {{count}} kwenye tupio. Huwezi kutendua tendo hili.",
+    "emptyBody_other": "Hii itafuta kabisa kurasa {{count}} kwenye tupio. Huwezi kutendua tendo hili."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Imeondolewa kabisa",
+    "couldntDelete": "Haikuweza kufuta ukurasa",
+    "restored": "Ukurasa umerejeshwa",
+    "couldntRestore": "Haikuweza kurejesha ukurasa",
+    "emptied": "Tupio limefutwa",
+    "couldntEmpty": "Haikuweza kufuta tupio"
   }
 }

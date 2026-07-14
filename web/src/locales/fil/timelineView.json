@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Magdagdag ng property ng petsa",
+    "description": "Kailangan ng timeline view ng property ng petsa ng simula para maipakita ang mga pahina sa paglipas ng panahon."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Magdagdag ng end date property para magpakita ng mga range sa halip na bar ng isang araw.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zoom ng timeline",
+    "day": "Araw",
+    "week": "Linggo",
+    "month": "Buwan"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Mga dependency:",
+    "hint": "magdagdag ng relation property",
+    "relationPropertyAriaLabel": "Property ng dependency relation"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Ngayon",
+    "previousRange": "Nakaraang range",
+    "nextRange": "Susunod na range",
+    "newPage": "Bago",
+    "newPageIn": "Bagong pahina sa {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Talaan ng timeline",
+    "nameHeader": "Pangalan"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buksan ang {{title}}",
+    "openAriaLabelWithDates": "Buksan ang {{title}}, {{start}} hanggang {{end}}",
+    "openNoDateAriaLabel": "Buksan ang {{title}}, walang petsa"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Walang item sa range na ito.",
+    "noDatedItems": "Wala pang may petsang item.",
+    "jumpTo": "Pumunta sa {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Walang petsa ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Wala",
+    "untitled": "Walang pamagat"
   }
 }

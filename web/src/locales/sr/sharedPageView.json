@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Deljena stranica",
+  "loading": "Učitavanje deljene stranice",
+  "unavailable": "Ova deljena stranica nije dostupna.",
+  "notFound": "Deljena stranica nije pronađena.",
+  "outsideShare": "Stranica nije obuhvaćena ovim javnim deljenjem.",
+  "errors": {
+    "not-found": "Ovaj link je možda istekao, uklonjen iz objave ili pogrešno kopiran.",
+    "rate-limited": "Ova deljena stranica prima previše zahteva. Sačekajte trenutak i pokušajte ponovo.",
+    "unavailable": "Hanji trenutno ne može da otvori ovu deljenu stranicu. Pokušajte ponovo za trenutak.",
+    "offline": "Proverite internet vezu i pokušajte ponovo da otvorite deljenu stranicu."
+  },
+  "tryAgain": "Pokušaj ponovo"
 }

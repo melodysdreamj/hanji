@@ -1,43 +1,43 @@
 {
+  "custom": {
+    "apply": "Käytä",
+    "fallbackFileName": "Kuvake",
+    "linkLabel": "Kuvakekuvan linkki",
+    "linkPlaceholder": "Liitä kuvan linkki",
+    "previewPlaceholder": "Kuva",
+    "upload": "Lataa tiedosto",
+    "uploadFailed": "Kuvan lataus epäonnistui.",
+    "uploading": "Ladataan...",
+    "uploadingLabel": "Ladataan {{fileName}}"
+  },
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
-  },
-  "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
-  },
-  "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "backdropLabel": "Sulje kuvakevalitsin",
+    "label": "Valitse kuvake"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "gridLabel": "Kuvakkeet",
+    "gridLabelRecent": "Kuvakkeet, viimeksi käytetyt ensin",
+    "noResults": "Mikään kuvake ei vastaa hakua “{{query}}”. Kokeile toista sanaa tai tyhjennä suodatin.",
+    "optionLabel": "Valitse {{emoji}}-kuvake",
+    "random": "Satunnainen",
+    "randomLabel": "Valitse satunnainen kuvake",
+    "recentLabel": "Viimeksi käytetyt ensin",
+    "searchLabel": "Hae kuvakkeita",
+    "searchPlaceholder": "Suodata…"
   },
-  "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+  "remove": {
+    "ariaLabel": "Poista kuvake",
+    "label": "Poista"
+  },
+  "tabs": {
+    "emoji": "Emoji",
+    "groupLabel": "Kuvaketyyppi",
+    "image": "Kuva"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "complete": "Valmis",
+    "finalizing": "Viimeistellään",
+    "preparing": "Valmistellaan lähetystä",
+    "uploading": "Lähetetään"
   }
 }

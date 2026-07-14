@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Havolada yetishmayotgan yoki noto'g'ri belgilar borligini tekshirib, keyin qaytadan urinib ko'ring.",
+  "invalidTitle": "Bu manzil to'liq emas.",
+  "notFoundBody": "Bu manzil Hanji sahifasiga mos kelmaydi. Sahifa ko'chirilgan yoki mavjud bo'lmasligi mumkin.",
+  "notFoundTitle": "Sahifa topilmadi.",
+  "openHome": "Hanji bosh sahifasini oching",
+  "sharedBody": "Ulashilgan havola to'liq va to'g'ri ko'chirilganligini tekshirib, keyin qayta urinib ko'ring.",
+  "sharedTitle": "Bu ulashilgan havola noto'g'ri."
+}

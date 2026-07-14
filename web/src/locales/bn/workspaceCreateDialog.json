@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "নতুন ওয়ার্কস্পেস",
   "name": {
-    "label": "Workspace name",
+    "label": "ওয়ার্কস্পেস নাম",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "শুরু করুন",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "খালি ওয়ার্কস্পেস",
+      "body": "স্টার্টার পৃষ্ঠাগুলি সহ খালি শুরু করুন।"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "নোটিয়ন থেকে আমদানি করুন",
+      "body": "ওয়ার্কস্পেস তৈরি করে তাতে একটি নোটিয়ন ওয়ার্কস্পেস মাইগ্রেট করুন।"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "অন্য হাঞ্জি থেকে আমদানি করুন",
+      "body": "ওয়ার্কস্পেস তৈরি করে অন্য হাঞ্জি সার্ভার বা ফাইল থেকে ওয়ার্কস্পেস আনুন।"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "ওয়ার্কস্পেস তৈরি করুন",
+  "creating": "তৈরি হচ্ছে…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "ওয়ার্কস্পেস তৈরি করা যায়নি।"
   }
 }

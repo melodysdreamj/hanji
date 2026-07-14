@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "អត្ថបទ",
+      "description": "គ្រាន់តែចាប់ផ្ដើមសរសេរជាអត្ថបទធម្មតា",
+      "placeholder": "វាយ '/' សម្រាប់ពាក្យបញ្ជា"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "ទំព័រ",
+      "description": "បង្កើតទំព័ររងនៅក្នុងទំព័រនេះ។"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "តំណភ្ជាប់ទៅទំព័រ",
+      "description": "ភ្ជាប់ទៅទំព័រដែលមានស្រាប់"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ចំណងជើង 1",
+      "description": "ចំណងជើងផ្នែកធំ",
+      "placeholder": "ចំណងជើង 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ចំណងជើងបិទ/បើក 1",
+      "description": "ចំណងជើងធំដែលអាចលាក់មាតិការងបាន។",
+      "placeholder": "ចំណងជើងបិទ/បើក 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ចំណងជើង 2",
+      "description": "ចំណងជើងផ្នែកមធ្យម",
+      "placeholder": "ចំណងជើង 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ចំណងជើងបិទ/បើក 2",
+      "description": "ចំណងជើងមធ្យមដែលអាចលាក់ខ្លឹមសារខាងក្នុងបាន។",
+      "placeholder": "ចំណងជើងបិទ/បើក 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ចំណងជើង 3",
+      "description": "ចំណងជើងផ្នែកតូច",
+      "placeholder": "ចំណងជើង 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ចំណងជើងបិទ/បើក 3",
+      "description": "ចំណងជើងតូចដែលអាចលាក់ខ្លឹមសារខាងក្នុងបាន។",
+      "placeholder": "ចំណងជើងកុងតាក់ ៣"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ចំណងជើង 4",
+      "description": "ចំណងជើងផ្នែកតូចបំផុត",
+      "placeholder": "ចំណងជើង 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ចំណងជើងកុងតាក់ ៤",
+      "description": "ចំណងជើងបង្រួមដែលអាចលាក់មាតិការរងបាន។",
+      "placeholder": "ចំណងជើងកុងតាក់ ៤"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "បញ្ជីកិច្ចការ",
+      "description": "តាមដានកិច្ចការដោយប្រើប្រអប់ធីក។",
+      "placeholder": "កិច្ចការ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "បញ្ជីចំណុច",
+      "description": "បង្កើតបញ្ជីចំណុចសាមញ្ញ។",
+      "placeholder": "បញ្ជី"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "បញ្ជីរាយលេខ",
+      "description": "បង្កើតបញ្ជីរាយលេខ",
+      "placeholder": "បញ្ជី"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "បញ្ជីកុងតាក់",
+      "description": "កុងតាក់អាចលាក់ និងបង្ហាញមាតិកាបាន។",
+      "placeholder": "កុងតាក់"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "សម្រង់",
+      "description": "ដាក់សម្រង់",
+      "placeholder": "សម្រង់ទទេ"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "ការសំគាល់",
+      "description": "ធ្វើឱ្យអត្ថបទលេចធ្លោ។",
+      "placeholder": "វាយបញ្ចូលអ្វីមួយ…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "បន្ទាត់បំបែក",
+      "description": "បែងចែកប្លុកដោយមើលឃើញ"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "កូដ",
+      "description": "ចាប់យកកូដស្នាម។",
+      "placeholder": "សរសេរកូដ ឬបិទភ្ជាប់កូដស្នាម…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "សមីការ",
+      "description": "បង្ហាញសមីការគណិតវិទ្យា"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "តារាងមាតិកា",
+      "description": "បង្ហាញតំណភ្ជាប់ទៅកាន់ចំណងជើងនៅក្នុងទំព័រនេះ។"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "ប្លុកសមកាល",
+      "description": "ប្រើមាតិកាឡើងវិញឆ្លងទំព័រ"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ប៊ូតុង",
+      "description": "បញ្ចូលមាតិកាប្រើឡើងវិញបានដោយចុចម្ដង។"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ថេប",
+      "description": "ដាក់ជាផ្ទាំងមានស្លាក",
+      "placeholder": "ថេប"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "មាគ៌ា",
+      "description": "បង្ហាញទីតាំងទំព័រនេះ។"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ថតចម្លង",
+      "description": "បង្កើតច្បាប់ចម្លងពិតប្រាកដនៃប្លុកនេះ។"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ផ្លាស់ទីទៅ",
+      "description": "ផ្លាស់ទីប្លុកនេះទៅទំព័រផ្សេងទៀត។"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "លុបប្លុកនេះ។"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "ប្ដូរទៅជា",
+      "description": "ប្ដូរប្រភេទប្លុកនេះ។"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "ពណ៌",
+      "description": "ប្តូរពណ៌អក្សរ ឬពណ៌ផ្ទៃខាងក្រោយរបស់ប្លុកនេះ។"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "តារាង",
+      "description": "បន្ថែមតារាងសាមញ្ញទៅទំព័រនេះ"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ជួរឈរ",
+      "description": "ដាក់ប្លុកជាប់គ្នា"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ជួរឈរ",
+      "description": "រៀបប្លុកជា3ជួរឈរ"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ជួរឈរ",
+      "description": "រៀបប្លុកជា4ជួរឈរ"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ជួរឈរ",
+      "description": "រៀបប្លុកជា5ជួរឈរ"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "រូបភាព",
+      "description": "ផ្ទុកឡើង ឬបញ្ចូលតាមតំណ"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "វីដេអូ",
+      "description": "បង្កប់វីដេអូតាមរយៈតំណភ្ជាប់។"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "អូឌីយ៉ូ",
+      "description": "បញ្ចូលអូឌីយ៉ូតាមតំណ។"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "ចំណាំគេហទំព័រ",
+      "description": "រក្សាទុកតំណគេហទំព័រជាកាត។"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "បង្កប់",
+      "description": "បង្កប់មាតិកាពីតំណភ្ជាប់"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ឯកសារ",
+      "description": "ភ្ជាប់តំណភ្ជាប់ឯកសារទៅទំព័រនេះ"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "មូលដ្ឋានទិន្នន័យ - ទំព័រពេញ",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យថ្មីជាទំព័ររង។"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "តារាង - ពេញទំព័រ",
+      "description": "បន្ថែមតារាងមូលដ្ឋានទិន្នន័យពេញទំព័រ។"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ក្ដារ - ពេញទំព័រ",
+      "description": "បន្ថែមក្ដារកានបានពេញទំព័រ។"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "បញ្ជី - ពេញទំព័រ",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យពេញទំព័រជាបញ្ជី។"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "បន្ទាត់ពេលវេលា - ពេញទំព័រ",
+      "description": "បន្ថែមបន្ទាត់ពេលវេលាមូលដ្ឋានទិន្នន័យពេញទំព័រ។"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "ប្រតិទិន - ពេញទំព័រ",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យប្រតិទិនពេញទំព័រ។"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "វិចិត្រសាល - ពេញទំព័រ",
+      "description": "បន្ថែមវិចិត្រសាលមូលដ្ឋានទិន្នន័យពេញទំព័រ។"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "មូលដ្ឋានទិន្នន័យ - ក្នុងបន្ទាត់",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យក្នុងទំព័រនេះ"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "ទិដ្ឋភាពតារាង",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យក្នុងបន្ទាត់ជាតារាង"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "ទិដ្ឋភាពក្តារ",
+      "description": "បន្ថែមក្តារ kanban ក្នុងបន្ទាត់"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "ទិដ្ឋភាពបញ្ជី",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យក្នុងបន្ទាត់ជាបញ្ជី"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "ទិដ្ឋភាពបន្ទាត់ពេលវេលា",
+      "description": "បន្ថែមបន្ទាត់ពេលវេលាមូលដ្ឋានទិន្នន័យក្នុងបន្ទាត់"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "ទិដ្ឋភាពប្រតិទិន",
+      "description": "បន្ថែមមូលដ្ឋានទិន្នន័យប្រតិទិនក្នុងបន្ទាត់"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "ទិដ្ឋភាពវិចិត្រសាល",
+      "description": "បន្ថែមវិចិត្រសាលមូលដ្ឋានទិន្នន័យក្នុងបន្ទាត់"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "លំនាំដើម",
+      "description": "លុបពណ៌អក្សរ ឬពណ៌ផ្ទៃខាងក្រោយចេញពីប្លុកនេះ។"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ពណ៌ប្រផេះ",
+      "description": "អនុវត្តពណ៌ប្រផេះទៅប្លុកនេះ។"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "ពណ៌ត្នោត",
+      "description": "អនុវត្តពណ៌ត្នោតទៅនឹងប្លុកនេះ។"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ពណ៌ទឹកក្រូច",
+      "description": "អនុវត្តពណ៌ទឹកក្រូចទៅប្លុកនេះ។"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "ពណ៌លឿង",
+      "description": "អនុវត្តពណ៌លឿងទៅលើប្លុកនេះ"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "ពណ៌បៃតង",
+      "description": "អនុវត្តពណ៌បៃតងទៅប្លុកនេះ។"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "ពណ៌ខៀវ",
+      "description": "អនុវត្តពណ៌ខៀវទៅនឹងប្លុកនេះ។"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ពណ៌ស្វាយ",
+      "description": "អនុវត្តពណ៌ស្វាយទៅលើប្លុកនេះ"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "ពណ៌ផ្កាឈូក",
+      "description": "អនុវត្តពណ៌ផ្កាឈូកទៅលើប្លុកនេះ"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ពណ៌ក្រហម",
+      "description": "អនុវត្តពណ៌ក្រហមទៅលើប្លុកនេះ"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ប្រផេះ",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ប្រផេះទៅប្លុកនេះ។"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ត្នោត",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ត្នោតទៅនឹងប្លុកនេះ។"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ទឹកក្រូច",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ទឹកក្រូចទៅប្លុកនេះ។"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌លឿង",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌លឿងទៅលើប្លុកនេះ"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌បៃតង",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌បៃតងទៅប្លុកនេះ។"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ខៀវ",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ខៀវទៅនឹងប្លុកនេះ។"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ស្វាយ",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ស្វាយទៅលើប្លុកនេះ"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ផ្កាឈូក",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ផ្កាឈូកទៅប្លុកនេះ។"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ផ្ទៃខាងក្រោយពណ៌ក្រហម",
+      "description": "អនុវត្តផ្ទៃខាងក្រោយពណ៌ក្រហមទៅលើប្លុកនេះ"
     }
   }
 }

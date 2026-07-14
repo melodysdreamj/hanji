@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "אין שיחות עדיין. הגב בדף או אזכר מישהו כדי להתחיל.",
+  "leave": "עזוב",
+  "leaveAria": "עזוב את השיחה ב{{title}}",
+  "open": "פתח את השיחה ב{{title}}",
+  "participants_one": "{{count}} משתתף",
+  "participants_other": "{{count}} משתתפים",
+  "untitled": "ללא כותרת",
+  "loading": "טוען שיחות..."
 }

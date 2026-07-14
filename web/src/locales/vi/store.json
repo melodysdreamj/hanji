@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Cơ sở dữ liệu này đã bị khóa, vì vậy các thay đổi của bạn không thể được lưu.",
+  "databaseRowsLoadFailed": "Không thể tải các hàng cơ sở dữ liệu. Vui lòng thử lại sau một lát.",
+  "editAccessDeniedSave": "Bạn không có quyền chỉnh sửa, vì vậy các thay đổi của bạn không thể được lưu.",
+  "lockedSave": "Trang hoặc cơ sở dữ liệu đã bị khóa, vì vậy các thay đổi của bạn không thể được lưu.",
+  "pageLockedSave": "Trang này đã bị khóa, vì vậy các thay đổi của bạn không thể được lưu.",
+  "pageMissingSave": "Không tìm thấy trang, vì vậy các thay đổi của bạn không thể được lưu.",
+  "saveFailed": "Các thay đổi của bạn không thể được lưu.",
+  "sessionExpired": "Phiên của bạn đã hết hạn hoặc yêu cầu không thể xác thực. Vui lòng thử lại.",
+  "blockConflictSave": "Khối này đã được chỉnh sửa trên thiết bị khác, vì vậy thay đổi ngoại tuyến của bạn không được áp dụng.",
+  "blockConflictKeepMine": "Áp dụng phiên bản của tôi",
+  "blockMoveCommentsSkipped": "Khối đã được di chuyển, nhưng các bình luận không thể di chuyển theo."
 }

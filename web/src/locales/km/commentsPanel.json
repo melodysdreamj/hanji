@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "មតិយោបល់",
+  "closeAria": "បិទមតិ",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ការពិភាក្សាលើប្លុក",
+    "page": "ការពិភាក្សាលើទំព័រ"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "ស្ថានភាពមតិយោបល់",
+    "open": "បើក",
+    "resolved": "ដោះស្រាយ"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "កំពុងផ្តល់មតិលើ",
+    "commentingOnSelectedText": "កំពុងផ្តល់មតិលើអត្ថបទដែលបានជ្រើស",
+    "selectedBlock": "ប្លុកដែលបានជ្រើស",
+    "onSelectedText": "នៅលើអត្ថបទដែលបានជ្រើស",
+    "onSelectedBlock": "នៅលើប្លុកដែលបានជ្រើស",
+    "onABlock": "នៅលើប្លុក"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "បន្ថែមមតិលើប្លុក",
+    "addPageComment": "បន្ថែមមតិលើទំព័រ",
+    "blockPlaceholder": "ផ្តល់មតិលើប្លុកនេះ...",
+    "pagePlaceholder": "បន្ថែមមតិ...",
+    "submit": "មតិ"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "រៀបរាប់អ្នកក្នុងមតិយោបល់",
+    "replyPeopleAria": "រៀបរាប់អ្នកក្នុងចម្លើយ",
+    "trigger": "រៀបរាប់អ្នក",
+    "noMatches": "គ្មានអ្នកដែលត្រូវគ្នាទេ",
+    "title": "រៀបរាប់ {{name}}",
+    "person": "បុគ្គល",
+    "you": "អ្នក",
+    "organizationPerson": "បុគ្គលក្នុងស្ថាប័ន",
+    "roleInOrganization": "{{role}} ក្នុងស្ថាប័ន"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "ខ្សែមតិយោបល់",
+    "empty": "មិនទាន់មានមតិយោបល់",
+    "noOpen": "គ្មានមតិយោបល់បើកចំហ",
+    "noResolved": "គ្មានមតិយោបល់ដោះស្រាយ"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} មតិ, {{time}}",
+    "commentAriaResolved": "{{author}} មតិ, {{time}}, បានដោះស្រាយ",
+    "replyAria": "{{author}} ចម្លើយ, {{time}}",
+    "repliesAria": "ចម្លើយ {{count}}",
+    "edited": "(បានកែសម្រួល)",
+    "emptyComment": "(មតិទទេ)",
+    "emptyReply": "(ចម្លើយទទេ)",
+    "justNow": "ទើបតែ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ឆ្លើយតប",
+    "showInPage": "បង្ហាញក្នុងទំព័រ",
+    "resolve": "ដោះស្រាយ",
+    "reopen": "បើកឡើងវិញ",
+    "edit": "កែសម្រួល"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "ឆ្លើយតប..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "កែសម្រួលមតិយោបល់"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "លុបមតិនេះ?",
+    "threadConfirm_one": "លុបមតិយោបល់នេះ និងចម្លើយរបស់វា?",
+    "threadConfirm_other": "លុបមតិយោបល់នេះ និងចម្លើយ {{count}} របស់វា?"
   }
 }

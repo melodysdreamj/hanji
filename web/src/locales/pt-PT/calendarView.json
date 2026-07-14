@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Adicionar uma propriedade de data",
+    "description": "As vistas de calendário precisam de uma propriedade de data para colocar as páginas no mês.",
+    "addDateButton": "Data"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Calendário por",
+    "today": "Hoje",
+    "previousWeek": "Semana anterior",
+    "previousMonth": "Mês anterior",
+    "nextWeek": "Próxima semana",
+    "nextMonth": "Próximo mês"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Dom",
+    "mon": "Seg",
+    "tue": "Ter",
+    "wed": "Qua",
+    "thu": "Qui",
+    "fri": "Sex",
+    "sat": "Sáb"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Calendário {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} itens",
+    "newRowAriaLabel": "Nova linha em {{date}}",
+    "newRowTitle": "Novo",
+    "showLess": "Mostrar menos",
+    "showMore": "+{{count}} mais"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Abrir {{title}}",
+    "openAriaLabelWithDate": "Abrir {{title}}, agendado para {{date}}",
+    "openNoDateAriaLabel": "Abrir {{title}}, sem data"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Sem data ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Sem título",
+    "dateDefaultName": "Data"
   }
 }

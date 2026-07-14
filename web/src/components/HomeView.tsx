@@ -10,6 +10,7 @@ import { canCreateWorkspacePage } from "@/lib/permissions";
 import { useStore } from "@/lib/store";
 import { Plus } from "@/icons/hanji";
 import { WorkspaceIconGlyph } from "./PageIcon";
+import { PageView } from "./PageView";
 import { TopBar } from "./TopBar";
 import styles from "./HomeView.module.css";
 
@@ -45,9 +46,10 @@ export function HomeView({ autoOpenFirstPage = true }: { autoOpenFirstPage?: boo
   }
 
   if (autoOpenFirstPage && targetPage) {
-    return (
-      <div className={styles.redirecting} aria-busy="true" aria-label={t("homeView:openingPage")} />
-    );
+    // Rendering does not need to wait for history.replaceState. The cached
+    // target is already known, so show it in this same paint while the effect
+    // canonicalizes the URL in the background.
+    return <PageView pageId={targetPage.id} />;
   }
 
   return (

@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "פותח דף",
+  "workspace": "סביבת עבודה",
+  "emptyWorkspace": "סביבת עבודה ריקה",
+  "untitled": "ללא כותרת",
+  "newPage": "דף חדש"
 }

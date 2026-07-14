@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "חפש או קפץ אל...",
+  "quickFind": "חיפוש מהיר",
+  "closeSearch": "סגור חיפוש",
+  "quickFindResults": "תוצאות חיפוש מהיר",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "נצפו לאחרונה",
+    "recentSearches": "חיפושים אחרונים",
+    "pages": "דפים",
+    "pageContent": "תוכן הדף",
+    "favorites": "מועדפים"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "בדף",
+  "searchingDetail": "מחפש...",
+  "searchAgain": "חפש שוב",
+  "searchingPageContent": "מחפש בתוכן הדף...",
+  "noResultsFor": "אין תוצאות עבור \"{{query}}\"",
+  "noPagesFound": "לא נמצאו דפים",
+  "creating": "יוצר...",
+  "newPage": "דף חדש \"{{query}}\"",
+  "couldntCreatePage": "לא ניתן ליצור דף",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "בחר",
+    "open": "פתח",
+    "newTab": "לשונית חדשה"
   }
 }

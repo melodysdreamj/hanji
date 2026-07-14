@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Tutup pemilih ikon",
+    "label": "Pilih ikon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Jenis ikon",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Gambar"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Hapus",
+    "ariaLabel": "Hapus ikon"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchLabel": "Cari ikon",
+    "random": "Acak",
+    "randomLabel": "Pilih ikon acak",
+    "recentLabel": "Terbaru digunakan pertama",
+    "gridLabelRecent": "Ikon, yang baru digunakan terlebih dahulu",
+    "gridLabel": "Ikon",
+    "optionLabel": "Pilih ikon {{emoji}}",
+    "noResults": "Tidak ada ikon yang cocok dengan \"{{query}}\". Coba kata lain atau hapus filter."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Gambar",
+    "linkPlaceholder": "Tempelkan tautan gambar",
+    "linkLabel": "Tautan gambar ikon",
+    "apply": "Terapkan",
+    "upload": "Unggah file",
+    "uploading": "Mengunggah...",
+    "uploadingLabel": "Mengunggah {{fileName}}",
+    "uploadFailed": "Gagal mengunggah gambar tersebut.",
+    "fallbackFileName": "Gambar ikon"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Menyiapkan unggah",
+    "finalizing": "Finalisasi",
+    "complete": "Selesai",
+    "uploading": "Mengunggah"
   }
 }

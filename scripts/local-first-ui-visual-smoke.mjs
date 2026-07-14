@@ -2,18 +2,21 @@
 // Local-first UI visual pass (docs/notion-reference-loop.md, changed-surface
 // loop). Surfaces + normalized contracts:
 //
-//  1. TopBar ··· "Available offline" row — must follow the app's existing
+//  1. Boot experience — a cache miss shows only the official Hanji product
+//     icon plus one credit line; a cache hit renders the workspace immediately
+//     without flashing the icon while auth and sync revalidate in the background.
+//  2. TopBar ··· "Available offline" row — must follow the app's existing
 //     menu-toggle convention (Small text / Full width rows; current Notion's
 //     offline row uses the same label + right-aligned switch pattern): icon,
 //     flex-1 label, 32×18 right-aligned switch, sibling row height rhythm.
-//  2. SyncStatusBadge — offline pill bottom-left: pill radius, compact 12px
+//  3. SyncStatusBadge — offline pill bottom-left: pill radius, compact 12px
 //     type, dot + "오프라인" text, viewport-anchored. NAMED DEVIATION: Notion
 //     surfaces connection state in the topbar; Hanji keeps a bottom-left
 //     pill (topbar space is already dense) — recorded, not parity-claimed.
-//  3. LocalLockGate — product-only surface (no Notion equivalent): centered
+//  4. LocalLockGate — product-only surface (no Notion equivalent): centered
 //     card ≤360px, password input auto-focused, primary disabled until input,
 //     wrong-pass error state, mobile containment.
-//  4. Settings 계정 보안 → 로컬 데이터 잠금 panel — must share the security
+//  5. Settings 계정 보안 → 로컬 데이터 잠금 panel — must share the security
 //     panel rhythm (strong+span header, passwordChangeForm rows) with the
 //     비밀번호 panel above it.
 //
@@ -78,6 +81,9 @@ async function main() {
   });
 
   try {
+    await assertBootExperience(browser, appUrl, seed);
+    console.log('PASS first visit uses the official product icon/credit fallback and cached reload skips it.');
+
     await assertOfflinePinRow(browser, appUrl, seed, 'light');
     await assertOfflinePinRow(browser, appUrl, seed, 'dark');
     console.log('PASS offline pin row follows the menu-toggle convention (light/dark).');
@@ -100,7 +106,129 @@ async function main() {
   }
 }
 
-// ── 1. offline pin row ──────────────────────────────────────────────────────
+// ── 1. local-first boot experience ──────────────────────────────────────────
+
+async function assertBootExperience(browser, appUrl, seed) {
+  const context = await newSeededContext(browser, appUrl, seed, { theme: 'dark' });
+  const page = await context.newPage();
+  const browserDiagnostics = [];
+  page.on('console', (message) => {
+    if (message.type() === 'warning' || message.type() === 'error') {
+      browserDiagnostics.push(`${message.type()}: ${message.text()}`);
+    }
+  });
+  page.on('pageerror', (error) => browserDiagnostics.push(`pageerror: ${error.message}`));
+  let bootstrapDelayMs = 1_200;
+
+  await page.route('**/api/functions/workspace-bootstrap**', async (route) => {
+    const delay = bootstrapDelayMs;
+    if (delay > 0) await new Promise((resolveDelay) => setTimeout(resolveDelay, delay));
+    await route.continue().catch(() => {});
+  });
+
+  await page.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
+    waitUntil: 'domcontentloaded',
+    timeout: options.timeoutMs,
+  });
+
+  const splash = page.getByTestId('product-loading-screen');
+  await splash.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const splashFacts = await splash.evaluate((el) => {
+    const mark = el.querySelector('[data-testid="product-loading-mark"]');
+    const markRect = mark?.getBoundingClientRect() ?? null;
+    const credit = el.querySelector('[data-testid="product-loading-credit"]');
+    return {
+      mark: markRect ? { height: markRect.height, width: markRect.width } : null,
+      markSrc: mark instanceof HTMLImageElement ? mark.currentSrc || mark.src : '',
+      credit: credit?.textContent?.trim() ?? '',
+      text: el.textContent ?? '',
+    };
+  });
+  assert(
+    splashFacts.mark && Math.round(splashFacts.mark.width) === 48 && Math.round(splashFacts.mark.height) === 48,
+    `first-visit mark must be 48×48px (got ${JSON.stringify(splashFacts.mark)})`
+  );
+  assert(splashFacts.markSrc.includes('/icon-192.png'), 'first-visit fallback must use the official Hanji product icon');
+  assert(splashFacts.credit.length > 0, 'first-visit fallback must show one sponsor/built-with thank-you credit');
+  assert(!/Finishing sign-in|로그인 마무리 중/.test(splashFacts.text), 'fallback must omit the old auth heading');
+  assert(!/Checking your login session|로그인 세션을 확인/.test(splashFacts.text), 'fallback must omit session prose');
+  assert(await page.getByTestId('legal-notice').count() === 0, 'fallback must omit the legal/source footer');
+  await page.screenshot({ path: join(SHOT_DIR, 'first-visit-loading-minimal.png'), fullPage: false });
+
+  await page.getByRole('region', { name: 'Page body' }).waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+  await page.locator(`[data-block-id="${seed.blockId}"]`).waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+  // Bootstrap/block cache writes are asynchronous to the rendered response;
+  // prove this is a genuinely warm reload before introducing network delay.
+  await waitForCachedBlock(page, seed.recordsDbName, `blocks:${seed.pageId}`);
+  await waitForCachedMeta(page, seed.recordsDbName, `bootstrap:page:${seed.pageId}`);
+  const warmIdentity = await page.evaluate(() => {
+    const cookieSessionKey = Object.keys(localStorage).find((key) => key.endsWith(':cookie-session'));
+    return {
+      cookieSession: cookieSessionKey ? localStorage.getItem(cookieSessionKey) : null,
+      encryptionMode: localStorage.getItem('hanji.encryption.mode'),
+      lastUserId: localStorage.getItem('hanji.lastUserId'),
+    };
+  });
+
+  const revalidationDelayMs = 5_000;
+  bootstrapDelayMs = revalidationDelayMs;
+  await page.route('**/api/auth/refresh**', async (route) => {
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, revalidationDelayMs));
+    await route.continue().catch(() => {});
+  });
+
+  const reloadStartedAt = Date.now();
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+  try {
+    await page.locator(`[data-block-id="${seed.blockId}"]`).waitFor({
+      state: 'visible',
+      timeout: revalidationDelayMs - 500,
+    });
+  } catch (error) {
+    const diagnostics = await page.evaluate(() => ({
+      bodyText: document.body.innerText.slice(0, 800),
+      loadingScreen: !!document.querySelector('[data-testid="product-loading-screen"]'),
+      loadingSource: document.querySelector('[data-testid="product-loading-screen"]')?.getAttribute('data-source'),
+      loadingOpacity: (() => {
+        const content = document.querySelector('[data-testid="product-loading-screen"] > div');
+        return content ? getComputedStyle(content).opacity : null;
+      })(),
+      pageBody: !!document.querySelector('[aria-label="Page body"]'),
+      path: window.location.pathname,
+    }));
+    await page.screenshot({ path: join(SHOT_DIR, 'cached-hard-reload-failure.png'), fullPage: false });
+    throw new Error(
+      `cached reload missed the local-first window: ${JSON.stringify({
+        ...diagnostics,
+        browserDiagnostics,
+        warmIdentity,
+      })}; ${error}`
+    );
+  }
+  const cachedVisibleAfterMs = Date.now() - reloadStartedAt;
+  assert(
+    cachedVisibleAfterMs < revalidationDelayMs - 500,
+    `cached page must render before delayed auth/sync (${cachedVisibleAfterMs}ms vs ${revalidationDelayMs}ms)`
+  );
+  assert(
+    await page.getByTestId('product-loading-screen').count() === 0,
+    'cached reload must not leave the mark/credit fallback mounted'
+  );
+  assert(
+    await page.getByText(/Finishing sign-in|로그인 마무리 중/).count() === 0,
+    'cached reload must not show the former login-finishing screen'
+  );
+  await page.screenshot({ path: join(SHOT_DIR, 'cached-hard-reload-no-splash.png'), fullPage: false });
+  await closeSeededContext(context, appUrl, seed);
+}
+
+// ── 2. offline pin row ──────────────────────────────────────────────────────
 
 async function assertOfflinePinRow(browser, appUrl, seed, theme) {
   const context = await newSeededContext(browser, appUrl, seed, { theme });
@@ -390,6 +518,74 @@ async function openSeededPage(page, appUrl, seed) {
     .waitFor({ state: 'visible', timeout: options.timeoutMs });
 }
 
+async function waitForCachedBlock(page, databaseName, tableName) {
+  await page.waitForFunction(
+    async ({ databaseName: name, tableName: table }) => {
+      const databases = await indexedDB.databases();
+      if (!databases.some((database) => database.name === name)) return false;
+      return await new Promise((resolveReady) => {
+        const request = indexedDB.open(name);
+        request.onerror = () => resolveReady(false);
+        request.onsuccess = () => {
+          const database = request.result;
+          try {
+            const count = database
+              .transaction('records', 'readonly')
+              .objectStore('records')
+              .index('byTable')
+              .count(table);
+            count.onerror = () => {
+              database.close();
+              resolveReady(false);
+            };
+            count.onsuccess = () => {
+              database.close();
+              resolveReady(count.result > 0);
+            };
+          } catch {
+            database.close();
+            resolveReady(false);
+          }
+        };
+      });
+    },
+    { databaseName, tableName },
+    { timeout: options.timeoutMs }
+  );
+}
+
+async function waitForCachedMeta(page, databaseName, key) {
+  await page.waitForFunction(
+    async ({ databaseName: name, key: metaKey }) => {
+      const databases = await indexedDB.databases();
+      if (!databases.some((database) => database.name === name)) return false;
+      return await new Promise((resolveReady) => {
+        const request = indexedDB.open(name);
+        request.onerror = () => resolveReady(false);
+        request.onsuccess = () => {
+          const database = request.result;
+          try {
+            const get = database.transaction('meta', 'readonly').objectStore('meta').get(metaKey);
+            get.onerror = () => {
+              database.close();
+              resolveReady(false);
+            };
+            get.onsuccess = () => {
+              database.close();
+              resolveReady(get.result !== undefined);
+            };
+          } catch {
+            database.close();
+            resolveReady(false);
+          }
+        };
+      });
+    },
+    { databaseName, key },
+    { timeout: options.timeoutMs }
+  );
+}
+
 async function seedPage(baseUrl) {
   const session = await signIn(baseUrl);
   const bootstrap = await callFunction(baseUrl, session.accessToken, 'workspace-bootstrap', {});
@@ -425,6 +621,7 @@ async function seedPage(baseUrl) {
     workspaceId,
     pageId,
     blockId,
+    recordsDbName: `hanji-records:${session.userId}`,
   };
 }
 

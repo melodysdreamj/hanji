@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ಹುಡುಕು ಅಥವಾ ನೆಗೆತ...",
+  "quickFind": "ತ್ವರಿತ ಹುಡುಕು",
+  "closeSearch": "ಹುಡುಕಾಟವನ್ನು ಮುಚ್ಚು",
+  "quickFindResults": "ತ್ವರಿತ ಹುಡುಕು ಫಲಿತಾಂಶಗಳು",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "ಇತ್ತೀಚೆಗೆ ನೋಡಿದವು",
+    "recentSearches": "ಇತ್ತೀಚಿನ ಹುಡುಕಾಟಗಳು",
+    "pages": "ಪುಟಗಳು",
+    "pageContent": "ಪುಟದ ವಿಷಯ",
+    "favorites": "ಮೆಚ್ಚಿನವುಗಳು"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "ಪುಟದಲ್ಲಿ",
+  "searchingDetail": "ಹುಡುಕುತ್ತಿದೆ...",
+  "searchAgain": "ಮತ್ತೆ ಹುಡುಕು",
+  "searchingPageContent": "ಪುಟದ ವಿಷಯ ಹುಡುಕುತ್ತಿದೆ...",
+  "noResultsFor": "\"{{query}}\" ಗೆ ಫಲಿತಾಂಶಗಳಿಲ್ಲ",
+  "noPagesFound": "ಪುಟಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+  "creating": "ರಚಿಸುತ್ತಿದೆ...",
+  "newPage": "ಹೊಸ ಪುಟ \"{{query}}\"",
+  "couldntCreatePage": "ಪುಟವನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "ಆಯ್ಕೆಮಾಡಿ",
+    "open": "ತೆರೆ",
+    "newTab": "ಹೊಸ ಟ್ಯಾಬ್"
   }
 }

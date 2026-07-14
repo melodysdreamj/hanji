@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "কভার পরিবর্তন করুন",
+    "reposition": "স্থান পরিবর্তন",
+    "remove": "সরান",
+    "uploadFile": "ফাইল আপলোড",
+    "uploading": "আপলোড হচ্ছে...",
+    "submit": "জমা দিন",
+    "savePosition": "অবস্থান সংরক্ষণ"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "গ্যালারি",
+    "upload": "আপলোড",
+    "link": "লিংক"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "ইমেজ লিংক পেস্ট করুন",
+    "invalid": "একটি http বা https ইমেজ লিংক পেস্ট করুন।"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "সেই ছবিটি আপলোড করা যায়নি।",
+    "defaultFileName": "কভার ইমেজ"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "ছবি টেনে স্থান পরিবর্তন করুন"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "আপলোড প্রস্তুত হচ্ছে",
+    "finalizing": "চূড়ান্তকরণ",
+    "complete": "সম্পন্ন",
+    "uploading": "আপলোড হচ্ছে"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "কভার সরানো হয়েছে",
+    "restored": "কভার পুনরুদ্ধার করা হয়েছে",
+    "undo": "পূর্বাবস্থায় ফিরুন"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "পৃষ্ঠা কভার",
+    "coverVerticalPosition": "কভার উল্লম্ব অবস্থান",
+    "positionFromTop": "উপরে থেকে {{position}}%",
+    "closeCoverMenu": "কভার মেনু বন্ধ করুন",
+    "changePageCover": "পৃষ্ঠা কভার পরিবর্তন",
+    "repositionPageCover": "পৃষ্ঠা কভার স্থান পরিবর্তন",
+    "removePageCover": "পৃষ্ঠা কভার সরান",
+    "changeCoverDialog": "কভার পরিবর্তন",
+    "coverSource": "কভার উৎস",
+    "selectCover": "কভার {{number}} নির্বাচন করুন",
+    "uploadFromDevice": "এই ডিভাইস থেকে কভার ছবি আপলোড করুন",
+    "uploadingFile": "{{fileName}} আপলোড হচ্ছে",
+    "coverImageLink": "কভার ছবি লিঙ্ক"
   }
 }

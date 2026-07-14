@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "剛剛",
+  "editedJustNow": "剛剛編輯",
+  "editedMinutesAgo": "{{minutes}}分鐘前編輯",
+  "editedHoursAgo": "{{hours}}小時前編輯",
+  "editedDaysAgo": "{{days}}天前編輯",
+  "editedOn": "編輯於 {{date}}",
+  "noEdits": "無編輯",
+  "noEditsYet": "尚無編輯",
+  "todayAt": "今天 {{time}}",
+  "yesterdayAt": "昨天 {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

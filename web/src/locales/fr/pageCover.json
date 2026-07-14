@@ -3,14 +3,14 @@
     "changeCover": "Changer la couverture",
     "reposition": "Repositionner",
     "remove": "Supprimer",
-    "uploadFile": "Téléverser un fichier",
-    "uploading": "Téléversement...",
+    "uploadFile": "Télécharger un fichier",
+    "uploading": "Téléchargement...",
     "submit": "Valider",
     "savePosition": "Enregistrer la position"
   },
   "tabs": {
     "gallery": "Galerie",
-    "upload": "Téléverser",
+    "upload": "Téléchargement",
     "link": "Lien"
   },
   "link": {
@@ -18,17 +18,17 @@
     "invalid": "Collez un lien d'image http ou https."
   },
   "upload": {
-    "error": "Impossible de téléverser cette image.",
+    "error": "Impossible de télécharger cette image.",
     "defaultFileName": "Image de couverture"
   },
   "reposition": {
-    "hint": "Faites glisser l'image pour la repositionner"
+    "hint": "Glissez l'image pour la repositionner"
   },
   "progress": {
-    "preparing": "Préparation du téléversement",
+    "preparing": "Préparation du téléchargement",
     "finalizing": "Finalisation",
     "complete": "Terminé",
-    "uploading": "Téléversement"
+    "uploading": "Téléchargement"
   },
   "toast": {
     "removed": "Couverture supprimée",
@@ -36,18 +36,18 @@
     "undo": "Annuler"
   },
   "aria": {
-    "pageCover": "Couverture de page",
+    "pageCover": "Couverture de la page",
     "coverVerticalPosition": "Position verticale de la couverture",
-    "positionFromTop": "{{position}} % depuis le haut",
+    "positionFromTop": "{{position}}% depuis le haut",
     "closeCoverMenu": "Fermer le menu de couverture",
-    "changePageCover": "Changer la couverture de page",
-    "repositionPageCover": "Repositionner la couverture de page",
-    "removePageCover": "Supprimer la couverture de page",
-    "changeCoverDialog": "Changer la couverture",
+    "changePageCover": "Modifier la couverture de la page",
+    "repositionPageCover": "Repositionner la couverture de la page",
+    "removePageCover": "Supprimer la couverture de la page",
+    "changeCoverDialog": "Modifier la couverture",
     "coverSource": "Source de la couverture",
     "selectCover": "Sélectionner la couverture {{number}}",
-    "uploadFromDevice": "Téléverser une image de couverture depuis cet appareil",
-    "uploadingFile": "Téléversement de {{fileName}}",
+    "uploadFromDevice": "Télécharger l'image de couverture depuis cet appareil",
+    "uploadingFile": "Téléchargement de {{fileName}}",
     "coverImageLink": "Lien de l'image de couverture"
   }
 }

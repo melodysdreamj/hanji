@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Δεν ήταν δυνατή η επαναφορά σελίδας",
+  "emptyBodyPrompt": "Πατήστε Enter για να αρχίσετε να γράφετε σε αυτήν την κενή σελίδα.",
+  "inTrashTopBarTitle": "Στον Κάδο",
+  "notFoundTopBarTitle": "Δεν βρέθηκε",
+  "openWorkspace": "Άνοιγμα χώρου εργασίας",
+  "pageInTrash": "Αυτή η σελίδα βρίσκεται στον Κάδο.",
+  "pageInTrashDetail": "Επαναφέρετέ την πριν ανοίξετε ή επεξεργαστείτε τα περιεχόμενά της.",
+  "pageUnavailable": "Η σελίδα δεν είναι διαθέσιμη.",
+  "pageUnavailableDetail": "Αυτή η σελίδα μπορεί να έχει διαγραφεί, μετακινηθεί ή κοινοποιηθεί σε διαφορετικό λογαριασμό.",
+  "restorePage": "Επαναφορά σελίδας",
+  "restoredPage": "Η σελίδα επαναφέρθηκε",
+  "loadingPageContent": "Φόρτωση περιεχομένου σελίδας"
 }

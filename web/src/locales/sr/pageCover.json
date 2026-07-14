@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Promeni naslovnu sliku",
+    "reposition": "Promeni poziciju",
+    "remove": "Ukloni",
+    "uploadFile": "Otpremi datoteku",
+    "uploading": "Otpremanje...",
+    "submit": "Potvrdi",
+    "savePosition": "Sačuvaj poziciju"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
+    "gallery": "Galerija",
+    "upload": "Otpremanje",
     "link": "Link"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Nalepi link slike",
+    "invalid": "Nalepite http ili https link slike."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Није могуће отпремити ту слику.",
+    "defaultFileName": "Насловна слика"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Prevucite sliku da promenite poziciju"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Priprema otpremanja",
+    "finalizing": "Završavanje",
+    "complete": "Završeno",
+    "uploading": "Otpremanje"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Uklonjena naslovnica",
+    "restored": "Vraćena naslovnica",
+    "undo": "Поништи"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Naslovnica stranice",
+    "coverVerticalPosition": "Vertikalna pozicija naslovnice",
+    "positionFromTop": "{{position}}% od vrha",
+    "closeCoverMenu": "Zatvori meni naslovnice",
+    "changePageCover": "Promeni naslovnicu stranice",
+    "repositionPageCover": "Promeni poziciju naslovnice stranice",
+    "removePageCover": "Ukloni naslovnicu stranice",
+    "changeCoverDialog": "Promeni naslovnicu",
+    "coverSource": "Izvor naslovnice",
+    "selectCover": "Izaberi naslovnicu {{number}}",
+    "uploadFromDevice": "Otpremi sliku naslovnice sa ovog uređaja",
+    "uploadingFile": "Otpremanje {{fileName}}",
+    "coverImageLink": "Link slike naslovnice"
   }
 }

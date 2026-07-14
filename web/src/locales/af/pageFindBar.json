@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Soek in bladsy"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Soek in bladsy",
+    "placeholder": "Soek in bladsy"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Vorige ooreenstemming",
+    "next": "Volgende ooreenstemming",
+    "close": "Sluit soektog"
   }
 }

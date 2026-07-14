@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Ξεκλείδωμα τοπικών δεδομένων",
+  "description": "Τα δεδομένα εκτός σύνδεσης σε αυτήν τη συσκευή είναι κλειδωμένα με μια φράση πρόσβασης. Το ξεκλείδωμα ενεργοποιεί ξανά τη χρήση και την αποθήκευση εκτός σύνδεσης.",
+  "passphrasePlaceholder": "Φράση πρόσβασης",
+  "unlock": "Ξεκλείδωμα",
+  "continueOnline": "Συνέχεια μόνο σε σύνδεση",
+  "continueOnlineHint": "Η επιλογή «Συνέχεια μόνο σε σύνδεση» διατηρεί κλειδωμένες τις επεξεργασίες εκτός σύνδεσης αυτής της συσκευής — παραμένουν σε αυτήν τη συσκευή και δεν θα συγχρονιστούν μέχρι να τις ξεκλειδώσετε με τη σωστή φράση πρόσβασης.",
+  "wrongPassphrase": "Αυτή η φράση πρόσβασης δεν είναι σωστή.",
+  "unsupportedBrowser": "Το τοπικό κλείδωμα δεν είναι διαθέσιμο σε αυτό το πρόγραμμα περιήγησης."
 }

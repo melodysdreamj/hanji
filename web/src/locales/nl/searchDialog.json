@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Zoeken of ga naar...",
+  "quickFind": "Snel zoeken",
+  "closeSearch": "Zoeken sluiten",
+  "quickFindResults": "Snel zoeken resultaten",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Recent bekeken",
+    "recentSearches": "Recente zoekopdrachten",
+    "pages": "Pagina's",
+    "pageContent": "Pagina-inhoud",
+    "favorites": "Favorieten"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "in pagina",
+  "searchingDetail": "Zoeken...",
+  "searchAgain": "Opnieuw zoeken",
+  "searchingPageContent": "Pagina-inhoud doorzoeken...",
+  "noResultsFor": "Geen resultaten voor \"{{query}}\"",
+  "noPagesFound": "Geen pagina's gevonden",
+  "creating": "Maken...",
+  "newPage": "Nieuwe pagina \"{{query}}\"",
+  "couldntCreatePage": "Pagina maken mislukt",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Selecteren",
+    "open": "Openen",
+    "newTab": "Nieuw tabblad"
   }
 }

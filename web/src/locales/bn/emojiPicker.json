@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "আইকন পিকার বন্ধ করুন",
+    "label": "আইকন চয়ন করুন"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "আইকনের ধরন",
+    "emoji": "ইমোজি",
+    "image": "ছবি"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "সরান",
+    "ariaLabel": "আইকন সরান"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "ফিল্টার…",
+    "searchLabel": "আইকন অনুসন্ধান",
+    "random": "র্যান্ডম",
+    "randomLabel": "র্যান্ডম আইকন বেছে নিন",
+    "recentLabel": "সাম্প্রতিক ব্যবহৃত প্রথম",
+    "gridLabelRecent": "আইকন, সম্প্রতি ব্যবহৃত প্রথমে",
+    "gridLabel": "আইকন",
+    "optionLabel": "{{emoji}} আইকন চয়ন করুন",
+    "noResults": "“{{query}}” এর সাথে মিলে এমন কোনো আইকন নেই। অন্য শব্দ চেষ্টা করুন বা ফিল্টার সরান।"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "ছবি",
+    "linkPlaceholder": "ইমেজ লিঙ্ক পেস্ট করুন",
+    "linkLabel": "ইমেজ আইকন লিঙ্ক",
+    "apply": "প্রয়োগ",
+    "upload": "ফাইল আপলোড",
+    "uploading": "আপলোড হচ্ছে...",
+    "uploadingLabel": "{{fileName}} আপলোড হচ্ছে",
+    "uploadFailed": "ইমেজটি আপলোড করা যায়নি।",
+    "fallbackFileName": "আইকন ইমেজ"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "আপলোড প্রস্তুত হচ্ছে",
+    "finalizing": "চূড়ান্তকরণ চলছে",
+    "complete": "সম্পন্ন",
+    "uploading": "আপলোড হচ্ছে"
   }
 }

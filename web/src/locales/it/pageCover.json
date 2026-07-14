@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Cambia copertina",
+    "reposition": "Riposiziona",
+    "remove": "Rimuovi",
+    "uploadFile": "Carica file",
+    "uploading": "Caricamento in corso...",
+    "submit": "Invia",
+    "savePosition": "Salva posizione"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galleria",
+    "upload": "Carica",
+    "link": "Collegamento"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Incolla collegamento immagine",
+    "invalid": "Incolla un collegamento immagine http o https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Impossibile caricare l'immagine.",
+    "defaultFileName": "Immagine di copertina"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Trascina l'immagine per riposizionarla"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Preparazione caricamento",
+    "finalizing": "Finalizzazione in corso",
+    "complete": "Completato",
+    "uploading": "Caricamento in corso"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Copertina rimossa",
+    "restored": "Copertina ripristinata",
+    "undo": "Annulla"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Copertina della pagina",
+    "coverVerticalPosition": "Posizione verticale copertina",
+    "positionFromTop": "{{position}}% dall'alto",
+    "closeCoverMenu": "Chiudi menu copertina",
+    "changePageCover": "Cambia copertina della pagina",
+    "repositionPageCover": "Riposiziona copertina della pagina",
+    "removePageCover": "Rimuovi copertina della pagina",
+    "changeCoverDialog": "Cambia copertina",
+    "coverSource": "Origine copertina",
+    "selectCover": "Seleziona copertina {{number}}",
+    "uploadFromDevice": "Carica immagine copertina da questo dispositivo",
+    "uploadingFile": "Caricamento di {{fileName}}",
+    "coverImageLink": "Link immagine copertina"
   }
 }

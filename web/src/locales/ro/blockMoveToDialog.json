@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Mută blocul la",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Caută destinații de mutare",
+    "placeholder": "Caută pagini..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Închide dialogul de mutare"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Destinații de mutare",
+    "empty": "Nu s-au găsit pagini.",
+    "destinationLabel": "Mută blocul la {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Creează \"{{query}}\"",
+    "optionLabel": "Creează pagina \"{{query}}\" și mută blocul aici",
+    "hint": "Pagină nouă - mută blocul aici"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Pagină blocată"
   },
-  "untitled": "Untitled",
+  "untitled": "Fără titlu",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Pagina este blocată",
+    "movedBlock": "Bloc mutat",
+    "movedBlocks": "Blocuri mutate",
+    "movedBlocksCount": "{{blockCount}} blocuri mutate",
+    "moveFailed": "Nu s-a putut muta blocul"
   }
 }

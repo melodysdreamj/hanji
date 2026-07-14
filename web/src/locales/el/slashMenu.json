@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Εντολές μπλοκ",
+  "closeBlockCommands": "Κλείσιμο εντολών μπλοκ",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Βασικά μπλοκ",
+    "Media": "Πολυμέσα",
+    "Database": "Βάση δεδομένων",
+    "Advanced": "Προχωρημένα μπλοκ"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} από {{total}}. Πατήστε Enter για εισαγωγή.",
+  "listStatus": "{{total}} εντολές μπλοκ διαθέσιμες.",
+  "noBlocks": "Δεν βρέθηκαν μπλοκ.",
+  "noBlocksFor": "Δεν βρέθηκαν μπλοκ για \"{{query}}\"",
+  "recentlyUsed": "Πρόσφατα χρησιμοποιημένα"
 }

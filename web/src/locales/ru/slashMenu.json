@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Команды блоков",
+  "closeBlockCommands": "Закрыть команды блоков",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Основные блоки",
+    "Media": "Медиа",
+    "Database": "База данных",
+    "Advanced": "Расширенные блоки"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} из {{total}}. Нажмите Enter, чтобы вставить.",
+  "listStatus": "Доступно {{total}} команд блоков.",
+  "noBlocks": "Блоки не найдены",
+  "noBlocksFor": "Блоки для «{{query}}» не найдены.",
+  "recentlyUsed": "Недавние"
 }

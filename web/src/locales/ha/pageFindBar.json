@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Bincika a shafi"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Bincika a shafi",
+    "placeholder": "Bincika a shafi"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Mai gabata",
+    "next": "Mai biyo baya",
+    "close": "Rufe binciken"
   }
 }

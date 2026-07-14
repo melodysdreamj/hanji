@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "இந்த தரவுத்தளத்தில் இன்னும் பக்கங்கள் இல்லை.",
+  "emptyTitle": "இன்னும் பக்கங்கள் இல்லை",
+  "newInline": "புதியது",
+  "newPage": "புதிய பக்கம்",
+  "newPageIn": "{{dbTitle}} இல் புதிய பக்கம்",
+  "noResultsDesc": "தற்போதைய வடிகட்டிகள் அல்லது தேடலுடன் பொருந்தும் பக்கங்கள் எதுவுமில்லை.",
+  "noResultsTitle": "முடிவுகள் இல்லை",
+  "openRow": "{{title}} திற"
 }

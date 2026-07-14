@@ -3,13 +3,13 @@
   "closeBlockCommands": "Fermer les commandes de bloc",
   "groups": {
     "Basic": "Blocs de base",
-    "Media": "Médias",
+    "Media": "Média",
     "Database": "Base de données",
     "Advanced": "Blocs avancés"
   },
   "itemStatus": "{{label}}, {{position}} sur {{total}}. Appuyez sur Entrée pour insérer.",
   "listStatus": "{{total}} commandes de bloc disponibles.",
   "noBlocks": "Aucun bloc trouvé",
-  "noBlocksFor": "Aucun bloc trouvé pour « {{query}} »",
+  "noBlocksFor": "Aucun bloc trouvé pour \"{{query}}\"",
   "recentlyUsed": "Récemment utilisés"
 }

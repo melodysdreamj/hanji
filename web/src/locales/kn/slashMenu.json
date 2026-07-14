@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "ಬ್ಲಾಕ್ ಆಜ್ಞೆಗಳು",
+  "closeBlockCommands": "ಬ್ಲಾಕ್ ಆಜ್ಞೆಗಳನ್ನು ಮುಚ್ಚಿ",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "ಮೂಲ ಬ್ಲಾಕ್‌ಗಳು",
+    "Media": "ಮೀಡಿಯಾ",
+    "Database": "ಡೇಟಾಬೇಸ್",
+    "Advanced": "ಸುಧಾರಿತ ಬ್ಲಾಕ್‌ಗಳು"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}} ರಲ್ಲಿ {{position}}. ಸೇರಿಸಲು ಎಂಟರ್ ಒತ್ತಿ.",
+  "listStatus": "{{total}} ಬ್ಲಾಕ್ ಆಜ್ಞೆಗಳು ಲಭ್ಯವಿವೆ.",
+  "noBlocks": "ಯಾವುದೇ ಬ್ಲಾಕ್‌ಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+  "noBlocksFor": "{{query}} ಗಾಗಿ ಬ್ಲಾಕ್ಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+  "recentlyUsed": "ಇತ್ತೀಚೆಗೆ ಬಳಸಿದ"
 }

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "เพิ่ม property วันที่",
+    "description": "มุมมองปฏิทินต้องมี property วันที่เพื่อวางหน้าต่างๆ ในเดือน",
+    "addDateButton": "วันที่"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ปฏิทินตาม",
+    "today": "วันนี้",
+    "previousWeek": "สัปดาห์ก่อนหน้า",
+    "previousMonth": "เดือนก่อนหน้า",
+    "nextWeek": "สัปดาห์ถัดไป",
+    "nextMonth": "เดือนถัดไป"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "อา.",
+    "mon": "จ.",
+    "tue": "อ.",
+    "wed": "พ.",
+    "thu": "พฤ.",
+    "fri": "ศ.",
+    "sat": "ส."
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "ปฏิทิน {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} รายการ",
+    "newRowAriaLabel": "แถวใหม่ใน {{date}}",
+    "newRowTitle": "ใหม่",
+    "showLess": "แสดงน้อยลง",
+    "showMore": "+{{count}} เพิ่มเติม"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "เปิด {{title}}",
+    "openAriaLabelWithDate": "เปิด {{title}}, กำหนดการสำหรับ {{date}}",
+    "openNoDateAriaLabel": "เปิด {{title}}, ไม่มีวันที่"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ไม่มีวันที่ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ไม่มีชื่อ",
+    "dateDefaultName": "วันที่"
   }
 }

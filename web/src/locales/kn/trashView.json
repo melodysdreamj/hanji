@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ಕಸದ ಬುಟ್ಟಿ",
+  "empty": "ನೀವು ಅಳಿಸುವ ಪುಟಗಳು ಇಲ್ಲಿ ಸೇರುತ್ತವೆ. ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿ ಏನೂ ಇಲ್ಲ.",
+  "searchTrash": "ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿ ಹುಡುಕಿ",
+  "deletedPages": "ಅಳಿಸಲಾದ ಪುಟಗಳು",
+  "noSearchMatches": "ನಿಮ್ಮ ಹುಡುಕಾಟಕ್ಕೆ ಹೊಂದಾಣಿಕೆಯಾಗುವ ಅಳಿಸಿದ ಪುಟಗಳಿಲ್ಲ.",
+  "pageCount_one": "{{count}} ಪುಟ",
+  "pageCount_other": "{{count}} ಪುಟಗಳು",
+  "deletedJustNow": "ಈಗಷ್ಟೇ ಅಳಿಸಲಾಗಿದೆ",
+  "deletedOn": "{{date}} ರಂದು ಅಳಿಸಲಾಗಿದೆ",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "ಮರುಸ್ಥಾಪಿಸಿ",
+    "deleteForever": "ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಿ",
+    "emptyTrash": "ಕಸದ ಬುಟ್ಟಿ ಖಾಲಿ ಮಾಡಿ"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "ಕಸದ ಬುಟ್ಟಿಯಿಂದ {{title}} ತೆರೆಯಿರಿ",
+    "restorePage": "{{title}} ಮರುಸ್ಥಾಪಿಸಿ",
+    "deletePageForever": "{{title}} ಅನ್ನು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಿ",
+    "cancelPermanentDelete": "ಶಾಶ್ವತ ಅಳಿಸುವಿಕೆಯನ್ನು ರದ್ದುಮಾಡಿ",
+    "cancelEmptyTrash": "ಕಸದ ಬುಟ್ಟಿ ಖಾಲಿ ಮಾಡುವುದನ್ನು ರದ್ದುಮಾಡಿ"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಬೇಕೇ?",
+    "deleteBodyPrefix": "ಇದು ಶಾಶ್ವತವಾಗಿ ",
+    "deleteBodySuffix": " ಅನ್ನು ಅಳಿಸುತ್ತದೆ. ನೀವು ಈ ಕ್ರಿಯೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗುವುದಿಲ್ಲ.",
+    "emptyTitle": "ಕಸದ ಬುಟ್ಟಿ ಖಾಲಿ ಮಾಡಬೇಕೇ?",
+    "emptyBody_one": "ಇದು ಶಾಶ್ವತವಾಗಿ ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿರುವ ಎಲ್ಲಾ {{count}} ಪುಟವನ್ನು ಅಳಿಸುತ್ತದೆ. ನೀವು ಈ ಕ್ರಿಯೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗುವುದಿಲ್ಲ.",
+    "emptyBody_other": "ಇದು ಶಾಶ್ವತವಾಗಿ ಕಸದ ಬುಟ್ಟಿಯಲ್ಲಿರುವ ಎಲ್ಲಾ {{count}} ಪುಟಗಳನ್ನು ಅಳಿಸುತ್ತದೆ. ನೀವು ಈ ಕ್ರಿಯೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗುವುದಿಲ್ಲ."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
+    "couldntDelete": "ಪುಟವನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+    "restored": "ಪುಟವನ್ನು ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ",
+    "couldntRestore": "ಪುಟವನ್ನು ಮರುಸ್ಥಾಪಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+    "emptied": "ಕಸದ ಬುಟ್ಟಿ ಖಾಲಿ ಮಾಡಲಾಗಿದೆ",
+    "couldntEmpty": "ಕಸದ ಬುಟ್ಟಿಯನ್ನು ಖಾಲಿ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
   }
 }

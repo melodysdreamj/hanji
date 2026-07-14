@@ -191,6 +191,9 @@ function completeProductionEnvironment(overrides = {}) {
     HANJI_CLOUDFLARE_EMAIL_BINDING: 'EMAIL',
     HANJI_CLOUDFLARE_EMAIL_ACCOUNT_ID: '1234567890abcdef1234567890abcdef',
     HANJI_CLOUDFLARE_EMAIL_API_TOKEN: testSecret('cloudflare-email-token'),
+    HANJI_BROWSER_SETUP: 'true',
+    HANJI_BROWSER_SETUP_TOKEN: testSecret('browser-setup-capability'),
+    HANJI_TRUST_SELF_HOSTED_PROXY: 'false',
     HANJI_MASTER_EMAIL: 'master@hanji.dev',
     HANJI_MASTER_PASSWORD: 'MasterPass!2026X',
     HANJI_INSTANCE_ADMIN_USER_IDS: 'off',
@@ -427,6 +430,7 @@ test('production validation rejects runtime, test, debug, and proxy-trust overri
     'HANJI_ALLOW_DEV_GUEST_LOGIN',
     'HANJI_ALLOW_ANONYMOUS_BOOTSTRAP',
     'HANJI_MASTER_DEV_AUTOLOGIN',
+    'HANJI_TRUST_SELF_HOSTED_PROXY',
   ]) {
     const result = validateProductionEnvironment(completeProductionEnvironment({ [name]: 'on' }));
     assert.ok(result.errors.some((error) => error.includes(name)), `${name}=on must be rejected`);
@@ -771,22 +775,27 @@ test('production validation rejects active pre-Hanji environment names even when
   assert.ok(result.errors.every((error) => !error.includes('legacy.example.com')));
 });
 
-test('production validation requires master account credentials', () => {
-  const result = validateProductionEnvironment({
-    JWT_USER_SECRET: 'u'.repeat(32),
-    JWT_ADMIN_SECRET: 'a'.repeat(32),
-    HANJI_NOTION_IMPORT_SECRET: 'i'.repeat(32),
-    HANJI_MCP_OAUTH_SECRET: 'm'.repeat(32),
-    HANJI_APP_ORIGIN: 'https://app.example.com',
-    HANJI_PASSKEY_RP_ID: 'example.com',
-    HANJI_PASSKEY_ORIGINS: 'https://app.example.com',
-    HANJI_AUTH_EMAIL_FROM: 'no-reply@example.com',
-    HANJI_CLOUDFLARE_EMAIL_BINDING: 'EMAIL',
+test('production validation requires browser setup or a complete legacy master pair', () => {
+  const partialMaster = validateProductionEnvironment(completeProductionEnvironment({
+    HANJI_MASTER_EMAIL: '',
     HANJI_MASTER_PASSWORD: 'short',
-  });
+  }));
+  assert.ok(partialMaster.errors.some((error) => error.includes('must both be empty')));
 
-  assert.ok(result.errors.some((error) => error.includes('HANJI_MASTER_EMAIL')));
-  assert.ok(result.errors.some((error) => error.includes('HANJI_MASTER_PASSWORD')));
+  const missingBrowserSetup = validateProductionEnvironment(completeProductionEnvironment({
+    HANJI_BROWSER_SETUP: 'false',
+    HANJI_BROWSER_SETUP_TOKEN: '',
+    HANJI_MASTER_EMAIL: '',
+    HANJI_MASTER_PASSWORD: '',
+  }));
+  assert.ok(missingBrowserSetup.errors.some((error) => error.includes('Enable HANJI_BROWSER_SETUP')));
+
+  const browserSetup = validateProductionEnvironment(completeProductionEnvironment({
+    HANJI_MASTER_EMAIL: '',
+    HANJI_MASTER_PASSWORD: '',
+  }));
+  assert.ok(!browserSetup.errors.some((error) => /MASTER_EMAIL|MASTER_PASSWORD/.test(error)));
+  assert.ok(!browserSetup.errors.some((error) => error.includes('HANJI_BROWSER_SETUP_TOKEN')));
 });
 
 test('production validation rejects placeholder secrets and implicit admin bootstrap', () => {

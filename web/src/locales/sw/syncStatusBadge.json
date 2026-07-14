@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Nje ya mtandao",
+  "offlinePending_one": "Nje ya mtandao · mabadiliko {{count}} yanasubiri",
+  "offlinePending_other": "Nje ya mtandao · mabadiliko {{count}} yanasubiri",
+  "syncing": "Inasawazisha · {{count}}",
+  "unreachable": "Haifikiki seva",
+  "unreachablePending_one": "Haifikiki seva · badiliko {{count}} linalosubiri",
+  "unreachablePending_other": "Haifikiki seva · mabadiliko {{count}} yanayosubiri",
+  "retryHint": "Bofya kujaribu tena sasa"
 }

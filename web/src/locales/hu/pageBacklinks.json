@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} visszahivatkozás",
+    "count_other": "{{count}} visszahivatkozás"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Linkelt említések"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
+    "mention_one": "{{count}} említés",
+    "mention_other": "{{count}} említés",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "link_other": "{{count}} link"
   },
   "kind": {
-    "mention": "Mention",
+    "mention": "Említés",
     "link": "Link"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} további visszahivatkozás",
+    "count_other": "{{count}} további visszahivatkozás"
   }
 }

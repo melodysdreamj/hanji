@@ -81,6 +81,38 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("PropertyCell", () => {
+  it("opens image attachments in an accessible in-app preview and restores focus", async () => {
+    const prop = makeProp(DB_ID, { id: "files", type: "files", name: "Files" });
+    seedDbProps(DB_ID, [prop]);
+    const row = makeRow(DB_ID, {
+      id: "row-image-preview",
+      properties: {
+        files: [{
+          id: "preview-image",
+          name: "preview.png",
+          type: "image/png",
+          url: "data:image/png;base64,iVBORw0KGgo=",
+        }],
+      },
+    });
+    seedPages([row]);
+
+    render(<PropertyCell row={row} prop={prop} />);
+    const open = screen.getByRole("link", { name: "Open preview.png" });
+    open.focus();
+    fireEvent.click(open);
+
+    const dialog = screen.getByRole("dialog", { name: "Image preview" });
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(screen.getByRole("img", { name: "preview.png" }).getAttribute("src")).toContain("data:image/png");
+    expect(document.body.style.overflow).toBe("hidden");
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Image preview" })).toBeNull();
+    expect(document.body.style.overflow).toBe("");
+    await waitFor(() => expect(document.activeElement).toBe(open));
+  });
+
   it("detaches a stored file through the row update without raw deletion and preserves concurrent files", async () => {
     const prop = makeProp(DB_ID, { id: "files", type: "files", name: "Files" });
     seedDbProps(DB_ID, [prop]);

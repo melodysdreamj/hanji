@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ਬਲੌਕ ਨੂੰ ਲੈ ਜਾਓ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ਮੂਵ ਟਿਕਾਣੇ ਖੋਜੋ",
+    "placeholder": "ਪੰਨੇ ਖੋਜੋ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ਮੂਵ ਡਾਇਲਾਗ ਬੰਦ ਕਰੋ"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ਮੂਵ ਟਿਕਾਣੇ",
+    "empty": "ਕੋਈ ਪੰਨੇ ਨਹੀਂ ਮਿਲੇ।",
+    "destinationLabel": "ਬਲੌਕ ਨੂੰ {{label}}, {{path}} 'ਤੇ ਲੈ ਜਾਓ"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" ਬਣਾਓ",
+    "optionLabel": "\"{{query}}\" ਪੰਨਾ ਬਣਾਓ ਅਤੇ ਬਲੌਕ ਇੱਥੇ ਲੈ ਜਾਓ",
+    "hint": "ਨਵਾਂ ਪੰਨਾ - ਬਲੌਕ ਇੱਥੇ ਲੈ ਜਾਓ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "ਲੌਕ ਕੀਤਾ ਪੰਨਾ"
   },
-  "untitled": "Untitled",
+  "untitled": "ਸਿਰਲੇਖ ਰਹਿਤ",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "ਪੰਨਾ ਲੌਕ ਹੈ।",
+    "movedBlock": "ਬਲੌਕ ਮੂਵ ਕੀਤਾ",
+    "movedBlocks": "ਬਲੌਕ ਮੂਵ ਕੀਤੇ",
+    "movedBlocksCount": "{{blockCount}} ਬਲੌਕ ਮੂਵ ਕੀਤੇ",
+    "moveFailed": "ਬਲੌਕ ਮੂਵ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ"
   }
 }

@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Tässä tietokannassa ei ole vielä sivuja.",
+  "emptyTitle": "Ei vielä sivuja",
+  "newInline": "Uusi",
+  "newPage": "Uusi sivu",
+  "newPageIn": "Uusi sivu tietokannassa {{dbTitle}}",
+  "noResultsDesc": "Mikään sivu ei vastaa nykyisiä suodattimia tai hakua.",
+  "noResultsTitle": "Ei tuloksia",
+  "openRow": "Avaa {{title}}"
 }

@@ -4,7 +4,7 @@
   "newInline": "Nuevo",
   "newPage": "Nueva página",
   "newPageIn": "Nueva página en {{dbTitle}}",
-  "noResultsDesc": "Ninguna página coincide con los filtros o la búsqueda actuales.",
+  "noResultsDesc": "Ninguna página coincide con los filtros o búsqueda actuales.",
   "noResultsTitle": "Sin resultados",
   "openRow": "Abrir {{title}}"
 }

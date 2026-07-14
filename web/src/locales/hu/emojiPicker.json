@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Ikonválasztó bezárása",
+    "label": "Válasszon ikont"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Ikon típusa",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Kép"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Eltávolítás",
+    "ariaLabel": "Ikon eltávolítása"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Szűrés…",
+    "searchLabel": "Ikonok keresése",
+    "random": "Véletlen",
+    "randomLabel": "Véletlenszerű ikon kiválasztása",
+    "recentLabel": "Legutóbb használtak előre",
+    "gridLabelRecent": "Ikonok, legutóbb használtak először",
+    "gridLabel": "Ikonok",
+    "optionLabel": "Válassza a(z) {{emoji}} ikont",
+    "noResults": "Nincs a(z) „{{query}}” kifejezésre illő ikon. Próbálkozzon másik szóval, vagy törölje a szűrőt."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Kép",
+    "linkPlaceholder": "Illesszen be képlinket",
+    "linkLabel": "Ikonkép hivatkozása",
+    "apply": "Alkalmaz",
+    "upload": "Fájl feltöltése",
+    "uploading": "Feltöltés...",
+    "uploadingLabel": "{{fileName}} feltöltése",
+    "uploadFailed": "Nem sikerült feltölteni a képet.",
+    "fallbackFileName": "Ikonkép"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Előkészítés",
+    "finalizing": "Véglegesítés",
+    "complete": "Kész",
+    "uploading": "Feltöltés"
   }
 }

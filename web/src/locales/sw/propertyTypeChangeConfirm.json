@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Badilisha aina ya sifa?",
+  "message": "\"{{propName}}\" tayari ina thamani. Kubadilisha aina yake kuwa {{typeLabel}} kunaweza kuonyesha thamani zilizopo tofauti au kuzipoteza.",
+  "cancelAria": "Ghairi mabadiliko ya aina ya sifa",
+  "confirm": "Badilisha aina"
 }

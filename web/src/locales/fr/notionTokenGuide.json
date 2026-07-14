@@ -7,8 +7,8 @@
   "stepLabel": "Étape {{n}} sur {{total}}",
   "scenes": [
     {
-      "title": "Ouvrir la page du jeton depuis Hanji",
-      "caption": "Dans Hanji, cliquez sur « Ouvrir la page du jeton Notion » pour ouvrir le portail développeur de Notion dans un nouvel onglet."
+      "title": "Ouvrir la page de jeton depuis Hanji",
+      "caption": "Dans Hanji, cliquez sur « Ouvrir la page de jeton Notion » pour ouvrir le portail développeur Notion dans un nouvel onglet."
     },
     {
       "title": "Créer une connexion",
@@ -20,43 +20,43 @@
     },
     {
       "title": "Copier le jeton d'accès",
-      "caption": "Copiez le jeton ntn_… et collez-le dans le champ de jeton ci-dessous."
+      "caption": "Copiez le jeton ntn_… et collez-le dans le champ jeton ci-dessous."
     },
     {
-      "title": "Le connecter à vos pages",
-      "caption": "Dans Notion, ouvrez chaque page de premier niveau → ··· → Connexions → ajoutez cette connexion. Les sous-pages sont incluses automatiquement — revenez ensuite analyser."
+      "title": "Connectez-le à vos pages",
+      "caption": "Dans Notion, ouvrez chaque page de premier niveau → ··· → Connexions → ajoutez cette connexion. Les sous-pages sont incluses automatiquement — puis revenez et scannez."
     },
     {
       "title": "Coller le jeton dans Hanji",
-      "caption": "De retour dans Hanji, collez le jeton que vous avez copié dans le champ « Jeton d'API Notion »."
+      "caption": "De retour dans Hanji, collez le jeton copié dans le champ « Jeton API Notion »."
     },
     {
-      "title": "Choisir ce qu'il faut importer",
-      "caption": "Importez l'espace de travail entier, ou choisissez « Pages spécifiques » pour importer uniquement les pages et bases de données que vous sélectionnez."
+      "title": "Choisir quoi importer",
+      "caption": "Importez l'intégralité de l'espace de travail, ou choisissez « Pages spécifiques » pour n'importer que les pages et bases de données sélectionnées."
     }
   ],
   "mock": {
     "url": "app.notion.com/developers/connections",
-    "hanjiTitle": "Hanji · Importation",
-    "inkIntroTitle": "Importer avec un jeton d'API Notion",
+    "hanjiTitle": "Hanji · Import",
+    "inkIntroTitle": "Importer avec un jeton API Notion",
     "inkIntroDesc": "Pour un hébergement local, coller un jeton que vous créez dans Notion est la configuration la plus fiable.",
-    "inkMakeToken": "Ouvrir la page du jeton Notion",
-    "inkStep1Title": "Préparer le jeton Notion",
-    "inkTokenLabel": "Jeton d'API Notion",
+    "inkMakeToken": "Ouvrir la page des jetons Notion",
+    "inkStep1Title": "Préparer le token Notion",
+    "inkTokenLabel": "Token API Notion",
     "inkTokenValue": "ntn_••••••••",
-    "inkStep2Title": "Choisir ce qu'il faut importer",
-    "scopeAllTitle": "Espace de travail entier",
+    "inkStep2Title": "Choisir les éléments à importer",
+    "scopeAllTitle": "Tout l'espace de travail",
     "scopeAllRec": "Recommandé",
-    "scopeAllDesc": "Tout ce à quoi la connexion peut accéder. Les relations de base de données entre les pages restent intactes.",
+    "scopeAllDesc": "Tout ce à quoi la connexion peut accéder. Les relations de bases de données entre les pages restent intactes.",
     "scopeSomeTitle": "Pages spécifiques",
-    "scopeSomeDesc": "Analyser les éléments de premier niveau accessibles, puis importer uniquement les pages/bases de données que vous sélectionnez.",
+    "scopeSomeDesc": "Analyse les éléments de premier niveau accessibles, puis importe uniquement les pages/bases de données sélectionnées.",
     "urlPage": "notion.so/Team-Handbook-82fd91",
     "backLink": "‹ Retour à Notion",
     "devTitle": "Développeurs",
     "nav": [
-      "Premiers pas",
+      "Commencer",
       "Worker",
-      "Jetons d'accès personnels",
+      "Tokens d'accès personnels",
       "Connexions"
     ],
     "navNew": "Nouveau",
@@ -74,18 +74,18 @@
     "authTypeCell": "Jeton d'accès",
     "ownerName": "Vous",
     "modalTitle": "Nouvelle connexion",
-    "modalDesc": "Créez une connexion pour authentifier des applications, des agents et des flux de travail avec Notion. Choisissez une portée sur un ou plusieurs espaces de travail.",
+    "modalDesc": "Créez une connexion pour authentifier des apps, des agents et des workflows avec Notion. Choisissez une portée d'espace de travail unique ou multi.",
     "nameLabel": "Nom de la connexion",
     "namePlaceholder": "Ma connexion",
     "authMethod": "Méthode d'authentification",
     "accessToken": "Jeton d'accès",
-    "accessTokenDesc": "Un jeton d'API statique, limité à un espace de travail, partagé entre les collaborateurs, avec ses propres paramètres de capacités. Limité à 1 espace de travail et ne peut pas être inscrit sur le Marketplace.",
+    "accessTokenDesc": "Un jeton API statique, limité à un espace de travail, partagé entre les collaborateurs, avec ses propres paramètres de capacité. Limité à 1 espace de travail et ne peut pas être listé sur le Marketplace.",
     "oauth": "OAuth",
-    "oauthDesc": "OAuth 2.0 limité à l'utilisateur ; les autorisations sont limitées à l'utilisateur connecté. Prend en charge plusieurs espaces de travail.",
+    "oauthDesc": "OAuth 2.0 limité à l'utilisateur ; les autorisations sont limitées à l'utilisateur connecté. Compatible avec plusieurs espaces de travail.",
     "wsLabel": "Espaces de travail installables :",
     "wsDesc": "Ce jeton s'applique à l'espace de travail sélectionné.",
-    "terms": "En créant une connexion, vous acceptez les conditions de développeur de Notion.",
-    "createButton": "Créer la connexion",
+    "terms": "En créant une connexion, vous acceptez les conditions développeur de Notion.",
+    "createButton": "Créer une connexion",
     "breadcrumb": "Connexions  ›  Gérer la connexion",
     "detailTabs": [
       "Configuration",
@@ -94,11 +94,11 @@
       "Propriétaires"
     ],
     "tokenSectionTitle": "Jeton d'intégration API",
-    "tokenSectionDesc": "Utilisez ce jeton pour authentifier les requêtes API de cet espace de travail. Toute personne disposant du jeton peut agir au nom de la connexion, alors gardez-le secret.",
+    "tokenSectionDesc": "Utilisez ce jeton pour authentifier les requêtes API de cet espace de travail. Toute personne possédant le jeton peut agir au nom de la connexion, gardez-le secret.",
     "tokenFieldLabel": "Jeton d'accès",
     "tokenValue": "••••••••••••••••••••••••••••",
     "copied": "Copié",
-    "pageTitle": "Manuel de l'équipe",
+    "pageTitle": "Manuel d'équipe",
     "share": "Partager",
     "menuCopyLink": "Copier le lien",
     "menuDuplicate": "Dupliquer",

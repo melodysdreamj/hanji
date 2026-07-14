@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Разблокировать локальные данные",
+  "description": "Офлайн-данные на этом устройстве заблокированы парольной фразой. Разблокировка снова включит офлайн-использование и сохранение.",
+  "passphrasePlaceholder": "Парольная фраза",
+  "unlock": "Разблокировать",
+  "continueOnline": "Продолжить только онлайн",
+  "continueOnlineHint": "«Продолжить только онлайн» оставляет заблокированные офлайн-правки на этом устройстве запечатанными — они останутся на этом устройстве и не будут синхронизироваться, пока вы не разблокируете их с помощью правильной парольной фразы.",
+  "wrongPassphrase": "Неверная парольная фраза.",
+  "unsupportedBrowser": "Локальная блокировка недоступна в этом браузере."
 }

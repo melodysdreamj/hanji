@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Alamat ini tidak lengkap.",
+  "invalidBody": "Periksa tautan untuk karakter yang hilang atau salah format, lalu coba lagi.",
+  "notFoundTitle": "Halaman tidak ditemukan.",
+  "notFoundBody": "Alamat ini tidak sesuai dengan halaman Hanji. Halaman mungkin telah dipindahkan atau tidak ada lagi.",
+  "sharedTitle": "Tautan bersama ini tidak valid.",
+  "sharedBody": "Pastikan tautan bersama telah disalin dengan benar, lalu coba lagi.",
+  "openHome": "Buka beranda Hanji"
+}

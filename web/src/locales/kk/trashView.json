@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Себет",
+  "empty": "Жойған парақтарыңыз осында келеді. Себет бос.",
+  "searchTrash": "Себетті іздеу",
+  "deletedPages": "Жойылған парақтар",
+  "noSearchMatches": "Іздеуге сәйкес жойылған парақтар жоқ.",
+  "pageCount_one": "{{count}} парақ",
+  "pageCount_other": "{{count}} парақ",
+  "deletedJustNow": "Жаңа ғана жойылды",
+  "deletedOn": "{{date}} жойылды",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Қалпына келтіру",
+    "deleteForever": "Мәңгі жою",
+    "emptyTrash": "Себетті тазалау"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} себеттен ашу",
+    "restorePage": "{{title}} қалпына келтіру",
+    "deletePageForever": "{{title}} мәңгі жою",
+    "cancelPermanentDelete": "Мәңгі жоюдан бас тарту",
+    "cancelEmptyTrash": "Себетті тазалауды болдырмау"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Мәңгі жою?",
+    "deleteBodyPrefix": "Бұл мәңгі жояды ",
+    "deleteBodySuffix": ". Бұл әрекетті қайтару мүмкін емес.",
+    "emptyTitle": "Себетті босату?",
+    "emptyBody_one": "Бұл себеттегі барлық {{count}} парақты мәңгі жояды. Бұл әрекетті қайтару мүмкін емес.",
+    "emptyBody_other": "Бұл себеттегі барлық {{count}} парақты мәңгі жояды. Бұл әрекетті қайтару мүмкін емес."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Мәңгі жойылды",
+    "couldntDelete": "Парақты жою мүмкін болмады",
+    "restored": "Парақ қалпына келтірілді",
+    "couldntRestore": "Парақты қалпына келтіру мүмкін болмады",
+    "emptied": "Себет босатылды",
+    "couldntEmpty": "Себетті босату мүмкін болмады"
   }
 }

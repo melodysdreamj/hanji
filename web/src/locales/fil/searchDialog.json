@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Maghanap o pumunta sa...",
+  "quickFind": "Mabilis na Paghahanap",
+  "closeSearch": "Isara ang search",
+  "quickFindResults": "Mga resulta ng Mabilis na Paghahanap",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Kamakailang Tiningnan",
+    "recentSearches": "Kamakailang Paghahanap",
+    "pages": "Mga Pahina",
+    "pageContent": "Nilalaman ng pahina",
+    "favorites": "Mga Paborito"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "sa pahina",
+  "searchingDetail": "Naghahanap...",
+  "searchAgain": "Maghanap muli",
+  "searchingPageContent": "Naghahanap ng nilalaman ng pahina...",
+  "noResultsFor": "Walang resulta para sa \"{{query}}\"",
+  "noPagesFound": "Walang nahanap na pahina",
+  "creating": "Gumagawa...",
+  "newPage": "Bagong pahina \"{{query}}\"",
+  "couldntCreatePage": "Hindi na-create ang page",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Piliin",
+    "open": "Buksan",
+    "newTab": "Bagong tab"
   }
 }

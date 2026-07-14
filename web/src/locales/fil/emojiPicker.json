@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Isara ang icon picker",
+    "label": "Pumili ng icon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Uri ng icon",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Larawan"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Alisin",
+    "ariaLabel": "Alisin ang icon"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
+    "searchLabel": "Maghanap ng icon",
     "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "randomLabel": "Pumili ng random na icon",
+    "recentLabel": "Kamakailang ginamit muna",
+    "gridLabelRecent": "Mga icon, pinakabagong ginamit ang nauuna",
+    "gridLabel": "Mga Icon",
+    "optionLabel": "Piliin ang icon na {{emoji}}",
+    "noResults": "Walang icon na tugma sa “{{query}}”. Subukan ang ibang salita o alisin ang filter."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Larawan",
+    "linkPlaceholder": "Idikit ang link ng larawan",
+    "linkLabel": "Link ng icon na larawan",
+    "apply": "Ilapat",
+    "upload": "I-upload ang file",
+    "uploading": "Nag-a-upload...",
+    "uploadingLabel": "Ina-upload ang {{fileName}}",
+    "uploadFailed": "Hindi na-upload ang larawang iyon.",
+    "fallbackFileName": "Larawan ng icon"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Inihahanda ang pag-upload",
+    "finalizing": "Pinasasapinal",
+    "complete": "Kumpleto",
+    "uploading": "Nag-a-upload"
   }
 }

@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Общая страница",
+  "loading": "Загрузка общей страницы",
+  "unavailable": "Эта общая страница недоступна.",
+  "notFound": "Общая страница не найдена.",
+  "outsideShare": "Страница не входит в эту публичную публикацию.",
+  "tryAgain": "Повторить попытку",
+  "errors": {
+    "not-found": "Возможно, срок действия ссылки истек, она снята с публикации или скопирована неверно.",
+    "rate-limited": "Эта общая страница получает слишком много запросов. Повторите попытку чуть позже.",
+    "offline": "Проверьте соединение, затем попробуйте снова открыть общую страницу.",
+    "unavailable": "Hanji не может открыть эту общую страницу сейчас. Повторите попытку чуть позже."
+  }
 }

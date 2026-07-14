@@ -1,76 +1,76 @@
 {
-  "toolbar": {
-    "ariaLabel": "Text formatting"
-  },
-  "turnInto": {
-    "label": "Turn into",
-    "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
-    }
-  },
-  "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
-  },
-  "comment": {
-    "label": "Comment"
-  },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Kolor tekstu: {{color}}",
+    "title": "Kolor: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
-    "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
-    },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "blue": "Niebieskie tło",
+      "brown": "Brązowe tło",
+      "gray": "Szare tło",
+      "green": "Zielone tło",
+      "heading": "Kolor tła",
+      "orange": "Pomarańczowe tło",
+      "pink": "Różowe tło",
+      "purple": "Fioletowe tło",
+      "red": "Czerwone tło",
+      "yellow": "Żółte tło"
+    },
+    "mixed": "Mieszane",
+    "text": {
+      "blue": "Niebieski",
+      "brown": "Brązowy",
+      "default": "Domyślny",
+      "gray": "Szary",
+      "green": "Zielony",
+      "heading": "Kolor tekstu",
+      "orange": "Pomarańczowy",
+      "pink": "Różowy",
+      "purple": "Fioletowy",
+      "red": "Czerwony",
+      "yellow": "Żółty"
     }
   },
+  "comment": {
+    "label": "Komentarz"
+  },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Edytuj link",
+    "copied": "Skopiowano",
+    "copiedLink": "Skopiowano link",
+    "copy": "Kopiuj link",
+    "open": "Otwórz link",
+    "placeholder": "Wklej link",
+    "remove": "Usuń",
+    "urlAriaLabel": "URL linku"
+  },
+  "marks": {
+    "bold": "Pogrubienie",
+    "code": "Kod",
+    "italic": "Kursywa",
+    "link": "Link",
+    "strikethrough": "Przekreślenie",
+    "underline": "Podkreślenie"
+  },
+  "toolbar": {
+    "ariaLabel": "Formatowanie tekstu"
+  },
+  "turnInto": {
+    "label": "Zamień na",
+    "options": {
+      "bulletedList": "Lista wypunktowana",
+      "callout": "Callout",
+      "code": "Kod",
+      "heading1": "Nagłówek 1",
+      "heading2": "Nagłówek 2",
+      "heading3": "Nagłówek 3",
+      "heading4": "Nagłówek 4",
+      "numberedList": "Lista numerowana",
+      "quote": "Cytat",
+      "text": "Tekst",
+      "toDoList": "Lista zadań",
+      "toggleList": "Lista przełączana"
+    }
   }
 }

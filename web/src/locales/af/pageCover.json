@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Verander omslag",
+    "reposition": "Herposisioneer",
+    "remove": "Verwyder",
+    "uploadFile": "Laai lêer op",
+    "uploading": "Laai tans op...",
+    "submit": "Stuur",
+    "savePosition": "Stoor posisie"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galerie",
+    "upload": "Oplaai",
+    "link": "Skakel"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Plak beeldskakel",
+    "invalid": "Plak 'n http- of https-beeldskakel."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Kon nie daardie beeld oplaai nie.",
+    "defaultFileName": "Omslagbeeld"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Sleep beeld om te herposisioneer"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Berei voor",
+    "finalizing": "Finaliseer",
+    "complete": "Voltooid",
+    "uploading": "Oplaai"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Voorblad verwyder",
+    "restored": "Voorblad herstel",
+    "undo": "Ontdoen"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Bladsyvoorblad",
+    "coverVerticalPosition": "Vertikale posisie van voorblad",
+    "positionFromTop": "{{position}}% van bo",
+    "closeCoverMenu": "Maak voorbladkieslys toe",
+    "changePageCover": "Verander bladsyvoorblad",
+    "repositionPageCover": "Herposisioneer bladsyvoorblad",
+    "removePageCover": "Verwyder bladsyvoorblad",
+    "changeCoverDialog": "Verander voorblad",
+    "coverSource": "Voorbladbron",
+    "selectCover": "Kies voorblad {{number}}",
+    "uploadFromDevice": "Laai voorbladbeeld van hierdie toestel op",
+    "uploadingFile": "Laai {{fileName}} tans op",
+    "coverImageLink": "Skakel na voorbladbeeld"
   }
 }

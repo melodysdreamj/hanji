@@ -1,43 +1,43 @@
 {
+  "custom": {
+    "apply": "Použít",
+    "fallbackFileName": "Obrázek ikony",
+    "linkLabel": "Odkaz na obrázek ikony",
+    "linkPlaceholder": "Vložit odkaz na obrázek",
+    "previewPlaceholder": "Obrázek",
+    "upload": "Nahrát soubor",
+    "uploadFailed": "Tento obrázek se nepodařilo nahrát.",
+    "uploading": "Nahrávání...",
+    "uploadingLabel": "Nahrávání {{fileName}}"
+  },
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
-  },
-  "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
-  },
-  "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "backdropLabel": "Zavřít výběr ikon",
+    "label": "Vybrat ikonu"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "gridLabel": "Ikony",
+    "gridLabelRecent": "Ikony, nejprve nedávno použité",
+    "noResults": "Žádné ikony neodpovídají „{{query}}“. Zkuste jiné slovo nebo vymažte filtr.",
+    "optionLabel": "Vybrat ikonu {{emoji}}",
+    "random": "Náhodně",
+    "randomLabel": "Vybrat náhodnou ikonu",
+    "recentLabel": "Nedávno použité první",
+    "searchLabel": "Hledat ikony",
+    "searchPlaceholder": "Filtr…"
   },
-  "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+  "remove": {
+    "ariaLabel": "Odstranit ikonu",
+    "label": "Odstranit"
+  },
+  "tabs": {
+    "emoji": "Emoji",
+    "groupLabel": "Typ ikony",
+    "image": "Obrázek"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "complete": "Dokončeno",
+    "finalizing": "Dokončování",
+    "preparing": "Příprava nahrávání",
+    "uploading": "Nahrávání"
   }
 }

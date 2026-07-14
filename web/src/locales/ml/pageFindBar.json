@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "പേജിൽ തിരയുക"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "പേജിൽ തിരയുക",
+    "placeholder": "പേജിൽ തിരയുക"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "മുന്‍പത്തെ പൊരുത്തം",
+    "next": "അടുത്ത പൊരുത്തം",
+    "close": "തിരയൽ അടയ്ക്കുക"
   }
 }

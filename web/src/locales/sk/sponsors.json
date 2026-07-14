@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> sponzoruje Hanji, ktoré rastie",
+  "supportTitle": "Podporte Hanji",
+  "builtWith": "<a>{{name}}</a> pomáha tvoriť Hanji",
+  "rule1": "Banner zobrazuje päť najlepších sponzorov podľa zostatku.",
+  "settingsIntro": "Hanji je udržiavané vďaka svojim sponzorom. Prihlasovacia obrazovka zobrazuje malý banner s aktuálnymi piatimi najlepšími sponzormi.",
+  "rule2": "Raz mesačne sa zostatok každého zobrazeného sponzora zníži o sumu sponzora na piatom mieste, takže všetci piati platia rovnakú sumu.",
+  "builtWithTitle": "Vytvorené vďaka",
+  "emptySlot": "Voľné miesto – tu sa zobrazí sponzor",
+  "rule3": "Keď sa zostatok vyčerpá, miesto prejde na ďalšieho sponzora podľa zostatku.",
+  "rule4": "Ponechanie banneru predvolene zapnutého udeľuje výnimku z licencie Hanji; uzavretá verzia bez banneru vyžaduje samostatnú komerčnú licenciu.",
+  "builtWithIntro": "Hanji bolo vytvorené pomocou týchto nástrojov a platforiem.",
+  "sponsorSlots": "Aktuálni sponzori",
+  "becomeSponsor": "Staňte sa sponzorom"
+}

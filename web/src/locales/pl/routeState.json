@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Sprawdź, czy link nie zawiera brakujących lub nieprawidłowych znaków, a następnie spróbuj ponownie.",
+  "invalidTitle": "Ten adres jest niekompletny.",
+  "notFoundBody": "Ten adres nie odpowiada żadnej stronie Hanji. Strona mogła zostać przeniesiona lub już nie istnieje.",
+  "notFoundTitle": "Nie znaleziono strony.",
+  "openHome": "Otwórz stronę główną Hanji",
+  "sharedBody": "Sprawdź, czy cały link udostępniania został poprawnie skopiowany, a następnie spróbuj ponownie.",
+  "sharedTitle": "Ten link udostępniania jest nieprawidłowy."
+}

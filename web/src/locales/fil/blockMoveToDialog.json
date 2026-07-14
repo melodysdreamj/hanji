@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Ilipat ang block sa",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Maghanap ng mga destinasyon ng paglipat",
+    "placeholder": "Maghanap ng mga pahina..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Isara ang dialog ng paglipat"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Mga destinasyon ng paglipat",
+    "empty": "Walang nakitang pahina.",
+    "destinationLabel": "Ilipat ang block sa {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Gawin ang \"{{query}}\"",
+    "optionLabel": "Gumawa ng pahina \"{{query}}\" at ilipat ang block dito",
+    "hint": "Bagong pahina - ilipat ang block dito"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Naka-lock na pahina"
   },
-  "untitled": "Untitled",
+  "untitled": "Walang pamagat",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Naka-lock ang pahina",
+    "movedBlock": "Inilipat ang block",
+    "movedBlocks": "Inilipat ang mga block",
+    "movedBlocksCount": "Inilipat ang {{blockCount}} block",
+    "moveFailed": "Hindi nailipat ang block"
   }
 }

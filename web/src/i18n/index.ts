@@ -7,10 +7,11 @@
 // the Vite glob below. Adding a namespace needs no runtime change. Translation
 // target wrappers may exist before a language is released in the selector.
 //
-// Locale selection: an explicit in-app choice (WorkspaceSettingsDialog, stored
-// under LANGUAGE_STORAGE_KEY) wins; otherwise the browser language decides, with
-// English as the ultimate fallback. Browser tags are normalized to a released
-// catalog before i18next starts so script/region variants remain intact.
+// Locale selection: an authenticated account's server preference is mirrored
+// into an account-scoped local cache for first paint. Public shares, signed-out
+// visitors and anonymous sessions ignore that cache and follow the browser.
+// Browser tags are normalized to a released catalog before i18next starts so
+// script/region variants remain intact.
 import i18next, { type BackendModule, type ReadCallback } from "i18next";
 import { initReactI18next } from "react-i18next";
 import { LANGUAGE_OPTIONS } from "./languages";
@@ -32,9 +33,14 @@ for (const [path, loader] of Object.entries(languageModules)) {
 export const SUPPORTED_LANGUAGES = LANGUAGE_OPTIONS.map((option) => option.value);
 export const DEFAULT_NS = "common";
 
-// An explicit in-app language choice is stored here (a language code) and takes
-// precedence over the browser language; absent = follow the browser.
+// Prefix for account-scoped language caches. Never read the old unscoped key as
+// a preference: doing so would leak one account's UI language into another
+// account or into a public share opened in the same browser.
 export const LANGUAGE_STORAGE_KEY = "hanji:language";
+
+export function languageStorageKey(userId: string): string {
+  return `${LANGUAGE_STORAGE_KEY}:${encodeURIComponent(userId.trim())}`;
+}
 
 function canonicalLanguageTag(language: string): string {
   const normalized = language.trim().replaceAll("_", "-");
@@ -104,20 +110,30 @@ function loadLanguageCatalogs(language: string) {
   return request;
 }
 
-function storedLanguage(): string | undefined {
+export function shouldUseAccountLanguagePreference(pathname: string): boolean {
+  return pathname !== "/share" && !pathname.startsWith("/share/");
+}
+
+function normalizeLanguagePreference(pref: string): string | undefined {
+  if (pref === "system") return "system";
+  const supportedLower = new Map(
+    SUPPORTED_LANGUAGES.map((language) => [language.toLowerCase(), language]),
+  );
+  return supportedLanguageForCandidate(pref, supportedLower);
+}
+
+function storedLanguagePreference(userId = ""): string | undefined {
+  if (!userId) return undefined;
   try {
-    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    const stored = localStorage.getItem(languageStorageKey(userId));
     if (!stored) return undefined;
-    const supportedLower = new Map(
-      SUPPORTED_LANGUAGES.map((language) => [language.toLowerCase(), language]),
-    );
-    return supportedLanguageForCandidate(stored, supportedLower);
+    return normalizeLanguagePreference(stored);
   } catch {
     return undefined;
   }
 }
 
-function browserLanguage(): string {
+export function browserLanguage(): string {
   const requested: string[] = [];
   if (typeof navigator !== "undefined") {
     if (Array.isArray(navigator.languages)) requested.push(...navigator.languages);
@@ -139,14 +155,29 @@ const resourceBackend: BackendModule = {
   },
 };
 
-export async function initI18n(): Promise<unknown> {
-  const sourceCatalogs = await loadLanguageCatalogs("en");
+export async function initI18n(userIdHint = ""): Promise<unknown> {
+  const useAccountPreference = typeof window !== "undefined"
+    ? shouldUseAccountLanguagePreference(window.location.pathname)
+    : false;
+  const preference = useAccountPreference
+    ? storedLanguagePreference(userIdHint)
+    : undefined;
+  const language = preference && preference !== "system" ? preference : browserLanguage();
+  // The previous boot always waited for English before requesting the active
+  // language. On a Korean (or any non-English) browser that serialized two
+  // fairly large lazy chunks on the critical path. Fetch both catalogs in
+  // parallel and seed i18next with them so its backend does not request either
+  // one a second time during initialization.
+  const [sourceCatalogs, activeCatalogs] = await Promise.all([
+    loadLanguageCatalogs("en"),
+    loadLanguageCatalogs(language),
+  ]);
   const namespaces = Object.keys(sourceCatalogs);
   return i18next
     .use(resourceBackend)
     .use(initReactI18next)
     .init({
-      lng: storedLanguage() ?? browserLanguage(),
+      lng: language,
       fallbackLng: "en",
       supportedLngs: SUPPORTED_LANGUAGES,
       // Detection is normalized before init so full script/region codes use
@@ -155,6 +186,14 @@ export async function initI18n(): Promise<unknown> {
       nonExplicitSupportedLngs: false,
       ns: namespaces.length > 0 ? namespaces : [DEFAULT_NS],
       defaultNS: DEFAULT_NS,
+      // English + the active locale are bundled into the initial resource
+      // object above; every other released locale remains lazy-loadable when
+      // tests or the live language preference switch calls changeLanguage.
+      partialBundledLanguages: true,
+      resources: {
+        en: sourceCatalogs,
+        ...(language === "en" ? {} : { [language]: activeCatalogs }),
+      },
       interpolation: { escapeValue: false },
       returnNull: false,
     });
@@ -187,34 +226,49 @@ if (typeof document !== "undefined") {
 }
 
 // ── Language preference API (for the in-app language selector) ─────────────
-// "system" = follow the browser (no stored override); otherwise a language code.
-export function currentLanguagePreference(): string {
-  return storedLanguage() ?? "system";
+// "system" = follow the browser; otherwise a released language code. System is
+// stored explicitly after a user chooses it so it remains distinguishable from
+// an account that has never completed language onboarding.
+export function currentLanguagePreference(userId = ""): string {
+  return storedLanguagePreference(userId) ?? "system";
 }
 
-export function setLanguagePreference(pref: string): void {
-  const supportedLower = new Map(
-    SUPPORTED_LANGUAGES.map((language) => [language.toLowerCase(), language]),
-  );
-  const resolved = pref === "system"
-    ? "system"
-    : supportedLanguageForCandidate(pref, supportedLower);
+export function hasCachedLanguagePreference(userId = ""): boolean {
+  return storedLanguagePreference(userId) !== undefined;
+}
+
+export function resolvedLanguageForPreference(pref: string): string {
+  const resolved = normalizeLanguagePreference(pref);
+  return resolved && resolved !== "system" ? resolved : browserLanguage();
+}
+
+export function cacheLanguagePreference(userId: string, pref: string): boolean {
+  const resolved = normalizeLanguagePreference(pref);
+  if (!userId || !resolved) return false;
+  try {
+    localStorage.setItem(languageStorageKey(userId), resolved);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function setLanguagePreference(pref: string, userId = ""): void {
+  const resolved = normalizeLanguagePreference(pref);
   if (!resolved) return;
 
-  let persisted = false;
-  try {
-    if (resolved === "system") localStorage.removeItem(LANGUAGE_STORAGE_KEY);
-    else localStorage.setItem(LANGUAGE_STORAGE_KEY, resolved);
-    persisted = true;
-  } catch {
-    /* storage unavailable */
-  }
+  const persisted = cacheLanguagePreference(userId, resolved);
+  const nextLanguage = resolvedLanguageForPreference(resolved);
   // Reload so EVERY surface renders in the new language: many option/label
   // arrays bake their strings in at module-evaluation time and would not
   // re-localize on a live changeLanguage. The selected preference is re-read
-  // on boot. If we couldn't persist, fall back to a live switch.
-  if (persisted && typeof window !== "undefined") window.location.reload();
-  else void i18next.changeLanguage(resolved === "system" ? browserLanguage() : resolved);
+  // on boot. A no-op selection needs no reload; if storage is unavailable,
+  // fall back to a live switch.
+  if (persisted && nextLanguage !== i18next.resolvedLanguage && typeof window !== "undefined") {
+    window.location.reload();
+  } else if (!persisted) {
+    void i18next.changeLanguage(nextLanguage);
+  }
 }
 
 export { i18next };

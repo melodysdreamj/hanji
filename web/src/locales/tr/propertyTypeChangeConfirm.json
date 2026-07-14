@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Özellik türü değiştirilsin mi?",
+  "message": "\"{{propName}}\" zaten değerlere sahip. Türünü {{typeLabel}} olarak değiştirmek mevcut değerlerin farklı görünmesine veya kaybolmasına neden olabilir.",
+  "cancelAria": "Özellik türü değişikliğini iptal et",
+  "confirm": "Türü değiştir"
 }

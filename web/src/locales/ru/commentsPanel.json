@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Комментарии",
+  "closeAria": "Закрыть комментарии",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Обсуждение блока",
+    "page": "Обсуждение страницы"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Статус комментария",
+    "open": "Открыто",
+    "resolved": "Решено"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Комментируется",
+    "commentingOnSelectedText": "Комментируется выделенный текст",
+    "selectedBlock": "Выбранный блок",
+    "onSelectedText": "На выделенном тексте",
+    "onSelectedBlock": "На выбранном блоке",
+    "onABlock": "На блоке"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Добавить комментарий к блоку",
+    "addPageComment": "Добавить комментарий к странице",
+    "blockPlaceholder": "Комментировать этот блок...",
+    "pagePlaceholder": "Добавить комментарий...",
+    "submit": "Комментировать"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Упоминание людей в комментарии",
+    "replyPeopleAria": "Упоминание людей в ответе",
+    "trigger": "Упоминание людей",
+    "noMatches": "Нет подходящих людей",
+    "title": "Упоминание {{name}}",
+    "person": "Человек",
+    "you": "Вы",
+    "organizationPerson": "Сотрудник организации",
+    "roleInOrganization": "{{role}} в организации"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Потоки комментариев",
+    "empty": "Ещё нет комментариев",
+    "noOpen": "Нет открытых комментариев",
+    "noResolved": "Нет решённых комментариев"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} комментарий, {{time}}",
+    "commentAriaResolved": "{{author}} комментарий, {{time}}, решён",
+    "replyAria": "{{author}} ответ, {{time}}",
+    "repliesAria": "{{count}} ответов",
+    "edited": "(изменено)",
+    "emptyComment": "(пустой комментарий)",
+    "emptyReply": "(пустой ответ)",
+    "justNow": "Только что"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Ответить",
+    "showInPage": "Показать на странице",
+    "resolve": "Решить",
+    "reopen": "Открыть снова",
+    "edit": "Редактировать"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Ответ..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Редактировать комментарий"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Удалить этот комментарий?",
+    "threadConfirm_one": "Удалить этот комментарий и ответ?",
+    "threadConfirm_other": "Удалить этот комментарий и {{count}} ответов?"
   }
 }

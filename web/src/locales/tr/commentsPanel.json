@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Yorumlar",
+  "closeAria": "Yorumları kapat",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Blok tartışması",
+    "page": "Sayfa tartışması"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Yorum durumu",
+    "open": "Açık",
+    "resolved": "Çözüldü"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Yorum yapılan",
+    "commentingOnSelectedText": "Seçili metin hakkında yorum",
+    "selectedBlock": "Seçili blok",
+    "onSelectedText": "Seçili metinde",
+    "onSelectedBlock": "Seçili blokta",
+    "onABlock": "Bir blokta"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Blok yorumu ekle",
+    "addPageComment": "Sayfa yorumu ekle",
+    "blockPlaceholder": "Bu bloğa yorum yap...",
+    "pagePlaceholder": "Yorum ekle...",
+    "submit": "Yorum yap"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Yorumda bahsedilecek kişiler",
+    "replyPeopleAria": "Yanıtta bahsedilecek kişiler",
+    "trigger": "Kişilerden bahset",
+    "noMatches": "Eşleşen kişi yok",
+    "title": "{{name}}'den bahset",
+    "person": "Kişi",
+    "you": "Sen",
+    "organizationPerson": "Organizasyon üyesi",
+    "roleInOrganization": "Organizasyonda {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Yorum konuları",
+    "empty": "Henüz yorum yok",
+    "noOpen": "Açık yorum yok",
+    "noResolved": "Çözülmüş yorum yok"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} yorumu, {{time}}",
+    "commentAriaResolved": "{{author}} yorumu, {{time}}, çözüldü",
+    "replyAria": "{{author}} yanıtı, {{time}}",
+    "repliesAria": "{{count}} yanıt",
+    "edited": "(düzenlendi)",
+    "emptyComment": "(boş yorum)",
+    "emptyReply": "(boş yanıt)",
+    "justNow": "Az önce"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Yanıtla",
+    "showInPage": "Sayfada göster",
+    "resolve": "Çöz",
+    "reopen": "Yeniden aç",
+    "edit": "Düzenle"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Yanıtla..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Yorumu düzenle"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Bu yorumu sil?",
+    "threadConfirm_one": "Bu yorum ve yanıtı silinsin mi?",
+    "threadConfirm_other": "Bu yorum ve {{count}} yanıtı silinsin mi?"
   }
 }

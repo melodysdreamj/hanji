@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "အိုင်ကွန်ရွေးချယ်မှုပိတ်ရန်",
+    "label": "အိုင်ကွန်ရွေးရန်"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "အိုင်ကွန်အမျိုးအစား",
+    "emoji": "အီမိုဂျီ",
+    "image": "ရုပ်ပုံ"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ဖယ်ရှားရန်",
+    "ariaLabel": "အိုင်ကွန်ဖယ်ရှားရန်"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "စစ်ထုတ်ရန်…",
+    "searchLabel": "အိုင်ကွန်ရှာဖွေရန်",
+    "random": "ကျပန်း",
+    "randomLabel": "ကျပန်းအိုင်ကွန်ရွေးရန်",
+    "recentLabel": "မကြာသေးမီသုံးသည်များ ရှေ့ဆုံး",
+    "gridLabelRecent": "အိုင်ကွန်များ၊ မကြာသေးမီသုံးထားသည်များရှေ့မှ",
+    "gridLabel": "အိုင်ကွန်များ",
+    "optionLabel": "{{emoji}} အိုင်ကွန်ကိုရွေးရန်",
+    "noResults": "“{{query}}” နှင့်ကိုက်သောအိုင်ကွန်မရှိပါ။ အခြားစာလုံးရှာပါ သို့မဟုတ် စစ်ထုတ်မှုကိုရှင်းပါ။"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "ပုံ",
+    "linkPlaceholder": "ပုံလင့်ခ်ကူးထည့်ပါ",
+    "linkLabel": "ပုံအိုင်ကွန်လင့်ခ်",
+    "apply": "အသုံးပြုရန်",
+    "upload": "ဖိုင်တင်ရန်",
+    "uploading": "တင်နေသည်...",
+    "uploadingLabel": "{{fileName}} တင်နေသည်",
+    "uploadFailed": "ထိုပုံကိုတင်လို့မရပါ။",
+    "fallbackFileName": "အိုင်ကွန်ပုံ"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "အပ်လုဒ်ပြင်ဆင်နေသည်",
+    "finalizing": "အပြီးသတ်နေသည်",
+    "complete": "ပြီးဆုံးပြီ",
+    "uploading": "အပ်လုဒ်တင်နေသည်"
   }
 }

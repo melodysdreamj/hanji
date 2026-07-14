@@ -145,6 +145,7 @@ describe("frontend structural guards", () => {
     expect(precacheGenerator).toContain('html.matchAll(/<script[^>]+src=');
     const serviceWorker = source("public/sw.js");
     const serviceWorkerClient = source("src/lib/serviceWorker.ts");
+    const appInteractive = source("src/lib/appInteractive.ts");
     expect(serviceWorker).toContain("precachedShellAssetNetworkFirst(request)");
     expect(serviceWorker).toContain("manifest.assets.includes(pathname)");
     expect(serviceWorker).toContain("event.waitUntil(precacheBoot().then(() => self.skipWaiting()))");
@@ -153,6 +154,11 @@ describe("frontend structural guards", () => {
       "event.waitUntil(ensureFullPrecache().catch(() => undefined))",
     );
     expect(serviceWorkerClient).toContain("registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE })");
+    expect(serviceWorker).not.toContain(
+      "event.respondWith(navigationNetworkFirst(request));\n    event.waitUntil(ensureFullPrecache()",
+    );
+    expect(serviceWorkerClient).toContain("onAppInteractiveForOfflineWarm(requestOfflineWarm)");
+    expect(appInteractive).toContain("markAppInteractiveForOfflineWarm");
 
     const manifest = JSON.parse(source("public/manifest.webmanifest")) as {
       id?: string;
@@ -229,10 +235,10 @@ describe("frontend structural guards", () => {
 
   it("keeps long Notion discovery alive after the dialog closes and exposes resume", () => {
     const dialog = source("src/components/ImportDialog.tsx");
-    expect(dialog).toContain("while (running)");
-    expect(dialog).not.toContain("while (running && !closedRef.current)");
+    expect(dialog).toContain("for (let chunk = 0; chunk < NOTION_MAX_DISCOVER_CHUNKS; chunk += 1)");
+    expect(dialog).not.toContain("chunk < NOTION_MAX_DISCOVER_CHUNKS && !closedRef.current");
     expect(dialog).toContain("async function resumeNotionDiscovery");
-    expect(dialog).toContain("activeJob.connectionId");
+    expect(dialog).toContain("job.connectionId || selectedConnectionId");
     expect(dialog).toContain("L.resumeImport");
   });
 
@@ -255,6 +261,20 @@ describe("frontend structural guards", () => {
     const nativeExport = source("src/components/nativeExport.ts");
     expect(nativeExport).not.toContain("\u0000");
     expect(nativeExport).toContain("\\u0000-\\u001f");
+  });
+
+  it("renders cached core routes without a lazy or redirect-only blank frame", () => {
+    const app = source("src/App.tsx");
+    const product = source("src/components/AuthenticatedProduct.tsx");
+    const home = source("src/components/HomeView.tsx");
+    const i18n = source("src/i18n/index.ts");
+    expect(app).toContain('import AuthenticatedProduct from "@/components/AuthenticatedProduct"');
+    expect(app).not.toContain("lazy(() => import");
+    expect(product).toContain('import { PageView } from "./PageView"');
+    expect(product).toContain('import { SharedPageView } from "./SharedPageView"');
+    expect(home).toContain("return <PageView pageId={targetPage.id} />");
+    expect(home).not.toContain("styles.redirecting");
+    expect(i18n).toContain("const [sourceCatalogs, activeCatalogs] = await Promise.all");
   });
 
   it("keeps editor JSX text and accessible names in translation catalogs", () => {
@@ -371,7 +391,7 @@ describe("frontend structural guards", () => {
 
     const backend = source("../backend/functions/database-mutation.ts");
     expect(backend).toContain("starterDatabaseLabels(locale)");
-    expect(backend).toContain("body.properties, body.locale");
+    expect(backend).toMatch(/body\.properties,\s*body\.locale/);
   });
 
   it("never lets the host OS locale choose persisted UI date or number formatting", () => {

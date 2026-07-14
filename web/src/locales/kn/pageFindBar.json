@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "ಪುಟದಲ್ಲಿ ಹುಡುಕು"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "ಪುಟದಲ್ಲಿ ಹುಡುಕು",
+    "placeholder": "ಪುಟದಲ್ಲಿ ಹುಡುಕು"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ಹಿಂದಿನ ಹೊಂದಾಣಿಕೆ",
+    "next": "ಮುಂದಿನ ಹೊಂದಾಣಿಕೆ",
+    "close": "ಹುಡುಕಾಟ ಮುಚ್ಚು"
   }
 }

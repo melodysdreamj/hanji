@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Ana loda abubuwan dangantaka",
+  "relationUnavailable": "Abubuwan dangantaka ba su samuwa",
+  "unavailable": "Ba a samuwa",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "An zaɓi",
+    "unchecked": "Ba a zaɓi"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Buɗe {{title}}",
+  "openOrDownloadFile": "Buɗe ko sauke {{name}}"
 }

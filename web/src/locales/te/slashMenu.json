@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "బ్లాక్ ఆదేశాలు",
+  "closeBlockCommands": "బ్లాక్ ఆదేశాలను మూసివేయి",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "ప్రాథమిక బ్లాక్లు",
+    "Media": "మీడియా",
+    "Database": "డేటాబేస్",
+    "Advanced": "అధునాతన బ్లాక్లు"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}}లో {{position}}. చొప్పించడానికి Enter నొక్కండి.",
+  "listStatus": "{{total}} బ్లాక్ ఆదేశాలు అందుబాటులో ఉన్నాయి.",
+  "noBlocks": "బ్లాక్లు కనుగొనబడలేదు",
+  "noBlocksFor": "{{query}} కోసం బ్లాక్‌లు కనుగొనబడలేదు",
+  "recentlyUsed": "ఇటీవల ఉపయోగించినవి"
 }

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "නව වැඩබිම",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "වැඩබිම් නම",
+    "placeholder": "ඔබේ සමාගම"
   },
-  "startLabel": "Start from",
+  "startLabel": "ආරම්භ කරන්නේ",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "හිස් වැඩබිම",
+      "body": "ආරම්භක පිටු සමඟ හිස්ව ආරම්භ කරන්න."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion වලින් ආයාත කරන්න",
+      "body": "වැඩබිම සාදා, පසුව Notion වැඩබිමක් එයට සංක්‍රමණය කරන්න."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "වෙනත් Hanji වලින් ආයාත කරන්න",
+      "body": "වැඩබිම සාදා, පසුව වෙනත් Hanji සේවාදායකයකින් හෝ ගොනුවකින් වැඩබිමක් ආයාත කරන්න."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "වැඩබිම සාදන්න",
+  "creating": "සාදමින්...",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "වැඩබිම සෑදීමට නොහැකි විය."
   }
 }

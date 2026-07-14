@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "ரத்துசெய்",
+    "save": "சேமி",
+    "close": "மூடு",
+    "search": "தேடு",
+    "create": "உருவாக்கு",
+    "delete": "நீக்கு",
+    "clearAll": "அனைத்தையும் அழி",
+    "done": "முடிந்தது",
+    "add": "சேர்"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "தலைப்பில்லா"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} நகல்",
+    "columnName": "நிரல் {{number}}",
+    "importedDatabase": "இறக்குமதி தரவுத்தளம்",
+    "uploadedFile": "பதிவேற்றிய கோப்பு",
+    "image": "படம்",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "பெயர்",
+      "status": "நிலை",
+      "select": "தேர்வு",
+      "date": "தேதி"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "தொடங்காதது",
+      "doing": "நடைமுறையில்",
+      "done": "முடிந்தது"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "விருப்பம் 1",
+      "second": "விருப்பம் 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "அட்டவணை"
     }
   }
 }

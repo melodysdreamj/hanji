@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Verplaats blok naar",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Zoek verplaatsbestemmingen",
+    "placeholder": "Zoek pagina's..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Sluit verplaatsdialoog"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Verplaatsbestemmingen",
+    "empty": "Geen pagina's gevonden.",
+    "destinationLabel": "Verplaats blok naar {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Maak \"{{query}}\"",
+    "optionLabel": "Maak pagina \"{{query}}\" en verplaats blok hierheen",
+    "hint": "Nieuwe pagina - blok hierheen verplaatsen"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Vergrendelde pagina"
   },
-  "untitled": "Untitled",
+  "untitled": "Naamloos",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Pagina is vergrendeld",
+    "movedBlock": "Blok verplaatst",
+    "movedBlocks": "Blokken verplaatst",
+    "movedBlocksCount": "{{blockCount}} blokken verplaatst",
+    "moveFailed": "Kon blok niet verplaatsen"
   }
 }

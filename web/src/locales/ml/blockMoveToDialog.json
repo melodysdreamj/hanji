@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ബ്ലോക്ക് നീക്കൽ സ്ഥാനം",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "നീക്കൽ ലക്ഷ്യസ്ഥാനങ്ങൾ തിരയുക",
+    "placeholder": "പേജുകൾ തിരയുക..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "നീക്കൽ ഡയലോഗ് അടയ്ക്കുക"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "നീക്കൽ ലക്ഷ്യസ്ഥാനങ്ങൾ",
+    "empty": "പേജുകളൊന്നും കണ്ടെത്തിയില്ല.",
+    "destinationLabel": "{{label}} (ലേക്ക്) ബ്ലോക്ക് നീക്കുക, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" സൃഷ്ടിക്കുക",
+    "optionLabel": "\"{{query}}\" പേജ് സൃഷ്ടിച്ച് ബ്ലോക്ക് ഇവിടേക്ക് നീക്കുക",
+    "hint": "പുതിയ പേജ് - ബ്ലോക്ക് ഇവിടേക്ക് നീക്കുക"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "ലോക്ക് ചെയ്ത പേജ്"
   },
-  "untitled": "Untitled",
+  "untitled": "ശീർഷകമില്ലാത്ത",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "പേജ് ലോക്ക് ചെയ്തിരിക്കുന്നു",
+    "movedBlock": "ബ്ലോക്ക് നീക്കി",
+    "movedBlocks": "ബ്ലോക്കുകൾ നീക്കി",
+    "movedBlocksCount": "{{blockCount}} ബ്ലോക്കുകൾ നീക്കി",
+    "moveFailed": "ബ്ലോക്ക് നീക്കാൻ കഴിഞ്ഞില്ല"
   }
 }

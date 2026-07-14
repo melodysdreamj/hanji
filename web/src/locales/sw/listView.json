@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Hifadhidata hii bado haina kurasa.",
+  "emptyTitle": "Bado hakuna kurasa",
+  "newInline": "Mpya",
+  "newPage": "Ukurasa mpya",
+  "newPageIn": "Ukurasa mpya katika {{dbTitle}}",
+  "noResultsDesc": "Hakuna kurasa zinazolingana na vichujio au utaftaji wa sasa.",
+  "noResultsTitle": "Hakuna matokeo",
+  "openRow": "Fungua {{title}}"
 }

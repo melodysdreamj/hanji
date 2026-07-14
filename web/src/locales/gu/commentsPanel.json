@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "ટિપ્પણીઓ",
+  "closeAria": "ટિપ્પણીઓ બંધ કરો",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "બ્લોક ચર્ચા",
+    "page": "પાનું ચર્ચા"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "ટિપ્પણી સ્થિતિ",
+    "open": "ખુલ્લું",
+    "resolved": "ઉકેલાયેલું"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "ટિપ્પણી લક્ષ્ય",
+    "commentingOnSelectedText": "પસંદ કરેલ ટેક્સ્ટ પર ટિપ્પણી",
+    "selectedBlock": "પસંદ કરેલ બ્લોક",
+    "onSelectedText": "પસંદ કરેલ ટેક્સ્ટ પર",
+    "onSelectedBlock": "પસંદ કરેલ બ્લોક પર",
+    "onABlock": "બ્લોક પર"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "બ્લોક ટિપ્પણી ઉમેરો",
+    "addPageComment": "પેજ ટિપ્પણી ઉમેરો",
+    "blockPlaceholder": "આ બ્લોક પર ટિપ્પણી લખો...",
+    "pagePlaceholder": "ટિપ્પણી ઉમેરો...",
+    "submit": "ટિપ્પણી કરો"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "ટિપ્પણીમાં લોકોનો ઉલ્લેખ કરો",
+    "replyPeopleAria": "જવાબમાં લોકોનો ઉલ્લેખ કરો",
+    "trigger": "લોકોનો ઉલ્લેખ કરો",
+    "noMatches": "કોઈ મેળ ખાતા લોકો નથી",
+    "title": "{{name}}નો ઉલ્લેખ કરો",
+    "person": "વ્યક્તિ",
+    "you": "તમે",
+    "organizationPerson": "સંસ્થા વ્યક્તિ",
+    "roleInOrganization": "સંસ્થામાં {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "ટિપ્પણી થ્રેડ્સ",
+    "empty": "હજી સુધી કોઈ ટિપ્પણી નથી",
+    "noOpen": "કોઈ ખુલ્લી ટિપ્પણી નથી",
+    "noResolved": "કોઈ ઉકેલાયેલી ટિપ્પણી નથી"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ટિપ્પણી, {{time}}",
+    "commentAriaResolved": "{{author}} ટિપ્પણી, {{time}}, ઉકેલાઈ",
+    "replyAria": "{{author}} જવાબ, {{time}}",
+    "repliesAria": "{{count}} જવાબો",
+    "edited": "(સંપાદિત)",
+    "emptyComment": "(ખાલી ટિપ્પણી)",
+    "emptyReply": "(ખાલી જવાબ)",
+    "justNow": "હમણાં જ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "જવાબ",
+    "showInPage": "પાનામાં બતાવો",
+    "resolve": "ઉકેલો",
+    "reopen": "ફરી ખોલો",
+    "edit": "સંપાદન"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "જવાબ લખો..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "ટિપ્પણી સંપાદિત કરો"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "આ ટિપ્પણી કાઢી નાખો?",
+    "threadConfirm_one": "આ ટિપ્પણી અને તેના જવાબને કાઢી નાખો?",
+    "threadConfirm_other": "આ ટિપ્પણી અને તેના {{count}} જવાબોને કાઢી નાખો?"
   }
 }

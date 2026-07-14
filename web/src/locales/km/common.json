@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "បោះបង់",
+    "save": "រក្សាទុក",
+    "close": "បិទ",
+    "search": "ស្វែងរក",
+    "create": "បង្កើត",
+    "delete": "លុប",
+    "clearAll": "សម្អាតទាំងអស់",
+    "done": "រួចរាល់",
+    "add": "បន្ថែម"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "គ្មានចំណងជើង"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} ច្បាប់ចម្លង",
+    "columnName": "ជួរឈរ {{number}}",
+    "importedDatabase": "មូលដ្ឋានទិន្នន័យដែលបាននាំចូល",
+    "uploadedFile": "ឯកសារដែលបានផ្ទុកឡើង",
+    "image": "រូបភាព",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "ឈ្មោះ",
+      "status": "ស្ថានភាព",
+      "select": "ជ្រើសរើស",
+      "date": "កាលបរិច្ឆេទ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "មិនទាន់ចាប់ផ្ដើម",
+      "doing": "កំពុងដំណើរការ",
+      "done": "រួចរាល់"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ជម្រើស 1",
+      "second": "ជម្រើស 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "តារាង"
     }
   }
 }

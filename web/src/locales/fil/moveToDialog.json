@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Ilipat sa",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Root ng Workspace",
+    "path": "Pinakamataas"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Maghanap ng mga destinasyon ng paglipat",
+    "placeholder": "Maghanap ng mga pahina..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Isara ang dialog ng paglipat"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Mga destinasyon ng paglipat",
+    "empty": "Walang nahanap na pahina.",
+    "destinationLabel": "Ilipat sa {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Gumawa ng \"{{title}}\"",
+    "optionLabel": "Gumawa ng page {{title}} at ilipat dito",
+    "hint": "Bagong pahina sa itaas na antas - ilipat dito"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Naka-lock na parent",
+    "page": "Naka-lock na pahina"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Ang pahina ay nasa isang naka-lock na magulang",
+    "locked": "Naka-lock ang pahina",
+    "moved": "Inilipat ang pahina",
+    "moveFailed": "Hindi mailipat ang pahina"
   }
 }

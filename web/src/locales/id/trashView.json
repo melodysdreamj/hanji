@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Sampah",
+  "empty": "Halaman yang Anda hapus akan muncul di sini. Sampah kosong.",
+  "searchTrash": "Cari sampah",
+  "deletedPages": "Halaman terhapus",
+  "noSearchMatches": "Tidak ada halaman terhapus yang cocok dengan pencarian Anda.",
+  "pageCount_one": "{{count}} halaman",
+  "pageCount_other": "{{count}} halaman",
+  "deletedJustNow": "Baru saja dihapus",
+  "deletedOn": "Dihapus {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Pulihkan",
+    "deleteForever": "Hapus permanen",
+    "emptyTrash": "Kosongkan sampah"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Buka {{title}} dari sampah",
+    "restorePage": "Pulihkan {{title}}",
+    "deletePageForever": "Hapus {{title}} selamanya",
+    "cancelPermanentDelete": "Batal hapus permanen",
+    "cancelEmptyTrash": "Batal mengosongkan sampah"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Hapus permanen?",
+    "deleteBodyPrefix": "Ini akan menghapus permanen ",
+    "deleteBodySuffix": ". Tindakan ini tidak dapat dibatalkan.",
+    "emptyTitle": "Kosongkan sampah?",
+    "emptyBody_one": "Ini akan menghapus permanen {{count}} halaman di sampah. Tindakan ini tidak dapat dibatalkan.",
+    "emptyBody_other": "Ini akan menghapus permanen {{count}} halaman di sampah. Tindakan ini tidak dapat dibatalkan."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Dihapus permanen",
+    "couldntDelete": "Gagal menghapus halaman",
+    "restored": "Halaman dipulihkan",
+    "couldntRestore": "Gagal memulihkan halaman",
+    "emptied": "Sampah dikosongkan",
+    "couldntEmpty": "Gagal mengosongkan sampah"
   }
 }

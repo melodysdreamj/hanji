@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Đóng trình chọn biểu tượng",
+    "label": "Chọn biểu tượng"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Loại biểu tượng",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Hình ảnh"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Xóa",
+    "ariaLabel": "Xóa biểu tượng"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Lọc…",
+    "searchLabel": "Tìm biểu tượng",
+    "random": "Ngẫu nhiên",
+    "randomLabel": "Chọn biểu tượng ngẫu nhiên",
+    "recentLabel": "Gần đây dùng trước",
+    "gridLabelRecent": "Biểu tượng, gần đây nhất trước",
+    "gridLabel": "Biểu tượng",
+    "optionLabel": "Chọn biểu tượng {{emoji}}",
+    "noResults": "Không có biểu tượng nào khớp với “{{query}}”. Hãy thử từ khác hoặc xóa bộ lọc."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Hình ảnh",
+    "linkPlaceholder": "Dán liên kết hình ảnh",
+    "linkLabel": "Liên kết hình ảnh biểu tượng",
+    "apply": "Áp dụng",
+    "upload": "Tải lên tệp",
+    "uploading": "Đang tải lên...",
+    "uploadingLabel": "Đang tải lên {{fileName}}",
+    "uploadFailed": "Không thể tải lên hình ảnh đó.",
+    "fallbackFileName": "Hình ảnh biểu tượng"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Đang chuẩn bị tải lên",
+    "finalizing": "Đang hoàn tất",
+    "complete": "Hoàn tất",
+    "uploading": "Đang tải lên"
   }
 }

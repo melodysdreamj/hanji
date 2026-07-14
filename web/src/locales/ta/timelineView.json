@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "தேதி சொத்து சேர்",
+    "description": "காலவரிசைக் காட்சிகளுக்குப் பக்கங்களை நேரத்தில் காட்ட ஒரு தொடக்க தேதி சொத்து தேவை."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "ஒற்றை நாள் பார்களுக்குப் பதிலாக வரம்புகளை வரைய முடிவு தேதி சொத்தைச் சேர்க்கவும்.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "காலவரிசை பெரிதாக்கு/சுருக்கு",
+    "day": "நாள்",
+    "week": "வாரம்",
+    "month": "மாதம்"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "சார்புகள்:",
+    "hint": "தொடர்பு பண்பைச் சேர்க்கவும்",
+    "relationPropertyAriaLabel": "சார்பு தொடர்பு பண்பு"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "இன்று",
+    "previousRange": "முந்தைய வரம்பு",
+    "nextRange": "அடுத்த வரம்பு",
+    "newPage": "புதியது",
+    "newPageIn": "{{dbTitle}} இல் புதிய பக்கம்"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "காலவரிசை அட்டவணை",
+    "nameHeader": "பெயர்"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} திற",
+    "openAriaLabelWithDates": "{{title}} திற, {{start}} முதல் {{end}} வரை",
+    "openNoDateAriaLabel": "{{title}} திற, தேதி இல்லை"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "இந்த வரம்பில் உருப்படிகள் இல்லை.",
+    "noDatedItems": "தேதியிட்ட உருப்படிகள் இல்லை.",
+    "jumpTo": "{{date}} க்குச் செல்"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "தேதி இல்லை ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "இல்லை",
+    "untitled": "தலைப்பில்லா"
   }
 }

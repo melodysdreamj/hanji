@@ -3,19 +3,19 @@
     "ariaLabel": "Textformatierung"
   },
   "turnInto": {
-    "label": "Umwandeln in",
+    "label": "Umwandeln",
     "options": {
       "text": "Text",
       "heading1": "Überschrift 1",
       "heading2": "Überschrift 2",
       "heading3": "Überschrift 3",
       "heading4": "Überschrift 4",
-      "toDoList": "To-do-Liste",
+      "toDoList": "Aufgabenliste",
       "bulletedList": "Aufzählungsliste",
       "numberedList": "Nummerierte Liste",
-      "toggleList": "Klappliste",
+      "toggleList": "Umschaltliste",
       "quote": "Zitat",
-      "callout": "Hinweis",
+      "callout": "Callout",
       "code": "Code"
     }
   },
@@ -46,7 +46,7 @@
       "green": "Grün",
       "blue": "Blau",
       "purple": "Lila",
-      "pink": "Rosa",
+      "pink": "Pink",
       "red": "Rot"
     },
     "background": {
@@ -58,7 +58,7 @@
       "green": "Grüner Hintergrund",
       "blue": "Blauer Hintergrund",
       "purple": "Lila Hintergrund",
-      "pink": "Rosa Hintergrund",
+      "pink": "Pinker Hintergrund",
       "red": "Roter Hintergrund"
     }
   },
@@ -66,7 +66,7 @@
     "ariaLabel": "Link bearbeiten",
     "placeholder": "Link einfügen",
     "urlAriaLabel": "Link-URL",
-    "apply": "Verlinken",
+    "apply": "Link",
     "open": "Link öffnen",
     "copy": "Link kopieren",
     "copied": "Kopiert",

@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "deleteForever": "Slett for alltid",
+    "emptyTrash": "Tøm papirkurv",
+    "restore": "Gjenopprett"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "cancelEmptyTrash": "Avbryt tømming av papirkurv",
+    "cancelPermanentDelete": "Avbryt sletting for alltid",
+    "deletePageForever": "Slett {{title}} for alltid",
+    "openFromTrash": "Åpne {{title}} fra papirkurv",
+    "restorePage": "Gjenopprett {{title}}"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteBodyPrefix": "Dette vil permanent slette ",
+    "deleteBodySuffix": ". Du kan ikke angre denne handlingen.",
+    "deleteTitle": "Slett for alltid?",
+    "emptyBody_one": "Dette vil permanent slette {{count}} side i papirkurven. Du kan ikke angre denne handlingen.",
+    "emptyBody_other": "Dette vil permanent slette alle {{count}} sider i papirkurven. Du kan ikke angre denne handlingen.",
+    "emptyTitle": "Tøm papirkurv?"
   },
+  "deletedJustNow": "Slettet nettopp",
+  "deletedOn": "Slettet {{date}}",
+  "deletedPages": "Slettede sider",
+  "empty": "Sider du sletter havner her. Papirkurven er tom.",
+  "noSearchMatches": "Ingen slettede sider samsvarer med søket ditt.",
+  "pageCount_one": "{{count}} side",
+  "pageCount_other": "{{count}} sider",
+  "searchTrash": "Søk i papirkurv",
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
-  }
+    "couldntDelete": "Kunne ikke slette side",
+    "couldntEmpty": "Kunne ikke tømme papirkurv",
+    "couldntRestore": "Kunne ikke gjenopprette side",
+    "deletedForever": "Slettet for alltid",
+    "emptied": "Papirkurv tømt",
+    "restored": "Side gjenopprettet"
+  },
+  "trash": "Papirkurv"
 }

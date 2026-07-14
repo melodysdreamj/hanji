@@ -1,13 +1,13 @@
 {
-  "addView": "Adicionar uma visualização",
-  "cantCopyBlockHere": "Não é possível copiar o bloco para cá",
-  "cantMoveBlockHere": "Não é possível mover o bloco para cá",
+  "addView": "Adicionar visualização",
+  "cantCopyBlockHere": "Não é possível copiar bloco aqui",
+  "cantMoveBlockHere": "Não é possível mover bloco aqui",
   "copiedBlock": "Bloco copiado",
   "copiedBlocks": "{{count}} blocos copiados",
   "copyViewLink": "Copiar link da visualização",
   "couldntCut": "Não foi possível recortar",
-  "cutBlock": "Recortar bloco",
-  "cutBlocks": "Recortar {{count}} blocos",
+  "cutBlock": "Bloco recortado",
+  "cutBlocks": "{{count}} blocos recortados",
   "databaseNotReady": "O banco de dados ainda não está pronto",
   "databaseTitleHidden": "Título do banco de dados oculto",
   "deletedBlock": "Bloco excluído",
@@ -18,7 +18,7 @@
   "editIcon": "Editar ícone",
   "editLayout": "Editar layout",
   "editTitle": "Editar título",
-  "emptyTogglePrompt": "Toggle vazio. Clique ou arraste um bloco para dentro dele.",
+  "emptyTogglePrompt": "Alternância vazia. Clique ou arraste um bloco para dentro.",
   "groupDate": "Data",
   "groupLinkToPage": "Link para página",
   "groupNewPage": "Nova página",
@@ -30,34 +30,34 @@
   "mentionYesterday": "Ontem",
   "movedBlock": "Bloco movido",
   "movedBlocks": "{{count}} blocos movidos",
-  "nothingToUndo": "Nada para desfazer",
+  "nothingToUndo": "Nada a desfazer",
   "openDatabase": "Abrir banco de dados {{title}}",
   "restoredBlock": "Bloco restaurado",
   "restoredBlocks": "Blocos restaurados",
   "undidCopy": "Cópia desfeita",
   "undidDuplicate": "Duplicação desfeita",
-  "undidMove": "Movimentação desfeita",
+  "undidMove": "Movimento desfeito",
   "undo": "Desfazer",
   "uploadComplete": "Concluído",
   "uploadedFile": "Arquivo enviado",
   "uploadedFiles": "{{count}} arquivos enviados",
   "uploadFailed": "Não foi possível enviar {{fileName}}.",
-  "uploadFailedUnknown": "Não foi possível enviar esse arquivo.",
-  "uploadFileTooLarge": "O arquivo é grande demais. O limite atual de envio é 5 GB.",
+  "uploadFailedUnknown": "Não foi possível fazer upload desse arquivo.",
+  "uploadFileTooLarge": "O arquivo é muito grande. O limite atual de upload é de 5 GB.",
   "uploadUnsafeFileType": "Arquivos de conteúdo web ativo, como HTML, SVG, XML e JavaScript, não podem ser enviados.",
   "uploadFinalizing": "Finalizando",
-  "uploadingFile": "Enviando {{fileName}}",
-  "uploadPreparing": "Preparando envio",
-  "uploadUploading": "Enviando",
-  "viewDataSource": "Visualizar fonte de dados",
+  "uploadingFile": "Fazendo upload de {{fileName}}",
+  "uploadPreparing": "Preparando upload",
+  "uploadUploading": "Fazendo upload",
+  "viewDataSource": "Ver fonte de dados",
   "block": {
-    "aria": "Bloco de {{type}}",
-    "ariaWithSummary": "Bloco de {{type}}: {{summary}}",
+    "aria": "Bloco {{type}}",
+    "ariaWithSummary": "Bloco {{type}}: {{summary}}",
     "pagePlaceholder": "Digite '/' para comandos",
-    "textbox": "Texto do bloco de {{type}}"
+    "textbox": "Texto do bloco {{type}}"
   },
   "common": {
-    "addCaption": "Adicionar uma legenda",
+    "addCaption": "Adicionar legenda",
     "attach": "Anexar",
     "change": "Alterar",
     "close": "Fechar",
@@ -68,14 +68,14 @@
     "download": "Baixar",
     "embed": "Incorporar",
     "open": "Abrir",
-    "openNewTab": "Abrir em nova aba",
+    "openNewTab": "Abrir em nova guia",
     "remove": "Remover",
     "replace": "Substituir",
     "resize": "Redimensionar",
     "save": "Salvar",
     "untitled": "Sem título",
-    "upload": "Enviar",
-    "uploading": "Enviando..."
+    "upload": "Carregar",
+    "uploading": "Carregando..."
   },
   "selection": {
     "selectedBlocks_one": "{{count}} bloco selecionado",
@@ -84,19 +84,19 @@
   "comments": {
     "count_one": "{{count}} comentário",
     "count_other": "{{count}} comentários",
-    "unresolvedOnBlock_one": "{{count}} comentário não resolvido no bloco de {{type}}",
-    "unresolvedOnBlock_other": "{{count}} comentários não resolvidos no bloco de {{type}}"
+    "unresolvedOnBlock_one": "{{count}} comentário não resolvido no bloco {{type}}",
+    "unresolvedOnBlock_other": "{{count}} comentários não resolvidos no bloco {{type}}"
   },
   "toggle": {
-    "addInside": "Adicionar um bloco dentro deste toggle",
-    "addInsideEmpty": "Adicionar um bloco dentro deste toggle vazio",
-    "close": "Fechar toggle",
-    "open": "Abrir toggle"
+    "addInside": "Adicionar bloco nesta alternância",
+    "addInsideEmpty": "Adicionar bloco nesta alternância vazia",
+    "close": "Fechar alternância",
+    "open": "Abrir alternância"
   },
   "tabs": {
-    "add": "Adicionar uma aba",
-    "addBlockInside": "Adicionar um bloco dentro desta aba",
-    "addBlockInsideEmpty": "Adicionar um bloco dentro desta aba vazia",
+    "add": "Adicionar aba",
+    "addBlockInside": "Adicionar bloco nesta aba",
+    "addBlockInsideEmpty": "Adicionar bloco nesta aba vazia",
     "delete": "Excluir aba",
     "deleteNamed": "Excluir {{label}}",
     "empty": "Aba vazia",
@@ -124,7 +124,7 @@
     "addRowShort": "Adicionar linha",
     "cell": "Célula da tabela",
     "cellNumbered": "Célula da tabela {{row}}, {{column}}",
-    "dimensions": "Tabela simples de {{rows}} por {{columns}}",
+    "dimensions": "Tabela simples {{rows}} por {{columns}}",
     "headerColumn": "Coluna de cabeçalho",
     "headerRow": "Linha de cabeçalho",
     "label": "Tabela simples",
@@ -142,17 +142,17 @@
       "left": "esquerda",
       "right": "direita"
     },
-    "alignAction": "Alinhar imagem à {{align}}",
-    "alignTitle": "Alinhar à {{align}}",
+    "alignAction": "Alinhar imagem {{align}}",
+    "alignTitle": "Alinhar {{align}}",
     "caption": "Legenda da imagem",
-    "chooseFile": "Escolha um arquivo de imagem.",
-    "closePreview": "Fechar pré-visualização da imagem",
+    "chooseFile": "Selecione um arquivo de imagem.",
+    "closePreview": "Fechar visualização da imagem",
     "embed": "Incorporar imagem",
-    "emptyHint": "Envie uma imagem ou cole um link para exibi-la aqui.",
+    "emptyHint": "Carregue uma imagem ou cole um link para exibi-la aqui.",
     "invalidLink": "Cole um link de imagem válido.",
     "label": "Imagem",
     "link": "Link da imagem",
-    "preview": "Pré-visualização da imagem",
+    "preview": "Visualização da imagem",
     "replace": "Substituir imagem",
     "resizeFromLeft": "Redimensionar imagem pela esquerda",
     "resizeFromRight": "Redimensionar imagem pela direita"
@@ -161,7 +161,7 @@
     "audio": "Áudio",
     "audioCaption": "Legenda do áudio",
     "audioEmptyHint": "Envie um arquivo de áudio ou cole um link de áudio para reproduzi-lo aqui.",
-    "audioLink": "Link do áudio",
+    "audioLink": "Link de áudio",
     "chooseAudioFile": "Escolha um arquivo de áudio.",
     "chooseVideoFile": "Escolha um arquivo de vídeo.",
     "embedAudio": "Incorporar áudio",
@@ -169,53 +169,53 @@
     "embeddedVideo": "Vídeo incorporado",
     "invalidAudioLink": "Cole um link de áudio válido.",
     "invalidVideoLink": "Cole um link de vídeo válido.",
-    "openAudio": "Abrir link de áudio em uma nova aba",
-    "openVideo": "Abrir link de vídeo em uma nova aba",
+    "openAudio": "Abrir link de áudio em uma nova guia",
+    "openVideo": "Abrir link de vídeo em uma nova guia",
     "replaceAudio": "Substituir áudio",
     "replaceVideo": "Substituir vídeo",
     "video": "Vídeo",
     "videoCaption": "Legenda do vídeo",
     "videoEmptyHint": "Envie um arquivo de vídeo, cole um link direto ou use um link do YouTube, Vimeo ou Loom.",
-    "videoLink": "Link do vídeo"
+    "videoLink": "Link de vídeo"
   },
   "bookmark": {
-    "copy": "Copiar link do favorito",
-    "embed": "Incorporar favorito",
-    "emptyHint": "Cole um link da web para criar um card de favorito.",
-    "invalidLink": "Cole um link da web válido.",
-    "label": "Favorito",
-    "link": "Link do favorito",
+    "copy": "Copiar link do marcador",
+    "embed": "Incorporar marcador",
+    "emptyHint": "Cole um link da web para criar um cartão de marcador.",
+    "invalidLink": "Cole um link válido.",
+    "label": "Marcador",
+    "link": "Link do marcador",
     "linkPrefix": "Link",
-    "open": "Abrir favorito em uma nova aba",
-    "openNamed": "Abrir favorito {{title}} em uma nova aba",
-    "replace": "Substituir link do favorito"
+    "open": "Abrir marcador em nova guia",
+    "openNamed": "Abrir marcador {{title}} em nova guia",
+    "replace": "Substituir link do marcador"
   },
   "embed": {
-    "caption": "Legenda da incorporação",
+    "caption": "Legenda do embed",
     "emptyHint": "Cole um link para incorporar conteúdo na página.",
-    "invalidLink": "Cole um link de incorporação válido.",
-    "link": "Link de incorporação",
-    "open": "Abrir link de incorporação em uma nova aba",
-    "openActions": "Abrir ações do bloco de incorporação",
-    "replace": "Substituir link de incorporação",
-    "title": "Link de incorporação"
+    "invalidLink": "Cole um link de embed válido.",
+    "link": "Link do embed",
+    "open": "Abrir link do embed em nova guia",
+    "openActions": "Abrir ações do bloco de embed",
+    "replace": "Substituir link do embed",
+    "title": "Link de embed"
   },
   "file": {
     "attach": "Anexar arquivo",
     "caption": "Legenda do arquivo",
     "downloadNamed": "Baixar {{fileName}}",
-    "emptyHint": "Envie um arquivo ou cole um link de arquivo para anexá-lo aqui.",
+    "emptyHint": "Faça upload de um arquivo ou cole um link de arquivo para anexá-lo aqui.",
     "invalidLink": "Cole um link de arquivo válido.",
     "label": "Arquivo",
     "link": "Link do arquivo",
-    "openNamed": "Abrir {{fileName}} em uma nova aba",
+    "openNamed": "Abrir {{fileName}} em nova guia",
     "replaceNamed": "Substituir {{fileName}}"
   },
   "childPage": {
-    "copiedLink": "Link da subpágina copiado",
-    "copyLink": "Copiar link da subpágina",
+    "copiedLink": "Link da página filha copiado",
+    "copyLink": "Copiar link da página filha",
     "create": "Criar subpágina",
-    "openNewTab": "Abrir subpágina em uma nova aba"
+    "openNewTab": "Abrir página filha em uma nova guia"
   },
   "pageLink": {
     "change": "Alterar página vinculada",
@@ -224,11 +224,11 @@
     "copyUrl": "Copiar URL da página vinculada",
     "currentPage": "página atual",
     "label": "Link de página",
-    "linkToPage": "Link para página",
+    "linkToPage": "Vincular à página",
     "mention": "Menção de página",
     "newPageIn": "Nova página em {{title}}",
     "noPages": "Nenhuma página encontrada.",
-    "openNewTab": "Abrir página vinculada em uma nova aba",
+    "openNewTab": "Abrir página vinculada em nova aba",
     "pages": "Páginas",
     "pathFallback": "Página",
     "search": "Pesquisar páginas",
@@ -239,7 +239,7 @@
     "copiedLink": "Link do banco de dados filho copiado",
     "copyLink": "Copiar link do banco de dados filho",
     "create": "Criar banco de dados",
-    "openNewTab": "Abrir banco de dados filho em uma nova aba"
+    "openNewTab": "Abrir banco de dados filho em uma nova guia"
   },
   "toc": {
     "empty": "Adicione títulos para criar um sumário.",
@@ -258,9 +258,9 @@
     "original": "Original",
     "textbox": "{{label}} sincronizado",
     "todoPlaceholder": "Tarefa",
-    "todoText": "Texto de tarefa sincronizada",
-    "unavailable": "Bloco original indisponível.",
-    "unsync": "Dessincronizar"
+    "todoText": "Texto de tarefa sincronizado",
+    "unavailable": "Bloco original não disponível.",
+    "unsync": "Desincronizar"
   },
   "button": {
     "addBlock": "Adicionar bloco",
@@ -284,11 +284,11 @@
   },
   "database": {
     "closeOptions": "Fechar opções do banco de dados",
-    "createInline": "Criar banco de dados embutido",
+    "createInline": "Criar banco de dados inline",
     "defaultView": "Visualização padrão",
     "fullPagePlacement": "página inteira",
     "imported": "Banco de dados importado",
-    "inlinePlacement": "embutido",
+    "inlinePlacement": "inline",
     "label": "Banco de dados",
     "loading": "Carregando banco de dados",
     "options": "Opções de {{title}}",
@@ -300,10 +300,10 @@
     "closePageLinkMenu": "Fechar menu de link de página",
     "createPage": "Criar uma nova página",
     "label": "Menção",
-    "newPageNamed": "Nova página \"{{title}}\"",
+    "newPageNamed": "Nova página “{{title}}”",
     "noPages": "Nenhuma página",
     "noResults": "Nenhum resultado",
-    "noResultsFor": "Nenhum resultado para \"{{query}}\""
+    "noResultsFor": "Nenhum resultado para “{{query}}”"
   },
   "databaseSource": {
     "choose": "Escolher fonte do banco de dados",
@@ -313,27 +313,27 @@
     "existingSources": "Fontes de dados existentes",
     "newDatabase": "Novo banco de dados",
     "noMatching": "Nenhum banco de dados correspondente",
-    "noneYet": "Nenhum banco de dados ainda",
+    "noneYet": "Ainda não há bancos de dados",
     "searchExisting": "Pesquisar bancos de dados existentes",
     "searchPlaceholder": "Pesquisar bancos de dados"
   },
   "todo": {
     "markComplete": "Marcar tarefa como concluída",
-    "markIncomplete": "Marcar tarefa como não concluída"
+    "markIncomplete": "Marcar tarefa como incompleta"
   },
   "callout": {
-    "changeIcon": "Alterar ícone do destaque"
+    "changeIcon": "Alterar ícone do callout"
   },
   "code": {
     "caption": "Legenda do código",
     "copy": "Copiar código",
-    "diagramPreview": "Pré-visualização do diagrama",
+    "diagramPreview": "Visualização do diagrama",
     "language": "Linguagem do código",
     "plainText": "Texto simples",
     "showLineNumbers": "Mostrar números de linha",
     "toggleLineNumbers": "Alternar números de linha",
     "toggleWrap": "Alternar quebra de linha",
-    "wrap": "Quebrar"
+    "wrap": "Quebra de linha"
   },
   "pastedLink": {
     "createAudio": "Criar áudio",
@@ -348,13 +348,13 @@
   "linkEditor": {
     "edit": "Editar link",
     "open": "Abrir link",
-    "pastePlaceholder": "Colar link",
+    "pastePlaceholder": "Cole o link",
     "url": "URL do link"
   },
   "date": {
     "editMention": "Editar menção de data",
     "label": "Data",
-    "mention": "Mencionar data",
+    "mention": "Data de menção",
     "nextMonth": "Próximo mês",
     "previousMonth": "Mês anterior"
   },
@@ -363,9 +363,9 @@
     "copyName": "Copiar nome",
     "label": "Pessoa",
     "mention": "Menção de pessoa",
-    "organizationMember": "Pessoa da organização",
+    "organizationMember": "Membro da organização",
     "profile": "Perfil",
     "roleInOrganization": "{{role}} na organização",
-    "workspaceMember": "Membro do espaço de trabalho"
+    "workspaceMember": "Membro do workspace"
   }
 }

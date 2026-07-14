@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Fechar o seletor de ícones",
+    "label": "Escolher ícone"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Tipo de ícone",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Imagem"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Remover",
+    "ariaLabel": "Remover ícone"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtrar…",
+    "searchLabel": "Pesquisar ícones",
+    "random": "Aleatório",
+    "randomLabel": "Escolher um ícone aleatório",
+    "recentLabel": "Mais recentes primeiro",
+    "gridLabelRecent": "Ícones, primeiro os mais recentes",
+    "gridLabel": "Ícones",
+    "optionLabel": "Escolher ícone {{emoji}}",
+    "noResults": "Nenhum ícone corresponde a “{{query}}”. Tente outra palavra ou limpe o filtro."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Imagem",
+    "linkPlaceholder": "Cole o link da imagem",
+    "linkLabel": "Link do ícone de imagem",
+    "apply": "Aplicar",
+    "upload": "Carregar ficheiro",
+    "uploading": "A carregar…",
+    "uploadingLabel": "A carregar {{fileName}}",
+    "uploadFailed": "Não foi possível carregar essa imagem.",
+    "fallbackFileName": "Imagem de ícone"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "A preparar o upload",
+    "finalizing": "A finalizar",
+    "complete": "Concluído",
+    "uploading": "A carregar"
   }
 }

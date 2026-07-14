@@ -23,22 +23,17 @@ actual local server is opened by `backend` when `npm run dev` runs
 
 ## One-time dev environment setup
 
-Since a fresh instance has no accounts, you choose the **master account**
-here — the setup script prompts for the master email and password (the first
-server administrator; see [master-account.md](master-account.md)), then
-generates the git-ignored dev secret files. Safe to re-run; never overwrites:
+The setup script generates the git-ignored runtime secret files and enables
+browser first-run setup. It does not ask for or store an administrator email or
+password. Safe to re-run; existing cryptographic secrets are preserved:
 
 ```bash
 node scripts/setup-dev-env.mjs
-# Master email [master@hanji.local]: you@example.com
-# Master password (16+ chars, mixed) [generated]: ********
 ```
 
-The server provisions this account automatically on first boot; sign in through
-the normal password form, and you can change the password later in Account
-Security. Use an address that does not already belong to an ordinary account:
-unconfirmed email matches are never promoted to master, and client signup stays
-closed until provisioning records the trusted master identity.
+Start the backend, open the app, and choose the first server administrator name,
+email, and password in the browser. The durable first-run claim closes after one
+administrator is created. Details: [master-account.md](master-account.md).
 
 ### One-time local namespace migration
 
@@ -75,10 +70,10 @@ npm run dev
 
 > EdgeBase loads the local JWT and account secrets from `.env.development` /
 > `.dev.vars` (created by the setup script above). The dev command allowlists
-> only the explicit guest-login build flag for config evaluation; it does not
+> only the explicit guest-login and browser-setup flags for config evaluation; it does not
 > expose the rest of the parent shell environment to the worker. On first boot
-> the server provisions the master account you chose in setup; use the normal
-> password form to sign in.
+> the browser shows the first-administrator form; later boots use the normal
+> sign-in form.
 
 **2. Web app** (Vite SPA, port 3000):
 

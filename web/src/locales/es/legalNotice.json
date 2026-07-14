@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Información legal y de origen",
-  "noWarranty": "Provisto sin garantía.",
-  "sourceCode": "Código fuente",
+  "ariaLabel": "Información legal y de fuente",
+  "noWarranty": "Se proporciona sin garantía.",
+  "sourceCode": "Fuente",
   "agplLicense": "AGPL-3.0",
   "sponsorException": "Excepción 2.0"
 }

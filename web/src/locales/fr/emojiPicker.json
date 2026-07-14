@@ -9,35 +9,35 @@
     "image": "Image"
   },
   "remove": {
-    "label": "Retirer",
-    "ariaLabel": "Retirer l'icône"
+    "label": "Supprimer",
+    "ariaLabel": "Supprimer l'icône"
   },
   "emoji": {
     "searchPlaceholder": "Filtrer…",
     "searchLabel": "Rechercher des icônes",
     "random": "Aléatoire",
-    "randomLabel": "Choisir une icône au hasard",
-    "recentLabel": "Récemment utilisés en premier",
-    "gridLabelRecent": "Icônes, récemment utilisés en premier",
+    "randomLabel": "Choisir une icône aléatoire",
+    "recentLabel": "Récents d'abord",
+    "gridLabelRecent": "Icônes, les plus récentes en premier",
     "gridLabel": "Icônes",
     "optionLabel": "Choisir l'icône {{emoji}}",
     "noResults": "Aucune icône ne correspond à « {{query}} ». Essayez un autre mot ou effacez le filtre."
   },
   "custom": {
     "previewPlaceholder": "Image",
-    "linkPlaceholder": "Collez le lien de l'image",
-    "linkLabel": "Lien de l'icône image",
+    "linkPlaceholder": "Coller le lien de l'image",
+    "linkLabel": "Lien de l'icône",
     "apply": "Appliquer",
     "upload": "Importer un fichier",
-    "uploading": "Importation...",
-    "uploadingLabel": "Importation de {{fileName}}",
+    "uploading": "Importation en cours...",
+    "uploadingLabel": "Importation de {{fileName}} en cours",
     "uploadFailed": "Impossible d'importer cette image.",
     "fallbackFileName": "Image d'icône"
   },
   "uploadProgress": {
-    "preparing": "Préparation de l'import",
+    "preparing": "Préparation de l'upload",
     "finalizing": "Finalisation",
     "complete": "Terminé",
-    "uploading": "Importation"
+    "uploading": "Téléversement"
   }
 }

@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Pravkar",
+  "editedJustNow": "Urejeno pravkar",
+  "editedMinutesAgo": "Urejeno pred {{minutes}} m",
+  "editedHoursAgo": "Urejeno pred {{hours}} h",
+  "editedDaysAgo": "Urejeno pred {{days}} d",
+  "editedOn": "Urejeno {{date}}",
+  "noEdits": "Ni urejanj",
+  "noEditsYet": "Še ni urejanj",
+  "todayAt": "Danes ob {{time}}",
+  "yesterdayAt": "Včeraj ob {{time}}",
+  "dateAt": "{{date}} ob {{time}}"
 }

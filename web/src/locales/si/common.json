@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "අවලංගු කරන්න",
+    "save": "සුරකින්න",
+    "close": "වසන්න",
+    "search": "සොයන්න",
+    "create": "සාදන්න",
+    "delete": "මකන්න",
+    "clearAll": "සියල්ල මකන්න",
+    "done": "අවසන්",
+    "add": "එක් කරන්න"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "මාතෘකාවක් නැත"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} පිටපත",
+    "columnName": "තීරුව {{number}}",
+    "importedDatabase": "ආනයනිත දත්ත සමුදාය",
+    "uploadedFile": "උඩුගත කළ ගොනුව",
+    "image": "රූපය",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "නම",
+      "status": "තත්ත්වය",
+      "select": "තෝරන්න",
+      "date": "දිනය"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ආරම්භ කර නැත",
+      "doing": "ක්‍රියාත්මකයි",
+      "done": "නිමි"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "විකල්පය 1",
+      "second": "විකල්පය 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "වගුව"
     }
   }
 }

@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "පිටුව ප්‍රතිෂ්ඨාපනය කළ නොහැකි විය",
+  "emptyBodyPrompt": "මෙම හිස් පිටුවේ ලිවීම ආරම්භ කිරීමට Enter ඔබන්න.",
+  "inTrashTopBarTitle": "කුණු කූඩයේ",
+  "notFoundTopBarTitle": "හමු නොවීය",
+  "openWorkspace": "වැඩබිම විවෘත කරන්න",
+  "pageInTrash": "මෙම පිටුව කුණු කූඩයේ ඇත.",
+  "pageInTrashDetail": "එහි අන්තර්ගතය විවෘත කිරීමට හෝ සංස්කරණය කිරීමට පෙර එය ප්‍රතිෂ්ඨාපනය කරන්න.",
+  "pageUnavailable": "පිටුව ලබා ගත නොහැක.",
+  "pageUnavailableDetail": "මෙම පිටුව මකා දමා, ගෙනයන ලද හෝ වෙනත් ගිණුමක් සමඟ බෙදාගෙන තිබිය හැක.",
+  "restorePage": "පිටුව ප්‍රතිෂ්ඨාපනය කරන්න",
+  "restoredPage": "පිටුව ප්‍රතිෂ්ඨාපනය කරන ලදී",
+  "loadingPageContent": "පිටු අන්තර්ගතය පූරණය කරමින්"
 }

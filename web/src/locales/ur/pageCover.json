@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "کور تبدیل کریں",
+    "reposition": "مقام تبدیل کریں",
+    "remove": "ہٹائیں",
+    "uploadFile": "فائل اپ لوڈ کریں",
+    "uploading": "اپ لوڈ ہو رہا ہے...",
+    "submit": "جمع کریں",
+    "savePosition": "مقام محفوظ کریں"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "گیلری",
+    "upload": "اپ لوڈ",
+    "link": "لنک"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "تصویر کا لنک چسپاں کریں",
+    "invalid": "ایک http یا https تصویر کا لنک چسپاں کریں۔"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "وہ تصویر اپ لوڈ نہیں ہو سکی۔",
+    "defaultFileName": "کور تصویر"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "تصویر کو گھسیٹ کر مقام تبدیل کریں"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "اپ لوڈ تیار کر رہا ہے",
+    "finalizing": "فائنلائز کر رہا ہے",
+    "complete": "مکمل",
+    "uploading": "اپ لوڈ ہو رہا ہے"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "کور ہٹا دیا گیا",
+    "restored": "کور بحال کر دیا گیا",
+    "undo": "واپس کریں"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "صفحہ کور",
+    "coverVerticalPosition": "کور عمودی پوزیشن",
+    "positionFromTop": "اوپر سے {{position}}%",
+    "closeCoverMenu": "کور مینو بند کریں",
+    "changePageCover": "صفحہ کور تبدیل کریں",
+    "repositionPageCover": "صفحہ کور کی پوزیشن تبدیل کریں",
+    "removePageCover": "صفحہ کور ہٹائیں",
+    "changeCoverDialog": "کور تبدیل کریں",
+    "coverSource": "کور ماخذ",
+    "selectCover": "کور {{number}} منتخب کریں",
+    "uploadFromDevice": "اس آلے سے کور تصویر اپ لوڈ کریں",
+    "uploadingFile": "{{fileName}} اپ لوڈ ہو رہا ہے",
+    "coverImageLink": "کور تصویر کا لنک"
   }
 }

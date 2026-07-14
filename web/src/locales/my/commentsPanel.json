@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "မှတ်ချက်များ",
+  "closeAria": "မှတ်ချက်များကို ပိတ်ရန်",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ဘလောက်ဆွေးနွေးချက်",
+    "page": "စာမျက်နှာဆွေးနွေးချက်"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "မှတ်ချက်အခြေအနေ",
+    "open": "ဖွင့်ထားသည်",
+    "resolved": "ဖြေရှင်းပြီး"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "မှတ်ချက်ပေးနေသည်",
+    "commentingOnSelectedText": "ရွေးချယ်ထားသော စာသားပေါ်တွင် မှတ်ချက်ပေးနေသည်",
+    "selectedBlock": "ရွေးချယ်ထားသော ဘလောက်",
+    "onSelectedText": "ရွေးချယ်ထားသော စာသားပေါ်တွင်",
+    "onSelectedBlock": "ရွေးချယ်ထားသော ဘလောက်ပေါ်တွင်",
+    "onABlock": "ဘလောက်တစ်ခုပေါ်တွင်"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ဘလောက်မှတ်ချက် ထည့်ရန်",
+    "addPageComment": "စာမျက်နှာမှတ်ချက် ထည့်ရန်",
+    "blockPlaceholder": "ဤဘလောက်တွင် မှတ်ချက်ရေးရန်...",
+    "pagePlaceholder": "မှတ်ချက်ထည့်ရန်...",
+    "submit": "မှတ်ချက်ပေးရန်"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "မှတ်ချက်တွင် @ပြုလုပ်ရန် လူများ",
+    "replyPeopleAria": "အကြောင်းပြန်တွင် @ပြုလုပ်ရန် လူများ",
+    "trigger": "လူများကို ဖော်ပြရန်",
+    "noMatches": "ကိုက်ညီသော လူမရှိပါ",
+    "title": "{{name}} ကို ဖော်ပြရန်",
+    "person": "လူ",
+    "you": "သင်တို့",
+    "organizationPerson": "အဖွဲ့အစည်းရှိ လူ",
+    "roleInOrganization": "အဖွဲ့အစည်းအတွင်း {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "မှတ်ချက်ကြိုးများ",
+    "empty": "မှတ်ချက်များ မရှိသေးပါ",
+    "noOpen": "ဖွင့်ထားသော မှတ်ချက်မရှိပါ",
+    "noResolved": "ဖြေရှင်းထားသော မှတ်ချက်မရှိပါ"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ၏ မှတ်ချက်၊ {{time}}",
+    "commentAriaResolved": "{{author}} ၏ မှတ်ချက်၊ {{time}}၊ ဖြေရှင်းပြီး",
+    "replyAria": "{{author}} ၏ ပြန်ကြားချက်၊ {{time}}",
+    "repliesAria": "ပြန်ကြားချက် {{count}} ခု",
+    "edited": "(တည်းဖြတ်ပြီး)",
+    "emptyComment": "(မှတ်ချက်အလွတ်)",
+    "emptyReply": "(ပြန်ကြားချက်အလွတ်)",
+    "justNow": "ယခုလေးတင်"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ပြန်ကြားရန်",
+    "showInPage": "စာမျက်နှာတွင် ပြရန်",
+    "resolve": "ဖြေရှင်းရန်",
+    "reopen": "ပြန်ဖွင့်ရန်",
+    "edit": "တည်းဖြတ်ရန်"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "အကြောင်းပြန်ရန်..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "မှတ်ချက် တည်းဖြတ်"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ဤမှတ်ချက်ကို ဖျက်မည်လား။",
+    "threadConfirm_one": "ဤမှတ်ချက်နှင့် ၎င်း၏အကြောင်းပြန်ချက်ကို ဖျက်မည်လား။",
+    "threadConfirm_other": "ဤမှတ်ချက်နှင့် ၎င်း၏အကြောင်းပြန်ချက် {{count}} ခုကို ဖျက်မည်လား။"
   }
 }

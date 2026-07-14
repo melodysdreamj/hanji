@@ -6,10 +6,14 @@
 // "hanji.sw.disabled" = "1" unregisters and stops re-registering.
 
 import { i18next } from "@/i18n";
+import { onAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
 import { useStore } from "@/lib/store";
 
 const DISABLE_KEY = "hanji.sw.disabled";
 const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
+let registeredWorker: ServiceWorkerRegistration | undefined;
+let offlineWarmRequested = false;
+let offlineWarmScheduled = false;
 
 function swDisabled(): boolean {
   try {
@@ -49,6 +53,30 @@ function warmOfflineAssets(registration: ServiceWorkerRegistration) {
   registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE });
 }
 
+function scheduleOfflineWarm() {
+  if (!offlineWarmRequested || offlineWarmScheduled) return;
+  offlineWarmScheduled = true;
+  const run = () => {
+    offlineWarmScheduled = false;
+    void navigator.serviceWorker.ready
+      .then((readyRegistration) => warmOfflineAssets(readyRegistration))
+      .catch(() => {});
+  };
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+  };
+  if (typeof idleWindow.requestIdleCallback === "function") {
+    idleWindow.requestIdleCallback(run, { timeout: 10_000 });
+  } else {
+    globalThis.setTimeout(run, 1_500);
+  }
+}
+
+function requestOfflineWarm() {
+  offlineWarmRequested = true;
+  if (registeredWorker) scheduleOfflineWarm();
+}
+
 export function registerServiceWorker() {
   if (typeof window === "undefined") return;
   if (!("serviceWorker" in navigator)) return;
@@ -60,18 +88,18 @@ export function registerServiceWorker() {
       .catch(() => {});
     return;
   }
+  onAppInteractiveForOfflineWarm(requestOfflineWarm);
   window.addEventListener("load", () => {
     const warmActiveWorker = () => {
-      void navigator.serviceWorker.ready
-        .then((registration) => warmOfflineAssets(registration))
-        .catch(() => {});
+      if (registeredWorker) scheduleOfflineWarm();
     };
     navigator.serviceWorker.addEventListener("controllerchange", warmActiveWorker);
     navigator.serviceWorker
       .register("/sw.js")
       .then((registration) => {
+        registeredWorker = registration;
         watchForUpdates(registration);
-        warmActiveWorker();
+        scheduleOfflineWarm();
       })
       .catch(() => {
         // Offline support is progressive; registration failure is non-fatal.

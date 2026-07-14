@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Tukar kulit",
+    "reposition": "Ubah kedudukan",
+    "remove": "Alih keluar",
+    "uploadFile": "Muat naik fail",
+    "uploading": "Memuat naik...",
+    "submit": "Hantar",
+    "savePosition": "Simpan kedudukan"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galeri",
+    "upload": "Muat naik",
+    "link": "Pautan"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Tampal pautan imej",
+    "invalid": "Tampal pautan imej http atau https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Gagal memuat naik imej itu.",
+    "defaultFileName": "Imej kulit"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Seret imej untuk mengubah kedudukan"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Menyediakan muat naik",
+    "finalizing": "Memuktamadkan",
+    "complete": "Selesai",
+    "uploading": "Memuat naik"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Kulit dialih keluar",
+    "restored": "Kulit dipulihkan",
+    "undo": "Buat asal"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Kulit halaman",
+    "coverVerticalPosition": "Kedudukan menegak kulit",
+    "positionFromTop": "{{position}}% dari atas",
+    "closeCoverMenu": "Tutup menu kulit",
+    "changePageCover": "Tukar kulit halaman",
+    "repositionPageCover": "Ubah kedudukan kulit halaman",
+    "removePageCover": "Alih keluar kulit halaman",
+    "changeCoverDialog": "Tukar kulit",
+    "coverSource": "Sumber kulit",
+    "selectCover": "Pilih kulit {{number}}",
+    "uploadFromDevice": "Muat naik imej kulit dari peranti ini",
+    "uploadingFile": "Memuat naik {{fileName}}",
+    "coverImageLink": "Pautan imej kulit"
   }
 }

@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "פקודות בלוקים",
+  "closeBlockCommands": "סגור פקודות בלוקים",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "בלוקים בסיסיים",
+    "Media": "מדיה",
+    "Database": "בסיס נתונים",
+    "Advanced": "בלוקים מתקדמים"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} מתוך {{total}}. לחץ Enter להוספה.",
+  "listStatus": "{{total}} פקודות בלוקים זמינות.",
+  "noBlocks": "לא נמצאו בלוקים",
+  "noBlocksFor": "לא נמצאו בלוקים עבור \"{{query}}\"",
+  "recentlyUsed": "בשימוש לאחרונה"
 }

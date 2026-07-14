@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Schimbă coperta",
+    "reposition": "Repoziționare",
+    "remove": "Elimină",
+    "uploadFile": "Încarcă fișier",
+    "uploading": "Se încarcă...",
+    "submit": "Trimite",
+    "savePosition": "Salvează poziția"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
+    "gallery": "Galerie",
+    "upload": "Încărcare",
     "link": "Link"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Lipește link de imagine",
+    "invalid": "Lipește un link de imagine http sau https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Nu s-a putut încărca acea imagine.",
+    "defaultFileName": "Imagine copertă"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Trage imaginea pentru repoziționare"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Pregătire încărcare",
+    "finalizing": "Finalizare",
+    "complete": "Finalizat",
+    "uploading": "Încărcare"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Copertă eliminată",
+    "restored": "Copertă restaurată",
+    "undo": "Anulează"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Copertă pagină",
+    "coverVerticalPosition": "Poziție verticală copertă",
+    "positionFromTop": "{{position}}% de sus",
+    "closeCoverMenu": "Închide meniul de copertă",
+    "changePageCover": "Schimbă coperta paginii",
+    "repositionPageCover": "Repoziționează coperta paginii",
+    "removePageCover": "Elimină coperta paginii",
+    "changeCoverDialog": "Schimbare copertă",
+    "coverSource": "Sursă copertă",
+    "selectCover": "Selectează coperta {{number}}",
+    "uploadFromDevice": "Încarcă imagine de copertă de pe acest dispozitiv",
+    "uploadingFile": "Se încarcă {{fileName}}",
+    "coverImageLink": "Link imagine copertă"
   }
 }

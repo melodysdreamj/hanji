@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Sopas",
+  "editedJustNow": "Sopas geredigeer",
+  "editedMinutesAgo": "Geredigeer {{minutes}}m gelede",
+  "editedHoursAgo": "Geredigeer {{hours}}h gelede",
+  "editedDaysAgo": "Geredigeer {{days}}d gelede",
+  "editedOn": "Geredigeer {{date}}",
+  "noEdits": "Geen wysigings",
+  "noEditsYet": "Nog geen wysigings",
+  "todayAt": "Vandag om {{time}}",
+  "yesterdayAt": "Gister om {{time}}",
+  "dateAt": "{{date}} om {{time}}"
 }

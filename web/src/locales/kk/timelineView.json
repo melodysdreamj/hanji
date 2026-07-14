@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Күн қасиетін қосу",
+    "description": "Timeline көріністері беттерді уақыт бойынша көрсету үшін басталу күні қасиетін талап етеді."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Аяқталу күні қасиетін қоссаңыз, бір күндік жолақтардың орнына ауқымдар көрсетіледі.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Timeline масштабы",
+    "day": "Күн",
+    "week": "Апта",
+    "month": "Ай"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Тәуелділіктер:",
+    "hint": "Қатынас қасиетін қосу",
+    "relationPropertyAriaLabel": "Тәуелділік қатынас қасиеті"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Бүгін",
+    "previousRange": "Алдыңғы ауқым",
+    "nextRange": "Келесі ауқым",
+    "newPage": "Жаңа",
+    "newPageIn": "{{dbTitle}} ішінде жаңа бет"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Timeline кестесі",
+    "nameHeader": "Аты"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ашу",
+    "openAriaLabelWithDates": "{{title}} ашу, {{start}} - {{end}}",
+    "openNoDateAriaLabel": "{{title}} ашу, күні жоқ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Бұл ауқымда элементтер жоқ.",
+    "noDatedItems": "Күні бар элементтер әлі жоқ.",
+    "jumpTo": "{{date}} күніне өту"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Күні жоқ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Жоқ",
+    "untitled": "Атаусыз"
   }
 }

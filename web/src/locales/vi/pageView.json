@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Không thể khôi phục trang",
+  "emptyBodyPrompt": "Nhấn Enter để bắt đầu viết trên trang trống này.",
+  "inTrashTopBarTitle": "Trong thùng rác",
+  "notFoundTopBarTitle": "Không tìm thấy",
+  "openWorkspace": "Mở không gian làm việc",
+  "pageInTrash": "Trang này đang ở trong thùng rác.",
+  "pageInTrashDetail": "Hãy khôi phục trang trước khi mở hoặc chỉnh sửa nội dung.",
+  "pageUnavailable": "Trang không khả dụng.",
+  "pageUnavailableDetail": "Trang này có thể đã bị xóa, di chuyển hoặc chia sẻ với một tài khoản khác.",
+  "restorePage": "Khôi phục trang",
+  "restoredPage": "Đã khôi phục trang",
+  "loadingPageContent": "Đang tải nội dung trang"
 }

@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "ಕಾಮೆಂಟ್‌ಗಳು",
+  "closeAria": "ಟಿಪ್ಪಣಿಗಳನ್ನು ಮುಚ್ಚು",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ಬ್ಲಾಕ್ ಚರ್ಚೆ",
+    "page": "ಪುಟ ಚರ್ಚೆ"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "ಕಾಮೆಂಟ್ ಸ್ಥಿತಿ",
+    "open": "ತೆರೆದ",
+    "resolved": "ಪರಿಹರಿಸಲಾಗಿದೆ"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "ಟಿಪ್ಪಣಿ ಮಾಡಲಾಗುತ್ತಿದೆ",
+    "commentingOnSelectedText": "ಆಯ್ಕೆ ಮಾಡಿದ ಪಠ್ಯದಲ್ಲಿ ಟಿಪ್ಪಣಿ",
+    "selectedBlock": "ಆಯ್ಕೆ ಮಾಡಿದ ಬ್ಲಾಕ್",
+    "onSelectedText": "ಆಯ್ಕೆ ಮಾಡಿದ ಪಠ್ಯದ ಮೇಲೆ",
+    "onSelectedBlock": "ಆಯ್ಕೆ ಮಾಡಿದ ಬ್ಲಾಕ್ ಮೇಲೆ",
+    "onABlock": "ಬ್ಲಾಕ್ ಮೇಲೆ"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ಬ್ಲಾಕ್ ಟಿಪ್ಪಣಿ ಸೇರಿಸು",
+    "addPageComment": "ಪುಟ ಟಿಪ್ಪಣಿ ಸೇರಿಸು",
+    "blockPlaceholder": "ಈ ಬ್ಲಾಕ್ ಮೇಲೆ ಟಿಪ್ಪಣಿ ಮಾಡಿ...",
+    "pagePlaceholder": "ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ...",
+    "submit": "ಟಿಪ್ಪಣಿ ಮಾಡಿ"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "ಕಾಮೆಂಟ್‌ನಲ್ಲಿ ಉಲ್ಲೇಖಿಸಬೇಕಾದ ಜನರು",
+    "replyPeopleAria": "ಪ್ರತ್ಯುತ್ತರದಲ್ಲಿ ಉಲ್ಲೇಖಿಸಬೇಕಾದ ಜನರು",
+    "trigger": "ಜನರನ್ನು ಉಲ್ಲೇಖಿಸಿ",
+    "noMatches": "ಹೊಂದಾಣಿಕೆಯ ಜನರಿಲ್ಲ",
+    "title": "{{name}} ಅವರನ್ನು ಉಲ್ಲೇಖಿಸಿ",
+    "person": "ವ್ಯಕ್ತಿ",
+    "you": "ನಾನು",
+    "organizationPerson": "ಸಂಸ್ಥೆಯ ಸದಸ್ಯ",
+    "roleInOrganization": "ಸಂಸ್ಥೆಯಲ್ಲಿ {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "ಕಾಮೆಂಟ್ ಥ್ರೆಡ್‌ಗಳು",
+    "empty": "ಇನ್ನೂ ಕಾಮೆಂಟ್‌ಗಳಿಲ್ಲ",
+    "noOpen": "ತೆರೆದ ಕಾಮೆಂಟ್‌ಗಳಿಲ್ಲ",
+    "noResolved": "ಪರಿಹರಿಸಿದ ಕಾಮೆಂಟ್‌ಗಳಿಲ್ಲ"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ಅವರ ಟಿಪ್ಪಣಿ, {{time}}",
+    "commentAriaResolved": "{{author}} ಅವರ ಟಿಪ್ಪಣಿ, {{time}}, ಪರಿಹರಿಸಲಾಗಿದೆ",
+    "replyAria": "{{author}} ಅವರ ಉತ್ತರ, {{time}}",
+    "repliesAria": "{{count}} ಉತ್ತರಗಳು",
+    "edited": "(ಸಂಪಾದಿಸಲಾಗಿದೆ)",
+    "emptyComment": "(ಖಾಲಿ ಟಿಪ್ಪಣಿ)",
+    "emptyReply": "(ಖಾಲಿ ಉತ್ತರ)",
+    "justNow": "ಈಗಲೇ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ಉತ್ತರ",
+    "showInPage": "ಪುಟದಲ್ಲಿ ತೋರಿಸು",
+    "resolve": "ಪರಿಹರಿಸು",
+    "reopen": "ಮರುತೆರೆ",
+    "edit": "ಸಂಪಾದಿಸು"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "ಪ್ರತ್ಯುತ್ತರ..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "ಕಾಮೆಂಟ್ ಸಂಪಾದಿಸು"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಅಳಿಸಬೇಕೇ?",
+    "threadConfirm_one": "ಈ ಕಾಮೆಂಟ್ ಮತ್ತು ಅದರ ಪ್ರತ್ಯುತ್ತರವನ್ನು ಅಳಿಸುವುದೇ?",
+    "threadConfirm_other": "ಈ ಕಾಮೆಂಟ್ ಮತ್ತು ಅದರ {{count}} ಪ್ರತ್ಯುತ್ತರಗಳನ್ನು ಅಳಿಸುವುದೇ?"
   }
 }

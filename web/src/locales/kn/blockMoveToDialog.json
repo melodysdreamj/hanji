@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ಬ್ಲಾಕ್ ಸರಿಸಿ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ಸರಿಸಲು ಸ್ಥಳಗಳನ್ನು ಹುಡುಕಿ",
+    "placeholder": "ಪುಟಗಳನ್ನು ಹುಡುಕಿ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ಸರಿಸು ಸಂವಾದವನ್ನು ಮುಚ್ಚಿ"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ಸರಿಸಲು ಸ್ಥಳಗಳು",
+    "empty": "ಯಾವುದೇ ಪುಟಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
+    "destinationLabel": "ಬ್ಲಾಕ್ ಅನ್ನು {{label}}, {{path}} ಗೆ ಸರಿಸಿ"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" ರಚಿಸಿ",
+    "optionLabel": "\"{{query}}\" ಪುಟವನ್ನು ರಚಿಸಿ ಮತ್ತು ಬ್ಲಾಕ್ ಅನ್ನು ಇಲ್ಲಿಗೆ ಸರಿಸಿ",
+    "hint": "ಹೊಸ ಪುಟ - ಬ್ಲಾಕ್ ಅನ್ನು ಇಲ್ಲಿಗೆ ಸರಿಸಿ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "ಲಾಕ್ ಪುಟ"
   },
-  "untitled": "Untitled",
+  "untitled": "ಶೀರ್ಷಿಕೆಯಿಲ್ಲದ",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "ಪುಟ ಲಾಕ್ ಆಗಿದೆ",
+    "movedBlock": "ಬ್ಲಾಕ್ ಸರಿಸಲಾಗಿದೆ",
+    "movedBlocks": "ಬ್ಲಾಕ್ಗಳನ್ನು ಸರಿಸಲಾಗಿದೆ",
+    "movedBlocksCount": "{{blockCount}} ಬ್ಲಾಕ್ಗಳನ್ನು ಸರಿಸಲಾಗಿದೆ",
+    "moveFailed": "ಬ್ಲಾಕ್ ಸರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
   }
 }

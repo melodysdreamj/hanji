@@ -1,6 +1,6 @@
 {
-  "emptyDesc": "Cette base de données ne contient pas encore de pages.",
-  "emptyTitle": "Aucune page pour le moment",
+  "emptyDesc": "Cette base de données n'a pas encore de pages.",
+  "emptyTitle": "Pas encore de pages",
   "newInline": "Nouveau",
   "newPage": "Nouvelle page",
   "newPageIn": "Nouvelle page dans {{dbTitle}}",

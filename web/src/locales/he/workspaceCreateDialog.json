@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "מרחב עבודה חדש",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "שם סביבת עבודה",
+    "placeholder": "החברה שלי"
   },
-  "startLabel": "Start from",
+  "startLabel": "התחל מ",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "מרחב עבודה ריק",
+      "body": "התחל ריק עם דפי ההתחלה."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "ייבא מ-Notion",
+      "body": "צור מרחב עבודה, ולאחר מכן העבר מרחב עבודה מ-Notion לתוכו."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "ייבא מ-Hanji אחר",
+      "body": "צור מרחב עבודה, ולאחר מכן יבא מרחב עבודה משרת Hanji אחר או מקובץ."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "צור סביבת עבודה",
+  "creating": "יוצר…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "לא ניתן ליצור סביבת עבודה."
   }
 }

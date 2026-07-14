@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Sponsor ol",
+  "builtWith": "<a>{{name}}</a> Hanji'nin yapımına yardımcı oluyor",
+  "builtWithIntro": "Hanji, bu araçlar ve platformların yardımıyla oluşturuldu.",
+  "builtWithTitle": "Yapımında Kullanılanlar",
+  "emptySlot": "Boş yer — sponsor olun, burada görünün",
+  "rule1": "Banner, kalan bakiyeye göre ilk beş sponsoru gösterir.",
+  "rule2": "Ayda bir, gösterilen her sponsorun bakiyesi, beşinci sıradaki sponsorun bakiyesi kadar düşülür, bu nedenle beş sponsor da aynı adil ücreti öder.",
+  "rule3": "Bakiye tükendiğinde, yer bakiyeye göre bir sonraki sponsora geçer.",
+  "rule4": "Banner'ı varsayılan olarak etkin tutmak, Hanji'nin lisans istisnasını sağlar; kapalı, bannersız bir sürüm ise ayrı bir ticari lisans gerektirir.",
+  "settingsIntro": "Hanji, sponsorları tarafından desteklenir. Giriş ekranı, mevcut ilk beş sponsoru gösteren küçük bir banner gösterir.",
+  "sponsorSlots": "Mevcut sponsorlar",
+  "supportTitle": "Hanji'yi Destekle",
+  "thanksSponsor": "<a>{{name}}</a> Hanji büyürken sponsor oluyor"
+}

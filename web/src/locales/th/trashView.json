@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ถังขยะ",
+  "empty": "หน้าที่คุณลบจะมาอยู่ที่นี่ ถังขยะว่างเปล่า",
+  "searchTrash": "ค้นหาถังขยะ",
+  "deletedPages": "หน้าที่ถูกลบ",
+  "noSearchMatches": "ไม่พบหน้าที่ถูกลบที่ตรงกับการค้นหาของคุณ",
+  "pageCount_one": "{{count}} หน้า",
+  "pageCount_other": "{{count}} หน้า",
+  "deletedJustNow": "ลบเมื่อสักครู่",
+  "deletedOn": "ลบเมื่อ {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "กู้คืน",
+    "deleteForever": "ลบถาวร",
+    "emptyTrash": "ล้างถังขยะ"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "เปิด {{title}} จากถังขยะ",
+    "restorePage": "กู้คืน {{title}}",
+    "deletePageForever": "ลบ {{title}} ถาวร",
+    "cancelPermanentDelete": "ยกเลิกการลบถาวร",
+    "cancelEmptyTrash": "ยกเลิกการล้างถังขยะ"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "ลบถาวร?",
+    "deleteBodyPrefix": "นี่จะลบอย่างถาวร ",
+    "deleteBodySuffix": ". คุณไม่สามารถยกเลิกการดำเนินการนี้ได้",
+    "emptyTitle": "ล้างถังขยะ?",
+    "emptyBody_one": "นี่จะลบทั้งหมด {{count}} หน้าในถังขยะอย่างถาวร คุณไม่สามารถยกเลิกการดำเนินการนี้ได้",
+    "emptyBody_other": "นี่จะลบทั้งหมด {{count}} หน้าในถังขยะอย่างถาวร คุณไม่สามารถยกเลิกการดำเนินการนี้ได้"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "ลบถาวรแล้ว",
+    "couldntDelete": "ไม่สามารถลบหน้าได้",
+    "restored": "กู้คืนหน้าแล้ว",
+    "couldntRestore": "ไม่สามารถกู้คืนหน้าได้",
+    "emptied": "ล้างถังขยะแล้ว",
+    "couldntEmpty": "ไม่สามารถล้างถังขยะได้"
   }
 }

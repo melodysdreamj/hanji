@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Μόλις τώρα",
+  "editedJustNow": "Μόλις τώρα",
+  "editedMinutesAgo": "Επεξεργασία {{minutes}}λ πριν",
+  "editedHoursAgo": "Επεξεργασία {{hours}}ω πριν",
+  "editedDaysAgo": "Επεξεργασία {{days}}η πριν",
+  "editedOn": "Επεξεργασία {{date}}",
+  "noEdits": "Καμία επεξεργασία",
+  "noEditsYet": "Ακόμα καμία επεξεργασία",
+  "todayAt": "Σήμερα στις {{time}}",
+  "yesterdayAt": "Χθες στις {{time}}",
+  "dateAt": "{{date}} στις {{time}}"
 }

@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "ബന്ധ ഇനങ്ങൾ ലോഡ് ചെയ്യുന്നു",
+  "relationUnavailable": "ബന്ധ ഇനങ്ങൾ ലഭ്യമല്ല",
+  "unavailable": "ലഭ്യമല്ല",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "തിരഞ്ഞെടുത്തു",
+    "unchecked": "തിരഞ്ഞെടുത്തിട്ടില്ല"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "{{title}} തുറക്കുക",
+  "openOrDownloadFile": "{{name}} തുറക്കുക അല്ലെങ്കിൽ ഡൗൺലോഡ് ചെയ്യുക"
 }

@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ਔਫਲਾਈਨ",
+  "offlinePending_one": "ਔਫਲਾਈਨ · {{count}} ਤਬਦੀਲੀ ਬਕਾਇਆ",
+  "offlinePending_other": "ਔਫਲਾਈਨ · {{count}} ਤਬਦੀਲੀਆਂ ਬਕਾਇਆ",
+  "syncing": "ਸਿੰਕ ਕਰ ਰਿਹਾ · {{count}}",
+  "unreachable": "ਸਰਵਰ ਤੱਕ ਪਹੁੰਚ ਨਹੀਂ ਹੋ ਸਕੀ",
+  "unreachablePending_one": "ਸਰਵਰ ਤੱਕ ਪਹੁੰਚ ਨਹੀਂ ਹੋ ਸਕੀ · {{count}} ਤਬਦੀਲੀ ਬਕਾਇਆ",
+  "unreachablePending_other": "ਸਰਵਰ ਤੱਕ ਪਹੁੰਚ ਨਹੀਂ ਹੋ ਸਕੀ · {{count}} ਤਬਦੀਲੀਆਂ ਬਕਾਇਆ",
+  "retryHint": "ਹੁਣ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰਨ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 }

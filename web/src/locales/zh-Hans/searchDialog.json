@@ -8,16 +8,16 @@
     "recentSearches": "最近搜索",
     "pages": "页面",
     "pageContent": "页面内容",
-    "favorites": "收藏"
+    "favorites": "收藏夹"
   },
-  "inPage": "在页面中",
+  "inPage": "页面内",
   "searchingDetail": "搜索中...",
-  "searchAgain": "再次搜索",
+  "searchAgain": "重新搜索",
   "searchingPageContent": "正在搜索页面内容...",
-  "noResultsFor": "未找到 \"{{query}}\" 的相关结果",
+  "noResultsFor": "未找到\"{{query}}\"的结果",
   "noPagesFound": "未找到页面",
   "creating": "创建中...",
-  "newPage": "新页面 \"{{query}}\"",
+  "newPage": "新建页面 \"{{query}}\"",
   "couldntCreatePage": "无法创建页面",
   "hints": {
     "select": "选择",

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Icoonkiezer sluiten",
+    "label": "Icoon kiezen"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Icoontype",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Afbeelding"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Verwijderen",
+    "ariaLabel": "Icoon verwijderen"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchLabel": "Icoon zoeken",
+    "random": "Willekeurig",
+    "randomLabel": "Kies willekeurig icoon",
+    "recentLabel": "Recent gebruikt eerst",
+    "gridLabelRecent": "Iconen, recente eerst",
+    "gridLabel": "Iconen",
+    "optionLabel": "Kies {{emoji}} icoon",
+    "noResults": "Geen iconen voor “{{query}}”. Probeer een ander woord of wis het filter."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Afbeelding",
+    "linkPlaceholder": "Plak afbeeldingslink",
+    "linkLabel": "Icoonafbeelding link",
+    "apply": "Toepassen",
+    "upload": "Bestand uploaden",
+    "uploading": "Uploaden...",
+    "uploadingLabel": "{{fileName}} uploaden",
+    "uploadFailed": "Kon afbeelding niet uploaden.",
+    "fallbackFileName": "Icoonafbeelding"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Upload voorbereiden",
+    "finalizing": "Afronden",
+    "complete": "Voltooid",
+    "uploading": "Uploaden"
   }
 }

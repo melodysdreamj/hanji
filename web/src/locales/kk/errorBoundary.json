@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Бұл мазмұнды көрсету кезінде қате пайда болды.",
+  "detail": "Қайталап көріңіз. Егер мәселе жалғасса, қолданбаны қайта жүктеп, төмендегі анықтаманы бөлісіңіз.",
+  "reference": "Анықтама: {{reference}}",
+  "reload": "Қолданбаны қайта жүктеу",
+  "retry": "Қайталап көріңіз"
 }

@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
-  "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+  "create": {
+    "hint": "Nowa strona - przenieś blok tutaj",
+    "label": "Utwórz \"{{query}}\"",
+    "optionLabel": "Utwórz stronę \"{{query}}\" i przenieś blok tutaj"
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
-  },
-  "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
-  },
-  "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "closeLabel": "Zamknij okno przenoszenia"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Strona zablokowana"
   },
-  "untitled": "Untitled",
+  "results": {
+    "destinationLabel": "Przenieś blok do {{label}}, {{path}}",
+    "empty": "Nie znaleziono stron.",
+    "listLabel": "Miejsca docelowe przenoszenia"
+  },
+  "search": {
+    "label": "Szukaj miejsc docelowych",
+    "placeholder": "Szukaj stron..."
+  },
+  "title": "Przenieś blok do",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
-  }
+    "locked": "Strona jest zablokowana",
+    "movedBlock": "Przeniesiono blok",
+    "movedBlocks": "Przeniesiono bloki",
+    "movedBlocksCount": "Przeniesiono {{blockCount}} bloków",
+    "moveFailed": "Nie udało się przenieść bloku"
+  },
+  "untitled": "Bez tytułu"
 }

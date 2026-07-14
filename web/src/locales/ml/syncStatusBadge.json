@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ഓഫ്‌ലൈൻ",
+  "offlinePending_one": "ഓഫ്‌ലൈൻ · {{count}} മാറ്റം തീർപ്പാക്കാനുണ്ട്",
+  "offlinePending_other": "ഓഫ്‌ലൈൻ · {{count}} മാറ്റങ്ങൾ തീർപ്പാക്കാനുണ്ട്",
+  "syncing": "സമന്വയിപ്പിക്കുന്നു · {{count}}",
+  "unreachable": "സെർവറിലേക്ക് ബന്ധപ്പെടാനാകുന്നില്ല",
+  "unreachablePending_one": "സെർവറിലേക്ക് ബന്ധപ്പെടാനാകുന്നില്ല · {{count}} മാറ്റം തയ്യാറാകുന്നു",
+  "unreachablePending_other": "സെർവറിലേക്ക് ബന്ധപ്പെടാനാകുന്നില്ല · {{count}} മാറ്റങ്ങൾ തയ്യാറാകുന്നു",
+  "retryHint": "വീണ്ടും ശ്രമിക്കാൻ ക്ലിക്ക് ചെയ്യുക"
 }

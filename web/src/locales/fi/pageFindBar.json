@@ -1,14 +1,14 @@
 {
+  "actions": {
+    "close": "Sulje haku",
+    "next": "Seuraava osuma",
+    "previous": "Edellinen osuma"
+  },
   "dialog": {
-    "label": "Find in page"
+    "label": "Etsi sivulta"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
-  },
-  "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "label": "Etsi sivulta",
+    "placeholder": "Etsi sivulta"
   }
 }

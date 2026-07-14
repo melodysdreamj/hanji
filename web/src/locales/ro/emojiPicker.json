@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Închide selectorul de pictograme",
+    "label": "Alege pictogramă"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Tip pictogramă",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Imagine"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Elimină",
+    "ariaLabel": "Elimină pictograma"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtru…",
+    "searchLabel": "Caută pictograme",
+    "random": "Aleatoriu",
+    "randomLabel": "Alege o pictogramă aleatoare",
+    "recentLabel": "Mai întâi cele utilizate recent",
+    "gridLabelRecent": "Pictograme, cele mai recente primele",
+    "gridLabel": "Pictograme",
+    "optionLabel": "Alege pictograma {{emoji}}",
+    "noResults": "Nicio pictogramă nu corespunde „{{query}}”. Încercați un alt cuvânt sau ștergeți filtrul."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Imagine",
+    "linkPlaceholder": "Lipește link imagine",
+    "linkLabel": "Link imagine pictogramă",
+    "apply": "Aplică",
+    "upload": "Încarcă fișier",
+    "uploading": "Se încarcă...",
+    "uploadingLabel": "Se încarcă {{fileName}}",
+    "uploadFailed": "Nu s-a putut încărca imaginea.",
+    "fallbackFileName": "Imagine pictogramă"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Se pregătește încărcarea",
+    "finalizing": "Se finalizează",
+    "complete": "Finalizat",
+    "uploading": "Se încarcă"
   }
 }

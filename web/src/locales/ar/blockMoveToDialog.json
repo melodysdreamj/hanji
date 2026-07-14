@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "نقل الكتلة إلى",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "البحث عن وجهات النقل",
+    "placeholder": "ابحث عن صفحات..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "إغلاق حوار النقل"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "وجهات النقل",
+    "empty": "لا توجد صفحات.",
+    "destinationLabel": "نقل الكتلة إلى {{label}}، {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "إنشاء \"{{query}}\"",
+    "optionLabel": "إنشاء صفحة \"{{query}}\" ونقل الكتلة هنا",
+    "hint": "صفحة جديدة - نقل الكتلة هنا"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "صفحة مقفلة"
   },
-  "untitled": "Untitled",
+  "untitled": "بدون عنوان",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "الصفحة مقفلة",
+    "movedBlock": "تم نقل الكتلة",
+    "movedBlocks": "تم نقل الكتل",
+    "movedBlocksCount": "تم نقل {{blockCount}} كتلة",
+    "moveFailed": "تعذر نقل الكتلة"
   }
 }

@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "正在載入關聯項目",
+  "relationUnavailable": "關聯項目無法使用",
+  "unavailable": "無法使用",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "已勾選",
+    "unchecked": "未勾選"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "開啟 {{title}}",
+  "openOrDownloadFile": "開啟或下載 {{name}}"
 }

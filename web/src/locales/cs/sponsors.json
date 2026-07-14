@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Stát se sponzorem",
+  "builtWith": "<a>{{name}}</a> pomáhá budovat Hanji",
+  "builtWithIntro": "Hanji byla vytvořena za pomoci těchto nástrojů a platforem.",
+  "builtWithTitle": "Vytvořeno pomocí",
+  "emptySlot": "Volné místo – sponzor se zobrazí zde",
+  "rule1": "Banner zobrazuje prvních pět sponzorů podle zbývajícího zůstatku.",
+  "rule2": "Jednou měsíčně se zůstatek každého zobrazeného sponzora snižuje o zůstatek pátého sponzora, takže všech pět zobrazených sponzorů platí stejnou spravedlivou sazbu.",
+  "rule3": "Když zůstatek dojde, místo přechází na dalšího sponzora podle zůstatku.",
+  "rule4": "Ponechání banneru ve výchozím nastavení zapnutého uděluje výjimku z licence Hanji; uzavřená verze bez banneru vyžaduje samostatnou komerční licenci.",
+  "settingsIntro": "Hanji je udržována svými sponzory. Přihlašovací obrazovka zobrazuje malý banner s aktuálními pěti nejlepšími sponzory.",
+  "sponsorSlots": "Aktuální sponzoři",
+  "supportTitle": "Podpořit Hanji",
+  "thanksSponsor": "<a>{{name}}</a> sponzoruje Hanji během jejího růstu"
+}

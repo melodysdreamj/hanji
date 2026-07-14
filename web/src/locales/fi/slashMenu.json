@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Lohkokomennot",
+  "closeBlockCommands": "Sulje lohkokomennot",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Advanced": "Edistyneet lohkot",
+    "Basic": "Peruslohkot",
+    "Database": "Tietokanta",
+    "Media": "Media"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} / {{total}}. Paina Enter lisätäksesi.",
+  "listStatus": "{{total}} lohkokomentoa saatavilla.",
+  "noBlocks": "Ei lohkoja löytynyt",
+  "noBlocksFor": "Lohkoja ei löytynyt haulle \"{{query}}\"",
+  "recentlyUsed": "Viimeksi käytetyt"
 }

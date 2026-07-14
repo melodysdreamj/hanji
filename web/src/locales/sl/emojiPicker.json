@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Zapri izbirnik ikon",
+    "label": "Izberi ikono"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Tip ikone",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Slika"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Odstrani",
+    "ariaLabel": "Odstrani ikono"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtriraj…",
+    "searchLabel": "Išči ikone",
+    "random": "Naključno",
+    "randomLabel": "Izberi naključno ikono",
+    "recentLabel": "Nedavno uporabljeni najprej",
+    "gridLabelRecent": "Ikone, nedavne najprej",
+    "gridLabel": "Ikone",
+    "optionLabel": "Izberi ikono {{emoji}}",
+    "noResults": "Ni ikon, ki bi ustrezale “{{query}}”. Poskusite z drugim iskalnim nizom ali počistite filter."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Slika",
+    "linkPlaceholder": "Prilepi povezavo slike",
+    "linkLabel": "Povezava do slikovne ikone",
+    "apply": "Uporabi",
+    "upload": "Naloži datoteko",
+    "uploading": "Nalaganje...",
+    "uploadingLabel": "Nalaganje {{fileName}}",
+    "uploadFailed": "Ni bilo mogoče naložiti te slike.",
+    "fallbackFileName": "Slika ikone"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Priprava nalaganja",
+    "finalizing": "Dokončevanje",
+    "complete": "Končano",
+    "uploading": "Nalaganje"
   }
 }

@@ -1,31 +1,31 @@
 {
   "buttons": {
     "addBlockBelow": "在下方添加块",
-    "dragHint": "拖动以移动。点击打开菜单。",
+    "dragHint": "拖拽移动。点击打开菜单。",
     "openBlockActions": "打开块操作",
     "closeBlockActions": "关闭块操作"
   },
   "menu": {
     "ariaLabel": "块操作",
-    "deleteMany": "删除 {{num}} 个块",
+    "deleteMany": "删除{{num}}个块",
     "duplicate": "创建副本",
-    "duplicateMany": "复制 {{num}} 个块",
+    "duplicateMany": "创建{{num}}个副本",
     "turnInto": "转换为",
     "copy": "复制",
-    "copyMany": "复制 {{num}} 个块",
+    "copyMany": "复制{{num}}个块",
     "copied": "已复制",
     "copyLinkToBlock": "复制块链接",
     "copiedBlockLink": "已复制块链接",
     "moveTo": "移动到",
-    "moveToMany": "移动到 {{num}} 个块",
+    "moveToMany": "移动到{{num}}个块",
     "moveUp": "上移",
-    "moveUpMany": "上移 {{num}} 个块",
+    "moveUpMany": "上移{{num}}个块",
     "moveDown": "下移",
-    "moveDownMany": "下移 {{num}} 个块",
+    "moveDownMany": "下移{{num}}个块",
     "comment": "评论",
     "commentMany": "评论 {{num}} 个块",
-    "addCaption": "添加题注",
-    "removeCaption": "移除题注",
+    "addCaption": "添加说明",
+    "removeCaption": "移除说明",
     "unsyncSyncedBlock": "取消同步块",
     "copySyncedBlock": "复制同步块",
     "color": "颜色",
@@ -36,7 +36,7 @@
     "chooseType": "选择块类型"
   },
   "colorMenu": {
-    "textColor": "文本颜色",
+    "textColor": "文字颜色",
     "backgroundColor": "背景颜色"
   },
   "colors": {
@@ -61,32 +61,32 @@
     "red_background": "红色背景"
   },
   "notifications": {
-    "duplicatedBlock": "已复制块",
-    "duplicatedBlocks": "已复制 {{num}} 个块",
+    "duplicatedBlock": "已创建副本",
+    "duplicatedBlocks": "已创建{{num}}个副本",
     "undo": "撤销",
-    "undidDuplicate": "已撤销复制",
-    "nothingToUndo": "无可撤销操作",
-    "deletedBlock": "已删除块",
-    "deletedBlocks": "已删除 {{num}} 个块",
-    "restoredBlock": "已恢复块",
+    "undidDuplicate": "已撤销重复",
+    "nothingToUndo": "无撤销操作",
+    "deletedBlock": "块已删除",
+    "deletedBlocks": "已删除{{num}}个块",
+    "restoredBlock": "块已恢复",
     "copiedToClipboard": "已复制到剪贴板",
     "couldNotCopy": "无法复制",
     "couldNotCopyLink": "无法复制链接",
-    "clearedColor": "已清除颜色",
-    "changedColor": "已更改颜色",
-    "changedBlockType": "已更改块类型"
+    "clearedColor": "颜色已清除",
+    "changedColor": "颜色已更改",
+    "changedBlockType": "块类型已更改"
   },
   "comments": {
-    "selectedBlocksQuote": "{{num}} 个选中的块"
+    "selectedBlocksQuote": "已选 {{num}} 个块"
   },
   "moveDialog": {
-    "title": "将 {{num}} 个块移动到"
+    "title": "移动{{num}}个块到"
   },
   "edited": {
     "justNow": "刚刚编辑",
-    "minutesAgo": "{{minutes}} 分钟前编辑",
-    "hoursAgo": "{{hours}} 小时前编辑",
-    "daysAgo": "{{days}} 天前编辑",
+    "minutesAgo": "最后编辑于 {{minutes}} 分钟前",
+    "hoursAgo": "最后编辑于 {{hours}} 小时前",
+    "daysAgo": "最后编辑于 {{days}} 天前",
     "on": "最后编辑于 {{date}}"
   }
 }

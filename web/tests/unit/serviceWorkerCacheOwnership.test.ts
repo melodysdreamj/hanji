@@ -197,6 +197,7 @@ describe("service-worker cache ownership", () => {
     };
     const listeners = new Map<string, (event: WorkerEvent) => void>();
     const oldLazy = "/assets/OldLazy-Abc123Xy.js";
+    const reusable = "/assets/shared-Ghi789Qr.js";
     const active = new Map<string, Response>([
       ["/theme-init.js", new Response("old theme", { headers: { "content-type": "application/javascript" } })],
       ["/__hanji_shell__", new Response("old shell", { headers: { "content-type": "text/html" } })],
@@ -207,6 +208,7 @@ describe("service-worker cache ownership", () => {
         }),
       ],
       [oldLazy, new Response("old lazy", { headers: { "content-type": "application/javascript" } })],
+      [reusable, new Response("reusable current asset", { headers: { "content-type": "application/javascript" } })],
     ]);
     const stores = new Map<string, Map<string, Response>>([["hanji-sw-v2", active]]);
     const pathOf = (input: string | Request) =>
@@ -233,7 +235,7 @@ describe("service-worker cache ownership", () => {
     };
     const manifest = {
       version: "new",
-      assets: ["/", "/theme-init.js", "/assets/app-Abc123Xy.js", "/assets/lazy-Def456Uv.js"],
+      assets: ["/", "/theme-init.js", "/assets/app-Abc123Xy.js", "/assets/lazy-Def456Uv.js", reusable],
       bootAssets: ["/", "/theme-init.js"],
     };
     const fetchMock = vi.fn(async (input: string) => {
@@ -294,6 +296,7 @@ describe("service-worker cache ownership", () => {
     expect(fetchMock.mock.calls.filter(([input]) => input === "/theme-init.js")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([input]) => input === "/assets/app-Abc123Xy.js")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([input]) => input === "/assets/lazy-Def456Uv.js")).toHaveLength(1);
+    expect(fetchMock.mock.calls.filter(([input]) => input === reusable)).toHaveLength(0);
     await expect(active.get("/__hanji_shell__")?.clone().text()).resolves.toBe("new shell");
     await expect(active.get("/__hanji_precache__")?.clone().json()).resolves.toMatchObject({
       version: "new",
@@ -304,6 +307,7 @@ describe("service-worker cache ownership", () => {
     await expect(active.get("/theme-init.js")?.clone().text()).resolves.toBe("new /theme-init.js");
     expect(active.has("/assets/app-Abc123Xy.js")).toBe(true);
     expect(active.has("/assets/lazy-Def456Uv.js")).toBe(true);
+    await expect(active.get(reusable)?.clone().text()).resolves.toBe("reusable current asset");
     expect(active.has(oldLazy)).toBe(true);
     expect(active.has("/__hanji_boot__")).toBe(false);
     expect(stores.has("hanji-sw-boot-new")).toBe(false);
@@ -404,7 +408,9 @@ describe("service-worker cache ownership", () => {
     await expect(active.get("/theme-init.js")?.text()).resolves.toBe("old theme");
     await expect(active.get("/__hanji_shell__")?.text()).resolves.toBe("old shell");
     await expect(active.get("/__hanji_precache__")?.json()).resolves.toEqual(oldMarker);
-    expect(active.has("/assets/app-Abc123Xy.js")).toBe(false);
+    // Immutable hashes are independently safe and intentionally survive a
+    // mutable shell rollback so the next warm resumes instead of refetching.
+    expect(active.has("/assets/app-Abc123Xy.js")).toBe(true);
     expect(stores.has("hanji-sw-stage-new")).toBe(false);
     expect(stores.has("hanji-sw-rollback-new")).toBe(false);
     expect(stores.has("hanji-sw-boot-new")).toBe(true);
@@ -792,6 +798,7 @@ describe("service-worker cache ownership", () => {
     fetchListener(appEvent);
     const responsePromise = appEvent.respondWith.mock.calls[0]?.[0] as Promise<Response>;
     await expect(responsePromise).resolves.toBeInstanceOf(Response);
+    expect(appEvent.waitUntil).not.toHaveBeenCalled();
     expect(shellCache.put).not.toHaveBeenCalled();
 
     const accountEvent: FetchEvent = {
@@ -801,6 +808,7 @@ describe("service-worker cache ownership", () => {
     };
     fetchListener(accountEvent);
     expect(accountEvent.respondWith).toHaveBeenCalledTimes(1);
+    expect(accountEvent.waitUntil).not.toHaveBeenCalled();
     await accountEvent.respondWith.mock.calls[0]?.[0];
 
     const redirectedAsset = new Response("external script", {
@@ -866,7 +874,7 @@ describe("service-worker cache ownership", () => {
     };
     fetchListener(newShellEvent);
     await newShellEvent.respondWith.mock.calls[0]?.[0];
-    await newShellEvent.waitUntil.mock.calls[0]?.[0];
+    expect(newShellEvent.waitUntil).not.toHaveBeenCalled();
     expect(shellCache.put).not.toHaveBeenCalled();
   });
 

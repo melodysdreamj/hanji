@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Caută în pagină"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Caută în pagină",
+    "placeholder": "Caută în pagină"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Potrivirea anterioară",
+    "next": "Următoarea potrivire",
+    "close": "Închide căutarea"
   }
 }

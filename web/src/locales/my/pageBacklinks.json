@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "ဘက်ခ်လင့်ခ် {{count}} ခု",
+    "count_other": "ဘက်ခ်လင့်ခ် {{count}} ခု"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "လင့်ခ်ချိတ်ထားသော ဖော်ပြချက်များ"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "ဖော်ပြချက် {{count}} ခု",
+    "mention_other": "ဖော်ပြချက် {{count}} ခု",
+    "link_one": "လင့်ခ် {{count}} ခု",
+    "link_other": "လင့်ခ် {{count}} ခု"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "ဖော်ပြချက်",
+    "link": "လင့်ခ်"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "နောက်ထပ် ဘက်ခ်လင့်ခ် {{count}} ခု",
+    "count_other": "နောက်ထပ် ဘက်ခ်လင့်ခ် {{count}} ခု"
   }
 }

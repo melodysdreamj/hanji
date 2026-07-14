@@ -1,10 +1,10 @@
 {
-  "empty": "Noch keine Konversationen. Kommentieren Sie eine Seite oder erwähnen Sie jemanden, um eine zu starten.",
+  "empty": "Noch keine Unterhaltungen. Kommentieren Sie eine Seite oder erwähnen Sie jemanden, um eine zu beginnen.",
   "leave": "Verlassen",
-  "leaveAria": "Konversation zu {{title}} verlassen",
-  "open": "Konversation zu {{title}} öffnen",
+  "leaveAria": "Die Unterhaltung zu {{title}} verlassen",
+  "open": "Die Unterhaltung zu {{title}} öffnen",
   "participants_one": "{{count}} Teilnehmer",
   "participants_other": "{{count}} Teilnehmer",
   "untitled": "Ohne Titel",
-  "loading": "Konversationen werden geladen…"
+  "loading": "Lade Unterhaltungen…"
 }

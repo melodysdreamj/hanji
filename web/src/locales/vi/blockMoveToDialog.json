@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Di chuyển khối đến",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Tìm kiếm điểm đến di chuyển",
+    "placeholder": "Tìm kiếm trang..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Đóng hộp thoại di chuyển"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Điểm đến di chuyển",
+    "empty": "Không tìm thấy trang nào.",
+    "destinationLabel": "Di chuyển khối đến {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Tạo \"{{query}}\"",
+    "optionLabel": "Tạo trang \"{{query}}\" và di chuyển khối đến đây",
+    "hint": "Trang mới - di chuyển khối đến đây"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Trang đã khóa"
   },
-  "untitled": "Untitled",
+  "untitled": "Không có tiêu đề",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Trang đã bị khóa",
+    "movedBlock": "Đã di chuyển khối",
+    "movedBlocks": "Đã di chuyển các khối",
+    "movedBlocksCount": "Đã di chuyển {{blockCount}} khối",
+    "moveFailed": "Không thể di chuyển khối"
   }
 }

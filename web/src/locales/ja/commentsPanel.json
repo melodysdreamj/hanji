@@ -2,20 +2,20 @@
   "title": "コメント",
   "closeAria": "コメントを閉じる",
   "subtitle": {
-    "block": "ブロックのディスカッション",
-    "page": "ページのディスカッション"
+    "block": "ブロックディスカッション",
+    "page": "ページディスカッション"
   },
   "status": {
-    "aria": "コメントのステータス",
+    "aria": "コメントステータス",
     "open": "未解決",
     "resolved": "解決済み"
   },
   "anchor": {
-    "commentingOn": "コメント先",
-    "commentingOnSelectedText": "選択したテキストにコメント",
-    "selectedBlock": "選択したブロック",
-    "onSelectedText": "選択したテキスト",
-    "onSelectedBlock": "選択したブロック",
+    "commentingOn": "コメント対象",
+    "commentingOnSelectedText": "選択テキストにコメント",
+    "selectedBlock": "選択ブロック",
+    "onSelectedText": "選択テキスト",
+    "onSelectedBlock": "選択ブロック",
     "onABlock": "ブロック"
   },
   "composer": {
@@ -28,28 +28,28 @@
   "mention": {
     "commentPeopleAria": "コメントでメンションする人",
     "replyPeopleAria": "返信でメンションする人",
-    "trigger": "ユーザーをメンション",
-    "noMatches": "該当する人がいません",
-    "title": "{{name}} さんをメンション",
+    "trigger": "メンションする",
+    "noMatches": "一致する人がいません",
+    "title": "{{name}}をメンション",
     "person": "ユーザー",
-    "you": "あなた",
-    "organizationPerson": "組織のユーザー",
-    "roleInOrganization": "組織の {{role}}"
+    "you": "自分",
+    "organizationPerson": "組織のメンバー",
+    "roleInOrganization": "組織の{{role}}"
   },
   "list": {
     "threadsAria": "コメントスレッド",
-    "empty": "まだコメントがありません",
+    "empty": "まだコメントはありません",
     "noOpen": "未解決のコメントはありません",
     "noResolved": "解決済みのコメントはありません"
   },
   "card": {
-    "commentAria": "{{author}} のコメント、{{time}}",
-    "commentAriaResolved": "{{author}} のコメント、{{time}}、解決済み",
-    "replyAria": "{{author}} の返信、{{time}}",
-    "repliesAria": "{{count}} 件の返信",
-    "edited": "（編集済み）",
-    "emptyComment": "（空のコメント）",
-    "emptyReply": "（空の返信）",
+    "commentAria": "{{author}}のコメント, {{time}}",
+    "commentAriaResolved": "{{author}}のコメント, {{time}}, 解決済み",
+    "replyAria": "{{author}}の返信, {{time}}",
+    "repliesAria": "{{count}}件の返信",
+    "edited": "(編集済み)",
+    "emptyComment": "(空のコメント)",
+    "emptyReply": "(空の返信)",
     "justNow": "たった今"
   },
   "actions": {
@@ -67,7 +67,7 @@
   },
   "delete": {
     "commentConfirm": "このコメントを削除しますか？",
-    "threadConfirm_one": "このコメントと返信を削除しますか？",
-    "threadConfirm_other": "このコメントと {{count}} 件の返信を削除しますか？"
+    "threadConfirm_one": "このコメントとその返信を削除しますか？",
+    "threadConfirm_other": "このコメントと{{count}}件の返信を削除しますか？"
   }
 }

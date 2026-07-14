@@ -1,7 +1,7 @@
 {
   "buttons": {
     "addBlockBelow": "Block darunter hinzufügen",
-    "dragHint": "Ziehen zum Verschieben. Klicken zum Öffnen des Menüs.",
+    "dragHint": "Zum Verschieben ziehen. Klicken, um Menü zu öffnen.",
     "openBlockActions": "Blockaktionen öffnen",
     "closeBlockActions": "Blockaktionen schließen"
   },
@@ -17,16 +17,16 @@
     "copyLinkToBlock": "Link zum Block kopieren",
     "copiedBlockLink": "Blocklink kopiert",
     "moveTo": "Verschieben nach",
-    "moveToMany": "{{num}} Blöcke verschieben nach",
+    "moveToMany": "{{num}} Blöcke verschieben",
     "moveUp": "Nach oben verschieben",
     "moveUpMany": "{{num}} Blöcke nach oben verschieben",
     "moveDown": "Nach unten verschieben",
     "moveDownMany": "{{num}} Blöcke nach unten verschieben",
-    "comment": "Kommentar",
+    "comment": "Kommentieren",
     "commentMany": "{{num}} Blöcke kommentieren",
     "addCaption": "Beschriftung hinzufügen",
-    "removeCaption": "Beschriftung entfernen",
-    "unsyncSyncedBlock": "Synchronisierung des Blocks aufheben",
+    "removeCaption": "Bildunterschrift entfernen",
+    "unsyncSyncedBlock": "Synchronisierten Block entsynchronisieren",
     "copySyncedBlock": "Synchronisierten Block kopieren",
     "color": "Farbe",
     "mixed": "Gemischt",
@@ -48,7 +48,7 @@
     "green": "Grün",
     "blue": "Blau",
     "purple": "Lila",
-    "pink": "Rosa",
+    "pink": "Pink",
     "red": "Rot",
     "gray_background": "Grauer Hintergrund",
     "brown_background": "Brauner Hintergrund",
@@ -57,21 +57,21 @@
     "green_background": "Grüner Hintergrund",
     "blue_background": "Blauer Hintergrund",
     "purple_background": "Lila Hintergrund",
-    "pink_background": "Rosa Hintergrund",
+    "pink_background": "Pinker Hintergrund",
     "red_background": "Roter Hintergrund"
   },
   "notifications": {
     "duplicatedBlock": "Block dupliziert",
     "duplicatedBlocks": "{{num}} Blöcke dupliziert",
-    "undo": "Rückgängig",
+    "undo": "Rückgängig machen",
     "undidDuplicate": "Duplikat rückgängig gemacht",
     "nothingToUndo": "Nichts rückgängig zu machen",
     "deletedBlock": "Block gelöscht",
     "deletedBlocks": "{{num}} Blöcke gelöscht",
     "restoredBlock": "Block wiederhergestellt",
     "copiedToClipboard": "In die Zwischenablage kopiert",
-    "couldNotCopy": "Kopieren nicht möglich",
-    "couldNotCopyLink": "Link konnte nicht kopiert werden",
+    "couldNotCopy": "Kopieren fehlgeschlagen",
+    "couldNotCopyLink": "Link kopieren fehlgeschlagen",
     "clearedColor": "Farbe entfernt",
     "changedColor": "Farbe geändert",
     "changedBlockType": "Blocktyp geändert"
@@ -83,10 +83,10 @@
     "title": "{{num}} Blöcke verschieben nach"
   },
   "edited": {
-    "justNow": "Zuletzt gerade eben bearbeitet",
-    "minutesAgo": "Zuletzt vor {{minutes}} Min. bearbeitet",
-    "hoursAgo": "Zuletzt vor {{hours}} Std. bearbeitet",
-    "daysAgo": "Zuletzt vor {{days}} Tg. bearbeitet",
-    "on": "Zuletzt bearbeitet am {{date}}"
+    "justNow": "Zuletzt bearbeitet soeben",
+    "minutesAgo": "Zuletzt bearbeitet vor {{minutes}} Min",
+    "hoursAgo": "Zuletzt bearbeitet vor {{hours}} Std",
+    "daysAgo": "Zuletzt bearbeitet vor {{days}} T",
+    "on": "Zuletzt bearbeitet {{date}}"
   }
 }

@@ -612,6 +612,7 @@ export function TableView({
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => new Set());
   const [titleFocusRowId, setTitleFocusRowId] = useState<string | null>(null);
   const [copiedRows, setCopiedRows] = useState(false);
+  const [duplicatingSelected, setDuplicatingSelected] = useState(false);
   const [selectionMenuOpen, setSelectionMenuOpen] = useState(false);
   const [selectionChromeSlot, setSelectionChromeSlot] = useState<HTMLElement | null>(null);
   const initialRowLimit = tableInitialLoadLimit(view);
@@ -633,6 +634,7 @@ export function TableView({
   const tableShortcutRef = useRef<{
     shown: Page[];
     selectedCount: number;
+    busy: boolean;
     clearSelection: () => void;
     copySelected: () => void;
     duplicateSelected: () => void;
@@ -745,6 +747,7 @@ export function TableView({
   }
 
   function toggleRowSelected(id: string, selected: boolean, range = false) {
+    if (duplicatingSelected) return;
     const orderedIds = treeRows.map((item) => item.row.id);
     const lastIndex = lastSelectedRowId ? orderedIds.indexOf(lastSelectedRowId) : -1;
     const currentIndex = orderedIds.indexOf(id);
@@ -767,6 +770,7 @@ export function TableView({
     setLastSelectedRowId(id);
   }
   function toggleSelectAll() {
+    if (duplicatingSelected) return;
     setSelectedRows(allSelected ? new Set() : new Set(renderedRows.map((row) => row.id)));
     setLastSelectedRowId(null);
   }
@@ -910,10 +914,10 @@ export function TableView({
     }
   }
   async function duplicateSelected() {
-    if (readOnly) return;
+    if (readOnly || duplicatingSelected) return;
     const ids = selectedShown.map((row) => row.id);
     if (ids.length === 0) return;
-    clearSelection();
+    setDuplicatingSelected(true);
     try {
       let copiedCount = 0;
       for (const id of ids) {
@@ -932,6 +936,10 @@ export function TableView({
       }
     } catch {
       notify(t("tableView:couldntDuplicateRows"), "error");
+    } finally {
+      setDuplicatingSelected(false);
+      setSelectionMenuOpen(false);
+      clearSelection();
     }
   }
   async function copySelected() {
@@ -958,6 +966,7 @@ export function TableView({
     tableShortcutRef.current = {
       shown: renderedRows,
       selectedCount: selectedShown.length,
+      busy: duplicatingSelected,
       clearSelection,
       copySelected: () => void copySelected(),
       duplicateSelected: () => void duplicateSelected(),
@@ -986,8 +995,20 @@ export function TableView({
 
       const key = e.key.toLowerCase();
       const mod = e.metaKey || e.ctrlKey;
+      const state = tableShortcutRef.current;
+      if (state?.busy) {
+        const isBlockedSelectionCommand =
+          e.key === "Escape" ||
+          e.key === "Tab" ||
+          (!mod && !e.altKey && !e.shiftKey && (e.key === "Backspace" || e.key === "Delete")) ||
+          (mod && !e.altKey && !e.shiftKey && ["a", "c", "d"].includes(key));
+        if (isBlockedSelectionCommand) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
       if (mod && !e.altKey && !e.shiftKey && key === "a" && !isEditingCellText(target)) {
-        const state = tableShortcutRef.current;
         if (!state || state.shown.length === 0) return;
         e.preventDefault();
         e.stopPropagation();
@@ -996,7 +1017,6 @@ export function TableView({
         return;
       }
 
-      const state = tableShortcutRef.current;
       if (!state || state.selectedCount === 0) return;
 
       if (e.key === "Escape") {
@@ -1660,12 +1680,14 @@ export function TableView({
         data-table-selection-bar
         role="toolbar"
         aria-label={t("tableView:selectedRowActions")}
+        aria-busy={duplicatingSelected || undefined}
         onPaste={onTablePaste}
       >
         <label className={styles.selectionCount}>
           <input
             type="checkbox"
             checked={allSelected}
+            disabled={duplicatingSelected}
             ref={(el) => {
               if (el) el.indeterminate = !allSelected && selectedShown.length > 0;
             }}
@@ -1688,7 +1710,7 @@ export function TableView({
         <button
           type="button"
           className={styles.selectionIconAction}
-          disabled={readOnly}
+          disabled={readOnly || duplicatingSelected}
           title={t("tableView:deleteSelectedRows")}
           aria-label={t("tableView:deleteSelectedRows")}
           onClick={() => void deleteSelected()}
@@ -1701,6 +1723,7 @@ export function TableView({
             className={styles.selectionMore}
             aria-label={t("tableView:moreSelectedRowActions")}
             aria-expanded={selectionMenuOpen}
+            disabled={duplicatingSelected}
             onClick={() => setSelectionMenuOpen((open) => !open)}
           >
             ...
@@ -1711,6 +1734,7 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
+                disabled={duplicatingSelected}
                 onClick={() => void copySelected()}
               >
                 <Copy size={14} aria-hidden="true" />
@@ -1720,17 +1744,18 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={readOnly}
+                disabled={readOnly || duplicatingSelected}
+                aria-busy={duplicatingSelected || undefined}
                 onClick={() => void duplicateSelected()}
               >
                 <Copy size={14} aria-hidden="true" />
-                {t("tableView:duplicate")}
+                {duplicatingSelected ? `${t("tableView:duplicate")}…` : t("tableView:duplicate")}
               </button>
               <button
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={!canOutdentSelectedRows()}
+                disabled={duplicatingSelected || !canOutdentSelectedRows()}
                 onClick={outdentSelectedRows}
               >
                 <ArrowLeft size={14} aria-hidden="true" />
@@ -1740,7 +1765,7 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={!canIndentSelectedRows()}
+                disabled={duplicatingSelected || !canIndentSelectedRows()}
                 onClick={indentSelectedRows}
               >
                 <ArrowRight size={14} aria-hidden="true" />
@@ -1753,6 +1778,7 @@ export function TableView({
           type="button"
           className={styles.selectionClose}
           aria-label={t("tableView:clearSelection")}
+          disabled={duplicatingSelected}
           onClick={clearSelection}
         >
           <X size={14} aria-hidden="true" />
@@ -2017,6 +2043,7 @@ export function TableView({
 	                    data-table-row-select
 	                    aria-label={t("tableView:selectRow", { title: pageDisplayTitle(row) })}
 	                    checked={selectedRows.has(row.id)}
+                    disabled={duplicatingSelected}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleRowSelected(row.id, !selectedRows.has(row.id), e.shiftKey);

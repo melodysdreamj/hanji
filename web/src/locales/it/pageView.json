@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Impossibile ripristinare la pagina",
+  "emptyBodyPrompt": "Premi Invio per iniziare a scrivere su questa pagina vuota.",
+  "inTrashTopBarTitle": "Nel cestino",
+  "notFoundTopBarTitle": "Non trovata",
+  "openWorkspace": "Apri workspace",
+  "pageInTrash": "Questa pagina è nel cestino.",
+  "pageInTrashDetail": "Ripristinala prima di aprirne o modificarne i contenuti.",
+  "pageUnavailable": "Pagina non disponibile.",
+  "pageUnavailableDetail": "Questa pagina potrebbe essere stata eliminata, spostata o condivisa con un altro account.",
+  "restorePage": "Ripristina pagina",
+  "restoredPage": "Pagina ripristinata",
+  "loadingPageContent": "Caricamento del contenuto della pagina"
 }

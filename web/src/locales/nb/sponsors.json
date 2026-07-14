@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Bli sponsor",
+  "builtWith": "<a>{{name}}</a> hjelper med å bygge Hanji",
+  "builtWithIntro": "Hanji ble bygget ved hjelp av disse verktøyene og plattformene.",
+  "builtWithTitle": "Bygget med",
+  "emptySlot": "Ledig plass – spons for å vises her",
+  "rule1": "Banneret viser de fem beste sponsorene etter gjenstående saldo.",
+  "rule2": "En gang i måneden reduseres alle viste sponsorers saldo med den femte sponsors saldo, slik at alle fem betaler samme sats.",
+  "rule3": "Når saldoen går tom, går plassen til neste sponsor etter saldo.",
+  "rule4": "Å holde banneret aktivt som standard er det som gir Hanjis lisensunntak; en lukket, bannerfri versjon trenger en egen kommersiell lisens.",
+  "settingsIntro": "Hanji opprettholdes av sine sponsorer. Innloggingsskjermen viser et lite banner med de fem beste sponsorene for øyeblikket.",
+  "sponsorSlots": "Nåværende sponsorer",
+  "supportTitle": "Støtt Hanji",
+  "thanksSponsor": "<a>{{name}}</a> sponser Hanji mens det vokser"
+}

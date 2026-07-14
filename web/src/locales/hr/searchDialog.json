@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Pretraži ili idi na...",
+  "quickFind": "Brzo pronalaženje",
+  "closeSearch": "Zatvori pretraživanje",
+  "quickFindResults": "Rezultati brzog pronalaženja",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Nedavno pregledano",
+    "recentSearches": "Nedavna pretraživanja",
+    "pages": "Stranice",
+    "pageContent": "Sadržaj stranice",
+    "favorites": "Favoriti"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "u stranici",
+  "searchingDetail": "Pretraživanje...",
+  "searchAgain": "Ponovno pretraži",
+  "searchingPageContent": "Pretraživanje sadržaja stranice...",
+  "noResultsFor": "Nema rezultata za \"{{query}}\"",
+  "noPagesFound": "Nema pronađenih stranica",
+  "creating": "Stvaranje...",
+  "newPage": "Nova stranica \"{{query}}\"",
+  "couldntCreatePage": "Nije moguće stvoriti stranicu",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Odaberi",
+    "open": "Otvori",
+    "newTab": "Nova kartica"
   }
 }

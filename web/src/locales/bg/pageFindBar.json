@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Търсене в страница"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Търсене в страница",
+    "placeholder": "Търсене в страница"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Предишно съвпадение",
+    "next": "Следващо съвпадение",
+    "close": "Затвори търсене"
   }
 }

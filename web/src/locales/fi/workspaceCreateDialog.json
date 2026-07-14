@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
-  "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+  "create": "Luo työtila",
+  "creating": "Luodaan…",
+  "error": {
+    "couldntCreate": "Työtilaa ei voitu luoda."
   },
-  "startLabel": "Start from",
+  "name": {
+    "label": "Työtilan nimi",
+    "placeholder": "Yritys Oy"
+  },
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
-    },
-    "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "body": "Aloita tyhjästä aloitussivujen kanssa.",
+      "title": "Tyhjä työtila"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "body": "Luo työtila ja tuo toisesta Hanji-palvelimesta tai tiedostosta.",
+      "title": "Tuo toisesta Hanjista"
+    },
+    "notion": {
+      "body": "Luo työtila ja siirrä Notion-työtila siihen.",
+      "title": "Tuo Notionista"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
-  "error": {
-    "couldntCreate": "Couldn't create workspace."
-  }
+  "startLabel": "Aloitus",
+  "title": "Uusi työtila"
 }

@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> anafadhili Hanji inavyokua",
+  "builtWith": "<a>{{name}}</a> husaidia kujenga Hanji",
+  "supportTitle": "Saidia Hanji",
+  "settingsIntro": "Hanji inaendeshwa na wafadhili wake. Skrini ya kuingia inaonyesha banner ndogo yenye wafadhili watano wa juu wa sasa.",
+  "rule1": "Banner inaonyesha wafadhili watano walio juu kwa salio lililobaki.",
+  "rule2": "Kila mwezi, salio la kila mfadhili anayeonyeshwa hupunguzwa kwa kiasi cha yule wa tano, ili wote watano walipe kiwango sawa.",
+  "rule3": "Salio linapoisha, nafasi hupewa mfadhili anayefuata kwa salio.",
+  "rule4": "Kuweka banner ikiwa imewashwa kwa msingi ndiko kunakopa Hanji msamaha wa leseni; toleo lililofungwa lisilo na banner linahitaji leseni tofauti ya kibiashara.",
+  "sponsorSlots": "Wafadhili wa sasa",
+  "emptySlot": "Nafasi wazi — fadhili ili ujitokeze hapa",
+  "becomeSponsor": "Kuwa mfadhili",
+  "builtWithTitle": "Imejengwa kwa",
+  "builtWithIntro": "Hanji ilijengwa kwa usaidizi wa zana na majukwaa haya."
+}

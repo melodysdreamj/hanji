@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "tryAgain": "Jaribu tena",
+  "errors": {
+    "not-found": "Kiungo hiki kinaweza kuwa kimeisha muda, kimeondolewa uchapishaji, au kunakiliwa vibaya.",
+    "rate-limited": "Ukurasa huu ulioshirishwa unapokea maombi mengi sana. Subiri kidogo kisha ujaribu tena.",
+    "offline": "Angalia muunganisho wako, kisha ujaribu kufungua ukurasa ulioshirishwa tena.",
+    "unavailable": "Hanji haiwezi kufungua ukurasa huu ulioshirishwa kwa sasa. Jaribu tena baadaye kidogo."
+  },
+  "title": "Ukurasa ulioshirishwa",
+  "loading": "Inapakia ukurasa ulioshirishwa",
+  "unavailable": "Ukurasa huu ulioshirishwa haupatikani.",
+  "notFound": "Ukurasa ulioshirishwa haukupatikana.",
+  "outsideShare": "Ukurasa huu si sehemu ya shirikisho hili la umma."
 }

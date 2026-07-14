@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "errors": {
+    "not-found": "Denne lenken kan ha utløpt, blitt avpublisert eller kopiert feil.",
+    "offline": "Sjekk tilkoblingen din, og prøv å åpne den delte siden på nytt.",
+    "rate-limited": "Denne delte siden mottar for mange forespørsler. Vent et øyeblikk og prøv igjen.",
+    "unavailable": "Hanji kunne ikke åpne denne delte siden nå. Prøv igjen om et øyeblikk."
+  },
+  "loading": "Laster delt side",
+  "notFound": "Delt side ble ikke funnet.",
+  "outsideShare": "Siden er ikke en del av denne offentlige delingen.",
+  "title": "Delt side",
+  "tryAgain": "Prøv igjen",
+  "unavailable": "Denne delte siden er utilgjengelig."
 }

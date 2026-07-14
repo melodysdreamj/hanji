@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "在頁面中搜尋"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "在頁面中搜尋",
+    "placeholder": "在頁面中搜尋"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "上一個相符項目",
+    "next": "下一個相符項目",
+    "close": "關閉搜尋"
   }
 }

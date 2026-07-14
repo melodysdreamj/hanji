@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Пошук або перейти до...",
+  "quickFind": "Швидкий пошук",
+  "closeSearch": "Закрити пошук",
+  "quickFindResults": "Результати швидкого пошуку",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Нещодавно переглянуті",
+    "recentSearches": "Нещодавні пошуки",
+    "pages": "Сторінки",
+    "pageContent": "Вміст сторінки",
+    "favorites": "Улюблене"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "на сторінці",
+  "searchingDetail": "Пошук...",
+  "searchAgain": "Шукати знову",
+  "searchingPageContent": "Пошук вмісту сторінки...",
+  "noResultsFor": "Немає результатів для \"{{query}}\"",
+  "noPagesFound": "Сторінок не знайдено",
+  "creating": "Створення...",
+  "newPage": "Нова сторінка \"{{query}}\"",
+  "couldntCreatePage": "Не вдалося створити сторінку",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Вибрати",
+    "open": "Відкрити",
+    "newTab": "Нова вкладка"
   }
 }

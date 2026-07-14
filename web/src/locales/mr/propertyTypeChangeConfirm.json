@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "गुणधर्म प्रकार बदलायचा?",
+  "message": "\"{{propName}}\" मध्ये आधीपासून मूल्ये आहेत. त्याचा प्रकार {{typeLabel}} मध्ये बदलल्यास विद्यमान मूल्ये वेगळी दर्शविली जाऊ शकतात किंवा गमावली जाऊ शकतात.",
+  "cancelAria": "गुणधर्म प्रकार बदल रद्द करा",
+  "confirm": "प्रकार बदला"
 }

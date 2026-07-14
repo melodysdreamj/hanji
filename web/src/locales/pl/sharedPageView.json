@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "errors": {
+    "not-found": "Ten link mógł wygasnąć, zostać wycofany lub skopiowany nieprawidłowo.",
+    "offline": "Sprawdź połączenie i spróbuj ponownie otworzyć udostępnioną stronę.",
+    "rate-limited": "Ta udostępniona strona otrzymuje zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
+    "unavailable": "Hanji nie może teraz otworzyć tej udostępnionej strony. Spróbuj ponownie za chwilę."
+  },
+  "loading": "Ładowanie udostępnionej strony",
+  "notFound": "Nie znaleziono udostępnionej strony.",
+  "outsideShare": "Strona nie należy do tego publicznego udostępnienia.",
+  "title": "Udostępniona strona",
+  "tryAgain": "Spróbuj ponownie",
+  "unavailable": "Ta udostępniona strona jest niedostępna."
 }

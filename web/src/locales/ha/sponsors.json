@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Zama mai tallafi",
+  "builtWith": "<a>{{name}}</a> na taimakawa gina Hanji",
+  "builtWithIntro": "An gina Hanji da taimakon waɗannan kayan aiki da dandamali.",
+  "builtWithTitle": "An gina da",
+  "emptySlot": "Rami mara cika — yi tallafi don bayyana nan",
+  "rule1": "Tutanin yana nuna manyan tallafi biyar bisa ragowar ma'auni.",
+  "rule2": "Sau ɗaya a wata, ana rage ma'auni na kowane mai tallafi da aka nuna da na mai tallafi na biyar, don haka duk manyan tallafi biyar suna biyan kuɗi ɗaya.",
+  "rule3": "Idan ma'auni ya ƙare, ramin yana wucewa zuwa mai tallafi na gaba.",
+  "rule4": "Ci gaba da kunna tutanin ta tsohuwa shi ne ke ba da keɓantaccen lasisin Hanji; sigar rufaffiyar mara tuta tana buƙatar lasisin kasuwanci daban.",
+  "settingsIntro": "Masu tallafawa ne ke ci gaba da gudanar da Hanji. Allon shiga yana nuna ƙaramin tuta da manyan tallafi biyar na yanzu.",
+  "sponsorSlots": "Masu tallafi na yanzu",
+  "supportTitle": "Tallafawa Hanji",
+  "thanksSponsor": "<a>{{name}}</a> na tallafawa Hanji yayin girma"
+}

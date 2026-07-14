@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "آف لائن",
+  "offlinePending_one": "آف لائن · {{count}} تبدیلی زیر التوا",
+  "offlinePending_other": "آف لائن · {{count}} تبدیلیاں زیر التوا",
+  "syncing": "مطابقت جاری ہے · {{count}}",
+  "unreachable": "سرور سے رابطہ نہیں ہو سکا",
+  "unreachablePending_one": "سرور سے رابطہ نہیں ہو سکا · {{count}} تبدیلی زیر التوا",
+  "unreachablePending_other": "سرور سے رابطہ نہیں ہو سکا · {{count}} تبدیلیاں زیر التوا",
+  "retryHint": "ابھی دوبارہ کوشش کرنے کے لیے کلک کریں"
 }

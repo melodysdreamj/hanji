@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Legyél támogató",
+  "builtWith": "<a>{{name}}</a> segít a Hanji építésében",
+  "builtWithIntro": "A Hanji ezeknek az eszközöknek és platformoknak a segítségével készült.",
+  "builtWithTitle": "Készült ezekkel",
+  "emptySlot": "Üres hely – itt jelenhet meg a támogató",
+  "rule1": "A banner a fennmaradó egyenleg alapján a legjobb öt támogatót mutatja.",
+  "rule2": "Havonta egyszer minden megjelenített támogató egyenlege csökken az ötödik helyezett egyenlegével, így mind az öt megjelenített támogató ugyanazt az egyenlő összeget fizeti.",
+  "rule3": "Ha egy egyenleg elfogy, a hely a következő támogatóra száll az egyenleg sorrendjében.",
+  "rule4": "A banner alapértelmezett bekapcsolva tartása biztosítja a Hanji licenc-kivételét; egy zárt, bannert nem tartalmazó verzió külön kereskedelmi licencet igényel.",
+  "settingsIntro": "A Hanji-t a támogatói tartják fenn. A bejelentkezési képernyőn egy kis banner mutatja az aktuális öt legnagyobb támogatót.",
+  "sponsorSlots": "Aktuális támogatók",
+  "supportTitle": "Támogasd a Hanji-t",
+  "thanksSponsor": "<a>{{name}}</a> támogatja a Hanji növekedését"
+}

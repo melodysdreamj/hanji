@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "اس ڈیٹابیس میں ابھی تک کوئی صفحہ نہیں ہے۔",
+  "emptyTitle": "ابھی تک کوئی صفحہ نہیں",
+  "newInline": "نیا",
+  "newPage": "نیا صفحہ",
+  "newPageIn": "{{dbTitle}} میں نیا صفحہ",
+  "noResultsDesc": "کوئی صفحہ موجودہ فلٹرز یا تلاش سے مماثل نہیں ہے۔",
+  "noResultsTitle": "کوئی نتائج نہیں",
+  "openRow": "{{title}} کھولیں"
 }

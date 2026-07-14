@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Postanite sponzor",
+  "builtWith": "<a>{{name}}</a> pomaže u izgradnji Hanjia",
+  "builtWithIntro": "Hanji je izgrađen uz pomoć ovih alata i platformi.",
+  "builtWithTitle": "Izgrađeno uz",
+  "emptySlot": "Slobodno mjesto — sponzor će se prikazati ovdje",
+  "rule1": "Banner prikazuje prvih pet sponzora prema preostalom saldu.",
+  "rule2": "Jednom mjesečno, saldo svakog prikazanog sponzora smanjuje se za iznos koji ima petoplasirani sponzor, tako da svih pet prikazanih sponzora plaća istu poštenu stopu.",
+  "rule3": "Kada saldo istekne, mjesto prelazi na sljedećeg sponzora prema saldu.",
+  "rule4": "Zadržavanje bannera aktivnim prema zadanim postavkama daje iznimku licence Hanjia; zatvorena verzija bez bannera zahtijeva zasebnu komercijalnu licencu.",
+  "settingsIntro": "Hanji održavaju njegovi sponzori. Zaslon za prijavu prikazuje mali banner s trenutnih pet najboljih sponzora.",
+  "sponsorSlots": "Trenutni sponzori",
+  "supportTitle": "Podržite Hanji",
+  "thanksSponsor": "<a>{{name}}</a> sponzorira Hanji dok raste"
+}

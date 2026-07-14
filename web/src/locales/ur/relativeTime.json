@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "ابھی",
+  "editedJustNow": "ابھی ترمیم شد",
+  "editedMinutesAgo": "ترمیم شد {{minutes}} منٹ پہلے",
+  "editedHoursAgo": "ترمیم شد {{hours}} گھنٹے پہلے",
+  "editedDaysAgo": "ترمیم شد {{days}} دن پہلے",
+  "editedOn": "{{date}} ترمیم شد",
+  "noEdits": "کوئی ترمیم نہیں",
+  "noEditsYet": "ابھی تک ترمیم نہیں",
+  "todayAt": "آج {{time}}",
+  "yesterdayAt": "کل {{time}}",
+  "dateAt": "{{date}} کو {{time}}"
 }

@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Blokk mozgatása",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Mozgatási célok keresése",
+    "placeholder": "Oldalak keresése..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Mozgatási párbeszédablak bezárása"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Mozgatási célok",
+    "empty": "Nem található oldal.",
+    "destinationLabel": "Blokk mozgatása ide: {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" létrehozása",
+    "optionLabel": "\"{{query}}\" oldal létrehozása és blokk ide mozgatása",
+    "hint": "Új oldal - blokk ide mozgatása"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Zárolt oldal"
   },
-  "untitled": "Untitled",
+  "untitled": "Névtelen",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Az oldal zárolva",
+    "movedBlock": "Blokk mozgatva",
+    "movedBlocks": "Blokkok mozgatva",
+    "movedBlocksCount": "{{blockCount}} blokk mozgatva",
+    "moveFailed": "Nem sikerült a blokk mozgatása"
   }
 }

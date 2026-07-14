@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "തിരയുക അല്ലെങ്കിൽ പോവുക...",
+  "quickFind": "ദ്രുതതിരയൽ",
+  "closeSearch": "തിരയൽ അടയ്ക്കുക",
+  "quickFindResults": "ദ്രുതതിരയൽ ഫലങ്ങൾ",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "അടുത്തിടെ കണ്ടവ",
+    "recentSearches": "അടുത്തിടെയുള്ള തിരയലുകൾ",
+    "pages": "പേജുകൾ",
+    "pageContent": "പേജ് ഉള്ളടക്കം",
+    "favorites": "പ്രിയപ്പെട്ടവ"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "പേജിൽ",
+  "searchingDetail": "തിരയുന്നു...",
+  "searchAgain": "വീണ്ടും തിരയുക",
+  "searchingPageContent": "പേജ് ഉള്ളടക്കം തിരയുന്നു...",
+  "noResultsFor": "\"{{query}}\" എന്നതിന് ഫലങ്ങളൊന്നുമില്ല",
+  "noPagesFound": "പേജുകളൊന്നും കണ്ടെത്തിയില്ല",
+  "creating": "സൃഷ്ടിക്കുന്നു...",
+  "newPage": "പുതിയ പേജ് \"{{query}}\"",
+  "couldntCreatePage": "പേജ് സൃഷ്ടിക്കാനായില്ല",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "തിരഞ്ഞെടുക്കുക",
+    "open": "തുറക്കുക",
+    "newTab": "പുതിയ ടാബ്"
   }
 }

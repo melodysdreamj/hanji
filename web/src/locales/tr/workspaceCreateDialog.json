@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Yeni çalışma alanı",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Çalışma alanı adı",
+    "placeholder": "Firma Adı"
   },
-  "startLabel": "Start from",
+  "startLabel": "Başlangıç",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Boş çalışma alanı",
+      "body": "Başlangıç sayfalarıyla boş başlayın."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion'dan içe aktar",
+      "body": "Çalışma alanını oluşturun, ardından bir Notion çalışma alanını içine taşıyın."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Başka bir Hanji'den içe aktar",
+      "body": "Çalışma alanını oluşturun, ardından başka bir Hanji sunucusu veya dosyasından alın."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Çalışma alanı oluştur",
+  "creating": "Oluşturuluyor…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Çalışma alanı oluşturulamadı."
   }
 }

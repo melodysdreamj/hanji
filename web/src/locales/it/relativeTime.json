@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Ora",
+  "editedJustNow": "Appena modificato",
+  "editedMinutesAgo": "Modificato {{minutes}}m fa",
+  "editedHoursAgo": "Modificato {{hours}}h fa",
+  "editedDaysAgo": "Modificato {{days}}g fa",
+  "editedOn": "Modificato {{date}}",
+  "noEdits": "Nessuna modifica",
+  "noEditsYet": "Ancora nessuna modifica",
+  "todayAt": "Oggi alle {{time}}",
+  "yesterdayAt": "Ieri alle {{time}}",
+  "dateAt": "{{date}} alle {{time}}"
 }

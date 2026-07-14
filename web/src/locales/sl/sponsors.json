@@ -1,0 +1,15 @@
+{
+  "supportTitle": "Podpri Hanji",
+  "builtWith": "<a>{{name}}</a> pomaga graditi Hanji",
+  "rule1": "Pasica prikazuje pet najboljših sponzorjev po preostalem stanju.",
+  "thanksSponsor": "<a>{{name}}</a> sponzorira Hanji med njegovo rastjo",
+  "settingsIntro": "Hanji vzdržujejo njegovi sponzorji. Prijavni zaslon prikaže majhno pasico s trenutnimi petimi najboljšimi sponzorji.",
+  "sponsorSlots": "Trenutni sponzorji",
+  "becomeSponsor": "Postani sponzor",
+  "rule3": "Ko stanje zmanjka, mesto preide na naslednjega sponzorja po stanju.",
+  "emptySlot": "Prosto mesto – sponzor se bo prikazal tukaj",
+  "rule2": "Enkrat na mesec se stanje vsakega prikazanega sponzorja zmanjša za stanje petouvrščenega sponzorja, tako da vseh pet prikazanih sponzorjev plača enako pošteno ceno.",
+  "rule4": "Privzeto omogočena pasica je tisto, kar daje izjemo licence Hanji; zaprta različica brez pasice potrebuje ločeno komercialno licenco.",
+  "builtWithTitle": "Zgrajeno z",
+  "builtWithIntro": "Hanji je bil zgrajen s pomočjo teh orodij in platform."
+}

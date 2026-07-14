@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "உரை வடிவமைப்பு"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "மாற்று",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "உரை",
+      "heading1": "தலைப்பு 1",
+      "heading2": "தலைப்பு 2",
+      "heading3": "தலைப்பு 3",
+      "heading4": "தலைப்பு 4",
+      "toDoList": "செய்யவேண்டியவை",
+      "bulletedList": "புள்ளி பட்டியல்",
+      "numberedList": "எண் பட்டியல்",
+      "toggleList": "மாற்று பட்டியல்",
+      "quote": "மேற்கோள்",
+      "callout": "அழைப்பு",
+      "code": "குறியீடு"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "தடித்த",
+    "italic": "சாய்வு",
+    "underline": "அடிக்கோடு",
+    "strikethrough": "குறுக்கு வரி",
+    "code": "குறியீடு",
+    "link": "இணைப்பு"
   },
   "comment": {
-    "label": "Comment"
+    "label": "கருத்து"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "உரை நிறம்: {{color}}",
+    "title": "நிறம்: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "கலவை",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "எழுத்து நிறம்",
+      "default": "இயல்பு",
+      "gray": "சாம்பல்",
+      "brown": "பழுப்பு",
+      "orange": "ஆரஞ்சு",
+      "yellow": "மஞ்சள்",
+      "green": "பச்சை",
+      "blue": "நீலம்",
+      "purple": "ஊதா",
+      "pink": "இளஞ்சிவப்பு",
+      "red": "சிவப்பு"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "பின்னணி நிறம்",
+      "gray": "சாம்பல் பின்னணி",
+      "brown": "பழுப்பு பின்னணி",
+      "orange": "ஆரஞ்சு பின்னணி",
+      "yellow": "மஞ்சள் பின்னணி",
+      "green": "பச்சை பின்னணி",
+      "blue": "நீல பின்னணி",
+      "purple": "ஊதா பின்னணி",
+      "pink": "இளஞ்சிவப்பு பின்னணி",
+      "red": "சிவப்பு பின்னணி"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "இணைப்பைத் திருத்து",
+    "placeholder": "இணைப்பை ஒட்டு",
+    "urlAriaLabel": "இணைப்பு URL",
+    "apply": "இணைப்பு",
+    "open": "இணைப்பைத் திற",
+    "copy": "இணைப்பை நகலெடு",
+    "copied": "நகலெடுக்கப்பட்டது",
+    "copiedLink": "இணைப்பு நகலெடுக்கப்பட்டது",
+    "remove": "அகற்று"
   }
 }

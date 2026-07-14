@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "אופליין",
+  "offlinePending_one": "אופליין · {{count}} שינוי ממתין",
+  "offlinePending_other": "אופליין · {{count}} שינויים ממתינים",
+  "syncing": "מסנכרן · {{count}}",
+  "unreachable": "לא ניתן להגיע לשרת",
+  "unreachablePending_one": "לא ניתן להגיע לשרת · {{count}} שינוי בהמתנה",
+  "unreachablePending_other": "לא ניתן להגיע לשרת · {{count}} שינויים בהמתנה",
+  "retryHint": "לחץ כדי לנסות שוב"
 }

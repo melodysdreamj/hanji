@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Tambah sifat tarikh",
+    "description": "Paparan kalendar memerlukan sifat tarikh untuk meletakkan halaman pada bulan.",
+    "addDateButton": "Tarikh"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalendar mengikut",
+    "today": "Hari ini",
+    "previousWeek": "Minggu lepas",
+    "previousMonth": "Bulan lepas",
+    "nextWeek": "Minggu depan",
+    "nextMonth": "Bulan depan"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Ahad",
+    "mon": "Isn",
+    "tue": "Sel",
+    "wed": "Rab",
+    "thu": "Kha",
+    "fri": "Jum",
+    "sat": "Sab"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Kalendar {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} item",
+    "newRowAriaLabel": "Baris baru pada {{date}}",
+    "newRowTitle": "Baru",
+    "showLess": "Tunjukkan kurang",
+    "showMore": "+{{count}} lagi"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buka {{title}}",
+    "openAriaLabelWithDate": "Buka {{title}}, dijadualkan pada {{date}}",
+    "openNoDateAriaLabel": "Buka {{title}}, tiada tarikh"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tiada tarikh ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Tanpa tajuk",
+    "dateDefaultName": "Tarikh"
   }
 }

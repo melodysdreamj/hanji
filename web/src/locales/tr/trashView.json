@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Çöp",
+  "empty": "Sildiğiniz sayfalar buraya gelir. Çöp kutusu boş.",
+  "searchTrash": "Çöp kutusunda ara",
+  "deletedPages": "Silinen sayfalar",
+  "noSearchMatches": "Aramanızla eşleşen silinmiş sayfa yok.",
+  "pageCount_one": "{{count}} sayfa",
+  "pageCount_other": "{{count}} sayfa",
+  "deletedJustNow": "Az önce silindi",
+  "deletedOn": "{{date}} tarihinde silindi",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Geri yükle",
+    "deleteForever": "Kalıcı olarak sil",
+    "emptyTrash": "Çöp kutusunu boşalt"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} çöp kutusundan aç",
+    "restorePage": "{{title}} geri yükle",
+    "deletePageForever": "{{title}} sayfasını kalıcı olarak sil",
+    "cancelPermanentDelete": "Kalıcı silmeyi iptal et",
+    "cancelEmptyTrash": "Çöp kutusunu boşaltmayı iptal et"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Kalıcı olarak silinsin mi?",
+    "deleteBodyPrefix": "Bu, ",
+    "deleteBodySuffix": " kalıcı olarak silinecek. Bu işlemi geri alamazsınız.",
+    "emptyTitle": "Çöp kutusu boşaltılsın mı?",
+    "emptyBody_one": "Bu, çöp kutusundaki {{count}} sayfayı kalıcı olarak silecek. Bu işlemi geri alamazsınız.",
+    "emptyBody_other": "Bu, çöp kutusundaki {{count}} sayfayı kalıcı olarak silecek. Bu işlemi geri alamazsınız."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Kalıcı olarak silindi",
+    "couldntDelete": "Sayfa silinemedi",
+    "restored": "Sayfa geri yüklendi",
+    "couldntRestore": "Sayfa geri yüklenemedi",
+    "emptied": "Çöp kutusu boşaltıldı",
+    "couldntEmpty": "Çöp kutusu boşaltılamadı"
   }
 }

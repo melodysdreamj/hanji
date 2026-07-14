@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Borítókép módosítása",
+    "reposition": "Áthelyezés",
+    "remove": "Eltávolítás",
+    "uploadFile": "Fájl feltöltése",
+    "uploading": "Feltöltés...",
+    "submit": "Beküldés",
+    "savePosition": "Pozíció mentése"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galéria",
+    "upload": "Feltöltés",
+    "link": "Hivatkozás"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Kép hivatkozás beillesztése",
+    "invalid": "Illesszen be egy http vagy https kép hivatkozást."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "A kép feltöltése nem sikerült.",
+    "defaultFileName": "Borítókép"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Húzza a képet az áthelyezéshez"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Feltöltés előkészítése",
+    "finalizing": "Véglegesítés",
+    "complete": "Kész",
+    "uploading": "Feltöltés"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Borító eltávolítva",
+    "restored": "Borító visszaállítva",
+    "undo": "Visszavonás"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Oldalborító",
+    "coverVerticalPosition": "Borító függőleges helyzete",
+    "positionFromTop": "Fentről {{position}}%",
+    "closeCoverMenu": "Borítómenü bezárása",
+    "changePageCover": "Oldalborító módosítása",
+    "repositionPageCover": "Oldalborító áthelyezése",
+    "removePageCover": "Oldalborító eltávolítása",
+    "changeCoverDialog": "Borító módosítása",
+    "coverSource": "Borító forrása",
+    "selectCover": "Borító kiválasztása {{number}}",
+    "uploadFromDevice": "Borítókép feltöltése erről az eszközről",
+    "uploadingFile": "{{fileName}} feltöltése",
+    "coverImageLink": "Borítókép hivatkozása"
   }
 }

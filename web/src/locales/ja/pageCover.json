@@ -1,7 +1,7 @@
 {
   "actions": {
     "changeCover": "カバーを変更",
-    "reposition": "位置を調整",
+    "reposition": "位置変更",
     "remove": "削除",
     "uploadFile": "ファイルをアップロード",
     "uploading": "アップロード中...",
@@ -22,11 +22,11 @@
     "defaultFileName": "カバー画像"
   },
   "reposition": {
-    "hint": "画像をドラッグして位置を調整"
+    "hint": "画像をドラッグして位置を変更"
   },
   "progress": {
-    "preparing": "アップロードを準備中",
-    "finalizing": "完了処理中",
+    "preparing": "アップロード準備中",
+    "finalizing": "最終処理中",
     "complete": "完了",
     "uploading": "アップロード中"
   },
@@ -41,13 +41,13 @@
     "positionFromTop": "上から{{position}}%",
     "closeCoverMenu": "カバーメニューを閉じる",
     "changePageCover": "ページカバーを変更",
-    "repositionPageCover": "ページカバーの位置を調整",
+    "repositionPageCover": "ページカバーの位置を変更",
     "removePageCover": "ページカバーを削除",
-    "changeCoverDialog": "カバーを変更",
-    "coverSource": "カバーのソース",
+    "changeCoverDialog": "カバー変更",
+    "coverSource": "カバーソース",
     "selectCover": "カバー{{number}}を選択",
     "uploadFromDevice": "このデバイスからカバー画像をアップロード",
     "uploadingFile": "{{fileName}}をアップロード中",
-    "coverImageLink": "カバー画像のリンク"
+    "coverImageLink": "カバー画像リンク"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "משהו השתבש בהצגת תוכן זה.",
+  "detail": "נסה שוב. אם הבעיה נמשכת, טען מחדש את האפליקציה ושתף את ההפניה למטה.",
+  "reference": "הפניה: {{reference}}",
+  "reload": "טען מחדש",
+  "retry": "נסה שוב"
 }

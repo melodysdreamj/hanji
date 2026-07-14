@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ቆሻሻ መጣያ",
+  "empty": "የሰረዟቸው ገጾች እዚህ ይታያሉ። ቆሻሻ መጣያ ባዶ ነው።",
+  "searchTrash": "ቆሻሻ መጣያ ፈልግ",
+  "deletedPages": "የተሰረዙ ገጾች",
+  "noSearchMatches": "ከፍለጋዎ ጋር የሚዛመዱ የተሰረዙ ገጾች የሉም።",
+  "pageCount_one": "{{count}} ገጽ",
+  "pageCount_other": "{{count}} ገጾች",
+  "deletedJustNow": "ልክ አሁን ተሰርዟል",
+  "deletedOn": "{{date}} ተሰርዟል",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "መልስ",
+    "deleteForever": "ለዘለቄታው ሰርዝ",
+    "emptyTrash": "መጣያ አጥራ"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} ከቆሻሻ መጣያ ውስጥ ክፈት",
+    "restorePage": "{{title}} ወደነበረበት መልስ",
+    "deletePageForever": "{{title}} ለዘለቄታው ሰርዝ",
+    "cancelPermanentDelete": "ለዘለቄታው መሰረዝ ሰርዝ",
+    "cancelEmptyTrash": "መጣያ ማጽዳት ሰርዝ"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "ለዘላለም ሰርዝ?",
+    "deleteBodyPrefix": "ይህ በቋሚነት ይሰርዛል ",
+    "deleteBodySuffix": ". ይህን ተግባር መቀልበስ አይችሉም።",
+    "emptyTitle": "ቆሻሻ መጣያ ባዶ ማድረግ?",
+    "emptyBody_one": "ይህ በቋሚነት በቆሻሻ መጣያ ውስጥ ያለውን {{count}} ገጽ በሙሉ ይሰርዛል። ይህን ተግባር መቀልበስ አይችሉም።",
+    "emptyBody_other": "ይህ በቋሚነት በቆሻሻ መጣያ ውስጥ ያሉትን ሁሉንም {{count}} ገጾች ይሰርዛል። ይህን ተግባር መቀልበስ አይችሉም።"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "ለዘላለም ተሰርዟል",
+    "couldntDelete": "ገጽ መሰረዝ አልተቻለም",
+    "restored": "ገጽ ወደነበረበት ተመልሷል",
+    "couldntRestore": "ገጽ ወደነበረበት መመለስ አልተቻለም",
+    "emptied": "ቆሻሻ መጣያ ባዶ ሆኗል",
+    "couldntEmpty": "ቆሻሻ መጣያ ባዶ ማድረግ አልተቻለም"
   }
 }

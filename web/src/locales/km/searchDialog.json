@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ស្វែងរក ឬ លោតទៅ...",
+  "quickFind": "ស្វែងរករហ័ស",
+  "closeSearch": "បិទការស្វែងរក",
+  "quickFindResults": "លទ្ធផលស្វែងរករហ័ស",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "បានមើលថ្មីៗ",
+    "recentSearches": "ការស្វែងរកថ្មីៗ",
+    "pages": "ទំព័រ",
+    "pageContent": "មាតិកាទំព័រ",
+    "favorites": "ចំណូលចិត្ត"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "ក្នុងទំព័រ",
+  "searchingDetail": "កំពុងស្វែងរក...",
+  "searchAgain": "ស្វែងរកម្តងទៀត",
+  "searchingPageContent": "កំពុងស្វែងរកមាតិកាទំព័រ...",
+  "noResultsFor": "គ្មានលទ្ធផលសម្រាប់ \"{{query}}\"",
+  "noPagesFound": "រកមិនឃើញទំព័រ",
+  "creating": "កំពុងបង្កើត...",
+  "newPage": "ទំព័រថ្មី \"{{query}}\"",
+  "couldntCreatePage": "មិនអាចបង្កើតទំព័របានទេ",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "ជ្រើសរើស",
+    "open": "បើក",
+    "newTab": "ផ្ទាំងថ្មី"
   }
 }

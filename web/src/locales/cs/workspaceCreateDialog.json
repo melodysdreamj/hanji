@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
-  "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+  "create": "Vytvořit pracovní prostor",
+  "creating": "Vytváření…",
+  "error": {
+    "couldntCreate": "Nepodařilo se vytvořit pracovní prostor."
   },
-  "startLabel": "Start from",
+  "name": {
+    "label": "Název pracovního prostoru",
+    "placeholder": "Název firmy"
+  },
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
-    },
-    "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "body": "Začněte prázdný s úvodními stránkami.",
+      "title": "Prázdný pracovní prostor"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "body": "Vytvořte workspace a poté importujte z jiného serveru Hanji nebo souboru.",
+      "title": "Import z jiného Hanji"
+    },
+    "notion": {
+      "body": "Vytvořte workspace a poté do něj migrujte workspace z Notion.",
+      "title": "Import z Notion"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
-  "error": {
-    "couldntCreate": "Couldn't create workspace."
-  }
+  "startLabel": "Začít od",
+  "title": "Nový pracovní prostor"
 }

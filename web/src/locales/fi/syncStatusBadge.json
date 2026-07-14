@@ -1,10 +1,10 @@
 {
   "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offlinePending_one": "Offline · {{count}} muutos odottaa",
+  "offlinePending_other": "Offline · {{count}} muutosta odottaa",
+  "retryHint": "Napsauta yrittääksesi uudelleen",
+  "syncing": "Synkronoidaan · {{count}}",
+  "unreachable": "Palvelimeen ei saa yhteyttä",
+  "unreachablePending_one": "Palvelimeen ei saa yhteyttä · {{count}} muutos odottaa",
+  "unreachablePending_other": "Palvelimeen ei saa yhteyttä · {{count}} muutosta odottaa"
 }

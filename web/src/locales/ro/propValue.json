@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Se încarcă elementele de relație",
+  "relationUnavailable": "Elemente de relație indisponibile",
+  "unavailable": "Indisponibil",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Selectat",
+    "unchecked": "Neselectat"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Deschideți {{title}}",
+  "openOrDownloadFile": "Deschideți sau descărcați {{name}}"
 }

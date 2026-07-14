@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> patrocina Hanji à medida que cresce.",
+  "builtWith": "<a>{{name}}</a> ajuda a construir Hanji",
+  "supportTitle": "Apoiar Hanji",
+  "settingsIntro": "Hanji é sustentado pelos seus patrocinadores. O ecrã de início de sessão mostra um pequeno banner com os cinco melhores patrocinadores atuais.",
+  "rule1": "O banner mostra os cinco principais patrocinadores por saldo restante.",
+  "rule2": "Uma vez por mês, o saldo de cada patrocinador exibido é reduzido pelo valor do quinto patrocinador, para que todos paguem o mesmo valor.",
+  "rule3": "Quando um saldo se esgota, a vaga passa para o próximo patrocinador por saldo.",
+  "rule4": "Manter o banner ativo por predefinição é o que concede a exceção de licença do Hanji; uma versão fechada, sem banner, necessita de uma licença comercial separada.",
+  "sponsorSlots": "Patrocinadores atuais",
+  "emptySlot": "Vaga em aberto — patrocinador aparece aqui",
+  "becomeSponsor": "Seja patrocinador",
+  "builtWithTitle": "Construído com",
+  "builtWithIntro": "Hanji foi construído com a ajuda destas ferramentas e plataformas."
+}

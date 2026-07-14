@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Táto databáza zatiaľ nemá stránky.",
+  "emptyTitle": "Zatiaľ žiadne stránky",
+  "newInline": "Nová",
+  "newPage": "Nová stránka",
+  "newPageIn": "Nová stránka v {{dbTitle}}",
+  "noResultsDesc": "Žiadne stránky nezodpovedajú aktuálnym filtrom alebo vyhľadávaniu.",
+  "noResultsTitle": "Žiadne výsledky",
+  "openRow": "Otvoriť {{title}}"
 }

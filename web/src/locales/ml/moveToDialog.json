@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "മാറ്റുക",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "വർക്ക്സ്പെയ്സ് റൂട്ട്",
+    "path": "മുകൾത്തട്ട്"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ലക്ഷ്യസ്ഥാനങ്ങൾ തിരയുക",
+    "placeholder": "പേജുകൾ തിരയുക..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "മാറ്റൽ ഡയലോഗ് അടയ്ക്കുക"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "നീക്കൽ ലക്ഷ്യസ്ഥാനങ്ങൾ",
+    "empty": "പേജുകളൊന്നും കണ്ടെത്തിയില്ല.",
+    "destinationLabel": "{{label}}, {{path}} എന്നതിലേക്ക് മാറ്റുക"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" സൃഷ്ടിക്കുക",
+    "optionLabel": "{{title}} പേജ് സൃഷ്ടിച്ച് ഇവിടേക്ക് മാറ്റുക",
+    "hint": "പുതിയ ടോപ്പ്-ലെവൽ പേജ് - ഇവിടേക്ക് മാറ്റുക"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "ലോക്ക് ചെയ്ത പാരന്റ്",
+    "page": "ലോക്ക് ചെയ്ത പേജ്"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "പേജ് ലോക്ക് ചെയ്ത പാരന്റിലാണ്",
+    "locked": "പേജ് ലോക്ക് ചെയ്തിരിക്കുന്നു",
+    "moved": "പേജ് മാറ്റി",
+    "moveFailed": "പേജ് മാറ്റാൻ കഴിഞ്ഞില്ല"
   }
 }

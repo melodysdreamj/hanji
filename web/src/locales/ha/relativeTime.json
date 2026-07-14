@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Yanzu",
+  "editedJustNow": "An gyara yanzu",
+  "editedMinutesAgo": "An gyara minti {{minutes}} da suka wuce",
+  "editedHoursAgo": "An gyara awa {{hours}} da suka wuce",
+  "editedDaysAgo": "An gyara kwana {{days}} da suka wuce",
+  "editedOn": "An gyara {{date}}",
+  "noEdits": "Babu gyara",
+  "noEditsYet": "Babu gyara har yanzu",
+  "todayAt": "Yau a {{time}}",
+  "yesterdayAt": "Jiya a {{time}}",
+  "dateAt": "{{date}} a {{time}}"
 }

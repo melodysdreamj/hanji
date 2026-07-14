@@ -3,8 +3,8 @@
   "offlinePending_one": "Offline · {{count}} alteração pendente",
   "offlinePending_other": "Offline · {{count}} alterações pendentes",
   "syncing": "Sincronizando · {{count}}",
-  "unreachable": "Não é possível acessar o servidor",
-  "unreachablePending_one": "Não é possível acessar o servidor · {{count}} alteração pendente",
-  "unreachablePending_other": "Não é possível acessar o servidor · {{count}} alterações pendentes",
+  "unreachable": "Servidor inacessível",
+  "unreachablePending_one": "Servidor inacessível · {{count}} alteração pendente",
+  "unreachablePending_other": "Servidor inacessível · {{count}} alterações pendentes",
   "retryHint": "Clique para tentar novamente"
 }

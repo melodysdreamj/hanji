@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "खोज्नुहोस् वा जानुहोस्...",
+  "quickFind": "द्रुत खोज",
+  "closeSearch": "खोज बन्द गर्नुहोस्",
+  "quickFindResults": "द्रुत खोज परिणाम",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "भर्खरै हेरिएका",
+    "recentSearches": "भर्खरका खोजहरू",
+    "pages": "पृष्ठहरू",
+    "pageContent": "पृष्ठ सामग्री",
+    "favorites": "मनपर्ने"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "पृष्ठमा",
+  "searchingDetail": "खोज्दै...",
+  "searchAgain": "फेरि खोज्नुहोस्",
+  "searchingPageContent": "पृष्ठ सामग्री खोज्दै...",
+  "noResultsFor": "\"{{query}}\" को लागि कुनै परिणाम छैन",
+  "noPagesFound": "कुनै पृष्ठ फेला परेन",
+  "creating": "सिर्जना गर्दै...",
+  "newPage": "नयाँ पृष्ठ \"{{query}}\"",
+  "couldntCreatePage": "पृष्ठ सिर्जना गर्न सकिएन",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "चयन",
+    "open": "खोल्नुहोस्",
+    "newTab": "नयाँ ट्याब"
   }
 }

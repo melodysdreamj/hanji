@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "deleteForever": "Smazat navždy",
+    "emptyTrash": "Vyprázdnit koš",
+    "restore": "Obnovit"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "cancelEmptyTrash": "Zrušit vyprázdnění koše",
+    "cancelPermanentDelete": "Zrušit trvalé smazání",
+    "deletePageForever": "Smazat {{title}} navždy",
+    "openFromTrash": "Otevřít {{title}} z koše",
+    "restorePage": "Obnovit {{title}}"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteBodyPrefix": "Toto trvale smaže ",
+    "deleteBodySuffix": ". Tuto akci nelze vrátit zpět.",
+    "deleteTitle": "Smazat natrvalo?",
+    "emptyBody_one": "Toto trvale smaže všech {{count}} stránku v koši. Tuto akci nelze vrátit zpět.",
+    "emptyBody_other": "Toto trvale smaže všech {{count}} stránek v koši. Tuto akci nelze vrátit zpět.",
+    "emptyTitle": "Vyprázdnit koš?"
   },
+  "deletedJustNow": "Právě smazáno",
+  "deletedOn": "Smazáno {{date}}",
+  "deletedPages": "Smazané stránky",
+  "empty": "Stránky, které smažete, se zobrazí zde. Koš je prázdný.",
+  "noSearchMatches": "Žádné smazané stránky neodpovídají vašemu vyhledávání.",
+  "pageCount_one": "{{count}} stránka",
+  "pageCount_other": "{{count}} stránek",
+  "searchTrash": "Hledat v koši",
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
-  }
+    "couldntDelete": "Nepodařilo se smazat stránku.",
+    "couldntEmpty": "Nepodařilo se vyprázdnit koš.",
+    "couldntRestore": "Nepodařilo se obnovit stránku.",
+    "deletedForever": "Natrvalo smazáno",
+    "emptied": "Koš vyprázdněn",
+    "restored": "Stránka obnovena"
+  },
+  "trash": "Koš"
 }

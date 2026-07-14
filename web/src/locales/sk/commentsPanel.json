@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komentáre",
+  "closeAria": "Zavrieť komentáre",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Diskusia k bloku",
+    "page": "Diskusia k stránke"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Stav komentára",
+    "open": "Otvorené",
+    "resolved": "Vyriešené"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Komentár na",
+    "commentingOnSelectedText": "Komentár na vybraný text",
+    "selectedBlock": "Vybraný blok",
+    "onSelectedText": "Na vybranom texte",
+    "onSelectedBlock": "Na vybranom bloku",
+    "onABlock": "Na bloku"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Pridať komentár na blok",
+    "addPageComment": "Pridať komentár na stránku",
+    "blockPlaceholder": "Komentár na tento blok...",
+    "pagePlaceholder": "Pridať komentár...",
+    "submit": "Komentovať"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Ľudia na zmienku v komentári",
+    "replyPeopleAria": "Ľudia na zmienku v odpovedi",
+    "trigger": "Zmieniť ľudí",
+    "noMatches": "Žiadni zodpovedajúci ľudia",
+    "title": "Spomenúť {{name}}",
+    "person": "Osoba",
+    "you": "Vy",
+    "organizationPerson": "Osoba v organizácii",
+    "roleInOrganization": "{{role}} v organizácii"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Vlákna komentárov",
+    "empty": "Zatiaľ žiadne komentáre",
+    "noOpen": "Žiadne otvorené komentáre",
+    "noResolved": "Žiadne vyriešené komentáre"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komentár, {{time}}",
+    "commentAriaResolved": "{{author}} komentár, {{time}}, vyriešený",
+    "replyAria": "{{author}} odpoveď, {{time}}",
+    "repliesAria": "{{count}} odpovedí",
+    "edited": "(upravené)",
+    "emptyComment": "(prázdny komentár)",
+    "emptyReply": "(prázdna odpoveď)",
+    "justNow": "Práve teraz"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Odpovedať",
+    "showInPage": "Zobraziť na stránke",
+    "resolve": "Vyriešiť",
+    "reopen": "Znovu otvoriť",
+    "edit": "Upraviť"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Odpoveď..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Upraviť komentár"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Odstrániť tento komentár?",
+    "threadConfirm_one": "Odstrániť tento komentár a jeho odpoveď?",
+    "threadConfirm_other": "Odstrániť tento komentár a jeho {{count}} odpovedí?"
   }
 }

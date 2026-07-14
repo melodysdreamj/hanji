@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Добавяне на свойство за дата",
+    "description": "Изгледите в хронологията изискват свойство за начална дата, за да се показват страниците във времето."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Добавете свойство за крайна дата, за да се показват интервали вместо еднодневни ленти.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Мащабиране на хронологията",
+    "day": "Ден",
+    "week": "Седмица",
+    "month": "Месец"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Зависимости:",
+    "hint": "добавете свойство за релация",
+    "relationPropertyAriaLabel": "Свойство за релация на зависимост"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Днес",
+    "previousRange": "Предишен диапазон",
+    "nextRange": "Следващ диапазон",
+    "newPage": "Нов",
+    "newPageIn": "Нова страница в {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Хронологична таблица",
+    "nameHeader": "Име"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Отвори {{title}}",
+    "openAriaLabelWithDates": "Отвори {{title}}, от {{start}} до {{end}}",
+    "openNoDateAriaLabel": "Отвори {{title}}, без дата"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Няма елементи в този диапазон.",
+    "noDatedItems": "Все още няма елементи с дата.",
+    "jumpTo": "Отиди на {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Без дата ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Няма",
+    "untitled": "Без заглавие"
   }
 }

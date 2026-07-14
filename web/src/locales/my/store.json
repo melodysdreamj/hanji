@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "ဤဒေတာဘေ့စ်သည် သော့ခတ်ထားသောကြောင့် သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "databaseRowsLoadFailed": "ဒေတာဘေ့စ်အတန်းများကို တင်မရပါ။ ခဏကြာပြီးနောက် ထပ်မံကြိုးစားပါ။",
+  "editAccessDeniedSave": "သင့်တွင် တည်းဖြတ်ခွင့်မရှိသောကြောင့် သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "lockedSave": "စာမျက်နှာ သို့မဟုတ် ဒေတာဘေ့စ်သည် သော့ခတ်ထားသောကြောင့် သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "pageLockedSave": "ဤစာမျက်နှာသည် သော့ခတ်ထားသောကြောင့် သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "pageMissingSave": "စာမျက်နှာကို ရှာမတွေ့သောကြောင့် သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "saveFailed": "သင်၏ပြောင်းလဲမှုများကို သိမ်းဆည်း၍မရခဲ့ပါ။",
+  "sessionExpired": "သင်၏စက်ရှင်သည် သက်တမ်းကုန်သွားသည် သို့မဟုတ် တောင်းဆိုချက်ကို အတည်ပြု၍မရပါ။ ထပ်မံကြိုးစားပါ။",
+  "blockConflictSave": "ဤဘလောက်ကို အခြားစက်တွင် တည်းဖြတ်ထားသောကြောင့် သင်၏အော့ဖ်လိုင်းပြောင်းလဲမှုကို အသုံးမချနိုင်ခဲ့ပါ။",
+  "blockConflictKeepMine": "ကျွန်ုပ်၏ဗားရှင်းကို အသုံးပြုပါ",
+  "blockMoveCommentsSkipped": "ဘလောက်ကို ရွှေ့ပြောင်းခဲ့သော်လည်း ၎င်း၏မှတ်ချက်များကို အတူမရွှေ့နိုင်ခဲ့ပါ။"
 }

@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "垃圾桶",
+  "empty": "刪除的頁面會在此顯示。垃圾桶為空。",
+  "searchTrash": "搜尋垃圾桶",
+  "deletedPages": "已刪除的頁面",
+  "noSearchMatches": "沒有符合搜尋條件的已刪除頁面。",
+  "pageCount_one": "{{count}} 個頁面",
+  "pageCount_other": "{{count}} 個頁面",
+  "deletedJustNow": "剛剛刪除",
+  "deletedOn": "於 {{date}} 刪除",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "還原",
+    "deleteForever": "永久刪除",
+    "emptyTrash": "清空垃圾桶"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "從垃圾桶開啟 {{title}}",
+    "restorePage": "還原 {{title}}",
+    "deletePageForever": "永久刪除 {{title}}",
+    "cancelPermanentDelete": "取消永久刪除",
+    "cancelEmptyTrash": "取消清空垃圾桶"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "永久刪除？",
+    "deleteBodyPrefix": "這將永久刪除",
+    "deleteBodySuffix": "。此動作無法復原。",
+    "emptyTitle": "清空垃圾桶？",
+    "emptyBody_one": "這將永久刪除垃圾桶中的所有 {{count}} 個頁面。此動作無法復原。",
+    "emptyBody_other": "這將永久刪除垃圾桶中的所有 {{count}} 個頁面。此動作無法復原。"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "已永久刪除",
+    "couldntDelete": "無法刪除頁面",
+    "restored": "已還原頁面",
+    "couldntRestore": "無法還原頁面",
+    "emptied": "垃圾桶已清空",
+    "couldntEmpty": "無法清空垃圾桶"
   }
 }

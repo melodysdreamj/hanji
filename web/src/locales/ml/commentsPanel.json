@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "കമന്റുകൾ",
+  "closeAria": "കമന്റുകൾ അടയ്ക്കുക",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ബ്ലോക്ക് ചർച്ച",
+    "page": "പേജ് ചർച്ച"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "കമന്റ് അവസ്ഥ",
+    "open": "തുറന്നു",
+    "resolved": "പരിഹരിച്ചു"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "കമന്റ് ചെയ്യുന്നത്",
+    "commentingOnSelectedText": "തിരഞ്ഞെടുത്ത വാചകത്തിൽ കമന്റ് ചെയ്യുന്നത്",
+    "selectedBlock": "തിരഞ്ഞെടുത്ത ബ്ലോക്ക്",
+    "onSelectedText": "തിരഞ്ഞെടുത്ത വാചകത്തിൽ",
+    "onSelectedBlock": "തിരഞ്ഞെടുത്ത ബ്ലോക്കിൽ",
+    "onABlock": "ഒരു ബ്ലോക്കിൽ"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ഒരു ബ്ലോക്ക് കമന്റ് ചേർക്കുക",
+    "addPageComment": "ഒരു പേജ് കമന്റ് ചേർക്കുക",
+    "blockPlaceholder": "ഈ ബ്ലോക്കിൽ കമന്റ് ചെയ്യുക...",
+    "pagePlaceholder": "കമന്റ് ചേർക്കുക...",
+    "submit": "കമന്റ്"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "കമന്റിൽ മെൻഷൻ ചെയ്യാനുള്ള ആളുകൾ",
+    "replyPeopleAria": "മറുപടിയിൽ മെൻഷൻ ചെയ്യാനുള്ള ആളുകൾ",
+    "trigger": "ആളുകളെ മെൻഷൻ ചെയ്യുക",
+    "noMatches": "പൊരുത്തപ്പെടുന്ന ആളുകളൊന്നുമില്ല",
+    "title": "{{name}} മെൻഷൻ",
+    "person": "വ്യക്തി",
+    "you": "നിങ്ങൾ",
+    "organizationPerson": "സംഘടനയിലെ വ്യക്തി",
+    "roleInOrganization": "സംഘടനയിലെ {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "കമന്റ് ത്രെഡുകൾ",
+    "empty": "ഇതുവരെ കമന്റുകളൊന്നുമില്ല",
+    "noOpen": "തുറന്ന കമന്റുകളൊന്നുമില്ല",
+    "noResolved": "പരിഹരിച്ച കമന്റുകളൊന്നുമില്ല"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} കമന്റ്, {{time}}",
+    "commentAriaResolved": "{{author}} കമന്റ്, {{time}}, പരിഹരിച്ചു",
+    "replyAria": "{{author}} മറുപടി, {{time}}",
+    "repliesAria": "{{count}} മറുപടികൾ",
+    "edited": "(തിരുത്തി)",
+    "emptyComment": "(ശൂന്യ കമന്റ്)",
+    "emptyReply": "(ശൂന്യ മറുപടി)",
+    "justNow": "ഇപ്പോൾ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "മറുപടി",
+    "showInPage": "പേജിൽ കാണിക്കുക",
+    "resolve": "പരിഹരിക്കുക",
+    "reopen": "വീണ്ടും തുറക്കുക",
+    "edit": "തിരുത്തുക"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "മറുപടി..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "കമന്റ് തിരുത്തുക"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ഈ കമന്റ് ഇല്ലാതാക്കണോ?",
+    "threadConfirm_one": "ഈ കമന്റും അതിന്റെ മറുപടിയും ഇല്ലാതാക്കണോ?",
+    "threadConfirm_other": "ഈ കമന്റും അതിന്റെ {{count}} മറുപടികളും ഇല്ലാതാക്കണോ?"
   }
 }

@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "कव्हर बदला",
+    "reposition": "पुनर्स्थित करा",
+    "remove": "काढा",
+    "uploadFile": "फाइल अपलोड करा",
+    "uploading": "अपलोड करत आहे...",
+    "submit": "सबमिट करा",
+    "savePosition": "स्थान जतन करा"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "गॅलरी",
+    "upload": "अपलोड",
+    "link": "दुवा"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "प्रतिमा दुवा पेस्ट करा",
+    "invalid": "http किंवा https प्रतिमा दुवा पेस्ट करा."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "ती प्रतिमा अपलोड करता आली नाही.",
+    "defaultFileName": "कव्हर प्रतिमा"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "पुनर्स्थित करण्यासाठी प्रतिमा ड्रॅग करा"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "अपलोड तयार करत आहे",
+    "finalizing": "अंतिम करत आहे",
+    "complete": "पूर्ण",
+    "uploading": "अपलोड करत आहे"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "कवर काढला",
+    "restored": "कवर पुनर्संचयित केला",
+    "undo": "पूर्ववत"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "पृष्ठ कवर",
+    "coverVerticalPosition": "कवर उभी स्थिती",
+    "positionFromTop": "वरून {{position}}%",
+    "closeCoverMenu": "कवर मेनू बंद करा",
+    "changePageCover": "पृष्ठ कवर बदला",
+    "repositionPageCover": "पृष्ठ कवर पुनर्स्थित करा",
+    "removePageCover": "पृष्ठ कवर काढा",
+    "changeCoverDialog": "कवर बदला",
+    "coverSource": "कवर स्रोत",
+    "selectCover": "कवर {{number}} निवडा",
+    "uploadFromDevice": "या उपकरणावरून कवर प्रतिमा अपलोड करा",
+    "uploadingFile": "{{fileName}} अपलोड करत आहे",
+    "coverImageLink": "कवर प्रतिमा दुवा"
   }
 }

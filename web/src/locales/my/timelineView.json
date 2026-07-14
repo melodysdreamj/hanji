@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "ရက်စွဲ ပိုင်ဆိုင်မှု ထည့်ပါ",
+    "description": "အချိန်မျဉ်းပြကွက်များသည် စာမျက်နှာများကို အချိန်အတိုင်း ဖြန့်ကျက်ရန် စတင်ရက်စွဲ ပိုင်ဆိုင်မှု လိုအပ်သည်။"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "တစ်ရက်တည်းမဟုတ်ဘဲ အပိုင်းအခြားများကို ပြသရန် ပြီးဆုံးရက်စွဲ ပိုင်ဆိုင်မှု ထည့်ပါ။",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "အချိန်မျဉ်းပြကွက် ချုံ့ချဲ့",
+    "day": "နေ့",
+    "week": "ပတ်",
+    "month": "လ"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "မှီခိုမှုများ:",
+    "hint": "ဆက်စပ်မှု ပရောပတီတစ်ခု ထည့်ရန်",
+    "relationPropertyAriaLabel": "မှီခိုမှု ဆက်စပ်ပရောပတီ"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ယနေ့",
+    "previousRange": "ယခင်အပိုင်းအခြား",
+    "nextRange": "နောက်အပိုင်းအခြား",
+    "newPage": "အသစ်",
+    "newPageIn": "{{dbTitle}} တွင် စာမျက်နှာအသစ်"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "အချိန်မျဉ်းပြကွက် ဇယား",
+    "nameHeader": "အမည်"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ကို ဖွင့်ရန်",
+    "openAriaLabelWithDates": "{{title}} ကို ဖွင့်ရန်၊ {{start}} မှ {{end}} အထိ",
+    "openNoDateAriaLabel": "{{title}} ကို ဖွင့်ရန်၊ ရက်စွဲမရှိ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "ဤအပိုင်းအခြားတွင် အကြောင်းအရာများ မရှိပါ။",
+    "noDatedItems": "ရက်စွဲပါ အကြောင်းအရာများ မရှိသေးပါ။",
+    "jumpTo": "{{date}} သို့ သွားပါ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ရက်စွဲမရှိ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "မရှိ",
+    "untitled": "ခေါင်းစဉ်မဲ့"
   }
 }

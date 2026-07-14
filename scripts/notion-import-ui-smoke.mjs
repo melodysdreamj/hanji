@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 import { createServer } from 'node:http';
+import { mkdirSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   browserAuthStorageKeys,
   assert,
@@ -22,6 +25,8 @@ const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:878
 const DEFAULT_API_URL = process.env.HANJI_EDGEBASE_API_URL ?? DEFAULT_BASE_URL;
 const DEFAULT_MOCK_NOTION_API_BASE = process.env.HANJI_MOCK_NOTION_API_BASE ?? 'http://127.0.0.1:9797/v1';
 const DEFAULT_TIMEOUT_MS = 20_000;
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const SCREENSHOT_DIR = join(root, '.edgebase', 'ui-discovery', 'notion-import-ui');
 
 const options = parseArgs(process.argv.slice(2));
 setDefaultTimeoutMs(options.timeoutMs);
@@ -46,6 +51,7 @@ async function main() {
   console.log(`Notion import UI smoke target: ${appUrl}`);
   if (apiUrl !== appUrl) console.log(`Notion import UI smoke API: ${apiUrl}`);
   console.log(`Mock Notion API target: ${mockNotionApiBase}`);
+  mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
   const mockNotionApi = await startMockNotionApi(mockNotionApiBase);
   try {
@@ -60,7 +66,8 @@ async function main() {
 
     try {
       await assertNotionImportUi(browser, appUrl, apiUrl, seed);
-      console.log('PASS Notion import wizard walks connect → scope → discover → apply with a live activity feed, reviews, and checks stored connections when available without screenshots.');
+      console.log('PASS Notion import wizard walks connect → scope → discover → apply with a live activity feed, reviews, and checks stored connections when available.');
+      console.log(`Screenshot: ${join(SCREENSHOT_DIR, 'browser-runner-warning.png')}`);
     } finally {
       await browser.close().catch(() => {});
     }
@@ -103,6 +110,16 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
       await dialog.getByRole('button', { name: 'Next', exact: true }).click({ timeout: options.timeoutMs });
       // Entire-workspace scope is selected at the end of the root-scan step.
       await dialog.getByRole('button', { name: 'Start discovery', exact: true }).click({ timeout: options.timeoutMs });
+      const browserRunnerWarning = dialog.locator('[data-browser-runner-warning]');
+      await browserRunnerWarning.waitFor({ state: 'visible', timeout: options.timeoutMs });
+      assert(
+        ((await browserRunnerWarning.textContent()) ?? '').includes('Keep the tab open until it finishes'),
+        'live Notion import must explain that closing the browser tab pauses processing',
+      );
+      await page.screenshot({
+        path: join(SCREENSHOT_DIR, 'browser-runner-warning.png'),
+        fullPage: false,
+      });
       // Inline discovery against the mock finishes to a Ready job with items,
       // and the wizard auto-advances to the discover run panel.
       await dialog.locator('[data-run-panel="discover"]').waitFor({ state: 'visible', timeout: options.timeoutMs });
@@ -252,16 +269,13 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
   }
 
   await dialog.getByLabel('Connection name').fill(connectionName, { timeout: options.timeoutMs });
-  await dialog.getByRole('button', { name: 'Save connection' }).click({ timeout: options.timeoutMs });
+  // Appliance runtimes persist the entered token before leaving Connect. The
+  // user does not need to find or click a separate save action first.
+  await dialog.getByRole('button', { name: 'Next', exact: true }).click({ timeout: options.timeoutMs });
 
   const connection = await waitForSavedConnectionOrMissingSecret(page, apiUrl, seed, connectionName);
   if (!connection) return false;
 
-  const picker = dialog.getByLabel('Saved connection');
-  await picker.waitFor({ state: 'visible', timeout: options.timeoutMs });
-  await picker.selectOption({ value: connection.id }, { timeout: options.timeoutMs });
-  await expectLocatorValue(dialog.getByLabel('Notion API token'), '');
-  await dialog.getByRole('button', { name: 'Next', exact: true }).click({ timeout: options.timeoutMs });
   await dialog.getByRole('button', { name: 'Start discovery' }).click({ timeout: options.timeoutMs });
 
   const job = await waitForImportJob(apiUrl, seed, (candidate) => (
@@ -307,7 +321,10 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
   await expectRunStatus(page, 'Ready');
 
   await gotoWizardStep(dialog, 1);
+  const picker = dialog.getByLabel('Saved connection');
+  await picker.waitFor({ state: 'visible', timeout: options.timeoutMs });
   await picker.selectOption({ value: connection.id }, { timeout: options.timeoutMs });
+  await expectLocatorValue(dialog.getByLabel('Notion API token'), '');
   await dialog.getByRole('button', { name: 'Remove' }).click({ timeout: options.timeoutMs });
   await waitForConnection(apiUrl, seed, (candidate) => (
     candidate.id === connection.id &&
@@ -319,9 +336,16 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
 }
 
 async function assertManualTokenReloadResume(page, apiUrl, seed) {
-  // A request-scoped token is intentionally absent from the durable job. A
-  // reload must therefore stop at Connect and ask for the original token; it
-  // must never guess, persist, or auto-run with an unrelated credential.
+  // A legacy request-scoped job has no durable credential, so reload must stop
+  // at Connect. On an appliance, re-entering the token upgrades that same job
+  // to an encrypted stored connection before discovery resumes; a no-secret
+  // local runtime keeps the request-only fallback.
+  const connectionProbe = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+    action: 'listConnections',
+    workspaceId: seed.workspaceId,
+    limit: 1,
+  });
+  const storageAvailable = connectionProbe.connectionStorageAvailable !== false;
   const deferred = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
     action: 'create',
     workspaceId: seed.workspaceId,
@@ -368,12 +392,23 @@ async function assertManualTokenReloadResume(page, apiUrl, seed) {
   const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
     candidate.id === deferred.job.id &&
     candidate.status === 'ready' &&
-    !candidate.connectionId &&
-    candidate.options?.credentialSource === 'request' &&
+    (storageAvailable
+      ? Boolean(candidate.connectionId) && candidate.options?.credentialSource === 'connection'
+      : !candidate.connectionId && candidate.options?.credentialSource === 'request') &&
     candidate.options?.tokenStored === false
   ), 'manual-token resumed job');
-  assert(resumed.report?.credentialSource === 'request', 'Manual resume must use only the re-entered request token');
+  assert(
+    resumed.report?.credentialSource === (storageAvailable ? 'connection' : 'request'),
+    'Manual resume must use the server-stored connection whenever connection storage is available',
+  );
   await expectRunStatus(page, 'Ready');
+  if (storageAvailable && resumed.connectionId) {
+    await callFunction(apiUrl, seed.accessToken, 'notion-import', {
+      action: 'revokeConnection',
+      workspaceId: seed.workspaceId,
+      connectionId: resumed.connectionId,
+    });
+  }
 }
 
 async function assertStoredConnectionReloadResume(page, apiUrl, seed) {
@@ -452,16 +487,15 @@ async function assertTokenSetupGuidanceUi(page) {
   await tokenInput.waitFor({ state: 'visible', timeout: options.timeoutMs });
   const placeholder = await tokenInput.getAttribute('placeholder');
   assert(placeholder === 'ntn_...', `Notion token placeholder must only advertise ntn_ tokens, got ${placeholder}`);
-  // A legacy secret_ token passes the step-1 gate (any credential text) but is
-  // rejected when discovery actually starts on step 2.
+  // A legacy secret_ token is rejected before the appliance attempts to save
+  // it or advances away from Connect.
   await tokenInput.fill('secret_old-token', { timeout: options.timeoutMs });
   await dialog.getByRole('button', { name: 'Next', exact: true }).click({ timeout: options.timeoutMs });
-  await dialog.getByRole('button', { name: 'Start discovery', exact: true }).click({ timeout: options.timeoutMs });
   await page.getByText('Use a Notion API token that starts with ntn_.', { exact: true }).waitFor({
     state: 'visible',
     timeout: options.timeoutMs,
   });
-  await gotoWizardStep(dialog, 1);
+  await tokenInput.waitFor({ state: 'visible', timeout: options.timeoutMs });
   await tokenInput.fill('', { timeout: options.timeoutMs });
   await dialog.getByText('Before importing', { exact: true }).click({ timeout: options.timeoutMs });
   await dialog.getByText('Use a current Notion API token that starts with ntn_.', { exact: true }).waitFor({

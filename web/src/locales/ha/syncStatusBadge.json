@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Bayan layi",
+  "offlinePending_one": "Bayan layi · {{count}} canji a jira",
+  "offlinePending_other": "Bayan layi · {{count}} canje-canje a jira",
+  "syncing": "Ana daidaitawa · {{count}}",
+  "unreachable": "Ba a iya haɗa da sabar",
+  "unreachablePending_one": "Ba a iya haɗa da sabar · {{count}} canji yana jira",
+  "unreachablePending_other": "Ba a iya haɗa da sabar · {{count}} canje-canje suna jira",
+  "retryHint": "Danna don sake gwadawa yanzu"
 }

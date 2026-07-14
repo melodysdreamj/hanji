@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "ಪಠ್ಯ",
+      "description": "ಸರಳ ಪಠ್ಯದೊಂದಿಗೆ ಬರೆಯಿರಿ.",
+      "placeholder": "ಆಜ್ಞೆಗಳಿಗಾಗಿ '/' ಟೈಪ್ ಮಾಡಿ"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "ಪುಟ",
+      "description": "ಈ ಪುಟದಲ್ಲಿ ಉಪಪುಟವನ್ನು ರಚಿಸಿ."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "ಪುಟ ಲಿಂಕ್",
+      "description": "ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಪುಟಕ್ಕೆ ಲಿಂಕ್ ಮಾಡಿ."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ಶೀರ್ಷಿಕೆ 1",
+      "description": "ದೊಡ್ಡ ವಿಭಾಗ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಶೀರ್ಷಿಕೆ 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 1",
+      "description": "ಒಳಗಿನ ವಿಷಯವನ್ನು ಮರೆಮಾಡಬಲ್ಲ ದೊಡ್ಡ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ಶೀರ್ಷಿಕೆ 2",
+      "description": "ಮಧ್ಯಮ ವಿಭಾಗ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಶೀರ್ಷಿಕೆ 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 2",
+      "description": "ಒಳಗಿನ ವಿಷಯ ಮಡಚಬಲ್ಲ ಮಧ್ಯಮ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ಶೀರ್ಷಿಕೆ 3",
+      "description": "ಚಿಕ್ಕ ವಿಭಾಗ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಶೀರ್ಷಿಕೆ 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 3",
+      "description": "ಒಳಗಿನ ವಿಷಯ ಮಡಚಬಲ್ಲ ಸಣ್ಣ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ಶೀರ್ಷಿಕೆ 4",
+      "description": "ಸಣ್ಣ ವಿಭಾಗ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಶೀರ್ಷಿಕೆ 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 4",
+      "description": "ನೆಸ್ಟೆಡ್ ವಿಷಯವನ್ನು ಮರೆಮಾಡಬಲ್ಲ ಕಾಂಪ್ಯಾಕ್ಟ್ ಶೀರ್ಷಿಕೆ.",
+      "placeholder": "ಟಾಗಲ್ ಶೀರ್ಷಿಕೆ 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "ಕಾರ್ಯ ಪಟ್ಟಿ",
+      "description": "ಚೆಕ್‌ಬಾಕ್ಸ್ನೊಂದಿಗೆ ಕಾರ್ಯಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.",
+      "placeholder": "ಕಾರ್ಯ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "ಬುಲೆಟ್ ಪಟ್ಟಿ",
+      "description": "ಸರಳ ಬುಲೆಟ್ ಪಟ್ಟಿಯನ್ನು ರಚಿಸಿ.",
+      "placeholder": "ಪಟ್ಟಿ"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "ಸಂಖ್ಯೆ ಪಟ್ಟಿ",
+      "description": "ಸಂಖ್ಯೆ ಪಟ್ಟಿಯನ್ನು ರಚಿಸಿ.",
+      "placeholder": "ಪಟ್ಟಿ"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ಟಾಗಲ್ ಪಟ್ಟಿ",
+      "description": "ಟಾಗಲ್ಗಳು ವಿಷಯವನ್ನು ಮರೆಮಾಡಬಹುದು ಮತ್ತು ತೋರಿಸಬಹುದು.",
+      "placeholder": "ಟಾಗಲ್"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "ಉಲ್ಲೇಖ",
+      "description": "ಉಲ್ಲೇಖವನ್ನು ಸೆರೆಹಿಡಿಯಿರಿ.",
+      "placeholder": "ಖಾಲಿ ಉಲ್ಲೇಖ"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "ಕಾಲ್ಔಟ್",
+      "description": "ಬರಹವನ್ನು ಎದ್ದುಕಾಣುವಂತೆ ಮಾಡಿ.",
+      "placeholder": "ಏನಾದರೂ ಟೈಪ್ ಮಾಡಿ…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "ವಿಭಜಕ",
+      "description": "ಬ್ಲಾಕ್‌ಗಳನ್ನು ದೃಶ್ಯವಾಗಿ ವಿಭಜಿಸಿ."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "ಕೋಡ್",
+      "description": "ಕೋಡ್ ಸ್ನಿಪೆಟ್ ಅನ್ನು ಸೆರೆಹಿಡಿಯಿರಿ.",
+      "placeholder": "ಕೋಡ್ ಬರೆಯಿರಿ ಅಥವಾ ಸ್ನಿಪೆಟ್ ಅಂಟಿಸಿ..."
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "ಸಮೀಕರಣ",
+      "description": "ಗಣಿತ ಸಮೀಕರಣವನ್ನು ಪ್ರದರ್ಶಿಸಿ."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "ಪರಿವಿಡಿ",
+      "description": "ಈ ಪುಟದಲ್ಲಿನ ಶೀರ್ಷಿಕೆಗಳಿಗೆ ಲಿಂಕ್ಗಳನ್ನು ತೋರಿಸಿ."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "ಸಿಂಕ್ ಬ್ಲಾಕ್",
+      "description": "ಪುಟಗಳ ನಡುವೆ ವಿಷಯ ಮರುಬಳಕೆ ಮಾಡಿ."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ಬಟನ್",
+      "description": "ಒಂದು ಕ್ಲಿಕ್ನಲ್ಲಿ ಮರುಬಳಕೆಯ ವಿಷಯವನ್ನು ಸೇರಿಸಿ."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ಟ್ಯಾಬ್ಗಳು",
+      "description": "ವಿಷಯವನ್ನು ಲೇಬಲ್ ಟ್ಯಾಬ್‌ಗಳಲ್ಲಿ ಗುಂಪು ಮಾಡಿ.",
+      "placeholder": "ಟ್ಯಾಬ್ಗಳು"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "ಬ್ರೆಡ್ಕ್ರಂಬ್",
+      "description": "ಈ ಪುಟವು ಎಲ್ಲಿದೆ ಎಂಬುದನ್ನು ತೋರಿಸುತ್ತದೆ."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ನಕಲು",
+      "description": "ಈ ಬ್ಲಾಕ್ನ ನಿಖರ ಪ್ರತಿಯನ್ನು ರಚಿಸಿ"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ಸರಿಸು",
+      "description": "ಈ ಬ್ಲಾಕ್ ಅನ್ನು ಮತ್ತೊಂದು ಪುಟಕ್ಕೆ ಸರಿಸಿ."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ಈ ಬ್ಲಾಕ್ ಅನ್ನು ಅಳಿಸಿ"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "ಬದಲಾಯಿಸು",
+      "description": "ಈ ಬ್ಲಾಕ್ನ ಪ್ರಕಾರವನ್ನು ಬದಲಾಯಿಸಿ."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "ಬಣ್ಣ",
+      "description": "ಈ ಬ್ಲಾಕ್ನ ಪಠ್ಯ ಅಥವಾ ಹಿನ್ನೆಲೆ ಬಣ್ಣವನ್ನು ಬದಲಾಯಿಸಿ"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "ಕೋಷ್ಟಕ",
+      "description": "ಈ ಪುಟಕ್ಕೆ ಸರಳ ಕೋಷ್ಟಕ ಸೇರಿಸಿ."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ಕಾಲಮ್‌ಗಳು",
+      "description": "ಬ್ಲಾಕ್‌ಗಳನ್ನು ಪಕ್ಕಪಕ್ಕದಲ್ಲಿ ಇರಿಸಿ."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ಕಾಲಮ್‌ಗಳು",
+      "description": "ಬ್ಲಾಕ್‌ಗಳನ್ನು 3 ಕಾಲಮ್‌ಗಳಲ್ಲಿ ಜೋಡಿಸಿ."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ಕಾಲಮ್‌ಗಳು",
+      "description": "ಬ್ಲಾಕ್‌ಗಳನ್ನು 4 ಕಾಲಮ್‌ಗಳಲ್ಲಿ ಜೋಡಿಸಿ."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ಕಾಲಮ್‌ಗಳು",
+      "description": "ಬ್ಲಾಕ್‌ಗಳನ್ನು 5 ಕಾಲಮ್‌ಗಳಲ್ಲಿ ಜೋಡಿಸಿ."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "ಚಿತ್ರ",
+      "description": "ಲಿಂಕ್ ಮೂಲಕ ಅಪ್ಲೋಡ್ ಮಾಡಿ ಅಥವಾ ಎಂಬೆಡ್ ಮಾಡಿ."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ವೀಡಿಯೊ",
+      "description": "ಲಿಂಕ್ ಮೂಲಕ ವೀಡಿಯೊ ಎಂಬೆಡ್ ಮಾಡಿ."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ಆಡಿಯೊ",
+      "description": "ಲಿಂಕ್ ಮೂಲಕ ಆಡಿಯೊವನ್ನು ಎಂಬೆಡ್ ಮಾಡಿ."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "ವೆಬ್ ಬುಕ್ಮಾರ್ಕ್",
+      "description": "ವೆಬ್ ಲಿಂಕ್ ಅನ್ನು ಕಾರ್ಡ್ ಆಗಿ ಉಳಿಸಿ."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ಎಂಬೆಡ್",
+      "description": "ಲಿಂಕ್‌ನಿಂದ ವಿಷಯವನ್ನು ಎಂಬೆಡ್ ಮಾಡಿ."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ಫೈಲ್",
+      "description": "ಈ ಪುಟಕ್ಕೆ ಫೈಲ್ ಲಿಂಕ್ ಅನ್ನು ಲಗತ್ತಿಸಿ."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ಡೇಟಾಬೇಸ್ - ಸಂಪೂರ್ಣ ಪುಟ",
+      "description": "ಹೊಸ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಉಪಪುಟವಾಗಿ ಸೇರಿಸಿ."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "ಕೋಷ್ಟಕ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಡೇಟಾಬೇಸ್ ಕೋಷ್ಟಕವಾಗಿ ಸೇರಿಸಿ."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ಬೋರ್ಡ್ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಕಾನ್ಬನ್ ಬೋರ್ಡ್ ಸೇರಿಸಿ."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "ಪಟ್ಟಿ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಡೇಟಾಬೇಸ್ ಪಟ್ಟಿಯಾಗಿ ಸೇರಿಸಿ."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "ಟೈಮ್ಲೈನ್ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಡೇಟಾಬೇಸ್ ಟೈಮ್ಲೈನ್ ಸೇರಿಸಿ."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "ಕ್ಯಾಲೆಂಡರ್ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಕ್ಯಾಲೆಂಡರ್ ಡೇಟಾಬೇಸ್ ಸೇರಿಸಿ."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "ಗ್ಯಾಲರಿ - ಪೂರ್ಣ ಪುಟ",
+      "description": "ಪೂರ್ಣ-ಪುಟ ಡೇಟಾಬೇಸ್ ಗ್ಯಾಲರಿ ಸೇರಿಸಿ."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ಡೇಟಾಬೇಸ್ - ಇನ್ಲೈನ್",
+      "description": "ಈ ಪುಟದೊಳಗೆ ಡೇಟಾಬೇಸ್ ಸೇರಿಸಿ."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "ಟೇಬಲ್ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಟೇಬಲ್ ಆಗಿ ಸೇರಿಸಿ."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "ಬೋರ್ಡ್ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಕಾನ್ಬನ್ ಬೋರ್ಡ್ ಸೇರಿಸಿ."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "ಪಟ್ಟಿ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಪಟ್ಟಿಯಾಗಿ ಸೇರಿಸಿ."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "ಟೈಮ್ಲೈನ್ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಡೇಟಾಬೇಸ್ ಟೈಮ್ಲೈನ್ ಸೇರಿಸಿ."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "ಕ್ಯಾಲೆಂಡರ್ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಕ್ಯಾಲೆಂಡರ್ ಡೇಟಾಬೇಸ್ ಸೇರಿಸಿ."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "ಗ್ಯಾಲರಿ ವ್ಯೂ",
+      "description": "ಇನ್ಲೈನ್ ಡೇಟಾಬೇಸ್ ಗ್ಯಾಲರಿ ಸೇರಿಸಿ."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "ಡೀಫಾಲ್ಟ್",
+      "description": "ಈ ಬ್ಲಾಕ್ನಿಂದ ಪಠ್ಯ/ಹಿನ್ನೆಲೆ ಬಣ್ಣ ತೆಗೆದುಹಾಕಿ."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ಬೂದು",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಬೂದು ಅನ್ವಯಿಸಿ."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "ಕಂದು",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಕಂದು ಬಣ್ಣವನ್ನು ಅನ್ವಯಿಸಿ."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ಕಿತ್ತಳೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಕಿತ್ತಳೆ ಅನ್ವಯಿಸಿ."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "ಹಳದಿ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ಹಳದಿ ಅನ್ವಯಿಸಿ."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "ಹಸಿರು",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಹಸಿರು ಅನ್ವಯಿಸಿ."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "ನೀಲಿ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ನೀಲಿ ಬಣ್ಣವನ್ನು ಅನ್ವಯಿಸಿ."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ನೇರಳೆ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ನೇರಳೆ ಅನ್ವಯಿಸಿ."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "ಗುಲಾಬಿ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ಗುಲಾಬಿ ಅನ್ವಯಿಸಿ."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ಕೆಂಪು",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ಕೆಂಪು ಅನ್ವಯಿಸಿ."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ಬೂದು ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಬೂದು ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "ಕಂದು ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಕಂದು ಹಿನ್ನೆಲೆಯನ್ನು ಅನ್ವಯಿಸಿ."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ಕಿತ್ತಳೆ ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಕಿತ್ತಳೆ ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "ಹಳದಿ ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ಹಳದಿ ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "ಹಸಿರು ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಹಸಿರು ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "ನೀಲಿ ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ನೀಲಿ ಹಿನ್ನೆಲೆಯನ್ನು ಅನ್ವಯಿಸಿ."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ನೇರಳೆ ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ನೇರಳೆ ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "ಗುಲಾಬಿ ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್ಗೆ ಗುಲಾಬಿ ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ಕೆಂಪು ಹಿನ್ನೆಲೆ",
+      "description": "ಈ ಬ್ಲಾಕ್‌ಗೆ ಕೆಂಪು ಹಿನ್ನೆಲೆ ಅನ್ವಯಿಸಿ."
     }
   }
 }

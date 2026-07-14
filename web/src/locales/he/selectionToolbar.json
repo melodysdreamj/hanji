@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "עיצוב טקסט"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "הפוך ל",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "טקסט",
+      "heading1": "כותרת 1",
+      "heading2": "כותרת 2",
+      "heading3": "כותרת 3",
+      "heading4": "כותרת 4",
+      "toDoList": "רשימת מטלות",
+      "bulletedList": "רשימת תבליטים",
+      "numberedList": "רשימה ממוספרת",
+      "toggleList": "רשימת מתג",
+      "quote": "ציטוט",
+      "callout": "קריאה",
+      "code": "קוד"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "מודגש",
+    "italic": "נטוי",
+    "underline": "קו תחתון",
+    "strikethrough": "קו חוצה",
+    "code": "קוד",
+    "link": "קישור"
   },
   "comment": {
-    "label": "Comment"
+    "label": "תגובה"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "צבע טקסט: {{color}}",
+    "title": "צבע: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "מעורב",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "צבע טקסט",
+      "default": "ברירת מחדל",
+      "gray": "אפור",
+      "brown": "חום",
+      "orange": "כתום",
+      "yellow": "צהוב",
+      "green": "ירוק",
+      "blue": "כחול",
+      "purple": "סגול",
+      "pink": "ורוד",
+      "red": "אדום"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "צבע רקע",
+      "gray": "רקע אפור",
+      "brown": "רקע חום",
+      "orange": "רקע כתום",
+      "yellow": "רקע צהוב",
+      "green": "רקע ירוק",
+      "blue": "רקע כחול",
+      "purple": "רקע סגול",
+      "pink": "רקע ורוד",
+      "red": "רקע אדום"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "עריכת קישור",
+    "placeholder": "הדבקת קישור",
+    "urlAriaLabel": "קישור URL",
+    "apply": "קישור",
+    "open": "פתח קישור",
+    "copy": "העתק קישור",
+    "copied": "הועתק",
+    "copiedLink": "קישור הועתק",
+    "remove": "הסר"
   }
 }

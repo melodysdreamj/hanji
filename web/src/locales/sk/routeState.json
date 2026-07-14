@@ -1,0 +1,9 @@
+{
+  "notFoundBody": "Táto adresa nezodpovedá žiadnej stránke Hanji. Stránka sa mohla presunúť alebo už neexistuje.",
+  "sharedTitle": "Tento zdieľaný odkaz je neplatný.",
+  "invalidTitle": "Táto adresa je neúplná.",
+  "invalidBody": "Skontrolujte, či v odkaze nie sú chýbajúce alebo chybné znaky, a potom to skúste znova.",
+  "notFoundTitle": "Stránka sa nenašla.",
+  "sharedBody": "Skontrolujte, či bol celý zdieľaný odkaz správne skopírovaný, a potom to skúste znova.",
+  "openHome": "Otvoriť Hanji domov"
+}

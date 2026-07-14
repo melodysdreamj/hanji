@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Tarih özelliği ekle",
+    "description": "Zaman çizelgesi görünümleri, sayfaları zamana yaymak için bir başlangıç tarihi özelliği gerektirir."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Tek günlük çubuklar yerine aralıklar göstermek için bir bitiş tarihi özelliği ekleyin.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zaman çizelgesi yakınlaştırma",
+    "day": "Gün",
+    "week": "Hafta",
+    "month": "Ay"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Bağımlılıklar:",
+    "hint": "ilişki özelliği ekleyin",
+    "relationPropertyAriaLabel": "Bağımlılık ilişki özelliği"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Bugün",
+    "previousRange": "Önceki aralık",
+    "nextRange": "Sonraki aralık",
+    "newPage": "Yeni",
+    "newPageIn": "{{dbTitle}} içinde yeni sayfa"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Zaman çizelgesi tablosu",
+    "nameHeader": "Ad"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}}'ı aç",
+    "openAriaLabelWithDates": "{{title}}'ı aç, {{start}} - {{end}}",
+    "openNoDateAriaLabel": "{{title}}'ı aç, tarih yok"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Bu aralıkta öğe yok.",
+    "noDatedItems": "Henüz tarihli öğe yok.",
+    "jumpTo": "{{date}}'e git"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tarih yok ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Hiçbiri",
+    "untitled": "Başlıksız"
   }
 }

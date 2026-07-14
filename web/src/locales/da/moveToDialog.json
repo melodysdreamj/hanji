@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
-  "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
-  },
-  "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+  "create": {
+    "hint": "Ny topniveau-side - flyt hertil",
+    "label": "Opret \"{{title}}\"",
+    "optionLabel": "Opret side {{title}} og flyt hertil"
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
-  },
-  "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
-  },
-  "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "closeLabel": "Luk flyt-dialog"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "page": "Låst side",
+    "parent": "Låst overordnet"
   },
+  "results": {
+    "destinationLabel": "Flyt til {{label}}, {{path}}",
+    "empty": "Ingen sider fundet.",
+    "listLabel": "Flyt destinations"
+  },
+  "search": {
+    "label": "Søg flyttemål",
+    "placeholder": "Søg sider..."
+  },
+  "title": "Flyt til",
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "locked": "Siden er låst",
+    "lockedParent": "Siden er i en låst overordnet side",
+    "moved": "Side flyttet",
+    "moveFailed": "Kunne ikke flytte siden"
+  },
+  "workspaceRoot": {
+    "label": "Workspace root",
+    "path": "Øverste niveau"
   }
 }

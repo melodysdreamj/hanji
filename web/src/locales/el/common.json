@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Ακύρωση",
+    "save": "Αποθήκευση",
+    "close": "Κλείσιμο",
+    "search": "Αναζήτηση",
+    "create": "Δημιουργία",
+    "delete": "Διαγραφή",
+    "clearAll": "Εκκαθάριση όλων",
+    "done": "Ολοκληρώθηκε",
+    "add": "Προσθήκη"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Χωρίς τίτλο"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} αντίγραφο",
+    "columnName": "Στήλη {{number}}",
+    "importedDatabase": "Εισαγμένη βάση δεδομένων",
+    "uploadedFile": "Μεταφορτωμένο αρχείο",
+    "image": "Εικόνα",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Όνομα",
+      "status": "Κατάσταση",
+      "select": "Επιλογή",
+      "date": "Ημερομηνία"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Δεν ξεκίνησε",
+      "doing": "Σε εξέλιξη",
+      "done": "Ολοκληρωμένο"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Επιλογή 1",
+      "second": "Επιλογή 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Πίνακας"
     }
   }
 }

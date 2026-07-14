@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "ទំព័រចែករំលែក",
+  "loading": "កំពុងផ្ទុកទំព័រចែករំលែក",
+  "unavailable": "ទំព័រចែករំលែកនេះមិនអាចប្រើបានទេ។",
+  "notFound": "រកមិនឃើញទំព័រចែករំលែកទេ។",
+  "outsideShare": "ទំព័រនេះមិនមែនជាផ្នែកនៃការចែករំលែកសាធារណៈនេះទេ។",
+  "errors": {
+    "not-found": "តំណនេះប្រហែលជាផុតកំណត់ ត្រូវបានឈប់ផ្សាយ ឬត្រូវបានចម្លងខុស។",
+    "offline": "ពិនិត្យការតភ្ជាប់របស់អ្នក រួចព្យាយាមបើកទំព័រចែករំលែកម្តងទៀត។",
+    "rate-limited": "ទំព័រចែករំលែកនេះកំពុងទទួលសំណើច្រើនពេក។ រង់ចាំមួយសន្ទុះ ហើយព្យាយាមម្តងទៀត។",
+    "unavailable": "Hanji មិនអាចបើកទំព័រចែករំលែកនេះឥឡូវនេះបានទេ។ សូមព្យាយាមម្តងទៀតបន្តិចទៀត។"
+  },
+  "tryAgain": "ព្យាយាមម្តងទៀត"
 }

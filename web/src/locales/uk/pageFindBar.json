@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Знайти на сторінці"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Знайти на сторінці",
+    "placeholder": "Знайти на сторінці"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Попередній збіг",
+    "next": "Наступний збіг",
+    "close": "Закрити пошук"
   }
 }

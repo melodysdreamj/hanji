@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Tafuta au nenda kwa...",
+  "quickFind": "Tafuta Haraka",
+  "closeSearch": "Funga utafutaji",
+  "quickFindResults": "Matokeo ya Tafuta Haraka",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Zilizotazamwa hivi karibuni",
+    "recentSearches": "Tafuta za hivi karibuni",
+    "pages": "Kurasa",
+    "pageContent": "Maudhui ya ukurasa",
+    "favorites": "Vipendwa"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "katika ukurasa",
+  "searchingDetail": "Inatafuta...",
+  "searchAgain": "Tafuta tena",
+  "searchingPageContent": "Inatafuta maudhui ya ukurasa...",
+  "noResultsFor": "Hakuna matokeo ya \"{{query}}\"",
+  "noPagesFound": "Hakuna kurasa",
+  "creating": "Inaunda...",
+  "newPage": "Ukurasa mpya \"{{query}}\"",
+  "couldntCreatePage": "Imeshindwa kuunda ukurasa",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Chagua",
+    "open": "Fungua",
+    "newTab": "Kichupo kipya"
   }
 }

@@ -14,10 +14,11 @@ const viteManifestPath = join(distDir, '.vite', 'manifest.json');
 const limits = {
   initialRaw: numberEnv('HANJI_BUDGET_INITIAL_JS_RAW', 700_000),
   initialGzip: numberEnv('HANJI_BUDGET_INITIAL_JS_GZIP', 220_000),
-  // Includes both language catalogs deliberately precached for a guaranteed
-  // first-installed offline boot. Measured release baseline after the complete
-  // en/ko migration is 364,286 bytes; keep less than 2% headroom.
-  initialTotalGzip: numberEnv('HANJI_BUDGET_INITIAL_TOTAL_GZIP', 370_000),
+  // Includes both boot language catalogs and the synchronous core routes that
+  // keep cache-backed reloads free of blank lazy boundaries. The measured
+  // baseline for that approved boot graph is 433,698 bytes; keep under 1.5%
+  // headroom so future growth still has to be intentional.
+  initialTotalGzip: numberEnv('HANJI_BUDGET_INITIAL_TOTAL_GZIP', 440_000),
   lazyRaw: numberEnv('HANJI_BUDGET_LAZY_JS_RAW', 750_000),
   lazyGzip: numberEnv('HANJI_BUDGET_LAZY_JS_GZIP', 260_000),
   bootJsRequests: numberEnv('HANJI_BUDGET_BOOT_JS_REQUESTS', 16),

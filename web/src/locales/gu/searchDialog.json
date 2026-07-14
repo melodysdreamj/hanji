@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "શોધો અથવા પર જાઓ...",
+  "quickFind": "ઝડપી શોધ",
+  "closeSearch": "શોધ બંધ કરો",
+  "quickFindResults": "ઝડપી શોધ પરિણામો",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "તાજેતરમાં જોવાયેલ",
+    "recentSearches": "તાજેતરની શોધો",
+    "pages": "પાનાં",
+    "pageContent": "પાનાની સામગ્રી",
+    "favorites": "મનપસંદ"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "પાનામાં",
+  "searchingDetail": "શોધી રહ્યા છે...",
+  "searchAgain": "ફરી શોધો",
+  "searchingPageContent": "પાનાની સામગ્રી શોધી રહ્યા છે...",
+  "noResultsFor": "\"{{query}}\" માટે કોઈ પરિણામો નથી",
+  "noPagesFound": "કોઈ પાનાં મળ્યાં નથી",
+  "creating": "બનાવી રહ્યા છે...",
+  "newPage": "નવું પાનું \"{{query}}\"",
+  "couldntCreatePage": "પેજ બનાવી શકાયું નહીં",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "પસંદ કરો",
+    "open": "ખોલો",
+    "newTab": "નવી ટૅબ"
   }
 }

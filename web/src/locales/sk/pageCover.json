@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Zmeniť obálku",
+    "reposition": "Premiestniť",
+    "remove": "Odstrániť",
+    "uploadFile": "Nahrať súbor",
+    "uploading": "Nahrávanie...",
+    "submit": "Odoslať",
+    "savePosition": "Uložiť polohu"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galéria",
+    "upload": "Nahrať",
+    "link": "Odkaz"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Vložte odkaz na obrázok",
+    "invalid": "Vložte http alebo https obrázkový odkaz."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Obrázok sa nepodarilo nahrať.",
+    "defaultFileName": "Obrázok obálky"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Potiahnutím obrázku zmeníte polohu"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Príprava nahrávania",
+    "finalizing": "Finalizácia",
+    "complete": "Dokončené",
+    "uploading": "Nahrávanie"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Obálka odstránená",
+    "restored": "Obálka obnovená",
+    "undo": "Späť"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Obálka stránky",
+    "coverVerticalPosition": "Vertikálna poloha obálky",
+    "positionFromTop": "{{position}}% zhora",
+    "closeCoverMenu": "Zavrieť menu obálky",
+    "changePageCover": "Zmeniť obálku stránky",
+    "repositionPageCover": "Premiestniť obálku stránky",
+    "removePageCover": "Odstrániť obálku stránky",
+    "changeCoverDialog": "Zmeniť obálku",
+    "coverSource": "Zdroj obálky",
+    "selectCover": "Vybrať obálku {{number}}",
+    "uploadFromDevice": "Nahrať obrázok obálky z tohto zariadenia",
+    "uploadingFile": "Nahrávanie {{fileName}}",
+    "coverImageLink": "Odkaz na obrázok obálky"
   }
 }

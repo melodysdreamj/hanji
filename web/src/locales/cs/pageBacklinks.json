@@ -1,23 +1,23 @@
 {
-  "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
-  },
   "header": {
-    "title": "Linked mentions"
-  },
-  "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "title": "Propojené zmínky"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "link": "Odkaz",
+    "mention": "Zmínka"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} další zpětný odkaz",
+    "count_other": "{{count}} dalších zpětných odkazů"
+  },
+  "summary": {
+    "link_one": "{{count}} odkaz",
+    "link_other": "{{count}} odkazů",
+    "mention_one": "{{count}} zmínka",
+    "mention_other": "{{count}} zmínek"
+  },
+  "toggle": {
+    "count_one": "{{count}} zpětný odkaz",
+    "count_other": "{{count}} zpětných odkazů"
   }
 }

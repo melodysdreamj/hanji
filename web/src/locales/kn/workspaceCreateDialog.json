@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "ಹೊಸ ವರ್ಕ್‌ಸ್ಪೇಸ್",
   "name": {
-    "label": "Workspace name",
+    "label": "ಕಾರ್ಯಕ್ಷೇತ್ರದ ಹೆಸರು",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "ಇಂದ ಪ್ರಾರಂಭಿಸಿ",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "ಖಾಲಿ ವರ್ಕ್‌ಸ್ಪೇಸ್",
+      "body": "ಸ್ಟಾರ್ಟರ್ ಪುಟಗಳೊಂದಿಗೆ ಖಾಲಿಯಾಗಿ ಪ್ರಾರಂಭಿಸಿ."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion ನಿಂದ ಆಮದು",
+      "body": "ವರ್ಕ್‌ಸ್ಪೇಸ್ ರಚಿಸಿ, ನಂತರ ಅದರೊಳಗೆ Notion ವರ್ಕ್‌ಸ್ಪೇಸ್ ಅನ್ನು ವರ್ಗಾಯಿಸಿ."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "ಮತ್ತೊಂದು Hanji ನಿಂದ ಆಮದು",
+      "body": "ವರ್ಕ್‌ಸ್ಪೇಸ್ ರಚಿಸಿ, ನಂತರ ಇನ್ನೊಂದು Hanji ಸರ್ವರ್ ಅಥವಾ ಫೈಲ್ನಿಂದ ವರ್ಕ್‌ಸ್ಪೇಸ್ ಅನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಿ."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "ಕಾರ್ಯಕ್ಷೇತ್ರ ರಚಿಸಿ",
+  "creating": "ರಚಿಸುತ್ತಿದೆ…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "ಕಾರ್ಯಕ್ಷೇತ್ರ ರಚಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
   }
 }

@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "စကားဝိုင်းမရှိသေးပါ။ စာမျက်နှာတွင် မှတ်ချက်ရေးပါ သို့မဟုတ် တစ်စုံတစ်ဦးကို မန်းရှင်းပါ။",
+  "leave": "ထွက်ရန်",
+  "leaveAria": "{{title}} စကားဝိုင်းမှ ထွက်ရန်",
+  "open": "{{title}} စကားဝိုင်းဖွင့်ရန်",
+  "participants_one": "ပါဝင်သူ {{count}} ဦး",
+  "participants_other": "ပါဝင်သူ {{count}} ဦး",
+  "untitled": "ခေါင်းစဉ်မရှိ",
+  "loading": "စကားဝိုင်းများ တင်နေသည်…"
 }

@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Жылжыту",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Жұмыс кеңістігінің түбірі",
+    "path": "Жоғарғы деңгей"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Жылжыту орындарын іздеу",
+    "placeholder": "Беттерді іздеу..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Жылжыту диалогын жабу"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Жылжыту орындары",
+    "empty": "Ешбір бет табылмады.",
+    "destinationLabel": "{{label}} -ге жылжыту, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" жасау",
+    "optionLabel": "{{title}} бетін жасау және осында жылжыту",
+    "hint": "Жаңа жоғарғы деңгей беті - осында жылжыту"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Құлыпталған аталық бет",
+    "page": "Құлыпталған бет"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Бет құлыпталған ата-бетте орналасқан",
+    "locked": "Бет құлыпталған",
+    "moved": "Бет жылжытылды",
+    "moveFailed": "Бетті жылжыту мүмкін болмады"
   }
 }

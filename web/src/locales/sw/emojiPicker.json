@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Funga kichaguzi cha ikoni",
+    "label": "Chagua ikoni"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Aina ya aikoni",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Picha"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Ondoa",
+    "ariaLabel": "Ondoa aikoni"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Chuja…",
+    "searchLabel": "Tafuta aikoni",
+    "random": "Bila mpangilio",
+    "randomLabel": "Chagua ikoni bila mpangilio",
+    "recentLabel": "Zilizotumika hivi karibuni kwanza",
+    "gridLabelRecent": "Ikoni, zilizotumiwa hivi karibuni kwanza",
+    "gridLabel": "Ikoni",
+    "optionLabel": "Chagua ikoni {{emoji}}",
+    "noResults": "Hakuna ikoni inalingana na “{{query}}”. Jaribu neno lingine au futa kichujio."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Picha",
+    "linkPlaceholder": "Bandika kiungo cha picha",
+    "linkLabel": "Kiungo cha picha ya ikoni",
+    "apply": "Weka",
+    "upload": "Pakia faili",
+    "uploading": "Inapakia...",
+    "uploadingLabel": "Inapakia {{fileName}}",
+    "uploadFailed": "Haikuweza kupakia picha hiyo.",
+    "fallbackFileName": "Picha ya ikoni"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Inatayarisha upakiaji",
+    "finalizing": "Inakamilisha",
+    "complete": "Imekamilika",
+    "uploading": "Inapakia"
   }
 }

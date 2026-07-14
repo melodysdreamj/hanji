@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "ఈ కంటెంట్ని ప్రదర్శించడంలో లోపం సంభవించింది.",
+  "detail": "మళ్లీ ప్రయత్నించండి. సమస్య కొనసాగితే, అనువర్తనాన్ని రీలోడ్ చేసి, కింది సూచనను షేర్ చేయండి.",
+  "reference": "సూచన: {{reference}}",
+  "reload": "యాప్ను రీలోడ్ చేయండి",
+  "retry": "మళ్లీ ప్రయత్నించండి"
 }

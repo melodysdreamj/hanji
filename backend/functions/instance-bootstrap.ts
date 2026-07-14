@@ -7,14 +7,14 @@ import {
 import { hanjiEnvFlag, hanjiEnvValue } from '../lib/hanji-compat';
 import { getExisting, type TransactDb } from '../lib/table-utils';
 
-// Master-account bootstrap. The deployment command/environment provides
-// HANJI_MASTER_EMAIL / HANJI_MASTER_PASSWORD; this endpoint
-// idempotently ensures that account exists and is an instance admin, and
-// tells the client whether the instance is usable at all:
+// First-administrator bootstrap. The common dev/Docker/hosted path collects
+// the administrator identity in the browser; the legacy environment path
+// remains available for noninteractive provisioning. This endpoint tells the
+// client whether the instance is usable at all:
 //  - master env configured  -> ensure account, never blocked
 //  - no master env, but the instance already has users -> normal sign-in
-//  - no master env, zero users, setup token configured -> first-run web setup
-//  - no master env/token, zero users, no dev-guest escape -> setup blocked;
+//  - no master env, zero users, browser setup enabled -> first-run web setup
+//  - no master env/browser setup, zero users, no dev-guest escape -> setup blocked;
 //    the operator must provide an initialization mechanism.
 // The endpoint never returns the configured credentials. Request URL/Host
 // metadata cannot prove that the network peer is loopback (proxies and direct
@@ -74,7 +74,24 @@ interface FunctionContext {
 }
 
 const SETUP_ID = 'global';
-const SETUP_CODE_MIN_LENGTH = 24;
+const SETUP_TOKEN_HEADER = 'X-Hanji-Setup-Token';
+
+export function setupTokenAuthorized(expected: string | null, presented: unknown): boolean {
+  if (!expected) return true;
+  const candidate = typeof presented === 'string' ? presented.trim() : '';
+  const expectedBytes = new TextEncoder().encode(expected);
+  const candidateBytes = new TextEncoder().encode(candidate);
+  let difference = expectedBytes.length ^ candidateBytes.length;
+  const comparisonLength = Math.max(expectedBytes.length, candidateBytes.length);
+  for (let index = 0; index < comparisonLength; index += 1) {
+    difference |= (expectedBytes[index] ?? 0) ^ (candidateBytes[index] ?? 0);
+  }
+  return difference === 0;
+}
+
+function setupTokenFrom(context: FunctionContext) {
+  return context.request?.headers.get(SETUP_TOKEN_HEADER) ?? '';
+}
 
 export function normalizeMasterEmail(value: unknown): string | null {
   if (typeof value !== 'string') return null;
@@ -111,8 +128,8 @@ export function isSetupBlocked(opts: {
   if (opts.usersExist) return false;
   if (opts.setupAvailable) return false;
   // Dev/test runtimes with the loopback guest escape keep their existing
-  // anonymous bootstrap path; production instances must restart with master
-  // credentials before any account can exist.
+  // anonymous bootstrap path; other runtimes need an enabled initialization
+  // mechanism before any account can exist.
   return !opts.devGuestEnabled;
 }
 
@@ -125,21 +142,6 @@ export function validSetupPassword(value: unknown): value is string {
     /\d/.test(value) &&
     /[^A-Za-z0-9]/.test(value) &&
     !/[\s\u0000-\u001f\u007f]/.test(value);
-}
-
-// The setup code is fixed-length random data in normal deployments. Keep the
-// comparison work proportional to the longer input so a remote caller cannot
-// learn a matching prefix from early returns.
-export function setupCodeMatches(provided: unknown, configured: string | null): boolean {
-  if (typeof provided !== 'string' || !configured || configured.length < SETUP_CODE_MIN_LENGTH) {
-    return false;
-  }
-  const length = Math.max(provided.length, configured.length);
-  let difference = provided.length ^ configured.length;
-  for (let index = 0; index < length; index += 1) {
-    difference |= (provided.charCodeAt(index) || 0) ^ (configured.charCodeAt(index) || 0);
-  }
-  return difference === 0;
 }
 
 function userIdFrom(user: Record<string, unknown>) {
@@ -359,7 +361,10 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   );
   const masterPassword =
     hanjiEnvValue(context.env, 'HANJI_MASTER_PASSWORD', 'EDGEBASE_MASTER_PASSWORD') ?? null;
-  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
+  const browserSetupEnabled = hanjiEnvFlag(context.env, 'HANJI_BROWSER_SETUP');
+  const configuredSetupToken =
+    hanjiEnvValue(context.env, 'HANJI_BROWSER_SETUP_TOKEN') ?? null;
+  const setupAuthorized = setupTokenAuthorized(configuredSetupToken, setupTokenFrom(context));
   const devGuestEnabled = hanjiEnvFlag(
     context.env,
     'HANJI_ALLOW_DEV_GUEST_LOGIN',
@@ -405,22 +410,23 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   }
 
   let pendingSetup = false;
-  if (!plan.masterConfigured && setupToken && !settings.masterUserId) {
+  if (!plan.masterConfigured && browserSetupEnabled && !settings.masterUserId) {
     try {
       pendingSetup = (await setupRecord(db))?.state === 'pending';
     } catch {
       pendingSetup = false;
     }
   }
-  const setupAvailable = Boolean(
-    !plan.masterConfigured && !settings.masterUserId && setupToken &&
-      setupToken.length >= SETUP_CODE_MIN_LENGTH && (!usersExist || pendingSetup),
+  const setupAvailableWithoutAuthorization = Boolean(
+    !plan.masterConfigured && !settings.masterUserId && browserSetupEnabled &&
+      (!usersExist || pendingSetup),
   );
+  const setupAvailable = setupAvailableWithoutAuthorization && setupAuthorized;
   const setupBlocked = isSetupBlocked({
     masterConfigured: plan.masterConfigured,
     usersExist,
     devGuestEnabled,
-    setupAvailable,
+    setupAvailable: setupAvailableWithoutAuthorization,
   });
 
   return Response.json(
@@ -431,7 +437,10 @@ export const GET = defineFunction(async (rawContext: unknown) => {
       masterError,
       setupBlocked,
       setupAvailable,
-      setupCodeRequired: setupAvailable,
+      setupAuthorizationRequired: setupAvailableWithoutAuthorization && !setupAuthorized,
+      // Kept for older clients that know this response field. The Docker
+      // installer is deliberately browser-only and never requires a log code.
+      setupCodeRequired: false,
       setupInProgress: pendingSetup,
       // Kept for older web bundles. The credential-returning flow was removed:
       // URL/Host loopback checks do not authenticate the actual network peer.
@@ -470,10 +479,17 @@ export const POST = defineFunction(async (rawContext: unknown) => {
     );
   }
 
-  const setupToken = hanjiEnvValue(context.env, 'HANJI_SETUP_TOKEN') ?? null;
-  if (!setupCodeMatches(body.setupCode, setupToken)) {
+  if (!hanjiEnvFlag(context.env, 'HANJI_BROWSER_SETUP')) {
     return Response.json(
-      { ok: false, message: 'The setup code is invalid.' },
+      { ok: false, message: 'Browser setup is not enabled for this runtime.' },
+      { status: 409, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
+  const configuredSetupToken =
+    hanjiEnvValue(context.env, 'HANJI_BROWSER_SETUP_TOKEN') ?? null;
+  if (!setupTokenAuthorized(configuredSetupToken, setupTokenFrom(context))) {
+    return Response.json(
+      { ok: false, message: 'Use the private first-administrator setup link from the deploy output.' },
       { status: 403, headers: { 'Cache-Control': 'no-store' } },
     );
   }

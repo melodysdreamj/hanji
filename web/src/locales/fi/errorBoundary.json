@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "detail": "Yritä uudelleen. Jos ongelma jatkuu, lataa sovellus uudelleen ja jaa alla oleva viite.",
+  "reference": "Viite: {{reference}}",
+  "reload": "Lataa sovellus uudelleen",
+  "retry": "Yritä uudelleen",
+  "title": "Sisällön näyttämisessä tapahtui virhe."
 }

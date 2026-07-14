@@ -1,21 +1,21 @@
 {
-  "title": "将块移动到",
+  "title": "将块移至",
   "search": {
-    "label": "搜索移动目标",
-    "placeholder": "搜索页面…"
+    "label": "搜索移动目标位置",
+    "placeholder": "搜索页面..."
   },
   "dialog": {
     "closeLabel": "关闭移动对话框"
   },
   "results": {
-    "listLabel": "移动目标",
+    "listLabel": "移动目标位置",
     "empty": "未找到页面。",
-    "destinationLabel": "将块移动到 {{label}}，{{path}}"
+    "destinationLabel": "将块移至 {{label}}, {{path}}"
   },
   "create": {
-    "label": "创建“{{query}}”",
-    "optionLabel": "创建页面“{{query}}”并将块移动到此处",
-    "hint": "新页面 - 将块移动到此处"
+    "label": "创建 \"{{query}}\"",
+    "optionLabel": "创建页面 \"{{query}}\" 并将块移至此处",
+    "hint": "新页面 - 将块移动至此"
   },
   "locked": {
     "page": "已锁定页面"
@@ -23,8 +23,8 @@
   "untitled": "无标题",
   "toast": {
     "locked": "页面已锁定",
-    "movedBlock": "已移动块",
-    "movedBlocks": "已移动多个块",
+    "movedBlock": "块已移动",
+    "movedBlocks": "块已移动",
     "movedBlocksCount": "已移动 {{blockCount}} 个块",
     "moveFailed": "无法移动块"
   }

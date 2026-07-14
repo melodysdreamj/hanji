@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Wala pang pahina ang database na ito.",
+  "emptyTitle": "Wala pang pahina",
+  "newInline": "Bago",
+  "newPage": "Bagong pahina",
+  "newPageIn": "Bagong pahina sa {{dbTitle}}",
+  "noResultsDesc": "Walang pahinang tumutugma sa kasalukuyang mga filter o paghahanap.",
+  "noResultsTitle": "Walang Resulta",
+  "openRow": "Buksan ang {{title}}"
 }

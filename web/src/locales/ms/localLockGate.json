@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Buka kunci data tempatan",
+  "description": "Data luar talian pada peranti ini dikunci dengan frasa laluan. Membuka kunci akan menghidupkan semula penggunaan dan penyimpanan luar talian.",
+  "passphrasePlaceholder": "Frasa laluan",
+  "unlock": "Buka kunci",
+  "continueOnline": "Teruskan dalam talian sahaja",
+  "continueOnlineHint": "\"Teruskan dalam talian sahaja\" mengekalkan suntingan luar talian terkunci peranti ini — ia kekal pada peranti dan tidak akan disegerakkan sehingga anda membuka kuncinya dengan frasa laluan yang betul.",
+  "wrongPassphrase": "Frasa laluan itu tidak betul.",
+  "unsupportedBrowser": "Kunci tempatan tidak tersedia dalam pelayar ini."
 }

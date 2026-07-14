@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komentarji",
+  "closeAria": "Zapri komentarje",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Pogovor o bloku",
+    "page": "Pogovor o strani"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Status komentarja",
+    "open": "Odprto",
+    "resolved": "Rešeno"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Komentar na",
+    "commentingOnSelectedText": "Komentar na izbrano besedilo",
+    "selectedBlock": "Izbrani blok",
+    "onSelectedText": "Na izbranem besedilu",
+    "onSelectedBlock": "Na izbranem bloku",
+    "onABlock": "Na bloku"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Dodaj komentar na blok",
+    "addPageComment": "Dodaj komentar na stran",
+    "blockPlaceholder": "Komentar na ta blok...",
+    "pagePlaceholder": "Dodaj komentar...",
+    "submit": "Komentiraj"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Omeni osebe v komentarju",
+    "replyPeopleAria": "Omeni osebe v odgovoru",
+    "trigger": "Omeni osebe",
+    "noMatches": "Ni ustreznih oseb",
+    "title": "Omeni {{name}}",
+    "person": "Oseba",
+    "you": "Vi",
+    "organizationPerson": "Član organizacije",
+    "roleInOrganization": "{{role}} v organizaciji"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Niti komentarjev",
+    "empty": "Še ni komentarjev",
+    "noOpen": "Ni odprtih komentarjev",
+    "noResolved": "Ni rešenih komentarjev"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komentar, {{time}}",
+    "commentAriaResolved": "{{author}} komentar, {{time}}, razrešeno",
+    "replyAria": "{{author}} odgovor, {{time}}",
+    "repliesAria": "{{count}} odgovorov",
+    "edited": "(urejeno)",
+    "emptyComment": "(prazen komentar)",
+    "emptyReply": "(prazen odgovor)",
+    "justNow": "Pravkar"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Odgovori",
+    "showInPage": "Pokaži na strani",
+    "resolve": "Razreši",
+    "reopen": "Ponovno odpri",
+    "edit": "Uredi"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Odgovori..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Uredi komentar"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Izbriši ta komentar?",
+    "threadConfirm_one": "Izbrišem ta komentar in njegov odgovor?",
+    "threadConfirm_other": "Izbrišem ta komentar in njegovih {{count}} odgovorov?"
   }
 }

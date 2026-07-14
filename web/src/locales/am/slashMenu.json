@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "ብሎክ ትዕዛዞች",
+  "closeBlockCommands": "ብሎክ ትዕዛዞችን ዝጋ",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "መሰረታዊ ብሎኮች",
+    "Media": "ሚዲያ",
+    "Database": "ዳታቤዝ",
+    "Advanced": "የላቁ ብሎኮች"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, ከ{{total}} ውስጥ {{position}}ኛ. ለማስገባት Enter ተጫን.",
+  "listStatus": "{{total}} ብሎክ ትዕዛዞች አሉ።",
+  "noBlocks": "ብሎኮች አልተገኙም",
+  "noBlocksFor": "ለ\"{{query}}\" ብሎኮች አልተገኙም",
+  "recentlyUsed": "በቅርብ ጥቅም ላይ የዋሉ"
 }

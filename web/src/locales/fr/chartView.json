@@ -6,13 +6,13 @@
     "min": "Min",
     "max": "Max"
   },
-  "chartAria": "Graphique {{name}}",
+  "chartAria": "{{name}} chart",
   "chartType": "Type de graphique",
   "chartTypes": {
     "bar": "Barres",
     "horizontal_bar": "Barres horizontales",
     "line": "Ligne",
-    "donut": "Anneau"
+    "donut": "Donut"
   },
   "checked": "Coché",
   "empty": "Vide",
@@ -20,12 +20,12 @@
   "monthLabel": "{{month}} {{year}}",
   "noData": "Aucune donnée",
   "noDataDesc": "Aucune ligne ne correspond aux filtres ou à la recherche actuels.",
-  "noGroupProperty": "Rien à grapher pour le moment",
-  "noGroupPropertyDesc": "Ajoutez une propriété Sélection, Statut, Personne, Case à cocher ou Date pour regrouper ce graphique.",
+  "noGroupProperty": "Rien à représenter pour l'instant",
+  "noGroupPropertyDesc": "Ajoutez une propriété de sélection, statut, personne, case à cocher ou date pour regrouper ce graphique.",
   "total": "Total",
   "unchecked": "Non coché",
   "untitledProperty": "Sans titre",
-  "valueProperty": "Propriété de valeur",
+  "valueProperty": "Propriété valeur",
   "xAxis": "Axe X",
   "yAxis": "Axe Y"
 }

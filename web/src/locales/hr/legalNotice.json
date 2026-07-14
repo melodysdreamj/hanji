@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Pravne i izvorne informacije",
+  "noWarranty": "Dostavljeno bez jamstva.",
+  "sourceCode": "Izvorni kod",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Iznimka 2.0"
 }

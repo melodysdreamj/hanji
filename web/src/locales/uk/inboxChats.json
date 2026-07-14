@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Ще немає діалогів. Залиште коментар на сторінці або згадайте когось, щоб почати.",
+  "leave": "Вийти",
+  "leaveAria": "Вийти з діалогу «{{title}}»",
+  "open": "Відкрити діалог «{{title}}»",
+  "participants_one": "{{count}} учасник",
+  "participants_other": "{{count}} учасників",
+  "untitled": "Без назви",
+  "loading": "Завантаження діалогів…"
 }

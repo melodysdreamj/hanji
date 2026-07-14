@@ -149,10 +149,28 @@ const permissionRefSchema = v.object({
 const publicPageSchema = v.object({
   token: v.optional(v.string({ min: 1, max: 256 })),
   shareId: v.optional(v.string({ min: 1, max: 256 })),
+  snapshotVersion: v.optional(v.string({ min: 1, max: 128 })),
 });
 
 function jsonError(status: number, message: string) {
   return Response.json({ code: status, message }, { status });
+}
+
+async function publicSnapshotVersion(value: unknown) {
+  const canonical = JSON.stringify(value, (_key, candidate) => {
+    if (typeof candidate === 'string' && candidate.startsWith('public-person:')) {
+      // Public person aliases are intentionally response-local. Their random
+      // ids must not invalidate an otherwise identical snapshot.
+      return 'public-person';
+    }
+    if (!candidate || Array.isArray(candidate) || typeof candidate !== 'object') return candidate;
+    return Object.fromEntries(
+      Object.entries(candidate as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right)),
+    );
+  });
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 async function requestJson(request?: Request): Promise<Record<string, unknown>> {
@@ -2643,10 +2661,36 @@ async function publicPage(
       ...(lastEditedBy ? { lastEditedBy } : {}),
     };
   });
+  const sanitizedBlocks = sanitize(publicBlocks) as Block[];
+  const sanitizedProperties = sanitize(publicProperties) as DbProperty[];
+  const sanitizedViews = sanitize(publicViews) as DbView[];
+  const snapshotVersion = await publicSnapshotVersion({
+    blocks: sanitizedBlocks.slice().sort((a, b) => a.id.localeCompare(b.id)),
+    fileDownloadsAllowed,
+    pages: renderablePages.slice().sort((a, b) => a.id.localeCompare(b.id)),
+    properties: sanitizedProperties.slice().sort((a, b) => a.id.localeCompare(b.id)),
+    shareLink: publicShareLinkPayload(link),
+    uploads: Array.from(allowedUploads.values())
+      .map((upload) => ({
+        completedAt: upload.completedAt,
+        contentType: upload.contentType,
+        etag: upload.etag,
+        key: upload.key,
+        size: upload.size,
+      }))
+      .sort((a, b) => a.key.localeCompare(b.key)),
+    views: sanitizedViews.slice().sort((a, b) => a.id.localeCompare(b.id)),
+  });
+  if (body.snapshotVersion === snapshotVersion) {
+    // This is an application-level 304 because EdgeBase functions use a JSON
+    // POST transport. Access, expiry and DLP checks above still run first, so
+    // a revoked share can never be resurrected from browser storage.
+    return { notModified: true, snapshotVersion };
+  }
   const signedPages = await signSharedFileUrls(renderablePages, allowedUploads, storage) as Page[];
-  const signedBlocks = await signSharedFileUrls(sanitize(publicBlocks), allowedUploads, storage) as Block[];
-  const signedProperties = await signSharedFileUrls(sanitize(publicProperties), allowedUploads, storage) as DbProperty[];
-  const signedViews = await signSharedFileUrls(sanitize(publicViews), allowedUploads, storage) as DbView[];
+  const signedBlocks = await signSharedFileUrls(sanitizedBlocks, allowedUploads, storage) as Block[];
+  const signedProperties = await signSharedFileUrls(sanitizedProperties, allowedUploads, storage) as DbProperty[];
+  const signedViews = await signSharedFileUrls(sanitizedViews, allowedUploads, storage) as DbView[];
   const signedRoot = signedPages.find((page) => page.id === root.id);
   if (!signedRoot) throw new Error('Shared page was not found.');
 
@@ -2661,6 +2705,7 @@ async function publicPage(
     templates: [],
     navigablePageIds: Array.from(navigablePageIds),
     shareLink: publicShareLinkPayload(link),
+    snapshotVersion,
   };
 }
 

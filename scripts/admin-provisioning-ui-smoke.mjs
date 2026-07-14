@@ -3,13 +3,16 @@
 //   1. master (instance admin) creates a user through instance-admin and
 //      receives a one-time temporary password with mustChangePassword set;
 //   2. the new user signs in through the AuthGate UI and is blocked by the
-//      forced password-change screen until they set their own password;
+//      forced password-change screen until they set their own password, then
+//      completes the one-time account-language step;
 //   3. server-level membership: the master adds the provisioned account to a
 //      workspace directly by email (resolved to the existing account) with no
 //      invitation email and no accept step; an unknown email is a blind no-op.
 //
 // Requires the local dev runtime (npm --prefix backend run dev) with the dev
 // master account env (backend package.json dev script provides it).
+import { mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   assert,
   assertRuntimeReachable,
@@ -27,6 +30,7 @@ import {
 const BASE = normalizeBaseUrl(process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787');
 const { email: MASTER_EMAIL, password: MASTER_PASSWORD } = masterCredentials();
 const TIMEOUT_MS = Number(process.env.HANJI_SMOKE_TIMEOUT_MS ?? 30_000);
+const SCREENSHOT_DIR = resolve('.edgebase', 'smoke', 'admin-provisioning');
 setDefaultTimeoutMs(TIMEOUT_MS);
 
 async function api(path, body, token) {
@@ -86,6 +90,7 @@ async function main() {
     userCleanupToken = await signin(userEmail, tempPassword);
     const flags = await api('/api/functions/account-state', { action: 'get' }, userCleanupToken);
     assert(flags.json.mustChangePassword === true, 'admin-created account should carry mustChangePassword');
+    assert(flags.json.languageOnboardingCompleted !== true, 'new account should not invent a language choice');
     console.log('PASS account-state reports mustChangePassword for the provisioned account.');
 
     // 2. Forced password change through the UI.
@@ -109,16 +114,45 @@ async function main() {
       await page.locator('#must-change-next').fill(newPassword);
       await page.locator('#must-change-confirm').fill(newPassword);
       await mustChange.getByRole('button').last().click({ timeout: TIMEOUT_MS });
+
+      const languageOnboarding = page.locator('[data-testid="language-onboarding"]');
+      await languageOnboarding.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
+      const languageSelect = languageOnboarding.getByLabel('Language');
+      const languageOptionCount = await languageSelect.locator('option').count();
+      const recommendedValue = await languageSelect.locator('option').first().getAttribute('value');
+      const recommendedText = await languageSelect.locator('option').first().textContent();
+      assert(languageOptionCount === 59, `language onboarding should expose system + 58 languages, got ${languageOptionCount}`);
+      assert(recommendedValue === 'en', `English browser should recommend en first, got ${recommendedValue}`);
+      assert(recommendedText?.includes('Recommended'), 'first browser-language option should be visibly recommended');
+      mkdirSync(SCREENSHOT_DIR, { recursive: true });
+      await page.screenshot({
+        path: resolve(SCREENSHOT_DIR, 'language-onboarding.png'),
+        fullPage: true,
+      });
+      console.log('PASS first real account login shows the browser-recommended 58-language step.');
+
+      await languageOnboarding.getByRole('button', { name: 'Continue' }).click({ timeout: TIMEOUT_MS });
       await page.locator('button[aria-label="Open workspace menu"]').waitFor({
         state: 'visible',
         timeout: TIMEOUT_MS,
       });
-      console.log('PASS forced password change unlocks the workspace shell.');
+      console.log('PASS password and language completion unlock the workspace shell.');
 
       userCleanupToken = await signin(userEmail, newPassword);
       const cleared = await api('/api/functions/account-state', { action: 'get' }, userCleanupToken);
       assert(cleared.json.mustChangePassword === false, 'flag should clear after the password change');
+      assert(cleared.json.languageOnboardingCompleted === true, 'language onboarding should persist completion');
+      assert(cleared.json.languagePreference === 'en', 'recommended English choice should persist per account');
       console.log('PASS mustChangePassword clears after the change.');
+      console.log('PASS language preference persists in account-state.');
+
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await page.locator('button[aria-label="Open workspace menu"]').waitFor({
+        state: 'visible',
+        timeout: TIMEOUT_MS,
+      });
+      assert(await page.locator('[data-testid="language-onboarding"]').count() === 0, 'saved language step must not repeat');
+      console.log('PASS saved account language skips onboarding on the next authenticated load.');
 
       // 3. Server-level membership: the master adds the provisioned account to a
       //    workspace directly (no invitation email and no accept step). An email that
@@ -174,7 +208,7 @@ async function main() {
       await browser.close().catch(() => {});
     }
 
-    console.log('PASS admin provisioning + forced password change + server-account membership works end to end.');
+    console.log('PASS admin provisioning + password/language onboarding + server-account membership works end to end.');
   } catch (error) {
     runError = error;
   } finally {

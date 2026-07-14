@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Ova baza podataka još nema stranica.",
+  "emptyTitle": "Još nema stranica",
+  "newInline": "Nova",
+  "newPage": "Nova stranica",
+  "newPageIn": "Nova stranica u {{dbTitle}}",
+  "noResultsDesc": "Nijedna stranica se ne podudara sa trenutnim filterima ili pretragom.",
+  "noResultsTitle": "Nema rezultata",
+  "openRow": "Otvori {{title}}"
 }

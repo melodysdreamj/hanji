@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Mga Komento",
+  "closeAria": "Isara ang mga komento",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Diskusyon sa block",
+    "page": "Diskusyon sa page"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Katayuan ng komento",
+    "open": "Bukas",
+    "resolved": "Naresolba"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Nagkokomento sa",
+    "commentingOnSelectedText": "Nagkokomento sa napiling teksto",
+    "selectedBlock": "Napiling block",
+    "onSelectedText": "Sa napiling teksto",
+    "onSelectedBlock": "Sa napiling block",
+    "onABlock": "Sa isang block"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Magdagdag ng block comment",
+    "addPageComment": "Magdagdag ng page comment",
+    "blockPlaceholder": "Magkomento sa block na ito...",
+    "pagePlaceholder": "Magdagdag ng komento...",
+    "submit": "Komento"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "I-mention ang mga tao sa komento",
+    "replyPeopleAria": "I-mention ang mga tao sa tugon",
+    "trigger": "I-mention ang tao",
+    "noMatches": "Walang katugmang tao",
+    "title": "I-mention si {{name}}",
+    "person": "Tao",
+    "you": "Ikaw",
+    "organizationPerson": "Miyembro ng organisasyon",
+    "roleInOrganization": "{{role}} sa organisasyon"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Mga thread ng komento",
+    "empty": "Wala pang komento",
+    "noOpen": "Walang bukas na komento",
+    "noResolved": "Walang naresolbang komento"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komento, {{time}}",
+    "commentAriaResolved": "{{author}} komento, {{time}}, nalutas",
+    "replyAria": "{{author}} tugon, {{time}}",
+    "repliesAria": "{{count}} na tugon",
+    "edited": "(na-edit)",
+    "emptyComment": "(walang laman na komento)",
+    "emptyReply": "(walang laman na tugon)",
+    "justNow": "Ngayon lang"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Tumugon",
+    "showInPage": "Ipakita sa page",
+    "resolve": "I-resolve",
+    "reopen": "Buksan muli",
+    "edit": "I-edit"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Tugon..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "I-edit ang komento"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Burahin ang komentong ito?",
+    "threadConfirm_one": "Tanggalin ang komentong ito at ang tugon nito?",
+    "threadConfirm_other": "Tanggalin ang komentong ito at ang {{count}} tugon nito?"
   }
 }

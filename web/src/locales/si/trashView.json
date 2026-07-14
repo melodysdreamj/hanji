@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "කසළ",
+  "empty": "ඔබ මකා දමන පිටු මෙහි දිස් වේ. කසළ හිස් ය.",
+  "searchTrash": "කසළ සොයන්න",
+  "deletedPages": "මකා දැමූ පිටු",
+  "noSearchMatches": "ඔබගේ සෙවුමට ගැළපෙන මකා දැමූ පිටු නොමැත.",
+  "pageCount_one": "{{count}} පිටුව",
+  "pageCount_other": "{{count}} පිටු",
+  "deletedJustNow": "මේ දැන් මකා ඇත",
+  "deletedOn": "{{date}} මකා ඇත",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "ප්‍රතිස්ථාපනය කරන්න",
+    "deleteForever": "ස්ථිරව මකන්න",
+    "emptyTrash": "කසළ හිස් කරන්න"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "කසළෙන් {{title}} විවෘත කරන්න",
+    "restorePage": "{{title}} ප්‍රතිස්ථාපනය කරන්න",
+    "deletePageForever": "{{title}} ස්ථිරව මකන්න",
+    "cancelPermanentDelete": "ස්ථිර මැකීම අවලංගු කරන්න",
+    "cancelEmptyTrash": "කසළ හිස් කිරීම අවලංගු කරන්න"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "ස්ථිරව මකන්නද?",
+    "deleteBodyPrefix": "මෙය ස්ථිරව මකාදමනු ඇත ",
+    "deleteBodySuffix": ". ඔබට මෙම ක්‍රියාව අවලංගු කළ නොහැක.",
+    "emptyTitle": "කසළ හිස් කරන්නද?",
+    "emptyBody_one": "මෙය කසළේ ඇති {{count}} පිටුව ස්ථිරව මකාදමනු ඇත. ඔබට මෙම ක්‍රියාව අවලංගු කළ නොහැක.",
+    "emptyBody_other": "මෙය කසළේ ඇති {{count}} පිටු ස්ථිරව මකාදමනු ඇත. ඔබට මෙම ක්‍රියාව අවලංගු කළ නොහැක."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "ස්ථිරව මකා දමන ලදී",
+    "couldntDelete": "පිටුව මකා දැමිය නොහැකි විය",
+    "restored": "පිටුව ප්‍රතිස්ථාපනය කර ඇත",
+    "couldntRestore": "පිටුව ප්‍රතිස්ථාපනය කළ නොහැකි විය",
+    "emptied": "කසළ හිස් කර ඇත",
+    "couldntEmpty": "කසළ හිස් කළ නොහැකි විය"
   }
 }

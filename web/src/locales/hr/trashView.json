@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Smeće",
+  "empty": "Stranice koje izbrišete završavaju ovdje. Smeće je prazno.",
+  "searchTrash": "Pretraži smeće",
+  "deletedPages": "Izbrisane stranice",
+  "noSearchMatches": "Nema izbrisanih stranica koje odgovaraju vašem pretraživanju.",
+  "pageCount_one": "{{count}} stranica",
+  "pageCount_other": "{{count}} stranica",
+  "deletedJustNow": "Upravo izbrisano",
+  "deletedOn": "Izbrisano {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Vrati",
+    "deleteForever": "Trajno izbriši",
+    "emptyTrash": "Isprazni smeće"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Otvori {{title}} iz smeća",
+    "restorePage": "Vrati {{title}}",
+    "deletePageForever": "Trajno izbriši {{title}}",
+    "cancelPermanentDelete": "Otkaži trajno brisanje",
+    "cancelEmptyTrash": "Otkaži pražnjenje smeća"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Trajno izbrisati?",
+    "deleteBodyPrefix": "Ovo će trajno izbrisati ",
+    "deleteBodySuffix": ". Ovu radnju ne možete poništiti.",
+    "emptyTitle": "Isprazniti smeće?",
+    "emptyBody_one": "Ovo će trajno izbrisati {{count}} stranicu u smeću. Ovu radnju ne možete poništiti.",
+    "emptyBody_other": "Ovo će trajno izbrisati {{count}} stranica u smeću. Ovu radnju ne možete poništiti."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Trajno izbrisano",
+    "couldntDelete": "Nije moguće izbrisati stranicu",
+    "restored": "Stranica vraćena",
+    "couldntRestore": "Nije moguće vratiti stranicu",
+    "emptied": "Smeće ispražnjeno",
+    "couldntEmpty": "Nije moguće isprazniti smeće"
   }
 }

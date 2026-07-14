@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Kunde inte återställa sidan",
+  "emptyBodyPrompt": "Tryck Enter för att börja skriva på denna tomma sida.",
+  "inTrashTopBarTitle": "I papperskorgen",
+  "notFoundTopBarTitle": "Sidan hittades inte",
+  "openWorkspace": "Öppna workspace",
+  "pageInTrash": "Den här sidan finns i papperskorgen.",
+  "pageInTrashDetail": "Återställ den innan du öppnar eller redigerar dess innehåll.",
+  "pageUnavailable": "Sidan är inte tillgänglig.",
+  "pageUnavailableDetail": "Sidan kan ha tagits bort, flyttats eller delats med ett annat konto.",
+  "restorePage": "Återställ sida",
+  "restoredPage": "Sidan återställd",
+  "loadingPageContent": "Laddar sidinnehåll"
 }

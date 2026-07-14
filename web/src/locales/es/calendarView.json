@@ -1,6 +1,6 @@
 {
   "empty": {
-    "title": "Añade una propiedad de fecha",
+    "title": "Añadir una propiedad de fecha",
     "description": "Las vistas de calendario necesitan una propiedad de fecha para colocar páginas en el mes.",
     "addDateButton": "Fecha"
   },
@@ -9,8 +9,8 @@
     "today": "Hoy",
     "previousWeek": "Semana anterior",
     "previousMonth": "Mes anterior",
-    "nextWeek": "Próxima semana",
-    "nextMonth": "Próximo mes"
+    "nextWeek": "Siguiente semana",
+    "nextMonth": "Siguiente mes"
   },
   "weekdays": {
     "sun": "Dom",
@@ -24,14 +24,14 @@
   "gridAriaLabel": "Calendario de {{title}}",
   "cell": {
     "ariaLabel": "{{date}}, {{count}} elementos",
-    "newRowAriaLabel": "Fila nueva el {{date}}",
+    "newRowAriaLabel": "Nueva fila el {{date}}",
     "newRowTitle": "Nuevo",
     "showLess": "Mostrar menos",
     "showMore": "+{{count}} más"
   },
   "card": {
     "openAriaLabel": "Abrir {{title}}",
-    "openAriaLabelWithDate": "Abrir {{title}}, programado para {{date}}",
+    "openAriaLabelWithDate": "Abrir {{title}}, programado para el {{date}}",
     "openNoDateAriaLabel": "Abrir {{title}}, sin fecha"
   },
   "noDate": {

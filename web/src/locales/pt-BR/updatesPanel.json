@@ -1,6 +1,6 @@
 {
   "filters": {
-    "all": "Tudo",
+    "all": "Todos",
     "unread": "Não lidas",
     "comments": "Comentários",
     "mentions": "Menções",
@@ -8,7 +8,7 @@
   },
   "header": {
     "closeUpdates": "Fechar atualizações",
-    "markAllRead": "Marcar todas como lidas",
+    "markAllRead": "Marcar tudo como lido",
     "markAllReadAria": "Marcar todas as atualizações como lidas",
     "pageHistory": "Histórico da página",
     "recentUpdates_one": "{{count}} atualização recente",
@@ -21,7 +21,7 @@
     "inboxMode": "Modo caixa de entrada"
   },
   "time": {
-    "justNow": "Agora há pouco",
+    "justNow": "Agora mesmo",
     "today": "Hoje",
     "yesterday": "Ontem"
   },
@@ -29,11 +29,11 @@
     "blockCount_one": "{{count}} bloco",
     "blockCount_other": "{{count}} blocos",
     "currentVersion": "Versão atual",
-    "currentVersionOnly": "Apenas a versão atual",
-    "next": "Próxima",
+    "currentVersionOnly": "Apenas versão atual",
+    "next": "Próximo",
     "nextVersion": "Próxima versão",
-    "noVersionPrevious": "Sem versão anterior",
-    "noVersionNext": "Sem próxima versão",
+    "noVersionPrevious": "Nenhuma versão anterior",
+    "noVersionNext": "Nenhuma próxima versão",
     "pageLocked": "Página bloqueada",
     "previous": "Anterior",
     "previousSnapshots_one": "{{count}} snapshot anterior",
@@ -44,19 +44,19 @@
     "restoredVersions": "{{count}} versões restauradas",
     "versionCount_one": "{{count}} versão",
     "versionCount_other": "{{count}} versões",
-    "versionsAgo": "{{count}} versões atrás",
+    "versionsAgo": "Há {{count}} versões",
     "versionsAhead": "{{count}} versões à frente",
     "versionsAria": "Versões"
   },
   "badges": {
     "comment": "Comentário",
-    "edited": "Editada",
-    "linked": "Vinculada",
+    "edited": "Editado",
+    "linked": "Vinculado",
     "member": "Membro",
     "mention": "Menção",
     "reply": "Resposta",
     "replyMention": "Menção em resposta",
-    "shared": "Compartilhada",
+    "shared": "Compartilhado",
     "system": "Sistema"
   },
   "rows": {
@@ -65,15 +65,15 @@
     "forYou": "para você",
     "notification": "Notificação",
     "referenceMention": "Mencionou {{title}} · {{preview}}",
-    "referenceLink": "Vinculada a {{title}} · {{preview}}",
-    "unreadDot": "Não lida",
-    "workspaceUpdate": "Atualização do espaço de trabalho"
+    "referenceLink": "Vinculado a {{title}} · {{preview}}",
+    "unreadDot": "Não lido",
+    "workspaceUpdate": "Atualização do workspace"
   },
   "empty": {
-    "allCaughtUp": "Você está em dia.",
+    "allCaughtUp": "Tudo em dia.",
     "loadingUpdates": "Carregando atualizações...",
-    "noFilteredUpdatesYet": "Nenhuma atualização de {{filter}} ainda.",
-    "noPageHistoryYet": "Ainda não há histórico da página.",
+    "noFilteredUpdatesYet": "Nenhum {{filter}} ainda.",
+    "noPageHistoryYet": "Nenhum histórico de página ainda.",
     "noUpdatesYet": "Nenhuma atualização ainda."
   }
 }

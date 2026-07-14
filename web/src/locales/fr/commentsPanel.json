@@ -2,8 +2,8 @@
   "title": "Commentaires",
   "closeAria": "Fermer les commentaires",
   "subtitle": {
-    "block": "Discussion sur le bloc",
-    "page": "Discussion sur la page"
+    "block": "Discussion du bloc",
+    "page": "Discussion de la page"
   },
   "status": {
     "aria": "Statut du commentaire",
@@ -11,8 +11,8 @@
     "resolved": "Résolu"
   },
   "anchor": {
-    "commentingOn": "Commenter",
-    "commentingOnSelectedText": "Commenter le texte sélectionné",
+    "commentingOn": "Commentaire sur",
+    "commentingOnSelectedText": "Commentaire sur le texte sélectionné",
     "selectedBlock": "Bloc sélectionné",
     "onSelectedText": "Sur le texte sélectionné",
     "onSelectedBlock": "Sur le bloc sélectionné",
@@ -32,20 +32,20 @@
     "noMatches": "Aucune personne correspondante",
     "title": "Mentionner {{name}}",
     "person": "Personne",
-    "you": "Vous",
-    "organizationPerson": "Personne de l'organisation",
+    "you": "Moi",
+    "organizationPerson": "Membre de l'organisation",
     "roleInOrganization": "{{role}} dans l'organisation"
   },
   "list": {
     "threadsAria": "Fils de commentaires",
-    "empty": "Aucun commentaire pour le moment",
+    "empty": "Aucun commentaire pour l'instant",
     "noOpen": "Aucun commentaire ouvert",
     "noResolved": "Aucun commentaire résolu"
   },
   "card": {
-    "commentAria": "Commentaire de {{author}}, {{time}}",
-    "commentAriaResolved": "Commentaire de {{author}}, {{time}}, résolu",
-    "replyAria": "Réponse de {{author}}, {{time}}",
+    "commentAria": "{{author}} comment, {{time}}",
+    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
+    "replyAria": "{{author}} reply, {{time}}",
     "repliesAria": "{{count}} réponses",
     "edited": "(modifié)",
     "emptyComment": "(commentaire vide)",

@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Kommentarer",
+  "closeAria": "Stäng kommentarer",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Blockdiskussion",
+    "page": "Siddiskussion"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Kommentarsstatus",
+    "open": "Öppen",
+    "resolved": "Löst"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Kommenterar",
+    "commentingOnSelectedText": "Kommenterar på markerad text",
+    "selectedBlock": "Valt block",
+    "onSelectedText": "På markerad text",
+    "onSelectedBlock": "På markerat block",
+    "onABlock": "På ett block"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Lägg till en blockkommentar",
+    "addPageComment": "Lägg till en sidkommentar",
+    "blockPlaceholder": "Kommentera det här blocket...",
+    "pagePlaceholder": "Lägg till en kommentar...",
+    "submit": "Kommentera"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
+    "commentPeopleAria": "Nämn personer i kommentar",
+    "replyPeopleAria": "Nämn personer i svar",
+    "trigger": "Nämn personer",
+    "noMatches": "Inga matchande personer",
+    "title": "Nämn {{name}}",
     "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "you": "Du",
+    "organizationPerson": "Organisationsperson",
+    "roleInOrganization": "{{role}} i organisationen"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Kommentarstrådar",
+    "empty": "Inga kommentarer än",
+    "noOpen": "Inga öppna kommentarer",
+    "noResolved": "Inga lösta kommentarer"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} kommentar, {{time}}",
+    "commentAriaResolved": "{{author}} kommentar, {{time}}, löst",
+    "replyAria": "{{author}}s svar, {{time}}",
+    "repliesAria": "{{count}} svar",
+    "edited": "(redigerad)",
+    "emptyComment": "(tom kommentar)",
+    "emptyReply": "(tomt svar)",
+    "justNow": "Nyss"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Svara",
+    "showInPage": "Visa på sidan",
+    "resolve": "Lös",
+    "reopen": "Återöppna",
+    "edit": "Redigera"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Svara..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Redigera kommentar"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Ta bort den här kommentaren?",
+    "threadConfirm_one": "Ta bort den här kommentaren och dess svar?",
+    "threadConfirm_other": "Ta bort den här kommentaren och dess {{count}} svar?"
   }
 }

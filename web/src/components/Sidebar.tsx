@@ -23,10 +23,16 @@ import { pageDisplayTitle } from "@/lib/pageTitle";
 import { canCreateWorkspacePage, canEditPage, workspaceMemberShareRole } from "@/lib/permissions";
 import { resolveTheme, useTheme } from "@/lib/theme";
 import { clearDurableOutboxOnSignOut, useStore } from "@/lib/store";
-import { listNotificationsRemote, signOutRemote } from "@/lib/edgebase";
+import {
+  claimNotionImportOnboardingRemote,
+  listNotificationsRemote,
+  signOutRemote,
+  suppressNotionImportOnboardingRemote,
+} from "@/lib/edgebase";
 import type { Block, Page } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import type { WorkspaceCreateChoice } from "./WorkspaceCreateDialog";
+import type { NotionImportActivitySummary } from "./ImportDialog";
 import { BLOCK_DRAG_IDS_TYPE, BLOCK_DRAG_TYPE, PAGE_DRAG_TYPE } from "./dndTypes";
 import { TEXT_BLOCKS } from "./editor/textBlockTypes";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -67,6 +73,11 @@ const WorkspaceCreateDialog = lazy(() =>
     default: WorkspaceCreateDialog,
   }))
 );
+const NotionImportOnboardingDialog = lazy(() =>
+  import("./NotionImportOnboardingDialog").then(({ NotionImportOnboardingDialog }) => ({
+    default: NotionImportOnboardingDialog,
+  }))
+);
 const TemplatesDialog = lazy(() =>
   import("./TemplatesDialog").then(({ TemplatesDialog }) => ({ default: TemplatesDialog }))
 );
@@ -77,7 +88,6 @@ const UpdatesPanel = lazy(() =>
 type SidebarSection = "favorites" | "shared" | "private";
 
 const SIDEBAR_SECTION_COLLAPSED_KEY = "hanji:sidebar-section-collapsed";
-const SIDEBAR_INVITE_CARD_DISMISSED_KEY = "hanji:sidebar-invite-card-dismissed";
 const SIDEBAR_TOP_RAIL_ICON_SIZE = 19;
 const PRIVATE_SECTION_INITIAL_LIMIT = 12;
 
@@ -178,6 +188,9 @@ export function Sidebar({
   // first render so its completion effect cannot be stranded behind a false
   // local `importOpen` state.
   const [importOpen, setImportOpen] = useState(notionOAuthCallback);
+  const [notionImportActivity, setNotionImportActivity] =
+    useState<NotionImportActivitySummary | null>(null);
+  const [notionOnboardingOpen, setNotionOnboardingOpen] = useState(false);
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const [workspaceCreateOpen, setWorkspaceCreateOpen] = useState(false);
   // Creation flows that import land the ImportDialog on the matching tab.
@@ -195,6 +208,7 @@ export function Sidebar({
   const workspaceMenuRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLElement>(null);
   const mobileRestoreFocusRef = useRef<HTMLElement | null>(null);
+  const notionOnboardingCheckedWorkspaceIdsRef = useRef(new Set<string>());
   const [themePref, setThemePref] = useTheme();
   const workspace = useStore((s) => s.workspace);
   const workspaces = useStore((s) => s.workspaces);
@@ -232,10 +246,6 @@ export function Sidebar({
   const notify = useStore((s) => s.notify);
   const createWorkspace = useStore((s) => s.createWorkspace);
   const switchWorkspace = useStore((s) => s.switchWorkspace);
-  const [inviteCardDismissed, setInviteCardDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem(SIDEBAR_INVITE_CARD_DISMISSED_KEY) === "1";
-  });
 
   // Inbox unread dot. There is no realtime notification push yet, so the dot
   // refreshes on workspace change, when the tab regains focus/visibility
@@ -347,7 +357,6 @@ export function Sidebar({
   const workspaceRole = workspaceMemberShareRole({ workspace, currentMember, userId });
   const canCreateRootPage = canCreateWorkspacePage({ workspace, currentMember, userId });
   const canUseFooterNewPage = canCreateRootPage;
-  const canInviteMembers = workspaceRole === "full_access";
   const canManageWorkspaceSettings =
     workspaceRole === "full_access" || organizationRole === "owner" || organizationRole === "admin";
   const canOpenAdminConsole =
@@ -358,6 +367,48 @@ export function Sidebar({
   // gate its entry point on instance-admin status (not workspace/org role) —
   // otherwise a workspace owner would open a console that fails to load.
   const canOpenServerConsole = isInstanceAdmin;
+
+  useEffect(() => {
+    const workspaceId = workspace?.id;
+    if (
+      !workspaceId ||
+      !isInstanceAdmin ||
+      !canManageWorkspaceSettings ||
+      notionOAuthCallback ||
+      importOpen ||
+      templatesOpen ||
+      workspaceCreateOpen ||
+      notionOnboardingCheckedWorkspaceIdsRef.current.has(workspaceId)
+    ) {
+      return;
+    }
+    notionOnboardingCheckedWorkspaceIdsRef.current.add(workspaceId);
+    let cancelled = false;
+    claimNotionImportOnboardingRemote(workspaceId)
+      .then(({ show }) => {
+        if (!cancelled && show) setNotionOnboardingOpen(true);
+      })
+      .catch(() => {
+        // A failed claim did not consume the server record. Let a later
+        // workspace/modal transition retry instead of blocking the app shell.
+        notionOnboardingCheckedWorkspaceIdsRef.current.delete(workspaceId);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    canManageWorkspaceSettings,
+    importOpen,
+    isInstanceAdmin,
+    notionOAuthCallback,
+    templatesOpen,
+    workspace?.id,
+    workspaceCreateOpen,
+  ]);
+
+  useEffect(() => {
+    setNotionOnboardingOpen(false);
+  }, [workspace?.id]);
   const workspaceSettingsLabel = t("sidebar:accountConsole");
   // The inbox is "active" while it is open and while its inline view is still
   // animating out, so the rail label and Home stay in sync with the body during
@@ -513,16 +564,15 @@ export function Sidebar({
     switchToDarkMode: t("sidebar:switchToDarkMode"),
     switchToLightMode: t("sidebar:switchToLightMode"),
     logOut: t("sidebar:logOut"),
-    dismissInviteCard: t("sidebar:dismissInviteCard"),
     resizeSidebar: t("sidebar:resizeSidebar"),
     favoritePages: t("sidebar:favoritePages"),
     favorites: t("sidebar:favorites"),
     home: t("sidebar:home"),
     import: t("sidebar:import"),
+    importInProgress: t("sidebar:importInProgress"),
+    importProgress: (percent: number) => t("sidebar:importProgress", { percent }),
     inbox: t("sidebar:inbox"),
     inboxUnread: t("sidebar:inboxUnread"),
-    inviteMembers: t("sidebar:inviteMembers"),
-    inviteMembersDescription: t("sidebar:inviteMembersDescription"),
     newPage: t("sidebar:newPage"),
     openPrivateLibrary: t("sidebar:openPrivateLibrary"),
     openPrivateOptions: t("sidebar:openPrivateOptions"),
@@ -598,20 +648,6 @@ export function Sidebar({
   function openSettingsRoute() {
     if (mobile && open) onToggle();
     router.push(settingsHrefFromCurrentRoute());
-  }
-
-  function openMemberInviteRoute() {
-    if (mobile && open) onToggle();
-    router.push(canOpenAdminConsole ? workspaceConsoleHref("members") : settingsHrefFromCurrentRoute("members"));
-  }
-
-  function dismissInviteCard() {
-    setInviteCardDismissed(true);
-    try {
-      window.localStorage.setItem(SIDEBAR_INVITE_CARD_DISMISSED_KEY, "1");
-    } catch {
-      // Local storage is optional; the current session state is enough.
-    }
   }
 
   async function signOut() {
@@ -701,6 +737,10 @@ export function Sidebar({
       // Import flows skip the starter pages so the imported tree arrives clean.
       skipDefaultPages: choice !== "blank",
     });
+    // This flow already asked how the workspace should start, so it must not
+    // trigger the first-login prompt on the newly selected workspace.
+    notionOnboardingCheckedWorkspaceIdsRef.current.add(next.id);
+    void suppressNotionImportOnboardingRemote(next.id).catch(() => {});
     setWorkspaceCreateOpen(false);
     router.push(workspaceRoute(next));
     notify(labels.createdWorkspace, "success");
@@ -709,6 +749,12 @@ export function Sidebar({
       setImportOpen(true);
     }
     return next;
+  }
+
+  function openNotionImportFromOnboarding() {
+    setNotionOnboardingOpen(false);
+    setImportInitialTab("notion");
+    setImportOpen(true);
   }
 
   function setSectionCollapsed(section: SidebarSection, nextCollapsed: boolean) {
@@ -1568,35 +1614,6 @@ export function Sidebar({
           )}
         </div>
 
-        {canInviteMembers && !inviteCardDismissed && (
-          <div className={styles.collaborationArea} data-sidebar-collaboration>
-            <div className={styles.inviteCard} data-sidebar-member-invite>
-              <button
-                type="button"
-                className={styles.inviteCardMain}
-                onClick={openMemberInviteRoute}
-                data-sidebar-member-invite-action
-              >
-                <span className={styles.inviteIcon} aria-hidden="true">
-                  <UserIcon size={16} />
-                </span>
-                <span className={styles.inviteCopy}>
-                  <span className={styles.inviteTitle}>{labels.inviteMembers}</span>
-                  <span className={styles.inviteDescription}>{labels.inviteMembersDescription}</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className={styles.inviteDismiss}
-                onClick={dismissInviteCard}
-                aria-label={labels.dismissInviteCard}
-              >
-                x
-              </button>
-            </div>
-          </div>
-        )}
-
         <div className={styles.footer} data-sidebar-footer>
           <button
             type="button"
@@ -1612,9 +1629,23 @@ export function Sidebar({
             className={styles.actionRow}
             onClick={() => setImportOpen(true)}
             data-sidebar-footer-action
+            data-import-running={notionImportActivity ? "true" : undefined}
+            aria-label={
+              notionImportActivity
+                ? labels.importProgress(notionImportActivity.percent)
+                : undefined
+            }
           >
             <Upload size={17} />
-            <span className={styles.actionLabel}>{labels.import}</span>
+            <span className={styles.actionLabel}>
+              {notionImportActivity ? labels.importInProgress : labels.import}
+            </span>
+            {notionImportActivity ? (
+              <span className={styles.importProgress} data-import-progress aria-hidden="true">
+                <span className={styles.importProgressDot} />
+                {notionImportActivity.percent}%
+              </span>
+            ) : null}
           </button>
           <button
             type="button"
@@ -1678,17 +1709,25 @@ export function Sidebar({
             <TemplatesDialog onClose={() => setTemplatesOpen(false)} />
           </ErrorBoundary>
         )}
-        {importOpen && (
-          <ErrorBoundary scope="import-dialog">
-            <ImportDialog
-              initialTab={importInitialTab}
-              onClose={() => {
-                setImportOpen(false);
-                setImportInitialTab(undefined);
-              }}
+        {notionOnboardingOpen && (
+          <ErrorBoundary scope="notion-import-onboarding-dialog">
+            <NotionImportOnboardingDialog
+              onImport={openNotionImportFromOnboarding}
+              onLater={() => setNotionOnboardingOpen(false)}
             />
           </ErrorBoundary>
         )}
+        <ErrorBoundary scope="import-dialog">
+          <ImportDialog
+            open={importOpen}
+            initialTab={importInitialTab}
+            onActivityChange={setNotionImportActivity}
+            onClose={() => {
+              setImportOpen(false);
+              setImportInitialTab(undefined);
+            }}
+          />
+        </ErrorBoundary>
         {workspaceCreateOpen && (
           <ErrorBoundary scope="workspace-create-dialog">
             <WorkspaceCreateDialog

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "新增日期屬性",
+    "description": "日曆檢視需要日期屬性才能將頁面放置在月份上。",
+    "addDateButton": "日期"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "日曆依據",
+    "today": "今天",
+    "previousWeek": "上週",
+    "previousMonth": "上個月",
+    "nextWeek": "下週",
+    "nextMonth": "下個月"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "日",
+    "mon": "一",
+    "tue": "二",
+    "wed": "三",
+    "thu": "四",
+    "fri": "五",
+    "sat": "六"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} 日曆",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}，{{count}} 個項目",
+    "newRowAriaLabel": "在 {{date}} 新增列",
+    "newRowTitle": "新增",
+    "showLess": "顯示較少",
+    "showMore": "+{{count}} 更多"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "開啟 {{title}}",
+    "openAriaLabelWithDate": "開啟 {{title}}，預定於 {{date}}",
+    "openNoDateAriaLabel": "開啟 {{title}}，無日期"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "無日期 ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "未命名",
+    "dateDefaultName": "日期"
   }
 }

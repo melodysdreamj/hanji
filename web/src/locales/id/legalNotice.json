@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Informasi hukum dan sumber",
+  "noWarranty": "Disediakan tanpa jaminan.",
+  "sourceCode": "Sumber",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Pengecualian 2.0"
 }

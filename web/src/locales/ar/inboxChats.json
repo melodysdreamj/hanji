@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "لا توجد محادثات بعد. علّق على صفحة أو أشر إلى شخص لبدء واحدة.",
+  "leave": "مغادرة",
+  "leaveAria": "مغادرة المحادثة على {{title}}",
+  "open": "فتح المحادثة على {{title}}",
+  "participants_one": "{{count}} مشارك",
+  "participants_other": "{{count}} مشاركين",
+  "untitled": "بدون عنوان",
+  "loading": "جارٍ تحميل المحادثات…"
 }

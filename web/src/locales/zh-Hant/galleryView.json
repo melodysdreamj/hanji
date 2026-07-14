@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "此資料庫尚無頁面。",
+  "emptyTitle": "尚無頁面",
+  "newInline": "新增",
+  "newPage": "新頁面",
+  "newPageIn": "在 {{dbTitle}} 中新增頁面",
+  "noResultsDesc": "沒有頁面符合目前的篩選或搜尋。",
+  "noResultsTitle": "無結果",
+  "openRow": "開啟 {{title}}"
 }

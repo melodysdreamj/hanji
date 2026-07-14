@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "දැන්",
+  "editedJustNow": "දැන් සංස්කරණය කර ඇත",
+  "editedMinutesAgo": "{{minutes}} මිනිත්තු පෙර සංස්කරණය කර ඇත",
+  "editedHoursAgo": "{{hours}} පැය පෙර සංස්කරණය කර ඇත",
+  "editedDaysAgo": "{{days}} දින පෙර සංස්කරණය කර ඇත",
+  "editedOn": "{{date}} සංස්කරණය කර ඇත",
+  "noEdits": "සංස්කරණ නැත",
+  "noEditsYet": "තවම සංස්කරණ නැත",
+  "todayAt": "අද {{time}}",
+  "yesterdayAt": "ඊයේ {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

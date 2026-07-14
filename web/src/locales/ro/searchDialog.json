@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Caută sau accesează...",
+  "quickFind": "Căutare rapidă",
+  "closeSearch": "Închide căutarea",
+  "quickFindResults": "Rezultate căutare rapidă",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Vizualizat recent",
+    "recentSearches": "Căutări recente",
+    "pages": "Pagini",
+    "pageContent": "Conținut pagină",
+    "favorites": "Favorite"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "în pagină",
+  "searchingDetail": "Se caută...",
+  "searchAgain": "Caută din nou",
+  "searchingPageContent": "Se caută conținut pagină...",
+  "noResultsFor": "Niciun rezultat pentru \"{{query}}\"",
+  "noPagesFound": "Nu s-au găsit pagini",
+  "creating": "Se creează...",
+  "newPage": "Pagină nouă \"{{query}}\"",
+  "couldntCreatePage": "Nu s-a putut crea pagina",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Selectează",
+    "open": "Deschide",
+    "newTab": "Filă nouă"
   }
 }

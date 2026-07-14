@@ -2,315 +2,315 @@
   "defs": {
     "paragraph": {
       "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "description": "Începe să scrii cu text simplu.",
+      "placeholder": "Scrie '/' pentru comenzi"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Pagină",
+      "description": "Creează o sub-pagină în această pagină."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Link către pagină",
+      "description": "Conectează la o pagină existentă."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Titlu 1",
+      "description": "Titlu mare de secțiune.",
+      "placeholder": "Titlu 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Titlu comutabil 1",
+      "description": "Titlu mare care poate ascunde conținut imbricat.",
+      "placeholder": "Titlu comutabil 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Titlu 2",
+      "description": "Titlu mediu de secțiune.",
+      "placeholder": "Titlu 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Titlu comutabil 2",
+      "description": "Titlu mediu care poate ascunde conținutul imbricat.",
+      "placeholder": "Titlu comutabil 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Titlu 3",
+      "description": "Titlu mic de secțiune.",
+      "placeholder": "Titlu 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Titlu comutabil 3",
+      "description": "Titlu mic ce poate ascunde conținutul imbricat.",
+      "placeholder": "Antet comutabil 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Titlu 4",
+      "description": "Titlu compact de secțiune.",
+      "placeholder": "Titlu 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Antet comutabil 4",
+      "description": "Antet compact care poate ascunde conținutul imbricat.",
+      "placeholder": "Antet comutabil 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Listă de sarcini",
+      "description": "Gestionează sarcinile cu un checkbox.",
+      "placeholder": "Sarcină"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Listă cu marcatori",
+      "description": "Creează o listă simplă cu marcatori.",
+      "placeholder": "Listă"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Listă numerotată",
+      "description": "Creează o listă numerotată.",
+      "placeholder": "Listă"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Listă comutabilă",
+      "description": "Comutatoarele pot ascunde și afișa conținutul.",
+      "placeholder": "Comutare"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citat",
+      "description": "Adaugă un citat.",
+      "placeholder": "Citat gol"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Evidențiere",
+      "description": "Evidențiază textul.",
+      "placeholder": "Scrie ceva…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Separator",
+      "description": "Separați vizual blocurile."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Cod",
+      "description": "Adaugă un fragment de cod.",
+      "placeholder": "Scrie cod sau lipește un fragment…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Ecuație",
+      "description": "Afișați o ecuație matematică."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Cuprins",
+      "description": "Afișează linkuri către titluri din această pagină."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Bloc sincronizat",
+      "description": "Reutilizează conținutul pe mai multe pagini."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Buton",
+      "description": "Inserează conținut reutilizabil cu un singur clic."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "File",
+      "description": "Grupează conținutul în file etichetate.",
+      "placeholder": "File"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Cale de navigare",
+      "description": "Arată locația acestei pagini."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplică",
+      "description": "Creează o copie exactă a acestui bloc."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Mută în",
+      "description": "Mută acest bloc în altă pagină."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Șterge acest bloc."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Transformă în",
+      "description": "Schimbă tipul acestui bloc."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Culoare",
+      "description": "Schimbă culoarea textului sau a fundalului acestui bloc."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabel",
+      "description": "Adaugă un tabel simplu pe această pagină."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 coloane",
+      "description": "Plasați blocurile unul lângă altul."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 coloane",
+      "description": "Aranjați blocurile în trei coloane."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 coloane",
+      "description": "Aranjați blocurile în patru coloane."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 coloane",
+      "description": "Aranjați blocurile în cinci coloane."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Imagine",
+      "description": "Încarcă sau încorporează cu un link."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Incorporează un videoclip cu un link."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Încorporează audio printr-un link."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Semn de carte web",
+      "description": "Salvează un link web ca card."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Încorporare",
+      "description": "Încorporați conținut dintr-un link."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fișier",
+      "description": "Atașați un link către un fișier la această pagină."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Bază de date - Pagină completă",
+      "description": "Adaugă o nouă bază de date ca sub-pagină."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabel - Pagină întreagă",
+      "description": "Adaugă o bază de date ca tabel pe pagină întreagă."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Panou - Pagină întreagă",
+      "description": "Adaugă un panou kanban pe pagină întreagă."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Listă - Pagină întreagă",
+      "description": "Adaugă o bază de date ca listă pe pagină întreagă."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Cronologie - Pagină întreagă",
+      "description": "Adaugă o cronologie de bază de date pe pagină întreagă."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Calendar - Pagină întreagă",
+      "description": "Adaugă o bază de date calendar pe pagină întreagă."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galerie - Pagină întreagă",
+      "description": "Adaugă o galerie de bază de date pe pagină întreagă."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Bază de date - În linie",
+      "description": "Adaugă o bază de date în această pagină."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Vizualizare tabel",
+      "description": "Adaugă o bază de date în linie ca tabel."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Vizualizare panou",
+      "description": "Adaugă un panou kanban în linie."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Vizualizare listă",
+      "description": "Adaugă o bază de date în linie ca listă."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Vizualizare cronologie",
+      "description": "Adaugă o cronologie de bază de date în linie."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Vizualizare calendar",
+      "description": "Adaugă o bază de date calendar în linie."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Vizualizare galerie",
+      "description": "Adaugă o galerie de bază de date în linie."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Implicit",
+      "description": "Elimină culoarea textului sau fundalului acestui bloc."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Gri",
+      "description": "Aplică gri acestui bloc."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Maro",
+      "description": "Aplică maro acestui bloc."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Portocaliu",
+      "description": "Aplică portocaliu acestui bloc."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Galben",
+      "description": "Aplică galben pe acest bloc."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Verde",
+      "description": "Aplică verde acestui bloc."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Albastru",
+      "description": "Aplică albastru acestui bloc."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Violet",
+      "description": "Aplică violet pe acest bloc."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Roz",
+      "description": "Aplică roz pe acest bloc."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Roșu",
+      "description": "Aplică roșu pe acest bloc."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Fundal gri",
+      "description": "Aplică fundal gri acestui bloc."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Fundal maro",
+      "description": "Aplică fundal maro acestui bloc."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Fundal portocaliu",
+      "description": "Aplică fundal portocaliu acestui bloc."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Fundal galben",
+      "description": "Aplică fundal galben pe acest bloc."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Fundal verde",
+      "description": "Aplică fundal verde acestui bloc."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Fundal albastru",
+      "description": "Aplică fundal albastru acestui bloc."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Fundal violet",
+      "description": "Aplică fundal violet pe acest bloc."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Fundal roz",
+      "description": "Aplică fundal roz acestui bloc."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Fundal roșu",
+      "description": "Aplică fundal roșu pe acest bloc."
     }
   }
 }

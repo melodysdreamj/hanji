@@ -35,6 +35,23 @@ export default defineConfig({
     // The service-worker precache generator follows the emitted language
     // chunks through this manifest so first-load offline boot is complete.
     manifest: true,
+    rolldownOptions: {
+      output: {
+        // These small shell helpers are all required by the synchronous app
+        // entry. Keep them in one request instead of emitting several tiny
+        // shared chunks while preserving the synchronous core-route contract
+        // and the existing deferred feature boundaries.
+        codeSplitting: {
+          groups: [
+            {
+              name: "app-foundation",
+              test: /[\\/]src[\\/]lib[\\/](clipboard|keyboard|modalFocus|navigation|pageVerification)\.ts$/,
+              includeDependenciesRecursively: false,
+            },
+          ],
+        },
+      },
+    },
   },
   server: {
     port: 3000,

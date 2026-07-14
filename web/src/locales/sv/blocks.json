@@ -2,315 +2,315 @@
   "defs": {
     "paragraph": {
       "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "description": "Börja skriva med vanlig text.",
+      "placeholder": "Skriv '/' för kommandon"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Sida",
+      "description": "Skapa en undersida i denna sida."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Länk till sida",
+      "description": "Länka till en befintlig sida."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Rubrik 1",
+      "description": "Stor sektionsrubrik.",
+      "placeholder": "Rubrik 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Toggle-rubrik 1",
+      "description": "Stor rubrik som kan dölja kapslat innehåll.",
+      "placeholder": "Toggle-rubrik 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Rubrik 2",
+      "description": "Mellanstor sektionsrubrik.",
+      "placeholder": "Rubrik 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Toggle-rubrik 2",
+      "description": "Medelstor rubrik som kan dölja underordnat innehåll.",
+      "placeholder": "Växla rubrik 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Rubrik 3",
+      "description": "Liten sektionsrubrik.",
+      "placeholder": "Rubrik 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Växla rubrik 3",
+      "description": "Liten rubrik som kan dölja kapslat innehåll.",
+      "placeholder": "Toggla rubrik 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Rubrik 4",
+      "description": "Kompakt sektionsrubrik.",
+      "placeholder": "Rubrik 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Toggla rubrik 4",
+      "description": "Kompakt rubrik som kan dölja innehåll.",
+      "placeholder": "Toggla rubrik 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Att-göra-lista",
+      "description": "Spåra uppgifter med en kryssruta.",
+      "placeholder": "Att göra"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Punktlista",
+      "description": "Skapa en enkel punktlista.",
+      "placeholder": "Lista"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Numrerad lista",
+      "description": "Skapa en lista med numrering.",
+      "placeholder": "Lista"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Toggla lista",
+      "description": "Togglingar kan dölja och visa innehåll.",
+      "placeholder": "Toggla"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citat",
+      "description": "Fånga ett citat.",
+      "placeholder": "Tomt citat"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Utrop",
+      "description": "Få text att sticka ut.",
+      "placeholder": "Skriv något…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Avgränsare",
+      "description": "Dela blocken visuellt."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kod",
+      "description": "Infoga en kodsnutt.",
+      "placeholder": "Skriv kod eller klistra in en kodsnutt…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Ekvation",
+      "description": "Visa en ekvation."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Innehållsförteckning",
+      "description": "Visa länkar till rubriker på denna sida."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Synkat block",
+      "description": "Återanvänd innehåll över sidor."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Knapp",
+      "description": "Infoga återanvändbart innehåll med ett klick."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Flikar",
+      "description": "Gruppera innehåll i etiketterade flikar.",
+      "placeholder": "Flikar"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Brödsmula",
+      "description": "Visa var den här sidan finns."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplicera",
+      "description": "Skapa en exakt kopia av det här blocket."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Flytta till",
+      "description": "Flytta det här blocket till en annan sida."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Ta bort det här blocket."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Omvandla till",
+      "description": "Ändra det här blockets typ."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Färg",
+      "description": "Ändra blockets text- eller bakgrundsfärg."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabell",
+      "description": "Lägg till en enkel tabell på sidan."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 kolumner",
+      "description": "Placera blocken sida vid sida."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 kolumner",
+      "description": "Ordna blocken i tre kolumner."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 kolumner",
+      "description": "Ordna blocken i fyra kolumner."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 kolumner",
+      "description": "Ordna blocken i fem kolumner."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Bild",
+      "description": "Ladda upp eller bädda in med en länk."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Bädda in en video med en länk."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "Ljud",
+      "description": "Bädda in ljud med en länk."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Webbokmärke",
+      "description": "Spara en webblänk som ett kort."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Bädda in",
+      "description": "Bädda in innehåll från en länk."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fil",
+      "description": "Bifoga en fillänk till sidan."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Databas - Helsida",
+      "description": "Lägg till en ny databas som undersida."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabell – Helsida",
+      "description": "Lägg till en helsides databas som tabell."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Tavla – Helsida",
+      "description": "Lägg till en helsides kanban-tavla."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Lista – Helsida",
+      "description": "Lägg till en helsides databas som lista."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Tidslinje – Helsida",
+      "description": "Lägg till en helsides databastidslinje."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalender – Helsida",
+      "description": "Lägg till en helsides kalenderdatabas."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galleri – Helsida",
+      "description": "Lägg till en helsides databasgalleri."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Databas - Inline",
+      "description": "Lägg till en databas på den här sidan."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Tabell",
+      "description": "Lägg till en inline-databas som en tabell."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Tavla",
+      "description": "Lägg till en inline kanban-tavla."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Lista",
+      "description": "Lägg till en inline-databas som en lista."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Tidslinje",
+      "description": "Lägg till en inline-databas-tidslinje."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Kalender",
+      "description": "Lägg till en inline kalenderdatabas."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Galleri",
+      "description": "Lägg till ett inline-databasgalleri."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Standard",
+      "description": "Ta bort text- eller bakgrundsfärg från detta block."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Grå",
+      "description": "Använd grå på detta block."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Brun",
+      "description": "Använd brunt på detta block."
     },
     "color_orange": {
       "label": "Orange",
-      "description": "Apply orange to this block."
+      "description": "Använd orange på detta block."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Gul",
+      "description": "Applicera gul på blocket."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Grön",
+      "description": "Använd grönt på detta block."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Blå",
+      "description": "Använd blått på detta block."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Lila",
+      "description": "Applicera lila på blocket."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Rosa",
+      "description": "Applicera rosa på blocket."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Röd",
+      "description": "Applicera röd på blocket."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Grå bakgrund",
+      "description": "Använd grå bakgrund på detta block."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Brun bakgrund",
+      "description": "Använd brun bakgrund på detta block."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Orange bakgrund",
+      "description": "Använd orange bakgrund på detta block."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Gul bakgrund",
+      "description": "Applicera gul bakgrund på blocket."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Grön bakgrund",
+      "description": "Använd grön bakgrund på detta block."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Blå bakgrund",
+      "description": "Använd blå bakgrund på detta block."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Lila bakgrund",
+      "description": "Applicera lila bakgrund på blocket."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Rosa bakgrund",
+      "description": "Använd rosa bakgrund på detta block."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Röd bakgrund",
+      "description": "Applicera röd bakgrund på blocket."
     }
   }
 }

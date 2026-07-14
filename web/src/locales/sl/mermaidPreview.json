@@ -1,7 +1,7 @@
 {
   "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "emptyPreview": "Predogled diagrama",
+  "sourceDescription": "Vir diagrama: {{source}}",
+  "syntaxError": "Diagram ima skladenjsko napako.",
+  "syntaxErrorDetails": "Pokaži podrobnosti"
 }

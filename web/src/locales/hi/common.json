@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "create": "बनाएँ",
+    "delete": "हटाएँ",
+    "clearAll": "सभी साफ़ करें",
+    "done": "हो गया",
+    "add": "जोड़ें"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "शीर्षक रहित"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} प्रतिलिपि",
+    "columnName": "स्तंभ {{number}}",
+    "importedDatabase": "आयातित डेटाबेस",
+    "uploadedFile": "अपलोड की गई फ़ाइल",
+    "image": "चित्र",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "नाम",
+      "status": "स्थिति",
+      "select": "चयन",
+      "date": "दिनांक"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "शुरू नहीं",
+      "doing": "प्रगति पर",
+      "done": "पूर्ण"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "विकल्प 1",
+      "second": "विकल्प 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "तालिका"
     }
   }
 }

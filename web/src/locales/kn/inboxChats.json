@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ಇನ್ನೂ ಯಾವುದೇ ಸಂವಾದಗಳಿಲ್ಲ. ಒಂದನ್ನು ಪ್ರಾರಂಭಿಸಲು ಪುಟದಲ್ಲಿ ಕಾಮೆಂಟ್ ಮಾಡಿ ಅಥವಾ ಯಾರನ್ನಾದರೂ ಉಲ್ಲೇಖಿಸಿ.",
+  "leave": "ನಿರ್ಗಮಿಸಿ",
+  "leaveAria": "{{title}} ನಲ್ಲಿ ಸಂವಾದದಿಂದ ನಿರ್ಗಮಿಸಿ",
+  "open": "{{title}} ನಲ್ಲಿ ಸಂವಾದವನ್ನು ತೆರೆಯಿರಿ",
+  "participants_one": "{{count}} ಭಾಗವಹಿಸುವವ",
+  "participants_other": "{{count}} ಭಾಗವಹಿಸುವವರು",
+  "untitled": "ಶೀರ್ಷಿಕೆಯಿಲ್ಲದ",
+  "loading": "ಸಂವಾದಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…"
 }

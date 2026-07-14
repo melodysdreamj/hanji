@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "مساحة عمل جديدة",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "اسم مساحة العمل",
+    "placeholder": "شركتنا"
   },
-  "startLabel": "Start from",
+  "startLabel": "البدء من",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "مساحة عمل فارغة",
+      "body": "ابدأ فارغًا مع الصفحات الأولية."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "استيراد من Notion",
+      "body": "أنشئ مساحة العمل، ثم انقل مساحة عمل Notion إليها."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "استيراد من Hanji آخر",
+      "body": "أنشئ مساحة العمل، ثم استورد مساحة من خادم Hanji آخر أو من ملف."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "إنشاء مساحة عمل",
+  "creating": "جارٍ الإنشاء…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "تعذر إنشاء مساحة العمل."
   }
 }

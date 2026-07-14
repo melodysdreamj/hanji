@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "ጽሑፍ",
+      "description": "በተራ ጽሑፍ መጻፍ ይጀምሩ።",
+      "placeholder": "ለትእዛዞች '/' ይተይቡ"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "ገጽ",
+      "description": "በዚህ ገጽ ውስጥ ንዑስ ገጽ ይፍጠሩ።"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "አገናኝ ወደ ገጽ",
+      "description": "አሁን ያለ ገጽ አገናኝ።"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ርዕስ 1",
+      "description": "ትልቅ የክፍል ርዕስ።",
+      "placeholder": "ርዕስ 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ተቀያሪ ራስጌ 1",
+      "description": "የተከተተ ይዘት መደበቅ የሚችል ትልቅ ርዕስ",
+      "placeholder": "ተቀያሪ ራስጌ 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ርዕስ 2",
+      "description": "መካከለኛ የክፍል ርዕስ።",
+      "placeholder": "ርዕስ 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ተቀያሪ ራስጌ 2",
+      "description": "የተከተተ ይዘትን የሚደብቅ መካከለኛ ራስጌ።",
+      "placeholder": "ተቀያሪ ራስጌ 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ርዕስ 3",
+      "description": "ትንሽ የክፍል ርዕስ።",
+      "placeholder": "ርዕስ 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ተቀያሪ ራስጌ 3",
+      "description": "የተከተተ ይዘትን የሚደብቅ ትንሽ ራስጌ።",
+      "placeholder": "ማዞሪያ ርዕስ 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ርዕስ 4",
+      "description": "የታመቀ የክፍል ርዕስ።",
+      "placeholder": "ርዕስ 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ማዞሪያ ርዕስ 4",
+      "description": "የታመቀ ርዕስ ሲሆን የተከተተ ይዘትን መደበቅ ይችላል።",
+      "placeholder": "ማዞሪያ ርዕስ 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "የተግባር ዝርዝር",
+      "description": "በአመልካች ሳጥን ተግባሮችን ይከታተሉ",
+      "placeholder": "ተግባር"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "የነጥብ ዝርዝር",
+      "description": "ቀላል የነጥብ ዝርዝር ይፍጠሩ።",
+      "placeholder": "ዝርዝር"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "ቁጥር ያለው ዝርዝር",
+      "description": "ቁጥር ያለው ዝርዝር ይፍጠሩ።",
+      "placeholder": "ዝርዝር"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ማዞሪያ ዝርዝር",
+      "description": "ማዞሪያዎች ይዘትን መደበቅ እና ማሳየት ይችላሉ።",
+      "placeholder": "ማዞሪያ"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "ጥቅስ",
+      "description": "ጥቅስ ይያዙ።",
+      "placeholder": "ባዶ ጥቅስ"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "ጥሪ",
+      "description": "ጽሑፍን ጎልቶ እንዲታይ ያድርጉ።",
+      "placeholder": "አንድ ነገር ይተይቡ…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "መለያ",
+      "description": "ብሎኮችን በእይታ ለይ"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "ኮድ",
+      "description": "የኮድ ቁራጭ ያዙ።",
+      "placeholder": "ኮድ ይጻፉ፣ ወይም ቁራጭ ይለጥፉ…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "ቀመር",
+      "description": "የሂሳብ ቀመር አሳይ"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "ማውጫ",
+      "description": "በዚህ ገጽ ላይ ወደ ርዕሶች አገናኞችን አሳይ"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "የተመሳሰለ ብሎክ",
+      "description": "ይዘትን በገጾች መካከል እንደገና ይጠቀሙ።"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "አዝራር",
+      "description": "በአንድ ጠቅታ እንደገና ጥቅም ላይ የሚውል ይዘት ያስገቡ።"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ትሮች",
+      "description": "ይዘትን በመለያ ታብሶች ያደራጁ።",
+      "placeholder": "ትሮች"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "የዳቦ ፍርፋሪ",
+      "description": "ይህ ገጽ የት እንዳለ ያሳይ።"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ይድገሙት",
+      "description": "የዚህን እገዳ ትክክለኛ ቅጂ ይፍጠሩ።"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ወደ ያዙሩ",
+      "description": "ይህን ብሎክ ወደ ሌላ ገጽ ያዙሩት።"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ይህን እገዳ ይሰርዙ።"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "ወደ ይቀይሩ",
+      "description": "የዚህን ብሎክ አይነት ይቀይሩ።"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "ቀለም",
+      "description": "የዚህን እገዳ ጽሑፍ ወይም የጀርባ ቀለም ይቀይሩ።"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "ሠንጠረዥ",
+      "description": "ቀላል ሠንጠረዥ ወደዚህ ገጽ ያክሉ።"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 አምዶች",
+      "description": "ብሎኮችን አጠገብ አስቀምጥ"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 አምዶች",
+      "description": "ብሎኮችን በሶስት አምዶች አስቀምጥ"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 አምዶች",
+      "description": "ብሎኮችን በአራት አምዶች አስቀምጥ"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 አምዶች",
+      "description": "ብሎኮችን በአምስት አምዶች አስቀምጥ"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "ምስል",
+      "description": "ሰቀል ወይም በሊንክ አስገባ።"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ቪዲዮ",
+      "description": "በአገናኝ ቪዲዮ አስገባ።"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ኦዲዮ",
+      "description": "ኦዲዮን በአገናኝ ያስተካክሉ።"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "የድር ዕልባት",
+      "description": "የድር አገናኝን እንደ ካርድ ያስቀምጡ።"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "አስገባ",
+      "description": "ከሊንክ ይዘትን አስገባ"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ፋይል",
+      "description": "የፋይል አገናኝን በዚህ ገፅ ላይ አያይዝ"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ዳታቤዝ - ሙሉ ገጽ",
+      "description": "እንደ ንዑስ ገጽ አዲስ ዳታቤዝ ያክሉ።"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "ሰንጠረዥ - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ ዳታቤዝን እንደ ሰንጠረዥ ያክሉ።"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ሰሌዳ - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ የካንባን ሰሌዳ ያክሉ።"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "ዝርዝር - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ ዳታቤዝን እንደ ዝርዝር ያክሉ።"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "የጊዜ መስመር - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ የዳታቤዝ የጊዜ መስመር ያክሉ።"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "የቀን መቁጠሪያ - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ የቀን መቁጠሪያ ዳታቤዝ ያክሉ።"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "ማዕከለ-ስዕላት - ሙሉ ገጽ",
+      "description": "ሙሉ ገጽ የዳታቤዝ ማዕከለ-ስዕላት ያክሉ።"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ዳታቤዝ - የተዋሃደ",
+      "description": "በዚህ ገጽ ውስጥ ዳታቤዝ አክል።"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "የሰንጠረዥ እይታ",
+      "description": "የተዋሃደ ዳታቤዝ እንደ ሠንጠረዥ አክል።"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "የቦርድ እይታ",
+      "description": "የተዋሃደ የካንባን ሰሌዳ አክል።"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "የዝርዝር እይታ",
+      "description": "የተዋሃደ ዳታቤዝ እንደ ዝርዝር አክል።"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "የጊዜ መስመር እይታ",
+      "description": "የተዋሃደ የዳታቤዝ የጊዜ መስመር አክል።"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "የቀን መቁጠሪያ እይታ",
+      "description": "የተዋሃደ የቀን መቁጠሪያ ዳታቤዝ አክል።"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "የጋለሪ እይታ",
+      "description": "የተዋሃደ የዳታቤዝ ጋለሪ አክል።"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "ነባሪ",
+      "description": "ከዚህ ብሎክ የጽሁፍ ወይም የዳራ ቀለም ያስወግዱ።"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ግራጫ",
+      "description": "ለዚህ ብሎክ ግራጫ ይተግብሩ።"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "ቡኒ",
+      "description": "ለዚህ ብሎክ ቡኒ ይተግብሩ።"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ብርቱካን",
+      "description": "ለዚህ ብሎክ ብርቱካን ይተግብሩ።"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "ቢጫ",
+      "description": "ይህን ብሎክ ቢጫ አድርግ"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "አረንጓዴ",
+      "description": "ለዚህ ብሎክ አረንጓዴ ይተግብሩ።"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "ሰማያዊ",
+      "description": "ለዚህ ብሎክ ሰማያዊ ይተግብሩ።"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ሐምራዊ",
+      "description": "ይህን ብሎክ ሐምራዊ አድርግ"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "ሮዝ",
+      "description": "ይህን ብሎክ ሮዝ አድርግ"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ቀይ",
+      "description": "ይህን ብሎክ ቀይ አድርግ"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ግራጫ ዳራ",
+      "description": "ለዚህ ብሎክ ግራጫ ዳራ ይተግብሩ።"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "ቡኒ ዳራ",
+      "description": "ለዚህ ብሎክ ቡኒ ዳራ ይተግብሩ።"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ብርቱካን ዳራ",
+      "description": "ለዚህ ብሎክ ብርቱካን ዳራ ይተግብሩ።"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "ቢጫ ዳራ",
+      "description": "ይህን ብሎክ ቢጫ ዳራ አድርግ"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "አረንጓዴ ዳራ",
+      "description": "ለዚህ ብሎክ አረንጓዴ ዳራ ይተግብሩ።"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "ሰማያዊ ዳራ",
+      "description": "ለዚህ ብሎክ ሰማያዊ ዳራ ይተግብሩ።"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ሐምራዊ ዳራ",
+      "description": "ይህን ብሎክ ሐምራዊ ዳራ አድርግ"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "ሮዝ ዳራ",
+      "description": "ለዚህ ብሎክ ሮዝ ዳራ ይተግብሩ።"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ቀይ ዳራ",
+      "description": "ይህን ብሎክ ቀይ ዳራ አድርግ"
     }
   }
 }

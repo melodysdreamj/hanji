@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> mensponsori Hanji seiring pertumbuhannya",
+  "builtWith": "<a>{{name}}</a> membantu membangun Hanji",
+  "supportTitle": "Dukung Hanji",
+  "settingsIntro": "Hanji didukung oleh para sponsornya. Layar masuk menampilkan banner kecil dengan lima sponsor teratas saat ini.",
+  "rule1": "Banner menampilkan lima sponsor teratas berdasarkan saldo tersisa.",
+  "rule2": "Setiap bulan, saldo setiap sponsor yang ditampilkan dikurangi sebesar saldo sponsor peringkat kelima, sehingga kelima sponsor membayar tarif yang sama.",
+  "rule3": "Ketika saldo habis, slot berpindah ke sponsor berikutnya berdasarkan saldo.",
+  "rule4": "Mempertahankan banner aktif secara default memberikan pengecualian lisensi Hanji; versi tertutup tanpa banner memerlukan lisensi komersial terpisah.",
+  "sponsorSlots": "Sponsor saat ini",
+  "emptySlot": "Slot kosong — sponsor untuk tampil di sini",
+  "becomeSponsor": "Jadi sponsor",
+  "builtWithTitle": "Dibangun dengan",
+  "builtWithIntro": "Hanji dibangun dengan bantuan alat dan platform ini."
+}

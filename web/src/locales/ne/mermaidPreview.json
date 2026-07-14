@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Mermaid डायग्राम",
+  "emptyPreview": "डायग्राम पूर्वावलोकन",
+  "sourceDescription": "डायग्राम स्रोत: {{source}}",
+  "syntaxError": "डायग्राममा सिन्ट्याक्स त्रुटि छ।",
+  "syntaxErrorDetails": "विवरण देखाउनुहोस्"
 }

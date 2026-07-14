@@ -1,43 +1,43 @@
 {
+  "custom": {
+    "apply": "Zastosuj",
+    "fallbackFileName": "Obraz ikony",
+    "linkLabel": "Link obrazu ikony",
+    "linkPlaceholder": "Wklej link do obrazu",
+    "previewPlaceholder": "Obraz",
+    "upload": "Prześlij plik",
+    "uploadFailed": "Nie udało się przesłać tego obrazu.",
+    "uploading": "Przesyłanie...",
+    "uploadingLabel": "Przesyłanie {{fileName}}"
+  },
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
-  },
-  "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
-  },
-  "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "backdropLabel": "Zamknij wybór ikony",
+    "label": "Wybierz ikonę"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "gridLabel": "Ikony",
+    "gridLabelRecent": "Ikony, ostatnio używane jako pierwsze",
+    "noResults": "Brak ikon pasujących do „{{query}}”. Spróbuj innego słowa lub wyczyść filtr.",
+    "optionLabel": "Wybierz ikonę {{emoji}}",
+    "random": "Losowo",
+    "randomLabel": "Wybierz losową ikonę",
+    "recentLabel": "Ostatnio używane najpierw",
+    "searchLabel": "Szukaj ikon",
+    "searchPlaceholder": "Filtruj…"
   },
-  "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+  "remove": {
+    "ariaLabel": "Usuń ikonę",
+    "label": "Usuń"
+  },
+  "tabs": {
+    "emoji": "Emoji",
+    "groupLabel": "Typ ikony",
+    "image": "Obraz"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "complete": "Gotowe",
+    "finalizing": "Finalizowanie",
+    "preparing": "Przygotowywanie przesyłania",
+    "uploading": "Przesyłanie"
   }
 }

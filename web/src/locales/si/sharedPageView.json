@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "බෙදාගත් පිටුව",
+  "loading": "බෙදාගත් පිටුව පූරණය වෙමින්",
+  "unavailable": "මෙම බෙදාගත් පිටුව ලබා ගත නොහැක.",
+  "notFound": "බෙදාගත් පිටුව හමු නොවීය.",
+  "outsideShare": "පිටුව මෙම පොදු බෙදාගැනීමේ කොටසක් නොවේ.",
+  "tryAgain": "නැවත උත්සාහ කරන්න",
+  "errors": {
+    "unavailable": "Hanji හට මෙම බෙදාගත් පිටුව දැනට විවෘත කළ නොහැකි විය. මොහොතකට පසුව නැවත උත්සාහ කරන්න.",
+    "rate-limited": "මෙම බෙදාගත් පිටුවට ඉල්ලීම් වැඩියි. මොහොතක් බලා සිට නැවත උත්සාහ කරන්න.",
+    "not-found": "මෙම සබැඳිය කල් ඉකුත් වී ඇති, ප්‍රකාශයට පත් නොකළ, හෝ වැරදි ලෙස පිටපත් කර ඇති විය හැක.",
+    "offline": "ඔබගේ සම්බන්ධතාවය පරීක්ෂා කර, පසුව බෙදාගත් පිටුව නැවත විවෘත කිරීමට උත්සාහ කරන්න."
+  }
 }

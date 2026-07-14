@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Pangkalan data ini belum mempunyai halaman lagi.",
+  "emptyTitle": "Belum ada halaman",
+  "newInline": "Baharu",
+  "newPage": "Halaman baharu",
+  "newPageIn": "Halaman baharu dalam {{dbTitle}}",
+  "noResultsDesc": "Tiada halaman yang sepadan dengan penapis atau carian semasa.",
+  "noResultsTitle": "Tiada hasil",
+  "openRow": "Buka {{title}}"
 }

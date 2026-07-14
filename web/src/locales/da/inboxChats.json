@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Ingen samtaler endnu. Kommentér på en side eller nævn nogen for at starte en.",
+  "leave": "Forlad",
+  "leaveAria": "Forlad samtalen på {{title}}",
+  "loading": "Indlæser samtaler…",
+  "open": "Åbn samtalen på {{title}}",
+  "participants_one": "{{count}} deltager",
+  "participants_other": "{{count}} deltagere",
+  "untitled": "Uden titel"
 }

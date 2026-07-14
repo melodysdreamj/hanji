@@ -1,316 +1,316 @@
 {
   "defs": {
-    "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
-    },
-    "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
-    },
-    "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
-    },
-    "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
-    },
-    "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
-    },
-    "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
-    },
-    "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
-    },
-    "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
-    },
-    "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
-    },
-    "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
-    },
-    "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
-    },
-    "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
-    },
-    "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
-    },
-    "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
-    },
-    "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
-    },
-    "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
-    },
-    "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
-    },
-    "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
-    },
-    "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
-    },
-    "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
-    },
-    "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
-    },
-    "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
-    },
-    "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
-    },
-    "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
-    },
-    "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
-    },
-    "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
-    },
-    "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+    "action_color": {
+      "description": "Endre tekst- eller bakgrunnsfargen til denne blokken.",
+      "label": "Farge"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Slett denne blokken."
+    },
+    "action_duplicate": {
+      "description": "Lag en nøyaktig kopi av denne blokken.",
+      "label": "Dupliser"
+    },
+    "action_move_to": {
+      "description": "Flytt denne blokken til en annen side.",
+      "label": "Flytt til"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
-    },
-    "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
-    },
-    "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
-    },
-    "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
-    },
-    "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
-    },
-    "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
-    },
-    "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
-    },
-    "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
-    },
-    "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Endre denne blokkens type.",
+      "label": "Endre til"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Bygg inn lyd med lenke.",
+      "label": "Lyd"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "description": "Lagre en nettlenke som kort.",
+      "label": "Nettbokmerke"
     },
-    "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+    "breadcrumb": {
+      "description": "Vis plasseringen til denne siden.",
+      "label": "Brødsmuler"
     },
-    "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+    "bulleted_list_item": {
+      "description": "Lag en enkel punktliste.",
+      "label": "Punktliste",
+      "placeholder": "Liste"
     },
-    "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+    "button": {
+      "description": "Sett inn gjenbrukbart innhold med ett klikk.",
+      "label": "Knapp"
     },
-    "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+    "callout": {
+      "description": "Fremhev tekst.",
+      "label": "Utheving",
+      "placeholder": "Skriv noe…"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
-    },
-    "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
-    },
-    "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "description": "Legg til en fullside kanban-tavle.",
+      "label": "Tavle - Full side"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "description": "Legg til en fullside kalenderdatabase.",
+      "label": "Kalender - Full side"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "description": "Legg til et fullside databasegalleri.",
+      "label": "Galleri - Full side"
     },
-    "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+    "child_database_list": {
+      "description": "Legg til en fullside database som liste.",
+      "label": "Liste - Full side"
     },
-    "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+    "child_database_table": {
+      "description": "Legg til en fullside database som tabell.",
+      "label": "Tabell - Full side"
     },
-    "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+    "child_database_timeline": {
+      "description": "Legg til en fullside databasetidslinje.",
+      "label": "Tidslinje - Full side"
     },
-    "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+    "child_database": {
+      "description": "Legg til ny database som underside.",
+      "label": "Database - Full side"
     },
-    "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+    "child_page": {
+      "description": "Opprett en underside i denne siden.",
+      "label": "Side"
     },
-    "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
-    },
-    "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
-    },
-    "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
-    },
-    "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
-    },
-    "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
-    },
-    "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
-    },
-    "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
-    },
-    "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
-    },
-    "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
-    },
-    "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
-    },
-    "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
-    },
-    "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
-    },
-    "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
-    },
-    "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
-    },
-    "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
-    },
-    "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
-    },
-    "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+    "code": {
+      "description": "Fang et kodesnutt.",
+      "label": "Kode",
+      "placeholder": "Skriv kode, eller lim inn et kodesnutt…"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "description": "Bruk blå bakgrunn på denne blokken.",
+      "label": "Blå bakgrunn"
     },
-    "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+    "color_blue": {
+      "description": "Bruk blå på denne blokken.",
+      "label": "Blå"
+    },
+    "color_brown_background": {
+      "description": "Bruk brun bakgrunn på denne blokken.",
+      "label": "Brun bakgrunn"
+    },
+    "color_brown": {
+      "description": "Bruk brun på denne blokken.",
+      "label": "Brun"
+    },
+    "color_default": {
+      "description": "Fjern skrift- eller bakgrunnsfarge fra denne blokken.",
+      "label": "Standard"
+    },
+    "color_gray_background": {
+      "description": "Bruk grå bakgrunn på denne blokken.",
+      "label": "Grå bakgrunn"
+    },
+    "color_gray": {
+      "description": "Bruk grå på denne blokken.",
+      "label": "Grå"
+    },
+    "color_green_background": {
+      "description": "Bruk grønn bakgrunn på denne blokken.",
+      "label": "Grønn bakgrunn"
+    },
+    "color_green": {
+      "description": "Bruk grønn på denne blokken.",
+      "label": "Grønn"
+    },
+    "color_orange_background": {
+      "description": "Bruk oransje bakgrunn på denne blokken.",
+      "label": "Oransje bakgrunn"
+    },
+    "color_orange": {
+      "description": "Bruk oransje på denne blokken.",
+      "label": "Oransje"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "description": "Bruk rosa bakgrunn på denne blokken.",
+      "label": "Rosa bakgrunn"
+    },
+    "color_pink": {
+      "description": "Bruk rosa på denne blokken.",
+      "label": "Rosa"
+    },
+    "color_purple_background": {
+      "description": "Bruk lilla bakgrunn på denne blokken.",
+      "label": "Lilla bakgrunn"
+    },
+    "color_purple": {
+      "description": "Bruk lilla på denne blokken.",
+      "label": "Lilla"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "description": "Bruk rød bakgrunn på denne blokken.",
+      "label": "Rød bakgrunn"
+    },
+    "color_red": {
+      "description": "Bruk rød på denne blokken.",
+      "label": "Rød"
+    },
+    "color_yellow_background": {
+      "description": "Bruk gul bakgrunn på denne blokken.",
+      "label": "Gul bakgrunn"
+    },
+    "color_yellow": {
+      "description": "Bruk gul på denne blokken.",
+      "label": "Gul"
+    },
+    "column_list_2": {
+      "description": "Plasser blokker side om side.",
+      "label": "2 kolonner"
+    },
+    "column_list_3": {
+      "description": "Ordne blokker i tre kolonner.",
+      "label": "3 kolonner"
+    },
+    "column_list_4": {
+      "description": "Ordne blokker i fire kolonner.",
+      "label": "4 kolonner"
+    },
+    "column_list_5": {
+      "description": "Ordne blokker i fem kolonner.",
+      "label": "5 kolonner"
+    },
+    "divider": {
+      "description": "Skill blokker visuelt.",
+      "label": "Skillelinje"
+    },
+    "embed": {
+      "description": "Bygg inn innhold fra en lenke.",
+      "label": "Bygg inn"
+    },
+    "equation": {
+      "description": "Vis en matematisk likning.",
+      "label": "Likning"
+    },
+    "file": {
+      "description": "Legg ved en fillenke til denne siden.",
+      "label": "Fil"
+    },
+    "heading_1": {
+      "description": "Stor seksjonsoverskrift.",
+      "label": "Overskrift 1",
+      "placeholder": "Overskrift 1"
+    },
+    "heading_2": {
+      "description": "Middels seksjonsoverskrift.",
+      "label": "Overskrift 2",
+      "placeholder": "Overskrift 2"
+    },
+    "heading_3": {
+      "description": "Liten seksjonsoverskrift.",
+      "label": "Overskrift 3",
+      "placeholder": "Overskrift 3"
+    },
+    "heading_4": {
+      "description": "Kompakt seksjonsoverskrift.",
+      "label": "Overskrift 4",
+      "placeholder": "Overskrift 4"
+    },
+    "image": {
+      "description": "Last opp eller bygg inn med en lenke.",
+      "label": "Bilde"
+    },
+    "inline_database_board": {
+      "description": "Legg til et innebygd kanban-tavle.",
+      "label": "Brettvisning"
+    },
+    "inline_database_calendar": {
+      "description": "Legg til en innebygd kalenderdatabase.",
+      "label": "Kalendervisning"
+    },
+    "inline_database_gallery": {
+      "description": "Legg til et innebygd databasegalleri.",
+      "label": "Galleri-visning"
+    },
+    "inline_database_list": {
+      "description": "Legg til en innebygd database som liste.",
+      "label": "Listevisning"
+    },
+    "inline_database_table": {
+      "description": "Legg til en innebygd database som tabell.",
+      "label": "Tabellvisning"
+    },
+    "inline_database_timeline": {
+      "description": "Legg til en innebygd databasetidslinje.",
+      "label": "Tidslinjevisning"
+    },
+    "inline_database": {
+      "description": "Legg til en database på denne siden.",
+      "label": "Database – Innebygd"
+    },
+    "link_to_page": {
+      "description": "Lenk til en eksisterende side.",
+      "label": "Lenke til side"
+    },
+    "numbered_list_item": {
+      "description": "Opprett en nummerert liste.",
+      "label": "Nummerert liste",
+      "placeholder": "Liste"
+    },
+    "paragraph": {
+      "description": "Bare begynn å skrive med ren tekst.",
+      "label": "Tekst",
+      "placeholder": "Skriv '/' for kommandoer"
+    },
+    "quote": {
+      "description": "Fang et sitat.",
+      "label": "Sitat",
+      "placeholder": "Tomt sitat"
+    },
+    "simple_table": {
+      "description": "Legg til en enkel tabell på denne siden.",
+      "label": "Tabell"
+    },
+    "synced_block": {
+      "description": "Gjenbruk innhold på tvers av sider.",
+      "label": "Synkronisert blokk"
+    },
+    "tab": {
+      "description": "Grupper innhold i merkede faner.",
+      "label": "Faner",
+      "placeholder": "Faner"
+    },
+    "table_of_contents": {
+      "description": "Vis linker til overskrifter i denne siden.",
+      "label": "Innholdsfortegnelse"
+    },
+    "to_do": {
+      "description": "Spor oppgaver med en avkrysningsboks.",
+      "label": "Oppgaveliste",
+      "placeholder": "Oppgave"
+    },
+    "toggle_heading_1": {
+      "description": "Stor overskrift som kan skjule innhold.",
+      "label": "Skjul/vis-overskrift 1",
+      "placeholder": "Skjul/vis-overskrift 1"
+    },
+    "toggle_heading_2": {
+      "description": "Mellomstor overskrift som kan skjule innhold.",
+      "label": "Skjul/vis-overskrift 2",
+      "placeholder": "Skjul/vis-overskrift 2"
+    },
+    "toggle_heading_3": {
+      "description": "Liten overskrift som kan skjule innhold.",
+      "label": "Skjul/vis-overskrift 3",
+      "placeholder": "Togle overskrift 3"
+    },
+    "toggle_heading_4": {
+      "description": "Kompakt overskrift som kan skjule underinnhold.",
+      "label": "Togle overskrift 4",
+      "placeholder": "Togle overskrift 4"
+    },
+    "toggle": {
+      "description": "Togler kan skjule og vise innhold.",
+      "label": "Togleliste",
+      "placeholder": "Togle"
+    },
+    "video": {
+      "description": "Bygg inn en video med en lenke.",
+      "label": "Video"
     }
   }
 }

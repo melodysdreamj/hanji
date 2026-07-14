@@ -2,31 +2,31 @@
   "trash": "ゴミ箱",
   "empty": "削除したページはここに表示されます。ゴミ箱は空です。",
   "searchTrash": "ゴミ箱を検索",
-  "deletedPages": "削除されたページ",
+  "deletedPages": "削除済みページ",
   "noSearchMatches": "検索に一致する削除済みページはありません。",
-  "pageCount_one": "{{count}} ページ",
-  "pageCount_other": "{{count}} ページ",
-  "deletedJustNow": "たった今削除",
-  "deletedOn": "{{date}} に削除",
+  "pageCount_one": "{{count}}ページ",
+  "pageCount_other": "{{count}}ページ",
+  "deletedJustNow": "削除したばかり",
+  "deletedOn": "{{date}}に削除",
   "actions": {
     "restore": "復元",
     "deleteForever": "完全に削除",
     "emptyTrash": "ゴミ箱を空にする"
   },
   "aria": {
-    "openFromTrash": "ゴミ箱から {{title}} を開く",
-    "restorePage": "{{title}} を復元",
-    "deletePageForever": "{{title}} を完全に削除",
+    "openFromTrash": "ゴミ箱から{{title}}を開く",
+    "restorePage": "{{title}}を復元",
+    "deletePageForever": "{{title}}を完全に削除",
     "cancelPermanentDelete": "完全削除をキャンセル",
-    "cancelEmptyTrash": "ゴミ箱を空にする操作をキャンセル"
+    "cancelEmptyTrash": "ゴミ箱を空にするのをキャンセル"
   },
   "confirm": {
     "deleteTitle": "完全に削除しますか？",
-    "deleteBodyPrefix": "次のページを完全に削除します: ",
+    "deleteBodyPrefix": "完全に削除します ",
     "deleteBodySuffix": "。この操作は元に戻せません。",
     "emptyTitle": "ゴミ箱を空にしますか？",
-    "emptyBody_one": "ゴミ箱内の {{count}} ページすべてを完全に削除します。この操作は元に戻せません。",
-    "emptyBody_other": "ゴミ箱内の {{count}} ページすべてを完全に削除します。この操作は元に戻せません。"
+    "emptyBody_one": "ゴミ箱内の{{count}}ページを完全に削除します。この操作は元に戻せません。",
+    "emptyBody_other": "ゴミ箱内の{{count}}ページを完全に削除します。この操作は元に戻せません。"
   },
   "toast": {
     "deletedForever": "完全に削除しました",

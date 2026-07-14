@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "नवीन वर्कस्पेस",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "कार्यक्षेत्राचे नाव",
+    "placeholder": "आमची कंपनी"
   },
-  "startLabel": "Start from",
+  "startLabel": "यापासून सुरू करा",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "रिकामे वर्कस्पेस",
+      "body": "स्टार्टर पृष्ठांसह रिकामे सुरू करा."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "नोशन मधून आयात करा",
+      "body": "वर्कस्पेस तयार करा, नंतर त्यात नोशन वर्कस्पेस मायग्रेट करा."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "दुसऱ्या हांजी मधून आयात करा",
+      "body": "वर्कस्पेस तयार करा, नंतर दुसऱ्या हांजी सर्व्हर किंवा फाइलमधून वर्कस्पेस आयात करा."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "कार्यक्षेत्र तयार करा",
+  "creating": "तयार करत आहे…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "कार्यक्षेत्र तयार करता आले नाही."
   }
 }

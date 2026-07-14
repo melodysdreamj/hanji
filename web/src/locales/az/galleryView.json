@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Bu verilənlər bazasında hələ səhifə yoxdur.",
+  "emptyTitle": "Hələ səhifə yoxdur",
+  "newInline": "Yeni",
+  "newPage": "Yeni səhifə",
+  "newPageIn": "{{dbTitle}}-da yeni səhifə",
+  "noResultsDesc": "Heç bir səhifə cari filtrlərə və ya axtarışa uyğun gəlmir.",
+  "noResultsTitle": "Nəticə yoxdur",
+  "openRow": "{{title}} aç"
 }

@@ -40,6 +40,9 @@ async function main() {
     if (options.onlyRowSelect) {
       await assertRowSelectMenuUi(browser, baseUrl, seed);
       console.log('PASS row detail multi-select menu clicks update selected chips.');
+    } else if (options.onlyRowPropertyMenu) {
+      await assertRowPropertyMenuUi(browser, baseUrl, seed);
+      console.log('PASS row property menus follow Notion type-specific root and edit-panel rules.');
     } else if (options.onlyMenuDismissAudit) {
       await assertMenuDismissAuditUi(browser, baseUrl, seed);
       console.log('PASS database row peek menu outside-click dismissal audit.');
@@ -56,6 +59,89 @@ async function main() {
   } finally {
     await browser.close().catch(() => {});
     await cleanupSeed(baseUrl, seed).catch(() => {});
+  }
+}
+
+async function assertRowPropertyMenuUi(browser, baseUrl, seed) {
+  const { context, page, errors } = await newCheckedPage(browser);
+  await seedSession(context, seed);
+
+  try {
+    await openDatabase(page, baseUrl, seed);
+    await openRow(page, seed.rowOneTitle);
+    try {
+      await assertPeekMode(page, seed.rowOneTitle, 'side');
+    } catch (error) {
+      const state = await page.evaluate((rowTitle) => ({
+        url: window.location.href,
+        titleInputs: Array.from(document.querySelectorAll('input')).filter((input) => input.value === rowTitle).map((input) => ({
+          visible: input.offsetParent !== null,
+          disabled: input.disabled,
+        })),
+        dialogs: Array.from(document.querySelectorAll('[role="dialog"]')).map((dialog) => ({
+          label: dialog.getAttribute('aria-label'),
+          visible: dialog instanceof HTMLElement && dialog.offsetParent !== null,
+          text: (dialog.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 240),
+        })),
+        bodyText: document.body.innerText.replace(/\s+/g, ' ').trim().slice(0, 700),
+      }), seed.rowOneTitle);
+      throw new Error(`row property menu seed did not open in side peek: ${error instanceof Error ? error.message : String(error)}; state=${JSON.stringify(state)}; browserErrors=${JSON.stringify(errors)}`);
+    }
+    await assertRowPropertyMenu(page, seed.rowOneTitle, seed.amountPropId, 'Amount');
+    await assertRowPropertyMenuVariant(page, seed, {
+      propertyId: seed.relationPropId,
+      label: 'Related',
+      typeLabel: 'Relation',
+      requiredRoot: ['Rename', 'Edit property', 'Comments', 'Property visibility', 'Delete property', 'Customize Layout'],
+      forbiddenRoot: ['Duplicate property'],
+      requiredEdit: ['Type', 'Relation', 'Relation database', 'Delete property'],
+      forbiddenEdit: ['Duplicate property'],
+      artifact: 'local-row-property-menu-relation.png',
+    });
+    await assertRowPropertyMenuVariant(page, seed, {
+      propertyId: seed.duePropId,
+      label: 'Due',
+      typeLabel: 'Date',
+      requiredRoot: ['Comments', 'Duplicate property'],
+      forbiddenRoot: [],
+      requiredEdit: ['Type', 'Date', 'Duplicate property', 'Delete property'],
+      forbiddenEdit: ['Number format', 'Relation database', 'Formula'],
+      artifact: 'local-row-property-menu-date.png',
+    });
+    await assertRowPropertyMenuVariant(page, seed, {
+      propertyId: seed.classificationPropId,
+      label: '분류',
+      typeLabel: 'Multi-select',
+      requiredRoot: ['Comments', 'Duplicate property'],
+      forbiddenRoot: [],
+      requiredEdit: ['Type', 'Multi-select', 'Options', 'Duplicate property', 'Delete property'],
+      forbiddenEdit: ['Number format', 'Relation database', 'Formula'],
+      artifact: 'local-row-property-menu-multi-select.png',
+    });
+    await assertRowPropertyMenuVariant(page, seed, {
+      propertyId: seed.formulaPropId,
+      label: 'Calculated',
+      typeLabel: 'Formula',
+      requiredRoot: ['Duplicate property'],
+      forbiddenRoot: ['Comments'],
+      requiredEdit: ['Type', 'Formula', 'Duplicate property', 'Delete property'],
+      forbiddenEdit: ['Comments'],
+      artifact: 'local-row-property-menu-formula.png',
+    });
+    await assertRowPropertyMenuVariant(page, seed, {
+      propertyId: seed.createdTimePropId,
+      label: 'Created',
+      typeLabel: 'Created time',
+      requiredRoot: ['Duplicate property'],
+      forbiddenRoot: ['Comments'],
+      requiredEdit: ['Type', 'Created time', 'Duplicate property', 'Delete property'],
+      forbiddenEdit: ['Comments', 'Formula', 'Relation database'],
+      artifact: 'local-row-property-menu-created-time.png',
+      typeDisabled: true,
+    });
+    assertNoBrowserErrors(errors, 'row property options menu alignment');
+  } finally {
+    await closeSeededContext(context, seed);
   }
 }
 
@@ -1590,6 +1676,7 @@ async function assertRowPropertyMenu(page, rowTitle, propertyId, label) {
       const menuText = (menu?.innerText ?? menu?.textContent ?? '').replace(/\s+/g, ' ').trim();
       const menuRect = menu?.getBoundingClientRect();
       const menuStyle = menu ? getComputedStyle(menu) : null;
+      const menuItems = Array.from(menu?.querySelectorAll(':scope > [role="menuitem"]') ?? []);
       return {
         label: (labelNode?.innerText ?? labelNode?.textContent ?? '').trim(),
         buttonTag: button?.tagName ?? null,
@@ -1600,14 +1687,11 @@ async function assertRowPropertyMenu(page, rowTitle, propertyId, label) {
           menuStyle?.visibility !== 'hidden' &&
           (menuRect?.width ?? 0) > 0 &&
           (menuRect?.height ?? 0) > 0,
+        menuWidth: menuRect?.width ?? 0,
+        menuHeight: menuRect?.height ?? 0,
         menuText,
-        hasNameField: menuText.includes('Name'),
-        hasTypeField: menuText.includes('Type'),
-        hasDescriptionField: menuText.includes('Description'),
-        hasHideAction: menuText.includes('Hide property') || menuText.includes('Show property'),
-        hasDuplicateAction: menuText.includes('Duplicate property'),
-        hasHideEmptyAction: menuText.includes('Hide when empty'),
-        hasDeleteAction: menuText.includes('Delete property'),
+        itemTexts: menuItems.map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim()),
+        formControlCount: menu?.querySelectorAll('input, textarea, select').length ?? 0,
       };
 
       function findRowPeekDialog(dialogTitle) {
@@ -1628,22 +1712,23 @@ async function assertRowPropertyMenu(page, rowTitle, propertyId, label) {
   );
   assert(state.menuVisible, `row property options menu should open inside row peek: ${JSON.stringify(state)}`);
   assert(
-    state.hasNameField &&
-      state.hasTypeField &&
-      state.hasDescriptionField &&
-      state.hasHideAction &&
-      state.hasDuplicateAction &&
-      state.hasHideEmptyAction &&
-      state.hasDeleteAction,
-    `row property options menu should expose edit, visibility, duplicate, hide-empty, and delete actions: ${JSON.stringify(state)}`,
+    JSON.stringify(state.itemTexts) ===
+      JSON.stringify([
+        'Rename',
+        'Edit property',
+        'Comments',
+        'Property visibility',
+        'Duplicate property',
+        'Delete property',
+        'Customize Layout',
+      ]) &&
+      state.formControlCount === 0,
+    `non-relation value properties should expose Notion's compact root including comments and duplicate: ${JSON.stringify(state)}`,
   );
-
-  const nameInput = menu.getByLabel('Name', { exact: true });
-  await dispatchComposingEnter(nameInput);
-  await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
-  const keyState = {
-    composingEnterKeptOpen: await menu.isVisible({ timeout: options.timeoutMs }),
-  };
+  assert(
+    state.menuWidth >= 218 && state.menuWidth <= 222 && state.menuHeight <= 226,
+    `row property root menu should keep the live-Notion 220px compact rhythm: ${JSON.stringify(state)}`,
+  );
 
   const artifactDir = join(root, '.edgebase', 'ui-discovery', 'row-property-menu');
   mkdirSync(artifactDir, { recursive: true });
@@ -1651,6 +1736,168 @@ async function assertRowPropertyMenu(page, rowTitle, propertyId, label) {
     path: join(artifactDir, 'local-row-property-menu.png'),
     fullPage: false,
   });
+
+  await menu.getByRole('menuitem', { name: 'Edit property', exact: true }).click();
+  const editState = await page.evaluate(
+    ({ title, expectedLabel }) => {
+      const dialog = findRowPeekDialog(title);
+      const menu = dialog?.querySelector(`[role="menu"][aria-label="${cssString(expectedLabel)} property options"]`);
+      const text = (menu?.innerText ?? menu?.textContent ?? '').replace(/\s+/g, ' ').trim();
+      return {
+        panel: menu?.getAttribute('data-panel') ?? null,
+        text,
+        hasNameField: !!menu?.querySelector('input[aria-label="Name"]'),
+        hasTypeControl: text.includes('Type') && !!menu?.querySelector('[class*="rowPropertyEditType"]'),
+        hasDescriptionField: !!menu?.querySelector('textarea'),
+        hasDuplicateAction: text.includes('Duplicate property'),
+        hasDeleteAction: text.includes('Delete property'),
+        hasNumberFormat: text.includes('Number format'),
+      };
+
+      function findRowPeekDialog(dialogTitle) {
+        return Array.from(document.querySelectorAll('[role="dialog"]')).find(
+          (node) => node.getAttribute('aria-label') === `${dialogTitle} preview`,
+        );
+      }
+
+      function cssString(value) {
+        return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      }
+    },
+    { title: rowTitle, expectedLabel: label },
+  );
+  assert(
+    editState.panel === 'edit' &&
+      editState.hasNameField &&
+      editState.hasTypeControl &&
+      !editState.hasDescriptionField &&
+      editState.hasDuplicateAction &&
+      editState.hasDeleteAction &&
+      editState.hasNumberFormat,
+    `number edit panel should keep the Notion identity/type/config/footer hierarchy: ${JSON.stringify(editState)}`,
+  );
+  await page.screenshot({
+    path: join(artifactDir, 'local-row-property-menu-edit.png'),
+    fullPage: false,
+  });
+  await menu.locator('[class*="rowPropertyEditType"]').click();
+  const typeState = await page.evaluate(
+    ({ title, expectedLabel }) => {
+      const dialog = findRowPeekDialog(title);
+      const menu = dialog?.querySelector(`[role="menu"][aria-label="${cssString(expectedLabel)} property options"]`);
+      const active = menu?.querySelector('[class*="propertyHeaderTypeOption"][data-active="true"]');
+      return {
+        panel: menu?.getAttribute('data-panel') ?? null,
+        hasSearch: !!menu?.querySelector('input[aria-label="Search property types"]'),
+        activeType: (active?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      };
+
+      function findRowPeekDialog(dialogTitle) {
+        return Array.from(document.querySelectorAll('[role="dialog"]')).find(
+          (node) => node.getAttribute('aria-label') === `${dialogTitle} preview`,
+        );
+      }
+
+      function cssString(value) {
+        return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      }
+    },
+    { title: rowTitle, expectedLabel: label },
+  );
+  assert(
+    typeState.panel === 'type' && typeState.hasSearch && typeState.activeType.includes('Number'),
+    `type row should open a searchable type submenu with the current type selected: ${JSON.stringify(typeState)}`,
+  );
+  await page.screenshot({
+    path: join(artifactDir, 'local-row-property-menu-type.png'),
+    fullPage: false,
+  });
+  await menu.getByRole('button', { name: 'Back to property menu' }).click();
+  await menu.press('Escape');
+  await page.waitForFunction(
+    ({ title, expectedLabel }) => {
+      const dialog = Array.from(document.querySelectorAll('[role="dialog"]')).find(
+        (node) => node.getAttribute('aria-label') === `${title} preview`,
+      );
+      return dialog?.querySelector(`[role="menu"][aria-label="${expectedLabel} property options"]`)?.getAttribute('data-panel') === 'main';
+    },
+    { title: rowTitle, expectedLabel: label },
+    { timeout: options.timeoutMs },
+  );
+
+  await menu.getByRole('menuitem', { name: 'Property visibility', exact: true }).click();
+  const visibilityState = await page.evaluate(
+    ({ title, expectedLabel }) => {
+      const dialog = findRowPeekDialog(title);
+      const menu = dialog?.querySelector(`[role="menu"][aria-label="${cssString(expectedLabel)} property options"]`);
+      const menuItems = Array.from(menu?.querySelectorAll('[role="menuitemcheckbox"]') ?? []);
+      const hideAction = menuItems.find((node) => {
+        const text = (node.textContent ?? '').replace(/\s+/g, ' ').trim();
+        return text === 'Hide property' || text === 'Show property';
+      });
+      const hideEmptyAction = menuItems.find(
+        (node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim() === 'Hide when empty',
+      );
+      const labelFor = (action, labels) =>
+        Array.from(action?.querySelectorAll('[class*="propertyHeaderItemText"]') ?? []).find((node) =>
+          labels.includes((node.textContent ?? '').trim()),
+        );
+      const hideActionLabel = labelFor(hideAction, ['Hide property', 'Show property']);
+      const hideEmptyLabel = labelFor(hideEmptyAction, ['Hide when empty']);
+      const hideEmptyCheck = hideEmptyAction?.querySelector('[class*="propertyHeaderCheck"]');
+      const hideActionLabelRect = hideActionLabel?.getBoundingClientRect();
+      const hideEmptyLabelRect = hideEmptyLabel?.getBoundingClientRect();
+      const hideEmptyCheckRect = hideEmptyCheck?.getBoundingClientRect();
+      return {
+        panel: menu?.getAttribute('data-panel') ?? null,
+        itemTexts: menuItems.map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim()),
+        actionLabelAlignmentDelta:
+          hideActionLabelRect && hideEmptyLabelRect
+            ? Math.abs(hideActionLabelRect.left - hideEmptyLabelRect.left)
+            : null,
+        hideEmptyCheckIsTrailing:
+          !!hideEmptyLabelRect && !!hideEmptyCheckRect && hideEmptyCheckRect.left >= hideEmptyLabelRect.right,
+      };
+
+      function findRowPeekDialog(dialogTitle) {
+        return Array.from(document.querySelectorAll('[role="dialog"]')).find(
+          (node) => node.getAttribute('aria-label') === `${dialogTitle} preview`,
+        );
+      }
+
+      function cssString(value) {
+        return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      }
+    },
+    { title: rowTitle, expectedLabel: label },
+  );
+  assert(
+    visibilityState.panel === 'visibility' &&
+      visibilityState.itemTexts.some((text) => text === 'Hide property' || text === 'Show property') &&
+      visibilityState.itemTexts.includes('Hide when empty'),
+    `row property visibility actions should live under Property visibility: ${JSON.stringify(visibilityState)}`,
+  );
+  assert(
+    visibilityState.actionLabelAlignmentDelta !== null && visibilityState.actionLabelAlignmentDelta <= 1,
+    `row property visibility labels should share one leading edge: ${JSON.stringify(visibilityState)}`,
+  );
+  assert(
+    visibilityState.hideEmptyCheckIsTrailing,
+    `row property hide-empty check should trail its label instead of indenting it: ${JSON.stringify(visibilityState)}`,
+  );
+  await page.screenshot({
+    path: join(artifactDir, 'local-row-property-menu-visibility.png'),
+    fullPage: false,
+  });
+  await menu.getByRole('button', { name: 'Back to property menu' }).click();
+
+  await menu.getByRole('menuitem', { name: 'Rename', exact: true }).click();
+  const nameInput = menu.getByLabel('Name', { exact: true });
+  await dispatchComposingEnter(nameInput);
+  await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const keyState = {
+    composingEnterKeptOpen: await menu.isVisible({ timeout: options.timeoutMs }),
+  };
   await nameInput.press('Enter', { timeout: options.timeoutMs });
   await menu.waitFor({ state: 'hidden', timeout: options.timeoutMs });
   keyState.enterClosedMenu = !(await menu.isVisible().catch(() => false));
@@ -1658,12 +1905,110 @@ async function assertRowPropertyMenu(page, rowTitle, propertyId, label) {
     keyState.composingEnterKeptOpen && keyState.enterClosedMenu,
     `row property name input should ignore composing Enter and close on regular Enter: ${JSON.stringify(keyState)}`,
   );
+
+  await propertyButton.click({ timeout: options.timeoutMs });
+  await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await menu.getByRole('menuitem', { name: 'Customize Layout', exact: true }).click();
+  await menu.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+  const customizeMenu = page.getByRole('menu', { name: 'Customize properties' });
+  await customizeMenu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const layoutState = {
+    rootClosed: !(await menu.isVisible().catch(() => false)),
+    customizeMenuVisible: await customizeMenu.isVisible(),
+    searchVisible: await customizeMenu.getByLabel('Search properties').isVisible(),
+  };
+  assert(
+    layoutState.rootClosed && layoutState.customizeMenuVisible && layoutState.searchVisible,
+    `row property layout command should open the existing property layout manager: ${JSON.stringify(layoutState)}`,
+  );
+  await page.screenshot({
+    path: join(artifactDir, 'local-row-property-menu-layout.png'),
+    fullPage: false,
+  });
+  await page.keyboard.press('Escape');
+  await customizeMenu.waitFor({ state: 'hidden', timeout: options.timeoutMs });
   writeFileSync(
     join(artifactDir, 'local-row-property-menu.json'),
-    `${JSON.stringify({ rowTitle, propertyId, label, state, keyState }, null, 2)}\n`,
+    `${JSON.stringify({ rowTitle, propertyId, label, state, editState, visibilityState, keyState, layoutState }, null, 2)}\n`,
+  );
+}
+
+async function assertRowPropertyMenuVariant(
+  page,
+  seed,
+  {
+    propertyId,
+    label,
+    typeLabel,
+    requiredRoot,
+    forbiddenRoot,
+    requiredEdit,
+    forbiddenEdit,
+    artifact,
+    typeDisabled = false,
+  },
+) {
+  const dialog = await rowPeekDialog(page, seed.rowOneTitle);
+  const propertyButton = dialog
+    .locator(`[data-row-property-id="${propertyId}"] button[aria-haspopup="menu"]`)
+    .first();
+  await propertyButton.scrollIntoViewIfNeeded({ timeout: options.timeoutMs });
+  await propertyButton.click({ timeout: options.timeoutMs });
+  const menu = dialog.getByRole('menu', { name: `${label} property options` });
+  await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+
+  const rootItems = await menu.locator(':scope > [role="menuitem"]').allTextContents();
+  const normalizedRoot = rootItems.map((text) => text.replace(/\s+/g, ' ').trim());
+  for (const expected of requiredRoot) {
+    assert(normalizedRoot.includes(expected), `${typeLabel} root should include ${expected}: ${JSON.stringify(normalizedRoot)}`);
+  }
+  for (const forbidden of forbiddenRoot) {
+    assert(!normalizedRoot.includes(forbidden), `${typeLabel} root should omit ${forbidden}: ${JSON.stringify(normalizedRoot)}`);
+  }
+
+  await menu.getByRole('menuitem', { name: 'Edit property', exact: true }).click();
+  const edit = await page.evaluate(
+    ({ rowTitle, menuLabel }) => {
+      const dialog = Array.from(document.querySelectorAll('[role="dialog"]')).find(
+        (node) => node.getAttribute('aria-label') === `${rowTitle} preview`,
+      );
+      const menu = dialog?.querySelector(`[role="menu"][aria-label="${menuLabel} property options"]`);
+      const type = menu?.querySelector('[class*="rowPropertyEditType"]');
+      return {
+        panel: menu?.getAttribute('data-panel') ?? null,
+        text: (menu?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+        typeDisabled: type instanceof HTMLButtonElement ? type.disabled : null,
+      };
+    },
+    { rowTitle: seed.rowOneTitle, menuLabel: label },
+  );
+  assert(edit.panel === 'edit', `${typeLabel} should open its edit panel: ${JSON.stringify(edit)}`);
+  for (const expected of requiredEdit) {
+    assert(edit.text.includes(expected), `${typeLabel} edit should include ${expected}: ${JSON.stringify(edit)}`);
+  }
+  for (const forbidden of forbiddenEdit) {
+    assert(!edit.text.includes(forbidden), `${typeLabel} edit should omit ${forbidden}: ${JSON.stringify(edit)}`);
+  }
+  assert(
+    edit.typeDisabled === typeDisabled,
+    `${typeLabel} type control disabled state should match its mutability: ${JSON.stringify(edit)}`,
   );
 
-  await page.keyboard.press('Escape');
+  const artifactDir = join(root, '.edgebase', 'ui-discovery', 'row-property-menu');
+  mkdirSync(artifactDir, { recursive: true });
+  await page.screenshot({ path: join(artifactDir, artifact), fullPage: false });
+  await menu.press('Escape');
+  await page.waitForFunction(
+    ({ rowTitle, menuLabel }) => {
+      const dialog = Array.from(document.querySelectorAll('[role="dialog"]')).find(
+        (node) => node.getAttribute('aria-label') === `${rowTitle} preview`,
+      );
+      return dialog?.querySelector(`[role="menu"][aria-label="${menuLabel} property options"]`)?.getAttribute('data-panel') === 'main';
+    },
+    { rowTitle: seed.rowOneTitle, menuLabel: label },
+    { timeout: options.timeoutMs },
+  );
+  await menu.press('Escape');
   await menu.waitFor({ state: 'hidden', timeout: options.timeoutMs });
 }
 
@@ -1863,8 +2208,25 @@ async function assertRowMultiSelectOptionInteraction(page, seed) {
 async function openRowMultiSelectMenu(page, seed) {
   const dialog = await rowPeekDialog(page, seed.rowOneTitle);
   const row = dialog.locator(`[data-row-property-id="${seed.classificationPropId}"]`);
-  const trigger = row.locator('[role="button"][aria-haspopup="dialog"]').first();
-  await trigger.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await row.scrollIntoViewIfNeeded({ timeout: options.timeoutMs });
+  const trigger = row.locator('button[aria-haspopup="dialog"]').first();
+  try {
+    await trigger.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  } catch (error) {
+    const state = await row.evaluate((node) => ({
+      text: (node.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      html: node.innerHTML.slice(0, 1_200),
+      rect: node.getBoundingClientRect().toJSON(),
+      style: {
+        display: getComputedStyle(node).display,
+        visibility: getComputedStyle(node).visibility,
+        opacity: getComputedStyle(node).opacity,
+      },
+    }));
+    throw new Error(
+      `row multi-select trigger did not become visible: ${error instanceof Error ? error.message : String(error)}; state=${JSON.stringify(state)}`,
+    );
+  }
   await trigger.click({ timeout: options.timeoutMs });
   const menu = page.getByRole('dialog', { name: 'Edit multi-select property' });
   await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
@@ -2272,6 +2634,8 @@ async function seedDatabase(baseUrl) {
   const amountPropId = crypto.randomUUID();
   const relationPropId = crypto.randomUUID();
   const classificationPropId = crypto.randomUUID();
+  const formulaPropId = crypto.randomUUID();
+  const createdTimePropId = crypto.randomUUID();
   const classificationFirstOption = { id: crypto.randomUUID(), name: '공급처', color: 'blue' };
   const classificationSecondOption = { id: crypto.randomUUID(), name: '설치업체(기사)', color: 'green' };
   await callFunction(baseUrl, session.accessToken, 'database-mutation', {
@@ -2343,6 +2707,29 @@ async function seedDatabase(baseUrl) {
       config: { options: [classificationFirstOption, classificationSecondOption] },
     },
   });
+  await callFunction(baseUrl, session.accessToken, 'database-mutation', {
+    action: 'insert',
+    table: 'db_properties',
+    record: {
+      id: formulaPropId,
+      databaseId,
+      name: 'Calculated',
+      type: 'formula',
+      position: 10,
+      config: { formula: 'prop("Amount")' },
+    },
+  });
+  await callFunction(baseUrl, session.accessToken, 'database-mutation', {
+    action: 'insert',
+    table: 'db_properties',
+    record: {
+      id: createdTimePropId,
+      databaseId,
+      name: 'Created',
+      type: 'created_time',
+      position: 11,
+    },
+  });
   const accountText = [
     '샘플은행 000-000000-00-000',
     '예금주: 주식회사 샘플컴퍼니',
@@ -2385,7 +2772,16 @@ async function seedDatabase(baseUrl) {
   const timelineViewId = crypto.randomUUID();
   const visibleProperties = created.properties
     .map((prop) => prop.id)
-    .concat(accountPropId, memoPropId, duePropId, amountPropId, relationPropId, classificationPropId);
+    .concat(
+      accountPropId,
+      memoPropId,
+      duePropId,
+      amountPropId,
+      relationPropId,
+      classificationPropId,
+      formulaPropId,
+      createdTimePropId,
+    );
   await callFunction(baseUrl, session.accessToken, 'database-mutation', {
     action: 'insertMany',
     table: 'db_views',
@@ -2565,9 +2961,12 @@ async function seedDatabase(baseUrl) {
     accountText,
     memoPropId,
     memoText,
+    duePropId,
     amountPropId,
     relationPropId,
     classificationPropId,
+    formulaPropId,
+    createdTimePropId,
     classificationFirstLabel: classificationFirstOption.name,
     classificationSecondLabel: classificationSecondOption.name,
     relatedRowId: relatedRow.id,
@@ -2757,6 +3156,7 @@ function parseArgs(args) {
     headed: false,
     onlyInlinePropertySelect: false,
     onlyMenuDismissAudit: false,
+    onlyRowPropertyMenu: false,
     onlyRowPeekMotion: false,
     onlyRowSelect: false,
     theme: 'light',
@@ -2776,6 +3176,10 @@ function parseArgs(args) {
     }
     if (arg === '--only-row-select') {
       parsed.onlyRowSelect = true;
+      continue;
+    }
+    if (arg === '--only-row-property-menu') {
+      parsed.onlyRowPropertyMenu = true;
       continue;
     }
     if (arg === '--only-inline-property-select') {
@@ -2832,6 +3236,8 @@ Options:
   --url <url>             Runtime URL. Defaults to HANJI_EDGEBASE_URL or ${DEFAULT_BASE_URL}.
   --timeout-ms <number>   Browser/action timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
   --only-row-select       Check the row-detail multi-select menu click flow only.
+  --only-row-property-menu
+                          Check row-property action alignment and trailing check placement only.
   --only-inline-property-select
                           Check an inline database relation property dropdown inside row peek only.
   --only-menu-dismiss-audit

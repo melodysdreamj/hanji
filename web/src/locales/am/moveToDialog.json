@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "ማዛወሪያ",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "የስራ ቦታ መነሻ",
+    "path": "ከፍተኛ ደረጃ"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "የመዛወሪያ መዳረሻዎችን ይፈልጉ",
+    "placeholder": "ገፆችን ይፈልጉ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "የማንቀሳቀስ መስኮት ዝጋ"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "የመዛወሪያ መዳረሻዎች",
+    "empty": "ገፆች አልተገኙም።",
+    "destinationLabel": "ወደ {{label}} አንቀሳቅስ፣ {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" ፍጠር",
+    "optionLabel": "ገፅ {{title}} ፍጠር እና ወደዚህ አንቀሳቅስ",
+    "hint": "አዲስ ከፍተኛ ደረጃ ገፅ - ወደዚህ አንቀሳቅስ"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "የተቆለፈ ወላጅ",
+    "page": "የተቆለፈ ገፅ"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "ገፁ በተቆለፈ ወላጅ ገጽ ውስጥ ነው",
+    "locked": "ገፁ ተቆልፏል",
+    "moved": "ገፁ ተዛውሯል",
+    "moveFailed": "ገፁን ማዛወር አልተቻለም"
   }
 }

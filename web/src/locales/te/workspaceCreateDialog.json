@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "కొత్త వర్క్స్పేస్",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "వర్క్స్పేస్ పేరు",
+    "placeholder": "మీ సంస్థ"
   },
-  "startLabel": "Start from",
+  "startLabel": "ప్రారంభ విధానం",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "ఖాళీ వర్క్స్పేస్",
+      "body": "ప్రారంభ పేజీలతో ఖాళీగా మొదలుపెట్టండి."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "నోషన్ నుండి దిగుమతి",
+      "body": "వర్క్స్పేస్ను సృష్టించి, నోషన్ వర్క్స్పేస్ను అందులోకి తరలించండి."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "మరొక హంజీ నుండి దిగుమతి",
+      "body": "వర్క్స్పేస్ను సృష్టించి, మరొక హంజీ సర్వర్ లేదా ఫైల్ నుండి దిగుమతి చేయండి."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "వర్క్స్పేస్ సృష్టించు",
+  "creating": "సృష్టిస్తోంది…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "వర్క్స్పేస్ను సృష్టించడం సాధ్యపడలేదు."
   }
 }

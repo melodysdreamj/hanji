@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Μετακίνηση μπλοκ σε",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Αναζήτηση προορισμών μετακίνησης",
+    "placeholder": "Αναζήτηση σελίδων..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Κλείσιμο διαλόγου μετακίνησης"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Προορισμοί μετακίνησης",
+    "empty": "Δεν βρέθηκαν σελίδες.",
+    "destinationLabel": "Μετακίνηση μπλοκ στο {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Δημιουργία \"{{query}}\"",
+    "optionLabel": "Δημιουργία σελίδας \"{{query}}\" και μετακίνηση μπλοκ εδώ",
+    "hint": "Νέα σελίδα - μετακίνηση μπλοκ εδώ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Κλειδωμένη σελίδα"
   },
-  "untitled": "Untitled",
+  "untitled": "Χωρίς τίτλο",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Η σελίδα είναι κλειδωμένη",
+    "movedBlock": "Μετακινήθηκε το μπλοκ",
+    "movedBlocks": "Μετακινήθηκαν τα μπλοκ",
+    "movedBlocksCount": "Μετακινήθηκαν {{blockCount}} μπλοκ",
+    "moveFailed": "Αδυναμία μετακίνησης μπλοκ"
   }
 }

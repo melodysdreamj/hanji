@@ -172,6 +172,31 @@ describe("bootstrap hydration", () => {
     expect(state.pagesById["p1"]?.title).toBe("Offline title");
   });
 
+  it("joins the current page's cached blocks before exposing a warm boot", async () => {
+    const page = makePage({ id: "p1", title: "Cached page" });
+    const block = makeBlock("p1", "b1", "cached body");
+    vi.mocked(bootstrapWorkspace).mockResolvedValue(bootstrapResult([page]));
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({ blocks: [block] } as never);
+    seedUser();
+    await useStore.getState().bootstrap({ workspaceId: "ws-1", pageId: "p1" });
+    await useStore.getState().loadBlocks("p1");
+    await settled();
+
+    resetStore();
+    resetBootstrapForTests();
+    resetOutboxForTests();
+    window.localStorage.setItem("hanji.lastUserId", TEST_USER);
+    vi.mocked(bootstrapWorkspace).mockRejectedValue(new Error("network down"));
+    vi.mocked(getPageBlocksRemote).mockRejectedValue(new Error("network down"));
+
+    await useStore.getState().bootstrap({ workspaceId: "ws-1", pageId: "p1" });
+
+    const state = useStore.getState();
+    expect(state.ready).toBe(true);
+    expect(state.loadedBlockPages.has("p1")).toBe(true);
+    expect(state.blocksByPage.p1?.[0]?.plainText).toBe("cached body");
+  });
+
   it("reconciles a cached boot with the fresh server result", async () => {
     vi.mocked(bootstrapWorkspace).mockResolvedValue(
       bootstrapResult([makePage({ id: "p1", title: "Old" })])

@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "ሽፋን ቀይር",
+    "reposition": "አቀማመጥ ቀይር",
+    "remove": "አስወግድ",
+    "uploadFile": "ፋይል ጫን",
+    "uploading": "በመጫን ላይ...",
+    "submit": "አስገባ",
+    "savePosition": "አቀማመጥ አስቀምጥ"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "ጋለሪ",
+    "upload": "ጫን",
+    "link": "አገናኝ"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "የምስል አገናኝ ይለጥፉ",
+    "invalid": "የhttp ወይም የhttps ምስል አገናኝ ይለጥፉ።"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "ያንን ምስል መጫን አልተቻለም።",
+    "defaultFileName": "ሽፋን ምስል"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "አቀማመጥ ለመቀየር ምስሉን ይጎትቱ"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "ለመጫን በመዘጋጀት ላይ",
+    "finalizing": "በማጠናቀቅ ላይ",
+    "complete": "ተጠናቋል",
+    "uploading": "በመጫን ላይ"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "ሽፋን ተወግዷል",
+    "restored": "ሽፋን ተመልሷል",
+    "undo": "ተመለስ"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "የገጽ ሽፋን",
+    "coverVerticalPosition": "የሽፋን ቀጥተኛ አቀማመጥ",
+    "positionFromTop": "ከላይ {{position}}%",
+    "closeCoverMenu": "የሽፋን ምናሌ ዝጋ",
+    "changePageCover": "የገጽ ሽፋን ቀይር",
+    "repositionPageCover": "የገጽ ሽፋን አቀማመጥ ቀይር",
+    "removePageCover": "የገጽ ሽፋን አስወግድ",
+    "changeCoverDialog": "ሽፋን ቀይር",
+    "coverSource": "የሽፋን ምንጭ",
+    "selectCover": "ሽፋን {{number}} ምረጥ",
+    "uploadFromDevice": "ከዚህ መሳሪያ የሽፋን ምስል ጫን",
+    "uploadingFile": "{{fileName}} በመጫን ላይ",
+    "coverImageLink": "የሽፋን ምስል አገናኝ"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "detail": "Spróbuj ponownie. Jeśli problem będzie się powtarzał, przeładuj aplikację i udostępnij poniższy numer referencyjny.",
+  "reference": "Numer referencyjny: {{reference}}",
+  "reload": "Przeładuj aplikację",
+  "retry": "Spróbuj ponownie",
+  "title": "Coś poszło nie tak podczas wyświetlania tej treści."
 }

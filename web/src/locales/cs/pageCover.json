@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
-  },
-  "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
-  },
-  "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
-  },
-  "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
-  },
-  "reposition": {
-    "hint": "Drag image to reposition"
-  },
-  "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
-  },
-  "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "changeCover": "Změnit obálku",
+    "remove": "Odebrat",
+    "reposition": "Přemístit",
+    "savePosition": "Uložit polohu",
+    "submit": "Odeslat",
+    "uploadFile": "Nahrát soubor",
+    "uploading": "Nahrávání…"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "changeCoverDialog": "Změnit obálku",
+    "changePageCover": "Změnit obálku stránky",
+    "closeCoverMenu": "Zavřít nabídku obálky",
+    "coverImageLink": "Odkaz na obrázek obálky",
+    "coverSource": "Zdroj obálky",
+    "coverVerticalPosition": "Svislá poloha obálky",
+    "pageCover": "Obálka stránky",
+    "positionFromTop": "{{position}}% shora",
+    "removePageCover": "Odebrat obálku stránky",
+    "repositionPageCover": "Změnit polohu obálky stránky",
+    "selectCover": "Vybrat obálku {{number}}",
+    "uploadFromDevice": "Nahrát obrázek obálky z tohoto zařízení",
+    "uploadingFile": "Nahrávání {{fileName}}"
+  },
+  "link": {
+    "invalid": "Vložte odkaz na obrázek (http nebo https).",
+    "placeholder": "Vložit odkaz na obrázek"
+  },
+  "progress": {
+    "complete": "Dokončeno",
+    "finalizing": "Dokončování",
+    "preparing": "Příprava nahrávání",
+    "uploading": "Nahrávání"
+  },
+  "reposition": {
+    "hint": "Přetáhněte obrázek pro změnu polohy"
+  },
+  "tabs": {
+    "gallery": "Galerie",
+    "link": "Odkaz",
+    "upload": "Nahrát"
+  },
+  "toast": {
+    "removed": "Obálka odstraněna",
+    "restored": "Obálka obnovena",
+    "undo": "Vrátit zpět"
+  },
+  "upload": {
+    "defaultFileName": "Titulní obrázek",
+    "error": "Tento obrázek se nepodařilo nahrát."
   }
 }

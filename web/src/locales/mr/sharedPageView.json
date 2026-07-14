@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "सामायिक पृष्ठ",
+  "loading": "सामायिक पृष्ठ लोड करत आहे",
+  "unavailable": "हे सामायिक पृष्ठ अनुपलब्ध आहे.",
+  "notFound": "सामायिक पृष्ठ सापडले नाही.",
+  "outsideShare": "हे पृष्ठ या सार्वजनिक सामायिकरणाचा भाग नाही.",
+  "errors": {
+    "not-found": "हा दुवा कालबाह्य झाला असावा, अप्रकाशित केला गेला असावा, किंवा चुकीच्या पद्धतीने कॉपी केला गेला असावा.",
+    "offline": "तुमचे कनेक्शन तपासा, नंतर सामायिक पृष्ठ पुन्हा उघडण्याचा प्रयत्न करा.",
+    "rate-limited": "या सामायिक पृष्ठावर खूप विनंत्या येत आहेत. थोडा वेळ थांबा आणि पुन्हा प्रयत्न करा.",
+    "unavailable": "Hanji सध्या हे सामायिक पृष्ठ उघडू शकले नाही. थोड्या वेळाने पुन्हा प्रयत्न करा."
+  },
+  "tryAgain": "पुन्हा प्रयत्न करा"
 }

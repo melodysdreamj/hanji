@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Hali suhbatlar yo‘q. Boshlash uchun sahifaga izoh qoldiring yoki kimnidir eslatib o‘ting.",
+  "leave": "Chiqish",
+  "leaveAria": "{{title}} suhbatidan chiqish",
+  "open": "{{title}} suhbatini ochish",
+  "participants_one": "{{count}} nafar ishtirokchi",
+  "participants_other": "{{count}} nafar ishtirokchi",
+  "untitled": "Nomsiz",
+  "loading": "Suhbatlar yuklanmoqda…"
 }

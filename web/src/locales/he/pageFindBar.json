@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "חיפוש בדף"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "חיפוש בדף",
+    "placeholder": "חיפוש בדף"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "התאמה קודמת",
+    "next": "התאמה הבאה",
+    "close": "סגור חיפוש"
   }
 }

@@ -93,12 +93,13 @@ afterEach(() => {
 });
 
 describe("addComment terminal drop", () => {
-  it("rolls the phantom optimistic comment back and rethrows", async () => {
+  it("returns the optimistic comment immediately and rolls it back after a terminal drop", async () => {
     vi.mocked(createCommentRemote).mockRejectedValue(httpError(403));
 
-    await expect(useStore.getState().addComment("p1", "hello")).rejects.toMatchObject({
-      status: 403,
-    });
+    const comment = await useStore.getState().addComment("p1", "hello");
+    expect(useStore.getState().commentsByPage.p1).toContainEqual(comment);
+
+    await vi.advanceTimersByTimeAsync(0);
 
     expect(useStore.getState().commentsByPage.p1 ?? []).toHaveLength(0);
     expect(hasToast("edit access")).toBe(true);

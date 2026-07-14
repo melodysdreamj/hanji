@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "errors": {
+    "not-found": "Linkki on saattanut vanhentua, olla poistettu julkaisusta tai kopioitu väärin.",
+    "offline": "Tarkista verkkoyhteytesi ja yritä avata jaettu sivu uudelleen.",
+    "rate-limited": "Tämä jaettu sivu vastaanottaa liian monta pyyntöä. Odota hetki ja yritä uudelleen.",
+    "unavailable": "Hanji ei voinut avata tätä jaettua sivua juuri nyt. Yritä uudelleen hetken kuluttua."
+  },
+  "loading": "Ladataan jaettua sivua",
+  "notFound": "Jaettua sivua ei löytynyt.",
+  "outsideShare": "Sivu ei kuulu tähän julkiseen jakoon.",
+  "title": "Jaettu sivu",
+  "tryAgain": "Yritä uudelleen",
+  "unavailable": "Tämä jaettu sivu ei ole käytettävissä."
 }

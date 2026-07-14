@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Teksformatering"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Omskep na",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Teks",
+      "heading1": "Opskrif 1",
+      "heading2": "Opskrif 2",
+      "heading3": "Opskrif 3",
+      "heading4": "Opskrif 4",
+      "toDoList": "Doenlys",
+      "bulletedList": "Kolpuntlys",
+      "numberedList": "Genommerde lys",
+      "toggleList": "Wissellys",
+      "quote": "Aanhaling",
+      "callout": "Uitlig",
+      "code": "Kode"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Vet",
+    "italic": "Kursief",
+    "underline": "Onderstreep",
+    "strikethrough": "Deurstreep",
+    "code": "Kode",
+    "link": "Skakel"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Kommentaar"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Tekskleur: {{color}}",
+    "title": "Kleur: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Gemeng",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Tekskleur",
+      "default": "Verstek",
+      "gray": "Grys",
+      "brown": "Bruin",
+      "orange": "Oranje",
+      "yellow": "Geel",
+      "green": "Groen",
+      "blue": "Blou",
+      "purple": "Pers",
+      "pink": "Pienk",
+      "red": "Rooi"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Agtergrondkleur",
+      "gray": "Grys agtergrond",
+      "brown": "Bruin agtergrond",
+      "orange": "Oranje agtergrond",
+      "yellow": "Geel agtergrond",
+      "green": "Groen agtergrond",
+      "blue": "Blou agtergrond",
+      "purple": "Pers agtergrond",
+      "pink": "Pienk agtergrond",
+      "red": "Rooi agtergrond"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Wysig skakel",
+    "placeholder": "Plak skakel",
+    "urlAriaLabel": "Skakel-URL",
+    "apply": "Skakel",
+    "open": "Maak skakel oop",
+    "copy": "Kopieer skakel",
+    "copied": "Gekopieer",
+    "copiedLink": "Skakel gekopieer",
+    "remove": "Verwyder"
   }
 }

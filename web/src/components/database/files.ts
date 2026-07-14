@@ -2,6 +2,7 @@ import type { FileAttachment } from "@/lib/types";
 import { activePersistentGeneratedLabels } from "@/lib/persistentGeneratedLabels";
 
 const IMAGE_EXT = /\.(avif|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i;
+const PDF_EXT = /\.pdf(?:[?#].*)?$/i;
 
 function asString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
@@ -90,7 +91,25 @@ export function isImageAttachment(file: FileAttachment) {
   return (
     file.type?.startsWith("image/") ||
     file.url.startsWith("data:image/") ||
+    IMAGE_EXT.test(file.name) ||
     IMAGE_EXT.test(file.url)
+  );
+}
+
+export function isPreviewableImageAttachment(file: FileAttachment) {
+  const type = file.type?.split(";", 1)[0]?.trim().toLowerCase();
+  if (type === "image/svg+xml") return false;
+  if (file.url.toLowerCase().startsWith("data:image/svg+xml")) return false;
+  if (/\.svg(?:[?#].*)?$/i.test(file.name) || /\.svg(?:[?#].*)?$/i.test(file.url)) return false;
+  return isImageAttachment(file);
+}
+
+export function isPdfAttachment(file: FileAttachment) {
+  return (
+    file.type?.split(";", 1)[0]?.trim().toLowerCase() === "application/pdf" ||
+    file.url.toLowerCase().startsWith("data:application/pdf") ||
+    PDF_EXT.test(file.name) ||
+    PDF_EXT.test(file.url)
   );
 }
 

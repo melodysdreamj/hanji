@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Tekst",
+      "description": "Počnite da pišete običnim tekstom.",
+      "placeholder": "Ukucajte '/' za komande"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Stranica",
+      "description": "Kreiraj podstranicu unutar ove stranice."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Link ka stranici",
+      "description": "Повежите са постојећом страницом."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Наслов 1",
+      "description": "Велики наслов секције.",
+      "placeholder": "Наслов 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Preklopni naslov 1",
+      "description": "Veliki naslov koji može sakriti ugnježđeni sadržaj.",
+      "placeholder": "Preklopni naslov 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Наслов 2",
+      "description": "Средњи наслов секције.",
+      "placeholder": "Наслов 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Preklopni naslov 2",
+      "description": "Srednji naslov koji može sakriti ugneždeni sadržaj.",
+      "placeholder": "Preklopni naslov 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Наслов 3",
+      "description": "Мали наслов секције.",
+      "placeholder": "Наслов 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Preklopni naslov 3",
+      "description": "Mali naslov koji može sakriti ugneždeni sadržaj.",
+      "placeholder": "Preklopni naslov 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Наслов 4",
+      "description": "Компактни наслов секције.",
+      "placeholder": "Наслов 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Preklopni naslov 4",
+      "description": "Kompaktni naslov koji može da sakrije ugnježđeni sadržaj.",
+      "placeholder": "Preklopni naslov 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Lista obaveza",
+      "description": "Označite zadatke checkbox-om.",
+      "placeholder": "Obaveza"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Nabrajanje",
+      "description": "Napravi listu sa nabrajanjem.",
+      "placeholder": "Lista"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Numerisana lista",
+      "description": "Napravite numerisanu listu.",
+      "placeholder": "Lista"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Preklopna lista",
+      "description": "Preklopnici mogu da sakriju i prikažu sadržaj.",
+      "placeholder": "Preklopnik"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citat",
+      "description": "Zabeležite citat.",
+      "placeholder": "Prazan citat"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Istaknuti tekst",
+      "description": "Istakni tekst.",
+      "placeholder": "Unesite nešto…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Razdelnik",
+      "description": "Vizuelno razdvoji blokove."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kod",
+      "description": "Snimi isečak koda.",
+      "placeholder": "Napiši kod ili nalepi isečak…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Jednačina",
+      "description": "Prikaži matematičku jednačinu."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Sadržaj",
+      "description": "Prikaži linkove ka naslovima na ovoj stranici."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Sinhronizovani blok",
+      "description": "Ponovo koristite sadržaj na više stranica."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Dugme",
+      "description": "Umetni sadržaj za ponovnu upotrebu jednim klikom."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Kartice",
+      "description": "Grupirajte sadržaj u označene tabove.",
+      "placeholder": "Kartice"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Hlebne mrvice",
+      "description": "Pokaži gde se ova stranica nalazi."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Дуплирај",
+      "description": "Направи тачну копију овог блока."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Premešti",
+      "description": "Premešti ovaj blok na drugu stranicu."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Обриши овај блок."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Pretvori u",
+      "description": "Promeni tip ovog bloka."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Боја",
+      "description": "Промени боју текста или позадине овог блока."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabela",
+      "description": "Dodajte jednostavnu tabelu na ovu stranicu."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 kolone",
+      "description": "Postavi blokove jedan pored drugog."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 kolone",
+      "description": "Rasporedi blokove u tri kolone."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 kolone",
+      "description": "Rasporedi blokove u četiri kolone."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 kolona",
+      "description": "Rasporedi blokove u pet kolona."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Слика",
+      "description": "Отпремите или уградите преко линка."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Ugradite video pomoću linka."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Ugradi audio preko linka."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Web obeleživač",
+      "description": "Sačuvaj link kao karticu."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Ugradi",
+      "description": "Ugradi sadržaj sa linka."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Датотека",
+      "description": "Priloži link ka fajlu na ovu stranicu."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Baza podataka - Cela stranica",
+      "description": "Dodaj novu bazu podataka kao podstranicu."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabela - Cela stranica",
+      "description": "Dodaj tabelu baze podataka na celoj stranici."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Tabla - Cela stranica",
+      "description": "Dodaj kanban tablu na celoj stranici."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Lista - Cela stranica",
+      "description": "Dodaj listu baze podataka na celoj stranici."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Vremenska linija - Cela stranica",
+      "description": "Dodaj vremensku liniju baze podataka na celoj stranici."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalendar - Cela stranica",
+      "description": "Dodaj bazu podataka kalendara na celoj stranici."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galerija - Cela stranica",
+      "description": "Dodaj galeriju baze podataka na celoj stranici."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "База података - Инлине",
+      "description": "Додајте базу података унутар ове странице."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Преглед табеле",
+      "description": "Додајте инлине базу података као табелу."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Преглед табле",
+      "description": "Додајте инлине канбан таблу."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Преглед листе",
+      "description": "Додајте инлине базу података као листу."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Преглед временске линије",
+      "description": "Додајте инлине временску линију базе података."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Преглед календара",
+      "description": "Додајте инлине календарску базу података."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Преглед галерије",
+      "description": "Додајте инлине галерију базе података."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Podrazumevano",
+      "description": "Ukloni boju teksta ili pozadine iz ovog bloka."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Siva",
+      "description": "Primeni sivu na ovaj blok."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Smeđa",
+      "description": "Primeni smeđu boju na ovaj blok."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Narandžasta",
+      "description": "Primeni narandžastu na ovaj blok."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Žuta",
+      "description": "Primeni žutu na ovaj blok."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Zelena",
+      "description": "Primeni zelenu na ovaj blok."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Plava",
+      "description": "Primeni plavu boju na ovaj blok."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Ljubičasta",
+      "description": "Primeni ljubičastu na ovaj blok."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Ružičasta",
+      "description": "Primeni ružičastu na ovaj blok."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Crvena",
+      "description": "Primeni crvenu na ovaj blok."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Siva pozadina",
+      "description": "Primeni sivu pozadinu na ovaj blok."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Smeđa pozadina",
+      "description": "Primeni smeđu pozadinu na ovaj blok."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Narandžasta pozadina",
+      "description": "Primeni narandžastu pozadinu na ovaj blok."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Žuta pozadina",
+      "description": "Primeni žutu pozadinu na ovaj blok."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Zelena pozadina",
+      "description": "Primeni zelenu pozadinu na ovaj blok."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Plava pozadina",
+      "description": "Primeni plavu pozadinu na ovaj blok."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Ljubičasta pozadina",
+      "description": "Primeni ljubičastu pozadinu na ovaj blok."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Ružičasta pozadina",
+      "description": "Primeni ružičastu pozadinu na ovaj blok."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Crvena pozadina",
+      "description": "Primeni crvenu pozadinu na ovaj blok."
     }
   }
 }

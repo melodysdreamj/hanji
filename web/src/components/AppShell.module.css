@@ -86,45 +86,6 @@
   width: 100vw;
   background: var(--bg-app);
 }
-.bootLoading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.4;
-  animation: bootFadeIn 0.4s ease 0.15s both;
-}
-.bootSpinner {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2.5px solid var(--bg-active);
-  border-top-color: var(--text-secondary);
-  animation: bootSpin 0.8s linear infinite;
-}
-@keyframes bootSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes bootFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .bootSpinner {
-    animation-duration: 1.6s;
-  }
-  .bootLoading {
-    animation: none;
-  }
-}
 .bootCard {
   max-width: 360px;
   padding: 24px 28px;

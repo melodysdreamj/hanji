@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Stäng ikonväljare",
+    "label": "Välj ikon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Ikontyp",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Bild"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Ta bort",
+    "ariaLabel": "Ta bort ikon"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchLabel": "Sök ikoner",
+    "random": "Slumpa",
+    "randomLabel": "Välj en slumpad ikon",
+    "recentLabel": "Senast använda först",
+    "gridLabelRecent": "Ikoner, senast använda först",
+    "gridLabel": "Ikoner",
+    "optionLabel": "Välj ikonen {{emoji}}",
+    "noResults": "Inga ikoner matchar “{{query}}”. Prova ett annat ord eller rensa filtret."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Bild",
+    "linkPlaceholder": "Klistra in bildlänk",
+    "linkLabel": "Länk till ikonbild",
+    "apply": "Verkställ",
+    "upload": "Ladda upp fil",
+    "uploading": "Laddar upp...",
+    "uploadingLabel": "Laddar upp {{fileName}}",
+    "uploadFailed": "Det gick inte att ladda upp den bilden.",
+    "fallbackFileName": "Ikonbild"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Förbereder uppladdning",
+    "finalizing": "Slutför",
+    "complete": "Klart",
+    "uploading": "Laddar upp"
   }
 }

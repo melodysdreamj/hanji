@@ -74,7 +74,7 @@ describe("moveDatabaseRow order rollback (#18)", () => {
 });
 
 describe("addRow phantom rollback (#19)", () => {
-  it("removes the optimistic row from state and rethrows on a terminal rejection", async () => {
+  it("returns the optimistic row immediately and removes it after a terminal rejection", async () => {
     const database = makePage({
       id: "db",
       kind: "database",
@@ -91,12 +91,15 @@ describe("addRow phantom rollback (#19)", () => {
 
     const idsBefore = Object.keys(useStore.getState().pagesById).sort();
 
-    await expect(useStore.getState().addRow("db")).rejects.toBeTruthy();
+    const row = await useStore.getState().addRow("db");
+    expect(useStore.getState().pagesById[row.id]).toEqual(row);
 
-    const state = useStore.getState();
-    // No phantom page survives in either the id map or the ordered row list.
-    expect(Object.keys(state.pagesById).sort()).toEqual(idsBefore);
-    expect(state.databaseRowIdsByDb["db"]).toEqual([]);
+    await vi.waitFor(() => {
+      const state = useStore.getState();
+      // No phantom page survives in either the id map or the ordered row list.
+      expect(Object.keys(state.pagesById).sort()).toEqual(idsBefore);
+      expect(state.databaseRowIdsByDb["db"]).toEqual([]);
+    });
   });
 
   it("guards addRow with the create-page permission check", async () => {

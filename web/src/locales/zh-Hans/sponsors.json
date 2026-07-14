@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> 赞助 Hanji 成长",
+  "builtWith": "<a>{{name}}</a> 帮助构建 Hanji",
+  "supportTitle": "赞助 Hanji",
+  "settingsIntro": "Hanji 依靠赞助者支持。登录界面会展示当前前五位赞助者的小横幅。",
+  "rule1": "横幅按剩余余额展示前五位赞助者。",
+  "rule2": "每月所有展示赞助者的余额均按第五名余额等额扣除，实现公平分摊。",
+  "rule3": "余额用尽时，位次按余额传递给下一位赞助者。",
+  "rule4": "默认启用横幅是获得 Hanji 许可豁免的关键；无横幅的封闭版本需另行获取商业许可。",
+  "sponsorSlots": "当前赞助者",
+  "emptySlot": "空位 — 赞助后此处显示",
+  "becomeSponsor": "成为赞助者",
+  "builtWithTitle": "构建自",
+  "builtWithIntro": "Hanji 借助这些工具和平台构建而成。"
+}

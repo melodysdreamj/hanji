@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Εκτός σύνδεσης",
+  "offlinePending_one": "Εκτός σύνδεσης · {{count}} αλλαγή σε εκκρεμότητα",
+  "offlinePending_other": "Εκτός σύνδεσης · {{count}} αλλαγές σε εκκρεμότητα",
+  "syncing": "Συγχρονισμός · {{count}}",
+  "unreachable": "Αδυναμία σύνδεσης με τον διακομιστή",
+  "unreachablePending_one": "Αδυναμία σύνδεσης με τον διακομιστή · {{count}} αλλαγή σε εκκρεμότητα",
+  "unreachablePending_other": "Αδυναμία σύνδεσης με τον διακομιστή · {{count}} αλλαγές σε εκκρεμότητα",
+  "retryHint": "Κλικ για επανάληψη τώρα"
 }

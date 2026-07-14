@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "باز کردن قفل داده‌های محلی",
+  "description": "داده‌های آفلاین این دستگاه با یک عبارت عبور قفل شده است. باز کردن قفل، استفاده و ذخیره‌سازی آفلاین را دوباره فعال می‌کند.",
+  "passphrasePlaceholder": "عبارت عبور",
+  "unlock": "باز کردن قفل",
+  "continueOnline": "ادامه فقط به صورت آنلاین",
+  "continueOnlineHint": "\"ادامه فقط به صورت آنلاین\" ویرایش‌های آفلاین قفل‌شده این دستگاه را مهر و موم نگه می‌دارد — آنها در این دستگاه باقی می‌مانند و تا زمانی که با عبارت عبور صحیح آن‌ها را باز نکنید، همگام‌سازی نمی‌شوند.",
+  "wrongPassphrase": "آن عبارت عبور صحیح نیست.",
+  "unsupportedBrowser": "قفل محلی در این مرورگر در دسترس نیست."
 }

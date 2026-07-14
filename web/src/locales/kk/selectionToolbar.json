@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Мәтінді пішімдеу"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Түрлендіру",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Мәтін",
+      "heading1": "Тақырып 1",
+      "heading2": "Тақырып 2",
+      "heading3": "Тақырып 3",
+      "heading4": "Тақырып 4",
+      "toDoList": "Істер тізімі",
+      "bulletedList": "Маркерленген тізім",
+      "numberedList": "Нөмірленген тізім",
+      "toggleList": "Жиналмалы тізім",
+      "quote": "Дәйексөз",
+      "callout": "Ескертпе",
+      "code": "Код"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Қалың",
+    "italic": "Курсив",
+    "underline": "Асты сызылған",
+    "strikethrough": "Сызылған",
+    "code": "Код",
+    "link": "Сілтеме"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Пікір"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Мәтін түсі: {{color}}",
+    "title": "Түс: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Аралас",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Мәтін түсі",
+      "default": "Әдепкі",
+      "gray": "Сұр",
+      "brown": "Қоңыр",
+      "orange": "Қызғылт сары",
+      "yellow": "Сары",
+      "green": "Жасыл",
+      "blue": "Көк",
+      "purple": "Күлгін",
+      "pink": "Қызғылт",
+      "red": "Қызыл"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Фон түсі",
+      "gray": "Сұр фон",
+      "brown": "Қоңыр фон",
+      "orange": "Оранж фон",
+      "yellow": "Сары фон",
+      "green": "Жасыл фон",
+      "blue": "Көк фон",
+      "purple": "Күлгін фон",
+      "pink": "Қызғылт фон",
+      "red": "Қызыл фон"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Сілтемені өңдеу",
+    "placeholder": "Сілтемені қою",
+    "urlAriaLabel": "Сілтеме URL",
+    "apply": "Сілтеме",
+    "open": "Сілтемені ашу",
+    "copy": "Сілтемені көшіру",
+    "copied": "Көшірілді",
+    "copiedLink": "Сілтеме көшірілді",
+    "remove": "Жою"
   }
 }

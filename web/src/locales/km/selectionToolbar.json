@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "ទម្រង់អក្សរ"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "ប្តូរទៅជា",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "អត្ថបទ",
+      "heading1": "ចំណងជើង ១",
+      "heading2": "ចំណងជើង ២",
+      "heading3": "ចំណងជើង ៣",
+      "heading4": "ចំណងជើង ៤",
+      "toDoList": "បញ្ជីកិច្ចការ",
+      "bulletedList": "បញ្ជីចំណុច",
+      "numberedList": "បញ្ជីរាយលេខ",
+      "toggleList": "បញ្ជីបត់/ពង្រីក",
+      "quote": "សម្រង់",
+      "callout": "ប្រអប់ព័ត៌មាន",
+      "code": "កូដ"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ដិត",
+    "italic": "ទ្រេត",
+    "underline": "គូសបន្ទាត់ក្រោម",
+    "strikethrough": "ឆូតកាត់",
+    "code": "កូដ",
+    "link": "តំណ"
   },
   "comment": {
-    "label": "Comment"
+    "label": "មតិយោបល់"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "ពណ៌អក្សរ: {{color}}",
+    "title": "ពណ៌: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ចម្រុះ",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "ពណ៌អក្សរ",
+      "default": "លំនាំដើម",
+      "gray": "ប្រផេះ",
+      "brown": "ត្នោត",
+      "orange": "ទឹកក្រូច",
+      "yellow": "លឿង",
+      "green": "បៃតង",
+      "blue": "ខៀវ",
+      "purple": "ស្វាយ",
+      "pink": "ផ្កាឈូក",
+      "red": "ក្រហម"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "ពណ៌ផ្ទៃខាងក្រោយ",
+      "gray": "ផ្ទៃខាងក្រោយពណ៌ប្រផេះ",
+      "brown": "ផ្ទៃខាងក្រោយពណ៌ត្នោត",
+      "orange": "ផ្ទៃខាងក្រោយពណ៌ទឹកក្រូច",
+      "yellow": "ផ្ទៃខាងក្រោយពណ៌លឿង",
+      "green": "ផ្ទៃខាងក្រោយពណ៌បៃតង",
+      "blue": "ផ្ទៃខាងក្រោយពណ៌ខៀវ",
+      "purple": "ផ្ទៃខាងក្រោយពណ៌ស្វាយ",
+      "pink": "ផ្ទៃខាងក្រោយពណ៌ផ្កាឈូក",
+      "red": "ផ្ទៃខាងក្រោយពណ៌ក្រហម"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "កែសម្រួលតំណ",
+    "placeholder": "បិទភ្ជាប់តំណ",
+    "urlAriaLabel": "URL តំណ",
+    "apply": "តំណ",
+    "open": "បើកតំណ",
+    "copy": "ចម្លងតំណ",
+    "copied": "បានចម្លង",
+    "copiedLink": "បានចម្លងតំណ",
+    "remove": "លុប"
   }
 }

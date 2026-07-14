@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Смяна на корица",
+    "reposition": "Преместване",
+    "remove": "Премахване",
+    "uploadFile": "Качи файл",
+    "uploading": "Качване...",
+    "submit": "Потвърди",
+    "savePosition": "Запази позиция"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Галерия",
+    "upload": "Качване",
+    "link": "Линк"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Поставете линк на изображение",
+    "invalid": "Поставете http или https линк на изображение."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Неуспешно качване на изображението.",
+    "defaultFileName": "Корица"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Влачете за преместване"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Подготовка",
+    "finalizing": "Финализиране",
+    "complete": "Готово",
+    "uploading": "Качване"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Корицата е премахната",
+    "restored": "Корицата е възстановена",
+    "undo": "Отмяна"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Корица на страница",
+    "coverVerticalPosition": "Вертикална позиция",
+    "positionFromTop": "{{position}}% от горе",
+    "closeCoverMenu": "Затваряне на менюто",
+    "changePageCover": "Промяна на корица на страница",
+    "repositionPageCover": "Преместване на корицата",
+    "removePageCover": "Премахване на корицата",
+    "changeCoverDialog": "Промяна на корица",
+    "coverSource": "Източник на корица",
+    "selectCover": "Избор на корица {{number}}",
+    "uploadFromDevice": "Качване от устройство",
+    "uploadingFile": "Качване на {{fileName}}",
+    "coverImageLink": "Линк на корица"
   }
 }

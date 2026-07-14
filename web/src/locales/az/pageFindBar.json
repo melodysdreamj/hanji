@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Səhifədə axtar"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Səhifədə axtar",
+    "placeholder": "Səhifədə axtar"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Əvvəlki uyğunluq",
+    "next": "Növbəti uyğunluq",
+    "close": "Axtarışı bağla"
   }
 }

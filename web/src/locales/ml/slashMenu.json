@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "ബ്ലോക്ക് കമാൻഡുകൾ",
+  "closeBlockCommands": "ബ്ലോക്ക് കമാൻഡുകൾ അടയ്ക്കുക",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "അടിസ്ഥാന ബ്ലോക്കുകൾ",
+    "Media": "മീഡിയ",
+    "Database": "ഡാറ്റാബേസ്",
+    "Advanced": "വിപുല ബ്ലോക്കുകൾ"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}} ൽ {{position}}. ചേർക്കാൻ Enter അമർത്തുക.",
+  "listStatus": "{{total}} ബ്ലോക്ക് കമാൻഡുകൾ ലഭ്യം.",
+  "noBlocks": "ബ്ലോക്കുകളൊന്നും കണ്ടെത്തിയില്ല",
+  "noBlocksFor": "{{query}} എന്നതിന് ബ്ലോക്കുകളൊന്നും കണ്ടെത്തിയില്ല",
+  "recentlyUsed": "അടുത്തിടെ ഉപയോഗിച്ചവ"
 }

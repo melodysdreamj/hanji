@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "A abrir página",
+  "workspace": "Espaço de trabalho",
+  "emptyWorkspace": "Espaço de trabalho vazio",
+  "untitled": "Sem título",
+  "newPage": "Nova página"
 }

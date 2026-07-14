@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "ព័ត៌មានផ្លូវច្បាប់ និងប្រភព",
+  "noWarranty": "ផ្តល់ជូនដោយគ្មានការធានា។",
+  "sourceCode": "ប្រភព",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "ករណីលើកលែង 2.0"
 }

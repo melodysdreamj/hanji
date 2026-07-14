@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "أوامر الكتل",
+  "closeBlockCommands": "إغلاق أوامر الكتل",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "الكتل الأساسية",
+    "Media": "الوسائط",
+    "Database": "قاعدة البيانات",
+    "Advanced": "الكتل المتقدمة"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}، {{position}} من {{total}}. اضغط Enter للإدراج.",
+  "listStatus": "{{total}} من أوامر الكتل متاحة",
+  "noBlocks": "لا توجد كتل",
+  "noBlocksFor": "لا توجد كتل لـ \"{{query}}\"",
+  "recentlyUsed": "المستخدمة مؤخراً"
 }

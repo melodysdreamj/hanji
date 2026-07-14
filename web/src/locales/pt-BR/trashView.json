@@ -1,35 +1,35 @@
 {
   "trash": "Lixeira",
-  "empty": "As páginas que você exclui vão para cá. Nada na lixeira.",
+  "empty": "Páginas que você exclui vão parar aqui. A lixeira está vazia.",
   "searchTrash": "Pesquisar na lixeira",
   "deletedPages": "Páginas excluídas",
   "noSearchMatches": "Nenhuma página excluída corresponde à sua pesquisa.",
   "pageCount_one": "{{count}} página",
   "pageCount_other": "{{count}} páginas",
-  "deletedJustNow": "Excluída agora há pouco",
-  "deletedOn": "Excluída em {{date}}",
+  "deletedJustNow": "Excluído agora",
+  "deletedOn": "Excluído em {{date}}",
   "actions": {
     "restore": "Restaurar",
-    "deleteForever": "Excluir para sempre",
+    "deleteForever": "Excluir permanentemente",
     "emptyTrash": "Esvaziar lixeira"
   },
   "aria": {
     "openFromTrash": "Abrir {{title}} da lixeira",
     "restorePage": "Restaurar {{title}}",
-    "deletePageForever": "Excluir {{title}} para sempre",
+    "deletePageForever": "Excluir {{title}} permanentemente",
     "cancelPermanentDelete": "Cancelar exclusão permanente",
     "cancelEmptyTrash": "Cancelar esvaziamento da lixeira"
   },
   "confirm": {
-    "deleteTitle": "Excluir para sempre?",
+    "deleteTitle": "Excluir permanentemente?",
     "deleteBodyPrefix": "Isso excluirá permanentemente ",
     "deleteBodySuffix": ". Você não pode desfazer esta ação.",
-    "emptyTitle": "Esvaziar a lixeira?",
-    "emptyBody_one": "Isso excluirá permanentemente todas as {{count}} página da lixeira. Você não pode desfazer esta ação.",
-    "emptyBody_other": "Isso excluirá permanentemente todas as {{count}} páginas da lixeira. Você não pode desfazer esta ação."
+    "emptyTitle": "Esvaziar lixeira?",
+    "emptyBody_one": "Isso excluirá permanentemente {{count}} página na lixeira. Você não pode desfazer esta ação.",
+    "emptyBody_other": "Isso excluirá permanentemente {{count}} páginas na lixeira. Você não pode desfazer esta ação."
   },
   "toast": {
-    "deletedForever": "Excluída para sempre",
+    "deletedForever": "Excluído permanentemente",
     "couldntDelete": "Não foi possível excluir a página",
     "restored": "Página restaurada",
     "couldntRestore": "Não foi possível restaurar a página",

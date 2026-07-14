@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Matsar zuwa",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Tushen wurin aiki",
+    "path": "Matakin farko"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Nemo wuraren matsawa",
+    "placeholder": "Nemo shafuka..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Rufe tattaunawar motsi"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Wuraren matsawa",
+    "empty": "Ba a sami shafuka ba.",
+    "destinationLabel": "Matsar zuwa {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Ƙirƙiri \"{{title}}\"",
+    "optionLabel": "Ƙirƙiri shafi {{title}} kuma matsar anan",
+    "hint": "Sabon shafi na sama - matsar anan"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Shafin iyaye da aka kulle",
+    "page": "Shafin da aka kulle"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Shafin yana cikin mahaifa da aka kulle",
+    "locked": "Shafin yana kulle",
+    "moved": "An matsar da shafin",
+    "moveFailed": "An kasa matsar da shafin"
   }
 }

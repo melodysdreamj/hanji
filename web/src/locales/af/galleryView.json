@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Hierdie databasis het nog geen bladsye nie.",
+  "emptyTitle": "Nog geen bladsye",
+  "newInline": "Nuut",
+  "newPage": "Nuwe bladsy",
+  "newPageIn": "Nuwe bladsy in {{dbTitle}}",
+  "noResultsDesc": "Geen bladsye pas by die huidige filters of soektog nie.",
+  "noResultsTitle": "Geen resultate",
+  "openRow": "Maak {{title}} oop"
 }

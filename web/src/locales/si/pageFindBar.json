@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "පිටුවේ සොයන්න"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "පිටුවේ සොයන්න",
+    "placeholder": "පිටුවේ සොයන්න"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "පෙර ගැලපීම",
+    "next": "ඊළඟ ගැලපීම",
+    "close": "සොයා වසන්න"
   }
 }

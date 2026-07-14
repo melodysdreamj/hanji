@@ -1,76 +1,76 @@
 {
-  "toolbar": {
-    "ariaLabel": "Text formatting"
-  },
-  "turnInto": {
-    "label": "Turn into",
-    "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
-    }
-  },
-  "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
-  },
-  "comment": {
-    "label": "Comment"
-  },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Tekstin väri: {{color}}",
+    "title": "Väri: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
-    "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
-    },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "blue": "Sininen tausta",
+      "brown": "Ruskea tausta",
+      "gray": "Harmaa tausta",
+      "green": "Vihreä tausta",
+      "heading": "Taustaväri",
+      "orange": "Oranssi tausta",
+      "pink": "Vaaleanpunainen tausta",
+      "purple": "Violetti tausta",
+      "red": "Punainen tausta",
+      "yellow": "Keltainen tausta"
+    },
+    "mixed": "Sekoitettu",
+    "text": {
+      "blue": "Sininen",
+      "brown": "Ruskea",
+      "default": "Oletus",
+      "gray": "Harmaa",
+      "green": "Vihreä",
+      "heading": "Tekstin väri",
+      "orange": "Oranssi",
+      "pink": "Pinkki",
+      "purple": "Violetti",
+      "red": "Punainen",
+      "yellow": "Keltainen"
     }
   },
+  "comment": {
+    "label": "Kommentti"
+  },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "apply": "Linkki",
+    "ariaLabel": "Muokkaa linkkiä",
+    "copied": "Kopioitu",
+    "copiedLink": "Linkki kopioitu",
+    "copy": "Kopioi linkki",
+    "open": "Avaa linkki",
+    "placeholder": "Liitä linkki",
+    "remove": "Poista",
+    "urlAriaLabel": "Linkin URL"
+  },
+  "marks": {
+    "bold": "Lihavoitu",
+    "code": "Koodi",
+    "italic": "Kursivoitu",
+    "link": "Linkki",
+    "strikethrough": "Yliviivaus",
+    "underline": "Alleviivaus"
+  },
+  "toolbar": {
+    "ariaLabel": "Tekstin muotoilu"
+  },
+  "turnInto": {
+    "label": "Muuta",
+    "options": {
+      "bulletedList": "Luettelomerkit",
+      "callout": "Huomio",
+      "code": "Koodi",
+      "heading1": "Otsikko 1",
+      "heading2": "Otsikko 2",
+      "heading3": "Otsikko 3",
+      "heading4": "Otsikko 4",
+      "numberedList": "Numeroitu lista",
+      "quote": "Lainaus",
+      "text": "Teksti",
+      "toDoList": "Tehtävälista",
+      "toggleList": "Taitettava lista"
+    }
   }
 }

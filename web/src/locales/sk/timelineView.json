@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Pridať vlastnosť dátumu",
+    "description": "Zobrazenia časovej osi potrebujú vlastnosť dátumu začiatku na zobrazenie stránok v čase."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Pridaním vlastnosti dátumu konca zobrazíte rozsahy namiesto jednodňových pruhov.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Priblíženie časovej osi",
+    "day": "Deň",
+    "week": "Týždeň",
+    "month": "Mesiac"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Závislosti:",
+    "hint": "pridať vlastnosť vzťahu",
+    "relationPropertyAriaLabel": "Vlastnosť vzťahu závislostí"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Dnes",
+    "previousRange": "Predchádzajúci rozsah",
+    "nextRange": "Ďalší rozsah",
+    "newPage": "Nový",
+    "newPageIn": "Nová stránka v {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tabuľka časovej osi",
+    "nameHeader": "Názov"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Otvoriť {{title}}",
+    "openAriaLabelWithDates": "Otvoriť {{title}}, {{start}} do {{end}}",
+    "openNoDateAriaLabel": "Otvoriť {{title}}, bez dátumu"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "V tomto rozsahu nie sú žiadne položky.",
+    "noDatedItems": "Zatiaľ žiadne položky s dátumom.",
+    "jumpTo": "Prejsť na {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Bez dátumu ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Žiadne",
+    "untitled": "Bez názvu"
   }
 }

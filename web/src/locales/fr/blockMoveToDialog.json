@@ -2,7 +2,7 @@
   "title": "Déplacer le bloc vers",
   "search": {
     "label": "Rechercher des destinations de déplacement",
-    "placeholder": "Rechercher des pages…"
+    "placeholder": "Rechercher des pages..."
   },
   "dialog": {
     "closeLabel": "Fermer la boîte de dialogue de déplacement"
@@ -13,8 +13,8 @@
     "destinationLabel": "Déplacer le bloc vers {{label}}, {{path}}"
   },
   "create": {
-    "label": "Créer « {{query}} »",
-    "optionLabel": "Créer la page « {{query}} » et y déplacer le bloc",
+    "label": "Créer \"{{query}}\"",
+    "optionLabel": "Créer la page \"{{query}}\" et déplacer le bloc ici",
     "hint": "Nouvelle page - déplacer le bloc ici"
   },
   "locked": {

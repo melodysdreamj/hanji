@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Testo",
+      "description": "Inizia a scrivere in testo semplice.",
+      "placeholder": "Digita '/' per i comandi"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Pagina",
+      "description": "Crea una sottopagina in questa pagina."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Collega a pagina",
+      "description": "Collega a una pagina esistente."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Intestazione 1",
+      "description": "Intestazione di sezione grande.",
+      "placeholder": "Intestazione 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Intestazione a discesa 1",
+      "description": "Titolo grande che può nascondere contenuti annidati.",
+      "placeholder": "Intestazione a discesa 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Intestazione 2",
+      "description": "Intestazione di sezione media.",
+      "placeholder": "Intestazione 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Intestazione a discesa 2",
+      "description": "Intestazione media che può nascondere i contenuti annidati.",
+      "placeholder": "Intestazione a discesa 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Intestazione 3",
+      "description": "Intestazione di sezione piccola.",
+      "placeholder": "Intestazione 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Intestazione a discesa 3",
+      "description": "Intestazione piccola che può nascondere i contenuti annidati.",
+      "placeholder": "Intestazione 3 a scomparsa"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Intestazione 4",
+      "description": "Intestazione di sezione compatta.",
+      "placeholder": "Intestazione 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Intestazione 4 a scomparsa",
+      "description": "Intestazione compatta che può nascondere il contenuto annidato.",
+      "placeholder": "Intestazione 4 a scomparsa"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Lista cose da fare",
+      "description": "Tieni traccia delle attività con una casella di spunta.",
+      "placeholder": "Cose da fare"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Elenco puntato",
+      "description": "Crea un semplice elenco puntato.",
+      "placeholder": "Elenco"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Elenco numerato",
+      "description": "Crea un elenco numerato.",
+      "placeholder": "Elenco"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
+      "label": "Elenco a scomparsa",
+      "description": "I toggle possono nascondere e mostrare il contenuto.",
       "placeholder": "Toggle"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citazione",
+      "description": "Cattura una citazione.",
+      "placeholder": "Citazione vuota"
     },
     "callout": {
       "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "description": "Fai risaltare il testo.",
+      "placeholder": "Scrivi qualcosa…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Divisore",
+      "description": "Divide visivamente i blocchi."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Codice",
+      "description": "Inserisci un frammento di codice.",
+      "placeholder": "Scrivi codice o incolla uno snippet…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Equazione",
+      "description": "Mostra un'equazione matematica."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Indice",
+      "description": "Mostra i collegamenti ai titoli di questa pagina."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Blocco sincronizzato",
+      "description": "Riutilizza i contenuti tra le pagine."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Pulsante",
+      "description": "Inserisci contenuti riutilizzabili con un clic."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Schede",
+      "description": "Raggruppa i contenuti in schede etichettate.",
+      "placeholder": "Schede"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Mostra dove si trova questa pagina."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplica",
+      "description": "Crea una copia esatta di questo blocco."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Sposta in",
+      "description": "Sposta questo blocco in un'altra pagina."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Elimina questo blocco."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Converti in",
+      "description": "Cambia il tipo di questo blocco."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Colore",
+      "description": "Cambia il colore del testo o dello sfondo di questo blocco."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabella",
+      "description": "Aggiungi una tabella semplice a questa pagina."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 colonne",
+      "description": "Affianca i blocchi."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 colonne",
+      "description": "Disponi i blocchi in tre colonne."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 colonne",
+      "description": "Disponi i blocchi in quattro colonne."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 colonne",
+      "description": "Disponi i blocchi in cinque colonne."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Immagine",
+      "description": "Carica o incorpora con un link."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Incorpora un video con un link."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Incorpora audio con un link."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Segnalibro web",
+      "description": "Salva un link web come card."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Incorpora",
+      "description": "Incorpora contenuto da un link."
     },
     "file": {
       "label": "File",
-      "description": "Attach a file link to this page."
+      "description": "Allega un link di file a questa pagina."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Database - Pagina intera",
+      "description": "Aggiungi un nuovo database come sottopagina."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabella - Pagina intera",
+      "description": "Aggiungi un database a pagina intera come tabella."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Board - Pagina intera",
+      "description": "Aggiungi un board kanban a pagina intera."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Elenco - Pagina intera",
+      "description": "Aggiungi un database a pagina intera come elenco."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Timeline - Pagina intera",
+      "description": "Aggiungi una timeline di database a pagina intera."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Calendario - Pagina intera",
+      "description": "Aggiungi un database calendario a pagina intera."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galleria - Pagina intera",
+      "description": "Aggiungi una galleria di database a pagina intera."
     },
     "inline_database": {
       "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "description": "Aggiungi un database in questa pagina."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Vista tabella",
+      "description": "Aggiungi un database in linea come tabella."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Vista bacheca",
+      "description": "Aggiungi una bacheca kanban in linea."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Vista elenco",
+      "description": "Aggiungi un database in linea come elenco."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Vista timeline",
+      "description": "Aggiungi una timeline di database in linea."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Vista calendario",
+      "description": "Aggiungi un database calendario in linea."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Vista galleria",
+      "description": "Aggiungi una galleria di database in linea."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Predefinito",
+      "description": "Rimuovi il colore del testo o dello sfondo da questo blocco."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Grigio",
+      "description": "Applica il grigio a questo blocco."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Marrone",
+      "description": "Applica marrone a questo blocco."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Arancione",
+      "description": "Applica l'arancione a questo blocco."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Giallo",
+      "description": "Applica giallo a questo blocco."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Verde",
+      "description": "Applica il verde a questo blocco."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Blu",
+      "description": "Applica blu a questo blocco."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Viola",
+      "description": "Applica viola a questo blocco."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Rosa",
+      "description": "Applica rosa a questo blocco."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Rosso",
+      "description": "Applica rosso a questo blocco."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Sfondo grigio",
+      "description": "Applica lo sfondo grigio a questo blocco."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Sfondo marrone",
+      "description": "Applica uno sfondo marrone a questo blocco."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Sfondo arancione",
+      "description": "Applica lo sfondo arancione a questo blocco."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Sfondo giallo",
+      "description": "Applica sfondo giallo a questo blocco."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Sfondo verde",
+      "description": "Applica lo sfondo verde a questo blocco."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Sfondo blu",
+      "description": "Applica uno sfondo blu a questo blocco."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Sfondo viola",
+      "description": "Applica sfondo viola a questo blocco."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Sfondo rosa",
+      "description": "Applica lo sfondo rosa a questo blocco."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Sfondo rosso",
+      "description": "Applica sfondo rosso a questo blocco."
     }
   }
 }

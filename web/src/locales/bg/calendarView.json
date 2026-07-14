@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Добавяне на свойство за дата",
+    "description": "Изгледът Календар изисква свойство за дата, за да поставя страници на месеца.",
+    "addDateButton": "Дата"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Календар по",
+    "today": "Днес",
+    "previousWeek": "Предишна седмица",
+    "previousMonth": "Предишен месец",
+    "nextWeek": "Следваща седмица",
+    "nextMonth": "Следващ месец"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Нед",
+    "mon": "Пон",
+    "tue": "Вто",
+    "wed": "Сря",
+    "thu": "Чет",
+    "fri": "Пет",
+    "sat": "Съб"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} календар",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} елемента",
+    "newRowAriaLabel": "Нов ред на {{date}}",
+    "newRowTitle": "Нов",
+    "showLess": "Покажи по-малко",
+    "showMore": "+{{count}} още"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Отвори {{title}}",
+    "openAriaLabelWithDate": "Отвори {{title}}, насрочен за {{date}}",
+    "openNoDateAriaLabel": "Отвори {{title}}, без дата"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Без дата ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Без заглавие",
+    "dateDefaultName": "Дата"
   }
 }

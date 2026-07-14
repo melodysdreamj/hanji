@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Hindi ma-restore ang page",
+  "emptyBodyPrompt": "Pindutin ang Enter para magsimulang magsulat sa blangkong page na ito.",
+  "inTrashTopBarTitle": "Nasa Basura",
+  "notFoundTopBarTitle": "Hindi nahanap",
+  "openWorkspace": "Buksan ang workspace",
+  "pageInTrash": "Nasa Basura ang page na ito.",
+  "pageInTrashDetail": "I-restore ito bago buksan o i-edit ang nilalaman.",
+  "pageUnavailable": "Hindi available ang page.",
+  "pageUnavailableDetail": "Maaaring natanggal, nailipat, o na-share ang page na ito sa ibang account.",
+  "restorePage": "I-restore ang page",
+  "restoredPage": "Na-restore ang page",
+  "loadingPageContent": "Naglo-load ng content ng page"
 }

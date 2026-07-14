@@ -2,14 +2,23 @@
 
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { installBrowserSession, permanentlyDeletePage } from './lib/harness.mjs';
+import {
+  assertNoBrowserErrors,
+  installBrowserSession,
+  newCheckedPage,
+  permanentlyDeletePage,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const DEFAULT_TIMEOUT_MS = 20_000;
+const FILE_DROP_SCREENSHOT_DIR = join(root, '.edgebase', 'ui-discovery', 'file-drop');
+const SLASH_EVIDENCE_DIR = process.env.HANJI_SLASH_EVIDENCE_DIR
+  ? resolve(root, process.env.HANJI_SLASH_EVIDENCE_DIR)
+  : null;
 const SHORTCUT_MODIFIER = process.platform === 'darwin' ? 'Meta' : 'Control';
 
 const options = parseArgs(process.argv.slice(2));
@@ -42,7 +51,7 @@ async function main() {
   try {
     await assertBlockEditorUi(browser, appUrl, apiUrl, seed);
     if (options.onlyFileDrop) {
-      console.log('PASS block editor external file drops upload through block rows and empty media cards.');
+      console.log('PASS block editor external file drops preserve block/canvas placement, order, progress, and media-card upload behavior.');
     } else if (options.onlyFocusFlow) {
       console.log('PASS block creation focus and Enter continuation work across representative block types.');
     } else if (options.onlySlashPageTitle) {
@@ -66,7 +75,7 @@ async function main() {
     } else if (options.onlySelectionEdit) {
       console.log('PASS Enter and paste over a non-collapsed selection replace the selected text.');
     } else if (options.onlySlashKeepText) {
-      console.log('PASS slash commands keep preceding text and insert the chosen block on the next line.');
+      console.log('PASS slash text transforms preserve content in place while insert-style blocks are added below.');
     } else {
       console.log('PASS block editor text input, rich HTML paste, keyboard formatting shortcuts, slash commands, synced blocks, tabs, pasted/imported tab icons, columns, buttons, Markdown shortcuts, to-dos, toggles, and dividers persist through the product API without screenshots.');
     }
@@ -77,15 +86,21 @@ async function main() {
 }
 
 async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
-  const { context, page, errors } = await newCheckedPage(browser);
+  const { context, page, errors } = await newCheckedPage(browser, {}, { includeConsoleLocation: true });
   await seedSession(context, seed);
 
   try {
     await step('open seeded editor page', () => openPage(page, appUrl, seed));
     if (options.onlyFileDrop) {
       await step('drop an external file onto a block row', () => assertFileDropUpload(page, apiUrl, seed));
+      await step('drop multiple files between blocks through the editor canvas', () =>
+        assertEditorCanvasFileDrop(page, apiUrl, seed)
+      );
       await step('drop a video file onto an empty video card', () => assertMediaPlaceholderDropUpload(page, apiUrl, seed));
-      assertNoBrowserErrors(errors, 'block editor file drop flow');
+      assertNoBrowserErrors(
+        errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+        'block editor file drop flow',
+      );
       return;
     }
     if (options.onlyFocusFlow) {
@@ -184,10 +199,13 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
       return;
     }
     if (options.onlySlashKeepText) {
-      await step('keep preceding text and insert the slash block on the next line', () =>
+      await step('transform text in place and insert media below without losing preceding text', () =>
         assertSlashKeepsPrecedingText(page, apiUrl, seed)
       );
-      assertNoBrowserErrors(errors, 'block editor slash preceding-text flow');
+      assertNoBrowserErrors(
+        errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+        'block editor slash preceding-text flow',
+      );
       return;
     }
     await step('type plain text into a block', () => assertPlainTextInput(page, apiUrl, seed));
@@ -205,7 +223,7 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
       assertSingleParagraphRichHtmlPaste(page, apiUrl, seed)
     );
     await step('create and check a to-do through slash commands', () => assertSlashTodo(page, apiUrl, seed));
-    await step('keep preceding text and insert the slash block on the next line', () =>
+    await step('transform text in place and insert media below without losing preceding text', () =>
       assertSlashKeepsPrecedingText(page, apiUrl, seed)
     );
     await step('create a blank child page through /page without saving Untitled', () =>
@@ -684,6 +702,7 @@ async function assertFileDropUpload(page, baseUrl, seed) {
   await group.evaluate((element) => {
     const row = element.querySelector('[data-type]');
     if (!(row instanceof HTMLElement)) throw new Error('file drop row is missing');
+    const rect = row.getBoundingClientRect();
     const data = new DataTransfer();
     data.items.add(
       new File([new Uint8Array([0x78, 0x01, 0x73, 0x0d])], 'dragged-installer.dmg', {
@@ -696,6 +715,8 @@ async function assertFileDropUpload(page, baseUrl, seed) {
           bubbles: true,
           cancelable: true,
           dataTransfer: data,
+          clientX: rect.left + Math.min(80, rect.width / 2),
+          clientY: rect.top + rect.height / 2,
         }),
       );
     }
@@ -712,6 +733,228 @@ async function assertFileDropUpload(page, baseUrl, seed) {
       block.content.url.includes('/api/storage/files/'),
     'dragged DMG file upload',
   );
+}
+
+async function assertEditorCanvasFileDrop(page, baseUrl, seed) {
+  const autoScroll = await page.evaluate(() => {
+    const editor = document.querySelector('[data-editor-page]');
+    if (!(editor instanceof HTMLElement)) throw new Error('editor canvas is missing');
+    let scrollContainer = editor.parentElement;
+    while (scrollContainer) {
+      const style = getComputedStyle(scrollContainer);
+      if (
+        /(auto|scroll|overlay)/.test(style.overflowY) &&
+        scrollContainer.scrollHeight > scrollContainer.clientHeight + 1
+      ) {
+        break;
+      }
+      scrollContainer = scrollContainer.parentElement;
+    }
+    const scrollingElement = document.scrollingElement;
+    const maxScroll = scrollContainer
+      ? scrollContainer.scrollHeight - scrollContainer.clientHeight
+      : Math.max(0, (scrollingElement?.scrollHeight ?? 0) - window.innerHeight);
+    if (maxScroll <= 2) return { supported: false, before: 0, after: 0, maxScroll };
+    const start = Math.min(24, Math.max(0, maxScroll - 40));
+    if (scrollContainer) scrollContainer.scrollTop = start;
+    else window.scrollTo(0, start);
+    const viewport = scrollContainer?.getBoundingClientRect();
+    const before = scrollContainer?.scrollTop ?? window.scrollY;
+    const data = new DataTransfer();
+    data.items.add(new File([new Uint8Array([1])], 'auto-scroll-probe.txt', { type: 'text/plain' }));
+    editor.dispatchEvent(
+      new DragEvent('dragover', {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: data,
+        clientX: Math.max(1, editor.getBoundingClientRect().left + 8),
+        clientY: (viewport?.bottom ?? window.innerHeight) - 1,
+      }),
+    );
+    const after = scrollContainer?.scrollTop ?? window.scrollY;
+    editor.dispatchEvent(new DragEvent('dragleave', { bubbles: true, cancelable: true, dataTransfer: data }));
+    return { supported: true, before, after, maxScroll };
+  });
+  assert(
+    !autoScroll.supported || autoScroll.after > autoScroll.before,
+    `editor file drag must auto-scroll near the viewport edge; ${JSON.stringify(autoScroll)}`,
+  );
+
+  const anchorGroup = blockGroup(page, seed.blockIds.fileDrop);
+  await anchorGroup.scrollIntoViewIfNeeded();
+  await page.keyboard.press('Escape');
+  const dragGeometry = await anchorGroup.evaluate((element) => {
+    const row = element.querySelector(':scope > [data-type]');
+    const editor = element.closest('[data-editor-page]');
+    if (!(row instanceof HTMLElement) || !(editor instanceof HTMLElement)) {
+      throw new Error('editor canvas file-drop anchor is missing');
+    }
+    const rect = row.getBoundingClientRect();
+    const data = new DataTransfer();
+    const pngBytes = Uint8Array.from(
+      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+      (character) => character.charCodeAt(0),
+    );
+    data.items.add(new File([pngBytes], 'canvas-image.png', { type: 'image/png' }));
+    data.items.add(
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a])], 'canvas-notes.pdf', {
+        type: 'application/pdf',
+      }),
+    );
+    const clientX = rect.left + Math.min(96, rect.width / 2);
+    const clientY = rect.bottom + 4;
+    globalThis.__hanjiEditorFileDropSmoke = { clientX, clientY };
+    for (const type of ['dragenter', 'dragover']) {
+      editor.dispatchEvent(
+        new DragEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          dataTransfer: data,
+          clientX,
+          clientY,
+        }),
+      );
+    }
+    return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right, width: rect.width };
+  });
+
+  const indicator = page.locator('[data-editor-file-drop-indicator="after"]');
+  await indicator.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const indicatorGeometry = await indicator.boundingBox();
+  assert(indicatorGeometry, 'editor canvas file-drop insertion line must have geometry');
+  assert(
+    Math.abs(indicatorGeometry.y - dragGeometry.bottom) <= 3,
+    `file-drop insertion line must track the anchor boundary; line=${JSON.stringify(indicatorGeometry)} anchor=${JSON.stringify(dragGeometry)}`,
+  );
+  assert(
+    indicatorGeometry.height >= 1 && indicatorGeometry.height <= 3,
+    `file-drop insertion line must stay quiet and compact; height=${indicatorGeometry.height}`,
+  );
+  assert(
+    indicatorGeometry.width >= dragGeometry.width * 0.9,
+    `file-drop insertion line must span the block row; line=${indicatorGeometry.width}, row=${dragGeometry.width}`,
+  );
+
+  mkdirSync(FILE_DROP_SCREENSHOT_DIR, { recursive: true });
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-canvas-insertion-line.png') });
+  writeFileSync(
+    join(FILE_DROP_SCREENSHOT_DIR, 'editor-canvas-insertion-line.json'),
+    `${JSON.stringify(
+      {
+        reference: 'current Notion-normalized quiet insertion-line contract',
+        state: 'external image and file hovering between two populated blocks',
+        anchor: dragGeometry,
+        indicator: indicatorGeometry,
+        placement: 'after',
+        files: ['canvas-image.png', 'canvas-notes.pdf'],
+        autoScroll,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+
+  const storageRoute = '**/api/storage/files/**';
+  let delayedStorageUpload = false;
+  const delayFirstStorageUpload = async (route) => {
+    if (!delayedStorageUpload && route.request().method() === 'POST') {
+      delayedStorageUpload = true;
+      await delay(700);
+    }
+    await route.continue();
+  };
+  await page.route(storageRoute, delayFirstStorageUpload);
+  const dropResult = await page.evaluate(() => {
+    const transfer = globalThis.__hanjiEditorFileDropSmoke;
+    const editor = document.querySelector('[data-editor-page]');
+    if (!transfer || !(editor instanceof HTMLElement)) throw new Error('editor canvas drop transfer is missing');
+    const data = new DataTransfer();
+    const pngBytes = Uint8Array.from(
+      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+      (character) => character.charCodeAt(0),
+    );
+    data.items.add(new File([pngBytes], 'canvas-image.png', { type: 'image/png' }));
+    data.items.add(
+      new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a])], 'canvas-notes.pdf', {
+        type: 'application/pdf',
+      }),
+    );
+    const event = new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: data,
+      clientX: transfer.clientX,
+      clientY: transfer.clientY,
+    });
+    editor.dispatchEvent(event);
+    delete globalThis.__hanjiEditorFileDropSmoke;
+    return { defaultPrevented: event.defaultPrevented, fileCount: data.files.length, types: Array.from(data.types) };
+  });
+  assert(
+    dropResult.defaultPrevented && dropResult.fileCount === 2 && dropResult.types.includes('Files'),
+    `editor canvas drop event must be accepted with both files; ${JSON.stringify(dropResult)}`,
+  );
+
+  const progressCard = page.locator('[data-editor-file-upload]').first();
+  await progressCard.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const progressGeometry = await progressCard.boundingBox();
+  const progressText = ((await progressCard.textContent()) ?? '').trim();
+  const progressValue = await progressCard.getByRole('progressbar').getAttribute('aria-valuenow');
+  const viewportWidth = page.viewportSize()?.width ?? 1280;
+  assert(progressGeometry, 'editor file upload progress must have geometry');
+  assert(
+    progressGeometry.width <= 340 && progressGeometry.x + progressGeometry.width <= viewportWidth,
+    `editor file upload progress must stay compact and inside the viewport; ${JSON.stringify(progressGeometry)}`,
+  );
+  assert(progressText.includes('canvas-image.png'), `upload progress must name the active file; text=${progressText}`);
+  assert(Number.isFinite(Number(progressValue)), `upload progress must expose a numeric value; value=${progressValue}`);
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-upload-progress.png') });
+  writeFileSync(
+    join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-upload-progress.json'),
+    `${JSON.stringify(
+      {
+        state: 'first of two dropped files uploading',
+        geometry: progressGeometry,
+        text: progressText,
+        percent: Number(progressValue),
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  await page.unroute(storageRoute, delayFirstStorageUpload);
+
+  const blocks = await waitForBlocks(
+    baseUrl,
+    seed,
+    (current) => {
+      const image = current.find((block) => block.content?.fileName === 'canvas-image.png');
+      const file = current.find((block) => block.content?.fileName === 'canvas-notes.pdf');
+      return (
+        image?.type === 'image' &&
+        file?.type === 'file' &&
+        image.content?.url?.includes('/api/storage/files/') &&
+        file.content?.url?.includes('/api/storage/files/')
+      );
+    },
+    'editor canvas multi-file drop',
+  );
+  const topLevel = blocks
+    .filter((block) => block.parentId == null)
+    .sort((a, b) => Number(a.position ?? 0) - Number(b.position ?? 0));
+  const anchorIndex = topLevel.findIndex((block) => block.id === seed.blockIds.fileDrop);
+  const imageIndex = topLevel.findIndex((block) => block.content?.fileName === 'canvas-image.png');
+  const fileIndex = topLevel.findIndex((block) => block.content?.fileName === 'canvas-notes.pdf');
+  const followingIndex = topLevel.findIndex((block) => block.id === seed.blockIds.richInlinePaste);
+  assert(
+    anchorIndex >= 0 && imageIndex === anchorIndex + 1 && fileIndex === imageIndex + 1 && followingIndex === fileIndex + 1,
+    `editor canvas drop must preserve insertion point and file order; indices=${JSON.stringify({ anchorIndex, imageIndex, fileIndex, followingIndex })}`,
+  );
+  await page.getByText('canvas-notes.pdf', { exact: true }).waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await page.screenshot({ path: join(FILE_DROP_SCREENSHOT_DIR, 'editor-file-drop-complete.png') });
 }
 
 async function assertMediaPlaceholderDropUpload(page, baseUrl, seed) {
@@ -873,10 +1116,9 @@ async function assertSlashTodo(page, baseUrl, seed) {
   );
 }
 
-// Notion parity: pressing "/" after existing text keeps the current text block
-// intact and inserts the chosen block on the next line, instead of swallowing
-// the block in place (which for media types would also discard the typed text).
-// An otherwise-empty block still converts in place — covered by assertSlashTodo.
+// Text-formatting commands transform the current block in place and preserve
+// the text before the slash trigger. Insert-style commands such as Image keep
+// the paragraph intact and insert their block immediately below it.
 async function assertSlashKeepsPrecedingText(page, baseUrl, seed) {
   const textbox = blockTextBox(page, seed.blockIds.slashKeepText, 'Text block text');
   await textbox.click({ timeout: options.timeoutMs });
@@ -892,26 +1134,47 @@ async function assertSlashKeepsPrecedingText(page, baseUrl, seed) {
     seed,
     (items) => {
       const original = items.find((block) => block.id === seed.blockIds.slashKeepText);
-      if (!original || original.type !== 'paragraph') return false;
+      if (!original || original.type !== 'heading_1') return false;
       if ((original.plainText ?? '').trim() !== 'hello') return false;
-      const after = items
-        .filter(
-          (block) =>
-            (block.parentId ?? null) === (original.parentId ?? null) &&
-            block.position > original.position,
-        )
-        .sort((a, b) => a.position - b.position);
-      const next = after[0];
-      return Boolean(next && next.type === 'heading_1' && (next.plainText ?? '') === '');
+      return true;
     },
-    'slash on a text block keeps the text and inserts an empty heading below',
+    'slash heading transforms the current text block in place',
   );
 
   const original = blocks.find((block) => block.id === seed.blockIds.slashKeepText);
   assert(
-    original && original.type === 'paragraph',
-    'slash command must leave the original text block as a paragraph, not swallow it into the chosen type',
+    original && original.type === 'heading_1' && original.plainText.trim() === 'hello',
+    'text-formatting slash command must preserve the text and transform the current block in place',
   );
+  await captureSlashEvidence(page, 'heading-in-place.png');
+
+  const mediaTextbox = blockTextBox(page, seed.blockIds.slashKeepTextMedia, 'Text block text');
+  await mediaTextbox.click({ timeout: options.timeoutMs });
+  await page.keyboard.type('world ');
+  await page.keyboard.type('/image');
+
+  const mediaMenu = page.getByRole('listbox', { name: 'Block commands' });
+  await mediaMenu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await mediaMenu.getByRole('option', { name: /^Image/ }).first().click({ timeout: options.timeoutMs });
+
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (items) => {
+      const paragraph = items.find((block) => block.id === seed.blockIds.slashKeepTextMedia);
+      if (!paragraph || paragraph.type !== 'paragraph' || paragraph.plainText.trim() !== 'world') return false;
+      const next = items
+        .filter(
+          (block) =>
+            (block.parentId ?? null) === (paragraph.parentId ?? null) &&
+            block.position > paragraph.position,
+        )
+        .sort((a, b) => a.position - b.position)[0];
+      return next?.type === 'image';
+    },
+    'slash image keeps preceding text and inserts an image below',
+  );
+  await captureSlashEvidence(page, 'media-insert-below.png');
 }
 
 async function assertSlashPageCreatesEmptyTitle(page, baseUrl, seed) {
@@ -1564,6 +1827,7 @@ async function assertBlockCreationFocusFlow(page, baseUrl, seed) {
     query: 'h1',
     option: /Heading 1/,
     label: 'Heading 1 block text',
+    placeholder: 'Heading 1',
     text: seed.focusHeadingText,
     type: 'heading_1',
     nextText: seed.focusHeadingNextText,
@@ -1904,8 +2168,25 @@ async function embedChromeGeometry(page, blockId) {
 async function assertSlashTextFocusAndEnter(page, baseUrl, seed, spec) {
   const blockId = seed.blockIds[spec.key];
   await pickSlashBlock(page, blockId, spec.query, spec.option);
-  await blockTextBox(page, blockId, spec.label).waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const textbox = blockTextBox(page, blockId, spec.label);
+  await textbox.waitFor({ state: 'visible', timeout: options.timeoutMs });
   await waitForFocusedBlockTextbox(page, blockId, spec.label);
+  if (spec.placeholder) {
+    const placeholder = await textbox.evaluate((element) => ({
+      aria: element.getAttribute('aria-placeholder'),
+      data: element.getAttribute('data-placeholder'),
+      empty: element.getAttribute('data-empty'),
+      rendered: getComputedStyle(element, '::before').content,
+    }));
+    assert(
+      placeholder.empty === 'true' &&
+        placeholder.aria === spec.placeholder &&
+        placeholder.data === spec.placeholder &&
+        placeholder.rendered.includes(spec.placeholder),
+      `empty ${spec.type} should render its placeholder: ${JSON.stringify(placeholder)}`,
+    );
+    await captureSlashEvidence(page, 'empty-heading-placeholder.png');
+  }
   await page.keyboard.type(spec.text);
   await waitForBlock(
     baseUrl,
@@ -2581,6 +2862,7 @@ async function seedEditorPage(baseUrl) {
     richInlinePaste: randomUUID(),
     todo: randomUUID(),
     slashKeepText: randomUUID(),
+    slashKeepTextMedia: randomUUID(),
     slashPage: randomUUID(),
     pastedUrlMention: randomUUID(),
     tabs: randomUUID(),
@@ -2675,6 +2957,7 @@ async function seedEditorPage(baseUrl) {
     blockIds.richInlinePaste,
     blockIds.todo,
     blockIds.slashKeepText,
+    blockIds.slashKeepTextMedia,
     blockIds.slashPage,
     blockIds.pastedUrlMention,
     blockIds.tabs,
@@ -3001,32 +3284,6 @@ async function seedSession(context, seed) {
   });
 }
 
-async function newCheckedPage(browser) {
-  const context = await browser.newContext();
-  // Smokes own their sign-in state: keep the dev runtime's master
-  // auto-login (HANJI_MASTER_DEV_AUTOLOGIN) from racing this script.
-  await context.addInitScript(() => {
-    try {
-      window.localStorage.setItem('hanji:disable-master-autologin', '1');
-    } catch {
-      // Storage unavailable: the smoke controls auth through its own flow.
-    }
-  });
-  const page = await context.newPage();
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
-  });
-  return { context, page, errors };
-}
-
-function assertNoBrowserErrors(errors, label) {
-  if (errors.length) {
-    throw new Error(`Browser errors while checking ${label}:\n- ${errors.join('\n- ')}`);
-  }
-}
-
 function isExpectedExternalEmbedBrowserMessage(message) {
   return (
     message.includes('Failed to load resource:') ||
@@ -3264,7 +3521,7 @@ Options:
   --url <url>             App URL. Defaults to HANJI_EDGEBASE_URL or ${DEFAULT_BASE_URL}.
   --api-url <url>         EdgeBase API URL. Defaults to HANJI_EDGEBASE_API_URL or ${DEFAULT_BASE_URL}.
   --timeout-ms <number>   Browser/action timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
-  --only-file-drop        Check only external file drag/drop onto a block row.
+  --only-file-drop        Check external file drops on block rows, canvas boundaries, and media cards.
   --only-focus-flow       Check block creation focus and Enter continuation only.
   --only-embed-caption-slash
                           Check default-hidden embed captions and next-line slash continuation.
@@ -3273,6 +3530,7 @@ Options:
   --only-ime-flow         Check only IME Enter composition and next-block behavior.
   --only-slash-page-title
                           Check only blank /page creation title placeholder behavior.
+  --only-slash-keep-text  Check text transforms in place, media insertion below, and text preservation.
   --only-pasted-url-mention
                           Check only external URL paste-to-mention metadata behavior.
   --only-markdown-shortcuts
@@ -3300,6 +3558,12 @@ function resolveUrl(baseUrl, path) {
 
 function delay(ms) {
   return new Promise((resolveDelay) => setTimeout(resolveDelay, ms));
+}
+
+async function captureSlashEvidence(page, fileName) {
+  if (!SLASH_EVIDENCE_DIR) return;
+  mkdirSync(SLASH_EVIDENCE_DIR, { recursive: true });
+  await page.screenshot({ path: join(SLASH_EVIDENCE_DIR, fileName), fullPage: true });
 }
 
 async function dispatchComposingEnter(locator) {

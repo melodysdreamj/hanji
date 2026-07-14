@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "ប្តូរប្រភេទទ្រព្យ?",
+  "message": "\"{{propName}}\" មានតម្លៃរួចហើយ។ ការប្តូរប្រភេទទៅជា {{typeLabel}} អាចបង្ហាញតម្លៃដែលមានស្រាប់ខុសប្លែក ឬបាត់បង់វា។",
+  "cancelAria": "បោះបង់ការផ្លាស់ប្តូរប្រភេទលក្ខណៈ",
+  "confirm": "ប្តូរប្រភេទ"
 }

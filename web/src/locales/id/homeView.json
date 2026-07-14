@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
+  "openingPage": "Membuka halaman",
   "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "emptyWorkspace": "Workspace kosong",
+  "untitled": "Tanpa judul",
+  "newPage": "Halaman baru"
 }

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Synology reverse proxy wireframe</title>
+  <desc id="desc">A generic Synology-style reverse proxy rule sends public HTTPS traffic on port 25781 to Hanji over local HTTP port 18787 and enables WebSocket forwarding.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#18314f" flood-opacity=".16"/>
+    </filter>
+    <linearGradient id="flow" x1="0" x2="1">
+      <stop offset="0" stop-color="#137be6"/>
+      <stop offset="1" stop-color="#31ae75"/>
+    </linearGradient>
+    <style>
+      .ui { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .value { fill: #24364b; font-size: 22px; font-weight: 680; }
+      .protocol { fill: #137be6; font-size: 18px; font-weight: 760; letter-spacing: .08em; }
+      .label { fill: #728197; font-size: 15px; font-weight: 650; letter-spacing: .12em; }
+      .callout { fill: #137be6; }
+      .callout-text { fill: white; font-size: 20px; font-weight: 750; text-anchor: middle; dominant-baseline: central; }
+    </style>
+  </defs>
+  <rect width="1200" height="700" rx="30" fill="#f2f6fb"/>
+  <g class="ui" filter="url(#shadow)">
+    <rect x="70" y="42" width="1060" height="616" rx="18" fill="white"/>
+    <rect x="70" y="42" width="1060" height="92" rx="18" fill="#147de1"/>
+    <path d="M70 116h1060v18H70z" fill="#147de1"/>
+    <rect x="108" y="77" width="276" height="16" rx="8" fill="#d6eaff"/>
+    <circle cx="1084" cy="78" r="6" fill="#d6eaff"/>
+    <circle cx="1106" cy="78" r="6" fill="#d6eaff"/>
+    <rect x="108" y="164" width="454" height="318" rx="16" fill="#f9fbfd" stroke="#d8e2ed" stroke-width="2"/>
+    <text x="142" y="204" class="label">PUBLIC</text>
+    <rect x="142" y="224" width="154" height="58" rx="11" fill="#e7f2ff"/>
+    <path d="M169 250v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#137be6" stroke-width="4" stroke-linecap="round"/>
+    <rect x="163" y="248" width="36" height="25" rx="6" fill="#137be6"/>
+    <text x="214" y="260" class="protocol">HTTPS</text>
+    <rect x="142" y="302" width="386" height="66" rx="10" fill="white" stroke="#b5c3d2" stroke-width="2"/>
+    <text x="166" y="343" class="value">hanji.example.com</text>
+    <rect x="142" y="390" width="176" height="66" rx="10" fill="white" stroke="#137be6" stroke-width="3"/>
+    <text x="184" y="432" class="value">25781</text>
+    <path d="M580 324h40" stroke="url(#flow)" stroke-width="8" stroke-linecap="round"/>
+    <path d="m610 308 20 16-20 16" fill="none" stroke="#31ae75" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="648" y="164" width="444" height="318" rx="16" fill="#f9fbfd" stroke="#d8e2ed" stroke-width="2"/>
+    <text x="682" y="204" class="label">HANJI</text>
+    <rect x="682" y="224" width="142" height="58" rx="11" fill="#e8f7f0"/>
+    <circle cx="710" cy="253" r="15" fill="#31ae75"/>
+    <path d="M703 253h14M710 246v14" stroke="white" stroke-width="3" stroke-linecap="round"/>
+    <text x="742" y="260" class="protocol" style="fill:#218c5d">HTTP</text>
+    <rect x="682" y="302" width="376" height="66" rx="10" fill="white" stroke="#b5c3d2" stroke-width="2"/>
+    <text x="708" y="343" class="value">127.0.0.1</text>
+    <rect x="682" y="390" width="176" height="66" rx="10" fill="white" stroke="#31ae75" stroke-width="3"/>
+    <text x="724" y="432" class="value">18787</text>
+    <rect x="108" y="516" width="984" height="92" rx="14" fill="#edf5fc"/>
+    <g transform="translate(144 535)">
+      <path d="M16 5c13 0 23 10 23 23s-10 23-23 23S-7 41-7 28 3 5 16 5zm0 8a15 15 0 1 0 0 30 15 15 0 0 0 0-30z" fill="#137be6"/>
+      <path d="M16 17v22M5 28h22" stroke="#137be6" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <text x="202" y="572" class="value">WebSocket</text>
+    <rect x="896" y="538" width="152" height="48" rx="24" fill="#31ae75"/>
+    <circle cx="1023" cy="562" r="18" fill="white"/>
+    <text x="918" y="570" fill="white" font-size="17" font-weight="760">ON</text>
+    <circle cx="305" cy="380" r="22" class="callout"/>
+    <text x="305" y="380" class="callout-text">1</text>
+    <circle cx="846" cy="380" r="22" class="callout"/>
+    <text x="846" y="380" class="callout-text">2</text>
+    <circle cx="1078" cy="516" r="22" class="callout"/>
+    <text x="1078" y="516" class="callout-text">3</text>
+  </g>
+</svg>

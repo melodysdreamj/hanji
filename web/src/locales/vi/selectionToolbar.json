@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Định dạng văn bản"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Chuyển thành",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "text": "Văn bản",
+      "heading1": "Tiêu đề 1",
+      "heading2": "Tiêu đề 2",
+      "heading3": "Tiêu đề 3",
+      "heading4": "Tiêu đề 4",
+      "toDoList": "Danh sách việc cần làm",
+      "bulletedList": "Danh sách gạch đầu dòng",
+      "numberedList": "Danh sách đánh số",
+      "toggleList": "Danh sách thu gọn",
+      "quote": "Trích dẫn",
       "callout": "Callout",
       "code": "Code"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Đậm",
+    "italic": "Nghiêng",
+    "underline": "Gạch chân",
+    "strikethrough": "Gạch ngang",
+    "code": "Mã",
+    "link": "Liên kết"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Bình luận"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Màu chữ: {{color}}",
+    "title": "Màu: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Hỗn hợp",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Màu chữ",
+      "default": "Mặc định",
+      "gray": "Xám",
+      "brown": "Nâu",
+      "orange": "Cam",
+      "yellow": "Vàng",
+      "green": "Xanh lá",
+      "blue": "Xanh dương",
+      "purple": "Tím",
+      "pink": "Hồng",
+      "red": "Đỏ"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Màu nền",
+      "gray": "Nền xám",
+      "brown": "Nền nâu",
+      "orange": "Nền cam",
+      "yellow": "Nền vàng",
+      "green": "Nền xanh lá",
+      "blue": "Nền xanh dương",
+      "purple": "Nền tím",
+      "pink": "Nền hồng",
+      "red": "Nền đỏ"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Chỉnh sửa liên kết",
+    "placeholder": "Dán liên kết",
+    "urlAriaLabel": "URL liên kết",
+    "apply": "Liên kết",
+    "open": "Mở liên kết",
+    "copy": "Sao chép liên kết",
+    "copied": "Đã sao chép",
+    "copiedLink": "Đã sao chép liên kết",
+    "remove": "Xóa"
   }
 }

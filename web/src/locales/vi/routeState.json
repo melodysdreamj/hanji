@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Địa chỉ không đầy đủ.",
+  "invalidBody": "Kiểm tra liên kết xem có ký tự bị thiếu hoặc sai không, rồi thử lại.",
+  "notFoundTitle": "Không tìm thấy trang.",
+  "notFoundBody": "Địa chỉ này không khớp với trang Hanji nào. Trang có thể đã di chuyển hoặc không còn tồn tại.",
+  "sharedTitle": "Liên kết chia sẻ này không hợp lệ.",
+  "sharedBody": "Kiểm tra xem liên kết chia sẻ đầy đủ đã được sao chép đúng chưa, sau đó thử lại.",
+  "openHome": "Mở trang chủ Hanji"
+}

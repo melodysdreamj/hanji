@@ -12,16 +12,16 @@
   },
   "anchor": {
     "commentingOn": "Comentando en",
-    "commentingOnSelectedText": "Comentando el texto seleccionado",
+    "commentingOnSelectedText": "Comentando en texto seleccionado",
     "selectedBlock": "Bloque seleccionado",
-    "onSelectedText": "Sobre el texto seleccionado",
-    "onSelectedBlock": "Sobre el bloque seleccionado",
-    "onABlock": "Sobre un bloque"
+    "onSelectedText": "En el texto seleccionado",
+    "onSelectedBlock": "En el bloque seleccionado",
+    "onABlock": "En un bloque"
   },
   "composer": {
-    "addBlockComment": "Añadir un comentario de bloque",
-    "addPageComment": "Añadir un comentario de página",
-    "blockPlaceholder": "Comentar este bloque...",
+    "addBlockComment": "Añadir comentario de bloque",
+    "addPageComment": "Añadir comentario de página",
+    "blockPlaceholder": "Comentar en este bloque...",
     "pagePlaceholder": "Añadir un comentario...",
     "submit": "Comentar"
   },
@@ -29,7 +29,7 @@
     "commentPeopleAria": "Mencionar personas en comentario",
     "replyPeopleAria": "Mencionar personas en respuesta",
     "trigger": "Mencionar personas",
-    "noMatches": "No hay coincidencias de personas",
+    "noMatches": "No hay personas que coincidan",
     "title": "Mencionar a {{name}}",
     "person": "Persona",
     "you": "Tú",
@@ -37,7 +37,7 @@
     "roleInOrganization": "{{role}} en la organización"
   },
   "list": {
-    "threadsAria": "Conversaciones de comentarios",
+    "threadsAria": "Hilos de comentarios",
     "empty": "Aún no hay comentarios",
     "noOpen": "No hay comentarios abiertos",
     "noResolved": "No hay comentarios resueltos"
@@ -50,7 +50,7 @@
     "edited": "(editado)",
     "emptyComment": "(comentario vacío)",
     "emptyReply": "(respuesta vacía)",
-    "justNow": "Justo ahora"
+    "justNow": "Ahora mismo"
   },
   "actions": {
     "reply": "Responder",

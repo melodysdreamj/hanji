@@ -1,6 +1,6 @@
 {
   "acceptInvitation": "Accepter l'invitation",
-  "acceptingInvitation": "Connexion en cours…",
+  "acceptingInvitation": "Rejoindre…",
   "invitationBody": "Acceptez l'invitation pour ajouter cet espace de travail à votre compte.",
   "invitationTitle": "Rejoindre cet espace de travail ?",
   "joinedWorkspace": "Espace de travail rejoint",
@@ -19,7 +19,7 @@
   "lightMode": "Mode clair",
   "pendingInvitesTitle": "Invitations à l'espace de travail",
   "pendingInviteRole": "en tant que {{role}}",
-  "skipToMain": "Aller au contenu principal",
+  "skipToMain": "Passer au contenu principal",
   "navigationComplete": "Navigation vers {{destination}}",
   "route": {
     "home": "Accueil",

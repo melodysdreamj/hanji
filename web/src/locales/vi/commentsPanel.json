@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Bình luận",
+  "closeAria": "Đóng bình luận",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Thảo luận khối",
+    "page": "Thảo luận trang"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Trạng thái bình luận",
+    "open": "Mở",
+    "resolved": "Đã giải quyết"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Đang bình luận về",
+    "commentingOnSelectedText": "Đang bình luận về văn bản đã chọn",
+    "selectedBlock": "Khối đã chọn",
+    "onSelectedText": "Trên văn bản đã chọn",
+    "onSelectedBlock": "Trên khối đã chọn",
+    "onABlock": "Trên một khối"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Thêm bình luận khối",
+    "addPageComment": "Thêm bình luận trang",
+    "blockPlaceholder": "Bình luận về khối này...",
+    "pagePlaceholder": "Thêm bình luận...",
+    "submit": "Bình luận"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Nhắc đến mọi người trong bình luận",
+    "replyPeopleAria": "Nhắc đến mọi người trong trả lời",
+    "trigger": "Nhắc đến mọi người",
+    "noMatches": "Không có người phù hợp",
+    "title": "Nhắc đến {{name}}",
+    "person": "Người",
+    "you": "Bạn",
+    "organizationPerson": "Người trong tổ chức",
+    "roleInOrganization": "{{role}} trong tổ chức"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Chuỗi bình luận",
+    "empty": "Chưa có bình luận",
+    "noOpen": "Không có bình luận mở",
+    "noResolved": "Không có bình luận đã giải quyết"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Bình luận của {{author}}, {{time}}",
+    "commentAriaResolved": "Bình luận của {{author}}, {{time}}, đã giải quyết",
+    "replyAria": "Trả lời của {{author}}, {{time}}",
+    "repliesAria": "{{count}} trả lời",
+    "edited": "(đã chỉnh sửa)",
+    "emptyComment": "(bình luận trống)",
+    "emptyReply": "(trả lời trống)",
+    "justNow": "Vừa xong"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Trả lời",
+    "showInPage": "Hiển thị trong trang",
+    "resolve": "Giải quyết",
+    "reopen": "Mở lại",
+    "edit": "Chỉnh sửa"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Trả lời..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Sửa bình luận"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Xóa bình luận này?",
+    "threadConfirm_one": "Xóa bình luận này và trả lời của nó?",
+    "threadConfirm_other": "Xóa bình luận này và {{count}} trả lời của nó?"
   }
 }

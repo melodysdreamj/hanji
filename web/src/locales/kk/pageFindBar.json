@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Беттен іздеу"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Беттен іздеу",
+    "placeholder": "Беттен іздеу"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Алдыңғы сәйкестік",
+    "next": "Келесі сәйкестік",
+    "close": "Іздеуді жабу"
   }
 }

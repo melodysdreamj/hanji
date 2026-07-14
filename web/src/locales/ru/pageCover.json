@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Изменить обложку",
+    "reposition": "Изменить положение",
+    "remove": "Удалить",
+    "uploadFile": "Загрузить файл",
+    "uploading": "Загрузка...",
+    "submit": "Отправить",
+    "savePosition": "Сохранить положение"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Галерея",
+    "upload": "Загрузка",
+    "link": "Ссылка"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Вставьте ссылку на изображение",
+    "invalid": "Вставьте ссылку на изображение http или https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Не удалось загрузить это изображение.",
+    "defaultFileName": "Обложка"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Перетащите изображение, чтобы изменить положение"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Подготовка загрузки",
+    "finalizing": "Завершение",
+    "complete": "Завершено",
+    "uploading": "Загрузка"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Обложка удалена",
+    "restored": "Обложка восстановлена",
+    "undo": "Отменить"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Обложка страницы",
+    "coverVerticalPosition": "Вертикальное положение обложки",
+    "positionFromTop": "{{position}}% сверху",
+    "closeCoverMenu": "Закрыть меню обложки",
+    "changePageCover": "Изменение обложки страницы",
+    "repositionPageCover": "Изменить положение обложки страницы",
+    "removePageCover": "Удалить обложку страницы",
+    "changeCoverDialog": "Изменение обложки",
+    "coverSource": "Источник обложки",
+    "selectCover": "Выбрать обложку {{number}}",
+    "uploadFromDevice": "Загрузить изображение обложки с этого устройства",
+    "uploadingFile": "Загрузка {{fileName}}",
+    "coverImageLink": "Ссылка на изображение обложки"
   }
 }

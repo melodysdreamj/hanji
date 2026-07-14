@@ -1,44 +1,44 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
-  },
-  "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
-  },
-  "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
-  },
-  "gridAriaLabel": "{{title}} calendar",
-  "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
-  },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Åbn {{title}}",
+    "openAriaLabelWithDate": "Åbn {{title}}, planlagt til {{date}}",
+    "openNoDateAriaLabel": "Åbn {{title}}, ingen dato"
   },
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} elementer",
+    "newRowAriaLabel": "Ny række den {{date}}",
+    "newRowTitle": "Ny",
+    "showLess": "Vis færre",
+    "showMore": "+{{count}} mere"
+  },
+  "empty": {
+    "addDateButton": "Dato",
+    "description": "Kalendervisninger kræver en datoegenskab for at placere sider på måneden.",
+    "title": "Tilføj en datoegenskab"
+  },
+  "gridAriaLabel": "{{title}} kalender",
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Ingen dato ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "dateDefaultName": "Dato",
+    "untitled": "Uden titel"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Kalender efter",
+    "nextMonth": "Næste måned",
+    "nextWeek": "Næste uge",
+    "previousMonth": "Forrige måned",
+    "previousWeek": "Forrige uge",
+    "today": "I dag"
+  },
+  "weekdays": {
+    "fri": "Fre",
+    "mon": "Man",
+    "sat": "Lør",
+    "sun": "Søn",
+    "thu": "Tor",
+    "tue": "Tir",
+    "wed": "Ons"
   }
 }

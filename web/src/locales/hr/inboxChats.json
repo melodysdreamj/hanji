@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Još nema razgovora. Komentirajte na stranici ili spomenite nekoga da započnete.",
+  "leave": "Napusti",
+  "leaveAria": "Napusti razgovor na {{title}}",
+  "open": "Otvori razgovor na {{title}}",
+  "participants_one": "{{count}} sudionik",
+  "participants_other": "{{count}} sudionika",
+  "untitled": "Bez naslova",
+  "loading": "Učitavanje razgovora…"
 }

@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Aggiungi una proprietà data",
+    "description": "Le viste timeline necessitano di una proprietà data di inizio per visualizzare le pagine nel tempo."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Aggiungi una proprietà data di fine per visualizzare intervalli invece di barre di un solo giorno.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zoom timeline",
+    "day": "Giorno",
+    "week": "Settimana",
+    "month": "Mese"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Dipendenze:",
+    "hint": "aggiungi una proprietà relazione",
+    "relationPropertyAriaLabel": "Proprietà relazione di dipendenza"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Oggi",
+    "previousRange": "Intervallo precedente",
+    "nextRange": "Intervallo successivo",
+    "newPage": "Nuovo",
+    "newPageIn": "Nuova pagina in {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tabella timeline",
+    "nameHeader": "Nome"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Apri {{title}}",
+    "openAriaLabelWithDates": "Apri {{title}}, da {{start}} a {{end}}",
+    "openNoDateAriaLabel": "Apri {{title}}, nessuna data"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Nessun elemento in questo intervallo.",
+    "noDatedItems": "Nessun elemento datato ancora.",
+    "jumpTo": "Vai a {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Nessuna data ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Nessuno",
+    "untitled": "Senza titolo"
   }
 }

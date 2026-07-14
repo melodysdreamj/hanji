@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "average": "Keskiarvo",
+    "count": "Määrä",
+    "max": "Maksimi",
+    "min": "Minimi",
+    "sum": "Summa"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} kaavio",
+  "chartType": "Kaavion tyyppi",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Pylväs",
+    "donut": "Donitsi",
+    "horizontal_bar": "Vaakapalkki",
+    "line": "Viiva"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Valittu",
+  "empty": "Tyhjä",
+  "legend": "Kaavion selite",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Ei dataa",
+  "noDataDesc": "Mikään rivi ei vastaa suodattimia tai hakua.",
+  "noGroupProperty": "Ei vielä kaavioitavaa",
+  "noGroupPropertyDesc": "Lisää valinta-, tila-, henkilö-, valintaruutu- tai päivämääräominaisuus ryhmittelyä varten.",
+  "total": "Yhteensä",
+  "unchecked": "Valitsematon",
+  "untitledProperty": "Nimeämätön",
+  "valueProperty": "Arvo-ominaisuus",
+  "xAxis": "X-akseli",
+  "yAxis": "Y-akseli"
 }

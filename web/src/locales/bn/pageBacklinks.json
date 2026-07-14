@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}}টি ব্যাকলিঙ্ক",
+    "count_other": "{{count}}টি ব্যাকলিঙ্ক"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "লিঙ্কযুক্ত মেনশন"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}}টি মেনশন",
+    "mention_other": "{{count}}টি মেনশন",
+    "link_one": "{{count}}টি লিঙ্ক",
+    "link_other": "{{count}}টি লিঙ্ক"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "মেনশন",
+    "link": "লিঙ্ক"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "আরও {{count}}টি ব্যাকলিঙ্ক",
+    "count_other": "আরও {{count}}টি ব্যাকলিঙ্ক"
   }
 }

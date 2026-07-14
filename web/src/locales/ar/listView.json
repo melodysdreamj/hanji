@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "لم تُنشأ صفحات في قاعدة البيانات هذه بعد.",
+  "emptyTitle": "لا توجد صفحات بعد",
+  "newInline": "جديد",
+  "newPage": "صفحة جديدة",
+  "newPageIn": "صفحة جديدة في {{dbTitle}}",
+  "noResultsDesc": "لا توجد صفحات تطابق الفلاتر أو البحث الحالي.",
+  "noResultsTitle": "لا توجد نتائج",
+  "openRow": "فتح {{title}}"
 }

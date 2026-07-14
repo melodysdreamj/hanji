@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Sabon wurin aiki",
   "name": {
-    "label": "Workspace name",
+    "label": "Sunan workspace",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Fara daga",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Wurin aiki wofi",
+      "body": "Fara da komai a wofi tare da shafukan farawa."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Shigo daga Notion",
+      "body": "Ƙirƙiri wurin aiki, sa'an nan matsar da wurin aikin Notion a ciki."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Shigo daga wani Hanji",
+      "body": "Ƙirƙiri wurin aiki, sa'an nan ja wurin aiki daga wani sabar Hanji ko fayil."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Ƙirƙiri workspace",
+  "creating": "Ana ƙirƙira…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "An kasa ƙirƙirar workspace."
   }
 }

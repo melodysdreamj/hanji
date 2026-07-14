@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Jogi és forrásinformációk",
+  "noWarranty": "Garancia nélkül.",
+  "sourceCode": "Forráskód",
   "agplLicense": "AGPL-3.0",
   "sponsorException": "Exception 2.0"
 }

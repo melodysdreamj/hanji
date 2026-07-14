@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "ספירה",
+    "sum": "סכום",
+    "average": "ממוצע",
+    "min": "מינימום",
+    "max": "מקסימום"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "תרשים {{name}}",
+  "chartType": "סוג תרשים",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "עמודות",
+    "horizontal_bar": "עמודות אופקיות",
+    "line": "קו",
+    "donut": "דונאט"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "מסומן",
+  "empty": "ריק",
+  "legend": "מקרא",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "אין נתונים",
+  "noDataDesc": "אין שורות התואמות את המסננים או החיפוש הנוכחיים.",
+  "noGroupProperty": "אין מאפיין להצגה",
+  "noGroupPropertyDesc": "הוסף מאפיין בחירה, סטטוס, איש, תיבת סימון או תאריך לקיבוץ התרשים.",
+  "total": "סך הכול",
+  "unchecked": "לא מסומן",
+  "untitledProperty": "ללא שם",
+  "valueProperty": "מאפיין ערך",
+  "xAxis": "ציר X",
+  "yAxis": "ציר Y"
 }

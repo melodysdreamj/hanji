@@ -1,0 +1,9 @@
+{
+  "notFoundBody": "Această adresă nu corespunde unei pagini Hanji. Pagina s-ar putea să fi fost mutată sau să nu mai existe.",
+  "invalidTitle": "Această adresă este incompletă.",
+  "invalidBody": "Verifică link-ul pentru caractere lipsă sau incorecte, apoi încearcă din nou.",
+  "openHome": "Deschide pagina de start Hanji",
+  "notFoundTitle": "Pagină negăsită",
+  "sharedTitle": "Acest link partajat este invalid.",
+  "sharedBody": "Verifică dacă link-ul partajat a fost copiat corect, apoi încearcă din nou."
+}

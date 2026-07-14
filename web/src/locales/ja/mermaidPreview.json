@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid ダイアグラム",
-  "emptyPreview": "ダイアグラムのプレビュー",
-  "sourceDescription": "ダイアグラムのソース: {{source}}",
-  "syntaxError": "ダイアグラムに構文エラーがあります。",
+  "diagramLabel": "Mermaid図",
+  "emptyPreview": "図のプレビュー",
+  "sourceDescription": "図のソース: {{source}}",
+  "syntaxError": "図に構文エラーがあります。",
   "syntaxErrorDetails": "詳細を表示"
 }

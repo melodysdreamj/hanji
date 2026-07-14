@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "ปิดตัวเลือกไอคอน",
+    "label": "เลือกไอคอน"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "ประเภทไอคอน",
+    "emoji": "อิโมจิ",
+    "image": "รูปภาพ"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ลบ",
+    "ariaLabel": "ลบไอคอน"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "กรอง…",
+    "searchLabel": "ค้นหาไอคอน",
+    "random": "สุ่ม",
+    "randomLabel": "เลือกไอคอนแบบสุ่ม",
+    "recentLabel": "ใช้ล่าสุดก่อน",
+    "gridLabelRecent": "ไอคอน ใช้ล่าสุดก่อน",
+    "gridLabel": "ไอคอน",
+    "optionLabel": "เลือกไอคอน {{emoji}}",
+    "noResults": "ไม่มีไอคอนที่ตรงกับ “{{query}}” ลองใช้คำอื่นหรือล้างตัวกรอง"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "รูปภาพ",
+    "linkPlaceholder": "วางลิงก์รูปภาพ",
+    "linkLabel": "ลิงก์รูปภาพไอคอน",
+    "apply": "นำไปใช้",
+    "upload": "อัปโหลดไฟล์",
+    "uploading": "กำลังอัปโหลด...",
+    "uploadingLabel": "กำลังอัปโหลด {{fileName}}",
+    "uploadFailed": "ไม่สามารถอัปโหลดรูปภาพนั้นได้",
+    "fallbackFileName": "รูปภาพไอคอน"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "กำลังเตรียมอัปโหลด",
+    "finalizing": "กำลังทำเสร็จ",
+    "complete": "เสร็จสิ้น",
+    "uploading": "กำลังอัปโหลด"
   }
 }

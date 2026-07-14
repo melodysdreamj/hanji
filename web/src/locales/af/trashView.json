@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Asblik",
+  "empty": "Bladsye wat jy verwyder, beland hier. Niks in die asblik nie.",
+  "searchTrash": "Soek asblik",
+  "deletedPages": "Verwyderde bladsye",
+  "noSearchMatches": "Geen verwyderde bladsye pas by jou soektog nie.",
+  "pageCount_one": "{{count}} bladsy",
+  "pageCount_other": "{{count}} bladsye",
+  "deletedJustNow": "Pas verwyder",
+  "deletedOn": "Verwyder op {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Herstel",
+    "deleteForever": "Permanent verwyder",
+    "emptyTrash": "Leeg asblik"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Open {{title}} van asblik",
+    "restorePage": "Herstel {{title}}",
+    "deletePageForever": "Verwyder {{title}} permanent",
+    "cancelPermanentDelete": "Kanselleer permanente verwydering",
+    "cancelEmptyTrash": "Kanselleer asblik leegmaak"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Permanent verwyder?",
+    "deleteBodyPrefix": "Dit sal permanent verwyder ",
+    "deleteBodySuffix": ". Jy kan nie hierdie aksie ongedaan maak nie.",
+    "emptyTitle": "Leeg asblik?",
+    "emptyBody_one": "Dit sal permanent al {{count}} bladsy in die asblik verwyder. Jy kan nie hierdie aksie ongedaan maak nie.",
+    "emptyBody_other": "Dit sal permanent al {{count}} bladsye in die asblik verwyder. Jy kan nie hierdie aksie ongedaan maak nie."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Permanent verwyder",
+    "couldntDelete": "Kon nie bladsy verwyder nie",
+    "restored": "Bladsy herstel",
+    "couldntRestore": "Kon nie bladsy herstel nie",
+    "emptied": "Asblik leeggemaak",
+    "couldntEmpty": "Kon nie asblik leegmaak nie"
   }
 }

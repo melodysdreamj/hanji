@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Wannan database ɗin bai da shafuka har yanzu.",
+  "emptyTitle": "Babu shafuka har yanzu",
+  "newInline": "Sabuwa",
+  "newPage": "Sabon shafi",
+  "newPageIn": "Sabon shafi a cikin {{dbTitle}}",
+  "noResultsDesc": "Babu shafuka da suka dace da tacewa ko bincike na yanzu.",
+  "noResultsTitle": "Babu sakamako",
+  "openRow": "Buɗe {{title}}"
 }

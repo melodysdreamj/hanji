@@ -15,10 +15,10 @@
     "phone": "Téléphone",
     "formula": "Formule",
     "relation": "Relation",
-    "rollup": "Synthèse",
-    "created_time": "Heure de création",
+    "rollup": "Récapitulatif",
+    "created_time": "Date de création",
     "created_by": "Créé par",
-    "last_edited_time": "Heure de dernière modification",
+    "last_edited_time": "Date de dernière modification",
     "last_edited_by": "Dernière modification par",
     "unique_id": "ID"
   }

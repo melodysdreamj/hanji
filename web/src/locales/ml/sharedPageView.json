@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "പങ്കിട്ട പേജ്",
+  "loading": "പങ്കിട്ട പേജ് ലോഡുചെയ്യുന്നു",
+  "unavailable": "ഈ പങ്കിട്ട പേജ് ലഭ്യമല്ല.",
+  "notFound": "പങ്കിട്ട പേജ് കണ്ടെത്തിയില്ല.",
+  "outsideShare": "ഈ പേജ് ഈ പൊതു പങ്കിടലിന്റെ ഭാഗമല്ല.",
+  "errors": {
+    "not-found": "ഈ ലിങ്ക് കാലഹരണപ്പെട്ടതോ, പ്രസിദ്ധീകരിക്കാത്തതോ, അല്ലെങ്കിൽ തെറ്റായി പകർത്തിയതോ ആകാം.",
+    "offline": "നിങ്ങളുടെ കണക്ഷൻ പരിശോധിച്ച്, പങ്കിട്ട പേജ് വീണ്ടും തുറക്കാൻ ശ്രമിക്കുക.",
+    "rate-limited": "ഈ പങ്കിട്ട പേജിന് വളരെയധികം അഭ്യർത്ഥനകൾ. കുറച്ച് സമയം കാത്തിരുന്ന് വീണ്ടും ശ്രമിക്കുക.",
+    "unavailable": "Hanji-ന് ഇപ്പോൾ ഈ പങ്കിട്ട പേജ് തുറക്കാൻ കഴിഞ്ഞില്ല. കുറച്ച് സമയത്തിന് ശേഷം വീണ്ടും ശ്രമിക്കുക."
+  },
+  "tryAgain": "വീണ്ടും ശ്രമിക്കുക"
 }

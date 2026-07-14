@@ -1,14 +1,14 @@
 {
   "couldntRestorePage": "ページを復元できませんでした",
-  "emptyBodyPrompt": "Enter キーを押して、この空のページで書き始めましょう。",
+  "emptyBodyPrompt": "この空白ページでEnterキーを押して入力を開始してください。",
   "inTrashTopBarTitle": "ゴミ箱内",
   "notFoundTopBarTitle": "見つかりません",
   "openWorkspace": "ワークスペースを開く",
   "pageInTrash": "このページはゴミ箱にあります。",
-  "pageInTrashDetail": "内容を開くまたは編集する前に復元してください。",
-  "pageUnavailable": "ページは利用できません。",
-  "pageUnavailableDetail": "このページは削除、移動されたか、別のアカウントと共有されている可能性があります。",
+  "pageInTrashDetail": "内容を開く・編集する前に復元してください。",
+  "pageUnavailable": "ページが利用できません。",
+  "pageUnavailableDetail": "このページは削除、移動、または別のアカウントと共有された可能性があります。",
   "restorePage": "ページを復元",
   "restoredPage": "ページを復元しました",
-  "loadingPageContent": "ページの内容を読み込んでいます"
+  "loadingPageContent": "ページコンテンツを読み込み中"
 }

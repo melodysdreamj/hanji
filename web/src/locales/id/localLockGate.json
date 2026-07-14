@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Buka kunci data lokal",
+  "description": "Data luring di perangkat ini dikunci dengan frasa sandi. Membuka kunci akan mengaktifkan kembali penggunaan dan penyimpanan luring.",
+  "passphrasePlaceholder": "Frasa sandi",
+  "unlock": "Buka kunci",
+  "continueOnline": "Lanjutkan hanya daring",
+  "continueOnlineHint": "«Lanjutkan hanya daring» menjaga suntingan luring yang terkunci tetap tersegel — suntingan tetap di perangkat ini dan tidak akan disinkronkan hingga Anda membukanya dengan frasa sandi yang benar.",
+  "wrongPassphrase": "Frasa sandi itu tidak benar.",
+  "unsupportedBrowser": "Kunci lokal tidak tersedia di peramban ini."
 }

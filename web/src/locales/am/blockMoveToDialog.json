@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "እገዳን ወደ አንቀሳቅስ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "የማንቀሳቀስ መዳረሻዎችን ይፈልጉ",
+    "placeholder": "ገጾችን ይፈልጉ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "የማንቀሳቀስ ንግግር ዝጋ"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "የማንቀሳቀስ መዳረሻዎች",
+    "empty": "ምንም ገጾች አልተገኙም።",
+    "destinationLabel": "እገዳን ወደ {{label}}፣ {{path}} አንቀሳቅስ"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" ፍጠር",
+    "optionLabel": "\"{{query}}\" ገጽ ፍጠር እና እገዳን ወደዚህ አንቀሳቅስ",
+    "hint": "አዲስ ገጽ - እገዳን ወደዚህ ያንቀሳቅሱ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "የተቆለፈ ገጽ"
   },
-  "untitled": "Untitled",
+  "untitled": "ርዕስ የለሽ",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "ገጽ ተቆልፏል",
+    "movedBlock": "እገዳ ተንቀሳቅሷል",
+    "movedBlocks": "እገዳዎች ተንቀሳቅሰዋል",
+    "movedBlocksCount": "{{blockCount}} እገዳዎች ተንቀሳቅሰዋል",
+    "moveFailed": "እገዳን ማንቀሳቀስ አልተቻለም"
   }
 }

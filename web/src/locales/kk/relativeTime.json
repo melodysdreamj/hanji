@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Жаңа ғана",
+  "editedJustNow": "Жаңа ғана өңделген",
+  "editedMinutesAgo": "{{minutes}} мин бұрын өңделген",
+  "editedHoursAgo": "{{hours}} сағ бұрын өңделген",
+  "editedDaysAgo": "{{days}} күн бұрын өңделген",
+  "editedOn": "{{date}} өңделген",
+  "noEdits": "Өңдеулер жоқ",
+  "noEditsYet": "Әзірге өңдеулер жоқ",
+  "todayAt": "Бүгін {{time}}",
+  "yesterdayAt": "Кеше {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

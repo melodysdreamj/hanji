@@ -1,6 +1,6 @@
 {
-  "title": "Algo salió mal al mostrar este contenido.",
-  "detail": "Inténtalo de nuevo. Si el problema continúa, recarga la aplicación y comparte la referencia a continuación.",
+  "title": "Ocurrió un error al mostrar este contenido.",
+  "detail": "Intente de nuevo. Si el problema persiste, recargue la aplicación y comparta la referencia a continuación.",
   "reference": "Referencia: {{reference}}",
   "reload": "Recargar aplicación",
   "retry": "Reintentar"

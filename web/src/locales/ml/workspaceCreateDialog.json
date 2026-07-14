@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "പുതിയ വർക്ക്സ്പേസ്",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "വർക്ക്സ്പെയ്സ് പേര്",
+    "placeholder": "എന്റെ കമ്പനി"
   },
-  "startLabel": "Start from",
+  "startLabel": "ആരംഭിക്കുന്നത്",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "ശൂന്യ വർക്ക്സ്പേസ്",
+      "body": "സ്റ്റാർട്ടർ പേജുകൾക്കൊപ്പം ശൂന്യമായി ആരംഭിക്കുക."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "നോഷനിൽ നിന്ന് ഇറക്കുമതി",
+      "body": "വർക്ക്സ്പേസ് സൃഷ്ടിച്ച്, അതിലേക്ക് ഒരു നോഷൻ വർക്ക്സ്പേസ് മൈഗ്രേറ്റ് ചെയ്യുക."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "മറ്റൊരു ഹാൻജിയിൽ നിന്ന് ഇറക്കുമതി",
+      "body": "വർക്ക്സ്പേസ് സൃഷ്ടിച്ച്, മറ്റൊരു ഹാൻജി സെർവറിൽ നിന്നോ ഫയലിൽ നിന്നോ വർക്ക്സ്പേസ് ഇറക്കുമതി ചെയ്യുക."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "വർക്ക്സ്പെയ്സ് സൃഷ്ടിക്കുക",
+  "creating": "സൃഷ്ടിക്കുന്നു…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "വർക്ക്സ്പെയ്സ് സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല."
   }
 }

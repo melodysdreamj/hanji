@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "తేదీ ఆస్తిని జోడించండి",
+    "description": "క్యాలెండర్ వీక్షణలకు నెలలో పేజీలను ఉంచడానికి తేదీ ఆస్తి అవసరం.",
+    "addDateButton": "తేదీ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "క్యాలెండర్ ప్రకారం",
+    "today": "ఈరోజు",
+    "previousWeek": "గత వారం",
+    "previousMonth": "మునుపటి నెల",
+    "nextWeek": "తదుపరి వారం",
+    "nextMonth": "తదుపరి నెల"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ఆది",
+    "mon": "సోమ",
+    "tue": "మంగళ",
+    "wed": "బుధ",
+    "thu": "గురు",
+    "fri": "శుక్ర",
+    "sat": "శని"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} క్యాలెండర్",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} అంశాలు",
+    "newRowAriaLabel": "{{date}} న కొత్త వరుస",
+    "newRowTitle": "కొత్త",
+    "showLess": "తక్కువ చూపించు",
+    "showMore": "+{{count}} మరిన్ని"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} తెరవండి",
+    "openAriaLabelWithDate": "{{title}} తెరవండి, {{date}} కోసం షెడ్యూల్ చేయబడింది",
+    "openNoDateAriaLabel": "{{title}} తెరవండి, తేదీ లేదు"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "తేదీ లేదు ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "శీర్షిక లేని",
+    "dateDefaultName": "తేదీ"
   }
 }

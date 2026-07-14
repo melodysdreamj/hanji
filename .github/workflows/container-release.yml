@@ -20,6 +20,7 @@ concurrency:
 
 env:
   IMAGE_NAME: ghcr.io/melodysdreamj/hanji
+  DOCKERHUB_IMAGE: melodysdreamj/hanji
 
 jobs:
   platform-runtime:
@@ -79,6 +80,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: docker.io
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
@@ -88,6 +95,7 @@ jobs:
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=alpha,enable=${{ contains(github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name, '-alpha') }}
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-') }}
             type=sha,format=long
           labels: |
@@ -105,9 +113,17 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             HANJI_BUILD_SHA=${{ github.sha }}
-          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,"name=${{ env.IMAGE_NAME }},${{ env.DOCKERHUB_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
           provenance: mode=max
           sbom: true
+      - name: Verify both registries received the exact platform digest
+        shell: bash
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          docker buildx imagetools inspect --raw "$IMAGE_NAME@$DIGEST" > ghcr-platform.json
+          docker buildx imagetools inspect --raw "$DOCKERHUB_IMAGE@$DIGEST" > dockerhub-platform.json
+          cmp ghcr-platform.json dockerhub-platform.json
       - name: Verify the exact digest's first-admin and persistence contract
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
@@ -198,15 +214,24 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        with:
+          registry: docker.io
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: |
+            ${{ env.IMAGE_NAME }}
+            ${{ env.DOCKERHUB_IMAGE }}
           tags: |
             type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
             type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=alpha,enable=${{ contains(github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name, '-alpha') }}
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-') }}
             type=sha,format=long
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -222,21 +247,43 @@ jobs:
         run: |
           mapfile -t digest_files < <(find /tmp/digests -type f | sort)
           [[ "${#digest_files[@]}" -eq 2 ]]
-          refs=()
+          ghcr_refs=()
+          dockerhub_refs=()
           for file in "${digest_files[@]}"; do
-            refs+=("$IMAGE_NAME@sha256:$(basename "$file")")
+            digest="sha256:$(basename "$file")"
+            ghcr_refs+=("$IMAGE_NAME@$digest")
+            dockerhub_refs+=("$DOCKERHUB_IMAGE@$digest")
           done
-          tag_args=()
+          ghcr_tag_args=()
+          dockerhub_tag_args=()
+          first_ghcr_tag=
+          first_dockerhub_tag=
           while IFS= read -r tag; do
-            [[ -n "$tag" ]] && tag_args+=(-t "$tag")
+            case "$tag" in
+              "$IMAGE_NAME":*)
+                ghcr_tag_args+=(-t "$tag")
+                [[ -n "$first_ghcr_tag" ]] || first_ghcr_tag="$tag"
+                ;;
+              "$DOCKERHUB_IMAGE":*)
+                dockerhub_tag_args+=(-t "$tag")
+                [[ -n "$first_dockerhub_tag" ]] || first_dockerhub_tag="$tag"
+                ;;
+            esac
           done <<< "$TAGS"
-          [[ "${#tag_args[@]}" -ge 2 ]]
-          docker buildx imagetools create "${tag_args[@]}" "${refs[@]}"
-          first_tag=${TAGS%%$'\n'*}
-          docker buildx imagetools inspect "$first_tag" > manifest.txt
-          digest=$(awk '$1 == "Digest:" { print $2; exit }' manifest.txt)
-          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          [[ "${#ghcr_tag_args[@]}" -ge 2 ]]
+          [[ "${#dockerhub_tag_args[@]}" -ge 2 ]]
+          docker buildx imagetools create "${ghcr_tag_args[@]}" "${ghcr_refs[@]}"
+          docker buildx imagetools create "${dockerhub_tag_args[@]}" "${dockerhub_refs[@]}"
+          docker buildx imagetools inspect "$first_ghcr_tag" > ghcr-manifest.txt
+          docker buildx imagetools inspect "$first_dockerhub_tag" > dockerhub-manifest.txt
+          ghcr_digest=$(awk '$1 == "Digest:" { print $2; exit }' ghcr-manifest.txt)
+          dockerhub_digest=$(awk '$1 == "Digest:" { print $2; exit }' dockerhub-manifest.txt)
+          [[ "$ghcr_digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          [[ "$ghcr_digest" == "$dockerhub_digest" ]]
+          docker buildx imagetools inspect --raw "$IMAGE_NAME@$ghcr_digest" > ghcr-index.json
+          docker buildx imagetools inspect --raw "$DOCKERHUB_IMAGE@$dockerhub_digest" > dockerhub-index.json
+          cmp ghcr-index.json dockerhub-index.json
+          echo "digest=$ghcr_digest" >> "$GITHUB_OUTPUT"
       - name: Publish GitHub build provenance
         uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
         with:
@@ -248,15 +295,25 @@ jobs:
         env:
           DIGEST: ${{ steps.manifest.outputs.digest }}
         run: |
-          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > manifest.txt
-          grep -q 'linux/amd64' manifest.txt
-          grep -q 'linux/arm64' manifest.txt
-      - name: Require anonymous pullability before calling the image public
+          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > ghcr-manifest.txt
+          docker buildx imagetools inspect "$DOCKERHUB_IMAGE@$DIGEST" > dockerhub-manifest.txt
+          grep -q 'linux/amd64' ghcr-manifest.txt
+          grep -q 'linux/arm64' ghcr-manifest.txt
+          grep -q 'linux/amd64' dockerhub-manifest.txt
+          grep -q 'linux/arm64' dockerhub-manifest.txt
+      - name: Require anonymous pullability and registry parity
         shell: bash
         env:
           DIGEST: ${{ steps.manifest.outputs.digest }}
         run: |
           docker logout ghcr.io
-          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > anonymous-manifest.txt
-          grep -q 'linux/amd64' anonymous-manifest.txt
-          grep -q 'linux/arm64' anonymous-manifest.txt
+          docker logout docker.io
+          docker buildx imagetools inspect --raw "$IMAGE_NAME@$DIGEST" > anonymous-ghcr.json
+          docker buildx imagetools inspect --raw "$DOCKERHUB_IMAGE@$DIGEST" > anonymous-dockerhub.json
+          cmp anonymous-ghcr.json anonymous-dockerhub.json
+          docker buildx imagetools inspect "$IMAGE_NAME@$DIGEST" > anonymous-ghcr.txt
+          docker buildx imagetools inspect "$DOCKERHUB_IMAGE@$DIGEST" > anonymous-dockerhub.txt
+          grep -q 'linux/amd64' anonymous-ghcr.txt
+          grep -q 'linux/arm64' anonymous-ghcr.txt
+          grep -q 'linux/amd64' anonymous-dockerhub.txt
+          grep -q 'linux/arm64' anonymous-dockerhub.txt

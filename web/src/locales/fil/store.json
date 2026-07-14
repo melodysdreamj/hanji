@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Naka-lock ang database na ito, kaya hindi nai-save ang iyong mga pagbabago.",
+  "databaseRowsLoadFailed": "Hindi na-load ang mga row ng database. Pakisubukan muli sa ilang sandali.",
+  "editAccessDeniedSave": "Wala kang access sa pag-edit, kaya hindi nai-save ang iyong mga pagbabago.",
+  "lockedSave": "Naka-lock ang page o database, kaya hindi nai-save ang iyong mga pagbabago.",
+  "pageLockedSave": "Naka-lock ang page na ito, kaya hindi nai-save ang iyong mga pagbabago.",
+  "pageMissingSave": "Hindi mahanap ang page, kaya hindi nai-save ang iyong mga pagbabago.",
+  "saveFailed": "Hindi nai-save ang iyong mga pagbabago.",
+  "sessionExpired": "Nag-expire ang iyong session o hindi napatunayan ang request. Pakisubukan muli.",
+  "blockConflictSave": "Ang block na ito ay na-edit sa ibang device, kaya hindi na-apply ang iyong offline na pagbabago.",
+  "blockConflictKeepMine": "Ilapat ang aking bersyon",
+  "blockMoveCommentsSkipped": "Nailipat ang block, ngunit hindi nailipat ang mga komento nito kasama nito."
 }

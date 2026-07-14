@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "पृष्ठ में खोजें"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "पृष्ठ में खोजें",
+    "placeholder": "पृष्ठ में खोजें"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "पिछला मिलान",
+    "next": "अगला मिलान",
+    "close": "खोज बंद करें"
   }
 }

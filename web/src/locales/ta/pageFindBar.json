@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "பக்கத்தில் தேடு"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "பக்கத்தில் தேடு",
+    "placeholder": "பக்கத்தில் தேடு"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "முந்தைய பொருத்தம்",
+    "next": "அடுத்த பொருத்தம்",
+    "close": "தேடலை மூடு"
   }
 }

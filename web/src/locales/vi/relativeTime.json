@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Vừa xong",
+  "editedJustNow": "Vừa chỉnh sửa",
+  "editedMinutesAgo": "Đã chỉnh sửa {{minutes}} phút trước",
+  "editedHoursAgo": "Đã chỉnh sửa {{hours}} giờ trước",
+  "editedDaysAgo": "Đã chỉnh sửa {{days}} ngày trước",
+  "editedOn": "Đã chỉnh sửa {{date}}",
+  "noEdits": "Chưa chỉnh sửa",
+  "noEditsYet": "Chưa có chỉnh sửa",
+  "todayAt": "Hôm nay lúc {{time}}",
+  "yesterdayAt": "Hôm qua lúc {{time}}",
+  "dateAt": "{{date}} lúc {{time}}"
 }

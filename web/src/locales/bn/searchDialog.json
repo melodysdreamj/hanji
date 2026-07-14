@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "অনুসন্ধান বা যান...",
+  "quickFind": "দ্রুত খুঁজুন",
+  "closeSearch": "অনুসন্ধান বন্ধ করুন",
+  "quickFindResults": "দ্রুত খুঁজুন ফলাফল",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "সম্প্রতি দেখা",
+    "recentSearches": "সম্প্রতি অনুসন্ধান",
+    "pages": "পৃষ্ঠাগুলি",
+    "pageContent": "পৃষ্ঠার বিষয়বস্তু",
+    "favorites": "প্রিয়"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "পৃষ্ঠায়",
+  "searchingDetail": "অনুসন্ধান করা হচ্ছে...",
+  "searchAgain": "আবার অনুসন্ধান",
+  "searchingPageContent": "পৃষ্ঠার বিষয়বস্তু অনুসন্ধান করা হচ্ছে...",
+  "noResultsFor": "\"{{query}}\"-এর জন্য কোনো ফলাফল নেই",
+  "noPagesFound": "কোনো পৃষ্ঠা পাওয়া যায়নি",
+  "creating": "তৈরি হচ্ছে...",
+  "newPage": "নতুন পৃষ্ঠা \"{{query}}\"",
+  "couldntCreatePage": "পৃষ্ঠা তৈরি করা যায়নি",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "নির্বাচন",
+    "open": "খুলুন",
+    "newTab": "নতুন ট্যাব"
   }
 }

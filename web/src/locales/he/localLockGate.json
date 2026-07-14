@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "בטל נעילת נתונים מקומיים",
+  "description": "נתונים לא מקוונים במכשיר זה נעולים באמצעות סיסמה. ביטול הנעילה מפעיל מחדש שימוש לא מקוון ושמירה.",
+  "passphrasePlaceholder": "סיסמה",
+  "unlock": "בטל נעילה",
+  "continueOnline": "המשך רק במצב מקוון",
+  "continueOnlineHint": "המשך רק במצב מקוון שומר על עריכות המכשיר הנעולות – הן נשארות במכשיר ולא מסתנכרנות עד לפתיחה עם הסיסמה הנכונה.",
+  "wrongPassphrase": "הסיסמה שגויה.",
+  "unsupportedBrowser": "נעילה מקומית אינה זמינה בדפדפן זה."
 }

@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Nog geen gesprekken. Reageer op een pagina of vermeld iemand om er een te beginnen.",
+  "leave": "Verlaten",
+  "leaveAria": "Verlaat het gesprek op {{title}}",
+  "open": "Open het gesprek op {{title}}",
+  "participants_one": "{{count}} deelnemer",
+  "participants_other": "{{count}} deelnemers",
+  "untitled": "Naamloos",
+  "loading": "Gesprekken laden…"
 }

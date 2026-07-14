@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "顯示此內容時發生錯誤。",
+  "detail": "請再試一次。如果問題持續發生，請重新載入應用程式並分享下方的參考編號。",
+  "reference": "參考編號：{{reference}}",
+  "reload": "重新載入應用程式",
+  "retry": "重試"
 }

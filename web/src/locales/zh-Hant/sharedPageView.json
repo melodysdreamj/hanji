@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "共用頁面",
+  "loading": "正在載入共用頁面",
+  "unavailable": "此共用頁面無法使用。",
+  "notFound": "找不到共用頁面。",
+  "outsideShare": "此頁面不屬於此公開分享。",
+  "tryAgain": "重試",
+  "errors": {
+    "not-found": "此連結可能已過期、已取消發布或複製有誤。",
+    "rate-limited": "此共用頁面收到過多請求，請稍後再試。",
+    "offline": "請檢查連線後重新開啟共用頁面。",
+    "unavailable": "Hanji 目前無法開啟此共用頁面，請稍後再試。"
+  }
 }

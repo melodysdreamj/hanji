@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Ƙara sifa ta kwanan wata",
+    "description": "Duban lokaci yana buƙatar sifa ta kwanan watan farawa don nuna shafuka a cikin lokaci."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Ƙara sifa ta kwanan watan ƙarshe don nuna zango maimakon sandunan kwana ɗaya.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zuƙowa lokaci",
+    "day": "Rana",
+    "week": "Mako",
+    "month": "Wata"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Abubuwan dogaro:",
+    "hint": "ƙara sifa na dangantaka",
+    "relationPropertyAriaLabel": "Sifa na dangantaka dogaro"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Yau",
+    "previousRange": "Zango na baya",
+    "nextRange": "Zango na gaba",
+    "newPage": "Sabo",
+    "newPageIn": "Sabon shafi a cikin {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Teburin lokaci",
+    "nameHeader": "Suna"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buɗe {{title}}",
+    "openAriaLabelWithDates": "Buɗe {{title}}, {{start}} zuwa {{end}}",
+    "openNoDateAriaLabel": "Buɗe {{title}}, babu kwanan wata"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Babu abubuwa a cikin wannan zangon.",
+    "noDatedItems": "Har yanzu babu abubuwa masu kwanan wata.",
+    "jumpTo": "Tsallaka zuwa {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Babu kwanan wata ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Babu",
+    "untitled": "Babu take"
   }
 }

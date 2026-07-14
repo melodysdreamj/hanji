@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "İkon seçiciyi kapat",
+    "label": "İkon seç"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Simge türü",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Görsel"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Kaldır",
+    "ariaLabel": "Simgeyi kaldır"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtrele…",
+    "searchLabel": "Simge ara",
+    "random": "Rastgele",
+    "randomLabel": "Rastgele ikon seç",
+    "recentLabel": "Son kullanılanlar ilk",
+    "gridLabelRecent": "İkonlar, en son kullanılanlar önce",
+    "gridLabel": "İkonlar",
+    "optionLabel": "{{emoji}} ikonunu seç",
+    "noResults": "“{{query}}” ile eşleşen ikon yok. Farklı bir kelime deneyin veya filtreyi temizleyin."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Görsel",
+    "linkPlaceholder": "Görsel bağlantısını yapıştır",
+    "linkLabel": "Görsel ikon bağlantısı",
+    "apply": "Uygula",
+    "upload": "Dosya yükle",
+    "uploading": "Yükleniyor...",
+    "uploadingLabel": "{{fileName}} yükleniyor",
+    "uploadFailed": "Bu görsel yüklenemedi.",
+    "fallbackFileName": "İkon görseli"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Yükleme hazırlanıyor",
+    "finalizing": "Sonlandırılıyor",
+    "complete": "Tamamlandı",
+    "uploading": "Yükleniyor"
   }
 }

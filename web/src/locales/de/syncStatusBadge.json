@@ -1,10 +1,10 @@
 {
   "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} ausstehende Änderung",
-  "offlinePending_other": "Offline · {{count}} ausstehende Änderungen",
-  "syncing": "Synchronisierung · {{count}}",
+  "offlinePending_one": "Offline · {{count}} Änderung ausstehend",
+  "offlinePending_other": "Offline · {{count}} Änderungen ausstehend",
+  "syncing": "Synchronisiere · {{count}}",
   "unreachable": "Server nicht erreichbar",
-  "unreachablePending_one": "Server nicht erreichbar · {{count}} ausstehende Änderung",
-  "unreachablePending_other": "Server nicht erreichbar · {{count}} ausstehende Änderungen",
-  "retryHint": "Klicken Sie, um jetzt erneut zu versuchen"
+  "unreachablePending_one": "Server nicht erreichbar · {{count}} Änderung ausstehend",
+  "unreachablePending_other": "Server nicht erreichbar · {{count}} Änderungen ausstehend",
+  "retryHint": "Klicken zum erneuten Versuchen"
 }

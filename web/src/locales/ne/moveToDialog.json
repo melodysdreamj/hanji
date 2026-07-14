@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "मा सार्नुहोस्",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "कार्यक्षेत्रको मूल",
+    "path": "शीर्ष तह"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "स्थानान्तरण गन्तव्यहरू खोज्नुहोस्",
+    "placeholder": "पृष्ठहरू खोज्नुहोस्..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "सार्नुहोस् संवाद बन्द गर्नुहोस्"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "स्थानान्तरण गन्तव्यहरू",
+    "empty": "कुनै पृष्ठ फेला परेन।",
+    "destinationLabel": "{{label}}, {{path}} मा सार्नुहोस्"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" बनाउनुहोस्",
+    "optionLabel": "{{title}} पृष्ठ बनाउनुहोस् र यहाँ सार्नुहोस्",
+    "hint": "नयाँ शीर्ष-स्तरीय पृष्ठ - यहाँ सार्नुहोस्"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "लक गरिएको अभिभावक पृष्ठ",
+    "page": "लक गरिएको पृष्ठ"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "पृष्ठ लक गरिएको अभिभावकमा छ",
+    "locked": "पृष्ठ लक गरिएको छ",
+    "moved": "पृष्ठ सारियो",
+    "moveFailed": "पृष्ठ सार्न सकिएन"
   }
 }

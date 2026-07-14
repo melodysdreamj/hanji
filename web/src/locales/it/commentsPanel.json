@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Commenti",
+  "closeAria": "Chiudi commenti",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Discussione blocco",
+    "page": "Discussione pagina"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Stato commento",
+    "open": "Aperto",
+    "resolved": "Risolto"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Commento su",
+    "commentingOnSelectedText": "Commento su testo selezionato",
+    "selectedBlock": "Blocco selezionato",
+    "onSelectedText": "Sul testo selezionato",
+    "onSelectedBlock": "Sul blocco selezionato",
+    "onABlock": "Su un blocco"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Aggiungi commento al blocco",
+    "addPageComment": "Aggiungi commento alla pagina",
+    "blockPlaceholder": "Commenta questo blocco...",
+    "pagePlaceholder": "Aggiungi un commento...",
+    "submit": "Commenta"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Menziona persone nel commento",
+    "replyPeopleAria": "Menziona persone nella risposta",
+    "trigger": "Menziona persone",
+    "noMatches": "Nessuna persona corrispondente",
+    "title": "Menziona {{name}}",
+    "person": "Persona",
+    "you": "Tu",
+    "organizationPerson": "Membro dell'organizzazione",
+    "roleInOrganization": "{{role}} nell'organizzazione"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Thread dei commenti",
+    "empty": "Nessun commento ancora",
+    "noOpen": "Nessun commento aperto",
+    "noResolved": "Nessun commento risolto"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Commento di {{author}}, {{time}}",
+    "commentAriaResolved": "Commento di {{author}}, {{time}}, risolto",
+    "replyAria": "Risposta di {{author}}, {{time}}",
+    "repliesAria": "{{count}} risposte",
+    "edited": "(modificato)",
+    "emptyComment": "(commento vuoto)",
+    "emptyReply": "(risposta vuota)",
+    "justNow": "Proprio ora"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Rispondi",
+    "showInPage": "Mostra nella pagina",
+    "resolve": "Risolvi",
+    "reopen": "Riapri",
+    "edit": "Modifica"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Rispondi..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Modifica commento"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Eliminare questo commento?",
+    "threadConfirm_one": "Eliminare questo commento e la sua risposta?",
+    "threadConfirm_other": "Eliminare questo commento e le sue {{count}} risposte?"
   }
 }

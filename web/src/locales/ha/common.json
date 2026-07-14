@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Soke",
+    "save": "Ajiye",
+    "close": "Rufe",
+    "search": "Nema",
+    "create": "Ƙirƙiri",
+    "delete": "Goge",
+    "clearAll": "Share duka",
+    "done": "An yi",
+    "add": "Ƙara"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Mara suna"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} kwafi",
+    "columnName": "Rukuni {{number}}",
+    "importedDatabase": "Database da aka shigo",
+    "uploadedFile": "Fayil da aka loda",
+    "image": "Hoto",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Suna",
+      "status": "Matsayi",
+      "select": "Zaɓi",
+      "date": "Kwanan wata"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Ba a fara ba",
+      "doing": "Ana ci gaba",
+      "done": "An gama"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Zaɓi 1",
+      "second": "Zaɓi 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tebur"
     }
   }
 }

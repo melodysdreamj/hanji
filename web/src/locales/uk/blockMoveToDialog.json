@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Перемістити блок у",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Пошук місць переміщення",
+    "placeholder": "Пошук сторінок..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Закрити діалог переміщення"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Місця переміщення",
+    "empty": "Сторінок не знайдено.",
+    "destinationLabel": "Перемістити блок у {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Створити \"{{query}}\"",
+    "optionLabel": "Створити сторінку \"{{query}}\" і перемістити блок сюди",
+    "hint": "Нова сторінка - перемістити блок сюди"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Заблокована сторінка"
   },
-  "untitled": "Untitled",
+  "untitled": "Без назви",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Сторінку заблоковано",
+    "movedBlock": "Блок переміщено",
+    "movedBlocks": "Блоки переміщено",
+    "movedBlocksCount": "Переміщено {{blockCount}} блоків",
+    "moveFailed": "Не вдалося перемістити блок"
   }
 }

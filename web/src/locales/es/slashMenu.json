@@ -11,5 +11,5 @@
   "listStatus": "{{total}} comandos de bloque disponibles.",
   "noBlocks": "No se encontraron bloques",
   "noBlocksFor": "No se encontraron bloques para \"{{query}}\"",
-  "recentlyUsed": "Usados recientemente"
+  "recentlyUsed": "Recientes"
 }

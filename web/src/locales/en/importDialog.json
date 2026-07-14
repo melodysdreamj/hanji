@@ -242,7 +242,8 @@
     "applying": "Applying...",
     "readyHint_one": "{{count}} item ready to import.",
     "readyHint_other": "{{count}} items ready to import.",
-    "runningHint": "Progress updates live — you can keep this dialog open.",
+    "runningHint": "Keep this browser tab open while the import is running.",
+    "browserRunnerWarning": "This import is running in this browser tab. Keep the tab open until it finishes. Closing or reloading the tab pauses processing; opening Hanji again resumes from the saved progress.",
     "noJobHint": "Start discovery from the Scope step first.",
     "applyLocksHint": "Applying writes the discovered items into this workspace."
   },

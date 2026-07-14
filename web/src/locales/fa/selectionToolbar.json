@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "قالب‌بندی متن"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "تبدیل",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "متن",
+      "heading1": "عنوان 1",
+      "heading2": "عنوان 2",
+      "heading3": "عنوان 3",
+      "heading4": "عنوان 4",
+      "toDoList": "لیست کارها",
+      "bulletedList": "لیست نقطه‌ای",
+      "numberedList": "لیست شماره‌دار",
+      "toggleList": "لیست بازشونده",
+      "quote": "نقل‌قول",
+      "callout": "کال‌اوت",
+      "code": "کد"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "پررنگ",
+    "italic": "ایتالیک",
+    "underline": "زیرخط",
+    "strikethrough": "خط‌خورده",
+    "code": "کد",
+    "link": "لینک"
   },
   "comment": {
-    "label": "Comment"
+    "label": "نظر"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "رنگ متن: {{color}}",
+    "title": "رنگ: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "مخلوط",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "رنگ متن",
+      "default": "پیش‌فرض",
+      "gray": "خاکستری",
+      "brown": "قهوه‌ای",
+      "orange": "نارنجی",
+      "yellow": "زرد",
+      "green": "سبز",
+      "blue": "آبی",
+      "purple": "بنفش",
+      "pink": "صورتی",
+      "red": "قرمز"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "رنگ زمینه",
+      "gray": "زمینه خاکستری",
+      "brown": "زمینه قهوه‌ای",
+      "orange": "زمینه نارنجی",
+      "yellow": "زمینه زرد",
+      "green": "زمینه سبز",
+      "blue": "زمینه آبی",
+      "purple": "زمینه بنفش",
+      "pink": "زمینه صورتی",
+      "red": "زمینه قرمز"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "ویرایش لینک",
+    "placeholder": "چسباندن لینک",
+    "urlAriaLabel": "آدرس لینک",
+    "apply": "لینک",
+    "open": "باز کردن لینک",
+    "copy": "کپی لینک",
+    "copied": "کپی شد",
+    "copiedLink": "لینک کپی شد",
+    "remove": "حذف"
   }
 }

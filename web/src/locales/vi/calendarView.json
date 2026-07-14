@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Thêm thuộc tính ngày",
+    "description": "Chế độ xem lịch cần một thuộc tính ngày để đặt trang lên lịch tháng.",
+    "addDateButton": "Ngày"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Lịch theo",
+    "today": "Hôm nay",
+    "previousWeek": "Tuần trước",
+    "previousMonth": "Tháng trước",
+    "nextWeek": "Tuần sau",
+    "nextMonth": "Tháng sau"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "CN",
+    "mon": "T2",
+    "tue": "T3",
+    "wed": "T4",
+    "thu": "T5",
+    "fri": "T6",
+    "sat": "T7"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Lịch {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} mục",
+    "newRowAriaLabel": "Hàng mới vào {{date}}",
+    "newRowTitle": "Mới",
+    "showLess": "Thu gọn",
+    "showMore": "+{{count}} nữa"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Mở {{title}}",
+    "openAriaLabelWithDate": "Mở {{title}}, dự kiến vào {{date}}",
+    "openNoDateAriaLabel": "Mở {{title}}, không có ngày"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Không có ngày ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Không có tiêu đề",
+    "dateDefaultName": "Ngày"
   }
 }

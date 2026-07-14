@@ -1,12 +1,12 @@
 {
   "justNow": "たった今",
-  "editedJustNow": "たった今編集",
-  "editedMinutesAgo": "{{minutes}} 分前に編集",
-  "editedHoursAgo": "{{hours}} 時間前に編集",
-  "editedDaysAgo": "{{days}} 日前に編集",
-  "editedOn": "{{date}} に編集",
+  "editedJustNow": "編集したばかり",
+  "editedMinutesAgo": "{{minutes}}分前に編集",
+  "editedHoursAgo": "{{hours}}時間前に編集",
+  "editedDaysAgo": "{{days}}日前に編集",
+  "editedOn": "{{date}}に編集",
   "noEdits": "編集なし",
-  "noEditsYet": "まだ編集はありません",
+  "noEditsYet": "まだ編集なし",
   "todayAt": "今日 {{time}}",
   "yesterdayAt": "昨日 {{time}}",
   "dateAt": "{{date}} {{time}}"

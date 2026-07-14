@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "සෙවීම හෝ වෙත යන්න...",
+  "quickFind": "ඉක්මන් සෙවීම",
+  "closeSearch": "සෙවීම වසන්න",
+  "quickFindResults": "ඉක්මන් සෙවීම් ප්‍රතිඵල",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "මෑතකදී නරඹන ලද",
+    "recentSearches": "මෑත සෙවීම්",
+    "pages": "පිටු",
+    "pageContent": "පිටු අන්තර්ගතය",
+    "favorites": "ප්‍රියතම"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "පිටුව තුළ",
+  "searchingDetail": "සෙවීමේ...",
+  "searchAgain": "නැවත සොයන්න",
+  "searchingPageContent": "පිටු අන්තර්ගතය සෙවීමේ...",
+  "noResultsFor": "\"{{query}}\" සඳහා ප්‍රතිඵල නොමැත",
+  "noPagesFound": "පිටු හමු නොවීය",
+  "creating": "සාදමින්...",
+  "newPage": "නව පිටුව \"{{query}}\"",
+  "couldntCreatePage": "පිටුව සෑදීමට නොහැකි විය",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "තෝරන්න",
+    "open": "විවෘත කරන්න",
+    "newTab": "නව ටැබ්"
   }
 }

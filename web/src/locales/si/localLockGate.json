@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "දේශීය දත්ත අගුළු හරින්න",
+  "description": "මෙම උපාංගයේ නොබැඳි දත්ත රහස් වාක්‍ය ඛණ්ඩයකින් අගුළු දමා ඇත. අගුළු හැරීමෙන් නොබැඳි භාවිතය සහ සුරැකීම නැවත ක්‍රියාත්මක වේ.",
+  "passphrasePlaceholder": "රහස් වාක්‍යය",
+  "unlock": "අගුළු හරින්න",
+  "continueOnline": "මාර්ගගත පමණක් ඉදිරියට යන්න",
+  "continueOnlineHint": "\"මාර්ගගත පමණක් ඉදිරියට යන්න\" මෙම උපාංගයේ අගුළු දැමූ නොබැඳි සංස්කරණ මුද්‍රා තබයි — ඒවා මෙම උපාංගයේ රැඳේ, නිවැරදි රහස් වාක්‍ය ඛණ්ඩයෙන් අගුළු හරින තෙක් සමමුහුර්ත නොවේ.",
+  "wrongPassphrase": "එම රහස් වාක්‍යය නිවැරදි නැත.",
+  "unsupportedBrowser": "මෙම බ්‍රවුසරයේ දේශීය අගුලු ලබා ගත නොහැක."
 }

@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "ဤဒေတာဘေ့စ်တွင် စာမျက်နှာများမရှိသေးပါ။",
+  "emptyTitle": "စာမျက်နှာမရှိသေးပါ",
+  "newInline": "အသစ်",
+  "newPage": "စာမျက်နှာအသစ်",
+  "newPageIn": "{{dbTitle}} တွင် စာမျက်နှာအသစ်",
+  "noResultsDesc": "လက်ရှိစစ်ထုတ်မှု သို့မဟုတ် ရှာဖွေမှုနှင့် ကိုက်ညီသော စာမျက်နှာများ မရှိပါ။",
+  "noResultsTitle": "ရလဒ်မရှိပါ",
+  "openRow": "{{title}} ဖွင့်ရန်"
 }

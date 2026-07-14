@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Reacties",
+  "closeAria": "Reacties sluiten",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Blokdiscussie",
+    "page": "Paginadiscussie"
   },
   "status": {
-    "aria": "Comment status",
+    "aria": "Reactiestatus",
     "open": "Open",
-    "resolved": "Resolved"
+    "resolved": "Opgelost"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Reageren op",
+    "commentingOnSelectedText": "Reageren op geselecteerde tekst",
+    "selectedBlock": "Geselecteerd blok",
+    "onSelectedText": "Op geselecteerde tekst",
+    "onSelectedBlock": "Op geselecteerd blok",
+    "onABlock": "Op een blok"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Blokreactie toevoegen",
+    "addPageComment": "Paginareactie toevoegen",
+    "blockPlaceholder": "Reageer op dit blok...",
+    "pagePlaceholder": "Voeg een reactie toe...",
+    "submit": "Reageren"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Mensen vermelden bij reactie",
+    "replyPeopleAria": "Mensen vermelden bij antwoord",
+    "trigger": "Mensen vermelden",
+    "noMatches": "Geen overeenkomende personen",
+    "title": "{{name}} vermelden",
+    "person": "Persoon",
+    "you": "Jij",
+    "organizationPerson": "Organisatielid",
+    "roleInOrganization": "{{role}} in de organisatie"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Reactiedraden",
+    "empty": "Nog geen reacties",
+    "noOpen": "Geen open reacties",
+    "noResolved": "Geen opgeloste reacties"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} reactie, {{time}}",
+    "commentAriaResolved": "{{author}} reactie, {{time}}, opgelost",
+    "replyAria": "{{author}} antwoord, {{time}}",
+    "repliesAria": "{{count}} antwoorden",
+    "edited": "(bewerkt)",
+    "emptyComment": "(lege reactie)",
+    "emptyReply": "(leeg antwoord)",
+    "justNow": "Zojuist"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Antwoorden",
+    "showInPage": "Tonen in pagina",
+    "resolve": "Oplossen",
+    "reopen": "Opnieuw openen",
+    "edit": "Bewerken"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Antwoord..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Reactie bewerken"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Deze reactie verwijderen?",
+    "threadConfirm_one": "Deze reactie en het antwoord verwijderen?",
+    "threadConfirm_other": "Deze reactie en de {{count}} antwoorden verwijderen?"
   }
 }

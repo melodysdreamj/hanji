@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Naglo-load ng mga item ng relasyon",
+  "relationUnavailable": "Hindi available ang mga item ng relasyon",
+  "unavailable": "Hindi available",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Naka-check",
+    "unchecked": "Hindi naka-check"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Buksan ang {{title}}",
+  "openOrDownloadFile": "Buksan o i-download ang {{name}}"
 }

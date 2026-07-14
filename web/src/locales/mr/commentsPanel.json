@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "टिप्पण्या",
+  "closeAria": "टिप्पणी बंद करा",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ब्लॉक चर्चा",
+    "page": "पृष्ठ चर्चा"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "टिप्पणी स्थिती",
+    "open": "खुले",
+    "resolved": "सोडवलेले"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "टिप्पणी विषय",
+    "commentingOnSelectedText": "निवडलेल्या मजकुरावर टिप्पणी",
+    "selectedBlock": "निवडलेला ब्लॉक",
+    "onSelectedText": "निवडलेल्या मजकुरावर",
+    "onSelectedBlock": "निवडलेल्या ब्लॉकवर",
+    "onABlock": "ब्लॉकवर"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ब्लॉक टिप्पणी जोडा",
+    "addPageComment": "पृष्ठ टिप्पणी जोडा",
+    "blockPlaceholder": "या ब्लॉकवर टिप्पणी करा...",
+    "pagePlaceholder": "टिप्पणी जोडा...",
+    "submit": "टिप्पणी करा"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "टिप्पणी उल्लेख व्यक्ती",
+    "replyPeopleAria": "उत्तर उल्लेख व्यक्ती",
+    "trigger": "व्यक्तींना उल्लेख करा",
+    "noMatches": "जुळणाऱ्या व्यक्ती नाहीत",
+    "title": "{{name}} ला उल्लेख करा",
+    "person": "व्यक्ती",
+    "you": "आपण",
+    "organizationPerson": "संस्था सदस्य",
+    "roleInOrganization": "संस्थेतील {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "टिप्पणी धागे",
+    "empty": "अजून टिप्पण्या नाहीत",
+    "noOpen": "खुल्या टिप्पण्या नाहीत",
+    "noResolved": "सोडवलेल्या टिप्पण्या नाहीत"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}}ची टिप्पणी, {{time}}",
+    "commentAriaResolved": "{{author}}ची टिप्पणी, {{time}}, निराकरण झालेली",
+    "replyAria": "{{author}}चे उत्तर, {{time}}",
+    "repliesAria": "{{count}} उत्तरे",
+    "edited": "(संपादित)",
+    "emptyComment": "(रिक्त टिप्पणी)",
+    "emptyReply": "(रिक्त उत्तर)",
+    "justNow": "आत्ताच"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "उत्तर द्या",
+    "showInPage": "पृष्ठात दाखवा",
+    "resolve": "निराकरण करा",
+    "reopen": "पुन्हा उघडा",
+    "edit": "संपादित करा"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "उत्तर..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "टिप्पणी संपादित करा"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ही टिप्पणी हटवायची?",
+    "threadConfirm_one": "ही टिप्पणी आणि तिचे उत्तर हटवायचे?",
+    "threadConfirm_other": "ही टिप्पणी आणि तिची {{count}} उत्तरे हटवायची?"
   }
 }

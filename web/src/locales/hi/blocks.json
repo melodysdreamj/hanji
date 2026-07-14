@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "पाठ",
+      "description": "सादे पाठ से लिखना शुरू करें",
+      "placeholder": "कमांड के लिए '/' टाइप करें"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "पेज",
+      "description": "इस पेज के अंदर एक उप-पेज बनाएं।"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "पृष्ठ से लिंक",
+      "description": "किसी मौजूदा पेज से लिंक करें।"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "शीर्षक 1",
+      "description": "बड़ा अनुभाग शीर्षक।",
+      "placeholder": "शीर्षक 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "टॉगल शीर्षक 1",
+      "description": "बड़ा शीर्षक जो नेस्टेड सामग्री छिपा सकता है।",
+      "placeholder": "टॉगल शीर्षक 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "शीर्षक 2",
+      "description": "मध्यम अनुभाग शीर्षक।",
+      "placeholder": "शीर्षक 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "टॉगल शीर्षक 2",
+      "description": "मध्यम शीर्षक जो नेस्टेड सामग्री को छुपा सकता है।",
+      "placeholder": "टॉगल शीर्षक 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "शीर्षक 3",
+      "description": "छोटा अनुभाग शीर्षक।",
+      "placeholder": "शीर्षक 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "टॉगल शीर्षक 3",
+      "description": "छोटा शीर्षक जो नेस्टेड सामग्री को छुपा सकता है।",
+      "placeholder": "टॉगल शीर्षक 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "शीर्षक 4",
+      "description": "लघु अनुभाग शीर्षक।",
+      "placeholder": "शीर्षक 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "टॉगल शीर्षक 4",
+      "description": "संक्षिप्त शीर्षक जो नेस्टेड सामग्री को छुपा सकता है।",
+      "placeholder": "टॉगल शीर्षक 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "टू-डू सूची",
+      "description": "चेकबॉक्स से कार्य ट्रैक करें।",
+      "placeholder": "टू-डू"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "बुलेटेड सूची",
+      "description": "एक साधारण बुलेटेड सूची बनाएँ।",
+      "placeholder": "सूची"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "क्रमांकित सूची",
+      "description": "क्रमांकित सूची बनाएँ",
+      "placeholder": "सूची"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "टॉगल सूची",
+      "description": "टॉगल सामग्री को छुपा और दिखा सकते हैं।",
+      "placeholder": "टॉगल"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "उद्धरण",
+      "description": "उद्धरण लिखें",
+      "placeholder": "खाली उद्धरण"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "कॉलआउट",
+      "description": "लेखन को प्रमुख बनाएँ।",
+      "placeholder": "कुछ टाइप करें…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "विभाजक",
+      "description": "ब्लॉकों को दृश्य रूप से विभाजित करें।"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "कोड",
+      "description": "कोड स्निपेट जोड़ें।",
+      "placeholder": "कोड लिखें, या कोई स्निपेट चिपकाएँ…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "समीकरण",
+      "description": "गणितीय समीकरण प्रदर्शित करें।"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "विषय सूची",
+      "description": "इस पेज के शीर्षकों के लिंक दिखाएँ।"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "समन्वयित ब्लॉक",
+      "description": "पृष्ठों पर सामग्री का पुन: उपयोग करें।"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "बटन",
+      "description": "एक क्लिक से पुन: उपयोग योग्य सामग्री डालें।"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "टैब",
+      "description": "सामग्री को लेबल वाले टैब में समूहित करें।",
+      "placeholder": "टैब"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "ब्रेडक्रम्ब",
+      "description": "दिखाएँ कि यह पेज कहाँ स्थित है।"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "डुप्लिकेट",
+      "description": "इस ब्लॉक की एक सटीक प्रतिलिपि बनाएँ।"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ले जाएँ",
+      "description": "इस ब्लॉक को दूसरे पेज पर ले जाएँ।"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "इस ब्लॉक को हटाएँ।"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "बदलें",
+      "description": "इस ब्लॉक का प्रकार बदलें।"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "रंग",
+      "description": "इस ब्लॉक का टेक्स्ट या पृष्ठभूमि रंग बदलें।"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "तालिका",
+      "description": "इस पेज में एक सरल तालिका जोड़ें।"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 कॉलम",
+      "description": "ब्लॉकों को एक साथ रखें।"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 कॉलम",
+      "description": "ब्लॉकों को तीन कॉलम में व्यवस्थित करें।"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 कॉलम",
+      "description": "ब्लॉकों को चार कॉलम में व्यवस्थित करें।"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 कॉलम",
+      "description": "ब्लॉकों को पांच कॉलम में व्यवस्थित करें।"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "इमेज",
+      "description": "अपलोड करें या लिंक से एम्बेड करें।"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "वीडियो",
+      "description": "लिंक के साथ वीडियो एम्बेड करें।"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ऑडियो",
+      "description": "लिंक से ऑडियो एम्बेड करें।"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "वेब बुकमार्क",
+      "description": "वेब लिंक को कार्ड के रूप में सहेजें।"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "एम्बेड",
+      "description": "लिंक से सामग्री एम्बेड करें।"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "फ़ाइल",
+      "description": "इस पृष्ठ पर फ़ाइल लिंक संलग्न करें।"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "डेटाबेस - पूरा पेज",
+      "description": "एक नया डेटाबेस उप-पेज के रूप में जोड़ें।"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "तालिका - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ डेटाबेस को तालिका के रूप में जोड़ें।"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "बोर्ड - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ कानबान बोर्ड जोड़ें।"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "सूची - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ डेटाबेस को सूची के रूप में जोड़ें।"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "टाइमलाइन - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ डेटाबेस टाइमलाइन जोड़ें।"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "कैलेंडर - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ कैलेंडर डेटाबेस जोड़ें।"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "गैलरी - पूर्ण पृष्ठ",
+      "description": "एक पूर्ण-पृष्ठ डेटाबेस गैलरी जोड़ें।"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "डेटाबेस - इनलाइन",
+      "description": "इस पेज में डेटाबेस जोड़ें।"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "तालिका दृश्य",
+      "description": "इनलाइन डेटाबेस को तालिका के रूप में जोड़ें।"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "बोर्ड दृश्य",
+      "description": "इनलाइन कानबान बोर्ड जोड़ें।"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "सूची दृश्य",
+      "description": "इनलाइन डेटाबेस को सूची के रूप में जोड़ें।"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "टाइमलाइन दृश्य",
+      "description": "इनलाइन डेटाबेस टाइमलाइन जोड़ें।"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "कैलेंडर दृश्य",
+      "description": "इनलाइन कैलेंडर डेटाबेस जोड़ें।"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "गैलरी दृश्य",
+      "description": "इनलाइन डेटाबेस गैलरी जोड़ें।"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "डिफ़ॉल्ट",
+      "description": "इस ब्लॉक से टेक्स्ट या पृष्ठभूमि का रंग हटाएँ।"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ग्रे",
+      "description": "इस ब्लॉक पर ग्रे लागू करें।"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "भूरा",
+      "description": "इस ब्लॉक पर भूरा लागू करें।"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "नारंगी",
+      "description": "इस ब्लॉक पर नारंगी लागू करें।"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "पीला",
+      "description": "इस ब्लॉक पर पीला लागू करें।"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "हरा",
+      "description": "इस ब्लॉक पर हरा लागू करें।"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "नीला",
+      "description": "इस ब्लॉक पर नीला लागू करें।"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "बैंगनी",
+      "description": "इस ब्लॉक पर बैंगनी लागू करें।"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "गुलाबी",
+      "description": "इस ब्लॉक पर गुलाबी लागू करें।"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "लाल",
+      "description": "इस ब्लॉक पर लाल लागू करें।"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ग्रे पृष्ठभूमि",
+      "description": "इस ब्लॉक पर ग्रे पृष्ठभूमि लागू करें।"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "भूरी पृष्ठभूमि",
+      "description": "इस ब्लॉक पर भूरी पृष्ठभूमि लागू करें।"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "नारंगी पृष्ठभूमि",
+      "description": "इस ब्लॉक पर नारंगी पृष्ठभूमि लागू करें।"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "पीली पृष्ठभूमि",
+      "description": "इस ब्लॉक पर पीली पृष्ठभूमि लागू करें।"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "हरी पृष्ठभूमि",
+      "description": "इस ब्लॉक पर हरी पृष्ठभूमि लागू करें।"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "नीली पृष्ठभूमि",
+      "description": "इस ब्लॉक पर नीली पृष्ठभूमि लागू करें।"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "बैंगनी पृष्ठभूमि",
+      "description": "इस ब्लॉक पर बैंगनी पृष्ठभूमि लागू करें।"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "गुलाबी पृष्ठभूमि",
+      "description": "इस ब्लॉक पर गुलाबी पृष्ठभूमि लागू करें।"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "लाल पृष्ठभूमि",
+      "description": "इस ब्लॉक पर लाल पृष्ठभूमि लागू करें।"
     }
   }
 }

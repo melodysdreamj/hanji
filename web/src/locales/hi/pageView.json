@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "पेज पुनर्स्थापित नहीं कर सके",
+  "emptyBodyPrompt": "इस खाली पेज पर लिखना शुरू करने के लिए Enter दबाएं।",
+  "inTrashTopBarTitle": "ट्रैश में",
+  "notFoundTopBarTitle": "नहीं मिला",
+  "openWorkspace": "वर्कस्पेस खोलें",
+  "pageInTrash": "यह पेज ट्रैश में है।",
+  "pageInTrashDetail": "सामग्री खोलने या संपादित करने से पहले इसे पुनर्स्थापित करें।",
+  "pageUnavailable": "पेज अनुपलब्ध है।",
+  "pageUnavailableDetail": "यह पेज हटा दिया गया हो, स्थानांतरित कर दिया गया हो, या किसी अन्य खाते के साथ साझा किया गया हो सकता है।",
+  "restorePage": "पेज पुनर्स्थापित करें",
+  "restoredPage": "पेज पुनर्स्थापित किया गया",
+  "loadingPageContent": "पेज सामग्री लोड हो रही है"
 }

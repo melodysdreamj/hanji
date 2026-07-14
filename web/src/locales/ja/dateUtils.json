@@ -3,5 +3,5 @@
     "am": "午前",
     "pm": "午後"
   },
-  "notionTimestamp": "{{date}} {{hour12}}:{{minutes}} {{period}}"
+  "notionTimestamp": "{{date}} {{period}}{{hour12}}:{{minutes}}"
 }

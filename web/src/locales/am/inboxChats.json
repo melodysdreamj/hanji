@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ገና ምንም ውይይት የለም። አዲስ ለመጀመር በገጽ ላይ አስተያየት ይስጡ ወይም አንድን ሰው ይጠቅሱ።",
+  "leave": "ለቀቅ",
+  "leaveAria": "በ{{title}} ላይ ያለውን ውይይት ለቀቅ",
+  "open": "በ{{title}} ላይ ያለውን ውይይት ይክፈቱ",
+  "participants_one": "{{count}} ተሳታፊ",
+  "participants_other": "{{count}} ተሳታፊዎች",
+  "untitled": "ርዕስ የለሽ",
+  "loading": "ውይይቶች እየተጫኑ ነው…"
 }

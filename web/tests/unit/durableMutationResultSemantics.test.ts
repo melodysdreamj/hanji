@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 //
-// Durable optimistic actions have three deliberately different first-attempt
-// outcomes: ok commits, queued keeps the durable optimistic state, and a
-// terminal dropped result must never return/display a successful object.
+// Destructive/result-driven optimistic actions remain fail-closed. Creation
+// actions with complete client ids return immediately, then reconcile or roll
+// back a terminal background result without holding the UI handoff hostage.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/edgebase", async (importOriginal) => {
@@ -211,10 +211,13 @@ describe("page lifecycle durable outcomes", () => {
 });
 
 describe("database property durable outcomes", () => {
-  it("addProperty returns null and removes the phantom on dropped, but returns it for queued/ok", async () => {
+  it("addProperty returns immediately, then removes a terminal phantom and retains queued/ok", async () => {
     seedDatabase();
     vi.mocked(createPropertyRemote).mockRejectedValueOnce(terminal(403));
-    await expect(useStore.getState().addProperty("db", "text", "Dropped")).resolves.toBeNull();
+    const dropped = await useStore.getState().addProperty("db", "text", "Dropped");
+    expect(dropped?.name).toBe("Dropped");
+    expect(createPropertyRemote).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(0);
     expect(useStore.getState().dbProperties("db").some((item) => item.name === "Dropped")).toBe(false);
 
     resetStore();
@@ -224,6 +227,7 @@ describe("database property durable outcomes", () => {
     const queued = await useStore.getState().addProperty("db", "text", "Queued");
     expect(queued?.name).toBe("Queued");
     expect(useStore.getState().dbProperties("db")).toContainEqual(queued);
+    await vi.advanceTimersByTimeAsync(2000);
 
     resetStore();
     seedUser();
@@ -231,13 +235,17 @@ describe("database property durable outcomes", () => {
     vi.mocked(createPropertyRemote).mockResolvedValueOnce({} as never);
     const ok = await useStore.getState().addProperty("db", "text", "OK");
     expect(ok?.name).toBe("OK");
+    await vi.advanceTimersByTimeAsync(0);
   });
 
-  it("does not report full addProperty success when a dependent view write drops", async () => {
+  it("keeps the property but removes invalid view references when a dependent view write drops", async () => {
     const { baseView } = seedDatabase();
     vi.mocked(updateViewRemote).mockRejectedValueOnce(terminal(400));
 
-    await expect(useStore.getState().addProperty("db", "text", "Partial")).resolves.toBeNull();
+    await expect(useStore.getState().addProperty("db", "text", "Partial")).resolves.toMatchObject({
+      name: "Partial",
+    });
+    await vi.advanceTimersByTimeAsync(0);
 
     expect(useStore.getState().dbProperties("db").some((item) => item.name === "Partial")).toBe(true);
     expect(useStore.getState().dbViews("db")[0]?.config).toEqual(baseView.config);
@@ -313,11 +321,13 @@ describe("database property durable outcomes", () => {
 });
 
 describe("database view durable outcomes", () => {
-  it("addView returns null/removes on dropped and returns the optimistic view for queued/ok", async () => {
+  it("addView returns immediately, then removes on dropped and retains queued/ok", async () => {
     seedDatabase();
     vi.mocked(createViewRemote).mockRejectedValueOnce(terminal(403));
     const dropped = await useStore.getState().addView("db", "board", "Dropped");
-    expect(dropped).toBeNull();
+    expect(dropped?.name).toBe("Dropped");
+    expect(createViewRemote).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(0);
     expect(useStore.getState().dbViews("db").some((item) => item.name === "Dropped")).toBe(false);
 
     resetStore();
@@ -326,12 +336,14 @@ describe("database view durable outcomes", () => {
     vi.mocked(createViewRemote).mockRejectedValueOnce(offline());
     const queued = await useStore.getState().addView("db", "board", "Queued");
     expect(queued?.name).toBe("Queued");
+    await vi.advanceTimersByTimeAsync(2000);
 
     resetStore();
     seedUser();
     seedDatabase();
     const ok = await useStore.getState().addView("db", "board", "OK");
     expect(ok?.name).toBe("OK");
+    await vi.advanceTimersByTimeAsync(0);
   });
 
   it("deleteView returns null/restores on dropped; queued and ok return the snapshot", async () => {
@@ -399,6 +411,7 @@ describe("database template durable outcomes", () => {
 
     expect(copy?.name).toContain("Untitled template");
     expect(copy?.title).toBe("Untitled");
+    await vi.advanceTimersByTimeAsync(0);
   });
 
   it("deleteTemplate returns null/restores on dropped; queued and ok return the snapshot", async () => {

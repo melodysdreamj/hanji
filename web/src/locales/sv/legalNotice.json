@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Juridisk information och källinformation",
+  "noWarranty": "Tillhandahålls utan garanti.",
+  "sourceCode": "Källkod",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Undantag 2.0"
 }

@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "بلاک منتقل کریں:",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "منتقلی کے مقامات تلاش کریں",
+    "placeholder": "صفحات تلاش کریں..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "منتقلی ڈائیلاگ بند کریں"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "منتقلی کے مقامات",
+    "empty": "کوئی صفحہ نہیں ملا۔",
+    "destinationLabel": "بلاک {{label}}، {{path}} پر منتقل کریں"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" بنائیں",
+    "optionLabel": "\"{{query}}\" صفحہ بنائیں اور بلاک یہاں منتقل کریں",
+    "hint": "نیا صفحہ - بلاک یہاں منتقل کریں"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "مقفل صفحہ"
   },
-  "untitled": "Untitled",
+  "untitled": "بغیر عنوان",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "صفحہ مقفل ہے",
+    "movedBlock": "بلاک منتقل ہو گیا",
+    "movedBlocks": "بلاکس منتقل ہو گئے",
+    "movedBlocksCount": "{{blockCount}} بلاکس منتقل ہو گئے",
+    "moveFailed": "بلاک منتقل نہیں ہو سکا"
   }
 }

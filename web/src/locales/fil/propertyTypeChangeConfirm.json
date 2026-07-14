@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Baguhin ang uri ng property?",
+  "message": "\"{{propName}}\" ay mayroon nang mga value. Ang pagbabago ng uri nito sa {{typeLabel}} ay maaaring magpakita ng mga kasalukuyang value nang iba o mawala ang mga ito.",
+  "cancelAria": "Kanselahin ang pagbabago ng uri ng property",
+  "confirm": "Baguhin ang uri"
 }

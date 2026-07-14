@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Ubah sampul",
+    "reposition": "Ubah posisi",
+    "remove": "Hapus",
+    "uploadFile": "Unggah file",
+    "uploading": "Mengunggah...",
+    "submit": "Kirim",
+    "savePosition": "Simpan posisi"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galeri",
+    "upload": "Unggah",
+    "link": "Tautan"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Tempel tautan gambar",
+    "invalid": "Tempel tautan gambar http atau https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Gagal mengunggah gambar tersebut.",
+    "defaultFileName": "Gambar sampul"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Seret gambar untuk mengubah posisi"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Menyiapkan unggahan",
+    "finalizing": "Menyelesaikan",
+    "complete": "Selesai",
+    "uploading": "Mengunggah"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Sampul dihapus",
+    "restored": "Sampul dipulihkan",
+    "undo": "Urungkan"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Sampul halaman",
+    "coverVerticalPosition": "Posisi vertikal sampul",
+    "positionFromTop": "{{position}}% dari atas",
+    "closeCoverMenu": "Tutup menu sampul",
+    "changePageCover": "Ubah sampul halaman",
+    "repositionPageCover": "Ubah posisi sampul halaman",
+    "removePageCover": "Hapus sampul halaman",
+    "changeCoverDialog": "Ubah sampul",
+    "coverSource": "Sumber sampul",
+    "selectCover": "Pilih sampul {{number}}",
+    "uploadFromDevice": "Unggah gambar sampul dari perangkat ini",
+    "uploadingFile": "Mengunggah {{fileName}}",
+    "coverImageLink": "Tautan gambar sampul"
   }
 }

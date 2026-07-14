@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Κείμενο",
+      "description": "Ξεκινήστε γράφοντας απλό κείμενο",
+      "placeholder": "Πληκτρολογήστε '/' για εντολές"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Σελίδα",
+      "description": "Δημιουργήστε μια υποσελίδα μέσα σε αυτή τη σελίδα."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Σύνδεσμος σελίδας",
+      "description": "Σύνδεση με υπάρχουσα σελίδα."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Επικεφαλίδα 1",
+      "description": "Μεγάλη επικεφαλίδα ενότητας.",
+      "placeholder": "Επικεφαλίδα 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Επικεφαλίδα εναλλαγής 1",
+      "description": "Μεγάλη επικεφαλίδα που μπορεί να κρύβει ένθετο περιεχόμενο.",
+      "placeholder": "Επικεφαλίδα εναλλαγής 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Επικεφαλίδα 2",
+      "description": "Μεσαία επικεφαλίδα ενότητας.",
+      "placeholder": "Επικεφαλίδα 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Επικεφαλίδα εναλλαγής 2",
+      "description": "Μεσαία επικεφαλίδα για απόκρυψη εμφωλευμένου περιεχομένου.",
+      "placeholder": "Επικεφαλίδα εναλλαγής 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Επικεφαλίδα 3",
+      "description": "Μικρή επικεφαλίδα ενότητας.",
+      "placeholder": "Επικεφαλίδα 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Επικεφαλίδα εναλλαγής 3",
+      "description": "Μικρή επικεφαλίδα για απόκρυψη εμφωλευμένου περιεχομένου.",
+      "placeholder": "Εναλλαγή επικεφαλίδας 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Επικεφαλίδα 4",
+      "description": "Συμπαγής επικεφαλίδα ενότητας.",
+      "placeholder": "Επικεφαλίδα 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Εναλλαγή επικεφαλίδας 4",
+      "description": "Συμπαγής επικεφαλίδα που μπορεί να κρύψει εμφωλευμένο περιεχόμενο.",
+      "placeholder": "Εναλλαγή επικεφαλίδας 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Λίστα εργασιών",
+      "description": "Παρακολούθηση εργασιών με ένα πλαίσιο ελέγχου.",
+      "placeholder": "Εργασία"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Λίστα με κουκκίδες",
+      "description": "Δημιουργήστε μια απλή λίστα με κουκκίδες.",
+      "placeholder": "Λίστα"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Αριθμημένη λίστα",
+      "description": "Δημιουργία λίστας με αρίθμηση",
+      "placeholder": "Λίστα"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Λίστα εναλλαγής",
+      "description": "Οι εναλλαγές μπορούν να κρύβουν και να εμφανίζουν περιεχόμενο.",
+      "placeholder": "Εναλλαγή"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Παράθεση",
+      "description": "Καταγράψτε ένα απόσπασμα",
+      "placeholder": "Κενή παράθεση"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Επισήμανση",
+      "description": "Κάντε το κείμενο να ξεχωρίζει.",
+      "placeholder": "Πληκτρολογήστε κάτι…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Διαχωριστικό",
+      "description": "Οπτική διαίρεση μπλοκ."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Κώδικας",
+      "description": "Καταγράψτε ένα απόσπασμα κώδικα.",
+      "placeholder": "Γράψτε κώδικα ή επικολλήστε ένα απόσπασμα…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Εξίσωση",
+      "description": "Εμφάνιση μαθηματικής εξίσωσης."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Πίνακας περιεχομένων",
+      "description": "Εμφάνιση συνδέσμων προς επικεφαλίδες σε αυτήν τη σελίδα."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Συγχρονισμένο μπλοκ",
+      "description": "Επαναχρησιμοποιήστε περιεχόμενο μεταξύ σελίδων"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Κουμπί",
+      "description": "Εισαγάγετε επαναχρησιμοποιήσιμο περιεχόμενο με ένα κλικ."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Καρτέλες",
+      "description": "Ομαδοποιήστε περιεχόμενο σε καρτέλες",
+      "placeholder": "Καρτέλες"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Διαδρομή",
+      "description": "Εμφανίστε πού βρίσκεται αυτή η σελίδα."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Δημιουργία αντιγράφου",
+      "description": "Δημιουργία ακριβούς αντιγράφου αυτού του μπλοκ."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Μετακίνηση",
+      "description": "Μετακινήστε αυτό το μπλοκ σε άλλη σελίδα."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Διαγραφή αυτού του μπλοκ."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Μετατροπή",
+      "description": "Αλλάξτε τον τύπο αυτού του μπλοκ."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Χρώμα",
+      "description": "Αλλαγή του χρώματος κειμένου ή φόντου αυτού του μπλοκ."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Πίνακας",
+      "description": "Προσθέστε έναν απλό πίνακα στη σελίδα"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 στήλες",
+      "description": "Τοποθέτηση μπλοκ το ένα δίπλα στο άλλο."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 στήλες",
+      "description": "Ταξινόμηση μπλοκ σε τρεις στήλες."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 στήλες",
+      "description": "Ταξινόμηση μπλοκ σε τέσσερις στήλες."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 στήλες",
+      "description": "Ταξινόμηση μπλοκ σε πέντε στήλες."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Εικόνα",
+      "description": "Μεταφόρτωση ή ενσωμάτωση με σύνδεσμο."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "Βίντεο",
+      "description": "Ενσωματώστε ένα βίντεο με έναν σύνδεσμο."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "Ήχος",
+      "description": "Ενσωματώστε ήχο με έναν σύνδεσμο."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Σελιδοδείκτης ιστού",
+      "description": "Αποθηκεύστε έναν σύνδεσμο ιστού ως κάρτα."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Ενσωμάτωση",
+      "description": "Ενσωμάτωση περιεχομένου από σύνδεσμο."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Αρχείο",
+      "description": "Επισύναψη συνδέσμου αρχείου σε αυτήν τη σελίδα."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Βάση δεδομένων - Πλήρης σελίδα",
+      "description": "Προσθέστε μια νέα βάση δεδομένων ως υποσελίδα."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Πίνακας - Πλήρης σελίδα",
+      "description": "Προσθέστε μια βάση δεδομένων πλήρους σελίδας ως πίνακα."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Πίνακας (Kanban) - Πλήρης σελίδα",
+      "description": "Προσθέστε έναν πίνακα kanban πλήρους σελίδας."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Λίστα - Πλήρης σελίδα",
+      "description": "Προσθέστε μια βάση δεδομένων πλήρους σελίδας ως λίστα."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Χρονογραμμή - Πλήρης σελίδα",
+      "description": "Προσθέστε μια χρονογραμμή βάσης δεδομένων πλήρους σελίδας."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Ημερολόγιο - Πλήρης σελίδα",
+      "description": "Προσθέστε μια βάση δεδομένων ημερολογίου πλήρους σελίδας."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Συλλογή - Πλήρης σελίδα",
+      "description": "Προσθέστε μια συλλογή βάσης δεδομένων πλήρους σελίδας."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Βάση δεδομένων - Ενσωματωμένη",
+      "description": "Προσθέστε μια βάση δεδομένων μέσα σε αυτή τη σελίδα."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Προβολή πίνακα",
+      "description": "Προσθέστε μια ενσωματωμένη βάση δεδομένων ως πίνακα."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Προβολή board",
+      "description": "Προσθέστε ένα ενσωματωμένο kanban board."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Προβολή λίστας",
+      "description": "Προσθέστε μια ενσωματωμένη βάση δεδομένων ως λίστα."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Προβολή χρονολογίου",
+      "description": "Προσθέστε μια ενσωματωμένη βάση δεδομένων χρονολογίου."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Προβολή ημερολογίου",
+      "description": "Προσθέστε μια ενσωματωμένη βάση δεδομένων ημερολογίου."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Προβολή γκαλερί",
+      "description": "Προσθέστε μια ενσωματωμένη γκαλερί βάσης δεδομένων."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Προεπιλογή",
+      "description": "Αφαίρεσε το χρώμα κειμένου ή φόντου από αυτό το μπλοκ."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Γκρι",
+      "description": "Εφάρμοσε γκρι σε αυτό το μπλοκ."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Καφέ",
+      "description": "Εφαρμόστε καφέ σε αυτό το μπλοκ."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Πορτοκαλί",
+      "description": "Εφαρμογή πορτοκαλί σε αυτό το μπλοκ."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Κίτρινο",
+      "description": "Εφαρμογή κίτρινου σε αυτό το μπλοκ."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Πράσινο",
+      "description": "Εφαρμογή πράσινου σε αυτό το μπλοκ."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Μπλε",
+      "description": "Εφαρμόστε μπλε σε αυτό το μπλοκ."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Μωβ",
+      "description": "Εφαρμογή μωβ σε αυτό το μπλοκ."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Ροζ",
+      "description": "Εφαρμογή ροζ σε αυτό το μπλοκ."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Κόκκινο",
+      "description": "Εφαρμογή κόκκινου σε αυτό το μπλοκ."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Γκρι φόντο",
+      "description": "Εφάρμοσε γκρι φόντο σε αυτό το μπλοκ."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Καφέ φόντο",
+      "description": "Εφαρμόστε καφέ φόντο σε αυτό το μπλοκ."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Πορτοκαλί φόντο",
+      "description": "Εφαρμογή πορτοκαλί φόντου σε αυτό το μπλοκ."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Κίτρινο φόντο",
+      "description": "Εφαρμογή κίτρινου φόντου σε αυτό το μπλοκ."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Πράσινο φόντο",
+      "description": "Εφάρμοσε πράσινο φόντο σε αυτό το μπλοκ."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Μπλε φόντο",
+      "description": "Εφαρμόστε μπλε φόντο σε αυτό το μπλοκ."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Μωβ φόντο",
+      "description": "Εφαρμογή μωβ φόντου σε αυτό το μπλοκ."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Ροζ φόντο",
+      "description": "Εφαρμογή ροζ φόντου σε αυτό το μπλοκ."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Κόκκινο φόντο",
+      "description": "Εφαρμογή κόκκινου φόντου σε αυτό το μπλοκ."
     }
   }
 }

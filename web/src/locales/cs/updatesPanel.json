@@ -1,79 +1,79 @@
 {
-  "filters": {
-    "all": "All",
-    "unread": "Unread",
-    "comments": "Comments",
-    "mentions": "Mentions",
-    "edits": "Edits"
-  },
-  "header": {
-    "closeUpdates": "Close updates",
-    "markAllRead": "Mark all as read",
-    "markAllReadAria": "Mark all updates as read",
-    "pageHistory": "Page history",
-    "recentUpdates_one": "{{count}} recent update",
-    "recentUpdates_other": "{{count}} recent updates",
-    "unreadOfTotal": "{{unread}} unread of {{total}} updates",
-    "updateType": "Update type",
-    "updates": "Updates",
-    "modeUpdates": "Updates",
-    "modeChats": "Chats",
-    "inboxMode": "Inbox mode"
-  },
-  "time": {
-    "justNow": "Just now",
-    "today": "Today",
-    "yesterday": "Yesterday"
-  },
-  "versions": {
-    "blockCount_one": "{{count}} block",
-    "blockCount_other": "{{count}} blocks",
-    "currentVersion": "Current version",
-    "currentVersionOnly": "Current version only",
-    "next": "Next",
-    "nextVersion": "Next version",
-    "noVersionPrevious": "No previous version",
-    "noVersionNext": "No next version",
-    "pageLocked": "Page locked",
-    "previous": "Previous",
-    "previousSnapshots_one": "{{count}} previous snapshot",
-    "previousSnapshots_other": "{{count}} previous snapshots",
-    "previousVersion": "Previous version",
-    "restoredPrevious": "Restored previous version",
-    "restoredNext": "Restored next version",
-    "restoredVersions": "Restored {{count}} versions",
-    "versionCount_one": "{{count}} version",
-    "versionCount_other": "{{count}} versions",
-    "versionsAgo": "{{count}} versions ago",
-    "versionsAhead": "{{count}} versions ahead",
-    "versionsAria": "Versions"
-  },
   "badges": {
-    "comment": "Comment",
-    "edited": "Edited",
-    "linked": "Linked",
-    "member": "Member",
-    "mention": "Mention",
-    "reply": "Reply",
-    "replyMention": "Reply mention",
-    "shared": "Shared",
-    "system": "System"
-  },
-  "rows": {
-    "byActor": "by {{name}}",
-    "emptyComment": "Empty comment",
-    "forYou": "for you",
-    "notification": "Notification",
-    "referenceMention": "Mentioned {{title}} · {{preview}}",
-    "referenceLink": "Linked to {{title}} · {{preview}}",
-    "unreadDot": "Unread",
-    "workspaceUpdate": "Workspace update"
+    "comment": "Komentář",
+    "edited": "Upraveno",
+    "linked": "Propojeno",
+    "member": "Člen",
+    "mention": "Zmínka",
+    "reply": "Odpověď",
+    "replyMention": "Odpověď na zmínku",
+    "shared": "Sdílené",
+    "system": "Systémové"
   },
   "empty": {
-    "allCaughtUp": "You're all caught up.",
-    "loadingUpdates": "Loading updates...",
-    "noFilteredUpdatesYet": "No {{filter}} yet.",
-    "noPageHistoryYet": "No page history yet.",
-    "noUpdatesYet": "No updates yet."
+    "allCaughtUp": "Všechno přečteno.",
+    "loadingUpdates": "Načítání aktualizací...",
+    "noFilteredUpdatesYet": "Zatím žádné {{filter}}.",
+    "noPageHistoryYet": "Zatím žádná historie stránky.",
+    "noUpdatesYet": "Zatím žádné aktualizace."
+  },
+  "filters": {
+    "all": "Vše",
+    "comments": "Komentáře",
+    "edits": "Úpravy",
+    "mentions": "Zmínky",
+    "unread": "Nečtené"
+  },
+  "header": {
+    "closeUpdates": "Zavřít aktualizace",
+    "inboxMode": "Režim doručené pošty",
+    "markAllRead": "Označit vše jako přečtené",
+    "markAllReadAria": "Označit všechny aktualizace jako přečtené",
+    "modeChats": "Konverzace",
+    "modeUpdates": "Aktualizace",
+    "pageHistory": "Historie stránky",
+    "recentUpdates_one": "{{count}} nedávná aktualizace",
+    "recentUpdates_other": "{{count}} nedávných aktualizací",
+    "unreadOfTotal": "{{unread}} nepřečtených z {{total}} aktualizací",
+    "updates": "Aktualizace",
+    "updateType": "Typ aktualizace"
+  },
+  "rows": {
+    "byActor": "od {{name}}",
+    "emptyComment": "Prázdný komentář",
+    "forYou": "pro vás",
+    "notification": "Oznámení",
+    "referenceLink": "Odkaz na {{title}} · {{preview}}",
+    "referenceMention": "Zmínka {{title}} · {{preview}}",
+    "unreadDot": "Nepřečtené",
+    "workspaceUpdate": "Aktualizace pracovního prostoru"
+  },
+  "time": {
+    "justNow": "Právě teď",
+    "today": "Dnes",
+    "yesterday": "Včera"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} blok",
+    "blockCount_other": "{{count}} bloků",
+    "currentVersion": "Aktuální verze",
+    "currentVersionOnly": "Pouze aktuální verze",
+    "next": "Další",
+    "nextVersion": "Další verze",
+    "noVersionNext": "Žádná další verze",
+    "noVersionPrevious": "Žádná předchozí verze",
+    "pageLocked": "Stránka uzamčena",
+    "previous": "Předchozí",
+    "previousSnapshots_one": "{{count}} předchozí snímek",
+    "previousSnapshots_other": "{{count}} předchozích snímků",
+    "previousVersion": "Předchozí verze",
+    "restoredNext": "Obnovena další verze",
+    "restoredPrevious": "Obnovena předchozí verze",
+    "restoredVersions": "Obnoveno {{count}} verzí",
+    "versionCount_one": "{{count}} verze",
+    "versionCount_other": "{{count}} verzí",
+    "versionsAgo": "Před {{count}} verzemi",
+    "versionsAhead": "O {{count}} verzí napřed",
+    "versionsAria": "Verze"
   }
 }

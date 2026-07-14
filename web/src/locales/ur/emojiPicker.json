@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "آئیکون چنندہ بند کریں",
+    "label": "آئیکون منتخب کریں"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "آئیکن کی قسم",
+    "emoji": "ایموجی",
+    "image": "امیج"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ہٹائیں",
+    "ariaLabel": "آئیکن ہٹائیں"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "فلٹر…",
+    "searchLabel": "آئیکن تلاش کریں",
+    "random": "بے ترتیب",
+    "randomLabel": "بے ترتیب آئیکون چنیں",
+    "recentLabel": "حالیہ استعمال شدہ پہلے",
+    "gridLabelRecent": "آئیکون، حالیہ استعمال شدہ پہلے",
+    "gridLabel": "آئیکون",
+    "optionLabel": "{{emoji}} آئیکون منتخب کریں",
+    "noResults": "کوئی آئیکون “{{query}}” سے مماثل نہیں ہے۔ کوئی اور لفظ آزمائیں یا فلٹر صاف کریں۔"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "تصویر",
+    "linkPlaceholder": "تصویر کا لنک چسپاں کریں",
+    "linkLabel": "تصویر آئیکون کا لنک",
+    "apply": "لاگو کریں",
+    "upload": "فائل اپ لوڈ",
+    "uploading": "اپ لوڈ ہو رہا ہے...",
+    "uploadingLabel": "{{fileName}} اپ لوڈ ہو رہا ہے",
+    "uploadFailed": "وہ تصویر اپ لوڈ نہیں ہو سکی۔",
+    "fallbackFileName": "آئیکون تصویر"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "اپ لوڈ کی تیاری",
+    "finalizing": "آخری مراحل",
+    "complete": "مکمل",
+    "uploading": "اپ لوڈ جاری"
   }
 }

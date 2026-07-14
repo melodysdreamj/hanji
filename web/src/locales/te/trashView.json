@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ట్రాష్",
+  "empty": "మీరు తొలగించే పేజీలు ఇక్కడ చేరతాయి. ట్రాష్‌లో ఏమీ లేదు.",
+  "searchTrash": "ట్రాష్‌లో శోధించండి",
+  "deletedPages": "తొలగించబడిన పేజీలు",
+  "noSearchMatches": "మీ శోధనకు సరిపోలిన తొలగించబడిన పేజీలు లేవు.",
+  "pageCount_one": "{{count}} పేజీ",
+  "pageCount_other": "{{count}} పేజీలు",
+  "deletedJustNow": "ఇప్పుడే తొలగించబడింది",
+  "deletedOn": "{{date}} తొలగించబడింది",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "పునరుద్ధరించు",
+    "deleteForever": "శాశ్వతంగా తొలగించు",
+    "emptyTrash": "ట్రాష్ ఖాళీ చేయి"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "ట్రాష్ నుండి {{title}} తెరవండి",
+    "restorePage": "{{title}} పునరుద్ధరించండి",
+    "deletePageForever": "{{title}} శాశ్వతంగా తొలగించు",
+    "cancelPermanentDelete": "శాశ్వత తొలగింపు రద్దు చేయి",
+    "cancelEmptyTrash": "ట్రాష్ ఖాళీ చేయడం రద్దు చేయి"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "శాశ్వతంగా తొలగించాలా?",
+    "deleteBodyPrefix": "ఇది శాశ్వతంగా తొలగిస్తుంది ",
+    "deleteBodySuffix": ". మీరు ఈ చర్యను రద్దు చేయలేరు.",
+    "emptyTitle": "ట్రాష్ ఖాళీ చేయాలా?",
+    "emptyBody_one": "ఇది ట్రాష్‌లోని {{count}} పేజీని శాశ్వతంగా తొలగిస్తుంది. మీరు ఈ చర్యను రద్దు చేయలేరు.",
+    "emptyBody_other": "ఇది ట్రాష్‌లోని {{count}} పేజీలను శాశ్వతంగా తొలగిస్తుంది. మీరు ఈ చర్యను రద్దు చేయలేరు."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "శాశ్వతంగా తొలగించబడింది",
+    "couldntDelete": "పేజీని తొలగించలేకపోయింది",
+    "restored": "పేజీ పునరుద్ధరించబడింది",
+    "couldntRestore": "పేజీని పునరుద్ధరించలేకపోయింది",
+    "emptied": "ట్రాష్ ఖాళీ చేయబడింది",
+    "couldntEmpty": "ట్రాష్ ఖాళీ చేయలేకపోయింది"
   }
 }

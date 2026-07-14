@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Брой",
+    "sum": "Сума",
+    "average": "Средно",
+    "min": "Мин",
+    "max": "Макс"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} диаграма",
+  "chartType": "Тип диаграма",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Колона",
+    "horizontal_bar": "Хоризонтална лента",
+    "line": "Линия",
+    "donut": "Поничка"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Отметнато",
+  "empty": "Празно",
+  "legend": "Легенда",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Няма данни",
+  "noDataDesc": "Няма редове за текущите филтри или търсене.",
+  "noGroupProperty": "Няма нищо за диаграма",
+  "noGroupPropertyDesc": "Добавете свойство за избор, статус, човек, отметка или дата, за да групирате тази диаграма.",
+  "total": "Общо",
+  "unchecked": "Неотметнато",
+  "untitledProperty": "Без име",
+  "valueProperty": "Свойство стойност",
+  "xAxis": "X ос",
+  "yAxis": "Y ос"
 }

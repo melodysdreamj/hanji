@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "لغو",
+    "save": "ذخیره",
+    "close": "بستن",
+    "search": "جستجو",
+    "create": "ایجاد",
+    "delete": "حذف",
+    "clearAll": "پاک کردن همه",
+    "done": "تمام",
+    "add": "افزودن"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "بدون عنوان"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "کپی {{name}}",
+    "columnName": "ستون {{number}}",
+    "importedDatabase": "دیتابیس واردشده",
+    "uploadedFile": "فایل بارگذاری‌شده",
+    "image": "تصویر",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "نام",
+      "status": "وضعیت",
+      "select": "انتخاب",
+      "date": "تاریخ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "شروع نشده",
+      "doing": "در حال انجام",
+      "done": "انجام شده"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "گزینه 1",
+      "second": "گزینه 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "جدول"
     }
   }
 }

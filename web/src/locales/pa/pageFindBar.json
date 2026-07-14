@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "ਪੰਨੇ ਵਿੱਚ ਖੋਜੋ"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "ਪੰਨੇ ਵਿੱਚ ਖੋਜੋ",
+    "placeholder": "ਪੰਨੇ ਵਿੱਚ ਖੋਜੋ"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ਪਿਛਲਾ ਮੇਲ",
+    "next": "ਅਗਲਾ ਮੇਲ",
+    "close": "ਖੋਜ ਬੰਦ ਕਰੋ"
   }
 }

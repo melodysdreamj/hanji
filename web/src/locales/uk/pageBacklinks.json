@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} зворотне посилання",
+    "count_other": "{{count}} зворотних посилань"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Пов'язані згадки"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} згадка",
+    "mention_other": "{{count}} згадок",
+    "link_one": "{{count}} посилання",
+    "link_other": "{{count}} посилань"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Згадка",
+    "link": "Посилання"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "Ще {{count}} зворотне посилання",
+    "count_other": "Ще {{count}} зворотних посилань"
   }
 }

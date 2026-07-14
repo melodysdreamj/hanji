@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "ಈ ಡೇಟಾಬೇಸ್ ಲಾಕ್ ಆಗಿದೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "databaseRowsLoadFailed": "ಡೇಟಾಬೇಸ್ ಸಾಲುಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "editAccessDeniedSave": "ನಿಮಗೆ ಸಂಪಾದನೆ ಅನುಮತಿ ಇಲ್ಲ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "lockedSave": "ಪುಟ ಅಥವಾ ಡೇಟಾಬೇಸ್ ಲಾಕ್ ಆಗಿದೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "pageLockedSave": "ಈ ಪುಟ ಲಾಕ್ ಆಗಿದೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "pageMissingSave": "ಪುಟ ಕಂಡುಬಂದಿಲ್ಲ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "saveFailed": "ನಿಮ್ಮ ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ.",
+  "sessionExpired": "ನಿಮ್ಮ ಸೆಶನ್ ಅವಧಿ ಮೀರಿದೆ ಅಥವಾ ವಿನಂತಿಯನ್ನು ದೃಢೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+  "blockConflictSave": "ಈ ಬ್ಲಾಕ್ ಅನ್ನು ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ಸಂಪಾದಿಸಲಾಗಿದೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಆಫ್ಲೈನ್ ಬದಲಾವಣೆಯನ್ನು ಅನ್ವಯಿಸಲಾಗಿಲ್ಲ.",
+  "blockConflictKeepMine": "ನನ್ನ ಆವೃತ್ತಿಯನ್ನು ಅನ್ವಯಿಸಿ",
+  "blockMoveCommentsSkipped": "ಬ್ಲಾಕ್ ಸ್ಥಳಾಂತರಗೊಂಡಿದೆ, ಆದರೆ ಅದರ ಕಾಮೆಂಟ್ಗಳನ್ನು ಅದರೊಂದಿಗೆ ಸ್ಥಳಾಂತರಿಸಲಾಗಲಿಲ್ಲ."
 }

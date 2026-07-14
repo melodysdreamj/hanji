@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "አዶ መራጭን ዝጋ",
+    "label": "አዶ ምረጥ"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "የአዶ አይነት",
+    "emoji": "ኢሞጂ",
+    "image": "ምስል"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "አስወግድ",
+    "ariaLabel": "አዶን አስወግድ"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "ማጣሪያ…",
+    "searchLabel": "አዶዎችን ፈልግ",
+    "random": "የዘፈቀደ",
+    "randomLabel": "የዘፈቀደ አዶ ምረጥ",
+    "recentLabel": "በቅርብ ጥቅም ላይ የዋሉ መጀመሪያ",
+    "gridLabelRecent": "አዶዎች፣ በቅርብ ጊዜ የተጠቀሙባቸው በመጀመሪያ",
+    "gridLabel": "አዶዎች",
+    "optionLabel": "{{emoji}} አዶን ምረጥ",
+    "noResults": "ከ“{{query}}” ጋር የሚዛመድ አዶ አልተገኘም። ሌላ ቃል ይሞክሩ ወይም ማጣሪያውን ያጽዱ።"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "ምስል",
+    "linkPlaceholder": "ምስል ሊንክ ለጥፍ",
+    "linkLabel": "ምስል አዶ ሊንክ",
+    "apply": "ተግብር",
+    "upload": "ፋይል ስቀል",
+    "uploading": "በመስቀል ላይ...",
+    "uploadingLabel": "{{fileName}} በመስቀል ላይ",
+    "uploadFailed": "ያንን ምስል መስቀል አልተቻለም።",
+    "fallbackFileName": "አዶ ምስል"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "ሰቀላ በማዘጋጀት ላይ",
+    "finalizing": "በማጠናቀቅ ላይ",
+    "complete": "ተጠናቀቀ",
+    "uploading": "በመስቀል ላይ"
   }
 }

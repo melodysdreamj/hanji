@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "法律与来源信息",
-  "noWarranty": "按「现状」提供，不附带任何保证。",
+  "ariaLabel": "法律和源信息",
+  "noWarranty": "不提供任何担保。",
   "sourceCode": "源代码",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "赞助横幅例外 2.0"
+  "sponsorException": "例外条款 2.0"
 }

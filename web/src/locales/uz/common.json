@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Bekor qilish",
+    "save": "Saqlash",
+    "close": "Yopish",
+    "search": "Qidirish",
+    "create": "Yaratish",
+    "delete": "O‘chirish",
+    "clearAll": "Hammasini tozalash",
+    "done": "Tayyor",
+    "add": "Qo‘shish"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Nomsiz"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} nusxasi",
+    "columnName": "Ustun {{number}}",
+    "importedDatabase": "Import qilingan ma'lumotlar bazasi",
+    "uploadedFile": "Yuklangan fayl",
+    "image": "Rasm",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Nomi",
+      "status": "Holat",
+      "select": "Tanlash",
+      "date": "Sana"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Boshlanmagan",
+      "doing": "Jarayonda",
+      "done": "Bajarildi"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Variant 1",
+      "second": "Variant 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Jadval"
     }
   }
 }

@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "रद्दी",
+  "empty": "तपाईंले मेटाएका पृष्ठहरू यहाँ देखिनेछन्। रद्दीमा केही छैन।",
+  "searchTrash": "रद्दी खोज्नुहोस्",
+  "deletedPages": "मेटिएका पृष्ठहरू",
+  "noSearchMatches": "तपाईंको खोजीसँग मेल खाने कुनै मेटिएका पृष्ठहरू छैनन्।",
+  "pageCount_one": "{{count}} पृष्ठ",
+  "pageCount_other": "{{count}} पृष्ठहरू",
+  "deletedJustNow": "भर्खर मेटिएको",
+  "deletedOn": "{{date}} मेटिएको",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "पुनर्स्थापित गर्नुहोस्",
+    "deleteForever": "स्थायी रूपमा मेट्नुहोस्",
+    "emptyTrash": "रद्दी खाली गर्नुहोस्"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "रद्दीबाट {{title}} खोल्नुहोस्",
+    "restorePage": "{{title}} पुनर्स्थापना गर्नुहोस्",
+    "deletePageForever": "{{title}} स्थायी रूपमा मेट्नुहोस्",
+    "cancelPermanentDelete": "स्थायी मेटाउने रद्द गर्नुहोस्",
+    "cancelEmptyTrash": "रद्दी खाली गर्ने रद्द गर्नुहोस्"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "स्थायी रूपमा मेट्ने?",
+    "deleteBodyPrefix": "यसले स्थायी रूपमा मेटाउनेछ ",
+    "deleteBodySuffix": ". यो कार्य पूर्ववत गर्न सकिन्न।",
+    "emptyTitle": "रद्दी खाली गर्ने?",
+    "emptyBody_one": "यसले रद्दीमा रहेको {{count}} पृष्ठलाई स्थायी रूपमा मेटाउनेछ। तपाईं यो कार्य पूर्ववत गर्न सक्नुहुन्न।",
+    "emptyBody_other": "यसले रद्दीमा रहेको सबै {{count}} पृष्ठहरू स्थायी रूपमा मेटाउनेछ। तपाईं यो कार्य पूर्ववत गर्न सक्नुहुन्न।"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "स्थायी रूपमा मेटियो।",
+    "couldntDelete": "पृष्ठ मेटाउन सकिएन।",
+    "restored": "पृष्ठ पुनर्स्थापित गरियो।",
+    "couldntRestore": "पृष्ठ पुनर्स्थापित गर्न सकिएन।",
+    "emptied": "रद्दी खाली गरियो।",
+    "couldntEmpty": "रद्दी खाली गर्न सकिएन।"
   }
 }

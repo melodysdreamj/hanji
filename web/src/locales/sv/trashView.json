@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Papperskorg",
+  "empty": "Sidor du raderar hamnar här. Papperskorgen är tom.",
+  "searchTrash": "Sök i papperskorgen",
+  "deletedPages": "Raderade sidor",
+  "noSearchMatches": "Inga raderade sidor matchar din sökning.",
+  "pageCount_one": "{{count}} sida",
+  "pageCount_other": "{{count}} sidor",
+  "deletedJustNow": "Raderad nyss",
+  "deletedOn": "Raderad {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Återställ",
+    "deleteForever": "Ta bort permanent",
+    "emptyTrash": "Töm papperskorgen"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Öppna {{title}} från papperskorgen",
+    "restorePage": "Återställ {{title}}",
+    "deletePageForever": "Radera {{title}} för alltid",
+    "cancelPermanentDelete": "Avbryt permanent radering",
+    "cancelEmptyTrash": "Avbryt tömning av papperskorgen"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Radera för alltid?",
+    "deleteBodyPrefix": "Detta kommer att permanent radera ",
+    "deleteBodySuffix": ". Du kan inte ångra denna åtgärd.",
+    "emptyTitle": "Töm papperskorgen?",
+    "emptyBody_one": "Detta kommer att permanent radera {{count}} sida i papperskorgen. Du kan inte ångra denna åtgärd.",
+    "emptyBody_other": "Detta kommer att permanent radera alla {{count}} sidor i papperskorgen. Du kan inte ångra denna åtgärd."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Raderad för alltid",
+    "couldntDelete": "Kunde inte radera sida",
+    "restored": "Återställd sida",
+    "couldntRestore": "Kunde inte återställa sida",
+    "emptied": "Papperskorgen tömd",
+    "couldntEmpty": "Kunde inte tömma papperskorgen"
   }
 }

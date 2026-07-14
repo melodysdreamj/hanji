@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Zdieľaná stránka",
+  "loading": "Načítava sa zdieľaná stránka",
+  "unavailable": "Táto zdieľaná stránka nie je k dispozícii.",
+  "notFound": "Zdieľaná stránka sa nenašla.",
+  "outsideShare": "Stránka nie je súčasťou tohto verejného zdieľania.",
+  "tryAgain": "Skúste znova",
+  "errors": {
+    "not-found": "Tento odkaz mohol vypršať, byť zrušený alebo skopírovaný nesprávne.",
+    "offline": "Skontrolujte pripojenie a potom skúste znova otvoriť zdieľanú stránku.",
+    "rate-limited": "Táto zdieľaná stránka prijíma príliš veľa požiadaviek. Počkajte chvíľu a skúste znova.",
+    "unavailable": "Hanji momentálne nemôže otvoriť túto zdieľanú stránku. Skúste znova o chvíľu."
+  }
 }

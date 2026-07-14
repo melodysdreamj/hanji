@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Telling",
+    "sum": "Som",
+    "average": "Gemiddeld",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} grafiek",
+  "chartType": "Grafiektipe",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "bar": "Staaf",
+    "horizontal_bar": "Horisontale staaf",
+    "line": "Lyn",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Gemerk",
+  "empty": "Leeg",
+  "legend": "Grafieklegende",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Geen data",
+  "noDataDesc": "Geen rye pas by die huidige filters of soektog nie.",
+  "noGroupProperty": "Nog niks om te grafiek nie",
+  "noGroupPropertyDesc": "Voeg 'n keuse-, status-, persoon-, blokkie- of datum-eienskap by om hierdie grafiek te groepeer.",
+  "total": "Totaal",
+  "unchecked": "Ontmerk",
+  "untitledProperty": "Ongetiteld",
+  "valueProperty": "Waarde-eienskap",
+  "xAxis": "X-as",
+  "yAxis": "Y-as"
 }

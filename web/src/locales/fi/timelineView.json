@@ -1,46 +1,46 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
-  },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
-  "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+  "bar": {
+    "openAriaLabel": "Avaa {{title}}",
+    "openAriaLabelWithDates": "Avaa {{title}}, {{start}}–{{end}}",
+    "openNoDateAriaLabel": "Avaa {{title}}, ei päivämäärää"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "hint": "lisää viittausominaisuus",
+    "label": "Riippuvuudet:",
+    "relationPropertyAriaLabel": "Riippuvuuden viittausominaisuus"
   },
-  "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+  "empty": {
+    "description": "Aikajananäkymät tarvitsevat alkupäivämääräominaisuuden.",
+    "title": "Lisää päivämääräominaisuus"
   },
-  "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
-  },
-  "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
-  },
+  "endDateHint": "Lisää loppupäivämääräominaisuus aikavälien piirtämiseen yksittäispäiväpalkkien sijaan.",
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "jumpTo": "Siirry {{date}}",
+    "noDatedItems": "Ei vielä päivättyjä kohteita.",
+    "noItemsInRange": "Ei kohteita tällä aikavälillä."
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Ei päivämäärää ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Ei mitään",
+    "untitled": "Nimetön"
+  },
+  "table": {
+    "ariaLabel": "Aikajanataulukko",
+    "nameHeader": "Nimi"
+  },
+  "toolbar": {
+    "newPage": "Uusi",
+    "newPageIn": "Uusi sivu kohteessa {{dbTitle}}",
+    "nextRange": "Seuraava aikaväli",
+    "previousRange": "Edellinen aikaväli",
+    "today": "Tänään"
+  },
+  "zoom": {
+    "ariaLabel": "Aikajanan zoomaus",
+    "day": "Päivä",
+    "month": "Kuukausi",
+    "week": "Viikko"
   }
 }

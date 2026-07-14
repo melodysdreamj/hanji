@@ -10,7 +10,7 @@
   },
   "tabs": {
     "gallery": "Galeria",
-    "upload": "Enviar",
+    "upload": "Envio",
     "link": "Link"
   },
   "link": {
@@ -19,7 +19,7 @@
   },
   "upload": {
     "error": "Não foi possível enviar essa imagem.",
-    "defaultFileName": "Imagem da capa"
+    "defaultFileName": "Imagem de capa"
   },
   "reposition": {
     "hint": "Arraste a imagem para reposicionar"
@@ -44,10 +44,10 @@
     "repositionPageCover": "Reposicionar capa da página",
     "removePageCover": "Remover capa da página",
     "changeCoverDialog": "Alterar capa",
-    "coverSource": "Fonte da capa",
+    "coverSource": "Origem da capa",
     "selectCover": "Selecionar capa {{number}}",
     "uploadFromDevice": "Enviar imagem de capa deste dispositivo",
     "uploadingFile": "Enviando {{fileName}}",
-    "coverImageLink": "Link da imagem da capa"
+    "coverImageLink": "Link da imagem de capa"
   }
 }

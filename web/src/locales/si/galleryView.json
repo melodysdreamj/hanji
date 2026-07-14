@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "මෙම දත්ත සමුදායට තවම පිටු නොමැත.",
+  "emptyTitle": "තවම පිටු නැත",
+  "newInline": "අලුත්",
+  "newPage": "නව පිටුව",
+  "newPageIn": "{{dbTitle}} හි නව පිටුව",
+  "noResultsDesc": "වත්මන් පෙරහන් හෝ සෙවුමට ගැළපෙන පිටු නොමැත.",
+  "noResultsTitle": "ප්රතිඵල නැත",
+  "openRow": "{{title}} විවෘත කරන්න"
 }

@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Додати властивість дати",
+    "description": "У представленнях часової шкали потрібна властивість дати початку для розташування сторінок у часі."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Додайте властивість дати завершення, щоб відображати діапазони замість одноденних смуг.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Масштаб часової шкали",
+    "day": "День",
+    "week": "Тиждень",
+    "month": "Місяць"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Залежності:",
+    "hint": "додайте властивість зв'язку",
+    "relationPropertyAriaLabel": "Властивість зв'язку залежності"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Сьогодні",
+    "previousRange": "Попередній діапазон",
+    "nextRange": "Наступний діапазон",
+    "newPage": "Нова",
+    "newPageIn": "Нова сторінка в {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Таблиця часової шкали",
+    "nameHeader": "Назва"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Відкрити {{title}}",
+    "openAriaLabelWithDates": "Відкрити {{title}}, {{start}} – {{end}}",
+    "openNoDateAriaLabel": "Відкрити {{title}}, без дати"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Немає елементів у цьому діапазоні.",
+    "noDatedItems": "Немає датованих елементів.",
+    "jumpTo": "Перейти до {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Без дати ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Немає",
+    "untitled": "Без назви"
   }
 }

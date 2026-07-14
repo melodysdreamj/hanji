@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
+  "openingPage": "Đang mở trang",
   "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "emptyWorkspace": "Workspace trống",
+  "untitled": "Chưa có tiêu đề",
+  "newPage": "Trang mới"
 }

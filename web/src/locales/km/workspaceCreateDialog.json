@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "វរក្សាស្ប៉េសថ្មី",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "ឈ្មោះស្ថានីយការងារ",
+    "placeholder": "ឈ្មោះក្រុមហ៊ុន"
   },
-  "startLabel": "Start from",
+  "startLabel": "ចាប់ផ្តើមពី",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "វរក្សាស្ប៉េសទទេ",
+      "body": "ចាប់ផ្តើមទទេជាមួយទំព័រចាប់ផ្តើម"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "នាំចូលពី Notion",
+      "body": "បង្កើតវរក្សាស្ប៉េស រួចផ្ទេរវរក្សាស្ប៉េស Notion ចូល"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "នាំចូលពី Hanji ផ្សេងទៀត",
+      "body": "បង្កើតវរក្សាស្ប៉េស រួចទាញយកពីម៉ាស៊ីនមេ Hanji ផ្សេងទៀត ឬឯកសារ"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "បង្កើតស្ថានីយការងារ",
+  "creating": "កំពុងបង្កើត…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "មិនអាចបង្កើតស្ថានីយការងារបានទេ។"
   }
 }

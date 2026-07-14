@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Bloğu taşı",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Taşıma hedeflerini ara",
+    "placeholder": "Sayfaları ara..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Taşıma iletişim kutusunu kapat"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Taşıma hedefleri",
+    "empty": "Sayfa bulunamadı.",
+    "destinationLabel": "Bloğu {{label}}, {{path}} konumuna taşı"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" oluştur",
+    "optionLabel": "\"{{query}}\" sayfası oluştur ve bloğu buraya taşı",
+    "hint": "Yeni sayfa - bloğu buraya taşı"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Kilitli sayfa"
   },
-  "untitled": "Untitled",
+  "untitled": "Başlıksız",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Sayfa kilitli",
+    "movedBlock": "Blok taşındı",
+    "movedBlocks": "Bloklar taşındı",
+    "movedBlocksCount": "{{blockCount}} blok taşındı",
+    "moveFailed": "Blok taşınamadı"
   }
 }

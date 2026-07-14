@@ -1,46 +1,46 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
-  },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
-  "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+  "bar": {
+    "openAriaLabel": "Otevřít {{title}}",
+    "openAriaLabelWithDates": "Otevřít {{title}}, {{start}} do {{end}}",
+    "openNoDateAriaLabel": "Otevřít {{title}}, bez data"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "hint": "přidat vlastnost relace",
+    "label": "Závislosti:",
+    "relationPropertyAriaLabel": "Vlastnost vztahu závislostí"
   },
-  "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+  "empty": {
+    "description": "Časové osy vyžadují vlastnost počátečního data pro zobrazení stránek v čase.",
+    "title": "Přidat vlastnost data"
   },
-  "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
-  },
-  "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
-  },
+  "endDateHint": "Přidejte vlastnost koncového data pro zobrazení intervalů místo jednodenních pruhů.",
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "jumpTo": "Přejít na {{date}}",
+    "noDatedItems": "Zatím žádné datované položky.",
+    "noItemsInRange": "V tomto rozsahu nejsou žádné položky."
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Bez data ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Žádné",
+    "untitled": "Bez názvu"
+  },
+  "table": {
+    "ariaLabel": "Tabulka časové osy",
+    "nameHeader": "Název"
+  },
+  "toolbar": {
+    "newPage": "Nová",
+    "newPageIn": "Nová stránka v {{dbTitle}}",
+    "nextRange": "Další rozsah",
+    "previousRange": "Předchozí rozsah",
+    "today": "Dnes"
+  },
+  "zoom": {
+    "ariaLabel": "Přiblížení časové osy",
+    "day": "Den",
+    "month": "Měsíc",
+    "week": "Týden"
   }
 }

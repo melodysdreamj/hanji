@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Закрыть выбор иконки",
+    "label": "Выбрать иконку"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "Тип значка",
+    "emoji": "Эмодзи",
+    "image": "Изображение"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Удалить",
+    "ariaLabel": "Удалить значок"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Фильтр…",
+    "searchLabel": "Поиск значков",
+    "random": "Случайная",
+    "randomLabel": "Выбрать случайную иконку",
+    "recentLabel": "Сначала недавние",
+    "gridLabelRecent": "Иконки, сначала недавние",
+    "gridLabel": "Иконки",
+    "optionLabel": "Выбрать иконку {{emoji}}",
+    "noResults": "Нет иконок, соответствующих «{{query}}». Попробуйте другое слово или сбросьте фильтр."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Изображение",
+    "linkPlaceholder": "Вставьте ссылку на изображение",
+    "linkLabel": "Ссылка на иконку",
+    "apply": "Применить",
+    "upload": "Загрузить файл",
+    "uploading": "Загрузка...",
+    "uploadingLabel": "Загрузка {{fileName}}",
+    "uploadFailed": "Не удалось загрузить это изображение.",
+    "fallbackFileName": "Изображение иконки"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Подготовка загрузки",
+    "finalizing": "Завершение",
+    "complete": "Завершено",
+    "uploading": "Загрузка"
   }
 }

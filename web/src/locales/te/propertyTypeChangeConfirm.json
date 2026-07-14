@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "ప్రాపర్టీ రకం మార్చాలా?",
+  "message": "\"{{propName}}\" ఇప్పటికే విలువలు కలిగి ఉంది. దీని రకాన్ని {{typeLabel}}గా మార్చడం వలన ఇప్పటికే ఉన్న విలువలు భిన్నంగా ప్రదర్శించబడవచ్చు లేదా కోల్పోవచ్చు.",
+  "cancelAria": "ప్రాపర్టీ రకం మార్పును రద్దు చేయండి",
+  "confirm": "రకం మార్చు"
 }

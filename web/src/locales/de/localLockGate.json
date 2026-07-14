@@ -1,10 +1,10 @@
 {
   "title": "Lokale Daten entsperren",
-  "description": "Offline-Daten auf diesem Gerät sind mit einem Passwort gesperrt. Beim Entsperren werden Offline-Nutzung und Speicherung wieder aktiviert.",
+  "description": "Offline-Daten auf diesem Gerät sind mit einer Passphrase gesperrt. Entsperren aktiviert die Offline-Nutzung und das Speichern wieder.",
   "passphrasePlaceholder": "Passphrase",
   "unlock": "Entsperren",
-  "continueOnline": "Nur online fortfahren",
-  "continueOnlineHint": "„Nur online fortfahren“ lässt die gesperrten Offline-Bearbeitungen dieses Geräts versiegelt — sie bleiben auf diesem Gerät und werden erst synchronisiert, wenn Sie sie mit der richtigen Passphrase entsperren.",
-  "wrongPassphrase": "Diese Passphrase ist nicht richtig.",
-  "unsupportedBrowser": "Lokale Sperre ist in diesem Browser nicht verfügbar."
+  "continueOnline": "Nur online fortsetzen",
+  "continueOnlineHint": "\"Nur online fortsetzen\" hält die gesperrten Offline-Bearbeitungen auf diesem Gerät versiegelt – sie bleiben auf diesem Gerät und werden erst synchronisiert, wenn Sie sie mit der richtigen Passphrase entsperren.",
+  "wrongPassphrase": "Diese Passphrase ist nicht korrekt.",
+  "unsupportedBrowser": "Lokale Sperrung ist in diesem Browser nicht verfügbar."
 }

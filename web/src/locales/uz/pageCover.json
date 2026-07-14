@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Muqovani o'zgartirish",
+    "reposition": "Joyini o'zgartirish",
+    "remove": "Olib tashlash",
+    "uploadFile": "Faylni yuklash",
+    "uploading": "Yuklanmoqda...",
+    "submit": "Yuborish",
+    "savePosition": "Joyni saqlash"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galereya",
+    "upload": "Yuklash",
+    "link": "Havola"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Rasm havolasini joylashtiring",
+    "invalid": "http yoki https rasm havolasini joylashtiring."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Rasmni yuklab bo‘lmadi.",
+    "defaultFileName": "Muqova rasmi"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Rasmni joyini o'zgartirish uchun torting"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Yuklash tayyorlanmoqda",
+    "finalizing": "Yakunlanmoqda",
+    "complete": "Tugallandi",
+    "uploading": "Yuklanmoqda"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Muqova olib tashlandi",
+    "restored": "Muqova tiklandi",
+    "undo": "Bekor qilish"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Sahifa muqovasi",
+    "coverVerticalPosition": "Muqova vertikal joylashuvi",
+    "positionFromTop": "Tepadan {{position}}%",
+    "closeCoverMenu": "Muqova menyusini yopish",
+    "changePageCover": "Sahifa muqovasini o'zgartirish",
+    "repositionPageCover": "Sahifa muqovasini joyini o'zgartirish",
+    "removePageCover": "Sahifa muqovasini olib tashlash",
+    "changeCoverDialog": "Muqovani o'zgartirish",
+    "coverSource": "Muqova manbasi",
+    "selectCover": "{{number}}-muqovani tanlash",
+    "uploadFromDevice": "Ushbu qurilmadan muqova rasmini yuklash",
+    "uploadingFile": "{{fileName}} yuklanmoqda",
+    "coverImageLink": "Muqova rasm havolasi"
   }
 }

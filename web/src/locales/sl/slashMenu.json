@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Ukazi blokov",
+  "closeBlockCommands": "Zapri ukaze blokov",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Osnovni bloki",
+    "Media": "Mediji",
+    "Database": "Baza",
+    "Advanced": "Napredni bloki"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} od {{total}}. Pritisnite Enter za vstavitev.",
+  "listStatus": "Na voljo je {{total}} ukazov blokov.",
+  "noBlocks": "Ni najdenih blokov",
+  "noBlocksFor": "Ni najdenih blokov za \"{{query}}\"",
+  "recentlyUsed": "Nedavno uporabljeno"
 }

@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Thông tin pháp lý và nguồn",
+  "noWarranty": "Không bảo hành",
+  "sourceCode": "Mã nguồn",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Ngoại lệ 2.0"
 }

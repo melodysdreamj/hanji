@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "இன்னும் உரையாடல்கள் இல்லை. ஒரு பக்கத்தில் கருத்து தெரிவிக்கவும் அல்லது ஒருவரைக் குறிப்பிட்டு உரையாடலைத் தொடங்கவும்.",
+  "leave": "வெளியேறு",
+  "leaveAria": "{{title}} உரையாடலில் இருந்து வெளியேறு",
+  "open": "{{title}} உரையாடலைத் திற",
+  "participants_one": "{{count}} பங்கேற்பாளர்",
+  "participants_other": "{{count}} பங்கேற்பாளர்கள்",
+  "untitled": "தலைப்பில்லாத",
+  "loading": "உரையாடல்களை ஏற்றுகிறது..."
 }

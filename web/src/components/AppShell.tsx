@@ -6,9 +6,11 @@ import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { absolutePageUrl, pageHref } from "@/lib/navigation";
 import { pageDisplayTitle } from "@/lib/pageTitle";
+import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
 import { flushAllPending, handleLocalUnlock, readLastUserId, useStore } from "@/lib/store";
 import { resolveTheme, useTheme } from "@/lib/theme";
 import LocalLockGate from "./LocalLockGate";
+import { ProductLoadingScreen } from "./ProductLoadingScreen";
 import { Sidebar } from "./Sidebar";
 import SyncStatusBadge from "./SyncStatusBadge";
 import { ToastStack } from "./ToastStack";
@@ -92,6 +94,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const mainRef = useRef<HTMLElement>(null);
   const previousPathnameRef = useRef(pathname);
   const navigationCleanupPathnameRef = useRef(pathname);
+
+  useEffect(() => {
+    if (ready && !publicShareRoute) markAppInteractiveForOfflineWarm();
+  }, [publicShareRoute, ready]);
 
   async function retryWorkspaceLoad() {
     setError(null);
@@ -408,14 +414,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   if (!ready && !publicShareRoute) {
-    return (
-      <div className={styles.boot} aria-busy="true">
-        <div className={styles.bootLoading} role="status">
-          <span className={styles.bootSpinner} aria-hidden="true" />
-          <span>{t("appShell:loadingWorkspace")}</span>
-        </div>
-      </div>
-    );
+    return <ProductLoadingScreen deferred source="workspace" />;
   }
 
   const shellStyle = {

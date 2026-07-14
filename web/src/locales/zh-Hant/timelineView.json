@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "新增日期屬性",
+    "description": "時間軸檢視需要開始日期屬性，才能在時間軸上顯示頁面。"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "新增結束日期屬性以顯示範圍，而非單日條。",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "時間軸縮放",
+    "day": "日",
+    "week": "週",
+    "month": "月"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "相依關係：",
+    "hint": "新增關聯屬性",
+    "relationPropertyAriaLabel": "相依關聯屬性"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "今天",
+    "previousRange": "上一個範圍",
+    "nextRange": "下一個範圍",
+    "newPage": "新增",
+    "newPageIn": "在 {{dbTitle}} 中新增頁面"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "時間軸表格",
+    "nameHeader": "名稱"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "開啟 {{title}}",
+    "openAriaLabelWithDates": "開啟 {{title}}，{{start}} 至 {{end}}",
+    "openNoDateAriaLabel": "開啟 {{title}}，無日期"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "此範圍內沒有項目。",
+    "noDatedItems": "尚無已標註日期的項目。",
+    "jumpTo": "跳至 {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "無日期 ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "無",
+    "untitled": "無標題"
   }
 }

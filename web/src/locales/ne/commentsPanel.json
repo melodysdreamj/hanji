@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "टिप्पणी",
+  "closeAria": "टिप्पणी बन्द गर्नुहोस्",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ब्लक छलफल",
+    "page": "पृष्ठ छलफल"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "टिप्पणी स्थिति",
+    "open": "खुला",
+    "resolved": "समाधान"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "टिप्पणी गर्दै",
+    "commentingOnSelectedText": "चयन गरिएको पाठमा टिप्पणी गर्दै",
+    "selectedBlock": "चयन गरिएको ब्लक",
+    "onSelectedText": "चयन गरिएको पाठमा",
+    "onSelectedBlock": "चयन गरिएको ब्लकमा",
+    "onABlock": "एउटा ब्लकमा"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ब्लक टिप्पणी थप्नुहोस्",
+    "addPageComment": "पृष्ठ टिप्पणी थप्नुहोस्",
+    "blockPlaceholder": "यस ब्लकमा टिप्पणी गर्नुहोस्...",
+    "pagePlaceholder": "टिप्पणी थप्नुहोस्...",
+    "submit": "टिप्पणी"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "टिप्पणी मेन्सन व्यक्तिहरू",
+    "replyPeopleAria": "जवाफ मेन्सन व्यक्तिहरू",
+    "trigger": "व्यक्तिहरू मेन्सन गर्नुहोस्",
+    "noMatches": "कुनै मिल्ने व्यक्ति छैन",
+    "title": "{{name}} मेन्सन",
+    "person": "व्यक्ति",
+    "you": "तपाईं",
+    "organizationPerson": "संस्थाको व्यक्ति",
+    "roleInOrganization": "संस्थामा {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "टिप्पणी धागोहरू",
+    "empty": "अहिलेसम्म कुनै टिप्पणी छैन",
+    "noOpen": "कुनै खुला टिप्पणी छैन",
+    "noResolved": "समाधान गरिएको टिप्पणी छैन"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}}को टिप्पणी, {{time}}",
+    "commentAriaResolved": "{{author}}को टिप्पणी, {{time}}, समाधान भयो",
+    "replyAria": "{{author}}को जवाफ, {{time}}",
+    "repliesAria": "{{count}} जवाफ",
+    "edited": "(सम्पादित)",
+    "emptyComment": "(खाली टिप्पणी)",
+    "emptyReply": "(खाली जवाफ)",
+    "justNow": "भर्खरै"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "जवाफ",
+    "showInPage": "पृष्ठमा देखाउनुहोस्",
+    "resolve": "समाधान",
+    "reopen": "पुन: खोल्नुहोस्",
+    "edit": "सम्पादन"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "जवाफ लेख्नुहोस्..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "टिप्पणी सम्पादन"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "यो टिप्पणी मेटाउने?",
+    "threadConfirm_one": "यो टिप्पणी र यसको जवाफ मेटाउने हो?",
+    "threadConfirm_other": "यो टिप्पणी र यसको {{count}} जवाफहरू मेटाउने हो?"
   }
 }

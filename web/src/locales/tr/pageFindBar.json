@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Sayfada ara"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Sayfada ara",
+    "placeholder": "Sayfada ara"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Önceki eşleşme",
+    "next": "Sonraki eşleşme",
+    "close": "Bulmayı kapat"
   }
 }

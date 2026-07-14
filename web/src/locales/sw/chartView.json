@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Hesabu",
+    "sum": "Jumla",
+    "average": "Wastani",
+    "min": "Kichini",
+    "max": "Upeo"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Chati ya {{name}}",
+  "chartType": "Aina ya chati",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Baa",
+    "horizontal_bar": "Baa mlalo",
+    "line": "Mstari",
+    "donut": "Donati"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Imechaguliwa",
+  "empty": "Tupu",
+  "legend": "Ufafanuzi wa chati",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Hakuna data",
+  "noDataDesc": "Hakuna safu mlalo inayolingana na vichujio au utafutaji.",
+  "noGroupProperty": "Hakuna sifa ya kundi bado",
+  "noGroupPropertyDesc": "Ongeza sifa ya chaguo, hali, mtu, kisanduku, au tarehe.",
+  "total": "Jumla",
+  "unchecked": "Haijachaguliwa",
+  "untitledProperty": "Isiyo na jina",
+  "valueProperty": "Sifa ya thamani",
+  "xAxis": "Mhimili wa X",
+  "yAxis": "Mhimili wa Y"
 }

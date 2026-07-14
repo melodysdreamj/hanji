@@ -3,5 +3,12 @@
   "loading": "Chargement de la page partagée",
   "unavailable": "Cette page partagée est indisponible.",
   "notFound": "Page partagée introuvable.",
-  "outsideShare": "La page ne fait pas partie de ce partage public."
+  "outsideShare": "Cette page ne fait pas partie de ce partage public.",
+  "tryAgain": "Réessayer",
+  "errors": {
+    "not-found": "Ce lien a peut-être expiré, a été dépublié ou a été mal copié.",
+    "rate-limited": "Cette page partagée reçoit trop de requêtes. Attendez un instant et réessayez.",
+    "offline": "Vérifiez votre connexion, puis réessayez d'ouvrir la page partagée.",
+    "unavailable": "Hanji n'a pas pu ouvrir cette page partagée pour le moment. Réessayez dans un instant."
+  }
 }

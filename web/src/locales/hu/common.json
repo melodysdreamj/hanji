@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Mégse",
+    "save": "Mentés",
+    "close": "Bezárás",
+    "search": "Keresés",
+    "create": "Létrehozás",
+    "delete": "Törlés",
+    "clearAll": "Összes törlése",
+    "done": "Kész",
+    "add": "Hozzáadás"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Cím nélküli"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} másolata",
+    "columnName": "Oszlop {{number}}",
+    "importedDatabase": "Importált adatbázis",
+    "uploadedFile": "Feltöltött fájl",
+    "image": "Kép",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Név",
+      "status": "Állapot",
+      "select": "Választás",
+      "date": "Dátum"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Nem kezdődött el",
+      "doing": "Folyamatban",
+      "done": "Kész"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opció 1",
+      "second": "Opció 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tábla"
     }
   }
 }

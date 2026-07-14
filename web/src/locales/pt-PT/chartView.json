@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Contagem",
+    "sum": "Soma",
+    "average": "Média",
+    "min": "Mín.",
+    "max": "Máx."
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} gráfico",
+  "chartType": "Tipo de gráfico",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "bar": "Barras",
+    "horizontal_bar": "Barras horizontais",
+    "line": "Linha",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Selecionado",
+  "empty": "Vazio",
+  "legend": "Legenda do gráfico",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
+  "noData": "Sem dados",
+  "noDataDesc": "Nenhuma linha corresponde aos filtros ou pesquisa atuais.",
+  "noGroupProperty": "Nada para gráfico ainda",
+  "noGroupPropertyDesc": "Adicione uma propriedade de seleção, estado, pessoa, caixa de seleção ou data para agrupar este gráfico.",
   "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "unchecked": "Não selecionado",
+  "untitledProperty": "Sem título",
+  "valueProperty": "Propriedade do valor",
+  "xAxis": "Eixo X",
+  "yAxis": "Eixo Y"
 }

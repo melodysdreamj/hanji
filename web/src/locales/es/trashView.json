@@ -1,32 +1,32 @@
 {
   "trash": "Papelera",
-  "empty": "Las páginas que elimines aparecen aquí. La papelera está vacía.",
-  "searchTrash": "Buscar en la papelera",
+  "empty": "Las páginas que eliminas aparecen aquí. No hay nada en la papelera.",
+  "searchTrash": "Buscar en papelera",
   "deletedPages": "Páginas eliminadas",
   "noSearchMatches": "Ninguna página eliminada coincide con tu búsqueda.",
   "pageCount_one": "{{count}} página",
   "pageCount_other": "{{count}} páginas",
-  "deletedJustNow": "Eliminada justo ahora",
+  "deletedJustNow": "Recién eliminada",
   "deletedOn": "Eliminada el {{date}}",
   "actions": {
     "restore": "Restaurar",
-    "deleteForever": "Eliminar para siempre",
+    "deleteForever": "Eliminar permanentemente",
     "emptyTrash": "Vaciar papelera"
   },
   "aria": {
-    "openFromTrash": "Abrir {{title}} de la papelera",
+    "openFromTrash": "Abrir {{title}} desde la papelera",
     "restorePage": "Restaurar {{title}}",
-    "deletePageForever": "Eliminar {{title}} para siempre",
+    "deletePageForever": "Eliminar {{title}} permanentemente",
     "cancelPermanentDelete": "Cancelar eliminación permanente",
-    "cancelEmptyTrash": "Cancelar vaciado de la papelera"
+    "cancelEmptyTrash": "Cancelar vaciado de papelera"
   },
   "confirm": {
     "deleteTitle": "¿Eliminar para siempre?",
-    "deleteBodyPrefix": "Esto eliminará permanentemente ",
-    "deleteBodySuffix": ". No puedes deshacer esta acción.",
-    "emptyTitle": "¿Vaciar la papelera?",
-    "emptyBody_one": "Esto eliminará permanentemente las {{count}} página de la papelera. No puedes deshacer esta acción.",
-    "emptyBody_other": "Esto eliminará permanentemente las {{count}} páginas de la papelera. No puedes deshacer esta acción."
+    "deleteBodyPrefix": "Se eliminará permanentemente ",
+    "deleteBodySuffix": ". No se puede deshacer esta acción.",
+    "emptyTitle": "¿Vaciar papelera?",
+    "emptyBody_one": "Se eliminará permanentemente {{count}} página en la papelera. No se puede deshacer esta acción.",
+    "emptyBody_other": "Se eliminarán permanentemente {{count}} páginas en la papelera. No se puede deshacer esta acción."
   },
   "toast": {
     "deletedForever": "Eliminada para siempre",

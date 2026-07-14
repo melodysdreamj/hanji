@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Новий робочий простір",
   "name": {
-    "label": "Workspace name",
+    "label": "Назва робочого простору",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Почати з",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Порожній робочий простір",
+      "body": "Почніть порожнім зі стартовими сторінками."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Імпорт з Notion",
+      "body": "Створіть робочий простір, потім перенесіть робочий простір Notion до нього."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Імпорт з іншого Hanji",
+      "body": "Створіть робочий простір, потім імпортуйте з іншого сервера Hanji або файлу."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Створити робочий простір",
+  "creating": "Створення…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Не вдалося створити робочий простір."
   }
 }

@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Sana xususiyatini qo'shish",
+    "description": "Timeline ko'rinishi sahifalarni vaqt bo'ylab joylashtirish uchun boshlanish sanasi xususiyatiga muhtoj."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Bir kunlik chiziqlar o'rniga oraliklarni chizish uchun tugash sanasi xususiyatini qo'shing.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Timeline masshtabi",
+    "day": "Kun",
+    "week": "Hafta",
+    "month": "Oy"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Bog'liqliklar:",
+    "hint": "aloqa xususiyatini qo'shing",
+    "relationPropertyAriaLabel": "Bog'liqlik aloqa xususiyati"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Bugun",
+    "previousRange": "Oldingi oralik",
+    "nextRange": "Keyingi oralik",
+    "newPage": "Yangi",
+    "newPageIn": "{{dbTitle}} da yangi sahifa"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Timeline jadvali",
+    "nameHeader": "Nomi"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ni ochish",
+    "openAriaLabelWithDates": "{{title}} ni ochish, {{start}} dan {{end}} gacha",
+    "openNoDateAriaLabel": "{{title}} ni ochish, sana yo'q"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Bu oralikda elementlar yo'q.",
+    "noDatedItems": "Hali sanalangan elementlar yo'q.",
+    "jumpTo": "{{date}} ga o'tish"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Sana yo'q ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Yo'q",
+    "untitled": "Nomsiz"
   }
 }

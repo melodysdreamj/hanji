@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "แผนภาพ Mermaid",
+  "emptyPreview": "ตัวอย่างแผนภาพ",
+  "sourceDescription": "ซอร์สแผนภาพ: {{source}}",
+  "syntaxError": "แผนภาพมีข้อผิดพลาดทางไวยากรณ์",
+  "syntaxErrorDetails": "แสดงรายละเอียด"
 }

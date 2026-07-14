@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "average": "Gennemsnit",
+    "count": "Antal",
+    "max": "Maks",
     "min": "Min",
-    "max": "Max"
+    "sum": "Sum"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} diagram",
+  "chartType": "Diagramtype",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Søjler",
+    "donut": "Donut",
+    "horizontal_bar": "Vandrette søjler",
+    "line": "Linje"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Tjekket",
+  "empty": "Tom",
+  "legend": "Forklaring",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Ingen data",
+  "noDataDesc": "Ingen rækker matcher de aktuelle filtre eller søgning.",
+  "noGroupProperty": "Intet at vise i diagram endnu",
+  "noGroupPropertyDesc": "Tilføj en select-, status-, person-, checkbox- eller date-egenskab for at gruppere dette diagram.",
+  "total": "I alt",
+  "unchecked": "Umarkeret",
+  "untitledProperty": "Unavngivet",
+  "valueProperty": "Værdiegenskab",
+  "xAxis": "X-akse",
+  "yAxis": "Y-akse"
 }

@@ -1,7 +1,7 @@
 {
   "empty": {
-    "title": "Adicione uma propriedade de data",
-    "description": "As visualizações de calendário precisam de uma propriedade de data para posicionar páginas no mês.",
+    "title": "Adicionar propriedade de data",
+    "description": "As visualizações de calendário precisam de uma propriedade de data para colocar páginas no mês.",
     "addDateButton": "Data"
   },
   "toolbar": {
@@ -21,7 +21,7 @@
     "fri": "Sex",
     "sat": "Sáb"
   },
-  "gridAriaLabel": "Calendário de {{title}}",
+  "gridAriaLabel": "Calendário {{title}}",
   "cell": {
     "ariaLabel": "{{date}}, {{count}} itens",
     "newRowAriaLabel": "Nova linha em {{date}}",

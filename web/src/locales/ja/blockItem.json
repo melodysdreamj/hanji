@@ -1,29 +1,29 @@
 {
   "addView": "ビューを追加",
-  "cantCopyBlockHere": "ここではブロックをコピーできません",
-  "cantMoveBlockHere": "ここではブロックを移動できません",
+  "cantCopyBlockHere": "ここにはブロックをコピーできません",
+  "cantMoveBlockHere": "ここにはブロックを移動できません",
   "copiedBlock": "ブロックをコピーしました",
   "copiedBlocks": "{{count}}個のブロックをコピーしました",
-  "copyViewLink": "ビューのリンクをコピー",
-  "couldntCut": "切り取りできませんでした",
-  "cutBlock": "ブロックを切り取り",
-  "cutBlocks": "{{count}}個のブロックを切り取り",
-  "databaseNotReady": "データベースの準備がまだ整っていません",
-  "databaseTitleHidden": "データベースのタイトルを非表示",
+  "copyViewLink": "ビューリンクをコピー",
+  "couldntCut": "切り取れませんでした",
+  "cutBlock": "ブロックを切り取りました",
+  "cutBlocks": "{{count}}個のブロックを切り取りました",
+  "databaseNotReady": "データベースはまだ準備できていません",
+  "databaseTitleHidden": "データベースタイトルを非表示にしました",
   "deletedBlock": "ブロックを削除しました",
   "deletedBlocks": "{{count}}個のブロックを削除しました",
   "duplicatedBlock": "ブロックを複製しました",
   "duplicatedBlocks": "{{count}}個のブロックを複製しました",
-  "duplicateView": "ビューを複製",
+  "duplicateView": "表示を複製",
   "editIcon": "アイコンを編集",
   "editLayout": "レイアウトを編集",
   "editTitle": "タイトルを編集",
-  "emptyTogglePrompt": "空のトグルです。クリックするか、ブロックをドラッグしてください。",
+  "emptyTogglePrompt": "空のトグルです。クリックするか、ブロックを内側にドラッグしてください。",
   "groupDate": "日付",
-  "groupLinkToPage": "ページへのリンク",
-  "groupNewPage": "新しいページ",
+  "groupLinkToPage": "ページリンク",
+  "groupNewPage": "新規ページ",
   "groupPeople": "ユーザー",
-  "hideTitle": "タイトルを非表示",
+  "hideTitle": "タイトルを隠す",
   "manageInCalendar": "カレンダーで管理",
   "mentionToday": "今日",
   "mentionTomorrow": "明日",
@@ -31,46 +31,46 @@
   "movedBlock": "ブロックを移動しました",
   "movedBlocks": "{{count}}個のブロックを移動しました",
   "nothingToUndo": "元に戻す操作はありません",
-  "openDatabase": "{{title}} データベースを開く",
-  "restoredBlock": "ブロックを復元しました",
-  "restoredBlocks": "ブロックを復元しました",
-  "undidCopy": "コピーを元に戻しました",
-  "undidDuplicate": "複製を元に戻しました",
-  "undidMove": "移動を元に戻しました",
+  "openDatabase": "{{title}}データベースを開く",
+  "restoredBlock": "復元されたブロック",
+  "restoredBlocks": "復元されたブロック",
+  "undidCopy": "コピーを取り消しました",
+  "undidDuplicate": "複製を取り消しました",
+  "undidMove": "移動を取り消しました",
   "undo": "元に戻す",
   "uploadComplete": "完了",
   "uploadedFile": "ファイルをアップロードしました",
   "uploadedFiles": "{{count}}個のファイルをアップロードしました",
-  "uploadFailed": "{{fileName}} をアップロードできませんでした。",
+  "uploadFailed": "{{fileName}}をアップロードできませんでした。",
   "uploadFailedUnknown": "そのファイルをアップロードできませんでした。",
   "uploadFileTooLarge": "ファイルが大きすぎます。現在のアップロード上限は5 GBです。",
   "uploadUnsafeFileType": "HTML、SVG、XML、JavaScriptなどのアクティブなウェブコンテンツファイルはアップロードできません。",
   "uploadFinalizing": "最終処理中",
-  "uploadingFile": "{{fileName}} をアップロードしています",
-  "uploadPreparing": "アップロードを準備中",
+  "uploadingFile": "{{fileName}}をアップロード中",
+  "uploadPreparing": "アップロード準備中",
   "uploadUploading": "アップロード中",
-  "viewDataSource": "ビューのデータソース",
+  "viewDataSource": "データソースを表示",
   "block": {
     "aria": "{{type}}ブロック",
     "ariaWithSummary": "{{type}}ブロック: {{summary}}",
-    "pagePlaceholder": "「/」でコマンドを表示",
-    "textbox": "{{type}}ブロックのテキスト"
+    "pagePlaceholder": "コマンドを表示するには「/」を入力",
+    "textbox": "{{type}}ブロックテキスト"
   },
   "common": {
     "addCaption": "キャプションを追加",
     "attach": "添付",
     "change": "変更",
     "close": "閉じる",
-    "copied": "コピーしました",
+    "copied": "コピー済み",
     "copy": "コピー",
     "copyLink": "リンクをコピー",
     "done": "完了",
     "download": "ダウンロード",
-    "embed": "埋め込む",
+    "embed": "埋め込み",
     "open": "開く",
     "openNewTab": "新しいタブで開く",
     "remove": "削除",
-    "replace": "置換",
+    "replace": "置き換え",
     "resize": "サイズ変更",
     "save": "保存",
     "untitled": "無題",
@@ -78,14 +78,14 @@
     "uploading": "アップロード中..."
   },
   "selection": {
-    "selectedBlocks_one": "{{count}}個のブロックを選択",
-    "selectedBlocks_other": "{{count}}個のブロックを選択"
+    "selectedBlocks_one": "選択したブロック {{count}}個",
+    "selectedBlocks_other": "選択したブロック {{count}}個"
   },
   "comments": {
-    "count_one": "{{count}}件のコメント",
-    "count_other": "{{count}}件のコメント",
-    "unresolvedOnBlock_one": "{{type}}ブロックに{{count}}件の未解決コメント",
-    "unresolvedOnBlock_other": "{{type}}ブロックに{{count}}件の未解決コメント"
+    "count_one": "{{count}} 件のコメント",
+    "count_other": "{{count}} 件のコメント",
+    "unresolvedOnBlock_one": "{{type}}ブロックの未解決コメント {{count}}件",
+    "unresolvedOnBlock_other": "{{type}}ブロックの未解決コメント {{count}}件"
   },
   "toggle": {
     "addInside": "このトグル内にブロックを追加",
@@ -100,7 +100,7 @@
     "delete": "タブを削除",
     "deleteNamed": "{{label}}を削除",
     "empty": "空のタブ",
-    "emptyGroup": "空のタブ",
+    "emptyGroup": "空のタブグループ",
     "label": "タブ",
     "newNamed": "タブ{{number}}",
     "rename": "{{label}}の名前を変更"
@@ -118,13 +118,13 @@
     "resize": "列のサイズを変更"
   },
   "simpleTable": {
-    "actions": "シンプルテーブルの操作",
+    "actions": "シンプルテーブル操作",
     "addColumn": "シンプルテーブルに列を追加",
     "addRow": "シンプルテーブルに行を追加",
     "addRowShort": "行を追加",
     "cell": "テーブルセル",
-    "cellNumbered": "テーブルセル {{row}}, {{column}}",
-    "dimensions": "{{rows}}行{{columns}}列のシンプルテーブル",
+    "cellNumbered": "{{row}}行 {{column}}列のテーブルセル",
+    "dimensions": "{{rows}}行×{{columns}}列のシンプルテーブル",
     "headerColumn": "ヘッダー列",
     "headerRow": "ヘッダー行",
     "label": "シンプルテーブル",
@@ -134,7 +134,7 @@
     "removeLastRowShort": "最後の行を削除",
     "toggleHeaderColumn": "ヘッダー列を切り替え",
     "toggleHeaderRow": "ヘッダー行を切り替え",
-    "typeSomething": "何か入力してください"
+    "typeSomething": "内容を入力"
   },
   "image": {
     "align": {
@@ -142,40 +142,40 @@
       "left": "左",
       "right": "右"
     },
-    "alignAction": "画像を{{align}}に配置",
-    "alignTitle": "{{align}}に配置",
-    "caption": "画像のキャプション",
+    "alignAction": "画像を{{align}}揃え",
+    "alignTitle": "{{align}}揃え",
+    "caption": "画像キャプション",
     "chooseFile": "画像ファイルを選択してください。",
     "closePreview": "画像プレビューを閉じる",
     "embed": "画像を埋め込む",
-    "emptyHint": "画像をアップロードするか、リンクを貼り付けてここに表示します。",
-    "invalidLink": "有効な画像リンクを貼り付けてください。",
+    "emptyHint": "画像をアップロードするか、リンクを貼り付けて表示してください。",
+    "invalidLink": "正しい画像リンクを貼り付けてください。",
     "label": "画像",
     "link": "画像リンク",
     "preview": "画像プレビュー",
     "replace": "画像を置換",
-    "resizeFromLeft": "画像を左からサイズ変更",
-    "resizeFromRight": "画像を右からサイズ変更"
+    "resizeFromLeft": "左から画像をリサイズ",
+    "resizeFromRight": "右から画像をリサイズ"
   },
   "media": {
     "audio": "オーディオ",
-    "audioCaption": "オーディオのキャプション",
-    "audioEmptyHint": "オーディオファイルをアップロードするか、オーディオリンクを貼り付けてここで再生します。",
+    "audioCaption": "オーディオキャプション",
+    "audioEmptyHint": "オーディオファイルをアップロード、またはリンクを貼り付けて再生",
     "audioLink": "オーディオリンク",
-    "chooseAudioFile": "オーディオファイルを選択してください。",
-    "chooseVideoFile": "動画ファイルを選択してください。",
+    "chooseAudioFile": "オーディオファイルを選択",
+    "chooseVideoFile": "動画ファイルを選択",
     "embedAudio": "オーディオを埋め込む",
     "embedVideo": "動画を埋め込む",
     "embeddedVideo": "埋め込み動画",
     "invalidAudioLink": "有効なオーディオリンクを貼り付けてください。",
     "invalidVideoLink": "有効な動画リンクを貼り付けてください。",
-    "openAudio": "オーディオリンクを新しいタブで開く",
-    "openVideo": "動画リンクを新しいタブで開く",
-    "replaceAudio": "オーディオを置換",
-    "replaceVideo": "動画を置換",
+    "openAudio": "新しいタブでオーディオリンクを開く",
+    "openVideo": "新しいタブで動画リンクを開く",
+    "replaceAudio": "オーディオを置き換え",
+    "replaceVideo": "動画を置き換え",
     "video": "動画",
-    "videoCaption": "動画のキャプション",
-    "videoEmptyHint": "動画ファイルをアップロードするか、直接リンクを貼り付けるか、YouTube、Vimeo、Loomのリンクを使用してください。",
+    "videoCaption": "動画キャプション",
+    "videoEmptyHint": "動画ファイルをアップロード、または直接リンクやYouTube、Vimeo、Loomリンクを貼り付けてください。",
     "videoLink": "動画リンク"
   },
   "bookmark": {
@@ -187,29 +187,29 @@
     "link": "ブックマークリンク",
     "linkPrefix": "リンク",
     "open": "ブックマークを新しいタブで開く",
-    "openNamed": "ブックマーク {{title}} を新しいタブで開く",
-    "replace": "ブックマークリンクを置換"
+    "openNamed": "ブックマーク「{{title}}」を新しいタブで開く",
+    "replace": "ブックマークリンクを置き換える"
   },
   "embed": {
-    "caption": "埋め込みのキャプション",
-    "emptyHint": "リンクを貼り付けてページにコンテンツを埋め込みます。",
+    "caption": "埋め込みキャプション",
+    "emptyHint": "コンテンツをページに埋め込むリンクを貼り付けてください。",
     "invalidLink": "有効な埋め込みリンクを貼り付けてください。",
     "link": "埋め込みリンク",
     "open": "埋め込みリンクを新しいタブで開く",
-    "openActions": "埋め込みブロックの操作を開く",
-    "replace": "埋め込みリンクを置換",
-    "title": "リンクを埋め込み"
+    "openActions": "埋め込みブロックのアクションを開く",
+    "replace": "埋め込みリンクを置き換え",
+    "title": "リンクを埋め込む"
   },
   "file": {
     "attach": "ファイルを添付",
-    "caption": "ファイルのキャプション",
-    "downloadNamed": "{{fileName}} をダウンロード",
-    "emptyHint": "ファイルをアップロードするか、ファイルリンクを貼り付けてここに添付します。",
+    "caption": "ファイルキャプション",
+    "downloadNamed": "{{fileName}}をダウンロード",
+    "emptyHint": "ファイルをアップロードするか、ファイルリンクを貼り付けて添付してください。",
     "invalidLink": "有効なファイルリンクを貼り付けてください。",
     "label": "ファイル",
     "link": "ファイルリンク",
-    "openNamed": "{{fileName}} を新しいタブで開く",
-    "replaceNamed": "{{fileName}} を置換"
+    "openNamed": "{{fileName}}を新しいタブで開く",
+    "replaceNamed": "{{fileName}}を置換"
   },
   "childPage": {
     "copiedLink": "子ページのリンクをコピーしました",
@@ -218,7 +218,7 @@
     "openNewTab": "子ページを新しいタブで開く"
   },
   "pageLink": {
-    "change": "リンク先のページを変更",
+    "change": "リンク先ページを変更",
     "closePicker": "ページリンクピッカーを閉じる",
     "copiedUrl": "リンク先ページのURLをコピーしました",
     "copyUrl": "リンク先ページのURLをコピー",
@@ -226,8 +226,8 @@
     "label": "ページリンク",
     "linkToPage": "ページにリンク",
     "mention": "ページメンション",
-    "newPageIn": "{{title}} に新しいページを作成",
-    "noPages": "ページが見つかりません。",
+    "newPageIn": "{{title}}に新しいページ",
+    "noPages": "ページが見つかりませんでした",
     "openNewTab": "リンク先ページを新しいタブで開く",
     "pages": "ページ",
     "pathFallback": "ページ",
@@ -242,58 +242,58 @@
     "openNewTab": "子データベースを新しいタブで開く"
   },
   "toc": {
-    "empty": "見出しを追加して目次を作成します。",
+    "empty": "見出しを追加すると目次が作成されます。",
     "label": "目次"
   },
   "equation": {
-    "label": "数式"
+    "label": "数式表現"
   },
   "breadcrumb": {
-    "label": "ページのパンくず"
+    "label": "ページのパンくずリスト"
   },
   "synced": {
     "block": "同期ブロック",
-    "copy": "同期コピー",
-    "empty": "空の同期ブロックです。",
+    "copy": "同期されたコピー",
+    "empty": "空の同期ブロック。",
     "original": "オリジナル",
     "textbox": "同期された{{label}}",
     "todoPlaceholder": "To-do",
     "todoText": "同期されたTo-doテキスト",
-    "unavailable": "オリジナルブロックは利用できません。",
-    "unsync": "同期を解除"
+    "unavailable": "元のブロックは利用できません。",
+    "unsync": "同期解除"
   },
   "button": {
     "addBlock": "ブロックを追加",
-    "captureNext": "次のブロックをキャプチャ",
+    "captureNext": "次のブロックを取得",
     "closeConfiguration": "ボタン設定を閉じる",
-    "configure": "ボタンを設定",
-    "importedActionUnavailable": "Notionはこのインポートされたボタンアクションを公開していません。",
+    "configure": "ボタン設定",
+    "importedActionUnavailable": "Notionはこのインポートしたボタンのアクションを提供していません。",
     "insertBlocks": "ブロックを挿入",
     "label": "ボタン",
     "moveTemplateDown": "テンプレートブロックを下に移動",
     "moveTemplateUp": "テンプレートブロックを上に移動",
     "name": "名前",
-    "nestedBlocks_one": "{{count}}個のネストされたブロック",
-    "nestedBlocks_other": "{{count}}個のネストされたブロック",
-    "newButton": "新しいボタン",
-    "newContent": "新しいコンテンツ",
-    "newTask": "新しいタスク",
+    "nestedBlocks_one": "{{count}}個の入れ子ブロック",
+    "nestedBlocks_other": "{{count}}個のネストブロック",
+    "newButton": "新規ボタン",
+    "newContent": "新規コンテンツ",
+    "newTask": "新規タスク",
     "removeTemplate": "テンプレートブロックを削除",
     "templateBlockType": "テンプレートブロックタイプ",
-    "templateText": "テンプレートブロック {{number}} のテキスト"
+    "templateText": "テンプレートブロック{{number}}テキスト"
   },
   "database": {
-    "closeOptions": "データベースのオプションを閉じる",
+    "closeOptions": "データベースオプションを閉じる",
     "createInline": "インラインデータベースを作成",
     "defaultView": "デフォルトビュー",
-    "fullPagePlacement": "全ページ",
-    "imported": "インポートされたデータベース",
+    "fullPagePlacement": "フルページ",
+    "imported": "インポートしたデータベース",
     "inlinePlacement": "インライン",
     "label": "データベース",
     "loading": "データベースを読み込み中",
-    "options": "{{title}} オプション",
-    "titleInput": "{{title}} データベースタイトル",
-    "unavailable": "データベースは利用できません"
+    "options": "{{title}}オプション",
+    "titleInput": "{{title}}データベースタイトル",
+    "unavailable": "データベースを利用できません"
   },
   "mention": {
     "closeMenu": "メンションメニューを閉じる",
@@ -301,9 +301,9 @@
     "createPage": "新しいページを作成",
     "label": "メンション",
     "newPageNamed": "新しい「{{title}}」ページ",
-    "noPages": "ページがありません",
-    "noResults": "結果がありません",
-    "noResultsFor": "「{{query}}」の結果がありません"
+    "noPages": "ページなし",
+    "noResults": "結果なし",
+    "noResultsFor": "「{{query}}」の結果はありません"
   },
   "databaseSource": {
     "choose": "データベースソースを選択",
@@ -318,31 +318,31 @@
     "searchPlaceholder": "データベースを検索"
   },
   "todo": {
-    "markComplete": "To-doを完了にする",
-    "markIncomplete": "To-doを未完了にする"
+    "markComplete": "To-doを完了とマーク",
+    "markIncomplete": "To-doを未完了とマーク"
   },
   "callout": {
-    "changeIcon": "コールアウトのアイコンを変更"
+    "changeIcon": "コールアウトアイコンを変更"
   },
   "code": {
-    "caption": "コードのキャプション",
+    "caption": "コードキャプション",
     "copy": "コードをコピー",
-    "diagramPreview": "図のプレビュー",
+    "diagramPreview": "ダイアグラムプレビュー",
     "language": "コード言語",
     "plainText": "プレーンテキスト",
     "showLineNumbers": "行番号を表示",
-    "toggleLineNumbers": "行番号の表示を切り替え",
+    "toggleLineNumbers": "行番号を切り替え",
     "toggleWrap": "折り返しを切り替え",
     "wrap": "折り返し"
   },
   "pastedLink": {
-    "createAudio": "音声を作成",
+    "createAudio": "オーディオを作成",
     "createFile": "ファイルを作成",
     "createImage": "画像を作成",
     "createVideo": "動画を作成",
-    "mentionPage": "ページをメンション",
-    "options": "貼り付けリンクのオプション",
-    "pasteAs": "貼り付けとして",
+    "mentionPage": "ページメンション",
+    "options": "リンク貼り付けオプション",
+    "pasteAs": "形式を選択して貼り付け",
     "url": "URL"
   },
   "linkEditor": {
@@ -354,16 +354,16 @@
   "date": {
     "editMention": "日付メンションを編集",
     "label": "日付",
-    "mention": "日付をメンション",
-    "nextMonth": "翌月",
+    "mention": "日付のメンション",
+    "nextMonth": "来月",
     "previousMonth": "前月"
   },
   "person": {
     "collaborator": "共同編集者",
     "copyName": "名前をコピー",
     "label": "人物",
-    "mention": "人物をメンション",
-    "organizationMember": "組織の人物",
+    "mention": "人物メンション",
+    "organizationMember": "組織メンバー",
     "profile": "プロフィール",
     "roleInOrganization": "組織内の{{role}}",
     "workspaceMember": "ワークスペースメンバー"

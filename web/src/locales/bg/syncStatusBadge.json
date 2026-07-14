@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Офлайн",
+  "offlinePending_one": "Офлайн · {{count}} промяна в очакване",
+  "offlinePending_other": "Офлайн · {{count}} промени в очакване",
+  "syncing": "Синхронизиране · {{count}}",
+  "unreachable": "Сървърът е недостъпен",
+  "unreachablePending_one": "Сървърът е недостъпен · {{count}} чакаща промяна",
+  "unreachablePending_other": "Сървърът е недостъпен · {{count}} чакащи промени",
+  "retryHint": "Кликнете, за да опитате отново сега"
 }

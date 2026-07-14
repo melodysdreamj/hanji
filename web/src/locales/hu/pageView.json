@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Nem sikerült az oldal visszaállítása",
+  "emptyBodyPrompt": "Nyomj Entert, hogy írni kezdj ezen az üres oldalon.",
+  "inTrashTopBarTitle": "A kukában",
+  "notFoundTopBarTitle": "Nem található",
+  "openWorkspace": "Munkaterület megnyitása",
+  "pageInTrash": "Ez az oldal a kukában van.",
+  "pageInTrashDetail": "A tartalom megnyitásához vagy szerkesztéséhez előbb állítsd vissza.",
+  "pageUnavailable": "Az oldal nem érhető el.",
+  "pageUnavailableDetail": "Lehet, hogy az oldalt törölték, áthelyezték, vagy egy másik fiókkal osztották meg.",
+  "restorePage": "Oldal visszaállítása",
+  "restoredPage": "Oldal visszaállítva",
+  "loadingPageContent": "Oldal tartalmának betöltése"
 }

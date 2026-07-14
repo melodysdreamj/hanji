@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Mover para",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Raiz do espaço de trabalho",
+    "path": "Nível superior"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Pesquisar destinos de movimento",
+    "placeholder": "Pesquisar páginas..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Fechar diálogo de mover"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Destinos de movimento",
+    "empty": "Nenhuma página encontrada.",
+    "destinationLabel": "Mover para {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Criar \"{{title}}\"",
+    "optionLabel": "Criar página {{title}} e mover para aqui",
+    "hint": "Nova página de topo - mover para aqui"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Página superior bloqueada",
+    "page": "Página bloqueada"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Página está numa página pai bloqueada",
+    "locked": "Página está bloqueada",
+    "moved": "Página movida",
+    "moveFailed": "Não foi possível mover a página"
   }
 }

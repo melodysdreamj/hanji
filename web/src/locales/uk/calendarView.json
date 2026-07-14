@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Додати властивість дати",
+    "description": "Календарні подання потребують властивості дати для розміщення сторінок у місяці.",
+    "addDateButton": "Дата"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Календар за",
+    "today": "Сьогодні",
+    "previousWeek": "Попередній тиждень",
+    "previousMonth": "Попередній місяць",
+    "nextWeek": "Наступний тиждень",
+    "nextMonth": "Наступний місяць"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Нд",
+    "mon": "Пн",
+    "tue": "Вт",
+    "wed": "Ср",
+    "thu": "Чт",
+    "fri": "Пт",
+    "sat": "Сб"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Календар {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} елементів",
+    "newRowAriaLabel": "Новий рядок на {{date}}",
+    "newRowTitle": "Новий",
+    "showLess": "Показати менше",
+    "showMore": "+{{count}} ще"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Відкрити {{title}}",
+    "openAriaLabelWithDate": "Відкрити {{title}}, заплановано на {{date}}",
+    "openNoDateAriaLabel": "Відкрити {{title}}, без дати"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Без дати ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Без назви",
+    "dateDefaultName": "Дата"
   }
 }

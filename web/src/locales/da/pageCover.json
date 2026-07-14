@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
-  },
-  "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
-  },
-  "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
-  },
-  "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
-  },
-  "reposition": {
-    "hint": "Drag image to reposition"
-  },
-  "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
-  },
-  "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "changeCover": "Skift cover",
+    "remove": "Fjern",
+    "reposition": "Flyt",
+    "savePosition": "Gem position",
+    "submit": "Send",
+    "uploadFile": "Upload fil",
+    "uploading": "Uploader..."
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "changeCoverDialog": "Skift cover",
+    "changePageCover": "Skift sidecover",
+    "closeCoverMenu": "Luk cover-menu",
+    "coverImageLink": "Link til coverbillede",
+    "coverSource": "Coverkilde",
+    "coverVerticalPosition": "Cover lodret position",
+    "pageCover": "Sidecover",
+    "positionFromTop": "{{position}}% fra toppen",
+    "removePageCover": "Fjern sidecover",
+    "repositionPageCover": "Flyt sidecover",
+    "selectCover": "Vælg cover {{number}}",
+    "uploadFromDevice": "Upload coverbillede fra denne enhed",
+    "uploadingFile": "Uploader {{fileName}}"
+  },
+  "link": {
+    "invalid": "Indsæt et http- eller https-billedlink.",
+    "placeholder": "Indsæt billedlink"
+  },
+  "progress": {
+    "complete": "Færdig",
+    "finalizing": "Afslutter",
+    "preparing": "Forbereder upload",
+    "uploading": "Uploader"
+  },
+  "reposition": {
+    "hint": "Træk billedet for at flytte"
+  },
+  "tabs": {
+    "gallery": "Galleri",
+    "link": "Link",
+    "upload": "Upload"
+  },
+  "toast": {
+    "removed": "Cover fjernet",
+    "restored": "Cover gendannet",
+    "undo": "Fortryd"
+  },
+  "upload": {
+    "defaultFileName": "Cover billede",
+    "error": "Kunne ikke uploade billedet."
   }
 }

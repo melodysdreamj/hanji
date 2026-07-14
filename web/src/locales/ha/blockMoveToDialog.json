@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Matsar da block zuwa",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Bincika wuraren matsawa",
+    "placeholder": "Bincika shafuka..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Rufe tattaunawar matsawa"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Wuraren matsawa",
+    "empty": "Ba a sami shafuka ba.",
+    "destinationLabel": "Matsar da block zuwa {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Ƙirƙiri \"{{query}}\"",
+    "optionLabel": "Ƙirƙiri shafi \"{{query}}\" kuma matsar da block nan",
+    "hint": "Sabon shafi - matsar da block nan"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Shafin da aka kulle"
   },
-  "untitled": "Untitled",
+  "untitled": "Ba tare da take ba",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Shafin yana kulle",
+    "movedBlock": "An matsar da block",
+    "movedBlocks": "An matsar da blocks",
+    "movedBlocksCount": "An matsar da {{blockCount}} blocks",
+    "moveFailed": "Ba a iya matsar da block ba"
   }
 }

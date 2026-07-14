@@ -161,6 +161,7 @@ export function RowMenu({
   const [actionQuery, setActionQuery] = useState("");
   const [contextPosition, setContextPosition] = useState<{ left: number; top: number } | null>(null);
   const [importing, setImporting] = useState(false);
+  const [duplicateBusy, setDuplicateBusy] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
@@ -172,13 +173,14 @@ export function RowMenu({
   const [openInOpen, setOpenInOpen] = useState(false);
 
   const close = useCallback((restoreFocus = true) => {
+    if (duplicateBusy) return;
     onClose();
     if (!restoreFocus) return;
     window.requestAnimationFrame(() => {
       if (restoreFocusRef.current?.isConnected) restoreFocusRef.current.focus();
       restoreFocusRef.current = null;
     });
-  }, [onClose]);
+  }, [duplicateBusy, onClose]);
 
   useEffect(() => {
     if (moveOpen || historyOpen) return;
@@ -481,7 +483,8 @@ export function RowMenu({
   }
 
   async function duplicateCurrentPage() {
-    const shouldClose = true;
+    if (duplicateBusy) return;
+    setDuplicateBusy(true);
     try {
       const copyPage = await duplicatePage(pageId);
       if (!copyPage) {
@@ -502,7 +505,8 @@ export function RowMenu({
     } catch {
       notify(t("rowMenu:toast.couldntDuplicatePage"), "error");
     } finally {
-      if (shouldClose) close();
+      setDuplicateBusy(false);
+      close();
     }
   }
 
@@ -768,11 +772,12 @@ export function RowMenu({
               className={styles.item}
               data-menu-item
               role="menuitem"
-              disabled={!canEditThisPage}
+              disabled={!canEditThisPage || duplicateBusy}
+              aria-busy={duplicateBusy || undefined}
               onClick={() => void duplicateCurrentPage()}
             >
               <Copy size={16} aria-hidden="true" />
-              <span>{t("rowMenu:actions.duplicate")}</span>
+              <span>{duplicateBusy ? `${t("rowMenu:actions.duplicate")}…` : t("rowMenu:actions.duplicate")}</span>
               <span className={styles.itemHint}>⌘D</span>
             </button>
           )}
@@ -937,11 +942,12 @@ export function RowMenu({
               className={styles.item}
               data-menu-item
               role="menuitem"
-              disabled={!canEditThisPage}
+              disabled={!canEditThisPage || duplicateBusy}
+              aria-busy={duplicateBusy || undefined}
               onClick={() => void duplicateCurrentPage()}
             >
               <Copy size={16} aria-hidden="true" />
-              <span>{t("rowMenu:actions.duplicate")}</span>
+              <span>{duplicateBusy ? `${t("rowMenu:actions.duplicate")}…` : t("rowMenu:actions.duplicate")}</span>
               <span className={styles.itemHint}>⌘D</span>
             </button>
             <div className={styles.divider} role="separator" />

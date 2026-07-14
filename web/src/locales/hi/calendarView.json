@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "दिनांक गुण जोड़ें",
+    "description": "कैलेंडर दृश्यों को पृष्ठों को महीने में रखने के लिए दिनांक गुण चाहिए।",
+    "addDateButton": "दिनांक"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "कैलेंडर के अनुसार",
+    "today": "आज",
+    "previousWeek": "पिछला सप्ताह",
+    "previousMonth": "पिछला महीना",
+    "nextWeek": "अगला सप्ताह",
+    "nextMonth": "अगला महीना"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "रवि",
+    "mon": "सोम",
+    "tue": "मंगल",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} कैलेंडर",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} आइटम",
+    "newRowAriaLabel": "{{date}} को नई पंक्ति",
+    "newRowTitle": "नया",
+    "showLess": "कम दिखाएं",
+    "showMore": "+{{count}} और"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} खोलें",
+    "openAriaLabelWithDate": "{{title}} खोलें, {{date}} को",
+    "openNoDateAriaLabel": "{{title}} खोलें, कोई दिनांक नहीं"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "कोई दिनांक नहीं ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "शीर्षकहीन",
+    "dateDefaultName": "दिनांक"
   }
 }

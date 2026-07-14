@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Блок командалары",
+  "closeBlockCommands": "Блок командаларын жабу",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Негізгі блоктар",
+    "Media": "Медиа",
+    "Database": "Дерекқор",
+    "Advanced": "Кеңейтілген блоктар"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}} ішінен {{position}}. Кірістіру үшін Enter пернесін басыңыз.",
+  "listStatus": "{{total}} блок командасы қолжетімді.",
+  "noBlocks": "Блоктар табылмады",
+  "noBlocksFor": "\"{{query}}\" бойынша блоктар табылмады",
+  "recentlyUsed": "Жақында қолданылған"
 }

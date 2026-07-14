@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ဘလောက်ရွှေ့မည့်နေရာ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ရွှေ့ပြောင်းရန်နေရာများရှာဖွေပါ",
+    "placeholder": "စာမျက်နှာများရှာဖွေပါ..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ရွှေ့ပြောင်းဒိုင်ယာလော့ဂ်ကိုပိတ်ပါ"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ရွှေ့ပြောင်းရန်နေရာများ",
+    "empty": "စာမျက်နှာများ မတွေ့ပါ။",
+    "destinationLabel": "ဘလောက်ကို {{label}}, {{path}} သို့ ရွှေ့ပါ"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" ဖန်တီးပါ",
+    "optionLabel": "\"{{query}}\" စာမျက်နှာဖန်တီးပြီး ဤနေရာသို့ ဘလောက်ရွှေ့ပါ",
+    "hint": "စာမျက်နှာအသစ် - ဤနေရာသို့ ဘလောက်ရွှေ့ရန်"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "သော့ခတ်ထားသော စာမျက်နှာ"
   },
-  "untitled": "Untitled",
+  "untitled": "ခေါင်းစဉ်မရှိ",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "စာမျက်နှာသော့ခတ်ထားသည်",
+    "movedBlock": "ဘလောက်ရွှေ့ပြီးပါပြီ",
+    "movedBlocks": "ဘလောက်များရွှေ့ပြီးပါပြီ",
+    "movedBlocksCount": "ဘလောက် {{blockCount}} ခုရွှေ့ပြီးပါပြီ",
+    "moveFailed": "ဘလောက်ရွှေ့မရပါ။"
   }
 }

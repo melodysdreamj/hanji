@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> ay nag-sponsor ng Hanji habang ito ay lumalago",
+  "builtWith": "<a>{{name}}</a> ay tumutulong sa pagbuo ng Hanji",
+  "supportTitle": "Suportahan ang Hanji",
+  "settingsIntro": "Ang Hanji ay sinusuportahan ng mga sponsor nito. Ang sign-in screen ay nagpapakita ng maliit na banner na may kasalukuyang nangungunang limang sponsor.",
+  "rule1": "Ipinapakita ng banner ang nangungunang limang sponsor batay sa natitirang balanse.",
+  "rule2": "Minsan sa isang buwan, ang balanse ng bawat ipinapakitang sponsor ay binabawasan ng halaga ng ikalimang puwesto, kaya lahat ng limang ipinapakitang sponsor ay nagbabayad ng parehong patas na antas.",
+  "rule3": "Kapag naubos ang balanse, ang slot ay mapupunta sa susunod na sponsor ayon sa balance.",
+  "rule4": "Ang pagpapanatili ng banner na naka-enable bilang default ay nagbibigay ng eksepsiyon sa lisensya ng Hanji; ang sarado at walang banner na bersyon ay nangangailangan ng hiwalay na lisensyang pangkomersyo.",
+  "sponsorSlots": "Kasalukuyang mga sponsor",
+  "emptySlot": "Bukas na slot — mag-sponsor para lumitaw dito",
+  "becomeSponsor": "Maging sponsor",
+  "builtWithTitle": "Binuo gamit ang",
+  "builtWithIntro": "Ang Hanji ay binuo sa tulong ng mga tool at platform na ito."
+}

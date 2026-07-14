@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Página partilhada",
+  "loading": "A carregar página partilhada",
+  "unavailable": "Esta página partilhada não está disponível.",
+  "notFound": "Página partilhada não encontrada.",
+  "outsideShare": "A página não faz parte desta partilha pública.",
+  "tryAgain": "Tentar novamente",
+  "errors": {
+    "not-found": "Este link pode ter expirado, sido removido ou copiado incorretamente.",
+    "rate-limited": "Esta página partilhada está a receber demasiados pedidos. Aguarde um momento e tente novamente.",
+    "offline": "Verifique a sua ligação e tente abrir a página partilhada novamente.",
+    "unavailable": "O Hanji não conseguiu abrir esta página partilhada de momento. Tente novamente daqui a instantes."
+  }
 }

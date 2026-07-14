@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "tryAgain": "Спробувати знову",
+  "errors": {
+    "not-found": "Це посилання могло застаріти, бути знятим з публікації або неправильно скопійоване.",
+    "rate-limited": "Ця спільна сторінка отримує забагато запитів. Зачекайте мить і спробуйте знову.",
+    "offline": "Перевірте з'єднання, а потім спробуйте відкрити спільну сторінку знову.",
+    "unavailable": "Hanji не може відкрити цю спільну сторінку зараз. Спробуйте знову за мить."
+  },
+  "title": "Спільна сторінка",
+  "loading": "Завантаження спільної сторінки",
+  "unavailable": "Ця спільна сторінка недоступна.",
+  "notFound": "Спільну сторінку не знайдено.",
+  "outsideShare": "Ця сторінка не входить до цього публічного поширення."
 }

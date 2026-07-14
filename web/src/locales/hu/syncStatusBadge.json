@@ -1,10 +1,10 @@
 {
   "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offlinePending_one": "Offline · {{count}} változtatás függőben",
+  "offlinePending_other": "Offline · {{count}} változtatás függőben",
+  "syncing": "Szinkronizálás · {{count}}",
+  "unreachable": "A szerver nem elérhető",
+  "unreachablePending_one": "A szerver nem elérhető · {{count}} változtatás függőben",
+  "unreachablePending_other": "A szerver nem elérhető · {{count}} változtatás függőben",
+  "retryHint": "Kattints az újrapróbálkozáshoz"
 }

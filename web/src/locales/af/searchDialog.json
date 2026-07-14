@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Soek of gaan na...",
+  "quickFind": "Vinnige Soek",
+  "closeSearch": "Sluit soektog",
+  "quickFindResults": "Vinnige Soek resultate",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Onlangs bekyk",
+    "recentSearches": "Onlangse soektogte",
+    "pages": "Bladsye",
+    "pageContent": "Bladsy inhoud",
+    "favorites": "Gunstelinge"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "in bladsy",
+  "searchingDetail": "Soek...",
+  "searchAgain": "Soek weer",
+  "searchingPageContent": "Soek bladsy inhoud...",
+  "noResultsFor": "Geen resultate vir \"{{query}}\" nie",
+  "noPagesFound": "Geen bladsye gevind nie",
+  "creating": "Skep...",
+  "newPage": "Nuwe bladsy \"{{query}}\"",
+  "couldntCreatePage": "Kon nie bladsy skep nie",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Kies",
+    "open": "Maak oop",
+    "newTab": "Nuwe oortjie"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
-  "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+  "create": "Utwórz obszar roboczy",
+  "creating": "Tworzenie…",
+  "error": {
+    "couldntCreate": "Nie udało się utworzyć obszaru roboczego."
   },
-  "startLabel": "Start from",
+  "name": {
+    "label": "Nazwa obszaru roboczego",
+    "placeholder": "Nazwa firmy"
+  },
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
-    },
-    "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "body": "Rozpocznij od pustego obszaru roboczego ze stronami startowymi.",
+      "title": "Pusty obszar roboczy"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "body": "Utwórz obszar roboczy, a następnie zaimportuj go z innego serwera Hanji lub pliku.",
+      "title": "Import z innego Hanji"
+    },
+    "notion": {
+      "body": "Utwórz obszar roboczy, a następnie migruj do niego obszar roboczy z Notion.",
+      "title": "Import z Notion"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
-  "error": {
-    "couldntCreate": "Couldn't create workspace."
-  }
+  "startLabel": "Rozpocznij od",
+  "title": "Nowy obszar roboczy"
 }

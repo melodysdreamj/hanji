@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "close": "Đóng",
+    "search": "Tìm kiếm",
+    "create": "Tạo",
+    "delete": "Xóa",
+    "clearAll": "Xóa tất cả",
+    "done": "Xong",
+    "add": "Thêm"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Chưa có tiêu đề"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Bản sao của {{name}}",
+    "columnName": "Cột {{number}}",
+    "importedDatabase": "Cơ sở dữ liệu đã nhập",
+    "uploadedFile": "Tệp đã tải lên",
+    "image": "Hình ảnh",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Tên",
+      "status": "Trạng thái",
+      "select": "Lựa chọn",
+      "date": "Ngày"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Chưa bắt đầu",
+      "doing": "Đang tiến hành",
+      "done": "Hoàn thành"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Tùy chọn 1",
+      "second": "Tùy chọn 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Bảng"
     }
   }
 }

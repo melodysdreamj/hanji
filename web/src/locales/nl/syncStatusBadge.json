@@ -1,10 +1,10 @@
 {
   "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offlinePending_one": "Offline · {{count}} wijziging in afwachting",
+  "offlinePending_other": "Offline · {{count}} wijzigingen in afwachting",
+  "syncing": "Synchroniseren · {{count}}",
+  "unreachable": "Server niet bereikbaar",
+  "unreachablePending_one": "Server niet bereikbaar · {{count}} wijziging in afwachting",
+  "unreachablePending_other": "Server niet bereikbaar · {{count}} wijzigingen in afwachting",
+  "retryHint": "Klik om opnieuw te proberen"
 }

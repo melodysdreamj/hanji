@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Ellenőrizze a hivatkozást hiányzó vagy hibás karakterek miatt, majd próbálja újra.",
+  "invalidTitle": "A cím hiányos.",
+  "notFoundBody": "Ez a cím nem egyezik egyetlen Hanji oldallal sem. Az oldal áthelyezésre került vagy már nem létezik.",
+  "notFoundTitle": "Az oldal nem található.",
+  "openHome": "Hanji kezdőlap megnyitása",
+  "sharedBody": "Ellenőrizze, hogy a teljes megosztott hivatkozás helyesen lett másolva, majd próbálja újra.",
+  "sharedTitle": "Ez a megosztott hivatkozás érvénytelen."
+}

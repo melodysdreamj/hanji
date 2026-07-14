@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Кошче",
+  "empty": "Страниците, които изтривате, се появяват тук. Няма нищо в кошчето.",
+  "searchTrash": "Търсене в кошчето",
+  "deletedPages": "Изтрити страници",
+  "noSearchMatches": "Няма изтрити страници, които да отговарят на вашето търсене.",
+  "pageCount_one": "{{count}} страница",
+  "pageCount_other": "{{count}} страници",
+  "deletedJustNow": "Току-що изтрито",
+  "deletedOn": "Изтрито на {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Възстановяване",
+    "deleteForever": "Изтриване завинаги",
+    "emptyTrash": "Изпразване на кошчето"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Отвори {{title}} от кошчето",
+    "restorePage": "Възстанови {{title}}",
+    "deletePageForever": "Изтриване на {{title}} завинаги",
+    "cancelPermanentDelete": "Отмяна на изтриване завинаги",
+    "cancelEmptyTrash": "Отмяна на изпразване на кошчето"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Изтриване завинаги?",
+    "deleteBodyPrefix": "Това ще изтрие завинаги ",
+    "deleteBodySuffix": ". Това действие не може да бъде отменено.",
+    "emptyTitle": "Изпразване на кошчето?",
+    "emptyBody_one": "Това ще изтрие завинаги всички {{count}} страница в кошчето. Това действие не може да бъде отменено.",
+    "emptyBody_other": "Това ще изтрие завинаги всички {{count}} страници в кошчето. Това действие не може да бъде отменено."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Изтрито завинаги",
+    "couldntDelete": "Неуспешно изтриване на страница",
+    "restored": "Страницата е възстановена",
+    "couldntRestore": "Неуспешно възстановяване на страница",
+    "emptied": "Кошчето е изпразнено",
+    "couldntEmpty": "Неуспешно изпразване на кошчето"
   }
 }

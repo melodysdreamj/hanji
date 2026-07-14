@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Mermaid خاکہ",
+  "emptyPreview": "خاکہ پیش منظر",
+  "sourceDescription": "خاکہ ماخذ: {{source}}",
+  "syntaxError": "خاکہ میں نحوی غلطی ہے۔",
+  "syntaxErrorDetails": "تفصیلات دکھائیں"
 }

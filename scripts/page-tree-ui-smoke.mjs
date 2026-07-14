@@ -57,7 +57,13 @@ async function main() {
       console.log('PASS desktop sidebar collapse and expand use Hanji panel slide motion.');
       return;
     }
+    if (options.onlyImmediatePageCreate) {
+      await assertImmediatePageCreateNavigation(browser, appUrl, seed);
+      console.log('PASS page navigation and editor render complete before the held page-create response.');
+      return;
+    }
     await assertPageTreeUi(browser, appUrl, seed);
+    await assertImmediatePageCreateNavigation(browser, appUrl, seed);
     await assertViewOnlyPageTreeUi(browser, appUrl, seed);
     await assertEmptyPrivateTreeFirstPage(browser, appUrl, seed);
     console.log('PASS sidebar page tree expands, focuses, jumps to edges, opens nested pages, captures nested tree screenshots, drags pages inside/back to root, reorders roots/nested children, copies pages by drag, moves/copies pages through the private root drop zone, moves/copies blocks into tree pages, creates private-root pages from block drops, runs menu rename/duplicate/trash actions, blocks view-only tree edits, and creates the first page in an empty workspace.');
@@ -72,6 +78,7 @@ async function main() {
     console.log(`Private header dark hover screenshot: ${join(options.screenshotDir, 'desktop-private-section-header-dark-hover.png')}`);
     console.log(`Secondary header dark hover screenshot: ${join(options.screenshotDir, 'desktop-secondary-section-header-dark-hover.png')}`);
     console.log(`Nested tree dark hover screenshot: ${join(options.screenshotDir, 'desktop-nested-sidebar-tree-dark-hover.png')}`);
+    console.log(`Immediate page create screenshot: ${join(options.screenshotDir, 'desktop-immediate-page-create.png')}`);
     console.log(`Nested tree mobile screenshot: ${join(options.screenshotDir, 'mobile-nested-sidebar-tree.png')}`);
     console.log(`Nested tree mobile dark screenshot: ${join(options.screenshotDir, 'mobile-nested-sidebar-tree-dark.png')}`);
   } finally {
@@ -127,6 +134,99 @@ async function assertSidebarCollapseMotionOnly(browser, baseUrl, seed) {
   }
 }
 
+async function assertImmediatePageCreateNavigation(browser, baseUrl, seed) {
+  const { context, page, errors } = await newCheckedPage(browser);
+  await seedSession(context, seed);
+  let releaseCreate;
+  let createRequestHeld = false;
+  let markCreateRequestHeld;
+  let markCreateRequestContinued;
+  const heldCreateRequest = new Promise((resolve) => {
+    markCreateRequestHeld = resolve;
+  });
+  const createRelease = new Promise((resolve) => {
+    releaseCreate = resolve;
+  });
+  const createRequestContinued = new Promise((resolve) => {
+    markCreateRequestContinued = resolve;
+  });
+  const mutationPattern = '**/api/functions/page-mutation';
+
+  await page.route(mutationPattern, async (route) => {
+    let heldThisRequest = false;
+    let body = null;
+    try {
+      body = route.request().postDataJSON();
+    } catch {
+      // Non-JSON requests are unrelated to this focused create gate.
+    }
+    if (!createRequestHeld && body?.action === 'create' && body?.page?.parentId == null) {
+      createRequestHeld = true;
+      heldThisRequest = true;
+      markCreateRequestHeld();
+      await createRelease;
+    }
+    await route.continue();
+    if (heldThisRequest) markCreateRequestContinued();
+  });
+
+  try {
+    await openPage(page, baseUrl, seed.siblingPageId, seed.siblingTitle);
+    await assertPrivateTreeRendered(page, seed);
+    await hoverPrivateSectionHeader(page);
+    const addButton = page.getByRole('button', { name: 'Add a page', exact: true });
+    const previousPath = new URL(page.url()).pathname;
+    const navigation = page.waitForFunction(
+      (oldPath) => window.location.pathname.startsWith('/p/') && window.location.pathname !== oldPath,
+      previousPath,
+      { timeout: 500 },
+    );
+    const startedAt = Date.now();
+    await addButton.click({ timeout: options.timeoutMs });
+    await navigation;
+    const navigationMs = Date.now() - startedAt;
+    assert(
+      navigationMs < 500,
+      `optimistic page navigation should not wait for page-mutation; measured ${navigationMs}ms`,
+    );
+
+    const createdPageId = await waitForCurrentPageId(page);
+    seed.immediateCreatedPageId = createdPageId;
+    const requestWasHeld = await Promise.race([
+      heldCreateRequest.then(() => true),
+      delay(1500).then(() => false),
+    ]);
+    assert(requestWasHeld, 'page create request should be intercepted and held after local navigation');
+    await page.getByRole('textbox', { name: 'Page title' }).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    await treeRow(page, createdPageId).waitFor({ state: 'visible', timeout: options.timeoutMs });
+    await expectTreeRowAttribute(page, createdPageId, 'aria-current', 'page');
+    await page.screenshot({
+      path: join(options.screenshotDir, 'desktop-immediate-page-create.png'),
+      fullPage: true,
+    });
+
+    releaseCreate();
+    await createRequestContinued;
+    await page.unroute(mutationPattern);
+    await waitForPageState(
+      apiBaseUrl(baseUrl, seed),
+      seed,
+      createdPageId,
+      (created) => Boolean(created && !created.inTrash),
+      'immediately navigated page create',
+    );
+    assertNoBrowserErrors(errors, 'immediate page create navigation flow');
+  } finally {
+    releaseCreate?.();
+    await Promise.race([createRequestContinued, delay(500)]).catch(() => {});
+    await page.unroute(mutationPattern).catch(() => {});
+    await closeSeededContext(context, seed);
+  }
+}
+
 async function assertPageTreeUi(browser, baseUrl, seed) {
   const { context, page, errors } = await newCheckedPage(browser);
   await seedSession(context, seed);
@@ -152,6 +252,7 @@ async function assertPageTreeUi(browser, baseUrl, seed) {
       assertSidebarWorkspaceHeaderLayout(page),
     );
     await step('verify sidebar top action layout contract', () => assertSidebarTopActionLayout(page));
+    await step('keep member management out of sidebar promo cards', () => assertNoSidebarMemberCard(page));
     await step('verify sidebar footer action layout contract', () => assertSidebarFooterActionLayout(page));
     await step('discover collapsed page tree caret layout issues', () =>
       assertCollapsedTreeDisclosureLayout(page, seed),
@@ -1448,6 +1549,22 @@ async function assertSidebarWorkspaceHeaderLayout(page) {
   await page.mouse.move(1000, 700);
 }
 
+async function assertNoSidebarMemberCard(page) {
+  const metrics = await page.evaluate(() => {
+    const sidebar = document.querySelector('aside[aria-label="Sidebar"]');
+    return {
+      sidebarPresent: sidebar instanceof HTMLElement,
+      collaborationAreaPresent: Boolean(sidebar?.querySelector('[data-sidebar-collaboration]')),
+      memberCardPresent: Boolean(sidebar?.querySelector('[data-sidebar-member-invite]')),
+    };
+  });
+  assert(metrics.sidebarPresent, `sidebar should be present for the member-card contract: ${JSON.stringify(metrics)}`);
+  assert(
+    !metrics.collaborationAreaPresent && !metrics.memberCardPresent,
+    `workspace membership belongs in the workspace console, not a persistent sidebar card: ${JSON.stringify(metrics)}`,
+  );
+}
+
 async function assertSidebarFooterActionLayout(page) {
   const metrics = await page.evaluate(() => {
     const sidebar = document.querySelector('aside[aria-label="Sidebar"]');
@@ -2090,7 +2207,7 @@ function sidebarReferenceInventory() {
         'child rows advance by a compact consistent indentation step',
       ],
       localDeviationPolicy:
-        'Use Hanji labels and responsive tokens, but preserve the reference surface inventory and reveal rules.',
+        'Use Hanji labels and responsive tokens, preserve the reference surface inventory and reveal rules, and keep member management in the workspace console instead of a persistent sidebar promo card.',
     },
   };
 }
@@ -2301,6 +2418,8 @@ async function collectSidebarSurfaceInventory(page, seed) {
           mobile: sidebar instanceof HTMLElement ? sidebar.getAttribute('data-mobile') : null,
           open: sidebar instanceof HTMLElement ? sidebar.getAttribute('data-open') : null,
           rect: readRect(sidebar),
+          collaborationAreaPresent: Boolean(sidebar?.querySelector('[data-sidebar-collaboration]')),
+          memberCardPresent: Boolean(sidebar?.querySelector('[data-sidebar-member-invite]')),
         },
         topRail: readTopRail(),
         sectionOrder,
@@ -2334,6 +2453,10 @@ function assertSidebarSurfaceInventory(inventory) {
   const privateSection = local.sections.private;
   assertTopRailInventory(inventory);
   assertSectionHeaderInventory(inventory);
+  assert(
+    !local.sidebar.collaborationAreaPresent && !local.sidebar.memberCardPresent,
+    `sidebar inventory should keep member management in the workspace console, not a promo card: ${JSON.stringify(local.sidebar)}`,
+  );
   assert(privateSection.present, `sidebar inventory must include the Private section: ${JSON.stringify(inventory)}`);
   // The private section header renders as "Pages" since the i18n label sweep
   // (Sidebar labels.private, commit 0cdac3bf).
@@ -4333,6 +4456,7 @@ async function seedPageTree(baseUrl) {
     emptyWorkspaceId,
     emptyWorkspaceDomain,
     emptyCreatedPageId: null,
+    immediateCreatedPageId: null,
     dragCopyPageId: null,
     dragCopiedBlockId: null,
     privateRootMovePageId: null,
@@ -4363,6 +4487,9 @@ async function cleanupSeed(baseUrl, seed) {
   if (!seed?.accessToken) return;
   if (seed.emptyCreatedPageId) {
     await permanentlyDeletePage(baseUrl, seed.accessToken, seed.emptyCreatedPageId, { call: callFunction }).catch(() => {});
+  }
+  if (seed.immediateCreatedPageId) {
+    await permanentlyDeletePage(baseUrl, seed.accessToken, seed.immediateCreatedPageId, { call: callFunction }).catch(() => {});
   }
   if (seed.emptyWorkspaceId) {
     await callFunction(baseUrl, seed.accessToken, 'workspace-mutation', {
@@ -4724,6 +4851,7 @@ function parseArgs(args) {
     headed: false,
     onlyActiveParentCollapse: false,
     onlyDatabaseChildViews: false,
+    onlyImmediatePageCreate: false,
     onlySidebarCollapseMotion: false,
     screenshotDir: DEFAULT_SCREENSHOT_DIR,
     timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -4750,6 +4878,10 @@ function parseArgs(args) {
     }
     if (arg === '--only-sidebar-collapse-motion') {
       parsed.onlySidebarCollapseMotion = true;
+      continue;
+    }
+    if (arg === '--only-immediate-page-create') {
+      parsed.onlyImmediatePageCreate = true;
       continue;
     }
     if (arg === '--url') {
@@ -4804,6 +4936,8 @@ Options:
                           Run only the database child/view manual disclosure check.
   --only-sidebar-collapse-motion
                           Run only the desktop sidebar collapse/expand motion check.
+  --only-immediate-page-create
+                          Hold page-create I/O and verify navigation remains immediate.
   --headed                Show the browser while running.
 `);
 }

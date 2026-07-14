@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Không gian làm việc mới",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Tên không gian làm việc",
+    "placeholder": "Công ty của bạn"
   },
-  "startLabel": "Start from",
+  "startLabel": "Bắt đầu từ",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Không gian làm việc trống",
+      "body": "Bắt đầu trống với các trang khởi tạo."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Nhập từ Notion",
+      "body": "Tạo không gian làm việc, sau đó di chuyển một không gian làm việc Notion vào đó."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Nhập từ Hanji khác",
+      "body": "Tạo không gian làm việc, sau đó nhập từ một máy chủ Hanji khác hoặc từ tệp."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Tạo không gian làm việc",
+  "creating": "Đang tạo…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Không thể tạo không gian làm việc."
   }
 }

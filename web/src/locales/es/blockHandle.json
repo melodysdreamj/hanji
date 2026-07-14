@@ -1,7 +1,7 @@
 {
   "buttons": {
-    "addBlockBelow": "Añadir bloque debajo",
-    "dragHint": "Arrastra para mover. Haz clic para abrir el menú.",
+    "addBlockBelow": "Agregar bloque debajo",
+    "dragHint": "Arrastre para mover. Haga clic para abrir el menú.",
     "openBlockActions": "Abrir acciones del bloque",
     "closeBlockActions": "Cerrar acciones del bloque"
   },
@@ -18,14 +18,14 @@
     "copiedBlockLink": "Enlace del bloque copiado",
     "moveTo": "Mover a",
     "moveToMany": "Mover a {{num}} bloques",
-    "moveUp": "Mover hacia arriba",
-    "moveUpMany": "Mover hacia arriba {{num}} bloques",
-    "moveDown": "Mover hacia abajo",
-    "moveDownMany": "Mover hacia abajo {{num}} bloques",
+    "moveUp": "Mover arriba",
+    "moveUpMany": "Mover arriba {{num}} bloques",
+    "moveDown": "Mover abajo",
+    "moveDownMany": "Mover abajo {{num}} bloques",
     "comment": "Comentar",
     "commentMany": "Comentar {{num}} bloques",
     "addCaption": "Añadir leyenda",
-    "removeCaption": "Quitar leyenda",
+    "removeCaption": "Eliminar subtítulo",
     "unsyncSyncedBlock": "Desincronizar bloque sincronizado",
     "copySyncedBlock": "Copiar bloque sincronizado",
     "color": "Color",
@@ -33,7 +33,7 @@
     "textFallback": "Texto"
   },
   "turnMenu": {
-    "chooseType": "Elige un tipo de bloque"
+    "chooseType": "Seleccionar tipo de bloque"
   },
   "colorMenu": {
     "textColor": "Color de texto",
@@ -64,7 +64,7 @@
     "duplicatedBlock": "Bloque duplicado",
     "duplicatedBlocks": "{{num}} bloques duplicados",
     "undo": "Deshacer",
-    "undidDuplicate": "Duplicación deshecha",
+    "undidDuplicate": "Duplicado deshecho",
     "nothingToUndo": "Nada que deshacer",
     "deletedBlock": "Bloque eliminado",
     "deletedBlocks": "{{num}} bloques eliminados",
@@ -72,7 +72,7 @@
     "copiedToClipboard": "Copiado al portapapeles",
     "couldNotCopy": "No se pudo copiar",
     "couldNotCopyLink": "No se pudo copiar el enlace",
-    "clearedColor": "Color borrado",
+    "clearedColor": "Color eliminado",
     "changedColor": "Color cambiado",
     "changedBlockType": "Tipo de bloque cambiado"
   },
@@ -83,10 +83,10 @@
     "title": "Mover {{num}} bloques a"
   },
   "edited": {
-    "justNow": "Última edición justo ahora",
-    "minutesAgo": "Última edición hace {{minutes}} min",
-    "hoursAgo": "Última edición hace {{hours}} h",
-    "daysAgo": "Última edición hace {{days}} d",
-    "on": "Última edición el {{date}}"
+    "justNow": "Última edición hace un momento",
+    "minutesAgo": "Última edición hace {{minutes}}min",
+    "hoursAgo": "Última edición hace {{hours}}h",
+    "daysAgo": "Última edición hace {{days}}d",
+    "on": "Última edición {{date}}"
   }
 }

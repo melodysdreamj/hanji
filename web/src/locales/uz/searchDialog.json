@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Qidirish yoki o‘tish...",
+  "quickFind": "Tez topish",
+  "closeSearch": "Qidiruvni yopish",
+  "quickFindResults": "Tez topish natijalari",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "So‘nggi ko‘rilganlar",
+    "recentSearches": "So‘nggi qidiruvlar",
+    "pages": "Sahifalar",
+    "pageContent": "Sahifa mazmuni",
+    "favorites": "Sevimlilar"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "sahifada",
+  "searchingDetail": "Qidirilmoqda...",
+  "searchAgain": "Qayta qidirish",
+  "searchingPageContent": "Sahifa mazmuni qidirilmoqda...",
+  "noResultsFor": "\"{{query}}\" bo‘yicha natijalar topilmadi",
+  "noPagesFound": "Sahifalar topilmadi",
+  "creating": "Yaratilmoqda...",
+  "newPage": "Yangi sahifa \"{{query}}\"",
+  "couldntCreatePage": "Sahifani yaratib bo'lmadi",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Tanlash",
+    "open": "Ochish",
+    "newTab": "Yangi tab"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ค้นหาหรือข้ามไปที่...",
+  "quickFind": "ค้นหาด่วน",
+  "closeSearch": "ปิดค้นหา",
+  "quickFindResults": "ผลลัพธ์การค้นหาด่วน",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "เพิ่งดู",
+    "recentSearches": "การค้นหาล่าสุด",
+    "pages": "หน้า",
+    "pageContent": "เนื้อหาในหน้า",
+    "favorites": "รายการโปรด"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "ในหน้า",
+  "searchingDetail": "กำลังค้นหา...",
+  "searchAgain": "ค้นหาอีกครั้ง",
+  "searchingPageContent": "กำลังค้นหาเนื้อหาในหน้า...",
+  "noResultsFor": "ไม่มีผลลัพธ์สำหรับ \"{{query}}\"",
+  "noPagesFound": "ไม่พบหน้า",
+  "creating": "กำลังสร้าง...",
+  "newPage": "หน้าใหม่ \"{{query}}\"",
+  "couldntCreatePage": "สร้างหน้าไม่ได้",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "เลือก",
+    "open": "เปิด",
+    "newTab": "แท็บใหม่"
   }
 }

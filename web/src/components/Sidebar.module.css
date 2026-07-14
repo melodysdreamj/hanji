@@ -451,6 +451,33 @@
 .actionRow .actionBadge {
   position: static;
 }
+.actionRow[data-import-running="true"] {
+  color: var(--text-primary);
+}
+.importProgress {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent-blue);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.importProgressDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: import-progress-pulse 1.4s ease-in-out infinite;
+}
+@keyframes import-progress-pulse {
+  0%, 100% { opacity: 0.42; transform: scale(0.82); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .importProgressDot { animation: none; }
+}
 .shortcutHint {
   flex: 0 0 auto;
   color: var(--text-tertiary);
@@ -1008,89 +1035,6 @@ button.disclosure {
 }
 .iconBtn:hover,
 .iconBtn:focus-visible {
-  background: var(--bg-active);
-  color: var(--text-secondary);
-  outline: none;
-}
-/* ── Collaboration card ───────────────────────────────────── */
-.collaborationArea {
-  padding: 6px 8px 0;
-  border-top: 1px solid var(--border-default);
-}
-.collaborationArea + .footer {
-  padding-top: 6px;
-  border-top: 0;
-}
-.inviteCard {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  min-height: 62px;
-  padding: 8px;
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--bg-default) 74%, var(--bg-hover));
-  color: var(--sidebar-row-text);
-}
-.inviteCard:hover,
-.inviteCard:focus-within {
-  background: var(--bg-hover);
-}
-.inviteCardMain {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  flex: 1 1 auto;
-  gap: 8px;
-  min-width: 0;
-  padding: 0;
-  color: inherit;
-  text-align: left;
-}
-.inviteCardMain:focus-visible {
-  outline: none;
-}
-.inviteIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  color: var(--sidebar-row-icon);
-}
-.inviteCopy {
-  display: grid;
-  min-width: 0;
-  gap: 2px;
-}
-.inviteTitle {
-  overflow: hidden;
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 650;
-  line-height: 18px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.inviteDescription {
-  color: var(--text-tertiary);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 15px;
-}
-.inviteDismiss {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  color: var(--text-tertiary);
-  font-size: 14px;
-  line-height: 1;
-}
-.inviteDismiss:hover,
-.inviteDismiss:focus-visible {
   background: var(--bg-active);
   color: var(--text-secondary);
   outline: none;

@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Zatiaľ žiadne konverzácie. Pridajte komentár na stránku alebo spomeňte niekoho, aby ste začali.",
+  "leave": "Opustiť",
+  "leaveAria": "Opustiť konverzáciu na {{title}}",
+  "open": "Otvoriť konverzáciu na {{title}}",
+  "participants_one": "{{count}} účastník",
+  "participants_other": "{{count}} účastníkov",
+  "untitled": "Bez názvu",
+  "loading": "Načítavanie konverzácií…"
 }

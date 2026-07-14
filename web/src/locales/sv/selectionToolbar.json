@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Textformatering"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Gör om till",
     "options": {
       "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "heading1": "Rubrik 1",
+      "heading2": "Rubrik 2",
+      "heading3": "Rubrik 3",
+      "heading4": "Rubrik 4",
+      "toDoList": "Att göra-lista",
+      "bulletedList": "Punktlista",
+      "numberedList": "Numrerad lista",
+      "toggleList": "Växlingslista",
+      "quote": "Citat",
+      "callout": "Utrop",
+      "code": "Kod"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Fet",
+    "italic": "Kursiv",
+    "underline": "Understruken",
+    "strikethrough": "Genomstruken",
+    "code": "Kod",
+    "link": "Länk"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Kommentar"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Textfärg: {{color}}",
+    "title": "Färg: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Blandad",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
+      "heading": "Textfärg",
+      "default": "Standard",
+      "gray": "Grå",
+      "brown": "Brun",
       "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "yellow": "Gul",
+      "green": "Grön",
+      "blue": "Blå",
+      "purple": "Lila",
+      "pink": "Rosa",
+      "red": "Röd"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Bakgrundsfärg",
+      "gray": "Grå bakgrund",
+      "brown": "Brun bakgrund",
+      "orange": "Orange bakgrund",
+      "yellow": "Gul bakgrund",
+      "green": "Grön bakgrund",
+      "blue": "Blå bakgrund",
+      "purple": "Lila bakgrund",
+      "pink": "Rosa bakgrund",
+      "red": "Röd bakgrund"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Redigera länk",
+    "placeholder": "Klistra in länk",
+    "urlAriaLabel": "Länk-URL",
+    "apply": "Länk",
+    "open": "Öppna länk",
+    "copy": "Kopiera länk",
+    "copied": "Kopierad",
+    "copiedLink": "Länk kopierad",
+    "remove": "Ta bort"
   }
 }

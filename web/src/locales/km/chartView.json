@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "ចំនួន",
+    "sum": "សរុប",
+    "average": "មធ្យម",
+    "min": "អប្បបរមា",
+    "max": "អតិបរមា"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "តារាង {{name}}",
+  "chartType": "ប្រភេទតារាង",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "របារ",
+    "horizontal_bar": "របារផ្ដេក",
+    "line": "បន្ទាត់",
+    "donut": "ដូណាត"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
-  "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "checked": "បានធីក",
+  "empty": "ទទេ",
+  "legend": "ពន្យល់តារាង",
+  "monthLabel": "ខែ{{month}} ឆ្នាំ{{year}}",
+  "noData": "គ្មានទិន្នន័យ",
+  "noDataDesc": "គ្មានជួរណាមួយត្រូវនឹងតម្រង ឬការស្វែងរកបច្ចុប្បន្នទេ",
+  "noGroupProperty": "គ្មានអ្វីត្រូវធ្វើតារាងនៅឡើយទេ",
+  "noGroupPropertyDesc": "បន្ថែមលក្ខណៈសម្បត្តិជ្រើសរើស ស្ថានភាព អ្នកប្រើប្រាស់ ប្រអប់ធីក ឬកាលបរិច្ឆេទ ដើម្បីដាក់ជាក្រុមតារាងនេះ",
+  "total": "សរុប",
+  "unchecked": "មិនបានធីក",
+  "untitledProperty": "គ្មានចំណងជើង",
+  "valueProperty": "លក្ខណសម្បត្តិតម្លៃ",
+  "xAxis": "អ័ក្ស X",
+  "yAxis": "អ័ក្ស Y"
 }

@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Pemformatan teks"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Ubah menjadi",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Teks",
+      "heading1": "Judul 1",
+      "heading2": "Judul 2",
+      "heading3": "Judul 3",
+      "heading4": "Judul 4",
+      "toDoList": "Daftar Tugas",
+      "bulletedList": "Daftar berpoin",
+      "numberedList": "Daftar Bernomor",
+      "toggleList": "Daftar Alih",
+      "quote": "Kutipan",
+      "callout": "Kotak Sorotan",
+      "code": "Kode"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Tebal",
+    "italic": "Miring",
+    "underline": "Garis bawah",
+    "strikethrough": "Coret",
+    "code": "Kode",
+    "link": "Tautan"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Komentar"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Warna teks: {{color}}",
+    "title": "Warna: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Campuran",
     "text": {
-      "heading": "Text color",
+      "heading": "Warna teks",
       "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
+      "gray": "Abu-abu",
+      "brown": "Cokelat",
+      "orange": "Oranye",
+      "yellow": "Kuning",
+      "green": "Hijau",
+      "blue": "Biru",
+      "purple": "Ungu",
       "pink": "Pink",
-      "red": "Red"
+      "red": "Merah"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Warna latar belakang",
+      "gray": "Latar belakang abu-abu",
+      "brown": "Latar belakang cokelat",
+      "orange": "Latar belakang oranye",
+      "yellow": "Latar belakang kuning",
+      "green": "Latar belakang hijau",
+      "blue": "Latar belakang biru",
+      "purple": "Latar belakang ungu",
+      "pink": "Latar belakang merah muda",
+      "red": "Latar belakang merah"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Edit tautan",
+    "placeholder": "Tempel tautan",
+    "urlAriaLabel": "URL tautan",
+    "apply": "Tautkan",
+    "open": "Buka tautan",
+    "copy": "Salin tautan",
+    "copied": "Disalin",
+    "copiedLink": "Tautan disalin",
+    "remove": "Hapus"
   }
 }

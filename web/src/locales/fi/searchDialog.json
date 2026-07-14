@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
-  "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
-  },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "closeSearch": "Sulje haku",
+  "couldntCreatePage": "Sivun luonti epäonnistui",
+  "creating": "Luodaan...",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "newTab": "Uusi välilehti",
+    "open": "Avaa",
+    "select": "Valitse"
+  },
+  "inPage": "sivulla",
+  "newPage": "Uusi sivu \"{{query}}\"",
+  "noPagesFound": "Sivuja ei löytynyt",
+  "noResultsFor": "Ei tuloksia \"{{query}}\"",
+  "quickFind": "Pikahaku",
+  "quickFindResults": "Pikahaun tulokset",
+  "searchAgain": "Hae uudelleen",
+  "searchingDetail": "Haetaan...",
+  "searchingPageContent": "Haetaan sivun sisältöä...",
+  "searchPlaceholder": "Hae tai siirry...",
+  "sections": {
+    "favorites": "Suosikit",
+    "pageContent": "Sivun sisältö",
+    "pages": "Sivut",
+    "recentlyViewed": "Viimeksi katsotut",
+    "recentSearches": "Viimeisimmät haut"
   }
 }

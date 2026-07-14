@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "အမှိုက်ပုံး",
+  "empty": "သင်ဖျက်သည့် စာမျက်နှာများ ဤနေရာတွင် ရှိသည်။ အမှိုက်ပုံးဗလာဖြစ်သည်။",
+  "searchTrash": "အမှိုက်ပုံးရှာဖွေပါ",
+  "deletedPages": "ဖျက်ထားသော စာမျက်နှာများ",
+  "noSearchMatches": "ရှာဖွေမှုနှင့် ကိုက်ညီသော ဖျက်ထားသည့် စာမျက်နှာ မရှိပါ။",
+  "pageCount_one": "စာမျက်နှာ {{count}} ခု",
+  "pageCount_other": "စာမျက်နှာ {{count}} ခု",
+  "deletedJustNow": "ဖျက်ပြီးခါစ",
+  "deletedOn": "{{date}} တွင် ဖျက်သည်",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "ပြန်လည်ရယူရန်",
+    "deleteForever": "အပြီးဖျက်မည်",
+    "emptyTrash": "အမှိုက်ပုံး ရှင်းလင်းရန်"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} ကို အမှိုက်ပုံးမှ ဖွင့်ပါ",
+    "restorePage": "{{title}} ကို ပြန်ယူပါ",
+    "deletePageForever": "{{title}} ကို အပြီးဖျက်မည်",
+    "cancelPermanentDelete": "အပြီးဖျက်ခြင်း ပယ်ဖျက်ရန်",
+    "cancelEmptyTrash": "အမှိုက်ပုံးရှင်းလင်းခြင်း ပယ်ဖျက်ရန်"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "အပြီးတိုင် ဖျက်မည်လား",
+    "deleteBodyPrefix": "ဤလုပ်ဆောင်ချက်သည် ",
+    "deleteBodySuffix": "ကို အပြီးတိုင် ဖျက်မည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်လို့မရပါ။",
+    "emptyTitle": "အမှိုက်ပုံးရှင်းမလား",
+    "emptyBody_one": "ဤသည်က အမှိုက်ပုံးရှိ စာမျက်နှာ {{count}} ခုလုံးကို အပြီးတိုင် ဖျက်မည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်လို့မရပါ။",
+    "emptyBody_other": "ဤသည်က အမှိုက်ပုံးရှိ စာမျက်နှာ {{count}} ခုလုံးကို အပြီးတိုင် ဖျက်မည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်ပြင်လို့မရပါ။"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "အပြီးတိုင်ဖျက်လိုက်သည်",
+    "couldntDelete": "စာမျက်နှာကို ဖျက်လို့မရပါ",
+    "restored": "စာမျက်နှာပြန်ယူပြီးပါပြီ",
+    "couldntRestore": "စာမျက်နှာကို ပြန်ယူလို့မရပါ",
+    "emptied": "အမှိုက်ပုံးရှင်းပြီးပါပြီ",
+    "couldntEmpty": "အမှိုက်ပုံးကို ရှင်းလို့မရပါ"
   }
 }

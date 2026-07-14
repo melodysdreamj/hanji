@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Adaugă o proprietate de dată",
+    "description": "Vizualizările de calendar necesită o proprietate de dată pentru a plasa paginile în calendar.",
+    "addDateButton": "Dată"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Calendar după",
+    "today": "Astăzi",
+    "previousWeek": "Săptămâna precedentă",
+    "previousMonth": "Luna anterioară",
+    "nextWeek": "Săptămâna următoare",
+    "nextMonth": "Luna următoare"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Dum",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mie",
+    "thu": "Joi",
+    "fri": "Vin",
+    "sat": "Sâm"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Calendar {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} elemente",
+    "newRowAriaLabel": "Rând nou pe {{date}}",
+    "newRowTitle": "Nou",
+    "showLess": "Arată mai puțin",
+    "showMore": "+{{count}} mai multe"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Deschide {{title}}",
+    "openAriaLabelWithDate": "Deschide {{title}}, programat pentru {{date}}",
+    "openNoDateAriaLabel": "Deschide {{title}}, fără dată"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Fără dată ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Fără titlu",
+    "dateDefaultName": "Dată"
   }
 }

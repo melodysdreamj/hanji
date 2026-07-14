@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "စာသား",
+      "description": "ရိုးရိုးစာသားဖြင့် စတင်ရေးသားပါ။",
+      "placeholder": "ကွန်မန်းများအတွက် '/' ကိုရိုက်ပါ။"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "စာမျက်နှာ",
+      "description": "ဤစာမျက်နှာအတွင်း စာမျက်နှာခွဲဖန်တီးပါ။"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "စာမျက်နှာ လင့်ခ်",
+      "description": "ရှိပြီးသား စာမျက်နှာသို့ လင့်ခ်ချိတ်ပါ။"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ခေါင်းစဉ် 1",
+      "description": "ကြီးမားသော ကဏ္ဍခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ဖွင့်ပိတ် ခေါင်းစဉ် 1",
+      "description": "အတွင်းအကြောင်းအရာများကိုခေါက်သိမ်းနိုင်သောခေါင်းစဉ်ကြီး။",
+      "placeholder": "ဖွင့်ပိတ် ခေါင်းစဉ် 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ခေါင်းစဉ် 2",
+      "description": "အလတ်စား ကဏ္ဍခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ဖွင့်ပိတ် ခေါင်းစဉ် 2",
+      "description": "အတွင်းအကြောင်းအရာကို ဝှက်ထားနိုင်သော အလတ်စားခေါင်းစဉ်။",
+      "placeholder": "ဖွင့်ပိတ် ခေါင်းစဉ် 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ခေါင်းစဉ် 3",
+      "description": "သေးငယ်သော ကဏ္ဍခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ဖွင့်ပိတ် ခေါင်းစဉ် 3",
+      "description": "အတွင်းအကြောင်းအရာကို ဝှက်ထားနိုင်သော အသေးစားခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 3 ဖွင့်ပိတ်"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ခေါင်းစဉ် 4",
+      "description": "ကျစ်လစ်သော ကဏ္ဍခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ခေါင်းစဉ် 4 ဖွင့်ပိတ်",
+      "description": "အတွင်းပါအကြောင်းအရာများကို ဝှက်နိုင်သော ကျစ်လစ်သည့် ခေါင်းစဉ်။",
+      "placeholder": "ခေါင်းစဉ် 4 ဖွင့်ပိတ်"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "လုပ်ဆောင်စရာစာရင်း",
+      "description": "အမှန်ခြစ်ဖြင့်လုပ်ဆောင်စရာများစီမံပါ။",
+      "placeholder": "လုပ်ဆောင်စရာ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "အမှတ်ချစာရင်း",
+      "description": "အမှတ်ချစာရင်းတစ်ခု ဖန်တီးပါ။",
+      "placeholder": "စာရင်း"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "နံပါတ်တပ် စာရင်း",
+      "description": "နံပါတ်တပ်ထားသော စာရင်းတစ်ခုကို ဖန်တီးပါ။",
+      "placeholder": "စာရင်း"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ဖွင့်ပိတ်စာရင်း",
+      "description": "ဖွင့်ပိတ်များသည် အကြောင်းအရာများကို ဝှက်ပြသနိုင်သည်။",
+      "placeholder": "ဖွင့်ပိတ်"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "ကိုးကားချက်",
+      "description": "ကိုးကားချက်တစ်ခုကို ထည့်သွင်းပါ။",
+      "placeholder": "ဗလာကိုးကားချက်"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "ခေါ်ထုတ်ချက်",
+      "description": "စာသားကို ပေါ်လွင်စေပါ။",
+      "placeholder": "တစ်ခုခု ရိုက်ထည့်ပါ…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "ပိုင်းခြားမျဉ်း",
+      "description": "ဘလောက်များကို အမြင်အားဖြင့် ပိုင်းခြားပါ။"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "ကုဒ်",
+      "description": "ကုဒ်အပိုင်းအစတစ်ခုကို ဖမ်းယူပါ။",
+      "placeholder": "ကုဒ်ရေးပါ၊ သို့မဟုတ် အပိုင်းအစတစ်ခုကို ကူးထည့်ပါ…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "ညီမျှခြင်း",
+      "description": "သင်္ချာညီမျှခြင်း ပြသပါ။"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "မာတိကာ",
+      "description": "စာမျက်နှာရှိခေါင်းစဉ်လင့်ခ်များကိုပြပါ။"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "ထပ်တူပြုထားသော ဘလောက်",
+      "description": "စာမျက်နှာများတစ်လျှောက် အကြောင်းအရာ ပြန်သုံးနိုင်သည်။"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ခလုတ်",
+      "description": "တစ်ချက်နှိပ်ရုံဖြင့် ပြန်သုံးနိုင်သော အကြောင်းအရာကို ထည့်သွင်းပါ။"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "တက်များ",
+      "description": "အကြောင်းအရာများကို အညွှန်းပါ tab များတွင် အုပ်စုဖွဲ့ပါ။",
+      "placeholder": "တက်များ"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "လမ်းကြောင်းပြ",
+      "description": "စာမျက်နှာတည်နေရာကို ပြပါ။"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ပုံတူကူးရန်",
+      "description": "ဤဘလောက်၏ အတိအကျမိတ္တူကို ဖန်တီးပါ။"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ရွှေ့ရန်",
+      "description": "ဘလောက်ကို အခြားစာမျက်နှာသို့ ရွှေ့ပါ။"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ဤဘလောက်ကို ဖျက်ပါ။"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "ပြောင်းရန်",
+      "description": "ဘလောက်အမျိုးအစားကို ပြောင်းပါ။"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "အရောင်",
+      "description": "ဤဘလောက်၏ စာသားအရောင် သို့မဟုတ် နောက်ခံအရောင်ကို ပြောင်းပါ။"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "ဇယား",
+      "description": "ဤစာမျက်နှာတွင် ရိုးရှင်းသောဇယားတစ်ခု ထည့်ပါ။"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ကော်လံ",
+      "description": "ဘလောက်များ ဘေးချင်းကပ်ထားပါ။"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ကော်လံ",
+      "description": "ဘလောက်များ ကော်လံ 3 ခုဖြင့် စီစဉ်ပါ။"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ကော်လံ",
+      "description": "ဘလောက်များ ကော်လံ 4 ခုဖြင့် စီစဉ်ပါ။"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ကော်လံ",
+      "description": "ဘလောက်များ ကော်လံ 5 ခုဖြင့် စီစဉ်ပါ။"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "ပုံ",
+      "description": "အပ်လုဒ်တင်ပါ သို့မဟုတ် လင့်ခ်ဖြင့် ထည့်သွင်းပါ။"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ဗီဒီယို",
+      "description": "လင့်ခ်ဖြင့် ဗီဒီယိုထည့်သွင်းပါ။"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "အော်ဒီယို",
+      "description": "လင့်ခ်ဖြင့် အသံဖိုင်ကို ထည့်သွင်းပါ။"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "ဝက်ဘ်စာညှပ်",
+      "description": "ဝက်ဘ်လင့်ခ်ကို ကတ်တစ်ခုအဖြစ် သိမ်းပါ။"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ထည့်သွင်းပါ",
+      "description": "လင့်ခ်မှ အကြောင်းအရာ ထည့်သွင်းပါ။"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ဖိုင်",
+      "description": "ဤစာမျက်နှာသို့ ဖိုင်လင့်ခ် ပူးတွဲပါ။"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ဒေတာဘေ့စ် - စာမျက်နှာအပြည့်",
+      "description": "စာမျက်နှာခွဲအဖြစ် ဒေတာဘေ့စ်အသစ်ထည့်ပါ။"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "ဇယား - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ဒေတာဘေ့စ်ကို ဇယားအဖြစ် ထည့်သွင်းပါ။"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ဘုတ် - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ကန်ဘန်ဘုတ်တစ်ခု ထည့်သွင်းပါ။"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "စာရင်း - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ဒေတာဘေ့စ်ကို စာရင်းအဖြစ် ထည့်သွင်းပါ။"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "အချိန်ဇယား - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ဒေတာဘေ့စ်အချိန်ဇယားတစ်ခု ထည့်သွင်းပါ။"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "ပြက္ခဒိန် - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ပြက္ခဒိန်ဒေတာဘေ့စ်တစ်ခု ထည့်သွင်းပါ။"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "ပြခန်း - မျက်နှာပြင်အပြည့်",
+      "description": "မျက်နှာပြင်အပြည့် ဒေတာဘေ့စ်ပြခန်းတစ်ခု ထည့်သွင်းပါ။"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ဒေတာဘေ့စ် - အတွင်းလိုင်း",
+      "description": "ဤစာမျက်နှာအတွင်း ဒေတာဘေ့စ် ထည့်ပါ။"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "ဇယားမြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ဒေတာဘေ့စ်ကို ဇယားအဖြစ် ထည့်ပါ။"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "ဘုတ်မြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ကန်ဘန်ဘုတ် ထည့်ပါ။"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "စာရင်းမြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ဒေတာဘေ့စ်ကို စာရင်းအဖြစ် ထည့်ပါ။"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "အချိန်ဇယားမြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ဒေတာဘေ့စ် အချိန်ဇယား ထည့်ပါ။"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "ပြက္ခဒိန်မြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ပြက္ခဒိန်ဒေတာဘေ့စ် ထည့်ပါ။"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "ပြခန်းမြင်ကွင်း",
+      "description": "အတွင်းလိုင်း ဒေတာဘေ့စ် ပြခန်း ထည့်ပါ။"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "ပုံသေ",
+      "description": "ဤဘလောက်မှ စာသားအရောင် သို့မဟုတ် နောက်ခံအရောင်ကို ဖယ်ရှားပါ။"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "မီးခိုးရောင်",
+      "description": "ဤဘလောက်တွင် မီးခိုးရောင်ကို အသုံးပြုပါ။"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "အညိုရောင်",
+      "description": "ဤဘလောက်သို့ အညိုရောင်သုံးပါ။"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "လိမ္မော်ရောင်",
+      "description": "ဤဘလောက်တွင် လိမ္မော်ရောင်ကို အသုံးပြုပါ။"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "အဝါရောင်",
+      "description": "ဤဘလောက်သို့ အဝါရောင် သုံးပါ။"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "အစိမ်းရောင်",
+      "description": "ဤဘလောက်တွင် အစိမ်းရောင်ကို အသုံးပြုပါ။"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "အပြာရောင်",
+      "description": "ဤဘလောက်သို့ အပြာရောင်သုံးပါ။"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ခရမ်းရောင်",
+      "description": "ဤဘလောက်သို့ ခရမ်းရောင် သုံးပါ။"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "ပန်းရောင်",
+      "description": "ဤဘလောက်သို့ ပန်းရောင် သုံးပါ။"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "အနီရောင်",
+      "description": "ဤဘလောက်သို့ အနီရောင် သုံးပါ။"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "မီးခိုးရောင် နောက်ခံ",
+      "description": "ဤဘလောက်တွင် မီးခိုးရောင် နောက်ခံကို အသုံးပြုပါ။"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "အညိုရောင်နောက်ခံ",
+      "description": "ဤဘလောက်သို့ အညိုရောင်နောက်ခံသုံးပါ။"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "လိမ္မော်ရောင် နောက်ခံ",
+      "description": "ဤဘလောက်တွင် လိမ္မော်ရောင် နောက်ခံကို အသုံးပြုပါ။"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "အဝါရောင်နောက်ခံ",
+      "description": "ဤဘလောက်သို့ အဝါရောင်နောက်ခံ သုံးပါ။"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "အစိမ်းရောင် နောက်ခံ",
+      "description": "ဤဘလောက်တွင် အစိမ်းရောင် နောက်ခံကို အသုံးပြုပါ။"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "အပြာရောင်နောက်ခံ",
+      "description": "ဤဘလောက်သို့ အပြာရောင်နောက်ခံသုံးပါ။"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ခရမ်းရောင်နောက်ခံ",
+      "description": "ဤဘလောက်သို့ ခရမ်းရောင်နောက်ခံ သုံးပါ။"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "ပန်းရောင်နောက်ခံ",
+      "description": "ဤဘလောက်တွင် ပန်းရောင် နောက်ခံကို အသုံးပြုပါ။"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "အနီရောင်နောက်ခံ",
+      "description": "ဤဘလောက်သို့ အနီရောင်နောက်ခံ သုံးပါ။"
     }
   }
 }

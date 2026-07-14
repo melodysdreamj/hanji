@@ -8,7 +8,7 @@
   "couldntCut": "Ausschneiden nicht möglich",
   "cutBlock": "Block ausgeschnitten",
   "cutBlocks": "{{count}} Blöcke ausgeschnitten",
-  "databaseNotReady": "Die Datenbank ist noch nicht bereit",
+  "databaseNotReady": "Datenbank ist noch nicht bereit",
   "databaseTitleHidden": "Datenbanktitel ausgeblendet",
   "deletedBlock": "Block gelöscht",
   "deletedBlocks": "{{count}} Blöcke gelöscht",
@@ -18,9 +18,9 @@
   "editIcon": "Symbol bearbeiten",
   "editLayout": "Layout bearbeiten",
   "editTitle": "Titel bearbeiten",
-  "emptyTogglePrompt": "Leerer Umschalter. Klicke oder ziehe einen Block hinein.",
+  "emptyTogglePrompt": "Leeres Toggle. Klicken oder Block hineinziehen.",
   "groupDate": "Datum",
-  "groupLinkToPage": "Link zur Seite",
+  "groupLinkToPage": "Link zu Seite",
   "groupNewPage": "Neue Seite",
   "groupPeople": "Personen",
   "hideTitle": "Titel ausblenden",
@@ -31,30 +31,30 @@
   "movedBlock": "Block verschoben",
   "movedBlocks": "{{count}} Blöcke verschoben",
   "nothingToUndo": "Nichts rückgängig zu machen",
-  "openDatabase": "Datenbank {{title}} öffnen",
-  "restoredBlock": "Block wiederhergestellt",
-  "restoredBlocks": "Blöcke wiederhergestellt",
+  "openDatabase": "{{title}} Datenbank öffnen",
+  "restoredBlock": "Wiederhergestellter Block",
+  "restoredBlocks": "Wiederhergestellte Blöcke",
   "undidCopy": "Kopieren rückgängig gemacht",
-  "undidDuplicate": "Duplikat rückgängig gemacht",
+  "undidDuplicate": "Duplizieren rückgängig gemacht",
   "undidMove": "Verschieben rückgängig gemacht",
   "undo": "Rückgängig",
   "uploadComplete": "Abgeschlossen",
   "uploadedFile": "Datei hochgeladen",
   "uploadedFiles": "{{count}} Dateien hochgeladen",
   "uploadFailed": "{{fileName}} konnte nicht hochgeladen werden.",
-  "uploadFailedUnknown": "Diese Datei konnte nicht hochgeladen werden.",
-  "uploadFileTooLarge": "Datei ist zu groß. Das aktuelle Upload-Limit beträgt 5 GB.",
-  "uploadUnsafeFileType": "Aktive Web-Inhaltsdateien wie HTML, SVG, XML und JavaScript können nicht hochgeladen werden.",
-  "uploadFinalizing": "Wird abgeschlossen",
+  "uploadFailedUnknown": "Datei konnte nicht hochgeladen werden.",
+  "uploadFileTooLarge": "Datei zu groß. Aktuelles Upload-Limit: 5 GB.",
+  "uploadUnsafeFileType": "Aktive Webinhalte wie HTML, SVG, XML und JavaScript können nicht hochgeladen werden.",
+  "uploadFinalizing": "Abschließen",
   "uploadingFile": "{{fileName}} wird hochgeladen",
   "uploadPreparing": "Upload wird vorbereitet",
-  "uploadUploading": "Wird hochgeladen",
-  "viewDataSource": "Ansichtsdatenquelle",
+  "uploadUploading": "Hochladen",
+  "viewDataSource": "Datenquelle anzeigen",
   "block": {
-    "aria": "{{type}}-Block",
-    "ariaWithSummary": "{{type}}-Block: {{summary}}",
-    "pagePlaceholder": "'/' für Befehle eingeben",
-    "textbox": "{{type}}-Blocktext"
+    "aria": "{{type}} Block",
+    "ariaWithSummary": "{{type}} Block: {{summary}}",
+    "pagePlaceholder": "Gib '/' für Befehle ein",
+    "textbox": "{{type}} Blocktext"
   },
   "common": {
     "addCaption": "Beschriftung hinzufügen",
@@ -73,9 +73,9 @@
     "replace": "Ersetzen",
     "resize": "Größe ändern",
     "save": "Speichern",
-    "untitled": "Ohne Titel",
+    "untitled": "Unbenannt",
     "upload": "Hochladen",
-    "uploading": "Wird hochgeladen..."
+    "uploading": "Wird hochgeladen…"
   },
   "selection": {
     "selectedBlocks_one": "{{count}} ausgewählter Block",
@@ -84,19 +84,19 @@
   "comments": {
     "count_one": "{{count}} Kommentar",
     "count_other": "{{count}} Kommentare",
-    "unresolvedOnBlock_one": "{{count}} ungelöster Kommentar am {{type}}-Block",
-    "unresolvedOnBlock_other": "{{count}} ungelöste Kommentare am {{type}}-Block"
+    "unresolvedOnBlock_one": "{{count}} ungelöster Kommentar auf {{type}}-Block",
+    "unresolvedOnBlock_other": "{{count}} ungelöste Kommentare auf {{type}}-Block"
   },
   "toggle": {
-    "addInside": "Block innerhalb dieses Umschalters hinzufügen",
-    "addInsideEmpty": "Block innerhalb dieses leeren Umschalters hinzufügen",
-    "close": "Umschalter schließen",
-    "open": "Umschalter öffnen"
+    "addInside": "Block in Toggle hinzufügen",
+    "addInsideEmpty": "Block in leeren Toggle hinzufügen",
+    "close": "Toggle schließen",
+    "open": "Toggle öffnen"
   },
   "tabs": {
     "add": "Tab hinzufügen",
-    "addBlockInside": "Block innerhalb dieses Tabs hinzufügen",
-    "addBlockInsideEmpty": "Block innerhalb dieses leeren Tabs hinzufügen",
+    "addBlockInside": "Block in Tab hinzufügen",
+    "addBlockInsideEmpty": "Block in leeren Tab hinzufügen",
     "delete": "Tab löschen",
     "deleteNamed": "{{label}} löschen",
     "empty": "Leerer Tab",
@@ -118,19 +118,19 @@
     "resize": "Spaltengröße ändern"
   },
   "simpleTable": {
-    "actions": "Aktionen für einfache Tabelle",
+    "actions": "Einfache Tabellenaktionen",
     "addColumn": "Spalte zur einfachen Tabelle hinzufügen",
     "addRow": "Zeile zur einfachen Tabelle hinzufügen",
     "addRowShort": "Zeile hinzufügen",
     "cell": "Tabellenzelle",
     "cellNumbered": "Tabellenzelle {{row}}, {{column}}",
-    "dimensions": "Einfache Tabelle: {{rows}} × {{columns}}",
+    "dimensions": "{{rows}}×{{columns}} einfache Tabelle",
     "headerColumn": "Kopfspalte",
     "headerRow": "Kopfzeile",
     "label": "Einfache Tabelle",
-    "removeLastColumn": "Letzte Spalte aus einfacher Tabelle entfernen",
+    "removeLastColumn": "Letzte Spalte der einfachen Tabelle entfernen",
     "removeLastColumnShort": "Letzte Spalte entfernen",
-    "removeLastRow": "Letzte Zeile aus einfacher Tabelle entfernen",
+    "removeLastRow": "Letzte Zeile der einfachen Tabelle entfernen",
     "removeLastRowShort": "Letzte Zeile entfernen",
     "toggleHeaderColumn": "Kopfspalte umschalten",
     "toggleHeaderRow": "Kopfzeile umschalten",
@@ -144,38 +144,38 @@
     },
     "alignAction": "Bild {{align}} ausrichten",
     "alignTitle": "{{align}} ausrichten",
-    "caption": "Bildbeschriftung",
-    "chooseFile": "Wähle eine Bilddatei.",
+    "caption": "Bildunterschrift",
+    "chooseFile": "Bilddatei auswählen.",
     "closePreview": "Bildvorschau schließen",
     "embed": "Bild einbetten",
-    "emptyHint": "Lade ein Bild hoch oder füge einen Link ein, um es hier anzuzeigen.",
-    "invalidLink": "Füge einen gültigen Bildlink ein.",
+    "emptyHint": "Laden Sie ein Bild hoch oder fügen Sie einen Link ein, um es anzuzeigen.",
+    "invalidLink": "Fügen Sie einen gültigen Bildlink ein.",
     "label": "Bild",
     "link": "Bildlink",
     "preview": "Bildvorschau",
     "replace": "Bild ersetzen",
-    "resizeFromLeft": "Bildgröße von links ändern",
-    "resizeFromRight": "Bildgröße von rechts ändern"
+    "resizeFromLeft": "Bild von links aus ändern",
+    "resizeFromRight": "Bild von rechts aus ändern"
   },
   "media": {
     "audio": "Audio",
-    "audioCaption": "Audiobeschriftung",
-    "audioEmptyHint": "Lade eine Audiodatei hoch oder füge einen Audiolink ein, um sie hier abzuspielen.",
+    "audioCaption": "Audio-Beschriftung",
+    "audioEmptyHint": "Audiodatei hochladen oder Audiolink einfügen, um sie hier abzuspielen.",
     "audioLink": "Audiolink",
-    "chooseAudioFile": "Wähle eine Audiodatei.",
-    "chooseVideoFile": "Wähle eine Videodatei.",
+    "chooseAudioFile": "Audiodatei auswählen.",
+    "chooseVideoFile": "Videodatei auswählen.",
     "embedAudio": "Audio einbetten",
     "embedVideo": "Video einbetten",
     "embeddedVideo": "Eingebettetes Video",
-    "invalidAudioLink": "Füge einen gültigen Audiolink ein.",
-    "invalidVideoLink": "Füge einen gültigen Videolink ein.",
+    "invalidAudioLink": "Gültigen Audiolink einfügen.",
+    "invalidVideoLink": "Gültigen Videolink einfügen.",
     "openAudio": "Audiolink in neuem Tab öffnen",
     "openVideo": "Videolink in neuem Tab öffnen",
     "replaceAudio": "Audio ersetzen",
     "replaceVideo": "Video ersetzen",
     "video": "Video",
-    "videoCaption": "Videobeschriftung",
-    "videoEmptyHint": "Lade eine Videodatei hoch, füge einen direkten Link ein oder verwende einen YouTube-, Vimeo- oder Loom-Link.",
+    "videoCaption": "Videounterschrift",
+    "videoEmptyHint": "Videodatei hochladen, direkten Link einfügen oder YouTube-, Vimeo- oder Loom-Link verwenden.",
     "videoLink": "Videolink"
   },
   "bookmark": {
@@ -191,96 +191,96 @@
     "replace": "Lesezeichen-Link ersetzen"
   },
   "embed": {
-    "caption": "Einbettungs-Beschriftung",
-    "emptyHint": "Füge einen Link ein, um Inhalt auf der Seite einzubetten.",
-    "invalidLink": "Füge einen gültigen Einbettungslink ein.",
-    "link": "Einbettungslink",
-    "open": "Einbettungslink in neuem Tab öffnen",
-    "openActions": "Einbettungs-Blockaktionen öffnen",
-    "replace": "Einbettungslink ersetzen",
+    "caption": "Embed-Beschriftung",
+    "emptyHint": "Zum Einbetten von Inhalten Link einfügen",
+    "invalidLink": "Gültigen Embed-Link einfügen",
+    "link": "Embed-Link",
+    "open": "Embed-Link in neuem Tab öffnen",
+    "openActions": "Embed-Block-Aktionen öffnen",
+    "replace": "Embed-Link ersetzen",
     "title": "Link einbetten"
   },
   "file": {
     "attach": "Datei anhängen",
-    "caption": "Datei-Beschriftung",
+    "caption": "Dateibeschriftung",
     "downloadNamed": "{{fileName}} herunterladen",
-    "emptyHint": "Lade eine Datei hoch oder füge einen Dateilink ein, um sie hier anzuhängen.",
-    "invalidLink": "Füge einen gültigen Dateilink ein.",
+    "emptyHint": "Zum Anhängen Datei hochladen oder Datei-Link einfügen",
+    "invalidLink": "Gültigen Datei-Link einfügen",
     "label": "Datei",
-    "link": "Dateilink",
+    "link": "Datei-Link",
     "openNamed": "{{fileName}} in neuem Tab öffnen",
     "replaceNamed": "{{fileName}} ersetzen"
   },
   "childPage": {
-    "copiedLink": "Link zur Unterseite kopiert",
-    "copyLink": "Link zur Unterseite kopieren",
+    "copiedLink": "Unterseiten-Link kopiert",
+    "copyLink": "Unterseiten-Link kopieren",
     "create": "Unterseite erstellen",
     "openNewTab": "Unterseite in neuem Tab öffnen"
   },
   "pageLink": {
-    "change": "Verlinkte Seite ändern",
-    "closePicker": "Seitenauswahl schließen",
-    "copiedUrl": "URL der verlinkten Seite kopiert",
-    "copyUrl": "URL der verlinkten Seite kopieren",
-    "currentPage": "aktuelle Seite",
+    "change": "Verknüpfte Seite ändern",
+    "closePicker": "Seitenlink-Auswahl schließen",
+    "copiedUrl": "URL der verknüpften Seite kopiert",
+    "copyUrl": "URL der verknüpften Seite kopieren",
+    "currentPage": "Aktuelle Seite",
     "label": "Seitenlink",
-    "linkToPage": "Link zur Seite",
-    "mention": "Seitenerwähnung",
+    "linkToPage": "Mit Seite verknüpfen",
+    "mention": "Seiten-Mention",
     "newPageIn": "Neue Seite in {{title}}",
     "noPages": "Keine Seiten gefunden.",
-    "openNewTab": "Verlinkte Seite in neuem Tab öffnen",
+    "openNewTab": "Verknüpfte Seite in neuem Tab öffnen",
     "pages": "Seiten",
     "pathFallback": "Seite",
     "search": "Seiten durchsuchen",
     "searchPlaceholder": "Seiten durchsuchen...",
-    "unavailable": "Verlinkte Seite nicht verfügbar"
+    "unavailable": "Verknüpfte Seite nicht verfügbar"
   },
   "childDatabase": {
-    "copiedLink": "Link zur Unterdatenbank kopiert",
-    "copyLink": "Link zur Unterdatenbank kopieren",
+    "copiedLink": "Link der untergeordneten Datenbank kopiert",
+    "copyLink": "Link der untergeordneten Datenbank kopieren",
     "create": "Datenbank erstellen",
-    "openNewTab": "Unterdatenbank in neuem Tab öffnen"
+    "openNewTab": "Untergeordnete Datenbank in neuem Tab öffnen"
   },
   "toc": {
     "empty": "Füge Überschriften hinzu, um ein Inhaltsverzeichnis zu erstellen.",
     "label": "Inhaltsverzeichnis"
   },
   "equation": {
-    "label": "Gleichungsausdruck"
+    "label": "Formelausdruck"
   },
   "breadcrumb": {
-    "label": "Seiten-Brotkrümelnavigation"
+    "label": "Seitenpfad"
   },
   "synced": {
     "block": "Synchronisierter Block",
     "copy": "Synchronisierte Kopie",
     "empty": "Leerer synchronisierter Block.",
     "original": "Original",
-    "textbox": "Synchronisierter {{label}}",
-    "todoPlaceholder": "To-do",
-    "todoText": "Synchronisierter To-do-Text",
-    "unavailable": "Originalblock ist nicht verfügbar.",
-    "unsync": "Synchronisierung aufheben"
+    "textbox": "Synchronisierte {{label}}",
+    "todoPlaceholder": "Aufgabe",
+    "todoText": "Synchronisierter Aufgabentext",
+    "unavailable": "Originalblock nicht verfügbar.",
+    "unsync": "Sync trennen"
   },
   "button": {
     "addBlock": "Block hinzufügen",
     "captureNext": "Nächsten Block erfassen",
-    "closeConfiguration": "Schaltflächenkonfiguration schließen",
-    "configure": "Schaltfläche konfigurieren",
-    "importedActionUnavailable": "Notion hat diese importierte Schaltflächenaktion nicht freigegeben.",
+    "closeConfiguration": "Button-Konfiguration schließen",
+    "configure": "Button konfigurieren",
+    "importedActionUnavailable": "Notion hat diese importierte Button-Aktion nicht bereitgestellt.",
     "insertBlocks": "Blöcke einfügen",
-    "label": "Schaltfläche",
+    "label": "Button",
     "moveTemplateDown": "Vorlagenblock nach unten verschieben",
     "moveTemplateUp": "Vorlagenblock nach oben verschieben",
     "name": "Name",
     "nestedBlocks_one": "{{count}} verschachtelter Block",
     "nestedBlocks_other": "{{count}} verschachtelte Blöcke",
-    "newButton": "Neue Schaltfläche",
+    "newButton": "Neuer Button",
     "newContent": "Neuer Inhalt",
     "newTask": "Neue Aufgabe",
     "removeTemplate": "Vorlagenblock entfernen",
     "templateBlockType": "Vorlagenblock-Typ",
-    "templateText": "Vorlagenblock {{number}} Text"
+    "templateText": "Vorlagenblock-{{number}}-Text"
   },
   "database": {
     "closeOptions": "Datenbankoptionen schließen",
@@ -292,7 +292,7 @@
     "label": "Datenbank",
     "loading": "Datenbank wird geladen",
     "options": "{{title}}-Optionen",
-    "titleInput": "{{title}}-Datenbanktitel",
+    "titleInput": "{{title}} Datenbanktitel",
     "unavailable": "Datenbank nicht verfügbar"
   },
   "mention": {
@@ -306,20 +306,20 @@
     "noResultsFor": "Keine Ergebnisse für „{{query}}“"
   },
   "databaseSource": {
-    "choose": "Datenbankquelle wählen",
-    "closePicker": "Auswahl der Datenbankquelle schließen",
-    "createNew": "Neue {{placement}}-Datenbank erstellen",
+    "choose": "Datenbankquelle auswählen",
+    "closePicker": "Datenbankquellenauswahl schließen",
+    "createNew": "Neue {{placement}} Datenbank erstellen",
     "existingDatabases": "Vorhandene Datenbanken",
     "existingSources": "Vorhandene Datenquellen",
     "newDatabase": "Neue Datenbank",
-    "noMatching": "Keine übereinstimmenden Datenbanken",
+    "noMatching": "Keine passenden Datenbanken",
     "noneYet": "Noch keine Datenbanken",
     "searchExisting": "Vorhandene Datenbanken durchsuchen",
     "searchPlaceholder": "Datenbanken durchsuchen"
   },
   "todo": {
-    "markComplete": "To-do als erledigt markieren",
-    "markIncomplete": "To-do als nicht erledigt markieren"
+    "markComplete": "Aufgabe als erledigt markieren",
+    "markIncomplete": "Aufgabe als nicht erledigt markieren"
   },
   "callout": {
     "changeIcon": "Callout-Symbol ändern"
@@ -333,7 +333,7 @@
     "showLineNumbers": "Zeilennummern anzeigen",
     "toggleLineNumbers": "Zeilennummern umschalten",
     "toggleWrap": "Zeilenumbruch umschalten",
-    "wrap": "Zeilenumbruch"
+    "wrap": "Umbruch"
   },
   "pastedLink": {
     "createAudio": "Audio erstellen",
@@ -352,20 +352,20 @@
     "url": "Link-URL"
   },
   "date": {
-    "editMention": "Daterwähnung bearbeiten",
+    "editMention": "Datumsangabe bearbeiten",
     "label": "Datum",
-    "mention": "Datum erwähnen",
+    "mention": "Datumsangabe",
     "nextMonth": "Nächster Monat",
     "previousMonth": "Vorheriger Monat"
   },
   "person": {
-    "collaborator": "Personen-Mitarbeiter",
-    "copyName": "Namen kopieren",
+    "collaborator": "Mitarbeiter",
+    "copyName": "Name kopieren",
     "label": "Person",
-    "mention": "Personenerwähnung",
+    "mention": "Personen-Mention",
     "organizationMember": "Organisationsperson",
     "profile": "Profil",
     "roleInOrganization": "{{role}} in Organisation",
-    "workspaceMember": "Arbeitsbereich-Mitglied"
+    "workspaceMember": "Workspace-Mitglied"
   }
 }

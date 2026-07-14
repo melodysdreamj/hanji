@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Még nincsenek beszélgetések. Hozzászólhat egy oldalon, vagy megemlíthet valakit az indításhoz.",
+  "leave": "Kilépés",
+  "leaveAria": "Kilépés a {{title}} beszélgetésből",
+  "open": "A {{title}} beszélgetés megnyitása",
+  "participants_one": "{{count}} résztvevő",
+  "participants_other": "{{count}} résztvevő",
+  "untitled": "Névtelen",
+  "loading": "Beszélgetések betöltése…"
 }

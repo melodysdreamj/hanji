@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Comenzi bloc",
+  "closeBlockCommands": "Închide comenzile bloc",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Blocuri de bază",
     "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Database": "Bază de date",
+    "Advanced": "Blocuri avansate"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} din {{total}}. Apasă Enter pentru a insera.",
+  "listStatus": "{{total}} comenzi bloc disponibile.",
+  "noBlocks": "Niciun bloc găsit",
+  "noBlocksFor": "Nu s-au găsit blocuri pentru \"{{query}}\"",
+  "recentlyUsed": "Folosite recent"
 }

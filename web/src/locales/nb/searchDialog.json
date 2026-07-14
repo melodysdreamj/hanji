@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
-  "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
-  },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "closeSearch": "Lukk søk",
+  "couldntCreatePage": "Kunne ikke opprette side",
+  "creating": "Oppretter...",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "newTab": "Ny fane",
+    "open": "Åpne",
+    "select": "Velg"
+  },
+  "inPage": "i siden",
+  "newPage": "Ny side \"{{query}}\"",
+  "noPagesFound": "Ingen sider funnet",
+  "noResultsFor": "Ingen resultater for \"{{query}}\"",
+  "quickFind": "Hurtigsøk",
+  "quickFindResults": "Hurtigsøkresultater",
+  "searchAgain": "Søk på nytt",
+  "searchingDetail": "Søker...",
+  "searchingPageContent": "Søker i sideinnhold...",
+  "searchPlaceholder": "Søk eller hopp til...",
+  "sections": {
+    "favorites": "Favoritter",
+    "pageContent": "Sideinnhold",
+    "pages": "Sider",
+    "recentlyViewed": "Nylig vist",
+    "recentSearches": "Nylige søk"
   }
 }

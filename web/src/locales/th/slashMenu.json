@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "คำสั่งบล็อก",
+  "closeBlockCommands": "ปิดคำสั่งบล็อก",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "บล็อกพื้นฐาน",
+    "Media": "สื่อ",
+    "Database": "ฐานข้อมูล",
+    "Advanced": "บล็อกขั้นสูง"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} จาก {{total}} กด Enter เพื่อแทรก",
+  "listStatus": "{{total}} คำสั่งบล็อกพร้อมใช้งาน",
+  "noBlocks": "ไม่พบบล็อก",
+  "noBlocksFor": "ไม่พบบล็อกสำหรับ \"{{query}}\"",
+  "recentlyUsed": "ที่ใช้ล่าสุด"
 }

@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Tekst",
+      "description": "Begin met schrijven in platte tekst.",
+      "placeholder": "Typ '/' voor commando's"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Pagina",
+      "description": "Maak een subpagina in deze pagina."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Link naar pagina",
+      "description": "Link naar een bestaande pagina."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Kop 1",
+      "description": "Grote sectiekop.",
+      "placeholder": "Kop 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Toggle kop 1",
+      "description": "Grote kop die geneste inhoud kan inklappen.",
+      "placeholder": "Toggle kop 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Kop 2",
+      "description": "Middelgrote sectiekop.",
+      "placeholder": "Kop 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Toggle kop 2",
+      "description": "Middelgrote kop die geneste inhoud kan verbergen.",
+      "placeholder": "Toggle kop 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Kop 3",
+      "description": "Kleine sectiekop.",
+      "placeholder": "Kop 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Toggle kop 3",
+      "description": "Kleine kop die geneste inhoud kan verbergen.",
+      "placeholder": "Toggle kop 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Kop 4",
+      "description": "Compacte sectiekop.",
+      "placeholder": "Kop 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Toggle kop 4",
+      "description": "Compacte kop die geneste inhoud kan verbergen.",
+      "placeholder": "Toggle kop 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Takenlijst",
+      "description": "Taken bijhouden met een checkbox.",
+      "placeholder": "Taak"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Opsommingslijst",
+      "description": "Maak een eenvoudige lijst met opsommingstekens.",
+      "placeholder": "Lijst"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Genummerde lijst",
+      "description": "Maak een genummerde lijst.",
+      "placeholder": "Lijst"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
+      "label": "Toggle lijst",
+      "description": "Toggles kunnen inhoud verbergen en tonen.",
       "placeholder": "Toggle"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citaat",
+      "description": "Leg een citaat vast.",
+      "placeholder": "Leeg citaat"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Uitgelicht",
+      "description": "Laat tekst opvallen.",
+      "placeholder": "Typ iets..."
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Scheidingslijn",
+      "description": "Blokken visueel scheiden."
     },
     "code": {
       "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "description": "Leg een codefragment vast.",
+      "placeholder": "Schrijf code of plak een fragment…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Vergelijking",
+      "description": "Wiskundige vergelijking weergeven."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Inhoudsopgave",
+      "description": "Toon links naar koppen in deze pagina."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Gesynchroniseerd blok",
+      "description": "Hergebruik inhoud over pagina's."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Knop",
+      "description": "Voeg herbruikbare inhoud in met één klik."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Tabbladen",
+      "description": "Groepeer inhoud in gelabelde tabbladen.",
+      "placeholder": "Tabbladen"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Kruimelpad",
+      "description": "Toon de locatie van deze pagina."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Dupliceer",
+      "description": "Maak een exacte kopie van dit blok."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Verplaatsen naar",
+      "description": "Verplaats dit blok naar een andere pagina."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Verwijder dit blok."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Omzetten",
+      "description": "Wijzig het type van dit blok."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Kleur",
+      "description": "Wijzig de tekst- of achtergrondkleur van dit blok."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabel",
+      "description": "Voeg een eenvoudige tabel toe aan deze pagina."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 kolommen",
+      "description": "Plaats blokken naast elkaar."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 kolommen",
+      "description": "Plaats blokken in drie kolommen."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 kolommen",
+      "description": "Plaats blokken in vier kolommen."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 kolommen",
+      "description": "Plaats blokken in vijf kolommen."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Afbeelding",
+      "description": "Upload of plaats via link."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Embed een video met een link."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Audio insluiten via een link."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Webkoppeling",
+      "description": "Webkoppeling opslaan als kaart."
     },
     "embed": {
       "label": "Embed",
-      "description": "Embed content from a link."
+      "description": "Inhoud van een link insluiten."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Bestand",
+      "description": "Voeg een bestandslink toe aan deze pagina."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Database - Volledige pagina",
+      "description": "Voeg een nieuwe database toe als subpagina."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabel - Volledige pagina",
+      "description": "Voeg een tabeldatabase op volledige pagina toe."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Bord - Volledige pagina",
+      "description": "Voeg een kanban-bord op volledige pagina toe."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Lijst - Volledige pagina",
+      "description": "Voeg een lijstdatabase op volledige pagina toe."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Tijdlijn - Volledige pagina",
+      "description": "Voeg een tijdlijn database op volledige pagina toe."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalender - Volledige pagina",
+      "description": "Voeg een kalenderdatabase op volledige pagina toe."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galerij - Volledige pagina",
+      "description": "Voeg een galerijdatabase op volledige pagina toe."
     },
     "inline_database": {
       "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "description": "Voeg een database toe op deze pagina."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Tabelweergave",
+      "description": "Voeg een inline database als tabel toe."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Bordweergave",
+      "description": "Voeg een inline kanbanbord toe."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Lijstweergave",
+      "description": "Voeg een inline database als lijst toe."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Tijdlijnweergave",
+      "description": "Voeg een inline databasetijdlijn toe."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Kalenderweergave",
+      "description": "Voeg een inline kalenderdatabase toe."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Galerijweergave",
+      "description": "Voeg een inline databasegalerij toe."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Standaard",
+      "description": "Verwijder tekst- of achtergrondkleur van dit blok."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Grijs",
+      "description": "Pas grijs toe op dit blok."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Bruin",
+      "description": "Pas bruin toe op dit blok."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Oranje",
+      "description": "Pas oranje toe op dit blok."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Geel",
+      "description": "Geel toepassen op dit blok."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Groen",
+      "description": "Pas groen toe op dit blok."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Blauw",
+      "description": "Pas blauw toe op dit blok."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Paars",
+      "description": "Paars toepassen op dit blok."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Roze",
+      "description": "Roze toepassen op dit blok."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Rood",
+      "description": "Rood toepassen op dit blok."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Grijze achtergrond",
+      "description": "Pas grijze achtergrond toe op dit blok."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Bruine achtergrond",
+      "description": "Pas een bruine achtergrond toe op dit blok."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Oranje achtergrond",
+      "description": "Pas oranje achtergrond toe op dit blok."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Gele achtergrond",
+      "description": "Gele achtergrond toepassen op dit blok."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Groene achtergrond",
+      "description": "Pas groene achtergrond toe op dit blok."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Blauwe achtergrond",
+      "description": "Pas een blauwe achtergrond toe op dit blok."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Paarse achtergrond",
+      "description": "Paarse achtergrond toepassen op dit blok."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Roze achtergrond",
+      "description": "Pas roze achtergrond toe op dit blok."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Rode achtergrond",
+      "description": "Rode achtergrond toepassen op dit blok."
     }
   }
 }

@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ከመስመር ውጭ",
+  "offlinePending_one": "ከመስመር ውጭ · {{count}} ለውጥ በመጠበቅ ላይ",
+  "offlinePending_other": "ከመስመር ውጭ · {{count}} ለውጦች በመጠበቅ ላይ",
+  "syncing": "ማመሳሰል · {{count}}",
+  "unreachable": "አገልጋዩ ላይ መድረስ አልተቻለም",
+  "unreachablePending_one": "አገልጋዩ ላይ መድረስ አልተቻለም · {{count}} ለውጥ በመጠባበቅ ላይ",
+  "unreachablePending_other": "አገልጋዩ ላይ መድረስ አልተቻለም · {{count}} ለውጦች በመጠባበቅ ላይ",
+  "retryHint": "አሁን እንደገና ለመሞከር ጠቅ ያድርጉ"
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Zatvori birač ikona",
+    "label": "Odaberi ikonu"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Vrsta ikone",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Slika"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Ukloni",
+    "ariaLabel": "Ukloni ikonu"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtriraj…",
+    "searchLabel": "Pretraži ikone",
+    "random": "Slučajno",
+    "randomLabel": "Odaberi slučajnu ikonu",
+    "recentLabel": "Nedavno korišteno prvo",
+    "gridLabelRecent": "Ikone, nedavno korištene prve",
+    "gridLabel": "Ikone",
+    "optionLabel": "Odaberi ikonu {{emoji}}",
+    "noResults": "Nema ikona koje odgovaraju “{{query}}”. Pokušaj s drugom riječi ili ukloni filtar."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Slika",
+    "linkPlaceholder": "Zalijepi poveznicu slike",
+    "linkLabel": "Poveznica slike ikone",
+    "apply": "Primijeni",
+    "upload": "Prenesi datoteku",
+    "uploading": "Prijenos...",
+    "uploadingLabel": "Prijenos {{fileName}}",
+    "uploadFailed": "Nije moguće prenijeti tu sliku.",
+    "fallbackFileName": "Slika ikone"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Priprema prijenosa",
+    "finalizing": "Završavanje",
+    "complete": "Završeno",
+    "uploading": "Prijenos"
   }
 }

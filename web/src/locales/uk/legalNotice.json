@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Юридична інформація та джерела",
+  "noWarranty": "Надається без гарантії.",
+  "sourceCode": "Джерело",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Виняток 2.0"
 }

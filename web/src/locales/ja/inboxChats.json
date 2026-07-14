@@ -1,10 +1,10 @@
 {
-  "empty": "まだ会話がありません。ページにコメントするか、誰かをメンションして会話を始めましょう。",
+  "empty": "まだ会話はありません。ページにコメントするか、誰かをメンションして開始してください。",
   "leave": "退出",
-  "leaveAria": "{{title}} の会話から退出",
-  "open": "{{title}} の会話を開く",
-  "participants_one": "{{count}} 人の参加者",
-  "participants_other": "{{count}} 人の参加者",
+  "leaveAria": "{{title}}の会話から退出する",
+  "open": "{{title}}の会話を開く",
+  "participants_one": "参加者{{count}}人",
+  "participants_other": "参加者{{count}}人",
   "untitled": "無題",
   "loading": "会話を読み込み中…"
 }

@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "ಕವರ್ ಬದಲಾಯಿಸಿ",
+    "reposition": "ಮರುಸ್ಥಾನಿಸಿ",
+    "remove": "ತೆಗೆದುಹಾಕಿ",
+    "uploadFile": "ಫೈಲ್ ಅಪ್ಲೋಡ್",
+    "uploading": "ಅಪ್ಲೋಡ್ ಮಾಡುತ್ತಿದೆ...",
+    "submit": "ಸಲ್ಲಿಸಿ",
+    "savePosition": "ಸ್ಥಾನ ಉಳಿಸಿ"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "ಗ್ಯಾಲರಿ",
+    "upload": "ಅಪ್ಲೋಡ್",
+    "link": "ಲಿಂಕ್"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "ಚಿತ್ರ ಲಿಂಕ್ ಅಂಟಿಸಿ",
+    "invalid": "http ಅಥವಾ https ಚಿತ್ರ ಲಿಂಕ್ ಅಂಟಿಸಿ."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "ಆ ಚಿತ್ರವನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
+    "defaultFileName": "ಕವರ್ ಚಿತ್ರ"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "ಸ್ಥಾನ ಬದಲಾಯಿಸಲು ಚಿತ್ರವನ್ನು ಎಳೆಯಿರಿ"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "ಅಪ್ಲೋಡ್ ಸಿದ್ಧಪಡಿಸುತ್ತಿದೆ",
+    "finalizing": "ಅಂತಿಮಗೊಳಿಸುತ್ತಿದೆ",
+    "complete": "ಪೂರ್ಣ",
+    "uploading": "ಅಪ್ಲೋಡ್ ಮಾಡುತ್ತಿದೆ"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "ಕವರ್ ತೆಗೆದುಹಾಕಲಾಗಿದೆ",
+    "restored": "ಕವರ್ ಪುನಃಸ್ಥಾಪಿಸಲಾಗಿದೆ",
+    "undo": "ಹಿಂತೆಗೆ"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "ಪುಟ ಕವರ್",
+    "coverVerticalPosition": "ಕವರ್ ಲಂಬ ಸ್ಥಾನ",
+    "positionFromTop": "ಮೇಲಿನಿಂದ {{position}}%",
+    "closeCoverMenu": "ಕವರ್ ಮೆನು ಮುಚ್ಚಿ",
+    "changePageCover": "ಪುಟ ಕವರ್ ಬದಲಾಯಿಸಿ",
+    "repositionPageCover": "ಪುಟ ಕವರ್ ಮರುಸ್ಥಾನಿಸಿ",
+    "removePageCover": "ಪುಟ ಕವರ್ ತೆಗೆದುಹಾಕಿ",
+    "changeCoverDialog": "ಕವರ್ ಬದಲಾಯಿಸಿ",
+    "coverSource": "ಕವರ್ ಮೂಲ",
+    "selectCover": "ಕವರ್ {{number}} ಆಯ್ಕೆಮಾಡಿ",
+    "uploadFromDevice": "ಈ ಸಾಧನದಿಂದ ಕವರ್ ಚಿತ್ರ ಅಪ್ಲೋಡ್ ಮಾಡಿ",
+    "uploadingFile": "{{fileName}} ಅಪ್ಲೋಡ್ ಮಾಡುತ್ತಿದೆ",
+    "coverImageLink": "ಕವರ್ ಚಿತ್ರ ಲಿಂಕ್"
   }
 }

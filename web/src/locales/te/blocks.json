@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "టెక్స్ట్",
+      "description": "సాదా టెక్స్ట్‌తో రాయడం ప్రారంభించండి.",
+      "placeholder": "ఆదేశాల కోసం '/' టైప్ చేయండి"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "పేజీ",
+      "description": "ఈ పేజీలో ఉప-పేజీని సృష్టించండి."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "పేజీ లింక్",
+      "description": "ఇప్పటికే ఉన్న పేజీకి లింక్ చేయండి."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "శీర్షిక 1",
+      "description": "పెద్ద సెక్షన్ శీర్షిక.",
+      "placeholder": "శీర్షిక 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "టోగుల్ శీర్షిక 1",
+      "description": "నెస్టెడ్ కంటెంట్‌ను దాచగల పెద్ద శీర్షిక.",
+      "placeholder": "టోగుల్ శీర్షిక 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "శీర్షిక 2",
+      "description": "మధ్యస్థ సెక్షన్ శీర్షిక.",
+      "placeholder": "శీర్షిక 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "టోగుల్ శీర్షిక 2",
+      "description": "నెస్టెడ్ కంటెంట్ను దాచగల మీడియం శీర్షిక.",
+      "placeholder": "టోగుల్ శీర్షిక 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "శీర్షిక 3",
+      "description": "చిన్న సెక్షన్ శీర్షిక.",
+      "placeholder": "శీర్షిక 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "టోగుల్ శీర్షిక 3",
+      "description": "నెస్టెడ్ కంటెంట్ను దాచగల చిన్న శీర్షిక.",
+      "placeholder": "టోగుల్ శీర్షిక 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "శీర్షిక 4",
+      "description": "కాంపాక్ట్ సెక్షన్ శీర్షిక.",
+      "placeholder": "శీర్షిక 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "టోగుల్ శీర్షిక 4",
+      "description": "నెస్టెడ్ కంటెంట్‌ను దాచగల సంక్షిప్త శీర్షిక.",
+      "placeholder": "టోగుల్ శీర్షిక 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "టు-డూ జాబితా",
+      "description": "చెక్బాక్స్‌తో పనులను ట్రాక్ చేయండి.",
+      "placeholder": "టు-డూ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "బుల్లెట్ జాబితా",
+      "description": "సాధారణ బుల్లెట్ జాబితా సృష్టించు",
+      "placeholder": "జాబితా"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "సంఖ్యా జాబితా",
+      "description": "సంఖ్యలతో జాబితా సృష్టించండి.",
+      "placeholder": "జాబితా"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "టోగుల్ జాబితా",
+      "description": "టోగుల్‌లు కంటెంట్‌ను దాచి చూపించగలవు.",
+      "placeholder": "టోగుల్"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "కోట్",
+      "description": "కోట్‌ను సంగ్రహించండి.",
+      "placeholder": "ఖాళీ కోట్"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "కాల్‌అవుట్",
+      "description": "రచనను ప్రముఖం చేయి",
+      "placeholder": "ఏదైనా టైప్ చేయండి…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "విభజకం",
+      "description": "బ్లాక్లను దృశ్యపరంగా విభజించండి."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "కోడ్",
+      "description": "కోడ్ స్నిపెట్ను సంగ్రహించండి.",
+      "placeholder": "కోడ్ రాయండి లేదా స్నిపెట్ను అతికించండి…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "సమీకరణం",
+      "description": "గణిత సమీకరణాన్ని ప్రదర్శించండి."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "విషయ సూచిక",
+      "description": "ఈ పేజీలోని శీర్షికలకు లింక్లను చూపించు."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "సింక్ చేయబడిన బ్లాక్",
+      "description": "పేజీల మధ్య కంటెంట్ను పునర్వినియోగించండి."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "బటన్",
+      "description": "ఒక క్లిక్‌లో రీయూజబుల్ కంటెంట్ చేర్చు"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ట్యాబ్స్",
+      "description": "కంటెంట్ను లేబుల్ చేసిన ట్యాబ్లుగా సమూహపరచండి.",
+      "placeholder": "ట్యాబ్స్"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "బ్రెడ్‌క్రంబ్",
+      "description": "ఈ పేజీ స్థానం చూపించు"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "నకలు",
+      "description": "ఈ బ్లాక్ యొక్క ఖచ్చితమైన ప్రతిని సృష్టించండి."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "తరలించు",
+      "description": "ఈ బ్లాక్ను మరొక పేజీకి తరలించు"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ఈ బ్లాక్‌ను తొలగించండి."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "మార్చు",
+      "description": "ఈ బ్లాక్ రకాన్ని మార్చు"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "రంగు",
+      "description": "ఈ బ్లాక్ యొక్క టెక్స్ట్ లేదా బ్యాక్‌గ్రౌండ్ రంగును మార్చండి."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "పట్టిక",
+      "description": "ఈ పేజీకి సాధారణ పట్టికను జోడించండి."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 నిలువు వరుసలు",
+      "description": "బ్లాక్లను పక్కపక్కన ఉంచండి."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 నిలువు వరుసలు",
+      "description": "బ్లాక్లను మూడు నిలువు వరుసలలో అమర్చండి."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 నిలువు వరుసలు",
+      "description": "బ్లాక్లను నాలుగు నిలువు వరుసలలో అమర్చండి."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 నిలువు వరుసలు",
+      "description": "బ్లాక్లను ఐదు నిలువు వరుసలలో అమర్చండి."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "చిత్రం",
+      "description": "అప్‌లోడ్ చేయండి లేదా లింక్‌తో ఎంబెడ్ చేయండి."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "వీడియో",
+      "description": "లింక్‌తో వీడియోను ఎంబెడ్ చేయండి."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ఆడియో",
+      "description": "లింక్‌తో ఆడియోను ఎంబెడ్ చేయి"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "వెబ్ బుక్‌మార్క్",
+      "description": "వెబ్ లింక్ను కార్డ్గా సేవ్ చేయి"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ఎంబెడ్",
+      "description": "లింక్ నుండి కంటెంట్‌ను ఎంబెడ్ చేయండి."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ఫైల్",
+      "description": "ఈ పేజీకి ఫైల్ లింక్ జోడించండి."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "డేటాబేస్ - పూర్తి పేజీ",
+      "description": "కొత్త డేటాబేస్ను ఉప-పేజీగా జోడించండి."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "పట్టిక - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ డేటాబేస్ను పట్టికగా జోడించు"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "బోర్డు - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ కాన్బన్ బోర్డు జోడించు"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "జాబితా - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ డేటాబేస్ను జాబితాగా జోడించు"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "టైమ్‌లైన్ - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ డేటాబేస్ టైమ్‌లైన్ జోడించు"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "క్యాలెండర్ - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ క్యాలెండర్ డేటాబేస్ జోడించు"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "గ్యాలరీ - పూర్తి పేజీ",
+      "description": "పూర్తి పేజీ డేటాబేస్ గ్యాలరీ జోడించు"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "డేటాబేస్ - ఇన్‌లైన్",
+      "description": "ఈ పేజీ లోపల డేటాబేస్ జోడించండి."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "టేబుల్ వీక్షణ",
+      "description": "ఇన్‌లైన్ డేటాబేస్ ను టేబుల్‌గా జోడించండి."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "బోర్డు వీక్షణ",
+      "description": "ఇన్‌లైన్ కాన్బన్ బోర్డును జోడించండి."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "జాబితా వీక్షణ",
+      "description": "ఇన్‌లైన్ డేటాబేస్ ను జాబితాగా జోడించండి."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "టైమ్‌లైన్ వీక్షణ",
+      "description": "ఇన్‌లైన్ డేటాబేస్ టైమ్‌లైన్ జోడించండి."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "క్యాలెండర్ వీక్షణ",
+      "description": "ఇన్‌లైన్ క్యాలెండర్ డేటాబేస్ జోడించండి."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "గ్యాలరీ వీక్షణ",
+      "description": "ఇన్‌లైన్ డేటాబేస్ గ్యాలరీ జోడించండి."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "డిఫాల్ట్",
+      "description": "ఈ బ్లాక్ నుండి వచ్చు లేదా నేపథ్య రంగును తొలగించండి."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "గ్రే",
+      "description": "ఈ బ్లాక్‌కు గ్రే వర్తించండి."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "గోధుమ",
+      "description": "ఈ బ్లాక్కు గోధుమ వర్తించండి."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "నారింజ",
+      "description": "ఈ బ్లాక్‌కు నారింజ వర్తించండి."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "పసుపు",
+      "description": "ఈ బ్లాక్‌కు పసుపు రంగును వర్తించండి."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "ఆకుపచ్చ",
+      "description": "ఈ బ్లాక్‌కు ఆకుపచ్చ వర్తించండి."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "నీలం",
+      "description": "ఈ బ్లాక్కు నీలం వర్తించండి."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ఊదా",
+      "description": "ఈ బ్లాక్‌కు ఊదా రంగును వర్తించండి."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "గులాబీ",
+      "description": "ఈ బ్లాక్‌కు గులాబీ రంగును వర్తించండి."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ఎరుపు",
+      "description": "ఈ బ్లాక్‌కు ఎరుపు రంగును వర్తించండి."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "గ్రే నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు గ్రే నేపథ్యం వర్తించండి."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "గోధుమ నేపథ్యం",
+      "description": "ఈ బ్లాక్కు గోధుమ నేపథ్యాన్ని వర్తించండి."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "నారింజ నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు నారింజ నేపథ్యం వర్తించండి."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "పసుపు నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు పసుపు నేపథ్యాన్ని వర్తించండి."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "ఆకుపచ్చ నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు ఆకుపచ్చ నేపథ్యం వర్తించండి."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "నీలం నేపథ్యం",
+      "description": "ఈ బ్లాక్కు నీలం నేపథ్యాన్ని వర్తించండి."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ఊదా నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు ఊదా నేపథ్యాన్ని వర్తించండి."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "గులాబీ నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు గులాబీ నేపథ్యం వర్తించండి."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ఎరుపు నేపథ్యం",
+      "description": "ఈ బ్లాక్‌కు ఎరుపు నేపథ్యాన్ని వర్తించండి."
     }
   }
 }

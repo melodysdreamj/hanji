@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Пікірлер",
+  "closeAria": "Түсініктемелерді жабу",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Блок талқылауы",
+    "page": "Бет талқылауы"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Пікір күйі",
+    "open": "Ашық",
+    "resolved": "Шешілді"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Түсініктеме берілетін",
+    "commentingOnSelectedText": "Таңдалған мәтінге түсініктеме",
+    "selectedBlock": "Таңдалған блок",
+    "onSelectedText": "Таңдалған мәтінде",
+    "onSelectedBlock": "Таңдалған блокта",
+    "onABlock": "Блокта"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Блок түсініктемесін қосу",
+    "addPageComment": "Парақ түсініктемесін қосу",
+    "blockPlaceholder": "Блокқа түсініктеме...",
+    "pagePlaceholder": "Түсініктеме қосу...",
+    "submit": "Түсініктеме беру"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Пікірде атап өту адамдары",
+    "replyPeopleAria": "Жауапта атап өту адамдары",
+    "trigger": "Адамдарды атап өту",
+    "noMatches": "Сәйкес адамдар жоқ",
+    "title": "{{name}} атап өту",
+    "person": "Адам",
+    "you": "Мен",
+    "organizationPerson": "Ұйым адамы",
+    "roleInOrganization": "Ұйымдағы {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Пікір талқылаулары",
+    "empty": "Әлі пікірлер жоқ",
+    "noOpen": "Ашық пікірлер жоқ",
+    "noResolved": "Шешілген пікірлер жоқ"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} түсініктемесі, {{time}}",
+    "commentAriaResolved": "{{author}} түсініктемесі, {{time}}, шешілген",
+    "replyAria": "{{author}} жауабы, {{time}}",
+    "repliesAria": "{{count}} жауап",
+    "edited": "(өңделген)",
+    "emptyComment": "(бос түсініктеме)",
+    "emptyReply": "(бос жауап)",
+    "justNow": "Жаңа ғана"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Жауап",
+    "showInPage": "Парақта көрсету",
+    "resolve": "Шешу",
+    "reopen": "Қайта ашу",
+    "edit": "Өңдеу"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Жауап жазыңыз..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Пікірді өңдеу"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Осы түсініктемені жою?",
+    "threadConfirm_one": "Бұл пікірді және оның жауабын жою керек пе?",
+    "threadConfirm_other": "Бұл пікірді және оның {{count}} жауабын жою керек пе?"
   }
 }

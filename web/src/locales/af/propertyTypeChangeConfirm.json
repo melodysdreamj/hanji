@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Eienskaptipe verander?",
+  "message": "\"{{propName}}\" het reeds waardes. Om die tipe na {{typeLabel}} te verander, kan bestaande waardes anders vertoon of verloor.",
+  "cancelAria": "Kanselleer eienskaptipe verandering",
+  "confirm": "Verander tipe"
 }

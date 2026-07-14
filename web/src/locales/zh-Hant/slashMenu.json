@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "區塊指令",
+  "closeBlockCommands": "關閉區塊指令",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "基本區塊",
+    "Media": "媒體",
+    "Database": "資料庫",
+    "Advanced": "進階區塊"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}，第{{position}}項，共{{total}}項。按 Enter 插入。",
+  "listStatus": "可使用 {{total}} 個區塊指令。",
+  "noBlocks": "找不到區塊",
+  "noBlocksFor": "找不到與「{{query}}」相符的區塊",
+  "recentlyUsed": "最近使用"
 }

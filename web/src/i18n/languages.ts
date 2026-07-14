@@ -1,8 +1,6 @@
-// Display metadata for languages that are ready to select in the product.
-// Translation targets that still fall back almost entirely to English keep
-// their catalogs under src/locales/, but are intentionally not exposed here.
-// `value` matches the folder/wrapper name and `label` is the endonym shown to
-// the user. Order follows docs/i18n-languages.md priority waves.
+// Display metadata for every released product language. `value` matches the
+// folder/wrapper name and `label` is the endonym shown to the user. Keep this
+// list aligned with docs/i18n-languages.md and the account-state allow-list.
 
 export interface LanguageOption {
   value: string;
@@ -14,8 +12,58 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
   { value: "en", label: "English" },
   { value: "ja", label: "日本語" },
   { value: "zh-Hans", label: "简体中文" },
+  { value: "zh-Hant", label: "繁體中文" },
   { value: "es", label: "Español" },
   { value: "fr", label: "Français" },
   { value: "de", label: "Deutsch" },
   { value: "pt-BR", label: "Português (Brasil)" },
+  { value: "pt-PT", label: "Português (Portugal)" },
+  { value: "it", label: "Italiano" },
+  { value: "nl", label: "Nederlands" },
+  { value: "sv", label: "Svenska" },
+  { value: "da", label: "Dansk" },
+  { value: "nb", label: "Norsk" },
+  { value: "fi", label: "Suomi" },
+  { value: "pl", label: "Polski" },
+  { value: "cs", label: "Čeština" },
+  { value: "sk", label: "Slovenčina" },
+  { value: "hu", label: "Magyar" },
+  { value: "ro", label: "Română" },
+  { value: "el", label: "Ελληνικά" },
+  { value: "hr", label: "Hrvatski" },
+  { value: "sr", label: "Српски" },
+  { value: "sl", label: "Slovenščina" },
+  { value: "bg", label: "Български" },
+  { value: "uk", label: "Українська" },
+  { value: "ru", label: "Русский" },
+  { value: "ar", label: "العربية" },
+  { value: "he", label: "עברית" },
+  { value: "fa", label: "فارسی" },
+  { value: "ur", label: "اردو" },
+  { value: "hi", label: "हिन्दी" },
+  { value: "bn", label: "বাংলা" },
+  { value: "ta", label: "தமிழ்" },
+  { value: "te", label: "తెలుగు" },
+  { value: "mr", label: "मराठी" },
+  { value: "gu", label: "ગુજરાતી" },
+  { value: "kn", label: "ಕನ್ನಡ" },
+  { value: "pa", label: "ਪੰਜਾਬੀ" },
+  { value: "ml", label: "മലയാളം" },
+  { value: "ne", label: "नेपाली" },
+  { value: "si", label: "සිංහල" },
+  { value: "vi", label: "Tiếng Việt" },
+  { value: "th", label: "ไทย" },
+  { value: "id", label: "Bahasa Indonesia" },
+  { value: "ms", label: "Bahasa Melayu" },
+  { value: "fil", label: "Filipino" },
+  { value: "my", label: "မြန်မာ" },
+  { value: "km", label: "ខ្មែរ" },
+  { value: "tr", label: "Türkçe" },
+  { value: "az", label: "Azərbaycanca" },
+  { value: "kk", label: "Қазақша" },
+  { value: "uz", label: "Oʻzbekcha" },
+  { value: "sw", label: "Kiswahili" },
+  { value: "am", label: "አማርኛ" },
+  { value: "af", label: "Afrikaans" },
+  { value: "ha", label: "Hausa" },
 ];

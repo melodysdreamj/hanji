@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "ပရော့ပါတီအမျိုးအစား ပြောင်းမလား။",
+  "message": "\"{{propName}}\" တွင် တန်ဖိုးများရှိပြီးသားဖြစ်သည်။ ၎င်းကို {{typeLabel}} အမျိုးအစားသို့ ပြောင်းလဲပါက ရှိပြီးသားတန်ဖိုးများကို ကွဲပြားစွာပြသခြင်း သို့မဟုတ် ဆုံးရှုံးနိုင်သည်။",
+  "cancelAria": "ပစ္စည်းအမျိုးအစားပြောင်းလဲမှုကို ပယ်ဖျက်ရန်",
+  "confirm": "အမျိုးအစားပြောင်းရန်"
 }

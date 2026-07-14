@@ -44,7 +44,7 @@
     "restoredVersions": "{{count}} versions restaurées",
     "versionCount_one": "{{count}} version",
     "versionCount_other": "{{count}} versions",
-    "versionsAgo": "il y a {{count}} versions",
+    "versionsAgo": "Il y a {{count}} versions",
     "versionsAhead": "{{count}} versions en avance",
     "versionsAria": "Versions"
   },
@@ -55,7 +55,7 @@
     "member": "Membre",
     "mention": "Mention",
     "reply": "Réponse",
-    "replyMention": "Mention de réponse",
+    "replyMention": "Mention en réponse",
     "shared": "Partagé",
     "system": "Système"
   },
@@ -64,16 +64,16 @@
     "emptyComment": "Commentaire vide",
     "forYou": "pour vous",
     "notification": "Notification",
-    "referenceMention": "A mentionné {{title}} · {{preview}}",
+    "referenceMention": "Mentionné {{title}} · {{preview}}",
     "referenceLink": "Lié à {{title}} · {{preview}}",
     "unreadDot": "Non lu",
     "workspaceUpdate": "Mise à jour de l'espace de travail"
   },
   "empty": {
-    "allCaughtUp": "Vous êtes à jour.",
-    "loadingUpdates": "Chargement des mises à jour…",
-    "noFilteredUpdatesYet": "Aucun {{filter}} pour le moment.",
-    "noPageHistoryYet": "Aucun historique de page pour le moment.",
-    "noUpdatesYet": "Aucune mise à jour pour le moment."
+    "allCaughtUp": "Tout est à jour.",
+    "loadingUpdates": "Chargement des mises à jour...",
+    "noFilteredUpdatesYet": "Pas encore de {{filter}}.",
+    "noPageHistoryYet": "Pas encore d'historique de page.",
+    "noUpdatesYet": "Pas encore de mises à jour."
   }
 }

@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Tsara rubutu"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Mai da",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Rubutu",
+      "heading1": "Taken 1",
+      "heading2": "Taken 2",
+      "heading3": "Taken 3",
+      "heading4": "Taken 4",
+      "toDoList": "Jerin ayyuka",
+      "bulletedList": "Jerin maki",
+      "numberedList": "Jerin lambobi",
+      "toggleList": "Jerin juyawa",
+      "quote": "Zance",
+      "callout": "Sanarwa",
+      "code": "Kodi"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Mai gwaɓi",
+    "italic": "Karkata",
+    "underline": "Jakkara",
+    "strikethrough": "Shuɗaɗɗe",
+    "code": "Kodo",
+    "link": "Haɗi"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Sharhi"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Launi na rubutu: {{color}}",
+    "title": "Launi: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Haɗe",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Launin rubutu",
+      "default": "Tsoho",
+      "gray": "Toka",
+      "brown": "Ruwan kasa",
+      "orange": "Lemu",
+      "yellow": "Rawayaa",
+      "green": "Kore",
+      "blue": "Shuɗi",
+      "purple": "Shuɗi ja",
+      "pink": "Hoda",
+      "red": "Ja"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Launin bango",
+      "gray": "Bango toka",
+      "brown": "Bango ruwan kasa",
+      "orange": "Bango lemu",
+      "yellow": "Bango rawaya",
+      "green": "Bango kore",
+      "blue": "Bango shuɗi",
+      "purple": "Bango ruwan shuɗi",
+      "pink": "Bango ruwan hoda",
+      "red": "Bango ja"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Gyara haɗi",
+    "placeholder": "Manna haɗi",
+    "urlAriaLabel": "URL haɗi",
+    "apply": "Haɗi",
+    "open": "Buɗe haɗi",
+    "copy": "Kwafa haɗi",
+    "copied": "An kwafa",
+    "copiedLink": "Haɗi an kwafa",
+    "remove": "Cire"
   }
 }

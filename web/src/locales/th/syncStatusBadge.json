@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ออฟไลน์",
+  "offlinePending_one": "ออฟไลน์ · รอการเปลี่ยนแปลง {{count}} รายการ",
+  "offlinePending_other": "ออฟไลน์ · รอการเปลี่ยนแปลง {{count}} รายการ",
+  "syncing": "กำลังซิงค์ · {{count}}",
+  "unreachable": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้",
+  "unreachablePending_one": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ · {{count}} การเปลี่ยนแปลงที่รอดำเนินการ",
+  "unreachablePending_other": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ · {{count}} การเปลี่ยนแปลงที่รอดำเนินการ",
+  "retryHint": "คลิกเพื่อลองอีกครั้งตอนนี้"
 }

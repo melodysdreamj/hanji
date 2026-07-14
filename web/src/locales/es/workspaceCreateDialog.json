@@ -1,22 +1,22 @@
 {
-  "title": "Nuevo espacio de trabajo",
+  "title": "Nuevo workspace",
   "name": {
     "label": "Nombre del espacio de trabajo",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Empezar desde",
+  "startLabel": "Comenzar desde",
   "options": {
     "blank": {
-      "title": "Espacio de trabajo en blanco",
-      "body": "Empezar vacío con las páginas iniciales."
+      "title": "Workspace vacío",
+      "body": "Empieza vacío con las páginas de inicio."
     },
     "notion": {
-      "title": "Importar de Notion",
-      "body": "Crear el espacio de trabajo y luego migrar un espacio de trabajo de Notion a él."
+      "title": "Importar desde Notion",
+      "body": "Crea el workspace, luego migra un workspace de Notion a él."
     },
     "hanji": {
-      "title": "Importar de otro Hanji",
-      "body": "Crear el espacio de trabajo y luego traer un espacio de trabajo desde otro servidor o archivo Hanji."
+      "title": "Importar desde otro Hanji",
+      "body": "Crea el workspace, luego importa un workspace desde otro servidor o archivo de Hanji."
     }
   },
   "create": "Crear espacio de trabajo",

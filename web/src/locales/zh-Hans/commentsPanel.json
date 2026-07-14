@@ -11,45 +11,45 @@
     "resolved": "已解决"
   },
   "anchor": {
-    "commentingOn": "正在评论",
-    "commentingOnSelectedText": "正在评论所选文本",
-    "selectedBlock": "所选块",
-    "onSelectedText": "关于所选文本",
-    "onSelectedBlock": "关于所选块",
-    "onABlock": "关于某个块"
+    "commentingOn": "评论于",
+    "commentingOnSelectedText": "评论选中文本",
+    "selectedBlock": "选中的块",
+    "onSelectedText": "在选中文本上",
+    "onSelectedBlock": "在选中块上",
+    "onABlock": "在某个块上"
   },
   "composer": {
     "addBlockComment": "添加块评论",
     "addPageComment": "添加页面评论",
-    "blockPlaceholder": "评论此块……",
-    "pagePlaceholder": "添加评论……",
+    "blockPlaceholder": "在此块上评论...",
+    "pagePlaceholder": "添加评论...",
     "submit": "评论"
   },
   "mention": {
-    "commentPeopleAria": "评论提及的人员",
-    "replyPeopleAria": "回复提及的人员",
+    "commentPeopleAria": "评论中提及的人",
+    "replyPeopleAria": "回复中提及的人",
     "trigger": "提及人员",
-    "noMatches": "没有匹配的人员",
+    "noMatches": "没有匹配的人",
     "title": "提及 {{name}}",
     "person": "人员",
     "you": "你",
-    "organizationPerson": "组织人员",
+    "organizationPerson": "组织成员",
     "roleInOrganization": "组织中的 {{role}}"
   },
   "list": {
-    "threadsAria": "评论主题",
+    "threadsAria": "评论线程",
     "empty": "暂无评论",
     "noOpen": "没有未解决的评论",
     "noResolved": "没有已解决的评论"
   },
   "card": {
-    "commentAria": "{{author}} 的评论，{{time}}",
-    "commentAriaResolved": "{{author}} 的评论，{{time}}，已解决",
-    "replyAria": "{{author}} 的回复，{{time}}",
+    "commentAria": "{{author}} 的评论, {{time}}",
+    "commentAriaResolved": "{{author}} 的评论, {{time}}, 已解决",
+    "replyAria": "{{author}} 的回复, {{time}}",
     "repliesAria": "{{count}} 条回复",
-    "edited": "（已编辑）",
-    "emptyComment": "（空评论）",
-    "emptyReply": "（空回复）",
+    "edited": "(已编辑)",
+    "emptyComment": "(空评论)",
+    "emptyReply": "(空回复)",
     "justNow": "刚刚"
   },
   "actions": {
@@ -60,7 +60,7 @@
     "edit": "编辑"
   },
   "reply": {
-    "placeholder": "回复……"
+    "placeholder": "回复..."
   },
   "edit": {
     "aria": "编辑评论"

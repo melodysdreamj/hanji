@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Sơ đồ Mermaid",
+  "emptyPreview": "Xem trước sơ đồ",
+  "sourceDescription": "Mã nguồn sơ đồ: {{source}}",
+  "syntaxError": "Sơ đồ có lỗi cú pháp.",
+  "syntaxErrorDetails": "Xem chi tiết"
 }

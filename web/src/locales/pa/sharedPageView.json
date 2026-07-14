@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "ਸਾਂਝਾ ਪੰਨਾ",
+  "loading": "ਸਾਂਝਾ ਪੰਨਾ ਲੋਡ ਹੋ ਰਿਹਾ",
+  "unavailable": "ਇਹ ਸਾਂਝਾ ਪੰਨਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।",
+  "notFound": "ਸਾਂਝਾ ਪੰਨਾ ਨਹੀਂ ਮਿਲਿਆ।",
+  "outsideShare": "ਇਹ ਪੰਨਾ ਇਸ ਜਨਤਕ ਸਾਂਝ ਦਾ ਹਿੱਸਾ ਨਹੀਂ ਹੈ।",
+  "errors": {
+    "not-found": "ਇਹ ਲਿੰਕ ਮਿਆਦ ਪੁੱਗ ਗਿਆ, ਅਣਪ੍ਰਕਾਸ਼ਿਤ, ਜਾਂ ਗਲਤ ਕਾਪੀ ਕੀਤਾ ਗਿਆ ਹੋ ਸਕਦਾ ਹੈ।",
+    "offline": "ਆਪਣਾ ਕੁਨੈਕਸ਼ਨ ਚੈੱਕ ਕਰੋ, ਫਿਰ ਸਾਂਝੇ ਪੰਨੇ ਨੂੰ ਦੁਬਾਰਾ ਖੋਲ੍ਹੋ।",
+    "rate-limited": "ਇਹ ਸਾਂਝਾ ਪੰਨਾ ਬਹੁਤ ਜ਼ਿਆਦਾ ਬੇਨਤੀਆਂ ਪ੍ਰਾਪਤ ਕਰ ਰਿਹਾ ਹੈ। ਕੁਝ ਪਲਾਂ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+    "unavailable": "Hanji ਇਸ ਸਾਂਝੇ ਪੰਨੇ ਨੂੰ ਹੁਣ ਨਹੀਂ ਖੋਲ੍ਹ ਸਕਦਾ। ਕੁਝ ਪਲਾਂ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+  },
+  "tryAgain": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ"
 }

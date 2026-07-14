@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "අයිකන තෝරනය වසන්න",
+    "label": "අයිකනයක් තෝරන්න"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "අයිකන වර්ගය",
+    "emoji": "ඉමෝජි",
+    "image": "රූපය"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ඉවත් කරන්න",
+    "ariaLabel": "අයිකනය ඉවත් කරන්න"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "පෙරහන්…",
+    "searchLabel": "අයිකන සොයන්න",
+    "random": "අහඹු",
+    "randomLabel": "අහඹු අයිකනයක් තෝරන්න",
+    "recentLabel": "මෑතකදී භාවිතා කළ පළමුව",
+    "gridLabelRecent": "මෑතකදී භාවිත කළ අයිකන පළමුව",
+    "gridLabel": "අයිකන",
+    "optionLabel": "{{emoji}} අයිකනය තෝරන්න",
+    "noResults": "“{{query}}” සඳහා ගැලපෙන අයිකන නැත. වෙනත් වචනයක් උත්සාහ කරන්න හෝ පෙරහන ඉවත් කරන්න."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "රූපය",
+    "linkPlaceholder": "රූප සබැඳිය අලවන්න",
+    "linkLabel": "රූප අයිකන සබැඳිය",
+    "apply": "යොදන්න",
+    "upload": "ගොනුව උඩුගත කරන්න",
+    "uploading": "උඩුගත වෙමින්...",
+    "uploadingLabel": "{{fileName}} උඩුගත වෙමින්",
+    "uploadFailed": "එම රූපය උඩුගත කළ නොහැකි විය.",
+    "fallbackFileName": "අයිකන රූපය"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "උඩුගත කිරීම සූදානම් කරමින්",
+    "finalizing": "අවසන් කරමින්",
+    "complete": "සම්පූර්ණයි",
+    "uploading": "උඩුගත කරමින්"
   }
 }

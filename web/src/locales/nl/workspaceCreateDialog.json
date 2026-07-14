@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Nieuwe werkruimte",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Werkruimtenaam",
+    "placeholder": "Uw bedrijf"
   },
-  "startLabel": "Start from",
+  "startLabel": "Starten vanuit",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Lege werkruimte",
+      "body": "Begin leeg met de startpagina's."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Importeren van Notion",
+      "body": "Maak de werkruimte aan en migreer er een Notion-werkruimte naar."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Importeren van een andere Hanji",
+      "body": "Maak de werkruimte aan en importeer daarna een werkruimte van een andere Hanji-server of bestand."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Werkruimte maken",
+  "creating": "Aanmaken…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Kan werkruimte niet aanmaken."
   }
 }

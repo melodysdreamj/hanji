@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Izohlar",
+  "closeAria": "Izohlarni yopish",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Blok muhokamasi",
+    "page": "Sahifa muhokamasi"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Izoh holati",
+    "open": "Ochiq",
+    "resolved": "Yechilgan"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Izoh berilmoqda",
+    "commentingOnSelectedText": "Tanlangan matnga izoh berilmoqda",
+    "selectedBlock": "Tanlangan blok",
+    "onSelectedText": "Tanlangan matnda",
+    "onSelectedBlock": "Tanlangan blokda",
+    "onABlock": "Blokda"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Blok izohi qo'shish",
+    "addPageComment": "Sahifa izohi qo'shish",
+    "blockPlaceholder": "Bu blokka izoh qoldiring...",
+    "pagePlaceholder": "Izoh qo'shing...",
+    "submit": "Izoh"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Izohda eslatiladigan odamlar",
+    "replyPeopleAria": "Javobda eslatiladigan odamlar",
+    "trigger": "Odamlarni eslatish",
+    "noMatches": "Mos keladigan odam yo‘q",
+    "title": "{{name}}ni eslatish",
+    "person": "Odam",
+    "you": "Siz",
+    "organizationPerson": "Tashkilot a'zosi",
+    "roleInOrganization": "Tashkilotdagi {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Izohlar mavzulari",
+    "empty": "Hali izohlar yo‘q",
+    "noOpen": "Ochiq izohlar yo‘q",
+    "noResolved": "Yechilgan izohlar yo‘q"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} izohi, {{time}}",
+    "commentAriaResolved": "{{author}} izohi, {{time}}, hal qilindi",
+    "replyAria": "{{author}} javobi, {{time}}",
+    "repliesAria": "{{count}} javob",
+    "edited": "(tahrirlangan)",
+    "emptyComment": "(bo'sh izoh)",
+    "emptyReply": "(bo'sh javob)",
+    "justNow": "Hozirgina"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Javob",
+    "showInPage": "Sahifada ko'rsatish",
+    "resolve": "Hal qilish",
+    "reopen": "Qayta ochish",
+    "edit": "Tahrirlash"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Javob..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Izohni tahrirlash"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Bu izohni o'chirasizmi?",
+    "threadConfirm_one": "Bu izoh va uning javobini o‘chirasizmi?",
+    "threadConfirm_other": "Bu izoh va uning {{count}} ta javobini o‘chirasizmi?"
   }
 }

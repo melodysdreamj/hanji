@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "శోధించు లేదా నేరుగా వెళ్ళు...",
+  "quickFind": "త్వరిత శోధన",
+  "closeSearch": "శోధన మూసివేయి",
+  "quickFindResults": "త్వరిత శోధన ఫలితాలు",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "ఇటీవల చూసినవి",
+    "recentSearches": "ఇటీవలి శోధనలు",
+    "pages": "పేజీలు",
+    "pageContent": "పేజీ విషయం",
+    "favorites": "ఇష్టమైనవి"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "పేజీలో",
+  "searchingDetail": "శోధిస్తోంది...",
+  "searchAgain": "మళ్ళీ శోధించు",
+  "searchingPageContent": "పేజీ విషయాలను శోధిస్తోంది...",
+  "noResultsFor": "\"{{query}}\"కు ఫలితాలు లేవు",
+  "noPagesFound": "పేజీలు కనుగొనబడలేదు",
+  "creating": "సృష్టిస్తోంది...",
+  "newPage": "కొత్త పేజీ \"{{query}}\"",
+  "couldntCreatePage": "పేజీని సృష్టించడంలో విఫలమైంది",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "ఎంచుకోండి",
+    "open": "తెరువు",
+    "newTab": "కొత్త ట్యాబ్"
   }
 }

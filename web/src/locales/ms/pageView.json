@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Tidak dapat memulihkan halaman",
+  "emptyBodyPrompt": "Tekan Enter untuk mula menulis pada halaman kosong ini.",
+  "inTrashTopBarTitle": "Dalam Tong Sampah",
+  "notFoundTopBarTitle": "Tidak dijumpai",
+  "openWorkspace": "Buka ruang kerja",
+  "pageInTrash": "Halaman ini berada dalam Tong Sampah.",
+  "pageInTrashDetail": "Pulihkannya sebelum membuka atau mengedit kandungannya.",
+  "pageUnavailable": "Halaman tidak tersedia.",
+  "pageUnavailableDetail": "Halaman ini mungkin telah dipadam, dipindahkan, atau dikongsi dengan akaun yang berbeza.",
+  "restorePage": "Pulihkan halaman",
+  "restoredPage": "Halaman dipulihkan",
+  "loadingPageContent": "Memuatkan kandungan halaman"
 }

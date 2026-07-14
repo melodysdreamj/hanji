@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Lệnh khối",
+  "closeBlockCommands": "Đóng lệnh khối",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Khối cơ bản",
+    "Media": "Phương tiện",
+    "Database": "Cơ sở dữ liệu",
+    "Advanced": "Khối nâng cao"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} trên {{total}}. Nhấn Enter để chèn.",
+  "listStatus": "{{total}} lệnh khối có sẵn.",
+  "noBlocks": "Không tìm thấy khối",
+  "noBlocksFor": "Không tìm thấy khối cho \"{{query}}\"",
+  "recentlyUsed": "Đã dùng gần đây"
 }

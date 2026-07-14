@@ -1,14 +1,14 @@
 {
+  "actions": {
+    "close": "Luk søg",
+    "next": "Næste match",
+    "previous": "Forrige match"
+  },
   "dialog": {
-    "label": "Find in page"
+    "label": "Find på siden"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
-  },
-  "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "label": "Find på siden",
+    "placeholder": "Find på siden"
   }
 }

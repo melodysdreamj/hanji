@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "စာမျက်နှာတွင် ရှာဖွေရန်"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "စာမျက်နှာတွင် ရှာဖွေရန်",
+    "placeholder": "စာမျက်နှာတွင် ရှာဖွေရန်"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ယခင် ကိုက်ညီမှု",
+    "next": "နောက်ထပ် ကိုက်ညီမှု",
+    "close": "ရှာဖွေပိတ်ရန်"
   }
 }

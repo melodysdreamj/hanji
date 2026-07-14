@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Неуспешно възстановяване на страница",
+  "emptyBodyPrompt": "Натиснете Enter, за да започнете да пишете на тази празна страница.",
+  "inTrashTopBarTitle": "В кошчето",
+  "notFoundTopBarTitle": "Не е намерена",
+  "openWorkspace": "Отворете работното пространство",
+  "pageInTrash": "Тази страница е в кошчето.",
+  "pageInTrashDetail": "Възстановете я, преди да отворите или редактирате съдържанието ѝ.",
+  "pageUnavailable": "Страницата не е налична.",
+  "pageUnavailableDetail": "Тази страница може да е изтрита, преместена или споделена с друг акаунт.",
+  "restorePage": "Възстановяване на страница",
+  "restoredPage": "Възстановена страница",
+  "loadingPageContent": "Зареждане на съдържанието на страницата"
 }

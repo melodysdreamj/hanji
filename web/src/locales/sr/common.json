@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Otkaži",
+    "save": "Sačuvaj",
+    "close": "Zatvori",
+    "search": "Pretraži",
+    "create": "Kreiraj",
+    "delete": "Izbriši",
+    "clearAll": "Obriši sve",
+    "done": "Gotovo",
+    "add": "Dodaj"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Bez naslova"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} kopija",
+    "columnName": "Kolona {{number}}",
+    "importedDatabase": "Uvezena baza",
+    "uploadedFile": "Otpremljen fajl",
+    "image": "Slika",
     "propertyNames": {
-      "name": "Name",
+      "name": "Naziv",
       "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "select": "Izbor",
+      "date": "Datum"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Nije započeto",
+      "doing": "U toku",
+      "done": "Završeno"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opcija 1",
+      "second": "Opcija 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tabela"
     }
   }
 }

@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "टिप्पणियाँ",
+  "closeAria": "टिप्पणियाँ बंद करें",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ब्लॉक चर्चा",
+    "page": "पेज चर्चा"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "टिप्पणी स्थिति",
+    "open": "खुला",
+    "resolved": "हल किया"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "टिप्पणी कर रहे हैं",
+    "commentingOnSelectedText": "चयनित पाठ पर टिप्पणी कर रहे हैं",
+    "selectedBlock": "चयनित ब्लॉक",
+    "onSelectedText": "चयनित पाठ पर",
+    "onSelectedBlock": "चयनित ब्लॉक पर",
+    "onABlock": "एक ब्लॉक पर"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ब्लॉक टिप्पणी जोड़ें",
+    "addPageComment": "पृष्ठ टिप्पणी जोड़ें",
+    "blockPlaceholder": "इस ब्लॉक पर टिप्पणी करें...",
+    "pagePlaceholder": "टिप्पणी जोड़ें...",
+    "submit": "टिप्पणी करें"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "टिप्पणी में उल्लेख के लिए लोग",
+    "replyPeopleAria": "जवाब में उल्लेख के लिए लोग",
+    "trigger": "लोगों को उल्लेख करें",
+    "noMatches": "कोई मेल खाने वाले लोग नहीं",
+    "title": "{{name}} को उल्लेख करें",
+    "person": "व्यक्ति",
+    "you": "आप",
+    "organizationPerson": "संगठन सदस्य",
+    "roleInOrganization": "संगठन में {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "टिप्पणी थ्रेड",
+    "empty": "अभी तक कोई टिप्पणी नहीं",
+    "noOpen": "कोई खुली टिप्पणी नहीं",
+    "noResolved": "कोई हल की गई टिप्पणी नहीं"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} की टिप्पणी, {{time}}",
+    "commentAriaResolved": "{{author}} की टिप्पणी, {{time}}, हल हो गई",
+    "replyAria": "{{author}} का उत्तर, {{time}}",
+    "repliesAria": "{{count}} उत्तर",
+    "edited": "(संपादित)",
+    "emptyComment": "(खाली टिप्पणी)",
+    "emptyReply": "(खाली उत्तर)",
+    "justNow": "अभी"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "उत्तर दें",
+    "showInPage": "पृष्ठ में दिखाएँ",
+    "resolve": "हल करें",
+    "reopen": "पुनः खोलें",
+    "edit": "संपादित"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "जवाब दें..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "टिप्पणी संपादित करें"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "इस टिप्पणी को हटाएँ?",
+    "threadConfirm_one": "इस टिप्पणी और इसके जवाब को हटाएं?",
+    "threadConfirm_other": "इस टिप्पणी और इसके {{count}} जवाबों को हटाएं?"
   }
 }

@@ -44,10 +44,14 @@ const languageOptionsPath = resolve(here, "..", "web", "src", "i18n", "languages
 const SOURCE = "en";
 const META = "_meta.json";
 const REQUIRED_COMPLETE_LANGUAGES = ["en", "ko"];
-// Languages that have been genuinely translated (not just English copies).
-// The UNTRANSLATED_COPY guard only fires for these; other languages are
-// infrastructure-ready but pending translation per docs/i18n-languages.md.
-const TRANSLATED_LANGUAGES = new Set(["ko", "ja", "zh-Hans", "es", "fr", "de", "pt-BR"]);
+// Every catalog currently present is released. New language scaffolds must not
+// be added as English copies: the UNTRANSLATED_COPY and selector-topology
+// guards require a real translated catalog and an explicit product option.
+const TRANSLATED_LANGUAGES = new Set(
+  readdirSync(localesDir).filter(
+    (name) => name !== SOURCE && statSync(join(localesDir, name)).isDirectory(),
+  ),
+);
 const SELECTABLE_LANGUAGES = new Set([SOURCE, ...TRANSLATED_LANGUAGES]);
 const INTENTIONAL_INTERPOLATION_VARIANTS = new Map([
   ["ko", new Set([

@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Say",
+    "sum": "Cəm",
+    "average": "Orta",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} qrafiki",
+  "chartType": "Qrafik növü",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Sütun",
+    "horizontal_bar": "Üfüqi sütun",
+    "line": "Xətt",
+    "donut": "Donat"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Seçildi",
+  "empty": "Boş",
+  "legend": "Qrafik izahı",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Məlumat yoxdur",
+  "noDataDesc": "Heç bir sətir cari filtrlərə və ya axtarışa uyğun gəlmir.",
+  "noGroupProperty": "Hələ qrafik yoxdur",
+  "noGroupPropertyDesc": "Bu qrafiki qruplaşdırmaq üçün seçim, status, şəxs, işarə qutusu və ya tarix xüsusiyyəti əlavə edin.",
+  "total": "Ümumi",
+  "unchecked": "Seçilməmiş",
+  "untitledProperty": "Adsız",
+  "valueProperty": "Dəyər xassəsi",
+  "xAxis": "X oxu",
+  "yAxis": "Y oxu"
 }

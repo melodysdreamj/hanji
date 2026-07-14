@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "मर्मेड आकृती",
+  "emptyPreview": "आकृती पूर्वावलोकन",
+  "sourceDescription": "आकृती स्रोत: {{source}}",
+  "syntaxError": "आकृतीत वाक्यरचना त्रुटी आहे.",
+  "syntaxErrorDetails": "तपशील दाखवा"
 }

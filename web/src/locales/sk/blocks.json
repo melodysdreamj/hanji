@@ -2,315 +2,315 @@
   "defs": {
     "paragraph": {
       "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "description": "Jednoducho začnite písať obyčajný text.",
+      "placeholder": "Zadajte '/' pre príkazy"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Stránka",
+      "description": "Vytvoriť podstránku v tejto stránke."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Odkaz na stránku",
+      "description": "Odkaz na existujúcu stránku."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Nadpis 1",
+      "description": "Nadpis veľkej sekcie.",
+      "placeholder": "Nadpis 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Prepínací nadpis 1",
+      "description": "Veľký nadpis, ktorý môže skryť vnorený obsah.",
+      "placeholder": "Prepínací nadpis 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Nadpis 2",
+      "description": "Nadpis strednej sekcie.",
+      "placeholder": "Nadpis 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Prepínací nadpis 2",
+      "description": "Stredný nadpis, ktorý dokáže skryť vnorený obsah.",
+      "placeholder": "Prepnúť nadpis 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Nadpis 3",
+      "description": "Nadpis malej sekcie.",
+      "placeholder": "Nadpis 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Prepnúť nadpis 3",
+      "description": "Malý nadpis na skrytie vnoreného obsahu.",
+      "placeholder": "Prepnúť nadpis 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Nadpis 4",
+      "description": "Kompaktný nadpis sekcie.",
+      "placeholder": "Nadpis 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Prepnúť nadpis 4",
+      "description": "Kompaktný nadpis, ktorý dokáže skryť vnorený obsah.",
+      "placeholder": "Prepnúť nadpis 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Zoznam úloh",
+      "description": "Spravujte úlohy pomocou začiarkavacieho políčka.",
+      "placeholder": "Úloha"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Zoznam s odrážkami",
+      "description": "Vytvoriť jednoduchý zoznam s odrážkami.",
+      "placeholder": "Zoznam"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Číslovaný zoznam",
+      "description": "Vytvorte zoznam s číslovaním.",
+      "placeholder": "Zoznam"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Preklápací zoznam",
+      "description": "Prepínače dokážu skrývať a zobrazovať obsah.",
+      "placeholder": "Prepnúť"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Citát",
+      "description": "Zachyťte citát.",
+      "placeholder": "Prázdny citát"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Zvýraznenie",
+      "description": "Zvýrazniť text.",
+      "placeholder": "Napíšte niečo…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Oddeľovač",
+      "description": "Vizuálne oddeľuje bloky."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kód",
+      "description": "Vložiť úryvok kódu.",
+      "placeholder": "Napíšte kód, alebo vložte úryvok…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Rovnica",
+      "description": "Zobrazí matematickú rovnicu."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Obsah",
+      "description": "Zobrazuje odkazy na nadpisy na tejto stránke."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Synchronizovaný blok",
+      "description": "Znova použite obsah na rôznych stránkach."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Tlačidlo",
+      "description": "Vložiť opakovane použiteľný obsah jedným kliknutím."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Karty",
+      "description": "Zoskupujte obsah do označených záložiek.",
+      "placeholder": "Karty"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Navigačná cesta",
+      "description": "Zobraziť, kde sa táto stránka nachádza."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplikovať",
+      "description": "Vytvorí presnú kópiu tohto bloku."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Presunúť do",
+      "description": "Presunúť tento blok na inú stránku."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Odstráni tento blok."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Zmeniť na",
+      "description": "Zmeniť typ tohto bloku."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Farba",
+      "description": "Zmení farbu textu alebo pozadia tohto bloku."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabuľka",
+      "description": "Pridajte jednoduchú tabuľku na túto stránku."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 stĺpce",
+      "description": "Umiestniť bloky vedľa seba."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 stĺpce",
+      "description": "Usporiadať bloky do 3 stĺpcov."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 stĺpce",
+      "description": "Usporiadať bloky do 4 stĺpcov."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 stĺpcov",
+      "description": "Usporiadať bloky do 5 stĺpcov."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Obrázok",
+      "description": "Nahrať alebo vložiť pomocou odkazu."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Vložiť video pomocou odkazu."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "Zvuk",
+      "description": "Vložiť zvuk pomocou odkazu."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Webová záložka",
+      "description": "Uložiť webový odkaz ako kartu."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Vložiť",
+      "description": "Vložiť obsah z odkazu."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Súbor",
+      "description": "Pripojí odkaz na súbor k tejto stránke."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Databáza - Celá stránka",
+      "description": "Pridať novú databázu ako podstránku."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabuľka – celá stránka",
+      "description": "Pridať celostránkovú databázu ako tabuľku."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Tabuľa – celá stránka",
+      "description": "Pridať celostránkovú kanban tabuľu."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Zoznam – celá stránka",
+      "description": "Pridať celostránkovú databázu ako zoznam."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Časová os – celá stránka",
+      "description": "Pridať celostránkovú časovú os databázy."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalendár – celá stránka",
+      "description": "Pridať celostránkovú databázu kalendára."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galéria – celá stránka",
+      "description": "Pridať celostránkovú galériu databázy."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Databáza - Inline",
+      "description": "Pridať databázu do tejto stránky."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Zobrazenie tabuľky",
+      "description": "Pridať inline databázu ako tabuľku."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Zobrazenie tabule",
+      "description": "Pridať inline kanban tabuľu."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Zobrazenie zoznamu",
+      "description": "Pridať inline databázu ako zoznam."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Zobrazenie časovej osi",
+      "description": "Pridať inline časovú os databázy."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Zobrazenie kalendára",
+      "description": "Pridať inline kalendárovú databázu."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Zobrazenie galérie",
+      "description": "Pridať inline galériu databázy."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Predvolené",
+      "description": "Odstrániť farbu textu alebo pozadia z tohto bloku."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Sivá",
+      "description": "Použiť sivú na tento blok."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Hnedá",
+      "description": "Použiť hnedú na tento blok."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Oranžová",
+      "description": "Použiť oranžovú na tento blok."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Žltá",
+      "description": "Použiť žltú na tento blok."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Zelená",
+      "description": "Použiť zelenú na tento blok."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Modrá",
+      "description": "Použiť modrú na tento blok."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Fialová",
+      "description": "Použiť fialovú na tento blok."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Ružová",
+      "description": "Použiť ružovú na tento blok."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Červená",
+      "description": "Použiť červenú na tento blok."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Sivé pozadie",
+      "description": "Použiť sivé pozadie na tento blok."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Hnedé pozadie",
+      "description": "Použiť hnedé pozadie na tento blok."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Oranžové pozadie",
+      "description": "Použiť oranžové pozadie na tento blok."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Žlté pozadie",
+      "description": "Použiť žlté pozadie na tento blok."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Zelené pozadie",
+      "description": "Použiť zelené pozadie na tento blok."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Modré pozadie",
+      "description": "Použiť modré pozadie na tento blok."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Fialové pozadie",
+      "description": "Použiť fialové pozadie na tento blok."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Ružové pozadie",
+      "description": "Použiť ružové pozadie na tento blok."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Červené pozadie",
+      "description": "Použiť červené pozadie na tento blok."
     }
   }
 }

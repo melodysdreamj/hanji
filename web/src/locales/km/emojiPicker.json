@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "បិទកម្មវិធីជ្រើសរូបតំណាង",
+    "label": "ជ្រើសរូបតំណាង"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "ប្រភេទរូបតំណាង",
+    "emoji": "អេម៉ូជី",
+    "image": "រូបភាព"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ដកចេញ",
+    "ariaLabel": "ដករូបតំណាងចេញ"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "តម្រង…",
+    "searchLabel": "ស្វែងរករូបតំណាង",
+    "random": "ចៃដន្យ",
+    "randomLabel": "ជ្រើសរូបតំណាងចៃដន្យ",
+    "recentLabel": "ប្រើថ្មីៗមុន",
+    "gridLabelRecent": "រូបតំណាងដែលបានប្រើថ្មីៗមុនគេ",
+    "gridLabel": "រូបតំណាង",
+    "optionLabel": "ជ្រើសរូបតំណាង {{emoji}}",
+    "noResults": "គ្មានរូបតំណាងដែលត្រូវនឹង “{{query}}” ទេ។ សាកល្បងពាក្យផ្សេង ឬសម្អាតតម្រង។"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "រូបភាព",
+    "linkPlaceholder": "បិទភ្ជាប់តំណរូបភាព",
+    "linkLabel": "តំណភ្ជាប់រូបតំណាង",
+    "apply": "អនុវត្ត",
+    "upload": "ផ្ទុកឯកសារ",
+    "uploading": "កំពុងផ្ទុកឡើង...",
+    "uploadingLabel": "កំពុងផ្ទុកឡើង {{fileName}}",
+    "uploadFailed": "មិនអាចផ្ទុករូបភាពនោះឡើងបានទេ។",
+    "fallbackFileName": "រូបភាពតំណាង"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "កំពុងរៀបចំផ្ទុក",
+    "finalizing": "កំពុងបញ្ចប់",
+    "complete": "បានបញ្ចប់",
+    "uploading": "កំពុងផ្ទុកឡើង"
   }
 }

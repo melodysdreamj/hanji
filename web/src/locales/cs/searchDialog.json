@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
-  "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
-  },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "closeSearch": "Zavřít hledání",
+  "couldntCreatePage": "Nepodařilo se vytvořit stránku",
+  "creating": "Vytváření...",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "newTab": "Nová karta",
+    "open": "Otevřít",
+    "select": "Vybrat"
+  },
+  "inPage": "na stránce",
+  "newPage": "Nová stránka \"{{query}}\"",
+  "noPagesFound": "Žádné stránky nenalezeny",
+  "noResultsFor": "Žádné výsledky pro \"{{query}}\"",
+  "quickFind": "Rychlé hledání",
+  "quickFindResults": "Výsledky rychlého hledání",
+  "searchAgain": "Hledat znovu",
+  "searchingDetail": "Hledání...",
+  "searchingPageContent": "Hledání v obsahu stránky...",
+  "searchPlaceholder": "Hledat nebo přejít na...",
+  "sections": {
+    "favorites": "Oblíbené",
+    "pageContent": "Obsah stránky",
+    "pages": "Stránky",
+    "recentlyViewed": "Nedávno prohlížené",
+    "recentSearches": "Poslední hledání"
   }
 }

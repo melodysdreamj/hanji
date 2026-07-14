@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "ಪಠ್ಯ ಸ್ವರೂಪ"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "ರೂಪಾಂತರಿಸಿ",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "ಪಠ್ಯ",
+      "heading1": "ಶೀರ್ಷಿಕೆ 1",
+      "heading2": "ಶೀರ್ಷಿಕೆ 2",
+      "heading3": "ಶೀರ್ಷಿಕೆ 3",
+      "heading4": "ಶೀರ್ಷಿಕೆ 4",
+      "toDoList": "ಕಾರ್ಯ ಪಟ್ಟಿ",
+      "bulletedList": "ಬುಲೆಟ್ ಪಟ್ಟಿ",
+      "numberedList": "ಸಂಖ್ಯಿತ ಪಟ್ಟಿ",
+      "toggleList": "ಟಾಗಲ್ ಪಟ್ಟಿ",
+      "quote": "ಉಲ್ಲೇಖ",
+      "callout": "ಕಾಲ್ಔಟ್",
+      "code": "ಕೋಡ್"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ದಪ್ಪ",
+    "italic": "ಇಟಾಲಿಕ್",
+    "underline": "ಕೆಳಗೆರೆ",
+    "strikethrough": "ಸ್ಟ್ರೈಕ್‌ಥ್ರೂ",
+    "code": "ಕೋಡ್",
+    "link": "ಲಿಂಕ್"
   },
   "comment": {
-    "label": "Comment"
+    "label": "ಟಿಪ್ಪಣಿ"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "ಪಠ್ಯ ಬಣ್ಣ: {{color}}",
+    "title": "ಬಣ್ಣ: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ಮಿಶ್ರ",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "ಪಠ್ಯ ಬಣ್ಣ",
+      "default": "ಡೀಫಾಲ್ಟ್",
+      "gray": "ಬೂದು",
+      "brown": "ಕಂದು",
+      "orange": "ಕಿತ್ತಳೆ",
+      "yellow": "ಹಳದಿ",
+      "green": "ಹಸಿರು",
+      "blue": "ನೀಲಿ",
+      "purple": "ನೇರಳೆ",
+      "pink": "ಗುಲಾಬಿ",
+      "red": "ಕೆಂಪು"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "ಹಿನ್ನೆಲೆ ಬಣ್ಣ",
+      "gray": "ಬೂದು ಹಿನ್ನೆಲೆ",
+      "brown": "ಕಂದು ಹಿನ್ನೆಲೆ",
+      "orange": "ಕಿತ್ತಳೆ ಹಿನ್ನೆಲೆ",
+      "yellow": "ಹಳದಿ ಹಿನ್ನೆಲೆ",
+      "green": "ಹಸಿರು ಹಿನ್ನೆಲೆ",
+      "blue": "ನೀಲಿ ಹಿನ್ನೆಲೆ",
+      "purple": "ನೇರಳೆ ಹಿನ್ನೆಲೆ",
+      "pink": "ಗುಲಾಬಿ ಹಿನ್ನೆಲೆ",
+      "red": "ಕೆಂಪು ಹಿನ್ನೆಲೆ"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "ಲಿಂಕ್ ಸಂಪಾದಿಸಿ",
+    "placeholder": "ಲಿಂಕ್ ಅಂಟಿಸಿ",
+    "urlAriaLabel": "ಲಿಂಕ್ URL",
+    "apply": "ಲಿಂಕ್",
+    "open": "ಲಿಂಕ್ ತೆರೆ",
+    "copy": "ಲಿಂಕ್ ನಕಲಿಸು",
+    "copied": "ನಕಲಿಸಲಾಗಿದೆ",
+    "copiedLink": "ಲಿಂಕ್ ನಕಲಿಸಲಾಗಿದೆ",
+    "remove": "ತೆಗೆದುಹಾಕು"
   }
 }

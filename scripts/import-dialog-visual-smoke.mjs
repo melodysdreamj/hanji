@@ -88,7 +88,7 @@ async function main() {
       contract: {
         // Wizard step 1 (Connect): token guidance only — scope and progress
         // moved to their own steps.
-        expectedTexts: ['Import', 'File', 'Notion', 'Prepare Notion token', 'Open Notion token page', 'Setup guide', 'Notion API token', ...connectionSaveTexts, 'Connect', 'Scope', 'Discover', 'Apply', 'Next'],
+        expectedTexts: ['Import', 'File', 'Notion', 'Prepare Notion token', 'Open Notion token page', 'Setup guide', 'Notion API token', ...connectionSaveTexts, 'Connect', 'Scope', 'Discover', 'Apply', 'Cancel import', 'Resume discovery'],
         // The always-on token walkthrough now occupies the top of step 1, so the
         // token intro card and input sit below the fold (still present via
         // expectedTexts). The step-1 header stays above the fold; the
@@ -120,10 +120,11 @@ async function main() {
       viewport: { width: 1440, height: 1000 },
       open: openNotionRunDialog,
       contract: {
-        // A queued job auto-advances the wizard to the discover run panel with
-        // the installer-style live feed (empty ring shows the waiting line).
-        expectedTexts: ['Import', 'File', 'Notion', 'Queued', 'Waiting for the first progress update'],
-        expectedVisibleTexts: ['Queued'],
+        // A manual-token job survives dialog dismissal but cannot persist the
+        // credential. Reopening returns to Connect with explicit resume and
+        // cancel controls instead of presenting a stranded run panel.
+        expectedTexts: ['Import', 'File', 'Notion', 'Notion API token', 'Resume discovery', 'Cancel import'],
+        expectedVisibleTexts: ['Notion API token', 'Cancel import'],
         minButtons: 4,
         minRows: 5,
         width: [600, 660],
@@ -148,7 +149,7 @@ async function main() {
       open: openNotionImportDialog,
       contract: {
         // See desktop-notion-import: wizard step 1 (Connect) only.
-        expectedTexts: ['Import', 'File', 'Notion', 'Prepare Notion token', 'Open Notion token page', 'Setup guide', 'Notion API token', ...connectionSaveTexts, 'Connect', 'Scope', 'Discover', 'Apply', 'Next'],
+        expectedTexts: ['Import', 'File', 'Notion', 'Prepare Notion token', 'Open Notion token page', 'Setup guide', 'Notion API token', ...connectionSaveTexts, 'Connect', 'Scope', 'Discover', 'Apply', 'Cancel import', 'Resume discovery'],
         expectedVisibleTexts: ['Prepare Notion token'],
         rejectVisibleTexts: ['Connect Notion', 'Start discovery'],
         minButtons: 4,
@@ -177,14 +178,17 @@ async function main() {
       mobile: true,
       open: openNotionRunDialog,
       contract: {
-        // See desktop-notion-run: queued job shows in the discover run panel.
-        expectedTexts: ['Import', 'File', 'Notion', 'Queued', 'Waiting for the first progress update'],
-        expectedVisibleTexts: ['Queued'],
+        // See desktop-notion-run: manual credentials are requested again while
+        // the durable job remains resumable and cancellable.
+        expectedTexts: ['Import', 'File', 'Notion', 'Notion API token', 'Resume discovery', 'Cancel import'],
+        expectedVisibleTexts: ['Notion API token', 'Cancel import'],
         minButtons: 4,
         minRows: 5,
         width: [350, 390],
       },
     });
+
+    await captureBackgroundImportLifecycle(browser, appUrl, seed);
 
     console.log('PASS import dialog surfaces are captured and stay within the Notion-style layout contract.');
     for (const name of [
@@ -196,6 +200,8 @@ async function main() {
       'mobile-notion-import',
       'mobile-notion-pages-scope',
       'mobile-notion-run',
+      'desktop-notion-background',
+      'desktop-notion-cancelled',
     ]) {
       console.log(`Screenshot: ${join(options.screenshotDir, `${name}.png`)}`);
     }
@@ -255,23 +261,86 @@ async function openFileImportDialog(page, baseUrl) {
 }
 
 async function openNotionRunDialog(page, baseUrl) {
-  // The seeded queued job auto-advances the wizard to the discover run panel.
+  // The seeded manual-token job is durable, but its credential is not. The
+  // reconnect state must expose both resume and cancellation controls.
   await openApp(page, baseUrl);
   const dialog = await openImportDialog(page);
   await dialog.getByRole('button', { name: 'Notion', exact: true }).click({ timeout: options.timeoutMs });
-  await dialog.locator('[data-run-panel]').waitFor({ state: 'visible', timeout: options.timeoutMs });
-  await waitForVisibleDialogText(page, 'Queued');
+  await dialog.getByRole('button', { name: 'Cancel import', exact: true }).waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
   return dialog;
 }
 
 async function openNotionImportDialog(page, baseUrl) {
-  // Step 1 (Connect): hop back from the auto-advanced run panel via the tab.
+  // Step 1 (Connect) for the durable manual-token job.
   const dialog = await openNotionRunDialog(page, baseUrl);
   await dialog.getByRole('tab', { name: 'Connect', exact: true }).click({ timeout: options.timeoutMs });
   await dialog.getByRole('link', { name: 'Open Notion token page', exact: true }).waitFor({
     state: 'visible',
     timeout: options.timeoutMs,
   });
+}
+
+async function captureBackgroundImportLifecycle(browser, appUrl, seed) {
+  console.log('Capture desktop Notion background/cancel lifecycle...');
+  const { context, page, errors } = await newCheckedPage(browser, {
+    deviceScaleFactor: 1,
+    locale: 'en-US',
+    viewport: { width: 1440, height: 1000 },
+  });
+  await seedSession(context, seed);
+
+  try {
+    await openApp(page, appUrl);
+    const runningButton = page.locator('[data-sidebar-footer-action][data-import-running="true"]');
+    await runningButton.waitFor({ state: 'visible', timeout: options.timeoutMs });
+    await assert(
+      await runningButton.textContent().then((text) => text?.includes('Importing') && text.includes('%')),
+      'dismissed Notion import should stay visible in the sidebar with progress',
+    );
+
+    await runningButton.click({ timeout: options.timeoutMs });
+    const dialog = page.getByRole('dialog', { name: 'Import', exact: true });
+    await dialog.waitFor({ state: 'visible', timeout: options.timeoutMs });
+    await dialog.getByRole('button', { name: 'Close import', exact: true }).click({ timeout: options.timeoutMs });
+    await dialog.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+    await runningButton.waitFor({ state: 'visible', timeout: options.timeoutMs });
+    await page.getByRole('heading', { name: 'Welcome to Hanji!', exact: true }).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    await page.screenshot({
+      path: join(options.screenshotDir, 'desktop-notion-background.png'),
+      fullPage: false,
+    });
+
+    await runningButton.click({ timeout: options.timeoutMs });
+    await dialog.waitFor({ state: 'visible', timeout: options.timeoutMs });
+    await dialog.getByRole('button', { name: 'Notion', exact: true }).click({ timeout: options.timeoutMs });
+    await dialog.getByRole('button', { name: 'Cancel import', exact: true }).click({ timeout: options.timeoutMs });
+    await runningButton.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+    await dialog.getByRole('button', { name: 'Close import', exact: true }).click({ timeout: options.timeoutMs });
+    await dialog.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+    const importButton = await onscreenButton(page, 'Import', { timeoutMs: options.timeoutMs });
+    assert(await importButton.isEnabled(), 'cancelled import should permit an immediate fresh import');
+    await page.getByRole('heading', { name: 'Welcome to Hanji!', exact: true }).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    await page.screenshot({
+      path: join(options.screenshotDir, 'desktop-notion-cancelled.png'),
+      fullPage: false,
+    });
+    assertNoBrowserErrors(errors, 'Notion background/cancel lifecycle');
+  } finally {
+    await captureBrowserSession(context, seed, {
+      appOrigin: appUrl,
+      authOrigin: options.apiUrl,
+    }).catch(() => {});
+    await context.close().catch(() => {});
+  }
 }
 
 async function openNotionPagesScopeDialog(page, baseUrl) {
@@ -296,16 +365,57 @@ async function openApp(page, baseUrl) {
 async function openImportDialog(page) {
   let importButton;
   try {
-    importButton = await onscreenButton(page, 'Import', { timeoutMs: 1000 });
+    importButton = await onscreenImportButton(page, { timeoutMs: 1000 });
   } catch {
     const openSidebarButton = await onscreenButton(page, 'Open sidebar', { timeoutMs: options.timeoutMs });
     await openSidebarButton.click({ timeout: options.timeoutMs });
-    importButton = await onscreenButton(page, 'Import', { timeoutMs: options.timeoutMs });
+    importButton = await onscreenImportButton(page, { timeoutMs: options.timeoutMs });
   }
   await importButton.click({ timeout: options.timeoutMs });
   const dialog = page.getByRole('dialog', { name: 'Import', exact: true });
   await dialog.waitFor({ state: 'visible', timeout: options.timeoutMs });
   return dialog;
+}
+
+async function onscreenImportButton(page, optionsOverride = {}) {
+  const timeoutMs = optionsOverride.timeoutMs ?? options.timeoutMs;
+  const buttons = page.locator('button[data-sidebar-footer-action]');
+  await page.waitForFunction(() => {
+    return Array.from(document.querySelectorAll('button[data-sidebar-footer-action]')).some((button) => {
+      if (!(button instanceof HTMLElement)) return false;
+      const text = (button.innerText || '').replace(/\s+/g, ' ').trim();
+      if (button.dataset.importRunning !== 'true' && text !== 'Import') return false;
+      const style = window.getComputedStyle(button);
+      const rect = button.getBoundingClientRect();
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.right > 0 &&
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth &&
+        rect.top < window.innerHeight
+      );
+    });
+  }, undefined, { timeout: timeoutMs });
+
+  const viewport = page.viewportSize() ?? { width: Number.POSITIVE_INFINITY, height: Number.POSITIVE_INFINITY };
+  const count = await buttons.count();
+  for (let index = 0; index < count; index += 1) {
+    const button = buttons.nth(index);
+    const text = (await button.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+    const running = await button.getAttribute('data-import-running') === 'true';
+    if (!running && text !== 'Import') continue;
+    if (!(await button.isVisible())) continue;
+    const box = await button.boundingBox();
+    if (!box) continue;
+    if (box.x + box.width > 0 && box.y + box.height > 0 && box.x < viewport.width && box.y < viewport.height) {
+      return button;
+    }
+  }
+
+  throw new Error('Could not find an onscreen import button');
 }
 
 async function waitForVisibleDialogText(page, text) {

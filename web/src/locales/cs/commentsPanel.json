@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
-  "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
-  },
-  "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+  "actions": {
+    "edit": "Upravit",
+    "reopen": "Znovu otevřít",
+    "reply": "Odpovědět",
+    "resolve": "Vyřešit",
+    "showInPage": "Zobrazit na stránce"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
-  },
-  "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
-  },
-  "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
-  },
-  "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "commentingOn": "Komentovat",
+    "commentingOnSelectedText": "Komentovat vybraný text",
+    "onABlock": "Na bloku",
+    "onSelectedBlock": "Na vybraném bloku",
+    "onSelectedText": "Na vybraném textu",
+    "selectedBlock": "Vybraný blok"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komentář, {{time}}",
+    "commentAriaResolved": "{{author}} komentář, {{time}}, vyřešeno",
+    "edited": "(upraveno)",
+    "emptyComment": "(prázdný komentář)",
+    "emptyReply": "(prázdná odpověď)",
+    "justNow": "Právě teď",
+    "repliesAria": "{{count}} odpovědí",
+    "replyAria": "{{author}} odpověď, {{time}}"
   },
-  "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
-  },
-  "reply": {
-    "placeholder": "Reply..."
-  },
-  "edit": {
-    "aria": "Edit comment"
+  "closeAria": "Zavřít komentáře",
+  "composer": {
+    "addBlockComment": "Přidat komentář k bloku",
+    "addPageComment": "Přidat komentář ke stránce",
+    "blockPlaceholder": "Komentovat tento blok...",
+    "pagePlaceholder": "Přidat komentář...",
+    "submit": "Komentovat"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
-  }
+    "commentConfirm": "Smazat tento komentář?",
+    "threadConfirm_one": "Smazat tento komentář a jeho odpověď?",
+    "threadConfirm_other": "Smazat tento komentář a jeho {{count}} odpovědí?"
+  },
+  "edit": {
+    "aria": "Upravit komentář"
+  },
+  "list": {
+    "empty": "Zatím žádné komentáře",
+    "noOpen": "Žádné otevřené komentáře",
+    "noResolved": "Žádné vyřešené komentáře",
+    "threadsAria": "Vlákna komentářů"
+  },
+  "mention": {
+    "commentPeopleAria": "Zmínit lidi v komentáři",
+    "noMatches": "Žádní odpovídající lidé",
+    "organizationPerson": "Člen organizace",
+    "person": "Osoba",
+    "replyPeopleAria": "Lidé ke zmínce v odpovědi",
+    "roleInOrganization": "{{role}} v organizaci",
+    "title": "Zmínit {{name}}",
+    "trigger": "Zmínit lidi",
+    "you": "Vy"
+  },
+  "reply": {
+    "placeholder": "Odpovědět..."
+  },
+  "status": {
+    "aria": "Stav komentáře",
+    "open": "Otevřeno",
+    "resolved": "Vyřešeno"
+  },
+  "subtitle": {
+    "block": "Diskuze k bloku",
+    "page": "Diskuze ke stránce"
+  },
+  "title": "Komentáře"
 }

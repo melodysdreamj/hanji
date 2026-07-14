@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
+  "detail": "Zkuste to znovu. Pokud problém přetrvává, obnovte aplikaci a sdílejte referenční číslo níže.",
   "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "reload": "Obnovit aplikaci",
+  "retry": "Zkusit znovu",
+  "title": "Při zobrazování tohoto obsahu došlo k chybě."
 }

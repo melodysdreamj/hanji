@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Belum ada percakapan. Beri komentar di halaman atau sebut seseorang untuk memulai.",
+  "leave": "Tinggalkan",
+  "leaveAria": "Tinggalkan percakapan di {{title}}",
+  "open": "Buka percakapan di {{title}}",
+  "participants_one": "{{count}} peserta",
+  "participants_other": "{{count}} peserta",
+  "untitled": "Tanpa judul",
+  "loading": "Memuat percakapan…"
 }

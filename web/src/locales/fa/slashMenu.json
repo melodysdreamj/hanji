@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "دستورات بلوک",
+  "closeBlockCommands": "بستن دستورات بلوک",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "بلوک‌های پایه",
+    "Media": "رسانه",
+    "Database": "پایگاه داده",
+    "Advanced": "بلوک‌های پیشرفته"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}، {{position}} از {{total}}. برای درج، Enter را فشار دهید.",
+  "listStatus": "{{total}} دستور بلوک موجود است.",
+  "noBlocks": "بلوکی یافت نشد",
+  "noBlocksFor": "بلوکی برای «{{query}}» یافت نشد",
+  "recentlyUsed": "اخیراً استفاده‌شده"
 }

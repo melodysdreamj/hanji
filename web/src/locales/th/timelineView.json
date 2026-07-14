@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "เพิ่มคุณสมบัติวันที่",
+    "description": "มุมมองไทม์ไลน์ต้องมีคุณสมบัติวันที่เริ่มต้นเพื่อแสดงหน้าตามช่วงเวลา"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "เพิ่มคุณสมบัติวันที่สิ้นสุดเพื่อแสดงช่วงแทนแถบวันเดียว",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "ซูมไทม์ไลน์",
+    "day": "วัน",
+    "week": "สัปดาห์",
+    "month": "เดือน"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "การพึ่งพา:",
+    "hint": "เพิ่มคุณสมบัติความสัมพันธ์",
+    "relationPropertyAriaLabel": "คุณสมบัติความสัมพันธ์ที่พึ่งพา"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "วันนี้",
+    "previousRange": "ช่วงก่อนหน้า",
+    "nextRange": "ช่วงถัดไป",
+    "newPage": "ใหม่",
+    "newPageIn": "หน้าใหม่ใน {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "ตารางไทม์ไลน์",
+    "nameHeader": "ชื่อ"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "เปิด {{title}}",
+    "openAriaLabelWithDates": "เปิด {{title}}, {{start}} ถึง {{end}}",
+    "openNoDateAriaLabel": "เปิด {{title}}, ไม่มีวันที่"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "ไม่มีรายการในช่วงนี้",
+    "noDatedItems": "ยังไม่มีรายการที่มีวันที่",
+    "jumpTo": "ข้ามไปที่ {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ไม่มีวันที่ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ไม่มี",
+    "untitled": "ไม่มีชื่อ"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "பக்கம் திறக்கப்படுகிறது",
+  "workspace": "பணியிடம்",
+  "emptyWorkspace": "காலி பணியிடம்",
+  "untitled": "தலைப்பில்லா",
+  "newPage": "புதிய பக்கம்"
 }

@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "ပယ်ဖျက်ပါ",
+    "save": "သိမ်းရန်",
+    "close": "ပိတ်ပါ",
+    "search": "ရှာဖွေရန်",
+    "create": "ဖန်တီးပါ",
+    "delete": "ဖျက်ပါ",
+    "clearAll": "အားလုံးရှင်းပါ",
+    "done": "ပြီးပြီ",
+    "add": "ထည့်ပါ"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ခေါင်းစဉ်မဲ့"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} မိတ္တူ",
+    "columnName": "ကော်လံ {{number}}",
+    "importedDatabase": "တင်သွင်းထားသော ဒေတာဘေ့စ်",
+    "uploadedFile": "တင်ထားသော ဖိုင်",
+    "image": "ရုပ်ပုံ",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "အမည်",
+      "status": "အခြေအနေ",
+      "select": "ရွေးချယ်မှု",
+      "date": "ရက်စွဲ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "မစတင်ရသေး",
+      "doing": "လုပ်ဆောင်နေဆဲ",
+      "done": "ပြီးပြီ"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ရွေးချယ်မှု ၁",
+      "second": "ရွေးချယ်မှု ၂"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ဇယား"
     }
   }
 }

@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "ይህ ዳታቤዝ እስካሁን ምንም ገፆች የሉትም።",
+  "emptyTitle": "ገፆች እስካሁን የሉም",
+  "newInline": "አዲስ",
+  "newPage": "አዲስ ገፅ",
+  "newPageIn": "አዲስ ገፅ በ{{dbTitle}}",
+  "noResultsDesc": "ከአሁኑ ማጣሪያ ወይም ፍለጋ ጋር የሚዛመዱ ገፆች የሉም።",
+  "noResultsTitle": "ምንም ውጤት የለም",
+  "openRow": "{{title}} ክፈት"
 }

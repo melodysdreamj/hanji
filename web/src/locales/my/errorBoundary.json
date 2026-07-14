@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "ဤအကြောင်းအရာကိုပြသရာတွင် ပြဿနာတစ်ခုဖြစ်ပွားခဲ့သည်။",
+  "detail": "ထပ်စမ်းကြည့်ပါ။ ပြဿနာဆက်ရှိနေပါက အက်ပ်ကို ပြန်ဖွင့်ပြီး အောက်ပါကိုးကားချက်ကို မျှဝေပါ။",
+  "reference": "ကိုးကားချက်: {{reference}}",
+  "reload": "အက်ပ်ကို ပြန်ဖွင့်ပါ",
+  "retry": "ထပ်စမ်းပါ"
 }

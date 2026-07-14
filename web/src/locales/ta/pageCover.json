@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "கவரை மாற்று",
+    "reposition": "இடமாற்று",
+    "remove": "அகற்று",
+    "uploadFile": "கோப்பைப் பதிவேற்று",
+    "uploading": "பதிவேற்றுகிறது...",
+    "submit": "சமர்ப்பி",
+    "savePosition": "இருப்பிடம் சேமி"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "கேலரி",
+    "upload": "பதிவேற்று",
+    "link": "இணைப்பு"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "பட இணைப்பை ஒட்டவும்",
+    "invalid": "http அல்லது https பட இணைப்பை ஒட்டவும்."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "படத்தைப் பதிவேற்ற முடியவில்லை.",
+    "defaultFileName": "கவர் படம்"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "இடமாற்ற படத்தை இழுக்கவும்"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "பதிவேற்றத் தயாராகிறது",
+    "finalizing": "இறுதி செய்கிறது",
+    "complete": "முடிந்தது",
+    "uploading": "பதிவேற்றுகிறது"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "கவர் அகற்றப்பட்டது",
+    "restored": "கவர் மீட்டெடுக்கப்பட்டது",
+    "undo": "செயல்தவிர்"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "பக்க கவர்",
+    "coverVerticalPosition": "கவர் செங்குத்து இருப்பிடம்",
+    "positionFromTop": "மேலிருந்து {{position}}%",
+    "closeCoverMenu": "கவர் மெனுவை மூடு",
+    "changePageCover": "பக்க கவர் மாற்று",
+    "repositionPageCover": "பக்க கவரை இடமாற்று",
+    "removePageCover": "பக்க கவரை அகற்று",
+    "changeCoverDialog": "கவர் மாற்று",
+    "coverSource": "கவர் மூலம்",
+    "selectCover": "கவர் {{number}} தேர்ந்தெடு",
+    "uploadFromDevice": "இந்த சாதனத்திலிருந்து கவர் படத்தைப் பதிவேற்று",
+    "uploadingFile": "{{fileName}} பதிவேற்றுகிறது",
+    "coverImageLink": "கவர் பட இணைப்பு"
   }
 }

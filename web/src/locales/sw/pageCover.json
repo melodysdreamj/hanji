@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Badilisha Jalada",
+    "reposition": "Badilisha nafasi",
+    "remove": "Ondoa",
+    "uploadFile": "Pakia faili",
+    "uploading": "Inapakia...",
+    "submit": "Wasilisha",
+    "savePosition": "Hifadhi nafasi"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Matunzio",
+    "upload": "Pakia",
+    "link": "Kiungo"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Bandika kiungo cha picha",
+    "invalid": "Bandika kiungo cha picha cha http au https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Imeshindwa kupakia picha hiyo.",
+    "defaultFileName": "Picha ya jalada"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Buruta picha ili kubadilisha nafasi"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Inaandaa upakiaji",
+    "finalizing": "Inamalizia",
+    "complete": "Imekamilika",
+    "uploading": "Inapakia"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Jalada limeondolewa",
+    "restored": "Jalada limerejeshwa",
+    "undo": "Tendua"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Jalada la ukurasa",
+    "coverVerticalPosition": "Nafasi wima ya jalada",
+    "positionFromTop": "{{position}}% kutoka juu",
+    "closeCoverMenu": "Funga menyu ya jalada",
+    "changePageCover": "Badilisha jalada la ukurasa",
+    "repositionPageCover": "Badilisha nafasi ya jalada la ukurasa",
+    "removePageCover": "Ondoa jalada la ukurasa",
+    "changeCoverDialog": "Badilisha jalada",
+    "coverSource": "Chanzo cha jalada",
+    "selectCover": "Chagua jalada {{number}}",
+    "uploadFromDevice": "Pakia picha ya jalada kutoka kifaa hiki",
+    "uploadingFile": "Inapakia {{fileName}}",
+    "coverImageLink": "Kiungo cha picha ya jalada"
   }
 }

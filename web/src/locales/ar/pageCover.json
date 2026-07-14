@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "تغيير الغلاف",
+    "reposition": "تغيير الموضع",
+    "remove": "إزالة",
+    "uploadFile": "رفع ملف",
+    "uploading": "جارٍ الرفع...",
+    "submit": "إرسال",
+    "savePosition": "حفظ الموضع"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "المعرض",
+    "upload": "رفع",
+    "link": "رابط"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "ألصق رابط الصورة",
+    "invalid": "ألصق رابط صورة http أو https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "تعذر تحميل هذه الصورة.",
+    "defaultFileName": "صورة الغلاف"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "اسحب الصورة لتغيير الموضع"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "جارٍ تحضير الرفع",
+    "finalizing": "جارٍ الإنهاء",
+    "complete": "مكتمل",
+    "uploading": "جارٍ الرفع"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "تمت إزالة الغلاف",
+    "restored": "تمت استعادة الغلاف",
+    "undo": "تراجع"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "غلاف الصفحة",
+    "coverVerticalPosition": "الموضع الرأسي للغلاف",
+    "positionFromTop": "{{position}}% من الأعلى",
+    "closeCoverMenu": "إغلاق قائمة الغلاف",
+    "changePageCover": "تغيير غلاف الصفحة",
+    "repositionPageCover": "تغيير موضع غلاف الصفحة",
+    "removePageCover": "إزالة غلاف الصفحة",
+    "changeCoverDialog": "تغيير الغلاف",
+    "coverSource": "مصدر الغلاف",
+    "selectCover": "اختيار الغلاف {{number}}",
+    "uploadFromDevice": "رفع صورة الغلاف من هذا الجهاز",
+    "uploadingFile": "جارٍ رفع {{fileName}}",
+    "coverImageLink": "رابط صورة الغلاف"
   }
 }

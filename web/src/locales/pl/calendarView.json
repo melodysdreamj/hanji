@@ -1,44 +1,44 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
-  },
-  "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
-  },
-  "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
-  },
-  "gridAriaLabel": "{{title}} calendar",
-  "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
-  },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Otwórz {{title}}",
+    "openAriaLabelWithDate": "Otwórz {{title}}, zaplanowane na {{date}}",
+    "openNoDateAriaLabel": "Otwórz {{title}}, brak daty"
   },
+  "cell": {
+    "ariaLabel": "{{date}}, {{count}} elementów",
+    "newRowAriaLabel": "Nowy wiersz w dniu {{date}}",
+    "newRowTitle": "Nowy",
+    "showLess": "Pokaż mniej",
+    "showMore": "+{{count}} więcej"
+  },
+  "empty": {
+    "addDateButton": "Data",
+    "description": "Widoki kalendarza wymagają właściwości daty, aby umieścić strony w miesiącu.",
+    "title": "Dodaj właściwość daty"
+  },
+  "gridAriaLabel": "Kalendarz {{title}}",
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Brak daty ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "dateDefaultName": "Data",
+    "untitled": "Bez tytułu"
+  },
+  "toolbar": {
+    "calendarByAriaLabel": "Kalendarz według",
+    "nextMonth": "Następny miesiąc",
+    "nextWeek": "Następny tydzień",
+    "previousMonth": "Poprzedni miesiąc",
+    "previousWeek": "Poprzedni tydzień",
+    "today": "Dzisiaj"
+  },
+  "weekdays": {
+    "fri": "Pt",
+    "mon": "Pon",
+    "sat": "Sob",
+    "sun": "Nd",
+    "thu": "Czw",
+    "tue": "Wt",
+    "wed": "Śr"
   }
 }

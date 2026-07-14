@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Maelezo ya kisheria na chanzo",
+  "noWarranty": "Imetolewa bila dhamana.",
+  "sourceCode": "Chanzo",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Isipokuwa 2.0"
 }

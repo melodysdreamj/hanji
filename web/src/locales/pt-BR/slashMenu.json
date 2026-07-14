@@ -9,7 +9,7 @@
   },
   "itemStatus": "{{label}}, {{position}} de {{total}}. Pressione Enter para inserir.",
   "listStatus": "{{total}} comandos de bloco disponíveis.",
-  "noBlocks": "Nenhum bloco encontrado",
+  "noBlocks": "Nenhum bloco encontrado.",
   "noBlocksFor": "Nenhum bloco encontrado para \"{{query}}\"",
-  "recentlyUsed": "Usados recentemente"
+  "recentlyUsed": "Recentes"
 }

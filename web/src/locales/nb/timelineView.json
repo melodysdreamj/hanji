@@ -1,46 +1,46 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
-  },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
-  "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+  "bar": {
+    "openAriaLabel": "Åpne {{title}}",
+    "openAriaLabelWithDates": "Åpne {{title}}, {{start}} til {{end}}",
+    "openNoDateAriaLabel": "Åpne {{title}}, ingen dato"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "hint": "legg til en relasjonsegenskap",
+    "label": "Avhengigheter:",
+    "relationPropertyAriaLabel": "Avhengighetsrelasjonsegenskap"
   },
-  "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+  "empty": {
+    "description": "Timeline-visninger trenger en startdato-egenskap for å vise sider på tidslinjen.",
+    "title": "Legg til datoegenskap"
   },
-  "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
-  },
-  "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
-  },
+  "endDateHint": "Legg til sluttdato-egenskap for å vise perioder i stedet for enkeltdager.",
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "jumpTo": "Hopp til {{date}}",
+    "noDatedItems": "Ingen datomerkede elementer ennå.",
+    "noItemsInRange": "Ingen elementer i dette området."
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Ingen dato ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Ingen",
+    "untitled": "Uten tittel"
+  },
+  "table": {
+    "ariaLabel": "Timeline-tabell",
+    "nameHeader": "Navn"
+  },
+  "toolbar": {
+    "newPage": "Ny",
+    "newPageIn": "Ny side i {{dbTitle}}",
+    "nextRange": "Neste område",
+    "previousRange": "Forrige område",
+    "today": "I dag"
+  },
+  "zoom": {
+    "ariaLabel": "Timeline-zoom",
+    "day": "Dag",
+    "month": "Måned",
+    "week": "Uke"
   }
 }

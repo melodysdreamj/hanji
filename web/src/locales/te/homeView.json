@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "పేజీ తెరుస్తోంది",
+  "workspace": "వర్క్‌స్పేస్",
+  "emptyWorkspace": "ఖాళీ వర్క్‌స్పేస్",
+  "untitled": "శీర్షిక లేని",
+  "newPage": "కొత్త పేజీ"
 }

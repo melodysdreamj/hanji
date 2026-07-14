@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Chưa có cuộc trò chuyện nào. Hãy bình luận trên trang hoặc đề cập ai đó để bắt đầu.",
+  "leave": "Rời",
+  "leaveAria": "Rời khỏi cuộc trò chuyện trên {{title}}",
+  "open": "Mở cuộc trò chuyện trên {{title}}",
+  "participants_one": "{{count}} người tham gia",
+  "participants_other": "{{count}} người tham gia",
+  "untitled": "Không có tiêu đề",
+  "loading": "Đang tải cuộc trò chuyện…"
 }

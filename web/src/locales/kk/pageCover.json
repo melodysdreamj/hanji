@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Мұқабаны өзгерту",
+    "reposition": "Қайта орналастыру",
+    "remove": "Жою",
+    "uploadFile": "Файл жүктеу",
+    "uploading": "Жүктелуде...",
+    "submit": "Растау",
+    "savePosition": "Орнын сақтау"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Галерея",
+    "upload": "Жүктеу",
+    "link": "Сілтеме"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Сурет сілтемесін қою",
+    "invalid": "http немесе https сурет сілтемесін қойыңыз."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Бұл суретті жүктеу мүмкін болмады.",
+    "defaultFileName": "Мұқаба суреті"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Суретті сүйреп орнын ауыстырыңыз"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Жүктеуге дайындалуда",
+    "finalizing": "Аяқталуда",
+    "complete": "Аяқталды",
+    "uploading": "Жүктелуде"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Мұқаба жойылды",
+    "restored": "Мұқаба қалпына келтірілді",
+    "undo": "Болдырмау"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Парақ мұқабасы",
+    "coverVerticalPosition": "Мұқаба тік орны",
+    "positionFromTop": "Жоғарыдан {{position}}%",
+    "closeCoverMenu": "Мұқаба мәзірін жабу",
+    "changePageCover": "Парақ мұқабасын өзгерту",
+    "repositionPageCover": "Парақ мұқабасын қайта орналастыру",
+    "removePageCover": "Парақ мұқабасын алып тастау",
+    "changeCoverDialog": "Мұқабаны өзгерту",
+    "coverSource": "Мұқаба көзі",
+    "selectCover": "Мұқаба {{number}} таңдау",
+    "uploadFromDevice": "Осы құрылғыдан мұқаба суретін жүктеу",
+    "uploadingFile": "{{fileName}} жүктелуде",
+    "coverImageLink": "Мұқаба сурет сілтемесі"
   }
 }

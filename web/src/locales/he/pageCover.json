@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "שנה כריכה",
+    "reposition": "מיקום מחדש",
+    "remove": "הסר",
+    "uploadFile": "העלה קובץ",
+    "uploading": "מעלה...",
+    "submit": "שלח",
+    "savePosition": "שמור מיקום"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "גלריה",
+    "upload": "העלאה",
+    "link": "קישור"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "הדבק קישור תמונה",
+    "invalid": "הדבק קישור תמונה מסוג http או https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "לא ניתן להעלות תמונה זו.",
+    "defaultFileName": "תמונת כריכה"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "גרור תמונה למיקום מחדש"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "מכין העלאה",
+    "finalizing": "מסיים",
+    "complete": "הושלם",
+    "uploading": "מעלה"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "תמונת הרקע הוסרה",
+    "restored": "תמונת הרקע שוחזרה",
+    "undo": "בטל"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "תמונת רקע של הדף",
+    "coverVerticalPosition": "מיקום אנכי של תמונת רקע",
+    "positionFromTop": "{{position}}% מהחלק העליון",
+    "closeCoverMenu": "סגור תפריט תמונת רקע",
+    "changePageCover": "שנה תמונת רקע של הדף",
+    "repositionPageCover": "שנה מיקום תמונת רקע של הדף",
+    "removePageCover": "הסר תמונת רקע של הדף",
+    "changeCoverDialog": "שינוי תמונת רקע",
+    "coverSource": "מקור תמונת רקע",
+    "selectCover": "בחר תמונת רקע {{number}}",
+    "uploadFromDevice": "העלה תמונת רקע ממכשיר זה",
+    "uploadingFile": "מעלה את {{fileName}}",
+    "coverImageLink": "קישור תמונת רקע"
   }
 }

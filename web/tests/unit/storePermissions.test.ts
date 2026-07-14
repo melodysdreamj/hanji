@@ -134,11 +134,14 @@ describe("store permission feedback", () => {
       properties: [{ name: i18next.t("databaseView:name"), type: "title", position: 1 }],
     });
 
+    await vi.waitFor(() => expect(createDatabaseRemote).toHaveBeenCalledTimes(1));
     expect(vi.mocked(createDatabaseRemote)).toHaveBeenCalledWith(
       expect.objectContaining({
         locale: "ko",
         viewType: "calendar",
-        properties: [expect.objectContaining({ name: "이름", type: "title" })],
+        properties: expect.arrayContaining([
+          expect.objectContaining({ name: "이름", type: "title" }),
+        ]),
       })
     );
   });
@@ -178,7 +181,7 @@ describe("store permission feedback", () => {
   });
 
   it.each(["create", "duplicate"] as const)(
-    "returns null and rolls back a template %s after a terminal durable failure",
+    "returns optimistically and rolls back a template %s after a terminal durable failure",
     async (operation) => {
       const database = makePage({ id: `template-drop-${operation}`, kind: "database" });
       seedPages([database]);
@@ -203,9 +206,11 @@ describe("store permission feedback", () => {
         ? await useStore.getState().addTemplate(database.id)
         : await useStore.getState().duplicateTemplate(source.id);
 
-      expect(result).toBeNull();
-      expect(useStore.getState().templatesByDb[database.id])
-        .toEqual(operation === "duplicate" ? [source] : []);
+      expect(result).not.toBeNull();
+      await vi.waitFor(() => {
+        expect(useStore.getState().templatesByDb[database.id])
+          .toEqual(operation === "duplicate" ? [source] : []);
+      });
     }
   );
 

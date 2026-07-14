@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Pindahkan blok ke",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Cari destinasi pindah",
+    "placeholder": "Cari halaman..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Tutup dialog pindah"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Destinasi pindah",
+    "empty": "Tiada halaman ditemui.",
+    "destinationLabel": "Pindahkan blok ke {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Cipta \"{{query}}\"",
+    "optionLabel": "Cipta halaman \"{{query}}\" dan pindahkan blok ke sini",
+    "hint": "Halaman baharu - pindahkan blok ke sini"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Halaman dikunci"
   },
-  "untitled": "Untitled",
+  "untitled": "Tidak bertajuk",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Halaman dikunci",
+    "movedBlock": "Blok dipindahkan",
+    "movedBlocks": "Blok dipindahkan",
+    "movedBlocksCount": "{{blockCount}} blok dipindahkan",
+    "moveFailed": "Tidak dapat memindahkan blok"
   }
 }

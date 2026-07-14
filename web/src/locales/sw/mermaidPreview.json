@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Mchoro wa Mermaid",
+  "emptyPreview": "Hakiki ya mchoro",
+  "sourceDescription": "Chanzo cha mchoro: {{source}}",
+  "syntaxError": "Mchoro una hitilafu ya sintaksia.",
+  "syntaxErrorDetails": "Onyesha maelezo"
 }

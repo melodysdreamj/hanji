@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Nu s-a putut restaura pagina",
+  "emptyBodyPrompt": "Apăsați Enter pentru a scrie pe această pagină goală.",
+  "inTrashTopBarTitle": "În Coș",
+  "notFoundTopBarTitle": "Nu s-a găsit",
+  "openWorkspace": "Deschideți spațiul de lucru",
+  "pageInTrash": "Această pagină este în Coș.",
+  "pageInTrashDetail": "Restaurați-o înainte de a deschide sau edita conținutul.",
+  "pageUnavailable": "Pagină indisponibilă.",
+  "pageUnavailableDetail": "Este posibil ca această pagină să fi fost ștearsă, mutată sau partajată cu un alt cont.",
+  "restorePage": "Restaurare pagină",
+  "restoredPage": "Pagină restaurată",
+  "loadingPageContent": "Se încarcă conținutul paginii"
 }

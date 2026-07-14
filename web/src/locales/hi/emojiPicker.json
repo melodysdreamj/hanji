@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "आइकन चयनक बंद करें",
+    "label": "आइकन चुनें"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "आइकन प्रकार",
+    "emoji": "इमोजी",
+    "image": "इमेज"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "हटाएं",
+    "ariaLabel": "आइकन हटाएं"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "फ़िल्टर…",
+    "searchLabel": "आइकन खोजें",
+    "random": "रैंडम",
+    "randomLabel": "रैंडम आइकन चुनें",
+    "recentLabel": "हाल ही में उपयोग किए गए पहले",
+    "gridLabelRecent": "आइकन, हाल के पहले",
+    "gridLabel": "आइकन",
+    "optionLabel": "{{emoji}} आइकन चुनें",
+    "noResults": "“{{query}}” से मेल खाने वाला कोई आइकन नहीं। कोई दूसरा शब्द आज़माएँ या फ़िल्टर साफ़ करें।"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "इमेज",
+    "linkPlaceholder": "इमेज लिंक चिपकाएँ",
+    "linkLabel": "इमेज आइकन लिंक",
+    "apply": "लागू करें",
+    "upload": "फ़ाइल अपलोड करें",
+    "uploading": "अपलोड हो रहा है...",
+    "uploadingLabel": "{{fileName}} अपलोड हो रहा है",
+    "uploadFailed": "इमेज अपलोड नहीं हो सकी।",
+    "fallbackFileName": "आइकन इमेज"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "अपलोड तैयार कर रहे हैं",
+    "finalizing": "अंतिम रूप दे रहे हैं",
+    "complete": "पूर्ण",
+    "uploading": "अपलोड हो रहा है"
   }
 }

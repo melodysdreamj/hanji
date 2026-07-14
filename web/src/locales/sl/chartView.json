@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Število",
+    "sum": "Vsota",
+    "average": "Povprečje",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Grafikon {{name}}",
+  "chartType": "Vrsta grafikona",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Stolpčni",
+    "horizontal_bar": "Vodoravni stolpčni",
+    "line": "Črtni",
+    "donut": "Krofni"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Označeno",
+  "empty": "Prazno",
+  "legend": "Legenda",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Ni podatkov",
+  "noDataDesc": "Nobena vrstica ne ustreza trenutnim filtrom ali iskanju.",
+  "noGroupProperty": "Nič za prikaz v grafikonu",
+  "noGroupPropertyDesc": "Dodajte lastnost izbire, statusa, osebe, potrditvenega polja ali datuma za združevanje tega grafikona.",
+  "total": "Skupaj",
+  "unchecked": "Neoznačeno",
+  "untitledProperty": "Neimenovano",
+  "valueProperty": "Vrednostna lastnost",
+  "xAxis": "X-os",
+  "yAxis": "Y-os"
 }

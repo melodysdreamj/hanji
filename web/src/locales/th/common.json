@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "ยกเลิก",
+    "save": "บันทึก",
+    "close": "ปิด",
+    "search": "ค้นหา",
+    "create": "สร้าง",
+    "delete": "ลบ",
+    "clearAll": "ล้างทั้งหมด",
+    "done": "เสร็จ",
+    "add": "เพิ่ม"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ไม่มีชื่อ"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} สำเนา",
+    "columnName": "คอลัมน์ {{number}}",
+    "importedDatabase": "ฐานข้อมูลที่นำเข้า",
+    "uploadedFile": "ไฟล์ที่อัปโหลด",
+    "image": "รูปภาพ",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "ชื่อ",
+      "status": "สถานะ",
+      "select": "ตัวเลือก",
+      "date": "วันที่"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ยังไม่เริ่ม",
+      "doing": "กำลังดำเนินการ",
+      "done": "เสร็จสิ้น"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ตัวเลือก 1",
+      "second": "ตัวเลือก 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ตาราง"
     }
   }
 }

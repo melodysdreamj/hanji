@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Skupna stran",
+  "loading": "Nalaganje skupne strani",
+  "unavailable": "Ta skupna stran ni na voljo.",
+  "notFound": "Skupna stran ni bila najdena.",
+  "outsideShare": "Ta stran ni del te javne objave.",
+  "errors": {
+    "offline": "Preverite povezavo in nato poskusite znova odpreti skupno stran.",
+    "not-found": "Povezava je morda potekla, je bila neobjavljena ali napačno kopirana.",
+    "rate-limited": "Ta skupna stran prejema preveč zahtev. Počakajte trenutek in poskusite znova.",
+    "unavailable": "Hanji trenutno ne more odpreti te skupne strani. Poskusite znova čez trenutek."
+  },
+  "tryAgain": "Poskusite znova"
 }

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ፈልግ ወይም ዝለል ወደ...",
+  "quickFind": "ፈጣን ፍለጋ",
+  "closeSearch": "ፍለጋ ዝጋ",
+  "quickFindResults": "ፈጣን ፍለጋ ውጤቶች",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "በቅርብ የታዩ",
+    "recentSearches": "የቅርብ ፍለጋዎች",
+    "pages": "ገጾች",
+    "pageContent": "የገጽ ይዘት",
+    "favorites": "ተወዳጆች"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "በገጽ ውስጥ",
+  "searchingDetail": "በመፈለግ ላይ...",
+  "searchAgain": "ዳግም ፈልግ",
+  "searchingPageContent": "የገጽ ይዘትን በመፈለግ ላይ...",
+  "noResultsFor": "ለ\"{{query}}\" ምንም ውጤት የለም",
+  "noPagesFound": "ምንም ገጾች አልተገኙም",
+  "creating": "በመፍጠር ላይ...",
+  "newPage": "አዲስ ገጽ \"{{query}}\"",
+  "couldntCreatePage": "ገፅ መፍጠር አልተቻለም",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "ምረጥ",
+    "open": "ክፈት",
+    "newTab": "አዲስ ትር"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "လုပ်ငန်းခွင်သစ်",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Workspace အမည်",
+    "placeholder": "ကျွန်ုပ်တို့၏ ကုမ္ပဏီ"
   },
-  "startLabel": "Start from",
+  "startLabel": "စတင်နည်း",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "ဗလာ လုပ်ငန်းခွင်",
+      "body": "စတင်စာမျက်နှာများဖြင့် အလွတ်စတင်ပါ။"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion မှ တင်သွင်းရန်",
+      "body": "လုပ်ငန်းခွင်ကို ဖန်တီးပြီး Notion လုပ်ငန်းခွင်တစ်ခုကို ၎င်းထဲသို့ ပြောင်းရွှေ့ပါ။"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "အခြား Hanji မှ တင်သွင်းရန်",
+      "body": "လုပ်ငန်းခွင်ကို ဖန်တီးပြီး အခြား Hanji ဆာဗာ သို့မဟုတ် ဖိုင်မှ လုပ်ငန်းခွင်တစ်ခုကို တင်သွင်းပါ။"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Workspace ဖန်တီးပါ",
+  "creating": "ဖန်တီးနေသည်...",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Workspace ဖန်တီးမရပါ။"
   }
 }

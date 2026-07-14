@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Luar talian",
+  "offlinePending_one": "Luar talian · {{count}} perubahan tertunda",
+  "offlinePending_other": "Luar talian · {{count}} perubahan tertunda",
+  "syncing": "Menyegerakan · {{count}}",
+  "unreachable": "Tidak dapat mencapai server",
+  "unreachablePending_one": "Tidak dapat mencapai server · {{count}} perubahan menunggu",
+  "unreachablePending_other": "Tidak dapat mencapai server · {{count}} perubahan menunggu",
+  "retryHint": "Klik untuk cuba semula sekarang"
 }

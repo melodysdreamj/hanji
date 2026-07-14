@@ -7,6 +7,7 @@ import { startLocalBundleFreshnessWatch } from "@/lib/devBundleFreshness";
 import { registerServiceWorker } from "@/lib/serviceWorker";
 import { applyTheme, getThemePref } from "@/lib/theme";
 import { initI18n } from "@/i18n";
+import { currentSessionUserIdHint } from "@/lib/edgebase";
 
 applyTheme(getThemePref());
 startLocalBundleFreshnessWatch();
@@ -28,4 +29,4 @@ const renderApp = () =>
     </StrictMode>
   );
 
-void initI18n().then(renderApp, renderApp);
+void initI18n(currentSessionUserIdHint()).then(renderApp, renderApp);

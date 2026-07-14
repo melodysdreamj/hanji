@@ -1,7 +1,7 @@
 {
   "ariaLabel": "法的情報とソース情報",
-  "noWarranty": "保証なしで提供されます。",
+  "noWarranty": "無保証で提供されます。",
   "sourceCode": "ソース",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "スポンサーバナー例外 2.0"
+  "sponsorException": "例外 2.0"
 }

@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "صفحه بازیابی نشد",
+  "emptyBodyPrompt": "برای شروع نوشتن در این صفحه خالی، Enter را بزنید",
+  "inTrashTopBarTitle": "در زباله‌دان",
+  "notFoundTopBarTitle": "یافت نشد",
+  "openWorkspace": "باز کردن فضای کاری",
+  "pageInTrash": "این صفحه در زباله‌دان است.",
+  "pageInTrashDetail": "برای باز کردن یا ویرایش محتوا، ابتدا آن را بازیابی کنید.",
+  "pageUnavailable": "صفحه در دسترس نیست.",
+  "pageUnavailableDetail": "این صفحه ممکن است حذف، جابه‌جا یا با حساب دیگری به اشتراک گذاشته شده باشد.",
+  "restorePage": "بازیابی صفحه",
+  "restoredPage": "صفحه بازیابی شد.",
+  "loadingPageContent": "در حال بارگیری محتوای صفحه"
 }

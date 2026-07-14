@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Novi workspace",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Ime radnog prostora",
+    "placeholder": "Moja kompanija"
   },
-  "startLabel": "Start from",
+  "startLabel": "Počni od",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Prazan workspace",
+      "body": "Počni prazno sa osnovnim stranicama."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Uvezi iz Notion",
+      "body": "Kreirajte workspace, zatim migrirajte Notion workspace u njega."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Uvezi iz drugog Hanji",
+      "body": "Kreirajte workspace, zatim uvezite workspace sa drugog Hanji servera ili iz datoteke."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Kreiraj radni prostor",
+  "creating": "Kreiranje…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Nije moguće kreirati radni prostor."
   }
 }

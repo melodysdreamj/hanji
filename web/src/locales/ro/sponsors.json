@@ -1,0 +1,15 @@
+{
+  "supportTitle": "Susține Hanji",
+  "thanksSponsor": "<a>{{name}}</a> sponsorizează Hanji pe măsură ce crește.",
+  "builtWith": "<a>{{name}}</a> ajută la construirea Hanji",
+  "rule1": "Bannerul afișează primii cinci sponsori în funcție de soldul rămas.",
+  "rule2": "O dată pe lună, soldul fiecărui sponsor afișat este redus cu soldul sponsorului de pe locul cinci, astfel încât toți cei cinci sponsori afișați plătesc aceeași sumă echitabilă.",
+  "settingsIntro": "Hanji este susținut de sponsorii săi. Ecranul de autentificare afișează un mic banner cu primii cinci sponsori actuali.",
+  "rule4": "Menținerea bannerului activat implicit este ceea ce acordă excepția de licență Hanji; o versiune închisă, fără banner, necesită o licență comercială separată.",
+  "rule3": "Când un sold se epuizează, locul trece la următorul sponsor în funcție de sold.",
+  "emptySlot": "Loc liber — sponsorul va apărea aici",
+  "becomeSponsor": "Devino sponsor",
+  "sponsorSlots": "Sponsori actuali",
+  "builtWithTitle": "Construit cu",
+  "builtWithIntro": "Hanji a fost construit cu ajutorul acestor instrumente și platforme."
+}

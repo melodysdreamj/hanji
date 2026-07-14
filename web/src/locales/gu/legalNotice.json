@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "કાનૂની અને સ્રોત માહિતી",
+  "noWarranty": "વોરંટી વિના પ્રદાન કરેલ.",
+  "sourceCode": "સ્રોત",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "અપવાદ 2.0"
 }

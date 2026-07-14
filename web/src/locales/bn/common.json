@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "বাতিল",
+    "save": "সংরক্ষণ",
+    "close": "বন্ধ করুন",
+    "search": "অনুসন্ধান",
+    "create": "তৈরি করুন",
+    "delete": "মুছুন",
+    "clearAll": "সব সাফ করুন",
+    "done": "সম্পন্ন",
+    "add": "যোগ করুন"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "শিরোনামহীন"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} কপি",
+    "columnName": "কলাম {{number}}",
+    "importedDatabase": "আমদানি করা ডাটাবেস",
+    "uploadedFile": "আপলোড করা ফাইল",
+    "image": "ছবি",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "নাম",
+      "status": "স্ট্যাটাস",
+      "select": "নির্বাচন",
+      "date": "তারিখ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "শুরু হয়নি",
+      "doing": "চলমান",
+      "done": "সম্পন্ন"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "বিকল্প ১",
+      "second": "বিকল্প ২"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "টেবিল"
     }
   }
 }

@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "បន្ថែមលក្ខណសម្បត្តិកាលបរិច្ឆេទ",
+    "description": "ទិដ្ឋភាពពេលវេលាត្រូវការលក្ខណសម្បត្តិកាលបរិច្ឆេទចាប់ផ្ដើមដើម្បីបង្ហាញទំព័រឆ្លងកាត់ពេលវេលា។"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "បន្ថែមលក្ខណសម្បត្តិកាលបរិច្ឆេទបញ្ចប់ដើម្បីបង្ហាញជួរពេលវេលាជំនួសឱ្យរបារមួយថ្ងៃ។",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "ពង្រីកពេលវេលា",
+    "day": "ថ្ងៃ",
+    "week": "សប្តាហ៍",
+    "month": "ខែ"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "ភាពអាស្រ័យ៖",
+    "hint": "បន្ថែមទ្រព្យសម្បត្តិទំនាក់ទំនង",
+    "relationPropertyAriaLabel": "ទ្រព្យសម្បត្តិទំនាក់ទំនងអាស្រ័យ"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ថ្ងៃនេះ",
+    "previousRange": "ជួរមុន",
+    "nextRange": "ជួរបន្ទាប់",
+    "newPage": "ថ្មី",
+    "newPageIn": "ទំព័រថ្មីក្នុង {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "តារាងពេលវេលា",
+    "nameHeader": "ឈ្មោះ"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "បើក {{title}}",
+    "openAriaLabelWithDates": "បើក {{title}}, {{start}} ដល់ {{end}}",
+    "openNoDateAriaLabel": "បើក {{title}}, គ្មានកាលបរិច្ឆេទ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "គ្មានធាតុនៅក្នុងជួរនេះទេ។",
+    "noDatedItems": "គ្មានធាតុដែលមានកាលបរិច្ឆេទនៅឡើយទេ។",
+    "jumpTo": "លោតទៅ {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "គ្មានកាលបរិច្ឆេទ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "គ្មាន",
+    "untitled": "គ្មានចំណងជើង"
   }
 }

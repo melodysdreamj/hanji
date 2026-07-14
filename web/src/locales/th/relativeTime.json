@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "เมื่อสักครู่",
+  "editedJustNow": "แก้ไขเมื่อสักครู่",
+  "editedMinutesAgo": "แก้ไข {{minutes}} นาทีที่แล้ว",
+  "editedHoursAgo": "แก้ไข {{hours}} ชั่วโมงที่แล้ว",
+  "editedDaysAgo": "แก้ไข {{days}} วันที่แล้ว",
+  "editedOn": "แก้ไขเมื่อ {{date}}",
+  "noEdits": "ไม่มีการแก้ไข",
+  "noEditsYet": "ยังไม่มีการแก้ไข",
+  "todayAt": "วันนี้ เวลา {{time}}",
+  "yesterdayAt": "เมื่อวานนี้ เวลา {{time}}",
+  "dateAt": "{{date}} เวลา {{time}}"
 }

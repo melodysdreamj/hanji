@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Datumeigenschap toevoegen",
+    "description": "Tijdlijnweergaven hebben een startdatum-eigenschap nodig om pagina's in de tijd weer te geven."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Einddatum-eigenschap toevoegen om tijdsintervallen in plaats van dagblokken weer te geven.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
+    "ariaLabel": "Tijdlijnzoom",
+    "day": "Dag",
     "week": "Week",
-    "month": "Month"
+    "month": "Maand"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Afhankelijkheden:",
+    "hint": "relatie-eigenschap toevoegen",
+    "relationPropertyAriaLabel": "Afhankelijkheidsrelatie-eigenschap"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Vandaag",
+    "previousRange": "Vorig bereik",
+    "nextRange": "Volgend bereik",
+    "newPage": "Nieuw",
+    "newPageIn": "Nieuwe pagina in {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tijdlijntabel",
+    "nameHeader": "Naam"
   },
   "bar": {
     "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabelWithDates": "Open {{title}}, {{start}} tot {{end}}",
+    "openNoDateAriaLabel": "Open {{title}}, geen datum"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Geen items in dit bereik.",
+    "noDatedItems": "Nog geen datumitems.",
+    "jumpTo": "Ga naar {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Geen datum ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Geen",
+    "untitled": "Naamloos"
   }
 }

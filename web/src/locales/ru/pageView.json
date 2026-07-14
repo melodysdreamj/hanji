@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Не удалось восстановить страницу",
+  "emptyBodyPrompt": "Нажмите Enter, чтобы начать писать на этой пустой странице.",
+  "inTrashTopBarTitle": "В корзине",
+  "notFoundTopBarTitle": "Не найдено",
+  "openWorkspace": "Открыть рабочее пространство",
+  "pageInTrash": "Эта страница находится в корзине.",
+  "pageInTrashDetail": "Восстановите её, чтобы открыть или редактировать содержимое.",
+  "pageUnavailable": "Страница недоступна.",
+  "pageUnavailableDetail": "Возможно, страница была удалена, перемещена или предоставлена другому аккаунту.",
+  "restorePage": "Восстановить страницу",
+  "restoredPage": "Страница восстановлена",
+  "loadingPageContent": "Загрузка содержимого страницы"
 }

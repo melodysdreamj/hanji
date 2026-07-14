@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Thùng rác",
+  "empty": "Các trang bạn xóa sẽ xuất hiện tại đây. Thùng rác trống.",
+  "searchTrash": "Tìm trong thùng rác",
+  "deletedPages": "Trang đã xóa",
+  "noSearchMatches": "Không có trang đã xóa nào khớp với tìm kiếm của bạn.",
+  "pageCount_one": "{{count}} trang",
+  "pageCount_other": "{{count}} trang",
+  "deletedJustNow": "Vừa xóa",
+  "deletedOn": "Đã xóa {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Khôi phục",
+    "deleteForever": "Xóa vĩnh viễn",
+    "emptyTrash": "Dọn thùng rác"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Mở {{title}} từ thùng rác",
+    "restorePage": "Khôi phục {{title}}",
+    "deletePageForever": "Xóa {{title}} vĩnh viễn",
+    "cancelPermanentDelete": "Hủy xóa vĩnh viễn",
+    "cancelEmptyTrash": "Hủy dọn thùng rác"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Xóa vĩnh viễn?",
+    "deleteBodyPrefix": "Thao tác này sẽ xóa vĩnh viễn ",
+    "deleteBodySuffix": ". Bạn không thể hoàn tác hành động này.",
+    "emptyTitle": "Dọn thùng rác?",
+    "emptyBody_one": "Thao tác này sẽ xóa vĩnh viễn tất cả {{count}} trang trong thùng rác. Bạn không thể hoàn tác hành động này.",
+    "emptyBody_other": "Thao tác này sẽ xóa vĩnh viễn tất cả {{count}} trang trong thùng rác. Bạn không thể hoàn tác hành động này."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Đã xóa vĩnh viễn",
+    "couldntDelete": "Không thể xóa trang",
+    "restored": "Đã khôi phục trang",
+    "couldntRestore": "Không thể khôi phục trang",
+    "emptied": "Đã dọn thùng rác",
+    "couldntEmpty": "Không thể dọn thùng rác"
   }
 }

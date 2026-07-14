@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Új munkaterület",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Munkaterület neve",
+    "placeholder": "Acme Kft."
   },
-  "startLabel": "Start from",
+  "startLabel": "Kezdés innen",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Üres munkaterület",
+      "body": "Üresen kezdés a kezdő oldalakkal."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Importálás Notionból",
+      "body": "Hozzon létre munkaterületet, majd telepítsen át egy Notion munkaterületet."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Importálás másik Hanjiból",
+      "body": "Hozzon létre munkaterületet, majd importáljon egy másik Hanji-szerverről vagy fájlból."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Munkaterület létrehozása",
+  "creating": "Létrehozás…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Nem sikerült létrehozni a munkaterületet."
   }
 }

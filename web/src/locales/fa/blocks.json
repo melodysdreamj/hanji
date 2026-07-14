@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "متن",
+      "description": "با متن ساده شروع به نوشتن کنید",
+      "placeholder": "برای دستورات '/' را تایپ کنید"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "صفحه",
+      "description": "ایجاد زیرصفحه در این صفحه."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "لینک به صفحه",
+      "description": "پیوند به یک صفحه موجود."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "عنوان ۱",
+      "description": "عنوان بخش بزرگ.",
+      "placeholder": "عنوان ۱"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "عنوان 1 تاشو",
+      "description": "سرتیتر بزرگی که می‌تواند محتوای تودرتو را پنهان کند.",
+      "placeholder": "عنوان 1 تاشو"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "عنوان ۲",
+      "description": "عنوان بخش متوسط.",
+      "placeholder": "عنوان ۲"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "عنوان 2 تاشو",
+      "description": "عنوان متوسط که می‌تواند محتوای درونی را پنهان کند.",
+      "placeholder": "سربرگ بازشو ۲"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "عنوان ۳",
+      "description": "عنوان بخش کوچک.",
+      "placeholder": "عنوان ۳"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "سربرگ بازشو ۳",
+      "description": "سربرگ کوچک با قابلیت پنهان‌سازی محتوای داخلی",
+      "placeholder": "سربرگ توگلی ۳"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "عنوان ۴",
+      "description": "عنوان بخش فشرده.",
+      "placeholder": "عنوان ۴"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "سربرگ توگلی ۴",
+      "description": "سربرگ فشرده برای مخفی کردن محتوای تودرتو",
+      "placeholder": "سربرگ توگلی ۴"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "لیست کارها",
+      "description": "ردیابی کارها با چک‌باکس.",
+      "placeholder": "کار"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "لیست نقطه‌ای",
+      "description": "ایجاد لیست نقطه‌ای ساده",
+      "placeholder": "لیست"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "لیست شماره‌دار",
+      "description": "ایجاد یک لیست شماره‌دار",
+      "placeholder": "لیست"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "فهرست توگل",
+      "description": "توگل‌ها محتوا را مخفی یا نمایش می‌دهند",
+      "placeholder": "توگل"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "نقل قول",
+      "description": "یک نقل قول اضافه کنید",
+      "placeholder": "نقل قول خالی"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "فراخوان",
+      "description": "برجسته کردن نوشته",
+      "placeholder": "مطلبی بنویسید…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "خط جداکننده",
+      "description": "بلوک‌ها را بصری جدا کنید."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "کد",
+      "description": "ثبت یک قطعه کد.",
+      "placeholder": "کد بنویسید، یا یک قطعه را بچسبانید…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "معادله",
+      "description": "نمایش یک معادله ریاضی."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "فهرست مطالب",
+      "description": "پیوند به سرتیترهای این صفحه را نشان بده."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "بلوک همگام‌شده",
+      "description": "استفاده مجدد از محتوا در صفحات"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "دکمه",
+      "description": "درج محتوای قابل استفاده مجدد با یک کلیک"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "تب‌ها",
+      "description": "محتوا را در تب‌های برچسب‌دار گروه‌بندی کنید",
+      "placeholder": "تب‌ها"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "مسیر راهنما",
+      "description": "نمایش مکان این صفحه"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "تکثیر",
+      "description": "ایجاد یک کپی دقیق از این بلوک."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "انتقال به",
+      "description": "انتقال این بلاک به صفحه دیگر"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "حذف این بلوک."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "تبدیل به",
+      "description": "تغییر نوع این بلاک"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "رنگ",
+      "description": "تغییر رنگ متن یا پس‌زمینه این بلوک."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "جدول",
+      "description": "یک جدول ساده به این صفحه اضافه کنید"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ستون",
+      "description": "بلوک‌ها را کنار هم بچینید."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ستون",
+      "description": "بلوک‌ها را در 3 ستون بچینید."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ستون",
+      "description": "بلوک‌ها را در 4 ستون بچینید."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ستون",
+      "description": "بلوک‌ها را در 5 ستون بچینید."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "تصویر",
+      "description": "آپلود یا جاسازی با لینک."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ویدیو",
+      "description": "جاسازی ویدیو با لینک"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "صدا",
+      "description": "جاسازی صدا با پیوند"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "نشانک وب",
+      "description": "ذخیره پیوند وب به عنوان کارت"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "جاسازی",
+      "description": "جاسازی محتوا از یک لینک."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "فایل",
+      "description": "پیوست یک پیوند فایل به این صفحه."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "پایگاه داده - صفحه کامل",
+      "description": "افزودن پایگاه داده جدید به عنوان زیرصفحه."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "جدول - تمام صفحه",
+      "description": "افزودن دیتابیس تمام صفحه به‌صورت جدول"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "تخته - تمام صفحه",
+      "description": "افزودن تخته کانبان تمام صفحه"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "لیست - تمام صفحه",
+      "description": "افزودن دیتابیس تمام صفحه به‌صورت لیست"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "تایم‌لاین - تمام صفحه",
+      "description": "افزودن تایم‌لاین دیتابیس تمام صفحه"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "تقویم - تمام صفحه",
+      "description": "افزودن دیتابیس تقویم تمام صفحه"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "گالری - تمام صفحه",
+      "description": "افزودن گالری دیتابیس تمام صفحه"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "پایگاه داده - درون‌خطی",
+      "description": "افزودن یک پایگاه داده درون این صفحه."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "نمایش جدول",
+      "description": "افزودن پایگاه داده درون‌خطی به صورت جدول."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "نمایش برد",
+      "description": "افزودن برد کانبان درون‌خطی."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "نمایش لیست",
+      "description": "افزودن پایگاه داده درون‌خطی به صورت لیست."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "نمایش خط زمانی",
+      "description": "افزودن خط زمانی پایگاه داده درون‌خطی."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "نمایش تقویم",
+      "description": "افزودن پایگاه داده تقویم درون‌خطی."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "نمایش گالری",
+      "description": "افزودن گالری پایگاه داده درون‌خطی."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "پیش‌فرض",
+      "description": "حذف رنگ متن یا پس‌زمینه از این بلوک."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "خاکستری",
+      "description": "اعمال خاکستری به این بلوک."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "قهوه‌ای",
+      "description": "اعمال رنگ قهوه‌ای به این بلوک."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "نارنجی",
+      "description": "اعمال نارنجی به این بلوک."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "زرد",
+      "description": "اعمال زرد به این بلاک."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "سبز",
+      "description": "اعمال سبز به این بلوک."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "آبی",
+      "description": "اعمال رنگ آبی به این بلوک."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "بنفش",
+      "description": "اعمال بنفش به این بلاک."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "صورتی",
+      "description": "اعمال صورتی به این بلاک."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "قرمز",
+      "description": "اعمال قرمز به این بلاک."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "پس‌زمینهٔ خاکستری",
+      "description": "اعمال پس‌زمینهٔ خاکستری به این بلوک."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "پس‌زمینه قهوه‌ای",
+      "description": "اعمال پس‌زمینه قهوه‌ای به این بلوک."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "پس‌زمینهٔ نارنجی",
+      "description": "اعمال پس‌زمینهٔ نارنجی به این بلوک."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "پس‌زمینه زرد",
+      "description": "اعمال پس‌زمینه زرد به این بلاک."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "پس‌زمینهٔ سبز",
+      "description": "اعمال پس‌زمینهٔ سبز به این بلوک."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "پس‌زمینه آبی",
+      "description": "اعمال پس‌زمینه آبی به این بلوک."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "پس‌زمینه بنفش",
+      "description": "اعمال پس‌زمینه بنفش به این بلاک."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "پس‌زمینه صورتی",
+      "description": "اعمال پس‌زمینهٔ صورتی به این بلوک."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "پس‌زمینه قرمز",
+      "description": "اعمال پس‌زمینه قرمز به این بلاک."
     }
   }
 }

@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "件数",
+    "count": "カウント",
     "sum": "合計",
     "average": "平均",
     "min": "最小",
     "max": "最大"
   },
   "chartAria": "{{name}} チャート",
-  "chartType": "チャートの種類",
+  "chartType": "チャートタイプ",
   "chartTypes": {
     "bar": "棒グラフ",
     "horizontal_bar": "横棒グラフ",
     "line": "折れ線グラフ",
-    "donut": "ドーナツグラフ"
+    "donut": "ドーナツ"
   },
-  "checked": "オン",
+  "checked": "チェック済み",
   "empty": "空",
-  "legend": "チャート凡例",
-  "monthLabel": "{{year}}年{{month}}",
-  "noData": "データがありません",
-  "noDataDesc": "現在のフィルターまたは検索に一致する行がありません。",
-  "noGroupProperty": "まだチャート化する項目がありません",
-  "noGroupPropertyDesc": "セレクト、ステータス、担当者、チェックボックス、または日付プロパティを追加してこのチャートをグループ化してください。",
+  "legend": "凡例",
+  "monthLabel": "{{year}}年{{month}}月",
+  "noData": "データなし",
+  "noDataDesc": "現在のフィルターや検索に一致する行がありません。",
+  "noGroupProperty": "グループ化するプロパティがありません",
+  "noGroupPropertyDesc": "セレクト、ステータス、メンバー、チェックボックス、または日付プロパティを追加してください。",
   "total": "合計",
-  "unchecked": "オフ",
+  "unchecked": "未チェック",
   "untitledProperty": "無題",
-  "valueProperty": "値のプロパティ",
+  "valueProperty": "値プロパティ",
   "xAxis": "X軸",
   "yAxis": "Y軸"
 }

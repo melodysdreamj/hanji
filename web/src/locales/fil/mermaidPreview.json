@@ -1,7 +1,7 @@
 {
   "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "emptyPreview": "Preview ng diagram",
+  "sourceDescription": "Pinagmulan ng diagram: {{source}}",
+  "syntaxError": "May syntax error ang diagram.",
+  "syntaxErrorDetails": "Ipakita ang detalye"
 }

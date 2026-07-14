@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Opmerkings",
+  "closeAria": "Sluit kommentaar",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Blokbespreking",
+    "page": "Bladsybespreking"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Opmerkingsstatus",
+    "open": "Oop",
+    "resolved": "Opgelos"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Kommentaar op",
+    "commentingOnSelectedText": "Kommentaar op geselekteerde teks",
+    "selectedBlock": "Geselekteerde blok",
+    "onSelectedText": "Op geselekteerde teks",
+    "onSelectedBlock": "Op geselekteerde blok",
+    "onABlock": "Op 'n blok"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Voeg 'n blokkommentaar by",
+    "addPageComment": "Voeg 'n bladkommentaar by",
+    "blockPlaceholder": "Kommentaar op hierdie blok...",
+    "pagePlaceholder": "Voeg 'n kommentaar by...",
+    "submit": "Kommentaar"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Noem mense in opmerking",
+    "replyPeopleAria": "Noem mense in antwoord",
+    "trigger": "Noem mense",
+    "noMatches": "Geen ooreenstemmende mense nie",
+    "title": "Noem {{name}}",
+    "person": "Persoon",
+    "you": "Jy",
+    "organizationPerson": "Organisasielid",
+    "roleInOrganization": "{{role}} in organisasie"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Opmerkingsdrade",
+    "empty": "Nog geen opmerkings nie",
+    "noOpen": "Geen oop opmerkings nie",
+    "noResolved": "Geen opgeloste opmerkings nie"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} se kommentaar, {{time}}",
+    "commentAriaResolved": "{{author}} se kommentaar, {{time}}, opgelos",
+    "replyAria": "{{author}} se antwoord, {{time}}",
+    "repliesAria": "{{count}} antwoorde",
+    "edited": "(gewysig)",
+    "emptyComment": "(leë kommentaar)",
+    "emptyReply": "(leë antwoord)",
+    "justNow": "Sopas"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Antwoord",
+    "showInPage": "Wys in bladsy",
+    "resolve": "Los op",
+    "reopen": "Heropen",
+    "edit": "Wysig"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Antwoord..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Wysig opmerking"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Verwyder hierdie kommentaar?",
+    "threadConfirm_one": "Vee hierdie opmerking en sy antwoord uit?",
+    "threadConfirm_other": "Vee hierdie opmerking en sy {{count}} antwoorde uit?"
   }
 }

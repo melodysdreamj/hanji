@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "ਟਿੱਪਣੀਆਂ",
+  "closeAria": "ਟਿੱਪਣੀਆਂ ਬੰਦ ਕਰੋ",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "ਬਲਾਕ ਚਰਚਾ",
+    "page": "ਪੰਨਾ ਚਰਚਾ"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "ਟਿੱਪਣੀ ਸਥਿਤੀ",
+    "open": "ਖੁੱਲ੍ਹਾ",
+    "resolved": "ਹੱਲ"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "ਟਿੱਪਣੀ-ਨਿਸ਼ਾਨ",
+    "commentingOnSelectedText": "ਚੁਣੇ ਟੈਕਸਟ 'ਤੇ ਟਿੱਪਣੀ",
+    "selectedBlock": "ਚੁਣਿਆ ਬਲਾਕ",
+    "onSelectedText": "ਚੁਣੇ ਟੈਕਸਟ 'ਤੇ",
+    "onSelectedBlock": "ਚੁਣੇ ਬਲਾਕ 'ਤੇ",
+    "onABlock": "ਬਲਾਕ 'ਤੇ"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "ਬਲਾਕ ਟਿੱਪਣੀ ਜੋੜੋ",
+    "addPageComment": "ਪੰਨਾ ਟਿੱਪਣੀ ਜੋੜੋ",
+    "blockPlaceholder": "ਇਸ ਬਲਾਕ 'ਤੇ ਟਿੱਪਣੀ...",
+    "pagePlaceholder": "ਟਿੱਪਣੀ ਜੋੜੋ...",
+    "submit": "ਟਿੱਪਣੀ ਕਰੋ"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "ਟਿੱਪਣੀ ਜ਼ਿਕਰ ਲੋਕ",
+    "replyPeopleAria": "ਜਵਾਬ ਜ਼ਿਕਰ ਲੋਕ",
+    "trigger": "ਲੋਕ ਜ਼ਿਕਰ",
+    "noMatches": "ਕੋਈ ਮੇਲ ਖਾਂਦੇ ਲੋਕ ਨਹੀਂ",
+    "title": "{{name}} ਜ਼ਿਕਰ",
+    "person": "ਵਿਅਕਤੀ",
+    "you": "ਤੁਸੀਂ",
+    "organizationPerson": "ਸੰਗਠਨ ਵਿਅਕਤੀ",
+    "roleInOrganization": "{{role}} (ਸੰਗਠਨ)"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "ਟਿੱਪਣੀ ਥਰੈਡ",
+    "empty": "ਅਜੇ ਕੋਈ ਟਿੱਪਣੀ ਨਹੀਂ",
+    "noOpen": "ਕੋਈ ਖੁੱਲ੍ਹੀ ਟਿੱਪਣੀ ਨਹੀਂ",
+    "noResolved": "ਕੋਈ ਹੱਲ ਕੀਤੀ ਟਿੱਪਣੀ ਨਹੀਂ"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ਦੀ ਟਿੱਪਣੀ, {{time}}",
+    "commentAriaResolved": "{{author}} ਦੀ ਟਿੱਪਣੀ, {{time}}, ਹੱਲ ਕੀਤੀ",
+    "replyAria": "{{author}} ਦਾ ਜਵਾਬ, {{time}}",
+    "repliesAria": "{{count}} ਜਵਾਬ",
+    "edited": "(ਸੋਧਿਆ)",
+    "emptyComment": "(ਖਾਲੀ ਟਿੱਪਣੀ)",
+    "emptyReply": "(ਖਾਲੀ ਜਵਾਬ)",
+    "justNow": "ਹੁਣੇ"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ਜਵਾਬ ਦਿਓ",
+    "showInPage": "ਪੰਨੇ ਵਿੱਚ ਦਿਖਾਓ",
+    "resolve": "ਸੁਲਝਾਓ",
+    "reopen": "ਮੁੜ ਖੋਲ੍ਹੋ",
+    "edit": "ਸੋਧੋ"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "ਜਵਾਬ..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "ਟਿੱਪਣੀ ਸੋਧੋ"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ਇਹ ਟਿੱਪਣੀ ਮਿਟਾਓ?",
+    "threadConfirm_one": "ਇਸ ਟਿੱਪਣੀ ਅਤੇ ਇਸਦੇ ਜਵਾਬ ਨੂੰ ਮਿਟਾਓ?",
+    "threadConfirm_other": "ਇਸ ਟਿੱਪਣੀ ਅਤੇ ਇਸਦੇ {{count}} ਜਵਾਬਾਂ ਨੂੰ ਮਿਟਾਓ?"
   }
 }

@@ -135,7 +135,7 @@ test('shared anonymous sign-in users explicitly finalize the current-process reg
     assert(imported.includes('finalizeRegisteredSmokeAccounts'), `${path} must import the registry finalizer`);
     assert.match(source, /finally\s*\{[\s\S]*finalizeRegisteredSmokeAccounts\s*\(/, `${path} must finalize from top-level finally`);
   }
-  assert.equal(users.length, 19, `unexpected shared anonymous sign-in inventory: ${JSON.stringify(users)}`);
+  assert.equal(users.length, 20, `unexpected shared anonymous sign-in inventory: ${JSON.stringify(users)}`);
 });
 
 test('local anonymous sign-in copies cannot grow outside the audited residual list', () => {

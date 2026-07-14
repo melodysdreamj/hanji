@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Ləğv et",
+    "save": "Yadda saxla",
+    "close": "Bağla",
+    "search": "Axtar",
+    "create": "Yarat",
+    "delete": "Sil",
+    "clearAll": "Hamısını təmizlə",
+    "done": "Hazır",
+    "add": "Əlavə et"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Başlıqsız"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} surəti",
+    "columnName": "Sütun {{number}}",
+    "importedDatabase": "İdxal edilmiş verilənlər bazası",
+    "uploadedFile": "Yüklənmiş fayl",
+    "image": "Şəkil",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Ad",
+      "status": "Vəziyyət",
+      "select": "Seçim",
+      "date": "Tarix"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Başlanmayıb",
+      "doing": "Davam edir",
+      "done": "Tamamlandı"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Seçim 1",
+      "second": "Seçim 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Cədvəl"
     }
   }
 }

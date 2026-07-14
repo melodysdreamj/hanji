@@ -1,7 +1,7 @@
 {
   "toggle": {
-    "count_one": "{{count}} rétrolien",
-    "count_other": "{{count}} rétroliens"
+    "count_one": "{{count}} backlink",
+    "count_other": "{{count}} backlinks"
   },
   "header": {
     "title": "Mentions liées"
@@ -17,7 +17,7 @@
     "link": "Lien"
   },
   "more": {
-    "count_one": "{{count}} rétrolien de plus",
-    "count_other": "{{count}} rétroliens de plus"
+    "count_one": "{{count}} backlink supplémentaire",
+    "count_other": "{{count}} backlinks supplémentaires"
   }
 }

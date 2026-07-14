@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Nepodařilo se obnovit stránku",
+  "emptyBodyPrompt": "Stisknutím Enter začněte psát na této prázdné stránce.",
+  "inTrashTopBarTitle": "V koši",
+  "loadingPageContent": "Načítání obsahu stránky",
+  "notFoundTopBarTitle": "Nenalezeno",
+  "openWorkspace": "Otevřít pracovní prostor",
+  "pageInTrash": "Tato stránka je v koši.",
+  "pageInTrashDetail": "Obnovte ji před otevřením nebo úpravou jejího obsahu.",
+  "pageUnavailable": "Stránka není k dispozici.",
+  "pageUnavailableDetail": "Tato stránka mohla být smazána, přesunuta nebo sdílena s jiným účtem.",
+  "restoredPage": "Stránka obnovena",
+  "restorePage": "Obnovit stránku"
 }

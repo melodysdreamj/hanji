@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "ದಿನಾಂಕ ಆಸ್ತಿ ಸೇರಿಸಿ",
+    "description": "ಕ್ಯಾಲೆಂಡರ್ ವೀಕ್ಷಣೆಗಳಿಗೆ ತಿಂಗಳಲ್ಲಿ ಪುಟಗಳನ್ನು ಇರಿಸಲು ದಿನಾಂಕ ಆಸ್ತಿ ಅಗತ್ಯವಿದೆ.",
+    "addDateButton": "ದಿನಾಂಕ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ಕ್ಯಾಲೆಂಡರ್ ಮೂಲಕ",
+    "today": "ಇಂದು",
+    "previousWeek": "ಹಿಂದಿನ ವಾರ",
+    "previousMonth": "ಹಿಂದಿನ ತಿಂಗಳು",
+    "nextWeek": "ಮುಂದಿನ ವಾರ",
+    "nextMonth": "ಮುಂದಿನ ತಿಂಗಳು"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ಭಾನು",
+    "mon": "ಸೋಮ",
+    "tue": "ಮಂಗಳ",
+    "wed": "ಬುಧ",
+    "thu": "ಗುರು",
+    "fri": "ಶುಕ್ರ",
+    "sat": "ಶನಿ"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} ಕ್ಯಾಲೆಂಡರ್",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ಐಟಂಗಳು",
+    "newRowAriaLabel": "{{date}} ದಿನಾಂಕದಂದು ಹೊಸ ಸಾಲು",
+    "newRowTitle": "ಹೊಸ",
+    "showLess": "ಕಡಿಮೆ ತೋರಿಸು",
+    "showMore": "+{{count}} ಹೆಚ್ಚು"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ತೆರೆಯಿರಿ",
+    "openAriaLabelWithDate": "{{title}} ತೆರೆಯಿರಿ, {{date}} ನಿಗದಿತ",
+    "openNoDateAriaLabel": "{{title}} ತೆರೆಯಿರಿ, ದಿನಾಂಕ ಇಲ್ಲ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ದಿನಾಂಕ ಇಲ್ಲ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ಶೀರ್ಷಿಕೆಯಿಲ್ಲ",
+    "dateDefaultName": "ದಿನಾಂಕ"
   }
 }

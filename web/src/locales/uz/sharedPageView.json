@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Birgalikdagi sahifa",
+  "loading": "Birgalikdagi sahifa yuklanmoqda",
+  "unavailable": "Bu birgalikdagi sahifa mavjud emas.",
+  "notFound": "Birgalikdagi sahifa topilmadi.",
+  "outsideShare": "Sahifa ushbu umumiy ulanishning bir qismi emas.",
+  "errors": {
+    "not-found": "Bu havola muddati o'tgan, nashr qilinmagan yoki noto'g'ri ko'chirilgan bo'lishi mumkin.",
+    "offline": "Ulanishni tekshiring, so'ng birgalikdagi sahifani qayta oching.",
+    "rate-limited": "Ushbu birgalikdagi sahifa juda ko'p so'rovlar olmoqda. Bir oz kuting va qayta urinib ko'ring.",
+    "unavailable": "Hanji hozirda bu birgalikdagi sahifani ocha olmadi. Bir ozdan keyin qayta urinib ko'ring."
+  },
+  "tryAgain": "Qayta urinib ko'ring"
 }

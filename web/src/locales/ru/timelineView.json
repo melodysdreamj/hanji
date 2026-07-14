@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Добавить свойство даты",
+    "description": "Для временной шкалы необходимо свойство даты начала, чтобы отображать страницы на временной оси."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Добавьте свойство даты окончания, чтобы отображать диапазоны вместо однодневных полос.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Масштаб временной шкалы",
+    "day": "День",
+    "week": "Неделя",
+    "month": "Месяц"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Зависимости:",
+    "hint": "добавьте свойство связи",
+    "relationPropertyAriaLabel": "Свойство связи зависимостей"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Сегодня",
+    "previousRange": "Предыдущий диапазон",
+    "nextRange": "Следующий диапазон",
+    "newPage": "Создать",
+    "newPageIn": "Новая страница в {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Таблица временной шкалы",
+    "nameHeader": "Название"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Открыть {{title}}",
+    "openAriaLabelWithDates": "Открыть {{title}}, {{start}}–{{end}}",
+    "openNoDateAriaLabel": "Открыть {{title}}, без даты"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Нет элементов в этом диапазоне.",
+    "noDatedItems": "Ещё нет датированных элементов.",
+    "jumpTo": "Перейти к {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Без даты ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Нет",
+    "untitled": "Без названия"
   }
 }

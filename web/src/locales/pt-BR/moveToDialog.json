@@ -1,7 +1,7 @@
 {
   "title": "Mover para",
   "workspaceRoot": {
-    "label": "Raiz do espaço de trabalho",
+    "label": "Raiz do workspace",
     "path": "Nível superior"
   },
   "search": {
@@ -9,7 +9,7 @@
     "placeholder": "Pesquisar páginas..."
   },
   "dialog": {
-    "closeLabel": "Fechar diálogo de movimentação"
+    "closeLabel": "Fechar diálogo de mover"
   },
   "results": {
     "listLabel": "Destinos de movimentação",
@@ -22,12 +22,12 @@
     "hint": "Nova página de nível superior - mover para cá"
   },
   "locked": {
-    "parent": "Pai bloqueado",
+    "parent": "Página pai bloqueada",
     "page": "Página bloqueada"
   },
   "toast": {
-    "lockedParent": "A página está em um pai bloqueado",
-    "locked": "A página está bloqueada",
+    "lockedParent": "Página em pai bloqueado",
+    "locked": "Página bloqueada",
     "moved": "Página movida",
     "moveFailed": "Não foi possível mover a página"
   }

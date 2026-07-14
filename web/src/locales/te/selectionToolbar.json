@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "టెక్స్ట్ ఫార్మాటింగ్"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "మార్చు",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "టెక్స్ట్",
+      "heading1": "శీర్షిక 1",
+      "heading2": "శీర్షిక 2",
+      "heading3": "శీర్షిక 3",
+      "heading4": "శీర్షిక 4",
+      "toDoList": "చేయాల్సిన పనుల జాబితా",
+      "bulletedList": "బుల్లెట్ జాబితా",
+      "numberedList": "సంఖ్యా జాబితా",
+      "toggleList": "టోగుల్ జాబితా",
+      "quote": "ఉద్ధరణ",
+      "callout": "కాల్‌అవుట్",
+      "code": "కోడ్"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "బోల్డ్",
+    "italic": "ఇటాలిక్",
+    "underline": "అండర్లైన్",
+    "strikethrough": "స్ట్రైక్త్రూ",
+    "code": "కోడ్",
+    "link": "లింకు"
   },
   "comment": {
-    "label": "Comment"
+    "label": "వ్యాఖ్య"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "వచన రంగు: {{color}}",
+    "title": "రంగు: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "మిశ్రమం",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "టెక్స్ట్ రంగు",
+      "default": "సాధారణ",
+      "gray": "బూడిద",
+      "brown": "గోధుమ",
+      "orange": "నారింజ",
+      "yellow": "పసుపు",
+      "green": "ఆకుపచ్చ",
+      "blue": "నీలం",
+      "purple": "ఊదా",
+      "pink": "గులాబీ",
+      "red": "ఎరుపు"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "నేపథ్య రంగు",
+      "gray": "బూడిదరంగు నేపథ్యం",
+      "brown": "గోధుమరంగు నేపథ్యం",
+      "orange": "నారింజరంగు నేపథ్యం",
+      "yellow": "పసుపు నేపథ్యం",
+      "green": "ఆకుపచ్చ నేపథ్యం",
+      "blue": "నీలిరంగు నేపథ్యం",
+      "purple": "ఊదారంగు నేపథ్యం",
+      "pink": "గులాబీరంగు నేపథ్యం",
+      "red": "ఎరుపు నేపథ్యం"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "లింకు సవరించు",
+    "placeholder": "లింకును అతికించు",
+    "urlAriaLabel": "లింక్ URL",
+    "apply": "లింకు",
+    "open": "లింకును తెరువు",
+    "copy": "లింకును కాపీ చేయి",
+    "copied": "కాపీ అయింది",
+    "copiedLink": "లింక్ కాపీ అయింది",
+    "remove": "తొలగించు"
   }
 }

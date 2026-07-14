@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "Backlink {{count}}",
+    "count_other": "Backlink {{count}}"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Mention Zilizounganishwa"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "Mention {{count}}",
+    "mention_other": "Mention {{count}}",
+    "link_one": "Kiungo {{count}}",
+    "link_other": "Viungo {{count}}"
   },
   "kind": {
     "mention": "Mention",
-    "link": "Link"
+    "link": "Kiungo"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} backlink zaidi",
+    "count_other": "{{count}} backlink zaidi"
   }
 }

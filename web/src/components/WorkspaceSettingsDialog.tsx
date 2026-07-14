@@ -51,6 +51,7 @@ import {
   transferWorkspaceOwnerRemote,
   currentUserEmail,
   currentUserId,
+  saveAccountLanguagePreferenceRemote,
   updateInstanceSignupPolicyRemote,
   updateMyWorkspaceProfileRemote,
   updateOrganizationGroupRemote,
@@ -1079,7 +1080,7 @@ export function WorkspaceSettingsDialog({
   const serverAdminSurface = surface === "server-admin";
   const adminSurface = workspaceAdminSurface || serverAdminSurface;
   const renderedSurface = surface === "settings" ? "account-console" : surface;
-  const { t } = useTranslation(["workspaceSettingsDialog", "common"]);
+  const { t } = useTranslation(["workspaceSettingsDialog", "common", "settingsErrors"]);
   const router = useRouter();
   const workspace = useStore((s) => s.workspace);
   const workspaces = useStore((s) => s.workspaces);
@@ -1204,7 +1205,9 @@ export function WorkspaceSettingsDialog({
       serverAdminSurface ? "server-overview" : workspaceAdminSurface ? "workspace" : "preferences",
     );
   const [themePref, setThemePref] = useTheme();
-  const [languagePref, setLanguagePref] = useState(() => currentLanguagePreference());
+  const [languagePref, setLanguagePref] = useState(() => currentLanguagePreference(currentUserId()));
+  const [languageSaving, setLanguageSaving] = useState(false);
+  const [languageError, setLanguageError] = useState("");
   const titleId = useId();
   const workspaceSectionId = useId();
   const deleteWorkspaceSectionId = useId();
@@ -3840,10 +3843,20 @@ export function WorkspaceSettingsDialog({
                 className={styles.languageSelect}
                 aria-label={t("workspaceSettingsDialog:ariaLanguage")}
                 value={languagePref}
+                disabled={languageSaving}
                 onChange={(event) => {
                   const nextLanguage = event.currentTarget.value;
-                  setLanguagePreference(nextLanguage);
+                  const previousLanguage = languagePref;
                   setLanguagePref(nextLanguage);
+                  setLanguageError("");
+                  setLanguageSaving(true);
+                  void saveAccountLanguagePreferenceRemote(nextLanguage)
+                    .then(() => setLanguagePreference(nextLanguage, currentUserId()))
+                    .catch(() => {
+                      setLanguagePref(previousLanguage);
+                      setLanguageError(t("settingsErrors:requestFailed"));
+                    })
+                    .finally(() => setLanguageSaving(false));
                 }}
               >
                 {[
@@ -3858,6 +3871,7 @@ export function WorkspaceSettingsDialog({
                   </option>
                 ))}
               </select>
+              {languageError ? <div className={styles.notice}>{languageError}</div> : null}
             </div>
             <SupportSection />
           </section>

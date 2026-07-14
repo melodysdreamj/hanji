@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Szöveg",
+      "description": "Kezdj el írni sima szöveggel.",
+      "placeholder": "Írj '/' a parancsokhoz"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Oldal",
+      "description": "Aloldal létrehozása ezen az oldalon."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Hivatkozás oldalra",
+      "description": "Hivatkozás meglévő oldalra."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Címsor 1",
+      "description": "Nagy szakasz címe.",
+      "placeholder": "Címsor 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Lenyitható fejléc 1",
+      "description": "Nagy címsor, ami elrejtheti a beágyazott tartalmat.",
+      "placeholder": "Lenyitható fejléc 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Címsor 2",
+      "description": "Közepes szakasz címe.",
+      "placeholder": "Címsor 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Lenyitható fejléc 2",
+      "description": "Közepes fejléc, lenyitható beágyazott tartalommal.",
+      "placeholder": "Lenyitható fejléc 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Címsor 3",
+      "description": "Kis szakasz címe.",
+      "placeholder": "Címsor 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Lenyitható fejléc 3",
+      "description": "Kis fejléc, lenyitható beágyazott tartalommal.",
+      "placeholder": "Váltó címsor 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Címsor 4",
+      "description": "Kompakt szakasz címe.",
+      "placeholder": "Címsor 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Váltó címsor 4",
+      "description": "Kompakt címsor, amely elrejtheti a beágyazott tartalmat.",
+      "placeholder": "Váltó címsor 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Teendőlista",
+      "description": "Feladatok nyomon követése jelölőnégyzettel.",
+      "placeholder": "Teendő"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Felsorolás",
+      "description": "Egyszerű felsorolás készítése.",
+      "placeholder": "Lista"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Számozott lista",
+      "description": "Hozz létre számozott listát.",
+      "placeholder": "Lista"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Váltó lista",
+      "description": "A váltók elrejthetik és megjeleníthetik a tartalmat.",
+      "placeholder": "Váltó"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Idézet",
+      "description": "Rögzíts egy idézetet.",
+      "placeholder": "Üres idézet"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Kiemelés",
+      "description": "Szöveg kiemelése.",
+      "placeholder": "Írj valamit…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Elválasztó",
+      "description": "Blokkok vizuális elválasztása."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kód",
+      "description": "Kódrészlet rögzítése.",
+      "placeholder": "Kód írása vagy kódrészlet beillesztése…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Egyenlet",
+      "description": "Matematikai egyenlet megjelenítése."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Tartalomjegyzék",
+      "description": "Az oldal címsoraihoz mutató linkek."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Szinkronizált blokk",
+      "description": "Használd fel újra a tartalmat oldalak között."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Gomb",
+      "description": "Újrafelhasználható tartalom beszúrása egy kattintással."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Fülek",
+      "description": "Csoportosítsd a tartalmat lapokba.",
+      "placeholder": "Fülek"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "Útvonal",
+      "description": "Oldal helyének mutatása."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplikálás",
+      "description": "A blokk pontos másolatának létrehozása."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Áthelyezés",
+      "description": "Blokk áthelyezése másik oldalra."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "A blokk törlése."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Átalakítás",
+      "description": "Blokk típusának megváltoztatása."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Szín",
+      "description": "A blokk szöveg- vagy háttérszínének módosítása."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Táblázat",
+      "description": "Adj hozzá egy egyszerű táblázatot ehhez az oldalhoz."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 oszlop",
+      "description": "Blokkok egymás mellé helyezése."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 oszlop",
+      "description": "Blokkok három oszlopba rendezése."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 oszlop",
+      "description": "Blokkok négy oszlopba rendezése."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 oszlop",
+      "description": "Blokkok öt oszlopba rendezése."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Kép",
+      "description": "Feltöltés vagy beágyazás hivatkozással."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "Videó",
+      "description": "Videó beágyazása linkkel."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "Hang",
+      "description": "Hang beágyazása link segítségével."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Webes könyvjelző",
+      "description": "Weblink mentése kártyaként."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Beágyazás",
+      "description": "Tartalom beágyazása linkből."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fájl",
+      "description": "Fájllink csatolása ehhez az oldalhoz."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Adatbázis - Teljes oldal",
+      "description": "Új adatbázis hozzáadása aloldalként."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Táblázat - Teljes oldal",
+      "description": "Teljes oldalas adatbázis hozzáadása táblázatként."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Tábla - Teljes oldal",
+      "description": "Teljes oldalas kanban tábla hozzáadása."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Lista - Teljes oldal",
+      "description": "Teljes oldalas adatbázis hozzáadása listaként."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Idővonal - Teljes oldal",
+      "description": "Teljes oldalas idővonal adatbázis hozzáadása."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Naptár - Teljes oldal",
+      "description": "Teljes oldalas naptár adatbázis hozzáadása."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galéria - Teljes oldal",
+      "description": "Teljes oldalas adatbázis galéria hozzáadása."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Adatbázis - Inline",
+      "description": "Adatbázis hozzáadása az oldalba."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Táblázat nézet",
+      "description": "Inline táblázat adatbázis hozzáadása."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Tábla nézet",
+      "description": "Inline kanban tábla hozzáadása."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Lista nézet",
+      "description": "Inline lista adatbázis hozzáadása."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Idővonal nézet",
+      "description": "Inline idővonal adatbázis hozzáadása."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Naptár nézet",
+      "description": "Inline naptár adatbázis hozzáadása."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Galéria nézet",
+      "description": "Inline galéria adatbázis hozzáadása."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Alapértelmezett",
+      "description": "Szöveg- vagy háttérszín eltávolítása ebből a blokkból."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Szürke",
+      "description": "Szürke alkalmazása erre a blokkra."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Barna",
+      "description": "Barna szín alkalmazása erre a blokkra."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Narancssárga",
+      "description": "Narancssárga szín alkalmazása erre a blokkra."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Sárga",
+      "description": "Sárga alkalmazása erre a blokkra."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Zöld",
+      "description": "Zöld szín alkalmazása erre a blokkra."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Kék",
+      "description": "Kék szín alkalmazása erre a blokkra."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Lila",
+      "description": "Lila alkalmazása erre a blokkra."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Rózsaszín",
+      "description": "Rózsaszín alkalmazása erre a blokkra."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Piros",
+      "description": "Piros alkalmazása erre a blokkra."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Szürke háttér",
+      "description": "Szürke háttér alkalmazása erre a blokkra."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Barna háttér",
+      "description": "Barna háttér alkalmazása erre a blokkra."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Narancssárga háttér",
+      "description": "Narancssárga háttér alkalmazása erre a blokkra."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Sárga háttér",
+      "description": "Sárga háttér alkalmazása erre a blokkra."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Zöld háttér",
+      "description": "Zöld háttér alkalmazása erre a blokkra."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Kék háttér",
+      "description": "Kék háttér alkalmazása erre a blokkra."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Lila háttér",
+      "description": "Lila háttér alkalmazása erre a blokkra."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Rózsaszín háttér",
+      "description": "Rózsaszín háttér alkalmazása erre a blokkra."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Piros háttér",
+      "description": "Piros háttér alkalmazása erre a blokkra."
     }
   }
 }

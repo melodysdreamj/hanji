@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "တရားဝင်အကြောင်းကြားချက်နှင့် အရင်းအမြစ်အချက်အလက်များ",
+  "noWarranty": "အာမခံချက်မရှိဘဲ ပံ့ပိုးထားပါသည်။",
+  "sourceCode": "ရင်းမြစ်",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "ချွင်းချက် 2.0"
 }

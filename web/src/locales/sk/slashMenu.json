@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blokové príkazy",
+  "closeBlockCommands": "Zavrieť blokové príkazy",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Základné bloky",
+    "Media": "Médiá",
+    "Database": "Databáza",
+    "Advanced": "Pokročilé bloky"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} z {{total}} blokových príkazov. Stlačte Enter pre vloženie.",
+  "listStatus": "K dispozícii je {{total}} blokových príkazov.",
+  "noBlocks": "Nenašli sa žiadne bloky",
+  "noBlocksFor": "Nenašli sa žiadne bloky pre \"{{query}}\"",
+  "recentlyUsed": "Naposledy použité"
 }

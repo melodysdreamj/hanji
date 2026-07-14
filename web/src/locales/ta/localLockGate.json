@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "லோக்கல் தரவைத் திற",
+  "description": "திறப்பது ஆஃப்லைன் பயன்பாட்டையும் சேமிப்பையும் மீண்டும் இயக்கும்.",
+  "passphrasePlaceholder": "கடவுச்சொற்றொடர்",
+  "unlock": "திற",
+  "continueOnline": "ஆன்லைனில் மட்டும் தொடரவும்",
+  "continueOnlineHint": "\"ஆன்லைனில் மட்டும் தொடரவும்\" என்பது இச்சாதனத்தின் பூட்டப்பட்ட ஆஃப்லைன் திருத்தங்களை முத்திரையிட்டு வைக்கும் — அவை இச்சாதனத்திலேயே இருக்கும், சரியான கடவுச்சொற்றொடரால் திறக்கும் வரை ஒத்திசையாது.",
+  "wrongPassphrase": "அந்தக் கடவுச்சொற்றொடர் சரியில்லை.",
+  "unsupportedBrowser": "இந்த உலாவியில் லோக்கல் லாக் கிடைக்காது."
 }

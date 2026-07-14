@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Halaman bersama",
+  "loading": "Memuat halaman bersama",
+  "unavailable": "Halaman bersama ini tidak tersedia.",
+  "notFound": "Halaman bersama tidak ditemukan.",
+  "outsideShare": "Halaman ini bukan bagian dari berbagi publik ini.",
+  "tryAgain": "Coba lagi",
+  "errors": {
+    "not-found": "Tautan ini mungkin sudah kedaluwarsa, tidak dipublikasikan, atau disalin dengan salah.",
+    "rate-limited": "Halaman bersama ini menerima terlalu banyak permintaan. Tunggu sebentar dan coba lagi.",
+    "offline": "Periksa koneksi Anda, lalu coba buka halaman bersama lagi.",
+    "unavailable": "Hanji tidak dapat membuka halaman bersama ini saat ini. Coba lagi sebentar."
+  }
 }

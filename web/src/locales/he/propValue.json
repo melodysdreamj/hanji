@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "טוען פריטי קשר",
+  "relationUnavailable": "פריטי קשר לא זמינים",
+  "unavailable": "לא זמין",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "מסומן",
+    "unchecked": "לא מסומן"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "פתח {{title}}",
+  "openOrDownloadFile": "פתח או הורד {{name}}"
 }

@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "មិនអាចស្តារទំព័របានទេ",
+  "emptyBodyPrompt": "ចុចគ្រាប់ចុច Enter ដើម្បីចាប់ផ្តើមសរសេរនៅលើទំព័រទទេនេះ។",
+  "inTrashTopBarTitle": "នៅក្នុងធុងសំរាម",
+  "notFoundTopBarTitle": "រកមិនឃើញ",
+  "openWorkspace": "បើកលំហការងារ",
+  "pageInTrash": "ទំព័រនេះស្ថិតនៅក្នុងធុងសំរាម។",
+  "pageInTrashDetail": "សូមស្តារវាឡើងវិញមុនពេលបើក ឬកែសម្រួលមាតិការបស់វា។",
+  "pageUnavailable": "ទំព័រមិនអាចប្រើបាន។",
+  "pageUnavailableDetail": "ទំព័រនេះអាចត្រូវបានលុប ផ្លាស់ទី ឬចែករំលែកជាមួយគណនីផ្សេង។",
+  "restorePage": "ស្តារទំព័រ",
+  "restoredPage": "បានស្តារទំព័រ",
+  "loadingPageContent": "កំពុងផ្ទុកមាតិកាទំព័រ"
 }

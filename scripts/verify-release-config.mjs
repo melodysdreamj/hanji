@@ -92,6 +92,9 @@ const STRICT_RELEASE_FILE_KEYS = [
   'HANJI_CLOUDFLARE_EMAIL_BINDING',
   'HANJI_CLOUDFLARE_EMAIL_ACCOUNT_ID',
   'HANJI_CLOUDFLARE_EMAIL_API_TOKEN',
+  'HANJI_BROWSER_SETUP',
+  'HANJI_BROWSER_SETUP_TOKEN',
+  'HANJI_TRUST_SELF_HOSTED_PROXY',
   'HANJI_MASTER_EMAIL',
   'HANJI_MASTER_PASSWORD',
   'HANJI_INSTANCE_ADMIN_USER_IDS',
@@ -827,6 +830,12 @@ export function validateProductionEnvironment(
       'HANJI_MASTER_DEV_AUTOLOGIN is retired and must be disabled for a release deploy.',
     );
   }
+  const trustSelfHostedProxy = value(env, 'HANJI_TRUST_SELF_HOSTED_PROXY').toLowerCase();
+  if (requireLegalUrls && !['0', 'false'].includes(trustSelfHostedProxy)) {
+    errors.push('HANJI_TRUST_SELF_HOSTED_PROXY must be explicitly set to false or 0 in strict release mode.');
+  } else if (['1', 'true', 'yes', 'on'].includes(trustSelfHostedProxy)) {
+    errors.push('HANJI_TRUST_SELF_HOSTED_PROXY is reserved for the self-hosted Docker reverse-proxy boundary.');
+  }
   const ssrfDnsCheck = value(env, 'HANJI_SSRF_DNS_CHECK').toLowerCase();
   if (requireLegalUrls && ssrfDnsCheck !== 'on') {
     errors.push('HANJI_SSRF_DNS_CHECK must be explicitly set to on in strict release mode.');
@@ -971,23 +980,55 @@ export function validateProductionEnvironment(
     errors.push('HANJI_NOTION_IMPORT_JOB_RETENTION_DAYS must be an integer from 1 to 365.');
   }
 
+  const browserSetup = value(env, 'HANJI_BROWSER_SETUP').toLowerCase();
+  const setupToken = value(env, 'HANJI_BROWSER_SETUP_TOKEN');
   const masterEmail = value(env, 'HANJI_MASTER_EMAIL');
   const masterPassword = value(env, 'HANJI_MASTER_PASSWORD');
-  if (!isDeliverableEmail(masterEmail)) {
+  const legacyMasterConfigured = Boolean(masterEmail && masterPassword);
+  if (Boolean(masterEmail) !== Boolean(masterPassword)) {
+    errors.push(
+      'HANJI_MASTER_EMAIL and HANJI_MASTER_PASSWORD must both be empty for browser setup, or both be set for legacy noninteractive provisioning.',
+    );
+  }
+  if (requireLegalUrls && browserSetup !== 'true') {
+    errors.push('HANJI_BROWSER_SETUP must be explicitly set to true in strict release mode.');
+  } else if (browserSetup && browserSetup !== 'true') {
+    errors.push('HANJI_BROWSER_SETUP must be exactly true when configured.');
+  }
+  if (!legacyMasterConfigured && browserSetup !== 'true') {
+    errors.push('Enable HANJI_BROWSER_SETUP=true when master credentials are not configured.');
+  }
+  if (setupToken) registerSecret('HANJI_BROWSER_SETUP_TOKEN');
+  if (!legacyMasterConfigured && (
+    !looksCryptographicallyRandom(setupToken, 43) ||
+    !/^[A-Za-z0-9_-]+$/.test(setupToken)
+  )) {
+    errors.push(
+      'HANJI_BROWSER_SETUP_TOKEN must be an independently generated URL-safe secret of at least 43 characters for browser setup.',
+    );
+  } else if (setupToken && (
+    !looksCryptographicallyRandom(setupToken, 43) ||
+    !/^[A-Za-z0-9_-]+$/.test(setupToken)
+  )) {
+    errors.push('HANJI_BROWSER_SETUP_TOKEN must be a strong URL-safe secret of at least 43 characters when configured.');
+  }
+  if (masterEmail && !isDeliverableEmail(masterEmail)) {
     errors.push('HANJI_MASTER_EMAIL must use a canonical, non-reserved public email domain.');
   }
-  registerSecret('HANJI_MASTER_PASSWORD');
-  if (
-    !looksCryptographicallyRandom(masterPassword, 16) ||
-    masterPassword.length > 256 ||
-    !/[A-Z]/.test(masterPassword) ||
-    !/[a-z]/.test(masterPassword) ||
-    !/[0-9]/.test(masterPassword) ||
-    !/[^A-Za-z0-9]/.test(masterPassword)
-  ) {
-    errors.push(
-      'HANJI_MASTER_PASSWORD must be 16-256 characters with upper/lowercase letters, a number, a special character, no whitespace/control characters, and sufficient diversity.',
-    );
+  if (masterPassword) {
+    registerSecret('HANJI_MASTER_PASSWORD');
+    if (
+      !looksCryptographicallyRandom(masterPassword, 16) ||
+      masterPassword.length > 256 ||
+      !/[A-Z]/.test(masterPassword) ||
+      !/[a-z]/.test(masterPassword) ||
+      !/[0-9]/.test(masterPassword) ||
+      !/[^A-Za-z0-9]/.test(masterPassword)
+    ) {
+      errors.push(
+        'HANJI_MASTER_PASSWORD must be 16-256 characters with upper/lowercase letters, a number, a special character, no whitespace/control characters, and sufficient diversity.',
+      );
+    }
   }
 
   const adminIds = value(env, 'HANJI_INSTANCE_ADMIN_USER_IDS');
@@ -998,8 +1039,8 @@ export function validateProductionEnvironment(
       'Instance-admin email allowlists are retired because password-signup emails are unverified; use HANJI_MASTER_EMAIL or HANJI_INSTANCE_ADMIN_USER_IDS.',
     );
   }
-  if (!adminIds && !masterEmail) {
-    errors.push('Configure an explicit instance-admin user ID or set HANJI_MASTER_EMAIL.');
+  if (!adminIds && !legacyMasterConfigured && !(browserSetup === 'true' && setupToken)) {
+    errors.push('Configure an explicit instance-admin user ID, browser setup, or legacy master credentials.');
   }
   if (requireLegalUrls && !adminIds) {
     errors.push('HANJI_INSTANCE_ADMIN_USER_IDS must explicitly be off or a comma-separated immutable user-ID list in strict release mode.');

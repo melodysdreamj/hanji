@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "بستن انتخابگر آیکون",
+    "label": "انتخاب آیکون"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "نوع آیکون",
+    "emoji": "ایموجی",
+    "image": "تصویر"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "حذف",
+    "ariaLabel": "حذف آیکون"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "فیلتر…",
+    "searchLabel": "جستجوی آیکون‌ها",
+    "random": "تصادفی",
+    "randomLabel": "انتخاب آیکون تصادفی",
+    "recentLabel": "ابتدا موارد استفاده‌شده اخیر",
+    "gridLabelRecent": "آیکون‌ها، ابتدا موارد اخیر",
+    "gridLabel": "آیکون‌ها",
+    "optionLabel": "انتخاب آیکون {{emoji}}",
+    "noResults": "هیچ آیکونی با “{{query}}” مطابقت ندارد. کلمه دیگری امتحان کنید یا فیلتر را پاک کنید."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "تصویر",
+    "linkPlaceholder": "لینک تصویر را بچسبانید",
+    "linkLabel": "پیوند تصویر آیکون",
+    "apply": "اعمال",
+    "upload": "بارگذاری فایل",
+    "uploading": "بارگذاری...",
+    "uploadingLabel": "بارگذاری {{fileName}}",
+    "uploadFailed": "تصویر بارگذاری نشد.",
+    "fallbackFileName": "تصویر آیکون"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "آماده‌سازی بارگذاری",
+    "finalizing": "نهایی‌سازی",
+    "complete": "تکمیل",
+    "uploading": "در حال بارگذاری"
   }
 }

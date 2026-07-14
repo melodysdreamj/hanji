@@ -13,6 +13,22 @@ function db(tables: Record<string, Row[]> = {}) {
 }
 
 describe('database-mutation createDatabase', () => {
+  it('preserves the client-generated starter view id for local-first creation', async () => {
+    const result = await callFunction(POST, db(), OWNER, {
+      action: 'createDatabase',
+      id: 'db-client-view-id',
+      viewId: 'view-client-generated',
+      workspaceId: 'ws1',
+      parentId: null,
+      parentType: 'workspace',
+      viewType: 'table',
+      seedRows: false,
+    }) as { views: Row[] };
+
+    expect(result.views).toHaveLength(1);
+    expect(result.views[0]?.id).toBe('view-client-generated');
+  });
+
   it('uses opt-in Korean starter names while preserving English defaults for existing API callers', async () => {
     const english = (await callFunction(POST, db(), OWNER, {
       action: 'createDatabase',

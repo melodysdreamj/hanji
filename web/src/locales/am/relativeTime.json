@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "አሁን",
+  "editedJustNow": "አሁን ተስተካክሏል",
+  "editedMinutesAgo": "{{minutes}} ደቂቃ በፊት ተስተካክሏል",
+  "editedHoursAgo": "{{hours}} ሰዓት በፊት ተስተካክሏል",
+  "editedDaysAgo": "{{days}} ቀን በፊት ተስተካክሏል",
+  "editedOn": "{{date}} ተስተካክሏል",
+  "noEdits": "አስተካክሎች የሉም",
+  "noEditsYet": "እስካሁን አስተካክሎች የሉም",
+  "todayAt": "ዛሬ {{time}}",
+  "yesterdayAt": "ትናንት {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

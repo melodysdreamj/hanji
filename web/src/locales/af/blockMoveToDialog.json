@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Skuif blok na",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Soek skuif bestemmings",
+    "placeholder": "Soek bladsye..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Sluit skuif dialoog"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Skuif bestemmings",
+    "empty": "Geen bladsye gevind nie.",
+    "destinationLabel": "Skuif blok na {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Skep \"{{query}}\"",
+    "optionLabel": "Skep bladsy \"{{query}}\" en skuif blok hierheen",
+    "hint": "Nuwe bladsy - skuif blok hierheen"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Geslote bladsy"
   },
-  "untitled": "Untitled",
+  "untitled": "Ongetiteld",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Bladsy is gesluit",
+    "movedBlock": "Blok geskuif",
+    "movedBlocks": "Blokke geskuif",
+    "movedBlocksCount": "{{blockCount}} blokke geskuif",
+    "moveFailed": "Kon nie blok skuif nie"
   }
 }

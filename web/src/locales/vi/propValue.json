@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Đang tải các mục quan hệ",
+  "relationUnavailable": "Mục liên kết không khả dụng",
+  "unavailable": "Không khả dụng",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Đã chọn",
+    "unchecked": "Chưa chọn"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "Mở {{title}}",
+  "openOrDownloadFile": "Mở hoặc tải xuống {{name}}"
 }

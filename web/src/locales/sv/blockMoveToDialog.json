@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Flytta block till",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Sök flyttdestinationer",
+    "placeholder": "Sök sidor..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Stäng flyttdialog"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Flyttdestinationer",
+    "empty": "Inga sidor hittades.",
+    "destinationLabel": "Flytta block till {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Skapa \"{{query}}\"",
+    "optionLabel": "Skapa sidan \"{{query}}\" och flytta block hit",
+    "hint": "Ny sida – flytta block hit"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Låst sida"
   },
-  "untitled": "Untitled",
+  "untitled": "Namnlös",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Sidan är låst",
+    "movedBlock": "Block flyttat",
+    "movedBlocks": "Block flyttade",
+    "movedBlocksCount": "{{blockCount}} block flyttade",
+    "moveFailed": "Kunde inte flytta block"
   }
 }

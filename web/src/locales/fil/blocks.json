@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Teksto",
+      "description": "Magsulat gamit ang plain text",
+      "placeholder": "I-type '/' para sa command"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Pahina",
+      "description": "Gumawa ng sub-pahina sa loob ng pahinang ito."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Link sa pahina",
+      "description": "Mag-link sa isang umiiral na pahina."
     },
     "heading_1": {
       "label": "Heading 1",
-      "description": "Big section heading.",
+      "description": "Malaking heading ng seksyon.",
       "placeholder": "Heading 1"
     },
     "toggle_heading_1": {
       "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
+      "description": "Malaking heading na maaaring itago ang mga nested na nilalaman.",
       "placeholder": "Toggle heading 1"
     },
     "heading_2": {
       "label": "Heading 2",
-      "description": "Medium section heading.",
+      "description": "Katamtamang heading ng seksyon.",
       "placeholder": "Heading 2"
     },
     "toggle_heading_2": {
       "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
+      "description": "Katamtamang heading na nagtatago ng nested content.",
       "placeholder": "Toggle heading 2"
     },
     "heading_3": {
       "label": "Heading 3",
-      "description": "Small section heading.",
+      "description": "Maliit na heading ng seksyon.",
       "placeholder": "Heading 3"
     },
     "toggle_heading_3": {
       "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
+      "description": "Maliit na heading na nagtatago ng nested content.",
       "placeholder": "Toggle heading 3"
     },
     "heading_4": {
       "label": "Heading 4",
-      "description": "Compact section heading.",
+      "description": "Kompaktong heading ng seksyon.",
       "placeholder": "Heading 4"
     },
     "toggle_heading_4": {
       "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
+      "description": "Compact na heading na maaaring itago ang nested content.",
       "placeholder": "Toggle heading 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Listahan ng Gagawin",
+      "description": "Subaybayan ang mga gawain gamit ang checkbox.",
+      "placeholder": "Gagawin"
     },
     "bulleted_list_item": {
       "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "description": "Gumawa ng simpleng bulleted list.",
+      "placeholder": "Listahan"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Listahang may numero",
+      "description": "Gumawa ng listahang may numero",
+      "placeholder": "Listahan"
     },
     "toggle": {
       "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
+      "description": "Maaaring itago at ipakita ng toggle ang nilalaman.",
       "placeholder": "Toggle"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Sipi",
+      "description": "Kumuha ng quote",
+      "placeholder": "Blangkong sipi"
     },
     "callout": {
       "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "description": "I-highlight ang pagsulat.",
+      "placeholder": "Mag-type rito…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Paghahati",
+      "description": "Paghiwalayin ang mga bloke nang biswal."
     },
     "code": {
       "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "description": "Kumuha ng code snippet.",
+      "placeholder": "Magsulat ng code, o mag-paste ng snippet…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Ekwasyon",
+      "description": "Magpakita ng mathematical equation."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Talaan ng Nilalaman",
+      "description": "Ipinapakita ang mga link sa mga heading sa pahinang ito."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Naka-sync na block",
+      "description": "Muling gamitin ang nilalaman sa iba't ibang pahina."
     },
     "button": {
       "label": "Button",
-      "description": "Insert reusable content with one click."
+      "description": "I-insert ang reusable na content sa isang click."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Tab",
+      "description": "Pangkatin ang nilalaman sa may label na mga tab.",
+      "placeholder": "Tab"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Ipakita ang lokasyon ng page na ito."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Kopyahin",
+      "description": "Gumawa ng eksaktong kopya ng block na ito."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Ilipat sa",
+      "description": "Ilipat ang block na ito sa ibang page."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Tanggalin ang block na ito."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Gawing",
+      "description": "Baguhin ang uri ng block na ito."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Kulay",
+      "description": "Baguhin ang kulay ng text o background ng block na ito."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Talahanayan",
+      "description": "Magdagdag ng simpleng talahanayan sa pahinang ito."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 kolum",
+      "description": "Ilagay ang mga bloke nang magkatabi."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 kolum",
+      "description": "Ayusin ang mga bloke sa tatlong kolum."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 kolum",
+      "description": "Ayusin ang mga bloke sa apat na kolum."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 kolum",
+      "description": "Ayusin ang mga bloke sa limang kolum."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Larawan",
+      "description": "Mag-upload o mag-embed gamit ang link."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "I-embed ang video gamit ang link."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "I-embed ang audio gamit ang link."
     },
     "bookmark": {
       "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "description": "I-save ang web link bilang card."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "I-embed",
+      "description": "I-embed ang nilalaman mula sa isang link."
     },
     "file": {
       "label": "File",
-      "description": "Attach a file link to this page."
+      "description": "Mag-attach ng file link sa pahinang ito."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Database - Buong pahina",
+      "description": "Magdagdag ng bagong database bilang sub-pahina."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Table - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang database bilang table."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Board - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang Kanban board."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Listahan - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang database bilang listahan."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Timeline - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang database timeline."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalendaryo - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang database ng kalendaryo."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Gallery - Buong pahina",
+      "description": "Magdagdag ng buong-pahinang database gallery."
     },
     "inline_database": {
       "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "description": "Magdagdag ng database sa loob ng pahinang ito."
     },
     "inline_database_table": {
       "label": "Table view",
-      "description": "Add an inline database as a table."
+      "description": "Magdagdag ng inline na database bilang talahanayan."
     },
     "inline_database_board": {
       "label": "Board view",
-      "description": "Add an inline kanban board."
+      "description": "Magdagdag ng inline na kanban board."
     },
     "inline_database_list": {
       "label": "List view",
-      "description": "Add an inline database as a list."
+      "description": "Magdagdag ng inline na database bilang listahan."
     },
     "inline_database_timeline": {
       "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "description": "Magdagdag ng inline na timeline ng database."
     },
     "inline_database_calendar": {
       "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "description": "Magdagdag ng inline na calendar database."
     },
     "inline_database_gallery": {
       "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "description": "Magdagdag ng inline na database gallery."
     },
     "color_default": {
       "label": "Default",
-      "description": "Remove text or background color from this block."
+      "description": "Alisin ang kulay ng teksto o background ng bloke."
     },
     "color_gray": {
       "label": "Gray",
-      "description": "Apply gray to this block."
+      "description": "Gamitan ng gray ang blokeng ito."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Kayumanggi",
+      "description": "Ilapat ang kayumanggi sa block na ito."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Kahel",
+      "description": "Gamitan ng kahel ang blokeng ito."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Dilaw",
+      "description": "Ilapat ang dilaw sa block na ito."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Berde",
+      "description": "Gamitan ng berde ang blokeng ito."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Asul",
+      "description": "Ilapat ang asul sa block na ito."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Lila",
+      "description": "Ilapat ang lila sa block na ito."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Rosas",
+      "description": "Ilapat ang rosas sa block na ito."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Pula",
+      "description": "Ilapat ang pula sa block na ito."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Gray na background",
+      "description": "Gamitan ng gray na background ang blokeng ito."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Kayumangging background",
+      "description": "Ilapat ang kayumangging background sa block na ito."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Kahel na background",
+      "description": "Gamitan ng kahel na background ang blokeng ito."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Dilaw na background",
+      "description": "Ilapat ang dilaw na background sa block na ito."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Berdeng background",
+      "description": "Gamitan ng berdeng background ang blokeng ito."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Asul na background",
+      "description": "Ilapat ang asul na background sa block na ito."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Lilang background",
+      "description": "Ilapat ang lilang background sa block na ito."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Rosas na background",
+      "description": "Gamitan ng rosas na background ang blokeng ito."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Pulang background",
+      "description": "Ilapat ang pulang background sa block na ito."
     }
   }
 }

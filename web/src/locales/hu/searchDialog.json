@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Keresés vagy ugrás...",
+  "quickFind": "Gyorskeresés",
+  "closeSearch": "Keresés bezárása",
+  "quickFindResults": "Gyorskeresés eredményei",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Legutóbb megtekintett",
+    "recentSearches": "Legutóbbi keresések",
+    "pages": "Oldalak",
+    "pageContent": "Oldal tartalma",
+    "favorites": "Kedvencek"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "oldalon",
+  "searchingDetail": "Keresés...",
+  "searchAgain": "Újra keresés",
+  "searchingPageContent": "Oldaltartalom keresése...",
+  "noResultsFor": "Nincs találat \"{{query}}\"",
+  "noPagesFound": "Nem található oldal",
+  "creating": "Létrehozás...",
+  "newPage": "Új oldal \"{{query}}\"",
+  "couldntCreatePage": "Nem sikerült az oldal létrehozása",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Kiválaszt",
+    "open": "Megnyitás",
+    "newTab": "Új lap"
   }
 }

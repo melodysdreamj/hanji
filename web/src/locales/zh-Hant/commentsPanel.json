@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "留言",
+  "closeAria": "關閉留言",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "區塊討論",
+    "page": "頁面討論"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "留言狀態",
+    "open": "開啟",
+    "resolved": "已解決"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "評論目標",
+    "commentingOnSelectedText": "評論選取文字",
+    "selectedBlock": "選取的區塊",
+    "onSelectedText": "選取文字留言",
+    "onSelectedBlock": "選取區塊留言",
+    "onABlock": "區塊留言"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "新增區塊留言",
+    "addPageComment": "新增頁面留言",
+    "blockPlaceholder": "對此區塊留言...",
+    "pagePlaceholder": "新增留言...",
+    "submit": "留言"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "留言提及人員",
+    "replyPeopleAria": "回覆提及人員",
+    "trigger": "提及人員",
+    "noMatches": "無符合人員",
+    "title": "提及{{name}}",
+    "person": "人員",
+    "you": "你",
+    "organizationPerson": "組織成員",
+    "roleInOrganization": "組織內的{{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "留言串",
+    "empty": "尚無留言",
+    "noOpen": "無開啟的留言",
+    "noResolved": "無已解決的留言"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} 的評論，{{time}}",
+    "commentAriaResolved": "{{author}} 的評論，{{time}}，已解決",
+    "replyAria": "{{author}} 的回覆，{{time}}",
+    "repliesAria": "{{count}} 則回覆",
+    "edited": "(已編輯)",
+    "emptyComment": "(空白評論)",
+    "emptyReply": "(空白回覆)",
+    "justNow": "剛剛"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "回覆",
+    "showInPage": "在頁面中顯示",
+    "resolve": "解決",
+    "reopen": "重新開啟",
+    "edit": "編輯"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "回覆..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "編輯留言"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "刪除此留言？",
+    "threadConfirm_one": "刪除此留言及其回覆？",
+    "threadConfirm_other": "刪除此留言及其 {{count}} 則回覆？"
   }
 }

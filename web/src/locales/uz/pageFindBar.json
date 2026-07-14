@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Sahifada qidirish"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Sahifada qidirish",
+    "placeholder": "Sahifada qidirish"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Oldingi topilma",
+    "next": "Keyingi topilma",
+    "close": "Qidirishni yopish"
   }
 }

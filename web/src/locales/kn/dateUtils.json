@@ -1,7 +1,7 @@
 {
   "period": {
-    "am": "AM",
-    "pm": "PM"
+    "am": "ಪೂರ್ವಾಹ್ನ",
+    "pm": "ಅಪರಾಹ್ನ"
   },
   "notionTimestamp": "{{date}} {{hour12}}:{{minutes}} {{period}}"
 }

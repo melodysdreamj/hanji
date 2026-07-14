@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "У цій базі даних ще немає сторінок.",
+  "emptyTitle": "Ще немає сторінок",
+  "newInline": "Нова",
+  "newPage": "Нова сторінка",
+  "newPageIn": "Нова сторінка в {{dbTitle}}",
+  "noResultsDesc": "Немає сторінок, які відповідають поточним фільтрам або пошуку.",
+  "noResultsTitle": "Немає результатів",
+  "openRow": "Відкрити {{title}}"
 }

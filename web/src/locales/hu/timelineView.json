@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Dátum tulajdonság hozzáadása",
+    "description": "Az idővonal nézetekhez kezdő dátum tulajdonság kell az oldalak idővonalon való megjelenítéséhez."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Befejező dátum tulajdonsággal időtartamokat rajzolhat egynapos sávok helyett.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Idővonal nagyítás/kicsinyítés",
+    "day": "Nap",
+    "week": "Hét",
+    "month": "Hónap"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Függőségek:",
+    "hint": "Relációs tulajdonság hozzáadása",
+    "relationPropertyAriaLabel": "Függőségi relációs tulajdonság"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Ma",
+    "previousRange": "Előző tartomány",
+    "nextRange": "Következő tartomány",
+    "newPage": "Új",
+    "newPageIn": "Új oldal ({{dbTitle}})"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Idővonal tábla",
+    "nameHeader": "Név"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} megnyitása",
+    "openAriaLabelWithDates": "{{title}} megnyitása, {{start}} – {{end}}",
+    "openNoDateAriaLabel": "{{title}} megnyitása, nincs dátum"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Ebben a tartományban nincs elem.",
+    "noDatedItems": "Még nincs dátumozott elem.",
+    "jumpTo": "Ugrás {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Dátum nélkül ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Nincs",
+    "untitled": "Cím nélkül"
   }
 }

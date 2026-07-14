@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
-  },
-  "labels": {
-    "untitled": "Untitled"
+    "add": "Lisää",
+    "cancel": "Peruuta",
+    "clearAll": "Tyhjennä kaikki",
+    "close": "Sulje",
+    "create": "Luo",
+    "delete": "Poista",
+    "done": "Valmis",
+    "save": "Tallenna",
+    "search": "Hae"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "columnName": "Sarake {{number}}",
+    "copyName": "{{name}} kopio",
+    "image": "Kuva",
+    "importedDatabase": "Tuotu tietokanta",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
-    },
-    "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "date": "Päivämäärä",
+      "name": "Nimi",
+      "select": "Valinta",
+      "status": "Tila"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Vaihtoehto 1",
+      "second": "Vaihtoehto 2"
     },
+    "statusOptions": {
+      "doing": "Käynnissä",
+      "done": "Valmis",
+      "todo": "Aloittamatta"
+    },
+    "uploadedFile": "Ladattu tiedosto",
     "viewNames": {
-      "table": "Table"
+      "table": "Taulukko"
     }
+  },
+  "labels": {
+    "untitled": "Nimetön"
   }
 }

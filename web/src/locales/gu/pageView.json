@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "પૃષ્ઠ પુનઃસ્થાપિત કરી શકાયું નહીં",
+  "emptyBodyPrompt": "ખાલી પૃષ્ઠ પર લખવાનું શરૂ કરવા Enter દબાવો.",
+  "inTrashTopBarTitle": "કચરાપેટીમાં",
+  "notFoundTopBarTitle": "મળ્યું નહીં",
+  "openWorkspace": "વર્કસ્પેસ ખોલો",
+  "pageInTrash": "આ પૃષ્ઠ કચરાપેટીમાં છે.",
+  "pageInTrashDetail": "તેની સામગ્રી ખોલતા અથવા સંપાદિત કરતા પહેલા તેને પુનઃસ્થાપિત કરો.",
+  "pageUnavailable": "પૃષ્ઠ ઉપલબ્ધ નથી.",
+  "pageUnavailableDetail": "આ પૃષ્ઠ કદાચ કાઢી નાખવામાં આવ્યું, ખસેડવામાં આવ્યું, અથવા બીજા એકાઉન્ટ સાથે શેર કરવામાં આવ્યું છે.",
+  "restorePage": "પૃષ્ઠ પુનઃસ્થાપિત કરો",
+  "restoredPage": "પૃષ્ઠ પુનઃસ્થાપિત કર્યું",
+  "loadingPageContent": "પૃષ્ઠ સામગ્રી લોડ થઈ રહી છે"
 }

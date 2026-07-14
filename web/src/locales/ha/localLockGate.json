@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Buɗe bayanan na'urar",
+  "description": "An kulle bayanan da ba su kan layi a wannan na'urar da kalmar wucewa. Buɗewa zai kunna amfani da kan layi mara layi da ajiyayyi.",
+  "passphrasePlaceholder": "Kalmar wucewa",
+  "unlock": "Buɗe",
+  "continueOnline": "Ci gaba da kan layi kawai",
+  "continueOnlineHint": "'Ci gaba da kan layi kawai' yana kulle gyare-gyaren da ba su kan layi a wannan na'urar — suna nan kuma ba za su aika ba har sai an buɗe su da kalmar wucewa mai kyau.",
+  "wrongPassphrase": "Wannan kalmar wucewa ba ta yi daidai ba.",
+  "unsupportedBrowser": "Kulle na gida baya samuwa a wannan mashigin yanar gizo."
 }

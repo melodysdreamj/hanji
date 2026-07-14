@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Szövegformázás"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Átalakítás",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "szöveg",
+      "heading1": "címsor 1",
+      "heading2": "címsor 2",
+      "heading3": "címsor 3",
+      "heading4": "címsor 4",
+      "toDoList": "teendőlista",
+      "bulletedList": "Felsorolás",
+      "numberedList": "számozott lista",
+      "toggleList": "toggel lista",
+      "quote": "idézet",
+      "callout": "Kiemelés",
+      "code": "kód"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
+    "bold": "Félkövér",
+    "italic": "Dőlt",
+    "underline": "Aláhúzott",
+    "strikethrough": "Áthúzott",
+    "code": "Kód",
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Megjegyzés"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Szöveg színe: {{color}}",
+    "title": "Szín: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Vegyes",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Betűszín",
+      "default": "Alap",
+      "gray": "Szürke",
+      "brown": "Barna",
+      "orange": "Narancssárga",
+      "yellow": "Sárga",
+      "green": "Zöld",
+      "blue": "Kék",
+      "purple": "Lila",
+      "pink": "Rózsaszín",
+      "red": "Piros"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Háttérszín",
+      "gray": "Szürke háttér",
+      "brown": "Barna háttér",
+      "orange": "Narancssárga háttér",
+      "yellow": "Sárga háttér",
+      "green": "Zöld háttér",
+      "blue": "Kék háttér",
+      "purple": "Lila háttér",
+      "pink": "Rózsaszín háttér",
+      "red": "Piros háttér"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
+    "ariaLabel": "Link szerkesztése",
+    "placeholder": "Link beillesztése",
     "urlAriaLabel": "Link URL",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Link megnyitása",
+    "copy": "Link másolása",
+    "copied": "Másolva",
+    "copiedLink": "Link másolva",
+    "remove": "Eltávolítás"
   }
 }

@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "close": "Закрити",
+    "search": "Пошук",
+    "create": "Створити",
+    "delete": "Видалити",
+    "clearAll": "Очистити все",
+    "done": "Готово",
+    "add": "Додати"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Без назви"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Копія {{name}}",
+    "columnName": "Стовпець {{number}}",
+    "importedDatabase": "Імпортована база даних",
+    "uploadedFile": "Завантажений файл",
+    "image": "Зображення",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Назва",
+      "status": "Статус",
+      "select": "Вибір",
+      "date": "Дата"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Не розпочато",
+      "doing": "В роботі",
+      "done": "Готово"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Варіант 1",
+      "second": "Варіант 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Таблиця"
     }
   }
 }

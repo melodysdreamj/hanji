@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "dateAt": "{{date}} kl. {{time}}",
+  "editedDaysAgo": "Redigert {{days}}d siden",
+  "editedHoursAgo": "Redigert {{hours}}t siden",
+  "editedJustNow": "Nettopp redigert",
+  "editedMinutesAgo": "Redigert {{minutes}}m siden",
+  "editedOn": "Redigert {{date}}",
+  "justNow": "Akkurat nå",
+  "noEdits": "Ingen redigeringer",
+  "noEditsYet": "Ingen redigeringer ennå",
+  "todayAt": "I dag kl. {{time}}",
+  "yesterdayAt": "I går kl. {{time}}"
 }

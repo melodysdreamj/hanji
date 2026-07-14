@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "একটি তারিখ বৈশিষ্ট্য যোগ করুন",
+    "description": "ক্যালেন্ডার ভিউতে মাসে পৃষ্ঠা রাখতে একটি তারিখ বৈশিষ্ট্য প্রয়োজন।",
+    "addDateButton": "তারিখ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ক্যালেন্ডার অনুযায়ী",
+    "today": "আজ",
+    "previousWeek": "গত সপ্তাহ",
+    "previousMonth": "আগের মাস",
+    "nextWeek": "পরের সপ্তাহ",
+    "nextMonth": "পরের মাস"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "রবি",
+    "mon": "সোম",
+    "tue": "মঙ্গল",
+    "wed": "বুধ",
+    "thu": "বৃহস্পতি",
+    "fri": "শুক্র",
+    "sat": "শনি"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} ক্যালেন্ডার",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}}টি আইটেম",
+    "newRowAriaLabel": "{{date}}-এ নতুন সারি",
+    "newRowTitle": "নতুন",
+    "showLess": "কম দেখান",
+    "showMore": "+{{count}}টি আরও"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} খুলুন",
+    "openAriaLabelWithDate": "{{title}} খুলুন, {{date}}-এর জন্য নির্ধারিত",
+    "openNoDateAriaLabel": "{{title}} খুলুন, কোনো তারিখ নেই"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "কোনো তারিখ নেই ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "শিরোনামহীন",
+    "dateDefaultName": "তারিখ"
   }
 }

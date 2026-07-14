@@ -3,9 +3,9 @@
   "relationUnavailable": "关联项不可用",
   "unavailable": "不可用",
   "checkbox": {
-    "checked": "已勾选",
-    "unchecked": "未勾选"
+    "checked": "已选中",
+    "unchecked": "未选中"
   },
-  "openRelation": "打开 {{title}}",
-  "openOrDownloadFile": "打开或下载 {{name}}"
+  "openRelation": "打开{{title}}",
+  "openOrDownloadFile": "打开或下载{{name}}"
 }

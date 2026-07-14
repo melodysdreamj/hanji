@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} رابط خلفي",
+    "count_other": "{{count}} روابط خلفية"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "الإشارات المرتبطة"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} إشارة",
+    "mention_other": "{{count}} إشارات",
+    "link_one": "{{count}} رابط",
+    "link_other": "{{count}} روابط"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "إشارة",
+    "link": "رابط"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} رابط خلفي إضافي",
+    "count_other": "{{count}} روابط خلفية إضافية"
   }
 }

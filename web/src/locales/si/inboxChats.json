@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "තවම සංවාද නැත. පිටුවක අදහස් දක්වන්න හෝ කෙනෙකුව මෙන්ෂන් කරන්න.",
+  "leave": "පිටවන්න",
+  "leaveAria": "{{title}} හි සංවාදයෙන් පිටවන්න",
+  "open": "{{title}} හි සංවාදය විවෘත කරන්න",
+  "participants_one": "{{count}} සහභාගිවන්නෙක්",
+  "participants_other": "{{count}} සහභාගිවන්නන්",
+  "untitled": "මාතෘකාවක් නැත",
+  "loading": "සංවාද පූරණය වෙමින්…"
 }

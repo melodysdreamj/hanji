@@ -15,11 +15,11 @@
     "phone": "Telefone",
     "formula": "Fórmula",
     "relation": "Relação",
-    "rollup": "Rollup",
-    "created_time": "Data de criação",
+    "rollup": "Acumulação",
+    "created_time": "Criado em",
     "created_by": "Criado por",
-    "last_edited_time": "Última edição",
-    "last_edited_by": "Editado pela última vez por",
+    "last_edited_time": "Última edição em",
+    "last_edited_by": "Última edição por",
     "unique_id": "ID"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Hiba történt a tartalom megjelenítése közben.",
+  "detail": "Próbálja újra. Ha a probléma továbbra is fennáll, indítsa újra az alkalmazást, és ossza meg az alábbi referenciát.",
+  "reference": "Referencia: {{reference}}",
+  "reload": "Alkalmazás újratöltése",
+  "retry": "Próbálja újra"
 }

@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Bu ma'lumotlar bazasi qulflangan, shuning uchun o'zgarishlaringizni saqlab bo'lmadi.",
+  "databaseRowsLoadFailed": "Ma'lumotlar bazasi qatorlarini yuklab bo'lmadi. Iltimos, bir ozdan so'ng qayta urinib ko'ring.",
+  "editAccessDeniedSave": "Tahrirlash huquqiga ega emassiz, shuning uchun o'zgarishlaringiz saqlanmadi.",
+  "lockedSave": "Sahifa yoki ma'lumotlar bazasi qulflangan, shuning uchun o'zgarishlaringiz saqlanmadi.",
+  "pageLockedSave": "Bu sahifa qulflangan, shuning uchun o'zgarishlaringiz saqlanmadi.",
+  "pageMissingSave": "Sahifa topilmadi, shuning uchun o'zgarishlaringiz saqlanmadi.",
+  "saveFailed": "O'zgarishlaringizni saqlab bo'lmadi.",
+  "sessionExpired": "Seansingiz muddati tugadi yoki so'rov autentifikatsiya qilinmadi. Iltimos, qayta urinib ko'ring.",
+  "blockConflictSave": "Bu blok boshqa qurilmada tahrir qilingan, shuning uchun sizning oflayn o'zgarishingiz qo'llanilmadi.",
+  "blockConflictKeepMine": "Mening versiyamni qo'llash",
+  "blockMoveCommentsSkipped": "Blok ko'chirildi, lekin uning izohlari u bilan birga ko'chirilmadi."
 }

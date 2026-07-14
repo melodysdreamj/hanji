@@ -5,16 +5,12 @@ import { useTranslation } from "react-i18next";
 import { routeInfoFromPath, usePathname, useRouter, useSearchParams } from "@/lib/router";
 import { AppShell } from "./AppShell";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { HomeView } from "./HomeView";
+import { PageView } from "./PageView";
+import { SharedPageView } from "./SharedPageView";
 import { TopBar } from "./TopBar";
 import pageStyles from "./PageView.module.css";
 
-const HomeView = lazy(() =>
-  import("./HomeView").then(({ HomeView }) => ({ default: HomeView }))
-);
-const PageView = lazy(() => import("./PageView").then(({ PageView }) => ({ default: PageView })));
-const SharedPageView = lazy(() =>
-  import("./SharedPageView").then(({ SharedPageView }) => ({ default: SharedPageView }))
-);
 const TrashView = lazy(() => import("./TrashView").then(({ TrashView }) => ({ default: TrashView })));
 const WorkspaceSettingsDialog = lazy(() =>
   import("./WorkspaceSettingsDialog").then(({ WorkspaceSettingsDialog }) => ({

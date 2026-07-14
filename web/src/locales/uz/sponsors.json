@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Homiy bo'lish",
+  "builtWith": "<a>{{name}}</a> Hanji yaratishga yordam beradi",
+  "builtWithIntro": "Hanji ushbu vositalar va platformalar yordamida yaratilgan.",
+  "builtWithTitle": "Yaratilgan texnologiyalar",
+  "emptySlot": "Bo'sh o'rin — homiy shu yerda ko'rinadi",
+  "rule1": "Bannerda qolgan balans bo'yicha eng yaxshi besh homiy ko'rsatiladi.",
+  "rule2": "Oyiga bir marta, ko'rsatilgan har bir homiyning balansi beshinchi o'rindagi homiyning balansiga teng miqdorda kamaytiriladi, shuning uchun barcha besh homiy bir xil to'lovni to'laydi.",
+  "rule3": "Balans tugagach, o'rin keyingi homiyga o'tadi.",
+  "rule4": "Bannerni sukut bo'yicha yoqilgan holda saqlash Hanji litsenziyasi istisnosini beradi; banneri bo'lmagan yopiq versiya alohida tijoriy litsenziyani talab qiladi.",
+  "settingsIntro": "Hanji homiylar tomonidan qo'llab-quvvatlanadi. Kirish ekranida joriy eng yaxshi besh homiy ko'rsatilgan kichik banner mavjud.",
+  "sponsorSlots": "Hozirgi homiylar",
+  "supportTitle": "Hanji ni qo'llab-quvvatlash",
+  "thanksSponsor": "<a>{{name}}</a> Hanji o'sib borayotganida homiylik qilmoqda"
+}

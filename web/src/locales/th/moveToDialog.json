@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "ย้ายไปที่",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "เวิร์กสเปซราก",
+    "path": "ระดับบนสุด"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ค้นหาปลายทางการย้าย",
+    "placeholder": "ค้นหาหน้า..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ปิดกล่องโต้ตอบย้าย"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "ปลายทางการย้าย",
+    "empty": "ไม่พบหน้า",
+    "destinationLabel": "ย้ายไป {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "สร้าง \"{{title}}\"",
+    "optionLabel": "สร้างหน้า {{title}} และย้ายมาที่นี่",
+    "hint": "หน้าใหม่ระดับบนสุด - ย้ายมาที่นี่"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "หน้าที่หลักถูกล็อก",
+    "page": "หน้าที่ถูกล็อก"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "หน้าอยู่ในหน้าหลักที่ถูกล็อก",
+    "locked": "หน้าถูกล็อก",
+    "moved": "ย้ายหน้าแล้ว",
+    "moveFailed": "ไม่สามารถย้ายหน้าได้"
   }
 }

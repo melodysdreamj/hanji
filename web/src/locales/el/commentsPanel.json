@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Σχόλια",
+  "closeAria": "Κλείσιμο σχολίων",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Συζήτηση μπλοκ",
+    "page": "Συζήτηση σελίδας"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Κατάσταση σχολίου",
+    "open": "Ανοιχτό",
+    "resolved": "Επιλύθηκε"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Σχολιασμός σε",
+    "commentingOnSelectedText": "Σχολιασμός επιλεγμένου κειμένου",
+    "selectedBlock": "Επιλεγμένο μπλοκ",
+    "onSelectedText": "Σε επιλεγμένο κείμενο",
+    "onSelectedBlock": "Σε επιλεγμένο μπλοκ",
+    "onABlock": "Σε ένα μπλοκ"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Προσθήκη σχολίου μπλοκ",
+    "addPageComment": "Προσθήκη σχολίου σελίδας",
+    "blockPlaceholder": "Σχόλιο σε αυτό το μπλοκ...",
+    "pagePlaceholder": "Προσθήκη σχολίου...",
+    "submit": "Σχόλιο"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Αναφορά ατόμων στο σχόλιο",
+    "replyPeopleAria": "Αναφορά ατόμων στην απάντηση",
+    "trigger": "Αναφορά ατόμων",
+    "noMatches": "Δεν βρέθηκαν άτομα",
+    "title": "Αναφορά {{name}}",
+    "person": "Άτομο",
+    "you": "Εσύ",
+    "organizationPerson": "Άτομο οργανισμού",
+    "roleInOrganization": "{{role}} στον οργανισμό"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Νήματα σχολίων",
+    "empty": "Δεν υπάρχουν ακόμη σχόλια",
+    "noOpen": "Δεν υπάρχουν ανοιχτά σχόλια",
+    "noResolved": "Δεν υπάρχουν επιλυμένα σχόλια"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Σχόλιο {{author}}, {{time}}",
+    "commentAriaResolved": "Σχόλιο {{author}}, {{time}}, επιλυμένο",
+    "replyAria": "Απάντηση {{author}}, {{time}}",
+    "repliesAria": "{{count}} απαντήσεις",
+    "edited": "(επεξεργασμένο)",
+    "emptyComment": "(κενό σχόλιο)",
+    "emptyReply": "(κενή απάντηση)",
+    "justNow": "Μόλις"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Απάντηση",
+    "showInPage": "Εμφάνιση στη σελίδα",
+    "resolve": "Επίλυση",
+    "reopen": "Επανάνοιγμα",
+    "edit": "Επεξεργασία"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Απάντηση..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Επεξεργασία σχολίου"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Διαγραφή αυτού του σχολίου;",
+    "threadConfirm_one": "Διαγραφή αυτού του σχολίου και της απάντησής του;",
+    "threadConfirm_other": "Διαγραφή αυτού του σχολίου και των {{count}} απαντήσεών του;"
   }
 }

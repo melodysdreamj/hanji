@@ -1,6 +1,6 @@
 {
   "title": "更改属性类型？",
-  "message": "\"{{propName}}\" 已有值。将其类型更改为 {{typeLabel}} 可能导致现有值显示方式变化或丢失。",
+  "message": "“{{propName}}”已有值。更改为{{typeLabel}}类型后，现有值可能显示不同或丢失。",
   "cancelAria": "取消属性类型更改",
   "confirm": "更改类型"
 }

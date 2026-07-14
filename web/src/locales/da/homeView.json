@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "emptyWorkspace": "Tomt workspace",
+  "newPage": "Ny side",
+  "openingPage": "Åbner side",
+  "untitled": "Uden titel",
+  "workspace": "Workspace"
 }

@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Příkazy bloků",
+  "closeBlockCommands": "Zavřít příkazy bloků",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Advanced": "Pokročilé bloky",
+    "Basic": "Základní bloky",
+    "Database": "Databáze",
+    "Media": "Média"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} z {{total}}. Stiskněte Enter pro vložení.",
+  "listStatus": "K dispozici je {{total}} příkazů bloků.",
+  "noBlocks": "Žádné bloky nenalezeny",
+  "noBlocksFor": "Žádné bloky pro \"{{query}}\"",
+  "recentlyUsed": "Naposledy použité"
 }

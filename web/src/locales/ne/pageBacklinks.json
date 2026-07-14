@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} ब्याकलिङ्क",
+    "count_other": "{{count}} ब्याकलिङ्कहरू"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "लिङ्क गरिएका उल्लेखहरू"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} उल्लेख",
+    "mention_other": "{{count}} उल्लेखहरू",
+    "link_one": "{{count}} लिङ्क",
+    "link_other": "{{count}} लिङ्कहरू"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "उल्लेख",
+    "link": "लिङ्क"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} थप ब्याकलिङ्क",
+    "count_other": "{{count}} थप ब्याकलिङ्कहरू"
   }
 }

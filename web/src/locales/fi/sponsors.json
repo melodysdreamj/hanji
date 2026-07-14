@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Ryhdy sponsoriksi",
+  "builtWith": "<a>{{name}}</a> auttaa rakentamaan Hanjia",
+  "builtWithIntro": "Hanji on rakennettu näiden työkalujen ja alustojen avulla.",
+  "builtWithTitle": "Rakennettu",
+  "emptySlot": "Vapaa paikka — sponsori tähän",
+  "rule1": "Banneri näyttää viisi parasta sponsoria jäljellä olevan saldon perusteella.",
+  "rule2": "Kerran kuussa kaikkien näytettävien sponsorien saldoa vähennetään viidennen sponsorin saldon verran, joten kaikki viisi näytettävää sponsoria maksavat saman kohtuullisen hinnan.",
+  "rule3": "Kun saldo loppuu, paikka siirtyy seuraavalle sponsorille saldon perusteella.",
+  "rule4": "Bannerin oletuksena käytössä pitäminen on se, mikä myöntää Hanjin lisenssipoikkeuksen; suljettu, banneriton versio tarvitsee erillisen kaupallisen lisenssin.",
+  "settingsIntro": "Hanji on tukijoidensa ylläpitämä. Kirjautumisnäytössä on pieni banneri, jossa näkyvät viisi parasta sponsoria.",
+  "sponsorSlots": "Nykyiset sponsorit",
+  "supportTitle": "Tue Hanjia",
+  "thanksSponsor": "<a>{{name}}</a> sponsoroi Hanjia sen kasvaessa"
+}

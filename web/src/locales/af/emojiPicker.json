@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Maak ikoonkiesser toe",
+    "label": "Kies ikoon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Ikoontipe",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Beeld"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Verwyder",
+    "ariaLabel": "Verwyder ikoon"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchLabel": "Soek ikone",
+    "random": "Ewekansig",
+    "randomLabel": "Kies 'n ewekansige ikoon",
+    "recentLabel": "Onlangs gebruik eerste",
+    "gridLabelRecent": "Ikone, eers onlangs gebruik",
+    "gridLabel": "Ikone",
+    "optionLabel": "Kies {{emoji}} ikoon",
+    "noResults": "Geen ikone pas by “{{query}}” nie. Probeer 'n ander woord of maak die filter skoon."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Prent",
+    "linkPlaceholder": "Plak prentskakel",
+    "linkLabel": "Ikoonprentskakel",
+    "apply": "Pas toe",
+    "upload": "Laai lêer op",
+    "uploading": "Laai tans op...",
+    "uploadingLabel": "Laai {{fileName}} tans op",
+    "uploadFailed": "Kon nie daardie prent oplaai nie.",
+    "fallbackFileName": "Ikoonbeeld"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Berei oplaai voor",
+    "finalizing": "Finaliseer",
+    "complete": "Voltooi",
+    "uploading": "Oplaai"
   }
 }

@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komentar",
+  "closeAria": "Tutup komentar",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Diskusi blok",
+    "page": "Diskusi halaman"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Status komentar",
+    "open": "Terbuka",
+    "resolved": "Selesai"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Berkomentar pada",
+    "commentingOnSelectedText": "Berkomentar pada teks yang dipilih",
+    "selectedBlock": "Blok yang dipilih",
+    "onSelectedText": "Pada teks yang dipilih",
+    "onSelectedBlock": "Pada blok yang dipilih",
+    "onABlock": "Pada blok"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Tambah komentar blok",
+    "addPageComment": "Tambah komentar halaman",
+    "blockPlaceholder": "Berkomentar pada blok ini...",
+    "pagePlaceholder": "Tambah komentar...",
+    "submit": "Komentar"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Menyebut orang di komentar",
+    "replyPeopleAria": "Menyebut orang di balasan",
+    "trigger": "Sebut orang",
+    "noMatches": "Tidak ada orang yang cocok",
+    "title": "Sebut {{name}}",
+    "person": "Orang",
+    "you": "Anda",
+    "organizationPerson": "Anggota organisasi",
+    "roleInOrganization": "{{role}} di organisasi"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Utas komentar",
+    "empty": "Belum ada komentar",
+    "noOpen": "Tidak ada komentar terbuka",
+    "noResolved": "Tidak ada komentar yang selesai"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komentar, {{time}}",
+    "commentAriaResolved": "{{author}} komentar, {{time}}, selesai",
+    "replyAria": "{{author}} balasan, {{time}}",
+    "repliesAria": "{{count}} balasan",
+    "edited": "(diedit)",
+    "emptyComment": "(komentar kosong)",
+    "emptyReply": "(balasan kosong)",
+    "justNow": "Baru saja"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
+    "reply": "Balas",
+    "showInPage": "Tampilkan di halaman",
+    "resolve": "Selesaikan",
+    "reopen": "Buka kembali",
     "edit": "Edit"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Balas..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Edit komentar"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Hapus komentar ini?",
+    "threadConfirm_one": "Hapus komentar ini dan balasannya?",
+    "threadConfirm_other": "Hapus komentar ini dan {{count}} balasannya?"
   }
 }

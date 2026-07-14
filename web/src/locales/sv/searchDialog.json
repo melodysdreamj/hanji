@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Sök eller gå till...",
+  "quickFind": "Snabbsök",
+  "closeSearch": "Stäng sökning",
+  "quickFindResults": "Snabbsökresultat",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Senast visade",
+    "recentSearches": "Senaste sökningar",
+    "pages": "Sidor",
+    "pageContent": "Sidinnehåll",
+    "favorites": "Favoriter"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "på sidan",
+  "searchingDetail": "Söker...",
+  "searchAgain": "Sök igen",
+  "searchingPageContent": "Söker sidinnehåll...",
+  "noResultsFor": "Inga resultat för \"{{query}}\"",
+  "noPagesFound": "Inga sidor hittades",
+  "creating": "Skapar...",
+  "newPage": "Ny sida \"{{query}}\"",
+  "couldntCreatePage": "Kunde inte skapa sida",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Välj",
+    "open": "Öppna",
+    "newTab": "Ny flik"
   }
 }

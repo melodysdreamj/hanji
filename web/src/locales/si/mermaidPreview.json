@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Mermaid රූප සටහන",
+  "emptyPreview": "රූප සටහන පෙරදසුන",
+  "sourceDescription": "රූප සටහන මූලාශ්‍රය: {{source}}",
+  "syntaxError": "රූප සටහනේ වාක්‍ය ඛණ්ඩ දෝෂයක් ඇත.",
+  "syntaxErrorDetails": "විස්තර පෙන්වන්න"
 }

@@ -247,14 +247,13 @@ jobs:
           WRANGLER_SEND_METRICS: "false"
         run: |
           # `edgebase dev` only forwards allowlisted shell variables. Write the
-          # runtime credentials to .dev.vars so the master account is available
-          # to the API smoke cleanup steps as well as the Worker bootstrap.
+          # runtime secrets to .dev.vars. The first administrator is created
+          # through the same browser-setup endpoint used by fresh deployments.
           {
             echo "JWT_USER_SECRET=$(openssl rand -hex 32)"
             echo "JWT_ADMIN_SECRET=$(openssl rand -hex 32)"
             echo "SERVICE_KEY=$(openssl rand -hex 32)"
-            echo "HANJI_MASTER_EMAIL=master@hanji.local"
-            echo "HANJI_MASTER_PASSWORD=HanjiMaster!2026"
+            echo "HANJI_BROWSER_SETUP=true"
             echo "HANJI_WORKSPACE_DO_SPLIT=1"
           } > .dev.vars
           # Keep stdin open: wrangler dev exits when its stdin reaches EOF.
@@ -271,13 +270,22 @@ jobs:
           echo "EdgeBase dev runtime did not become healthy" >&2
           tail -n 100 "$RUNNER_TEMP/edgebase-dev.log" >&2
           exit 1
-      - name: Provision CI master account
+      - name: Complete browser first-run setup for API smokes
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         run: |
           node --input-type=module -e '
-            const response = await fetch(`${process.env.HANJI_EDGEBASE_URL}/api/functions/instance-bootstrap`);
+            const response = await fetch(`${process.env.HANJI_EDGEBASE_URL}/api/functions/instance-bootstrap`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                action: "completeSetup",
+                displayName: "CI Master",
+                email: "master@hanji.local",
+                password: "HanjiMaster!2026",
+              }),
+            });
             const body = await response.json();
-            if (!response.ok || body.masterReady !== true) {
+            if (response.status !== 201 || body.ok !== true) {
               throw new Error(`CI master provisioning failed: HTTP ${response.status}`);
             }
           '
@@ -412,16 +420,13 @@ jobs:
         run: |
           # `edgebase dev` only forwards shell env that is allowlisted via
           # EDGEBASE_CONFIG_ENV_ALLOWLIST (the dev script allowlists just the
-          # guest-login flag), so exported master/JWT vars never reach the Worker
-          # and every `master@hanji.local` sign-in returns 401. A bundle-local
-          # .dev.vars always reaches the Worker — write it here, mirroring a
-          # developer's local .dev.vars, so the master account provisions.
+          # guest/browser-setup flags). A bundle-local .dev.vars always reaches
+          # the Worker; write only runtime secrets and setup capability here.
           {
             echo "JWT_USER_SECRET=$(openssl rand -hex 32)"
             echo "JWT_ADMIN_SECRET=$(openssl rand -hex 32)"
             echo "SERVICE_KEY=$(openssl rand -hex 32)"
-            echo "HANJI_MASTER_EMAIL=master@hanji.local"
-            echo "HANJI_MASTER_PASSWORD=HanjiMaster!2026"
+            echo "HANJI_BROWSER_SETUP=true"
             echo "HANJI_WORKSPACE_DO_SPLIT=1"
           } > .dev.vars
           # Keep stdin open: wrangler dev exits when its stdin reaches EOF.
@@ -438,6 +443,25 @@ jobs:
           echo "EdgeBase dev runtime did not become healthy" >&2
           tail -n 100 "$RUNNER_TEMP/edgebase-dev.log" >&2
           exit 1
+      - name: Complete browser first-run setup for UI smokes
+        if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
+        run: |
+          node --input-type=module -e '
+            const response = await fetch(`${process.env.HANJI_EDGEBASE_URL}/api/functions/instance-bootstrap`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                action: "completeSetup",
+                displayName: "CI Master",
+                email: "master@hanji.local",
+                password: "HanjiMaster!2026",
+              }),
+            });
+            const body = await response.json();
+            if (response.status !== 201 || body.ok !== true) {
+              throw new Error(`CI browser setup failed: HTTP ${response.status}`);
+            }
+          '
       - name: Dev guest login smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend

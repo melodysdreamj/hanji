@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Den här databasen är låst, så dina ändringar kunde inte sparas.",
+  "databaseRowsLoadFailed": "Kunde inte ladda databasrader. Försök igen om en stund.",
+  "editAccessDeniedSave": "Du har inte redigeringsåtkomst, så dina ändringar kunde inte sparas.",
+  "lockedSave": "Sidan eller databasen är låst, så dina ändringar kunde inte sparas.",
+  "pageLockedSave": "Den här sidan är låst, så dina ändringar kunde inte sparas.",
+  "pageMissingSave": "Sidan kunde inte hittas, så dina ändringar kunde inte sparas.",
+  "saveFailed": "Dina ändringar kunde inte sparas.",
+  "sessionExpired": "Din session löpte ut eller begäran kunde inte autentiseras. Försök igen.",
+  "blockConflictSave": "Det här blocket redigerades på en annan enhet, så din offlineändring tillämpades inte.",
+  "blockConflictKeepMine": "Använd min version",
+  "blockMoveCommentsSkipped": "Blocket flyttades, men kommentarerna kunde inte flyttas med det."
 }

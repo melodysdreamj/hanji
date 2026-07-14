@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "አቁም",
+    "save": "አስቀምጥ",
+    "close": "ዝጋ",
+    "search": "ፍለጋ",
+    "create": "ፍጠር",
+    "delete": "ሰርዝ",
+    "clearAll": "ሁሉንም አጽዳ",
+    "done": "አልቋል",
+    "add": "አክል"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ርዕስ የለሽ"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} ቅጂ",
+    "columnName": "አምድ {{number}}",
+    "importedDatabase": "የመጣ ዳታቤዝ",
+    "uploadedFile": "የተሰቀለ ፋይል",
+    "image": "ምስል",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "ስም",
+      "status": "ሁኔታ",
+      "select": "ምርጫ",
+      "date": "ቀን"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "አልተጀመረም",
+      "doing": "በሂደት ላይ",
+      "done": "ተጠናቅቋል"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "አማራጭ 1",
+      "second": "አማራጭ 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ሠንጠረዥ"
     }
   }
 }

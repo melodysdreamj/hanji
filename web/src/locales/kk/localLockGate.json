@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Жергілікті деректердің құлпын ашу",
+  "description": "Бұл құрылғыдағы офлайн деректер құпия сөзбен құлыпталған. Құлпын ашу офлайн пайдалануды және сақтауды қайта қосады.",
+  "passphrasePlaceholder": "Құпия сөз",
+  "unlock": "Құлпын ашу",
+  "continueOnline": "Тек онлайн жалғастыру",
+  "continueOnlineHint": "«Тек онлайн жалғастыру» бұл құрылғыдағы құлыпталған офлайн түзетулерді жабық күйде қалдырады — олар осы құрылғыда қалады және дұрыс құпия сөзбен құлпын ашқанша синхрондалмайды.",
+  "wrongPassphrase": "Бұл құпия сөз дұрыс емес.",
+  "unsupportedBrowser": "Бұл браузерде жергілікті құлыптау қолжетімсіз."
 }

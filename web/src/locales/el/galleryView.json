@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Αυτή η βάση δεδομένων δεν έχει ακόμη σελίδες.",
+  "emptyTitle": "Δεν υπάρχουν ακόμη σελίδες",
+  "newInline": "Νέο",
+  "newPage": "Νέα σελίδα",
+  "newPageIn": "Νέα σελίδα στο {{dbTitle}}",
+  "noResultsDesc": "Καμία σελίδα δεν ταιριάζει με τα τρέχοντα φίλτρα ή την αναζήτηση.",
+  "noResultsTitle": "Κανένα αποτέλεσμα",
+  "openRow": "Άνοιγμα {{title}}"
 }

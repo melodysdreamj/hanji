@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Mətn",
+      "description": "Sadə mətnlə yazmağa başlayın.",
+      "placeholder": "Əmrlər üçün '/' yazın"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Səhifə",
+      "description": "Bu səhifənin içində alt səhifə yaradın."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Səhifəyə keçid",
+      "description": "Mövcud səhifəyə keçid."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Başlıq 1",
+      "description": "Böyük bölmə başlığı.",
+      "placeholder": "Başlıq 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Açılan başlıq 1",
+      "description": "İçindəki məzmunu gizlədə bilən böyük başlıq.",
+      "placeholder": "Açılan başlıq 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Başlıq 2",
+      "description": "Orta bölmə başlığı.",
+      "placeholder": "Başlıq 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Açılan başlıq 2",
+      "description": "Orta ölçülü, iç-içə məzmunu gizlədə bilən başlıq.",
+      "placeholder": "Açılan başlıq 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Başlıq 3",
+      "description": "Kiçik bölmə başlığı.",
+      "placeholder": "Başlıq 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Açılan başlıq 3",
+      "description": "Kiçik ölçülü, iç-içə məzmunu gizlədə bilən başlıq.",
+      "placeholder": "Toggle başlıq 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Başlıq 4",
+      "description": "Yığcam bölmə başlığı.",
+      "placeholder": "Başlıq 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Toggle başlıq 4",
+      "description": "Daxili məzmunu gizlədə bilən yığcam başlıq.",
+      "placeholder": "Toggle başlıq 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Tapşırıq siyahısı",
+      "description": "Tapşırıqları qeyd qutusu ilə izləyin.",
+      "placeholder": "Tapşırıq"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Nöqtəli siyahı",
+      "description": "Sadə nöqtəli siyahı yaradın.",
+      "placeholder": "Siyahı"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Nömrələnmiş siyahı",
+      "description": "Nömrələnmiş siyahı yaradın.",
+      "placeholder": "Siyahı"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
+      "label": "Toggle siyahısı",
+      "description": "Toggle-lər məzmunu gizlədib göstərə bilər.",
       "placeholder": "Toggle"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Sitat",
+      "description": "Sitat əlavə edin.",
+      "placeholder": "Boş sitat"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "Vurğu",
+      "description": "Yazını vurğulayın.",
+      "placeholder": "Bir şey yazın…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Ayırıcı",
+      "description": "Blokları vizual olaraq ayırın."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kod",
+      "description": "Kod parçasını əlavə edin.",
+      "placeholder": "Kod yazın və ya parça yapışdırın…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Tənlik",
+      "description": "Riyazi tənlik göstərin."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Mündəricat",
+      "description": "Bu səhifədəki başlıqlara keçidləri göstərir."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Sinxronlaşdırılmış blok",
+      "description": "Məzmunu səhifələr arasında təkrar istifadə edin."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Düymə",
+      "description": "Bir kliklə təkrar istifadə edilən məzmun daxil edin."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Tablar",
+      "description": "Məzmunu nişanlarda qruplaşdırın.",
+      "placeholder": "Tablar"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Bu səhifənin harada olduğunu göstərin."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Surətini çıxar",
+      "description": "Bu blokun surətini yaradın."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Köçür",
+      "description": "Bu bloku başqa səhifəyə köçürün."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Bu bloku sil."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Çevir",
+      "description": "Bu blokun növünü dəyişin."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Rəng",
+      "description": "Bu blokun mətn və ya fon rəngini dəyişdir."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Cədvəl",
+      "description": "Bu səhifəyə sadə cədvəl əlavə edin."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 sütun",
+      "description": "Blokları yan-yana yerləşdirin."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 sütun",
+      "description": "Blokları üç sütunda düzün."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 sütun",
+      "description": "Blokları dörd sütunda düzün."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 sütun",
+      "description": "Blokları beş sütunda düzün."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Şəkil",
+      "description": "Yükləyin və ya link ilə daxil edin."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Videonu link ilə yerləşdirin."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Link ilə audio yerləşdirin."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Veb əlfəcin",
+      "description": "Veb linkini kart kimi qeyd edin."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Daxil et",
+      "description": "Linkdən məzmun daxil edin."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fayl",
+      "description": "Bu səhifəyə fayl linki əlavə edin."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Verilənlər bazası - Tam səhifə",
+      "description": "Yeni verilənlər bazasını alt səhifə kimi əlavə edin."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Cədvəl - Tam səhifə",
+      "description": "Tam səhifəli verilənlər bazasını cədvəl kimi əlavə edin."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Panel - Tam səhifə",
+      "description": "Tam səhifəli kanban paneli əlavə edin."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Siyahı - Tam səhifə",
+      "description": "Tam səhifəli verilənlər bazasını siyahı kimi əlavə edin."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Zaman qrafiki - Tam səhifə",
+      "description": "Tam səhifəli verilənlər bazası zaman qrafiki əlavə edin."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Təqvim - Tam səhifə",
+      "description": "Tam səhifəli təqvim verilənlər bazası əlavə edin."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Qalereya - Tam səhifə",
+      "description": "Tam səhifəli verilənlər bazası qalereyası əlavə edin."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Verilənlər bazası - Daxili",
+      "description": "Bu səhifəyə verilənlər bazası əlavə edin."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Cədvəl görünüşü",
+      "description": "Daxili baza cədvəl kimi əlavə edin."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Lövhə görünüşü",
+      "description": "Daxili kanban lövhəsi əlavə edin."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Siyahı görünüşü",
+      "description": "Daxili baza siyahı kimi əlavə edin."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Zaman xətti görünüşü",
+      "description": "Daxili zaman xətti əlavə edin."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Təqvim görünüşü",
+      "description": "Daxili təqvim bazası əlavə edin."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Qalereya görünüşü",
+      "description": "Daxili qalereya əlavə edin."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Varsayılan",
+      "description": "Bu blokdan mətn və ya fon rəngini silin."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Boz",
+      "description": "Bu bloka boz rəng tətbiq edin."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Qəhvəyi",
+      "description": "Bu bloka qəhvəyi rəng tətbiq edin."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Narıncı",
+      "description": "Bu bloka narıncı rəng tətbiq edin."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Sarı",
+      "description": "Bu bloka sarı rəng tətbiq edin."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Yaşıl",
+      "description": "Bu bloka yaşıl rəng tətbiq edin."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Mavi",
+      "description": "Bu bloka mavi rəng tətbiq edin."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Bənövşəyi",
+      "description": "Bu bloka bənövşəyi rəng tətbiq edin."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Çəhrayı",
+      "description": "Bu bloka çəhrayı rəng tətbiq edin."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Qırmızı",
+      "description": "Bu bloka qırmızı rəng tətbiq edin."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Boz fon",
+      "description": "Bu bloka boz fon tətbiq edin."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Qəhvəyi fon",
+      "description": "Bu bloka qəhvəyi fon tətbiq edin."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Narıncı fon",
+      "description": "Bu bloka narıncı fon tətbiq edin."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Sarı fon",
+      "description": "Bu bloka sarı fon tətbiq edin."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Yaşıl fon",
+      "description": "Bu bloka yaşıl fon tətbiq edin."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Mavi fon",
+      "description": "Bu bloka mavi fon tətbiq edin."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Bənövşəyi fon",
+      "description": "Bu bloka bənövşəyi fon tətbiq edin."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Çəhrayı fon",
+      "description": "Bu bloka çəhrayı fon tətbiq edin."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Qırmızı fon",
+      "description": "Bu bloka qırmızı fon tətbiq edin."
     }
   }
 }

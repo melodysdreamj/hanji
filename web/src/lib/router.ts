@@ -119,6 +119,10 @@ function navigate(href: string, replace = false) {
   emitRouteChange(currentUrl, window.location.href);
 }
 
+export function replaceRoute(href: string) {
+  navigate(href, true);
+}
+
 function useLocationKey() {
   return useSyncExternalStore(subscribe, getLocationKey, () => "/");
 }

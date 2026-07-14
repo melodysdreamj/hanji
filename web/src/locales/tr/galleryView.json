@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Bu veritabanında henüz sayfa yok.",
+  "emptyTitle": "Henüz sayfa yok",
+  "newInline": "Yeni",
+  "newPage": "Yeni sayfa",
+  "newPageIn": "{{dbTitle}} içinde yeni sayfa",
+  "noResultsDesc": "Filtrelere veya aramaya uyan sayfa yok.",
+  "noResultsTitle": "Sonuç yok",
+  "openRow": "{{title}}'ı aç"
 }

@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Teks",
+      "description": "Mulai menulis dengan teks biasa.",
+      "placeholder": "Ketik '/' untuk perintah"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Halaman",
+      "description": "Buat sub-halaman di dalam halaman ini."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Tautan ke halaman",
+      "description": "Tautkan ke halaman yang sudah ada."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Judul 1",
+      "description": "Judul bagian besar.",
+      "placeholder": "Judul 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Toggle judul 1",
+      "description": "Judul besar yang dapat menyembunyikan konten bertingkat.",
+      "placeholder": "Toggle judul 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Judul 2",
+      "description": "Judul bagian sedang.",
+      "placeholder": "Judul 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Toggle judul 2",
+      "description": "Judul berukuran sedang yang dapat menyembunyikan konten di dalamnya.",
+      "placeholder": "Toggle judul 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Judul 3",
+      "description": "Judul bagian kecil.",
+      "placeholder": "Judul 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Toggle judul 3",
+      "description": "Judul kecil yang dapat menyembunyikan konten di dalamnya.",
+      "placeholder": "Toggle judul 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Judul 4",
+      "description": "Judul bagian kompak.",
+      "placeholder": "Judul 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Toggle judul 4",
+      "description": "Judul kompak yang dapat menyembunyikan konten bertingkat.",
+      "placeholder": "Toggle judul 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Daftar Tugas",
+      "description": "Lacak tugas dengan kotak centang.",
+      "placeholder": "Tugas"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Daftar bullet",
+      "description": "Buat daftar bullet sederhana.",
+      "placeholder": "Daftar"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Daftar bernomor",
+      "description": "Buat daftar bernomor.",
+      "placeholder": "Daftar"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
+      "label": "Daftar Toggle",
+      "description": "Toggle dapat menyembunyikan dan menampilkan konten.",
       "placeholder": "Toggle"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Kutipan",
+      "description": "Buat kutipan.",
+      "placeholder": "Kutipan kosong"
     },
     "callout": {
       "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "description": "Buat tulisan menonjol.",
+      "placeholder": "Ketik sesuatu…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Pembagi",
+      "description": "Pisahkan blok secara visual."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kode",
+      "description": "Simpan cuplikan kode.",
+      "placeholder": "Tulis kode, atau tempel cuplikan…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Persamaan",
+      "description": "Tampilkan persamaan matematika."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Daftar Isi",
+      "description": "Menampilkan tautan ke judul di halaman ini."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Blok sinkron",
+      "description": "Gunakan ulang konten di seluruh halaman."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Tombol",
+      "description": "Sisipkan konten yang dapat digunakan ulang dengan satu klik."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Tab",
+      "description": "Kelompokkan konten ke dalam tab berlabel.",
+      "placeholder": "Tab"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Tunjukkan letak halaman ini."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Duplikat",
+      "description": "Buat salinan persis dari blok ini."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Pindahkan ke",
+      "description": "Pindahkan blok ini ke halaman lain."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Hapus blok ini."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Ubah menjadi",
+      "description": "Ubah tipe blok ini."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Warna",
+      "description": "Ubah warna teks atau latar belakang blok ini."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tabel",
+      "description": "Tambahkan tabel sederhana ke halaman ini."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 kolom",
+      "description": "Tempatkan blok secara berdampingan."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 kolom",
+      "description": "Atur blok dalam 3 kolom."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 kolom",
+      "description": "Atur blok dalam 4 kolom."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 kolom",
+      "description": "Atur blok dalam 5 kolom."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Gambar",
+      "description": "Unggah atau sematkan dengan tautan."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Sematkan video dengan tautan."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Sematkan audio dengan tautan."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Bookmark web",
+      "description": "Simpan tautan web sebagai kartu."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Sematkan",
+      "description": "Sematkan konten dari tautan."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Berkas",
+      "description": "Lampirkan tautan file ke halaman ini."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Database - Halaman penuh",
+      "description": "Tambahkan database baru sebagai sub-halaman."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tabel - Halaman penuh",
+      "description": "Tambahkan database sebagai tabel halaman penuh."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Papan - Halaman penuh",
+      "description": "Tambahkan papan kanban halaman penuh."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Daftar - Halaman penuh",
+      "description": "Tambahkan database sebagai daftar halaman penuh."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Timeline - Halaman penuh",
+      "description": "Tambahkan timeline database halaman penuh."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalender - Halaman penuh",
+      "description": "Tambahkan database kalender halaman penuh."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galeri - Halaman penuh",
+      "description": "Tambahkan galeri database halaman penuh."
     },
     "inline_database": {
       "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "description": "Tambahkan database di dalam halaman ini."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Tampilan Tabel",
+      "description": "Tambahkan database inline sebagai tabel."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Tampilan Papan",
+      "description": "Tambahkan papan kanban inline."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Tampilan Daftar",
+      "description": "Tambahkan database inline sebagai daftar."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Tampilan Linimasa",
+      "description": "Tambahkan linimasa database inline."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Tampilan Kalender",
+      "description": "Tambahkan database kalender inline."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Tampilan Galeri",
+      "description": "Tambahkan galeri database inline."
     },
     "color_default": {
       "label": "Default",
-      "description": "Remove text or background color from this block."
+      "description": "Hapus warna teks atau latar belakang blok ini."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Abu-abu",
+      "description": "Terapkan abu-abu pada blok ini."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Coklat",
+      "description": "Terapkan warna coklat ke blok ini."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Oranye",
+      "description": "Terapkan oranye pada blok ini."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Kuning",
+      "description": "Terapkan kuning ke blok ini."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Hijau",
+      "description": "Terapkan hijau pada blok ini."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Biru",
+      "description": "Terapkan warna biru ke blok ini."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Ungu",
+      "description": "Terapkan ungu ke blok ini."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Merah muda",
+      "description": "Terapkan merah muda ke blok ini."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Merah",
+      "description": "Terapkan merah ke blok ini."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Latar abu-abu",
+      "description": "Terapkan latar belakang abu-abu pada blok ini."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Latar belakang coklat",
+      "description": "Terapkan latar belakang coklat ke blok ini."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Latar belakang oranye",
+      "description": "Terapkan latar belakang oranye pada blok ini."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Latar belakang kuning",
+      "description": "Terapkan latar belakang kuning ke blok ini."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Latar hijau",
+      "description": "Terapkan latar belakang hijau pada blok ini."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Latar belakang biru",
+      "description": "Terapkan latar belakang biru ke blok ini."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Latar belakang ungu",
+      "description": "Terapkan latar belakang ungu ke blok ini."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Latar belakang merah muda",
+      "description": "Terapkan latar belakang merah muda pada blok ini."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Latar belakang merah",
+      "description": "Terapkan latar belakang merah ke blok ini."
     }
   }
 }

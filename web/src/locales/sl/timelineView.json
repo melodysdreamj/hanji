@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Dodaj datumsko lastnost",
+    "description": "Pogledi časovnice potrebujejo lastnost začetnega datuma za prikaz strani na časovnici."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Dodaj lastnost končnega datuma za prikaz obsegov namesto enodnevnih vrstic.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Povečava časovnice",
+    "day": "Dan",
+    "week": "Teden",
+    "month": "Mesec"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Odvisnosti:",
+    "hint": "dodaj relacijsko lastnost",
+    "relationPropertyAriaLabel": "Relacijska lastnost odvisnosti"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Danes",
+    "previousRange": "Prejšnji obseg",
+    "nextRange": "Naslednji obseg",
+    "newPage": "Novo",
+    "newPageIn": "Nova stran v {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tabela časovnice",
+    "nameHeader": "Ime"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Odpri {{title}}",
+    "openAriaLabelWithDates": "Odpri {{title}}, {{start}} do {{end}}",
+    "openNoDateAriaLabel": "Odpri {{title}}, brez datuma"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Ni elementov v tem obsegu.",
+    "noDatedItems": "Ni še datiranih elementov.",
+    "jumpTo": "Skoči na {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Brez datuma ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Brez",
+    "untitled": "Brez naslova"
   }
 }

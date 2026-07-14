@@ -20,6 +20,14 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
       connections: [],
       connectionStorageAvailable: true,
     })),
+    createNotionImportConnectionRemote: vi.fn(async () => ({
+      connection: {
+        id: "connection-root-picker",
+        name: "Root picker connection",
+        connectionKind: "internal_integration",
+        status: "active",
+      },
+    })),
     listNotionImportRootsRemote: vi.fn(async () => ({
       notionWorkspace: { id: "nw", name: "sample-workspace" },
       items: [

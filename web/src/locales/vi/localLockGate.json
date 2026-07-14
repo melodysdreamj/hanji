@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Mở khóa dữ liệu cục bộ",
+  "description": "Dữ liệu ngoại tuyến trên thiết bị này bị khóa bằng cụm mật khẩu. Mở khóa sẽ bật lại chế độ sử dụng và lưu ngoại tuyến.",
+  "passphrasePlaceholder": "Cụm mật khẩu",
+  "unlock": "Mở khóa",
+  "continueOnline": "Chỉ tiếp tục trực tuyến",
+  "continueOnlineHint": "'Chỉ tiếp tục trực tuyến' giữ các chỉnh sửa ngoại tuyến bị khóa của thiết bị này được niêm phong — chúng ở lại thiết bị và sẽ không đồng bộ cho đến khi bạn mở khóa bằng cụm mật khẩu chính xác.",
+  "wrongPassphrase": "Cụm mật khẩu không chính xác.",
+  "unsupportedBrowser": "Khóa cục bộ không khả dụng trên trình duyệt này."
 }

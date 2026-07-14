@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komen",
+  "closeAria": "Tutup komen",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Perbincangan blok",
+    "page": "Perbincangan halaman"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Status komen",
+    "open": "Terbuka",
+    "resolved": "Selesai"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Mengulas",
+    "commentingOnSelectedText": "Mengulas teks terpilih",
+    "selectedBlock": "Blok terpilih",
+    "onSelectedText": "Pada teks terpilih",
+    "onSelectedBlock": "Pada blok terpilih",
+    "onABlock": "Pada blok"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Tambah komen blok",
+    "addPageComment": "Tambah komen halaman",
+    "blockPlaceholder": "Komen pada blok ini...",
+    "pagePlaceholder": "Tambah komen...",
+    "submit": "Komen"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Sebutan orang dalam komen",
+    "replyPeopleAria": "Sebutan orang dalam balasan",
+    "trigger": "Sebut orang",
+    "noMatches": "Tiada orang sepadan",
+    "title": "Sebut {{name}}",
+    "person": "Orang",
+    "you": "Anda",
+    "organizationPerson": "Ahli organisasi",
+    "roleInOrganization": "{{role}} dalam organisasi"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Utas komen",
+    "empty": "Belum ada komen",
+    "noOpen": "Tiada komen terbuka",
+    "noResolved": "Tiada komen selesai"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} komen, {{time}}",
+    "commentAriaResolved": "{{author}} komen, {{time}}, diselesaikan",
+    "replyAria": "{{author}} balasan, {{time}}",
+    "repliesAria": "{{count}} balasan",
+    "edited": "(diedit)",
+    "emptyComment": "(komen kosong)",
+    "emptyReply": "(balasan kosong)",
+    "justNow": "Baru sahaja"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Balas",
+    "showInPage": "Paparkan di halaman",
+    "resolve": "Selesaikan",
+    "reopen": "Buka semula",
+    "edit": "Sunting"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Balas..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Sunting komen"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Padam komen ini?",
+    "threadConfirm_one": "Padamkan komen ini dan balasannya?",
+    "threadConfirm_other": "Padamkan komen ini dan {{count}} balasan?"
   }
 }

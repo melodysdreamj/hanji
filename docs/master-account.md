@@ -1,22 +1,19 @@
 # Master Account
 
 Every Hanji deployment starts with one master account, which is also the first
-instance administrator. Docker users normally create it in the first-run web
-installer. Automated/hosted deployments can still provision it from the
-environment.
+instance administrator. A fresh dev, Docker, or Cloudflare runtime normally
+creates it in the first-run web installer; the operator does not preconfigure
+the administrator email or password.
 
-## Docker first-run installer
+## Browser first-run installer
 
-A fresh Docker volume receives a random setup code and all runtime secrets on
-the container's first start. Run `docker logs hanji`, open Hanji, and enter the
-code with the administrator email and password you want. The code:
-
-- is generated inside the container and persisted in `/data/.hanji/` with mode
-  `0600`;
-- is never included in the image, Docker configuration, browser bootstrap
-  response, URL, or public database;
-- can claim only an instance with no existing account and no confirmed master;
-- becomes inert permanently after the first administrator is confirmed.
+Open a fresh Hanji runtime and choose the administrator name, email, password,
+and password confirmation in the browser. Dev and Docker require no setup code.
+Cloudflare's deploy command generates a private setup capability, syncs it as a
+Worker secret, and prints a setup link after deploy. The capability travels in
+the URL fragment, is removed from browser history before the first request, and
+is then sent only in a dedicated request header. It is never entered into the
+form.
 
 The server records a durable setup claim before creating the auth account, so
 concurrent setup requests cannot create two masters. A same-email retry can
@@ -24,47 +21,50 @@ recover if the process stopped between auth creation and app-database
 finalization. Public signup stays fenced until the master/admin record is
 complete.
 
+Like traditional wiki installers, the first browser visitor can claim a fresh
+dev or Docker instance. Keep a new container on a private LAN or unexposed
+reverse-proxy route until setup is complete. A public Cloudflare visitor without
+the private deploy link sees only the normal sign-in screen and cannot create
+the first administrator. The successful claim permanently closes the installer,
+including after Docker replacement with the same `/data` volume.
+
 ## Environment variables
 
 | Variable | Meaning |
 | --- | --- |
-| `HANJI_MASTER_EMAIL` | Master account email. It must be unused unless `instance_settings` already confirms that exact master identity. Changing it provisions a new account on the next request (the old account keeps existing). |
-| `HANJI_MASTER_PASSWORD` | Used only when the account is first created. Later password changes in Account Security are never overwritten by this value. |
+| `HANJI_BROWSER_SETUP` | Enables browser first-run setup. The normal dev, Docker, and Cloudflare paths set this automatically. |
+| `HANJI_BROWSER_SETUP_TOKEN` | Optional private hosted-setup capability. `npm --prefix backend run deploy` generates and preserves it in the ignored `.env.release`; Docker and dev do not need it. |
+| `HANJI_MASTER_EMAIL` | Legacy noninteractive compatibility. When set with `HANJI_MASTER_PASSWORD`, provisions an unused email without the browser installer. |
+| `HANJI_MASTER_PASSWORD` | Legacy noninteractive compatibility. Used only for the initial account creation and never reapplied after later password changes. |
 
-Use these values for dev automation, Cloudflare, portable packs, or an advanced
-Docker deployment that deliberately bypasses the web installer. Passing the literal password as a shell
-argument would leave it in shell history — reference an environment variable
-instead (e.g. `HANJI_MASTER_PASSWORD="$MASTER_PASSWORD"`).
+Normal installations leave both `HANJI_MASTER_*` values empty. They remain for
+legacy migrations and advanced automation that deliberately bypasses the web
+installer. Passing a literal compatibility password as a shell argument would
+leave it in shell history; use an environment file or secret manager instead.
 
 ## Behavior
 
-- **First boot**: the `instance-bootstrap` endpoint (called by the web client
-  on load) idempotently creates the master account, promotes it into
+- **Browser first boot**: `instance-bootstrap` records the single-winner claim,
+  creates the submitted account through trusted admin authority, promotes it into
   `instance_settings.instanceAdminUserIds`, records the ensure in
   `instance_audit_events` (`instance.master.bootstrap`), and caches
-  `masterUserId`/`masterEmail` in `instance_settings` so later requests skip
-  the scan. Client signup stays blocked until that pair is confirmed, so a
-  public signup cannot race the trusted admin creation and pre-claim the
-  configured email.
-- **Email collision**: an ordinary account with the configured email is never
+  `masterUserId`/`masterEmail` in `instance_settings`. Client signup stays
+  blocked until that identity is confirmed.
+- **Compatibility env boot**: the same endpoint idempotently provisions the
+  configured legacy master pair. An ordinary account with that email is never
   promoted. Provisioning fails closed and logs the collision; choose a new,
   unused master email (or use an already-confirmed master identity) and retry.
-- **Fresh Docker instance without master env**: when the image-generated setup
-  code is available, the sign-in screen becomes the first-run installer. When
-  neither a setup code nor master env exists (for example an incompletely
-  configured portable/hosted runtime), initialization still fails closed.
-  Existing instances and loopback dev/test runtimes keep their prior behavior.
-- **Dev**: `node scripts/setup-dev-env.mjs` asks for the master email and
-  password on first setup and writes them into `backend/.dev.vars` /
-  `.env.development` (no credentials are hardcoded in the repo). The dev
-  runtime reads them from there, and browsers sign in through the normal
-  password form. The public bootstrap endpoint never returns either value;
-  request URL/Host loopback checks cannot authenticate the network peer.
-  Smokes resolve credentials directly via the harness `masterCredentials()`
-  helper (env → backend/.dev.vars → CI defaults).
-- **Release preflight** (`npm run preflight:deploy`) requires
-  `HANJI_MASTER_EMAIL`/`HANJI_MASTER_PASSWORD` in `.env.release`
-  and rejects the retired `HANJI_MASTER_DEV_AUTOLOGIN` flag.
+- **Dev**: `node scripts/setup-dev-env.mjs` generates only runtime secrets and
+  enables browser setup. It removes retired stored master credentials from the
+  ignored dev env files. Open the fresh runtime and create the account there.
+- **Docker**: the image enables un-tokened browser setup internally and keeps
+  the first-visitor/private-network rule described above.
+- **Cloudflare**: `npm --prefix backend run deploy` prepares the private setup
+  capability before strict preflight and prints the fragment-only link only
+  after a successful deploy. Strict release validation accepts browser setup
+  without `HANJI_MASTER_*` and rejects a missing or weak hosted capability.
+- **CI**: managed jobs call `completeSetup` with synthetic credentials after the
+  runtime becomes healthy. The credentials are test data, not product defaults.
 
 ## Rotating credentials
 
@@ -74,15 +74,16 @@ instead (e.g. `HANJI_MASTER_PASSWORD="$MASTER_PASSWORD"`).
   at creation). Use another instance admin's Server console
   (`resetUserPassword` issues a temporary password and revokes sessions), or
   the EdgeBase admin path where applicable.
-- **Email**: change `HANJI_MASTER_EMAIL` to an unused address and restart;
-  the next request provisions the new master account. The previous master
-  keeps its instance-admin rights until removed in the Server console.
+- **Email**: use the account settings/admin workflow. Changing the legacy
+  `HANJI_MASTER_EMAIL` still provisions another administrator for compatibility,
+  but is not the normal rotation path.
 
 ## Security notes
 
-- Environment bootstrap never trusts caller identity. Web bootstrap accepts
-  caller input only after a constant-work comparison with the high-entropy
-  setup code and a durable single-winner claim.
+- Environment bootstrap never trusts caller identity. Dev/Docker browser setup
+  is open only while the instance has no account. Public hosted setup additionally
+  requires the private deploy capability. Both rely on the durable claim to
+  close the window permanently.
 - The legacy `HANJI_INSTANCE_ADMIN_EMAILS` and
   `EDGEBASE_INSTANCE_ADMIN_EMAILS` allowlists are ignored and rejected by
   release preflight because password-signup emails are unverified. Bootstrap

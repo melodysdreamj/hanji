@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ട്രാഷ്",
+  "empty": "ഇല്ലാതാക്കിയ പേജുകൾ ഇവിടെ കാണും. ട്രാഷിൽ ഒന്നുമില്ല.",
+  "searchTrash": "ട്രാഷ് തിരയുക",
+  "deletedPages": "ഇല്ലാതാക്കിയ പേജുകൾ",
+  "noSearchMatches": "തിരയലുമായി പൊരുത്തപ്പെടുന്ന ഇല്ലാതാക്കിയ പേജുകളൊന്നുമില്ല.",
+  "pageCount_one": "{{count}} പേജ്",
+  "pageCount_other": "{{count}} പേജുകൾ",
+  "deletedJustNow": "ഇപ്പോൾ മാത്രം ഇല്ലാതാക്കി",
+  "deletedOn": "{{date}} ഇല്ലാതാക്കി",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "പുനഃസ്ഥാപിക്കുക",
+    "deleteForever": "ശാശ്വതമായി ഇല്ലാതാക്കുക",
+    "emptyTrash": "ട്രാഷ് ശൂന്യമാക്കുക"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} ട്രാഷിൽ നിന്ന് തുറക്കുക",
+    "restorePage": "{{title}} പുനഃസ്ഥാപിക്കുക",
+    "deletePageForever": "{{title}} ശാശ്വതമായി ഇല്ലാതാക്കുക",
+    "cancelPermanentDelete": "ശാശ്വത ഇല്ലാതാക്കൽ റദ്ദാക്കുക",
+    "cancelEmptyTrash": "ട്രാഷ് ശൂന്യമാക്കൽ റദ്ദാക്കുക"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "സ്ഥായിയായി ഇല്ലാതാക്കണോ?",
+    "deleteBodyPrefix": "ഇത് സ്ഥായിയായി ഇല്ലാതാക്കും ",
+    "deleteBodySuffix": ". ഈ പ്രവർത്തനം പഴയപടിയാക്കാനാവില്ല.",
+    "emptyTitle": "ട്രാഷ് ശൂന്യമാക്കണോ?",
+    "emptyBody_one": "ഇത് ട്രാഷിലെ എല്ലാ {{count}} പേജും സ്ഥായിയായി ഇല്ലാതാക്കും. ഈ പ്രവർത്തനം പഴയപടിയാക്കാനാവില്ല.",
+    "emptyBody_other": "ഇത് ട്രാഷിലെ എല്ലാ {{count}} പേജുകളും സ്ഥായിയായി ഇല്ലാതാക്കും. ഈ പ്രവർത്തനം പഴയപടിയാക്കാനാവില്ല."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "സ്ഥായിയായി ഇല്ലാതാക്കി",
+    "couldntDelete": "പേജ് ഇല്ലാതാക്കാനായില്ല",
+    "restored": "പേജ് പുനഃസ്ഥാപിച്ചു",
+    "couldntRestore": "പേജ് പുനഃസ്ഥാപിക്കാനായില്ല",
+    "emptied": "ട്രാഷ് ശൂന്യമാക്കി",
+    "couldntEmpty": "ട്രാഷ് ശൂന്യമാക്കാനായില്ല"
   }
 }

@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "הוסף מאפיין תאריך",
+    "description": "תצוגות ציר זמן זקוקות למאפיין תאריך התחלה כדי להציג דפים לאורך זמן."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "הוסף מאפיין תאריך סיום כדי להציג טווחים במקום עמודות של יום בודד.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "זום ציר הזמן",
+    "day": "יום",
+    "week": "שבוע",
+    "month": "חודש"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "תלות:",
+    "hint": "הוסף מאפיין קשר",
+    "relationPropertyAriaLabel": "מאפיין קשר תלות"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "היום",
+    "previousRange": "הטווח הקודם",
+    "nextRange": "הטווח הבא",
+    "newPage": "חדש",
+    "newPageIn": "דף חדש ב{{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "טבלת ציר זמן",
+    "nameHeader": "שם"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "פתח {{title}}",
+    "openAriaLabelWithDates": "פתח {{title}}, מ{{start}} עד {{end}}",
+    "openNoDateAriaLabel": "פתח {{title}}, ללא תאריך"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "אין פריטים בטווח זה.",
+    "noDatedItems": "אין פריטים מתוארכים עדיין.",
+    "jumpTo": "עבור ל{{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ללא תאריך ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ללא",
+    "untitled": "ללא כותרת"
   }
 }

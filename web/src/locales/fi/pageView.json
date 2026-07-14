@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Sivun palautus epäonnistui",
+  "emptyBodyPrompt": "Paina Enter aloittaaksesi kirjoittamisen tällä tyhjällä sivulla.",
+  "inTrashTopBarTitle": "Roskakorissa",
+  "loadingPageContent": "Ladataan sivun sisältöä",
+  "notFoundTopBarTitle": "Ei löytynyt",
+  "openWorkspace": "Avaa työtila",
+  "pageInTrash": "Tämä sivu on roskakorissa.",
+  "pageInTrashDetail": "Palauta se ennen sisällön avaamista tai muokkaamista.",
+  "pageUnavailable": "Sivua ei voi avata.",
+  "pageUnavailableDetail": "Tämä sivu on saatettu poistaa, siirtää tai jakaa toiselle tilille.",
+  "restoredPage": "Sivu palautettu",
+  "restorePage": "Palauta sivu"
 }

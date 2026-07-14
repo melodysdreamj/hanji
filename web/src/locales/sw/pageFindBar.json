@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Tafuta kwenye ukurasa"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Tafuta kwenye ukurasa",
+    "placeholder": "Tafuta kwenye ukurasa"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Linganisho lililotangulia",
+    "next": "Linganisho linalofuata",
+    "close": "Funga utafutaji"
   }
 }

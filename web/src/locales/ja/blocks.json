@@ -2,64 +2,64 @@
   "defs": {
     "paragraph": {
       "label": "テキスト",
-      "description": "プレーンテキストで書き始めるだけです。",
-      "placeholder": "'/' でコマンドを表示"
+      "description": "プレーンテキストで書き始めてください。",
+      "placeholder": "コマンドは'/'を入力"
     },
     "child_page": {
       "label": "ページ",
-      "description": "このページ内にサブページを作成します。"
+      "description": "このページ内にサブページを作成"
     },
     "link_to_page": {
-      "label": "ページへのリンク",
-      "description": "既存のページにリンクします。"
+      "label": "ページリンク",
+      "description": "既存のページにリンク"
     },
     "heading_1": {
       "label": "見出し1",
-      "description": "大きなセクション見出し。",
+      "description": "大きなセクションの見出し",
       "placeholder": "見出し1"
     },
     "toggle_heading_1": {
       "label": "トグル見出し1",
-      "description": "ネストしたコンテンツを折りたためる大きな見出し。",
+      "description": "入れ子の内容を折りたたむことができる大きな見出し。",
       "placeholder": "トグル見出し1"
     },
     "heading_2": {
       "label": "見出し2",
-      "description": "中くらいのセクション見出し。",
+      "description": "中くらいのセクションの見出し",
       "placeholder": "見出し2"
     },
     "toggle_heading_2": {
       "label": "トグル見出し2",
-      "description": "ネストしたコンテンツを折りたためる中見出し。",
+      "description": "ネストされたコンテンツを折りたためる中見出し。",
       "placeholder": "トグル見出し2"
     },
     "heading_3": {
       "label": "見出し3",
-      "description": "小さなセクション見出し。",
+      "description": "小さなセクションの見出し",
       "placeholder": "見出し3"
     },
     "toggle_heading_3": {
       "label": "トグル見出し3",
-      "description": "ネストしたコンテンツを折りたためる小見出し。",
+      "description": "ネストされたコンテンツを折りたためる小見出し。",
       "placeholder": "トグル見出し3"
     },
     "heading_4": {
       "label": "見出し4",
-      "description": "コンパクトなセクション見出し。",
+      "description": "コンパクトなセクションの見出し",
       "placeholder": "見出し4"
     },
     "toggle_heading_4": {
       "label": "トグル見出し4",
-      "description": "ネストしたコンテンツを折りたためるコンパクトな見出し。",
+      "description": "折りたたみ可能なコンパクトな見出し。",
       "placeholder": "トグル見出し4"
     },
     "to_do": {
-      "label": "To-doリスト",
+      "label": "ToDoリスト",
       "description": "チェックボックスでタスクを管理します。",
-      "placeholder": "To-do"
+      "placeholder": "ToDo"
     },
     "bulleted_list_item": {
-      "label": "箇条書きリスト",
+      "label": "箇条書き",
       "description": "シンプルな箇条書きリストを作成します。",
       "placeholder": "リスト"
     },
@@ -70,18 +70,18 @@
     },
     "toggle": {
       "label": "トグルリスト",
-      "description": "コンテンツの表示/非表示を切り替えられます。",
+      "description": "トグルで内容を表示・非表示にできます。",
       "placeholder": "トグル"
     },
     "quote": {
       "label": "引用",
-      "description": "引用をキャプチャします。",
-      "placeholder": "空の引用"
+      "description": "引用文を追加します。",
+      "placeholder": "引用文を入力"
     },
     "callout": {
       "label": "コールアウト",
-      "description": "文章を際立たせます。",
-      "placeholder": "何か入力してください…"
+      "description": "文章を目立たせます。",
+      "placeholder": "何か入力…"
     },
     "divider": {
       "label": "区切り線",
@@ -89,8 +89,8 @@
     },
     "code": {
       "label": "コード",
-      "description": "コードスニペットをキャプチャします。",
-      "placeholder": "コードを書くか、スニペットを貼り付け…"
+      "description": "コードスニペットを追加",
+      "placeholder": "コードを書くか、スニペットを貼り付けてください…"
     },
     "equation": {
       "label": "数式",
@@ -102,7 +102,7 @@
     },
     "synced_block": {
       "label": "同期ブロック",
-      "description": "ページ間でコンテンツを再利用します。"
+      "description": "コンテンツを複数ページで再利用します。"
     },
     "button": {
       "label": "ボタン",
@@ -110,19 +110,19 @@
     },
     "tab": {
       "label": "タブ",
-      "description": "コンテンツをラベル付きのタブにまとめます。",
+      "description": "コンテンツをタブで整理します。",
       "placeholder": "タブ"
     },
     "breadcrumb": {
-      "label": "パンくずリスト",
+      "label": "パンくず",
       "description": "このページの場所を表示します。"
     },
     "action_duplicate": {
       "label": "複製",
-      "description": "このブロックの完全なコピーを作成します。"
+      "description": "このブロックを複製します。"
     },
     "action_move_to": {
-      "label": "移動先",
+      "label": "移動",
       "description": "このブロックを別のページに移動します。"
     },
     "action_delete": {
@@ -133,16 +133,16 @@
       "description": "このブロックのタイプを変更します。"
     },
     "action_color": {
-      "label": "カラー",
-      "description": "このブロックのテキストまたは背景の色を変更します。"
+      "label": "色",
+      "description": "このブロックの文字色または背景色を変更します。"
     },
     "simple_table": {
-      "label": "テーブル",
-      "description": "このページにシンプルなテーブルを追加します。"
+      "label": "表",
+      "description": "簡単な表を追加します。"
     },
     "column_list_2": {
       "label": "2列",
-      "description": "ブロックを横並びに配置します。"
+      "description": "ブロックを並べて配置します。"
     },
     "column_list_3": {
       "label": "3列",
@@ -158,19 +158,19 @@
     },
     "image": {
       "label": "画像",
-      "description": "アップロードまたはリンクで埋め込みます。"
+      "description": "アップロードまたはリンクで埋め込み"
     },
     "video": {
       "label": "動画",
-      "description": "リンクで動画を埋め込みます。"
+      "description": "リンクで動画を埋め込む。"
     },
     "audio": {
-      "label": "音声",
-      "description": "リンクで音声を埋め込みます。"
+      "label": "オーディオ",
+      "description": "リンクでオーディオを埋め込みます。"
     },
     "bookmark": {
-      "label": "Webブックマーク",
-      "description": "Webリンクをカードとして保存します。"
+      "label": "ウェブブックマーク",
+      "description": "ウェブリンクをカードとして保存します。"
     },
     "embed": {
       "label": "埋め込み",
@@ -182,23 +182,23 @@
     },
     "child_database": {
       "label": "データベース - フルページ",
-      "description": "新しいデータベースをサブページとして追加します。"
+      "description": "新しいデータベースをサブページとして追加"
     },
     "child_database_table": {
       "label": "テーブル - フルページ",
-      "description": "フルページのデータベースをテーブルとして追加します。"
+      "description": "フルページのテーブルデータベースを追加します。"
     },
     "child_database_board": {
       "label": "ボード - フルページ",
-      "description": "フルページのかんばんボードを追加します。"
+      "description": "フルページのカンバンボードを追加します。"
     },
     "child_database_list": {
       "label": "リスト - フルページ",
-      "description": "フルページのデータベースをリストとして追加します。"
+      "description": "フルページのリストデータベースを追加します。"
     },
     "child_database_timeline": {
       "label": "タイムライン - フルページ",
-      "description": "フルページのデータベースタイムラインを追加します。"
+      "description": "フルページのタイムラインデータベースを追加します。"
     },
     "child_database_calendar": {
       "label": "カレンダー - フルページ",
@@ -210,107 +210,107 @@
     },
     "inline_database": {
       "label": "データベース - インライン",
-      "description": "このページ内にデータベースを追加します。"
+      "description": "このページ内にデータベースを追加"
     },
     "inline_database_table": {
-      "label": "テーブルビュー",
-      "description": "インラインデータベースをテーブルとして追加します。"
+      "label": "テーブル表示",
+      "description": "インラインデータベースをテーブルとして追加"
     },
     "inline_database_board": {
-      "label": "ボードビュー",
-      "description": "インラインのかんばんボードを追加します。"
+      "label": "ボード表示",
+      "description": "インラインのカンバンボードを追加"
     },
     "inline_database_list": {
-      "label": "リストビュー",
-      "description": "インラインデータベースをリストとして追加します。"
+      "label": "リスト表示",
+      "description": "インラインデータベースをリストとして追加"
     },
     "inline_database_timeline": {
-      "label": "タイムラインビュー",
-      "description": "インラインデータベースタイムラインを追加します。"
+      "label": "タイムライン表示",
+      "description": "インラインのデータベースタイムラインを追加"
     },
     "inline_database_calendar": {
-      "label": "カレンダービュー",
-      "description": "インラインのカレンダーデータベースを追加します。"
+      "label": "カレンダー表示",
+      "description": "インラインのカレンダーデータベースを追加"
     },
     "inline_database_gallery": {
-      "label": "ギャラリービュー",
-      "description": "インラインのデータベースギャラリーを追加します。"
+      "label": "ギャラリー表示",
+      "description": "インラインのデータベースギャラリーを追加"
     },
     "color_default": {
       "label": "デフォルト",
-      "description": "このブロックのテキストまたは背景の色を削除します。"
+      "description": "ブロックの文字色と背景色を削除"
     },
     "color_gray": {
       "label": "グレー",
-      "description": "このブロックにグレーを適用します。"
+      "description": "このブロックにグレーを適用"
     },
     "color_brown": {
-      "label": "ブラウン",
-      "description": "このブロックにブラウンを適用します。"
+      "label": "茶色",
+      "description": "このブロックに茶色を適用"
     },
     "color_orange": {
       "label": "オレンジ",
-      "description": "このブロックにオレンジを適用します。"
+      "description": "このブロックにオレンジ色を適用します。"
     },
     "color_yellow": {
-      "label": "イエロー",
-      "description": "このブロックにイエローを適用します。"
+      "label": "黄",
+      "description": "このブロックに黄を適用します。"
     },
     "color_green": {
-      "label": "グリーン",
-      "description": "このブロックにグリーンを適用します。"
+      "label": "緑",
+      "description": "このブロックに緑色を適用します。"
     },
     "color_blue": {
-      "label": "ブルー",
-      "description": "このブロックにブルーを適用します。"
+      "label": "青",
+      "description": "このブロックに青を適用"
     },
     "color_purple": {
-      "label": "パープル",
-      "description": "このブロックにパープルを適用します。"
+      "label": "紫",
+      "description": "このブロックに紫を適用します。"
     },
     "color_pink": {
       "label": "ピンク",
       "description": "このブロックにピンクを適用します。"
     },
     "color_red": {
-      "label": "レッド",
-      "description": "このブロックにレッドを適用します。"
+      "label": "赤",
+      "description": "このブロックに赤を適用します。"
     },
     "color_gray_background": {
-      "label": "グレーの背景",
-      "description": "このブロックにグレーの背景を適用します。"
+      "label": "グレー背景",
+      "description": "このブロックにグレーの背景を適用"
     },
     "color_brown_background": {
-      "label": "ブラウンの背景",
-      "description": "このブロックにブラウンの背景を適用します。"
+      "label": "茶色い背景",
+      "description": "このブロックに茶色い背景を適用"
     },
     "color_orange_background": {
-      "label": "オレンジの背景",
-      "description": "このブロックにオレンジの背景を適用します。"
+      "label": "オレンジ色の背景",
+      "description": "このブロックにオレンジ色の背景を適用します。"
     },
     "color_yellow_background": {
-      "label": "イエローの背景",
-      "description": "このブロックにイエローの背景を適用します。"
+      "label": "黄背景",
+      "description": "このブロックに黄背景を適用します。"
     },
     "color_green_background": {
-      "label": "グリーンの背景",
-      "description": "このブロックにグリーンの背景を適用します。"
+      "label": "グリーン背景",
+      "description": "このブロックにグリーンの背景を適用"
     },
     "color_blue_background": {
-      "label": "ブルーの背景",
-      "description": "このブロックにブルーの背景を適用します。"
+      "label": "青い背景",
+      "description": "このブロックに青い背景を適用"
     },
     "color_purple_background": {
-      "label": "パープルの背景",
-      "description": "このブロックにパープルの背景を適用します。"
+      "label": "紫背景",
+      "description": "このブロックに紫背景を適用します。"
     },
     "color_pink_background": {
-      "label": "ピンクの背景",
-      "description": "このブロックにピンクの背景を適用します。"
+      "label": "ピンク背景",
+      "description": "このブロックにピンク色の背景を適用します。"
     },
     "color_red_background": {
-      "label": "レッドの背景",
-      "description": "このブロックにレッドの背景を適用します。"
+      "label": "赤背景",
+      "description": "このブロックに赤背景を適用します。"
     }
   }
 }

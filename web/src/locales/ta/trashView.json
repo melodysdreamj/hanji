@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "குப்பை",
+  "empty": "நீங்கள் நீக்கும் பக்கங்கள் இங்கு தோன்றும். குப்பையில் எதுவும் இல்லை.",
+  "searchTrash": "குப்பையில் தேடு",
+  "deletedPages": "நீக்கப்பட்ட பக்கங்கள்",
+  "noSearchMatches": "தேடலுடன் பொருந்தும் நீக்கப்பட்ட பக்கங்கள் இல்லை.",
+  "pageCount_one": "{{count}} பக்கம்",
+  "pageCount_other": "{{count}} பக்கங்கள்",
+  "deletedJustNow": "இப்போது நீக்கப்பட்டது",
+  "deletedOn": "{{date}} அன்று நீக்கப்பட்டது",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "மீட்டமை",
+    "deleteForever": "நிரந்தரமாக நீக்கு",
+    "emptyTrash": "குப்பையை காலி செய்"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "குப்பையிலிருந்து {{title}} ஐத் திற",
+    "restorePage": "{{title}} ஐ மீட்டெடு",
+    "deletePageForever": "{{title}} ஐ நிரந்தரமாக நீக்கு",
+    "cancelPermanentDelete": "நிரந்தர நீக்கத்தை ரத்துசெய்",
+    "cancelEmptyTrash": "குப்பை காலி செய்வதை ரத்துசெய்"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "நிரந்தரமாக நீக்கவா?",
+    "deleteBodyPrefix": "இது நிரந்தரமாக நீக்கும்",
+    "deleteBodySuffix": ". இந்தச் செயலை நீங்கள் செயல்தவிர்க்க முடியாது.",
+    "emptyTitle": "குப்பையை காலி செய்யவா?",
+    "emptyBody_one": "இது குப்பையில் உள்ள {{count}} பக்கத்தை நிரந்தரமாக நீக்கும். இந்தச் செயலை நீங்கள் செயல்தவிர்க்க முடியாது.",
+    "emptyBody_other": "இது குப்பையில் உள்ள {{count}} பக்கங்களை நிரந்தரமாக நீக்கும். இந்தச் செயலை நீங்கள் செயல்தவிர்க்க முடியாது."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "நிரந்தரமாக நீக்கப்பட்டது",
+    "couldntDelete": "பக்கத்தை நீக்க முடியவில்லை",
+    "restored": "பக்கம் மீட்டெடுக்கப்பட்டது",
+    "couldntRestore": "பக்கத்தை மீட்டெடுக்க முடியவில்லை",
+    "emptied": "குப்பை காலியானது",
+    "couldntEmpty": "குப்பையை காலி செய்ய முடியவில்லை"
   }
 }

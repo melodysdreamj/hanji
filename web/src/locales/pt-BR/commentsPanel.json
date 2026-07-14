@@ -11,33 +11,33 @@
     "resolved": "Resolvido"
   },
   "anchor": {
-    "commentingOn": "Comentando sobre",
-    "commentingOnSelectedText": "Comentando sobre o texto selecionado",
+    "commentingOn": "Comentando em",
+    "commentingOnSelectedText": "Comentando no texto selecionado",
     "selectedBlock": "Bloco selecionado",
     "onSelectedText": "No texto selecionado",
     "onSelectedBlock": "No bloco selecionado",
     "onABlock": "Em um bloco"
   },
   "composer": {
-    "addBlockComment": "Adicionar um comentário no bloco",
-    "addPageComment": "Adicionar um comentário na página",
+    "addBlockComment": "Adicionar comentário ao bloco",
+    "addPageComment": "Adicionar comentário à página",
     "blockPlaceholder": "Comentar neste bloco...",
-    "pagePlaceholder": "Adicionar um comentário...",
+    "pagePlaceholder": "Adicionar comentário...",
     "submit": "Comentar"
   },
   "mention": {
-    "commentPeopleAria": "Menção a pessoas no comentário",
-    "replyPeopleAria": "Menção a pessoas na resposta",
+    "commentPeopleAria": "Mencionar pessoas no comentário",
+    "replyPeopleAria": "Mencionar pessoas na resposta",
     "trigger": "Mencionar pessoas",
-    "noMatches": "Nenhuma pessoa correspondente",
+    "noMatches": "Nenhuma pessoa encontrada",
     "title": "Mencionar {{name}}",
     "person": "Pessoa",
     "you": "Você",
-    "organizationPerson": "Pessoa da organização",
+    "organizationPerson": "Membro da organização",
     "roleInOrganization": "{{role}} na organização"
   },
   "list": {
-    "threadsAria": "Tópicos de comentário",
+    "threadsAria": "Tópicos de comentários",
     "empty": "Nenhum comentário ainda",
     "noOpen": "Nenhum comentário aberto",
     "noResolved": "Nenhum comentário resolvido"

@@ -1,8 +1,8 @@
 {
   "title": "Neuer Arbeitsbereich",
   "name": {
-    "label": "Arbeitsbereichsname",
-    "placeholder": "Acme Inc."
+    "label": "Workspace-Name",
+    "placeholder": "Muster GmbH"
   },
   "startLabel": "Starten von",
   "options": {
@@ -11,17 +11,17 @@
       "body": "Leer mit den Startseiten beginnen."
     },
     "notion": {
-      "title": "Aus Notion importieren",
-      "body": "Arbeitsbereich erstellen und dann einen Notion-Arbeitsbereich migrieren."
+      "title": "Import von Notion",
+      "body": "Arbeitsbereich erstellen, dann Notion-Arbeitsbereich migrieren."
     },
     "hanji": {
-      "title": "Aus anderem Hanji importieren",
-      "body": "Arbeitsbereich erstellen und dann einen Arbeitsbereich von einem anderen Hanji-Server oder einer Datei abrufen."
+      "title": "Import von anderem Hanji",
+      "body": "Arbeitsbereich erstellen, dann von anderem Hanji-Server oder Datei importieren."
     }
   },
-  "create": "Arbeitsbereich erstellen",
-  "creating": "Wird erstellt…",
+  "create": "Workspace erstellen",
+  "creating": "Erstellen…",
   "error": {
-    "couldntCreate": "Arbeitsbereich konnte nicht erstellt werden."
+    "couldntCreate": "Workspace konnte nicht erstellt werden."
   }
 }

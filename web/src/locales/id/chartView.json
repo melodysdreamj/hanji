@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Jumlah",
+    "sum": "Total",
+    "average": "Rata-rata",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Bagan {{name}}",
+  "chartType": "Jenis bagan",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Batang",
+    "horizontal_bar": "Batang horizontal",
+    "line": "Garis",
+    "donut": "Donat"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Tercek",
+  "empty": "Kosong",
+  "legend": "Legenda bagan",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
+  "noData": "Tidak ada data",
+  "noDataDesc": "Tidak ada baris yang cocok dengan filter atau pencarian saat ini.",
+  "noGroupProperty": "Belum ada properti untuk bagan",
+  "noGroupPropertyDesc": "Tambahkan properti pilihan, status, orang, checkbox, atau tanggal untuk mengelompokkan bagan ini.",
   "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "unchecked": "Tidak tercek",
+  "untitledProperty": "Tanpa judul",
+  "valueProperty": "Properti nilai",
+  "xAxis": "Sumbu X",
+  "yAxis": "Sumbu Y"
 }

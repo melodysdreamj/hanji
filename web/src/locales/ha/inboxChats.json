@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Babu tattaunawa tukuna. Yi sharhi a shafi ko ambaci wani don fara tattaunawa.",
+  "leave": "Fita",
+  "leaveAria": "Fita daga tattaunawa akan {{title}}",
+  "open": "Buɗe tattaunawa akan {{title}}",
+  "participants_one": "Mahaluki {{count}}",
+  "participants_other": "Mahaluka {{count}}",
+  "untitled": "Marasa take",
+  "loading": "Ana loda tattaunawa…"
 }

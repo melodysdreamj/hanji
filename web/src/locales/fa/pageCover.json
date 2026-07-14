@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "تغییر کاور",
+    "reposition": "تغییر موقعیت",
+    "remove": "حذف",
+    "uploadFile": "آپلود فایل",
+    "uploading": "آپلود...",
+    "submit": "تأیید",
+    "savePosition": "ذخیره موقعیت"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "گالری",
+    "upload": "آپلود",
+    "link": "لینک"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "لینک تصویر را بچسبانید",
+    "invalid": "یک لینک تصویر http یا https بچسبانید."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "تصویر مورد نظر بارگذاری نشد.",
+    "defaultFileName": "تصویر جلد"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "برای تغییر موقعیت، تصویر را بکشید"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "آماده‌سازی",
+    "finalizing": "نهایی‌سازی",
+    "complete": "تکمیل",
+    "uploading": "آپلود"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "کاور حذف شد",
+    "restored": "کاور بازیابی شد",
+    "undo": "واگردانی"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "کاور صفحه",
+    "coverVerticalPosition": "موقعیت عمودی کاور",
+    "positionFromTop": "{{position}}% از بالا",
+    "closeCoverMenu": "بستن منوی کاور",
+    "changePageCover": "تغییر کاور صفحه",
+    "repositionPageCover": "تغییر موقعیت کاور صفحه",
+    "removePageCover": "حذف کاور صفحه",
+    "changeCoverDialog": "تغییر کاور",
+    "coverSource": "منبع کاور",
+    "selectCover": "انتخاب کاور {{number}}",
+    "uploadFromDevice": "آپلود کاور از این دستگاه",
+    "uploadingFile": "در حال آپلود {{fileName}}",
+    "coverImageLink": "لینک تصویر کاور"
   }
 }

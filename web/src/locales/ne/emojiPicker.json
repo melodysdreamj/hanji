@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "आइकन पिकर बन्द",
+    "label": "आइकन छान्नुहोस्"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "आइकन प्रकार",
+    "emoji": "इमोजी",
+    "image": "छवि"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "हटाउनुहोस्",
+    "ariaLabel": "आइकन हटाउनुहोस्"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "फिल्टर…",
+    "searchLabel": "आइकन खोज",
+    "random": "र्यान्डम",
+    "randomLabel": "र्यान्डम आइकन छान्नुहोस्",
+    "recentLabel": "हालै प्रयोग गरिएको पहिले",
+    "gridLabelRecent": "आइकनहरू, हालै प्रयोग गरिएको पहिले",
+    "gridLabel": "आइकन",
+    "optionLabel": "{{emoji}} आइकन छान्नुहोस्",
+    "noResults": "“{{query}}” सँग मिल्ने कुनै आइकन छैन। फरक शब्द प्रयोग गर्नुहोस् वा फिल्टर खाली गर्नुहोस्।"
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "छवि",
+    "linkPlaceholder": "छवि लिङ्क टाँस्नुहोस्",
+    "linkLabel": "छवि आइकन लिङ्क",
+    "apply": "लागू",
+    "upload": "फाइल अपलोड",
+    "uploading": "अपलोड हुँदै...",
+    "uploadingLabel": "{{fileName}} अपलोड हुँदै",
+    "uploadFailed": "त्यो छवि अपलोड गर्न सकिएन।",
+    "fallbackFileName": "आइकन छवि"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "अपलोड तयार गर्दै",
+    "finalizing": "अन्तिम रूप दिँदै",
+    "complete": "सम्पन्न",
+    "uploading": "अपलोड गर्दै"
   }
 }

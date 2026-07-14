@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "ಐಕಾನ್ ಪಿಕರ್ ಮುಚ್ಚಿ",
+    "label": "ಐಕಾನ್ ಆಯ್ಕೆ ಮಾಡಿ"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "ಐಕಾನ್ ಪ್ರಕಾರ",
+    "emoji": "ಎಮೋಜಿ",
+    "image": "ಚಿತ್ರ"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "ತೆಗೆದುಹಾಕು",
+    "ariaLabel": "ಐಕಾನ್ ತೆಗೆದುಹಾಕು"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "ಫಿಲ್ಟರ್…",
+    "searchLabel": "ಐಕಾನ್‌ಗಳನ್ನು ಹುಡುಕಿ",
+    "random": "ಯಾದೃಚ್ಛಿಕ",
+    "randomLabel": "ಯಾದೃಚ್ಛಿಕ ಐಕಾನ್ ಆಯ್ಕೆ ಮಾಡಿ",
+    "recentLabel": "ಇತ್ತೀಚೆಗೆ ಬಳಸಿದವು ಮೊದಲು",
+    "gridLabelRecent": "ಐಕಾನ್‌ಗಳು, ಇತ್ತೀಚಿನವು ಮೊದಲು",
+    "gridLabel": "ಐಕಾನ್‌ಗಳು",
+    "optionLabel": "{{emoji}} ಐಕಾನ್ ಆಯ್ಕೆ ಮಾಡಿ",
+    "noResults": "“{{query}}” ಗೆ ಹೊಂದಿಕೆಯಾಗುವ ಐಕಾನ್‌ಗಳಿಲ್ಲ. ಬೇರೆ ಪದ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಫಿಲ್ಟರ್ ತೆರವುಗೊಳಿಸಿ."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "ಚಿತ್ರ",
+    "linkPlaceholder": "ಚಿತ್ರ ಲಿಂಕ್ ಅಂಟಿಸಿ",
+    "linkLabel": "ಚಿತ್ರ ಐಕಾನ್ ಲಿಂಕ್",
+    "apply": "ಅನ್ವಯಿಸು",
+    "upload": "ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+    "uploading": "ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    "uploadingLabel": "{{fileName}} ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "uploadFailed": "ಆ ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
+    "fallbackFileName": "ಐಕಾನ್ ಚಿತ್ರ"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "ಅಪ್‌ಲೋಡ್ ತಯಾರಾಗುತ್ತಿದೆ",
+    "finalizing": "ಅಂತಿಮಗೊಳಿಸಲಾಗುತ್ತಿದೆ",
+    "complete": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "uploading": "ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ"
   }
 }

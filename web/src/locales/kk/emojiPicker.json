@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Иконка таңдағышты жабу",
+    "label": "Иконканы таңдау"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "Белгіше түрі",
+    "emoji": "Эмодзи",
+    "image": "Сурет"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Жою",
+    "ariaLabel": "Белгішені жою"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Сүзгі…",
+    "searchLabel": "Белгішелерді іздеу",
+    "random": "Кездейсоқ",
+    "randomLabel": "Кездейсоқ иконканы таңдау",
+    "recentLabel": "Соңғы қолданылғандар бірінші",
+    "gridLabelRecent": "Иконкалар, алдымен соңғы пайдаланылғандар",
+    "gridLabel": "Иконкалар",
+    "optionLabel": "{{emoji}} иконкасын таңдау",
+    "noResults": "“{{query}}” сұранысына сәйкес иконкалар табылмады. Басқа сөзді қолданып көріңіз немесе сүзгіні тазалаңыз."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Сурет",
+    "linkPlaceholder": "Сурет сілтемесін қою",
+    "linkLabel": "Сурет иконкасының сілтемесі",
+    "apply": "Қолдану",
+    "upload": "Файлды жүктеу",
+    "uploading": "Жүктелуде...",
+    "uploadingLabel": "{{fileName}} жүктелуде",
+    "uploadFailed": "Бұл суретті жүктеу мүмкін болмады.",
+    "fallbackFileName": "Иконка суреті"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Жүктеуге дайындау",
+    "finalizing": "Аяқталуда",
+    "complete": "Дайын",
+    "uploading": "Жүктелуде"
   }
 }

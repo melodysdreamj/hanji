@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "Sayfa açılıyor",
+  "workspace": "Çalışma Alanı",
+  "emptyWorkspace": "Boş çalışma alanı",
+  "untitled": "Başlıksız",
+  "newPage": "Yeni sayfa"
 }

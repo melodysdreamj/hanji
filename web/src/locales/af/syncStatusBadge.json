@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Vanlyn",
+  "offlinePending_one": "Vanlyn · {{count}} verandering hangende",
+  "offlinePending_other": "Vanlyn · {{count}} veranderinge hangende",
+  "syncing": "Sinchroniseer · {{count}}",
+  "unreachable": "Kan nie die bediener bereik nie",
+  "unreachablePending_one": "Kan nie die bediener bereik nie · {{count}} verandering hangend",
+  "unreachablePending_other": "Kan nie die bediener bereik nie · {{count}} veranderinge hangend",
+  "retryHint": "Klik om nou weer te probeer"
 }

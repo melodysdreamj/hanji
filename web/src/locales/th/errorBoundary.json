@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "เกิดข้อผิดพลาดในการแสดงเนื้อหานี้",
+  "detail": "ลองอีกครั้ง หากปัญหายังคงอยู่ ให้โหลดแอปใหม่และแชร์หมายเลขอ้างอิงด้านล่าง",
+  "reference": "หมายเลขอ้างอิง: {{reference}}",
+  "reload": "โหลดแอปใหม่",
+  "retry": "ลองอีกครั้ง"
 }

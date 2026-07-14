@@ -1,76 +1,76 @@
 {
-  "toolbar": {
-    "ariaLabel": "Text formatting"
-  },
-  "turnInto": {
-    "label": "Turn into",
-    "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
-    }
-  },
-  "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
-  },
-  "comment": {
-    "label": "Comment"
-  },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Tekstfarge: {{color}}",
+    "title": "Farge: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
-    "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
-    },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "blue": "Blå bakgrunn",
+      "brown": "Brun bakgrunn",
+      "gray": "Grå bakgrunn",
+      "green": "Grønn bakgrunn",
+      "heading": "Bakgrunnsfarge",
+      "orange": "Oransje bakgrunn",
+      "pink": "Rosa bakgrunn",
+      "purple": "Lilla bakgrunn",
+      "red": "Rød bakgrunn",
+      "yellow": "Gul bakgrunn"
+    },
+    "mixed": "Blandet",
+    "text": {
+      "blue": "Blå",
+      "brown": "Brun",
+      "default": "Standard",
+      "gray": "Grå",
+      "green": "Grønn",
+      "heading": "Tekstfarge",
+      "orange": "Oransje",
+      "pink": "Rosa",
+      "purple": "Lilla",
+      "red": "Rød",
+      "yellow": "Gul"
     }
   },
+  "comment": {
+    "label": "Kommentar"
+  },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "apply": "Lenke",
+    "ariaLabel": "Rediger lenke",
+    "copied": "Kopiert",
+    "copiedLink": "Kopiert lenke",
+    "copy": "Kopier lenke",
+    "open": "Åpne lenke",
+    "placeholder": "Lim inn lenke",
+    "remove": "Fjern",
+    "urlAriaLabel": "Lenke-URL"
+  },
+  "marks": {
+    "bold": "Fet",
+    "code": "Kode",
+    "italic": "Kursiv",
+    "link": "Lenke",
+    "strikethrough": "Gjennomstreking",
+    "underline": "Understreking"
+  },
+  "toolbar": {
+    "ariaLabel": "Tekstformatering"
+  },
+  "turnInto": {
+    "label": "Gjør om til",
+    "options": {
+      "bulletedList": "Punktliste",
+      "callout": "Utheving",
+      "code": "Kode",
+      "heading1": "Overskrift 1",
+      "heading2": "Overskrift 2",
+      "heading3": "Overskrift 3",
+      "heading4": "Overskrift 4",
+      "numberedList": "Nummerert liste",
+      "quote": "Sitat",
+      "text": "Tekst",
+      "toDoList": "Oppgaveliste",
+      "toggleList": "Toggelliste"
+    }
   }
 }

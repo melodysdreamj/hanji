@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "กำลังเปิดหน้า",
+  "workspace": "เวิร์กสเปซ",
+  "emptyWorkspace": "เวิร์กสเปซว่างเปล่า",
+  "untitled": "ไม่มีชื่อ",
+  "newPage": "หน้าใหม่"
 }

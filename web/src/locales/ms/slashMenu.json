@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Perintah blok",
+  "closeBlockCommands": "Tutup perintah blok",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Blok asas",
     "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Database": "Pangkalan data",
+    "Advanced": "Blok lanjutan"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} daripada {{total}}. Tekan Enter untuk menyisipkan.",
+  "listStatus": "{{total}} perintah blok tersedia.",
+  "noBlocks": "Tiada blok ditemui",
+  "noBlocksFor": "Tiada blok ditemui untuk \"{{query}}\"",
+  "recentlyUsed": "Baru digunakan"
 }

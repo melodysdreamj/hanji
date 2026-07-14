@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} pautan balik",
+    "count_other": "{{count}} pautan balik"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Sebutan yang dipautkan"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} sebutan",
+    "mention_other": "{{count}} sebutan",
+    "link_one": "{{count}} pautan",
+    "link_other": "{{count}} pautan"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Sebutan",
+    "link": "Pautan"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} lagi pautan balik",
+    "count_other": "{{count}} lagi pautan balik"
   }
 }

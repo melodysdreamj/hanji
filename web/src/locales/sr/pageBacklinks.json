@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} povratna veza",
+    "count_other": "{{count}} povratnih veza"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Povezani pomeni"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
+    "mention_one": "{{count}} pomen",
+    "mention_other": "{{count}} pomena",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "link_other": "{{count}} linka"
   },
   "kind": {
-    "mention": "Mention",
+    "mention": "Pomen",
     "link": "Link"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "Još {{count}} povratna veza",
+    "count_other": "Još {{count}} povratnih veza"
   }
 }

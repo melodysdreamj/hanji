@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} ta orqaga havola",
+    "count_other": "{{count}} ta orqaga havola"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Bog'langan eslatmalar"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} ta eslatma",
+    "mention_other": "{{count}} ta eslatma",
+    "link_one": "{{count}} ta havola",
+    "link_other": "{{count}} ta havola"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Eslatma",
+    "link": "Havola"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "Yana {{count}} ta orqaga havola",
+    "count_other": "Yana {{count}} ta orqaga havola"
   }
 }

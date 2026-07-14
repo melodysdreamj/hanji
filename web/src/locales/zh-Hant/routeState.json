@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "此地址不完整。",
+  "invalidBody": "請檢查連結中遺漏或格式錯誤的字元，然後重試。",
+  "notFoundTitle": "找不到頁面。",
+  "notFoundBody": "此地址與 Hanji 頁面不符。頁面可能已移動或不存在。",
+  "sharedTitle": "此共享連結無效。",
+  "sharedBody": "請確認完整共享連結已正確複製，然後再試一次。",
+  "openHome": "開啟 Hanji 首頁"
+}

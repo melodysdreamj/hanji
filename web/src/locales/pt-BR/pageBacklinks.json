@@ -17,7 +17,7 @@
     "link": "Link"
   },
   "more": {
-    "count_one": "mais {{count}} backlink",
-    "count_other": "mais {{count}} backlinks"
+    "count_one": "{{count}} backlink a mais",
+    "count_other": "{{count}} backlinks a mais"
   }
 }

@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "save": "ਸੰਭਾਲੋ",
+    "close": "ਬੰਦ ਕਰੋ",
+    "search": "ਖੋਜ",
+    "create": "ਬਣਾਓ",
+    "delete": "ਮਿਟਾਓ",
+    "clearAll": "ਸਭ ਸਾਫ਼ ਕਰੋ",
+    "done": "ਮੁਕੰਮਲ",
+    "add": "ਜੋੜੋ"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ਸਿਰਲੇਖ ਰਹਿਤ"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} ਕਾਪੀ",
+    "columnName": "ਕਾਲਮ {{number}}",
+    "importedDatabase": "ਆਯਾਤ ਡੇਟਾਬੇਸ",
+    "uploadedFile": "ਅਪਲੋਡ ਕੀਤੀ ਫਾਈਲ",
+    "image": "ਚਿੱਤਰ",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "ਨਾਮ",
+      "status": "ਸਥਿਤੀ",
+      "select": "ਚੁਣੋ",
+      "date": "ਤਾਰੀਖ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ਸ਼ੁਰੂ ਨਹੀਂ",
+      "doing": "ਚੱਲ ਰਿਹਾ",
+      "done": "ਮੁਕੰਮਲ"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ਵਿਕਲਪ 1",
+      "second": "ਵਿਕਲਪ 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ਸਾਰਣੀ"
     }
   }
 }

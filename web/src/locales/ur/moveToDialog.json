@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "منتقل کریں",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "ورک اسپیس روٹ",
+    "path": "اعلیٰ سطح"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "منتقل کرنے کے مقامات تلاش کریں",
+    "placeholder": "صفحات تلاش کریں..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "منتقلی کا ڈائیلاگ بند کریں"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "منتقل کرنے کے مقامات",
+    "empty": "کوئی صفحہ نہیں ملا۔",
+    "destinationLabel": "{{label}}، {{path}} پر منتقل کریں"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" بنائیں",
+    "optionLabel": "صفحہ {{title}} بنائیں اور یہاں منتقل کریں",
+    "hint": "نیا اعلیٰ سطحی صفحہ - یہاں منتقل کریں"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "مقفل والدین صفحہ",
+    "page": "مقفل صفحہ"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "صفحہ مقفل والد میں ہے",
+    "locked": "صفحہ مقفل ہے",
+    "moved": "صفحہ منتقل کر دیا گیا",
+    "moveFailed": "صفحہ منتقل نہیں کر سکے"
   }
 }

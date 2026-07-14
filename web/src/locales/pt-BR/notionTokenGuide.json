@@ -8,23 +8,23 @@
   "scenes": [
     {
       "title": "Abra a página de token a partir do Hanji",
-      "caption": "No Hanji, clique em “Abrir página de token do Notion” para abrir o portal de desenvolvedores do Notion em uma nova aba."
+      "caption": "No Hanji, clique em “Abrir página de token do Notion” para abrir o portal do desenvolvedor do Notion em uma nova guia."
     },
     {
       "title": "Criar uma conexão",
       "caption": "Em notion.so/profile/integrations (Conexões), clique em “Nova conexão”."
     },
     {
-      "title": "Escolha o espaço de trabalho e crie o token",
-      "caption": "Escolha “Token de acesso” e selecione a qual espaço de trabalho do Notion este token se aplica — um token sempre pertence a exatamente um espaço de trabalho."
+      "title": "Escolha o workspace, crie o token",
+      "caption": "Escolha “Token de acesso” e, em seguida, selecione a qual workspace do Notion este token se aplica — um token sempre pertence a exatamente um workspace."
     },
     {
-      "title": "Copiar o token de acesso",
+      "title": "Copie o token de acesso",
       "caption": "Copie o token ntn_… e cole no campo de token abaixo."
     },
     {
       "title": "Conecte-o às suas páginas",
-      "caption": "No Notion, abra cada página de nível superior → ··· → Conexões → adicione esta conexão. As subpáginas são incluídas automaticamente — depois volte e faça a verificação."
+      "caption": "No Notion, abra cada página de nível superior → ··· → Conexões → adicione esta conexão. As subpáginas são incluídas automaticamente — depois volte e digitalize."
     },
     {
       "title": "Cole o token no Hanji",
@@ -32,7 +32,7 @@
     },
     {
       "title": "Escolha o que importar",
-      "caption": "Importe todo o espaço de trabalho ou escolha “Páginas específicas” para trazer apenas as páginas e bancos de dados selecionados."
+      "caption": "Importe o workspace inteiro ou selecione “Páginas específicas” para trazer apenas as páginas e bancos de dados escolhidos."
     }
   ],
   "mock": {
@@ -44,14 +44,14 @@
     "inkStep1Title": "Preparar token do Notion",
     "inkTokenLabel": "Token da API do Notion",
     "inkTokenValue": "ntn_••••••••",
-    "inkStep2Title": "Escolha o que importar",
+    "inkStep2Title": "Escolher o que importar",
     "scopeAllTitle": "Espaço de trabalho inteiro",
     "scopeAllRec": "Recomendado",
     "scopeAllDesc": "Tudo o que a conexão pode acessar. As relações de banco de dados entre páginas permanecem intactas.",
     "scopeSomeTitle": "Páginas específicas",
-    "scopeSomeDesc": "Verifique os itens de nível superior acessíveis e importe apenas as páginas/bancos de dados selecionados.",
+    "scopeSomeDesc": "Examine itens de nível superior acessíveis e importe apenas as páginas/bancos de dados selecionados.",
     "urlPage": "notion.so/Team-Handbook-82fd91",
-    "backLink": "‹ Voltar ao Notion",
+    "backLink": "‹ Voltar para o Notion",
     "devTitle": "Desenvolvedores",
     "nav": [
       "Começar",
@@ -59,46 +59,46 @@
       "Tokens de acesso pessoal",
       "Conexões"
     ],
-    "navNew": "Novo",
+    "navNew": "Nova",
     "listTitle": "Conexões",
-    "listSubtitle": "Crie e gerencie as conexões de API públicas e privadas do Notion.",
+    "listSubtitle": "Criar e gerenciar conexões de API públicas e privadas do Notion.",
     "learnMore": "Saiba mais",
     "newConnection": "+ Nova conexão",
     "colConnection": "Conexão",
-    "colWorkspaces": "Espaços de trabalho instaláveis:",
+    "colWorkspaces": "Workspaces instaláveis:",
     "colAuthType": "Tipo de autenticação",
     "colOwner": "Proprietário",
     "integrationName": "Hanji",
-    "capabilities": "Ler conteúdo, atualizar e inserir conteúdo e ler informações de usuário",
-    "workspaceName": "Meu espaço de trabalho",
+    "capabilities": "Ler conteúdo, atualizar e inserir conteúdo e ler informações do usuário",
+    "workspaceName": "Meu workspace",
     "authTypeCell": "Token de acesso",
     "ownerName": "Você",
     "modalTitle": "Nova conexão",
-    "modalDesc": "Crie uma conexão para autenticar apps, agentes e fluxos de trabalho com o Notion. Escolha um escopo de espaço de trabalho único ou de vários espaços de trabalho.",
+    "modalDesc": "Criar uma conexão para autenticar aplicativos, agentes e fluxos de trabalho com o Notion. Escolher um escopo de um ou vários espaços de trabalho.",
     "nameLabel": "Nome da conexão",
     "namePlaceholder": "Minha conexão",
     "authMethod": "Método de autenticação",
     "accessToken": "Token de acesso",
-    "accessTokenDesc": "Um token de API estático, com escopo de espaço de trabalho, compartilhado entre colaboradores, com suas próprias configurações de capacidades. Limitado a 1 espaço de trabalho e não pode ser listado no Marketplace.",
+    "accessTokenDesc": "Um token de API estático, com escopo de workspace, compartilhado entre colaboradores, com suas próprias configurações de permissão. Limitado a 1 workspace e não pode ser listado no Marketplace.",
     "oauth": "OAuth",
-    "oauthDesc": "OAuth 2.0 com escopo de usuário; as permissões são limitadas ao usuário conectado. Suporta vários espaços de trabalho.",
-    "wsLabel": "Espaços de trabalho instaláveis:",
-    "wsDesc": "Este token se aplica ao espaço de trabalho selecionado.",
+    "oauthDesc": "OAuth 2.0 com escopo de usuário; as permissões são limitadas ao usuário logado. Suporta vários espaços de trabalho.",
+    "wsLabel": "Workspaces instaláveis:",
+    "wsDesc": "Este token se aplica ao workspace selecionado.",
     "terms": "Ao criar uma conexão, você concorda com os termos de desenvolvedor do Notion.",
     "createButton": "Criar conexão",
     "breadcrumb": "Conexões  ›  Gerenciar conexão",
     "detailTabs": [
       "Configuração",
-      "Capacidades de conteúdo",
+      "Permissões de conteúdo",
       "Webhooks",
       "Proprietários"
     ],
     "tokenSectionTitle": "Token de integração da API",
-    "tokenSectionDesc": "Use este token para autenticar requisições de API para este espaço de trabalho. Qualquer pessoa com o token pode agir em nome da conexão, portanto mantenha-o em segredo.",
+    "tokenSectionDesc": "Use este token para autenticar solicitações de API para este workspace. Qualquer pessoa com o token pode agir em nome da conexão, portanto, mantenha-o em segredo.",
     "tokenFieldLabel": "Token de acesso",
     "tokenValue": "••••••••••••••••••••••••••••",
     "copied": "Copiado",
-    "pageTitle": "Manual da Equipe",
+    "pageTitle": "Manual da equipe",
     "share": "Compartilhar",
     "menuCopyLink": "Copiar link",
     "menuDuplicate": "Duplicar",

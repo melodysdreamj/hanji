@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Zavrieť výber ikon",
+    "label": "Vybrať ikonu"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Typ ikony",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Obrázok"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Odstrániť",
+    "ariaLabel": "Odstrániť ikonu"
   },
   "emoji": {
     "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchLabel": "Vyhľadať ikony",
+    "random": "Náhodne",
+    "randomLabel": "Vybrať náhodnú ikonu",
+    "recentLabel": "Naposledy použité ako prvé",
+    "gridLabelRecent": "Ikony, naposledy použité najprv",
+    "gridLabel": "Ikony",
+    "optionLabel": "Vybrať ikonu {{emoji}}",
+    "noResults": "Žiadne ikony nezodpovedajú „{{query}}“. Skúste iné slovo alebo vymažte filter."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Obrázok",
+    "linkPlaceholder": "Vložiť odkaz na obrázok",
+    "linkLabel": "Odkaz na obrázok ikony",
+    "apply": "Použiť",
+    "upload": "Nahrať súbor",
+    "uploading": "Nahrávanie...",
+    "uploadingLabel": "Nahrávanie {{fileName}}",
+    "uploadFailed": "Obrázok sa nepodarilo nahrať.",
+    "fallbackFileName": "Obrázok ikony"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Pripravuje sa nahrávanie",
+    "finalizing": "Finalizuje sa",
+    "complete": "Dokončené",
+    "uploading": "Nahráva sa"
   }
 }

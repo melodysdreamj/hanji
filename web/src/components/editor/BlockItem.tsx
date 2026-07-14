@@ -27,7 +27,7 @@ import { copyText } from "@/lib/clipboard";
 import { activeDateLocale } from "@/lib/i18n";
 import { i18next } from "@/i18n";
 import { fetchUrlMetadataRemote, searchOrganizationPeopleRemote } from "@/lib/edgebase";
-import { isSafeEmbedTarget, isUnsafeWorkspaceFileError } from "@/lib/fileSecurity";
+import { isSafeEmbedTarget } from "@/lib/fileSecurity";
 import { storageKeyFromUrl, useWorkspaceFileUrl } from "@/lib/fileUrls";
 import { positionBetween } from "@/lib/ids";
 import { isComposingKeyEvent } from "@/lib/keyboard";
@@ -43,7 +43,6 @@ import type {
   PagePresenceAwareness,
 } from "@/lib/pagePresence";
 import { uploadWorkspaceFile } from "@/lib/storage";
-import type { UploadProgress } from "@/lib/storage";
 import type {
   Block,
   BlockContent,
@@ -104,6 +103,14 @@ import {
   registerEditable,
   selectEditableContents,
 } from "./focus";
+import {
+  blockUploadErrorMessage,
+  blockUploadProgressLabel,
+  dataTransferHasFiles,
+  droppedFiles,
+  type BlockUploadProgress,
+  type FileDropPlacement,
+} from "./fileDrop";
 import {
   concatSpans,
   escapeHtml,
@@ -887,32 +894,6 @@ type PastedUrlConversion =
   | "audio"
   | "file";
 
-type BlockUploadProgress = UploadProgress & { fileName: string };
-
-function blockUploadErrorMessage(error: unknown, fileName: string) {
-  const labels = blockItemLabels();
-  const message = error instanceof Error ? error.message.trim() : "";
-  // Map the failures we recognize to friendly copy; anything else gets a
-  // generic localized message — raw backend/library errors go to the console
-  // for debugging instead of being shown to the user.
-  if (/^file is too large\.?$/i.test(message)) return labels.uploadFileTooLarge;
-  if (isUnsafeWorkspaceFileError(error)) return labels.uploadUnsafeFileType;
-  if (message) console.error("Block file upload failed:", error);
-  return labels.uploadFailed(fileName);
-}
-
-function dataTransferHasFiles(dataTransfer: DataTransfer) {
-  return Array.from(dataTransfer.types).includes("Files");
-}
-
-function blockUploadProgressLabel(progress: UploadProgress) {
-  const labels = blockItemLabels();
-  if (progress.phase === "preparing") return labels.uploadPreparing;
-  if (progress.phase === "finalizing") return labels.uploadFinalizing;
-  if (progress.phase === "complete") return labels.uploadComplete;
-  return labels.uploadUploading;
-}
-
 function UploadProgressRow({ progress }: { progress: BlockUploadProgress | null }) {
   if (!progress) return null;
   return (
@@ -960,20 +941,6 @@ function blockTypeForPastedAssetUrl(url: string): Extract<PastedUrlConversion, "
 
 function focusEquationInput(blockId: string) {
   focusBlockControlSettled(blockId, `textarea[data-equation-input="${blockId}"]`);
-}
-
-function fileBlockType(file: File): Extract<BlockType, "image" | "video" | "audio" | "file"> {
-  if (file.type.startsWith("image/")) return "image";
-  if (file.type.startsWith("video/")) return "video";
-  if (file.type.startsWith("audio/")) return "audio";
-  return "file";
-}
-
-function blockUploadScope(type: Extract<BlockType, "image" | "video" | "audio" | "file">) {
-  if (type === "image") return "blocks/images";
-  if (type === "video") return "blocks/videos";
-  if (type === "audio") return "blocks/audio";
-  return "blocks/files";
 }
 
 function clampImageWidth(value: number) {
@@ -1460,7 +1427,7 @@ function BlockFrame({
   const router = useRouter();
   const rowRef = useRef<HTMLDivElement>(null);
   const [drop, setDrop] = useState<DropPlacement | null>(null);
-  const [fileDrop, setFileDrop] = useState(false);
+  const [fileDropPlacement, setFileDropPlacement] = useState<FileDropPlacement | null>(null);
   const [dragging, setDragging] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<BlockMenuAnchor | null>(null);
@@ -1559,6 +1526,21 @@ function BlockFrame({
     return "inside";
   }
 
+  function filePlacementFromEvent(e: React.DragEvent<HTMLDivElement>): FileDropPlacement {
+    const canReplace =
+      childBlocks.length === 0 &&
+      ((block.type === "paragraph" &&
+        !(block.plainText?.trim() || spansToPlainText(block.content?.rich).trim())) ||
+        ((block.type === "image" ||
+          block.type === "video" ||
+          block.type === "audio" ||
+          block.type === "file") &&
+          !block.content?.url));
+    if (canReplace) return "replace";
+    const rect = e.currentTarget.getBoundingClientRect();
+    return e.clientY < rect.top + rect.height * 0.5 ? "before" : "after";
+  }
+
   function draggedRootCount(draggedId: string) {
     return ops.selectedBlockIds.has(draggedId) ? ops.selectedBlockIds.size : 1;
   }
@@ -1577,57 +1559,6 @@ function BlockFrame({
     });
   }
 
-  async function uploadDroppedFiles(files: File[]) {
-    if (files.length === 0) return;
-    let targetId = block.id;
-    let replaceCurrent =
-      block.type === "paragraph" &&
-      childBlocks.length === 0 &&
-      !(block.plainText?.trim() || spansToPlainText(block.content?.rich).trim());
-    let uploadedCount = 0;
-
-    for (const file of files) {
-      const type = fileBlockType(file);
-      let uploadBlockId = targetId;
-      let insertedForUpload = false;
-      if (!replaceCurrent) {
-        const inserted = ops.insertAfter(targetId, type);
-        if (!inserted) continue;
-        targetId = inserted.id;
-        uploadBlockId = inserted.id;
-        insertedForUpload = true;
-      }
-
-      try {
-        const uploaded = await uploadWorkspaceFile(file, blockUploadScope(type), {
-          pageId: block.pageId,
-          blockId: uploadBlockId,
-        });
-        const plainText = file.name || uploaded.name || blockTypeLabel(type);
-        const content: BlockContent = {
-          url: uploaded.url,
-          fileName: file.name || uploaded.name || plainText,
-          caption: [],
-        };
-        if (replaceCurrent) {
-          updateBlock(targetId, { type, content, plainText });
-          replaceCurrent = false;
-        } else {
-          updateBlock(targetId, { content, plainText });
-        }
-        uploadedCount += 1;
-      } catch (err) {
-        if (insertedForUpload) ops.remove(uploadBlockId);
-        notify(blockUploadErrorMessage(err, file.name), "error");
-      }
-    }
-
-    if (uploadedCount > 0) {
-      ops.selectBlock(targetId);
-      notify(blockItemLabels().uploadedFiles(uploadedCount), "success");
-    }
-  }
-
   function onDragOver(e: React.DragEvent<HTMLDivElement>) {
     if (ops.readOnly) return;
     if (dataTransferHasFiles(e.dataTransfer)) {
@@ -1635,7 +1566,7 @@ function BlockFrame({
       e.stopPropagation();
       e.dataTransfer.dropEffect = "copy";
       setDrop(null);
-      setFileDrop(true);
+      setFileDropPlacement(filePlacementFromEvent(e));
       return;
     }
     if (!Array.from(e.dataTransfer.types).includes(BLOCK_DRAG_TYPE)) return;
@@ -1647,13 +1578,14 @@ function BlockFrame({
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     if (ops.readOnly) return;
     if (dataTransferHasFiles(e.dataTransfer)) {
-      const files = Array.from(e.dataTransfer.files).filter((file) => file.size > 0);
+      const files = droppedFiles(e.dataTransfer);
       if (files.length === 0) return;
       e.preventDefault();
       e.stopPropagation();
       setDrop(null);
-      setFileDrop(false);
-      void uploadDroppedFiles(files);
+      const placement = fileDropPlacement ?? filePlacementFromEvent(e);
+      setFileDropPlacement(null);
+      void ops.uploadDroppedFiles(files, block.id, placement);
       return;
     }
     const draggedId = e.dataTransfer.getData(BLOCK_DRAG_TYPE);
@@ -2056,7 +1988,7 @@ function BlockFrame({
         data-type={block.type}
         data-color={color && color !== "default" ? color : undefined}
         data-drop={drop ?? undefined}
-        data-file-drop={fileDrop ? "true" : undefined}
+        data-file-drop={fileDropPlacement ?? undefined}
         data-dragging={dragging ? "true" : undefined}
         data-remote-awareness={primaryRemoteAwareness ? primaryRemoteAwareness.mode : undefined}
         data-selected={selected ? "true" : undefined}
@@ -2068,9 +2000,10 @@ function BlockFrame({
         role="group"
         tabIndex={isSelectionAnchor ? 0 : -1}
         onDragOver={onDragOver}
-        onDragLeave={() => {
+        onDragLeave={(e) => {
+          if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
           setDrop(null);
-          setFileDrop(false);
+          setFileDropPlacement(null);
         }}
         onDrop={onDrop}
         onKeyDown={onSelectedKeyDown}
@@ -7744,14 +7677,12 @@ function TextBlock({
   const [linkCopied, setLinkCopied] = useState(false);
   const [copied, setCopied] = useState(false);
   const [codeFocused, setCodeFocused] = useState(false);
-  const [fileDragging, setFileDragging] = useState(false);
   const dateCalendar = dateEditor ? mentionCalendar(dateEditor.month, dateEditor.value) : null;
   const dateEditorFocusKey = dateEditor ? `${dateEditor.top}:${dateEditor.left}` : "";
   const nav = useRouter();
   const setSidebarOpen = useStore((s) => s.setSidebarOpen);
   const openComments = useStore((s) => s.openComments);
   const updateBlock = useStore((s) => s.updateBlock);
-  const notify = useStore((s) => s.notify);
   const calloutChildren = useStore(
     useShallow((s) => s.childBlocks(block.pageId, block.id))
   );
@@ -9061,11 +8992,10 @@ function TextBlock({
     // Remove the "/query" trigger before transforming, preserving inline marks.
     const el = ref.current;
     let cut = 0;
-    // Notion parity: when text remains before the "/" trigger, the slash command
-    // keeps the current text block intact and inserts the chosen block on the
-    // next line instead of swallowing it (converting the block in place, which
-    // for media types also discards the text). Only an otherwise-empty block
-    // converts in place. `stripSlashTrigger` records emptiness on the dataset.
+    // Text-formatting slash commands transform the current block in place while
+    // preserving the text before the "/" trigger. Insert-style commands (media
+    // and other non-text blocks) keep that text block intact and add the chosen
+    // block below it. `stripSlashTrigger` records emptiness on the dataset.
     let hasResidualText = false;
     if (el) {
       cut = stripSlashTrigger(el);
@@ -9119,7 +9049,7 @@ function TextBlock({
         ops.changeType(block.id, type);
         ops.insertAfter(block.id, "paragraph");
       }
-    } else if (hasResidualText) {
+    } else if (hasResidualText && !TEXT_BLOCKS.has(type)) {
       ops.insertAfter(block.id, type);
     } else {
       ops.changeType(block.id, type, cut);
@@ -9329,12 +9259,10 @@ function TextBlock({
     return true;
   }
 
-  async function applyClipboardFiles(files: File[]) {
+  function applyClipboardFiles(files: File[]) {
     const el = ref.current;
     if (!el || files.length === 0) return;
     const currentPlainText = spansToPlainText(htmlToSpans(el)).trim();
-    let targetId = block.id;
-    let replaceCurrent = currentPlainText.length === 0;
 
     setSlash({ open: false, query: "" });
     setMention({ open: false, query: "" });
@@ -9342,44 +9270,11 @@ function TextBlock({
     closeDateEditor();
     closePersonEditor();
     closePageEditor();
-
-    for (const file of files) {
-      const type = fileBlockType(file);
-      let uploadBlockId = targetId;
-      let insertedForUpload = false;
-      if (!replaceCurrent) {
-        const inserted = ops.insertAfter(targetId, type);
-        if (!inserted) continue;
-        targetId = inserted.id;
-        uploadBlockId = inserted.id;
-        insertedForUpload = true;
-      }
-      let uploadedUrl = "";
-      try {
-        uploadedUrl = (await uploadWorkspaceFile(file, blockUploadScope(type), {
-          pageId: block.pageId,
-          blockId: uploadBlockId,
-        })).url;
-      } catch (err) {
-        if (insertedForUpload) ops.remove(uploadBlockId);
-        notify(blockUploadErrorMessage(err, file.name), "error");
-        continue;
-      }
-      const plainText = file.name || blockTypeLabel(type);
-      const content: BlockContent = {
-        url: uploadedUrl,
-        fileName: file.name || plainText,
-        caption: [],
-      };
-
-      if (replaceCurrent) {
-        updateBlock(targetId, { type, content, plainText });
-        replaceCurrent = false;
-      } else {
-        updateBlock(targetId, { content, plainText });
-      }
-    }
-    ops.selectBlock(targetId);
+    void ops.uploadDroppedFiles(
+      files,
+      block.id,
+      currentPlainText.length === 0 ? "replace" : "after"
+    );
   }
 
   function showPastedUrlMenu(url: string) {
@@ -9961,24 +9856,6 @@ function TextBlock({
     ops.insertBlocksAfter(block.id, toInsert);
   }
 
-  function onFileDragOver(e: React.DragEvent<HTMLDivElement>) {
-    if (block.type === "code" || !Array.from(e.dataTransfer.types).includes("Files")) return;
-    e.preventDefault();
-    e.stopPropagation();
-    e.dataTransfer.dropEffect = "copy";
-    setFileDragging(true);
-  }
-
-  function onFileDrop(e: React.DragEvent<HTMLDivElement>) {
-    if (block.type === "code") return;
-    const files = Array.from(e.dataTransfer.files).filter((file) => file.size > 0);
-    if (files.length === 0) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setFileDragging(false);
-    void applyClipboardFiles(files);
-  }
-
   const editable = (
     <div
       ref={(el) => {
@@ -10003,7 +9880,6 @@ function TextBlock({
       data-empty={spansToPlainText(block.content?.rich).length === 0 ? "true" : "false"}
       data-page-placeholder={pagePlaceholder ? "true" : undefined}
       data-database-source-picker-open={databasePicker ? "true" : undefined}
-      data-file-drop={fileDragging ? "true" : undefined}
       onInput={ops.readOnly ? undefined : onInput}
       onFocus={() => {
         if (!ops.readOnly) {
@@ -10017,10 +9893,6 @@ function TextBlock({
       onBeforeInput={ops.readOnly ? undefined : onBeforeInput}
       onKeyDown={ops.readOnly ? undefined : onKeyDown}
       onPaste={ops.readOnly ? undefined : onPaste}
-      onDragEnter={ops.readOnly ? undefined : onFileDragOver}
-      onDragOver={ops.readOnly ? undefined : onFileDragOver}
-      onDragLeave={ops.readOnly ? undefined : () => setFileDragging(false)}
-      onDrop={ops.readOnly ? undefined : onFileDrop}
     />
   );
 

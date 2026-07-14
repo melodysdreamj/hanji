@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "סגור בוחר האייקונים",
+    "label": "בחר אייקון"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "סוג אייקון",
+    "emoji": "אמוג'י",
+    "image": "תמונה"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "הסר",
+    "ariaLabel": "הסר אייקון"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "סנן…",
+    "searchLabel": "חיפוש אייקונים",
+    "random": "אקראי",
+    "randomLabel": "בחר אייקון אקראי",
+    "recentLabel": "אחרונים ראשונים",
+    "gridLabelRecent": "אייקונים, אחרונים ראשונים",
+    "gridLabel": "אייקונים",
+    "optionLabel": "בחר אייקון {{emoji}}",
+    "noResults": "אין אייקונים התואמים “{{query}}”. נסה מילה אחרת או נקה את המסנן."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "תמונה",
+    "linkPlaceholder": "הדבק קישור לתמונה",
+    "linkLabel": "קישור לתמונת אייקון",
+    "apply": "החל",
+    "upload": "העלה קובץ",
+    "uploading": "מעלה...",
+    "uploadingLabel": "מעלה {{fileName}}",
+    "uploadFailed": "לא ניתן להעלות תמונה זו.",
+    "fallbackFileName": "תמונת אייקון"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "מכין העלאה",
+    "finalizing": "מסיים",
+    "complete": "הושלם",
+    "uploading": "מעלה"
   }
 }

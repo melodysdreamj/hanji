@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "ቁጥር",
+    "sum": "ድምር",
+    "average": "አማካይ",
+    "min": "ዝቅተኛ",
+    "max": "ከፍተኛ"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} ቻርት",
+  "chartType": "ቻርት አይነት",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "አሞሌ",
+    "horizontal_bar": "አግድም አሞሌ",
+    "line": "መስመር",
+    "donut": "ዶናት"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "የተመረጠ",
+  "empty": "ባዶ",
+  "legend": "የቻርት ማብራሪያ",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "ውሂብ የለም",
+  "noDataDesc": "ማጣሪያዎቹ ወይም ፍለጋው ምንም ረድፍ አላገኙም",
+  "noGroupProperty": "ገና የሚቻርት ነገር የለም",
+  "noGroupPropertyDesc": "ይህን ቻርት ለመቧደን የምርጫ፣ የሁኔታ፣ የሰው፣ የቼክቦክስ ወይም የቀን ንብረት ያክሉ።",
+  "total": "ጠቅላላ",
+  "unchecked": "ያልተመረጠ",
+  "untitledProperty": "ያልተሰየመ",
+  "valueProperty": "የእሴት ባህሪ",
+  "xAxis": "X-ዘንግ",
+  "yAxis": "Y-ዘንግ"
 }

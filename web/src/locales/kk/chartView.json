@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Саны",
+    "sum": "Қосынды",
+    "average": "Орташа",
+    "min": "Мин",
+    "max": "Макс"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} диаграммасы",
+  "chartType": "Диаграмма түрі",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Баған",
+    "horizontal_bar": "Көлденең баған",
+    "line": "Сызық",
+    "donut": "Дөңгелек"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Белгіленген",
+  "empty": "Бос",
+  "legend": "Диаграмма легендасы",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Деректер жоқ",
+  "noDataDesc": "Ағымдағы сүзгілерге немесе іздеуге сәйкес келетін жолдар жоқ.",
+  "noGroupProperty": "Диаграмма жасауға ештеңе жоқ",
+  "noGroupPropertyDesc": "Осы диаграмманы топтау үшін таңдау, күй, адам, құсбелгі немесе күн қасиетін қосыңыз.",
+  "total": "Барлығы",
+  "unchecked": "Белгіленбеген",
+  "untitledProperty": "Атаусыз",
+  "valueProperty": "Мән қасиеті",
+  "xAxis": "X осі",
+  "yAxis": "Y осі"
 }

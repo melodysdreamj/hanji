@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "An sami matsala yayin nuna wannan abun ciki.",
+  "detail": "Sake gwadawa. Idan matsalar ta ci gaba, sake loda aikace-aikacen kuma raba lambar magana da ke ƙasa.",
+  "reference": "Lambar magana: {{reference}}",
+  "reload": "Sake loda aikace-aikacen",
+  "retry": "Sake gwadawa"
 }

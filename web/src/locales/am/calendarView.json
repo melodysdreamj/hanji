@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "የቀን ንብረት አክል",
+    "description": "የቀን መቁጠሪያ እይታዎች ገፆችን በወሩ ውስጥ ለማስቀመጥ የቀን ንብረት ያስፈልጋቸዋል።",
+    "addDateButton": "ቀን"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "የቀን መቁጠሪያ በ",
+    "today": "ዛሬ",
+    "previousWeek": "ያለፈ ሳምንት",
+    "previousMonth": "ያለፈው ወር",
+    "nextWeek": "የሚቀጥለው ሳምንት",
+    "nextMonth": "የሚቀጥለው ወር"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "እሁድ",
+    "mon": "ሰኞ",
+    "tue": "ማክሰኞ",
+    "wed": "ረቡዕ",
+    "thu": "ሐሙስ",
+    "fri": "አርብ",
+    "sat": "ቅዳሜ"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} የቀን መቁጠሪያ",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ነገሮች",
+    "newRowAriaLabel": "በ{{date}} አዲስ ረድፍ",
+    "newRowTitle": "አዲስ",
+    "showLess": "ያነሰ አሳይ",
+    "showMore": "+{{count}} ተጨማሪ"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ክፈት",
+    "openAriaLabelWithDate": "{{title}} ክፈት፣ ለ{{date}} የታቀደ",
+    "openNoDateAriaLabel": "{{title}} ክፈት፣ ቀን የለም"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ቀን የለም ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ርዕስ የለሽ",
+    "dateDefaultName": "ቀን"
   }
 }

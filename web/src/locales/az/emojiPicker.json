@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "İkon seçicini bağla",
+    "label": "İkon seç"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "İkon növü",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Şəkil"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Sil",
+    "ariaLabel": "İkonu sil"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Filtr…",
+    "searchLabel": "İkonları axtar",
+    "random": "Təsadüfi",
+    "randomLabel": "Təsadüfi ikon seç",
+    "recentLabel": "Son istifadə edilənlər əvvəl",
+    "gridLabelRecent": "İkonlar, son istifadə edilənlər əvvəl",
+    "gridLabel": "İkonlar",
+    "optionLabel": "{{emoji}} ikonunu seç",
+    "noResults": "“{{query}}” uyğun ikon tapılmadı. Fərqli söz yoxlayın və ya filteri təmizləyin."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Şəkil",
+    "linkPlaceholder": "Şəkil bağlantısını yapışdır",
+    "linkLabel": "Şəkil ikon bağlantısı",
+    "apply": "Tətbiq",
+    "upload": "Fayl yüklə",
+    "uploading": "Yüklənir...",
+    "uploadingLabel": "{{fileName}} yüklənir",
+    "uploadFailed": "Şəkili yükləmək mümkün olmadı.",
+    "fallbackFileName": "İkon şəkli"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Yükləmə hazırlanır",
+    "finalizing": "Yekunlaşdırılır",
+    "complete": "Tamamlandı",
+    "uploading": "Yüklənir"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "புதிய பணியிடம்",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "பணியிடப் பெயர்",
+    "placeholder": "எங்கள் நிறுவனம்"
   },
-  "startLabel": "Start from",
+  "startLabel": "தொடக்கம்",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "வெற்று பணியிடம்",
+      "body": "வெற்றுத் தொடக்கப் பக்கங்களுடன் தொடங்குங்கள்."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "நோஷனிலிருந்து இறக்குமதி",
+      "body": "பணியிடத்தை உருவாக்கி, பின்னர் நோஷன் பணியிடத்தை இங்கு இடமாற்று செய்யுங்கள்."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "வேறு ஹன்ஜியிலிருந்து இறக்குமதி",
+      "body": "பணியிடத்தை உருவாக்கி, மற்றொரு ஹன்ஜி சேவையகம் அல்லது கோப்பிலிருந்து இறக்குமதி செய்யுங்கள்."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "பணியிடம் உருவாக்கு",
+  "creating": "உருவாக்குகிறது…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "பணியிடத்தை உருவாக்க முடியவில்லை."
   }
 }

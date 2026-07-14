@@ -1,19 +1,19 @@
 {
   "empty": {
     "title": "Datumseigenschaft hinzufügen",
-    "description": "Zeitachsenansichten benötigen eine Startdatum-Eigenschaft, um Seiten über die Zeit darzustellen."
+    "description": "Timeline-Ansichten benötigen eine Startdatum-Eigenschaft, um Seiten über die Zeit darzustellen."
   },
-  "endDateHint": "Füge eine Enddatum-Eigenschaft hinzu, um Bereiche statt einzelner Tagesbalken darzustellen.",
+  "endDateHint": "Enddatum-Eigenschaft hinzufügen, um Bereiche statt Tagesbalken darzustellen.",
   "zoom": {
-    "ariaLabel": "Zeitachsen-Zoom",
+    "ariaLabel": "Timeline-Zoom",
     "day": "Tag",
     "week": "Woche",
     "month": "Monat"
   },
   "dependencies": {
     "label": "Abhängigkeiten:",
-    "hint": "Verknüpfungseigenschaft hinzufügen",
-    "relationPropertyAriaLabel": "Abhängigkeits-Verknüpfungseigenschaft"
+    "hint": "Relationseigenschaft hinzufügen",
+    "relationPropertyAriaLabel": "Abhängigkeitsrelationseigenschaft"
   },
   "toolbar": {
     "today": "Heute",
@@ -23,7 +23,7 @@
     "newPageIn": "Neue Seite in {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Zeitachsen-Tabelle",
+    "ariaLabel": "Timeline-Tabelle",
     "nameHeader": "Name"
   },
   "bar": {
@@ -41,6 +41,6 @@
   },
   "options": {
     "none": "Keine",
-    "untitled": "Ohne Titel"
+    "untitled": "Unbenannt"
   }
 }

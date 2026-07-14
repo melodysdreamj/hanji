@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
-  },
-  "labels": {
-    "untitled": "Untitled"
+    "add": "Tilføj",
+    "cancel": "Annuller",
+    "clearAll": "Ryd alle",
+    "close": "Luk",
+    "create": "Opret",
+    "delete": "Slet",
+    "done": "Færdig",
+    "save": "Gem",
+    "search": "Søg"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "columnName": "Kolonne {{number}}",
+    "copyName": "{{name}} kopi",
+    "image": "Billede",
+    "importedDatabase": "Importeret database",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
-    },
-    "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "date": "Dato",
+      "name": "Navn",
+      "select": "Vælg",
+      "status": "Status"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Mulighed 1",
+      "second": "Mulighed 2"
     },
+    "statusOptions": {
+      "doing": "I gang",
+      "done": "Færdig",
+      "todo": "Ikke startet"
+    },
+    "uploadedFile": "Uploadet fil",
     "viewNames": {
-      "table": "Table"
+      "table": "Tabel"
     }
+  },
+  "labels": {
+    "untitled": "Uden titel"
   }
 }

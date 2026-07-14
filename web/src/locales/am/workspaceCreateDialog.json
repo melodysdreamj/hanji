@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "አዲስ የሥራ ቦታ",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "የስራ ቦታ ስም",
+    "placeholder": "የእኔ ኩባንያ"
   },
-  "startLabel": "Start from",
+  "startLabel": "መነሻ",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "ባዶ የሥራ ቦታ",
+      "body": "ከመነሻ ገጾች ጋር ባዶ ይጀምሩ"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "ከኖትሽን አስመጣ",
+      "body": "የሥራ ቦታውን ይፍጠሩ፣ ከዚያ የኖትሽን የሥራ ቦታን ወደ እሱ ያዛውሩ።"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "ከሌላ ሀንጂ አስመጣ",
+      "body": "የሥራ ቦታውን ይፍጠሩ፣ ከዚያ ከሌላ ሀንጂ አገልጋይ ወይም ፋይል ያስመጡ።"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "የስራ ቦታ ፍጠር",
+  "creating": "በመፍጠር ላይ…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "የስራ ቦታ መፍጠር አልተቻለም።"
   }
 }

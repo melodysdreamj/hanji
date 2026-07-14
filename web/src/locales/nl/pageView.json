@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Pagina herstellen mislukt",
+  "emptyBodyPrompt": "Druk op Enter om te schrijven op deze lege pagina.",
+  "inTrashTopBarTitle": "In prullenbak",
+  "notFoundTopBarTitle": "Niet gevonden",
+  "openWorkspace": "Werkruimte openen",
+  "pageInTrash": "Deze pagina staat in de prullenbak.",
+  "pageInTrashDetail": "Herstel deze pagina voordat je de inhoud opent of bewerkt.",
+  "pageUnavailable": "Pagina niet beschikbaar.",
+  "pageUnavailableDetail": "Deze pagina is mogelijk verwijderd, verplaatst of gedeeld met een ander account.",
+  "restorePage": "Pagina herstellen",
+  "restoredPage": "Pagina hersteld",
+  "loadingPageContent": "Pagina-inhoud laden"
 }

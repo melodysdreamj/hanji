@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Кількість",
+    "sum": "Сума",
+    "average": "Середнє",
+    "min": "Мін",
+    "max": "Макс"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} діаграма",
+  "chartType": "Тип діаграми",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Стовпчаста",
+    "horizontal_bar": "Горизонтальна стовпчаста",
+    "line": "Лінійна",
+    "donut": "Пончик"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Позначено",
+  "empty": "Порожньо",
+  "legend": "Легенда діаграми",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Немає даних",
+  "noDataDesc": "Жоден рядок не відповідає поточним фільтрам або пошуку.",
+  "noGroupProperty": "Немає що відобразити на діаграмі",
+  "noGroupPropertyDesc": "Додайте властивість «Вибір», «Статус», «Користувач», «Прапорець» або «Дата» для групування цієї діаграми.",
+  "total": "Всього",
+  "unchecked": "Не позначено",
+  "untitledProperty": "Без назви",
+  "valueProperty": "Властивість значення",
+  "xAxis": "Вісь X",
+  "yAxis": "Вісь Y"
 }

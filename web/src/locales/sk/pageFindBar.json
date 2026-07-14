@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Hľadať na stránke"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Hľadať na stránke",
+    "placeholder": "Hľadať na stránke"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Predchádzajúca zhoda",
+    "next": "Ďalšia zhoda",
+    "close": "Zavrieť hľadanie"
   }
 }

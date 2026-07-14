@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Ongeza sifa ya tarehe",
+    "description": "Mionekano ya timeline inahitaji sifa ya tarehe ya kuanza ili kuchora kurasa kwa muda."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Ongeza sifa ya tarehe ya mwisho ili kuonyesha vipindi badala ya pau za siku moja.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Kukuza kwa timeline",
+    "day": "Siku",
+    "week": "Wiki",
+    "month": "Mwezi"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Vitegemezi:",
+    "hint": "ongeza sifa ya uhusiano",
+    "relationPropertyAriaLabel": "Sifa ya uhusiano wa utegemezi"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Leo",
+    "previousRange": "Kipindi kilichopita",
+    "nextRange": "Kipindi kinachofuata",
+    "newPage": "Mpya",
+    "newPageIn": "Ukurasa mpya katika {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Jedwali la timeline",
+    "nameHeader": "Jina"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Fungua {{title}}",
+    "openAriaLabelWithDates": "Fungua {{title}}, {{start}} hadi {{end}}",
+    "openNoDateAriaLabel": "Fungua {{title}}, hakuna tarehe"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Hakuna vitu katika kipindi hiki.",
+    "noDatedItems": "Bado hakuna vitu vyenye tarehe.",
+    "jumpTo": "Ruka hadi {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Hakuna tarehe ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Hakuna",
+    "untitled": "Bila jina"
   }
 }

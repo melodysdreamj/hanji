@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "កំពុងផ្ទុកធាតុទំនាក់ទំនង",
+  "relationUnavailable": "ធាតុទំនាក់ទំនងមិនអាចប្រើបានទេ",
+  "unavailable": "មិនអាចប្រើបាន",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "បានធីក",
+    "unchecked": "មិនបានធីក"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "បើក {{title}}",
+  "openOrDownloadFile": "បើក ឬទាញយក {{name}}"
 }

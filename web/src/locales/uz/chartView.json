@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Soni",
+    "sum": "Jami",
+    "average": "O'rtacha",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} charti",
+  "chartType": "Chart turi",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "bar": "Ustunli",
+    "horizontal_bar": "Gorizontal",
+    "line": "Chiziqli",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Belgilangan",
+  "empty": "Bo'sh",
+  "legend": "Chart legenda",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Ma'lumot yo'q",
+  "noDataDesc": "Filtrlash yoki qidiruvga mos qatorlar yo'q.",
+  "noGroupProperty": "Chart qilish uchun ma'lumot yo'q",
+  "noGroupPropertyDesc": "Tanlov, holat, shaxs, belgilash yoki sana xususiyatini qo'shing.",
+  "total": "Jami",
+  "unchecked": "Belgilanmagan",
+  "untitledProperty": "Nomsiz",
+  "valueProperty": "Qiymat xususiyati",
+  "xAxis": "X o'qi",
+  "yAxis": "Y o'qi"
 }

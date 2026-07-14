@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Đổi bìa",
+    "reposition": "Thay đổi vị trí",
+    "remove": "Xóa",
+    "uploadFile": "Tải tệp lên",
+    "uploading": "Đang tải lên...",
+    "submit": "Gửi",
+    "savePosition": "Lưu vị trí"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Thư viện",
+    "upload": "Tải lên",
+    "link": "Liên kết"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Dán liên kết hình ảnh",
+    "invalid": "Dán liên kết hình ảnh http hoặc https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Không thể tải ảnh lên.",
+    "defaultFileName": "Ảnh bìa"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Kéo ảnh để thay đổi vị trí"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Đang chuẩn bị tải lên",
+    "finalizing": "Đang hoàn thiện",
+    "complete": "Hoàn tất",
+    "uploading": "Đang tải lên"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Đã xóa ảnh bìa",
+    "restored": "Đã khôi phục ảnh bìa",
+    "undo": "Hoàn tác"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Ảnh bìa trang",
+    "coverVerticalPosition": "Vị trí dọc ảnh bìa",
+    "positionFromTop": "{{position}}% từ trên xuống",
+    "closeCoverMenu": "Đóng menu ảnh bìa",
+    "changePageCover": "Thay đổi ảnh bìa trang",
+    "repositionPageCover": "Thay đổi vị trí ảnh bìa trang",
+    "removePageCover": "Xóa ảnh bìa trang",
+    "changeCoverDialog": "Thay đổi ảnh bìa",
+    "coverSource": "Nguồn ảnh bìa",
+    "selectCover": "Chọn ảnh bìa {{number}}",
+    "uploadFromDevice": "Tải ảnh bìa lên từ thiết bị này",
+    "uploadingFile": "Đang tải lên {{fileName}}",
+    "coverImageLink": "Liên kết ảnh bìa"
   }
 }

@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Canza murfin",
+    "reposition": "Matsar",
+    "remove": "Cire",
+    "uploadFile": "Loda fayil",
+    "uploading": "Ana lodawa...",
+    "submit": "Mika",
+    "savePosition": "Ajiye matsayi"
   },
   "tabs": {
     "gallery": "Gallery",
-    "upload": "Upload",
+    "upload": "Loda",
     "link": "Link"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Manna link hoton",
+    "invalid": "Manna link hoton http ko https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Ba a iya loda wannan hoton ba.",
+    "defaultFileName": "Hoton murfin"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Ja hoton don matsar da shi"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Ana shirya lodawa",
+    "finalizing": "Ana kammalawa",
+    "complete": "Kammala",
+    "uploading": "Ana lodawa"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "An cire murfin",
+    "restored": "An maido da murfin",
+    "undo": "Soke"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Murfin shafi",
+    "coverVerticalPosition": "Matsayin murfin a tsaye",
+    "positionFromTop": "{{position}}% daga sama",
+    "closeCoverMenu": "Rufe menu murfin",
+    "changePageCover": "Canza murfin shafi",
+    "repositionPageCover": "Matsar da murfin shafi",
+    "removePageCover": "Cire murfin shafi",
+    "changeCoverDialog": "Canza murfin",
+    "coverSource": "Tushen murfin",
+    "selectCover": "Zaɓi murfin {{number}}",
+    "uploadFromDevice": "Loda hoton murfin daga wannan na'ura",
+    "uploadingFile": "Ana loda {{fileName}}",
+    "coverImageLink": "Link hoton murfin"
   }
 }

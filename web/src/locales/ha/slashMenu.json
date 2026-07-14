@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Umarnin block",
+  "closeBlockCommands": "Rufe umarnin block",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Tushen blocks",
     "Media": "Media",
     "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Advanced": "Nagartattun blocks"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} daga cikin {{total}}. Latsa Enter don saka.",
+  "listStatus": "Akwai umarnin block {{total}}.",
+  "noBlocks": "Ba a sami blocks ba.",
+  "noBlocksFor": "Babu bulogi da aka samu don \"{{query}}\"",
+  "recentlyUsed": "Kwanan nan"
 }

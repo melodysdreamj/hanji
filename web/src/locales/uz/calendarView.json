@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Sana xususiyati qo'shish",
+    "description": "Taqvim ko'rinishlari sahifalarni oyga joylashtirish uchun sana xususiyatini talab qiladi.",
+    "addDateButton": "Sana"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Taqvim bo'yicha",
+    "today": "Bugun",
+    "previousWeek": "O'tgan hafta",
+    "previousMonth": "Oldingi oy",
+    "nextWeek": "Keyingi hafta",
+    "nextMonth": "Keyingi oy"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Yak",
+    "mon": "Du",
+    "tue": "Se",
+    "wed": "Cho",
+    "thu": "Pay",
+    "fri": "Jum",
+    "sat": "Shan"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} taqvimi",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ta element",
+    "newRowAriaLabel": "{{date}} ga yangi qator",
+    "newRowTitle": "Yangi",
+    "showLess": "Kamroq ko'rsatish",
+    "showMore": "+{{count}} ta ko'proq"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ochish",
+    "openAriaLabelWithDate": "{{title}} ochish, {{date}} ga belgilangan",
+    "openNoDateAriaLabel": "{{title}} ochish, sana yo'q"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Sana yo'q ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Sarlavhasiz",
+    "dateDefaultName": "Sana"
   }
 }

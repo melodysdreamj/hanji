@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ਕੋਈ ਗੱਲਬਾਤ ਨਹੀਂ। ਇੱਕ ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਕਿਸੇ ਪੰਨੇ 'ਤੇ ਟਿੱਪਣੀ ਕਰੋ ਜਾਂ ਕਿਸੇ ਦਾ ਜ਼ਿਕਰ ਕਰੋ।",
+  "leave": "ਛੱਡੋ",
+  "leaveAria": "{{title}} 'ਤੇ ਗੱਲਬਾਤ ਛੱਡੋ",
+  "open": "{{title}} 'ਤੇ ਗੱਲਬਾਤ ਖੋਲ੍ਹੋ",
+  "participants_one": "{{count}} ਭਾਗੀਦਾਰ",
+  "participants_other": "{{count}} ਭਾਗੀਦਾਰ",
+  "untitled": "ਬਿਨਾਂ ਸਿਰਲੇਖ",
+  "loading": "ਗੱਲਬਾਤਾਂ ਲੋਡ ਹੋ ਰਹੀਆਂ…"
 }

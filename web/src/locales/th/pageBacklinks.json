@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "ลิงก์ย้อนกลับ {{count}} รายการ",
+    "count_other": "ลิงก์ย้อนกลับ {{count}} รายการ"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "การกล่าวถึงที่เชื่อมโยง"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} เมนชัน",
+    "mention_other": "{{count}} เมนชัน",
+    "link_one": "{{count}} ลิงก์",
+    "link_other": "{{count}} ลิงก์"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "เมนชัน",
+    "link": "ลิงก์"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "ลิงก์ย้อนกลับอีก {{count}} รายการ",
+    "count_other": "ลิงก์ย้อนกลับอีก {{count}} รายการ"
   }
 }

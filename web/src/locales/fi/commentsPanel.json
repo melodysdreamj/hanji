@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
-  "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
-  },
-  "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+  "actions": {
+    "edit": "Muokkaa",
+    "reopen": "Avaa uudelleen",
+    "reply": "Vastaa",
+    "resolve": "Ratkaise",
+    "showInPage": "Näytä sivulla"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
-  },
-  "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
-  },
-  "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
-  },
-  "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "commentingOn": "Kommentoidaan",
+    "commentingOnSelectedText": "Kommentoidaan valittua tekstiä",
+    "onABlock": "Lohkolla",
+    "onSelectedBlock": "Valitulla lohkolla",
+    "onSelectedText": "Valitulla tekstillä",
+    "selectedBlock": "Valittu lohko"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}}n kommentti, {{time}}",
+    "commentAriaResolved": "{{author}}n kommentti, {{time}}, ratkaistu",
+    "edited": "(muokattu)",
+    "emptyComment": "(tyhjä kommentti)",
+    "emptyReply": "(tyhjä vastaus)",
+    "justNow": "Hetki sitten",
+    "repliesAria": "{{count}} vastausta",
+    "replyAria": "{{author}}n vastaus, {{time}}"
   },
-  "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
-  },
-  "reply": {
-    "placeholder": "Reply..."
-  },
-  "edit": {
-    "aria": "Edit comment"
+  "closeAria": "Sulje kommentit",
+  "composer": {
+    "addBlockComment": "Lisää lohkokommentti",
+    "addPageComment": "Lisää sivukommentti",
+    "blockPlaceholder": "Kommentoi tätä lohkoa...",
+    "pagePlaceholder": "Lisää kommentti...",
+    "submit": "Kommentoi"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
-  }
+    "commentConfirm": "Poista tämä kommentti?",
+    "threadConfirm_one": "Poista tämä kommentti ja sen vastaus?",
+    "threadConfirm_other": "Poista tämä kommentti ja sen {{count}} vastausta?"
+  },
+  "edit": {
+    "aria": "Muokkaa kommenttia"
+  },
+  "list": {
+    "empty": "Ei vielä kommentteja",
+    "noOpen": "Ei avoimia kommentteja",
+    "noResolved": "Ei ratkaistuja kommentteja",
+    "threadsAria": "Kommenttiketjut"
+  },
+  "mention": {
+    "commentPeopleAria": "Mainitse henkilöt kommentissa",
+    "noMatches": "Ei vastaavia henkilöitä",
+    "organizationPerson": "Organisaation henkilö",
+    "person": "Henkilö",
+    "replyPeopleAria": "Mainitse henkilöt vastauksessa",
+    "roleInOrganization": "{{role}} organisaatiossa",
+    "title": "Mainitse {{name}}",
+    "trigger": "Mainitse henkilöitä",
+    "you": "Sinä"
+  },
+  "reply": {
+    "placeholder": "Vastaa..."
+  },
+  "status": {
+    "aria": "Kommentin tila",
+    "open": "Avoin",
+    "resolved": "Ratkaistu"
+  },
+  "subtitle": {
+    "block": "Lohkon keskustelu",
+    "page": "Sivun keskustelu"
+  },
+  "title": "Kommentit"
 }

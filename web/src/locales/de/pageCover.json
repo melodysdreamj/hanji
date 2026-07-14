@@ -1,10 +1,10 @@
 {
   "actions": {
     "changeCover": "Cover ändern",
-    "reposition": "Neu positionieren",
+    "reposition": "Position ändern",
     "remove": "Entfernen",
     "uploadFile": "Datei hochladen",
-    "uploading": "Wird hochgeladen...",
+    "uploading": "Hochladen...",
     "submit": "Bestätigen",
     "savePosition": "Position speichern"
   },
@@ -18,17 +18,17 @@
     "invalid": "Fügen Sie einen http- oder https-Bildlink ein."
   },
   "upload": {
-    "error": "Dieses Bild konnte nicht hochgeladen werden.",
-    "defaultFileName": "Cover-Bild"
+    "error": "Bild konnte nicht hochgeladen werden.",
+    "defaultFileName": "Titelbild"
   },
   "reposition": {
     "hint": "Bild zum Neupositionieren ziehen"
   },
   "progress": {
-    "preparing": "Upload wird vorbereitet",
-    "finalizing": "Wird abgeschlossen",
+    "preparing": "Vorbereiten",
+    "finalizing": "Abschließen",
     "complete": "Abgeschlossen",
-    "uploading": "Wird hochgeladen"
+    "uploading": "Hochladen"
   },
   "toast": {
     "removed": "Cover entfernt",
@@ -36,18 +36,18 @@
     "undo": "Rückgängig"
   },
   "aria": {
-    "pageCover": "Seiten-Cover",
+    "pageCover": "Seitencover",
     "coverVerticalPosition": "Vertikale Cover-Position",
     "positionFromTop": "{{position}}% von oben",
     "closeCoverMenu": "Cover-Menü schließen",
-    "changePageCover": "Seiten-Cover ändern",
-    "repositionPageCover": "Seiten-Cover neu positionieren",
-    "removePageCover": "Seiten-Cover entfernen",
+    "changePageCover": "Seitencover ändern",
+    "repositionPageCover": "Seitencover neu positionieren",
+    "removePageCover": "Seitencover entfernen",
     "changeCoverDialog": "Cover ändern",
     "coverSource": "Cover-Quelle",
     "selectCover": "Cover {{number}} auswählen",
     "uploadFromDevice": "Cover-Bild von diesem Gerät hochladen",
     "uploadingFile": "{{fileName}} wird hochgeladen",
-    "coverImageLink": "Cover-Bildlink"
+    "coverImageLink": "Cover-Bild-Link"
   }
 }

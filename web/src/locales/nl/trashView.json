@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Prullenbak",
+  "empty": "Verwijderde pagina's komen hier terecht. Prullenbak is leeg.",
+  "searchTrash": "Zoeken in prullenbak",
+  "deletedPages": "Verwijderde pagina's",
+  "noSearchMatches": "Geen verwijderde pagina's voor deze zoekopdracht.",
+  "pageCount_one": "{{count}} pagina",
+  "pageCount_other": "{{count}} pagina's",
+  "deletedJustNow": "Zojuist verwijderd",
+  "deletedOn": "Verwijderd op {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Herstellen",
+    "deleteForever": "Definitief verwijderen",
+    "emptyTrash": "Prullenbak legen"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} openen vanuit prullenbak",
+    "restorePage": "{{title}} herstellen",
+    "deletePageForever": "{{title}} permanent verwijderen",
+    "cancelPermanentDelete": "Annuleer permanent verwijderen",
+    "cancelEmptyTrash": "Annuleer legen prullenbak"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Definitief verwijderen?",
+    "deleteBodyPrefix": "Dit verwijdert permanent ",
+    "deleteBodySuffix": ". Je kunt deze actie niet ongedaan maken.",
+    "emptyTitle": "Prullenbak legen?",
+    "emptyBody_one": "Alle {{count}} pagina in de prullenbak wordt permanent verwijderd. Je kunt deze actie niet ongedaan maken.",
+    "emptyBody_other": "Alle {{count}} pagina's in de prullenbak worden permanent verwijderd. Je kunt deze actie niet ongedaan maken."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Definitief verwijderd",
+    "couldntDelete": "Pagina verwijderen mislukt",
+    "restored": "Pagina hersteld",
+    "couldntRestore": "Pagina herstellen mislukt",
+    "emptied": "Prullenbak geleegd",
+    "couldntEmpty": "Prullenbak legen mislukt"
   }
 }

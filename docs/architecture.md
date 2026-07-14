@@ -90,6 +90,9 @@ self-hosted runtimes can tune this — see
 
 ## Master account
 
-Every instance is provisioned from `HANJI_MASTER_EMAIL` /
-`HANJI_MASTER_PASSWORD` on first boot; an instance started without them
-refuses to initialize. Details: [master-account.md](master-account.md).
+Fresh dev, Docker, and Cloudflare instances create the first server
+administrator through the common browser installer. Public hosted setup uses a
+private fragment-only deploy link; Docker/dev use the first-visitor model. The
+durable single-winner claim closes setup permanently. Environment-provisioned
+`HANJI_MASTER_EMAIL` / `HANJI_MASTER_PASSWORD` remains compatibility-only.
+Details: [master-account.md](master-account.md).

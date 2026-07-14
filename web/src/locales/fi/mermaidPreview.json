@@ -1,7 +1,7 @@
 {
-  "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "diagramLabel": "Mermaid-kaavio",
+  "emptyPreview": "Kaavion esikatselu",
+  "sourceDescription": "Kaavion lähde: {{source}}",
+  "syntaxError": "Kaaviossa on syntaksivirhe.",
+  "syntaxErrorDetails": "Näytä tiedot"
 }

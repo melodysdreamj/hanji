@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "尚無對話。請在頁面留言或提及某人以開始對話。",
+  "leave": "離開",
+  "leaveAria": "離開 {{title}} 的對話",
+  "open": "開啟 {{title}} 的對話",
+  "participants_one": "{{count}} 名參與者",
+  "participants_other": "{{count}} 名參與者",
+  "untitled": "無標題",
+  "loading": "載入對話中…"
 }

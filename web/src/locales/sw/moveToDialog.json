@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Hamishia kwa",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Mzizi wa workspace",
+    "path": "Kiwango cha juu"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Tafuta mahali pa kuhamishia",
+    "placeholder": "Tafuta kurasa..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Funga mazungumzo ya kusonga"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Mahali pa kuhamishia",
+    "empty": "Hakuna kurasa zilizopatikana.",
+    "destinationLabel": "Songa hadi {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Unda \"{{title}}\"",
+    "optionLabel": "Unda ukurasa {{title}} na usonge hapa",
+    "hint": "Ukurasa mpya wa kiwango cha juu - songa hapa"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Mzazi aliyefungwa",
+    "page": "Ukurasa uliofungwa"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Ukurasa uko kwenye mzazi uliofungwa",
+    "locked": "Ukurasa umefungwa",
+    "moved": "Ukurasa umehamishwa",
+    "moveFailed": "Haikuweza kuhamisha ukurasa"
   }
 }

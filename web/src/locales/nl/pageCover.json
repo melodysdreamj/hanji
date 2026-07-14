@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Cover wijzigen",
+    "reposition": "Positie wijzigen",
+    "remove": "Verwijderen",
+    "uploadFile": "Bestand uploaden",
+    "uploading": "Uploaden...",
+    "submit": "Verzenden",
+    "savePosition": "Positie opslaan"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
+    "gallery": "Galerij",
+    "upload": "Uploaden",
     "link": "Link"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Plak afbeeldingslink",
+    "invalid": "Plak een http- of https-afbeeldingslink."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Kan die afbeelding niet uploaden.",
+    "defaultFileName": "Coverafbeelding"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Sleep afbeelding om positie te wijzigen"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Upload voorbereiden",
+    "finalizing": "Afronden",
+    "complete": "Voltooid",
+    "uploading": "Uploaden"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Cover verwijderd",
+    "restored": "Cover hersteld",
+    "undo": "Ongedaan maken"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Pagina cover",
+    "coverVerticalPosition": "Verticale coverpositie",
+    "positionFromTop": "{{position}}% vanaf boven",
+    "closeCoverMenu": "Covermenu sluiten",
+    "changePageCover": "Pagina cover wijzigen",
+    "repositionPageCover": "Pagina cover verplaatsen",
+    "removePageCover": "Pagina cover verwijderen",
+    "changeCoverDialog": "Cover wijzigen",
+    "coverSource": "Coverbron",
+    "selectCover": "Selecteer cover {{number}}",
+    "uploadFromDevice": "Upload coverafbeelding vanaf dit apparaat",
+    "uploadingFile": "{{fileName}} uploaden",
+    "coverImageLink": "Coverafbeelding link"
   }
 }

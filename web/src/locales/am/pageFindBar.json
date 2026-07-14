@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "በገጽ ውስጥ ፈልግ"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "በገጽ ውስጥ ፈልግ",
+    "placeholder": "በገጽ ውስጥ ፈልግ"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ቀዳሚ ተዛማጅ",
+    "next": "ቀጣይ ተዛማጅ",
+    "close": "ፍለጋን ዝጋ"
   }
 }

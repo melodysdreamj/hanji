@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "close": "Закрыть",
+    "search": "Поиск",
+    "create": "Создать",
+    "delete": "Удалить",
+    "clearAll": "Очистить всё",
+    "done": "Готово",
+    "add": "Добавить"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Без названия"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Копия {{name}}",
+    "columnName": "Колонка {{number}}",
+    "importedDatabase": "Импортированная база данных",
+    "uploadedFile": "Загруженный файл",
+    "image": "Изображение",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Название",
+      "status": "Статус",
+      "select": "Выбор",
+      "date": "Дата"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Не начато",
+      "doing": "В процессе",
+      "done": "Готово"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Вариант 1",
+      "second": "Вариант 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Таблица"
     }
   }
 }

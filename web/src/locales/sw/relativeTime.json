@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Sasa hivi",
+  "editedJustNow": "Imehaririwa sasa hivi",
+  "editedMinutesAgo": "Imehaririwa dakika {{minutes}} zilizopita",
+  "editedHoursAgo": "Imehaririwa saa {{hours}} zilizopita",
+  "editedDaysAgo": "Imehaririwa siku {{days}} zilizopita",
+  "editedOn": "Imehaririwa {{date}}",
+  "noEdits": "Hakuna uhariri",
+  "noEditsYet": "Hakuna uhariri bado",
+  "todayAt": "Leo saa {{time}}",
+  "yesterdayAt": "Jana saa {{time}}",
+  "dateAt": "{{date}} saa {{time}}"
 }

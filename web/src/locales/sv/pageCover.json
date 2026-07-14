@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Ändra omslag",
+    "reposition": "Ändra position",
+    "remove": "Ta bort",
+    "uploadFile": "Ladda upp fil",
+    "uploading": "Laddar upp...",
+    "submit": "Skicka",
+    "savePosition": "Spara position"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galleri",
+    "upload": "Ladda upp",
+    "link": "Länk"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Klistra in bildlänk",
+    "invalid": "Klistra in en http- eller https-bildlänk."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Kunde inte ladda upp den bilden.",
+    "defaultFileName": "Omslagsbild"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Dra bilden för att ändra position"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Förbereder uppladdning",
+    "finalizing": "Slutför",
+    "complete": "Klart",
+    "uploading": "Laddar upp"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Omslag borttaget",
+    "restored": "Återställt omslag",
+    "undo": "Ångra"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Sidomslag",
+    "coverVerticalPosition": "Vertikal position för omslag",
+    "positionFromTop": "{{position}}% från toppen",
+    "closeCoverMenu": "Stäng omslagsmeny",
+    "changePageCover": "Ändra sidomslag",
+    "repositionPageCover": "Ändra position på sidomslag",
+    "removePageCover": "Ta bort sidomslag",
+    "changeCoverDialog": "Ändra omslag",
+    "coverSource": "Omslagskälla",
+    "selectCover": "Välj omslag {{number}}",
+    "uploadFromDevice": "Ladda upp omslagsbild från den här enheten",
+    "uploadingFile": "Laddar upp {{fileName}}",
+    "coverImageLink": "Länk till omslagsbild"
   }
 }

@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Premakni v",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Koren delovnega prostora",
+    "path": "Najvišja raven"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Iskanje ciljev premika",
+    "placeholder": "Išči strani..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Zapri pogovorno okno za premik"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Cilji premika",
+    "empty": "Ni najdenih strani.",
+    "destinationLabel": "Premakni v {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Ustvari \"{{title}}\"",
+    "optionLabel": "Ustvari stran {{title}} in premakni sem",
+    "hint": "Nova stran na najvišji ravni – premakni sem"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Zaklenjen nadrejeni",
+    "page": "Zaklenjena stran"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Stran je v zaklenjenem nadrejenem",
+    "locked": "Stran je zaklenjena",
+    "moved": "Stran premaknjena",
+    "moveFailed": "Strani ni mogoče premakniti"
   }
 }

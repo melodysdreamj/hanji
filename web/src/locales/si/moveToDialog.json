@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "වෙත ගෙන යන්න",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "වැඩබිම් මූලය",
+    "path": "ඉහළ මට්ටම"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ගෙන යාමේ ගමනාන්ත සොයන්න",
+    "placeholder": "පිටු සොයන්න..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ගෙනයාමේ සංවාද කවුළුව වසන්න"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "ගෙන යාමේ ගමනාන්ත",
+    "empty": "පිටු හමු නොවීය",
+    "destinationLabel": "{{label}}, {{path}} වෙත ගෙන යන්න"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" සාදන්න",
+    "optionLabel": "{{title}} පිටුව සාදා මෙහි ගෙන යන්න",
+    "hint": "නව ඉහළ මට්ටමේ පිටුව - මෙහි ගෙන යන්න"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "අගුළු දැමූ මාපිය පිටුව",
+    "page": "අගුළු දැමූ පිටුව"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "පිටුව අගුළු දැමූ මාපියෙකු තුළ ඇත",
+    "locked": "පිටුව අගුළු දමා ඇත",
+    "moved": "පිටුව ගෙන යන ලදී",
+    "moveFailed": "පිටුව ගෙන යා නොහැකි විය"
   }
 }

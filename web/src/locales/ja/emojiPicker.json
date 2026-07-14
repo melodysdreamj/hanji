@@ -4,7 +4,7 @@
     "label": "アイコンを選択"
   },
   "tabs": {
-    "groupLabel": "アイコンタイプ",
+    "groupLabel": "アイコンの種類",
     "emoji": "絵文字",
     "image": "画像"
   },
@@ -13,15 +13,15 @@
     "ariaLabel": "アイコンを削除"
   },
   "emoji": {
-    "searchPlaceholder": "絞り込み…",
+    "searchPlaceholder": "フィルター…",
     "searchLabel": "アイコンを検索",
     "random": "ランダム",
-    "randomLabel": "ランダムなアイコンを選択",
-    "recentLabel": "最近使用した順",
-    "gridLabelRecent": "アイコン、最近使用した順",
+    "randomLabel": "ランダムアイコンを選択",
+    "recentLabel": "最近使用順",
+    "gridLabelRecent": "アイコン（最近使用順）",
     "gridLabel": "アイコン",
-    "optionLabel": "{{emoji}}アイコンを選択",
-    "noResults": "「{{query}}」に一致するアイコンがありません。別の言葉を試すか、フィルターをクリアしてください。"
+    "optionLabel": "{{emoji}} アイコンを選択",
+    "noResults": "「{{query}}」に一致するアイコンはありません。別の単語を試すか、フィルターをクリアしてください。"
   },
   "custom": {
     "previewPlaceholder": "画像",
@@ -31,11 +31,11 @@
     "upload": "ファイルをアップロード",
     "uploading": "アップロード中...",
     "uploadingLabel": "{{fileName}}をアップロード中",
-    "uploadFailed": "その画像をアップロードできませんでした。",
+    "uploadFailed": "画像をアップロードできませんでした。",
     "fallbackFileName": "アイコン画像"
   },
   "uploadProgress": {
-    "preparing": "アップロードを準備中",
+    "preparing": "アップロード準備中",
     "finalizing": "最終処理中",
     "complete": "完了",
     "uploading": "アップロード中"

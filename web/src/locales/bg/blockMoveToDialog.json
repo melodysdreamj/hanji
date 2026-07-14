@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Преместване на блок в",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Търсене на дестинации за преместване",
+    "placeholder": "Търсене на страници..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Затваряне на диалог за преместване"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Дестинации за преместване",
+    "empty": "Няма намерени страници.",
+    "destinationLabel": "Преместване на блок в {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Създаване на \"{{query}}\"",
+    "optionLabel": "Създаване на страница \"{{query}}\" и преместване на блок тук",
+    "hint": "Нова страница - преместване на блок тук"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Заключена страница"
   },
-  "untitled": "Untitled",
+  "untitled": "Без заглавие",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Страницата е заключена",
+    "movedBlock": "Блокът е преместен",
+    "movedBlocks": "Блоковете са преместени",
+    "movedBlocksCount": "Преместени {{blockCount}} блокове",
+    "moveFailed": "Неуспешно преместване на блок"
   }
 }

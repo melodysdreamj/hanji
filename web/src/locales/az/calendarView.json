@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Tarix xassəsi əlavə et",
+    "description": "Təqvim görünüşləri səhifələri ayda yerləşdirmək üçün tarix xassəsi tələb edir.",
+    "addDateButton": "Tarix"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Təqvim üzrə",
+    "today": "Bugün",
+    "previousWeek": "Əvvəlki həftə",
+    "previousMonth": "Əvvəlki ay",
+    "nextWeek": "Növbəti həftə",
+    "nextMonth": "Növbəti ay"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "B.",
+    "mon": "B.e.",
+    "tue": "Ç.a.",
+    "wed": "Ç.",
+    "thu": "C.a.",
+    "fri": "C.",
+    "sat": "Ş."
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} təqvimi",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} element",
+    "newRowAriaLabel": "{{date}} tarixində yeni sətir",
+    "newRowTitle": "Yeni",
+    "showLess": "Az göstər",
+    "showMore": "+{{count}} daha"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} aç",
+    "openAriaLabelWithDate": "{{title}} aç, {{date}} tarixinə planlaşdırılıb",
+    "openNoDateAriaLabel": "{{title}} aç, tarix yoxdur"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tarix yoxdur ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Adsız",
+    "dateDefaultName": "Tarix"
   }
 }

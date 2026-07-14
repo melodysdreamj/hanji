@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "ទើបតែ",
+  "editedJustNow": "ទើបតែបានកែសម្រួល",
+  "editedMinutesAgo": "កែសម្រួល {{minutes}}នាទីមុន",
+  "editedHoursAgo": "កែសម្រួល {{hours}}ម៉ោងមុន",
+  "editedDaysAgo": "កែសម្រួល {{days}}ថ្ងៃមុន",
+  "editedOn": "កែសម្រួល {{date}}",
+  "noEdits": "គ្មានការកែសម្រួល",
+  "noEditsYet": "មិនទាន់មានការកែសម្រួល",
+  "todayAt": "ថ្ងៃនេះ {{time}}",
+  "yesterdayAt": "ម្សិលមិញ {{time}}",
+  "dateAt": "{{date}} ម៉ោង {{time}}"
 }

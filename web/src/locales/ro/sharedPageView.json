@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Pagină partajată",
+  "loading": "Se încarcă pagina partajată",
+  "unavailable": "Această pagină partajată nu este disponibilă.",
+  "notFound": "Pagina partajată nu a fost găsită.",
+  "outsideShare": "Pagina nu face parte din această partajare publică.",
+  "tryAgain": "Încercați din nou",
+  "errors": {
+    "unavailable": "Hanji nu a putut deschide această pagină partajată acum. Încercați din nou în câteva momente.",
+    "rate-limited": "Această pagină partajată primește prea multe cereri. Așteptați un moment și încercați din nou.",
+    "offline": "Verificați conexiunea, apoi încercați din nou să deschideți pagina partajată.",
+    "not-found": "Acest link poate fi expirat, a fost retras sau a fost copiat greșit."
+  }
 }

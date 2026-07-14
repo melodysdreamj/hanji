@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "स्थानीय डेटा अनलॉक करें",
+  "description": "इस उपकरण पर ऑफ़लाइन डेटा एक पासफ़्रेज़ से लॉक है। अनलॉक करने से ऑफ़लाइन उपयोग और सहेजना वापस चालू हो जाता है।",
+  "passphrasePlaceholder": "पासफ़्रेज़",
+  "unlock": "अनलॉक करें",
+  "continueOnline": "केवल ऑनलाइन जारी रखें",
+  "continueOnlineHint": "'केवल ऑनलाइन जारी रखें' इस उपकरण के लॉक किए गए ऑफ़लाइन संपादनों को सील रखता है — वे इस उपकरण पर रहते हैं और सही पासफ़्रेज़ से अनलॉक किए जाने तक सिंक नहीं होंगे।",
+  "wrongPassphrase": "वह पासफ़्रेज़ सही नहीं है।",
+  "unsupportedBrowser": "इस ब्राउज़र में स्थानीय लॉक उपलब्ध नहीं है।"
 }

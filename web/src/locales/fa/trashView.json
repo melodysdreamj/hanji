@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "زباله‌دان",
+  "empty": "صفحاتی که حذف می‌کنید اینجا قرار می‌گیرند. زباله‌دان خالی است.",
+  "searchTrash": "جستجو در زباله‌دان",
+  "deletedPages": "صفحات حذف شده",
+  "noSearchMatches": "هیچ صفحه حذف شده‌ای با جستجوی شما مطابقت ندارد.",
+  "pageCount_one": "{{count}} صفحه",
+  "pageCount_other": "{{count}} صفحه",
+  "deletedJustNow": "همین حالا حذف شد",
+  "deletedOn": "حذف شده در {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "بازیابی",
+    "deleteForever": "حذف دائمی",
+    "emptyTrash": "خالی کردن سطل زباله"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "باز کردن {{title}} از زباله‌دان",
+    "restorePage": "بازیابی {{title}}",
+    "deletePageForever": "حذف دائمی {{title}}",
+    "cancelPermanentDelete": "لغو حذف دائمی",
+    "cancelEmptyTrash": "لغو خالی کردن سطل زباله"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "حذف دائمی؟",
+    "deleteBodyPrefix": "این ",
+    "deleteBodySuffix": " به طور دائم حذف خواهد شد. شما نمی‌توانید این عمل را لغو کنید.",
+    "emptyTitle": "خالی کردن زباله‌دان؟",
+    "emptyBody_one": "این کار همه {{count}} صفحه در زباله‌دان را برای همیشه حذف می‌کند. این عمل قابل برگشت نیست.",
+    "emptyBody_other": "این کار همه {{count}} صفحه در زباله‌دان را برای همیشه حذف می‌کند. این عمل قابل برگشت نیست."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "برای همیشه حذف شد",
+    "couldntDelete": "صفحه حذف نشد",
+    "restored": "صفحه بازیابی شد",
+    "couldntRestore": "صفحه بازیابی نشد",
+    "emptied": "زباله‌دان خالی شد",
+    "couldntEmpty": "زباله‌دان خالی نشد"
   }
 }

@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "文本",
+      "description": "以純文字開始書寫",
+      "placeholder": "輸入 '/' 使用指令"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "頁面",
+      "description": "在此頁面內建立子頁面"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "連結到頁面",
+      "description": "連結至現有頁面。"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "標題1",
+      "description": "大型章節標題。",
+      "placeholder": "標題1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "切換標題 1",
+      "description": "可摺疊巢狀內容的大標題",
+      "placeholder": "切換標題 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "標題2",
+      "description": "中型章節標題。",
+      "placeholder": "標題2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "切換標題 2",
+      "description": "中等標題，可隱藏巢狀內容。",
+      "placeholder": "切換標題 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "標題3",
+      "description": "小型章節標題。",
+      "placeholder": "標題3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "切換標題 3",
+      "description": "小標題，可隱藏巢狀內容。",
+      "placeholder": "切換標題3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "標題4",
+      "description": "緊湊章節標題。",
+      "placeholder": "標題4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "切換標題4",
+      "description": "可隱藏巢狀內容的精簡標題。",
+      "placeholder": "切換標題4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "待辦清單",
+      "description": "使用核取方塊追蹤待辦事項",
+      "placeholder": "待辦事項"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "項目符號清單",
+      "description": "建立簡單的項目符號清單。",
+      "placeholder": "清單"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "編號列表",
+      "description": "建立編號列表",
+      "placeholder": "列表"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "切換列表",
+      "description": "切換區塊可隱藏與顯示內容。",
+      "placeholder": "切換"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "引用",
+      "description": "擷取一段引用",
+      "placeholder": "空白引用"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "提示框",
+      "description": "讓文字更醒目。",
+      "placeholder": "輸入內容…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "分隔線",
+      "description": "在區塊之間加入分隔線。"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "程式碼",
+      "description": "擷取程式碼片段",
+      "placeholder": "編寫程式碼，或貼上程式碼片段…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "公式",
+      "description": "顯示數學公式。"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "目錄",
+      "description": "顯示此頁面標題的連結"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "同步區塊",
+      "description": "跨頁面重用內容"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "按鈕",
+      "description": "一鍵插入可重複使用的內容。"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "標籤",
+      "description": "將內容分組至有標籤的頁籤",
+      "placeholder": "標籤"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "麵包屑",
+      "description": "顯示此頁面的所在位置。"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "複製",
+      "description": "建立此區塊的副本。"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "移至",
+      "description": "將此區塊移至其他頁面。"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "刪除此區塊。"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "轉換為",
+      "description": "變更此區塊的類型。"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "顏色",
+      "description": "變更此區塊的文字或背景色。"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "表格",
+      "description": "在此頁面新增簡易表格"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2欄",
+      "description": "將區塊並排排列。"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3欄",
+      "description": "將區塊排列成三欄。"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4欄",
+      "description": "將區塊排列成四欄。"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5欄",
+      "description": "將區塊排列成五欄。"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "圖片",
+      "description": "上傳或透過連結嵌入。"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "影片",
+      "description": "使用連結嵌入影片。"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "音訊",
+      "description": "透過連結嵌入音訊。"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "網頁書籤",
+      "description": "將網頁連結儲存為卡片。"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "嵌入",
+      "description": "從連結嵌入內容。"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "檔案",
+      "description": "將檔案連結附加到此頁面。"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "資料庫 - 完整頁面",
+      "description": "以子頁面新增資料庫"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "表格 - 全頁面",
+      "description": "以表格形式新增全頁面資料庫。"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "看板 - 全頁面",
+      "description": "新增全頁面看板。"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "清單 - 全頁面",
+      "description": "以清單形式新增全頁面資料庫。"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "時間軸 - 全頁面",
+      "description": "新增全頁面資料庫時間軸。"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "日曆 - 全頁面",
+      "description": "新增全頁面日曆資料庫。"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "圖庫 - 全頁面",
+      "description": "新增全頁面資料庫圖庫。"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "資料庫 - 內嵌",
+      "description": "在此頁面內新增資料庫。"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "表格檢視",
+      "description": "新增內嵌資料庫表格。"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "看板檢視",
+      "description": "新增內嵌看板。"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "清單檢視",
+      "description": "新增內嵌資料庫清單。"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "時間軸檢視",
+      "description": "新增內嵌資料庫時間軸。"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "行事曆檢視",
+      "description": "新增內嵌行事曆資料庫。"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "畫廊檢視",
+      "description": "新增內嵌資料庫畫廊。"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "預設",
+      "description": "移除這個區塊的文字或背景顏色。"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "灰色",
+      "description": "套用灰色至此區塊。"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "棕色",
+      "description": "將棕色套用至此區塊"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "橙色",
+      "description": "套用橙色至此區塊。"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "黃色",
+      "description": "對此區塊套用黃色。"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "綠色",
+      "description": "套用綠色至此區塊。"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "藍色",
+      "description": "將藍色套用至此區塊"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "紫色",
+      "description": "對此區塊套用紫色。"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "粉紅色",
+      "description": "對此區塊套用粉紅色。"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "紅色",
+      "description": "對此區塊套用紅色。"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "灰色背景",
+      "description": "套用灰色背景至此區塊。"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "棕色背景",
+      "description": "將棕色背景套用至此區塊"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "橙色背景",
+      "description": "套用橙色背景至此區塊。"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "黃色背景",
+      "description": "對此區塊套用黃色背景。"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "綠色背景",
+      "description": "套用綠色背景至此區塊。"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "藍色背景",
+      "description": "將藍色背景套用至此區塊"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "紫色背景",
+      "description": "對此區塊套用紫色背景。"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "粉紅色背景",
+      "description": "套用粉紅色背景至此區塊。"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "紅色背景",
+      "description": "對此區塊套用紅色背景。"
     }
   }
 }

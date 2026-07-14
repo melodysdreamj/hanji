@@ -9,24 +9,24 @@
     "image": "Imagen"
   },
   "remove": {
-    "label": "Quitar",
-    "ariaLabel": "Quitar icono"
+    "label": "Eliminar",
+    "ariaLabel": "Eliminar icono"
   },
   "emoji": {
     "searchPlaceholder": "Filtrar…",
     "searchLabel": "Buscar iconos",
     "random": "Aleatorio",
-    "randomLabel": "Elegir un icono al azar",
+    "randomLabel": "Seleccionar icono aleatorio",
     "recentLabel": "Usados recientemente primero",
-    "gridLabelRecent": "Iconos, usados recientemente primero",
+    "gridLabelRecent": "Iconos, recientes primero",
     "gridLabel": "Iconos",
     "optionLabel": "Elegir icono {{emoji}}",
-    "noResults": "Ningún icono coincide con “{{query}}”. Prueba con otra palabra o borra el filtro."
+    "noResults": "No hay iconos que coincidan con «{{query}}». Prueba con otra palabra o limpia el filtro."
   },
   "custom": {
     "previewPlaceholder": "Imagen",
     "linkPlaceholder": "Pegar enlace de imagen",
-    "linkLabel": "Enlace de icono de imagen",
+    "linkLabel": "Enlace de imagen de icono",
     "apply": "Aplicar",
     "upload": "Subir archivo",
     "uploading": "Subiendo...",
@@ -35,9 +35,9 @@
     "fallbackFileName": "Imagen de icono"
   },
   "uploadProgress": {
-    "preparing": "Preparando subida",
+    "preparing": "Preparando carga",
     "finalizing": "Finalizando",
-    "complete": "Completado",
-    "uploading": "Subiendo"
+    "complete": "Completo",
+    "uploading": "Cargando"
   }
 }

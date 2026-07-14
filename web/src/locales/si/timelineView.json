@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "දින ගුණාංගයක් එක් කරන්න",
+    "description": "ටයිම්ලයින් දර්ශන සඳහා පිටු කාල රේඛාවේ පෙන්වීමට ආරම්භක දින ගුණාංගයක් අවශ්‍යයි."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "අවසන් දින ගුණාංගයක් එක් කිරීමෙන් තනි දින තීරු වෙනුවට පරාස පෙන්වයි.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "ටයිම්ලයින් සූම්",
+    "day": "දිනය",
+    "week": "සතිය",
+    "month": "මාසය"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "යැපුම්:",
+    "hint": "සම්බන්ධතා ගුණාංගයක් එක් කරන්න",
+    "relationPropertyAriaLabel": "යැපුම් සම්බන්ධතා ගුණාංගය"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "අද",
+    "previousRange": "පෙර පරාසය",
+    "nextRange": "ඊළඟ පරාසය",
+    "newPage": "නව",
+    "newPageIn": "{{dbTitle}} හි නව පිටුව"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "ටයිම්ලයින් වගුව",
+    "nameHeader": "නම"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} විවෘත කරන්න",
+    "openAriaLabelWithDates": "{{title}} විවෘත කරන්න, {{start}} සිට {{end}} දක්වා",
+    "openNoDateAriaLabel": "{{title}} විවෘත කරන්න, දිනයක් නැත"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "මෙම පරාසයේ අයිතම නැත.",
+    "noDatedItems": "තවම දිනය සහිත අයිතම නැත.",
+    "jumpTo": "{{date}} වෙත පනින්න"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "දිනය නැත ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "කිසිවක් නැත",
+    "untitled": "ශීර්ෂ රහිත"
   }
 }

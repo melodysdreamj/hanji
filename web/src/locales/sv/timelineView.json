@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Lägg till datumegenskap",
+    "description": "Tidslinjevyer behöver en startdatum-egenskap för att visa sidor över tid."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Lägg till en slutdatumegenskap för att visa intervall istället för endagarsstaplar.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Tidslinjezoom",
+    "day": "Dag",
+    "week": "Vecka",
+    "month": "Månad"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Beroenden:",
+    "hint": "lägg till en relationsegenskap",
+    "relationPropertyAriaLabel": "Relationsegenskap för beroende"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Idag",
+    "previousRange": "Föregående intervall",
+    "nextRange": "Nästa intervall",
+    "newPage": "Ny",
+    "newPageIn": "Ny sida i {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tidslinjetabell",
+    "nameHeader": "Namn"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Öppna {{title}}",
+    "openAriaLabelWithDates": "Öppna {{title}}, {{start}} till {{end}}",
+    "openNoDateAriaLabel": "Öppna {{title}}, inget datum"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Inga objekt i detta intervall.",
+    "noDatedItems": "Inga daterade objekt än.",
+    "jumpTo": "Hoppa till {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Inget datum ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Inget",
+    "untitled": "Utan titel"
   }
 }

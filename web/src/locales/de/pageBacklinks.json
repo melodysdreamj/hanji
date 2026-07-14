@@ -1,10 +1,10 @@
 {
   "toggle": {
-    "count_one": "{{count}} Rückverweis",
-    "count_other": "{{count}} Rückverweise"
+    "count_one": "{{count}} Backlink",
+    "count_other": "{{count}} Backlinks"
   },
   "header": {
-    "title": "Verknüpfte Erwähnungen"
+    "title": "Verlinkte Erwähnungen"
   },
   "summary": {
     "mention_one": "{{count}} Erwähnung",
@@ -17,7 +17,7 @@
     "link": "Link"
   },
   "more": {
-    "count_one": "{{count}} weiterer Rückverweis",
-    "count_other": "{{count}} weitere Rückverweise"
+    "count_one": "{{count}} weiterer Backlink",
+    "count_other": "{{count}} weitere Backlinks"
   }
 }

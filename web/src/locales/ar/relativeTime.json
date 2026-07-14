@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "الآن",
+  "editedJustNow": "مُعدّل الآن",
+  "editedMinutesAgo": "مُعدّل قبل {{minutes}} دقيقة",
+  "editedHoursAgo": "مُعدّل قبل {{hours}} ساعة",
+  "editedDaysAgo": "مُعدّل قبل {{days}} يوم",
+  "editedOn": "مُعدّل {{date}}",
+  "noEdits": "لا تعديلات",
+  "noEditsYet": "لا تعديلات بعد",
+  "todayAt": "اليوم {{time}}",
+  "yesterdayAt": "أمس {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ఆఫ్‌లైన్",
+  "offlinePending_one": "ఆఫ్‌లైన్ · {{count}} మార్పు పెండింగ్‌లో ఉంది",
+  "offlinePending_other": "ఆఫ్‌లైన్ · {{count}} మార్పులు పెండింగ్‌లో ఉన్నాయి",
+  "syncing": "సింక్ అవుతోంది · {{count}}",
+  "unreachable": "సర్వర్ను చేరుకోలేకపోతున్నాము",
+  "unreachablePending_one": "సర్వర్ను చేరుకోలేకపోతున్నాము · {{count}} మార్పు పెండింగ్",
+  "unreachablePending_other": "సర్వర్ను చేరుకోలేకపోతున్నాము · {{count}} మార్పులు పెండింగ్",
+  "retryHint": "ఇప్పుడు మళ్లీ ప్రయత్నించడానికి క్లిక్ చేయండి"
 }

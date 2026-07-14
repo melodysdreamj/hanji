@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "سلة المهملات",
+  "empty": "الصفحات التي تحذفها تظهر هنا. سلة المهملات فارغة.",
+  "searchTrash": "البحث في سلة المهملات",
+  "deletedPages": "الصفحات المحذوفة",
+  "noSearchMatches": "لا توجد صفحات محذوفة تطابق بحثك.",
+  "pageCount_one": "{{count}} صفحة",
+  "pageCount_other": "{{count}} صفحات",
+  "deletedJustNow": "تم الحذف للتو",
+  "deletedOn": "تم الحذف في {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "استعادة",
+    "deleteForever": "حذف نهائي",
+    "emptyTrash": "إفراغ السلة"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "افتح {{title}} من سلة المهملات",
+    "restorePage": "استعادة {{title}}",
+    "deletePageForever": "حذف {{title}} نهائياً",
+    "cancelPermanentDelete": "إلغاء الحذف النهائي",
+    "cancelEmptyTrash": "إلغاء إفراغ السلة"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "حذف نهائي؟",
+    "deleteBodyPrefix": "سيؤدي هذا إلى حذف نهائي ",
+    "deleteBodySuffix": ". لا يمكنك التراجع عن هذا الإجراء.",
+    "emptyTitle": "تفريغ سلة المهملات؟",
+    "emptyBody_one": "سيتم حذف {{count}} صفحة في سلة المهملات نهائياً. لا يمكنك التراجع عن هذا الإجراء.",
+    "emptyBody_other": "سيتم حذف {{count}} صفحات في سلة المهملات نهائياً. لا يمكنك التراجع عن هذا الإجراء."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "تم الحذف نهائياً",
+    "couldntDelete": "تعذر حذف الصفحة",
+    "restored": "تمت استعادة الصفحة",
+    "couldntRestore": "تعذر استعادة الصفحة",
+    "emptied": "تم تفريغ سلة المهملات",
+    "couldntEmpty": "تعذر تفريغ سلة المهملات"
   }
 }

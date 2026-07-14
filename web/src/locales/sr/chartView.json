@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Broj",
+    "sum": "Zbir",
+    "average": "Prosek",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Grafikon {{name}}",
+  "chartType": "Tip grafikona",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Stubičasti",
+    "horizontal_bar": "Horizontalni stubičasti",
+    "line": "Linijski",
+    "donut": "Krofna"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Čekirano",
+  "empty": "Prazno",
+  "legend": "Legenda grafikona",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Nema podataka",
+  "noDataDesc": "Nijedan red se ne poklapa sa trenutnim filterima ili pretragom.",
+  "noGroupProperty": "Još ništa za grafikon",
+  "noGroupPropertyDesc": "Dodajte svojstvo tipa izbor, status, osoba, potvrdni okvir ili datum za grupisanje ovog grafikona.",
+  "total": "Ukupno",
+  "unchecked": "Nečekirano",
+  "untitledProperty": "Без назива",
+  "valueProperty": "Својство вредности",
+  "xAxis": "X-оса",
+  "yAxis": "Y-оса"
 }

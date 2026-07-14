@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "எண்ணிக்கை",
+    "sum": "மொத்தம்",
+    "average": "சராசரி",
+    "min": "குறைந்தபட்சம்",
+    "max": "அதிகபட்சம்"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} விளக்கப்படம்",
+  "chartType": "விளக்கப்பட வகை",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "பட்டை",
+    "horizontal_bar": "கிடைமட்ட பட்டை",
+    "line": "கோடு",
+    "donut": "டோனட்"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "சரிபார்க்கப்பட்டது",
+  "empty": "காலி",
+  "legend": "விளக்கப்பட விளக்கம்",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "தரவு இல்லை",
+  "noDataDesc": "தற்போதைய வடிப்பான்கள் அல்லது தேடலுடன் பொருந்தும் வரிசைகள் இல்லை.",
+  "noGroupProperty": "இன்னும் விளக்கப்படம் எதுவும் இல்லை",
+  "noGroupPropertyDesc": "விளக்கப்படத்தை தொகுக்க, தேர்வு, நிலை, நபர், சரிபார்ப்பு அல்லது தேதி பண்பைச் சேர்க்கவும்.",
+  "total": "மொத்தம்",
+  "unchecked": "சரிபார்க்கப்படாதது",
+  "untitledProperty": "தலைப்பில்லா",
+  "valueProperty": "மதிப்புப் பண்பு",
+  "xAxis": "X-அச்சு",
+  "yAxis": "Y-அச்சு"
 }

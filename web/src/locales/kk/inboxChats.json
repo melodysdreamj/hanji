@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Әзірге әңгімелер жоқ. Біреуін бастау үшін параққа пікір қалдырыңыз немесе біреуді атап өтіңіз.",
+  "leave": "Шығу",
+  "leaveAria": "{{title}} әңгімесінен шығу",
+  "open": "{{title}} әңгімесін ашу",
+  "participants_one": "{{count}} қатысушы",
+  "participants_other": "{{count}} қатысушы",
+  "untitled": "Тақырыпсыз",
+  "loading": "Әңгімелер жүктелуде…"
 }

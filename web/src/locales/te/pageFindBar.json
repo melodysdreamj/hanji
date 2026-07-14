@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "పేజీలో కనుగొను"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "పేజీలో కనుగొను",
+    "placeholder": "పేజీలో కనుగొను"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "మునుపటి సరిపోలిక",
+    "next": "తదుపరి సరిపోలిక",
+    "close": "శోధన మూసివేయి"
   }
 }

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Dodaj lastnost datuma",
+    "description": "Pogled koledarja potrebuje lastnost datuma za postavitev strani v mesec.",
+    "addDateButton": "Datum"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Koledar po",
+    "today": "Danes",
+    "previousWeek": "Prejšnji teden",
+    "previousMonth": "Prejšnji mesec",
+    "nextWeek": "Naslednji teden",
+    "nextMonth": "Naslednji mesec"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ned",
+    "mon": "pon",
+    "tue": "tor",
+    "wed": "sre",
+    "thu": "čet",
+    "fri": "pet",
+    "sat": "sob"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} koledar",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} elementov",
+    "newRowAriaLabel": "Nova vrstica na {{date}}",
+    "newRowTitle": "Nova",
+    "showLess": "Pokaži manj",
+    "showMore": "+{{count}} več"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Odpri {{title}}",
+    "openAriaLabelWithDate": "Odpri {{title}}, načrtovano za {{date}}",
+    "openNoDateAriaLabel": "Odpri {{title}}, brez datuma"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Brez datuma ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Neimenovano",
+    "dateDefaultName": "Datum"
   }
 }

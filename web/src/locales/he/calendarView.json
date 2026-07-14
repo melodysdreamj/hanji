@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "הוסף מאפיין תאריך",
+    "description": "תצוגות לוח שנה דורשות מאפיין תאריך כדי למקם דפים בחודש.",
+    "addDateButton": "תאריך"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "לוח שנה לפי",
+    "today": "היום",
+    "previousWeek": "שבוע קודם",
+    "previousMonth": "חודש קודם",
+    "nextWeek": "שבוע הבא",
+    "nextMonth": "חודש הבא"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "א'",
+    "mon": "ב'",
+    "tue": "ג'",
+    "wed": "ד'",
+    "thu": "ה'",
+    "fri": "ו'",
+    "sat": "ש'"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "לוח שנה {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} פריטים",
+    "newRowAriaLabel": "שורה חדשה ב{{date}}",
+    "newRowTitle": "חדש",
+    "showLess": "הצג פחות",
+    "showMore": "+{{count}} נוספים"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "פתח את {{title}}",
+    "openAriaLabelWithDate": "פתח את {{title}}, מתוכנן ל{{date}}",
+    "openNoDateAriaLabel": "פתח את {{title}}, ללא תאריך"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ללא תאריך ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ללא כותרת",
+    "dateDefaultName": "תאריך"
   }
 }

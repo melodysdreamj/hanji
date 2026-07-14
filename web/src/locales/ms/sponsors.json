@@ -1,0 +1,15 @@
+{
+  "becomeSponsor": "Jadi penaja",
+  "builtWith": "<a>{{name}}</a> membantu membina Hanji",
+  "builtWithIntro": "Hanji dibina dengan bantuan alat dan platform ini.",
+  "builtWithTitle": "Dibina dengan",
+  "emptySlot": "Slot kosong — menjadi penaja untuk muncul di sini",
+  "rule1": "Banner menunjukkan lima penaja teratas berdasarkan baki yang tinggal.",
+  "rule2": "Setiap bulan, baki setiap penaja yang dipaparkan dikurangkan sebanyak baki penaja tempat kelima, jadi kelima-lima penaja yang dipaparkan membayar kadar yang sama adil.",
+  "rule3": "Apabila baki habis, slot beralih kepada penaja seterusnya mengikut baki.",
+  "rule4": "Mengekalkan banner diaktifkan secara lalai memberikan pengecualian lesen Hanji; versi tertutup tanpa banner memerlukan lesen komersial yang berasingan.",
+  "settingsIntro": "Hanji disokong oleh penajanya. Skrin log masuk menunjukkan banner kecil dengan lima penaja teratas semasa.",
+  "sponsorSlots": "Penaja semasa",
+  "supportTitle": "Sokong Hanji",
+  "thanksSponsor": "<a>{{name}}</a> menaja Hanji semasa ia berkembang"
+}

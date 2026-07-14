@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "דף משותף",
+  "loading": "טוען דף משותף",
+  "unavailable": "דף משותף זה אינו זמין.",
+  "notFound": "הדף המשותף לא נמצא.",
+  "outsideShare": "הדף אינו חלק מהשיתוף הציבורי הזה.",
+  "errors": {
+    "not-found": "הקישור אולי פג, בוטלה פרסום, או הועתק באופן שגוי.",
+    "offline": "בדוק את החיבור שלך, ואז נסה לפתוח את הדף המשותף שוב.",
+    "rate-limited": "דף משותף זה מקבל יותר מדי בקשות. המתן רגע ונסה שוב.",
+    "unavailable": "Hanji לא יכול לפתוח את הדף המשותף כרגע. נסה שוב בעוד רגע."
+  },
+  "tryAgain": "נסה שוב"
 }

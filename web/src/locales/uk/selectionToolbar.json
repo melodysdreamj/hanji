@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Форматування тексту"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Перетворити на",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Текст",
+      "heading1": "Заголовок 1",
+      "heading2": "Заголовок 2",
+      "heading3": "Заголовок 3",
+      "heading4": "Заголовок 4",
+      "toDoList": "Список завдань",
+      "bulletedList": "Маркований список",
+      "numberedList": "Нумерований список",
+      "toggleList": "Список-перемикач",
+      "quote": "Цитата",
+      "callout": "Виноска",
+      "code": "Код"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Жирний",
+    "italic": "Курсив",
+    "underline": "Підкреслений",
+    "strikethrough": "Закреслений",
+    "code": "Код",
+    "link": "Посилання"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Коментар"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Колір тексту: {{color}}",
+    "title": "Колір: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Змішаний",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Колір тексту",
+      "default": "Стандартний",
+      "gray": "Сірий",
+      "brown": "Коричневий",
+      "orange": "Помаранчевий",
+      "yellow": "Жовтий",
+      "green": "Зелений",
+      "blue": "Синій",
+      "purple": "Фіолетовий",
+      "pink": "Рожевий",
+      "red": "Червоний"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Колір фону",
+      "gray": "Сірий фон",
+      "brown": "Коричневий фон",
+      "orange": "Помаранчевий фон",
+      "yellow": "Жовтий фон",
+      "green": "Зелений фон",
+      "blue": "Синій фон",
+      "purple": "Фіолетовий фон",
+      "pink": "Рожевий фон",
+      "red": "Червоний фон"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Редагувати посилання",
+    "placeholder": "Вставити посилання",
+    "urlAriaLabel": "URL посилання",
+    "apply": "Посилання",
+    "open": "Відкрити посилання",
+    "copy": "Копіювати посилання",
+    "copied": "Скопійовано",
+    "copiedLink": "Посилання скопійовано",
+    "remove": "Видалити"
   }
 }

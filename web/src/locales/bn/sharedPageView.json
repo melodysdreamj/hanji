@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "শেয়ার করা পৃষ্ঠা",
+  "loading": "শেয়ার করা পৃষ্ঠা লোড হচ্ছে",
+  "unavailable": "এই শেয়ার করা পৃষ্ঠাটি উপলব্ধ নয়।",
+  "notFound": "শেয়ার করা পৃষ্ঠাটি পাওয়া যায়নি।",
+  "outsideShare": "পৃষ্ঠাটি এই পাবলিক শেয়ারের অংশ নয়।",
+  "errors": {
+    "not-found": "এই লিঙ্কটির মেয়াদ শেষ হয়েছে, প্রকাশিত হয়নি, অথবা ভুল কপি করা হয়েছে।",
+    "offline": "আপনার সংযোগ পরীক্ষা করুন, তারপর আবার শেয়ার করা পৃষ্ঠাটি খোলার চেষ্টা করুন।",
+    "rate-limited": "এই শেয়ার করা পৃষ্ঠাটি অনেক বেশি অনুরোধ পাচ্ছে। কিছুক্ষণ অপেক্ষা করুন এবং আবার চেষ্টা করুন।",
+    "unavailable": "Hanji এখন এই শেয়ার করা পৃষ্ঠাটি খুলতে পারেনি। কিছুক্ষণ পর আবার চেষ্টা করুন।"
+  },
+  "tryAgain": "আবার চেষ্টা করুন"
 }

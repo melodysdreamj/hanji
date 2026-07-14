@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "tryAgain": "Subukan muli",
+  "errors": {
+    "not-found": "Ang link na ito ay maaaring nag-expire, hindi na-publish, o nakopya nang mali.",
+    "rate-limited": "Ang ibinahaging pahinang ito ay tumatanggap ng masyadong maraming kahilingan. Maghintay ng ilang sandali at subukan muli.",
+    "offline": "Suriin ang iyong koneksyon, pagkatapos subukang buksan muli ang ibinahaging pahina.",
+    "unavailable": "Hindi mabuksan ng Hanji ang ibinahaging pahinang ito ngayon. Subukan muli sa ilang sandali."
+  },
+  "title": "Ibinahaging pahina",
+  "loading": "Naglo-load ng ibinahaging pahina",
+  "unavailable": "Hindi available ang ibinahaging pahinang ito.",
+  "notFound": "Hindi mahanap ang ibinahaging pahina.",
+  "outsideShare": "Ang pahina ay hindi bahagi ng pampublikong pagbabahaging ito."
 }

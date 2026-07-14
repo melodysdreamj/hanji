@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Cari dalam halaman"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Cari dalam halaman",
+    "placeholder": "Cari dalam halaman"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Padanan sebelumnya",
+    "next": "Padanan seterusnya",
+    "close": "Tutup cari"
   }
 }

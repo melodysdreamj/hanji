@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "Άνοιγμα σελίδας",
+  "workspace": "Χώρος εργασίας",
+  "emptyWorkspace": "Κενός χώρος εργασίας",
+  "untitled": "Χωρίς τίτλο",
+  "newPage": "Νέα σελίδα"
 }

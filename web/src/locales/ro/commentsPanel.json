@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Comentarii",
+  "closeAria": "Închide comentariile",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Discuție bloc",
+    "page": "Discuție pagină"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Stare comentariu",
+    "open": "Deschis",
+    "resolved": "Rezolvat"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Comentariu pe",
+    "commentingOnSelectedText": "Comentariu pe textul selectat",
+    "selectedBlock": "Bloc selectat",
+    "onSelectedText": "Pe textul selectat",
+    "onSelectedBlock": "Pe blocul selectat",
+    "onABlock": "Pe un bloc"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Adaugă un comentariu pe bloc",
+    "addPageComment": "Adaugă un comentariu pe pagină",
+    "blockPlaceholder": "Comentează pe acest bloc...",
+    "pagePlaceholder": "Adaugă un comentariu...",
+    "submit": "Comentează"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Persoane de menționat în comentariu",
+    "replyPeopleAria": "Persoane de menționat în răspuns",
+    "trigger": "Menționează persoane",
+    "noMatches": "Nicio persoană găsită",
+    "title": "Menționează {{name}}",
+    "person": "Persoană",
+    "you": "Tu",
+    "organizationPerson": "Persoană din organizație",
+    "roleInOrganization": "{{role}} în organizație"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Fire de comentarii",
+    "empty": "Niciun comentariu încă",
+    "noOpen": "Niciun comentariu deschis",
+    "noResolved": "Niciun comentariu rezolvat"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} comentariu, {{time}}",
+    "commentAriaResolved": "{{author}} comentariu, {{time}}, rezolvat",
+    "replyAria": "{{author}} răspuns, {{time}}",
+    "repliesAria": "{{count}} răspunsuri",
+    "edited": "(editat)",
+    "emptyComment": "(comentariu gol)",
+    "emptyReply": "(răspuns gol)",
+    "justNow": "Chiar acum"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Răspunde",
+    "showInPage": "Afișează în pagină",
+    "resolve": "Rezolvă",
+    "reopen": "Redeschide",
+    "edit": "Editare"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Răspunde..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Editează comentariul"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Ștergi acest comentariu?",
+    "threadConfirm_one": "Ștergi acest comentariu și răspunsul său?",
+    "threadConfirm_other": "Ștergi acest comentariu și cele {{count}} răspunsuri?"
   }
 }

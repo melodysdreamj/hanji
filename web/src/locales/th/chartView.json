@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "จำนวน",
+    "sum": "รวม",
+    "average": "ค่าเฉลี่ย",
+    "min": "ต่ำสุด",
+    "max": "สูงสุด"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "แผนภูมิ {{name}}",
+  "chartType": "ประเภทแผนภูมิ",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "แท่งแนวตั้ง",
+    "horizontal_bar": "แท่งแนวนอน",
+    "line": "เส้น",
+    "donut": "โดนัท"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "เลือกแล้ว",
+  "empty": "ว่าง",
+  "legend": "คำอธิบายแผนภูมิ",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "ไม่มีข้อมูล",
+  "noDataDesc": "ไม่มีแถวที่ตรงกับตัวกรองหรือการค้นหาปัจจุบัน",
+  "noGroupProperty": "ยังไม่มีข้อมูลที่จะแสดงเป็นแผนภูมิ",
+  "noGroupPropertyDesc": "เพิ่มคุณสมบัติแบบเลือก, สถานะ, บุคคล, ช่องทำเครื่องหมาย หรือวันที่เพื่อจัดกลุ่มแผนภูมินี้",
+  "total": "รวม",
+  "unchecked": "ไม่เลือก",
+  "untitledProperty": "ไม่มีชื่อ",
+  "valueProperty": "คุณสมบัติค่า",
+  "xAxis": "แกน X",
+  "yAxis": "แกน Y"
 }

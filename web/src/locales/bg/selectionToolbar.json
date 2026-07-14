@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Форматиране на текст"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Превърни в",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Текст",
+      "heading1": "Заглавие 1",
+      "heading2": "Заглавие 2",
+      "heading3": "Заглавие 3",
+      "heading4": "Заглавие 4",
+      "toDoList": "Списък със задачи",
+      "bulletedList": "Списък с точки",
+      "numberedList": "Номериран списък",
+      "toggleList": "Превключващ списък",
+      "quote": "Цитат",
+      "callout": "Известие",
+      "code": "Код"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Удебелен",
+    "italic": "Курсив",
+    "underline": "Подчертан",
+    "strikethrough": "Зачеркнат",
+    "code": "Код",
+    "link": "Линк"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Коментар"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Цвят на текста: {{color}}",
+    "title": "Цвят: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Смесено",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Цвят на текста",
+      "default": "По подразбиране",
+      "gray": "Сив",
+      "brown": "Кафяв",
+      "orange": "Оранжев",
+      "yellow": "Жълт",
+      "green": "Зелен",
+      "blue": "Син",
+      "purple": "Лилав",
+      "pink": "Розов",
+      "red": "Червен"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Цвят на фона",
+      "gray": "Сив фон",
+      "brown": "Кафяв фон",
+      "orange": "Оранжев фон",
+      "yellow": "Жълт фон",
+      "green": "Зелен фон",
+      "blue": "Син фон",
+      "purple": "Лилав фон",
+      "pink": "Розов фон",
+      "red": "Червен фон"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Редактиране на линк",
+    "placeholder": "Поставяне на линк",
+    "urlAriaLabel": "URL на линк",
+    "apply": "Линк",
+    "open": "Отваряне на линк",
+    "copy": "Копиране на линк",
+    "copied": "Копирано",
+    "copiedLink": "Копиран линк",
+    "remove": "Премахване"
   }
 }

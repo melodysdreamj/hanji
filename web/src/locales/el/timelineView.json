@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Προσθήκη ιδιότητας ημερομηνίας",
+    "description": "Οι προβολές χρονολογίου χρειάζονται μια ιδιότητα ημερομηνίας έναρξης για να εμφανιστούν οι σελίδες στο χρόνο."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Προσθέστε μια ιδιότητα ημερομηνίας λήξης για να εμφανιστούν χρονικά διαστήματα αντί για μονοήμερες γραμμές.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Ζουμ χρονολογίου",
+    "day": "Ημέρα",
+    "week": "Εβδομάδα",
+    "month": "Μήνας"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Εξαρτήσεις:",
+    "hint": "προσθήκη ιδιότητας σχέσης",
+    "relationPropertyAriaLabel": "Ιδιότητα σχέσης εξάρτησης"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Σήμερα",
+    "previousRange": "Προηγούμενο εύρος",
+    "nextRange": "Επόμενο εύρος",
+    "newPage": "Νέο",
+    "newPageIn": "Νέα σελίδα στο {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Πίνακας χρονολογίου",
+    "nameHeader": "Όνομα"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Άνοιγμα {{title}}",
+    "openAriaLabelWithDates": "Άνοιγμα {{title}}, {{start}} έως {{end}}",
+    "openNoDateAriaLabel": "Άνοιγμα {{title}}, χωρίς ημερομηνία"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Δεν υπάρχουν αντικείμενα σε αυτό το εύρος.",
+    "noDatedItems": "Δεν υπάρχουν ακόμη αντικείμενα με ημερομηνία.",
+    "jumpTo": "Μετάβαση στην {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Χωρίς ημερομηνία ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Κανένα",
+    "untitled": "Χωρίς τίτλο"
   }
 }

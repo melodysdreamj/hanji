@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "新工作區",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "工作區名稱",
+    "placeholder": "公司名稱"
   },
-  "startLabel": "Start from",
+  "startLabel": "起始方式",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "空白工作區",
+      "body": "以空白頁面開始，包含預設入門頁。"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "從 Notion 匯入",
+      "body": "建立工作區，再將 Notion 工作區移轉至此。"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "從其他 Hanji 匯入",
+      "body": "建立工作區，再從其他 Hanji 伺服器或檔案匯入工作區。"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "建立工作區",
+  "creating": "建立中…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "無法建立工作區。"
   }
 }

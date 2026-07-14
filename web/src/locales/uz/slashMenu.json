@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blok buyruqlari",
+  "closeBlockCommands": "Blok buyruqlarini yopish",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Asosiy bloklar",
     "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Database": "Ma'lumotlar bazasi",
+    "Advanced": "Ilg'or bloklar"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}} dan {{position}}. Qo'shish uchun Enter ni bosing.",
+  "listStatus": "{{total}} blok buyruqlari mavjud.",
+  "noBlocks": "Bloklar topilmadi",
+  "noBlocksFor": "\"{{query}}\" uchun blok topilmadi",
+  "recentlyUsed": "So'nggi ishlatilgan"
 }

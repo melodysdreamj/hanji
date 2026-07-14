@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Zoeken in pagina"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Zoeken in pagina",
+    "placeholder": "Zoeken in pagina"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Vorige overeenkomst",
+    "next": "Volgende overeenkomst",
+    "close": "Zoeken sluiten"
   }
 }

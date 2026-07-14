@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Blokni ko'chirish",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Ko'chirish manzillarini qidirish",
+    "placeholder": "Sahifalarni qidirish..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Ko'chirish oynasini yopish"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Ko'chirish manzillari",
+    "empty": "Sahifalar topilmadi.",
+    "destinationLabel": "Blokni {{label}} ga ko'chirish, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" yaratish",
+    "optionLabel": "\"{{query}}\" sahifasini yaratish va blokni bu yerga ko'chirish",
+    "hint": "Yangi sahifa - blokni bu yerga ko'chirish"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Qulflangan sahifa"
   },
-  "untitled": "Untitled",
+  "untitled": "Nomsiz",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Sahifa qulflangan",
+    "movedBlock": "Blok ko'chirildi",
+    "movedBlocks": "Bloklar ko'chirildi",
+    "movedBlocksCount": "{{blockCount}} blok ko'chirildi",
+    "moveFailed": "Blokni ko'chirib bo'lmadi"
   }
 }

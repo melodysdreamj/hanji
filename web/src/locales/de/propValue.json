@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Beziehungselemente werden geladen",
-  "relationUnavailable": "Beziehungselemente nicht verfügbar",
+  "relationLoading": "Relationselemente werden geladen",
+  "relationUnavailable": "Relationselemente nicht verfügbar",
   "unavailable": "Nicht verfügbar",
   "checkbox": {
-    "checked": "Aktiviert",
-    "unchecked": "Nicht aktiviert"
+    "checked": "Markiert",
+    "unchecked": "Nicht markiert"
   },
   "openRelation": "{{title}} öffnen",
-  "openOrDownloadFile": "{{name}} öffnen oder herunterladen"
+  "openOrDownloadFile": "Öffnen oder herunterladen {{name}}"
 }

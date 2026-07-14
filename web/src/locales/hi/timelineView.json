@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "तिथि गुण जोड़ें",
+    "description": "टाइमलाइन दृश्यों को पृष्ठों को समय के अनुसार दिखाने के लिए आरंभ तिथि गुण की आवश्यकता है।"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "एकल-दिवसीय पट्टियों के बजाय श्रेणियाँ दिखाने के लिए समाप्ति तिथि गुण जोड़ें।",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "टाइमलाइन ज़ूम",
+    "day": "दिन",
+    "week": "सप्ताह",
+    "month": "माह"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "निर्भरताएँ:",
+    "hint": "एक संबंध संपत्ति जोड़ें",
+    "relationPropertyAriaLabel": "निर्भरता संबंध संपत्ति"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "आज",
+    "previousRange": "पिछली श्रेणी",
+    "nextRange": "अगली श्रेणी",
+    "newPage": "नया",
+    "newPageIn": "{{dbTitle}} में नया पृष्ठ"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "टाइमलाइन तालिका",
+    "nameHeader": "नाम"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} खोलें",
+    "openAriaLabelWithDates": "{{title}} खोलें, {{start}} से {{end}} तक",
+    "openNoDateAriaLabel": "{{title}} खोलें, कोई तारीख नहीं"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "इस श्रेणी में कोई आइटम नहीं।",
+    "noDatedItems": "अभी तक कोई दिनांकित आइटम नहीं।",
+    "jumpTo": "{{date}} पर जाएं"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "कोई तिथि नहीं ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "कोई नहीं",
+    "untitled": "शीर्षकहीन"
   }
 }

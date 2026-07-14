@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> sponsort Hanji terwijl het groeit",
+  "builtWith": "<a>{{name}}</a> helpt Hanji bouwen",
+  "supportTitle": "Steun Hanji",
+  "settingsIntro": "Hanji wordt in stand gehouden door zijn sponsors. Het inlogscherm toont een kleine banner met de huidige top vijf sponsors.",
+  "rule1": "De banner toont de top vijf sponsors op basis van resterend saldo.",
+  "rule2": "Eenmaal per maand wordt het saldo van elke getoonde sponsor verlaagd met dat van de vijfde sponsor, zodat alle vijf getoonde sponsors hetzelfde eerlijke tarief betalen.",
+  "rule3": "Wanneer een saldo op is, gaat de plek naar de volgende sponsor op basis van saldo.",
+  "rule4": "Het standaard ingeschakeld houden van de banner verleent de licentie-uitzondering van Hanji; een gesloten, bannerloze versie heeft een aparte commerciële licentie nodig.",
+  "sponsorSlots": "Huidige sponsors",
+  "emptySlot": "Open plek — sponsor om hier te verschijnen",
+  "becomeSponsor": "Word sponsor",
+  "builtWithTitle": "Gebouwd met",
+  "builtWithIntro": "Hanji is gebouwd met hulp van deze tools en platforms."
+}

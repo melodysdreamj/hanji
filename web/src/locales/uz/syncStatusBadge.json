@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Oflayn",
+  "offlinePending_one": "Oflayn · {{count}} o'zgarish kutilmoqda",
+  "offlinePending_other": "Oflayn · {{count}} o'zgarishlar kutilmoqda",
+  "syncing": "Sinxronlash · {{count}}",
+  "unreachable": "Serverga ulanib bo'lmaydi",
+  "unreachablePending_one": "Serverga ulanib bo'lmaydi · {{count}} o'zgarish kutilmoqda",
+  "unreachablePending_other": "Serverga ulanib bo'lmaydi · {{count}} o'zgarish kutilmoqda",
+  "retryHint": "Qayta urinish uchun bosing"
 }

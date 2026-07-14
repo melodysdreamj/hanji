@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "බ්ලොක් ගෙනයාමේ ස්ථානය",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ගෙනයාමේ ගමනාන්ත සොයන්න",
+    "placeholder": "පිටු සොයන්න..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ගෙනයාමේ සංවාදය වසන්න"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ගෙනයාමේ ගමනාන්ත",
+    "empty": "පිටු කිසිවක් හමු නොවීය.",
+    "destinationLabel": "බ්ලොක් එක {{label}} වෙත ගෙනයන්න, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" සාදන්න",
+    "optionLabel": "\"{{query}}\" පිටුව සාදා බ්ලොක් එක මෙතැනට ගෙනයන්න",
+    "hint": "නව පිටුව - බ්ලොක් එක මෙතැනට ගෙනයන්න"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "අගුළු දැමූ පිටුව"
   },
-  "untitled": "Untitled",
+  "untitled": "මාතෘකාවක් නැත",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "පිටුව අගුළු දමා ඇත",
+    "movedBlock": "බ්ලොක් එක ගෙනයන ලදී",
+    "movedBlocks": "බ්ලොක් ගෙනයන ලදී",
+    "movedBlocksCount": "බ්ලොක් {{blockCount}}ක් ගෙනයන ලදී",
+    "moveFailed": "බ්ලොක් එක ගෙනයාමට නොහැකි විය"
   }
 }

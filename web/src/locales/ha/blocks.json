@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Rubutu",
+      "description": "Fara rubutu kawai.",
+      "placeholder": "Buga '/' don umarni"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Shafi",
+      "description": "Ƙirƙiri shafi na ƙasa a cikin wannan shafi."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Hadi zuwa shafi",
+      "description": "Haɗi zuwa wani shafi da ke akwai."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Taken 1",
+      "description": "Babban taken sashe.",
+      "placeholder": "Taken 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Take 1 mai jujjuya",
+      "description": "Babban kan labari mai iya ɓoye abubuwan da ke ciki.",
+      "placeholder": "Take 1 mai jujjuya"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Taken 2",
+      "description": "Matsakaicin taken sashe.",
+      "placeholder": "Taken 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Take 2 mai jujjuya",
+      "description": "Take matsakaici mai iya ɓoye abubuwan ciki.",
+      "placeholder": "Take 2 mai jujjuya"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Taken 3",
+      "description": "Ƙaramin taken sashe.",
+      "placeholder": "Taken 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Take 3 mai jujjuya",
+      "description": "Take ƙarami mai iya ɓoye abubuwan ciki.",
+      "placeholder": "Juya taken 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Taken 4",
+      "description": "Matsatsaccen taken sashe.",
+      "placeholder": "Taken 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "Juya taken 4",
+      "description": "Takaitaccen take mai iya ɓoye abubuwan ciki.",
+      "placeholder": "Juya taken 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Jerin ayyuka",
+      "description": "Diddigi ayyuka tare da akwatin rajista.",
+      "placeholder": "Ayyuka"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Jeri mai bullet",
+      "description": "Ƙirƙiri jeri mai bullet.",
+      "placeholder": "Jeri"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Jerin lambobi",
+      "description": "Ƙirƙiri jerin da lambobi.",
+      "placeholder": "Jeri"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Jerin juya",
+      "description": "Juya na iya ɓoye da nuna abubuwa.",
+      "placeholder": "Juya"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Zance",
+      "description": "Ɗauki zance.",
+      "placeholder": "Zance mara komai"
     },
     "callout": {
       "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "description": "Fito da rubutu.",
+      "placeholder": "Rubuta wani abu…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Rarraba",
+      "description": "Raba tubalai a gani."
     },
     "code": {
       "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "description": "Ɗauki snippet na code.",
+      "placeholder": "Rubuta code, ko manna snippet…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Lissafi",
+      "description": "Nuna lissafi."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Teburin abubuwa",
+      "description": "Nuna hanyoyin haɗi zuwa kanun labarai a wannan shafi."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Tubali mai aiki tare",
+      "description": "Sake amfani da abun ciki a cikin shafuka."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Maɓalli",
+      "description": "Saka abu mai sake amfani da danni ɗaya."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Shafuka",
+      "description": "Haɗa abun ciki a cikin shafuka masu suna.",
+      "placeholder": "Shafuka"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Nuna inda wannan shafi yake."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Kwafi",
+      "description": "Ƙirƙiri ainihin kwafin wannan block."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Matsar zuwa",
+      "description": "Matsar da wannan block zuwa wani shafi."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Share wannan block."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Mai da",
+      "description": "Canja nau'in wannan block."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Launi",
+      "description": "Canza rubutu ko launin bango na wannan block."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Tebur",
+      "description": "Ƙara tebur mai sauƙi a wannan shafi."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "ginshiƙai 2",
+      "description": "Sanya tubalan gefe da gefe."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "ginshiƙai 3",
+      "description": "Shirya tubalan a ginshiƙai 3."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "ginshiƙai 4",
+      "description": "Shirya tubalan a ginshiƙai 4."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "ginshiƙai 5",
+      "description": "Shirya tubalan a ginshiƙai 5."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Hoto",
+      "description": "Loda ko shigar da hanyar haɗi."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "Bidiyo",
+      "description": "Saka bidiyo da hanyar haɗi."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Saka audio tare da link."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Alamar shafi",
+      "description": "Ajiye hanyar yanar gizo a matsayin kati."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Saka",
+      "description": "Saka abun ciki daga haɗi."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fayil",
+      "description": "Haɗa linkin fayil zuwa wannan shafi."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Database - Cikakken shafi",
+      "description": "Ƙara sabon database a matsayin shafi na ƙasa."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Tebur - Shafi cikakke",
+      "description": "Ƙara database na shafi cikakke a matsayin tebur."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Allon - Shafi cikakke",
+      "description": "Ƙara allon kanban na shafi cikakke."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Jeri - Shafi cikakke",
+      "description": "Ƙara database na shafi cikakke a matsayin jeri."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Timeline - Shafi cikakke",
+      "description": "Ƙara timeline na database na shafi cikakke."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalanda - Shafi cikakke",
+      "description": "Ƙara database na kalanda na shafi cikakke."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Gallery - Shafi cikakke",
+      "description": "Ƙara gallery na database na shafi cikakke."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Bayanai - Na layi",
+      "description": "Ƙara bayanai a cikin wannan shafin."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Duban tebur",
+      "description": "Ƙara bayanai na layi azaman tebur."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Duban allo",
+      "description": "Ƙara allon kanban na layi."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Duban jeri",
+      "description": "Ƙara bayanai na layi azaman jeri."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Duban layin lokaci",
+      "description": "Ƙara layin lokaci na bayanai na layi."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Duban kalanda",
+      "description": "Ƙara bayanan kalandar na layi."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Duban hotuna",
+      "description": "Ƙara hotunan bayanai na layi."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Tsoho",
+      "description": "Cire rubutu ko kalar bango daga wannan block."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Ruwan toka",
+      "description": "Sanya kalar ruwan toka a wannan block."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Ruwan kasa",
+      "description": "Aiwatar da ruwan kasa ga wannan block."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "Lemu",
+      "description": "Sanya lemu a wannan toshe."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Rawaya",
+      "description": "Aiwatar da rawaya a wannan toshe."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Kore",
+      "description": "Sanya kore a wannan toshe."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Shuɗi",
+      "description": "Aiwatar da shuɗi ga wannan block."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Ruwan shunayya",
+      "description": "Aiwatar da ruwan shunayya a wannan toshe."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Ruwan hoda",
+      "description": "Aiwatar da ruwan hoda a wannan toshe."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Ja",
+      "description": "Aiwatar da ja a wannan toshe."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Bango mai ruwan toka",
+      "description": "Sanya bango mai ruwan toka a wannan block."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Bango ruwan kasa",
+      "description": "Aiwatar da bango ruwan kasa ga wannan block."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "Bangon lemu",
+      "description": "Sanya bangon lemu a wannan toshe."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Bango rawaya",
+      "description": "Aiwatar da bango rawaya a wannan toshe."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Bango mai kore",
+      "description": "Sanya bango mai kore a wannan block."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Bango shuɗi",
+      "description": "Aiwatar da bango shuɗi ga wannan block."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Bango ruwan shunayya",
+      "description": "Aiwatar da bango ruwan shunayya a wannan toshe."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Bango ruwan hoda",
+      "description": "Sanya bangon ruwan hoda a wannan toshe."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Bango ja",
+      "description": "Aiwatar da bango ja a wannan toshe."
     }
   }
 }

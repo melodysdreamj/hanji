@@ -1,46 +1,46 @@
 {
-  "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
-  },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
-  "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+  "bar": {
+    "openAriaLabel": "Otwórz {{title}}",
+    "openAriaLabelWithDates": "Otwórz {{title}}, {{start}} do {{end}}",
+    "openNoDateAriaLabel": "Otwórz {{title}}, brak daty"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "hint": "dodaj właściwość relacji",
+    "label": "Zależności:",
+    "relationPropertyAriaLabel": "Właściwość relacji zależności"
   },
-  "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+  "empty": {
+    "description": "Widoki osi czasu wymagają właściwości daty początkowej, aby wyświetlać strony w czasie.",
+    "title": "Dodaj właściwość daty"
   },
-  "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
-  },
-  "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
-  },
+  "endDateHint": "Dodaj właściwość daty zakończenia, aby wyświetlać zakresy zamiast jednodniowych pasków.",
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "jumpTo": "Przejdź do {{date}}",
+    "noDatedItems": "Brak elementów z datą.",
+    "noItemsInRange": "Brak elementów w tym zakresie."
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Brak daty ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Brak",
+    "untitled": "Bez tytułu"
+  },
+  "table": {
+    "ariaLabel": "Tabela osi czasu",
+    "nameHeader": "Nazwa"
+  },
+  "toolbar": {
+    "newPage": "Nowa",
+    "newPageIn": "Nowa strona w {{dbTitle}}",
+    "nextRange": "Następny zakres",
+    "previousRange": "Poprzedni zakres",
+    "today": "Dzisiaj"
+  },
+  "zoom": {
+    "ariaLabel": "Powiększenie osi czasu",
+    "day": "Dzień",
+    "month": "Miesiąc",
+    "week": "Tydzień"
   }
 }

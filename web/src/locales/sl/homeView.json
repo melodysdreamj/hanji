@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "Odpiranje strani",
+  "workspace": "Delovni prostor",
+  "emptyWorkspace": "Prazen delovni prostor",
+  "untitled": "Brez naslova",
+  "newPage": "Nova stran"
 }

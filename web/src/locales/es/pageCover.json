@@ -2,7 +2,7 @@
   "actions": {
     "changeCover": "Cambiar portada",
     "reposition": "Reposicionar",
-    "remove": "Quitar",
+    "remove": "Eliminar",
     "uploadFile": "Subir archivo",
     "uploading": "Subiendo...",
     "submit": "Enviar",
@@ -14,7 +14,7 @@
     "link": "Enlace"
   },
   "link": {
-    "placeholder": "Pega el enlace de la imagen",
+    "placeholder": "Pegar enlace de imagen",
     "invalid": "Pega un enlace de imagen http o https."
   },
   "upload": {
@@ -22,29 +22,29 @@
     "defaultFileName": "Imagen de portada"
   },
   "reposition": {
-    "hint": "Arrastra la imagen para reposicionarla"
+    "hint": "Arrastra la imagen para cambiar la posición"
   },
   "progress": {
-    "preparing": "Preparando la subida",
+    "preparing": "Preparando subida",
     "finalizing": "Finalizando",
     "complete": "Completado",
     "uploading": "Subiendo"
   },
   "toast": {
-    "removed": "Portada quitada",
+    "removed": "Portada eliminada",
     "restored": "Portada restaurada",
     "undo": "Deshacer"
   },
   "aria": {
-    "pageCover": "Portada de la página",
-    "coverVerticalPosition": "Posición vertical de la portada",
+    "pageCover": "Portada de página",
+    "coverVerticalPosition": "Posición vertical de portada",
     "positionFromTop": "{{position}}% desde arriba",
     "closeCoverMenu": "Cerrar menú de portada",
-    "changePageCover": "Cambiar portada de la página",
-    "repositionPageCover": "Reposicionar portada de la página",
-    "removePageCover": "Quitar portada de la página",
+    "changePageCover": "Cambiar portada de página",
+    "repositionPageCover": "Reposicionar portada de página",
+    "removePageCover": "Eliminar portada de página",
     "changeCoverDialog": "Cambiar portada",
-    "coverSource": "Origen de la portada",
+    "coverSource": "Fuente de portada",
     "selectCover": "Seleccionar portada {{number}}",
     "uploadFromDevice": "Subir imagen de portada desde este dispositivo",
     "uploadingFile": "Subiendo {{fileName}}",

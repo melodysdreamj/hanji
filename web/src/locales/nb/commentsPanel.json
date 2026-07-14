@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
-  "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
-  },
-  "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+  "actions": {
+    "edit": "Rediger",
+    "reopen": "Åpne igjen",
+    "reply": "Svar",
+    "resolve": "Løs",
+    "showInPage": "Vis i side"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
-  },
-  "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
-  },
-  "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
-  },
-  "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "commentingOn": "Kommentar til",
+    "commentingOnSelectedText": "Kommentar til valgt tekst",
+    "onABlock": "På en blokk",
+    "onSelectedBlock": "På valgt blokk",
+    "onSelectedText": "På valgt tekst",
+    "selectedBlock": "Valgt blokk"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}}s kommentar, {{time}}",
+    "commentAriaResolved": "{{author}}s kommentar, {{time}}, løst",
+    "edited": "(redigert)",
+    "emptyComment": "(tom kommentar)",
+    "emptyReply": "(tomt svar)",
+    "justNow": "Akkurat nå",
+    "repliesAria": "{{count}} svar",
+    "replyAria": "{{author}}s svar, {{time}}"
   },
-  "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
-  },
-  "reply": {
-    "placeholder": "Reply..."
-  },
-  "edit": {
-    "aria": "Edit comment"
+  "closeAria": "Lukk kommentarer",
+  "composer": {
+    "addBlockComment": "Legg til blokkommentar",
+    "addPageComment": "Legg til sidekommentar",
+    "blockPlaceholder": "Kommenter denne blokken...",
+    "pagePlaceholder": "Legg til en kommentar...",
+    "submit": "Kommenter"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
-  }
+    "commentConfirm": "Slett denne kommentaren?",
+    "threadConfirm_one": "Slett denne kommentaren og svaret?",
+    "threadConfirm_other": "Slett denne kommentaren og de {{count}} svarene?"
+  },
+  "edit": {
+    "aria": "Rediger kommentar"
+  },
+  "list": {
+    "empty": "Ingen kommentarer ennå",
+    "noOpen": "Ingen åpne kommentarer",
+    "noResolved": "Ingen løste kommentarer",
+    "threadsAria": "Kommentartråder"
+  },
+  "mention": {
+    "commentPeopleAria": "Nevn personer i kommentar",
+    "noMatches": "Ingen samsvarende personer",
+    "organizationPerson": "Organisasjonsperson",
+    "person": "Person",
+    "replyPeopleAria": "Nevn personer i svar",
+    "roleInOrganization": "{{role}} i organisasjonen",
+    "title": "Nevn {{name}}",
+    "trigger": "Nevn personer",
+    "you": "Du"
+  },
+  "reply": {
+    "placeholder": "Svar..."
+  },
+  "status": {
+    "aria": "Kommentarstatus",
+    "open": "Åpen",
+    "resolved": "Løst"
+  },
+  "subtitle": {
+    "block": "Blokkdiskusjon",
+    "page": "Sidediskusjon"
+  },
+  "title": "Kommentarer"
 }

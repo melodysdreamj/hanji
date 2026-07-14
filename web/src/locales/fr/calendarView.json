@@ -1,7 +1,7 @@
 {
   "empty": {
-    "title": "Ajouter une propriété de date",
-    "description": "Les vues calendrier nécessitent une propriété de date pour placer les pages sur le mois.",
+    "title": "Ajouter une propriété date",
+    "description": "Les vues calendrier nécessitent une propriété date pour placer les pages sur le mois.",
     "addDateButton": "Date"
   },
   "toolbar": {

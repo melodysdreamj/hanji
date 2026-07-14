@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "ဆက်စပ်ပစ္စည်းများ တင်နေသည်",
+  "relationUnavailable": "ဆက်စပ်ပစ္စည်းများ မရရှိနိုင်",
+  "unavailable": "မရရှိနိုင်",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "အမှန်ခြစ်ပြီး",
+    "unchecked": "အမှန်ခြစ်မထား"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "{{title}} ဖွင့်ရန်",
+  "openOrDownloadFile": "{{name}} ဖွင့်ရန် သို့မဟုတ် ဒေါင်းလုဒ်"
 }

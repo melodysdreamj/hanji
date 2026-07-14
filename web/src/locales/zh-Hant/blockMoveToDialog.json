@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "將區塊移至",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "搜尋移動位置",
+    "placeholder": "搜尋頁面..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "關閉移動對話方塊"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "移動位置",
+    "empty": "找不到頁面。",
+    "destinationLabel": "將區塊移至 {{label}}，{{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "建立「{{query}}」",
+    "optionLabel": "建立「{{query}}」頁面並將區塊移至這裡",
+    "hint": "新頁面 - 將區塊移至這裡"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "已鎖定頁面"
   },
-  "untitled": "Untitled",
+  "untitled": "未命名",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "頁面已鎖定",
+    "movedBlock": "區塊已移動",
+    "movedBlocks": "區塊已移動",
+    "movedBlocksCount": "已移動 {{blockCount}} 個區塊",
+    "moveFailed": "無法移動區塊"
   }
 }

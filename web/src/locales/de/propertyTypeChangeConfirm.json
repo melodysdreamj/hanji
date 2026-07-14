@@ -1,6 +1,6 @@
 {
   "title": "Eigenschaftstyp ändern?",
-  "message": "„{{propName}}“ enthält bereits Werte. Eine Änderung des Typs in {{typeLabel}} kann bestehende Werte anders anzeigen oder verwerfen.",
+  "message": "\"{{propName}}\" hat bereits Werte. Bei Änderung des Typs in {{typeLabel}} können vorhandene Werte anders dargestellt oder verloren werden.",
   "cancelAria": "Eigenschaftstypänderung abbrechen",
   "confirm": "Typ ändern"
 }

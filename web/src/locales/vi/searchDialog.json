@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Tìm kiếm hoặc đi đến...",
+  "quickFind": "Tìm nhanh",
+  "closeSearch": "Đóng tìm kiếm",
+  "quickFindResults": "Kết quả tìm nhanh",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Đã xem gần đây",
+    "recentSearches": "Tìm kiếm gần đây",
+    "pages": "Trang",
+    "pageContent": "Nội dung trang",
+    "favorites": "Yêu thích"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "trong trang",
+  "searchingDetail": "Đang tìm kiếm...",
+  "searchAgain": "Tìm lại",
+  "searchingPageContent": "Đang tìm kiếm nội dung trang...",
+  "noResultsFor": "Không có kết quả cho \"{{query}}\"",
+  "noPagesFound": "Không tìm thấy trang nào",
+  "creating": "Đang tạo...",
+  "newPage": "Trang mới \"{{query}}\"",
+  "couldntCreatePage": "Không thể tạo trang",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Chọn",
+    "open": "Mở",
+    "newTab": "Tab mới"
   }
 }

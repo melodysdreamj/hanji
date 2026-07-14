@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Болдырмау",
+    "save": "Сақтау",
+    "close": "Жабу",
+    "search": "Іздеу",
+    "create": "Жасау",
+    "delete": "Жою",
+    "clearAll": "Барлығын тазалау",
+    "done": "Дайын",
+    "add": "Қосу"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Атаусыз"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} көшірмесі",
+    "columnName": "Баған {{number}}",
+    "importedDatabase": "Импортталған дерекқор",
+    "uploadedFile": "Жүктелген файл",
+    "image": "Сурет",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Атауы",
+      "status": "Күйі",
+      "select": "Таңдау",
+      "date": "Күні"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Басталмады",
+      "doing": "Орындалуда",
+      "done": "Аяқталды"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "1-нұсқа",
+      "second": "2-нұсқа"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Кесте"
     }
   }
 }

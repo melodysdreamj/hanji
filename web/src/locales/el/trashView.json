@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Κάδος",
+  "empty": "Οι σελίδες που διαγράφετε εμφανίζονται εδώ. Δεν υπάρχει τίποτα στον κάδο.",
+  "searchTrash": "Αναζήτηση στον κάδο",
+  "deletedPages": "Διαγραμμένες σελίδες",
+  "noSearchMatches": "Καμία διαγραμμένη σελίδα δεν ταιριάζει με την αναζήτησή σας.",
+  "pageCount_one": "{{count}} σελίδα",
+  "pageCount_other": "{{count}} σελίδες",
+  "deletedJustNow": "Μόλις διαγράφηκε",
+  "deletedOn": "Διαγράφηκε {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Επαναφορά",
+    "deleteForever": "Οριστική διαγραφή",
+    "emptyTrash": "Άδειασμα κάδου"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Άνοιγμα {{title}} από τον κάδο",
+    "restorePage": "Επαναφορά {{title}}",
+    "deletePageForever": "Οριστική διαγραφή {{title}}",
+    "cancelPermanentDelete": "Ακύρωση οριστικής διαγραφής",
+    "cancelEmptyTrash": "Ακύρωση αδειάσματος κάδου"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Οριστική διαγραφή;",
+    "deleteBodyPrefix": "Αυτό θα διαγράψει οριστικά ",
+    "deleteBodySuffix": ". Δεν μπορείτε να αναιρέσετε αυτήν την ενέργεια.",
+    "emptyTitle": "Άδειασμα κάδου;",
+    "emptyBody_one": "Αυτό θα διαγράψει οριστικά τη {{count}} σελίδα στον κάδο. Δεν μπορείτε να αναιρέσετε αυτήν την ενέργεια.",
+    "emptyBody_other": "Αυτό θα διαγράψει οριστικά όλες τις {{count}} σελίδες στον κάδο. Δεν μπορείτε να αναιρέσετε αυτήν την ενέργεια."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Διαγράφηκε οριστικά",
+    "couldntDelete": "Δεν ήταν δυνατή η διαγραφή της σελίδας",
+    "restored": "Η σελίδα επαναφέρθηκε",
+    "couldntRestore": "Δεν ήταν δυνατή η επαναφορά της σελίδας",
+    "emptied": "Ο κάδος αδειάστηκε",
+    "couldntEmpty": "Δεν ήταν δυνατό το άδειασμα του κάδου"
   }
 }

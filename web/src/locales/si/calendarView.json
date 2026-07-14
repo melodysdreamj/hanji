@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "දින ගුණාංගයක් එක් කරන්න",
+    "description": "කැලැන්ඩර දසුන් සඳහා මාසයේ පිටු තැබීමට දින ගුණයක් අවශ්‍ය වේ.",
+    "addDateButton": "දිනය"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "කැලැන්ඩරය අනුව",
+    "today": "අද",
+    "previousWeek": "පෙර සතිය",
+    "previousMonth": "පෙර මාසය",
+    "nextWeek": "ඊළඟ සතිය",
+    "nextMonth": "ඊළඟ මාසය"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ඉරි",
+    "mon": "සඳු",
+    "tue": "අඟ",
+    "wed": "බදා",
+    "thu": "බ්‍රහ",
+    "fri": "සිකු",
+    "sat": "සෙන"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} කැලැන්ඩරය",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, අයිතම {{count}}ක්",
+    "newRowAriaLabel": "{{date}} දින නව පේළිය",
+    "newRowTitle": "නව",
+    "showLess": "අඩුවෙන් පෙන්වන්න",
+    "showMore": "+{{count}} තවත්"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} විවෘත කරන්න",
+    "openAriaLabelWithDate": "{{title}} විවෘත කරන්න, {{date}} නියමිත",
+    "openNoDateAriaLabel": "{{title}} විවෘත කරන්න, දිනය නැත"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "දිනය නැත ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "නම් නොකළ",
+    "dateDefaultName": "දිනය"
   }
 }

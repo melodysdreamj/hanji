@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Zibil qutusu",
+  "empty": "Silinən səhifələr burada görünür. Zibil qutusu boşdur.",
+  "searchTrash": "Zibil qutusunda axtar",
+  "deletedPages": "Silinmiş səhifələr",
+  "noSearchMatches": "Axtarışınıza uyğun silinmiş səhifə tapılmadı.",
+  "pageCount_one": "{{count}} səhifə",
+  "pageCount_other": "{{count}} səhifə",
+  "deletedJustNow": "İndicə silindi",
+  "deletedOn": "{{date}} silindi",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Bərpa et",
+    "deleteForever": "Həmişəlik sil",
+    "emptyTrash": "Zibil qutusunu boşalt"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Zibil qutusundan {{title}} açın",
+    "restorePage": "{{title}} bərpa edin",
+    "deletePageForever": "{{title}} həmişəlik sil",
+    "cancelPermanentDelete": "Həmişəlik silməyi ləğv et",
+    "cancelEmptyTrash": "Zibil qutusunu boşaltmağı ləğv et"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Həmişəlik silinsin?",
+    "deleteBodyPrefix": "Bu ",
+    "deleteBodySuffix": " daimi olaraq silinəcək. Bu hərəkəti geri ala bilməzsiniz.",
+    "emptyTitle": "Zibil qutusu boşaldılsın?",
+    "emptyBody_one": "Bu zibil qutusundakı bütün {{count}} səhifəni daimi olaraq siləcək. Bu hərəkəti geri ala bilməzsiniz.",
+    "emptyBody_other": "Bu zibil qutusundakı bütün {{count}} səhifələri daimi olaraq siləcək. Bu hərəkəti geri ala bilməzsiniz."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Həmişəlik silindi",
+    "couldntDelete": "Səhifə silinə bilmədi",
+    "restored": "Səhifə bərpa edildi",
+    "couldntRestore": "Səhifə bərpa edilə bilmədi",
+    "emptied": "Zibil qutusu boşaldıldı",
+    "couldntEmpty": "Zibil qutusu boşaldıla bilmədi"
   }
 }

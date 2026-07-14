@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Relatie-items laden",
+  "relationUnavailable": "Relation items niet beschikbaar",
+  "unavailable": "Niet beschikbaar",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Aangevinkt",
+    "unchecked": "Uitgevinkt"
   },
   "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openOrDownloadFile": "Open of download {{name}}"
 }

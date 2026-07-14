@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Formattazione testo"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Trasforma in",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "text": "Testo",
+      "heading1": "Titolo 1",
+      "heading2": "Titolo 2",
+      "heading3": "Titolo 3",
+      "heading4": "Titolo 4",
+      "toDoList": "Elenco attività",
+      "bulletedList": "Elenco puntato",
+      "numberedList": "Elenco numerato",
+      "toggleList": "Elenco a scomparsa",
+      "quote": "Citazione",
       "callout": "Callout",
-      "code": "Code"
+      "code": "Codice"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
+    "bold": "Grassetto",
+    "italic": "Corsivo",
+    "underline": "Sottolineato",
+    "strikethrough": "Barrato",
+    "code": "Codice",
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Commento"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Colore del testo: {{color}}",
+    "title": "Colore: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Misto",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Colore testo",
+      "default": "Predefinito",
+      "gray": "Grigio",
+      "brown": "Marrone",
+      "orange": "Arancione",
+      "yellow": "Giallo",
+      "green": "Verde",
+      "blue": "Blu",
+      "purple": "Viola",
+      "pink": "Rosa",
+      "red": "Rosso"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Colore di sfondo",
+      "gray": "Sfondo grigio",
+      "brown": "Sfondo marrone",
+      "orange": "Sfondo arancione",
+      "yellow": "Sfondo giallo",
+      "green": "Sfondo verde",
+      "blue": "Sfondo blu",
+      "purple": "Sfondo viola",
+      "pink": "Sfondo rosa",
+      "red": "Sfondo rosso"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
+    "ariaLabel": "Modifica link",
+    "placeholder": "Incolla link",
+    "urlAriaLabel": "URL link",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Apri link",
+    "copy": "Copia link",
+    "copied": "Copiato",
+    "copiedLink": "Link copiato",
+    "remove": "Rimuovi"
   }
 }

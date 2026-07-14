@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "വാചക ഫോർമാറ്റിംഗ്"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "മാറ്റുക",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "വാചകം",
+      "heading1": "തലക്കെട്ട് 1",
+      "heading2": "തലക്കെട്ട് 2",
+      "heading3": "തലക്കെട്ട് 3",
+      "heading4": "തലക്കെട്ട് 4",
+      "toDoList": "ചെയ്യേണ്ടവ ലിസ്റ്റ്",
+      "bulletedList": "ബുള്ളറ്റ് ലിസ്റ്റ്",
+      "numberedList": "അക്കമിട്ട പട്ടിക",
+      "toggleList": "ടോഗിൾ ലിസ്റ്റ്",
+      "quote": "ഉദ്ധരണി",
+      "callout": "കോളൗട്ട്",
+      "code": "കോഡ്"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ബോൾഡ്",
+    "italic": "ഇറ്റാലിക്",
+    "underline": "അടിവര",
+    "strikethrough": "സ്ട്രൈക്ക്ത്രൂ",
+    "code": "കോഡ്",
+    "link": "ലിങ്ക്"
   },
   "comment": {
-    "label": "Comment"
+    "label": "കമന്റ്"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "അക്ഷര നിറം: {{color}}",
+    "title": "നിറം: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "മിക്സഡ്",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "വാചക നിറം",
+      "default": "ഡിഫോൾട്ട്",
+      "gray": "ഗ്രേ",
+      "brown": "തവിട്ട്",
+      "orange": "ഓറഞ്ച്",
+      "yellow": "മഞ്ഞ",
+      "green": "പച്ച",
+      "blue": "നീല",
+      "purple": "പർപ്പിൾ",
+      "pink": "പിങ്ക്",
+      "red": "ചുവപ്പ്"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "പശ്ചാത്തല നിറം",
+      "gray": "ചാര പശ്ചാത്തലം",
+      "brown": "തവിട്ട് പശ്ചാത്തലം",
+      "orange": "ഓറഞ്ച് പശ്ചാത്തലം",
+      "yellow": "മഞ്ഞ പശ്ചാത്തലം",
+      "green": "പച്ച പശ്ചാത്തലം",
+      "blue": "നീല പശ്ചാത്തലം",
+      "purple": "പർപ്പിൾ പശ്ചാത്തലം",
+      "pink": "പിങ്ക് പശ്ചാത്തലം",
+      "red": "ചുവപ്പ് പശ്ചാത്തലം"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "ലിങ്ക് തിരുത്തുക",
+    "placeholder": "ലിങ്ക് ഒട്ടിക്കുക",
+    "urlAriaLabel": "ലിങ്ക് URL",
+    "apply": "ലിങ്ക്",
+    "open": "ലിങ്ക് തുറക്കുക",
+    "copy": "ലിങ്ക് പകർത്തുക",
+    "copied": "പകർത്തി",
+    "copiedLink": "ലിങ്ക് പകർത്തി",
+    "remove": "നീക്കം ചെയ്യുക"
   }
 }

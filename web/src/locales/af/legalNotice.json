@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Wetlike en broninligting",
+  "noWarranty": "Verskaf sonder waarborg.",
+  "sourceCode": "Bron",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Uitsondering 2.0"
 }

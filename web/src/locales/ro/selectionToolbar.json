@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Formatare text"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Transformă în",
     "options": {
       "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "heading1": "Titlu 1",
+      "heading2": "Titlu 2",
+      "heading3": "Titlu 3",
+      "heading4": "Titlu 4",
+      "toDoList": "Listă de sarcini",
+      "bulletedList": "Listă cu puncte",
+      "numberedList": "Listă numerotată",
+      "toggleList": "Listă pliabilă",
+      "quote": "Citat",
       "callout": "Callout",
-      "code": "Code"
+      "code": "Cod"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
+    "bold": "Aldin",
+    "italic": "Cursiv",
+    "underline": "Subliniat",
+    "strikethrough": "Tăiat",
+    "code": "Cod",
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Comentariu"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Culoare text: {{color}}",
+    "title": "Culoare: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Mixt",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Culoare text",
+      "default": "Implicit",
+      "gray": "Gri",
+      "brown": "Maro",
+      "orange": "Portocaliu",
+      "yellow": "Galben",
+      "green": "Verde",
+      "blue": "Albastru",
+      "purple": "Violet",
+      "pink": "Roz",
+      "red": "Roșu"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Culoare fundal",
+      "gray": "Fundal gri",
+      "brown": "Fundal maro",
+      "orange": "Fundal portocaliu",
+      "yellow": "Fundal galben",
+      "green": "Fundal verde",
+      "blue": "Fundal albastru",
+      "purple": "Fundal violet",
+      "pink": "Fundal roz",
+      "red": "Fundal roșu"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
+    "ariaLabel": "Editează linkul",
+    "placeholder": "Lipește linkul",
+    "urlAriaLabel": "URL link",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Deschide linkul",
+    "copy": "Copiază link",
+    "copied": "Copiat",
+    "copiedLink": "Link copiat",
+    "remove": "Elimină"
   }
 }

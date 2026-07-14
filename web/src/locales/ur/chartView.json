@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "تعداد",
+    "sum": "کل",
+    "average": "اوسط",
+    "min": "کم سے کم",
+    "max": "زیادہ سے زیادہ"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} چارٹ",
+  "chartType": "چارٹ کی قسم",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "بار",
+    "horizontal_bar": "افقی بار",
+    "line": "لائن",
+    "donut": "ڈونٹ"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "چیک شدہ",
+  "empty": "خالی",
+  "legend": "چارٹ لیجنڈ",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "کوئی ڈیٹا نہیں",
+  "noDataDesc": "موجودہ فلٹرز یا تلاش سے مماثل کوئی قطار نہیں۔",
+  "noGroupProperty": "ابھی چارٹ کرنے کے لیے کچھ نہیں",
+  "noGroupPropertyDesc": "اس چارٹ کو گروپ کرنے کے لیے منتخب، حیثیت، شخص، چیک باکس، یا تاریخ کی پراپرٹی شامل کریں۔",
+  "total": "کل",
+  "unchecked": "غیر چیک شدہ",
+  "untitledProperty": "بغیر عنوان",
+  "valueProperty": "قدر پراپرٹی",
+  "xAxis": "X-محور",
+  "yAxis": "Y-محور"
 }

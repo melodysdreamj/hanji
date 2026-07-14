@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "No se pudo restaurar la página",
-  "emptyBodyPrompt": "Pulsa Intro para empezar a escribir en esta página vacía.",
-  "inTrashTopBarTitle": "En la papelera",
-  "notFoundTopBarTitle": "No encontrado",
+  "couldntRestorePage": "No se pudo restaurar página",
+  "emptyBodyPrompt": "Presiona Enter para empezar a escribir en esta página vacía.",
+  "inTrashTopBarTitle": "En Papelera",
+  "notFoundTopBarTitle": "No encontrada",
   "openWorkspace": "Abrir espacio de trabajo",
-  "pageInTrash": "Esta página está en la papelera.",
+  "pageInTrash": "Esta página está en Papelera.",
   "pageInTrashDetail": "Restáurala antes de abrir o editar su contenido.",
   "pageUnavailable": "Página no disponible.",
-  "pageUnavailableDetail": "Es posible que esta página se haya eliminado, movido o compartido con una cuenta diferente.",
+  "pageUnavailableDetail": "Esta página puede haber sido eliminada, movida o compartida con otra cuenta.",
   "restorePage": "Restaurar página",
   "restoredPage": "Página restaurada",
-  "loadingPageContent": "Cargando el contenido de la página"
+  "loadingPageContent": "Cargando contenido de página"
 }

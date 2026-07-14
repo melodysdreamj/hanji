@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Axlat",
+  "empty": "O'chirilgan sahifalar bu yerda paydo bo'ladi. Axlat bo'sh.",
+  "searchTrash": "Axlatda qidirish",
+  "deletedPages": "O'chirilgan sahifalar",
+  "noSearchMatches": "Qidiruvga mos keladigan o'chirilgan sahifalar yo'q.",
+  "pageCount_one": "{{count}} sahifa",
+  "pageCount_other": "{{count}} sahifa",
+  "deletedJustNow": "Hozirgina o'chirildi",
+  "deletedOn": "{{date}} da o'chirildi",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Tiklash",
+    "deleteForever": "Butunlay oʻchirish",
+    "emptyTrash": "Axlat qutisini tozalash"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Axlatdan {{title}} ochish",
+    "restorePage": "{{title}} tiklash",
+    "deletePageForever": "{{title}} ni butunlay oʻchirish",
+    "cancelPermanentDelete": "Butunlay oʻchirishni bekor qilish",
+    "cancelEmptyTrash": "Axlat qutisini tozalashni bekor qilish"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Butunlay o'chirilsinmi?",
+    "deleteBodyPrefix": "Bu butunlay o'chiriladi ",
+    "deleteBodySuffix": ". Bu amalni bekor qilish mumkin emas.",
+    "emptyTitle": "Axlatni bo'shatish kerakmi?",
+    "emptyBody_one": "Bu axlatdagi barcha {{count}} sahifani butunlay o'chiradi. Bu amalni bekor qilish mumkin emas.",
+    "emptyBody_other": "Bu axlatdagi barcha {{count}} sahifalarni butunlay o'chiradi. Bu amalni bekor qilish mumkin emas."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Butunlay o'chirildi",
+    "couldntDelete": "Sahifani o'chirib bo'lmadi",
+    "restored": "Sahifa tiklandi",
+    "couldntRestore": "Sahifani tiklab bo'lmadi",
+    "emptied": "Axlat bo'shatildi",
+    "couldntEmpty": "Axlatni bo'shatib bo'lmadi"
   }
 }

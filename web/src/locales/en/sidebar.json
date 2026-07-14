@@ -46,6 +46,15 @@
   "favorites": "Favorites",
   "home": "Home",
   "import": "Import",
+  "importInProgress": "Importing",
+  "importProgress": "Notion import in progress, {{percent}}%",
+  "notionOnboarding": {
+    "title": "Bring your Notion workspace to Hanji?",
+    "body": "Import your existing Notion pages and databases into this workspace.",
+    "note": "You can always start this later from Import in the sidebar.",
+    "later": "Maybe later",
+    "import": "Import from Notion"
+  },
   "inbox": "Inbox",
   "inboxUnread": "Inbox (unread updates)",
   "inviteMembers": "Add members",

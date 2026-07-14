@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const sharedState = vi.hoisted(() => ({
   getSharedPageRemote: vi.fn(),
   applySharedPageSnapshot: vi.fn(),
+  markAppInteractiveForOfflineWarm: vi.fn(),
 }));
 
 vi.mock("@/lib/edgebase", () => ({
@@ -14,6 +15,10 @@ vi.mock("@/lib/edgebase", () => ({
 vi.mock("@/lib/store", () => ({
   useStore: (selector: (state: { applySharedPageSnapshot: typeof sharedState.applySharedPageSnapshot }) => unknown) =>
     selector({ applySharedPageSnapshot: sharedState.applySharedPageSnapshot }),
+}));
+
+vi.mock("@/lib/appInteractive", () => ({
+  markAppInteractiveForOfflineWarm: sharedState.markAppInteractiveForOfflineWarm,
 }));
 
 vi.mock("@/components/TopBar", () => ({
@@ -30,11 +35,22 @@ beforeEach(() => {
   window.history.replaceState(null, "", "/share/public-token");
   sharedState.getSharedPageRemote.mockReset();
   sharedState.applySharedPageSnapshot.mockReset();
+  sharedState.markAppInteractiveForOfflineWarm.mockReset();
 });
 
 afterEach(cleanup);
 
 describe("SharedPageView failure recovery", () => {
+  it("shows stable page geometry while the authoritative snapshot is pending", () => {
+    sharedState.getSharedPageRemote.mockReturnValue(new Promise(() => {}));
+
+    render(<SharedPageView token="public-token" />);
+
+    const loading = screen.getByRole("status");
+    expect(loading.querySelectorAll("span")).toHaveLength(3);
+    expect(screen.queryByTestId("page-view")).toBeNull();
+  });
+
   it("never exposes raw backend details and lets the reader retry", async () => {
     sharedState.getSharedPageRemote
       .mockRejectedValueOnce(new Error("database shard public_pages_internal failed"))

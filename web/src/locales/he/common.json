@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "בטל",
+    "save": "שמור",
+    "close": "סגור",
+    "search": "חיפוש",
+    "create": "צור",
+    "delete": "מחק",
+    "clearAll": "נקה הכול",
+    "done": "סיום",
+    "add": "הוסף"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "ללא שם"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "עותק של {{name}}",
+    "columnName": "עמודה {{number}}",
+    "importedDatabase": "מסד נתונים מיובא",
+    "uploadedFile": "קובץ שהועלה",
+    "image": "תמונה",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "שם",
+      "status": "סטטוס",
+      "select": "בחירה",
+      "date": "תאריך"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "לא התחיל",
+      "doing": "בתהליך",
+      "done": "הסתיים"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "אפשרות 1",
+      "second": "אפשרות 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "טבלה"
     }
   }
 }

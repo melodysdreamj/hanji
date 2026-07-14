@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "नयाँ वर्कस्पेस",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "कार्यक्षेत्रको नाम",
+    "placeholder": "हाम्रो कम्पनी"
   },
-  "startLabel": "Start from",
+  "startLabel": "सुरू विधि",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "खाली वर्कस्पेस",
+      "body": "सुरुवाती पृष्ठहरूसँग खाली सुरू गर्नुहोस्।"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion बाट आयात",
+      "body": "वर्कस्पेस सिर्जना गर्नुहोस्, त्यसपछि यसमा Notion वर्कस्पेस स्थानान्तरण गर्नुहोस्।"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "अर्को Hanji बाट आयात",
+      "body": "वर्कस्पेस सिर्जना गर्नुहोस्, त्यसपछि अर्को Hanji सर्भर वा फाइलबाट वर्कस्पेस आयात गर्नुहोस्।"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "कार्यक्षेत्र बनाउनुहोस्",
+  "creating": "बनाउँदै…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "कार्यक्षेत्र बनाउन सकिएन।"
   }
 }

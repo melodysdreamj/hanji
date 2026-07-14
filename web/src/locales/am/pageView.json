@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "ገጹን መመለስ አልተቻለም",
+  "emptyBodyPrompt": "ባዶ ገጹ ላይ መጻፍ ለመጀመር Enter ይጫኑ።",
+  "inTrashTopBarTitle": "በቆሻሻ መጣያ ውስጥ",
+  "notFoundTopBarTitle": "አልተገኘም",
+  "openWorkspace": "የስራ ቦታ ክፈት",
+  "pageInTrash": "ይህ ገጽ በቆሻሻ መጣያ ውስጥ ነው።",
+  "pageInTrashDetail": "ይዘቱን ከመክፈት ወይም ከማርትዕ በፊት ይመልሱት።",
+  "pageUnavailable": "ገጽ አይገኝም።",
+  "pageUnavailableDetail": "ይህ ገጽ ተሰርዞ፣ ተንቀሳቅሶ ወይም ከሌላ መለያ ጋር ተጋርቶ ሊሆን ይችላል።",
+  "restorePage": "ገጽ መልስ",
+  "restoredPage": "ገጽ ተመልሷል",
+  "loadingPageContent": "የገጽ ይዘት በመጫን ላይ"
 }

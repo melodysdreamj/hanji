@@ -79,7 +79,7 @@ async function main() {
 
   await assertRuntimeReachable(apiUrl);
   mkdirSync(options.screenshotDir, { recursive: true });
-  const seed = await seedDatabase(apiUrl);
+  const seed = options.onlyImmediateCreates ? null : await seedDatabase(apiUrl, appUrl);
   const { chromium } = await loadPlaywright();
   const executablePath = resolveChromeExecutable();
   const browser = await chromium.launch({
@@ -126,6 +126,12 @@ async function main() {
       console.log(`View tab menu dark screenshot: ${join(options.screenshotDir, 'desktop-first-database-view-tab-menu-dark.png')}`);
       return;
     }
+    if (options.onlyImmediateCreates) {
+      await assertImmediateDatabaseCreates(browser, appUrl, apiUrl);
+      console.log('PASS database rows, views, and properties render before their held create responses.');
+      console.log(`Immediate-create screenshot: ${join(options.screenshotDir, 'desktop-immediate-database-creates.png')}`);
+      return;
+    }
     await assertDatabaseViews(browser, appUrl, seed);
     console.log('PASS database table, board, list, gallery, calendar, and timeline views render and route through browser tabs.');
     console.log(`Screenshot: ${join(options.screenshotDir, 'desktop-first-database.png')}`);
@@ -139,6 +145,197 @@ async function main() {
     }
   } finally {
     await browser.close().catch(() => {});
+    await cleanupSeed(apiUrl, seed).catch(() => {});
+  }
+}
+
+async function holdFunctionMutation(page, pattern, predicate) {
+  let releaseRequest;
+  let markHeld;
+  let markContinued;
+  let capturedBody;
+  let intercepted = false;
+  const releaseGate = new Promise((resolve) => {
+    releaseRequest = resolve;
+  });
+  const held = new Promise((resolve) => {
+    markHeld = resolve;
+  });
+  const continued = new Promise((resolve) => {
+    markContinued = resolve;
+  });
+  const handler = async (route) => {
+    let body = null;
+    try {
+      body = route.request().postDataJSON();
+    } catch {
+      // Ignore unrelated non-JSON traffic on the same function endpoint.
+    }
+    const heldThisRequest = !intercepted && predicate(body);
+    if (heldThisRequest) {
+      intercepted = true;
+      capturedBody = body;
+      markHeld(body);
+      await releaseGate;
+    }
+    await route.continue();
+    if (heldThisRequest) markContinued();
+  };
+  await page.route(pattern, handler);
+  return {
+    held,
+    continued,
+    get body() {
+      return capturedBody;
+    },
+    release() {
+      releaseRequest();
+    },
+    async dispose() {
+      releaseRequest();
+      await page.unroute(pattern, handler).catch(() => {});
+    },
+  };
+}
+
+async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
+  const { context, page, errors } = await newCheckedPage(browser, {
+    viewport: { width: 1440, height: 1000 },
+    deviceScaleFactor: 1,
+    locale: 'en-US',
+  });
+  let seed;
+
+  try {
+    await context.addInitScript(() => {
+      window.localStorage.setItem('hanji:language', 'en');
+      window.localStorage.setItem('hanji:theme', 'light');
+    });
+    const guestSignInResponse = await context.request.post(
+      resolveUrl(baseUrl, '/api/auth/signin/anonymous'),
+      {
+        data: {},
+        headers: {
+          Origin: new URL(baseUrl).origin,
+          'X-EdgeBase-Auth-Transport': 'cookie',
+        },
+        timeout: options.timeoutMs,
+      },
+    );
+    assert(guestSignInResponse.ok(), `browser guest sign-in returned HTTP ${guestSignInResponse.status()}`);
+    const authBody = await guestSignInResponse.json();
+    assert(authBody?.accessToken && authBody?.user?.id, 'browser guest sign-in must return a usable session');
+    seed = await seedDatabase(apiUrl, baseUrl, {
+      accessToken: authBody.accessToken,
+      refreshToken: authBody.refreshToken ?? '',
+      userId: authBody.user.id,
+    });
+    try {
+      await openDatabase(page, baseUrl, seed);
+    } catch (error) {
+      const diagnostic = await page.evaluate(() => ({
+        body: document.body.innerText.replace(/\s+/g, ' ').trim().slice(0, 1000),
+        language: window.localStorage.getItem('hanji:language'),
+        storageKeys: Object.keys(window.localStorage),
+        url: window.location.href,
+      }));
+      throw new Error(`${error instanceof Error ? error.message : String(error)}; state=${JSON.stringify(diagnostic)}; browserErrors=${JSON.stringify(errors)}`);
+    }
+
+    const initialRowCount = await page.locator('[data-table-row-id]').count();
+    const rowHold = await holdFunctionMutation(
+      page,
+      '**/api/functions/database-row-mutation',
+      (body) => body?.action === 'create' && body?.databaseId === seed.databaseId,
+    );
+    try {
+      const startedAt = Date.now();
+      await page.getByRole('button', { name: 'New database page', exact: true }).first().click();
+      const rowBody = await Promise.race([
+        rowHold.held,
+        page.waitForTimeout(1500).then(() => null),
+      ]);
+      assert(rowBody?.id, 'row create request should be intercepted after the local insert');
+      await page.locator(`[data-table-row-id="${rowBody.id}"]`).waitFor({
+        state: 'visible',
+        timeout: 500,
+      });
+      assert(
+        await page.locator('[data-table-row-id]').count() === initialRowCount + 1,
+        'held row create should add exactly one visible table row',
+      );
+      assert(Date.now() - startedAt < 500, 'row creation should render within 500ms while I/O is held');
+    } finally {
+      rowHold.release();
+      if (rowHold.body) await rowHold.continued;
+      await rowHold.dispose();
+    }
+    const rowPreview = page.locator('[data-row-peek-panel="true"]');
+    if (await rowPreview.isVisible().catch(() => false)) {
+      await page.getByRole('button', { name: 'Close database row preview', exact: true }).click();
+      await rowPreview.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+    }
+
+    const viewHold = await holdFunctionMutation(
+      page,
+      '**/api/functions/database-mutation',
+      (body) => body?.action === 'insert' && body?.table === 'db_views',
+    );
+    try {
+      await page.getByRole('button', { name: 'Add view', exact: true }).click();
+      const addViewDialog = page.getByRole('dialog', { name: 'New view', exact: true });
+      await addViewDialog.getByRole('textbox', { name: 'View name', exact: true }).fill('Latency view');
+      const startedAt = Date.now();
+      await addViewDialog.getByRole('button', { name: 'Create', exact: true }).click();
+      const viewBody = await Promise.race([
+        viewHold.held,
+        page.waitForTimeout(1500).then(() => null),
+      ]);
+      assert(viewBody?.record?.id, 'view create request should be intercepted after local activation');
+      await page.getByRole('tab', { name: 'Latency view', exact: true }).waitFor({
+        state: 'visible',
+        timeout: 500,
+      });
+      assert(Date.now() - startedAt < 500, 'view creation should render within 500ms while I/O is held');
+    } finally {
+      viewHold.release();
+      if (viewHold.body) await viewHold.continued;
+      await viewHold.dispose();
+    }
+
+    const propertyHold = await holdFunctionMutation(
+      page,
+      '**/api/functions/database-mutation',
+      (body) => body?.action === 'insert' && body?.table === 'db_properties',
+    );
+    try {
+      await page.getByRole('button', { name: 'Add a property', exact: true }).click();
+      const propertyTypeMenu = page.getByRole('menu', { name: 'New property type', exact: true });
+      const startedAt = Date.now();
+      await propertyTypeMenu.getByRole('menuitem', { name: 'Text', exact: true }).click();
+      const propertyBody = await Promise.race([
+        propertyHold.held,
+        page.waitForTimeout(1500).then(() => null),
+      ]);
+      assert(propertyBody?.record?.id, 'property create request should be intercepted after local insertion');
+      await page.locator(`[data-table-property-header="${propertyBody.record.id}"]`).waitFor({
+        state: 'visible',
+        timeout: 500,
+      });
+      assert(Date.now() - startedAt < 500, 'property creation should render within 500ms while I/O is held');
+      await page.screenshot({
+        path: join(options.screenshotDir, 'desktop-immediate-database-creates.png'),
+        fullPage: false,
+      });
+    } finally {
+      propertyHold.release();
+      if (propertyHold.body) await propertyHold.continued;
+      await propertyHold.dispose();
+    }
+
+    assertNoBrowserErrors(errors, 'immediate database create flow');
+  } finally {
+    await context.close().catch(() => {});
     await cleanupSeed(apiUrl, seed).catch(() => {});
   }
 }
@@ -3604,8 +3801,10 @@ async function expectCellInputValue(page, rowIndex, colIndex, value) {
   );
 }
 
-async function seedDatabase(baseUrl) {
-  const session = await signIn(baseUrl);
+async function seedDatabase(baseUrl, authBaseUrl = baseUrl, existingSession) {
+  // In split Vite/API runs the refresh token is origin-bound to the browser
+  // endpoint, while API seeding can still call the backend directly.
+  const session = existingSession ?? await signIn(authBaseUrl);
   const bootstrap = await callFunction(baseUrl, session.accessToken, 'workspace-bootstrap', {});
   const workspaceId = bootstrap?.workspace?.id;
   assert(workspaceId, 'workspace-bootstrap must return a workspace id for database view UI smoke');
@@ -3820,9 +4019,11 @@ async function seedSession(context, seed) {
   // original token across contexts).
   await installBrowserSession(context, seed, {
     appOrigin: normalizeBaseUrl(options.url),
-    authOrigin: normalizeBaseUrl(options.apiUrl ?? options.url),
+    // The browser SDK always talks to the app origin; Vite forwards /api to
+    // apiUrl during split local smoke runs.
+    authOrigin: normalizeBaseUrl(options.url),
     workspaceId: seed.workspaceId,
-    localStorage: { 'hanji:theme': 'light' },
+    localStorage: { 'hanji:language': 'en', 'hanji:theme': 'light' },
   });
 }
 
@@ -3832,7 +4033,7 @@ async function closeSeededContext(context, seed) {
   // cookie in the next context would trip reuse detection (family revocation).
   await captureBrowserSession(context, seed, {
     appOrigin: normalizeBaseUrl(options.url),
-    authOrigin: normalizeBaseUrl(options.apiUrl ?? options.url),
+    authOrigin: normalizeBaseUrl(options.url),
   }).catch(() => {});
   await context.close().catch(() => {});
 }
@@ -3980,6 +4181,7 @@ function parseArgs(args) {
     headed: false,
     apiUrl: process.env.HANJI_EDGEBASE_API_URL ?? DEFAULT_BASE_URL,
     onlyFilterSelect: false,
+    onlyImmediateCreates: false,
     onlyPropertyHeaderContextMenu: false,
     onlyRowContextMenu: false,
     onlySelection: false,
@@ -4005,6 +4207,10 @@ function parseArgs(args) {
     }
     if (arg === '--only-filter-select') {
       parsed.onlyFilterSelect = true;
+      continue;
+    }
+    if (arg === '--only-immediate-creates') {
+      parsed.onlyImmediateCreates = true;
       continue;
     }
     if (arg === '--only-property-header-context-menu') {
@@ -4066,6 +4272,7 @@ Options:
   --screenshot-dir <path>     Screenshot output directory. Defaults to ${DEFAULT_SCREENSHOT_DIR}.
   --timeout-ms <number>       Browser/action timeout. Defaults to ${DEFAULT_TIMEOUT_MS}.
   --only-filter-select        Only verify filter condition/value select menu click-through.
+  --only-immediate-creates    Hold row/view/property creates and require their UI to render first.
   --only-property-header-context-menu
                               Only verify property-header right-click opens the product menu.
   --only-row-context-menu     Only verify row right-click opens the compact database-row action menu.

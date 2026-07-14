@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Sposta blocco in",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Cerca destinazioni di spostamento",
+    "placeholder": "Cerca pagine..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Chiudi finestra di spostamento"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Destinazioni di spostamento",
+    "empty": "Nessuna pagina trovata.",
+    "destinationLabel": "Sposta blocco in {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "Crea \"{{query}}\"",
+    "optionLabel": "Crea pagina \"{{query}}\" e sposta blocco qui",
+    "hint": "Nuova pagina - sposta blocco qui"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Pagina bloccata"
   },
-  "untitled": "Untitled",
+  "untitled": "Senza titolo",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Pagina bloccata",
+    "movedBlock": "Blocco spostato",
+    "movedBlocks": "Blocchi spostati",
+    "movedBlocksCount": "{{blockCount}} blocchi spostati",
+    "moveFailed": "Impossibile spostare il blocco"
   }
 }

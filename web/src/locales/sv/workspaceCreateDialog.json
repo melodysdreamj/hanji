@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Ny arbetsyta",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Arbetsytans namn",
+    "placeholder": "Mitt företag"
   },
-  "startLabel": "Start from",
+  "startLabel": "Starta från",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Tom arbetsyta",
+      "body": "Börja tomt med startsidorna."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Importera från Notion",
+      "body": "Skapa arbetsytan, migrera sedan en Notion-arbetsyta till den."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Importera från en annan Hanji",
+      "body": "Skapa arbetsytan, hämta sedan en arbetsyta från en annan Hanji-server eller fil."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Skapa arbetsyta",
+  "creating": "Skapar…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Kunde inte skapa arbetsyta."
   }
 }

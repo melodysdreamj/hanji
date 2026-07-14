@@ -2,50 +2,50 @@
   "title": "Kommentare",
   "closeAria": "Kommentare schließen",
   "subtitle": {
-    "block": "Block-Diskussion",
-    "page": "Seiten-Diskussion"
+    "block": "Blockdiskussion",
+    "page": "Seitendiskussion"
   },
   "status": {
     "aria": "Kommentarstatus",
     "open": "Offen",
-    "resolved": "Gelöst"
+    "resolved": "Erledigt"
   },
   "anchor": {
-    "commentingOn": "Kommentieren auf",
-    "commentingOnSelectedText": "Kommentieren auf ausgewähltem Text",
+    "commentingOn": "Kommentar zu",
+    "commentingOnSelectedText": "Kommentar zu ausgewähltem Text",
     "selectedBlock": "Ausgewählter Block",
     "onSelectedText": "Auf ausgewähltem Text",
     "onSelectedBlock": "Auf ausgewähltem Block",
     "onABlock": "Auf einem Block"
   },
   "composer": {
-    "addBlockComment": "Einen Block-Kommentar hinzufügen",
-    "addPageComment": "Einen Seiten-Kommentar hinzufügen",
-    "blockPlaceholder": "Diesen Block kommentieren...",
+    "addBlockComment": "Blockkommentar hinzufügen",
+    "addPageComment": "Seitenkommentar hinzufügen",
+    "blockPlaceholder": "Kommentar zu diesem Block...",
     "pagePlaceholder": "Kommentar hinzufügen...",
     "submit": "Kommentieren"
   },
   "mention": {
-    "commentPeopleAria": "Kommentar Personen erwähnen",
-    "replyPeopleAria": "Antwort Personen erwähnen",
+    "commentPeopleAria": "Personen für Kommentar-Erwähnungen",
+    "replyPeopleAria": "Personen für Antwort-Erwähnungen",
     "trigger": "Personen erwähnen",
     "noMatches": "Keine passenden Personen",
     "title": "{{name}} erwähnen",
     "person": "Person",
-    "you": "Du",
-    "organizationPerson": "Organisationsperson",
-    "roleInOrganization": "{{role}} in Organisation"
+    "you": "Ich",
+    "organizationPerson": "Organisationsmitglied",
+    "roleInOrganization": "{{role}} in der Organisation"
   },
   "list": {
     "threadsAria": "Kommentarthreads",
     "empty": "Noch keine Kommentare",
     "noOpen": "Keine offenen Kommentare",
-    "noResolved": "Keine gelösten Kommentare"
+    "noResolved": "Keine erledigten Kommentare"
   },
   "card": {
-    "commentAria": "{{author}} Kommentar, {{time}}",
-    "commentAriaResolved": "{{author}} Kommentar, {{time}}, gelöst",
-    "replyAria": "{{author}} Antwort, {{time}}",
+    "commentAria": "Kommentar von {{author}}, {{time}}",
+    "commentAriaResolved": "Kommentar von {{author}}, {{time}}, aufgelöst",
+    "replyAria": "Antwort von {{author}}, {{time}}",
     "repliesAria": "{{count}} Antworten",
     "edited": "(bearbeitet)",
     "emptyComment": "(leerer Kommentar)",
@@ -55,12 +55,12 @@
   "actions": {
     "reply": "Antworten",
     "showInPage": "Auf Seite anzeigen",
-    "resolve": "Lösen",
-    "reopen": "Erneut öffnen",
+    "resolve": "Auflösen",
+    "reopen": "Wieder öffnen",
     "edit": "Bearbeiten"
   },
   "reply": {
-    "placeholder": "Antworten..."
+    "placeholder": "Antwort..."
   },
   "edit": {
     "aria": "Kommentar bearbeiten"

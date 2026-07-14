@@ -7,6 +7,7 @@ import {
   readFileSync,
   renameSync,
   rmSync,
+  statfsSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
@@ -16,9 +17,10 @@ const persistDir = process.env.PERSIST_DIR || '/data';
 const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || '8787';
 const wranglerConfig = process.env.WRANGLER_CONFIG || 'wrangler.toml';
-const protocol = process.env.LOCAL_PROTOCOL || 'https';
+const protocol = process.env.LOCAL_PROTOCOL || 'http';
 const runtimeUid = Number(process.env.EDGEBASE_UID || '10001');
 const runtimeGid = Number(process.env.EDGEBASE_GID || '10001');
+const minimumFreeKilobytes = Number(process.env.HANJI_DOCKER_MIN_FREE_KB || '524288');
 const secretDir = join(persistDir, '.hanji');
 const secretFile = join(secretDir, 'runtime-secrets.json');
 const generatedConfigPath = '/app/.edgebase/runtime/server/src/generated-config.ts';
@@ -28,18 +30,19 @@ const secretNames = [
   'SERVICE_KEY',
   'HANJI_NOTION_IMPORT_SECRET',
   'HANJI_MCP_OAUTH_SECRET',
-  'HANJI_SETUP_TOKEN',
 ];
 
-function validSecret(name, value) {
+function validSecret(value) {
   if (typeof value !== 'string' || /[\u0000-\u001f\u007f]/.test(value)) return false;
-  if (name === 'HANJI_SETUP_TOKEN') return value.length >= 24 && value.length <= 256;
   return value.length >= 32 && value.length <= 1024;
 }
 
 if (!Number.isInteger(runtimeUid) || runtimeUid < 1 ||
     !Number.isInteger(runtimeGid) || runtimeGid < 1) {
   throw new Error('EDGEBASE_UID and EDGEBASE_GID must be positive integers.');
+}
+if (!Number.isInteger(minimumFreeKilobytes) || minimumFreeKilobytes < 0) {
+  throw new Error('HANJI_DOCKER_MIN_FREE_KB must be a non-negative integer.');
 }
 
 // Docker bind mounts replace the image's prepared /data directory. Start as
@@ -58,6 +61,20 @@ if (typeof process.getuid === 'function' && process.getuid() === 0) {
   process.setuid(runtimeUid);
 }
 
+// A registry-pulled image starts this entrypoint directly, without the helper
+// launcher that performs the same guard. Fail before writing runtime state so
+// a nearly full Docker VM cannot strand SQLite midway through an import.
+const persistenceFilesystem = statfsSync(persistDir);
+const availableKilobytes = Math.floor(
+  (Number(persistenceFilesystem.bavail) * Number(persistenceFilesystem.bsize)) / 1024,
+);
+if (availableKilobytes < minimumFreeKilobytes) {
+  throw new Error(
+    `Docker persistence storage is too full (${availableKilobytes} KiB free; require ` +
+    `${minimumFreeKilobytes} KiB). Free Docker disk space and restart. The /data volume was kept.`,
+  );
+}
+
 mkdirSync(secretDir, { recursive: true, mode: 0o700 });
 chmodSync(secretDir, 0o700);
 let persisted = {};
@@ -68,13 +85,18 @@ if (existsSync(secretFile)) {
   }
 }
 
+// Older alpha volumes may contain the retired terminal-copy setup token. It is
+// no longer an authority and must not remain among the appliance secrets.
+delete persisted.HANJI_SETUP_TOKEN;
+delete process.env.HANJI_SETUP_TOKEN;
+
 for (const name of secretNames) {
   const explicit = process.env[name];
   const saved = persisted[name];
-  if (explicit && !validSecret(name, explicit)) {
+  if (explicit && !validSecret(explicit)) {
     throw new Error(`${name} does not meet the container secret requirements.`);
   }
-  if (saved !== undefined && !validSecret(name, saved)) {
+  if (saved !== undefined && !validSecret(saved)) {
     throw new Error(`Persisted ${name} is invalid; restore the original /data backup.`);
   }
   if (explicit && saved && explicit !== saved) {
@@ -108,15 +130,51 @@ if (process.env.EDGEBASE_CONFIG) {
   );
 }
 
-// A bundled .dev.vars makes Wrangler ignore the container process environment.
-rmSync('/app/.dev.vars', { force: true });
-process.env.CLOUDFLARE_INCLUDE_PROCESS_ENV ||= 'true';
+// The image, not the NAS operator, enables the wiki-style browser installer.
+// This is capability state rather than a secret: the durable single-winner
+// claim closes the installer permanently after the first administrator.
+process.env.HANJI_BROWSER_SETUP ||= 'true';
+process.env.HANJI_TRUST_SELF_HOSTED_PROXY ||= 'true';
 
-if (!process.env.HANJI_MASTER_EMAIL && !process.env.HANJI_MASTER_PASSWORD) {
-  console.log('');
-  console.log('Hanji first-run setup code (used only while this instance has no administrator):');
-  console.log(process.env.HANJI_SETUP_TOKEN);
-  console.log('');
+// Wrangler treats .dev.vars as the sole Worker environment source. Keep that
+// boundary narrow: the image-managed runtime secrets plus operator-supplied
+// HANJI_* settings are the only container values that may cross it. This mirrors
+// EdgeBase dev's explicit allowlist and mode-0600 atomic materialization.
+const configEnvAllowlist = new Set(
+  String(process.env.EDGEBASE_CONFIG_ENV_ALLOWLIST || '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter((name) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(name)),
+);
+for (const name of secretNames) configEnvAllowlist.add(name);
+for (const name of Object.keys(process.env)) {
+  if (name.startsWith('HANJI_')) configEnvAllowlist.add(name);
+}
+process.env.EDGEBASE_CONFIG_ENV_ALLOWLIST = [...configEnvAllowlist].sort().join(',');
+delete process.env.CLOUDFLARE_INCLUDE_PROCESS_ENV;
+
+const devVarsPath = '/app/.dev.vars';
+const temporaryDevVarsPath = `${devVarsPath}.${process.pid}.${randomBytes(8).toString('hex')}.tmp`;
+const devVarLines = [
+  '# Auto-generated by the Hanji appliance entrypoint. Do not package or commit.',
+];
+for (const name of [...configEnvAllowlist].sort()) {
+  const value = process.env[name];
+  if (typeof value !== 'string') continue;
+  const encoded = JSON.stringify(value).replace(/\$/g, '\\$');
+  devVarLines.push(`${name}=${encoded}`);
+}
+try {
+  writeFileSync(temporaryDevVarsPath, `${devVarLines.join('\n')}\n`, {
+    encoding: 'utf8',
+    mode: 0o600,
+    flag: 'wx',
+  });
+  chmodSync(temporaryDevVarsPath, 0o600);
+  renameSync(temporaryDevVarsPath, devVarsPath);
+  chmodSync(devVarsPath, 0o600);
+} finally {
+  rmSync(temporaryDevVarsPath, { force: true });
 }
 
 const args = [

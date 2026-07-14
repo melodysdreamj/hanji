@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Ongeza sifa ya tarehe",
+    "description": "Mwonekano wa kalenda unahitaji sifa ya tarehe kuweka kurasa kwenye mwezi.",
+    "addDateButton": "Tarehe"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalenda kwa",
+    "today": "Leo",
+    "previousWeek": "Wiki iliyopita",
+    "previousMonth": "Mwezi uliopita",
+    "nextWeek": "Wiki ijayo",
+    "nextMonth": "Mwezi unaofuata"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "JMP",
+    "mon": "JMT",
+    "tue": "JMN",
+    "wed": "JMT",
+    "thu": "ALH",
+    "fri": "IJU",
+    "sat": "JMS"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Kalenda ya {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, vitu {{count}}",
+    "newRowAriaLabel": "Safu mpya kwenye {{date}}",
+    "newRowTitle": "Mpya",
+    "showLess": "Onyesha machache",
+    "showMore": "+{{count}} zaidi"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Fungua {{title}}",
+    "openAriaLabelWithDate": "Fungua {{title}}, iliyoratibiwa {{date}}",
+    "openNoDateAriaLabel": "Fungua {{title}}, hakuna tarehe"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Hakuna tarehe ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Bila jina",
+    "dateDefaultName": "Tarehe"
   }
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Затваряне на избор на икона",
+    "label": "Избор на икона"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "Тип икона",
+    "emoji": "Емоджи",
+    "image": "Изображение"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Премахване",
+    "ariaLabel": "Премахване на икона"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Филтър…",
+    "searchLabel": "Търсене на икони",
+    "random": "Случайна",
+    "randomLabel": "Избор на случайна икона",
+    "recentLabel": "Последно използвани първо",
+    "gridLabelRecent": "Икони, последно използвани първи",
+    "gridLabel": "Икони",
+    "optionLabel": "Изберете икона {{emoji}}",
+    "noResults": "Няма икони, съответстващи на „{{query}}“. Опитайте с различна дума или изчистете филтъра."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Изображение",
+    "linkPlaceholder": "Поставете линк за изображение",
+    "linkLabel": "Връзка за икона",
+    "apply": "Приложи",
+    "upload": "Качи файл",
+    "uploading": "Качване...",
+    "uploadingLabel": "Качване на {{fileName}}",
+    "uploadFailed": "Неуспешно качване на това изображение.",
+    "fallbackFileName": "Изображение на икона"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Подготовка за качване",
+    "finalizing": "Финализиране",
+    "complete": "Готово",
+    "uploading": "Качване"
   }
 }

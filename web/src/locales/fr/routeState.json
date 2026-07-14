@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Cette adresse est incomplète.",
+  "invalidBody": "Vérifiez que le lien ne contient pas de caractères manquants ou malformés, puis réessayez.",
+  "notFoundTitle": "Page introuvable.",
+  "notFoundBody": "Cette adresse ne correspond à aucune page Hanji. La page a peut-être été déplacée ou n'existe plus.",
+  "sharedTitle": "Ce lien partagé est invalide.",
+  "sharedBody": "Vérifiez que le lien partagé complet a été copié correctement, puis réessayez.",
+  "openHome": "Ouvrir l'accueil Hanji"
+}

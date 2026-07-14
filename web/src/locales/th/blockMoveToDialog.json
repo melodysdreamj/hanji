@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ย้ายบล็อกไปยัง",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "ค้นหาปลายทางการย้าย",
+    "placeholder": "ค้นหาหน้า..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "ปิดกล่องโต้ตอบการย้าย"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "ปลายทางการย้าย",
+    "empty": "ไม่พบหน้า",
+    "destinationLabel": "ย้ายบล็อกไปยัง {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "สร้าง \"{{query}}\"",
+    "optionLabel": "สร้างหน้า \"{{query}}\" และย้ายบล็อกมาที่นี่",
+    "hint": "หน้าใหม่ - ย้ายบล็อกมาที่นี่"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "หน้าที่ถูกล็อก"
   },
-  "untitled": "Untitled",
+  "untitled": "ไม่มีชื่อ",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "หน้าถูกล็อก",
+    "movedBlock": "ย้ายบล็อกแล้ว",
+    "movedBlocks": "ย้ายบล็อกแล้ว",
+    "movedBlocksCount": "ย้าย {{blockCount}} บล็อกแล้ว",
+    "moveFailed": "ไม่สามารถย้ายบล็อกได้"
   }
 }

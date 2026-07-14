@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Verplaatsen naar",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Werkruimteroot",
+    "path": "Topniveau"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Zoek verplaatslocaties",
+    "placeholder": "Zoek pagina's..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Sluit verplaatsingsdialoog"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Verplaatslocaties",
+    "empty": "Geen pagina's gevonden.",
+    "destinationLabel": "Verplaatsen naar {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Maak \"{{title}}\"",
+    "optionLabel": "Maak pagina {{title}} en verplaats hier naartoe",
+    "hint": "Nieuwe toppagina - hier naartoe verplaatsen"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Vergrendelde bovenliggende pagina",
+    "page": "Vergrendelde pagina"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Bovenliggende pagina vergrendeld",
+    "locked": "Pagina vergrendeld",
+    "moved": "Pagina verplaatst",
+    "moveFailed": "Pagina verplaatsen mislukt"
   }
 }

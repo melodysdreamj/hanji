@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "continueOnline": "Jatka vain verkossa",
+  "continueOnlineHint": "Vain verkossa -tilassa tämän laitteen lukitut offline-muokkaukset pysyvät sinetöityinä — ne pysyvät tällä laitteella eivätkä synkronoidu ennen kuin avaat ne oikealla salasanalla.",
+  "description": "Tämän laitteen offline-tiedot on lukittu salasanalla. Lukituksen avaaminen ottaa offline-käytön ja tallennuksen uudelleen käyttöön.",
+  "passphrasePlaceholder": "Salasana",
+  "title": "Avaa paikallisten tietojen lukitus",
+  "unlock": "Avaa lukitus",
+  "unsupportedBrowser": "Paikallinen lukitus ei ole käytettävissä tässä selaimessa.",
+  "wrongPassphrase": "Salasana ei ole oikea."
 }

@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "dateAt": "{{date}} v {{time}}",
+  "editedDaysAgo": "Upraveno před {{days}} d",
+  "editedHoursAgo": "Upraveno před {{hours}} h",
+  "editedJustNow": "Právě upraveno",
+  "editedMinutesAgo": "Upraveno před {{minutes}} m",
+  "editedOn": "Upraveno {{date}}",
+  "justNow": "Právě teď",
+  "noEdits": "Žádné úpravy",
+  "noEditsYet": "Zatím žádné úpravy",
+  "todayAt": "Dnes v {{time}}",
+  "yesterdayAt": "Včera v {{time}}"
 }

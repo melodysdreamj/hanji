@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "ฐานข้อมูลนี้ยังไม่มีหน้า",
+  "emptyTitle": "ยังไม่มีหน้า",
+  "newInline": "ใหม่",
+  "newPage": "หน้าใหม่",
+  "newPageIn": "หน้าใหม่ใน {{dbTitle}}",
+  "noResultsDesc": "ไม่มีหน้าที่ตรงกับตัวกรองหรือการค้นหาปัจจุบัน",
+  "noResultsTitle": "ไม่มีผลลัพธ์",
+  "openRow": "เปิด {{title}}"
 }

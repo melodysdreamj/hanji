@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "ਗਿਣਤੀ",
+    "sum": "ਜੋੜ",
+    "average": "ਔਸਤ",
+    "min": "ਘੱਟ",
+    "max": "ਵੱਧ"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} ਚਾਰਟ",
+  "chartType": "ਚਾਰਟ ਕਿਸਮ",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "ਬਾਰ",
+    "horizontal_bar": "ਆੜਾ ਬਾਰ",
+    "line": "ਲਾਈਨ",
+    "donut": "ਡੋਨਟ"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "ਚੈਕ",
+  "empty": "ਖਾਲੀ",
+  "legend": "ਚਾਰਟ ਲੀਜੈਂਡ",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "ਡਾਟਾ ਨਹੀਂ",
+  "noDataDesc": "ਫਿਲਟਰ ਜਾਂ ਖੋਜ ਨਾਲ ਕੋਈ ਕਤਾਰ ਮੇਲ ਨਹੀਂ ਖਾਂਦੀ।",
+  "noGroupProperty": "ਚਾਰਟ ਕਰਨ ਲਈ ਕੁਝ ਨਹੀਂ",
+  "noGroupPropertyDesc": "ਚਾਰਟ ਸਮੂਹ ਕਰਨ ਲਈ ਇੱਕ ਚੁਣੋ, ਸਥਿਤੀ, ਵਿਅਕਤੀ, ਚੈਕਬਾਕਸ, ਜਾਂ ਮਿਤੀ ਵਿਸ਼ੇਸ਼ਤਾ ਸ਼ਾਮਲ ਕਰੋ।",
+  "total": "ਕੁੱਲ",
+  "unchecked": "ਅਣ-ਚੈਕ",
+  "untitledProperty": "ਬੇ-ਨਾਮ",
+  "valueProperty": "ਮੁੱਲ ਵਿਸ਼ੇਸ਼ਤਾ",
+  "xAxis": "X-ਧੁਰਾ",
+  "yAxis": "Y-ਧੁਰਾ"
 }

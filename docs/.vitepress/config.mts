@@ -34,6 +34,7 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
+      { text: 'Docker', link: '/docker' },
       { text: 'Guide', link: '/development' },
       { text: 'Deployment', link: '/deployment' },
       { text: 'GitHub', link: 'https://github.com/melodysdreamj/hanji' },
@@ -50,6 +51,7 @@ export default defineConfig({
       {
         text: 'Operations',
         items: [
+          { text: 'Docker quick start', link: '/docker' },
           { text: 'Deployment', link: '/deployment' },
           { text: 'Master account', link: '/master-account' },
           { text: 'Cloudflare teardown', link: '/cloudflare-teardown' },

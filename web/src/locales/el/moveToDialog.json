@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Μετάβαση σε",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Ρίζα χώρου εργασίας",
+    "path": "Ανώτατο επίπεδο"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Αναζήτηση προορισμών μετακίνησης",
+    "placeholder": "Αναζήτηση σελίδων..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Κλείσιμο διαλόγου μετακίνησης"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Προορισμοί μετακίνησης",
+    "empty": "Δεν βρέθηκαν σελίδες.",
+    "destinationLabel": "Μετακίνηση σε {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Δημιουργία \"{{title}}\"",
+    "optionLabel": "Δημιουργία σελίδας {{title}} και μετακίνηση εδώ",
+    "hint": "Νέα σελίδα ανώτατου επιπέδου - μετακίνηση εδώ"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Κλειδωμένος γονέας",
+    "page": "Κλειδωμένη σελίδα"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Η σελίδα βρίσκεται σε κλειδωμένο γονέα",
+    "locked": "Η σελίδα είναι κλειδωμένη",
+    "moved": "Η σελίδα μετακινήθηκε",
+    "moveFailed": "Αδύνατη η μετακίνηση της σελίδας"
   }
 }

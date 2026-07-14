@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "தொகுதியை நகர்த்தும் இடம்",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "நகர்த்தும் இலக்குகளைத் தேடு",
+    "placeholder": "பக்கங்களைத் தேடு..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "நகர்த்து உரையாடலை மூடு"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "நகர்த்தும் இலக்குகள்",
+    "empty": "பக்கங்கள் எதுவும் காணப்படவில்லை.",
+    "destinationLabel": "தொகுதியை {{label}}, {{path}} இற்கு நகர்த்து"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" உருவாக்கு",
+    "optionLabel": "\"{{query}}\" பக்கத்தை உருவாக்கி தொகுதியை இங்கே நகர்த்து",
+    "hint": "புதிய பக்கம் - தொகுதியை இங்கே நகர்த்து"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "பூட்டப்பட்ட பக்கம்"
   },
-  "untitled": "Untitled",
+  "untitled": "தலைப்பில்லா",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "பக்கம் பூட்டப்பட்டுள்ளது",
+    "movedBlock": "தொகுதி நகர்த்தப்பட்டது",
+    "movedBlocks": "தொகுதிகள் நகர்த்தப்பட்டன",
+    "movedBlocksCount": "{{blockCount}} தொகுதிகள் நகர்த்தப்பட்டன",
+    "moveFailed": "தொகுதியை நகர்த்த முடியவில்லை"
   }
 }

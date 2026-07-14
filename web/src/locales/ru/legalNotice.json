@@ -1,7 +1,7 @@
 {
-  "ariaLabel": "Legal and source information",
-  "noWarranty": "Provided without warranty.",
-  "sourceCode": "Source",
+  "ariaLabel": "Правовая информация и сведения об исходном коде",
+  "noWarranty": "Предоставляется без гарантии.",
+  "sourceCode": "Исходный код",
   "agplLicense": "AGPL-3.0",
-  "sponsorException": "Exception 2.0"
+  "sponsorException": "Исключение 2.0"
 }

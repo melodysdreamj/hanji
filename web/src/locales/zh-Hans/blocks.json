@@ -2,85 +2,85 @@
   "defs": {
     "paragraph": {
       "label": "文本",
-      "description": "直接以纯文本开始写作。",
-      "placeholder": "输入“/”获取命令"
+      "description": "直接用纯文本开始书写",
+      "placeholder": "输入 '/' 调出命令"
     },
     "child_page": {
       "label": "页面",
-      "description": "在此页面内创建子页面。"
+      "description": "在此页面中创建子页面。"
     },
     "link_to_page": {
-      "label": "链接到页面",
-      "description": "链接到现有页面。"
+      "label": "页面链接",
+      "description": "链接到现有页面"
     },
     "heading_1": {
-      "label": "标题 1",
-      "description": "大号章节标题。",
-      "placeholder": "标题 1"
+      "label": "标题1",
+      "description": "大节标题",
+      "placeholder": "标题1"
     },
     "toggle_heading_1": {
-      "label": "可折叠标题 1",
+      "label": "切换标题1",
       "description": "可隐藏嵌套内容的大标题。",
-      "placeholder": "可折叠标题 1"
+      "placeholder": "切换标题1"
     },
     "heading_2": {
-      "label": "标题 2",
-      "description": "中号章节标题。",
-      "placeholder": "标题 2"
+      "label": "标题2",
+      "description": "中节标题",
+      "placeholder": "标题2"
     },
     "toggle_heading_2": {
-      "label": "可折叠标题 2",
-      "description": "可隐藏嵌套内容的中标题。",
-      "placeholder": "可折叠标题 2"
+      "label": "切换标题2",
+      "description": "可折叠嵌套内容的中等标题",
+      "placeholder": "切换标题2"
     },
     "heading_3": {
-      "label": "标题 3",
-      "description": "小号章节标题。",
-      "placeholder": "标题 3"
+      "label": "标题3",
+      "description": "小节标题",
+      "placeholder": "标题3"
     },
     "toggle_heading_3": {
-      "label": "可折叠标题 3",
-      "description": "可隐藏嵌套内容的小标题。",
-      "placeholder": "可折叠标题 3"
+      "label": "切换标题3",
+      "description": "可折叠嵌套内容的小标题",
+      "placeholder": "折叠标题3"
     },
     "heading_4": {
-      "label": "标题 4",
-      "description": "紧凑型章节标题。",
-      "placeholder": "标题 4"
+      "label": "标题4",
+      "description": "紧凑节标题",
+      "placeholder": "标题4"
     },
     "toggle_heading_4": {
-      "label": "可折叠标题 4",
-      "description": "可隐藏嵌套内容的紧凑标题。",
-      "placeholder": "可折叠标题 4"
+      "label": "折叠标题4",
+      "description": "紧凑型标题，可隐藏嵌套内容。",
+      "placeholder": "折叠标题4"
     },
     "to_do": {
-      "label": "待办列表",
-      "description": "使用复选框跟踪任务。",
+      "label": "待办事项列表",
+      "description": "用复选框跟踪任务。",
       "placeholder": "待办"
     },
     "bulleted_list_item": {
       "label": "项目符号列表",
-      "description": "创建简单的项目符号列表。",
+      "description": "创建项目符号列表。",
       "placeholder": "列表"
     },
     "numbered_list_item": {
       "label": "编号列表",
-      "description": "创建带编号的列表。",
+      "description": "创建编号列表",
       "placeholder": "列表"
     },
     "toggle": {
       "label": "折叠列表",
-      "description": "可隐藏和显示内容的折叠块。",
+      "description": "折叠块可以隐藏和显示内容。",
       "placeholder": "折叠"
     },
     "quote": {
       "label": "引用",
-      "description": "捕获引用内容。",
+      "description": "捕获引用",
       "placeholder": "空引用"
     },
     "callout": {
       "label": "标注",
-      "description": "让文字内容更醒目。",
+      "description": "让文字更突出。",
       "placeholder": "输入内容…"
     },
     "divider": {
@@ -89,7 +89,7 @@
     },
     "code": {
       "label": "代码",
-      "description": "捕获代码片段。",
+      "description": "捕捉代码片段。",
       "placeholder": "编写代码，或粘贴代码片段…"
     },
     "equation": {
@@ -98,7 +98,7 @@
     },
     "table_of_contents": {
       "label": "目录",
-      "description": "显示本页面中标题的链接。"
+      "description": "显示此页面标题的链接。"
     },
     "synced_block": {
       "label": "同步块",
@@ -109,21 +109,21 @@
       "description": "一键插入可复用内容。"
     },
     "tab": {
-      "label": "标签页",
-      "description": "将内容分组到带标签的标签页中。",
-      "placeholder": "标签页"
+      "label": "标签",
+      "description": "将内容分组到带标签的标签页。",
+      "placeholder": "标签"
     },
     "breadcrumb": {
       "label": "面包屑",
-      "description": "显示此页面所在位置。"
+      "description": "显示此页面位置。"
     },
     "action_duplicate": {
       "label": "复制",
       "description": "创建此块的精确副本。"
     },
     "action_move_to": {
-      "label": "移动到",
-      "description": "将此块移动到其他页面。"
+      "label": "移至",
+      "description": "将此块移到另一页面。"
     },
     "action_delete": {
       "description": "删除此块。"
@@ -138,27 +138,27 @@
     },
     "simple_table": {
       "label": "表格",
-      "description": "在此页面中添加简单表格。"
+      "description": "在此页面添加简单表格。"
     },
     "column_list_2": {
-      "label": "2 列",
-      "description": "将块并排放置。"
+      "label": "2列",
+      "description": "将块并排摆放。"
     },
     "column_list_3": {
-      "label": "3 列",
-      "description": "将块排成三列。"
+      "label": "3列",
+      "description": "将块排列成三列。"
     },
     "column_list_4": {
-      "label": "4 列",
-      "description": "将块排成四列。"
+      "label": "4列",
+      "description": "将块排列成四列。"
     },
     "column_list_5": {
-      "label": "5 列",
-      "description": "将块排成五列。"
+      "label": "5列",
+      "description": "将块排列成五列。"
     },
     "image": {
       "label": "图片",
-      "description": "上传或通过链接嵌入。"
+      "description": "上传或通过链接嵌入"
     },
     "video": {
       "label": "视频",
@@ -174,67 +174,67 @@
     },
     "embed": {
       "label": "嵌入",
-      "description": "通过链接嵌入内容。"
+      "description": "嵌入链接中的内容。"
     },
     "file": {
       "label": "文件",
-      "description": "将文件链接附加到此页面。"
+      "description": "向此页面附加文件链接。"
     },
     "child_database": {
-      "label": "数据库 - 整页",
-      "description": "添加新数据库作为子页面。"
+      "label": "数据库 - 全页",
+      "description": "将新数据库作为子页面添加。"
     },
     "child_database_table": {
-      "label": "表格 - 整页",
-      "description": "添加整页数据库表格。"
+      "label": "表格 - 全页",
+      "description": "添加全页数据库表格。"
     },
     "child_database_board": {
-      "label": "看板 - 整页",
-      "description": "添加整页看板。"
+      "label": "看板 - 全页",
+      "description": "添加全页看板。"
     },
     "child_database_list": {
-      "label": "列表 - 整页",
-      "description": "添加整页数据库列表。"
+      "label": "列表 - 全页",
+      "description": "添加全页数据库列表。"
     },
     "child_database_timeline": {
-      "label": "时间线 - 整页",
-      "description": "添加整页数据库时间线。"
+      "label": "时间线 - 全页",
+      "description": "添加全页数据库时间线。"
     },
     "child_database_calendar": {
-      "label": "日历 - 整页",
-      "description": "添加整页日历数据库。"
+      "label": "日历 - 全页",
+      "description": "添加全页日历数据库。"
     },
     "child_database_gallery": {
-      "label": "画廊 - 整页",
-      "description": "添加整页数据库画廊。"
+      "label": "画廊 - 全页",
+      "description": "添加全页数据库画廊。"
     },
     "inline_database": {
       "label": "数据库 - 内联",
-      "description": "在此页面中添加数据库。"
+      "description": "在此页面中添加数据库"
     },
     "inline_database_table": {
       "label": "表格视图",
-      "description": "添加内联数据库表格。"
+      "description": "添加内联数据库表格"
     },
     "inline_database_board": {
       "label": "看板视图",
-      "description": "添加内联看板。"
+      "description": "添加内联看板"
     },
     "inline_database_list": {
       "label": "列表视图",
-      "description": "添加内联数据库列表。"
+      "description": "添加内联数据库列表"
     },
     "inline_database_timeline": {
       "label": "时间线视图",
-      "description": "添加内联数据库时间线。"
+      "description": "添加内联数据库时间线"
     },
     "inline_database_calendar": {
       "label": "日历视图",
-      "description": "添加一个内联日历数据库。"
+      "description": "添加内联日历数据库"
     },
     "inline_database_gallery": {
       "label": "画廊视图",
-      "description": "添加一个内联数据库画廊。"
+      "description": "添加内联数据库画廊"
     },
     "color_default": {
       "label": "默认",
@@ -242,7 +242,7 @@
     },
     "color_gray": {
       "label": "灰色",
-      "description": "将灰色应用于此块。"
+      "description": "为此块应用灰色。"
     },
     "color_brown": {
       "label": "棕色",
@@ -250,15 +250,15 @@
     },
     "color_orange": {
       "label": "橙色",
-      "description": "将橙色应用于此块。"
+      "description": "将此块设为橙色。"
     },
     "color_yellow": {
       "label": "黄色",
-      "description": "将黄色应用于此块。"
+      "description": "将此块设为黄色。"
     },
     "color_green": {
       "label": "绿色",
-      "description": "将绿色应用于此块。"
+      "description": "将此块设为绿色。"
     },
     "color_blue": {
       "label": "蓝色",
@@ -266,19 +266,19 @@
     },
     "color_purple": {
       "label": "紫色",
-      "description": "将紫色应用于此块。"
+      "description": "将此块设为紫色。"
     },
     "color_pink": {
-      "label": "粉色",
-      "description": "将粉色应用于此块。"
+      "label": "粉红色",
+      "description": "将此块设为粉红色。"
     },
     "color_red": {
       "label": "红色",
-      "description": "将红色应用于此块。"
+      "description": "将此块设为红色。"
     },
     "color_gray_background": {
       "label": "灰色背景",
-      "description": "将灰色背景应用于此块。"
+      "description": "为此块应用灰色背景。"
     },
     "color_brown_background": {
       "label": "棕色背景",
@@ -286,15 +286,15 @@
     },
     "color_orange_background": {
       "label": "橙色背景",
-      "description": "将橙色背景应用于此块。"
+      "description": "将此块背景设为橙色。"
     },
     "color_yellow_background": {
       "label": "黄色背景",
-      "description": "将黄色背景应用于此块。"
+      "description": "将此块设为黄色背景。"
     },
     "color_green_background": {
       "label": "绿色背景",
-      "description": "将绿色背景应用于此块。"
+      "description": "为此块应用绿色背景。"
     },
     "color_blue_background": {
       "label": "蓝色背景",
@@ -302,15 +302,15 @@
     },
     "color_purple_background": {
       "label": "紫色背景",
-      "description": "将紫色背景应用于此块。"
+      "description": "将此块设为紫色背景。"
     },
     "color_pink_background": {
-      "label": "粉色背景",
-      "description": "将粉色背景应用于此块。"
+      "label": "粉红色背景",
+      "description": "将此块背景设为粉色。"
     },
     "color_red_background": {
       "label": "红色背景",
-      "description": "将红色背景应用于此块。"
+      "description": "将此块设为红色背景。"
     }
   }
 }

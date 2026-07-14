@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "စာမျက်နှာ ပြန်မရပါ",
+  "emptyBodyPrompt": "စာရိုက်ရန် Enter နှိပ်ပါ။",
+  "inTrashTopBarTitle": "အမှိုက်ပုံးထဲတွင်",
+  "notFoundTopBarTitle": "မတွေ့ရှိပါ",
+  "openWorkspace": "အလုပ်နေရာ ဖွင့်ရန်",
+  "pageInTrash": "ဤစာမျက်နှာသည် အမှိုက်ပုံးထဲတွင် ရှိသည်။",
+  "pageInTrashDetail": "၎င်း၏အကြောင်းအရာများကို ဖွင့်ရန် သို့မဟုတ် တည်းဖြတ်ရန် ဦးစွာ ပြန်လည်ရယူပါ။",
+  "pageUnavailable": "စာမျက်နှာ မရနိုင်ပါ။",
+  "pageUnavailableDetail": "ဤစာမျက်နှာသည် ဖျက်ပစ်ခြင်း၊ ရွှေ့ပြောင်းခြင်း သို့မဟုတ် အခြားအကောင့်တစ်ခုနှင့် မျှဝေခြင်း ခံရနိုင်သည်။",
+  "restorePage": "စာမျက်နှာ ပြန်လည်ရယူရန်",
+  "restoredPage": "စာမျက်နှာ ပြန်လည်ရယူပြီး",
+  "loadingPageContent": "စာမျက်နှာအကြောင်းအရာ ဖွင့်နေသည်"
 }

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "तारीख गुणधर्म जोडा",
+    "description": "कॅलेंडर दृश्यांना महिन्यावर पृष्ठे ठेवण्यासाठी तारीख गुणधर्म आवश्यक आहे.",
+    "addDateButton": "तारीख"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "कॅलेंडर नुसार",
+    "today": "आज",
+    "previousWeek": "मागील आठवडा",
+    "previousMonth": "मागील महिना",
+    "nextWeek": "पुढील आठवडा",
+    "nextMonth": "पुढील महिना"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "रवि",
+    "mon": "सोम",
+    "tue": "मंगळ",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} कॅलेंडर",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} आयटम",
+    "newRowAriaLabel": "{{date}} रोजी नवीन पंक्ती",
+    "newRowTitle": "नवीन",
+    "showLess": "कमी दाखवा",
+    "showMore": "+{{count}} अधिक"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} उघडा",
+    "openAriaLabelWithDate": "{{title}} उघडा, {{date}} शेड्यूल केले",
+    "openNoDateAriaLabel": "{{title}} उघडा, तारीख नाही"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "तारीख नाही ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "शीर्षक नसलेले",
+    "dateDefaultName": "तारीख"
   }
 }

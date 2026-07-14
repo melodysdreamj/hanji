@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Komentari",
+  "closeAria": "Zatvori komentare",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Rasprava o bloku",
+    "page": "Rasprava o stranici"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Status komentara",
+    "open": "Otvoreno",
+    "resolved": "Riješeno"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Komentira se na",
+    "commentingOnSelectedText": "Komentira se na odabrani tekst",
+    "selectedBlock": "Odabrani blok",
+    "onSelectedText": "Na odabranom tekstu",
+    "onSelectedBlock": "Na odabranom bloku",
+    "onABlock": "Na bloku"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Dodaj komentar na blok",
+    "addPageComment": "Dodaj komentar na stranicu",
+    "blockPlaceholder": "Komentiraj ovaj blok...",
+    "pagePlaceholder": "Dodaj komentar...",
+    "submit": "Komentiraj"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Spomeni osobe u komentaru",
+    "replyPeopleAria": "Spomeni osobe u odgovoru",
+    "trigger": "Spomeni osobe",
+    "noMatches": "Nema odgovarajućih osoba",
+    "title": "Spominjanje {{name}}",
+    "person": "Osoba",
+    "you": "Vi",
+    "organizationPerson": "Član organizacije",
+    "roleInOrganization": "{{role}} u organizaciji"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Niti komentara",
+    "empty": "Još nema komentara",
+    "noOpen": "Nema otvorenih komentara",
+    "noResolved": "Nema riješenih komentara"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Komentar od {{author}}, {{time}}",
+    "commentAriaResolved": "Komentar od {{author}}, {{time}}, riješeno",
+    "replyAria": "Odgovor od {{author}}, {{time}}",
+    "repliesAria": "{{count}} odgovora",
+    "edited": "(uređeno)",
+    "emptyComment": "(prazan komentar)",
+    "emptyReply": "(prazan odgovor)",
+    "justNow": "Upravo sada"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Odgovori",
+    "showInPage": "Prikaži na stranici",
+    "resolve": "Riješi",
+    "reopen": "Ponovno otvori",
+    "edit": "Uredi"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Odgovor..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Uredi komentar"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Izbriši ovaj komentar?",
+    "threadConfirm_one": "Izbriši ovaj komentar i njegov odgovor?",
+    "threadConfirm_other": "Izbriši ovaj komentar i njegovih {{count}} odgovora?"
   }
 }

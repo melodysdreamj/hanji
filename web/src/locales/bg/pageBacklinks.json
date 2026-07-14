@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} обратна връзка",
+    "count_other": "{{count}} обратни връзки"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Свързани споменавания"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} споменаване",
+    "mention_other": "{{count}} споменавания",
+    "link_one": "{{count}} линк",
+    "link_other": "{{count}} линка"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Споменаване",
+    "link": "Линк"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "Още {{count}} обратна връзка",
+    "count_other": "Още {{count}} обратни връзки"
   }
 }

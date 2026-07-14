@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "หน้าแชร์",
+  "loading": "กำลังโหลดหน้าแชร์",
+  "unavailable": "หน้าแชร์นี้ไม่สามารถใช้งานได้",
+  "notFound": "ไม่พบหน้าแชร์",
+  "outsideShare": "หน้าเว็บนี้ไม่ได้เป็นส่วนหนึ่งของการแชร์สาธารณะนี้",
+  "errors": {
+    "not-found": "ลิงก์นี้อาจหมดอายุ ถูกยกเลิกการเผยแพร่ หรือถูกคัดลอกผิดพลาด",
+    "offline": "ตรวจสอบการเชื่อมต่อของคุณ แล้วลองเปิดหน้าแชร์อีกครั้ง",
+    "rate-limited": "หน้าแชร์นี้มีคำขอมากเกินไป รอสักครู่แล้วลองอีกครั้ง",
+    "unavailable": "Hanji ไม่สามารถเปิดหน้าแชร์นี้ได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่"
+  },
+  "tryAgain": "ลองอีกครั้ง"
 }

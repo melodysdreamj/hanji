@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Bloku köçürmək",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Köçürmə yerlərini axtar",
+    "placeholder": "Səhifə axtar..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Köçürmə dialoqunu bağla"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Köçürmə yerləri",
+    "empty": "Səhifə tapılmadı.",
+    "destinationLabel": "Bloku {{label}}, {{path}} ünvanına köçür"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" yarat",
+    "optionLabel": "\"{{query}}\" səhifəsini yarat və bloku buraya köçür",
+    "hint": "Yeni səhifə - bloku buraya köçür"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Kilidlənmiş səhifə"
   },
-  "untitled": "Untitled",
+  "untitled": "Adsız",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Səhifə kilidlənib",
+    "movedBlock": "Blok köçürüldü",
+    "movedBlocks": "Bloklar köçürüldü",
+    "movedBlocksCount": "{{blockCount}} blok köçürüldü",
+    "moveFailed": "Blok köçürülə bilmədi"
   }
 }

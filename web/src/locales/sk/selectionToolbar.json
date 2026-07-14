@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Formátovanie textu"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Zmeniť na",
     "options": {
       "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "heading1": "Nadpis 1",
+      "heading2": "Nadpis 2",
+      "heading3": "Nadpis 3",
+      "heading4": "Nadpis 4",
+      "toDoList": "Zoznam úloh",
+      "bulletedList": "Odrážkový zoznam",
+      "numberedList": "Číslovaný zoznam",
+      "toggleList": "Prepnuteľný zoznam",
+      "quote": "Citát",
       "callout": "Callout",
-      "code": "Code"
+      "code": "Kód"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Tučné",
+    "italic": "Kurzíva",
+    "underline": "Podčiarknuté",
+    "strikethrough": "Prečiarknuté",
+    "code": "Kód",
+    "link": "Odkaz"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Komentár"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Farba textu: {{color}}",
+    "title": "Farba: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Zmiešané",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Farba textu",
+      "default": "Predvolená",
+      "gray": "Sivá",
+      "brown": "Hnedá",
+      "orange": "Oranžová",
+      "yellow": "Žltá",
+      "green": "Zelená",
+      "blue": "Modrá",
+      "purple": "Fialová",
+      "pink": "Ružová",
+      "red": "Červená"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Farba pozadia",
+      "gray": "Sivé pozadie",
+      "brown": "Hnedé pozadie",
+      "orange": "Oranžové pozadie",
+      "yellow": "Žlté pozadie",
+      "green": "Zelené pozadie",
+      "blue": "Modré pozadie",
+      "purple": "Fialové pozadie",
+      "pink": "Ružové pozadie",
+      "red": "Červené pozadie"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Upraviť odkaz",
+    "placeholder": "Vložiť odkaz",
+    "urlAriaLabel": "URL odkazu",
+    "apply": "Odkaz",
+    "open": "Otvoriť odkaz",
+    "copy": "Kopírovať odkaz",
+    "copied": "Skopírované",
+    "copiedLink": "Skopírovaný odkaz",
+    "remove": "Odstrániť"
   }
 }

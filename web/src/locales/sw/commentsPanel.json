@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Maoni",
+  "closeAria": "Funga maoni",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Mjadala wa block",
+    "page": "Mjadala wa ukurasa"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Hali ya maoni",
+    "open": "Wazi",
+    "resolved": "Imetatuliwa"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Kutoa maoni kwenye",
+    "commentingOnSelectedText": "Kutoa maoni kwenye maandishi yaliyochaguliwa",
+    "selectedBlock": "Block iliyochaguliwa",
+    "onSelectedText": "Kwenye maandishi yaliyochaguliwa",
+    "onSelectedBlock": "Kwenye block iliyochaguliwa",
+    "onABlock": "Kwenye block"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Ongeza maoni ya block",
+    "addPageComment": "Ongeza maoni ya ukurasa",
+    "blockPlaceholder": "Toa maoni kwenye block hii...",
+    "pagePlaceholder": "Ongeza maoni...",
+    "submit": "Toa maoni"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Taja watu kwenye maoni",
+    "replyPeopleAria": "Taja watu kwenye jibu",
+    "trigger": "Taja watu",
+    "noMatches": "Hakuna watu wanaolingana",
+    "title": "Taja {{name}}",
+    "person": "Mtu",
+    "you": "Wewe",
+    "organizationPerson": "Mtu wa shirika",
+    "roleInOrganization": "{{role}} katika shirika"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Nyuzi za maoni",
+    "empty": "Bado hakuna maoni",
+    "noOpen": "Hakuna maoni wazi",
+    "noResolved": "Hakuna maoni yaliyotatuliwa"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Maoni ya {{author}}, {{time}}",
+    "commentAriaResolved": "Maoni ya {{author}}, {{time}}, yametatuliwa",
+    "replyAria": "Jibu la {{author}}, {{time}}",
+    "repliesAria": "{{count}} majibu",
+    "edited": "(yamehaririwa)",
+    "emptyComment": "(maoni tupu)",
+    "emptyReply": "(jibu tupu)",
+    "justNow": "Sasa hivi"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Jibu",
+    "showInPage": "Onyesha kwenye ukurasa",
+    "resolve": "Tatua",
+    "reopen": "Fungua tena",
+    "edit": "Hariri"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Jibu..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Hariri maoni"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Futa maoni haya?",
+    "threadConfirm_one": "Futa maoni haya na jibu lake?",
+    "threadConfirm_other": "Futa maoni haya na majibu yake {{count}}?"
   }
 }

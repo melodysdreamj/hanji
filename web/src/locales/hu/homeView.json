@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "Oldal megnyitása",
+  "workspace": "Munkaterület",
+  "emptyWorkspace": "Üres munkaterület",
+  "untitled": "Cím nélkül",
+  "newPage": "Új oldal"
 }

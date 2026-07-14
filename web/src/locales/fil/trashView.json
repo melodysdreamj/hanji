@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Basurahan",
+  "empty": "Dito napupunta ang mga pahinang iyong binubura. Walang laman ang basurahan.",
+  "searchTrash": "Hanapin sa basurahan",
+  "deletedPages": "Mga binurang pahina",
+  "noSearchMatches": "Walang binurang pahina na tugma sa iyong paghahanap.",
+  "pageCount_one": "{{count}} pahina",
+  "pageCount_other": "{{count}} pahina",
+  "deletedJustNow": "Kakabura lang",
+  "deletedOn": "Binura noong {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "I-restore",
+    "deleteForever": "Tanggalin nang permanente",
+    "emptyTrash": "Alisan ng laman ang basurahan"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Buksan ang {{title}} mula sa basurahan",
+    "restorePage": "Ibalik ang {{title}}",
+    "deletePageForever": "Tanggalin nang permanente ang {{title}}",
+    "cancelPermanentDelete": "Kanselahin ang permanenteng pagtanggal",
+    "cancelEmptyTrash": "Kanselahin ang pag-alis ng laman ng basurahan"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Burahin nang permanente?",
+    "deleteBodyPrefix": "Permanente nitong tatanggalin ang ",
+    "deleteBodySuffix": ". Hindi mo ito maaaring i-undo.",
+    "emptyTitle": "Walang lamanin ang basurahan?",
+    "emptyBody_one": "Permanente nitong tatanggalin ang lahat ng {{count}} pahina sa basurahan. Hindi mo ito maaaring i-undo.",
+    "emptyBody_other": "Permanente nitong tatanggalin ang lahat ng {{count}} pahina sa basurahan. Hindi mo ito maaaring i-undo."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Permanenteng binura",
+    "couldntDelete": "Hindi nabura ang pahina",
+    "restored": "Naibalik ang pahina",
+    "couldntRestore": "Hindi naibalik ang pahina",
+    "emptied": "Nawalan ng laman ang basurahan",
+    "couldntEmpty": "Hindi nawalan ng laman ang basurahan"
   }
 }

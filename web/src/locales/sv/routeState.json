@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Adressen är ofullständig.",
+  "invalidBody": "Kontrollera länken för saknade eller felaktiga tecken och försök igen.",
+  "notFoundTitle": "Sidan hittades inte.",
+  "notFoundBody": "Denna adress matchar inte en Hanji-sida. Sidan kan ha flyttats eller inte längre finnas.",
+  "sharedTitle": "Den delade länken är ogiltig.",
+  "sharedBody": "Kontrollera att hela den delade länken kopierades korrekt och försök igen.",
+  "openHome": "Öppna Hanji-hem"
+}

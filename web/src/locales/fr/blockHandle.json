@@ -1,7 +1,7 @@
 {
   "buttons": {
     "addBlockBelow": "Ajouter un bloc en dessous",
-    "dragHint": "Glisser pour déplacer. Cliquer pour ouvrir le menu.",
+    "dragHint": "Faire glisser pour déplacer. Cliquer pour ouvrir le menu.",
     "openBlockActions": "Ouvrir les actions du bloc",
     "closeBlockActions": "Fermer les actions du bloc"
   },
@@ -14,14 +14,14 @@
     "copy": "Copier",
     "copyMany": "Copier {{num}} blocs",
     "copied": "Copié",
-    "copyLinkToBlock": "Copier le lien vers le bloc",
+    "copyLinkToBlock": "Copier le lien du bloc",
     "copiedBlockLink": "Lien du bloc copié",
     "moveTo": "Déplacer vers",
-    "moveToMany": "Déplacer vers {{num}} blocs",
+    "moveToMany": "Déplacer {{num}} blocs",
     "moveUp": "Déplacer vers le haut",
-    "moveUpMany": "Déplacer vers le haut {{num}} blocs",
+    "moveUpMany": "Déplacer {{num}} blocs vers le haut",
     "moveDown": "Déplacer vers le bas",
-    "moveDownMany": "Déplacer vers le bas {{num}} blocs",
+    "moveDownMany": "Déplacer {{num}} blocs vers le bas",
     "comment": "Commenter",
     "commentMany": "Commenter {{num}} blocs",
     "addCaption": "Ajouter une légende",
@@ -37,12 +37,12 @@
   },
   "colorMenu": {
     "textColor": "Couleur du texte",
-    "backgroundColor": "Couleur d'arrière-plan"
+    "backgroundColor": "Couleur de fond"
   },
   "colors": {
     "default": "Par défaut",
     "gray": "Gris",
-    "brown": "Marron",
+    "brown": "Brun",
     "orange": "Orange",
     "yellow": "Jaune",
     "green": "Vert",
@@ -50,15 +50,15 @@
     "purple": "Violet",
     "pink": "Rose",
     "red": "Rouge",
-    "gray_background": "Arrière-plan gris",
-    "brown_background": "Arrière-plan marron",
-    "orange_background": "Arrière-plan orange",
-    "yellow_background": "Arrière-plan jaune",
-    "green_background": "Arrière-plan vert",
-    "blue_background": "Arrière-plan bleu",
-    "purple_background": "Arrière-plan violet",
-    "pink_background": "Arrière-plan rose",
-    "red_background": "Arrière-plan rouge"
+    "gray_background": "Fond gris",
+    "brown_background": "Fond marron",
+    "orange_background": "Fond orange",
+    "yellow_background": "Fond jaune",
+    "green_background": "Fond vert",
+    "blue_background": "Fond bleu",
+    "purple_background": "Fond violet",
+    "pink_background": "Fond rose",
+    "red_background": "Fond rouge"
   },
   "notifications": {
     "duplicatedBlock": "Bloc dupliqué",
@@ -72,7 +72,7 @@
     "copiedToClipboard": "Copié dans le presse-papiers",
     "couldNotCopy": "Impossible de copier",
     "couldNotCopyLink": "Impossible de copier le lien",
-    "clearedColor": "Couleur effacée",
+    "clearedColor": "Couleur supprimée",
     "changedColor": "Couleur modifiée",
     "changedBlockType": "Type de bloc modifié"
   },
@@ -83,10 +83,10 @@
     "title": "Déplacer {{num}} blocs vers"
   },
   "edited": {
-    "justNow": "Dernière modification à l'instant",
-    "minutesAgo": "Dernière modification il y a {{minutes}} min",
-    "hoursAgo": "Dernière modification il y a {{hours}} h",
-    "daysAgo": "Dernière modification il y a {{days}} j",
-    "on": "Dernière modification le {{date}}"
+    "justNow": "Modifié à l'instant",
+    "minutesAgo": "Modifié il y a {{minutes}}m",
+    "hoursAgo": "Modifié il y a {{hours}}h",
+    "daysAgo": "Modifié il y a {{days}}j",
+    "on": "Modifié le {{date}}"
   }
 }

@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "બ્લોક આદેશો",
+  "closeBlockCommands": "બ્લોક આદેશો બંધ કરો",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "મૂળભૂત બ્લોક",
+    "Media": "મીડિયા",
+    "Database": "ડેટાબેઝ",
+    "Advanced": "અદ્યતન બ્લોક"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}}માંથી {{position}}. દાખલ કરવા Enter દબાવો.",
+  "listStatus": "{{total}} બ્લોક આદેશો ઉપલબ્ધ છે.",
+  "noBlocks": "બ્લોક મળ્યા નથી",
+  "noBlocksFor": "\"{{query}}\" માટે કોઈ બ્લોક મળ્યા નથી",
+  "recentlyUsed": "તાજેતરમાં વપરાયેલ"
 }

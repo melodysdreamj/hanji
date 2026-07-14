@@ -1,20 +1,20 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Pag-format ng teksto"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Gawing",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
+      "text": "Teksto",
+      "heading1": "Pamagat 1",
+      "heading2": "Pamagat 2",
+      "heading3": "Pamagat 3",
+      "heading4": "Pamagat 4",
+      "toDoList": "Listahan ng dapat gawin",
       "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
+      "numberedList": "Listahang may bilang",
       "toggleList": "Toggle list",
-      "quote": "Quote",
+      "quote": "Sipi",
       "callout": "Callout",
       "code": "Code"
     }
@@ -28,49 +28,49 @@
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Komento"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Kulay ng teksto: {{color}}",
+    "title": "Kulay: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Halo",
     "text": {
-      "heading": "Text color",
+      "heading": "Kulay ng teksto",
       "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "gray": "Abuhin",
+      "brown": "Kayumanggi",
+      "orange": "Kahel",
+      "yellow": "Dilaw",
+      "green": "Berde",
+      "blue": "Asul",
+      "purple": "Lila",
+      "pink": "Rosas",
+      "red": "Pula"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Kulay ng background",
+      "gray": "Kulay abong background",
+      "brown": "Kayumangging background",
+      "orange": "Kahel na background",
+      "yellow": "Dilaw na background",
+      "green": "Berdeng background",
+      "blue": "Asul na background",
+      "purple": "Lilang background",
+      "pink": "Rosas na background",
+      "red": "Pulang background"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
+    "ariaLabel": "I-edit ang link",
+    "placeholder": "I-paste ang link",
+    "urlAriaLabel": "URL ng link",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Buksan ang link",
+    "copy": "Kopyahin ang link",
+    "copied": "Nakopya",
+    "copiedLink": "Nakopya ang link",
+    "remove": "Alisin"
   }
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "ஐகான் தேர்வியை மூடு",
+    "label": "ஐகான் தேர்வு"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "ஐகான் வகை",
+    "emoji": "எமோஜி",
+    "image": "படம்"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "அகற்று",
+    "ariaLabel": "ஐகானை அகற்று"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "வடிகட்டு…",
+    "searchLabel": "ஐகான் தேடல்",
+    "random": "சீரற்ற",
+    "randomLabel": "சீரற்ற ஐகானைத் தேர்ந்தெடு",
+    "recentLabel": "சமீபத்தில் பயன்படுத்தியவை முதலில்",
+    "gridLabelRecent": "ஐகான்கள், சமீபத்தில் பயன்படுத்தியவை முதலில்",
+    "gridLabel": "ஐகான்கள்",
+    "optionLabel": "{{emoji}} ஐகானைத் தேர்ந்தெடு",
+    "noResults": "“{{query}}” உடன் பொருந்தும் ஐகான்கள் எதுவும் இல்லை. வேறு வார்த்தையை முயற்சிக்கவும் அல்லது வடிப்பானை அழிக்கவும்."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "படம்",
+    "linkPlaceholder": "பட இணைப்பை ஒட்டவும்",
+    "linkLabel": "பட ஐகான் இணைப்பு",
+    "apply": "பயன்படுத்து",
+    "upload": "கோப்பைப் பதிவேற்று",
+    "uploading": "பதிவேற்றுகிறது...",
+    "uploadingLabel": "{{fileName}} பதிவேற்றுகிறது",
+    "uploadFailed": "அந்தப் படத்தைப் பதிவேற்ற முடியவில்லை.",
+    "fallbackFileName": "ஐகான் படம்"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "பதிவேற்றத் தயாரிப்பு",
+    "finalizing": "இறுதியாக்குகிறது",
+    "complete": "நிறைவு",
+    "uploading": "பதிவேற்றுகிறது"
   }
 }

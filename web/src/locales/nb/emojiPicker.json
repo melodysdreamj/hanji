@@ -1,43 +1,43 @@
 {
+  "custom": {
+    "apply": "Bruk",
+    "fallbackFileName": "Ikonbilde",
+    "linkLabel": "Ikonbildelenke",
+    "linkPlaceholder": "Lim inn bildelenke",
+    "previewPlaceholder": "Bilde",
+    "upload": "Last opp fil",
+    "uploadFailed": "Kunne ikke laste opp bildet.",
+    "uploading": "Laster opp...",
+    "uploadingLabel": "Laster opp {{fileName}}"
+  },
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
-  },
-  "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
-  },
-  "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "backdropLabel": "Lukk ikonvelger",
+    "label": "Velg ikon"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "gridLabel": "Ikoner",
+    "gridLabelRecent": "Ikoner, sist brukt først",
+    "noResults": "Ingen ikoner matcher “{{query}}”. Prøv et annet ord eller fjern filteret.",
+    "optionLabel": "Velg {{emoji}}-ikon",
+    "random": "Tilfeldig",
+    "randomLabel": "Velg et tilfeldig ikon",
+    "recentLabel": "Nylig brukt først",
+    "searchLabel": "Søk ikoner",
+    "searchPlaceholder": "Filter…"
   },
-  "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+  "remove": {
+    "ariaLabel": "Fjern ikon",
+    "label": "Fjern"
+  },
+  "tabs": {
+    "emoji": "Emoji",
+    "groupLabel": "Ikon type",
+    "image": "Bilde"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "complete": "Fullført",
+    "finalizing": "Fullfører",
+    "preparing": "Forbereder opplasting",
+    "uploading": "Laster opp"
   }
 }

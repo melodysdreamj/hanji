@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "బ్లాక్ తరలింపు",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "తరలింపు గమ్యస్థానాలను శోధించండి",
+    "placeholder": "పేజీలను శోధించండి..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "తరలింపు డైలాగ్ మూసివేయండి"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "తరలింపు గమ్యస్థానాలు",
+    "empty": "పేజీలు ఏవీ కనుగొనబడలేదు.",
+    "destinationLabel": "బ్లాక్‌ను {{label}}కి తరలించండి, {{path}}"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "సృష్టించండి \"{{query}}\"",
+    "optionLabel": "\"{{query}}\" పేజీని సృష్టించి, బ్లాక్‌ను ఇక్కడికి తరలించండి",
+    "hint": "కొత్త పేజీ - బ్లాక్‌ను ఇక్కడికి తరలించండి"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "లాక్ చేయబడిన పేజీ"
   },
-  "untitled": "Untitled",
+  "untitled": "పేరు లేని",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "పేజీ లాక్ చేయబడింది",
+    "movedBlock": "బ్లాక్ తరలించబడింది",
+    "movedBlocks": "బ్లాక్‌లు తరలించబడ్డాయి",
+    "movedBlocksCount": "{{blockCount}} బ్లాక్‌లు తరలించబడ్డాయి",
+    "moveFailed": "బ్లాక్‌ను తరలించలేకపోయింది"
   }
 }

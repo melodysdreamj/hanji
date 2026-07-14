@@ -245,7 +245,7 @@ export interface InstanceBootstrapStatus {
   masterReady: boolean;
   setupBlocked: boolean;
   setupAvailable: boolean;
-  setupCodeRequired: boolean;
+  setupAuthorizationRequired: boolean;
   setupInProgress: boolean;
 }
 
@@ -254,10 +254,15 @@ export interface InstanceBootstrapStatus {
  * master-account ensure. Returns null on any failure so the sign-in screen
  * degrades to its normal form instead of blocking on this probe.
  */
-export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapStatus | null> {
+export async function fetchInstanceBootstrapRemote(
+  setupToken?: string,
+): Promise<InstanceBootstrapStatus | null> {
   try {
     const response = await fetch(`${EDGEBASE_URL}/api/functions/instance-bootstrap`, {
-      headers: { Accept: "application/json" },
+      headers: {
+        Accept: "application/json",
+        ...(setupToken ? { "X-Hanji-Setup-Token": setupToken } : {}),
+      },
       cache: "no-store",
     });
     if (!response.ok) return null;
@@ -267,7 +272,7 @@ export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapS
       masterReady: json.masterReady === true,
       setupBlocked: json.setupBlocked === true,
       setupAvailable: json.setupAvailable === true,
-      setupCodeRequired: json.setupCodeRequired === true,
+      setupAuthorizationRequired: json.setupAuthorizationRequired === true,
       setupInProgress: json.setupInProgress === true,
     };
   } catch {
@@ -276,17 +281,23 @@ export async function fetchInstanceBootstrapRemote(): Promise<InstanceBootstrapS
 }
 
 export interface InitializeInstanceInput {
-  setupCode: string;
   email: string;
   password: string;
   displayName?: string;
 }
 
-/** Complete the one-time, setup-code-protected first administrator claim. */
-export async function initializeInstanceRemote(input: InitializeInstanceInput): Promise<void> {
+/** Complete the one-time, durable first-administrator claim. */
+export async function initializeInstanceRemote(
+  input: InitializeInstanceInput,
+  setupToken?: string,
+): Promise<void> {
   const response = await fetch(`${EDGEBASE_URL}/api/functions/instance-bootstrap`, {
     method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(setupToken ? { "X-Hanji-Setup-Token": setupToken } : {}),
+    },
     cache: "no-store",
     body: JSON.stringify({ action: "completeSetup", ...input }),
   });
@@ -310,6 +321,38 @@ export async function fetchMustChangePasswordRemote(): Promise<boolean> {
 
 export async function clearMustChangePasswordRemote(): Promise<void> {
   await getClient().functions.post("account-state", { action: "clearMustChangePassword" });
+}
+
+export interface AccountLanguageState {
+  languagePreference: string | null;
+  languageOnboardingCompleted: boolean;
+}
+
+/** Durable language preference for the current authenticated account. */
+export async function fetchAccountLanguageStateRemote(): Promise<AccountLanguageState> {
+  const result = await getClient().functions.post<{
+    languagePreference?: unknown;
+    languageOnboardingCompleted?: unknown;
+  }>("account-state", { action: "get" });
+  return {
+    languagePreference:
+      typeof result?.languagePreference === "string" ? result.languagePreference : null,
+    languageOnboardingCompleted: result?.languageOnboardingCompleted === true,
+  };
+}
+
+export async function saveAccountLanguagePreferenceRemote(
+  languagePreference: string,
+): Promise<AccountLanguageState> {
+  const result = await getClient().functions.post<{
+    languagePreference?: unknown;
+    languageOnboardingCompleted?: unknown;
+  }>("account-state", { action: "setLanguagePreference", languagePreference });
+  return {
+    languagePreference:
+      typeof result?.languagePreference === "string" ? result.languagePreference : null,
+    languageOnboardingCompleted: result?.languageOnboardingCompleted === true,
+  };
 }
 
 export interface SponsorEntry {
@@ -481,6 +524,18 @@ export function subscribeAuthStateRemote(listener: (userId: string) => void): ()
 
 export function currentUserId(): string {
   return ((getClient().auth.currentUser as { id?: string } | null)?.id ?? "").trim();
+}
+
+export function currentUserIsAnonymous(): boolean {
+  return (getClient().auth.currentUser as { isAnonymous?: boolean } | null)?.isAnonymous === true;
+}
+
+/**
+ * Non-secret, non-authoritative cookie-session hint for selecting the matching
+ * account-scoped local cache before the online refresh finishes.
+ */
+export function currentSessionUserIdHint(): string {
+  return (getClient().auth.sessionUserIdHint ?? "").trim();
 }
 
 export function currentUserEmail(): string {
@@ -1068,6 +1123,27 @@ export async function updateWorkspaceRemote(
   return result.workspace;
 }
 
+/** Atomically claims the one-time first-admin Notion import prompt. */
+export async function claimNotionImportOnboardingRemote(
+  workspaceId: string,
+): Promise<{ show: boolean }> {
+  const result = await getClient().functions.post<{ show?: unknown }>("workspace-mutation", {
+    action: "claimNotionImportOnboarding",
+    workspaceId,
+  });
+  return { show: result?.show === true };
+}
+
+/** Suppress the prompt when workspace creation already asked how to start. */
+export async function suppressNotionImportOnboardingRemote(
+  workspaceId: string,
+): Promise<void> {
+  await getClient().functions.post("workspace-mutation", {
+    action: "suppressNotionImportOnboarding",
+    workspaceId,
+  });
+}
+
 export interface CreateWorkspaceInput {
   name: string;
   icon?: string | null;
@@ -1331,6 +1407,8 @@ export interface ApplyNotionImportJobInput {
   notionToken?: string;
   connectionId?: string;
   importPagesFullWidth?: boolean;
+  applyPageBatchSize?: number;
+  applyDatabaseBatchSize?: number;
 }
 
 export interface NotionImportAppliedMapping {
@@ -1342,11 +1420,13 @@ export interface NotionImportAppliedMapping {
 export async function applyNotionImportJobRemote(input: string | ApplyNotionImportJobInput): Promise<NotionImportJobResult & {
   applied?: Record<string, number>;
   mappings?: NotionImportAppliedMapping[];
+  partial?: boolean;
 }> {
   const body = typeof input === "string" ? { jobId: input } : input;
   return getClient().functions.post<NotionImportJobResult & {
     applied?: Record<string, number>;
     mappings?: NotionImportAppliedMapping[];
+    partial?: boolean;
   }>("notion-import", {
     action: "apply",
     ...body,
@@ -2113,6 +2193,7 @@ export interface SharedPageResult {
   templates: DbTemplate[];
   navigablePageIds?: string[];
   shareLink: Pick<ShareLink, "enabled" | "role" | "expiresAt">;
+  snapshotVersion?: string;
 }
 
 export interface PageBlocksResult {
@@ -2592,10 +2673,50 @@ export async function getPageAccessRemote(pageId: string): Promise<PageAccessRes
 }
 
 export async function getSharedPageRemote(token: string): Promise<SharedPageResult> {
-  return getClient().functions.post<SharedPageResult>("share-mutation", {
+  const cacheKey = `hanji:public-share-snapshot:${token}`;
+  let cached: { cachedAt: number; snapshot: SharedPageResult } | undefined;
+  try {
+    const raw = window.sessionStorage.getItem(cacheKey);
+    if (raw) {
+      const parsed = JSON.parse(raw) as typeof cached;
+      if (parsed?.snapshot?.page?.id && typeof parsed.cachedAt === "number") cached = parsed;
+    }
+  } catch {
+    // Storage is an optimization only; public authorization remains remote.
+  }
+  // Signed file URLs last 15 minutes. Only reuse a confirmed snapshot inside
+  // a shorter window so its capabilities cannot expire underneath the page.
+  const reusable = cached && Date.now() - cached.cachedAt < 5 * 60_000 ? cached : undefined;
+  type ConditionalSharedPageResult =
+    | SharedPageResult
+    | { notModified: true; snapshotVersion: string };
+  let result = await getClient().functions.post<ConditionalSharedPageResult>("share-mutation", {
     action: "publicPage",
     token,
+    ...(reusable?.snapshot.snapshotVersion
+      ? { snapshotVersion: reusable.snapshot.snapshotVersion }
+      : {}),
   });
+  if ("notModified" in result) {
+    if (reusable) return reusable.snapshot;
+    // A storage race removed the local body after the conditional request.
+    // Retry unconditionally instead of rendering an incomplete snapshot.
+    result = await getClient().functions.post<SharedPageResult>("share-mutation", {
+      action: "publicPage",
+      token,
+    });
+  }
+  if (result.snapshotVersion) {
+    try {
+      window.sessionStorage.setItem(
+        cacheKey,
+        JSON.stringify({ cachedAt: Date.now(), snapshot: result })
+      );
+    } catch {
+      // Quota/privacy mode does not affect correctness.
+    }
+  }
+  return result;
 }
 
 export async function setPageWebSharingRemote(
@@ -2839,6 +2960,8 @@ export interface CreateDatabaseRowInput {
 
 export interface CreateDatabaseInput {
   id?: string;
+  /** Client-generated starter view id for local-first optimistic creation. */
+  viewId?: string;
   workspaceId: string;
   parentId?: string | null;
   parentType?: PageParentType;

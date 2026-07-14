@@ -1,5 +1,5 @@
 {
-  "empty": "Aucune conversation pour le moment. Commentez une page ou mentionnez quelqu'un pour en démarrer une.",
+  "empty": "Pas encore de conversations. Commentez une page ou mentionnez quelqu'un pour en commencer une.",
   "leave": "Quitter",
   "leaveAria": "Quitter la conversation sur {{title}}",
   "open": "Ouvrir la conversation sur {{title}}",

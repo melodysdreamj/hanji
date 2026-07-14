@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "dateAt": "{{date}} klo {{time}}",
+  "editedDaysAgo": "Muokattu {{days}} pv sitten",
+  "editedHoursAgo": "Muokattu {{hours}} t sitten",
+  "editedJustNow": "Muokattu juuri",
+  "editedMinutesAgo": "Muokattu {{minutes}} min sitten",
+  "editedOn": "Muokattu {{date}}",
+  "justNow": "Äsken",
+  "noEdits": "Ei muokkauksia",
+  "noEditsYet": "Ei vielä muokkauksia",
+  "todayAt": "Tänään klo {{time}}",
+  "yesterdayAt": "Eilen klo {{time}}"
 }

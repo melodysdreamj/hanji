@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Току-що",
+  "editedJustNow": "Редактирано току-що",
+  "editedMinutesAgo": "Редактирано преди {{minutes}} мин",
+  "editedHoursAgo": "Редактирано преди {{hours}} ч",
+  "editedDaysAgo": "Редактирано преди {{days}} д",
+  "editedOn": "Редактирано на {{date}}",
+  "noEdits": "Няма редакции",
+  "noEditsYet": "Все още няма редакции",
+  "todayAt": "Днес в {{time}}",
+  "yesterdayAt": "Вчера в {{time}}",
+  "dateAt": "{{date}} в {{time}}"
 }

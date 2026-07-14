@@ -1,0 +1,15 @@
+{
+  "thanksSponsor": "<a>{{name}}</a> borg Hanji soos dit groei.",
+  "builtWith": "<a>{{name}}</a> help om Hanji te bou.",
+  "supportTitle": "Ondersteun Hanji",
+  "settingsIntro": "Hanji word deur sy borge onderhou. Die aanmeldskerm wys 'n klein banier met die huidige top vyf borge.",
+  "rule1": "Die banier wys die top vyf borge volgens oorblywende saldo.",
+  "rule2": "Een keer per maand word elke vertoonde borg se saldo verminder met wat die vyfde-plek borg het, sodat al vyf vertoonde borge dieselfde billike koers betaal.",
+  "rule3": "Wanneer 'n saldo opraak, gaan die plek oor na die volgende borg volgens saldo.",
+  "rule4": "Om die banier by verstek geaktiveer te hou, verleen Hanji se lisensie-uitsondering; 'n geslote, banierlose weergawe benodig 'n aparte kommersiële lisensie.",
+  "sponsorSlots": "Huidige borge",
+  "emptySlot": "Oop plek — borg om hier te verskyn",
+  "becomeSponsor": "Word 'n borg",
+  "builtWithTitle": "Gebou met",
+  "builtWithIntro": "Hanji is gebou met die hulp van hierdie gereedskap en platforms."
+}

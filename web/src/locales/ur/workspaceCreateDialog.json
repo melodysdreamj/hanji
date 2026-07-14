@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "نیا ورک اسپیس",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "ورکسپیس کا نام",
+    "placeholder": "آپ کی کمپنی"
   },
-  "startLabel": "Start from",
+  "startLabel": "شروع کریں",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "خالی ورک اسپیس",
+      "body": "ابتدائی صفحات کے ساتھ خالی شروع کریں۔"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion سے درآمد",
+      "body": "ورک اسپیس بنائیں، پھر ایک Notion ورک اسپیس کو اس میں منتقل کریں۔"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "دوسرے Hanji سے درآمد",
+      "body": "ورک اسپیس بنائیں، پھر کسی دوسرے Hanji سرور یا فائل سے ورک اسپیس درآمد کریں۔"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "ورکسپیس بنائیں",
+  "creating": "بن رہا ہے…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "ورکسپیس تخلیق نہ ہو سکی"
   }
 }

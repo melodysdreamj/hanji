@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blok komutları",
+  "closeBlockCommands": "Blok komutlarını kapat",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Temel bloklar",
+    "Media": "Medya",
+    "Database": "Veritabanı",
+    "Advanced": "Gelişmiş bloklar"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{total}} öğeden {{position}}. Eklemek için Enter'a basın.",
+  "listStatus": "{{total}} blok komutu mevcut.",
+  "noBlocks": "Blok bulunamadı.",
+  "noBlocksFor": "\"{{query}}\" için blok bulunamadı",
+  "recentlyUsed": "Son kullanılan"
 }

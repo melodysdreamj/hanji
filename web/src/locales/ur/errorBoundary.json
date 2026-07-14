@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "یہ مواد دکھانے میں خرابی پیش آگئی۔",
+  "detail": "دوبارہ کوشش کریں۔ اگر مسئلہ برقرار رہے تو، ایپ کو دوبارہ لوڈ کریں اور نیچے دیا گیا حوالہ نمبر شیئر کریں۔",
+  "reference": "حوالہ: {{reference}}",
+  "reload": "دوبارہ لوڈ کریں",
+  "retry": "دوبارہ کوشش کریں"
 }

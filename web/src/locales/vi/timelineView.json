@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Thêm thuộc tính ngày",
+    "description": "Chế độ xem dòng thời gian cần thuộc tính ngày bắt đầu để hiển thị các trang trên dòng thời gian."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Thêm thuộc tính ngày kết thúc để hiển thị các khoảng thay vì các thanh một ngày.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Thu phóng dòng thời gian",
+    "day": "Ngày",
+    "week": "Tuần",
+    "month": "Tháng"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Phụ thuộc:",
+    "hint": "thêm thuộc tính quan hệ",
+    "relationPropertyAriaLabel": "Thuộc tính quan hệ phụ thuộc"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Hôm nay",
+    "previousRange": "Khoảng trước",
+    "nextRange": "Khoảng tiếp theo",
+    "newPage": "Mới",
+    "newPageIn": "Trang mới trong {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Bảng dòng thời gian",
+    "nameHeader": "Tên"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Mở {{title}}",
+    "openAriaLabelWithDates": "Mở {{title}}, {{start}} đến {{end}}",
+    "openNoDateAriaLabel": "Mở {{title}}, không có ngày"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Không có mục nào trong khoảng này.",
+    "noDatedItems": "Chưa có mục có ngày.",
+    "jumpTo": "Đi tới {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Không có ngày ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Không",
+    "untitled": "Chưa có tiêu đề"
   }
 }

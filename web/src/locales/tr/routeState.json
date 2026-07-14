@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Bağlantıyı eksik veya hatalı karakterler için kontrol edip tekrar deneyin.",
+  "invalidTitle": "Bu adres eksik.",
+  "notFoundBody": "Bu adres bir Hanji sayfasıyla eşleşmiyor. Sayfa taşınmış veya artık mevcut olmayabilir.",
+  "notFoundTitle": "Sayfa bulunamadı.",
+  "openHome": "Hanji ana sayfasını aç",
+  "sharedBody": "Paylaşılan bağlantının tamamının doğru kopyalandığını kontrol edip tekrar deneyin.",
+  "sharedTitle": "Bu paylaşılan bağlantı geçersiz."
+}

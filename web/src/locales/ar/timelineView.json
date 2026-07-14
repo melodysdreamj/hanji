@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "أضف خاصية تاريخ",
+    "description": "يتطلب عرض الجدول الزمني خاصية تاريخ البدء لعرض الصفحات عبر الزمن."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "أضف خاصية تاريخ الانتهاء لعرض الفترات بدلاً من أشرطة اليوم الواحد.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "تكبير/تصغير الجدول الزمني",
+    "day": "يوم",
+    "week": "أسبوع",
+    "month": "شهر"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "التبعيات:",
+    "hint": "أضف خاصية علاقة",
+    "relationPropertyAriaLabel": "خاصية علاقة التبعية"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "اليوم",
+    "previousRange": "النطاق السابق",
+    "nextRange": "النطاق التالي",
+    "newPage": "جديد",
+    "newPageIn": "صفحة جديدة في {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "جدول زمني",
+    "nameHeader": "الاسم"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "فتح {{title}}",
+    "openAriaLabelWithDates": "فتح {{title}}، من {{start}} إلى {{end}}",
+    "openNoDateAriaLabel": "فتح {{title}}، بدون تاريخ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "لا توجد عناصر في هذا النطاق.",
+    "noDatedItems": "لا توجد عناصر مؤرخة بعد.",
+    "jumpTo": "الانتقال إلى {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "بدون تاريخ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "لا شيء",
+    "untitled": "بدون عنوان"
   }
 }

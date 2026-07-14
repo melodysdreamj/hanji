@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "จัดรูปแบบข้อความ"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "แปลงเป็น",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "ข้อความ",
+      "heading1": "หัวข้อ 1",
+      "heading2": "หัวข้อ 2",
+      "heading3": "หัวข้อ 3",
+      "heading4": "หัวข้อ 4",
+      "toDoList": "สิ่งที่ต้องทำ",
+      "bulletedList": "รายการสัญลักษณ์",
+      "numberedList": "รายการลำดับเลข",
+      "toggleList": "รายการสลับ",
+      "quote": "คำพูด",
+      "callout": "คำอธิบาย",
+      "code": "โค้ด"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "ตัวหนา",
+    "italic": "ตัวเอียง",
+    "underline": "ขีดเส้นใต้",
+    "strikethrough": "ขีดทับ",
+    "code": "โค้ด",
+    "link": "ลิงก์"
   },
   "comment": {
-    "label": "Comment"
+    "label": "ความคิดเห็น"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "สีข้อความ: {{color}}",
+    "title": "สี: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "ผสม",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "สีข้อความ",
+      "default": "ค่าเริ่มต้น",
+      "gray": "สีเทา",
+      "brown": "สีน้ำตาล",
+      "orange": "สีส้ม",
+      "yellow": "สีเหลือง",
+      "green": "สีเขียว",
+      "blue": "น้ำเงิน",
+      "purple": "สีม่วง",
+      "pink": "สีชมพู",
+      "red": "สีแดง"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "สีพื้นหลัง",
+      "gray": "พื้นหลังสีเทา",
+      "brown": "พื้นหลังสีน้ำตาล",
+      "orange": "พื้นหลังสีส้ม",
+      "yellow": "พื้นหลังสีเหลือง",
+      "green": "พื้นหลังสีเขียว",
+      "blue": "พื้นหลังสีน้ำเงิน",
+      "purple": "พื้นหลังสีม่วง",
+      "pink": "พื้นหลังสีชมพู",
+      "red": "พื้นหลังสีแดง"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "แก้ไขลิงก์",
+    "placeholder": "วางลิงก์",
+    "urlAriaLabel": "URL ลิงก์",
+    "apply": "ลิงก์",
+    "open": "เปิดลิงก์",
+    "copy": "คัดลอกลิงก์",
+    "copied": "คัดลอกแล้ว",
+    "copiedLink": "คัดลอกลิงก์แล้ว",
+    "remove": "ลบ"
   }
 }

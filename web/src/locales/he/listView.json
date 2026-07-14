@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "במסד הנתונים הזה אין עדיין דפים.",
+  "emptyTitle": "עדיין אין דפים",
+  "newInline": "חדש",
+  "newPage": "דף חדש",
+  "newPageIn": "דף חדש ב{{dbTitle}}",
+  "noResultsDesc": "אין דפים התואמים את המסננים או החיפוש הנוכחיים.",
+  "noResultsTitle": "אין תוצאות",
+  "openRow": "פתח את {{title}}"
 }

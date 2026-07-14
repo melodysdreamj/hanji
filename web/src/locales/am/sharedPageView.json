@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "tryAgain": "እንደገና ይሞክሩ",
+  "errors": {
+    "not-found": "ይህ አገናኝ ጊዜው ያለፈበት፣ ያልታተመ፣ ወይም በተሳሳተ መንገድ የተቀዳ ሊሆን ይችላል።",
+    "rate-limited": "ይህ የተጋራ ገፅ በጣም ብዙ ጥያቄዎችን እየተቀበለ ነው። ትንሽ ቆይተው እንደገና ይሞክሩ።",
+    "offline": "ግንኙነትዎን ያረጋግጡ፣ ከዚያም የተጋራውን ገፅ እንደገና ለመክፈት ይሞክሩ።",
+    "unavailable": "Hanji ይህን የተጋራ ገፅ አሁን ሊከፍተው አልቻለም። ትንሽ ቆይተው እንደገና ይሞክሩ።"
+  },
+  "title": "የተጋራ ገፅ",
+  "loading": "የተጋራ ገፅን በመጫን ላይ",
+  "unavailable": "ይህ የተጋራ ገፅ አይገኝም።",
+  "notFound": "የተጋራ ገፅ አልተገኘም።",
+  "outsideShare": "ገፁ የዚህ የህዝብ መጋሪያ አካል አይደለም።"
 }

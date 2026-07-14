@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "പേജ് പുനഃസ്ഥാപിക്കാൻ കഴിഞ്ഞില്ല",
+  "emptyBodyPrompt": "ഈ ശൂന്യമായ പേജിൽ എഴുതാൻ Enter അമർത്തുക.",
+  "inTrashTopBarTitle": "ട്രാഷിൽ",
+  "notFoundTopBarTitle": "കണ്ടെത്തിയില്ല",
+  "openWorkspace": "വർക്ക്സ്പേസ് തുറക്കുക",
+  "pageInTrash": "ഈ പേജ് ട്രാഷിൽ ആണ്.",
+  "pageInTrashDetail": "ഇതിന്റെ ഉള്ളടക്കം തുറക്കുന്നതിനോ എഡിറ്റ് ചെയ്യുന്നതിനോ മുമ്പ് ഇത് പുനഃസ്ഥാപിക്കുക.",
+  "pageUnavailable": "പേജ് ലഭ്യമല്ല.",
+  "pageUnavailableDetail": "ഈ പേജ് ഇല്ലാതാക്കിയതോ, നീക്കിയതോ, അല്ലെങ്കിൽ മറ്റൊരു അക്കൗണ്ടുമായി പങ്കിട്ടതോ ആയിരിക്കാം.",
+  "restorePage": "പേജ് പുനഃസ്ഥാപിക്കുക",
+  "restoredPage": "പേജ് പുനഃസ്ഥാപിച്ചു",
+  "loadingPageContent": "പേജ് ഉള്ളടക്കം ലോഡ് ചെയ്യുന്നു"
 }

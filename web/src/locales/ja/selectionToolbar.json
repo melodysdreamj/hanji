@@ -1,6 +1,6 @@
 {
   "toolbar": {
-    "ariaLabel": "テキストの書式設定"
+    "ariaLabel": "テキスト書式設定"
   },
   "turnInto": {
     "label": "変換",
@@ -10,7 +10,7 @@
       "heading2": "見出し2",
       "heading3": "見出し3",
       "heading4": "見出し4",
-      "toDoList": "To-doリスト",
+      "toDoList": "ToDoリスト",
       "bulletedList": "箇条書きリスト",
       "numberedList": "番号付きリスト",
       "toggleList": "トグルリスト",
@@ -21,7 +21,7 @@
   },
   "marks": {
     "bold": "太字",
-    "italic": "イタリック",
+    "italic": "斜体",
     "underline": "下線",
     "strikethrough": "取り消し線",
     "code": "コード",
@@ -31,35 +31,35 @@
     "label": "コメント"
   },
   "colorButton": {
-    "ariaLabel": "テキストカラー: {{color}}",
-    "title": "カラー: {{color}}"
+    "ariaLabel": "文字色: {{color}}",
+    "title": "色: {{color}}"
   },
   "colors": {
-    "mixed": "混在",
+    "mixed": "混合",
     "text": {
-      "heading": "テキストカラー",
+      "heading": "テキスト色",
       "default": "デフォルト",
       "gray": "グレー",
-      "brown": "ブラウン",
+      "brown": "茶色",
       "orange": "オレンジ",
-      "yellow": "イエロー",
-      "green": "グリーン",
-      "blue": "ブルー",
-      "purple": "パープル",
+      "yellow": "黄",
+      "green": "緑",
+      "blue": "青",
+      "purple": "紫",
       "pink": "ピンク",
-      "red": "レッド"
+      "red": "赤"
     },
     "background": {
       "heading": "背景色",
-      "gray": "グレー背景",
-      "brown": "ブラウン背景",
-      "orange": "オレンジ背景",
-      "yellow": "イエロー背景",
-      "green": "グリーン背景",
-      "blue": "ブルー背景",
-      "purple": "パープル背景",
-      "pink": "ピンク背景",
-      "red": "レッド背景"
+      "gray": "灰色の背景",
+      "brown": "茶色の背景",
+      "orange": "オレンジの背景",
+      "yellow": "黄色の背景",
+      "green": "緑の背景",
+      "blue": "青の背景",
+      "purple": "紫の背景",
+      "pink": "ピンクの背景",
+      "red": "赤の背景"
     }
   },
   "linkEditor": {
@@ -69,7 +69,7 @@
     "apply": "リンク",
     "open": "リンクを開く",
     "copy": "リンクをコピー",
-    "copied": "コピーしました",
+    "copied": "コピー済み",
     "copiedLink": "リンクをコピーしました",
     "remove": "削除"
   }

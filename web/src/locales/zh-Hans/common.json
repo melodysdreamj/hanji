@@ -15,7 +15,7 @@
   },
   "generated": {
     "copyName": "{{name}} 副本",
-    "columnName": "第 {{number}} 列",
+    "columnName": "列 {{number}}",
     "importedDatabase": "导入的数据库",
     "uploadedFile": "上传的文件",
     "image": "图片",
@@ -28,7 +28,7 @@
     "statusOptions": {
       "todo": "未开始",
       "doing": "进行中",
-      "done": "已完成"
+      "done": "完成"
     },
     "selectOptions": {
       "first": "选项 1",

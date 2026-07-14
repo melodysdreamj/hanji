@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Kôš",
+  "empty": "Odstránené stránky sa zobrazia tu. Kôš je prázdny.",
+  "searchTrash": "Hľadať v koši",
+  "deletedPages": "Odstránené stránky",
+  "noSearchMatches": "Vyhľadávaniu nezodpovedajú žiadne odstránené stránky.",
+  "pageCount_one": "{{count}} stránka",
+  "pageCount_other": "{{count}} stránok",
+  "deletedJustNow": "Práve odstránené",
+  "deletedOn": "Odstránené {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Obnoviť",
+    "deleteForever": "Natrvalo odstrániť",
+    "emptyTrash": "Vyprázdniť kôš"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Otvoriť {{title}} z koša",
+    "restorePage": "Obnoviť {{title}}",
+    "deletePageForever": "Natrvalo odstrániť {{title}}",
+    "cancelPermanentDelete": "Zrušiť trvalé odstránenie",
+    "cancelEmptyTrash": "Zrušiť vyprázdňovanie koša"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Odstrániť natrvalo?",
+    "deleteBodyPrefix": "Toto natrvalo odstráni ",
+    "deleteBodySuffix": ". Túto akciu nemožno vrátiť späť.",
+    "emptyTitle": "Vyprázdniť kôš?",
+    "emptyBody_one": "Toto natrvalo odstráni {{count}} stránku v koši. Túto akciu nemožno vrátiť späť.",
+    "emptyBody_other": "Toto natrvalo odstráni {{count}} stránok v koši. Túto akciu nemožno vrátiť späť."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Natrvalo odstránené",
+    "couldntDelete": "Nepodarilo sa odstrániť stránku",
+    "restored": "Obnovená stránka",
+    "couldntRestore": "Nepodarilo sa obnoviť stránku",
+    "emptied": "Kôš vyprázdnený",
+    "couldntEmpty": "Nepodarilo sa vyprázdniť kôš"
   }
 }

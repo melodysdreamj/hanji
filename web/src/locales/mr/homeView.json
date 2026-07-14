@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "पृष्ठ उघडत आहे",
+  "workspace": "कार्यक्षेत्र",
+  "emptyWorkspace": "रिक्त कार्यक्षेत्र",
+  "untitled": "शीर्षकहीन",
+  "newPage": "नवीन पृष्ठ"
 }

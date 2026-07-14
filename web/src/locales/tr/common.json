@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "close": "Kapat",
+    "search": "Ara",
+    "create": "Oluştur",
+    "delete": "Sil",
+    "clearAll": "Tümünü temizle",
+    "done": "Bitti",
+    "add": "Ekle"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Başlıksız"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} kopyası",
+    "columnName": "Sütun {{number}}",
+    "importedDatabase": "İçe aktarılan veritabanı",
+    "uploadedFile": "Yüklenen dosya",
+    "image": "Görsel",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Ad",
+      "status": "Durum",
+      "select": "Seçim",
+      "date": "Tarih"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Başlanmadı",
+      "doing": "Devam ediyor",
+      "done": "Tamamlandı"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Seçenek 1",
+      "second": "Seçenek 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tablo"
     }
   }
 }

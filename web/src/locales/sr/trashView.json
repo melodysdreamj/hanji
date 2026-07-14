@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Корпа",
+  "empty": "Странице које избришете завршавају овде. Корпа је празна.",
+  "searchTrash": "Претражи корпу",
+  "deletedPages": "Избрисане странице",
+  "noSearchMatches": "Ниједна избрисана страница не одговара претрази.",
+  "pageCount_one": "{{count}} страница",
+  "pageCount_other": "{{count}} страница",
+  "deletedJustNow": "Управо избрисано",
+  "deletedOn": "Избрисано {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Vrati",
+    "deleteForever": "Obriši zauvek",
+    "emptyTrash": "Isprazni korpu"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Отвори {{title}} из корпе",
+    "restorePage": "Врати {{title}}",
+    "deletePageForever": "Obriši {{title}} zauvek",
+    "cancelPermanentDelete": "Otkaži trajno brisanje",
+    "cancelEmptyTrash": "Otkaži pražnjenje korpe"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Трајно избрисати?",
+    "deleteBodyPrefix": "Ово ће трајно избрисати ",
+    "deleteBodySuffix": ". Ову радњу не можете опозвати.",
+    "emptyTitle": "Испразнити корпу?",
+    "emptyBody_one": "Ово ће трајно избрисати {{count}} страницу у корпи. Ову радњу не можете опозвати.",
+    "emptyBody_other": "Ово ће трајно избрисати {{count}} страница у корпи. Ову радњу не можете опозвати."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Трајно избрисано",
+    "couldntDelete": "Није успело брисање странице",
+    "restored": "Страница враћена",
+    "couldntRestore": "Није успело враћање странице",
+    "emptied": "Корпа испражњена",
+    "couldntEmpty": "Није успело пражњење корпе"
   }
 }

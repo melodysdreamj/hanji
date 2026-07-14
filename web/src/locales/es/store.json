@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "Esta base de datos está bloqueada, por lo que no se pudieron guardar los cambios.",
-  "databaseRowsLoadFailed": "No se pudieron cargar las filas de la base de datos. Inténtalo de nuevo en un momento.",
-  "editAccessDeniedSave": "No tienes acceso de edición, por lo que no se pudieron guardar los cambios.",
-  "lockedSave": "La página o base de datos está bloqueada, por lo que no se pudieron guardar los cambios.",
-  "pageLockedSave": "Esta página está bloqueada, por lo que no se pudieron guardar los cambios.",
-  "pageMissingSave": "No se encontró la página, por lo que no se pudieron guardar los cambios.",
-  "saveFailed": "No se pudieron guardar los cambios.",
-  "sessionExpired": "Tu sesión expiró o la solicitud no se pudo autenticar. Inténtalo de nuevo.",
-  "blockConflictSave": "Este bloque se editó en otro dispositivo, por lo que tu cambio sin conexión no se aplicó.",
+  "databaseLockedSave": "Esta base de datos está bloqueada, por lo que no se pudieron guardar tus cambios.",
+  "databaseRowsLoadFailed": "No se pudieron cargar las filas de la base de datos. Vuelve a intentarlo en un momento.",
+  "editAccessDeniedSave": "No tienes acceso de edición, por lo que no se pudieron guardar tus cambios.",
+  "lockedSave": "La página o base de datos está bloqueada, por lo que no se pudieron guardar tus cambios.",
+  "pageLockedSave": "Esta página está bloqueada, por lo que no se pudieron guardar tus cambios.",
+  "pageMissingSave": "No se pudo encontrar la página, por lo que no se pudieron guardar tus cambios.",
+  "saveFailed": "No se pudieron guardar tus cambios.",
+  "sessionExpired": "Tu sesión expiró o no se pudo autenticar la solicitud. Inténtalo de nuevo.",
+  "blockConflictSave": "Este bloque fue editado en otro dispositivo, por lo que tu cambio sin conexión no se aplicó.",
   "blockConflictKeepMine": "Aplicar mi versión",
-  "blockMoveCommentsSkipped": "El bloque se movió, pero sus comentarios no se pudieron mover con él."
+  "blockMoveCommentsSkipped": "El bloque se movió, pero sus comentarios no pudieron moverse con él."
 }

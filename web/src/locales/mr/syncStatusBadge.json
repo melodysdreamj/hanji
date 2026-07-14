@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "ऑफलाइन",
+  "offlinePending_one": "ऑफलाइन · {{count}} बदल प्रलंबित",
+  "offlinePending_other": "ऑफलाइन · {{count}} बदल प्रलंबित",
+  "syncing": "समक्रमण होत आहे · {{count}}",
+  "unreachable": "सर्व्हरशी संपर्क होत नाही",
+  "unreachablePending_one": "सर्व्हरशी संपर्क होत नाही · {{count}} बदल प्रलंबित",
+  "unreachablePending_other": "सर्व्हरशी संपर्क होत नाही · {{count}} बदल प्रलंबित",
+  "retryHint": "पुन्हा प्रयत्न करण्यासाठी क्लिक करा"
 }

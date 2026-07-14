@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Перемістити до",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Корінь робочого простору",
+    "path": "Верхній рівень"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Пошук місць переміщення",
+    "placeholder": "Пошук сторінок..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Закрити діалог переміщення"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Місця переміщення",
+    "empty": "Сторінки не знайдено.",
+    "destinationLabel": "Перемістити до {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Створити \"{{title}}\"",
+    "optionLabel": "Створити сторінку {{title}} та перемістити сюди",
+    "hint": "Нова сторінка верхнього рівня — перемістити сюди"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Заблокована батьківська сторінка",
+    "page": "Заблокована сторінка"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Сторінка в заблокованому батьківському елементі",
+    "locked": "Сторінка заблокована",
+    "moved": "Сторінку переміщено",
+    "moveFailed": "Не вдалося перемістити сторінку"
   }
 }

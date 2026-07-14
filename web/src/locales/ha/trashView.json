@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Shara",
+  "empty": "Shafuffukan da aka share suna bayyana a nan. Babu komai a cikin shara.",
+  "searchTrash": "Bincika shara",
+  "deletedPages": "Shafuffuka da aka share",
+  "noSearchMatches": "Babu shafuffukan da aka share da suka dace da bincikenka.",
+  "pageCount_one": "shafi {{count}}",
+  "pageCount_other": "shafuffuka {{count}}",
+  "deletedJustNow": "An share yanzu",
+  "deletedOn": "An share a {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Mayar",
+    "deleteForever": "Share har abada",
+    "emptyTrash": "Babar da sharar"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Buɗe {{title}} daga shara",
+    "restorePage": "Maido da {{title}}",
+    "deletePageForever": "Share {{title}} har abada",
+    "cancelPermanentDelete": "Soke sharewar har abada",
+    "cancelEmptyTrash": "Soke babar da shara"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Share har abada?",
+    "deleteBodyPrefix": "Wannan zai share har abada ",
+    "deleteBodySuffix": ". Ba za ka iya mayar da wannan aikin ba.",
+    "emptyTitle": "Share shara?",
+    "emptyBody_one": "Wannan zai share har abada duk {{count}} shafi a cikin shara. Ba za ka iya mayar da wannan aikin ba.",
+    "emptyBody_other": "Wannan zai share har abada duk {{count}} shafuffuka a cikin shara. Ba za ka iya mayar da wannan aikin ba."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "An share har abada",
+    "couldntDelete": "An kasa share shafi",
+    "restored": "An maido da shafi",
+    "couldntRestore": "An kasa maido da shafi",
+    "emptied": "An share shara",
+    "couldntEmpty": "An kasa share shara"
   }
 }

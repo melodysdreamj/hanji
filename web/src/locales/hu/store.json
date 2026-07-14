@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Ez az adatbázis zárolva van, ezért a módosításaid nem menthetők.",
+  "databaseRowsLoadFailed": "Nem sikerült betölteni az adatbázis sorait. Kérjük, próbáld újra később.",
+  "editAccessDeniedSave": "Nincs szerkesztési jogosultságod, ezért a módosításaid nem menthetők.",
+  "lockedSave": "Az oldal vagy az adatbázis zárolva van, ezért a módosításaid nem menthetők.",
+  "pageLockedSave": "Ez az oldal zárolva van, ezért a módosításaid nem menthetők.",
+  "pageMissingSave": "Az oldal nem található, ezért a módosításaid nem menthetők.",
+  "saveFailed": "A módosításaidat nem sikerült elmenteni.",
+  "sessionExpired": "A munkamenet lejárt, vagy a kérést nem sikerült hitelesíteni. Kérjük, próbáld újra.",
+  "blockConflictSave": "Ezt a blokkot más eszközön módosították, így az offline változtatásod nem érvényesült.",
+  "blockConflictKeepMine": "Saját verzió alkalmazása",
+  "blockMoveCommentsSkipped": "A blokk áthelyeződött, de a hozzászólásai nem kerültek áthelyezésre."
 }

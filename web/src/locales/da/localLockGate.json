@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "continueOnline": "Fortsæt kun online",
+  "continueOnlineHint": "\"Fortsæt kun online\" holder denne enheds låste offline-redigeringer forseglet — de bliver på denne enhed og synkroniseres ikke, før du låser dem op med den rigtige adgangssætning.",
+  "description": "Offline-data på denne enhed er låst med en adgangssætning. Oplåsning aktiverer offlinebrug og -lagring igen.",
+  "passphrasePlaceholder": "Adgangssætning",
+  "title": "Lås lokale data op",
+  "unlock": "Lås op",
+  "unsupportedBrowser": "Lokal lås er ikke tilgængelig i denne browser.",
+  "wrongPassphrase": "Den adgangssætning er ikke korrekt."
 }

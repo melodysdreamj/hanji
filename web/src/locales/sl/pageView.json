@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Obnovitev strani ni uspela.",
+  "emptyBodyPrompt": "Pritisnite Enter, da začnete pisati na prazni strani.",
+  "inTrashTopBarTitle": "V košu",
+  "notFoundTopBarTitle": "Ni najdeno",
+  "openWorkspace": "Odpri delovni prostor",
+  "pageInTrash": "Ta stran je v košu.",
+  "pageInTrashDetail": "Obnovite jo, preden odprete ali uredite njeno vsebino.",
+  "pageUnavailable": "Stran ni na voljo.",
+  "pageUnavailableDetail": "Ta stran je bila morda izbrisana, premaknjena ali deljena z drugim računom.",
+  "restorePage": "Obnovi stran",
+  "restoredPage": "Obnovljena stran.",
+  "loadingPageContent": "Nalaganje vsebine strani"
 }

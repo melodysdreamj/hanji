@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Күн қасиетін қосу",
+    "description": "Күнтізбе көріністері айға беттерді орналастыру үшін күн қасиетін қажет етеді.",
+    "addDateButton": "Күн"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Күнтізбе бойынша",
+    "today": "Бүгін",
+    "previousWeek": "Өткен апта",
+    "previousMonth": "Алдыңғы ай",
+    "nextWeek": "Келесі апта",
+    "nextMonth": "Келесі ай"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Жек",
+    "mon": "Дүй",
+    "tue": "Сей",
+    "wed": "Сәр",
+    "thu": "Бей",
+    "fri": "Жұм",
+    "sat": "Сен"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} күнтізбесі",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} элемент",
+    "newRowAriaLabel": "{{date}} күні жаңа жол",
+    "newRowTitle": "Жаңа",
+    "showLess": "Азырақ көрсету",
+    "showMore": "+{{count}} артық"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ашу",
+    "openAriaLabelWithDate": "{{title}} ашу, {{date}} күні жоспарланған",
+    "openNoDateAriaLabel": "{{title}} ашу, күні жоқ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Күні жоқ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Атаусыз",
+    "dateDefaultName": "Күн"
   }
 }

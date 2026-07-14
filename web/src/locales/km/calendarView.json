@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "បន្ថែមលក្ខណសម្បត្តិកាលបរិច្ឆេទ",
+    "description": "ទិដ្ឋភាពប្រតិទិនត្រូវការលក្ខណសម្បត្តិកាលបរិច្ឆេទ ដើម្បីដាក់ទំព័រនៅលើខែ។",
+    "addDateButton": "កាលបរិច្ឆេទ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ប្រតិទិនតាម",
+    "today": "ថ្ងៃនេះ",
+    "previousWeek": "សប្តាហ៍មុន",
+    "previousMonth": "ខែមុន",
+    "nextWeek": "សប្ដាហ៍ក្រោយ",
+    "nextMonth": "ខែបន្ទាប់"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "អាទិត្យ",
+    "mon": "ចន្ទ",
+    "tue": "អង្គារ",
+    "wed": "ពុធ",
+    "thu": "ព្រហស្បតិ៍",
+    "fri": "សុក្រ",
+    "sat": "សៅរ៍"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "ប្រតិទិន {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, ធាតុ {{count}}",
+    "newRowAriaLabel": "ជួរដេកថ្មីនៅ {{date}}",
+    "newRowTitle": "ថ្មី",
+    "showLess": "បង្ហាញតិច",
+    "showMore": "+{{count}} ទៀត"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "បើក {{title}}",
+    "openAriaLabelWithDate": "បើក {{title}} ដែលកំណត់ពេលសម្រាប់ {{date}}",
+    "openNoDateAriaLabel": "បើក {{title}} គ្មានកាលបរិច្ឆេទ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "គ្មានកាលបរិច្ឆេទ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "គ្មានចំណងជើង",
+    "dateDefaultName": "កាលបរិច្ឆេទ"
   }
 }

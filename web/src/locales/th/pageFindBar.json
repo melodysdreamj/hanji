@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "ค้นหาในหน้า"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "ค้นหาในหน้า",
+    "placeholder": "ค้นหาในหน้า"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "close": "ปิดค้นหา"
   }
 }

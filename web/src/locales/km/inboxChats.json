@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "មិនទាន់មានការសន្ទនានៅឡើយទេ។ បញ្ចេញមតិលើទំព័រ ឬរំឭកនរណាម្នាក់ដើម្បីចាប់ផ្តើម។",
+  "leave": "ចាកចេញ",
+  "leaveAria": "ចាកចេញពីការសន្ទនានៅលើ {{title}}",
+  "open": "បើកការសន្ទនានៅលើ {{title}}",
+  "participants_one": "អ្នកចូលរួម {{count}} នាក់",
+  "participants_other": "អ្នកចូលរួម {{count}} នាក់",
+  "untitled": "គ្មានចំណងជើង",
+  "loading": "កំពុងផ្ទុកការសន្ទនា…"
 }

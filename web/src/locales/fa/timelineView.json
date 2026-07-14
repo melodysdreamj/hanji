@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "افزودن ویژگی تاریخ",
+    "description": "نمای تایم‌لاین برای نمایش صفحات در طول زمان به یک ویژگی تاریخ شروع نیاز دارد."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "برای نمایش بازه به جای نوارهای یک روزه، ویژگی تاریخ پایان اضافه کنید.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "بزرگ‌نمایی تایم‌لاین",
+    "day": "روز",
+    "week": "هفته",
+    "month": "ماه"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "وابستگی‌ها:",
+    "hint": "یک ویژگی رابطه اضافه کنید",
+    "relationPropertyAriaLabel": "ویژگی رابطه وابستگی"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "امروز",
+    "previousRange": "بازه قبلی",
+    "nextRange": "بازه بعدی",
+    "newPage": "جدید",
+    "newPageIn": "صفحه جدید در {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "جدول تایم‌لاین",
+    "nameHeader": "نام"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "باز کردن {{title}}",
+    "openAriaLabelWithDates": "باز کردن {{title}}، از {{start}} تا {{end}}",
+    "openNoDateAriaLabel": "باز کردن {{title}}، بدون تاریخ"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "در این بازه آیتمی وجود ندارد.",
+    "noDatedItems": "هنوز هیچ آیتم تاریخ‌داری وجود ندارد.",
+    "jumpTo": "پرش به {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "بدون تاریخ ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "هیچ",
+    "untitled": "بدون عنوان"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "A apărut o eroare la afișarea acestui conținut.",
+  "detail": "Încearcă din nou. Dacă problema persistă, reîncarcă aplicația și distribuie referința de mai jos.",
+  "reference": "Referință: {{reference}}",
+  "reload": "Reîncarcă aplicația",
+  "retry": "Încearcă din nou"
 }

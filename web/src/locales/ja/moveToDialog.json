@@ -1,8 +1,8 @@
 {
   "title": "移動先",
   "workspaceRoot": {
-    "label": "ワークスペースのルート",
-    "path": "最上位"
+    "label": "ワークスペースルート",
+    "path": "トップレベル"
   },
   "search": {
     "label": "移動先を検索",
@@ -14,20 +14,20 @@
   "results": {
     "listLabel": "移動先",
     "empty": "ページが見つかりません。",
-    "destinationLabel": "{{label}} に移動、{{path}}"
+    "destinationLabel": "{{label}}に移動, {{path}}"
   },
   "create": {
-    "label": "「{{title}}」を作成",
-    "optionLabel": "ページ {{title}} を作成してここに移動",
-    "hint": "新しい最上位ページ - ここに移動"
+    "label": "\"{{title}}\"を作成",
+    "optionLabel": "{{title}}ページを作成してここに移動",
+    "hint": "新しいトップレベルページ - ここに移動"
   },
   "locked": {
-    "parent": "ロックされた親",
+    "parent": "ロックされた親ページ",
     "page": "ロックされたページ"
   },
   "toast": {
-    "lockedParent": "ページがロックされた親の中にあります",
-    "locked": "ページはロックされています",
+    "lockedParent": "ページがロックされた親ページにあります",
+    "locked": "ページがロックされています",
     "moved": "ページを移動しました",
     "moveFailed": "ページを移動できませんでした"
   }

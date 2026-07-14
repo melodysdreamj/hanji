@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Kapağı değiştir",
+    "reposition": "Yeniden konumlandır",
+    "remove": "Kaldır",
+    "uploadFile": "Dosya yükle",
+    "uploading": "Yükleniyor...",
+    "submit": "Gönder",
+    "savePosition": "Konumu kaydet"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Galeri",
+    "upload": "Yükle",
+    "link": "Bağlantı"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Görsel bağlantısını yapıştır",
+    "invalid": "Bir http veya https görsel bağlantısı yapıştırın."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Bu görsel yüklenemedi.",
+    "defaultFileName": "Kapak görseli"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Yeniden konumlandırmak için görseli sürükleyin"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Yüklemeye hazırlanıyor",
+    "finalizing": "Sonlandırılıyor",
+    "complete": "Tamamlandı",
+    "uploading": "Yükleniyor"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Kapak kaldırıldı",
+    "restored": "Kapak geri yüklendi",
+    "undo": "Geri al"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Sayfa kapağı",
+    "coverVerticalPosition": "Kapak dikey konumu",
+    "positionFromTop": "{{position}}% üstten",
+    "closeCoverMenu": "Kapak menüsünü kapat",
+    "changePageCover": "Sayfa kapağını değiştir",
+    "repositionPageCover": "Sayfa kapağını yeniden konumlandır",
+    "removePageCover": "Sayfa kapağını kaldır",
+    "changeCoverDialog": "Kapağı değiştir",
+    "coverSource": "Kapak kaynağı",
+    "selectCover": "Kapak {{number}} seç",
+    "uploadFromDevice": "Bu cihazdan kapak görseli yükle",
+    "uploadingFile": "{{fileName}} yükleniyor",
+    "coverImageLink": "Kapak görseli bağlantısı"
   }
 }

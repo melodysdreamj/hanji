@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} 个反向链接",
-    "count_other": "{{count}} 个反向链接"
+    "count_one": "{{count}}个反向链接",
+    "count_other": "{{count}}个反向链接"
   },
   "header": {
-    "title": "链接提及"
+    "title": "提及链接"
   },
   "summary": {
-    "mention_one": "{{count}} 次提及",
-    "mention_other": "{{count}} 次提及",
-    "link_one": "{{count}} 个链接",
-    "link_other": "{{count}} 个链接"
+    "mention_one": "{{count}}个提及",
+    "mention_other": "{{count}}个提及",
+    "link_one": "{{count}}个链接",
+    "link_other": "{{count}}个链接"
   },
   "kind": {
     "mention": "提及",
     "link": "链接"
   },
   "more": {
-    "count_one": "还有 {{count}} 个反向链接",
-    "count_other": "还有 {{count}} 个反向链接"
+    "count_one": "还有{{count}}个反向链接",
+    "count_other": "还有{{count}}个反向链接"
   }
 }

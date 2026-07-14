@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "هنوز مکالمه‌ای وجود ندارد. برای شروع یک مکالمه، در صفحه‌ای نظر دهید یا کسی را منشن کنید.",
+  "leave": "ترک",
+  "leaveAria": "ترک مکالمه در {{title}}",
+  "open": "باز کردن مکالمه در {{title}}",
+  "participants_one": "{{count}} شرکت‌کننده",
+  "participants_other": "{{count}} شرکت‌کننده",
+  "untitled": "بدون عنوان",
+  "loading": "در حال بارگذاری مکالمات…"
 }

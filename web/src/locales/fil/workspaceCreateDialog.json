@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Bagong workspace",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Pangalan ng workspace",
+    "placeholder": "Aking Kumpanya"
   },
-  "startLabel": "Start from",
+  "startLabel": "Mula sa",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Blangkong workspace",
+      "body": "Magsimula nang walang laman gamit ang mga panimulang pahina."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Mag-import mula sa Notion",
+      "body": "Gawin ang workspace, pagkatapos ay i-migrate ang isang Notion workspace papunta rito."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Mag-import mula sa ibang Hanji",
+      "body": "Gawin ang workspace, pagkatapos ay mag-import mula sa ibang Hanji server o file."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Gumawa ng workspace",
+  "creating": "Gumagawa…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Hindi nagawa ang workspace."
   }
 }

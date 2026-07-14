@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "ความคิดเห็น",
+  "closeAria": "ปิดความคิดเห็น",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "การสนทนาบล็อก",
+    "page": "การสนทนาหน้า"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "สถานะความคิดเห็น",
+    "open": "เปิด",
+    "resolved": "แก้ไขแล้ว"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "กำลังแสดงความคิดเห็นบน",
+    "commentingOnSelectedText": "กำลังแสดงความคิดเห็นบนข้อความที่เลือก",
+    "selectedBlock": "บล็อกที่เลือก",
+    "onSelectedText": "บนข้อความที่เลือก",
+    "onSelectedBlock": "บนบล็อกที่เลือก",
+    "onABlock": "บนบล็อก"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "เพิ่มความคิดเห็นบนบล็อก",
+    "addPageComment": "เพิ่มความคิดเห็นบนหน้า",
+    "blockPlaceholder": "แสดงความคิดเห็นบนบล็อกนี้...",
+    "pagePlaceholder": "เพิ่มความคิดเห็น...",
+    "submit": "แสดงความคิดเห็น"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "ผู้ใช้ที่เมนชันในความคิดเห็น",
+    "replyPeopleAria": "ผู้ใช้ที่เมนชันในการตอบกลับ",
+    "trigger": "เมนชันผู้ใช้",
+    "noMatches": "ไม่พบผู้ใช้ที่ตรงกัน",
+    "title": "เมนชัน {{name}}",
+    "person": "บุคคล",
+    "you": "คุณ",
+    "organizationPerson": "บุคคลในองค์กร",
+    "roleInOrganization": "{{role}} ในองค์กร"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "เธรดความคิดเห็น",
+    "empty": "ยังไม่มีความคิดเห็น",
+    "noOpen": "ไม่มีความคิดเห็นที่เปิด",
+    "noResolved": "ไม่มีความคิดเห็นที่แก้ไขแล้ว"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} ความคิดเห็น, {{time}}",
+    "commentAriaResolved": "{{author}} ความคิดเห็น, {{time}}, แก้ไขแล้ว",
+    "replyAria": "{{author}} คำตอบ, {{time}}",
+    "repliesAria": "{{count}} คำตอบ",
+    "edited": "(แก้ไขแล้ว)",
+    "emptyComment": "(ความคิดเห็นว่างเปล่า)",
+    "emptyReply": "(คำตอบว่างเปล่า)",
+    "justNow": "เมื่อสักครู่"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "ตอบ",
+    "showInPage": "แสดงในหน้า",
+    "resolve": "แก้ไข",
+    "reopen": "เปิดอีกครั้ง",
+    "edit": "แก้ไข"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "ตอบกลับ..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "แก้ไขความคิดเห็น"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "ลบความคิดเห็นนี้?",
+    "threadConfirm_one": "ลบความคิดเห็นนี้และคำตอบของมัน?",
+    "threadConfirm_other": "ลบความคิดเห็นนี้และคำตอบของมัน {{count}} รายการ?"
   }
 }

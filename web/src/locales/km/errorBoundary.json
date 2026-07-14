@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "មានបញ្ហាក្នុងការបង្ហាញមាតិកានេះ។",
+  "detail": "សូមព្យាយាមម្តងទៀត។ បើបញ្ហានៅតែបន្ត សូមផ្ទុកកម្មវិធីឡើងវិញ និងចែករំលែកសេចក្តីយោងខាងក្រោម។",
+  "reference": "សេចក្តីយោង៖ {{reference}}",
+  "reload": "ផ្ទុកកម្មវិធីឡើងវិញ",
+  "retry": "ព្យាយាមម្តងទៀត"
 }

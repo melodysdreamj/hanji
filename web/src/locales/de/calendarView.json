@@ -21,17 +21,17 @@
     "fri": "Fr",
     "sat": "Sa"
   },
-  "gridAriaLabel": "{{title}} Kalender",
+  "gridAriaLabel": "{{title}}-Kalender",
   "cell": {
     "ariaLabel": "{{date}}, {{count}} Einträge",
-    "newRowAriaLabel": "Neue Zeile am {{date}}",
+    "newRowAriaLabel": "Neuer Eintrag am {{date}}",
     "newRowTitle": "Neu",
     "showLess": "Weniger anzeigen",
     "showMore": "+{{count}} weitere"
   },
   "card": {
     "openAriaLabel": "{{title}} öffnen",
-    "openAriaLabelWithDate": "{{title}} öffnen, geplant am {{date}}",
+    "openAriaLabelWithDate": "{{title}} öffnen, geplant für {{date}}",
     "openNoDateAriaLabel": "{{title}} öffnen, kein Datum"
   },
   "noDate": {

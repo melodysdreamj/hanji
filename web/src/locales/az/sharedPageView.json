@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Paylaşılan səhifə",
+  "loading": "Paylaşılan səhifə yüklənir",
+  "unavailable": "Bu paylaşılan səhifə əlçatan deyil.",
+  "notFound": "Paylaşılan səhifə tapılmadı.",
+  "outsideShare": "Səhifə bu ictimai paylaşımın bir hissəsi deyil.",
+  "errors": {
+    "not-found": "Bu linkin müddəti bitmiş, yayımdan götürülmüş və ya səhv kopyalanmış ola bilər.",
+    "offline": "Bağlantınızı yoxlayın, sonra paylaşılan səhifəni yenidən açmağa çalışın.",
+    "rate-limited": "Bu paylaşılan səhifə çox sayda sorğu alır. Bir an gözləyin və yenidən cəhd edin.",
+    "unavailable": "Hanji bu paylaşılan səhifəni hazırda aça bilmir. Bir az sonra yenidən cəhd edin."
+  },
+  "tryAgain": "Yenidən cəhd edin"
 }

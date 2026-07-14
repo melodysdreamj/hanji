@@ -1,0 +1,9 @@
+{
+  "invalidBody": "Provjerite ima li u vezi nedostajućih ili neispravnih znakova, zatim pokušajte ponovno.",
+  "invalidTitle": "Ova adresa je nepotpuna.",
+  "notFoundBody": "Ova adresa ne odgovara nijednoj Hanji stranici. Stranica je možda premještena ili više ne postoji.",
+  "notFoundTitle": "Stranica nije pronađena.",
+  "openHome": "Otvori Hanji početnu",
+  "sharedBody": "Provjerite je li cijeli dijeljeni link ispravno kopiran, zatim pokušajte ponovno.",
+  "sharedTitle": "Ovaj dijeljeni link nije važeći."
+}

@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "解鎖本機資料",
+  "description": "此裝置的離線資料已用密碼鎖定。解鎖後即可恢復離線使用與儲存。",
+  "passphrasePlaceholder": "密碼",
+  "unlock": "解鎖",
+  "continueOnline": "僅繼續線上模式",
+  "continueOnlineHint": "選擇「僅繼續線上模式」會將此裝置的鎖定離線編輯內容密封——這些編輯會留在本機，直到以正確密碼解鎖後才會同步。",
+  "wrongPassphrase": "密碼不正確。",
+  "unsupportedBrowser": "此瀏覽器不支援本機鎖定。"
 }

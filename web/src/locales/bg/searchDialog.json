@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Търси или премини към...",
+  "quickFind": "Бързо търсене",
+  "closeSearch": "Затвори търсене",
+  "quickFindResults": "Резултати от бързо търсене",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Последно прегледани",
+    "recentSearches": "Последни търсения",
+    "pages": "Страници",
+    "pageContent": "Съдържание на страница",
+    "favorites": "Любими"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "в страница",
+  "searchingDetail": "Търсене...",
+  "searchAgain": "Търсете отново",
+  "searchingPageContent": "Търсене в съдържанието на страницата...",
+  "noResultsFor": "Няма резултати за \"{{query}}\"",
+  "noPagesFound": "Няма намерени страници",
+  "creating": "Създаване...",
+  "newPage": "Нова страница \"{{query}}\"",
+  "couldntCreatePage": "Неуспешно създаване на страница",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Избери",
+    "open": "Отвори",
+    "newTab": "Нов раздел"
   }
 }

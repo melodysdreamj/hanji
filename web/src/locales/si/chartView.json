@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "ගණන",
+    "sum": "එකතුව",
+    "average": "සාමාන්‍ය",
+    "min": "අවම",
+    "max": "උපරිම"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} ප්‍රස්ථාරය",
+  "chartType": "ප්‍රස්ථාර වර්ගය",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "තීරු",
+    "horizontal_bar": "තිරස් තීරු",
+    "line": "රේඛා",
+    "donut": "ඩෝනට්"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "තෝරා ඇත",
+  "empty": "හිස්",
+  "legend": "ප්‍රස්ථාර පුරාවෘත්තය",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "දත්ත නැත",
+  "noDataDesc": "වත්මන් පෙරහන් හෝ සෙවුමට ගැළපෙන පේළි නැත.",
+  "noGroupProperty": "තවම ප්‍රස්ථාරගත කිරීමට කිසිවක් නැත",
+  "noGroupPropertyDesc": "තේරීම, තත්ත්වය, පුද්ගලයා, සලකුණු කොටුව හෝ දිනය ගුණාංගයක් එක්කරන්න.",
+  "total": "එකතුව",
+  "unchecked": "තෝරා නැත",
+  "untitledProperty": "නම් නැති",
+  "valueProperty": "අගය ගුණාංගය",
+  "xAxis": "X-අක්ෂය",
+  "yAxis": "Y-අක්ෂය"
 }

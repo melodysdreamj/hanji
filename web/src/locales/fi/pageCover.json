@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
-  },
-  "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
-  },
-  "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
-  },
-  "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
-  },
-  "reposition": {
-    "hint": "Drag image to reposition"
-  },
-  "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
-  },
-  "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "changeCover": "Vaihda kansi",
+    "remove": "Poista",
+    "reposition": "Sijoita uudelleen",
+    "savePosition": "Tallenna sijainti",
+    "submit": "Lähetä",
+    "uploadFile": "Lataa tiedosto",
+    "uploading": "Ladataan..."
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "changeCoverDialog": "Vaihda kansi",
+    "changePageCover": "Vaihda sivun kansi",
+    "closeCoverMenu": "Sulje kansivalikko",
+    "coverImageLink": "Kansikuvan linkki",
+    "coverSource": "Kannen lähde",
+    "coverVerticalPosition": "Kannen pystysijainti",
+    "pageCover": "Sivun kansi",
+    "positionFromTop": "{{position}}% ylhäältä",
+    "removePageCover": "Poista sivun kansi",
+    "repositionPageCover": "Sijoita sivun kansi uudelleen",
+    "selectCover": "Valitse kansi {{number}}",
+    "uploadFromDevice": "Lataa kansikuva tästä laitteesta",
+    "uploadingFile": "Ladataan {{fileName}}"
+  },
+  "link": {
+    "invalid": "Liitä http- tai https-kuvalinkki.",
+    "placeholder": "Liitä kuvalinkki"
+  },
+  "progress": {
+    "complete": "Valmis",
+    "finalizing": "Viimeistellään",
+    "preparing": "Valmistellaan latausta",
+    "uploading": "Ladataan"
+  },
+  "reposition": {
+    "hint": "Vedä kuvaa siirtääksesi"
+  },
+  "tabs": {
+    "gallery": "Galleria",
+    "link": "Linkki",
+    "upload": "Lataa"
+  },
+  "toast": {
+    "removed": "Kansi poistettu",
+    "restored": "Kansi palautettu",
+    "undo": "Kumoa"
+  },
+  "upload": {
+    "defaultFileName": "Kansikuva",
+    "error": "Kuvan lataus epäonnistui."
   }
 }

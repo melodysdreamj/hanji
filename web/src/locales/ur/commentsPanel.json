@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "تبصرے",
+  "closeAria": "تبصرے بند کریں",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "بلاک بحث",
+    "page": "صفحہ بحث"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "تبصرے کی حیثیت",
+    "open": "کھلا",
+    "resolved": "حل شدہ"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "تبصرہ کا مقام",
+    "commentingOnSelectedText": "منتخب متن پر تبصرہ",
+    "selectedBlock": "منتخب بلاک",
+    "onSelectedText": "منتخب متن پر",
+    "onSelectedBlock": "منتخب بلاک پر",
+    "onABlock": "بلاک پر"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "بلاک تبصرہ شامل کریں",
+    "addPageComment": "صفحہ تبصرہ شامل کریں",
+    "blockPlaceholder": "اس بلاک پر تبصرہ کریں...",
+    "pagePlaceholder": "تبصرہ شامل کریں...",
+    "submit": "تبصرہ کریں"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "تبصرہ میں لوگوں کا ذکر",
+    "replyPeopleAria": "جواب میں لوگوں کا ذکر",
+    "trigger": "لوگوں کا ذکر کریں",
+    "noMatches": "کوئی مماثل شخص نہیں",
+    "title": "{{name}} کا ذکر",
+    "person": "شخص",
+    "you": "آپ",
+    "organizationPerson": "تنظیمی شخص",
+    "roleInOrganization": "تنظیم میں {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "تبصروں کے تھریڈز",
+    "empty": "ابھی تک کوئی تبصرہ نہیں",
+    "noOpen": "کوئی کھلا تبصرہ نہیں",
+    "noResolved": "کوئی حل شدہ تبصرہ نہیں"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} کا تبصرہ، {{time}}",
+    "commentAriaResolved": "{{author}} کا تبصرہ، {{time}}، حل شدہ",
+    "replyAria": "{{author}} کا جواب، {{time}}",
+    "repliesAria": "{{count}} جوابات",
+    "edited": "(ترمیم شدہ)",
+    "emptyComment": "(خالی تبصرہ)",
+    "emptyReply": "(خالی جواب)",
+    "justNow": "ابھی"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "جواب",
+    "showInPage": "صفحہ میں دکھائیں",
+    "resolve": "حل کریں",
+    "reopen": "دوبارہ کھولیں",
+    "edit": "ترمیم"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "جواب..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "تبصرہ میں ترمیم"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "کیا یہ تبصرہ حذف کریں؟",
+    "threadConfirm_one": "اس تبصرے اور اس کے جواب کو حذف کریں؟",
+    "threadConfirm_other": "اس تبصرے اور اس کے {{count}} جوابات کو حذف کریں؟"
   }
 }

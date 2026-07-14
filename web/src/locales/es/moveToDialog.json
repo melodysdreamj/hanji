@@ -9,7 +9,7 @@
     "placeholder": "Buscar páginas..."
   },
   "dialog": {
-    "closeLabel": "Cerrar diálogo de movimiento"
+    "closeLabel": "Cerrar diálogo de mover"
   },
   "results": {
     "listLabel": "Destinos de movimiento",
@@ -22,12 +22,12 @@
     "hint": "Nueva página de nivel superior - mover aquí"
   },
   "locked": {
-    "parent": "Elemento padre bloqueado",
+    "parent": "Padre bloqueado",
     "page": "Página bloqueada"
   },
   "toast": {
-    "lockedParent": "La página está en un elemento padre bloqueado",
-    "locked": "La página está bloqueada",
+    "lockedParent": "Página en padre bloqueado",
+    "locked": "Página bloqueada",
     "moved": "Página movida",
     "moveFailed": "No se pudo mover la página"
   }

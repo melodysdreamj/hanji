@@ -1,6 +1,6 @@
 {
-  "title": "Change property type?",
-  "message": "\"{{propName}}\" already has values. Changing its type to {{typeLabel}} may display existing values differently or lose them.",
-  "cancelAria": "Cancel property type change",
-  "confirm": "Change type"
+  "title": "Canza nau'in sifa?",
+  "message": "\"{{propName}}\" ya riga ya sami dabi'u. Canja nau'insa zuwa {{typeLabel}} na iya nuna dabi'un da ke akwai daban ko rasa su.",
+  "cancelAria": "Soke canza nau'in dukiya",
+  "confirm": "Canza nau'i"
 }

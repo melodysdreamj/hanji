@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "พื้นที่ทำงานใหม่",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "ชื่อเวิร์กสเปซ",
+    "placeholder": "ชื่อบริษัท"
   },
-  "startLabel": "Start from",
+  "startLabel": "เริ่มจาก",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "พื้นที่ทำงานเปล่า",
+      "body": "เริ่มต้นเปล่าพร้อมหน้าเริ่มต้น"
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "นำเข้าจาก Notion",
+      "body": "สร้างพื้นที่ทำงาน แล้วย้ายพื้นที่ทำงาน Notion เข้าไป"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "นำเข้าจาก Hanji อื่น",
+      "body": "สร้างพื้นที่ทำงาน จากนั้นนำเข้าจากเซิร์ฟเวอร์ Hanji อื่นหรือไฟล์"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "สร้างเวิร์กสเปซ",
+  "creating": "กำลังสร้าง…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "ไม่สามารถสร้างเวิร์กสเปซได้."
   }
 }

@@ -46,6 +46,15 @@
   "favorites": "즐겨찾기",
   "home": "홈",
   "import": "가져오기",
+  "importInProgress": "가져오는 중",
+  "importProgress": "Notion 가져오는 중, {{percent}}%",
+  "notionOnboarding": {
+    "title": "Notion 데이터를 가져오시겠어요?",
+    "body": "기존 Notion 페이지와 데이터베이스를 이 워크스페이스로 옮길 수 있습니다.",
+    "note": "나중에도 사이드바의 가져오기에서 언제든 시작할 수 있어요.",
+    "later": "나중에",
+    "import": "Notion에서 가져오기"
+  },
   "inbox": "수신함",
   "inboxUnread": "수신함 (읽지 않은 업데이트)",
   "inviteMembers": "멤버 추가",

@@ -10,8 +10,8 @@
 //   converge on the next online load.
 //
 // Installation fetches only the build-generated boot graph. The complete
-// product graph warms after activation through a client message or an online
-// navigation, and only then atomically replaces the offline shell. This keeps
+// product graph warms after activation through an app-interactive client
+// message, and only then atomically replaces the offline shell. This keeps
 // installation responsive without ever publishing a shell whose lazy chunks
 // are incomplete.
 
@@ -26,6 +26,7 @@ const PRECACHE_MANIFEST_KEY = "/__hanji_precache__";
 const BOOT_MANIFEST_KEY = "/__hanji_boot__";
 const BOOT_CACHE_PREFIX = `${CACHE_PREFIX}boot-`;
 const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
+const FULL_PRECACHE_BATCH_SIZE = 4;
 // Upper bound on runtime-cached hashed assets. Content-hashed files are
 // immutable, so previous releases' lazy chunks are harmless (and necessary for
 // offline-pinned pages after a deploy) — we keep them and only evict the oldest
@@ -194,17 +195,31 @@ async function precacheFull() {
   const boot = await caches.open(bootCacheName(manifest.version));
   const bootAssetSet = new Set(manifest.bootAssets);
   try {
-    for (let offset = 0; offset < assets.length; offset += 16) {
+    for (let offset = 0; offset < assets.length; offset += FULL_PRECACHE_BATCH_SIZE) {
       await Promise.all(
-        assets.slice(offset, offset + 16).map(async (url) => {
+        assets.slice(offset, offset + FULL_PRECACHE_BATCH_SIZE).map(async (url) => {
           const bootResponse = bootAssetSet.has(url) ? await boot.match(url) : undefined;
-          if (bootResponse && isExpectedPrecacheResponse(url, bootResponse)) {
-            await staging.put(url, bootResponse);
-            return;
+          const immutable = isImmutableBuildAssetPath(url);
+          const activeResponse = immutable ? await cache.match(url) : undefined;
+          const reusableResponse =
+            bootResponse && isExpectedPrecacheResponse(url, bootResponse)
+              ? bootResponse
+              : activeResponse && isExpectedPrecacheResponse(url, activeResponse)
+                ? activeResponse
+                : undefined;
+          const response = reusableResponse ?? await fetchAndValidateAsset(url);
+          await staging.put(url, response.clone());
+          // A verified content-hashed response is independently safe even if
+          // the mutable shell commit later fails. Persist it immediately so a
+          // flaky connection resumes instead of downloading the whole graph.
+          if (immutable && !activeResponse) {
+            await cache.put(url, response.clone());
           }
-          await staging.put(url, await fetchAndValidateAsset(url));
         })
       );
+      if (offset + FULL_PRECACHE_BATCH_SIZE < assets.length) {
+        await Promise.resolve();
+      }
     }
     const shell = await staging.match("/");
     if (!shell) throw new Error("Offline staging shell disappeared.");
@@ -213,19 +228,12 @@ async function precacheFull() {
     // partial failure here cannot affect the old shell graph because the old
     // shell never references the new filenames. Existing hashes are never
     // overwritten.
-    const newlyAddedImmutable = [];
-    try {
-      for (const url of assets) {
-        if (url === "/" || !isImmutableBuildAssetPath(url)) continue;
-        if (await cache.match(url)) continue;
-        const staged = await staging.match(url);
-        if (!staged) throw new Error(`Offline staging asset disappeared: ${url}`);
-        await cache.put(url, staged);
-        newlyAddedImmutable.push(url);
-      }
-    } catch (error) {
-      for (const url of newlyAddedImmutable) await cache.delete(url).catch(() => undefined);
-      throw error;
+    for (const url of assets) {
+      if (url === "/" || !isImmutableBuildAssetPath(url)) continue;
+      if (await cache.match(url)) continue;
+      const staged = await staging.match(url);
+      if (!staged) throw new Error(`Offline staging asset disappeared: ${url}`);
+      await cache.put(url, staged);
     }
 
     // Mutable root dependencies, the shell alias, and the completion marker
@@ -273,13 +281,11 @@ async function precacheFull() {
       } catch (rollbackError) {
         await cache.delete(SHELL_KEY).catch(() => undefined);
         await cache.delete(PRECACHE_MANIFEST_KEY).catch(() => undefined);
-        for (const url of newlyAddedImmutable) await cache.delete(url).catch(() => undefined);
         throw new AggregateError(
           [commitError, rollbackError],
           "Offline release commit and rollback both failed."
         );
       }
-      for (const url of newlyAddedImmutable) await cache.delete(url).catch(() => undefined);
       throw commitError;
     }
 
@@ -356,10 +362,6 @@ self.addEventListener("fetch", (event) => {
     // cache their JSON/file/private response under the shared shell key.
     if (!isAppNavigationPath(url.pathname)) return;
     event.respondWith(navigationNetworkFirst(request));
-    // sw.js itself may be byte-identical between application builds. Warm the
-    // complete versioned graph behind the live response so new hashed chunks
-    // become offline-ready without delaying navigation or worker activation.
-    event.waitUntil(ensureFullPrecache().catch(() => undefined));
     return;
   }
   // Cache-first is restricted to content-hashed build output (plus the

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
-  "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+  "create": "Opprett arbeidsområde",
+  "creating": "Oppretter…",
+  "error": {
+    "couldntCreate": "Kunne ikke opprette arbeidsområde."
   },
-  "startLabel": "Start from",
+  "name": {
+    "label": "Arbeidsområdenavn",
+    "placeholder": "Bedrift"
+  },
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
-    },
-    "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "body": "Start tomt med startsidene.",
+      "title": "Tomt arbeidsområde"
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "body": "Opprett arbeidsområdet, og importer så fra en annen Hanji-server eller -fil.",
+      "title": "Importer fra en annen Hanji"
+    },
+    "notion": {
+      "body": "Opprett arbeidsområdet, og migrer deretter et Notion-arbeidsområde inn i det.",
+      "title": "Importer fra Notion"
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
-  "error": {
-    "couldntCreate": "Couldn't create workspace."
-  }
+  "startLabel": "Start fra",
+  "title": "Nytt arbeidsområde"
 }

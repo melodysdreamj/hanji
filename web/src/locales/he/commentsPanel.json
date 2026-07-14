@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "תגובות",
+  "closeAria": "סגור תגובות",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "דיון בלוק",
+    "page": "דיון בדף"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "מצב תגובה",
+    "open": "פתוח",
+    "resolved": "נפתר"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "תגובה על",
+    "commentingOnSelectedText": "תגובה על טקסט נבחר",
+    "selectedBlock": "בלוק נבחר",
+    "onSelectedText": "על טקסט נבחר",
+    "onSelectedBlock": "על בלוק נבחר",
+    "onABlock": "על בלוק"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "הוסף תגובת בלוק",
+    "addPageComment": "הוסף תגובת עמוד",
+    "blockPlaceholder": "תגובה על בלוק זה...",
+    "pagePlaceholder": "הוסף תגובה...",
+    "submit": "הגב"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "אנשים להזכיר בתגובה",
+    "replyPeopleAria": "אנשים להזכיר בתשובה",
+    "trigger": "הזכירו אנשים",
+    "noMatches": "אין אנשים תואמים",
+    "title": "{{name}}",
+    "person": "אדם",
+    "you": "אני",
+    "organizationPerson": "משתמש ארגוני",
+    "roleInOrganization": "{{role}} בארגון"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "שרשורי תגובות",
+    "empty": "עדיין אין תגובות",
+    "noOpen": "אין תגובות פתוחות",
+    "noResolved": "אין תגובות שנפתרו"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "תגובה של {{author}}, {{time}}",
+    "commentAriaResolved": "תגובה של {{author}}, {{time}}, נפתרה",
+    "replyAria": "תשובה של {{author}}, {{time}}",
+    "repliesAria": "{{count}} תשובות",
+    "edited": "(נערך)",
+    "emptyComment": "(תגובה ריקה)",
+    "emptyReply": "(תשובה ריקה)",
+    "justNow": "זה עתה"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "השב",
+    "showInPage": "הצג בעמוד",
+    "resolve": "פתור",
+    "reopen": "פתח מחדש",
+    "edit": "ערוך"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "תשובה..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "ערוך תגובה"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "למחוק תגובה זו?",
+    "threadConfirm_one": "למחוק תגובה זו ואת התשובה שלה?",
+    "threadConfirm_other": "למחוק תגובה זו ואת {{count}} תשובותיה?"
   }
 }

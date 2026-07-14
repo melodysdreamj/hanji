@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "यह डेटाबेस लॉक है, इसलिए आपके परिवर्तन सहेजे नहीं जा सके।",
+  "databaseRowsLoadFailed": "डेटाबेस पंक्तियाँ लोड नहीं हो सकीं। कृपया क्षण भर में पुनः प्रयास करें।",
+  "editAccessDeniedSave": "आपके पास संपादन पहुँच नहीं है, इसलिए आपके परिवर्तन सहेजे नहीं जा सके।",
+  "lockedSave": "पृष्ठ या डेटाबेस लॉक है, इसलिए आपके परिवर्तन सहेजे नहीं जा सके।",
+  "pageLockedSave": "यह पृष्ठ लॉक है, इसलिए आपके परिवर्तन सहेजे नहीं जा सके।",
+  "pageMissingSave": "पृष्ठ नहीं मिल सका, इसलिए आपके परिवर्तन सहेजे नहीं जा सके।",
+  "saveFailed": "आपके परिवर्तन सहेजे नहीं जा सके।",
+  "sessionExpired": "आपका सत्र समाप्त हो गया या अनुरोध प्रमाणित नहीं हो सका। कृपया पुनः प्रयास करें।",
+  "blockConflictSave": "यह ब्लॉक किसी अन्य डिवाइस पर संपादित किया गया था, इसलिए आपका ऑफ़लाइन परिवर्तन लागू नहीं किया गया।",
+  "blockConflictKeepMine": "मेरा संस्करण लागू करें",
+  "blockMoveCommentsSkipped": "ब्लॉक स्थानांतरित हो गया, लेकिन इसकी टिप्पणियाँ इसके साथ स्थानांतरित नहीं हो सकीं।"
 }

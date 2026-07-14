@@ -18,6 +18,7 @@ import { evaluateRollup, secondHopDatabaseId, valueAsIds } from "./rollup";
 import { CheckIcon, FileText } from "../icons";
 import { PageIconGlyph } from "../PageIcon";
 import { backendComputedText } from "./computed";
+import { AttachmentOpenLink } from "./AttachmentOpenLink";
 import styles from "./database.module.css";
 
 // Stable empty map so cells that don't resolve related rows (everything except
@@ -313,23 +314,16 @@ function ReadonlyFileLink({
   children: ReactNode;
 }) {
   const { t } = useTranslation(["propValue", "common"]);
-  const href = useWorkspaceFileUrl(file.url, ["data:"]);
-
-  if (!interactive || !href) return <span className={styles.fileChipLink}>{children}</span>;
+  if (!interactive) return <span className={styles.fileChipLink}>{children}</span>;
 
   return (
-    <a
+    <AttachmentOpenLink
+      file={file}
       className={styles.fileChipLink}
-      href={href}
-      target="_blank"
-      rel="noreferrer noopener"
-      download={file.name || undefined}
-      aria-label={t("propValue:openOrDownloadFile", { name: file.name })}
-      onClick={(e) => e.stopPropagation()}
-      onAuxClick={(e) => e.stopPropagation()}
+      ariaLabel={t("propValue:openOrDownloadFile", { name: file.name })}
     >
       {children}
-    </a>
+    </AttachmentOpenLink>
   );
 }
 

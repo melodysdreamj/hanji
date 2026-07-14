@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "ఐకాన్ ఎంపికను మూసివేయి",
+    "label": "ఐకాన్ ఎంచుకోండి"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "ఐకాన్ రకం",
+    "emoji": "ఎమోజి",
+    "image": "చిత్రం"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "తొలగించు",
+    "ariaLabel": "ఐకాన్ తొలగించు"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "వడపోత…",
+    "searchLabel": "ఐకాన్ శోధన",
+    "random": "యాదృచ్ఛికం",
+    "randomLabel": "యాదృచ్ఛిక ఐకాన్ ఎంచుకోండి",
+    "recentLabel": "ఇటీవల ఉపయోగించినవి మొదట",
+    "gridLabelRecent": "ఐకాన్లు, ఇటీవల ఉపయోగించినవి ముందు",
+    "gridLabel": "ఐకాన్లు",
+    "optionLabel": "{{emoji}} ఐకాన్ ను ఎంచుకోండి",
+    "noResults": "{{query}} కు సరిపోలే ఐకాన్లు లేవు. వేరే పదాన్ని ప్రయత్నించండి లేదా ఫిల్టర్ ను తీసివేయండి."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "చిత్రం",
+    "linkPlaceholder": "చిత్రం లింక్ అతికించండి",
+    "linkLabel": "చిత్రం ఐకాన్ లింక్",
+    "apply": "వర్తించు",
+    "upload": "ఫైల్ అప్‌లోడ్",
+    "uploading": "అప్‌లోడ్ చేస్తోంది...",
+    "uploadingLabel": "{{fileName}} అప్‌లోడ్ చేస్తోంది",
+    "uploadFailed": "ఆ చిత్రాన్ని అప్‌లోడ్ చేయలేము.",
+    "fallbackFileName": "ఐకాన్ చిత్రం"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "అప్లోడ్ సిద్ధం చేస్తోంది",
+    "finalizing": "ముగిస్తోంది",
+    "complete": "పూర్తి",
+    "uploading": "అప్లోడ్ అవుతోంది"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Bincike ko tsallaka zuwa...",
+  "quickFind": "Gaggawar Nema",
+  "closeSearch": "Rufe bincike",
+  "quickFindResults": "Sakamakon Gaggawar Nema",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Kwanan nan da aka duba",
+    "recentSearches": "Binciken kwanan nan",
+    "pages": "Shafuka",
+    "pageContent": "Abun cikin shafi",
+    "favorites": "Abubuwan da aka fi so"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "a shafin",
+  "searchingDetail": "Ana bincike...",
+  "searchAgain": "Sake bincike",
+  "searchingPageContent": "Ana bincike abun cikin shafi...",
+  "noResultsFor": "Babu sakamako ga \"{{query}}\"",
+  "noPagesFound": "Ba a samo shafuka ba",
+  "creating": "Ana ƙirƙira...",
+  "newPage": "Sabon shafi \"{{query}}\"",
+  "couldntCreatePage": "An kasa ƙirƙira shafi",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Zaba",
+    "open": "Buɗe",
+    "newTab": "Sabon shafi"
   }
 }

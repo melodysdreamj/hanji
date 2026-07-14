@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Ngayon lang",
+  "editedJustNow": "Na-edit ngayon lang",
+  "editedMinutesAgo": "Na-edit {{minutes}} minuto ang nakalipas",
+  "editedHoursAgo": "Na-edit {{hours}} oras ang nakalipas",
+  "editedDaysAgo": "Na-edit {{days}} araw ang nakalipas",
+  "editedOn": "Na-edit {{date}}",
+  "noEdits": "Walang pag-edit",
+  "noEditsYet": "Wala pang pag-edit",
+  "todayAt": "Ngayon sa {{time}}",
+  "yesterdayAt": "Kahapon sa {{time}}",
+  "dateAt": "{{date}} sa {{time}}"
 }

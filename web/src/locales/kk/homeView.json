@@ -1,7 +1,7 @@
 {
-  "openingPage": "Opening page",
-  "workspace": "Workspace",
-  "emptyWorkspace": "Empty workspace",
-  "untitled": "Untitled",
-  "newPage": "New page"
+  "openingPage": "Парақ ашылуда",
+  "workspace": "Жұмыс кеңістігі",
+  "emptyWorkspace": "Бос жұмыс кеңістігі",
+  "untitled": "Атауы жоқ",
+  "newPage": "Жаңа парақ"
 }

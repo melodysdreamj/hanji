@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "ਟੈਕਸਟ",
+      "description": "ਸਾਦਾ ਟੈਕਸਟ ਲਿਖਣਾ ਸ਼ੁਰੂ ਕਰੋ।",
+      "placeholder": "ਕਮਾਂਡਾਂ ਲਈ '/' ਟਾਈਪ ਕਰੋ"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "ਪੰਨਾ",
+      "description": "ਇਸ ਪੰਨੇ ਦੇ ਅੰਦਰ ਇੱਕ ਉਪ-ਪੰਨਾ ਬਣਾਓ।"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "ਸਫ਼ੇ ਨਾਲ ਲਿੰਕ",
+      "description": "ਕਿਸੇ ਮੌਜੂਦਾ ਪੰਨੇ ਨਾਲ ਲਿੰਕ ਕਰੋ।"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ਸਿਰਲੇਖ 1",
+      "description": "ਵੱਡਾ ਸੈਕਸ਼ਨ ਸਿਰਲੇਖ।",
+      "placeholder": "ਸਿਰਲੇਖ 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ਟੌਗਲ ਹੈਡਿੰਗ 1",
+      "description": "ਵੱਡਾ ਸਿਰਲੇਖ ਜੋ ਨੇਸਟਡ ਸਮੱਗਰੀ ਨੂੰ ਲੁਕਾ ਸਕਦਾ ਹੈ।",
+      "placeholder": "ਟੌਗਲ ਹੈਡਿੰਗ 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ਸਿਰਲੇਖ 2",
+      "description": "ਮੱਧਮ ਸੈਕਸ਼ਨ ਸਿਰਲੇਖ।",
+      "placeholder": "ਸਿਰਲੇਖ 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ਟੌਗਲ ਹੈਡਿੰਗ 2",
+      "description": "ਨੈਸਟਡ ਸਮਗਰੀ ਲੁਕਾਉਣ ਲਈ ਮਧਮ ਹੈਡਿੰਗ",
+      "placeholder": "ਟੌਗਲ ਹੈਡਿੰਗ 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ਸਿਰਲੇਖ 3",
+      "description": "ਛੋਟਾ ਸੈਕਸ਼ਨ ਸਿਰਲੇਖ।",
+      "placeholder": "ਸਿਰਲੇਖ 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ਟੌਗਲ ਹੈਡਿੰਗ 3",
+      "description": "ਨੈਸਟਡ ਸਮਗਰੀ ਲੁਕਾਉਣ ਲਈ ਛੋਟੀ ਹੈਡਿੰਗ",
+      "placeholder": "ਟੌਗਲ ਸਿਰਲੇਖ 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ਸਿਰਲੇਖ 4",
+      "description": "ਸੰਖੇਪ ਸੈਕਸ਼ਨ ਸਿਰਲੇਖ।",
+      "placeholder": "ਸਿਰਲੇਖ 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ਟੌਗਲ ਸਿਰਲੇਖ 4",
+      "description": "ਸੰਖੇਪ ਸਿਰਲੇਖ ਜੋ ਨਿਸ਼ਚਿਤ ਸਮੱਗਰੀ ਨੂੰ ਲੁਕਾ ਸਕਦਾ ਹੈ।",
+      "placeholder": "ਟੌਗਲ ਸਿਰਲੇਖ 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "ਕੰਮ ਸੂਚੀ",
+      "description": "ਚੈੱਕਬਾਕਸ ਨਾਲ ਕੰਮਾਂ ਨੂੰ ਟ੍ਰੈਕ ਕਰੋ।",
+      "placeholder": "ਕੰਮ"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "ਬੁਲੇਟਡ ਸੂਚੀ",
+      "description": "ਇੱਕ ਸਧਾਰਨ ਬੁਲੇਟਡ ਸੂਚੀ ਬਣਾਓ।",
+      "placeholder": "ਸੂਚੀ"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "ਗਿਣਤੀ ਸੂਚੀ",
+      "description": "ਗਿਣਤੀ ਵਾਲੀ ਸੂਚੀ ਬਣਾਓ।",
+      "placeholder": "ਸੂਚੀ"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ਟੌਗਲ ਸੂਚੀ",
+      "description": "ਟੌਗਲਸ ਸਮੱਗਰੀ ਨੂੰ ਲੁਕਾ ਅਤੇ ਦਿਖਾ ਸਕਦੇ ਹਨ।",
+      "placeholder": "ਟੌਗਲ"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "ਕੋਟ",
+      "description": "ਕੋਟ ਸ਼ਾਮਲ ਕਰੋ।",
+      "placeholder": "ਖਾਲੀ ਕੋਟ"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "ਕਾਲਆਊਟ",
+      "description": "ਲਿਖਤ ਨੂੰ ਉਘਾ ਕਰੋ।",
+      "placeholder": "ਕੁਝ ਲਿਖੋ…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "ਡਿਵਾਈਡਰ",
+      "description": "ਬਲਾਕਾਂ ਨੂੰ ਨਜ਼ਰੀ ਤੌਰ 'ਤੇ ਵੰਡੋ।"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "ਕੋਡ",
+      "description": "ਕੋਡ ਸਨਿੱਪਟ ਕੈਪਚਰ ਕਰੋ।",
+      "placeholder": "ਕੋਡ ਲਿਖੋ, ਜਾਂ ਸਨਿੱਪਟ ਪੇਸਟ ਕਰੋ..."
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "ਸਮੀਕਰਨ",
+      "description": "ਗਣਿਤ ਸਮੀਕਰਨ ਪ੍ਰਦਰਸ਼ਿਤ ਕਰੋ।"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "ਸਮੱਗਰੀ ਦੀ ਸਾਰਣੀ",
+      "description": "ਇਸ ਪੰਨੇ ਵਿੱਚ ਸਿਰਲੇਖਾਂ ਦੇ ਲਿੰਕ ਦਿਖਾਓ।"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "ਸਿੰਕ ਬਲਾਕ",
+      "description": "ਸਫ਼ਿਆਂ ਵਿੱਚ ਸਮੱਗਰੀ ਮੁੜ ਵਰਤੋ।"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "ਬਟਨ",
+      "description": "ਇੱਕ ਕਲਿੱਕ ਨਾਲ ਮੁੜ-ਵਰਜੋਗ ਸਮੱਗਰੀ ਪਾਓ।"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ਟੈਬਾਂ",
+      "description": "ਸਮੱਗਰੀ ਨੂੰ ਟੈਬਾਂ 'ਚ ਸਮੂਹਬੱਧ ਕਰੋ।",
+      "placeholder": "ਟੈਬਾਂ"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "ਬ੍ਰੈਡਕਰੰਬ",
+      "description": "ਦਿਖਾਓ ਕਿ ਇਹ ਪੇਜ ਕਿੱਥੇ ਹੈ।"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "ਨਕਲ",
+      "description": "ਇਸ ਬਲੌਕ ਦੀ ਬਿਲਕੁਲ ਨਕਲ ਬਣਾਓ।"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "ਇੱਥੇ ਲੈ ਜਾਓ",
+      "description": "ਇਸ ਬਲਾਕ ਨੂੰ ਦੂਜੇ ਪੇਜ 'ਤੇ ਲੈ ਜਾਓ।"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "ਇਸ ਬਲੌਕ ਨੂੰ ਮਿਟਾਓ।"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "ਬਦਲੋ",
+      "description": "ਇਸ ਬਲਾਕ ਦੀ ਕਿਸਮ ਬਦਲੋ।"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "ਰੰਗ",
+      "description": "ਇਸ ਬਲੌਕ ਦਾ ਟੈਕਸਟ ਜਾਂ ਪਿਛੋਕੜ ਰੰਗ ਬਦਲੋ।"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "ਸਾਰਣੀ",
+      "description": "ਇਸ ਸਫ਼ੇ ਵਿੱਚ ਸਰਲ ਸਾਰਣੀ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ਕਾਲਮ",
+      "description": "ਬਲਾਕਾਂ ਨੂੰ ਨਾਲ-ਨਾਲ ਰੱਖੋ।"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ਕਾਲਮ",
+      "description": "ਬਲਾਕਾਂ ਨੂੰ 3 ਕਾਲਮਾਂ ਵਿੱਚ ਰੱਖੋ।"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ਕਾਲਮ",
+      "description": "ਬਲਾਕਾਂ ਨੂੰ 4 ਕਾਲਮਾਂ ਵਿੱਚ ਰੱਖੋ।"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ਕਾਲਮ",
+      "description": "ਬਲਾਕਾਂ ਨੂੰ 5 ਕਾਲਮਾਂ ਵਿੱਚ ਰੱਖੋ।"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "ਤਸਵੀਰ",
+      "description": "ਅੱਪਲੋਡ ਕਰੋ ਜਾਂ ਲਿੰਕ ਨਾਲ ਏਮਬੈੱਡ ਕਰੋ।"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ਵੀਡੀਓ",
+      "description": "ਲਿੰਕ ਨਾਲ ਇੱਕ ਵੀਡੀਓ ਐਮਬੈਡ ਕਰੋ।"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ਆਡੀਓ",
+      "description": "ਲਿੰਕ ਨਾਲ ਆਡੀਓ ਐਮਬੈਡ ਕਰੋ।"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "ਵੈੱਬ ਬੁੱਕਮਾਰਕ",
+      "description": "ਵੈੱਬ ਲਿੰਕ ਨੂੰ ਕਾਰਡ ਵਜੋਂ ਸੁਰੱਖਿਅਤ ਕਰੋ।"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ਏਮਬੈਡ",
+      "description": "ਲਿੰਕ ਤੋਂ ਸਮੱਗਰੀ ਏਮਬੈਡ ਕਰੋ।"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "ਫ਼ਾਈਲ",
+      "description": "ਇਸ ਪੰਨੇ 'ਤੇ ਫ਼ਾਈਲ ਲਿੰਕ ਅਟੈਚ ਕਰੋ।"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ਡੇਟਾਬੇਸ - ਪੂਰਾ ਪੰਨਾ",
+      "description": "ਨਵਾਂ ਡੇਟਾਬੇਸ ਉਪ-ਪੰਨੇ ਵਜੋਂ ਜੋੜੋ।"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "ਟੇਬਲ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲੀ ਡੈਟਾਬੇਸ ਟੇਬਲ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "ਬੋਰਡ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲਾ ਕਾਨਬੈਨ ਬੋਰਡ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "ਸੂਚੀ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲੀ ਡੈਟਾਬੇਸ ਸੂਚੀ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "ਟਾਈਮਲਾਈਨ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲੀ ਡੈਟਾਬੇਸ ਟਾਈਮਲਾਈਨ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "ਕੈਲੰਡਰ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲਾ ਕੈਲੰਡਰ ਡੈਟਾਬੇਸ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "ਗੈਲਰੀ - ਪੂਰਾ ਪੇਜ",
+      "description": "ਪੂਰੇ ਪੇਜ ਵਾਲੀ ਡੈਟਾਬੇਸ ਗੈਲਰੀ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ਡੇਟਾਬੇਸ - ਇਨਲਾਈਨ",
+      "description": "ਇਸ ਪੰਨੇ ਦੇ ਅੰਦਰ ਇੱਕ ਡੇਟਾਬੇਸ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "ਟੇਬਲ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਡੇਟਾਬੇਸ ਨੂੰ ਟੇਬਲ ਵਜੋਂ ਜੋੜੋ।"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "ਬੋਰਡ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਕਾਨਬਨ ਬੋਰਡ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "ਸੂਚੀ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਡੇਟਾਬੇਸ ਸੂਚੀ ਦੇ ਰੂਪ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "ਟਾਈਮਲਾਈਨ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਡੇਟਾਬੇਸ ਟਾਈਮਲਾਈਨ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "ਕੈਲੰਡਰ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਕੈਲੰਡਰ ਡੇਟਾਬੇਸ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "ਗੈਲਰੀ ਦ੍ਰਿਸ਼",
+      "description": "ਇੱਕ ਇਨਲਾਈਨ ਡੇਟਾਬੇਸ ਗੈਲਰੀ ਸ਼ਾਮਲ ਕਰੋ।"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "ਡਿਫੌਲਟ",
+      "description": "ਇਸ ਬਲਾਕ ਤੋਂ ਟੈਕਸਟ ਜਾਂ ਪਿਛੋਕੜ ਰੰਗ ਹਟਾਓ।"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "ਸਲੇਟੀ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਸਲੇਟੀ ਲਗਾਓ।"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "ਭੂਰਾ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਭੂਰਾ ਲਾਗੂ ਕਰੋ।"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ਸੰਤਰੀ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਸੰਤਰੀ ਲਾਗੂ ਕਰੋ।"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "ਪੀਲਾ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਪੀਲਾ ਲਾਗੂ ਕਰੋ।"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "ਹਰਾ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਹਰਾ ਲਾਗੂ ਕਰੋ।"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "ਨੀਲਾ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਨੀਲਾ ਲਾਗੂ ਕਰੋ।"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ਜਾਮਣੀ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਜਾਮਣੀ ਲਾਗੂ ਕਰੋ।"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "ਗੁਲਾਬੀ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਗੁਲਾਬੀ ਲਾਗੂ ਕਰੋ।"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "ਲਾਲ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਲਾਲ ਲਾਗੂ ਕਰੋ।"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "ਸਲੇਟੀ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਸਲੇਟੀ ਪਿਛੋਕੜ ਲਗਾਓ।"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "ਭੂਰਾ ਬੈਕਗ੍ਰਾਊਂਡ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਭੂਰਾ ਬੈਕਗ੍ਰਾਊਂਡ ਲਾਗੂ ਕਰੋ।"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ਸੰਤਰੀ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਸੰਤਰੀ ਪਿਛੋਕੜ ਲਾਗੂ ਕਰੋ।"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "ਪੀਲਾ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਪੀਲਾ ਪਿਛੋਕੜ ਲਾਗੂ ਕਰੋ।"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "ਹਰਾ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਹਰਾ ਪਿਛੋਕੜ ਲਗਾਓ।"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "ਨੀਲਾ ਬੈਕਗ੍ਰਾਊਂਡ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਨੀਲਾ ਬੈਕਗ੍ਰਾਊਂਡ ਲਾਗੂ ਕਰੋ।"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ਜਾਮਣੀ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਜਾਮਣੀ ਪਿਛੋਕੜ ਲਾਗੂ ਕਰੋ।"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "ਗੁਲਾਬੀ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਗੁਲਾਬੀ ਪਿਛੋਕੜ ਲਾਗੂ ਕਰੋ।"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "ਲਾਲ ਪਿਛੋਕੜ",
+      "description": "ਇਸ ਬਲਾਕ 'ਤੇ ਲਾਲ ਪਿਛੋਕੜ ਲਾਗੂ ਕਰੋ।"
     }
   }
 }

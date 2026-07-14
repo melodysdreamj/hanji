@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "منسوخ",
+    "save": "محفوظ کریں",
+    "close": "بند کریں",
+    "search": "تلاش کریں",
+    "create": "بنائیں",
+    "delete": "حذف کریں",
+    "clearAll": "سب صاف کریں",
+    "done": "مکمل",
+    "add": "شامل کریں"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "بغیر عنوان"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} کاپی",
+    "columnName": "کالم {{number}}",
+    "importedDatabase": "درآمد کردہ ڈیٹا بیس",
+    "uploadedFile": "اپ لوڈ کردہ فائل",
+    "image": "تصویر",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "نام",
+      "status": "حالت",
+      "select": "انتخاب",
+      "date": "تاریخ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "غیر شروع شدہ",
+      "doing": "جاری",
+      "done": "مکمل"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "آپشن 1",
+      "second": "آپشن 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "ٹیبل"
     }
   }
 }

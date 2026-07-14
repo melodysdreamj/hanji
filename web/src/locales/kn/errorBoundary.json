@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "ಈ ವಿಷಯವನ್ನು ಪ್ರದರ್ಶಿಸುವಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ.",
+  "detail": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ, ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಮರುಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಕೆಳಗಿನ ಉಲ್ಲೇಖವನ್ನು ಹಂಚಿಕೊಳ್ಳಿ.",
+  "reference": "ಉಲ್ಲೇಖ: {{reference}}",
+  "reload": "ಅಪ್ಲಿಕೇಶನ್ ಮರುಲೋಡ್ ಮಾಡಿ",
+  "retry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
 }

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Tambahkan properti tanggal",
+    "description": "Tampilan kalender memerlukan properti tanggal untuk menempatkan halaman di bulan.",
+    "addDateButton": "Tanggal"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalender berdasarkan",
+    "today": "Hari ini",
+    "previousWeek": "Minggu sebelumnya",
+    "previousMonth": "Bulan lalu",
+    "nextWeek": "Minggu depan",
+    "nextMonth": "Bulan depan"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Min",
+    "mon": "Sen",
+    "tue": "Sel",
+    "wed": "Rab",
+    "thu": "Kam",
+    "fri": "Jum",
+    "sat": "Sab"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Kalender {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} item",
+    "newRowAriaLabel": "Baris baru pada {{date}}",
+    "newRowTitle": "Baru",
+    "showLess": "Tampilkan lebih sedikit",
+    "showMore": "+{{count}} lainnya"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buka {{title}}",
+    "openAriaLabelWithDate": "Buka {{title}}, dijadwalkan pada {{date}}",
+    "openNoDateAriaLabel": "Buka {{title}}, tanpa tanggal"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tanpa tanggal ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Tanpa judul",
+    "dateDefaultName": "Tanggal"
   }
 }

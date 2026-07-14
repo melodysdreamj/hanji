@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Baru saja",
+  "editedJustNow": "Baru saja diedit",
+  "editedMinutesAgo": "Diedit {{minutes}}mnt lalu",
+  "editedHoursAgo": "Diedit {{hours}}j lalu",
+  "editedDaysAgo": "Diedit {{days}}h lalu",
+  "editedOn": "Diedit {{date}}",
+  "noEdits": "Tidak ada edit",
+  "noEditsYet": "Belum ada edit",
+  "todayAt": "Hari ini pukul {{time}}",
+  "yesterdayAt": "Kemarin pukul {{time}}",
+  "dateAt": "{{date}} pukul {{time}}"
 }

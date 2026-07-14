@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Μορφοποίηση κειμένου"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Μετατροπή σε",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Κείμενο",
+      "heading1": "Επικεφαλίδα 1",
+      "heading2": "Επικεφαλίδα 2",
+      "heading3": "Επικεφαλίδα 3",
+      "heading4": "Επικεφαλίδα 4",
+      "toDoList": "Λίστα εργασιών",
+      "bulletedList": "Λίστα με κουκκίδες",
+      "numberedList": "Αριθμημένη λίστα",
+      "toggleList": "Λίστα εναλλαγής",
+      "quote": "Παράθεση",
+      "callout": "Επισήμανση",
+      "code": "Κώδικας"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Έντονο",
+    "italic": "Πλάγια",
+    "underline": "Υπογράμμιση",
+    "strikethrough": "Διακριτή γραμμή",
+    "code": "Κώδικας",
+    "link": "Σύνδεσμος"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Σχόλιο"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Χρώμα κειμένου: {{color}}",
+    "title": "Χρώμα: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Μικτό",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Χρώμα κειμένου",
+      "default": "Προεπιλογή",
+      "gray": "Γκρι",
+      "brown": "Καφέ",
+      "orange": "Πορτοκαλί",
+      "yellow": "Κίτρινο",
+      "green": "Πράσινο",
+      "blue": "Μπλε",
+      "purple": "Μωβ",
+      "pink": "Ροζ",
+      "red": "Κόκκινο"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Χρώμα φόντου",
+      "gray": "Γκρι φόντο",
+      "brown": "Καφέ φόντο",
+      "orange": "Πορτοκαλί φόντο",
+      "yellow": "Κίτρινο φόντο",
+      "green": "Πράσινο φόντο",
+      "blue": "Μπλε φόντο",
+      "purple": "Μωβ φόντο",
+      "pink": "Ροζ φόντο",
+      "red": "Κόκκινο φόντο"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Επεξεργασία συνδέσμου",
+    "placeholder": "Επικόλληση συνδέσμου",
+    "urlAriaLabel": "URL συνδέσμου",
+    "apply": "Σύνδεσμος",
+    "open": "Άνοιγμα συνδέσμου",
+    "copy": "Αντιγραφή συνδέσμου",
+    "copied": "Αντιγράφηκε",
+    "copiedLink": "Ο σύνδεσμος αντιγράφηκε",
+    "remove": "Αφαίρεση"
   }
 }

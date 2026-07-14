@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Tarix xüsusiyyəti əlavə et",
+    "description": "Zaman xətti görünüşləri səhifələri zaman üzrə göstərmək üçün başlanğıc tarix xüsusiyyəti tələb edir."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Aralıqları göstərmək üçün son tarix xüsusiyyəti əlavə edin.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zaman xətti miqyası",
+    "day": "Gün",
+    "week": "Həftə",
+    "month": "Ay"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Asılılıqlar:",
+    "hint": "əlaqəli xassə əlavə edin",
+    "relationPropertyAriaLabel": "Asılılıq əlaqəli xassəsi"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Bugün",
+    "previousRange": "Əvvəlki aralıq",
+    "nextRange": "Növbəti aralıq",
+    "newPage": "Yeni",
+    "newPageIn": "Yeni səhifə ({{dbTitle}})"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Zaman xətti cədvəli",
+    "nameHeader": "Ad"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} aç",
+    "openAriaLabelWithDates": "{{title}} aç, {{start}} - {{end}}",
+    "openNoDateAriaLabel": "{{title}} aç, tarix yoxdur"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Bu aralıqda element yoxdur.",
+    "noDatedItems": "Hələ tarixli element yoxdur.",
+    "jumpTo": "{{date}} tarixinə keç"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tarix yoxdur ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Heç biri",
+    "untitled": "Adsız"
   }
 }

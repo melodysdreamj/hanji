@@ -1,23 +1,23 @@
 {
-  "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
-  },
   "header": {
-    "title": "Linked mentions"
-  },
-  "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "title": "Wzmianki z linkami"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "link": "Link",
+    "mention": "Wzmianka"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "Jeszcze {{count}} backlink",
+    "count_other": "Jeszcze {{count}} backlinków"
+  },
+  "summary": {
+    "link_one": "{{count}} link",
+    "link_other": "{{count}} linków",
+    "mention_one": "{{count}} wzmianka",
+    "mention_other": "{{count}} wzmianek"
+  },
+  "toggle": {
+    "count_one": "{{count}} backlink",
+    "count_other": "{{count}} backlinków"
   }
 }

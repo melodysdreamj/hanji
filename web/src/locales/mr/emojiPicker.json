@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "चिन्ह निवडक बंद करा",
+    "label": "चिन्ह निवडा"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "चिन्ह प्रकार",
+    "emoji": "इमोजी",
+    "image": "प्रतिमा"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "काढा",
+    "ariaLabel": "चिन्ह काढा"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "फिल्टर…",
+    "searchLabel": "चिन्ह शोधा",
+    "random": "यादृच्छिक",
+    "randomLabel": "यादृच्छिक चिन्ह निवडा",
+    "recentLabel": "अलीकडील वापरलेले प्रथम",
+    "gridLabelRecent": "चिन्हे, अलीकडे वापरलेले प्रथम",
+    "gridLabel": "चिन्हे",
+    "optionLabel": "{{emoji}} चिन्ह निवडा",
+    "noResults": "“{{query}}” शी जुळणारी कोणतीही चिन्हे नाहीत. वेगळा शब्द वापरून पहा किंवा फिल्टर साफ करा."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "प्रतिमा",
+    "linkPlaceholder": "प्रतिमा दुवा पेस्ट करा",
+    "linkLabel": "प्रतिमा चिन्ह दुवा",
+    "apply": "लागू करा",
+    "upload": "फाइल अपलोड करा",
+    "uploading": "अपलोड करत आहे...",
+    "uploadingLabel": "{{fileName}} अपलोड करत आहे",
+    "uploadFailed": "ती प्रतिमा अपलोड करता आली नाही.",
+    "fallbackFileName": "चिन्ह प्रतिमा"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "अपलोड तयारी",
+    "finalizing": "अंतिमीकरण",
+    "complete": "पूर्ण",
+    "uploading": "अपलोड करीत आहे"
   }
 }

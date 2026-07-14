@@ -1,7 +1,7 @@
 {
   "diagramLabel": "Mermaid diagram",
-  "emptyPreview": "Diagram preview",
-  "sourceDescription": "Diagram source: {{source}}",
-  "syntaxError": "The diagram has a syntax error.",
-  "syntaxErrorDetails": "Show details"
+  "emptyPreview": "Diagram előnézet",
+  "sourceDescription": "Diagram forrása: {{source}}",
+  "syntaxError": "A diagram szintaktikai hibát tartalmaz.",
+  "syntaxErrorDetails": "Részletek megjelenítése"
 }

@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "කවරය වෙනස් කරන්න",
+    "reposition": "නැවත ස්ථානගත කරන්න",
+    "remove": "ඉවත් කරන්න",
+    "uploadFile": "ගොනුව උඩුගත කරන්න",
+    "uploading": "උඩුගත කරමින්...",
+    "submit": "යොමු කරන්න",
+    "savePosition": "ස්ථානය සුරකින්න"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "ගැලරිය",
+    "upload": "උඩුගත කරන්න",
+    "link": "සබැඳිය"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "රූප සබැඳිය අලවන්න",
+    "invalid": "http හෝ https රූප සබැඳියක් අලවන්න."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "එම රූපය උඩුගත කළ නොහැක.",
+    "defaultFileName": "ආවරණ රූපය"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "නැවත ස්ථානගත කිරීමට රූපය ඇදගෙන යන්න"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "උඩුගත කිරීම සූදානම් කරමින්",
+    "finalizing": "අවසන් කරමින්",
+    "complete": "සම්පූර්ණයි",
+    "uploading": "උඩුගත කරමින්"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "කවරය ඉවත් කරන ලදී",
+    "restored": "කවරය ප්රතිෂ්ඨාපනය කරන ලදී",
+    "undo": "අහෝසි කරන්න"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "පිටු කවරය",
+    "coverVerticalPosition": "කවර සිරස් ස්ථානය",
+    "positionFromTop": "ඉහළ සිට {{position}}%",
+    "closeCoverMenu": "කවර මෙනුව වසන්න",
+    "changePageCover": "පිටු කවරය වෙනස් කරන්න",
+    "repositionPageCover": "පිටු කවරය නැවත ස්ථානගත කරන්න",
+    "removePageCover": "පිටු කවරය ඉවත් කරන්න",
+    "changeCoverDialog": "කවරය වෙනස් කරන්න",
+    "coverSource": "කවර ප්රභවය",
+    "selectCover": "කවරය {{number}} තෝරන්න",
+    "uploadFromDevice": "මෙම උපාංගයෙන් කවර රූපය උඩුගත කරන්න",
+    "uploadingFile": "{{fileName}} උඩුගත කරමින්",
+    "coverImageLink": "කවර රූප සබැඳිය"
   }
 }

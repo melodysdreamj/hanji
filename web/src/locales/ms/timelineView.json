@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Tambah sifat tarikh",
+    "description": "Paparan garis masa memerlukan sifat tarikh mula untuk memaparkan halaman merentas masa."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Tambah sifat tarikh tamat untuk memaparkan julat dan bukannya bar sehari.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zum garis masa",
+    "day": "Hari",
+    "week": "Minggu",
+    "month": "Bulan"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Kebergantungan:",
+    "hint": "tambah sifat hubungan",
+    "relationPropertyAriaLabel": "Sifat hubungan kebergantungan"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Hari ini",
+    "previousRange": "Julat sebelumnya",
+    "nextRange": "Julat seterusnya",
+    "newPage": "Baharu",
+    "newPageIn": "Halaman baharu dalam {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Jadual garis masa",
+    "nameHeader": "Nama"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buka {{title}}",
+    "openAriaLabelWithDates": "Buka {{title}}, {{start}} hingga {{end}}",
+    "openNoDateAriaLabel": "Buka {{title}}, tiada tarikh"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Tiada item dalam julat ini.",
+    "noDatedItems": "Belum ada item bertarikh.",
+    "jumpTo": "Lompat ke {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Tiada tarikh ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Tiada",
+    "untitled": "Tanpa tajuk"
   }
 }

@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "deleteForever": "Poista pysyvästi",
+    "emptyTrash": "Tyhjennä roskakori",
+    "restore": "Palauta"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "cancelEmptyTrash": "Peruuta roskakorin tyhjennys",
+    "cancelPermanentDelete": "Peruuta pysyvä poisto",
+    "deletePageForever": "Poista {{title}} pysyvästi",
+    "openFromTrash": "Avaa {{title}} roskakorista",
+    "restorePage": "Palauta {{title}}"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteBodyPrefix": "Tämä poistaa pysyvästi ",
+    "deleteBodySuffix": ". Tätä toimintoa ei voi kumota.",
+    "deleteTitle": "Poista pysyvästi?",
+    "emptyBody_one": "Tämä poistaa pysyvästi kaikki {{count}} sivun roskakorista. Tätä toimintoa ei voi kumota.",
+    "emptyBody_other": "Tämä poistaa pysyvästi kaikki {{count}} sivua roskakorista. Tätä toimintoa ei voi kumota.",
+    "emptyTitle": "Tyhjennä roskakori?"
   },
+  "deletedJustNow": "Poistettu juuri nyt",
+  "deletedOn": "Poistettu {{date}}",
+  "deletedPages": "Poistetut sivut",
+  "empty": "Poistamasi sivut päätyvät tänne. Roskakori on tyhjä.",
+  "noSearchMatches": "Hakuasi vastaavia poistettuja sivuja ei löytynyt.",
+  "pageCount_one": "{{count}} sivu",
+  "pageCount_other": "{{count}} sivua",
+  "searchTrash": "Hae roskakorista",
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
-  }
+    "couldntDelete": "Sivua ei voitu poistaa",
+    "couldntEmpty": "Roskakoria ei voitu tyhjentää",
+    "couldntRestore": "Sivua ei voitu palauttaa",
+    "deletedForever": "Poistettu pysyvästi",
+    "emptied": "Roskakori tyhjennetty",
+    "restored": "Sivu palautettu"
+  },
+  "trash": "Roskakori"
 }

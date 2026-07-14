@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "உரை",
+      "description": "வெற்று உரையுடன் எழுதத் தொடங்கவும்",
+      "placeholder": "கட்டளைகளுக்காக '/' ஐ உள்ளிடவும்"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "பக்கம்",
+      "description": "இந்தப் பக்கத்தின் உள்ளே ஒரு துணைப்பக்கத்தை உருவாக்கவும்."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "பக்க இணைப்பு",
+      "description": "ஏற்கனவே உள்ள பக்கத்துடன் இணைக்கவும்."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "தலைப்பு 1",
+      "description": "பெரிய பகுதி தலைப்பு.",
+      "placeholder": "தலைப்பு 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "மாற்று தலைப்பு 1",
+      "description": "உள்ளமை உள்ளடக்கத்தை மறைக்கும் பெரிய தலைப்பு.",
+      "placeholder": "மாற்று தலைப்பு 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "தலைப்பு 2",
+      "description": "நடுத்தர பகுதி தலைப்பு.",
+      "placeholder": "தலைப்பு 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "மாற்று தலைப்பு 2",
+      "description": "உள்ளடக்கத்தை மறைக்கும் நடுத்தர தலைப்பு",
+      "placeholder": "மாற்று தலைப்பு 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "தலைப்பு 3",
+      "description": "சிறிய பகுதி தலைப்பு.",
+      "placeholder": "தலைப்பு 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "மாற்று தலைப்பு 3",
+      "description": "உள்ளடக்கத்தை மறைக்கும் சிறிய தலைப்பு",
+      "placeholder": "மாற்று தலைப்பு 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "தலைப்பு 4",
+      "description": "கச்சிதமான பகுதி தலைப்பு.",
+      "placeholder": "தலைப்பு 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "மாற்று தலைப்பு 4",
+      "description": "உள்ளடக்கத்தை மறைக்கக்கூடிய சிறிய தலைப்பு.",
+      "placeholder": "மாற்று தலைப்பு 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "செய்ய வேண்டிய பட்டியல்",
+      "description": "செக்பாக்ஸ் மூலம் பணிகளைக் கண்காணிக்கவும்.",
+      "placeholder": "செய்ய வேண்டியவை"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "புள்ளியிட்ட பட்டியல்",
+      "description": "எளிய புள்ளியிட்ட பட்டியலை உருவாக்கவும்.",
+      "placeholder": "பட்டியல்"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "எண் பட்டியல்",
+      "description": "எண்ணிட்ட பட்டியலை உருவாக்கவும்",
+      "placeholder": "பட்டியல்"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "மாற்று பட்டியல்",
+      "description": "மாற்றுகள் உள்ளடக்கத்தை மறைத்துக் காட்டும்.",
+      "placeholder": "மாற்று"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "மேற்கோள்",
+      "description": "மேற்கோளைச் சேர்க்கவும்",
+      "placeholder": "வெற்று மேற்கோள்"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "கால்அவுட்",
+      "description": "எழுத்தை தனித்துக் காட்டவும்.",
+      "placeholder": "ஏதாவது தட்டச்சு செய்க…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "பிரிப்பான்",
+      "description": "தொகுதிகளை காட்சியாகப் பிரிக்கும்."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "குறியீடு",
+      "description": "குறியீட்டுத் துண்டைச் சேர்க்கவும்.",
+      "placeholder": "குறியீட்டை எழுதவும், அல்லது ஒரு துண்டை ஒட்டவும்…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "சமன்பாடு",
+      "description": "கணித சமன்பாட்டைக் காண்பிக்கும்."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "உள்ளடக்க அட்டவணை",
+      "description": "இப்பக்கத்தில் உள்ள தலைப்புகளுக்கான இணைப்புகளைக் காட்டு."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "ஒத்திசைவுத் தொகுதி",
+      "description": "உள்ளடக்கத்தைப் பக்கங்களில் மீண்டும் பயன்படுத்தவும்"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "பொத்தான்",
+      "description": "மீண்டும் பயன்படுத்தக்கூடிய உள்ளடக்கத்தை ஒரே கிளிக்கில் செருகவும்."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "தாவல்கள்",
+      "description": "உள்ளடக்கத்தை லேபிளிடப்பட்ட தாவல்களில் தொகுக்கவும்",
+      "placeholder": "தாவல்கள்"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "ப்ரெட்கிரம்ப்",
+      "description": "இந்த பக்கம் எங்கு உள்ளது என்பதைக் காட்டவும்."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "நகலெடு",
+      "description": "இந்தத் தொகுதியின் சரியான நகலை உருவாக்குக."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "நகர்த்துக",
+      "description": "இந்த தொகுதியை மற்றொரு பக்கத்திற்கு நகர்த்தவும்."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "இந்தத் தொகுதியை நீக்குக."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "மாற்றுக",
+      "description": "இந்த தொகுதியின் வகையை மாற்றவும்."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "நிறம்",
+      "description": "இந்தத் தொகுதியின் உரை அல்லது பின்னணி நிறத்தை மாற்றுக."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "அட்டவணை",
+      "description": "இந்தப் பக்கத்தில் எளிய அட்டவணையைச் சேர்"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 நெடுவரிசைகள்",
+      "description": "தொகுதிகளை அருகருகே வைக்கவும்."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 நெடுவரிசைகள்",
+      "description": "தொகுதிகளை 3 நெடுவரிசைகளில் அமைக்கவும்."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 நெடுவரிசைகள்",
+      "description": "தொகுதிகளை 4 நெடுவரிசைகளில் அமைக்கவும்."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 நெடுவரிசைகள்",
+      "description": "தொகுதிகளை 5 நெடுவரிசைகளில் அமைக்கவும்."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "படம்",
+      "description": "இணைப்புடன் பதிவேற்றவும் அல்லது உட்பொதிக்கவும்."
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "வீடியோ",
+      "description": "இணைப்புடன் வீடியோவை உட்பொதிக்கவும்."
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "ஆடியோ",
+      "description": "இணைப்புடன் ஆடியோவை உட்பொதிக்கவும்."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "வலை புக்மார்க்",
+      "description": "வலை இணைப்பை அட்டையாகச் சேமிக்கவும்."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "உட்பொதி",
+      "description": "இணைப்பிலிருந்து உள்ளடக்கத்தை உட்பொதிக்கும்."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "கோப்பு",
+      "description": "இந்தப் பக்கத்தில் கோப்பு இணைப்பை இணைக்கும்."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "தரவுத்தளம் - முழு பக்கம்",
+      "description": "துணைப்பக்கமாக புதிய தரவுத்தளத்தைச் சேர்க்கவும்."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "அட்டவணை - முழு பக்கம்",
+      "description": "முழு பக்கம் தரவுத்தளத்தை அட்டவணையாகச் சேர்க்கவும்."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "பலகை - முழு பக்கம்",
+      "description": "முழு பக்கம் கான்பன் பலகையைச் சேர்க்கவும்."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "பட்டியல் - முழு பக்கம்",
+      "description": "முழு பக்கம் தரவுத்தளத்தைப் பட்டியலாகச் சேர்க்கவும்."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "காலவரிசை - முழு பக்கம்",
+      "description": "முழு பக்கம் தரவுத்தள காலவரிசையைச் சேர்க்கவும்."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "காலண்டர் - முழு பக்கம்",
+      "description": "முழு பக்கம் காலண்டர் தரவுத்தளத்தைச் சேர்க்கவும்."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "கேலரி - முழு பக்கம்",
+      "description": "முழு பக்கம் தரவுத்தள கேலரியைச் சேர்க்கவும்."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "தரவுத்தளம் - இன்லைன்",
+      "description": "இந்தப் பக்கத்தில் தரவுத்தளத்தைச் சேர்க்கவும்."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "அட்டவணை காட்சி",
+      "description": "இன்லைன் தரவுத்தளத்தை அட்டவணையாகச் சேர்க்கவும்."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "பலகை காட்சி",
+      "description": "இன்லைன் கான்பன் பலகையைச் சேர்க்கவும்."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "பட்டியல் காட்சி",
+      "description": "இன்லைன் தரவுத்தளத்தை பட்டியலாகச் சேர்க்கவும்."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "காலவரிசை காட்சி",
+      "description": "இன்லைன் தரவுத்தள காலவரிசையைச் சேர்க்கவும்."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "காலண்டர் காட்சி",
+      "description": "இன்லைன் காலண்டர் தரவுத்தளத்தைச் சேர்க்கவும்."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "கேலரி காட்சி",
+      "description": "இன்லைன் தரவுத்தள கேலரியைச் சேர்க்கவும்."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "இயல்பு",
+      "description": "இந்தத் தொகுதியின் உரை அல்லது பின்புல நிறத்தை அகற்று."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "சாம்பல்",
+      "description": "இந்தத் தொகுதிக்கு சாம்பல் நிறத்தைப் பயன்படுத்து."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "பழுப்பு",
+      "description": "இந்த தொகுதிக்கு பழுப்பைப் பயன்படுத்தவும்."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "ஆரஞ்சு",
+      "description": "இந்தத் தொகுதிக்கு ஆரஞ்சு நிறத்தைப் பயன்படுத்து."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "மஞ்சள்",
+      "description": "இந்த தொகுதிக்கு மஞ்சள் நிறத்தைப் பயன்படுத்தவும்."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "பச்சை",
+      "description": "இந்தத் தொகுதிக்கு பச்சை நிறத்தைப் பயன்படுத்து."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "நீலம்",
+      "description": "இந்த தொகுதிக்கு நீலத்தைப் பயன்படுத்தவும்."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "ஊதா",
+      "description": "இந்த தொகுதிக்கு ஊதா நிறத்தைப் பயன்படுத்தவும்."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "இளஞ்சிவப்பு",
+      "description": "இந்த தொகுதிக்கு இளஞ்சிவப்பு நிறத்தைப் பயன்படுத்தவும்."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "சிவப்பு",
+      "description": "இந்த தொகுதிக்கு சிவப்பு நிறத்தைப் பயன்படுத்தவும்."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "சாம்பல் பின்புலம்",
+      "description": "இந்தத் தொகுதிக்கு சாம்பல் பின்புலத்தைப் பயன்படுத்து."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "பழுப்பு பின்புலம்",
+      "description": "இந்த தொகுதிக்கு பழுப்பு பின்புலத்தைப் பயன்படுத்தவும்."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "ஆரஞ்சு பின்புலம்",
+      "description": "இந்தத் தொகுதிக்கு ஆரஞ்சு பின்புலத்தைப் பயன்படுத்து."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "மஞ்சள் பின்னணி",
+      "description": "இந்த தொகுதிக்கு மஞ்சள் பின்னணியைப் பயன்படுத்தவும்."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "பச்சை பின்புலம்",
+      "description": "இந்தத் தொகுதிக்கு பச்சை பின்புலத்தைப் பயன்படுத்து."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "நீல பின்புலம்",
+      "description": "இந்த தொகுதிக்கு நீல பின்புலத்தைப் பயன்படுத்தவும்."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "ஊதா பின்னணி",
+      "description": "இந்த தொகுதிக்கு ஊதா பின்னணியைப் பயன்படுத்தவும்."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "இளஞ்சிவப்பு பின்னணி",
+      "description": "இந்தத் தொகுதிக்கு இளஞ்சிவப்பு பின்புலத்தைப் பயன்படுத்து."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "சிவப்பு பின்னணி",
+      "description": "இந்த தொகுதிக்கு சிவப்பு பின்னணியைப் பயன்படுத்தவும்."
     }
   }
 }

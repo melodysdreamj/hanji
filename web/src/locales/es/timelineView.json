@@ -1,29 +1,29 @@
 {
   "empty": {
     "title": "Añadir una propiedad de fecha",
-    "description": "Las vistas de cronología necesitan una propiedad de fecha de inicio para dibujar las páginas a lo largo del tiempo."
+    "description": "Las vistas de línea de tiempo requieren una propiedad de fecha de inicio para mostrar las páginas en el tiempo."
   },
-  "endDateHint": "Añade una propiedad de fecha de fin para dibujar rangos en lugar de barras de un solo día.",
+  "endDateHint": "Añade una propiedad de fecha de fin para mostrar rangos en lugar de barras de un solo día.",
   "zoom": {
-    "ariaLabel": "Zoom de cronología",
+    "ariaLabel": "Zoom de línea de tiempo",
     "day": "Día",
     "week": "Semana",
     "month": "Mes"
   },
   "dependencies": {
     "label": "Dependencias:",
-    "hint": "añadir una propiedad de relación",
+    "hint": "agregar una propiedad de relación",
     "relationPropertyAriaLabel": "Propiedad de relación de dependencia"
   },
   "toolbar": {
     "today": "Hoy",
     "previousRange": "Rango anterior",
-    "nextRange": "Rango siguiente",
+    "nextRange": "Siguiente rango",
     "newPage": "Nuevo",
     "newPageIn": "Nueva página en {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Tabla de cronología",
+    "ariaLabel": "Tabla de línea de tiempo",
     "nameHeader": "Nombre"
   },
   "bar": {

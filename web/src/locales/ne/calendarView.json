@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "मिति गुण थप्नुहोस्",
+    "description": "पात्रो दृश्यहरूमा पृष्ठहरू राख्न मिति गुण चाहिन्छ।",
+    "addDateButton": "मिति"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "क्यालेन्डर अनुसार",
+    "today": "आज",
+    "previousWeek": "अघिल्लो हप्ता",
+    "previousMonth": "अघिल्लो महिना",
+    "nextWeek": "अर्को हप्ता",
+    "nextMonth": "अर्को महिना"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "आइत",
+    "mon": "सोम",
+    "tue": "मङ्गल",
+    "wed": "बुध",
+    "thu": "बिही",
+    "fri": "शुक्र",
+    "sat": "शनि"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} पात्रो",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} आइटम",
+    "newRowAriaLabel": "{{date}} मा नयाँ पङ्क्ति",
+    "newRowTitle": "नयाँ",
+    "showLess": "कम देखाउनुहोस्",
+    "showMore": "+{{count}} थप"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} खोल्नुहोस्",
+    "openAriaLabelWithDate": "{{title}} खोल्नुहोस्, {{date}} को लागि तय गरिएको",
+    "openNoDateAriaLabel": "{{title}} खोल्नुहोस्, मिति छैन"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "मिति छैन ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "शीर्षकहीन",
+    "dateDefaultName": "मिति"
   }
 }

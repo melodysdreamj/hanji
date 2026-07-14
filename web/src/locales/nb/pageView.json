@@ -1,14 +1,14 @@
 {
-  "couldntRestorePage": "Couldn't restore page",
-  "emptyBodyPrompt": "Press Enter to start writing on this empty page.",
-  "inTrashTopBarTitle": "In Trash",
-  "notFoundTopBarTitle": "Not found",
-  "openWorkspace": "Open workspace",
-  "pageInTrash": "This page is in Trash.",
-  "pageInTrashDetail": "Restore it before opening or editing its contents.",
-  "pageUnavailable": "Page unavailable.",
-  "pageUnavailableDetail": "This page may have been deleted, moved, or shared with a different account.",
-  "restorePage": "Restore page",
-  "restoredPage": "Restored page",
-  "loadingPageContent": "Loading page content"
+  "couldntRestorePage": "Kunne ikke gjenopprette side",
+  "emptyBodyPrompt": "Trykk Enter for å begynne å skrive på denne tomme siden.",
+  "inTrashTopBarTitle": "I papirkurven",
+  "loadingPageContent": "Laster sideinnhold",
+  "notFoundTopBarTitle": "Ikke funnet",
+  "openWorkspace": "Åpne arbeidsområde",
+  "pageInTrash": "Denne siden er i papirkurven.",
+  "pageInTrashDetail": "Gjenopprett den før du åpner eller redigerer innholdet.",
+  "pageUnavailable": "Siden er utilgjengelig.",
+  "pageUnavailableDetail": "Denne siden kan ha blitt slettet, flyttet eller delt med en annen konto.",
+  "restoredPage": "Gjenopprettet side",
+  "restorePage": "Gjenopprett side"
 }

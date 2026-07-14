@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Жаңа жұмыс кеңістігі",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Жұмыс кеңістігінің атауы",
+    "placeholder": "Біздің компания"
   },
-  "startLabel": "Start from",
+  "startLabel": "Бастау",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Бос жұмыс кеңістігі",
+      "body": "Бастапқы беттермен бос бастаңыз."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notion-нан импорттау",
+      "body": "Жұмыс кеңістігін жасап, оған Notion жұмыс кеңістігін көшіріңіз."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Басқа Hanji-ден импорттау",
+      "body": "Жұмыс кеңістігін жасап, басқа Hanji серверінен немесе файлынан импорттаңыз."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Жұмыс кеңістігін жасау",
+  "creating": "Жасалуда…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Жұмыс кеңістігін жасау мүмкін болмады."
   }
 }

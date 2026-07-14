@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Annulla",
+    "save": "Salva",
+    "close": "Chiudi",
+    "search": "Cerca",
+    "create": "Crea",
+    "delete": "Elimina",
+    "clearAll": "Cancella tutto",
+    "done": "Fatto",
+    "add": "Aggiungi"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Senza titolo"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} copia",
+    "columnName": "Colonna {{number}}",
+    "importedDatabase": "Database importato",
+    "uploadedFile": "File caricato",
+    "image": "Immagine",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Nome",
+      "status": "Stato",
+      "select": "Selezione",
+      "date": "Data"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Non iniziato",
+      "doing": "In corso",
+      "done": "Completato"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opzione 1",
+      "second": "Opzione 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tabella"
     }
   }
 }

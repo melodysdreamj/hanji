@@ -131,6 +131,29 @@ describe('Hanji local namespace migration', () => {
     assert.equal(existsSync(join(root, 'web', '.env.local')), false);
   });
 
+  it('migrates dev env files from stored master credentials to browser first-run setup', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'hanji-browser-first-run-'));
+    temporaryRoots.push(root);
+    mkdirSync(join(root, 'backend'), { recursive: true });
+    mkdirSync(join(root, 'web'), { recursive: true });
+    const envPath = join(root, 'backend', '.env.development');
+    writeFileSync(envPath, [
+      'JWT_USER_SECRET=synthetic-user-secret',
+      'HANJI_MASTER_EMAIL=master@example.com',
+      'HANJI_MASTER_PASSWORD=MasterPass!2026X',
+      'HANJI_MASTER_DEV_AUTOLOGIN=true',
+      '',
+    ].join('\n'));
+
+    await setupDevEnvironment({ root, environment: {} });
+
+    const migrated = readFileSync(envPath, 'utf8');
+    assert.match(migrated, /^HANJI_BROWSER_SETUP=true$/m);
+    assert.doesNotMatch(migrated, /HANJI_MASTER_(?:EMAIL|PASSWORD|DEV_AUTOLOGIN)=/);
+    assert.match(migrated, /^JWT_USER_SECRET=synthetic-user-secret$/m);
+    assert.match(readFileSync(join(root, 'backend', '.dev.vars'), 'utf8'), /^HANJI_BROWSER_SETUP=true$/m);
+  });
+
   it('renames backend state, dev targets, and old product names in local artifact paths', () => {
     assert.equal(
       migratedPathComponent(`${oldLowerPrefix}backend-storage`),

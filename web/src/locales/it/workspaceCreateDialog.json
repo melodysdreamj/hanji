@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Nuovo workspace",
   "name": {
-    "label": "Workspace name",
+    "label": "Nome del workspace",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Inizia da",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Workspace vuoto",
+      "body": "Inizia vuoto con le pagine iniziali."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Importa da Notion",
+      "body": "Crea il workspace, poi migra un workspace di Notion al suo interno."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Importa da un altro Hanji",
+      "body": "Crea il workspace, poi importa un workspace da un altro server Hanji o file."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Crea workspace",
+  "creating": "Creazione in corso…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Impossibile creare il workspace."
   }
 }

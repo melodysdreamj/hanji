@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "غير متصل",
+  "offlinePending_one": "غير متصل · {{count}} تغيير معلق",
+  "offlinePending_other": "غير متصل · {{count}} تغييرات معلقة",
+  "syncing": "مزامنة · {{count}}",
+  "unreachable": "تعذر الاتصال بالخادم",
+  "unreachablePending_one": "تعذر الاتصال بالخادم · {{count}} تغيير معلق",
+  "unreachablePending_other": "تعذر الاتصال بالخادم · {{count}} تغييرات معلقة",
+  "retryHint": "انقر لإعادة المحاولة الآن"
 }

@@ -1,12 +1,12 @@
 {
   "databaseLockedSave": "Cette base de données est verrouillée, vos modifications n'ont pas pu être enregistrées.",
   "databaseRowsLoadFailed": "Impossible de charger les lignes de la base de données. Veuillez réessayer dans un instant.",
-  "editAccessDeniedSave": "Vous n'avez pas d'accès en modification, vos modifications n'ont pas pu être enregistrées.",
-  "lockedSave": "La page ou la base de données est verrouillée, vos modifications n'ont pas pu être enregistrées.",
-  "pageLockedSave": "Cette page est verrouillée, vos modifications n'ont pas pu être enregistrées.",
-  "pageMissingSave": "La page est introuvable, vos modifications n'ont pas pu être enregistrées.",
+  "editAccessDeniedSave": "Vous n'avez pas les droits de modification, vos modifications n'ont donc pas pu être enregistrées.",
+  "lockedSave": "La page ou la base de données est verrouillée, vos modifications n'ont donc pas pu être enregistrées.",
+  "pageLockedSave": "Cette page est verrouillée, vos modifications n'ont donc pas pu être enregistrées.",
+  "pageMissingSave": "La page est introuvable, vos modifications n'ont donc pas pu être enregistrées.",
   "saveFailed": "Vos modifications n'ont pas pu être enregistrées.",
-  "sessionExpired": "Votre session a expiré ou la requête n'a pas pu être authentifiée. Veuillez réessayer.",
+  "sessionExpired": "Votre session a expiré ou la demande n'a pas pu être authentifiée. Veuillez réessayer.",
   "blockConflictSave": "Ce bloc a été modifié sur un autre appareil, votre modification hors ligne n'a donc pas été appliquée.",
   "blockConflictKeepMine": "Appliquer ma version",
   "blockMoveCommentsSkipped": "Le bloc a été déplacé, mais ses commentaires n'ont pas pu être déplacés avec lui."

@@ -2,51 +2,51 @@
   "defs": {
     "paragraph": {
       "label": "Texto",
-      "description": "Solo empieza a escribir con texto sin formato.",
-      "placeholder": "Escribe '/' para ver los comandos"
+      "description": "Empieza a escribir con texto plano.",
+      "placeholder": "Escribe '/' para comandos"
     },
     "child_page": {
       "label": "Página",
-      "description": "Crea una subpágina dentro de esta página."
+      "description": "Crear una subpágina dentro de esta página."
     },
     "link_to_page": {
-      "label": "Enlazar a la página",
-      "description": "Enlaza a una página existente."
+      "label": "Enlace a página",
+      "description": "Enlazar a una página existente."
     },
     "heading_1": {
-      "label": "Encabezado 1",
-      "description": "Encabezado de sección grande.",
-      "placeholder": "Encabezado 1"
+      "label": "Título 1",
+      "description": "Encabezado grande de sección.",
+      "placeholder": "Título 1"
     },
     "toggle_heading_1": {
-      "label": "Encabezado conmutado 1",
+      "label": "Encabezado 1 desplegable",
       "description": "Encabezado grande que puede ocultar contenido anidado.",
-      "placeholder": "Encabezado conmutado 1"
+      "placeholder": "Encabezado 1 desplegable"
     },
     "heading_2": {
-      "label": "Encabezado 2",
-      "description": "Encabezado de sección mediano.",
-      "placeholder": "Encabezado 2"
+      "label": "Título 2",
+      "description": "Encabezado mediano de sección.",
+      "placeholder": "Título 2"
     },
     "toggle_heading_2": {
-      "label": "Encabezado conmutado 2",
+      "label": "Encabezado 2 desplegable",
       "description": "Encabezado mediano que puede ocultar contenido anidado.",
-      "placeholder": "Encabezado conmutado 2"
+      "placeholder": "Encabezado 2 desplegable"
     },
     "heading_3": {
-      "label": "Encabezado 3",
-      "description": "Encabezado de sección pequeño.",
-      "placeholder": "Encabezado 3"
+      "label": "Título 3",
+      "description": "Encabezado pequeño de sección.",
+      "placeholder": "Título 3"
     },
     "toggle_heading_3": {
-      "label": "Encabezado conmutado 3",
+      "label": "Encabezado 3 desplegable",
       "description": "Encabezado pequeño que puede ocultar contenido anidado.",
       "placeholder": "Encabezado desplegable 3"
     },
     "heading_4": {
-      "label": "Encabezado 4",
-      "description": "Encabezado de sección compacto.",
-      "placeholder": "Encabezado 4"
+      "label": "Título 4",
+      "description": "Encabezado compacto de sección.",
+      "placeholder": "Título 4"
     },
     "toggle_heading_4": {
       "label": "Encabezado desplegable 4",
@@ -55,22 +55,22 @@
     },
     "to_do": {
       "label": "Lista de tareas",
-      "description": "Realiza un seguimiento de tareas con una casilla de verificación.",
+      "description": "Gestiona tareas con casillas de verificación.",
       "placeholder": "Tarea"
     },
     "bulleted_list_item": {
       "label": "Lista con viñetas",
-      "description": "Crea una lista sencilla con viñetas.",
+      "description": "Crear una lista con viñetas simple.",
       "placeholder": "Lista"
     },
     "numbered_list_item": {
       "label": "Lista numerada",
-      "description": "Crea una lista con numeración.",
+      "description": "Crea una lista numerada.",
       "placeholder": "Lista"
     },
     "toggle": {
       "label": "Lista desplegable",
-      "description": "Los bloques desplegables pueden ocultar y mostrar contenido.",
+      "description": "Los desplegables pueden ocultar y mostrar contenido.",
       "placeholder": "Desplegable"
     },
     "quote": {
@@ -85,11 +85,11 @@
     },
     "divider": {
       "label": "Divisor",
-      "description": "Divide visualmente los bloques."
+      "description": "Divide bloques visualmente."
     },
     "code": {
       "label": "Código",
-      "description": "Captura un fragmento de código.",
+      "description": "Capturar un fragmento de código.",
       "placeholder": "Escribe código o pega un fragmento…"
     },
     "equation": {
@@ -97,16 +97,16 @@
       "description": "Muestra una ecuación matemática."
     },
     "table_of_contents": {
-      "label": "Tabla de contenidos",
-      "description": "Muestra enlaces a los encabezados de esta página."
+      "label": "Tabla de contenido",
+      "description": "Mostrar enlaces a los encabezados de esta página."
     },
     "synced_block": {
       "label": "Bloque sincronizado",
-      "description": "Reutiliza contenido en varias páginas."
+      "description": "Reutiliza contenido entre páginas."
     },
     "button": {
       "label": "Botón",
-      "description": "Inserta contenido reutilizable con un clic."
+      "description": "Insertar contenido reutilizable con un clic."
     },
     "tab": {
       "label": "Pestañas",
@@ -115,34 +115,34 @@
     },
     "breadcrumb": {
       "label": "Ruta de navegación",
-      "description": "Muestra dónde se encuentra esta página."
+      "description": "Mostrar la ubicación de esta página."
     },
     "action_duplicate": {
       "label": "Duplicar",
-      "description": "Crea una copia exacta de este bloque."
+      "description": "Crear una copia exacta de este bloque."
     },
     "action_move_to": {
       "label": "Mover a",
-      "description": "Mueve este bloque a otra página."
+      "description": "Mover este bloque a otra página."
     },
     "action_delete": {
-      "description": "Elimina este bloque."
+      "description": "Eliminar este bloque."
     },
     "action_turn_into": {
       "label": "Convertir en",
-      "description": "Cambia el tipo de este bloque."
+      "description": "Cambiar el tipo de este bloque."
     },
     "action_color": {
       "label": "Color",
-      "description": "Cambia el color del texto o del fondo de este bloque."
+      "description": "Cambiar el color de texto o fondo de este bloque."
     },
     "simple_table": {
       "label": "Tabla",
-      "description": "Añade una tabla sencilla a esta página."
+      "description": "Añade una tabla simple a esta página."
     },
     "column_list_2": {
       "label": "2 columnas",
-      "description": "Coloca bloques uno al lado del otro."
+      "description": "Coloca bloques lado a lado."
     },
     "column_list_3": {
       "label": "3 columnas",
@@ -158,23 +158,23 @@
     },
     "image": {
       "label": "Imagen",
-      "description": "Sube o inserta con un enlace."
+      "description": "Subir o insertar con un enlace."
     },
     "video": {
-      "label": "Vídeo",
-      "description": "Inserta un vídeo con un enlace."
+      "label": "Video",
+      "description": "Incrusta un video con un enlace."
     },
     "audio": {
       "label": "Audio",
-      "description": "Inserta audio con un enlace."
+      "description": "Insertar audio con un enlace."
     },
     "bookmark": {
       "label": "Marcador web",
-      "description": "Guarda un enlace web como una tarjeta."
+      "description": "Guardar un enlace web como tarjeta."
     },
     "embed": {
-      "label": "Insertar",
-      "description": "Inserta contenido desde un enlace."
+      "label": "Incrustar",
+      "description": "Incrusta contenido desde un enlace."
     },
     "file": {
       "label": "Archivo",
@@ -182,75 +182,75 @@
     },
     "child_database": {
       "label": "Base de datos - Página completa",
-      "description": "Añade una nueva base de datos como subpágina."
+      "description": "Añadir una nueva base de datos como subpágina."
     },
     "child_database_table": {
       "label": "Tabla - Página completa",
-      "description": "Añade una base de datos de página completa como tabla."
+      "description": "Añadir una base de datos de página completa como tabla."
     },
     "child_database_board": {
       "label": "Tablero - Página completa",
-      "description": "Añade un tablero kanban de página completa."
+      "description": "Añadir un tablero kanban de página completa."
     },
     "child_database_list": {
       "label": "Lista - Página completa",
-      "description": "Añade una base de datos de página completa como lista."
+      "description": "Añadir una base de datos de página completa como lista."
     },
     "child_database_timeline": {
-      "label": "Cronograma - Página completa",
-      "description": "Añade un cronograma de base de datos de página completa."
+      "label": "Línea de tiempo - Página completa",
+      "description": "Añadir una línea de tiempo de base de datos de página completa."
     },
     "child_database_calendar": {
       "label": "Calendario - Página completa",
-      "description": "Añade una base de datos de calendario de página completa."
+      "description": "Añadir un calendario de base de datos de página completa."
     },
     "child_database_gallery": {
       "label": "Galería - Página completa",
-      "description": "Añade una galería de base de datos de página completa."
+      "description": "Añadir una galería de base de datos de página completa."
     },
     "inline_database": {
       "label": "Base de datos - En línea",
-      "description": "Añade una base de datos dentro de esta página."
+      "description": "Añadir una base de datos en esta página."
     },
     "inline_database_table": {
       "label": "Vista de tabla",
-      "description": "Añade una base de datos en línea como tabla."
+      "description": "Añadir una tabla en línea."
     },
     "inline_database_board": {
       "label": "Vista de tablero",
-      "description": "Añade un tablero kanban en línea."
+      "description": "Añadir un tablero kanban en línea."
     },
     "inline_database_list": {
       "label": "Vista de lista",
-      "description": "Añade una base de datos en línea como lista."
+      "description": "Añadir una lista en línea."
     },
     "inline_database_timeline": {
-      "label": "Vista de cronograma",
-      "description": "Añade un cronograma de base de datos en línea."
+      "label": "Vista de línea de tiempo",
+      "description": "Añadir una línea de tiempo en línea."
     },
     "inline_database_calendar": {
       "label": "Vista de calendario",
-      "description": "Añade una base de datos de calendario en línea."
+      "description": "Añadir un calendario en línea."
     },
     "inline_database_gallery": {
       "label": "Vista de galería",
-      "description": "Añade una galería de base de datos en línea."
+      "description": "Añadir una galería en línea."
     },
     "color_default": {
       "label": "Predeterminado",
-      "description": "Quita el color de texto o fondo de este bloque."
+      "description": "Eliminar el color de texto o fondo de este bloque."
     },
     "color_gray": {
       "label": "Gris",
-      "description": "Aplica gris a este bloque."
+      "description": "Aplicar gris a este bloque."
     },
     "color_brown": {
       "label": "Marrón",
-      "description": "Aplica marrón a este bloque."
+      "description": "Aplicar marrón a este bloque."
     },
     "color_orange": {
       "label": "Naranja",
-      "description": "Aplica naranja a este bloque."
+      "description": "Aplicar naranja a este bloque."
     },
     "color_yellow": {
       "label": "Amarillo",
@@ -258,11 +258,11 @@
     },
     "color_green": {
       "label": "Verde",
-      "description": "Aplica verde a este bloque."
+      "description": "Aplicar verde a este bloque."
     },
     "color_blue": {
       "label": "Azul",
-      "description": "Aplica azul a este bloque."
+      "description": "Aplicar azul a este bloque."
     },
     "color_purple": {
       "label": "Morado",
@@ -278,39 +278,39 @@
     },
     "color_gray_background": {
       "label": "Fondo gris",
-      "description": "Aplica un fondo gris a este bloque."
+      "description": "Aplicar fondo gris a este bloque."
     },
     "color_brown_background": {
       "label": "Fondo marrón",
-      "description": "Aplica un fondo marrón a este bloque."
+      "description": "Aplicar fondo marrón a este bloque."
     },
     "color_orange_background": {
       "label": "Fondo naranja",
-      "description": "Aplica un fondo naranja a este bloque."
+      "description": "Aplicar fondo naranja a este bloque."
     },
     "color_yellow_background": {
       "label": "Fondo amarillo",
-      "description": "Aplica un fondo amarillo a este bloque."
+      "description": "Aplica fondo amarillo a este bloque."
     },
     "color_green_background": {
       "label": "Fondo verde",
-      "description": "Aplica un fondo verde a este bloque."
+      "description": "Aplicar fondo verde a este bloque."
     },
     "color_blue_background": {
       "label": "Fondo azul",
-      "description": "Aplica un fondo azul a este bloque."
+      "description": "Aplicar fondo azul a este bloque."
     },
     "color_purple_background": {
       "label": "Fondo morado",
-      "description": "Aplica un fondo morado a este bloque."
+      "description": "Aplica fondo morado a este bloque."
     },
     "color_pink_background": {
       "label": "Fondo rosa",
-      "description": "Aplica un fondo rosa a este bloque."
+      "description": "Aplicar fondo rosa a este bloque."
     },
     "color_red_background": {
       "label": "Fondo rojo",
-      "description": "Aplica un fondo rojo a este bloque."
+      "description": "Aplica fondo rojo a este bloque."
     }
   }
 }

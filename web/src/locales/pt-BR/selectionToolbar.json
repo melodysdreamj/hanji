@@ -13,7 +13,7 @@
       "toDoList": "Lista de tarefas",
       "bulletedList": "Lista com marcadores",
       "numberedList": "Lista numerada",
-      "toggleList": "Lista recolhível",
+      "toggleList": "Lista de alternância",
       "quote": "Citação",
       "callout": "Destaque",
       "code": "Código"
@@ -35,7 +35,7 @@
     "title": "Cor: {{color}}"
   },
   "colors": {
-    "mixed": "Misturada",
+    "mixed": "Misto",
     "text": {
       "heading": "Cor do texto",
       "default": "Padrão",
@@ -64,7 +64,7 @@
   },
   "linkEditor": {
     "ariaLabel": "Editar link",
-    "placeholder": "Cole o link",
+    "placeholder": "Colar link",
     "urlAriaLabel": "URL do link",
     "apply": "Link",
     "open": "Abrir link",

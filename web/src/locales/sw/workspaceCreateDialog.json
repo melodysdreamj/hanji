@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Wokspasi mpya",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Jina la workspace",
+    "placeholder": "Kampuni Yangu"
   },
-  "startLabel": "Start from",
+  "startLabel": "Anza kutoka",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Wokspasi tupu",
+      "body": "Anza tupu na kurasa za kuanzia."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Ingiza kutoka Notion",
+      "body": "Unda wokspasi, kisha uhamishe wokspasi ya Notion ndani yake."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Ingiza kutoka Hanji nyingine",
+      "body": "Unda wokspasi, kisha uvute kutoka seva au faili nyingine ya Hanji."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Unda workspace",
+  "creating": "Inaundwa…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Imeshindwa kuunda workspace."
   }
 }

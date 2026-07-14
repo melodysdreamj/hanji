@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "पृष्ठात शोधा"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "पृष्ठात शोधा",
+    "placeholder": "पृष्ठात शोधा"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "मागील जुळणी",
+    "next": "पुढील जुळणी",
+    "close": "शोध बंद करा"
   }
 }

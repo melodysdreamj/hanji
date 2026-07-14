@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Cari atau buka...",
+  "quickFind": "Cari Cepat",
+  "closeSearch": "Tutup pencarian",
+  "quickFindResults": "Hasil Cari Cepat",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Baru dilihat",
+    "recentSearches": "Pencarian terbaru",
+    "pages": "Halaman",
+    "pageContent": "Konten halaman",
+    "favorites": "Favorit"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "di halaman",
+  "searchingDetail": "Mencari...",
+  "searchAgain": "Cari lagi",
+  "searchingPageContent": "Mencari konten halaman...",
+  "noResultsFor": "Tidak ada hasil untuk \"{{query}}\"",
+  "noPagesFound": "Halaman tidak ditemukan",
+  "creating": "Membuat...",
+  "newPage": "Halaman baru \"{{query}}\"",
+  "couldntCreatePage": "Gagal membuat halaman",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Pilih",
+    "open": "Buka",
+    "newTab": "Tab baru"
   }
 }

@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Batal",
+    "save": "Simpan",
+    "close": "Tutup",
+    "search": "Cari",
+    "create": "Buat",
+    "delete": "Hapus",
+    "clearAll": "Hapus semua",
+    "done": "Selesai",
+    "add": "Tambah"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Tanpa judul"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Salinan {{name}}",
+    "columnName": "Kolom {{number}}",
+    "importedDatabase": "Database yang diimpor",
+    "uploadedFile": "File yang diunggah",
+    "image": "Gambar",
     "propertyNames": {
-      "name": "Name",
+      "name": "Nama",
       "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "select": "Pilihan",
+      "date": "Tanggal"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Belum dimulai",
+      "doing": "Sedang dikerjakan",
+      "done": "Selesai"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opsi 1",
+      "second": "Opsi 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Tabel"
     }
   }
 }

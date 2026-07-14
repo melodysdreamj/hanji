@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Număr",
+    "sum": "Sumă",
+    "average": "Medie",
+    "min": "Minim",
+    "max": "Maxim"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Grafic {{name}}",
+  "chartType": "Tip grafic",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "bar": "Bare",
+    "horizontal_bar": "Bară orizontală",
+    "line": "Linie",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Bifat",
+  "empty": "Gol",
+  "legend": "Legendă grafic",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
+  "noData": "Fără date",
+  "noDataDesc": "Niciun rând nu corespunde filtrelor sau căutării curente.",
+  "noGroupProperty": "Nimic de reprezentat încă",
+  "noGroupPropertyDesc": "Adaugă o proprietate de tip select, stare, persoană, bifă sau dată pentru a grupa acest grafic.",
   "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "unchecked": "Nebifat",
+  "untitledProperty": "Fără titlu",
+  "valueProperty": "Proprietate Valoare",
+  "xAxis": "Axa X",
+  "yAxis": "Axa Y"
 }

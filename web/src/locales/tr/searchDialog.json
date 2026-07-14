@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Ara veya git...",
+  "quickFind": "Hızlı Bulma",
+  "closeSearch": "Aramayı kapat",
+  "quickFindResults": "Hızlı Bulma sonuçları",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Son görüntülenenler",
+    "recentSearches": "Son aramalar",
+    "pages": "Sayfalar",
+    "pageContent": "Sayfa içeriği",
+    "favorites": "Sık Kullanılanlar"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "Sayfa içi",
+  "searchingDetail": "Aranıyor...",
+  "searchAgain": "Tekrar ara",
+  "searchingPageContent": "Sayfa içeriği aranıyor...",
+  "noResultsFor": "\"{{query}}\" için sonuç bulunamadı",
+  "noPagesFound": "Sayfa bulunamadı",
+  "creating": "Oluşturuluyor...",
+  "newPage": "Yeni sayfa \"{{query}}\"",
+  "couldntCreatePage": "Sayfa oluşturulamadı",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Seç",
+    "open": "Aç",
+    "newTab": "Yeni sekme"
   }
 }

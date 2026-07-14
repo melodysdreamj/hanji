@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
-  "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
-  },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "closeSearch": "Zamknij wyszukiwanie",
+  "couldntCreatePage": "Nie udało się utworzyć strony",
+  "creating": "Tworzenie...",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "newTab": "Nowa karta",
+    "open": "Otwórz",
+    "select": "Wybierz"
+  },
+  "inPage": "na stronie",
+  "newPage": "Nowa strona \"{{query}}\"",
+  "noPagesFound": "Nie znaleziono stron",
+  "noResultsFor": "Brak wyników dla \"{{query}}\"",
+  "quickFind": "Szybkie znajdowanie",
+  "quickFindResults": "Wyniki szybkiego znajdowania",
+  "searchAgain": "Szukaj ponownie",
+  "searchingDetail": "Szukanie...",
+  "searchingPageContent": "Szukanie treści strony...",
+  "searchPlaceholder": "Szukaj lub przejdź do...",
+  "sections": {
+    "favorites": "Ulubione",
+    "pageContent": "Treść strony",
+    "pages": "Strony",
+    "recentlyViewed": "Ostatnio przeglądane",
+    "recentSearches": "Ostatnie wyszukiwania"
   }
 }

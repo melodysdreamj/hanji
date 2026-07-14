@@ -1,9 +1,9 @@
 {
   "justNow": "Gerade eben",
-  "editedJustNow": "Gerade eben bearbeitet",
+  "editedJustNow": "Soeben bearbeitet",
   "editedMinutesAgo": "Vor {{minutes}} Min. bearbeitet",
   "editedHoursAgo": "Vor {{hours}} Std. bearbeitet",
-  "editedDaysAgo": "Vor {{days}} Tg. bearbeitet",
+  "editedDaysAgo": "Vor {{days}} Tagen bearbeitet",
   "editedOn": "Bearbeitet am {{date}}",
   "noEdits": "Keine Bearbeitungen",
   "noEditsYet": "Noch keine Bearbeitungen",

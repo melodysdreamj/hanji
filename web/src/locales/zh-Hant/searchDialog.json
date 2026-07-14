@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "搜尋或跳至...",
+  "quickFind": "快速搜尋",
+  "closeSearch": "關閉搜尋",
+  "quickFindResults": "快速搜尋結果",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "最近檢視",
+    "recentSearches": "最近搜尋",
+    "pages": "頁面",
+    "pageContent": "頁面內容",
+    "favorites": "我的最愛"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "頁面內",
+  "searchingDetail": "搜尋中...",
+  "searchAgain": "重新搜尋",
+  "searchingPageContent": "正在搜尋頁面內容...",
+  "noResultsFor": "「{{query}}」查無結果",
+  "noPagesFound": "找不到頁面",
+  "creating": "建立中...",
+  "newPage": "新頁面「{{query}}」",
+  "couldntCreatePage": "無法建立頁面",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "選取",
+    "open": "開啟",
+    "newTab": "新分頁"
   }
 }

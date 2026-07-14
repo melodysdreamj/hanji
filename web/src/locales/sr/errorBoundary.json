@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Došlo je do greške pri prikazivanju ovog sadržaja.",
+  "detail": "Pokušajte ponovo. Ako se problem nastavi, ponovo učitajte aplikaciju i podelite referencu ispod.",
+  "reference": "Referenca: {{reference}}",
+  "reload": "Ponovo učitaj aplikaciju",
+  "retry": "Pokušaj ponovo"
 }

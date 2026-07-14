@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "變更封面",
+    "reposition": "重新定位",
+    "remove": "移除",
+    "uploadFile": "上傳檔案",
+    "uploading": "上傳中...",
+    "submit": "提交",
+    "savePosition": "儲存位置"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "圖庫",
+    "upload": "上傳",
+    "link": "連結"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "貼上圖片連結",
+    "invalid": "貼上 http 或 https 圖片連結。"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "無法上傳該圖片。",
+    "defaultFileName": "封面圖片"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "拖曳圖片以重新定位"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "準備上傳",
+    "finalizing": "正在完成",
+    "complete": "完成",
+    "uploading": "上傳中"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "已移除封面",
+    "restored": "已復原封面",
+    "undo": "復原"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "頁面封面",
+    "coverVerticalPosition": "封面垂直位置",
+    "positionFromTop": "距離頂部 {{position}}%",
+    "closeCoverMenu": "關閉封面選單",
+    "changePageCover": "變更頁面封面",
+    "repositionPageCover": "重新定位頁面封面",
+    "removePageCover": "移除頁面封面",
+    "changeCoverDialog": "變更封面",
+    "coverSource": "封面來源",
+    "selectCover": "選擇封面 {{number}}",
+    "uploadFromDevice": "從此裝置上傳封面圖片",
+    "uploadingFile": "正在上傳 {{fileName}}",
+    "coverImageLink": "封面圖片連結"
   }
 }

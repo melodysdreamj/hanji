@@ -1,29 +1,29 @@
 {
   "aggregates": {
-    "count": "Recuento",
+    "count": "Conteo",
     "sum": "Suma",
     "average": "Promedio",
-    "min": "Mín",
-    "max": "Máx"
+    "min": "Mínimo",
+    "max": "Máximo"
   },
-  "chartAria": "Gráfico de {{name}}",
+  "chartAria": "Gráfico {{name}}",
   "chartType": "Tipo de gráfico",
   "chartTypes": {
     "bar": "Barras",
     "horizontal_bar": "Barras horizontales",
     "line": "Línea",
-    "donut": "Anillo"
+    "donut": "Donut"
   },
-  "checked": "Marcado",
+  "checked": "Seleccionado",
   "empty": "Vacío",
   "legend": "Leyenda del gráfico",
   "monthLabel": "{{month}} {{year}}",
   "noData": "Sin datos",
-  "noDataDesc": "Ninguna fila coincide con los filtros o la búsqueda actuales.",
+  "noDataDesc": "No hay filas que coincidan con los filtros o la búsqueda actual.",
   "noGroupProperty": "Aún no hay nada que graficar",
-  "noGroupPropertyDesc": "Añade una propiedad de selección, estado, persona, casilla o fecha para agrupar este gráfico.",
+  "noGroupPropertyDesc": "Agrega una propiedad de selección, estado, persona, casilla de verificación o fecha para agrupar este gráfico.",
   "total": "Total",
-  "unchecked": "Sin marcar",
+  "unchecked": "No seleccionado",
   "untitledProperty": "Sin título",
   "valueProperty": "Propiedad de valor",
   "xAxis": "Eje X",

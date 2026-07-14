@@ -1,316 +1,316 @@
 {
   "defs": {
-    "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
-    },
-    "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
-    },
-    "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
-    },
-    "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
-    },
-    "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
-    },
-    "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
-    },
-    "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
-    },
-    "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
-    },
-    "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
-    },
-    "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
-    },
-    "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
-    },
-    "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
-    },
-    "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
-    },
-    "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
-    },
-    "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
-    },
-    "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
-    },
-    "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
-    },
-    "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
-    },
-    "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
-    },
-    "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
-    },
-    "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
-    },
-    "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
-    },
-    "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
-    },
-    "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
-    },
-    "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
-    },
-    "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
-    },
-    "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+    "action_color": {
+      "description": "Zmień kolor tekstu lub tła tego bloku.",
+      "label": "Kolor"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Usuń ten blok."
+    },
+    "action_duplicate": {
+      "description": "Utwórz dokładną kopię tego bloku.",
+      "label": "Duplikuj"
+    },
+    "action_move_to": {
+      "description": "Przenieś ten blok na inną stronę.",
+      "label": "Przenieś do"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
-    },
-    "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
-    },
-    "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
-    },
-    "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
-    },
-    "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
-    },
-    "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
-    },
-    "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
-    },
-    "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
-    },
-    "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Zmień typ tego bloku.",
+      "label": "Zmień na"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Osadź audio za pomocą linku.",
+      "label": "Audio"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "description": "Zapisz link jako kartę.",
+      "label": "Zakładka internetowa"
     },
-    "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+    "breadcrumb": {
+      "description": "Pokaż położenie strony.",
+      "label": "Ścieżka nawigacyjna"
     },
-    "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+    "bulleted_list_item": {
+      "description": "Utwórz prostą listę wypunktowaną.",
+      "label": "Lista wypunktowana",
+      "placeholder": "Lista"
     },
-    "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+    "button": {
+      "description": "Wstaw wielokrotnego użytku treść jednym kliknięciem.",
+      "label": "Przycisk"
     },
-    "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+    "callout": {
+      "description": "Wyróżnij tekst.",
+      "label": "Wyróżnienie",
+      "placeholder": "Wpisz coś…"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
-    },
-    "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
-    },
-    "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "description": "Dodaj pełnostroniczną tablicę kanban.",
+      "label": "Tablica - Pełna strona"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "description": "Dodaj pełnostroniczną bazę danych kalendarza.",
+      "label": "Kalendarz - Pełna strona"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "description": "Dodaj pełnostroniczną galerię bazy danych.",
+      "label": "Galeria - Pełna strona"
     },
-    "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+    "child_database_list": {
+      "description": "Dodaj pełnostroniczną bazę danych w formie listy.",
+      "label": "Lista - Pełna strona"
     },
-    "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+    "child_database_table": {
+      "description": "Dodaj pełnostroniczną bazę danych w formie tabeli.",
+      "label": "Tabela - Pełna strona"
     },
-    "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+    "child_database_timeline": {
+      "description": "Dodaj pełnostroniczną oś czasu bazy danych.",
+      "label": "Oś czasu - Pełna strona"
     },
-    "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+    "child_database": {
+      "description": "Dodaj nową bazę danych jako podstronę.",
+      "label": "Baza danych - pełna strona"
     },
-    "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+    "child_page": {
+      "description": "Utwórz podstronę wewnątrz tej strony.",
+      "label": "Strona"
     },
-    "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
-    },
-    "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
-    },
-    "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
-    },
-    "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
-    },
-    "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
-    },
-    "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
-    },
-    "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
-    },
-    "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
-    },
-    "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
-    },
-    "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
-    },
-    "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
-    },
-    "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
-    },
-    "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
-    },
-    "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
-    },
-    "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
-    },
-    "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
-    },
-    "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+    "code": {
+      "description": "Dodaj fragment kodu.",
+      "label": "Kod",
+      "placeholder": "Napisz kod lub wklej fragment…"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "description": "Zastosuj niebieskie tło do tego bloku.",
+      "label": "Niebieskie tło"
     },
-    "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+    "color_blue": {
+      "description": "Zastosuj niebieski do tego bloku.",
+      "label": "Niebieski"
+    },
+    "color_brown_background": {
+      "description": "Zastosuj brązowe tło do tego bloku.",
+      "label": "Brązowe tło"
+    },
+    "color_brown": {
+      "description": "Zastosuj brązowy do tego bloku.",
+      "label": "Brązowy"
+    },
+    "color_default": {
+      "description": "Usuń kolor tekstu lub tła z tego bloku.",
+      "label": "Domyślny"
+    },
+    "color_gray_background": {
+      "description": "Zastosuj szare tło do tego bloku.",
+      "label": "Szare tło"
+    },
+    "color_gray": {
+      "description": "Zastosuj szary do tego bloku.",
+      "label": "Szary"
+    },
+    "color_green_background": {
+      "description": "Zastosuj zielone tło do tego bloku.",
+      "label": "Zielone tło"
+    },
+    "color_green": {
+      "description": "Zastosuj zielony do tego bloku.",
+      "label": "Zielony"
+    },
+    "color_orange_background": {
+      "description": "Zastosuj pomarańczowe tło do tego bloku.",
+      "label": "Pomarańczowe tło"
+    },
+    "color_orange": {
+      "description": "Zastosuj pomarańczowy do tego bloku.",
+      "label": "Pomarańczowy"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "description": "Zastosuj różowe tło do tego bloku.",
+      "label": "Różowe tło"
+    },
+    "color_pink": {
+      "description": "Zastosuj różowy do tego bloku.",
+      "label": "Różowy"
+    },
+    "color_purple_background": {
+      "description": "Zastosuj fioletowe tło do tego bloku.",
+      "label": "Fioletowe tło"
+    },
+    "color_purple": {
+      "description": "Zastosuj fioletowy do tego bloku.",
+      "label": "Fioletowy"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "description": "Zastosuj czerwone tło do tego bloku.",
+      "label": "Czerwone tło"
+    },
+    "color_red": {
+      "description": "Zastosuj czerwony do tego bloku.",
+      "label": "Czerwony"
+    },
+    "color_yellow_background": {
+      "description": "Zastosuj żółte tło do tego bloku.",
+      "label": "Żółte tło"
+    },
+    "color_yellow": {
+      "description": "Zastosuj żółty do tego bloku.",
+      "label": "Żółty"
+    },
+    "column_list_2": {
+      "description": "Umieść bloki obok siebie.",
+      "label": "2 kolumny"
+    },
+    "column_list_3": {
+      "description": "Rozmieść bloki w trzech kolumnach.",
+      "label": "3 kolumny"
+    },
+    "column_list_4": {
+      "description": "Rozmieść bloki w czterech kolumnach.",
+      "label": "4 kolumny"
+    },
+    "column_list_5": {
+      "description": "Rozmieść bloki w pięciu kolumnach.",
+      "label": "5 kolumn"
+    },
+    "divider": {
+      "description": "Wizualnie podziel bloki.",
+      "label": "Separator"
+    },
+    "embed": {
+      "description": "Osadź treść z linku.",
+      "label": "Osadź"
+    },
+    "equation": {
+      "description": "Wyświetl równanie matematyczne.",
+      "label": "Równanie"
+    },
+    "file": {
+      "description": "Dołącz link do pliku do tej strony.",
+      "label": "Plik"
+    },
+    "heading_1": {
+      "description": "Duży nagłówek sekcji.",
+      "label": "Nagłówek 1",
+      "placeholder": "Nagłówek 1"
+    },
+    "heading_2": {
+      "description": "Średni nagłówek sekcji.",
+      "label": "Nagłówek 2",
+      "placeholder": "Nagłówek 2"
+    },
+    "heading_3": {
+      "description": "Mały nagłówek sekcji.",
+      "label": "Nagłówek 3",
+      "placeholder": "Nagłówek 3"
+    },
+    "heading_4": {
+      "description": "Kompaktowy nagłówek sekcji.",
+      "label": "Nagłówek 4",
+      "placeholder": "Nagłówek 4"
+    },
+    "image": {
+      "description": "Prześlij lub osadź za pomocą linku.",
+      "label": "Obraz"
+    },
+    "inline_database_board": {
+      "description": "Dodaj wbudowaną tablicę kanban.",
+      "label": "Widok tablicy"
+    },
+    "inline_database_calendar": {
+      "description": "Dodaj wbudowaną bazę danych z kalendarzem.",
+      "label": "Widok kalendarza"
+    },
+    "inline_database_gallery": {
+      "description": "Dodaj wbudowaną galerię bazy danych.",
+      "label": "Widok galerii"
+    },
+    "inline_database_list": {
+      "description": "Dodaj wbudowaną bazę danych jako listę.",
+      "label": "Widok listy"
+    },
+    "inline_database_table": {
+      "description": "Dodaj wbudowaną bazę danych jako tabelę.",
+      "label": "Widok tabeli"
+    },
+    "inline_database_timeline": {
+      "description": "Dodaj wbudowaną oś czasu bazy danych.",
+      "label": "Widok osi czasu"
+    },
+    "inline_database": {
+      "description": "Dodaj bazę danych na tej stronie.",
+      "label": "Baza danych – wbudowana"
+    },
+    "link_to_page": {
+      "description": "Połącz z istniejącą stroną.",
+      "label": "Link do strony"
+    },
+    "numbered_list_item": {
+      "description": "Utwórz listę numerowaną.",
+      "label": "Lista numerowana",
+      "placeholder": "Lista"
+    },
+    "paragraph": {
+      "description": "Zacznij pisać zwykłym tekstem.",
+      "label": "Tekst",
+      "placeholder": "Wpisz '/' aby użyć poleceń"
+    },
+    "quote": {
+      "description": "Dodaj cytat.",
+      "label": "Cytat",
+      "placeholder": "Pusty cytat"
+    },
+    "simple_table": {
+      "description": "Dodaj prostą tabelę do tej strony.",
+      "label": "Tabela"
+    },
+    "synced_block": {
+      "description": "Używaj ponownie treści na stronach.",
+      "label": "Zsynchronizowany blok"
+    },
+    "tab": {
+      "description": "Grupuj treść w zakładkach z etykietami.",
+      "label": "Zakładki",
+      "placeholder": "Zakładki"
+    },
+    "table_of_contents": {
+      "description": "Pokaż linki do nagłówków na tej stronie.",
+      "label": "Spis treści"
+    },
+    "to_do": {
+      "description": "Śledź zadania za pomocą pola wyboru.",
+      "label": "Lista zadań",
+      "placeholder": "Zadanie"
+    },
+    "toggle_heading_1": {
+      "description": "Duży nagłówek, który może ukrywać zagnieżdżone treści.",
+      "label": "Nagłówek przełączany 1",
+      "placeholder": "Nagłówek przełączany 1"
+    },
+    "toggle_heading_2": {
+      "description": "Średni nagłówek, który może zwijać zagnieżdżoną treść.",
+      "label": "Nagłówek przełączany 2",
+      "placeholder": "Nagłówek przełączany 2"
+    },
+    "toggle_heading_3": {
+      "description": "Mały nagłówek, który może zwijać zagnieżdżoną treść.",
+      "label": "Nagłówek przełączany 3",
+      "placeholder": "Przełączany nagłówek 3"
+    },
+    "toggle_heading_4": {
+      "description": "Kompaktowy nagłówek, który może ukrywać zagnieżdżoną treść.",
+      "label": "Przełączany nagłówek 4",
+      "placeholder": "Przełączany nagłówek 4"
+    },
+    "toggle": {
+      "description": "Przełączniki mogą ukrywać i pokazywać treść.",
+      "label": "Lista przełączników",
+      "placeholder": "Przełącznik"
+    },
+    "video": {
+      "description": "Osadź wideo za pomocą linku.",
+      "label": "Wideo"
     }
   }
 }

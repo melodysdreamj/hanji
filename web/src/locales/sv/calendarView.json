@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Lägg till en datumegenskap",
+    "description": "Kalendervyer behöver en datumegenskap för att placera sidor på månaden.",
+    "addDateButton": "Datum"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalender efter",
+    "today": "Idag",
+    "previousWeek": "Föregående vecka",
+    "previousMonth": "Föregående månad",
+    "nextWeek": "Nästa vecka",
+    "nextMonth": "Nästa månad"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Sön",
+    "mon": "Mån",
+    "tue": "Tis",
+    "wed": "Ons",
+    "thu": "Tor",
+    "fri": "Fre",
+    "sat": "Lör"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} kalender",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} objekt",
+    "newRowAriaLabel": "Ny rad på {{date}}",
+    "newRowTitle": "Ny",
+    "showLess": "Visa mindre",
+    "showMore": "+{{count}} till"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Öppna {{title}}",
+    "openAriaLabelWithDate": "Öppna {{title}}, schemalagd för {{date}}",
+    "openNoDateAriaLabel": "Öppna {{title}}, inget datum"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Inget datum ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Namnlös",
+    "dateDefaultName": "Datum"
   }
 }

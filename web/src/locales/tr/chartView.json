@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Sayı",
+    "sum": "Toplam",
+    "average": "Ortalama",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} grafiği",
+  "chartType": "Grafik türü",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "bar": "Çubuk",
+    "horizontal_bar": "Yatay çubuk",
+    "line": "Çizgi",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "İşaretli",
+  "empty": "Boş",
+  "legend": "Grafik açıklaması",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Veri yok",
+  "noDataDesc": "Geçerli filtreler veya aramayla eşleşen satır yok.",
+  "noGroupProperty": "Henüz grafik oluşturulacak bir şey yok.",
+  "noGroupPropertyDesc": "Bu grafiği gruplamak için bir seçim, durum, kişi, onay kutusu veya tarih özelliği ekleyin.",
+  "total": "Toplam",
+  "unchecked": "İşaretsiz",
+  "untitledProperty": "İsimsiz",
+  "valueProperty": "Değer özelliği",
+  "xAxis": "X ekseni",
+  "yAxis": "Y ekseni"
 }

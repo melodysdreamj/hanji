@@ -1,14 +1,14 @@
 {
+  "actions": {
+    "close": "Zavřít hledání",
+    "next": "Další shoda",
+    "previous": "Předchozí shoda"
+  },
   "dialog": {
-    "label": "Find in page"
+    "label": "Hledat na stránce"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
-  },
-  "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "label": "Hledat na stránce",
+    "placeholder": "Hledat na stránce"
   }
 }

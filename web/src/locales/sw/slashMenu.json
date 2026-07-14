@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Amri za vizuizi",
+  "closeBlockCommands": "Funga amri za vizuizi",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "Vizuizi vya msingi",
+    "Media": "Midia",
+    "Database": "Hifadhidata",
+    "Advanced": "Vizuizi vya hali ya juu"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} kati ya {{total}}. Bonyeza Enter kuingiza.",
+  "listStatus": "{{total}} amri za vizuizi zinapatikana.",
+  "noBlocks": "Hakuna vizuizi vilivyopatikana",
+  "noBlocksFor": "Hakuna vitalu vilivyopatikana kwa \"{{query}}\"",
+  "recentlyUsed": "Zilizotumiwa hivi karibuni"
 }

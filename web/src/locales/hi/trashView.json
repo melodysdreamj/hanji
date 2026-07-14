@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "ट्रैश",
+  "empty": "आपके द्वारा हटाए गए पेज यहाँ आते हैं। ट्रैश में कुछ नहीं है।",
+  "searchTrash": "ट्रैश खोजें",
+  "deletedPages": "हटाए गए पेज",
+  "noSearchMatches": "आपकी खोज से मेल खाने वाले कोई हटाए गए पेज नहीं हैं।",
+  "pageCount_one": "{{count}} पेज",
+  "pageCount_other": "{{count}} पेज",
+  "deletedJustNow": "अभी हटाया गया",
+  "deletedOn": "{{date}} को हटाया गया",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "पुनर्स्थापित करें",
+    "deleteForever": "हमेशा के लिए हटाएं",
+    "emptyTrash": "ट्रैश खाली करें"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} को ट्रैश से खोलें",
+    "restorePage": "{{title}} को पुनर्स्थापित करें",
+    "deletePageForever": "{{title}} को हमेशा के लिए हटाएं",
+    "cancelPermanentDelete": "स्थायी हटाना रद्द करें",
+    "cancelEmptyTrash": "ट्रैश खाली करना रद्द करें"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "स्थायी रूप से हटाएं?",
+    "deleteBodyPrefix": "यह स्थायी रूप से हटा देगा ",
+    "deleteBodySuffix": "। आप इस क्रिया को पूर्ववत नहीं कर सकते।",
+    "emptyTitle": "ट्रैश खाली करें?",
+    "emptyBody_one": "यह ट्रैश में मौजूद {{count}} पेज को स्थायी रूप से हटा देगा। आप इस क्रिया को पूर्ववत नहीं कर सकते।",
+    "emptyBody_other": "यह ट्रैश में मौजूद {{count}} पेजों को स्थायी रूप से हटा देंगे। आप इस क्रिया को पूर्ववत नहीं कर सकते।"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "स्थायी रूप से हटा दिया गया",
+    "couldntDelete": "पेज हटाया नहीं जा सका",
+    "restored": "पेज पुनर्स्थापित कर दिया गया",
+    "couldntRestore": "पेज पुनर्स्थापित नहीं किया जा सका",
+    "emptied": "ट्रैश खाली कर दिया गया",
+    "couldntEmpty": "ट्रैश खाली नहीं किया जा सका"
   }
 }

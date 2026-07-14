@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "صفحے میں تلاش"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "صفحے میں تلاش",
+    "placeholder": "صفحے میں تلاش"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "پچھلا مماثل",
+    "next": "اگلا مماثل",
+    "close": "تلاش بند کریں"
   }
 }

@@ -26,10 +26,63 @@ test('the release container base image is pinned to an immutable multi-arch dige
     /npm install -g npm@\d+\.\d+\.\d+/,
     'the npm bundled in the base image must be upgraded to an exact patched version',
   );
+  assert.match(
+    dockerfile,
+    /apt-get install -y --no-install-recommends ca-certificates/,
+    'the runtime image must trust public HTTPS APIs through the system CA bundle',
+  );
+  assert.match(dockerfile, /ENV LOCAL_PROTOCOL=http/);
+  assert.match(dockerfile, /VOLUME \["\/data"\]/);
   assert.doesNotMatch(
     dockerfile,
     /corepack\s+(?:enable|prepare)|pnpm@/,
     'the runtime image must not install the unused pnpm toolchain',
+  );
+});
+
+test('the container enables browser-only setup without a terminal setup secret', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+  const dockerfile = read('backend/Dockerfile');
+  const edgebaseConfig = read('backend/edgebase.config.ts');
+  const launcher = read('scripts/selfhost-docker.sh');
+  const persistedSecretList = entrypoint.match(/const secretNames = \[([\s\S]*?)\];/)?.[1] ?? '';
+
+  assert.match(entrypoint, /process\.env\.HANJI_BROWSER_SETUP \|\|= 'true'/);
+  assert.match(entrypoint, /process\.env\.HANJI_TRUST_SELF_HOSTED_PROXY \|\|= 'true'/);
+  assert.match(entrypoint, /process\.env\.EDGEBASE_CONFIG_ENV_ALLOWLIST/);
+  assert.match(entrypoint, /for \(const name of secretNames\) configEnvAllowlist\.add\(name\)/);
+  assert.match(entrypoint, /name\.startsWith\('HANJI_'\)/);
+  assert.match(entrypoint, /const devVarsPath = '\/app\/\.dev\.vars'/);
+  assert.match(entrypoint, /mode: 0o600/);
+  assert.doesNotMatch(entrypoint, /CLOUDFLARE_INCLUDE_PROCESS_ENV\s*\|\|=\s*'true'/);
+  assert.doesNotMatch(dockerfile, /ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true/);
+  assert.match(entrypoint, /process\.env\.LOCAL_PROTOCOL \|\| 'http'/);
+  assert.match(
+    edgebaseConfig,
+    /const ALLOW_INSECURE_LOCALHOST_AUTH = ALLOW_DEV_GUEST_LOGIN \|\| TRUST_SELF_HOSTED_PROXY/,
+  );
+  assert.match(edgebaseConfig, /allowInsecureLocalhost:\s*ALLOW_INSECURE_LOCALHOST_AUTH/);
+  assert.doesNotMatch(edgebaseConfig, /allowInsecureLocalhost:\s*BROWSER_SETUP_ENABLED/);
+  assert.match(edgebaseConfig, /trustSelfHostedProxy:\s*TRUST_SELF_HOSTED_PROXY/);
+  assert.match(edgebaseConfig, /const TRUST_SELF_HOSTED_PROXY = envFlag\('HANJI_TRUST_SELF_HOSTED_PROXY'\)/);
+  assert.doesNotMatch(persistedSecretList, /HANJI_SETUP_TOKEN/);
+  assert.doesNotMatch(entrypoint, /console\.log\([^\n]*first-run setup code/i);
+  assert.doesNotMatch(launcher, /HANJI_SETUP_TOKEN|Code:\s+%s/);
+});
+
+test('a registry-pulled image refuses to start when Docker persistence is nearly full', () => {
+  const entrypoint = read('backend/docker-context/edgebase-entrypoint.mjs');
+
+  assert.match(entrypoint, /statfsSync\(persistDir\)/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB \|\| '524288'/);
+  assert.match(entrypoint, /HANJI_DOCKER_MIN_FREE_KB must be a non-negative integer/);
+  assert.match(
+    entrypoint,
+    /Docker persistence storage is too full[\s\S]*?Free Docker disk space and restart\. The \/data volume was kept\./,
+  );
+  assert.ok(
+    entrypoint.indexOf('statfsSync(persistDir)') < entrypoint.indexOf('mkdirSync(secretDir'),
+    'the disk guard must run before the entrypoint writes persistent secrets',
   );
 });
 
@@ -41,9 +94,10 @@ test('local dev allowlists config flags without exposing the parent shell to the
 
   assert.match(
     devScript,
-    /EDGEBASE_CONFIG_ENV_ALLOWLIST=\$\{EDGEBASE_CONFIG_ENV_ALLOWLIST:-HANJI_ALLOW_DEV_GUEST_LOGIN\}/,
-    'the config-time guest flag must remain the explicit default allowlist while permitting a caller to add named keys',
+    /EDGEBASE_CONFIG_ENV_ALLOWLIST=\$\{EDGEBASE_CONFIG_ENV_ALLOWLIST:-HANJI_ALLOW_DEV_GUEST_LOGIN,HANJI_BROWSER_SETUP\}/,
+    'the config-time guest and browser-setup flags must remain the explicit default allowlist while permitting a caller to add named keys',
   );
+  assert.match(devScript, /HANJI_BROWSER_SETUP=true/);
   for (const [label, source] of [
     ['backend dev command', devScript],
     ['runtime refresh helper', refreshScript],
@@ -57,7 +111,7 @@ test('local dev allowlists config flags without exposing the parent shell to the
   }
 });
 
-test('live CI runtimes provision smoke credentials through worker-visible dev vars', () => {
+test('live CI runtimes complete the browser setup endpoint without stored master env', () => {
   const ci = read('.github/workflows/ci.yml');
   const runtimeSteps = ci.match(
     /- name: Start EdgeBase dev runtime\n[\s\S]*?(?=\n      - name:)/g,
@@ -65,16 +119,21 @@ test('live CI runtimes provision smoke credentials through worker-visible dev va
 
   assert.equal(runtimeSteps.length, 2, 'expected API and UI live-runtime jobs');
   for (const step of runtimeSteps) {
-    assert.match(step, /echo "HANJI_MASTER_EMAIL=master@hanji\.local"/);
-    assert.match(step, /echo "HANJI_MASTER_PASSWORD=HanjiMaster!2026"/);
+    assert.match(step, /echo "HANJI_BROWSER_SETUP=true"/);
     assert.match(step, /\} > \.dev\.vars/);
-    assert.doesNotMatch(step, /export HANJI_MASTER_(?:EMAIL|PASSWORD)=/);
+    assert.doesNotMatch(step, /HANJI_MASTER_(?:EMAIL|PASSWORD)=/);
   }
-  assert.match(
-    ci,
-    /name: Provision CI master account[\s\S]*?api\/functions\/instance-bootstrap[\s\S]*?body\.masterReady !== true/,
-    'API smokes must trigger and verify the lazy environment-provisioned master bootstrap before cleanup',
-  );
+  const setupSteps = ci.match(
+    /- name: Complete browser first-run setup for (?:API|UI) smokes\n[\s\S]*?(?=\n      - name:)/g,
+  ) ?? [];
+  assert.equal(setupSteps.length, 2, 'expected API and UI browser-setup completion steps');
+  for (const step of setupSteps) {
+    assert.match(step, /api\/functions\/instance-bootstrap/);
+    assert.match(step, /action: "completeSetup"/);
+    assert.match(step, /email: "master@hanji\.local"/);
+    assert.match(step, /password: "HanjiMaster!2026"/);
+    assert.match(step, /response\.status !== 201/);
+  }
   assert.match(
     ci,
     /name: Build web bundle[\s\S]*?VITE_ALLOW_ANONYMOUS_BOOTSTRAP: "true"/,
@@ -90,6 +149,8 @@ test('deploy uses strict live-link preflight while ordinary local packaging stay
   assert.match(String(scripts['preflight:release:strict'] ?? ''), /--strict-release/);
   assert.match(String(scripts['preflight:release:strict'] ?? ''), /verify:local-edgebase:release/);
   assert.match(String(scripts['preflight:deploy'] ?? ''), /preflight:release:strict/);
+  assert.match(String(scripts.deploy ?? ''), /prepare-browser-setup\.mjs/);
+  assert.match(String(scripts.deploy ?? ''), /--print-url/);
   assert.doesNotMatch(String(scripts['preflight:release'] ?? ''), /--strict-release/);
   assert.match(String(scripts['preflight:release'] ?? ''), /verify:local-edgebase:release/);
   assert.match(String(scripts.pack ?? ''), /preflight:release/);
@@ -98,6 +159,27 @@ test('deploy uses strict live-link preflight while ordinary local packaging stay
     String(webPackage.scripts?.build ?? ''),
     /verify-hanji-namespace\.mjs --generated/,
     'every deploy, pack, and packaging path that builds the web app must reject old names in generated output',
+  );
+});
+
+test('release versions and published EdgeBase pins stay aligned', () => {
+  const backendPackage = JSON.parse(read('backend/package.json'));
+  const webPackage = JSON.parse(read('web/package.json'));
+  const mcpPackage = JSON.parse(read('mcp/package.json'));
+  const edgebaseVersion = backendPackage.devDependencies?.['@edge-base/cli'];
+
+  assert.equal(webPackage.version, backendPackage.version);
+  assert.equal(mcpPackage.version, backendPackage.version);
+  assert.match(backendPackage.version, /^\d+\.\d+\.\d+-[0-9A-Za-z.-]+$/);
+  assert.match(edgebaseVersion ?? '', /^\d+\.\d+\.\d+$/);
+  assert.equal(backendPackage.devDependencies?.['@edge-base/shared'], edgebaseVersion);
+  assert.equal(webPackage.dependencies?.['@edge-base/web'], edgebaseVersion);
+
+  const dockerBuild = read('scripts/build-hanji-docker-image.mjs');
+  assert.doesNotMatch(
+    dockerBuild,
+    /cpSync|join\(backendDir, ['"]docker-context['"]\)/,
+    'Hanji must rely on the pinned EdgeBase Docker context contract instead of copying support files a second time',
   );
 });
 
@@ -298,15 +380,60 @@ test('container releases verify and publish both supported architectures with pr
   assert.match(workflow, /packages: write/);
   assert.match(workflow, /id-token: write/);
   assert.match(workflow, /attestations: write/);
-  assert.match(workflow, /push-by-digest=true,name-canonical=true,push=true/);
+  assert.match(workflow, /IMAGE_NAME: ghcr\.io\/melodysdreamj\/hanji/);
+  assert.match(workflow, /DOCKERHUB_IMAGE: melodysdreamj\/hanji/);
+  assert.equal(
+    workflow.match(/username: \$\{\{ vars\.DOCKERHUB_USERNAME \}\}/g)?.length,
+    2,
+    'both the platform and manifest jobs must authenticate to Docker Hub through the environment variable',
+  );
+  assert.equal(
+    workflow.match(/password: \$\{\{ secrets\.DOCKERHUB_TOKEN \}\}/g)?.length,
+    2,
+    'both the platform and manifest jobs must use the Docker Hub environment secret',
+  );
+  assert.doesNotMatch(
+    workflow,
+    /DOCKERHUB_(?:USERNAME|TOKEN):\s*(?:melodysdreamj|dckr_pat_)/,
+    'Docker Hub credentials must never be embedded in the workflow',
+  );
+  assert.match(
+    workflow,
+    /outputs: type=image,"name=\$\{\{ env\.IMAGE_NAME \}\},\$\{\{ env\.DOCKERHUB_IMAGE \}\}",push-by-digest=true,name-canonical=true,push=true/,
+    'one image exporter must push its single attested digest under both registry names',
+  );
+  assert.equal(
+    workflow.match(/outputs: type=image,/g)?.length,
+    1,
+    'separate image exporters would generate registry-specific provenance digests',
+  );
+  assert.match(workflow, /Verify both registries received the exact platform digest/);
+  assert.match(workflow, /cmp ghcr-platform\.json dockerhub-platform\.json/);
   assert.match(workflow, /Create tags only from verified platform digests/);
-  assert.match(workflow, /docker buildx imagetools create/);
+  assert.equal(
+    workflow.match(/docker buildx imagetools create/g)?.length,
+    2,
+    'each registry manifest must be assembled from its already-verified platform digests',
+  );
+  assert.match(workflow, /ghcr_refs\+=\("\$IMAGE_NAME@\$digest"\)/);
+  assert.match(workflow, /dockerhub_refs\+=\("\$DOCKERHUB_IMAGE@\$digest"\)/);
+  assert.match(workflow, /\[\[ "\$ghcr_digest" == "\$dockerhub_digest" \]\]/);
+  assert.match(workflow, /cmp ghcr-index\.json dockerhub-index\.json/);
   assert.match(workflow, /actions\/download-artifact@[0-9a-f]{40}/);
   assert.match(workflow, /provenance: mode=max/);
   assert.match(workflow, /sbom: true/);
   assert.match(workflow, /actions\/attest-build-provenance@[0-9a-f]{40}/);
-  assert.match(workflow, /Require anonymous pullability before calling the image public/);
+  assert.match(workflow, /subject-name: \$\{\{ env\.IMAGE_NAME \}\}/);
+  assert.match(workflow, /Require anonymous pullability and registry parity/);
+  assert.match(workflow, /docker logout ghcr\.io/);
+  assert.match(workflow, /docker logout docker\.io/);
+  assert.match(workflow, /cmp anonymous-ghcr\.json anonymous-dockerhub\.json/);
   assert.match(workflow, /docker buildx imagetools inspect/);
+  assert.equal(
+    workflow.match(/type=raw,value=alpha,enable=\$\{\{ contains\(github\.event_name == 'workflow_dispatch' && inputs\.tag \|\| github\.ref_name, '-alpha'\) \}\}/g)?.length,
+    2,
+    'alpha releases must advance the moving alpha tag in both metadata phases',
+  );
   assert.equal(
     workflow.match(/type=raw,value=latest,enable=\$\{\{ startsWith\(github\.ref, 'refs\/tags\/v'\) && !contains\(github\.ref_name, '-'\) \}\}/g)?.length,
     2,

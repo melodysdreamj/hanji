@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "Коментарі",
+  "closeAria": "Закрити коментарі",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "Обговорення блоку",
+    "page": "Обговорення сторінки"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "Статус коментаря",
+    "open": "Відкритий",
+    "resolved": "Вирішений"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "Коментар до",
+    "commentingOnSelectedText": "На вибраному тексті",
+    "selectedBlock": "Вибраний блок",
+    "onSelectedText": "На вибраному тексті",
+    "onSelectedBlock": "На вибраному блоці",
+    "onABlock": "На блоці"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "Додати коментар до блоку",
+    "addPageComment": "Додати коментар до сторінки",
+    "blockPlaceholder": "Коментар до цього блоку...",
+    "pagePlaceholder": "Додати коментар...",
+    "submit": "Коментувати"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "Люди для згадки в коментарі",
+    "replyPeopleAria": "Люди для згадки у відповіді",
+    "trigger": "Згадати людей",
+    "noMatches": "Немає відповідних людей",
+    "title": "Згадати {{name}}",
+    "person": "Людина",
+    "you": "Я",
+    "organizationPerson": "Член організації",
+    "roleInOrganization": "{{role}} в організації"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "Гілки коментарів",
+    "empty": "Ще немає коментарів",
+    "noOpen": "Немає відкритих коментарів",
+    "noResolved": "Немає вирішених коментарів"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} коментар, {{time}}",
+    "commentAriaResolved": "{{author}} коментар, {{time}}, вирішено",
+    "replyAria": "{{author}} відповідь, {{time}}",
+    "repliesAria": "{{count}} відповідей",
+    "edited": "(відредаговано)",
+    "emptyComment": "(порожній коментар)",
+    "emptyReply": "(порожня відповідь)",
+    "justNow": "Щойно"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "Відповісти",
+    "showInPage": "Показати на сторінці",
+    "resolve": "Вирішити",
+    "reopen": "Відкрити знову",
+    "edit": "Редагувати"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "Відповідь..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "Редагувати коментар"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "Видалити цей коментар?",
+    "threadConfirm_one": "Видалити цей коментар і його відповідь?",
+    "threadConfirm_other": "Видалити цей коментар і його {{count}} відповідей?"
   }
 }

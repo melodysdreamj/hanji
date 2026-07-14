@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ഇതുവരെ സംഭാഷണങ്ങളൊന്നുമില്ല. ഒരു പേജിൽ കമന്റ് ചെയ്യുക അല്ലെങ്കിൽ ആരെയെങ്കിലും മെൻഷൻ ചെയ്ത് ഒരു സംഭാഷണം ആരംഭിക്കുക.",
+  "leave": "പുറത്തുകടക്കുക",
+  "leaveAria": "{{title}} സംഭാഷണത്തിൽ നിന്ന് പുറത്തുകടക്കുക",
+  "open": "{{title}} സംഭാഷണം തുറക്കുക",
+  "participants_one": "{{count}} പങ്കാളി",
+  "participants_other": "{{count}} പങ്കാളികൾ",
+  "untitled": "ശീർഷകമില്ല",
+  "loading": "സംഭാഷണങ്ങൾ ലോഡ് ചെയ്യുന്നു…"
 }

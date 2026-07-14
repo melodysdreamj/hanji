@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "Pesquisar na página"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "Pesquisar na página",
+    "placeholder": "Pesquisar na página"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "close": "Fechar pesquisa"
   }
 }

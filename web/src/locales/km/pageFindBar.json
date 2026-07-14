@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "ស្វែងរកក្នុងទំព័រ"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "ស្វែងរកក្នុងទំព័រ",
+    "placeholder": "ស្វែងរកក្នុងទំព័រ"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "ត្រូវគ្នាមុន",
+    "next": "ត្រូវគ្នាបន្ទាប់",
+    "close": "បិទការស្វែងរក"
   }
 }

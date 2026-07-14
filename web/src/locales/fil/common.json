@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "Kanselahin",
+    "save": "I-save",
+    "close": "Isara",
+    "search": "Maghanap",
+    "create": "Gumawa",
+    "delete": "Tanggalin",
+    "clearAll": "I-clear lahat",
+    "done": "Tapos",
+    "add": "Idagdag"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "Walang pamagat"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "Kopya ng {{name}}",
+    "columnName": "Kolum {{number}}",
+    "importedDatabase": "Inangkat na database",
+    "uploadedFile": "Inupload na file",
+    "image": "Larawan",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "Pangalan",
+      "status": "Katayuan",
+      "select": "Pili",
+      "date": "Petsa"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "Hindi pa nasimulan",
+      "doing": "Ginagawa",
+      "done": "Tapos"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "Opsyon 1",
+      "second": "Opsyon 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "Talaan"
     }
   }
 }

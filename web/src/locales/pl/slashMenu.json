@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Polecenia bloków",
+  "closeBlockCommands": "Zamknij polecenia bloków",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Advanced": "Zaawansowane bloki",
+    "Basic": "Podstawowe bloki",
+    "Database": "Baza danych",
+    "Media": "Media"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} z {{total}}. Naciśnij Enter, aby wstawić.",
+  "listStatus": "Dostępne polecenia bloków: {{total}}.",
+  "noBlocks": "Nie znaleziono bloków",
+  "noBlocksFor": "Nie znaleziono bloków dla „{{query}}”",
+  "recentlyUsed": "Ostatnio używane"
 }

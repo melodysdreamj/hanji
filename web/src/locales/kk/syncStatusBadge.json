@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Офлайн",
+  "offlinePending_one": "Офлайн · {{count}} өзгеріс күтіп тұр",
+  "offlinePending_other": "Офлайн · {{count}} өзгеріс күтіп тұр",
+  "syncing": "Синхрондалуда · {{count}}",
+  "unreachable": "Серверге жету мүмкін емес",
+  "unreachablePending_one": "Серверге жету мүмкін емес · {{count}} өзгеріс күтілуде",
+  "unreachablePending_other": "Серверге жету мүмкін емес · {{count}} өзгеріс күтілуде",
+  "retryHint": "Қайталау үшін басыңыз"
 }

@@ -27,7 +27,7 @@ function snapshotPage(id: string, extra: Partial<Row> = {}): Row {
   };
 }
 
-async function publicSnapshot(database: FakeDb, token: string) {
+async function publicSnapshot(database: FakeDb, token: string, snapshotVersion?: string) {
   const uploads = database.tables.file_uploads ?? [];
   const result = await handlerOf(POST)({
     auth: null,
@@ -51,7 +51,7 @@ async function publicSnapshot(database: FakeDb, token: string) {
     request: new Request('http://localhost:8787/functions/share-mutation', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ action: 'publicPage', token }),
+      body: JSON.stringify({ action: 'publicPage', token, snapshotVersion }),
     }),
   });
   if (result instanceof Response) {
@@ -728,6 +728,29 @@ describe('publicPage database metadata privacy boundary', () => {
     const snapshot = await publicSnapshot(database, token) as { pages: Row[] };
 
     expect(snapshot.pages.map((page) => page.id)).toEqual([rootId]);
+  });
+
+  it('returns an authoritative not-modified response only after rechecking the public share', async () => {
+    const rootId = 'conditional-public-root';
+    const database = fakeDb(baseTables(rootId, [
+      snapshotPage(rootId, { isPublic: true, title: 'Conditional public page' }),
+    ]));
+    const first = await publicSnapshot(database, token) as {
+      page: Row;
+      snapshotVersion: string;
+    };
+    expect(first.page.id).toBe(rootId);
+    expect(first.snapshotVersion).toMatch(/^[a-f0-9]{64}$/);
+
+    const second = await publicSnapshot(database, token, first.snapshotVersion);
+    expect(second).toEqual({ notModified: true, snapshotVersion: first.snapshotVersion });
+
+    const shareLink = database.tables.share_links?.[0];
+    if (!shareLink) throw new Error('share link fixture missing');
+    shareLink.enabled = false;
+    await expect(publicSnapshot(database, token, first.snapshotVersion)).rejects.toThrow(
+      /publicPage failed \(404\)/,
+    );
   });
 
   it('minimizes direct-page and share-link metadata while preserving people display fields', async () => {

@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "Táto databáza je uzamknutá, preto sa vaše zmeny nepodarilo uložiť.",
+  "databaseRowsLoadFailed": "Nepodarilo sa načítať riadky databázy. Skúste to znova o chvíľu.",
+  "editAccessDeniedSave": "Nemáte práva na úpravy, preto sa vaše zmeny nepodarilo uložiť.",
+  "lockedSave": "Stránka alebo databáza je uzamknutá, preto sa vaše zmeny nepodarilo uložiť.",
+  "pageLockedSave": "Táto stránka je uzamknutá, preto sa vaše zmeny nepodarilo uložiť.",
+  "pageMissingSave": "Stránku sa nepodarilo nájsť, preto sa vaše zmeny nepodarilo uložiť.",
+  "saveFailed": "Vaše zmeny sa nepodarilo uložiť.",
+  "sessionExpired": "Vaša relácia vypršala alebo požiadavku nebolo možné overiť. Skúste to znova.",
+  "blockConflictSave": "Tento blok bol upravený na inom zariadení, preto vaša offline zmena nebola aplikovaná.",
+  "blockConflictKeepMine": "Použiť moju verziu",
+  "blockMoveCommentsSkipped": "Blok bol presunutý, ale jeho komentáre sa nepodarilo presunúť s ním."
 }

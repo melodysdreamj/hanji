@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "Блокты жылжыту орны",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Жылжыту орындарын іздеу",
+    "placeholder": "Беттерді іздеу..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Жылжыту диалогын жабу"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "Жылжыту нысаналары",
+    "empty": "Беттер табылмады.",
+    "destinationLabel": "Блокты {{label}}, {{path}} орнына жылжыту"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" жасау",
+    "optionLabel": "\"{{query}}\" бетін жасап, блокты осында жылжыту",
+    "hint": "Жаңа бет – блокты осында жылжыту"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Құлыпталған бет"
   },
-  "untitled": "Untitled",
+  "untitled": "Атаусыз",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "Бет құлыпталған.",
+    "movedBlock": "Блок жылжытылды.",
+    "movedBlocks": "Блоктар жылжытылды.",
+    "movedBlocksCount": "{{blockCount}} блок жылжытылды.",
+    "moveFailed": "Блокты жылжыту мүмкін болмады."
   }
 }

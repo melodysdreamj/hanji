@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "متن",
+      "description": "سادہ متن سے لکھنا شروع کریں۔",
+      "placeholder": "کمانڈز کے لیے '/' ٹائپ کریں"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "صفحہ",
+      "description": "اس صفحے میں ایک ذیلی صفحہ بنائیں۔"
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "صفحہ لنک",
+      "description": "موجودہ صفحہ سے لنک کریں۔"
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "ہیڈنگ 1",
+      "description": "بڑے حصے کی سرخی۔",
+      "placeholder": "ہیڈنگ 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "ٹوگل ہیڈنگ 1",
+      "description": "بڑی سرخی جو نیسٹڈ مواد کو چھپا سکتی ہے۔",
+      "placeholder": "ٹوگل ہیڈنگ 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "ہیڈنگ 2",
+      "description": "درمیانے حصے کی سرخی۔",
+      "placeholder": "ہیڈنگ 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "ٹوگل ہیڈنگ 2",
+      "description": "درمیانی ہیڈنگ جو نیسٹڈ مواد کو چھپا سکتی ہے۔",
+      "placeholder": "ٹوگل ہیڈنگ 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "ہیڈنگ 3",
+      "description": "چھوٹے حصے کی سرخی۔",
+      "placeholder": "ہیڈنگ 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "ٹوگل ہیڈنگ 3",
+      "description": "چھوٹی ہیڈنگ جو نیسٹڈ مواد کو چھپا سکتی ہے۔",
+      "placeholder": "ٹوگل ہیڈنگ 3"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "ہیڈنگ 4",
+      "description": "مختصر حصے کی سرخی۔",
+      "placeholder": "ہیڈنگ 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "ٹوگل ہیڈنگ 4",
+      "description": "کمپیکٹ سرخی جو نیسٹڈ مواد چھپا سکتی ہے۔",
+      "placeholder": "ٹوگل ہیڈنگ 4"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "کاموں کی فہرست",
+      "description": "چیک باکس کے ساتھ کاموں کو ٹریک کریں۔",
+      "placeholder": "کام"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "گولیوں والی فہرست",
+      "description": "ایک سادہ گولیوں والی فہرست بنائیں۔",
+      "placeholder": "فہرست"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "نمبر والی فہرست",
+      "description": "نمبر والی فہرست بنائیں۔",
+      "placeholder": "فہرست"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "ٹوگل فہرست",
+      "description": "ٹوگل مواد کو چھپا اور دکھا سکتے ہیں۔",
+      "placeholder": "ٹوگل"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "اقتباس",
+      "description": "اقتباس شامل کریں۔",
+      "placeholder": "خالی اقتباس"
     },
     "callout": {
-      "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "label": "کال آؤٹ",
+      "description": "تحریر کو نمایاں کریں۔",
+      "placeholder": "کچھ ٹائپ کریں…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "تقسیم کنندہ",
+      "description": "بلاکس کو بصری طور پر تقسیم کریں۔"
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "کوڈ",
+      "description": "ایک کوڈ سنیپٹ شامل کریں۔",
+      "placeholder": "کوڈ لکھیں، یا سنیپٹ چسپاں کریں…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "مساوات",
+      "description": "ریاضی کی مساوات دکھائیں۔"
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "فہرست مضامین",
+      "description": "اس صفحے میں سرخیوں کے لنک دکھائیں۔"
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "مطابقت شدہ بلاک",
+      "description": "صفحات میں مواد دوبارہ استعمال کریں۔"
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "بٹن",
+      "description": "ایک کلک سے دوبارہ استعمال ہونے والا مواد داخل کریں۔"
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "ٹیبز",
+      "description": "مواد کو ٹیبز میں گروپ کریں۔",
+      "placeholder": "ٹیبز"
     },
     "breadcrumb": {
-      "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "label": "مقام کا راستہ",
+      "description": "اس صفحے کا مقام دکھائیں۔"
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "نقل",
+      "description": "اس بلاک کی عین نقل بنائیں۔"
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "منتقل کریں",
+      "description": "اس بلاک کو دوسرے صفحے پر منتقل کریں۔"
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "اس بلاک کو حذف کریں۔"
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "بدلیں",
+      "description": "اس بلاک کی قسم تبدیل کریں۔"
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "رنگ",
+      "description": "اس بلاک کے متن یا پس منظر کا رنگ تبدیل کریں۔"
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "جدول",
+      "description": "اس صفحے میں سادہ جدول شامل کریں۔"
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 کالم",
+      "description": "بلاکس کو ساتھ ساتھ رکھیں۔"
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 کالم",
+      "description": "بلاکس کو تین کالموں میں ترتیب دیں۔"
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 کالم",
+      "description": "بلاکس کو چار کالموں میں ترتیب دیں۔"
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 کالم",
+      "description": "بلاکس کو پانچ کالموں میں ترتیب دیں۔"
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "تصویر",
+      "description": "اپ لوڈ کریں یا لنک سے ایمبیڈ کریں۔"
     },
     "video": {
-      "label": "Video",
-      "description": "Embed a video with a link."
+      "label": "ویڈیو",
+      "description": "لنک کے ساتھ ویڈیو ایمبیڈ کریں۔"
     },
     "audio": {
-      "label": "Audio",
-      "description": "Embed audio with a link."
+      "label": "آڈیو",
+      "description": "لنک سے آڈیو شامل کریں۔"
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "ویب بک مارک",
+      "description": "ویب لنک کو کارڈ کے طور پر محفوظ کریں۔"
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "ایمبیڈ",
+      "description": "لنک سے مواد ایمبیڈ کریں۔"
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "فائل",
+      "description": "اس صفحے پر فائل لنک منسلک کریں۔"
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "ڈیٹا بیس - مکمل صفحہ",
+      "description": "ذیلی صفحے کے طور پر ایک نیا ڈیٹا بیس شامل کریں۔"
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "جدول - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ ڈیٹا بیس بطور جدول شامل کریں۔"
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "بورڈ - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ کنبان بورڈ شامل کریں۔"
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "فہرست - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ ڈیٹا بیس بطور فہرست شامل کریں۔"
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "ٹائم لائن - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ ڈیٹا بیس ٹائم لائن شامل کریں۔"
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "کیلنڈر - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ کیلنڈر ڈیٹا بیس شامل کریں۔"
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "گیلری - مکمل صفحہ",
+      "description": "ایک مکمل صفحہ ڈیٹا بیس گیلری شامل کریں۔"
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "ڈیٹا بیس - ان لائن",
+      "description": "اس صفحے کے اندر ڈیٹا بیس شامل کریں۔"
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "جدول منظر",
+      "description": "ان لائن ڈیٹا بیس بطور جدول شامل کریں۔"
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "بورڈ منظر",
+      "description": "ان لائن کنبان بورڈ شامل کریں۔"
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "فہرست منظر",
+      "description": "ان لائن ڈیٹا بیس بطور فہرست شامل کریں۔"
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "ٹائم لائن منظر",
+      "description": "ان لائن ڈیٹا بیس ٹائم لائن شامل کریں۔"
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "کیلنڈر منظر",
+      "description": "ان لائن کیلنڈر ڈیٹا بیس شامل کریں۔"
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "گیلری منظر",
+      "description": "ان لائن ڈیٹا بیس گیلری شامل کریں۔"
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "پیش فرض",
+      "description": "اس بلاک سے متن یا پس منظر کا رنگ ہٹائیں۔"
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "سرمئی",
+      "description": "اس بلاک پر سرمئی رنگ لگائیں۔"
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "بھورا",
+      "description": "اس بلاک پر بھورا رنگ لگائیں۔"
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "نارنجی",
+      "description": "اس بلاک پر نارنجی لگائیں۔"
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "پیلا",
+      "description": "اس بلاک پر پیلا رنگ لگائیں۔"
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "سبز",
+      "description": "اس بلاک پر سبز لگائیں۔"
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "نیلا",
+      "description": "اس بلاک پر نیلا رنگ لگائیں۔"
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "جامنی",
+      "description": "اس بلاک پر جامنی رنگ لگائیں۔"
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "گلابی",
+      "description": "اس بلاک پر گلابی رنگ لگائیں۔"
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "سرخ",
+      "description": "اس بلاک پر سرخ رنگ لگائیں۔"
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "سرمئی پس منظر",
+      "description": "اس بلاک پر سرمئی پس منظر لگائیں۔"
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "بھورا پس منظر",
+      "description": "اس بلاک پر بھورا پس منظر لگائیں۔"
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "نارنجی پس منظر",
+      "description": "اس بلاک پر نارنجی پس منظر لگائیں۔"
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "پیلا پس منظر",
+      "description": "اس بلاک پر پیلا پس منظر لگائیں۔"
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "سبز پس منظر",
+      "description": "اس بلاک پر سبز پس منظر لگائیں۔"
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "نیلا پس منظر",
+      "description": "اس بلاک پر نیلا پس منظر لگائیں۔"
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "جامنی پس منظر",
+      "description": "اس بلاک پر جامنی پس منظر لگائیں۔"
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "گلابی پس منظر",
+      "description": "اس بلاک پر گلابی پس منظر لگائیں۔"
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "سرخ پس منظر",
+      "description": "اس بلاک پر سرخ پس منظر لگائیں۔"
     }
   }
 }

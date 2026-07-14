@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Bu maʼlumotlar bazasida hali sahifalar yoʻq.",
+  "emptyTitle": "Hali sahifalar yoʻq",
+  "newInline": "Yangi",
+  "newPage": "Yangi sahifa",
+  "newPageIn": "{{dbTitle}} ga yangi sahifa",
+  "noResultsDesc": "Joriy filtrlar yoki qidiruvga mos keladigan sahifalar yoʻq.",
+  "noResultsTitle": "Natijalar yoʻq",
+  "openRow": "{{title}} ochish"
 }

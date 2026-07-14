@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "എണ്ണം",
+    "sum": "ആകെ",
+    "average": "ശരാശരി",
+    "min": "കുറഞ്ഞത്",
+    "max": "പരമാവധി"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} ചാർട്ട്",
+  "chartType": "ചാർട്ട് തരം",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "ബാർ",
+    "horizontal_bar": "തിരശ്ചീന ബാർ",
+    "line": "ലൈൻ",
+    "donut": "ഡോനട്ട്"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "ചെക്ക് ചെയ്തത്",
+  "empty": "ശൂന്യം",
+  "legend": "ചാർട്ട് ലെജന്റ്",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "ഡാറ്റ ഇല്ല",
+  "noDataDesc": "ഫിൽട്ടറുകളുമായോ തിരയലുമായോ പൊരുത്തപ്പെടുന്ന വരികളൊന്നുമില്ല.",
+  "noGroupProperty": "ചാർട്ട് ചെയ്യാൻ ഒന്നുമില്ല",
+  "noGroupPropertyDesc": "ഈ ചാർട്ട് ഗ്രൂപ്പ് ചെയ്യാൻ ഒരു സെലക്ട്, സ്റ്റാറ്റസ്, വ്യക്തി, ചെക്ക്ബോക്സ് അല്ലെങ്കിൽ തീയതി പ്രോപ്പർട്ടി ചേർക്കുക.",
+  "total": "ആകെ",
+  "unchecked": "ചെക്ക് ചെയ്യാത്തത്",
+  "untitledProperty": "ശീർഷകമില്ലാത്ത",
+  "valueProperty": "മൂല്യ പ്രോപ്പർട്ടി",
+  "xAxis": "X-അക്ഷം",
+  "yAxis": "Y-അക്ഷം"
 }

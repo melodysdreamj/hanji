@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blok opdragte",
+  "closeBlockCommands": "Sluit blok opdragte",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Basiese blokke",
     "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Database": "Databasis",
+    "Advanced": "Gevorderde blokke"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} van {{total}}. Druk Enter om in te voeg.",
+  "listStatus": "{{total}} blok opdragte beskikbaar.",
+  "noBlocks": "Geen blokke gevind nie",
+  "noBlocksFor": "Geen blokke gevind vir \"{{query}}\" nie.",
+  "recentlyUsed": "Onlangs gebruik"
 }

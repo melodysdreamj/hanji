@@ -14,10 +14,10 @@
     "untitled": "Sans titre"
   },
   "generated": {
-    "copyName": "Copie de {{name}}",
+    "copyName": "{{name}} (copie)",
     "columnName": "Colonne {{number}}",
     "importedDatabase": "Base de données importée",
-    "uploadedFile": "Fichier téléversé",
+    "uploadedFile": "Fichier importé",
     "image": "Image",
     "propertyNames": {
       "name": "Nom",

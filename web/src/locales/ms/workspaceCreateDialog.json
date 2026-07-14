@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Ruang kerja baharu",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Nama ruang kerja",
+    "placeholder": "Acme Sdn. Bhd."
   },
-  "startLabel": "Start from",
+  "startLabel": "Mula dari",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Ruang kerja kosong",
+      "body": "Mulakan kosong dengan halaman permulaan."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Import dari Notion",
+      "body": "Cipta ruang kerja, kemudian migrasi ruang kerja Notion ke dalamnya."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Import dari Hanji lain",
+      "body": "Cipta ruang kerja, kemudian import dari pelayan atau fail Hanji lain."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Buat ruang kerja",
+  "creating": "Membuat…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Gagal membuat ruang kerja."
   }
 }

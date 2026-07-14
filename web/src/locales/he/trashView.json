@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "אשפה",
+  "empty": "דפים שאתה מוחק מופיעים כאן. האשפה ריקה.",
+  "searchTrash": "חפש באשפה",
+  "deletedPages": "דפים שנמחקו",
+  "noSearchMatches": "לא נמצאו דפים מחוקים התואמים לחיפוש שלך.",
+  "pageCount_one": "{{count}} דף",
+  "pageCount_other": "{{count}} דפים",
+  "deletedJustNow": "נמחק הרגע",
+  "deletedOn": "נמחק ב{{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "שחזר",
+    "deleteForever": "מחק לצמיתות",
+    "emptyTrash": "רוקן סל"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "פתח את {{title}} מהאשפה",
+    "restorePage": "שחזר את {{title}}",
+    "deletePageForever": "מחק {{title}} לצמיתות",
+    "cancelPermanentDelete": "בטל מחיקה לצמיתות",
+    "cancelEmptyTrash": "בטל ריקון סל"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "מחיקה לצמיתות?",
+    "deleteBodyPrefix": "תמחק לצמיתות ",
+    "deleteBodySuffix": ". לא ניתן לבטל פעולה זו.",
+    "emptyTitle": "לרוקן את האשפה?",
+    "emptyBody_one": "פעולה זו תמחק לצמיתות את כל {{count}} דף באשפה. לא ניתן לבטל פעולה זו.",
+    "emptyBody_other": "פעולה זו תמחק לצמיתות את כל {{count}} דפים באשפה. לא ניתן לבטל פעולה זו."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "נמחק לצמיתות",
+    "couldntDelete": "לא ניתן היה למחוק את הדף",
+    "restored": "הדף שוחזר",
+    "couldntRestore": "לא ניתן היה לשחזר את הדף",
+    "emptied": "האשפה רוקנה",
+    "couldntEmpty": "לא ניתן היה לרוקן את האשפה"
   }
 }

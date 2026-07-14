@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "Əlaqə elementləri yüklənir",
+  "relationUnavailable": "Əlaqə elementləri mövcud deyil",
+  "unavailable": "Mövcud deyil",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "Seçilib",
+    "unchecked": "Seçilməyib"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "{{title}}-ı aç",
+  "openOrDownloadFile": "{{name}}-ı aç və ya yüklə"
 }

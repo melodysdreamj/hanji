@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "average": "Gjennomsnitt",
+    "count": "Antall",
+    "max": "Maks",
     "min": "Min",
-    "max": "Max"
+    "sum": "Sum"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} diagram",
+  "chartType": "Diagramtype",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Søyle",
+    "donut": "Smultring",
+    "horizontal_bar": "Horisontal stolpe",
+    "line": "Linje"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Avmerket",
+  "empty": "Tom",
+  "legend": "Forklaring",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Ingen data",
+  "noDataDesc": "Ingen rader samsvarer med gjeldende filtre eller søk.",
+  "noGroupProperty": "Ingenting å vise i diagram ennå",
+  "noGroupPropertyDesc": "Legg til en egenskap for valg, status, person, avmerkingsboks eller dato for å gruppere dette diagrammet.",
+  "total": "Totalt",
+  "unchecked": "Ikke avmerket",
+  "untitledProperty": "Uten navn",
+  "valueProperty": "Verdiegenskap",
+  "xAxis": "X-akse",
+  "yAxis": "Y-akse"
 }

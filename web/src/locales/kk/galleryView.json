@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Бұл дерекқорда әлі парақтар жоқ.",
+  "emptyTitle": "Әлі парақтар жоқ",
+  "newInline": "Жаңа",
+  "newPage": "Жаңа парақ",
+  "newPageIn": "{{dbTitle}} ішінде жаңа парақ",
+  "noResultsDesc": "Ағымдағы сүзгілерге немесе іздеуге сәйкес парақтар жоқ.",
+  "noResultsTitle": "Нәтижелер жоқ",
+  "openRow": "{{title}} ашу"
 }

@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Переместить в",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "Корень рабочего пространства",
+    "path": "Верхний уровень"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Поиск расположений",
+    "placeholder": "Поиск страниц..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Закрыть диалог перемещения"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Куда переместить",
+    "empty": "Страницы не найдены.",
+    "destinationLabel": "Переместить в {{label}}, {{path}}"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "Создать «{{title}}»",
+    "optionLabel": "Создать страницу {{title}} и переместить сюда",
+    "hint": "Новая страница верхнего уровня — переместить сюда"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Заблокированный родитель",
+    "page": "Заблокированная страница"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Родительская страница заблокирована",
+    "locked": "Страница заблокирована",
+    "moved": "Страница перемещена",
+    "moveFailed": "Не удалось переместить страницу"
   }
 }

@@ -1,316 +1,316 @@
 {
   "defs": {
     "paragraph": {
-      "label": "Text",
-      "description": "Just start writing with plain text.",
-      "placeholder": "Type '/' for commands"
+      "label": "Matn",
+      "description": "Oddiy matn bilan yozishni boshlang.",
+      "placeholder": "Buyruqlar uchun '/' yozing"
     },
     "child_page": {
-      "label": "Page",
-      "description": "Create a sub-page inside this page."
+      "label": "Sahifa",
+      "description": "Ushbu sahifa ichida pastki sahifa yarating."
     },
     "link_to_page": {
-      "label": "Link to page",
-      "description": "Link to an existing page."
+      "label": "Sahifaga havola",
+      "description": "Mavjud sahifaga havola qiling."
     },
     "heading_1": {
-      "label": "Heading 1",
-      "description": "Big section heading.",
-      "placeholder": "Heading 1"
+      "label": "Sarlavha 1",
+      "description": "Katta bo‘lim sarlavhasi.",
+      "placeholder": "Sarlavha 1"
     },
     "toggle_heading_1": {
-      "label": "Toggle heading 1",
-      "description": "Large heading that can hide nested content.",
-      "placeholder": "Toggle heading 1"
+      "label": "Ochiladigan sarlavha 1",
+      "description": "Ichki tarkibni yashirish mumkin bo'lgan katta sarlavha.",
+      "placeholder": "Ochiladigan sarlavha 1"
     },
     "heading_2": {
-      "label": "Heading 2",
-      "description": "Medium section heading.",
-      "placeholder": "Heading 2"
+      "label": "Sarlavha 2",
+      "description": "O‘rta bo‘lim sarlavhasi.",
+      "placeholder": "Sarlavha 2"
     },
     "toggle_heading_2": {
-      "label": "Toggle heading 2",
-      "description": "Medium heading that can hide nested content.",
-      "placeholder": "Toggle heading 2"
+      "label": "Ochiladigan sarlavha 2",
+      "description": "Ichki tarkibni yashiruvchi o'rta sarlavha.",
+      "placeholder": "Ochiladigan sarlavha 2"
     },
     "heading_3": {
-      "label": "Heading 3",
-      "description": "Small section heading.",
-      "placeholder": "Heading 3"
+      "label": "Sarlavha 3",
+      "description": "Kichik bo‘lim sarlavhasi.",
+      "placeholder": "Sarlavha 3"
     },
     "toggle_heading_3": {
-      "label": "Toggle heading 3",
-      "description": "Small heading that can hide nested content.",
-      "placeholder": "Toggle heading 3"
+      "label": "Ochiladigan sarlavha 3",
+      "description": "Ichki tarkibni yashiruvchi kichik sarlavha.",
+      "placeholder": "3-darajali ochiladigan sarlavha"
     },
     "heading_4": {
-      "label": "Heading 4",
-      "description": "Compact section heading.",
-      "placeholder": "Heading 4"
+      "label": "Sarlavha 4",
+      "description": "Ixcham bo‘lim sarlavhasi.",
+      "placeholder": "Sarlavha 4"
     },
     "toggle_heading_4": {
-      "label": "Toggle heading 4",
-      "description": "Compact heading that can hide nested content.",
-      "placeholder": "Toggle heading 4"
+      "label": "4-darajali ochiladigan sarlavha",
+      "description": "Ichki tarkibni yashiruvchi ixcham sarlavha.",
+      "placeholder": "4-darajali ochiladigan sarlavha"
     },
     "to_do": {
-      "label": "To-do list",
-      "description": "Track tasks with a checkbox.",
-      "placeholder": "To-do"
+      "label": "Vazifalar ro'yxati",
+      "description": "Vazifalarni katakcha bilan kuzatish.",
+      "placeholder": "Vazifa"
     },
     "bulleted_list_item": {
-      "label": "Bulleted list",
-      "description": "Create a simple bulleted list.",
-      "placeholder": "List"
+      "label": "Nuqtalangan ro'yxat",
+      "description": "Oddiy nuqtalangan ro'yxat yarating.",
+      "placeholder": "Ro'yxat"
     },
     "numbered_list_item": {
-      "label": "Numbered list",
-      "description": "Create a list with numbering.",
-      "placeholder": "List"
+      "label": "Raqamlangan roʻyxat",
+      "description": "Raqam bilan roʻyxat yarating.",
+      "placeholder": "Roʻyxat"
     },
     "toggle": {
-      "label": "Toggle list",
-      "description": "Toggles can hide and show content.",
-      "placeholder": "Toggle"
+      "label": "Ochiladigan ro'yxat",
+      "description": "Ochiladigan bloklar tarkibni yashirishi va ko'rsatishi mumkin.",
+      "placeholder": "Ochiladigan"
     },
     "quote": {
-      "label": "Quote",
-      "description": "Capture a quote.",
-      "placeholder": "Empty quote"
+      "label": "Iqtibos",
+      "description": "Iqtibosni oling.",
+      "placeholder": "Bo'sh iqtibos"
     },
     "callout": {
       "label": "Callout",
-      "description": "Make writing stand out.",
-      "placeholder": "Type something…"
+      "description": "Matnni ajralib turishini ta'minlang.",
+      "placeholder": "Biror narsa yozing…"
     },
     "divider": {
-      "label": "Divider",
-      "description": "Visually divide blocks."
+      "label": "Ajratgich",
+      "description": "Bloklarni vizual ajrating."
     },
     "code": {
-      "label": "Code",
-      "description": "Capture a code snippet.",
-      "placeholder": "Write code, or paste a snippet…"
+      "label": "Kod",
+      "description": "Kod snippetini qo'shing.",
+      "placeholder": "Kod yozing yoki snippetni joylashtiring…"
     },
     "equation": {
-      "label": "Equation",
-      "description": "Display a math equation."
+      "label": "Tenglama",
+      "description": "Matematik tenglamani ko'rsating."
     },
     "table_of_contents": {
-      "label": "Table of contents",
-      "description": "Show links to headings in this page."
+      "label": "Mundarija",
+      "description": "Sahifadagi sarlavhalarga havolalarni ko'rsatish."
     },
     "synced_block": {
-      "label": "Synced block",
-      "description": "Reuse content across pages."
+      "label": "Sinxronlashtirilgan blok",
+      "description": "Kontentni sahifalar bo'ylab qayta ishlating."
     },
     "button": {
-      "label": "Button",
-      "description": "Insert reusable content with one click."
+      "label": "Tugma",
+      "description": "Bir bosish bilan qayta ishlatiladigan tarkib qo'shing."
     },
     "tab": {
-      "label": "Tabs",
-      "description": "Group content into labeled tabs.",
-      "placeholder": "Tabs"
+      "label": "Tablar",
+      "description": "Kontentni teglangan tablar bo'yicha guruhlang.",
+      "placeholder": "Tablar"
     },
     "breadcrumb": {
       "label": "Breadcrumb",
-      "description": "Show where this page lives."
+      "description": "Bu sahifaning joylashgan o'rnini ko'rsatadi."
     },
     "action_duplicate": {
-      "label": "Duplicate",
-      "description": "Create an exact copy of this block."
+      "label": "Nusxalash",
+      "description": "Ushbu blokning aniq nusxasini yaratish."
     },
     "action_move_to": {
-      "label": "Move to",
-      "description": "Move this block to another page."
+      "label": "Ko'chirish",
+      "description": "Bu blokni boshqa sahifaga ko'chiring."
     },
     "action_delete": {
-      "description": "Delete this block."
+      "description": "Ushbu blokni o'chirish."
     },
     "action_turn_into": {
-      "label": "Turn into",
-      "description": "Change this block's type."
+      "label": "Aylantirish",
+      "description": "Bu blok turini o'zgartiring."
     },
     "action_color": {
-      "label": "Color",
-      "description": "Change this block's text or background color."
+      "label": "Rang",
+      "description": "Ushbu blokning matn yoki fon rangini o'zgartirish."
     },
     "simple_table": {
-      "label": "Table",
-      "description": "Add a simple table to this page."
+      "label": "Jadval",
+      "description": "Ushbu sahifaga oddiy jadval qo'shing."
     },
     "column_list_2": {
-      "label": "2 columns",
-      "description": "Place blocks side by side."
+      "label": "2 ta ustun",
+      "description": "Bloklarni yonma-yon joylashtiring."
     },
     "column_list_3": {
-      "label": "3 columns",
-      "description": "Arrange blocks in three columns."
+      "label": "3 ta ustun",
+      "description": "Bloklarni uchta ustunda joylashtiring."
     },
     "column_list_4": {
-      "label": "4 columns",
-      "description": "Arrange blocks in four columns."
+      "label": "4 ta ustun",
+      "description": "Bloklarni to'rtta ustunda joylashtiring."
     },
     "column_list_5": {
-      "label": "5 columns",
-      "description": "Arrange blocks in five columns."
+      "label": "5 ta ustun",
+      "description": "Bloklarni beshta ustunda joylashtiring."
     },
     "image": {
-      "label": "Image",
-      "description": "Upload or embed with a link."
+      "label": "Rasm",
+      "description": "Yuklang yoki havola bilan joylashtiring."
     },
     "video": {
       "label": "Video",
-      "description": "Embed a video with a link."
+      "description": "Videoni havola orqali joylashtiring."
     },
     "audio": {
       "label": "Audio",
-      "description": "Embed audio with a link."
+      "description": "Havola orqali audio joylashtiring."
     },
     "bookmark": {
-      "label": "Web bookmark",
-      "description": "Save a web link as a card."
+      "label": "Veb xatcho'p",
+      "description": "Veb havolani karta sifatida saqlang."
     },
     "embed": {
-      "label": "Embed",
-      "description": "Embed content from a link."
+      "label": "Joylashtirish",
+      "description": "Havoladan kontentni joylashtiring."
     },
     "file": {
-      "label": "File",
-      "description": "Attach a file link to this page."
+      "label": "Fayl",
+      "description": "Ushbu sahifaga fayl havolasini biriktiring."
     },
     "child_database": {
-      "label": "Database - Full page",
-      "description": "Add a new database as a sub-page."
+      "label": "Ma'lumotlar bazasi - To'liq sahifa",
+      "description": "Yangi ma'lumotlar bazasini pastki sahifa sifatida qo'shing."
     },
     "child_database_table": {
-      "label": "Table - Full page",
-      "description": "Add a full-page database as a table."
+      "label": "Jadval - To'liq sahifa",
+      "description": "To'liq sahifali ma'lumotlar bazasini jadval sifatida qo'shing."
     },
     "child_database_board": {
-      "label": "Board - Full page",
-      "description": "Add a full-page kanban board."
+      "label": "Doska - To'liq sahifa",
+      "description": "To'liq sahifali kanban doskasini qo'shing."
     },
     "child_database_list": {
-      "label": "List - Full page",
-      "description": "Add a full-page database as a list."
+      "label": "Ro'yxat - To'liq sahifa",
+      "description": "To'liq sahifali ma'lumotlar bazasini ro'yxat sifatida qo'shing."
     },
     "child_database_timeline": {
-      "label": "Timeline - Full page",
-      "description": "Add a full-page database timeline."
+      "label": "Timeline - To'liq sahifa",
+      "description": "To'liq sahifali ma'lumotlar bazasi timeline'ini qo'shing."
     },
     "child_database_calendar": {
-      "label": "Calendar - Full page",
-      "description": "Add a full-page calendar database."
+      "label": "Kalendar - To'liq sahifa",
+      "description": "To'liq sahifali kalendar ma'lumotlar bazasini qo'shing."
     },
     "child_database_gallery": {
-      "label": "Gallery - Full page",
-      "description": "Add a full-page database gallery."
+      "label": "Galereya - To'liq sahifa",
+      "description": "To'liq sahifali ma'lumotlar bazasi galereyasini qo'shing."
     },
     "inline_database": {
-      "label": "Database - Inline",
-      "description": "Add a database inside this page."
+      "label": "Ma’lumotlar bazasi - Ichki",
+      "description": "Ushbu sahifa ichiga ma’lumotlar bazasini qo‘shing."
     },
     "inline_database_table": {
-      "label": "Table view",
-      "description": "Add an inline database as a table."
+      "label": "Jadval ko‘rinishi",
+      "description": "Ichki jadval ma’lumotlar bazasini qo‘shing."
     },
     "inline_database_board": {
-      "label": "Board view",
-      "description": "Add an inline kanban board."
+      "label": "Doska ko‘rinishi",
+      "description": "Ichki kanban doskasini qo‘shing."
     },
     "inline_database_list": {
-      "label": "List view",
-      "description": "Add an inline database as a list."
+      "label": "Ro‘yxat ko‘rinishi",
+      "description": "Ichki ro‘yxat ma’lumotlar bazasini qo‘shing."
     },
     "inline_database_timeline": {
-      "label": "Timeline view",
-      "description": "Add an inline database timeline."
+      "label": "Vaqt jadvali ko‘rinishi",
+      "description": "Ichki vaqt jadvali ma’lumotlar bazasini qo‘shing."
     },
     "inline_database_calendar": {
-      "label": "Calendar view",
-      "description": "Add an inline calendar database."
+      "label": "Kalendar ko‘rinishi",
+      "description": "Ichki kalendar ma’lumotlar bazasini qo‘shing."
     },
     "inline_database_gallery": {
-      "label": "Gallery view",
-      "description": "Add an inline database gallery."
+      "label": "Galereya ko‘rinishi",
+      "description": "Ichki galereya ma’lumotlar bazasini qo‘shing."
     },
     "color_default": {
-      "label": "Default",
-      "description": "Remove text or background color from this block."
+      "label": "Standart",
+      "description": "Bu blokdagi matn yoki fon rangini olib tashlang."
     },
     "color_gray": {
-      "label": "Gray",
-      "description": "Apply gray to this block."
+      "label": "Kulrang",
+      "description": "Bu blokka kulrang qo‘llang."
     },
     "color_brown": {
-      "label": "Brown",
-      "description": "Apply brown to this block."
+      "label": "Jigarrang",
+      "description": "Ushbu blokga jigarrang rang qo'llang."
     },
     "color_orange": {
-      "label": "Orange",
-      "description": "Apply orange to this block."
+      "label": "To‘q sariq",
+      "description": "Bu blokka to‘q sariq qo‘llang."
     },
     "color_yellow": {
-      "label": "Yellow",
-      "description": "Apply yellow to this block."
+      "label": "Sariq",
+      "description": "Bu blokga sariq rang qo'llang."
     },
     "color_green": {
-      "label": "Green",
-      "description": "Apply green to this block."
+      "label": "Yashil",
+      "description": "Bu blokka yashil qo‘llang."
     },
     "color_blue": {
-      "label": "Blue",
-      "description": "Apply blue to this block."
+      "label": "Ko'k",
+      "description": "Ushbu blokga ko'k rang qo'llang."
     },
     "color_purple": {
-      "label": "Purple",
-      "description": "Apply purple to this block."
+      "label": "Binafsha",
+      "description": "Bu blokga binafsha rang qo'llang."
     },
     "color_pink": {
-      "label": "Pink",
-      "description": "Apply pink to this block."
+      "label": "Pushti",
+      "description": "Bu blokga pushti rang qo'llang."
     },
     "color_red": {
-      "label": "Red",
-      "description": "Apply red to this block."
+      "label": "Qizil",
+      "description": "Bu blokga qizil rang qo'llang."
     },
     "color_gray_background": {
-      "label": "Gray background",
-      "description": "Apply gray background to this block."
+      "label": "Kulrang fon",
+      "description": "Bu blokka kulrang fon qo‘llang."
     },
     "color_brown_background": {
-      "label": "Brown background",
-      "description": "Apply brown background to this block."
+      "label": "Jigarrang fon",
+      "description": "Ushbu blokga jigarrang fon qo'llang."
     },
     "color_orange_background": {
-      "label": "Orange background",
-      "description": "Apply orange background to this block."
+      "label": "To‘q sariq fon",
+      "description": "Bu blokka to‘q sariq fon qo‘llang."
     },
     "color_yellow_background": {
-      "label": "Yellow background",
-      "description": "Apply yellow background to this block."
+      "label": "Sariq fon",
+      "description": "Bu blokga sariq fon qo'llang."
     },
     "color_green_background": {
-      "label": "Green background",
-      "description": "Apply green background to this block."
+      "label": "Yashil fon",
+      "description": "Bu blokka yashil fon qo‘llang."
     },
     "color_blue_background": {
-      "label": "Blue background",
-      "description": "Apply blue background to this block."
+      "label": "Ko'k fon",
+      "description": "Ushbu blokga ko'k fon qo'llang."
     },
     "color_purple_background": {
-      "label": "Purple background",
-      "description": "Apply purple background to this block."
+      "label": "Binafsha fon",
+      "description": "Bu blokga binafsha fon qo'llang."
     },
     "color_pink_background": {
-      "label": "Pink background",
-      "description": "Apply pink background to this block."
+      "label": "Pushti fon",
+      "description": "Bu blokka pushti fon qo‘llang."
     },
     "color_red_background": {
-      "label": "Red background",
-      "description": "Apply red background to this block."
+      "label": "Qizil fon",
+      "description": "Bu blokga qizil fon qo'llang."
     }
   }
 }

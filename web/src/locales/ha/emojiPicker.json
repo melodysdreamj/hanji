@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Rufe zaɓen ikon",
+    "label": "Zaɓi ikon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Nau'in ikon",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Hoto"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Cire",
+    "ariaLabel": "Cire ikon"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Tace…",
+    "searchLabel": "Nemo ikon",
+    "random": "Bazuwar",
+    "randomLabel": "Zaɓi ikon bazuwar",
+    "recentLabel": "Kwanan nan da farko",
+    "gridLabelRecent": "Ikon da aka yi amfani da su kwanan nan",
+    "gridLabel": "Ikon",
+    "optionLabel": "Zaɓi ikon {{emoji}}",
+    "noResults": "Babu ikon da suka dace da “{{query}}”. Gwada wata kalma ko share tacewa."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Hoto",
+    "linkPlaceholder": "Manna haɗin hoton",
+    "linkLabel": "Haɗin hoton ikon",
+    "apply": "Aiwatar",
+    "upload": "Loda fayil",
+    "uploading": "Ana lodawa...",
+    "uploadingLabel": "Ana loda {{fileName}}",
+    "uploadFailed": "Ba a iya loda hoton ba.",
+    "fallbackFileName": "Hoton ikon"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Ana shirya lodawa",
+    "finalizing": "Ana kammalawa",
+    "complete": "An kammala",
+    "uploading": "Ana lodawa"
   }
 }

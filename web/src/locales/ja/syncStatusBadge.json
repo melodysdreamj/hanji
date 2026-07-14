@@ -1,10 +1,10 @@
 {
   "offline": "オフライン",
-  "offlinePending_one": "オフライン · {{count}}件の保留中の変更",
-  "offlinePending_other": "オフライン · {{count}}件の保留中の変更",
+  "offlinePending_one": "オフライン · {{count}}件の変更を保留中",
+  "offlinePending_other": "オフライン · {{count}}件の変更を保留中",
   "syncing": "同期中 · {{count}}",
   "unreachable": "サーバーに接続できません",
-  "unreachablePending_one": "サーバーに接続できません · {{count}}件の保留中の変更",
-  "unreachablePending_other": "サーバーに接続できません · {{count}}件の保留中の変更",
-  "retryHint": "クリックして今すぐ再試行"
+  "unreachablePending_one": "サーバーに接続できません · 変更{{count}}件保留中",
+  "unreachablePending_other": "サーバーに接続できません · 変更{{count}}件保留中",
+  "retryHint": "クリックして再試行"
 }

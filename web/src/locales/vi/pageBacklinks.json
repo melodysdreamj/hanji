@@ -1,23 +1,23 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_other": "{{count}} backlink"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Mention được liên kết"
   },
   "summary": {
     "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_other": "{{count}} mention",
+    "link_one": "{{count}} liên kết",
+    "link_other": "{{count}} liên kết"
   },
   "kind": {
     "mention": "Mention",
-    "link": "Link"
+    "link": "Liên kết"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} backlink nữa",
+    "count_other": "{{count}} backlink nữa"
   }
 }

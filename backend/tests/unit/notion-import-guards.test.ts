@@ -27,7 +27,41 @@ const notionImportSource = readFileSync(
 describe('Notion incremental discovery live progress', () => {
   it('persists the current pending-enrichment count during a chunk', () => {
     expect(notionImportSource).toContain('pendingEnrichment: snapshot.pendingEnrichment');
-    expect(notionImportSource).toContain("item.notionObject === 'page' && !hasPageSnapshot(item)");
+    expect(notionImportSource).toContain('notionDiscoveryItemNeedsEnrichment');
+  });
+
+  it('bounds linked-database reads and persists terminal versus retryable attempts', () => {
+    expect(notionImportSource).toContain('const waveSize = notionEnrichmentWaveSize({');
+    expect(notionImportSource).toContain('databaseFetchStatus: result.fetchStatus');
+    expect(notionImportSource).toContain("fetchStatus: response.retryable ? 'retryable_error' as const : 'unavailable' as const");
+    expect(notionImportSource).toContain('const enrichable = notionDiscoveryEnrichmentCandidates(');
+  });
+
+  it('does not mark an incremental chunk complete while enrichment remains', () => {
+    expect(notionImportSource).toContain(
+      "status: discoveryWorkRemaining ? 'running' : 'completed'",
+    );
+    expect(notionImportSource).toContain(
+      "phase: discoveryWorkRemaining ? 'discovery_enrichment' : 'discovery_complete'",
+    );
+    expect(notionImportSource).toContain(
+      'finishedAt: discoveryWorkRemaining ? null : finishedAt',
+    );
+    expect(notionImportSource).toMatch(
+      /if \(!hasMore && pendingEnrichment === 0\) \{\s*pushImportActivity\(recentActivity, \{\s*kind: 'discovery_complete'/,
+    );
+  });
+
+  it('promotes a stored resume credential onto the durable job record', () => {
+    expect(notionImportSource).toContain(
+      'connectionId: tokenSource.connectionId ?? job.connectionId',
+    );
+    expect(notionImportSource).toContain(
+      'connectionKind: tokenSource.connection?.connectionKind ?? job.connectionKind',
+    );
+    expect(notionImportSource).toContain(
+      'connectionId: tokenSource?.connectionId ?? currentJob.connectionId',
+    );
   });
 });
 
@@ -680,6 +714,38 @@ describe('apply lease and mapping idempotency', () => {
     expect(db.tables.notion_import_jobs[0].status).toBe('completed');
   });
 
+  it('reclaims a stranded same-actor apply lease after its heartbeat is stale', async () => {
+    const staleAt = new Date(Date.now() - 6 * 60 * 1000).toISOString();
+    const db = workspaceDb({
+      notion_import_jobs: [job('job-1')],
+      notion_import_items: [discoveredPage()],
+      notion_import_mappings: [],
+      notion_import_apply_locks: [{
+        id: 'job-1',
+        workspaceId: 'ws-1',
+        jobId: 'job-1',
+        leaseId: 'stranded-apply-lease',
+        actorId: 'owner-1',
+        purpose: 'apply',
+        expiresAt: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
+        createdAt: staleAt,
+        updatedAt: staleAt,
+      }],
+      pages: [],
+      blocks: [],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'apply',
+      jobId: 'job-1',
+      workspaceId: 'ws-1',
+    });
+
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+    expect(db.tables.notion_import_apply_locks).toHaveLength(0);
+  });
+
   it('cancels a stranded discovery and removes its job-scoped lease immediately', async () => {
     const discoveringJob = job('job-1', {
       status: 'discovering',
@@ -688,6 +754,11 @@ describe('apply lease and mapping idempotency', () => {
     });
     const db = workspaceDb({
       notion_import_jobs: [discoveringJob],
+      notion_import_items: [{
+        ...discoveredPage(),
+        id: 'cancelled-discovery-item',
+        jobId: 'job-1',
+      }],
       notion_import_apply_locks: [{
         id: 'job-1',
         workspaceId: 'ws-1',
@@ -710,6 +781,72 @@ describe('apply lease and mapping idempotency', () => {
       phase: 'cancelled',
     });
     expect(db.tables.notion_import_apply_locks).toHaveLength(0);
+    expect(db.tables.notion_import_items).toHaveLength(0);
+    expect(db.tables.notion_import_jobs[0].report).toEqual(expect.objectContaining({
+      cancelCleanup: expect.objectContaining({ removedItems: 1, pending: false }),
+    }));
+  });
+
+  it('cancels an interrupted apply, clears its lease, and hides partial product pages', async () => {
+    const applyingJob = job('job-1', {
+      status: 'ready',
+      phase: 'apply_pages',
+      progress: { currentStep: 'apply', currentStatus: 'running' },
+    });
+    const db = workspaceDb({
+      notion_import_jobs: [applyingJob],
+      notion_import_items: [{
+        ...discoveredPage(),
+        id: 'cancelled-apply-item',
+        jobId: 'job-1',
+      }],
+      notion_import_mappings: [{
+        id: 'partial-page-mapping',
+        workspaceId: 'ws-1',
+        jobId: 'job-1',
+        notionId: 'partial-notion-page',
+        notionType: 'page',
+        localId: 'partial-local-page',
+        localType: 'page',
+        relationKind: 'page',
+      }],
+      notion_import_apply_locks: [{
+        id: 'job-1',
+        workspaceId: 'ws-1',
+        jobId: 'job-1',
+        leaseId: 'apply-lease',
+        actorId: 'owner-1',
+        purpose: 'apply',
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      }],
+      pages: [{
+        id: 'partial-local-page',
+        workspaceId: 'ws-1',
+        parentType: 'workspace',
+        kind: 'page',
+        title: 'Partial import',
+        isFavorite: true,
+      }],
+    });
+
+    const result = await callFunction(POST, db, 'owner-1', {
+      action: 'cancel',
+      jobId: 'job-1',
+      workspaceId: 'ws-1',
+    });
+
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0]).toMatchObject({
+      status: 'cancelled',
+      phase: 'cancelled',
+    });
+    expect(db.tables.notion_import_apply_locks).toHaveLength(0);
+    expect(db.tables.notion_import_items).toHaveLength(0);
+    expect(db.tables.pages[0]).toMatchObject({
+      id: 'partial-local-page',
+      inTrash: true,
+      isFavorite: false,
+    });
   });
 
   it('applies only the active generation when stale rows remain physically present', async () => {
@@ -833,7 +970,7 @@ describe('apply lease and mapping idempotency', () => {
     ]);
   });
 
-  it('rejects an active-content Notion file before writing it to storage', async () => {
+  it('copies active-content Notion attachments and leaves safe delivery to EdgeBase', async () => {
     const db = workspaceDb({
       notion_import_jobs: [job('job-1')],
       notion_import_items: [
@@ -863,36 +1000,35 @@ describe('apply lease and mapping idempotency', () => {
       blocks: [],
       file_uploads: [],
     });
-    let puts = 0;
-    const storage = {
-      bucket() {
-        return this;
+    const { storage, objects } = verifiedStorage();
+
+    const result = await applyWithStorage(db, storage);
+
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+    expect(db.tables.blocks).toHaveLength(1);
+    expect(db.tables.blocks[0]).toMatchObject({
+      type: 'file',
+      content: {
+        fileName: 'payload.html',
+        notionFileCopied: true,
+        fileUploadId: expect.any(String),
       },
-      async put() {
-        puts += 1;
-      },
-      async head() {
-        return null;
-      },
-      async delete() {},
-    };
-    const result = await handlerOf(POST)({
-      auth: { id: 'owner-1' },
-      admin: { db: () => db },
-      storage,
-      request: new Request('http://localhost:8787/functions/test', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'apply', jobId: 'job-1', workspaceId: 'ws-1' }),
-      }),
     });
-    await expectErrorResponse(result, 400, 'Active web content files are not allowed.');
-    expect(puts).toBe(0);
-    expect(db.tables.file_uploads).toHaveLength(0);
-    expect(db.tables.notion_import_jobs[0].status).toBe('failed');
+    expect(JSON.stringify(db.tables.blocks)).not.toContain('data:');
+    expect(db.tables.file_uploads).toEqual([
+      expect.objectContaining({
+        name: 'payload.html',
+        contentType: 'text/html',
+        status: 'uploaded',
+        blockId: db.tables.blocks[0].id,
+      }),
+    ]);
+    expect(objects.size).toBe(1);
+    expect(Array.from(objects.values())[0]?.contentType).toBe('text/html');
   });
 
-  it('never commits source page chrome and compensates an earlier completed copy when the cover fails', async () => {
+  it('copies arbitrary page chrome without retaining source URLs', async () => {
     const safeImage = 'data:image/png;base64,AQIDBA==';
     const unsafeCover = 'data:text/html,<script>alert(1)</script>';
     const db = workspaceDb({
@@ -913,25 +1049,30 @@ describe('apply lease and mapping idempotency', () => {
       blocks: [],
       file_uploads: [],
     });
-    const { storage } = verifiedStorage();
+    const { storage, objects } = verifiedStorage();
 
     const result = await applyWithStorage(db, storage);
 
-    await expectErrorResponse(result, 400, 'Active web content files are not allowed.');
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0].status).toBe('completed');
     const imported = db.tables.pages.find((page) => page.title === 'Imported page');
-    expect(imported).toMatchObject({ iconType: 'none' });
-    expect(imported?.icon || null).toBeNull();
-    expect(imported?.cover || null).toBeNull();
-    expect(JSON.stringify(imported)).not.toContain('data:');
-    expect(db.tables.file_uploads).toHaveLength(1);
-    expect(db.tables.file_uploads[0]).toMatchObject({
-      status: 'deleting',
-      deletionPreviousStatus: 'uploaded',
+    expect(imported).toMatchObject({
+      iconType: 'image',
+      icon: expect.stringContaining('/api/storage/files/'),
+      cover: expect.stringContaining('/api/storage/files/'),
     });
+    expect(JSON.stringify(imported)).not.toContain('data:');
+    expect(db.tables.file_uploads).toHaveLength(2);
+    expect(db.tables.file_uploads.every((upload) => upload.status === 'uploaded')).toBe(true);
+    expect(db.tables.file_uploads.map((upload) => upload.contentType).sort()).toEqual([
+      'image/png',
+      'text/html',
+    ]);
+    expect(objects.size).toBe(2);
     expect(JSON.stringify(db.tables.notion_import_items)).not.toContain('data:');
   });
 
-  it('does not insert a source-bearing file block and preserves an earlier durable copied owner', async () => {
+  it('copies passive media and active attachments into separate durable owners', async () => {
     const safeImage = 'data:image/png;base64,AQIDBA==';
     const unsafeFile = 'data:text/html,<script>alert(1)</script>';
     const db = workspaceDb({
@@ -967,16 +1108,21 @@ describe('apply lease and mapping idempotency', () => {
 
     const result = await applyWithStorage(db, storage);
 
-    await expectErrorResponse(result, 400, 'Active web content files are not allowed.');
-    expect(db.tables.blocks).toHaveLength(1);
-    expect(db.tables.blocks[0]).toMatchObject({ type: 'image' });
-    expect(JSON.stringify(db.tables.blocks[0])).not.toContain('data:');
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+    expect(db.tables.blocks).toHaveLength(2);
+    expect(db.tables.blocks.map((block) => block.type)).toEqual(['image', 'file']);
+    expect(JSON.stringify(db.tables.blocks)).not.toContain('data:');
     expect(JSON.stringify(db.tables.pages)).not.toContain('data:');
-    expect(db.tables.file_uploads).toHaveLength(1);
-    expect(db.tables.file_uploads[0]).toMatchObject({
-      status: 'uploaded',
-      blockId: db.tables.blocks[0].id,
-    });
+    expect(db.tables.file_uploads).toHaveLength(2);
+    expect(db.tables.file_uploads.every((upload) =>
+      upload.status === 'uploaded'
+      && db.tables.blocks.some((block) => block.id === upload.blockId)
+    )).toBe(true);
+    expect(db.tables.file_uploads.map((upload) => upload.contentType).sort()).toEqual([
+      'image/png',
+      'text/html',
+    ]);
   });
 
   it('copies file blocks embedded in a page template button without retaining its source URL', async () => {
@@ -1643,9 +1789,9 @@ describe('apply lease and mapping idempotency', () => {
     expect(db.tables.db_templates[0].icon).toBe(completedUrl);
   });
 
-  it('does not commit a partial template and schedules its earlier copied icon for cleanup', async () => {
+  it('copies an active attachment in a template file property without making the import partial', async () => {
     const safeImage = 'data:image/png;base64,AQIDBA==';
-    const unsafeFile = 'data:text/html,<script>alert(1)</script>';
+    const activeFile = 'data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cscript%3Ealert(1)%3C/script%3E%3C/svg%3E';
     const db = workspaceDb({
       notion_import_jobs: [job('job-1')],
       notion_import_items: [{
@@ -1674,7 +1820,7 @@ describe('apply lease and mapping idempotency', () => {
                 Files: {
                   id: 'files-prop',
                   type: 'files',
-                  files: [{ name: 'payload.html', type: 'external', external: { url: unsafeFile } }],
+                  files: [{ name: 'diagram.svg', type: 'external', external: { url: activeFile } }],
                 },
               },
               blocks: [],
@@ -1691,19 +1837,27 @@ describe('apply lease and mapping idempotency', () => {
       db_templates: [],
       file_uploads: [],
     });
-    const { storage } = verifiedStorage();
+    const { storage, objects } = verifiedStorage();
 
     const result = await applyWithStorage(db, storage);
 
-    await expectErrorResponse(result, 400, 'Active web content files are not allowed.');
-    expect(db.tables.db_templates).toHaveLength(0);
-    expect(db.tables.file_uploads).toHaveLength(1);
-    expect(db.tables.file_uploads[0]).toMatchObject({
-      status: 'deleting',
-      deletionPreviousStatus: 'uploaded',
-      templateId: expect.any(String),
-      databaseId: expect.any(String),
-    });
+    expect(result).not.toBeInstanceOf(Response);
+    expect(db.tables.notion_import_jobs[0].status).toBe('completed');
+    expect(db.tables.db_templates).toHaveLength(1);
+    const template = db.tables.db_templates[0];
+    expect(JSON.stringify(template)).not.toContain('data:');
+    expect(JSON.stringify(template)).toContain('diagram.svg');
+    expect(db.tables.file_uploads).toHaveLength(2);
+    expect(db.tables.file_uploads.every((upload) =>
+      upload.status === 'uploaded'
+      && upload.templateId === template.id
+      && upload.databaseId === template.databaseId
+    )).toBe(true);
+    expect(db.tables.file_uploads.map((upload) => upload.contentType).sort()).toEqual([
+      'image/png',
+      'image/svg+xml',
+    ]);
+    expect(objects.size).toBe(2);
     expect(JSON.stringify(db.tables.pages)).not.toContain('data:');
     expect(JSON.stringify(db.tables.notion_import_items)).not.toContain('data:');
   });
@@ -2146,6 +2300,9 @@ describe('discovery progress writes cannot land after the terminal update (#11)'
     const cancelBody = source.slice(cancelStart, cancelEnd);
     expect(cancelBody).toContain('updateNotionJobIfStatus(db, job.id, job.status');
     expect(cancelBody).toContain("db.table<NotionImportApplyLock>('notion_import_apply_locks').delete(job.id)");
+    expect(cancelBody).toContain('deleteNotionImportJobItems(db, job.id)');
+    expect(source).toContain("const nextJob = await updateNotionJobIfStatus(db, job.id, 'ready'");
+    expect(source).toContain("const updated = await updateNotionJobIfStatus(db, job.id, 'ready', {\n    status: 'completed'");
   });
 
   it('declares the persisted lease purpose used by discovery lock transactions', () => {

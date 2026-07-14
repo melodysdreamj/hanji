@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Προσθήκη ιδιότητας ημερομηνίας",
+    "description": "Οι προβολές ημερολογίου χρειάζονται μια ιδιότητα ημερομηνίας για να τοποθετούνται σελίδες στο μήνα.",
+    "addDateButton": "Ημερομηνία"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Ημερολόγιο ανά",
+    "today": "Σήμερα",
+    "previousWeek": "Προηγούμενη εβδομάδα",
+    "previousMonth": "Προηγούμενος μήνας",
+    "nextWeek": "Επόμενη εβδομάδα",
+    "nextMonth": "Επόμενος μήνας"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Κυρ",
+    "mon": "Δευ",
+    "tue": "Τρί",
+    "wed": "Τετ",
+    "thu": "Πέμ",
+    "fri": "Παρ",
+    "sat": "Σάβ"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Ημερολόγιο {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} στοιχεία",
+    "newRowAriaLabel": "Νέα σειρά στις {{date}}",
+    "newRowTitle": "Νέο",
+    "showLess": "Λιγότερα",
+    "showMore": "+{{count}} ακόμα"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Άνοιγμα {{title}}",
+    "openAriaLabelWithDate": "Άνοιγμα {{title}}, προγραμματισμένο για {{date}}",
+    "openNoDateAriaLabel": "Άνοιγμα {{title}}, χωρίς ημερομηνία"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Χωρίς ημερομηνία ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Χωρίς τίτλο",
+    "dateDefaultName": "Ημερομηνία"
   }
 }

@@ -1,13 +1,13 @@
 {
-  "justNow": "Just now",
-  "editedJustNow": "Edited just now",
-  "editedMinutesAgo": "Edited {{minutes}}m ago",
-  "editedHoursAgo": "Edited {{hours}}h ago",
-  "editedDaysAgo": "Edited {{days}}d ago",
-  "editedOn": "Edited {{date}}",
-  "noEdits": "No edits",
-  "noEditsYet": "No edits yet",
-  "todayAt": "Today at {{time}}",
-  "yesterdayAt": "Yesterday at {{time}}",
-  "dateAt": "{{date}} at {{time}}"
+  "justNow": "Hozirgina",
+  "editedJustNow": "Hozirgina tahrirlangan",
+  "editedMinutesAgo": "{{minutes}} daqiqa avval tahrirlangan",
+  "editedHoursAgo": "{{hours}} soat avval tahrirlangan",
+  "editedDaysAgo": "{{days}} kun avval tahrirlangan",
+  "editedOn": "{{date}} tahrirlangan",
+  "noEdits": "Tahrirlar yo'q",
+  "noEditsYet": "Hali tahrirlar yo'q",
+  "todayAt": "Bugun {{time}}",
+  "yesterdayAt": "Kecha {{time}}",
+  "dateAt": "{{date}} {{time}}"
 }

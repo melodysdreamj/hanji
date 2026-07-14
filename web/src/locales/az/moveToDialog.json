@@ -1,34 +1,34 @@
 {
-  "title": "Move to",
+  "title": "Keçid et",
   "workspaceRoot": {
-    "label": "Workspace root",
-    "path": "Top level"
+    "label": "İş məkanı kökü",
+    "path": "Üst səviyyə"
   },
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "Keçid yerlərini axtar",
+    "placeholder": "Səhifə axtar..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "Köçürmə dialoqunu bağla"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move to {{label}}, {{path}}"
+    "listLabel": "Keçid yerləri",
+    "empty": "Səhifə tapılmadı.",
+    "destinationLabel": "{{label}}, {{path}} - köçür"
   },
   "create": {
-    "label": "Create \"{{title}}\"",
-    "optionLabel": "Create page {{title}} and move here",
-    "hint": "New top-level page - move here"
+    "label": "\"{{title}}\" yarat",
+    "optionLabel": "{{title}} səhifəsini yarat və buraya köçür",
+    "hint": "Yeni üst səviyyə səhifə - buraya köçür"
   },
   "locked": {
-    "parent": "Locked parent",
-    "page": "Locked page"
+    "parent": "Kilidli valideyn",
+    "page": "Kilidli səhifə"
   },
   "toast": {
-    "lockedParent": "Page is in a locked parent",
-    "locked": "Page is locked",
-    "moved": "Moved page",
-    "moveFailed": "Couldn't move page"
+    "lockedParent": "Səhifə bloklanmış ana səhifədədir",
+    "locked": "Səhifə bloklanıb",
+    "moved": "Səhifə keçirildi",
+    "moveFailed": "Səhifə keçirilə bilmədi"
   }
 }

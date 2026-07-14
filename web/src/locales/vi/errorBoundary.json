@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Đã xảy ra lỗi khi hiển thị nội dung này.",
+  "detail": "Thử lại. Nếu sự cố vẫn tiếp diễn, hãy tải lại ứng dụng và chia sẻ tham chiếu bên dưới.",
+  "reference": "Tham chiếu: {{reference}}",
+  "reload": "Tải lại ứng dụng",
+  "retry": "Thử lại"
 }

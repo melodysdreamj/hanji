@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
+    "count": "Bilangan",
+    "sum": "Jumlah",
+    "average": "Purata",
     "min": "Min",
-    "max": "Max"
+    "max": "Maks"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "Carta {{name}}",
+  "chartType": "Jenis carta",
   "chartTypes": {
     "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
+    "horizontal_bar": "Bar mendatar",
+    "line": "Garis",
     "donut": "Donut"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Disemak",
+  "empty": "Kosong",
+  "legend": "Legenda carta",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Tiada data",
+  "noDataDesc": "Tiada baris yang sepadan dengan penapis atau carian semasa.",
+  "noGroupProperty": "Tiada properti untuk dicarta",
+  "noGroupPropertyDesc": "Tambah properti pilihan, status, orang, kotak semak, atau tarikh untuk mengumpulkan carta ini.",
+  "total": "Jumlah",
+  "unchecked": "Nyahsemak",
+  "untitledProperty": "Tanpa tajuk",
+  "valueProperty": "Properti nilai",
+  "xAxis": "Paksi X",
+  "yAxis": "Paksi Y"
 }

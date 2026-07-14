@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "کچرا",
+  "empty": "آپ کے حذف کردہ صفحات یہاں آتے ہیں۔ کچرے میں کچھ نہیں۔",
+  "searchTrash": "کچرا تلاش کریں",
+  "deletedPages": "حذف شدہ صفحات",
+  "noSearchMatches": "آپ کی تلاش کے مطابق کوئی حذف شدہ صفحات نہیں ہیں۔",
+  "pageCount_one": "{{count}} صفحہ",
+  "pageCount_other": "{{count}} صفحات",
+  "deletedJustNow": "ابھی حذف کیا گیا",
+  "deletedOn": "{{date}} کو حذف کیا گیا",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "بحال کریں",
+    "deleteForever": "مستقل حذف کریں",
+    "emptyTrash": "کچرا خالی کریں"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "کچرے سے {{title}} کھولیں",
+    "restorePage": "{{title}} بحال کریں",
+    "deletePageForever": "{{title}} کو مستقل حذف کریں",
+    "cancelPermanentDelete": "مستقل حذف منسوخ کریں",
+    "cancelEmptyTrash": "کچرا خالی کرنا منسوخ کریں"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "مستقل حذف کریں؟",
+    "deleteBodyPrefix": "یہ مستقل طور پر حذف کر دے گا ",
+    "deleteBodySuffix": ". آپ اس عمل کو کالعدم نہیں کر سکتے۔",
+    "emptyTitle": "کچرا خالی کریں؟",
+    "emptyBody_one": "یہ کچرے میں موجود {{count}} صفحہ کو مستقل طور پر حذف کر دے گا۔ آپ اس عمل کو کالعدم نہیں کر سکتے۔",
+    "emptyBody_other": "یہ کچرے میں موجود {{count}} صفحات کو مستقل طور پر حذف کر دے گا۔ آپ اس عمل کو کالعدم نہیں کر سکتے۔"
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "مستقل حذف کیا گیا",
+    "couldntDelete": "صفحہ حذف نہیں کیا جا سکا",
+    "restored": "صفحہ بحال کر دیا گیا",
+    "couldntRestore": "صفحہ بحال نہیں کیا جا سکا",
+    "emptied": "کچرا خالی کر دیا گیا",
+    "couldntEmpty": "کچرا خالی نہیں کیا جا سکا"
   }
 }

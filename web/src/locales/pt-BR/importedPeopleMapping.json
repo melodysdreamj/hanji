@@ -1,16 +1,16 @@
 {
   "title": "Pessoas importadas",
-  "body": "Pessoas importadas do Notion permanecem como referências da fonte até que um administrador as mapeie para contas do espaço de trabalho.",
+  "body": "Pessoas importadas do Notion permanecem como referências de origem até que um administrador as mapeie para contas do workspace.",
   "scan": "Encontrar pessoas importadas",
-  "scanning": "Verificando…",
-  "rescan": "Verificar novamente",
+  "scanning": "Escaneando…",
+  "rescan": "Escanear novamente",
   "empty": "Nenhuma pessoa importada não mapeada foi encontrada.",
   "keepPlaceholder": "Manter como referência importada",
   "usage": "{{values}} valores · {{mentions}} menções",
   "apply": "Aplicar mapeamento",
   "applying": "Aplicando…",
   "applied": "{{people}} pessoas mapeadas em {{pages}} linhas/páginas e {{blocks}} blocos.",
-  "failed": "Falha ao mapear pessoas.",
+  "failed": "Falha no mapeamento de pessoas.",
   "suggested": "sugerido",
   "mapAria": "Mapear {{label}}"
 }

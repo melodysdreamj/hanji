@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "กำลังโหลดรายการความสัมพันธ์",
+  "relationUnavailable": "รายการความสัมพันธ์ไม่พร้อมใช้งาน",
+  "unavailable": "ไม่พร้อมใช้งาน",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "เลือกแล้ว",
+    "unchecked": "ไม่ได้เลือก"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "เปิด {{title}}",
+  "openOrDownloadFile": "เปิดหรือดาวน์โหลด {{name}}"
 }

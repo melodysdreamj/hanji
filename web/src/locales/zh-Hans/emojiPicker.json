@@ -9,19 +9,19 @@
     "image": "图片"
   },
   "remove": {
-    "label": "移除",
-    "ariaLabel": "移除图标"
+    "label": "删除",
+    "ariaLabel": "删除图标"
   },
   "emoji": {
     "searchPlaceholder": "筛选…",
     "searchLabel": "搜索图标",
     "random": "随机",
     "randomLabel": "随机选择一个图标",
-    "recentLabel": "最近使用的优先",
-    "gridLabelRecent": "图标，最近使用的优先",
+    "recentLabel": "最近使用优先",
+    "gridLabelRecent": "图标（最近使用优先）",
     "gridLabel": "图标",
-    "optionLabel": "选择 {{emoji}} 图标",
-    "noResults": "没有匹配“{{query}}”的图标。请尝试其他关键词或清除筛选。"
+    "optionLabel": "选择{{emoji}}图标",
+    "noResults": "没有与“{{query}}”匹配的图标。请尝试其他关键词或清除筛选。"
   },
   "custom": {
     "previewPlaceholder": "图片",

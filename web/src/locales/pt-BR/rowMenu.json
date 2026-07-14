@@ -7,9 +7,9 @@
     "style": "Estilo"
   },
   "aria": {
-    "closeDatabaseRowActions": "Fechar ações da linha do banco de dados",
+    "closeDatabaseRowActions": "Fechar ações de linha do banco de dados",
     "closePageActions": "Fechar ações da página",
-    "databaseRowActionsFor": "Ações da linha do banco de dados para {{title}}",
+    "databaseRowActionsFor": "Ações de linha do banco de dados para {{title}}",
     "pageActionsFor": "Ações da página para {{title}}",
     "openIn": "Abrir em",
     "customizePage": "Personalizar página",
@@ -19,19 +19,19 @@
   },
   "actions": {
     "addToFavorites": "Adicionar aos favoritos",
-    "removeFromFavorites": "Remover dos favoritos",
+    "removeFromFavorites": "Remover dos Favoritos",
     "editIcon": "Editar ícone",
     "editProperties": "Editar propriedades",
     "openIn": "Abrir em",
     "sidePeek": "Visualização lateral",
     "centerPeek": "Visualização central",
-    "fullPage": "Página inteira",
-    "openInNewTab": "Abrir em nova aba",
+    "fullPage": "Página completa",
+    "openInNewTab": "Abrir em nova guia",
     "comments": "Comentários",
     "copyLink": "Copiar link",
     "duplicate": "Duplicar",
     "moveTo": "Mover para",
-    "moveToTrash": "Mover para a lixeira",
+    "moveToTrash": "Mover para a Lixeira",
     "rename": "Renomear",
     "addPageInside": "Adicionar página dentro",
     "exportAsMarkdown": "Exportar como Markdown",
@@ -55,11 +55,11 @@
   "displayOptions": {
     "default": "Padrão",
     "expanded": "Expandido",
-    "off": "Desativado"
+    "off": "Desligado"
   },
   "fonts": {
     "default": "Padrão",
-    "serif": "Serif",
+    "serif": "Serifada",
     "mono": "Mono"
   },
   "style": {
@@ -67,12 +67,12 @@
     "fullWidth": "Largura total"
   },
   "meta": {
-    "created": "Criada",
-    "createdBy": "Criada por",
+    "created": "Criado",
+    "createdBy": "Criado por",
     "lastEdited": "Última edição",
-    "editedBy": "Editada por",
-    "verified": "Verificada",
-    "verifiedPrefix": "Verificada · {{label}}",
+    "editedBy": "Editado por",
+    "verified": "Verificado",
+    "verifiedPrefix": "Verificado · {{label}}",
     "words": "Palavras",
     "characters": "Caracteres",
     "blocks": "Blocos"
@@ -81,26 +81,26 @@
     "copiedLink": "Link copiado",
     "couldntCopyLink": "Não foi possível copiar o link",
     "exportedMarkdown": "Markdown exportado",
-    "couldntExportMarkdown": "Não foi possível exportar o Markdown",
+    "couldntExportMarkdown": "Não foi possível exportar Markdown",
     "exportedHanjiFile": "Exportado como arquivo Hanji.",
-    "exportedHanjiFileWithWarnings": "Exportado como arquivo Hanji — anexos deixados como espaços reservados.",
+    "exportedHanjiFileWithWarnings": "Exportado como arquivo Hanji — anexos deixados como marcadores.",
     "couldntExportHanjiFile": "Não foi possível exportar o arquivo Hanji.",
-    "importedBlocks_one": "{{count}} bloco importado",
-    "importedBlocks_other": "{{count}} blocos importados",
-    "nothingToImport": "Nada para importar",
-    "couldntImportMarkdown": "Não foi possível importar o Markdown",
+    "importedBlocks_one": "Importado {{count}} bloco",
+    "importedBlocks_other": "Importados {{count}} blocos",
+    "nothingToImport": "Nada a importar",
+    "couldntImportMarkdown": "Não foi possível importar Markdown",
     "verificationRemoved": "Verificação removida",
     "pageVerified": "Página verificada",
-    "removedFromFavorites": "Removido dos favoritos",
-    "addedToFavorites": "Adicionado aos favoritos",
-    "couldntUpdateFavorites": "Não foi possível atualizar os favoritos",
+    "removedFromFavorites": "Removido dos Favoritos",
+    "addedToFavorites": "Adicionado aos Favoritos",
+    "couldntUpdateFavorites": "Não foi possível atualizar os Favoritos",
     "couldntDuplicatePage": "Não foi possível duplicar a página",
     "duplicatedPage": "Página duplicada",
     "pageLocked": "Página bloqueada",
     "pageUnlocked": "Página desbloqueada",
-    "movedToTrash": "Movido para a lixeira",
+    "movedToTrash": "Movido para a Lixeira",
     "restoredPage": "Página restaurada",
     "couldntRestorePage": "Não foi possível restaurar a página",
-    "couldntMoveToTrash": "Não foi possível mover para a lixeira"
+    "couldntMoveToTrash": "Não foi possível mover para a Lixeira"
   }
 }

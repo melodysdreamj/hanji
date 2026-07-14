@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Matn formatlash"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Aylantirish",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "Matn",
+      "heading1": "Sarlavha 1",
+      "heading2": "Sarlavha 2",
+      "heading3": "Sarlavha 3",
+      "heading4": "Sarlavha 4",
+      "toDoList": "Vazifalar roʻyxati",
+      "bulletedList": "Belgili ro'yxat",
+      "numberedList": "Raqamlangan roʻyxat",
+      "toggleList": "Togʻgʻle roʻyxati",
+      "quote": "Iqtibos",
+      "callout": "Eslatma",
+      "code": "Kod"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "Qalin",
+    "italic": "Yotiq",
+    "underline": "Tagiga chizilgan",
+    "strikethrough": "Chizilgan",
+    "code": "Kod",
+    "link": "Havola"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Izoh"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Matn rangi: {{color}}",
+    "title": "Rang: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Aralash",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Matn rangi",
+      "default": "Standart",
+      "gray": "Kulrang",
+      "brown": "Jigarrang",
+      "orange": "To'q sariq",
+      "yellow": "Sariq",
+      "green": "Yashil",
+      "blue": "Moviy",
+      "purple": "Binafsha",
+      "pink": "Pushti",
+      "red": "Qizil"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Fon rangi",
+      "gray": "Kul rang fon",
+      "brown": "Jigarrang fon",
+      "orange": "To‘q sariq fon",
+      "yellow": "Sariq fon",
+      "green": "Yashil fon",
+      "blue": "Moviy fon",
+      "purple": "Binafsha fon",
+      "pink": "Pushti fon",
+      "red": "Qizil fon"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "Havolani tahrirlash",
+    "placeholder": "Havolani joylashtirish",
+    "urlAriaLabel": "Havola URL",
+    "apply": "Havola",
+    "open": "Havolani ochish",
+    "copy": "Havolani nusxalash",
+    "copied": "Nusxalandi",
+    "copiedLink": "Havola nusxalandi",
+    "remove": "O'chirish"
   }
 }

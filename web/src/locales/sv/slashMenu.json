@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blockkommandon",
+  "closeBlockCommands": "Stäng blockkommandon",
   "groups": {
-    "Basic": "Basic blocks",
+    "Basic": "Grundläggande block",
     "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Database": "Databas",
+    "Advanced": "Avancerade block"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} av {{total}}. Tryck Enter för att infoga.",
+  "listStatus": "{{total}} blockkommandon tillgängliga.",
+  "noBlocks": "Inga block hittades",
+  "noBlocksFor": "Inga block hittades för \"{{query}}\"",
+  "recentlyUsed": "Senast använda"
 }

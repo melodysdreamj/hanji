@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} קישור חוזר",
+    "count_other": "{{count}} קישורים חוזרים"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "אזכורים מקושרים"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} אזכור",
+    "mention_other": "{{count}} אזכורים",
+    "link_one": "{{count}} קישור",
+    "link_other": "{{count}} קישורים"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "אזכור",
+    "link": "קישור"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} קישור חוזר נוסף",
+    "count_other": "{{count}} קישורים חוזרים נוספים"
   }
 }

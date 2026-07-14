@@ -2,22 +2,22 @@
   "buttons": {
     "addBlockBelow": "下にブロックを追加",
     "dragHint": "ドラッグで移動。クリックでメニューを開く。",
-    "openBlockActions": "ブロックアクションを開く",
-    "closeBlockActions": "ブロックアクションを閉じる"
+    "openBlockActions": "ブロック操作を開く",
+    "closeBlockActions": "ブロック操作を閉じる"
   },
   "menu": {
-    "ariaLabel": "ブロックアクション",
-    "deleteMany": "{{num}} 個のブロックを削除",
+    "ariaLabel": "ブロック操作",
+    "deleteMany": "{{num}}個のブロックを削除",
     "duplicate": "複製",
-    "duplicateMany": "{{num}} 個のブロックを複製",
+    "duplicateMany": "{{num}}個のブロックを複製",
     "turnInto": "変換",
     "copy": "コピー",
-    "copyMany": "{{num}} 個のブロックをコピー",
-    "copied": "コピーしました",
-    "copyLinkToBlock": "ブロックへのリンクをコピー",
+    "copyMany": "{{num}}個のブロックをコピー",
+    "copied": "コピー済み",
+    "copyLinkToBlock": "ブロックリンクをコピー",
     "copiedBlockLink": "ブロックリンクをコピーしました",
-    "moveTo": "移動先",
-    "moveToMany": "{{num}} 個のブロックを移動",
+    "moveTo": "移動",
+    "moveToMany": "{{num}}個のブロックを移動",
     "moveUp": "上に移動",
     "moveUpMany": "{{num}}個のブロックを上に移動",
     "moveDown": "下に移動",
@@ -28,65 +28,65 @@
     "removeCaption": "キャプションを削除",
     "unsyncSyncedBlock": "同期ブロックの同期を解除",
     "copySyncedBlock": "同期ブロックをコピー",
-    "color": "カラー",
-    "mixed": "混在",
+    "color": "色",
+    "mixed": "混合",
     "textFallback": "テキスト"
   },
   "turnMenu": {
     "chooseType": "ブロックタイプを選択"
   },
   "colorMenu": {
-    "textColor": "テキストカラー",
+    "textColor": "文字色",
     "backgroundColor": "背景色"
   },
   "colors": {
     "default": "デフォルト",
     "gray": "グレー",
-    "brown": "ブラウン",
+    "brown": "茶色",
     "orange": "オレンジ",
-    "yellow": "イエロー",
-    "green": "グリーン",
-    "blue": "ブルー",
-    "purple": "パープル",
+    "yellow": "黄",
+    "green": "緑",
+    "blue": "青",
+    "purple": "紫",
     "pink": "ピンク",
-    "red": "レッド",
+    "red": "赤",
     "gray_background": "グレーの背景",
-    "brown_background": "ブラウンの背景",
+    "brown_background": "茶色の背景",
     "orange_background": "オレンジの背景",
-    "yellow_background": "イエローの背景",
-    "green_background": "グリーンの背景",
-    "blue_background": "ブルーの背景",
-    "purple_background": "パープルの背景",
+    "yellow_background": "黄の背景",
+    "green_background": "緑の背景",
+    "blue_background": "青の背景",
+    "purple_background": "紫の背景",
     "pink_background": "ピンクの背景",
-    "red_background": "レッドの背景"
+    "red_background": "赤の背景"
   },
   "notifications": {
     "duplicatedBlock": "ブロックを複製しました",
     "duplicatedBlocks": "{{num}}個のブロックを複製しました",
     "undo": "元に戻す",
     "undidDuplicate": "複製を元に戻しました",
-    "nothingToUndo": "元に戻す操作はありません",
+    "nothingToUndo": "元に戻す操作がありません",
     "deletedBlock": "ブロックを削除しました",
     "deletedBlocks": "{{num}}個のブロックを削除しました",
     "restoredBlock": "ブロックを復元しました",
     "copiedToClipboard": "クリップボードにコピーしました",
     "couldNotCopy": "コピーできませんでした",
     "couldNotCopyLink": "リンクをコピーできませんでした",
-    "clearedColor": "カラーをクリアしました",
-    "changedColor": "カラーを変更しました",
+    "clearedColor": "色をクリアしました",
+    "changedColor": "色を変更しました",
     "changedBlockType": "ブロックタイプを変更しました"
   },
   "comments": {
-    "selectedBlocksQuote": "選択中の{{num}}個のブロック"
+    "selectedBlocksQuote": "選択したブロック {{num}}個"
   },
   "moveDialog": {
     "title": "{{num}}個のブロックの移動先"
   },
   "edited": {
-    "justNow": "たった今編集済み",
-    "minutesAgo": "{{minutes}}分前に編集済み",
-    "hoursAgo": "{{hours}}時間前に編集済み",
-    "daysAgo": "{{days}}日前に編集済み",
-    "on": "最終編集: {{date}}"
+    "justNow": "最終編集 たった今",
+    "minutesAgo": "最終編集 {{minutes}}分前",
+    "hoursAgo": "最終編集 {{hours}}時間前",
+    "daysAgo": "最終編集 {{days}}日前",
+    "on": "最終編集 {{date}}"
   }
 }

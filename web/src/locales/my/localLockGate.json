@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "ဒေသခံဒေတာ သော့ဖွင့်ရန်",
+  "description": "ဤစက်ပစ္စည်းပေါ်ရှိ အော့ဖ်လိုင်းဒေတာကို လျှို့ဝှက်စကားစုဖြင့် သော့ခတ်ထားသည်။ သော့ဖွင့်ခြင်းဖြင့် အော့ဖ်လိုင်းအသုံးပြုမှုနှင့် သိမ်းဆည်းမှုကို ပြန်ဖွင့်ပေးသည်။",
+  "passphrasePlaceholder": "လျှို့ဝှက်စကားစု",
+  "unlock": "သော့ဖွင့်ပါ",
+  "continueOnline": "အွန်လိုင်းသာ ဆက်သုံးပါ",
+  "continueOnlineHint": "\"အွန်လိုင်းသာ ဆက်သုံးပါ\" က ဤစက်ပစ္စည်းပေါ်ရှိ သော့ခတ်ထားသော အော့ဖ်လိုင်းတည်းဖြတ်မှုများကို တံဆိပ်ခတ်ထားသည် — ၎င်းတို့သည် ဤစက်ပေါ်တွင်သာ ရှိနေပြီး မှန်ကန်သော လျှို့ဝှက်စကားစုဖြင့် သော့မဖွင့်မချင်း ထပ်တူပြုခြင်း မပြုလုပ်ပါ။",
+  "wrongPassphrase": "ထိုလျှို့ဝှက်စကားစု မမှန်ကန်ပါ။",
+  "unsupportedBrowser": "ဤဘရောက်ဆာတွင် ဒေသခံသော့ခတ်ခြင်းကို မရနိုင်ပါ။"
 }

@@ -1,15 +1,15 @@
 {
   "empty": {
     "title": "添加日期属性",
-    "description": "日历视图需要日期属性才能将页面放置到月份中。",
+    "description": "日历视图需要日期属性才能将页面放置在月份中。",
     "addDateButton": "日期"
   },
   "toolbar": {
-    "calendarByAriaLabel": "日历按",
+    "calendarByAriaLabel": "日历依据",
     "today": "今天",
     "previousWeek": "上一周",
     "previousMonth": "上个月",
-    "nextWeek": "下一周",
+    "nextWeek": "下周",
     "nextMonth": "下个月"
   },
   "weekdays": {
@@ -26,16 +26,16 @@
     "ariaLabel": "{{date}}，{{count}} 项",
     "newRowAriaLabel": "在 {{date}} 新建行",
     "newRowTitle": "新建",
-    "showLess": "显示更少",
-    "showMore": "还有 {{count}} 项"
+    "showLess": "收起",
+    "showMore": "+{{count}} 更多"
   },
   "card": {
     "openAriaLabel": "打开 {{title}}",
-    "openAriaLabelWithDate": "打开 {{title}}，日期为 {{date}}",
+    "openAriaLabelWithDate": "打开 {{title}}，计划于 {{date}}",
     "openNoDateAriaLabel": "打开 {{title}}，无日期"
   },
   "noDate": {
-    "heading": "无日期（{{count}}）"
+    "heading": "无日期 ({{count}})"
   },
   "property": {
     "untitled": "无标题",

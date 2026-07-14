@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Змінити обкладинку",
+    "reposition": "Перемістити",
+    "remove": "Видалити",
+    "uploadFile": "Завантажити файл",
+    "uploading": "Завантаження...",
+    "submit": "Надіслати",
+    "savePosition": "Зберегти положення"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "Галерея",
+    "upload": "Завантажити",
+    "link": "Посилання"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Вставте посилання на зображення",
+    "invalid": "Вставте посилання на зображення http або https."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Не вдалося завантажити це зображення.",
+    "defaultFileName": "Зображення обкладинки"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "Перетягніть зображення, щоб перемістити"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Підготовка до завантаження",
+    "finalizing": "Завершення",
+    "complete": "Готово",
+    "uploading": "Завантаження"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Обкладинку видалено",
+    "restored": "Обкладинку відновлено",
+    "undo": "Скасувати"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Обкладинка сторінки",
+    "coverVerticalPosition": "Вертикальне положення обкладинки",
+    "positionFromTop": "{{position}}% зверху",
+    "closeCoverMenu": "Закрити меню обкладинки",
+    "changePageCover": "Змінити обкладинку сторінки",
+    "repositionPageCover": "Перемістити обкладинку сторінки",
+    "removePageCover": "Видалити обкладинку сторінки",
+    "changeCoverDialog": "Змінити обкладинку",
+    "coverSource": "Джерело обкладинки",
+    "selectCover": "Вибрати обкладинку {{number}}",
+    "uploadFromDevice": "Завантажити зображення обкладинки з цього пристрою",
+    "uploadingFile": "Завантаження {{fileName}}",
+    "coverImageLink": "Посилання на зображення обкладинки"
   }
 }

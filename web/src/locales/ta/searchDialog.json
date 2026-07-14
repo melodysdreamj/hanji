@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "தேடு அல்லது செல்லவும்...",
+  "quickFind": "விரைவு தேடல்",
+  "closeSearch": "தேடலை மூடு",
+  "quickFindResults": "விரைவு தேடல் முடிவுகள்",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "சமீபத்தில் பார்த்தவை",
+    "recentSearches": "சமீபத்திய தேடல்கள்",
+    "pages": "பக்கங்கள்",
+    "pageContent": "பக்க உள்ளடக்கம்",
+    "favorites": "பிடித்தவை"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "பக்கத்தில்",
+  "searchingDetail": "தேடுகிறது...",
+  "searchAgain": "மீண்டும் தேடு",
+  "searchingPageContent": "பக்க உள்ளடக்கத்தைத் தேடுகிறது...",
+  "noResultsFor": "\"{{query}}\"க்கான முடிவுகள் இல்லை",
+  "noPagesFound": "பக்கங்கள் எதுவும் இல்லை",
+  "creating": "உருவாக்குகிறது...",
+  "newPage": "புதிய பக்கம் \"{{query}}\"",
+  "couldntCreatePage": "பக்கத்தை உருவாக்க முடியவில்லை",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "தேர்ந்தெடு",
+    "open": "திற",
+    "newTab": "புதிய தாவல்"
   }
 }

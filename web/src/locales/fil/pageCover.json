@@ -1,12 +1,12 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "Palitan ang cover",
+    "reposition": "I-reposition",
+    "remove": "Alisin",
+    "uploadFile": "Mag-upload ng file",
+    "uploading": "Nag-a-upload...",
+    "submit": "Isumite",
+    "savePosition": "I-save ang posisyon"
   },
   "tabs": {
     "gallery": "Gallery",
@@ -14,40 +14,40 @@
     "link": "Link"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "Mag-paste ng link ng image",
+    "invalid": "Mag-paste ng http o https na link ng image."
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "Hindi ma-upload ang larawang iyon.",
+    "defaultFileName": "Larawan ng cover"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "I-drag ang image para baguhin ang posisyon"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Inihahanda ang pag-upload",
+    "finalizing": "Finisyalisa",
+    "complete": "Kumpleto",
+    "uploading": "Nag-a-upload"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "Naalis ang cover",
+    "restored": "Naibalik ang cover",
+    "undo": "I-undo"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "Cover ng page",
+    "coverVerticalPosition": "Patayong posisyon ng cover",
+    "positionFromTop": "{{position}}% mula sa itaas",
+    "closeCoverMenu": "Isara ang cover menu",
+    "changePageCover": "Palitan ang cover ng page",
+    "repositionPageCover": "I-reposition ang cover ng page",
+    "removePageCover": "Alisin ang cover ng page",
+    "changeCoverDialog": "Palitan ang cover",
+    "coverSource": "Pinagmulan ng cover",
+    "selectCover": "Piliin ang cover {{number}}",
+    "uploadFromDevice": "Mag-upload ng cover image mula sa device na ito",
+    "uploadingFile": "Ina-upload ang {{fileName}}",
+    "coverImageLink": "Link ng cover image"
   }
 }

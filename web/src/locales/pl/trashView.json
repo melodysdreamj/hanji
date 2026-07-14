@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "deleteForever": "Usuń na zawsze",
+    "emptyTrash": "Opróżnij kosz",
+    "restore": "Przywróć"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "cancelEmptyTrash": "Anuluj opróżnianie kosza",
+    "cancelPermanentDelete": "Anuluj trwałe usunięcie",
+    "deletePageForever": "Usuń {{title}} na zawsze",
+    "openFromTrash": "Otwórz {{title}} z kosza",
+    "restorePage": "Przywróć {{title}}"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteBodyPrefix": "Spowoduje to trwałe usunięcie ",
+    "deleteBodySuffix": ". Tej czynności nie można cofnąć.",
+    "deleteTitle": "Usunąć na zawsze?",
+    "emptyBody_one": "Spowoduje to trwałe usunięcie {{count}} strony w koszu. Tej czynności nie można cofnąć.",
+    "emptyBody_other": "Spowoduje to trwałe usunięcie {{count}} stron w koszu. Tej czynności nie można cofnąć.",
+    "emptyTitle": "Opróżnić kosz?"
   },
+  "deletedJustNow": "Usunięto przed chwilą",
+  "deletedOn": "Usunięto {{date}}",
+  "deletedPages": "Usunięte strony",
+  "empty": "Usunięte strony trafiają tutaj. Kosz jest pusty.",
+  "noSearchMatches": "Brak usuniętych stron pasujących do wyszukiwania.",
+  "pageCount_one": "{{count}} strona",
+  "pageCount_other": "{{count}} stron",
+  "searchTrash": "Szukaj w koszu",
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
-  }
+    "couldntDelete": "Nie udało się usunąć strony",
+    "couldntEmpty": "Nie udało się opróżnić kosza",
+    "couldntRestore": "Nie udało się przywrócić strony",
+    "deletedForever": "Usunięto na zawsze",
+    "emptied": "Kosz opróżniony",
+    "restored": "Przywrócono stronę"
+  },
+  "trash": "Kosz"
 }

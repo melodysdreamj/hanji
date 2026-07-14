@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Aggiungi una proprietà data",
+    "description": "Le viste calendario necessitano di una proprietà data per posizionare le pagine sul mese.",
+    "addDateButton": "Data"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Calendario per",
+    "today": "Oggi",
+    "previousWeek": "Settimana precedente",
+    "previousMonth": "Mese precedente",
+    "nextWeek": "Settimana successiva",
+    "nextMonth": "Mese successivo"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Dom",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Gio",
+    "fri": "Ven",
+    "sat": "Sab"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Calendario di {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} elementi",
+    "newRowAriaLabel": "Nuova riga il {{date}}",
+    "newRowTitle": "Nuovo",
+    "showLess": "Mostra meno",
+    "showMore": "+{{count}} altri"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Apri {{title}}",
+    "openAriaLabelWithDate": "Apri {{title}}, programmato per {{date}}",
+    "openNoDateAriaLabel": "Apri {{title}}, nessuna data"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Nessuna data ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Senza titolo",
+    "dateDefaultName": "Data"
   }
 }

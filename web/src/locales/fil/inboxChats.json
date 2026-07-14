@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Wala pang mga usapan. Magkomento sa isang pahina o mag-mention ng isang tao para magsimula.",
+  "leave": "Umalis",
+  "leaveAria": "Umalis sa usapan sa {{title}}",
+  "open": "Buksan ang usapan sa {{title}}",
+  "participants_one": "{{count}} kalahok",
+  "participants_other": "{{count}} kalahok",
+  "untitled": "Walang pamagat",
+  "loading": "Naglo-load ng mga usapan…"
 }

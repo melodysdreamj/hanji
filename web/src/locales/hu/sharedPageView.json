@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Megosztott oldal",
+  "loading": "Megosztott oldal betöltése",
+  "unavailable": "Ez a megosztott oldal nem elérhető.",
+  "notFound": "A megosztott oldal nem található.",
+  "outsideShare": "Az oldal nem része ennek a nyilvános megosztásnak.",
+  "errors": {
+    "not-found": "Lehet, hogy a link lejárt, publikálása megszűnt, vagy hibásan lett másolva.",
+    "offline": "Ellenőrizd a kapcsolatot, majd próbáld újra megnyitni a megosztott oldalt.",
+    "rate-limited": "Ez a megosztott oldal túl sok kérést kap. Várj egy pillanatot, majd próbáld újra.",
+    "unavailable": "A Hanji jelenleg nem tudja megnyitni ezt a megosztott oldalt. Próbáld újra egy pillanat múlva."
+  },
+  "tryAgain": "Próbáld újra"
 }

@@ -1,7 +1,7 @@
 {
   "justNow": "Agora mesmo",
-  "editedJustNow": "Editado agora mesmo",
-  "editedMinutesAgo": "Editado há {{minutes}}min",
+  "editedJustNow": "Editado agora",
+  "editedMinutesAgo": "Editado há {{minutes}}m",
   "editedHoursAgo": "Editado há {{hours}}h",
   "editedDaysAgo": "Editado há {{days}}d",
   "editedOn": "Editado em {{date}}",

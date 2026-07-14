@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Kuka",
+  "empty": "A törölt oldalak ide kerülnek. A kuka üres.",
+  "searchTrash": "Keresés a kukában",
+  "deletedPages": "Törölt oldalak",
+  "noSearchMatches": "Nincs a keresésnek megfelelő törölt oldal.",
+  "pageCount_one": "{{count}} oldal",
+  "pageCount_other": "{{count}} oldal",
+  "deletedJustNow": "Most törölve",
+  "deletedOn": "Törölve: {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Visszaállítás",
+    "deleteForever": "Végleges törlés",
+    "emptyTrash": "Kuka ürítése"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "{{title}} megnyitása a kukából",
+    "restorePage": "{{title}} visszaállítása",
+    "deletePageForever": "{{title}} végleges törlése",
+    "cancelPermanentDelete": "Végleges törlés megszakítása",
+    "cancelEmptyTrash": "Kuka ürítésének megszakítása"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Végleges törlés?",
+    "deleteBodyPrefix": "Ez véglegesen törlésre kerül ",
+    "deleteBodySuffix": ". Ezt a műveletet nem lehet visszavonni.",
+    "emptyTitle": "Kuka ürítése?",
+    "emptyBody_one": "Ez véglegesen törli a kukában lévő {{count}} oldalt. Ezt a műveletet nem lehet visszavonni.",
+    "emptyBody_other": "Ez véglegesen törli a kukában lévő {{count}} oldalt. Ezt a műveletet nem lehet visszavonni."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Véglegesen törölve",
+    "couldntDelete": "Nem sikerült törölni az oldalt",
+    "restored": "Oldal visszaállítva",
+    "couldntRestore": "Nem sikerült visszaállítani az oldalt",
+    "emptied": "Kuka ürítve",
+    "couldntEmpty": "Nem sikerült üríteni a kukát"
   }
 }

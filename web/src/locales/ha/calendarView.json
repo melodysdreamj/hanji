@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Ƙara kadara ta kwanan wata",
+    "description": "Ra'ayoyin kalandar suna buƙatar kadara ta kwanan wata don sanya shafuka a wata.",
+    "addDateButton": "Kwanan wata"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Kalanda ta",
+    "today": "Yau",
+    "previousWeek": "Makon da ya gabata",
+    "previousMonth": "Watan da ya gabata",
+    "nextWeek": "Mako na gaba",
+    "nextMonth": "Wata na gaba"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "Lah",
+    "mon": "Lit",
+    "tue": "Tal",
+    "wed": "Lar",
+    "thu": "Alh",
+    "fri": "Jum",
+    "sat": "Asb"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "Kalandar {{title}}",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} abubuwa",
+    "newRowAriaLabel": "Sabon jeri a {{date}}",
+    "newRowTitle": "Sabon",
+    "showLess": "Nuna kaɗan",
+    "showMore": "+{{count}} ƙari"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Buɗe {{title}}",
+    "openAriaLabelWithDate": "Buɗe {{title}}, an tsara don {{date}}",
+    "openNoDateAriaLabel": "Buɗe {{title}}, babu kwanan wata"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Babu kwanan wata ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Babu take",
+    "dateDefaultName": "Kwanan wata"
   }
 }

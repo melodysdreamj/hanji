@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Cestino",
+  "empty": "Le pagine eliminate finiscono qui. Il cestino è vuoto.",
+  "searchTrash": "Cerca nel cestino",
+  "deletedPages": "Pagine eliminate",
+  "noSearchMatches": "Nessuna pagina eliminata corrisponde alla tua ricerca.",
+  "pageCount_one": "{{count}} pagina",
+  "pageCount_other": "{{count}} pagine",
+  "deletedJustNow": "Appena eliminato",
+  "deletedOn": "Eliminato {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Ripristina",
+    "deleteForever": "Elimina definitivamente",
+    "emptyTrash": "Svuota cestino"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Apri {{title}} dal cestino",
+    "restorePage": "Ripristina {{title}}",
+    "deletePageForever": "Elimina definitivamente {{title}}",
+    "cancelPermanentDelete": "Annulla eliminazione permanente",
+    "cancelEmptyTrash": "Annulla svuotamento cestino"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Eliminare definitivamente?",
+    "deleteBodyPrefix": "Eliminerà definitivamente ",
+    "deleteBodySuffix": ". Non puoi annullare questa azione.",
+    "emptyTitle": "Svuotare il cestino?",
+    "emptyBody_one": "Eliminerà definitivamente {{count}} pagina nel cestino. Non puoi annullare questa azione.",
+    "emptyBody_other": "Eliminerà definitivamente tutte le {{count}} pagine nel cestino. Non puoi annullare questa azione."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Eliminato definitivamente",
+    "couldntDelete": "Impossibile eliminare la pagina",
+    "restored": "Pagina ripristinata",
+    "couldntRestore": "Impossibile ripristinare la pagina",
+    "emptied": "Cestino svuotato",
+    "couldntEmpty": "Impossibile svuotare il cestino"
   }
 }

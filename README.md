@@ -1,12 +1,16 @@
 <p align="center">
-  <img src="assets/brand/hanji-mark-round.png" alt="Hanji" width="160" />
+  <img src="assets/brand/hanji-mark-round.png" alt="Hanji" width="96" />
 </p>
 
 <h1 align="center">Hanji</h1>
 
 <p align="center"><i>Notion, on ground of your own.</i></p>
 
-<p align="center"><b>An open-source Notion you host yourself</b> — real databases, real organization, an unrestricted MCP, and not a line of AI you didn't ask for.</p>
+<p align="center"><b>An open-source Notion you host yourself</b> — real databases, real organization, and an unrestricted MCP.</p>
+
+<p align="center">
+  <img src="assets/screenshots/hanji-product-hero.png" alt="A shared Welcome to Hanji page with Hanji branding, a populated workspace sidebar, three live collaborators, unread notifications, comments, and an inline getting-started table with relations, rollups, and files" width="960" />
+</p>
 
 ## Why I Built Hanji
 
@@ -80,61 +84,92 @@ and deliberately differs on ownership.
 > column describes the Notion product as of 2026 — verify specifics against
 > Notion's own docs.
 
-## Get started in 30 seconds
+## Quick start
 
-First, get the code:
+### Docker — recommended
+
+No source checkout, environment file, or terminal setup code is required.
+
+#### Docker Hub / container UI
+
+In Docker Desktop, Synology Container Manager, or another container UI, pull
+[`melodysdreamj/hanji:0.1.0-alpha.2`](https://hub.docker.com/r/melodysdreamj/hanji),
+publish any unused host port to container `8787/TCP`, and start it. For durable
+storage, map a named volume or dedicated folder to `/data`; skipping that
+mapping still starts with an automatically created anonymous volume.
+
+#### One command
+
+```bash
+docker run -d \
+  --name hanji \
+  --restart unless-stopped \
+  -p 127.0.0.1:8787:8787 \
+  -v hanji-data:/data \
+  melodysdreamj/hanji:0.1.0-alpha.2
+```
+
+> **Current release:** `0.1.0-alpha.2` is an early self-hosted beta. Back up
+> `/data` before upgrading. The moving `alpha` tag is available, but `latest`
+> is intentionally not published until the first stable release.
+
+Open **http://localhost:8787** and choose the first administrator name, email,
+and password in the browser.
+
+Guides: [Docker Desktop & command line](docs/docker.md) ·
+[Synology DSM](docs/deployment.md#synology-setup-wireframes)
+
+### Cloudflare _(in progress)_ — deploy to your own Workers domain
+
+Needs **Node.js ≥ 22.12**, **npm**, and a Cloudflare account with Wrangler
+authenticated (`wrangler login` or a `CLOUDFLARE_API_TOKEN`):
 
 ```bash
 git clone https://github.com/melodysdreamj/hanji && cd hanji
+npm --prefix backend install && npm --prefix web install
+cp backend/.env.release.example backend/.env.release   # fill in domain, secrets, mail, and legal URLs
+npm --prefix backend run deploy                        # → deploy + private first-admin link
 ```
 
-Then pick a mode and paste its block — no edits needed.
+Leave `HANJI_MASTER_EMAIL` and `HANJI_MASTER_PASSWORD` empty. The deploy command
+generates a private fragment-only setup link; open it and choose the first
+administrator in the browser.
 
-### Dev — the app at `http://localhost:8787`
+Cloudflare deployment is still being hardened; Docker is the recommended
+self-hosted path today. See [docs/deployment.md](docs/deployment.md) for the
+release environment, email, certificate, and teardown requirements.
 
-Needs **Node.js ≥ 22.12** and **npm**.
+## Development from source
+
+Clone the repository when changing Hanji itself. For local hot reload:
 
 ```bash
+git clone https://github.com/melodysdreamj/hanji && cd hanji
 npm --prefix backend install && npm --prefix web install && npm --prefix mcp install
-HANJI_MASTER_EMAIL=admin@example.com HANJI_MASTER_PASSWORD='Hanji-Master-2026!' node scripts/setup-dev-env.mjs --yes
-npm --prefix web run build && npm --prefix backend run dev
+node scripts/setup-dev-env.mjs
 ```
 
-Open **http://localhost:8787** and sign in with **`admin@example.com`** /
-**`Hanji-Master-2026!`** — dev-only example credentials; change them for anything
-real. Editing the frontend? Also run `npm --prefix web run dev` for hot reload at
-`http://localhost:3000`.
+Then run the backend and frontend in separate terminals:
 
-### Docker — self-host with HTTPS at `https://localhost:8443`
+```bash
+npm --prefix backend run dev        # backend API: http://localhost:8787
+```
 
-Needs **Docker** (daemon running). The source-build path creates the image,
-issues a locally-trusted certificate, and prints the sign-in URL plus one-time
-setup code:
+```bash
+npm --prefix web run dev            # frontend hot reload: http://localhost:3000
+```
+
+To build and test a Docker image from that source checkout instead:
 
 ```bash
 bash scripts/selfhost-docker.sh up --build
 ```
 
-Open the URL and choose the first administrator email/password in the browser.
-Manage it with the `status`, `logs`, or `down` subcommand, for example
-`bash scripts/selfhost-docker.sh status`. For a no-warning certificate, install
-[mkcert](https://github.com/FiloSottile/mkcert) first. The release design also
-supports pulling the same amd64/arm64 image from GHCR in Synology/NAS Container
-Manager; the public image and multi-architecture manifest are not published
-yet, so the pinned source build is the working path today.
-
-### Cloudflare _(in progress)_ — deploy to your own Workers domain
-
-Needs a Cloudflare account with Wrangler authenticated (`wrangler login` or a
-`CLOUDFLARE_API_TOKEN`). Edit one file, then deploy:
-
-```bash
-cp backend/.env.release.example backend/.env.release   # fill in your domain, secrets, master account
-npm --prefix backend run deploy                        # → your Workers domain
-```
-
-More — hot reload, local EdgeBase linking, email/OAuth/SSRF config, and
-deployment: [docs/development.md](docs/development.md) ·
+The source-build helper provides local HTTPS and prints the URL. Use `status`,
+`logs`, or `down` with the same script to manage it. For a locally trusted
+certificate, install [mkcert](https://github.com/FiloSottile/mkcert) first.
+Development details, local EdgeBase linking, and deployment internals live in
+[docs/development.md](docs/development.md) and
 [docs/deployment.md](docs/deployment.md).
 
 ## Highlights
@@ -161,8 +196,8 @@ server**, so your AI agents can read and shape the workspace from the outside.
   (CJK-aware).
 - **Self-hosted auth** — email + password with TOTP MFA and recovery codes,
   server-level accounts (open signup or admin-only), admin-issued temporary
-  passwords with forced change, and a master account provisioned from
-  environment variables on first boot.
+  passwords with forced change, and browser first-run creation of the master
+  account across dev, Docker, and Cloudflare.
 - **MCP server** — AI agents can list, search, create, and edit pages,
   databases, comments, files, and workspace/organization settings through
   the product API, with read-only and allowlist narrowing. See
@@ -179,8 +214,9 @@ server**, so your AI agents can read and shape the workspace from the outside.
 
 <p align="center"><sub>The banner is drawn entirely by code (<code>scripts/readme-hero-banner.mjs</code>) — no Notion assets, generic UI only.</sub></p>
 
-Real app captures, regenerated from the live product by
-`scripts/readme-hero-capture.mjs`:
+The product hero at the top is regenerated from a temporary synthetic
+workspace in the live app by `scripts/readme-hero-capture.mjs`. Additional app
+captures:
 
 <p align="center">
   <img src="assets/screenshots/import-from-notion.png" alt="Importing a Notion workspace into Hanji" width="860" />
@@ -212,10 +248,11 @@ Pages workflow has completed; until then, use the in-repository links below.
 
 | Doc | What it covers |
 | --- | --- |
+| [docs/docker.md](docs/docker.md) | Docker Hub, Docker Desktop/CLI, first administrator, `/data`, backup, updates, and HTTPS |
 | [docs/development.md](docs/development.md) | Running locally, dev setup script, local EdgeBase linking, email/OAuth/passkey/SSRF configuration |
 | [docs/architecture.md](docs/architecture.md) | Packages, data model, auth and session security |
 | [docs/verification.md](docs/verification.md) | The full `verify:*` smoke/verification catalog (API, browser UI, import, MCP) |
-| [docs/deployment.md](docs/deployment.md) | Docker / Cloudflare / portable pack deployment, master account env, deployment verification |
+| [docs/deployment.md](docs/deployment.md) | Docker / Cloudflare / portable pack deployment, browser first-run setup, deployment verification |
 | [docs/master-account.md](docs/master-account.md) | How the first-admin master account is provisioned and rotated |
 | [docs/sponsors.md](docs/sponsors.md) | The sign-in sponsor banner and how sponsor slots work |
 | [docs/cloudflare-teardown.md](docs/cloudflare-teardown.md) | Removing every Cloudflare resource a deployment created |
@@ -224,26 +261,20 @@ Pages workflow has completed; until then, use the in-repository links below.
 
 ## Deploying
 
-For a source-built self-hosted container,
-[`scripts/selfhost-docker.sh up --build`](scripts/selfhost-docker.sh) is the
-one-command path. [docs/deployment.md](docs/deployment.md) separates the
-registry-image/NAS path from source/custom builds and covers HTTPS,
-reverse-proxy, Cloudflare, and portable-pack deployment.
+For normal self-hosting, use the immutable Docker Hub tag in
+[Quick start](#quick-start). Publish a host port to container `8787/TCP`, keep
+all persistent state in a named volume or dedicated folder mounted at `/data`,
+and back up that whole volume before replacing or upgrading the container. The
+first administrator is created in the browser without a terminal code or
+required environment file.
 
-**Data & backups (Docker).** Everything you create lives in the `hanji-data`
-Docker volume (mounted at `/data`) — pages, databases, uploaded files, and all.
-Put it elsewhere with `--data /your/host/path` (an absolute path to bind-mount)
-or `--data my-volume` (a named volume). For a full backup, keep that data **and**
-the image-managed secrets stored inside `/data/.hanji/`; backing up the whole
-volume/directory covers both. Legacy installs should start the new image once
-with their old `.edgebase/docker/hanji.env` so its cryptographic values are
-copied into `/data` before retiring that file. The TLS certificate volume can
-regenerate on its own.
-
-Docker normally creates its first administrator through the setup-code-protected
-web installer. `HANJI_MASTER_EMAIL` / `HANJI_MASTER_PASSWORD` remain the
-noninteractive path for Cloudflare, portable packs, and advanced Docker
-automation. See [docs/deployment.md](docs/deployment.md).
+The [Docker guide](docs/docker.md) covers Docker Desktop and command-line
+installation, backups, updates, and rollback. The
+[Synology visual guide](docs/deployment.md#synology-setup-wireframes) covers
+volume and port mapping plus HTTPS reverse proxy setup. Source builds,
+Cloudflare, portable packs, noninteractive administrator provisioning, and
+advanced deployment settings remain in the full
+[deployment guide](docs/deployment.md).
 
 ## Status & roadmap
 

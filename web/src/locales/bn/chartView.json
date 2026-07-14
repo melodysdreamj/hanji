@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "গণনা",
+    "sum": "যোগফল",
+    "average": "গড়",
+    "min": "সর্বনিম্ন",
+    "max": "সর্বোচ্চ"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} চার্ট",
+  "chartType": "চার্টের ধরন",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "বার",
+    "horizontal_bar": "অনুভূমিক বার",
+    "line": "রেখা",
+    "donut": "ডোনাট"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "চিহ্নিত",
+  "empty": "খালি",
+  "legend": "চার্টের কিংবদন্তি",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "কোনো তথ্য নেই",
+  "noDataDesc": "বর্তমান ফিল্টার বা অনুসন্ধানের সাথে কোনো সারি মেলে না।",
+  "noGroupProperty": "এখনও চার্ট করার কিছু নেই",
+  "noGroupPropertyDesc": "এই চার্ট গ্রুপ করতে একটি নির্বাচন, অবস্থা, ব্যক্তি, চেকবক্স বা তারিখ বৈশিষ্ট্য যোগ করুন।",
+  "total": "মোট",
+  "unchecked": "অচিহ্নিত",
+  "untitledProperty": "শিরোনামহীন",
+  "valueProperty": "মান বৈশিষ্ট্য",
+  "xAxis": "X-অক্ষ",
+  "yAxis": "Y-অক্ষ"
 }

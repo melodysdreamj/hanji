@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Yangi ish maydoni",
   "name": {
-    "label": "Workspace name",
-    "placeholder": "Acme Inc."
+    "label": "Ish maydoni nomi",
+    "placeholder": "Masalan, Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Boshlash usuli",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Bo'sh ish maydoni",
+      "body": "Boshlang'ich sahifalar bilan bo'sh holatda boshlang."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Notiondan import qilish",
+      "body": "Ish maydonini yarating, so'ngra Notion ish maydonini unga ko'chiring."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Boshqa Hanjidan import qilish",
+      "body": "Ish maydonini yarating, so'ngra boshqa Hanji server yoki fayldan ish maydonini import qiling."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Ish maydoni yaratish",
+  "creating": "Yaratilmoqda…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Ish maydoni yaratilmadi."
   }
 }

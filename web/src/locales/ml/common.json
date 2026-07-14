@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "റദ്ദാക്കുക",
+    "save": "സംരക്ഷിക്കുക",
+    "close": "അടയ്ക്കുക",
+    "search": "തിരയുക",
+    "create": "സൃഷ്ടിക്കുക",
+    "delete": "ഇല്ലാതാക്കുക",
+    "clearAll": "എല്ലാം മായ്ക്കുക",
+    "done": "പൂർത്തിയായി",
+    "add": "ചേർക്കുക"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "തലക്കെട്ടില്ലാത്ത"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} പകർപ്പ്",
+    "columnName": "നിര {{number}}",
+    "importedDatabase": "ഇറക്കുമതി ചെയ്ത ഡാറ്റാബേസ്",
+    "uploadedFile": "അപ്‌ലോഡ് ചെയ്ത ഫയൽ",
+    "image": "ചിത്രം",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "പേര്",
+      "status": "നില",
+      "select": "തിരഞ്ഞെടുപ്പ്",
+      "date": "തീയതി"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ആരംഭിച്ചിട്ടില്ല",
+      "doing": "പുരോഗതിയിൽ",
+      "done": "പൂർത്തിയായി"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ഓപ്ഷൻ 1",
+      "second": "ഓപ്ഷൻ 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "പട്ടിക"
     }
   }
 }

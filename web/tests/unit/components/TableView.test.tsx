@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("@/lib/edgebase", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/edgebase")>();
   return {
     ...actual,
+    getPageBlocksRemote: vi.fn(async () => ({ blocks: [] })),
     updateDatabaseRowRemote: vi.fn(async () => undefined),
     updatePageRemote: vi.fn(async () => undefined),
     updatePropertyRemote: vi.fn(async () => undefined),
@@ -246,6 +247,33 @@ describe("TableView", () => {
     fireEvent.blur(input);
 
     expect(useStore.getState().pagesById["row-a"].title).toBe("Alpha renamed");
+  });
+
+  it("keeps row selection locked while server-confirmed duplication is pending", async () => {
+    let releaseDuplicate!: () => void;
+    const duplicateGate = new Promise<void>((resolve) => {
+      releaseDuplicate = resolve;
+    });
+    const duplicatePage = vi.fn(async () => {
+      await duplicateGate;
+      return makeRow(DB_ID, { id: "row-copy", title: "Alpha task copy", position: 3 });
+    });
+    useStore.setState({ duplicatePage });
+    renderTable(makeView(DB_ID, { id: "v-duplicate-busy", type: "table" }));
+
+    const rowSelection = screen.getByRole("checkbox", { name: "Select Alpha task" });
+    const grid = screen.getByRole("grid", { name: "Tasks table" });
+    fireEvent.click(rowSelection);
+    fireEvent.keyDown(grid, { key: "d", metaKey: true });
+
+    await waitFor(() => expect(duplicatePage).toHaveBeenCalledTimes(1));
+    expect((rowSelection as HTMLInputElement).disabled).toBe(true);
+    fireEvent.click(rowSelection);
+    fireEvent.keyDown(grid, { key: "Escape" });
+    expect((rowSelection as HTMLInputElement).checked).toBe(true);
+
+    releaseDuplicate();
+    await waitFor(() => expect((rowSelection as HTMLInputElement).checked).toBe(false));
   });
 
   it("hides mutating chrome in read-only mode", () => {

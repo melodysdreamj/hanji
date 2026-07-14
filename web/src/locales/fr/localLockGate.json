@@ -1,10 +1,10 @@
 {
   "title": "Déverrouiller les données locales",
-  "description": "Les données hors ligne sur cet appareil sont verrouillées par une phrase secrète. Le déverrouillage réactive l'utilisation hors ligne et l'enregistrement.",
-  "passphrasePlaceholder": "Phrase secrète",
+  "description": "Les données hors ligne sur cet appareil sont verrouillées par une phrase de passe. Le déverrouillage réactive l'utilisation et la sauvegarde hors ligne.",
+  "passphrasePlaceholder": "Phrase de passe",
   "unlock": "Déverrouiller",
   "continueOnline": "Continuer en ligne uniquement",
-  "continueOnlineHint": "« Continuer en ligne uniquement » conserve les modifications hors ligne verrouillées de cet appareil scellées — elles restent sur cet appareil et ne seront pas synchronisées tant que vous ne les déverrouillerez pas avec la bonne phrase secrète.",
-  "wrongPassphrase": "Cette phrase secrète est incorrecte.",
+  "continueOnlineHint": "\"Continuer en ligne uniquement\" conserve les modifications hors ligne verrouillées scellées — elles restent sur cet appareil et ne se synchroniseront pas tant que vous ne les déverrouillez pas avec la bonne phrase de passe.",
+  "wrongPassphrase": "Cette phrase de passe n'est pas correcte.",
   "unsupportedBrowser": "Le verrouillage local n'est pas disponible dans ce navigateur."
 }

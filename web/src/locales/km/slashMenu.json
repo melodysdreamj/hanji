@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "ពាក្យបញ្ជាប្លុក",
+  "closeBlockCommands": "បិទពាក្យបញ្ជាប្លុក",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "ប្លុកមូលដ្ឋាន",
+    "Media": "មេឌា",
+    "Database": "មូលដ្ឋានទិន្នន័យ",
+    "Advanced": "ប្លុកកម្រិតខ្ពស់"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} ក្នុងចំណោម {{total}} ។ ចុច Enter ដើម្បីបញ្ចូល។",
+  "listStatus": "មានពាក្យបញ្ជាប្លុក {{total}} ដែលអាចប្រើបាន។",
+  "noBlocks": "រកមិនឃើញប្លុក",
+  "noBlocksFor": "រកមិនឃើញប្លុកសម្រាប់ \"{{query}}\"",
+  "recentlyUsed": "បានប្រើថ្មីៗ"
 }

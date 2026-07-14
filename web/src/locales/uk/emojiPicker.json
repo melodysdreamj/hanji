@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Закрити вибір іконки",
+    "label": "Вибрати іконку"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "Тип іконки",
+    "emoji": "Емодзі",
+    "image": "Зображення"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Видалити",
+    "ariaLabel": "Видалити іконку"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Фільтр…",
+    "searchLabel": "Пошук іконок",
+    "random": "Випадково",
+    "randomLabel": "Вибрати випадкову іконку",
+    "recentLabel": "Нещодавні спочатку",
+    "gridLabelRecent": "Іконки, спочатку нещодавно використані",
+    "gridLabel": "Іконки",
+    "optionLabel": "Вибрати іконку {{emoji}}",
+    "noResults": "Немає іконок, що відповідають “{{query}}”. Спробуйте інше слово або очистьте фільтр."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Зображення",
+    "linkPlaceholder": "Вставте посилання на зображення",
+    "linkLabel": "Посилання на іконку",
+    "apply": "Застосувати",
+    "upload": "Завантажити файл",
+    "uploading": "Завантаження...",
+    "uploadingLabel": "Завантаження {{fileName}}",
+    "uploadFailed": "Не вдалося завантажити зображення.",
+    "fallbackFileName": "Іконка"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Підготовка завантаження",
+    "finalizing": "Завершення",
+    "complete": "Завершено",
+    "uploading": "Завантаження"
   }
 }

@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "આઇકન પસંદગીકાર બંધ કરો",
+    "label": "આઇકન પસંદ કરો"
   },
   "tabs": {
-    "groupLabel": "Icon type",
-    "emoji": "Emoji",
-    "image": "Image"
+    "groupLabel": "આઇકોન પ્રકાર",
+    "emoji": "ઇમોજિ",
+    "image": "ઇમેજ"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "દૂર કરો",
+    "ariaLabel": "આઇકોન દૂર કરો"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "ફિલ્ટર…",
+    "searchLabel": "આઇકોન શોધો",
+    "random": "રેન્ડમ",
+    "randomLabel": "રેન્ડમ આઇકન પસંદ કરો",
+    "recentLabel": "તાજેતરના પ્રથમ",
+    "gridLabelRecent": "આઇકન્સ, તાજેતરના પ્રથમ",
+    "gridLabel": "આઇકન્સ",
+    "optionLabel": "{{emoji}} આઇકન પસંદ કરો",
+    "noResults": "“{{query}}” સાથે મેળ ખાતા કોઈ આઇકન નથી. બીજો શબ્દ અજમાવો અથવા ફિલ્ટર સાફ કરો."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "ઇમેજ",
+    "linkPlaceholder": "ઇમેજ લિંક પેસ્ટ કરો",
+    "linkLabel": "ઇમેજ આઇકન લિંક",
+    "apply": "લાગુ કરો",
+    "upload": "ફાઇલ અપલોડ કરો",
+    "uploading": "અપલોડ થઈ રહ્યું છે...",
+    "uploadingLabel": "{{fileName}} અપલોડ થઈ રહ્યું છે",
+    "uploadFailed": "તે ઇમેજ અપલોડ કરી શકાઈ નહીં.",
+    "fallbackFileName": "આઇકન ઇમેજ"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "અપલોડની તૈયારી",
+    "finalizing": "અંતિમીકરણ",
+    "complete": "પૂર્ણ",
+    "uploading": "અપલોડ થઈ રહ્યું છે"
   }
 }

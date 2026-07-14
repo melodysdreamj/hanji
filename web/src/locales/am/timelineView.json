@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "የቀን ንብረት አክል",
+    "description": "የጊዜ መስመር እይታዎች ገፆችን በጊዜ ላይ ለማሳየት የመጀመሪያ ቀን ንብረት ያስፈልጋቸዋል።"
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "ከነጠላ-ቀን አሞሌዎች ይልቅ ክልሎችን ለማሳየት የማጠናቀቂያ ቀን ንብረት አክል።",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "የጊዜ መስመር ማጉላት",
+    "day": "ቀን",
+    "week": "ሳምንት",
+    "month": "ወር"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "ጥገኞች:",
+    "hint": "የግንኙነት ንብረት ያክሉ",
+    "relationPropertyAriaLabel": "የጥገኝነት ግንኙነት ንብረት"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ዛሬ",
+    "previousRange": "የቀድሞ ክልል",
+    "nextRange": "ቀጣይ ክልል",
+    "newPage": "አዲስ",
+    "newPageIn": "አዲስ ገፅ በ{{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "የጊዜ መስመር ሠንጠረዥ",
+    "nameHeader": "ስም"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ክፈት",
+    "openAriaLabelWithDates": "{{title}} ክፈት፣ {{start}} እስከ {{end}}",
+    "openNoDateAriaLabel": "{{title}} ክፈት፣ ቀን የለም"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "በዚህ ክልል ውስጥ ምንም ንጥሎች የሉም።",
+    "noDatedItems": "ገና ቀን ያላቸው ንጥሎች የሉም።",
+    "jumpTo": "ወደ {{date}} ዝለል"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ቀን የለም ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ምንም",
+    "untitled": "ርዕስ የለሽ"
   }
 }

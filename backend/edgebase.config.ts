@@ -91,6 +91,8 @@ const OAUTH_PROVIDERS = Object.fromEntries(
 );
 const ALLOWED_OAUTH_PROVIDERS = Object.keys(OAUTH_PROVIDERS);
 const ALLOW_DEV_GUEST_LOGIN = envFlag('HANJI_ALLOW_DEV_GUEST_LOGIN');
+const TRUST_SELF_HOSTED_PROXY = envFlag('HANJI_TRUST_SELF_HOSTED_PROXY');
+const ALLOW_INSECURE_LOCALHOST_AUTH = ALLOW_DEV_GUEST_LOGIN || TRUST_SELF_HOSTED_PROXY;
 
 interface Workspace {
   id: string;
@@ -418,9 +420,7 @@ const appTables = {
         },
 
         // One-time first-run web setup claim. The fixed `global` row closes
-        // concurrent installer races before the auth account is created. The
-        // setup code itself is never stored in the database; Docker keeps it
-        // in the private persistent runtime file under /data.
+        // concurrent installer races before the auth account is created.
         instance_setup: {
           schema: {
             state: { type: 'string', required: true },
@@ -434,13 +434,39 @@ const appTables = {
 
         // Per-account product flags keyed by auth user id (row id = userId).
         // mustChangePassword marks admin-issued temporary credentials; the
-        // client forces a password change before the workspace UI unlocks.
+        // language fields keep a user's explicit UI preference across devices.
         account_flags: {
           schema: {
             mustChangePassword: { type: 'boolean', default: false },
             reason: { type: 'string' },
             updatedBy: { type: 'string' },
+            languagePreference: { type: 'string' },
+            languageOnboardingCompleted: { type: 'boolean', default: false },
+            languageUpdatedAt: { type: 'datetime' },
           },
+        },
+
+        // Workspace-scoped, server-durable product onboarding. The row id is
+        // the workspace id so a claim can atomically insert-if-absent across
+        // tabs and devices. Existing/populated workspaces never need a row.
+        workspace_onboarding: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            notionImportState: { type: 'string', default: 'presented' },
+            notionImportPresentedAt: { type: 'datetime' },
+            notionImportPresentedBy: { type: 'string' },
+            notionImportSuppressedAt: { type: 'datetime' },
+            notionImportSuppressedBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['notionImportState'] },
+          ],
         },
 
         instance_audit_events: {
@@ -1682,10 +1708,10 @@ export default defineConfig({
   // without an explicit access rule deny-by-default in local, packaged, and
   // deployed runtimes instead of silently bypassing authorization in dev.
   release: true,
-  // Off by default: forwarded client/protocol headers are spoofable when the
-  // container port is reachable directly. NAS/reverse-proxy operators may opt
-  // in after restricting the upstream port to that trusted proxy.
-  trustSelfHostedProxy: envFlag('HANJI_TRUST_SELF_HOSTED_PROXY'),
+  // The Docker appliance enables its browser installer and trusted proxy mode
+  // together so NAS/Desktop users do not need to discover proxy env flags.
+  // Other runtimes remain fail-closed unless they opt in explicitly.
+  trustSelfHostedProxy: TRUST_SELF_HOSTED_PROXY,
 
   frontend: {
     directory: '../web/dist',
@@ -1754,6 +1780,11 @@ export default defineConfig({
       maxActiveSessions: 5,
       cookie: {
         enabled: true,
+        // Browser setup is also enabled on public Cloudflare deployments and
+        // must not implicitly widen their cookie transport. Only explicitly
+        // local development or the self-hosted image gets the HTTP-loopback
+        // exception.
+        allowInsecureLocalhost: ALLOW_INSECURE_LOCALHOST_AUTH,
         name: 'hanji-refresh',
         legacyNames: [LEGACY_REFRESH_COOKIE_BASE_NAME_DELETE_ONLY],
         sameSite: 'strict',

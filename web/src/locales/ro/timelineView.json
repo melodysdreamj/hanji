@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "Adaugă o proprietate de dată",
+    "description": "Vizualizările timeline necesită o proprietate de dată de început pentru a plasa paginile de-a lungul timpului."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "Adaugă o proprietate de dată de sfârșit pentru a afișa intervale în loc de bare de o singură zi.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "Zoom timeline",
+    "day": "Zi",
+    "week": "Săptămână",
+    "month": "Lună"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "Dependențe:",
+    "hint": "adaugă o proprietate de relație",
+    "relationPropertyAriaLabel": "Proprietatea de relație pentru dependențe"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "Astăzi",
+    "previousRange": "Intervalul anterior",
+    "nextRange": "Intervalul următor",
+    "newPage": "Nou",
+    "newPageIn": "Pagină nouă în {{dbTitle}}"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "Tabel timeline",
+    "nameHeader": "Nume"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "Deschide {{title}}",
+    "openAriaLabelWithDates": "Deschide {{title}}, de la {{start}} la {{end}}",
+    "openNoDateAriaLabel": "Deschide {{title}}, fără dată"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "Niciun element în acest interval.",
+    "noDatedItems": "Nu există încă elemente cu dată.",
+    "jumpTo": "Salt la {{date}}"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Fără dată ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "Niciunul",
+    "untitled": "Fără titlu"
   }
 }

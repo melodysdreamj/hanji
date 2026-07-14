@@ -1,43 +1,43 @@
 {
   "dialog": {
-    "backdropLabel": "Close icon picker",
-    "label": "Choose icon"
+    "backdropLabel": "Tutup pemilih ikon",
+    "label": "Pilih ikon"
   },
   "tabs": {
-    "groupLabel": "Icon type",
+    "groupLabel": "Jenis ikon",
     "emoji": "Emoji",
-    "image": "Image"
+    "image": "Imej"
   },
   "remove": {
-    "label": "Remove",
-    "ariaLabel": "Remove icon"
+    "label": "Buang",
+    "ariaLabel": "Buang ikon"
   },
   "emoji": {
-    "searchPlaceholder": "Filter…",
-    "searchLabel": "Search icons",
-    "random": "Random",
-    "randomLabel": "Pick a random icon",
-    "recentLabel": "Recently used first",
-    "gridLabelRecent": "Icons, recently used first",
-    "gridLabel": "Icons",
-    "optionLabel": "Choose {{emoji}} icon",
-    "noResults": "No icons match “{{query}}”. Try a different word or clear the filter."
+    "searchPlaceholder": "Tapis…",
+    "searchLabel": "Cari ikon",
+    "random": "Rawak",
+    "randomLabel": "Pilih ikon secara rawak",
+    "recentLabel": "Terkini dahulu",
+    "gridLabelRecent": "Ikon, yang terbaru digunakan dahulu",
+    "gridLabel": "Ikon",
+    "optionLabel": "Pilih ikon {{emoji}}",
+    "noResults": "Tiada ikon yang sepadan dengan “{{query}}”. Cuba perkataan lain atau kosongkan penapis."
   },
   "custom": {
-    "previewPlaceholder": "Image",
-    "linkPlaceholder": "Paste image link",
-    "linkLabel": "Image icon link",
-    "apply": "Apply",
-    "upload": "Upload file",
-    "uploading": "Uploading...",
-    "uploadingLabel": "Uploading {{fileName}}",
-    "uploadFailed": "Could not upload that image.",
-    "fallbackFileName": "Icon image"
+    "previewPlaceholder": "Imej",
+    "linkPlaceholder": "Tampal pautan imej",
+    "linkLabel": "Pautan imej ikon",
+    "apply": "Guna",
+    "upload": "Muat naik fail",
+    "uploading": "Memuat naik...",
+    "uploadingLabel": "Memuat naik {{fileName}}",
+    "uploadFailed": "Tidak dapat memuat naik imej tersebut.",
+    "fallbackFileName": "Imej ikon"
   },
   "uploadProgress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "Menyediakan muat naik",
+    "finalizing": "Menyelesaikan",
+    "complete": "Selesai",
+    "uploading": "Memuat naik"
   }
 }

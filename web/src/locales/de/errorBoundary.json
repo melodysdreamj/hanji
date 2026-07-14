@@ -1,6 +1,6 @@
 {
   "title": "Beim Anzeigen dieses Inhalts ist ein Fehler aufgetreten.",
-  "detail": "Versuchen Sie es erneut. Wenn das Problem weiterhin besteht, laden Sie die Anwendung neu und teilen Sie die Referenz unten mit.",
+  "detail": "Erneut versuchen. Wenn das Problem weiterhin besteht, lade die Anwendung neu und teile die Referenz unten mit.",
   "reference": "Referenz: {{reference}}",
   "reload": "Anwendung neu laden",
   "retry": "Erneut versuchen"

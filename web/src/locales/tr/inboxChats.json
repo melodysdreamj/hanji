@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "Henüz sohbet yok. Bir sayfaya yorum yapın veya birinden bahsederek başlatın.",
+  "leave": "Ayrıl",
+  "leaveAria": "{{title}} sohbetinden ayrıl",
+  "open": "{{title}} sohbetini aç",
+  "participants_one": "{{count}} katılımcı",
+  "participants_other": "{{count}} katılımcı",
+  "untitled": "Başlıksız",
+  "loading": "Sohbetler yükleniyor…"
 }

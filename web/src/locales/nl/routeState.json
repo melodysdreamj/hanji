@@ -1,0 +1,9 @@
+{
+  "invalidTitle": "Dit adres is onvolledig.",
+  "invalidBody": "Controleer de link op ontbrekende of ongeldige tekens en probeer het opnieuw.",
+  "notFoundTitle": "Pagina niet gevonden.",
+  "notFoundBody": "Dit adres komt niet overeen met een Hanji-pagina. De pagina is mogelijk verplaatst of bestaat niet meer.",
+  "sharedTitle": "Deze gedeelde link is ongeldig.",
+  "sharedBody": "Controleer of de volledige gedeelde link correct is gekopieerd en probeer het opnieuw.",
+  "openHome": "Open Hanji home"
+}

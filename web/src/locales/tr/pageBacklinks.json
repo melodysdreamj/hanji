@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} geri bağlantı",
+    "count_other": "{{count}} geri bağlantı"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "Bağlantılı bahsedilenler"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} bahsedilme",
+    "mention_other": "{{count}} bahsedilme",
+    "link_one": "{{count}} bağlantı",
+    "link_other": "{{count}} bağlantı"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "Bahsedilme",
+    "link": "Bağlantı"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} daha fazla geri bağlantı",
+    "count_other": "{{count}} daha fazla geri bağlantı"
   }
 }

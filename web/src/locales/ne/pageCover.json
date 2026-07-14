@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "कभर परिवर्तन गर्नुहोस्",
+    "reposition": "स्थान परिवर्तन",
+    "remove": "हटाउनुहोस्",
+    "uploadFile": "फाइल अपलोड गर्नुहोस्",
+    "uploading": "अपलोड हुँदै...",
+    "submit": "पेश गर्नुहोस्",
+    "savePosition": "स्थान सुरक्षित गर्नुहोस्"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "ग्यालरी",
+    "upload": "अपलोड",
+    "link": "लिङ्क"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "छवि लिङ्क टाँस्नुहोस्",
+    "invalid": "http वा https छवि लिङ्क टाँस्नुहोस्।"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "त्यो छवि अपलोड गर्न सकिएन।",
+    "defaultFileName": "कभर छवि"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "स्थान परिवर्तन गर्न छवि तान्नुहोस्"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "अपलोड तयारी हुँदै",
+    "finalizing": "अन्तिम रूप दिँदै",
+    "complete": "सम्पन्न",
+    "uploading": "अपलोड हुँदै"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "कभर हटाइयो",
+    "restored": "कभर पुनर्स्थापित गरियो",
+    "undo": "पूर्ववत"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "पृष्ठ कभर",
+    "coverVerticalPosition": "कभर ठाडो स्थान",
+    "positionFromTop": "माथिबाट {{position}}%",
+    "closeCoverMenu": "कभर मेनु बन्द गर्नुहोस्",
+    "changePageCover": "पृष्ठ कभर परिवर्तन गर्नुहोस्",
+    "repositionPageCover": "पृष्ठ कभर स्थान परिवर्तन गर्नुहोस्",
+    "removePageCover": "पृष्ठ कभर हटाउनुहोस्",
+    "changeCoverDialog": "कभर परिवर्तन गर्नुहोस्",
+    "coverSource": "कभर स्रोत",
+    "selectCover": "कभर {{number}} चयन गर्नुहोस्",
+    "uploadFromDevice": "यस उपकरणबाट कभर छवि अपलोड गर्नुहोस्",
+    "uploadingFile": "{{fileName}} अपलोड हुँदै",
+    "coverImageLink": "कभर छवि लिङ्क"
   }
 }

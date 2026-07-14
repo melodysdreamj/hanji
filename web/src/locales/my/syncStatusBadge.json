@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "အော့ဖ်လိုင်း",
+  "offlinePending_one": "အော့ဖ်လိုင်း · ပြောင်းလဲမှု {{count}} ခု ဆိုင်းငံ့ထားသည်",
+  "offlinePending_other": "အော့ဖ်လိုင်း · ပြောင်းလဲမှု {{count}} ခု ဆိုင်းငံ့ထားသည်",
+  "syncing": "စင့်ခ်လုပ်နေသည် · {{count}}",
+  "unreachable": "ဆာဗာသို့မချိတ်ဆက်နိုင်",
+  "unreachablePending_one": "ဆာဗာသို့မချိတ်ဆက်နိုင် · ပြောင်းလဲမှု {{count}} ခု စောင့်ဆိုင်း",
+  "unreachablePending_other": "ဆာဗာသို့မချိတ်ဆက်နိုင် · ပြောင်းလဲမှု {{count}} ခု စောင့်ဆိုင်း",
+  "retryHint": "ယခုပြန်လည်ကြိုးစားရန် နှိပ်ပါ"
 }

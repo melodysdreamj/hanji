@@ -1,46 +1,46 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Timeline views need a start date property to draw pages across time."
+    "title": "തീയതി പ്രോപ്പർട്ടി ചേർക്കുക",
+    "description": "ടൈംലൈൻ വ്യൂവിന് പേജുകൾ സമയരേഖയിൽ വരയ്ക്കാൻ ആരംഭ തീയതി പ്രോപ്പർട്ടി ആവശ്യമാണ്."
   },
-  "endDateHint": "Add an end date property to draw ranges instead of single-day bars.",
+  "endDateHint": "ഒറ്റ ദിവസ ബാറുകൾക്ക് പകരം ശ്രേണികൾ വരയ്ക്കാൻ അവസാന തീയതി പ്രോപ്പർട്ടി ചേർക്കുക.",
   "zoom": {
-    "ariaLabel": "Timeline zoom",
-    "day": "Day",
-    "week": "Week",
-    "month": "Month"
+    "ariaLabel": "ടൈംലൈൻ സൂം",
+    "day": "ദിവസം",
+    "week": "ആഴ്ച",
+    "month": "മാസം"
   },
   "dependencies": {
-    "label": "Dependencies:",
-    "hint": "add a relation property",
-    "relationPropertyAriaLabel": "Dependency relation property"
+    "label": "ആശ്രിതത്വങ്ങൾ:",
+    "hint": "ഒരു ബന്ധ പ്രോപ്പർട്ടി ചേർക്കുക",
+    "relationPropertyAriaLabel": "ആശ്രിതത്വ ബന്ധ പ്രോപ്പർട്ടി"
   },
   "toolbar": {
-    "today": "Today",
-    "previousRange": "Previous range",
-    "nextRange": "Next range",
-    "newPage": "New",
-    "newPageIn": "New page in {{dbTitle}}"
+    "today": "ഇന്ന്",
+    "previousRange": "മുൻ ശ്രേണി",
+    "nextRange": "അടുത്ത ശ്രേണി",
+    "newPage": "പുതിയത്",
+    "newPageIn": "{{dbTitle}} എന്നതിൽ പുതിയ പേജ്"
   },
   "table": {
-    "ariaLabel": "Timeline table",
-    "nameHeader": "Name"
+    "ariaLabel": "ടൈംലൈൻ പട്ടിക",
+    "nameHeader": "പേര്"
   },
   "bar": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDates": "Open {{title}}, {{start}} to {{end}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} തുറക്കുക",
+    "openAriaLabelWithDates": "{{title}} തുറക്കുക, {{start}} മുതൽ {{end}} വരെ",
+    "openNoDateAriaLabel": "{{title}} തുറക്കുക, തീയതി ഇല്ല"
   },
   "lanes": {
-    "noItemsInRange": "No items in this range.",
-    "noDatedItems": "No dated items yet.",
-    "jumpTo": "Jump to {{date}}"
+    "noItemsInRange": "ഈ ശ്രേണിയിൽ ഇനങ്ങൾ ഇല്ല.",
+    "noDatedItems": "ഇതുവരെ തീയതിയുള്ള ഇനങ്ങൾ ഇല്ല.",
+    "jumpTo": "{{date}} ലേക്ക് പോവുക"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "തീയതിയില്ല ({{count}})"
   },
   "options": {
-    "none": "None",
-    "untitled": "Untitled"
+    "none": "ഒന്നുമില്ല",
+    "untitled": "ശീർഷകമില്ലാത്ത"
   }
 }

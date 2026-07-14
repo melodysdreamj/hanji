@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "التعليقات",
+  "closeAria": "إغلاق التعليقات",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "مناقشة البلوك",
+    "page": "مناقشة الصفحة"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "حالة التعليق",
+    "open": "مفتوح",
+    "resolved": "محلول"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "التعليق على",
+    "commentingOnSelectedText": "التعليق على نص محدد",
+    "selectedBlock": "الكتلة المحددة",
+    "onSelectedText": "على النص المحدد",
+    "onSelectedBlock": "على الكتلة المحددة",
+    "onABlock": "على كتلة"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "إضافة تعليق على الكتلة",
+    "addPageComment": "إضافة تعليق على الصفحة",
+    "blockPlaceholder": "التعليق على هذه الكتلة...",
+    "pagePlaceholder": "إضافة تعليق...",
+    "submit": "أضف تعليق"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "أشخاص الإشارة في التعليق",
+    "replyPeopleAria": "أشخاص الإشارة في الرد",
+    "trigger": "الإشارة إلى أشخاص",
+    "noMatches": "لا يوجد أشخاص مطابقون",
+    "title": "الإشارة إلى {{name}}",
+    "person": "شخص",
+    "you": "أنت",
+    "organizationPerson": "شخص من المؤسسة",
+    "roleInOrganization": "{{role}} في المؤسسة"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "سلاسل التعليقات",
+    "empty": "لا توجد تعليقات بعد",
+    "noOpen": "لا تعليقات مفتوحة",
+    "noResolved": "لا تعليقات محلولة"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "تعليق {{author}}، {{time}}",
+    "commentAriaResolved": "تعليق {{author}}، {{time}}، محلول",
+    "replyAria": "رد {{author}}، {{time}}",
+    "repliesAria": "{{count}} ردود",
+    "edited": "(معدل)",
+    "emptyComment": "(تعليق فارغ)",
+    "emptyReply": "(رد فارغ)",
+    "justNow": "الآن"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "رد",
+    "showInPage": "عرض في الصفحة",
+    "resolve": "حل",
+    "reopen": "إعادة فتح",
+    "edit": "تعديل"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "رد..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "تعديل التعليق"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "حذف هذا التعليق؟",
+    "threadConfirm_one": "حذف هذا التعليق و رده؟",
+    "threadConfirm_other": "حذف هذا التعليق و {{count}} ردود؟"
   }
 }

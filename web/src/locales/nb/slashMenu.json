@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "Blokkkommandoer",
+  "closeBlockCommands": "Lukk blokkkommandoer",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
+    "Advanced": "Avanserte blokker",
+    "Basic": "Grunnleggende blokker",
     "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Media": "Media"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}, {{position}} av {{total}}. Trykk Enter for å sette inn.",
+  "listStatus": "{{total}} blokkkommandoer tilgjengelig.",
+  "noBlocks": "Ingen blokker funnet.",
+  "noBlocksFor": "Fant ingen blokker for \"{{query}}\"",
+  "recentlyUsed": "Nylig brukt"
 }

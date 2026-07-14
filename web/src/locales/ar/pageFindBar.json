@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "البحث في الصفحة"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "البحث في الصفحة",
+    "placeholder": "البحث في الصفحة"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "التطابق السابق",
+    "next": "التطابق التالي",
+    "close": "إغلاق البحث"
   }
 }

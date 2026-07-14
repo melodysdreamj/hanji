@@ -1,15 +1,15 @@
 {
-  "blockCommands": "Block commands",
-  "closeBlockCommands": "Close block commands",
+  "blockCommands": "ဘလောက်ညွှန်ကြားချက်များ",
+  "closeBlockCommands": "ဘလောက်ညွှန်ကြားချက်များပိတ်ရန်",
   "groups": {
-    "Basic": "Basic blocks",
-    "Media": "Media",
-    "Database": "Database",
-    "Advanced": "Advanced blocks"
+    "Basic": "အခြေခံဘလောက်များ",
+    "Media": "မီဒီယာ",
+    "Database": "ဒေတာဘေ့စ်",
+    "Advanced": "အဆင့်မြင့်ဘလောက်များ"
   },
-  "itemStatus": "{{label}}, {{position}} of {{total}}. Press Enter to insert.",
-  "listStatus": "{{total}} block commands available.",
-  "noBlocks": "No blocks found",
-  "noBlocksFor": "No blocks found for \"{{query}}\"",
-  "recentlyUsed": "Recently used"
+  "itemStatus": "{{label}}၊ {{total}} ခုအနက် {{position}}။ ထည့်သွင်းရန် Enter နှိပ်ပါ။",
+  "listStatus": "ဘလောက်ညွှန်ကြားချက် {{total}} ခု ရရှိနိုင်ပါသည်။",
+  "noBlocks": "ဘလောက်များ မတွေ့ပါ။",
+  "noBlocksFor": "\"{{query}}\" အတွက် ဘလောက်များ မတွေ့ပါ",
+  "recentlyUsed": "မကြာသေးမီက"
 }

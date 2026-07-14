@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
-  "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
-  },
-  "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+  "actions": {
+    "edit": "Edytuj",
+    "reopen": "Otwórz ponownie",
+    "reply": "Odpowiedz",
+    "resolve": "Rozwiąż",
+    "showInPage": "Pokaż na stronie"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
-  },
-  "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
-  },
-  "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
-  },
-  "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "commentingOn": "Komentujesz",
+    "commentingOnSelectedText": "Komentujesz zaznaczony tekst",
+    "onABlock": "Na bloku",
+    "onSelectedBlock": "Na zaznaczonym bloku",
+    "onSelectedText": "Na zaznaczonym tekście",
+    "selectedBlock": "Zaznaczony blok"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "Komentarz {{author}}, {{time}}",
+    "commentAriaResolved": "Komentarz {{author}}, {{time}}, rozwiązany",
+    "edited": "(edytowano)",
+    "emptyComment": "(pusty komentarz)",
+    "emptyReply": "(pusta odpowiedź)",
+    "justNow": "Przed chwilą",
+    "repliesAria": "{{count}} odpowiedzi",
+    "replyAria": "Odpowiedź {{author}}, {{time}}"
   },
-  "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
-  },
-  "reply": {
-    "placeholder": "Reply..."
-  },
-  "edit": {
-    "aria": "Edit comment"
+  "closeAria": "Zamknij komentarze",
+  "composer": {
+    "addBlockComment": "Dodaj komentarz do bloku",
+    "addPageComment": "Dodaj komentarz do strony",
+    "blockPlaceholder": "Skomentuj ten blok...",
+    "pagePlaceholder": "Dodaj komentarz...",
+    "submit": "Skomentuj"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
-  }
+    "commentConfirm": "Usunąć ten komentarz?",
+    "threadConfirm_one": "Usunąć ten komentarz i jego odpowiedź?",
+    "threadConfirm_other": "Usunąć ten komentarz i jego {{count}} odpowiedzi?"
+  },
+  "edit": {
+    "aria": "Edytuj komentarz"
+  },
+  "list": {
+    "empty": "Brak komentarzy",
+    "noOpen": "Brak otwartych komentarzy",
+    "noResolved": "Brak rozwiązanych komentarzy",
+    "threadsAria": "Wątki komentarzy"
+  },
+  "mention": {
+    "commentPeopleAria": "Osoby do oznaczenia w komentarzu",
+    "noMatches": "Brak pasujących osób",
+    "organizationPerson": "Osoba z organizacji",
+    "person": "Osoba",
+    "replyPeopleAria": "Osoby do oznaczenia w odpowiedzi",
+    "roleInOrganization": "{{role}} w organizacji",
+    "title": "Wspomnij {{name}}",
+    "trigger": "Wspomnij osoby",
+    "you": "Ja"
+  },
+  "reply": {
+    "placeholder": "Odpowiedź..."
+  },
+  "status": {
+    "aria": "Status komentarza",
+    "open": "Otwarty",
+    "resolved": "Rozwiązany"
+  },
+  "subtitle": {
+    "block": "Dyskusja bloku",
+    "page": "Dyskusja strony"
+  },
+  "title": "Komentarze"
 }

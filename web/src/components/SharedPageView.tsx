@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getSharedPageRemote } from "@/lib/edgebase";
 import { useSearchParams } from "@/lib/router";
+import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
 import { sharedPageErrorKind, type SharedPageErrorKind } from "@/lib/sharedPageErrors";
 import { useStore } from "@/lib/store";
 import { PageView } from "./PageView";
@@ -35,6 +36,7 @@ export function SharedPageView({ token }: { token: string }) {
           rootPageId: snapshot.page.id,
           pageIds: new Set(snapshot.navigablePageIds?.length ? snapshot.navigablePageIds : fallbackPageIds),
         });
+        markAppInteractiveForOfflineWarm();
       })
       .catch((error) => {
         if (cancelled) return;
@@ -52,7 +54,18 @@ export function SharedPageView({ token }: { token: string }) {
     return (
       <>
         <TopBar title={t("sharedPageView:title")} />
-        <div className={styles.missing} aria-busy="true" aria-label={t("sharedPageView:loading")} />
+        <div className={styles.scroll}>
+          <div
+            className={styles.sharedLoading}
+            aria-busy="true"
+            aria-label={t("sharedPageView:loading")}
+            role="status"
+          >
+            <span className={styles.sharedLoadingTitle} />
+            <span className={styles.sharedLoadingLine} />
+            <span className={`${styles.sharedLoadingLine} ${styles.sharedLoadingLineShort}`} />
+          </div>
+        </div>
       </>
     );
   }

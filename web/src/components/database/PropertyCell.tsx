@@ -81,6 +81,7 @@ import {
 } from "../icons";
 import { PageIconGlyph } from "../PageIcon";
 import { backendComputedText } from "./computed";
+import { AttachmentOpenLink } from "./AttachmentOpenLink";
 import styles from "./database.module.css";
 
 const SELECT_OPTION_DRAG = "application/x-hanji-select-option";
@@ -1212,40 +1213,13 @@ function FileMenuText({
   );
 
   return (
-    <FileOpenLink file={file} className={styles.fileMenuText}>
-      {content}
-    </FileOpenLink>
-  );
-}
-
-function FileOpenLink({
-  file,
-  className,
-  children,
-}: {
-  file: FileAttachment;
-  className: string;
-  children: ReactNode;
-}) {
-  const { t } = useTranslation(["propertyCell", "common"]);
-  const href = useWorkspaceFileUrl(file.url);
-  const storedFile = !!storedWorkspaceFileKey(file);
-
-  if (!href) return <span className={className}>{children}</span>;
-
-  return (
-    <a
-      className={className}
-      href={href}
-      target={storedFile ? undefined : "_blank"}
-      download={storedFile ? file.name : undefined}
-      rel="noreferrer"
-      aria-label={t("propertyCell:open", { name: file.name })}
-      onClick={(e) => e.stopPropagation()}
-      onAuxClick={(e) => e.stopPropagation()}
+    <AttachmentOpenLink
+      file={file}
+      className={styles.fileMenuText}
+      ariaLabel={i18next.t("propertyCell:open", { name: file.name })}
     >
-      {children}
-    </a>
+      {content}
+    </AttachmentOpenLink>
   );
 }
 
@@ -1430,16 +1404,21 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
         className={styles.filesChips}
         role="group"
         aria-label={prop.name}
+        data-file-attachments
         data-empty={files.length === 0 ? "true" : undefined}
         onClick={(event) => openEditorFromCellBackground(event, openMenu)}
       >
         {files.map((file) => {
           return (
             <span key={file.id} className={styles.fileChip}>
-              <FileOpenLink file={file} className={styles.fileChipLink}>
+              <AttachmentOpenLink
+                file={file}
+                className={styles.fileChipLink}
+                ariaLabel={t("propertyCell:open", { name: file.name })}
+              >
                 <FileThumb file={file} className={styles.fileThumb} iconSize={13} />
                 <span className={styles.fileName}>{file.name}</span>
-              </FileOpenLink>
+              </AttachmentOpenLink>
               <button
                 type="button"
                 aria-label={t("propertyCell:remove", { name: file.name })}

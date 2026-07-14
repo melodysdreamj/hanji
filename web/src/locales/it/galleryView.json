@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Questo database non ha ancora pagine.",
+  "emptyTitle": "Ancora nessuna pagina",
+  "newInline": "Nuovo",
+  "newPage": "Nuova pagina",
+  "newPageIn": "Nuova pagina in {{dbTitle}}",
+  "noResultsDesc": "Nessuna pagina corrisponde ai filtri o alla ricerca attuali.",
+  "noResultsTitle": "Nessun risultato",
+  "openRow": "Apri {{title}}"
 }

@@ -106,6 +106,7 @@ import {
   stampDatabaseCached,
 } from "./recordCache";
 import { remapPageHref } from "./pageLinks";
+import { replaceRoute, routeInfoFromPath } from "./router";
 import {
   permanentDeleteIds,
   permanentDeleteCacheCleanupPending,
@@ -303,6 +304,100 @@ function assertDatabaseUnlocked(pagesById: Record<string, Page>, dbId: string) {
 function iconTypeForValue(icon?: string): Page["iconType"] {
   if (!icon) return "none";
   return /^(https?:\/\/|data:image\/|blob:|\/)/i.test(icon.trim()) ? "image" : "emoji";
+}
+
+type StarterDatabaseViewType = Extract<
+  ViewType,
+  "table" | "board" | "list" | "gallery" | "calendar" | "timeline"
+>;
+
+function optimisticStarterDatabaseSchema(
+  databaseId: string,
+  viewType: StarterDatabaseViewType,
+  rawProperties: Parameters<typeof createDatabaseRemote>[0]["properties"]
+) {
+  const labels = activePersistentGeneratedLabels();
+  const input = rawProperties ?? [
+    { name: labels.propertyNames.name, type: "title" as const, position: 1 },
+    {
+      name: labels.propertyNames.status,
+      type: "status" as const,
+      position: 2,
+      config: {
+        options: [
+          { id: newId(), name: labels.statusOptions.todo, color: "gray" },
+          { id: newId(), name: labels.statusOptions.doing, color: "blue" },
+          { id: newId(), name: labels.statusOptions.done, color: "green" },
+        ],
+      },
+    },
+    {
+      name: labels.propertyNames.select,
+      type: "multi_select" as const,
+      position: 3,
+      config: {
+        options: [
+          { id: newId(), name: labels.selectOptions.first, color: "purple" },
+          { id: newId(), name: labels.selectOptions.second, color: "red" },
+        ],
+      },
+    },
+  ];
+  const properties: DbProperty[] = input.map((property, index) => ({
+    id: property.id || newId(),
+    databaseId,
+    name: property.name?.trim() || labels.columnName(index + 1),
+    type: (property.type ?? "rich_text") as PropertyType,
+    description: property.description,
+    config: property.config ? cloneJson(property.config) : undefined,
+    position: property.position ?? index + 1,
+  }));
+  if (!properties.some((property) => property.type === "title")) {
+    properties.unshift({
+      id: newId(),
+      databaseId,
+      name: labels.propertyNames.name,
+      type: "title",
+      position: 1,
+    });
+  }
+  if (
+    (viewType === "calendar" || viewType === "timeline") &&
+    !properties.some((property) => property.type === "date")
+  ) {
+    properties.push({
+      id: newId(),
+      databaseId,
+      name: labels.propertyNames.date,
+      type: "date",
+      position: properties.length + 1,
+    });
+  }
+  const config: ViewConfig = {
+    propertyOrder: properties.map((property) => property.id),
+    visibleProperties: properties.map((property) => property.id),
+  };
+  if (viewType === "board") {
+    config.groupBy = properties.find(
+      (property) => property.type === "status" || property.type === "select"
+    )?.id;
+  }
+  const dateProperty = properties.find((property) => property.type === "date");
+  if (viewType === "calendar") config.calendarBy = dateProperty?.id;
+  if (viewType === "timeline") {
+    config.timelineBy = dateProperty?.id;
+    config.timelineZoom = "month";
+  }
+  if (viewType === "gallery") config.cardSize = "medium";
+  const view: DbView = {
+    id: newId(),
+    databaseId,
+    name: i18next.t(`databaseView:viewTypes.${viewType}`),
+    type: viewType,
+    position: 1,
+    config,
+  };
+  return { properties, view };
 }
 
 function omitRecordKey<T>(record: Record<string, T> | undefined, key: string) {
@@ -943,6 +1038,16 @@ const pendingBlockPage = new Map<string, string>();
 // patch must not silently clobber what another device wrote meanwhile.
 const pendingBlockBase = new Map<string, string>();
 const pendingPage = new Map<string, Partial<Page>>();
+type PendingPageCreate = { originHref: string; page: Page; userId: string };
+const pendingPageCreate = new Map<string, PendingPageCreate>();
+const pageCreateTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const pageCreateInFlight = new Map<string, Promise<void>>();
+const pendingDatabaseCreate = new Map<string, string>();
+const pendingDatabaseRowCreate = new Map<string, string>();
+const pendingPropertyCreate = new Map<string, string>();
+const pendingViewCreate = new Map<string, string>();
+const pendingTemplateCreate = new Map<string, string>();
+const pendingCommentCreate = new Map<string, string>();
 const PERSIST_RETRY_MS = 2000;
 // Invalidates any network/cache load that began before a permanent-delete
 // tombstone or a cross-tab deletion signal landed.
@@ -1072,6 +1177,50 @@ function retryBlock(id: string) {
   blockTimers.set(id, setTimeout(() => void flushBlock(id), PERSIST_RETRY_MS));
 }
 
+function pendingPageLikeCreateHas(id: string | null | undefined) {
+  return Boolean(
+    id &&
+      (pendingPageCreate.has(id) ||
+        pendingDatabaseCreate.has(id) ||
+        pendingDatabaseRowCreate.has(id))
+  );
+}
+
+function pendingOptimisticCreateHas(id: string) {
+  return (
+    pendingPageLikeCreateHas(id) ||
+    pendingPropertyCreate.has(id) ||
+    pendingViewCreate.has(id) ||
+    pendingTemplateCreate.has(id) ||
+    pendingCommentCreate.has(id)
+  );
+}
+
+function valueReferencesMatchingId(
+  value: unknown,
+  matches: (candidate: string) => boolean,
+  seen = new Set<object>()
+): boolean {
+  if (typeof value === "string") return matches(value);
+  if (!value || typeof value !== "object") return false;
+  if (seen.has(value)) return false;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    return value.some((item) => valueReferencesMatchingId(item, matches, seen));
+  }
+  return Object.entries(value as Record<string, unknown>).some(
+    ([key, item]) => matches(key) || valueReferencesMatchingId(item, matches, seen)
+  );
+}
+
+function valueReferencesPendingCreate(value: unknown) {
+  return valueReferencesMatchingId(value, pendingOptimisticCreateHas);
+}
+
+function valueReferencesId(value: unknown, id: string) {
+  return valueReferencesMatchingId(value, (candidate) => candidate === id);
+}
+
 async function flushPage(id: string) {
   const active = pageFlushes.get(id);
   if (active) {
@@ -1093,6 +1242,23 @@ async function flushPageOnce(id: string) {
   if (t) {
     clearTimeout(t);
     pageTimers.delete(id);
+  }
+  const queuedPatch = pendingPage.get(id);
+  const currentPage = useStore.getState().pagesById[id];
+  const targetParentId =
+    queuedPatch && Object.prototype.hasOwnProperty.call(queuedPatch, "parentId")
+      ? queuedPatch.parentId
+      : currentPage?.parentId;
+  // The local page and its title/metadata are usable immediately, but the
+  // backend must see the client-id create before an update or move that
+  // references it (or its just-created parent). Keep the durable patch queued;
+  // page-create completion releases this lane.
+  if (
+    pendingPageLikeCreateHas(id) ||
+    (typeof targetParentId === "string" && pendingPageLikeCreateHas(targetParentId)) ||
+    valueReferencesPendingCreate(queuedPatch)
+  ) {
+    return;
   }
   const patch = pendingPage.get(id);
   pendingPage.delete(id);
@@ -1244,6 +1410,21 @@ async function flushBlockOnce(id: string) {
     clearTimeout(t);
     blockTimers.delete(id);
   }
+  const createRun = blockCreateInFlight.get(id);
+  if (createRun) await createRun.catch(() => {});
+  // A fast edit can be queued in the same tick as an optimistic block create.
+  // Sending updateBlock first turns a healthy slow server into a terminal 404.
+  if (pendingBlockCreate.has(id)) return;
+  const owningPageId = pendingBlockPage.get(id);
+  const queuedBlockPatch = pendingBlock.get(id);
+  if (valueReferencesPendingCreate(queuedBlockPatch)) return;
+  if (
+    owningPageId &&
+    !(useStore.getState().blocksByPage[owningPageId] ?? []).some((block) => block.id === id)
+  ) {
+    cancelPendingBlock(id);
+    return;
+  }
   const patch = pendingBlock.get(id);
   const hintPageId = pendingBlockPage.get(id);
   pendingBlock.delete(id);
@@ -1306,6 +1487,275 @@ function cancelPendingBlock(id: string) {
   outboxAck(outboxUserId(), `block:${id}`);
 }
 
+function currentRelativeRouteHref() {
+  if (typeof window === "undefined") return "/";
+  return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+}
+
+function retryPageCreate(id: string, delay = PERSIST_RETRY_MS) {
+  if (pageCreateTimers.has(id)) return;
+  pageCreateTimers.set(id, setTimeout(() => void flushPageCreate(id), delay));
+}
+
+function pendingPageCreateSubtree(rootId: string) {
+  const ids = new Set([rootId]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [id, entry] of pendingPageCreate) {
+      if (ids.has(id) || !entry.page.parentId || !ids.has(entry.page.parentId)) continue;
+      ids.add(id);
+      changed = true;
+    }
+  }
+  return ids;
+}
+
+function rollbackDependentWritesForFailedCreate(id: string) {
+  cancelDurableCallsReferencing(id);
+  const state = useStore.getState();
+  const reloadBlockPages = new Set<string>();
+  const reloadDatabases = new Set<string>();
+  const reloadPages = new Set<string>();
+  const removeLocalBlockIds = new Set<string>();
+
+  for (const [blockId, patch] of pendingBlock) {
+    if (!valueReferencesId(patch, id)) continue;
+    const pageId = pendingBlockPage.get(blockId);
+    if (pageId) reloadBlockPages.add(pageId);
+    cancelPendingBlock(blockId);
+  }
+  for (const block of pendingBlockCreate.values()) {
+    if (!valueReferencesId(block, id)) continue;
+    removeLocalBlockIds.add(block.id);
+    reloadBlockPages.add(block.pageId);
+    cancelPendingBlockCreate(block.id);
+  }
+  for (const [pageId, patch] of pendingPage) {
+    if (!valueReferencesId(patch, id)) continue;
+    const page = state.pagesById[pageId];
+    cancelPendingPage(pageId);
+    if (page?.parentType === "database" && page.parentId) reloadDatabases.add(page.parentId);
+    else reloadPages.add(pageId);
+  }
+
+  if (removeLocalBlockIds.size > 0) {
+    useStore.setState((current) => ({
+      blocksByPage: Object.fromEntries(
+        Object.entries(current.blocksByPage).map(([pageId, blocks]) => [
+          pageId,
+          blocks.filter((block) => !removeLocalBlockIds.has(block.id)),
+        ])
+      ),
+    }));
+  }
+  for (const pageId of reloadBlockPages) void reloadBlocksFromServer(pageId);
+  for (const dbId of reloadDatabases) {
+    void useStore.getState().loadDatabase(dbId, { force: true, rows: true }).catch(() => {});
+  }
+  for (const pageId of reloadPages) {
+    void getPageRemote(pageId)
+      .then((page) => useStore.getState().applyRemotePage(page))
+      .catch(() => {});
+  }
+}
+
+function rollbackPendingPageCreate(rootId: string, originHref: string) {
+  const ids = pendingPageCreateSubtree(rootId);
+  for (const id of ids) rollbackDependentWritesForFailedCreate(id);
+  const state = useStore.getState();
+  const blockIds = new Set<string>();
+  for (const pageId of ids) {
+    for (const block of state.blocksByPage[pageId] ?? []) blockIds.add(block.id);
+    for (const [blockId, hintPageId] of pendingBlockPage) {
+      if (hintPageId === pageId) blockIds.add(blockId);
+    }
+    for (const block of pendingBlockCreate.values()) {
+      if (block.pageId === pageId) blockIds.add(block.id);
+    }
+  }
+
+  for (const pageId of ids) {
+    const entry = pendingPageCreate.get(pageId);
+    const timer = pageCreateTimers.get(pageId);
+    if (timer) clearTimeout(timer);
+    pageCreateTimers.delete(pageId);
+    pendingPageCreate.delete(pageId);
+    if (entry) outboxAck(entry.userId, `create-page:${pageId}`);
+    cancelPendingPage(pageId);
+  }
+  for (const blockId of blockIds) {
+    cancelPendingBlock(blockId);
+    cancelPendingBlockCreate(blockId);
+  }
+
+  useStore.setState((current) => {
+    const pagesById = { ...current.pagesById };
+    const pageRolesById = { ...current.pageRolesById };
+    const blocksByPage = { ...current.blocksByPage };
+    const blockHistoryByPage = { ...current.blockHistoryByPage };
+    const commentsByPage = { ...current.commentsByPage };
+    const propsByDb = { ...current.propsByDb };
+    const viewsByDb = { ...current.viewsByDb };
+    const templatesByDb = { ...current.templatesByDb };
+    const databaseRowIdsByDb = { ...current.databaseRowIdsByDb };
+    const databaseRowPagesByDb = { ...current.databaseRowPagesByDb };
+    const loadedBlockPages = new Set(current.loadedBlockPages);
+    const loadedCommentPages = new Set(current.loadedCommentPages);
+    const loadedDbs = new Set(current.loadedDbs);
+    const sharedPageIds = new Set(current.sharedPageIds);
+    const treeExpandedPageIds = new Set(current.treeExpandedPageIds);
+
+    for (const pageId of ids) {
+      delete pagesById[pageId];
+      delete pageRolesById[pageId];
+      delete blocksByPage[pageId];
+      delete blockHistoryByPage[pageId];
+      delete commentsByPage[pageId];
+      delete propsByDb[pageId];
+      delete viewsByDb[pageId];
+      delete templatesByDb[pageId];
+      delete databaseRowPagesByDb[pageId];
+      loadedBlockPages.delete(pageId);
+      loadedCommentPages.delete(pageId);
+      loadedDbs.delete(pageId);
+      sharedPageIds.delete(pageId);
+      treeExpandedPageIds.delete(pageId);
+    }
+    for (const [databaseId, rowIds] of Object.entries(databaseRowIdsByDb)) {
+      databaseRowIdsByDb[databaseId] = rowIds.filter((id) => !ids.has(id));
+    }
+
+    return {
+      pagesById,
+      pageRolesById,
+      blocksByPage,
+      blockHistoryByPage,
+      commentsByPage,
+      propsByDb,
+      viewsByDb,
+      templatesByDb,
+      databaseRowIdsByDb,
+      databaseRowPagesByDb,
+      loadedBlockPages,
+      loadedCommentPages,
+      loadedDbs,
+      sharedPageIds,
+      treeExpandedPageIds,
+      recentPageIds: current.recentPageIds.filter((id) => !ids.has(id)),
+      ...(current.focusPageId && ids.has(current.focusPageId)
+        ? { focusPageId: undefined, focusPageTarget: undefined }
+        : {}),
+    };
+  });
+
+  if (typeof window === "undefined" || !originHref.startsWith("/")) return;
+  const route = routeInfoFromPath(window.location.pathname);
+  const activeId =
+    route.kind === "page"
+      ? route.pageId
+      : route.kind === "database"
+        ? route.databaseId
+        : undefined;
+  if (activeId && ids.has(activeId)) replaceRoute(originHref);
+}
+
+function releaseOptimisticCreateDependents(id: string) {
+  for (const [childId, entry] of pendingPageCreate) {
+    if (entry.page.parentId === id) retryPageCreate(childId, 0);
+  }
+  const pagesById = useStore.getState().pagesById;
+  for (const [pageId, patch] of pendingPage) {
+    const targetParentId = Object.prototype.hasOwnProperty.call(patch, "parentId")
+      ? patch.parentId
+      : pagesById[pageId]?.parentId;
+    if (pageId === id || targetParentId === id || valueReferencesId(patch, id)) {
+      void flushPage(pageId);
+    }
+  }
+  for (const [blockId, block] of pendingBlockCreate) {
+    if (block.pageId === id || valueReferencesId(block, id)) void flushBlockCreate(blockId);
+  }
+  for (const [blockId, pageId] of pendingBlockPage) {
+    if (pageId === id || valueReferencesId(pendingBlock.get(blockId), id)) void flushBlock(blockId);
+  }
+  wakeBackgroundDurableCalls();
+  wakeDeferredDurableCalls();
+}
+
+function finishPendingPageCreate(id: string, persisted?: Page) {
+  const entry = pendingPageCreate.get(id);
+  if (!entry) return;
+  pendingPageCreate.delete(id);
+  const timer = pageCreateTimers.get(id);
+  if (timer) clearTimeout(timer);
+  pageCreateTimers.delete(id);
+  outboxAck(entry.userId, `create-page:${id}`);
+  if (persisted) {
+    // The user may already have typed a title while the create request was in
+    // flight. Server-only fields fill gaps, but fresher local values win.
+    useStore.setState((state) => {
+      const current = state.pagesById[id];
+      if (!current) return {};
+      return { pagesById: { ...state.pagesById, [id]: { ...persisted, ...current } } };
+    });
+  }
+  noteSyncSuccess();
+  releaseOptimisticCreateDependents(id);
+}
+
+async function flushPageCreate(id: string) {
+  const timer = pageCreateTimers.get(id);
+  if (timer) clearTimeout(timer);
+  pageCreateTimers.delete(id);
+  const entry = pendingPageCreate.get(id);
+  if (!entry) return;
+  const active = pageCreateInFlight.get(id);
+  if (active) {
+    await active.catch(() => {});
+    return;
+  }
+  if (entry.page.parentId && pendingPageLikeCreateHas(entry.page.parentId)) return;
+
+  const run = (async () => {
+    try {
+      const persisted = await createPageRemote(entry.page);
+      finishPendingPageCreate(id, persisted);
+    } catch (error) {
+      if (shouldDropPersistError(error)) {
+        // A retried client-id create that already landed is idempotent success.
+        if (persistErrorStatus(error) === 409) finishPendingPageCreate(id);
+        else {
+          notifyPersistDrop(error);
+          rollbackPendingPageCreate(id, entry.originHref);
+        }
+        return;
+      }
+      noteSyncFailure();
+      retryPageCreate(id);
+    }
+  })();
+  pageCreateInFlight.set(id, run);
+  try {
+    await run;
+  } finally {
+    if (pageCreateInFlight.get(id) === run) pageCreateInFlight.delete(id);
+  }
+}
+
+function persistPageCreate(page: Page, originHref: string, userId: string) {
+  pendingPageCreate.set(page.id, { originHref, page, userId });
+  outboxSet(userId, `create-page:${page.id}`, {
+    args: [page],
+    fn: "createPageRemote",
+    kind: "remote_call",
+  });
+  // Let the click handler finish its local route change before starting I/O.
+  // This also makes an immediate terminal response recover the already-opened
+  // optimistic route instead of racing just ahead of router.push().
+  retryPageCreate(page.id, 0);
+}
+
 // One-shot block create/delete persistence with the same transient-vs-terminal
 // retry policy as flushBlock/flushPage. addBlockLocal and deleteBlock used to be
 // fire-and-forget (`.catch(() => {})`), so a transient network/auth blip
@@ -1334,6 +1784,7 @@ async function flushBlockCreate(id: string) {
     return;
   }
   const run = (async () => {
+    if (pendingPageLikeCreateHas(block.pageId) || valueReferencesPendingCreate(block)) return;
     // A child's create must not reach the backend before its parent's create:
     // block-mutation validates parentId and 404s ("Parent block was not
     // found"), which the drop policy treats as terminal — the child would be
@@ -1356,6 +1807,7 @@ async function flushBlockCreate(id: string) {
       pendingBlockCreate.delete(id);
       outboxAck(outboxUserId(), `create:${id}`);
       noteSyncSuccess();
+      if (pendingBlock.has(id)) void flushBlock(id);
     } catch (error) {
       if (shouldDropPersistError(error)) {
         pendingBlockCreate.delete(id);
@@ -1363,7 +1815,21 @@ async function flushBlockCreate(id: string) {
         // 409 on create means the id already exists server-side — a retried or
         // replayed create whose earlier attempt landed. That is idempotent
         // success (client UUIDs), not a user-facing drop.
-        if (persistErrorStatus(error) !== 409) notifyPersistDrop(error);
+        if (persistErrorStatus(error) === 409) {
+          noteSyncSuccess();
+          if (pendingBlock.has(id)) void flushBlock(id);
+        } else {
+          cancelPendingBlock(id);
+          useStore.setState((state) => ({
+            blocksByPage: {
+              ...state.blocksByPage,
+              [block.pageId]: (state.blocksByPage[block.pageId] ?? []).filter(
+                (current) => current.id !== id
+              ),
+            },
+          }));
+          notifyPersistDrop(error);
+        }
         return;
       }
       noteSyncFailure();
@@ -1438,6 +1904,24 @@ function touchPageForBlockChange(
 
 /** Flush every pending debounced write immediately (e.g. before unload). */
 export async function flushAllPending() {
+  // Creation is the causal root for every title/block/child write on a new
+  // page, so give that lane the first chance to settle before flushing its
+  // dependents in parallel.
+  await Promise.allSettled([
+    ...Array.from(pageCreateInFlight.values()),
+    ...Array.from(pendingPageCreate.keys()).map((id) => flushPageCreate(id)),
+  ]);
+  await Promise.allSettled([
+    ...Array.from(backgroundDurableInFlight.values()),
+    ...Array.from(backgroundDurableCalls.keys()).map((opKey) =>
+      runBackgroundDurableCall(opKey)
+    ),
+  ]);
+  await Promise.allSettled(
+    Array.from(deferredDurableCalls.entries()).map(([opKey, call]) =>
+      retryDurableRemoteCall(opKey, call.fnKey, call.args, call.effect)
+    )
+  );
   await Promise.allSettled([
     ...Array.from(pageFlushes.values()),
     ...Array.from(blockCreateInFlight.values()),
@@ -1479,6 +1963,41 @@ export async function clearDurableOutboxOnSignOut() {
 export function resetBootstrapForTests() {
   bootPromise = null;
   bootKey = "";
+}
+
+/** Test-only isolation for module-level persistence lanes. */
+export function resetPendingPersistenceForTests() {
+  for (const timer of pageTimers.values()) clearTimeout(timer);
+  for (const timer of blockTimers.values()) clearTimeout(timer);
+  for (const timer of blockCreateTimers.values()) clearTimeout(timer);
+  for (const timer of pageCreateTimers.values()) clearTimeout(timer);
+  for (const timer of backgroundDurableTimers.values()) clearTimeout(timer);
+  for (const timer of deferredDurableTimers.values()) clearTimeout(timer);
+  pageTimers.clear();
+  blockTimers.clear();
+  blockCreateTimers.clear();
+  pageCreateTimers.clear();
+  backgroundDurableTimers.clear();
+  deferredDurableTimers.clear();
+  pendingPage.clear();
+  pendingBlock.clear();
+  pendingBlockPage.clear();
+  pendingBlockBase.clear();
+  pendingBlockCreate.clear();
+  pendingPageCreate.clear();
+  pendingDatabaseCreate.clear();
+  pendingDatabaseRowCreate.clear();
+  pendingPropertyCreate.clear();
+  pendingViewCreate.clear();
+  pendingTemplateCreate.clear();
+  pendingCommentCreate.clear();
+  backgroundDurableCalls.clear();
+  deferredDurableCalls.clear();
+  pageFlushes.clear();
+  blockFlushes.clear();
+  blockCreateInFlight.clear();
+  pageCreateInFlight.clear();
+  backgroundDurableInFlight.clear();
 }
 
 // ── offline scope warmer (local-first Phase 3 v2) ───────────────────────────
@@ -1866,6 +2385,7 @@ const DURABLE_REMOTE_CALLS: Record<string, DurableRemoteEntry> = {
   createBlockRemote: durableEntry(createBlockRemote, [409]),
   createBlocksRemote: durableEntry(createBlocksRemote, [404, 409]),
   createCommentRemote: durableEntry(createCommentRemote, [409]),
+  createDatabaseRemote: durableEntry(createDatabaseRemote, [409]),
   createDatabaseRowRemote: durableEntry(createDatabaseRowRemote, [404, 409]),
   createPageRemote: durableEntry(createPageRemote, [409]),
   createPropertyRemote: durableEntry(createPropertyRemote, [409]),
@@ -1899,6 +2419,68 @@ type DurableCallResult =
   | { result: unknown; status: "ok" }
   | { status: "queued" }
   | { error: unknown; status: "dropped" };
+
+function remoteCallWaitsForOptimisticCreate(args: unknown[]) {
+  return valueReferencesPendingCreate(args);
+}
+
+type DeferredDurableCall = {
+  args: unknown[];
+  effect?: RemoteCallEffect;
+  fnKey: string;
+  userId: string;
+};
+
+const deferredDurableCalls = new Map<string, DeferredDurableCall>();
+const deferredDurableTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function scheduleDeferredDurableCall(
+  opKey: string,
+  fnKey: string,
+  args: unknown[],
+  effect: RemoteCallEffect | undefined,
+  userId: string,
+  delay = PERSIST_RETRY_MS
+) {
+  deferredDurableCalls.set(opKey, { args, effect, fnKey, userId });
+  if (deferredDurableTimers.has(opKey)) return;
+  deferredDurableTimers.set(
+    opKey,
+    setTimeout(() => void retryDurableRemoteCall(opKey, fnKey, args, effect), delay)
+  );
+}
+
+function finishDeferredDurableCall(opKey: string) {
+  const timer = deferredDurableTimers.get(opKey);
+  if (timer) clearTimeout(timer);
+  deferredDurableTimers.delete(opKey);
+  deferredDurableCalls.delete(opKey);
+}
+
+function wakeDeferredDurableCalls() {
+  for (const [opKey, call] of deferredDurableCalls) {
+    if (remoteCallWaitsForOptimisticCreate(call.args)) continue;
+    const timer = deferredDurableTimers.get(opKey);
+    if (timer) clearTimeout(timer);
+    deferredDurableTimers.delete(opKey);
+    scheduleDeferredDurableCall(
+      opKey,
+      call.fnKey,
+      call.args,
+      call.effect,
+      call.userId,
+      0
+    );
+  }
+}
+
+function cancelDurableCallsReferencing(id: string) {
+  for (const [opKey, call] of deferredDurableCalls) {
+    if (!valueReferencesId(call.args, id)) continue;
+    finishDeferredDurableCall(opKey);
+    outboxAck(call.userId, opKey);
+  }
+}
 
 function firstDroppedDurableCall(calls: DurableCallResult[]) {
   return calls.find(
@@ -2095,24 +2677,30 @@ async function durableRemoteCall(
   const opKey = `call:${newId()}`;
   const userId = outboxUserId();
   outboxSet(userId, opKey, { args, effect, fn: fnKey, kind: "remote_call" });
+  if (remoteCallWaitsForOptimisticCreate(args)) {
+    scheduleDeferredDurableCall(opKey, fnKey, args, effect, userId);
+    return { status: "queued" };
+  }
   if (effect?.kind === "row_file_remove") {
     return startSerializedRowFileRemovalCall(userId, opKey, fnKey, effect);
   }
   try {
     const result = await entry.fn(...args);
     if (effect) await applyRemoteCallEffectSuccess(effect, result);
+    finishDeferredDurableCall(opKey);
     outboxAck(outboxUserId(), opKey);
     noteSyncSuccess();
     return { result, status: "ok" };
   } catch (error) {
     if (shouldDropRemoteCallEffectError({ args, effect, fn: fnKey, kind: "remote_call" }, error)) {
       outboxAck(outboxUserId(), opKey);
+      finishDeferredDurableCall(opKey);
       if (effect) await applyRemoteCallEffectDrop(effect, error);
       if (!entry.benign.includes(persistErrorStatus(error) ?? -1)) notifyPersistDrop(error);
       return { error, status: "dropped" };
     }
     noteSyncFailure();
-    setTimeout(() => void retryDurableRemoteCall(opKey, fnKey, args, effect), PERSIST_RETRY_MS);
+    scheduleDeferredDurableCall(opKey, fnKey, args, effect, userId);
     return { status: "queued" };
   }
 }
@@ -2123,8 +2711,24 @@ async function retryDurableRemoteCall(
   args: unknown[],
   effect?: RemoteCallEffect
 ) {
+  const timer = deferredDurableTimers.get(opKey);
+  if (timer) clearTimeout(timer);
+  deferredDurableTimers.delete(opKey);
   const entry = DURABLE_REMOTE_CALLS[fnKey];
-  if (!entry) return;
+  if (!entry) {
+    finishDeferredDurableCall(opKey);
+    return;
+  }
+  if (remoteCallWaitsForOptimisticCreate(args)) {
+    scheduleDeferredDurableCall(
+      opKey,
+      fnKey,
+      args,
+      effect,
+      deferredDurableCalls.get(opKey)?.userId ?? outboxUserId()
+    );
+    return;
+  }
   if (effect?.kind === "row_file_remove") {
     await startSerializedRowFileRemovalCall(outboxUserId(), opKey, fnKey, effect);
     return;
@@ -2132,18 +2736,202 @@ async function retryDurableRemoteCall(
   try {
     const result = await entry.fn(...args);
     if (effect) await applyRemoteCallEffectSuccess(effect, result);
+    finishDeferredDurableCall(opKey);
     outboxAck(outboxUserId(), opKey);
     noteSyncSuccess();
   } catch (error) {
     if (shouldDropRemoteCallEffectError({ args, effect, fn: fnKey, kind: "remote_call" }, error)) {
+      finishDeferredDurableCall(opKey);
       outboxAck(outboxUserId(), opKey);
       if (effect) await applyRemoteCallEffectDrop(effect, error);
       if (!entry.benign.includes(persistErrorStatus(error) ?? -1)) notifyPersistDrop(error);
       return;
     }
     noteSyncFailure();
-    setTimeout(() => void retryDurableRemoteCall(opKey, fnKey, args, effect), PERSIST_RETRY_MS);
+    scheduleDeferredDurableCall(
+      opKey,
+      fnKey,
+      args,
+      effect,
+      deferredDurableCalls.get(opKey)?.userId ?? outboxUserId()
+    );
   }
+}
+
+type BackgroundDurableCallSpec = {
+  args: unknown[];
+  fnKey: keyof typeof DURABLE_REMOTE_CALLS & string;
+  onDrop: (error: unknown) => void | Promise<void>;
+  onSuccess: (result: unknown | undefined) => void | Promise<void>;
+  opKey: string;
+  userId: string;
+  waitsFor?: () => boolean;
+};
+
+const backgroundDurableCalls = new Map<string, BackgroundDurableCallSpec>();
+const backgroundDurableTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const backgroundDurableInFlight = new Map<string, Promise<void>>();
+
+function scheduleBackgroundDurableCall(opKey: string, delay = PERSIST_RETRY_MS) {
+  if (backgroundDurableTimers.has(opKey)) return;
+  backgroundDurableTimers.set(
+    opKey,
+    setTimeout(() => void runBackgroundDurableCall(opKey), delay)
+  );
+}
+
+function wakeBackgroundDurableCalls() {
+  for (const [opKey, spec] of backgroundDurableCalls) {
+    if (spec.waitsFor?.()) continue;
+    const timer = backgroundDurableTimers.get(opKey);
+    if (timer) clearTimeout(timer);
+    backgroundDurableTimers.delete(opKey);
+    scheduleBackgroundDurableCall(opKey, 0);
+  }
+}
+
+async function runBackgroundDurableCall(opKey: string) {
+  const timer = backgroundDurableTimers.get(opKey);
+  if (timer) clearTimeout(timer);
+  backgroundDurableTimers.delete(opKey);
+  const spec = backgroundDurableCalls.get(opKey);
+  if (!spec) return;
+  const active = backgroundDurableInFlight.get(opKey);
+  if (active) {
+    await active.catch(() => {});
+    return;
+  }
+  if (spec.waitsFor?.()) {
+    scheduleBackgroundDurableCall(opKey);
+    return;
+  }
+  const entry = DURABLE_REMOTE_CALLS[spec.fnKey];
+  const run = (async () => {
+    try {
+      const result = await entry.fn(...spec.args);
+      backgroundDurableCalls.delete(opKey);
+      outboxAck(spec.userId, opKey);
+      noteSyncSuccess();
+      await spec.onSuccess(result);
+    } catch (error) {
+      if (shouldDropPersistError(error)) {
+        backgroundDurableCalls.delete(opKey);
+        outboxAck(spec.userId, opKey);
+        const benign = entry.benign.includes(persistErrorStatus(error) ?? -1);
+        if (benign) {
+          noteSyncSuccess();
+          await spec.onSuccess(undefined);
+        } else {
+          await spec.onDrop(error);
+          notifyPersistDrop(error);
+        }
+        return;
+      }
+      noteSyncFailure();
+      scheduleBackgroundDurableCall(opKey);
+    }
+  })().catch(() => {
+    // The server outcome is already classified above. A reconciliation
+    // callback must not cause the mutation itself to be sent twice.
+    noteSyncFailure();
+  });
+  backgroundDurableInFlight.set(opKey, run);
+  try {
+    await run;
+  } finally {
+    if (backgroundDurableInFlight.get(opKey) === run) {
+      backgroundDurableInFlight.delete(opKey);
+    }
+  }
+}
+
+function startBackgroundDurableCall(spec: BackgroundDurableCallSpec) {
+  backgroundDurableCalls.set(spec.opKey, spec);
+  outboxSet(spec.userId, spec.opKey, {
+    args: spec.args,
+    fn: spec.fnKey,
+    kind: "remote_call",
+  });
+  scheduleBackgroundDurableCall(spec.opKey, 0);
+}
+
+function cancelBackgroundDurableCall(opKey: string, userId = outboxUserId()) {
+  const timer = backgroundDurableTimers.get(opKey);
+  if (timer) clearTimeout(timer);
+  backgroundDurableTimers.delete(opKey);
+  backgroundDurableCalls.delete(opKey);
+  outboxAck(userId, opKey);
+}
+
+function persistOptimisticTemplateCreate(template: DbTemplate, reason: string) {
+  const dbId = template.databaseId;
+  pendingTemplateCreate.set(template.id, dbId);
+  startBackgroundDurableCall({
+    args: [template as Partial<DbTemplate>],
+    fnKey: "createTemplateRemote",
+    opKey: `create-template:${template.id}`,
+    userId: outboxUserId(),
+    waitsFor: () => pendingDatabaseCreate.has(dbId),
+    onSuccess: (result) => {
+      pendingTemplateCreate.delete(template.id);
+      const persisted = result as DbTemplate | undefined;
+      if (persisted) {
+        useStore.setState((state) => ({
+          templatesByDb: {
+            ...state.templatesByDb,
+            [dbId]: (state.templatesByDb[dbId] ?? []).map((current) =>
+              current.id === template.id ? { ...persisted, ...current } : current
+            ),
+          },
+        }));
+      }
+      publishDatabaseTemplatesMutation(dbId, reason);
+      releaseOptimisticCreateDependents(template.id);
+    },
+    onDrop: () => {
+      pendingTemplateCreate.delete(template.id);
+      useStore.setState((state) => ({
+        templatesByDb: {
+          ...state.templatesByDb,
+          [dbId]: (state.templatesByDb[dbId] ?? []).filter(
+            (item) => item.id !== template.id
+          ),
+        },
+      }));
+    },
+  });
+}
+
+function cancelPendingCreatesUnderDatabase(dbId: string) {
+  const dependentIds = new Set<string>();
+  const cancelMapped = (
+    map: Map<string, string>,
+    prefix: string,
+    matches: (ownerId: string) => boolean = (ownerId) => ownerId === dbId
+  ) => {
+    for (const [id, ownerId] of map) {
+      if (!matches(ownerId)) continue;
+      dependentIds.add(id);
+      map.delete(id);
+      cancelBackgroundDurableCall(`${prefix}:${id}`);
+    }
+  };
+  cancelMapped(pendingDatabaseRowCreate, "create-row");
+  cancelMapped(pendingPropertyCreate, "create-property");
+  cancelMapped(pendingViewCreate, "create-view");
+  cancelMapped(pendingTemplateCreate, "create-template");
+  cancelMapped(
+    pendingCommentCreate,
+    "create-comment",
+    (ownerId) => ownerId === dbId || dependentIds.has(ownerId)
+  );
+  for (const [id, entry] of Array.from(pendingPageCreate.entries())) {
+    if (entry.page.parentId !== dbId) continue;
+    dependentIds.add(id);
+    rollbackPendingPageCreate(id, entry.originHref);
+  }
+  for (const id of dependentIds) rollbackDependentWritesForFailedCreate(id);
+  return dependentIds;
 }
 
 function jsonValuesEqual(left: unknown, right: unknown) {
@@ -2703,7 +3491,8 @@ export async function changeLocalPassphrase(
 function applyBootstrapResult(
   result: WorkspaceBootstrapResult,
   mode: "initial" | "reconcile",
-  previousServerPageIds?: Set<string>
+  previousServerPageIds?: Set<string>,
+  exposeReady = true
 ) {
   const {
     userId,
@@ -2792,7 +3581,7 @@ function applyBootstrapResult(
     })
   );
   useStore.setState({
-    ready: true,
+    ready: exposeReady,
     workspace: ws,
     activeDataScope: { kind: "workspace", workspaceId: ws.id },
     isInstanceAdmin,
@@ -2827,6 +3616,109 @@ function applyBootstrapResult(
     hydratedRelationTargetIds: new Set(),
     commentPanel: undefined,
   });
+}
+
+function cachedBootTargetPageId(input: WorkspaceBootstrapInput): string | undefined {
+  const explicit = input.pageId?.trim();
+  if (explicit) return explicit;
+  if (typeof window !== "undefined") {
+    const route = routeInfoFromPath(window.location.pathname);
+    if (route.kind === "page") return route.pageId;
+    if (route.kind === "database") return route.databaseId;
+  }
+  const state = useStore.getState();
+  const recent = state.recentPageIds.find((id) => {
+    const page = state.pagesById[id];
+    return !!page && !page.inTrash;
+  });
+  if (recent) return recent;
+  return Object.values(state.pagesById)
+    .filter((page) => page.parentType === "workspace" && !page.inTrash)
+    .sort(bySortPos)[0]?.id;
+}
+
+async function hydrateCachedDatabaseForBoot(
+  databaseId: string,
+  options: { contextPageId?: string; preferredViewId?: string; rows?: boolean } = {}
+) {
+  const metadataHydrated = await hydrateDatabaseMetaFromCache(databaseId).catch(() => false);
+  if (!metadataHydrated || options.rows === false) return;
+  const views = useStore.getState().viewsByDb[databaseId] ?? [];
+  const preferredViewId = options.preferredViewId?.trim();
+  const view =
+    (preferredViewId ? views.find((candidate) => candidate.id === preferredViewId) : undefined) ??
+    views[0];
+  if (!view) return;
+  const query: DatabaseRowsQuery = {
+    viewId: view.id,
+    ...(options.contextPageId ? { currentPageId: options.contextPageId } : {}),
+  };
+  const queryKey = databaseRowsQueryKey(query);
+  useStore.setState((state) => ({
+    databaseRowPagesByDb: {
+      ...state.databaseRowPagesByDb,
+      [databaseId]: {
+        queryKey,
+        loadedCount: 0,
+        hasMore: false,
+        loading: true,
+        loadingMore: false,
+      },
+    },
+  }));
+  const hydrated =
+    (await hydrateDatabaseRowsFromCache(databaseId, queryKey).catch(() => false)) ||
+    (await hydrateRowsViaLocalEngine(
+      databaseId,
+      queryKey,
+      normalizeDatabaseRowsQuery(query)
+    ).catch(() => false));
+  if (hydrated) return;
+  useStore.setState((state) => {
+    if (state.databaseRowPagesByDb[databaseId]?.queryKey !== queryKey) return {};
+    const databaseRowPagesByDb = { ...state.databaseRowPagesByDb };
+    delete databaseRowPagesByDb[databaseId];
+    return { databaseRowPagesByDb };
+  });
+}
+
+async function hydrateCurrentRouteFromCache(input: WorkspaceBootstrapInput) {
+  const pageId = cachedBootTargetPageId(input);
+  if (!pageId) return;
+  await hydrateBlocksFromCache(pageId).catch(() => false);
+  const page = useStore.getState().pagesById[pageId];
+  if (!page || page.inTrash) return;
+
+  if (page.kind === "database") {
+    const preferredViewId = typeof window === "undefined"
+      ? undefined
+      : new URL(window.location.href).searchParams.get("v") ?? undefined;
+    await hydrateCachedDatabaseForBoot(page.id, { preferredViewId });
+    return;
+  }
+
+  // A database row needs its parent schema for the property header even
+  // though the row list itself is not rendered on this route.
+  if (page.parentType === "database" && page.parentId) {
+    await hydrateCachedDatabaseForBoot(page.parentId, { rows: false });
+  }
+
+  const blocks = useStore.getState().blocksByPage[pageId] ?? [];
+  const embedded = new Map<string, { contextPageId: string; preferredViewId?: string }>();
+  for (const block of blocks) {
+    const databaseId = block.content?.childPageId;
+    if (!databaseId || useStore.getState().pagesById[databaseId]?.kind !== "database") continue;
+    const preferredViewId =
+      typeof block.content?.databaseViewId === "string"
+        ? block.content.databaseViewId
+        : undefined;
+    embedded.set(databaseId, { contextPageId: pageId, preferredViewId });
+  }
+  await Promise.all(
+    Array.from(embedded, ([databaseId, options]) =>
+      hydrateCachedDatabaseForBoot(databaseId, options)
+    )
+  );
 }
 
 /** Merge still-queued outbox page patches over a cached page list. */
@@ -2947,7 +3839,8 @@ function discardHydratedBoot() {
 
 async function hydrateBootstrapFromCache(
   key: string,
-  blob: WorkspaceBootstrapResult | null
+  blob: WorkspaceBootstrapResult | null,
+  input: WorkspaceBootstrapInput
 ): Promise<boolean> {
   if (!blob || useStore.getState().ready) return false;
   const userId = useStore.getState().userId || readLastUserId();
@@ -2955,8 +3848,15 @@ async function hydrateBootstrapFromCache(
   const entries = await outboxAllEntries(userId);
   applyBootstrapResult(
     { ...blob, pages: overlayOutboxOnPages(entries, blob.pages ?? []) },
-    "initial"
+    "initial",
+    undefined,
+    false
   );
+  // Keep the boot surface hidden until the current page's cached blocks and
+  // database state have joined the workspace snapshot. This prevents a warm
+  // reload from exposing a page-shaped skeleton between separate cache reads.
+  await hydrateCurrentRouteFromCache(input).catch(() => {});
+  useStore.setState({ ready: true });
   return true;
 }
 
@@ -4178,7 +5078,7 @@ export const useStore = create<AppState>((set, get) => ({
           : input
       );
       resultPromise.catch(() => {}); // handled below; avoid unhandled rejection
-      const hydrated = await hydrateBootstrapFromCache(key, blob);
+      const hydrated = await hydrateBootstrapFromCache(key, blob, input);
       try {
         let result = await resultPromise;
         if (result.pagesDelta) {
@@ -4288,6 +5188,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (opts.parentId && get().pagesById[opts.parentId]?.isLocked) {
       throw new Error("Page is locked.");
     }
+    const originHref = currentRelativeRouteHref();
     const id = newId();
     const now = nowIso();
     const position = positionBetween(opts.afterPosition, opts.beforePosition);
@@ -4326,24 +5227,12 @@ export const useStore = create<AppState>((set, get) => ({
           }
         : {}),
     }));
-    const call = await durableRemoteCall("createPageRemote", [page]);
-    if (call.status === "dropped") {
-      // Terminal server rejection: roll the optimistic page back and surface
-      // the original error to the caller like the previous plain await did.
-      set((s) => {
-        const pagesById = { ...s.pagesById };
-        delete pagesById[id];
-        return { pagesById };
-      });
-      throw call.error;
-    }
-    // queued: the create is durable and retrying; the local page is usable now.
-    const persisted = call.status === "ok" ? (call.result as Page) : undefined;
-    set((s) => ({
-      pagesById: { ...s.pagesById, [id]: { ...page, ...(persisted ?? {}) } },
-      pageRolesById: { ...s.pageRolesById, [id]: "edit" },
-    }));
-    return { ...page, ...(persisted ?? {}) };
+    // Navigation callers await this method. Return the complete optimistic
+    // page now and persist in the background so a slow NAS cannot hold the
+    // route transition hostage. The create queue gates title/block/child
+    // writes until the server owns this client id.
+    persistPageCreate(page, originHref, userId || "");
+    return page;
   },
 
   applyRemotePage(page) {
@@ -5238,6 +6127,7 @@ export const useStore = create<AppState>((set, get) => ({
   async loadBlocks(pageId, opts) {
     const loadUserId = outboxUserId();
     if (loadUserId && permanentDeleteIds(loadUserId).has(pageId)) return;
+    if (pendingPageLikeCreateHas(pageId)) return;
     const force = opts?.force === true;
     if (!force && get().loadedBlockPages.has(pageId)) return;
     // Dedup is keyed by force-ness (like loadDatabase): a forced reload
@@ -6172,6 +7062,7 @@ export const useStore = create<AppState>((set, get) => ({
   async loadComments(pageId, opts) {
     const loadUserId = outboxUserId();
     if (loadUserId && permanentDeleteIds(loadUserId).has(pageId)) return;
+    if (pendingPageLikeCreateHas(pageId)) return;
     // Same force-aware dedup as loadBlocks: a forced refresh (terminal-drop
     // reconciliation) must not be swallowed by a plain load already in flight.
     const force = opts?.force === true;
@@ -6253,20 +7144,58 @@ export const useStore = create<AppState>((set, get) => ({
       },
       loadedCommentPages: new Set(s.loadedCommentPages).add(pageId),
     }));
-    const call = await durableRemoteCall("createCommentRemote", [comment]);
-    if (call.status === "dropped") {
-      // Terminal server rejection: remove the phantom optimistic comment
-      // (mirror createPage/addRow) and surface the original error. The toast
-      // already fired inside durableRemoteCall's drop policy.
-      set((s) => ({
-        commentsByPage: {
-          ...s.commentsByPage,
-          [pageId]: (s.commentsByPage[pageId] ?? []).filter((item) => item.id !== comment.id),
-        },
-      }));
-      throw call.error;
-    }
-    if (call.status === "ok") publishCommentsMutation(pageId);
+    pendingCommentCreate.set(comment.id, pageId);
+    const opKey = `create-comment:${comment.id}`;
+    startBackgroundDurableCall({
+      args: [comment],
+      fnKey: "createCommentRemote",
+      opKey,
+      userId: authorId,
+      waitsFor: () =>
+        pendingPageLikeCreateHas(pageId) ||
+        Boolean(parentId && pendingCommentCreate.has(parentId)),
+      onSuccess: (result) => {
+        pendingCommentCreate.delete(comment.id);
+        const persisted = result as Comment | undefined;
+        if (persisted) {
+          useStore.setState((state) => ({
+            commentsByPage: {
+              ...state.commentsByPage,
+              [pageId]: (state.commentsByPage[pageId] ?? []).map((current) =>
+                current.id === comment.id ? { ...persisted, ...current } : current
+              ),
+            },
+          }));
+        }
+        publishCommentsMutation(pageId);
+        releaseOptimisticCreateDependents(comment.id);
+      },
+      onDrop: () => {
+        const failed = new Set([comment.id]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const current of useStore.getState().commentsByPage[pageId] ?? []) {
+            if (failed.has(current.id) || !current.parentId || !failed.has(current.parentId)) continue;
+            failed.add(current.id);
+            changed = true;
+          }
+        }
+        for (const id of failed) {
+          pendingCommentCreate.delete(id);
+          cancelBackgroundDurableCall(`create-comment:${id}`, authorId);
+          rollbackDependentWritesForFailedCreate(id);
+        }
+        useStore.setState((state) => ({
+          commentsByPage: {
+            ...state.commentsByPage,
+            [pageId]: (state.commentsByPage[pageId] ?? []).filter(
+              (item) => !failed.has(item.id)
+            ),
+          },
+        }));
+      },
+    });
     return comment;
   },
 
@@ -6350,6 +7279,7 @@ export const useStore = create<AppState>((set, get) => ({
 
   // ── databases ───────────────────────────────────────────────────────
   async loadDatabase(dbId, options = {}) {
+    if (pendingDatabaseCreate.has(dbId)) return;
     const loadUserId = outboxUserId();
     if (loadUserId && permanentDeleteIds(loadUserId).has(dbId)) return;
     const force = options.force === true;
@@ -6467,6 +7397,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   async loadDatabaseRows(dbId, query = {}) {
+    if (pendingDatabaseCreate.has(dbId)) return;
     const loadUserId = outboxUserId();
     if (loadUserId && permanentDeleteIds(loadUserId).has(dbId)) return;
     const force = query.force === true;
@@ -6705,6 +7636,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   async loadMoreDatabaseRows(dbId, query) {
+    if (pendingDatabaseCreate.has(dbId)) return;
     const current = get().databaseRowPagesByDb[dbId];
     const queryKey = query ? databaseRowsQueryKey(query) : current?.queryKey ?? databaseRowsQueryKey();
     if (!current?.hasMore || current.loading || current.loadingMore || current.queryKey !== queryKey) return;
@@ -6779,40 +7711,208 @@ export const useStore = create<AppState>((set, get) => ({
     const userId = get().userId || (await ensureAuth());
     if (userId && userId !== get().userId) set({ userId });
     const id = newId();
-    const result = await createDatabaseRemote({
+    const originHref = currentRelativeRouteHref();
+    const viewType = opts.viewType ?? "table";
+    const { properties, view } = optimisticStarterDatabaseSchema(
+      id,
+      viewType,
+      opts.properties
+    );
+    const now = nowIso();
+    const siblings = Object.values(get().pagesById)
+      .filter(
+        (page) =>
+          page.parentId === opts.parentId &&
+          page.parentType === opts.parentType &&
+          !page.inTrash
+      )
+      .sort(bySortPos);
+    const page: Page = {
       id,
       workspaceId: ws.id,
       parentId: opts.parentId,
       parentType: opts.parentType,
+      kind: "database",
       title: typeof opts.title === "string" ? opts.title.trim() : "",
-      afterPosition: opts.afterPosition,
-      viewType: opts.viewType,
-      seedRows: opts.seedRows,
-      locale: isKoreanLocale() ? "ko" : "en",
-      properties: opts.properties,
-    });
-    const props = (result.properties ?? []).slice().sort(bySortPos);
-    const views = (result.views ?? []).slice().sort(bySortPos);
-    const templates = (result.templates ?? []).slice().sort(bySortPos);
-    const rowsById = Object.fromEntries((result.rows ?? []).map((row) => [row.id, row]));
-    const rowIds = (result.rows ?? []).slice().sort(bySortPos).map((row) => row.id);
+      iconType: "none",
+      font: "default",
+      smallText: false,
+      fullWidth: false,
+      isLocked: false,
+      backlinksDisplay: "default",
+      pageCommentsDisplay: "default",
+      position: positionBetween(
+        opts.afterPosition ?? siblings[siblings.length - 1]?.position,
+        undefined
+      ),
+      isFavorite: false,
+      isPublic: false,
+      inTrash: false,
+      createdBy: userId || undefined,
+      lastEditedBy: userId || undefined,
+      createdAt: now,
+      updatedAt: now,
+    };
     set((s) => ({
-      pagesById: { ...s.pagesById, [result.page.id]: result.page, ...rowsById },
-      propsByDb: { ...s.propsByDb, [result.page.id]: props },
-      viewsByDb: { ...s.viewsByDb, [result.page.id]: views },
-      templatesByDb: { ...s.templatesByDb, [result.page.id]: templates },
-      databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [result.page.id]: rowIds },
+      pagesById: { ...s.pagesById, [id]: page },
+      pageRolesById: { ...s.pageRolesById, [id]: "edit" },
+      propsByDb: { ...s.propsByDb, [id]: properties.slice().sort(bySortPos) },
+      viewsByDb: { ...s.viewsByDb, [id]: [view] },
+      templatesByDb: { ...s.templatesByDb, [id]: [] },
+      databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [id]: [] },
       databaseRowPagesByDb: {
         ...s.databaseRowPagesByDb,
-        [result.page.id]: {
-          loadedCount: rowIds.length,
-          totalCount: rowIds.length,
+        [id]: {
+          loadedCount: 0,
+          totalCount: 0,
           hasMore: false,
         },
       },
       loadedDbs: new Set(s.loadedDbs).add(id),
     }));
-    return result.page;
+    pendingDatabaseCreate.set(id, opts.parentId ?? "");
+    startBackgroundDurableCall({
+      args: [
+        {
+          id,
+          viewId: view.id,
+          workspaceId: ws.id,
+          parentId: opts.parentId,
+          parentType: opts.parentType,
+          title: page.title,
+          afterPosition: opts.afterPosition,
+          viewType,
+          seedRows: opts.seedRows,
+          locale: isKoreanLocale() ? "ko" : "en",
+          properties,
+        },
+      ],
+      fnKey: "createDatabaseRemote",
+      opKey: `create-database:${id}`,
+      userId: userId || "",
+      waitsFor: () => pendingPageLikeCreateHas(opts.parentId),
+      onSuccess: (rawResult) => {
+        pendingDatabaseCreate.delete(id);
+        const result = rawResult as Awaited<ReturnType<typeof createDatabaseRemote>> | undefined;
+        if (result) {
+          useStore.setState((state) => {
+            const currentPage = state.pagesById[id];
+            const currentProps = new Map(
+              (state.propsByDb[id] ?? []).map((property) => [property.id, property])
+            );
+            const currentViews = new Map(
+              (state.viewsByDb[id] ?? []).map((current) => [current.id, current])
+            );
+            const rows = (result.rows ?? []).slice().sort(bySortPos);
+            return {
+              pagesById: {
+                ...state.pagesById,
+                [id]: currentPage ? { ...result.page, ...currentPage } : result.page,
+                ...Object.fromEntries(rows.map((row) => [row.id, row])),
+              },
+              propsByDb: {
+                ...state.propsByDb,
+                [id]: (result.properties ?? [])
+                  .map((property) => ({ ...property, ...(currentProps.get(property.id) ?? {}) }))
+                  .sort(bySortPos),
+              },
+              viewsByDb: {
+                ...state.viewsByDb,
+                [id]: (result.views ?? [])
+                  .map((persisted) => ({ ...persisted, ...(currentViews.get(persisted.id) ?? {}) }))
+                  .sort(bySortPos),
+              },
+              templatesByDb: {
+                ...state.templatesByDb,
+                [id]: (result.templates ?? []).slice().sort(bySortPos),
+              },
+              databaseRowIdsByDb: {
+                ...state.databaseRowIdsByDb,
+                [id]: rows.map((row) => row.id),
+              },
+              databaseRowPagesByDb: {
+                ...state.databaseRowPagesByDb,
+                [id]: {
+                  loadedCount: rows.length,
+                  totalCount: rows.length,
+                  hasMore: false,
+                },
+              },
+            };
+          });
+        } else {
+          void useStore.getState().loadDatabase(id, { force: true, rows: true });
+        }
+        releaseOptimisticCreateDependents(id);
+      },
+      onDrop: () => {
+        pendingDatabaseCreate.delete(id);
+        const dependentIds = cancelPendingCreatesUnderDatabase(id);
+        rollbackDependentWritesForFailedCreate(id);
+        useStore.setState((state) => {
+          const pagesById = { ...state.pagesById };
+          const pageRolesById = { ...state.pageRolesById };
+          const propsByDb = { ...state.propsByDb };
+          const viewsByDb = { ...state.viewsByDb };
+          const templatesByDb = { ...state.templatesByDb };
+          const databaseRowIdsByDb = { ...state.databaseRowIdsByDb };
+          const databaseRowPagesByDb = { ...state.databaseRowPagesByDb };
+          const blocksByPage = { ...state.blocksByPage };
+          const blockHistoryByPage = { ...state.blockHistoryByPage };
+          const commentsByPage = { ...state.commentsByPage };
+          const loadedBlockPages = new Set(state.loadedBlockPages);
+          const loadedCommentPages = new Set(state.loadedCommentPages);
+          for (const pageId of new Set([id, ...dependentIds])) {
+            delete pagesById[pageId];
+            delete pageRolesById[pageId];
+            delete blocksByPage[pageId];
+            delete blockHistoryByPage[pageId];
+            delete commentsByPage[pageId];
+            loadedBlockPages.delete(pageId);
+            loadedCommentPages.delete(pageId);
+          }
+          delete propsByDb[id];
+          delete viewsByDb[id];
+          delete templatesByDb[id];
+          delete databaseRowIdsByDb[id];
+          delete databaseRowPagesByDb[id];
+          const loadedDbs = new Set(state.loadedDbs);
+          loadedDbs.delete(id);
+          return {
+            pagesById,
+            pageRolesById,
+            blocksByPage,
+            blockHistoryByPage,
+            commentsByPage,
+            propsByDb,
+            viewsByDb,
+            templatesByDb,
+            databaseRowIdsByDb,
+            databaseRowPagesByDb,
+            loadedBlockPages,
+            loadedCommentPages,
+            loadedDbs,
+            recentPageIds: state.recentPageIds.filter(
+              (pageId) => pageId !== id && !dependentIds.has(pageId)
+            ),
+            ...(state.focusPageId && dependentIds.has(state.focusPageId)
+              ? { focusPageId: undefined, focusPageTarget: undefined }
+              : {}),
+          };
+        });
+        if (typeof window !== "undefined") {
+          const route = routeInfoFromPath(window.location.pathname);
+          if (
+            (route.kind === "page" &&
+              (route.pageId === id || dependentIds.has(route.pageId))) ||
+            (route.kind === "database" && route.databaseId === id)
+          ) {
+            replaceRoute(originHref);
+          }
+        }
+      },
+    });
+    return page;
   },
 
   async addProperty(dbId, type, name, config) {
@@ -6853,87 +7953,80 @@ export const useStore = create<AppState>((set, get) => ({
             }
           : s.viewsByDb,
     }));
-    // The property is the prerequisite for every visibility/backfill write.
-    // Do not report a phantom object (or launch dependent writes) when that
-    // primary create is rejected terminally.
-    const createCall = await durableRemoteCall("createPropertyRemote", [
-      prop as Partial<DbProperty>,
-    ]);
-    if (createCall.status === "dropped") {
-      set((s) => ({
-        propsByDb: {
-          ...s.propsByDb,
-          [dbId]: (s.propsByDb[dbId] ?? []).filter((item) => item.id !== prop.id),
-        },
-        viewsByDb: {
-          ...s.viewsByDb,
-          [dbId]: (s.viewsByDb[dbId] ?? []).map((current) => {
-            const optimistic = updatedViews.find((view) => view.id === current.id);
-            const original = views.find((view) => view.id === current.id);
-            return optimistic &&
-              original &&
-              jsonValuesEqual(current.config, optimistic.config)
-              ? {
-                  ...current,
-                  config: original.config ? cloneJson(original.config) : undefined,
-                }
-              : current;
-          }),
-        },
-      }));
-      return null;
-    }
-
-    const viewCalls = await Promise.all(
-      updatedViews.map((view) =>
-        durableRemoteCall("updateViewRemote", [
-          view.id,
-          { config: view.config } as Partial<DbView>,
-          view.databaseId,
-        ])
-      )
-    );
-    const droppedViewIds = new Set(
-      viewCalls.flatMap((call, index) =>
-        call.status === "dropped" ? [updatedViews[index]!.id] : []
-      )
-    );
-    if (droppedViewIds.size > 0) {
-      // Preserve the successfully created/queued property, but un-apply only
-      // view configs whose own dependent write was dropped. A later edit to
-      // the same view wins over this conditional rollback.
-      set((s) => ({
-        viewsByDb: {
-          ...s.viewsByDb,
-          [dbId]: (s.viewsByDb[dbId] ?? []).map((current) => {
-            if (!droppedViewIds.has(current.id)) return current;
-            const optimistic = updatedViews.find((view) => view.id === current.id);
-            const original = views.find((view) => view.id === current.id);
-            return optimistic &&
-              original &&
-              jsonValuesEqual(current.config, optimistic.config)
-              ? {
-                  ...current,
-                  config: original.config ? cloneJson(original.config) : undefined,
-                }
-              : current;
-          }),
-        },
-      }));
-      // When the prerequisite is already committed, an authoritative metadata
-      // reload resolves any mixed dependent outcome. Do not reload over a
-      // still-queued create, whose optimistic record is the durable truth.
-      if (createCall.status === "ok") {
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
-      }
-    }
-
-    if (createCall.status === "ok" && viewCalls.every((call) => call.status === "ok")) {
-      publishDatabaseSchemaMutation(dbId, "property_created", [prop.id]);
-      if (updatedViews.length > 0) {
-        publishDatabaseViewsMutation(dbId, "view_property_visibility_updated", updatedViews.map((view) => view.id));
-      }
-    }
+    pendingPropertyCreate.set(prop.id, dbId);
+    startBackgroundDurableCall({
+      args: [prop as Partial<DbProperty>],
+      fnKey: "createPropertyRemote",
+      opKey: `create-property:${prop.id}`,
+      userId: outboxUserId(),
+      waitsFor: () => pendingDatabaseCreate.has(dbId),
+      onSuccess: (result) => {
+        pendingPropertyCreate.delete(prop.id);
+        const persisted = result as DbProperty | undefined;
+        if (persisted) {
+          useStore.setState((state) => ({
+            propsByDb: {
+              ...state.propsByDb,
+              [dbId]: (state.propsByDb[dbId] ?? []).map((current) =>
+                current.id === prop.id ? { ...persisted, ...current } : current
+              ),
+            },
+          }));
+        }
+        for (const optimisticView of updatedViews) {
+          const currentView = useStore
+            .getState()
+            .dbViews(dbId)
+            .find((view) => view.id === optimisticView.id);
+          if (!currentView) continue;
+          void durableRemoteCall("updateViewRemote", [
+            currentView.id,
+            { config: currentView.config } as Partial<DbView>,
+            dbId,
+          ]).then((call) => {
+            if (call.status === "ok") {
+              publishDatabaseViewsMutation(dbId, "view_property_visibility_updated", [
+                currentView.id,
+              ]);
+            } else if (call.status === "dropped") {
+              useStore.setState((state) => ({
+                viewsByDb: {
+                  ...state.viewsByDb,
+                  [dbId]: (state.viewsByDb[dbId] ?? []).map((view) =>
+                    view.id === currentView.id
+                      ? { ...view, config: viewConfigWithoutProperty(view.config, prop.id) }
+                      : view
+                  ),
+                },
+              }));
+              void useStore
+                .getState()
+                .loadDatabase(dbId, { force: true, rows: false })
+                .catch(() => {});
+            }
+          });
+        }
+        publishDatabaseSchemaMutation(dbId, "property_created", [prop.id]);
+        releaseOptimisticCreateDependents(prop.id);
+      },
+      onDrop: () => {
+        pendingPropertyCreate.delete(prop.id);
+        rollbackDependentWritesForFailedCreate(prop.id);
+        useStore.setState((state) => ({
+          propsByDb: {
+            ...state.propsByDb,
+            [dbId]: (state.propsByDb[dbId] ?? []).filter((item) => item.id !== prop.id),
+          },
+          viewsByDb: {
+            ...state.viewsByDb,
+            [dbId]: (state.viewsByDb[dbId] ?? []).map((view) => ({
+              ...view,
+              config: viewConfigWithoutProperty(view.config, prop.id),
+            })),
+          },
+        }));
+      },
+    });
     // Back-fill sequential ids for a new unique_id property so existing rows aren't blank.
     if (type === "unique_id") {
       const existing = get().dbRows(dbId);
@@ -6941,7 +8034,6 @@ export const useStore = create<AppState>((set, get) => ({
         get().setRowProperty(row.id, prop.id, index + 1, { debounce: false });
       });
     }
-    if (droppedViewIds.size > 0) return null;
     return prop;
   },
 
@@ -7762,18 +8854,39 @@ export const useStore = create<AppState>((set, get) => ({
     set((s) => ({
       viewsByDb: { ...s.viewsByDb, [dbId]: [...(s.viewsByDb[dbId] ?? []), view] },
     }));
-    const call = await durableRemoteCall("createViewRemote", [view as Partial<DbView>]);
-    if (call.status === "dropped") {
-      set((s) => ({
-        viewsByDb: {
-          ...s.viewsByDb,
-          [dbId]: (s.viewsByDb[dbId] ?? []).filter((item) => item.id !== view.id),
-        },
-      }));
-      return null;
-    } else if (call.status === "ok") {
-      publishDatabaseViewsMutation(dbId, "view_created", [view.id]);
-    }
+    pendingViewCreate.set(view.id, dbId);
+    startBackgroundDurableCall({
+      args: [view as Partial<DbView>],
+      fnKey: "createViewRemote",
+      opKey: `create-view:${view.id}`,
+      userId: outboxUserId(),
+      waitsFor: () => pendingDatabaseCreate.has(dbId),
+      onSuccess: (result) => {
+        pendingViewCreate.delete(view.id);
+        const persisted = result as DbView | undefined;
+        if (persisted) {
+          useStore.setState((state) => ({
+            viewsByDb: {
+              ...state.viewsByDb,
+              [dbId]: (state.viewsByDb[dbId] ?? []).map((current) =>
+                current.id === view.id ? { ...persisted, ...current } : current
+              ),
+            },
+          }));
+        }
+        publishDatabaseViewsMutation(dbId, "view_created", [view.id]);
+        releaseOptimisticCreateDependents(view.id);
+      },
+      onDrop: () => {
+        pendingViewCreate.delete(view.id);
+        useStore.setState((state) => ({
+          viewsByDb: {
+            ...state.viewsByDb,
+            [dbId]: (state.viewsByDb[dbId] ?? []).filter((item) => item.id !== view.id),
+          },
+        }));
+      },
+    });
     return view;
   },
 
@@ -7882,18 +8995,7 @@ export const useStore = create<AppState>((set, get) => ({
         [dbId]: [...(s.templatesByDb[dbId] ?? []), template].sort(bySortPos),
       },
     }));
-    const createCall = await durableRemoteCall("createTemplateRemote", [template as Partial<DbTemplate>]);
-    if (createCall.status === "dropped") {
-      set((s) => ({
-        templatesByDb: {
-          ...s.templatesByDb,
-          [dbId]: (s.templatesByDb[dbId] ?? []).filter((item) => item.id !== template.id),
-        },
-      }));
-      return null;
-    } else if (createCall.status === "ok") {
-      publishDatabaseTemplatesMutation(dbId, "template_created");
-    }
+    persistOptimisticTemplateCreate(template, "template_created");
     return template;
   },
 
@@ -7935,18 +9037,7 @@ export const useStore = create<AppState>((set, get) => ({
         [dbId]: [...(s.templatesByDb[dbId] ?? []), copy].sort(bySortPos),
       },
     }));
-    const duplicateCall = await durableRemoteCall("createTemplateRemote", [copy as Partial<DbTemplate>]);
-    if (duplicateCall.status === "dropped") {
-      set((s) => ({
-        templatesByDb: {
-          ...s.templatesByDb,
-          [dbId]: (s.templatesByDb[dbId] ?? []).filter((item) => item.id !== copy.id),
-        },
-      }));
-      return null;
-    } else if (duplicateCall.status === "ok") {
-      publishDatabaseTemplatesMutation(dbId, "template_duplicated");
-    }
+    persistOptimisticTemplateCreate(copy, "template_duplicated");
     return copy;
   },
 
@@ -8178,6 +9269,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (!canCreatePageInState(get(), dbId, userId)) {
       throw new Error("Page access required.");
     }
+    const originHref = currentRelativeRouteHref();
     const rows = get().dbRows(dbId);
     const templates = get().dbTemplates(dbId);
     const template =
@@ -8249,66 +9341,94 @@ export const useStore = create<AppState>((set, get) => ({
       },
       ...(opts?.focusTitle ? { focusPageId: id } : {}),
     }));
-    const call = await durableRemoteCall("createDatabaseRowRemote", [
-      {
-        id,
-        databaseId: dbId,
-        title: row.title,
-        templateId,
-        empty: templateId === "",
-        position: row.position,
+    pendingDatabaseRowCreate.set(id, dbId);
+    startBackgroundDurableCall({
+      args: [
+        {
+          id,
+          databaseId: dbId,
+          title: row.title,
+          templateId,
+          empty: templateId === "",
+          position: row.position,
+        },
+      ],
+      fnKey: "createDatabaseRowRemote",
+      opKey: `create-row:${id}`,
+      userId: userId || "",
+      waitsFor: () => pendingDatabaseCreate.has(dbId),
+      onSuccess: (result) => {
+        pendingDatabaseRowCreate.delete(id);
+        const created = result as
+          | Awaited<ReturnType<typeof createDatabaseRowRemote>>
+          | undefined;
+        if (created) {
+          useStore.setState((state) => {
+            const current = state.pagesById[id];
+            return {
+              pagesById: current
+                ? { ...state.pagesById, [id]: { ...created.row, ...current } }
+                : state.pagesById,
+              blocksByPage: {
+                ...state.blocksByPage,
+                [id]: created.blocks.slice().sort(bySortPos),
+              },
+              loadedBlockPages: new Set(state.loadedBlockPages).add(id),
+            };
+          });
+        } else {
+          void useStore.getState().loadDatabase(dbId, { force: true, rows: true });
+          void reloadBlocksFromServer(id);
+        }
+        publishDatabaseRowsMutation(dbId, "row_created", [id]);
+        releaseOptimisticCreateDependents(id);
       },
-    ]);
-    if (call.status === "dropped") {
-      // Terminal server rejection: roll the optimistic row back (mirror
-      // createPage) so it does not linger as a phantom, then surface the error.
-      set((s) => {
-        const pagesById = { ...s.pagesById };
-        delete pagesById[id];
-        const pageState = s.databaseRowPagesByDb[dbId];
-        return {
-          pagesById,
-          databaseRowIdsByDb: {
-            ...s.databaseRowIdsByDb,
-            [dbId]: (s.databaseRowIdsByDb[dbId] ?? []).filter((rid) => rid !== id),
-          },
-          ...(pageState
-            ? {
-                databaseRowPagesByDb: {
-                  ...s.databaseRowPagesByDb,
-                  [dbId]: {
-                    ...pageState,
-                    loadedCount: Math.max(0, pageState.loadedCount - 1),
-                    totalCount:
-                      typeof pageState.totalCount === "number"
-                        ? Math.max(0, pageState.totalCount - 1)
-                        : pageState.totalCount,
+      onDrop: () => {
+        pendingDatabaseRowCreate.delete(id);
+        rollbackDependentWritesForFailedCreate(id);
+        useStore.setState((state) => {
+          const pagesById = { ...state.pagesById };
+          const blocksByPage = { ...state.blocksByPage };
+          delete pagesById[id];
+          delete blocksByPage[id];
+          const loadedBlockPages = new Set(state.loadedBlockPages);
+          loadedBlockPages.delete(id);
+          const pageState = state.databaseRowPagesByDb[dbId];
+          return {
+            pagesById,
+            blocksByPage,
+            loadedBlockPages,
+            ...(state.focusPageId === id
+              ? { focusPageId: undefined, focusPageTarget: undefined }
+              : {}),
+            databaseRowIdsByDb: {
+              ...state.databaseRowIdsByDb,
+              [dbId]: (state.databaseRowIdsByDb[dbId] ?? []).filter((rid) => rid !== id),
+            },
+            ...(pageState
+              ? {
+                  databaseRowPagesByDb: {
+                    ...state.databaseRowPagesByDb,
+                    [dbId]: {
+                      ...pageState,
+                      loadedCount: Math.max(0, pageState.loadedCount - 1),
+                      totalCount:
+                        typeof pageState.totalCount === "number"
+                          ? Math.max(0, pageState.totalCount - 1)
+                          : pageState.totalCount,
+                    },
                   },
-                },
-              }
-            : {}),
-        };
-      });
-      throw call.error;
-    }
-    const created =
-      call.status === "ok"
-        ? (call.result as Awaited<ReturnType<typeof createDatabaseRowRemote>>)
-        : undefined;
-    if (created) {
-      set((s) => ({
-        pagesById: { ...s.pagesById, [id]: { ...row, ...created.row } },
-      }));
-      if (created.blocks.length > 0) {
-        set((s) => ({
-          blocksByPage: { ...s.blocksByPage, [id]: created.blocks.sort(bySortPos) },
-          loadedBlockPages: new Set(s.loadedBlockPages).add(id),
-        }));
-      }
-      publishDatabaseRowsMutation(dbId, "row_created", [id]);
-    }
-    // queued: the optimistic row is durable in the outbox and usable now.
-    return { ...row, ...(created?.row ?? {}) };
+                }
+              : {}),
+          };
+        });
+        if (typeof window !== "undefined") {
+          const route = routeInfoFromPath(window.location.pathname);
+          if (route.kind === "page" && route.pageId === id) replaceRoute(originHref);
+        }
+      },
+    });
+    return row;
   },
 
   async moveDatabaseRow(rowId, targetId, side) {

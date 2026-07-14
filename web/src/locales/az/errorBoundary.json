@@ -1,7 +1,7 @@
 {
-  "title": "Something went wrong displaying this content.",
-  "detail": "Try again. If the problem continues, reload the application and share the reference below.",
-  "reference": "Reference: {{reference}}",
-  "reload": "Reload application",
-  "retry": "Try again"
+  "title": "Bu məzmunu göstərərkən xəta baş verdi.",
+  "detail": "Yenidən cəhd edin. Problem davam edərsə, tətbiqi yenidən yükləyin və aşağıdakı istinadı paylaşın.",
+  "reference": "İstinad: {{reference}}",
+  "reload": "Tətbiqi yenidən yüklə",
+  "retry": "Yenidən cəhd edin"
 }

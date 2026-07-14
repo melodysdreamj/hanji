@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "title": "Fungua data za ndani",
+  "description": "Data ya nje ya mtandao kwenye kifaa hiki imefungwa kwa nenosiri. Kufungua kunawasha matumizi ya nje ya mtandao na kuhifadhi tena.",
+  "passphrasePlaceholder": "Nenosiri",
+  "unlock": "Fungua",
+  "continueOnline": "Endelea mtandaoni pekee",
+  "continueOnlineHint": "\"Endelea mtandaoni pekee\" huhifadhi mabadiliko ya nje ya mtandao yaliyofungwa kwenye kifaa hiki — yanabaki hapa na hayatasawazishwa hadi uyafungue kwa nenosiri sahihi.",
+  "wrongPassphrase": "Nenosiri hilo si sahihi.",
+  "unsupportedBrowser": "Fungasho la ndani halipatikani katika kivinjari hiki."
 }

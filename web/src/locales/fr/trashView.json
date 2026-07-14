@@ -16,17 +16,17 @@
   "aria": {
     "openFromTrash": "Ouvrir {{title}} depuis la corbeille",
     "restorePage": "Restaurer {{title}}",
-    "deletePageForever": "Supprimer définitivement {{title}}",
+    "deletePageForever": "Supprimer {{title}} définitivement",
     "cancelPermanentDelete": "Annuler la suppression définitive",
     "cancelEmptyTrash": "Annuler le vidage de la corbeille"
   },
   "confirm": {
     "deleteTitle": "Supprimer définitivement ?",
-    "deleteBodyPrefix": "Cette action supprimera définitivement ",
+    "deleteBodyPrefix": "Ceci supprimera définitivement ",
     "deleteBodySuffix": ". Vous ne pouvez pas annuler cette action.",
     "emptyTitle": "Vider la corbeille ?",
-    "emptyBody_one": "Cette action supprimera définitivement les {{count}} page de la corbeille. Vous ne pouvez pas annuler cette action.",
-    "emptyBody_other": "Cette action supprimera définitivement les {{count}} pages de la corbeille. Vous ne pouvez pas annuler cette action."
+    "emptyBody_one": "Ceci supprimera définitivement {{count}} page dans la corbeille. Vous ne pouvez pas annuler cette action.",
+    "emptyBody_other": "Ceci supprimera définitivement les {{count}} pages dans la corbeille. Vous ne pouvez pas annuler cette action."
   },
   "toast": {
     "deletedForever": "Supprimé définitivement",

@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "This database is locked, so your changes couldn't be saved.",
-  "databaseRowsLoadFailed": "Couldn't load database rows. Please try again in a moment.",
-  "editAccessDeniedSave": "You don't have edit access, so your changes couldn't be saved.",
-  "lockedSave": "The page or database is locked, so your changes couldn't be saved.",
-  "pageLockedSave": "This page is locked, so your changes couldn't be saved.",
-  "pageMissingSave": "The page couldn't be found, so your changes couldn't be saved.",
-  "saveFailed": "Your changes couldn't be saved.",
-  "sessionExpired": "Your session expired or the request couldn't be authenticated. Please try again.",
-  "blockConflictSave": "This block was edited on another device, so your offline change wasn't applied.",
-  "blockConflictKeepMine": "Apply my version",
-  "blockMoveCommentsSkipped": "The block moved, but its comments couldn't be moved with it."
+  "databaseLockedSave": "இந்த தரவுத்தளம் பூட்டப்பட்டுள்ளது, எனவே உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "databaseRowsLoadFailed": "தரவுத்தள வரிசைகளை ஏற்ற முடியவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+  "editAccessDeniedSave": "உங்களுக்கு திருத்த அணுகல் இல்லை, எனவே உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "lockedSave": "பக்கம் அல்லது தரவுத்தளம் பூட்டப்பட்டுள்ளது, எனவே உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "pageLockedSave": "இந்தப் பக்கம் பூட்டப்பட்டுள்ளது, எனவே உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "pageMissingSave": "பக்கத்தைக் கண்டுபிடிக்க முடியவில்லை, எனவே உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "saveFailed": "உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை.",
+  "sessionExpired": "உங்கள் அமர்வு காலாவதியானது அல்லது கோரிக்கையை அங்கீகரிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+  "blockConflictSave": "இந்தத் தொகுதி வேறொரு சாதனத்தில் திருத்தப்பட்டதால், உங்கள் ஆஃப்லைன் மாற்றம் பயன்படுத்தப்படவில்லை.",
+  "blockConflictKeepMine": "எனது பதிப்பைப் பயன்படுத்து",
+  "blockMoveCommentsSkipped": "தொகுதி நகர்த்தப்பட்டது, ஆனால் அதன் கருத்துகளை அதனுடன் நகர்த்த முடியவில்லை."
 }

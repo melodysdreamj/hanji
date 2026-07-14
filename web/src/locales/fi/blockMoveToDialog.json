@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
-  "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+  "create": {
+    "hint": "Uusi sivu - siirrä lohko tähän",
+    "label": "Luo \"{{query}}\"",
+    "optionLabel": "Luo sivu \"{{query}}\" ja siirrä lohko tähän"
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
-  },
-  "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
-  },
-  "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "closeLabel": "Sulje siirtovalintaikkuna"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "Lukittu sivu"
   },
-  "untitled": "Untitled",
+  "results": {
+    "destinationLabel": "Siirrä lohko kohteeseen {{label}}, {{path}}",
+    "empty": "Ei sivuja löytynyt.",
+    "listLabel": "Siirtokohteet"
+  },
+  "search": {
+    "label": "Etsi siirtokohteita",
+    "placeholder": "Etsi sivuja..."
+  },
+  "title": "Siirrä lohko kohteeseen",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
-  }
+    "locked": "Sivu on lukittu",
+    "movedBlock": "Lohko siirretty",
+    "movedBlocks": "Lohkot siirretty",
+    "movedBlocksCount": "{{blockCount}} lohkoa siirretty",
+    "moveFailed": "Lohkoa ei voitu siirtää"
+  },
+  "untitled": "Nimetön"
 }

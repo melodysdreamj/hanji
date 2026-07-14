@@ -6,20 +6,20 @@
     "min": "Mín",
     "max": "Máx"
   },
-  "chartAria": "Gráfico de {{name}}",
+  "chartAria": "Gráfico {{name}}",
   "chartType": "Tipo de gráfico",
   "chartTypes": {
     "bar": "Barras",
     "horizontal_bar": "Barras horizontais",
     "line": "Linha",
-    "donut": "Rosca"
+    "donut": "Donut"
   },
   "checked": "Marcado",
   "empty": "Vazio",
-  "legend": "Legenda do gráfico",
+  "legend": "Legenda",
   "monthLabel": "{{month}} {{year}}",
   "noData": "Sem dados",
-  "noDataDesc": "Nenhuma linha corresponde aos filtros ou à pesquisa atual.",
+  "noDataDesc": "Nenhuma linha corresponde aos filtros ou pesquisa atuais.",
   "noGroupProperty": "Nada para gráfico ainda",
   "noGroupPropertyDesc": "Adicione uma propriedade de seleção, status, pessoa, caixa de seleção ou data para agrupar este gráfico.",
   "total": "Total",

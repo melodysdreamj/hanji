@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "නොබැඳි",
+  "offlinePending_one": "නොබැඳි · {{count}} වෙනසක් බලා සිටී",
+  "offlinePending_other": "නොබැඳි · {{count}} වෙනස්කම් බලා සිටී",
+  "syncing": "සමමුහුර්ත කරමින් · {{count}}",
+  "unreachable": "සේවාදායකයට සම්බන්ධ විය නොහැක",
+  "unreachablePending_one": "සේවාදායකයට සම්බන්ධ විය නොහැක · {{count}} වෙනසක් බලා සිටී",
+  "unreachablePending_other": "සේවාදායකයට සම්බන්ධ විය නොහැක · {{count}} වෙනස්කම් බලා සිටී",
+  "retryHint": "නැවත උත්සාහ කිරීමට ක්ලික් කරන්න"
 }

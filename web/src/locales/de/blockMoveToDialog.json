@@ -1,8 +1,8 @@
 {
   "title": "Block verschieben nach",
   "search": {
-    "label": "Verschiebeziele durchsuchen",
-    "placeholder": "Seiten durchsuchen..."
+    "label": "Verschiebeziele suchen",
+    "placeholder": "Seiten suchen..."
   },
   "dialog": {
     "closeLabel": "Verschieben-Dialog schließen"
@@ -14,13 +14,13 @@
   },
   "create": {
     "label": "\"{{query}}\" erstellen",
-    "optionLabel": "Seite \"{{query}}\" erstellen und Block hierhin verschieben",
-    "hint": "Neue Seite – Block hierhin verschieben"
+    "optionLabel": "Seite \"{{query}}\" erstellen und Block hierher verschieben",
+    "hint": "Neue Seite – Block hierher verschieben"
   },
   "locked": {
     "page": "Gesperrte Seite"
   },
-  "untitled": "Ohne Titel",
+  "untitled": "Unbenannt",
   "toast": {
     "locked": "Seite ist gesperrt",
     "movedBlock": "Block verschoben",

@@ -1,10 +1,10 @@
 {
-  "emptyDesc": "This database has no pages yet.",
-  "emptyTitle": "No pages yet",
-  "newInline": "New",
-  "newPage": "New page",
-  "newPageIn": "New page in {{dbTitle}}",
-  "noResultsDesc": "No pages match the current filters or search.",
-  "noResultsTitle": "No results",
-  "openRow": "Open {{title}}"
+  "emptyDesc": "Databasen har inga sidor än.",
+  "emptyTitle": "Inga sidor än",
+  "newInline": "Ny",
+  "newPage": "Ny sida",
+  "newPageIn": "Ny sida i {{dbTitle}}",
+  "noResultsDesc": "Inga sidor matchar aktuella filter eller sökning.",
+  "noResultsTitle": "Inga resultat",
+  "openRow": "Öppna {{title}}"
 }

@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "ยังไม่มีการสนทนา คอมเมนต์ในหน้าหรือเมนชันผู้ใช้เพื่อเริ่มต้น",
+  "leave": "ออก",
+  "leaveAria": "ออกจากการสนทนาใน {{title}}",
+  "open": "เปิดสนทนาใน {{title}}",
+  "participants_one": "ผู้เข้าร่วม {{count}} คน",
+  "participants_other": "ผู้เข้าร่วม {{count}} คน",
+  "untitled": "ไม่มีชื่อ",
+  "loading": "กำลังโหลดการสนทนา…"
 }

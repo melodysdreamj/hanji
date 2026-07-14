@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ब्लॉक हलवा येथे",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "हलवा गंतव्ये शोधा",
+    "placeholder": "पृष्ठे शोधा..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "हलवा संवाद बंद करा"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "हलवा गंतव्ये",
+    "empty": "कोणतीही पृष्ठे सापडली नाहीत.",
+    "destinationLabel": "ब्लॉक {{label}}, {{path}} येथे हलवा"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" तयार करा",
+    "optionLabel": "\"{{query}}\" पृष्ठ तयार करा आणि ब्लॉक येथे हलवा",
+    "hint": "नवीन पृष्ठ - ब्लॉक येथे हलवा"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "लॉक केलेले पृष्ठ"
   },
-  "untitled": "Untitled",
+  "untitled": "शीर्षकहीन",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "पृष्ठ लॉक केले आहे",
+    "movedBlock": "ब्लॉक हलवला",
+    "movedBlocks": "ब्लॉक्स हलवले",
+    "movedBlocksCount": "{{blockCount}} ब्लॉक्स हलवले",
+    "moveFailed": "ब्लॉक हलवता आला नाही"
   }
 }

@@ -1,31 +1,31 @@
 {
-  "title": "Move block to",
+  "title": "ब्लॉक को ले जाएँ",
   "search": {
-    "label": "Search move destinations",
-    "placeholder": "Search pages..."
+    "label": "स्थानांतरण गंतव्य खोजें",
+    "placeholder": "पेज खोजें..."
   },
   "dialog": {
-    "closeLabel": "Close move dialog"
+    "closeLabel": "स्थानांतरण डायलॉग बंद करें"
   },
   "results": {
-    "listLabel": "Move destinations",
-    "empty": "No pages found.",
-    "destinationLabel": "Move block to {{label}}, {{path}}"
+    "listLabel": "स्थानांतरण गंतव्य",
+    "empty": "कोई पेज नहीं मिला।",
+    "destinationLabel": "ब्लॉक को {{label}}, {{path}} पर ले जाएँ"
   },
   "create": {
-    "label": "Create \"{{query}}\"",
-    "optionLabel": "Create page \"{{query}}\" and move block here",
-    "hint": "New page - move block here"
+    "label": "\"{{query}}\" बनाएँ",
+    "optionLabel": "\"{{query}}\" पेज बनाएँ और ब्लॉक यहाँ ले जाएँ",
+    "hint": "नया पेज - ब्लॉक यहाँ ले जाएँ"
   },
   "locked": {
-    "page": "Locked page"
+    "page": "लॉक पेज"
   },
-  "untitled": "Untitled",
+  "untitled": "शीर्षकहीन",
   "toast": {
-    "locked": "Page is locked",
-    "movedBlock": "Moved block",
-    "movedBlocks": "Moved blocks",
-    "movedBlocksCount": "Moved {{blockCount}} blocks",
-    "moveFailed": "Couldn't move block"
+    "locked": "पेज लॉक है",
+    "movedBlock": "ब्लॉक ले जाया गया",
+    "movedBlocks": "ब्लॉक ले जाए गए",
+    "movedBlocksCount": "{{blockCount}} ब्लॉक ले जाए गए",
+    "moveFailed": "ब्लॉक नहीं ले जाया जा सका"
   }
 }

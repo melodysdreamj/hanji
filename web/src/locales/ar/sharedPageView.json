@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "صفحة مشتركة",
+  "loading": "جارٍ تحميل الصفحة المشتركة",
+  "unavailable": "هذه الصفحة المشتركة غير متاحة.",
+  "notFound": "لم يتم العثور على الصفحة المشتركة.",
+  "outsideShare": "الصفحة ليست جزءًا من هذه المشاركة العامة.",
+  "errors": {
+    "not-found": "قد تكون هذه الصفحة منتهية الصلاحية، أو غير منشورة، أو تم نسخها بشكل غير صحيح.",
+    "offline": "تحقق من اتصالك، ثم حاول فتح الصفحة المشتركة مرة أخرى.",
+    "rate-limited": "تتلقى هذه الصفحة المشتركة عددًا كبيرًا جدًا من الطلبات. انتظر لحظة وحاول مرة أخرى.",
+    "unavailable": "لم يتمكن Hanji من فتح هذه الصفحة المشتركة الآن. حاول مرة أخرى بعد لحظة."
+  },
+  "tryAgain": "حاول مرة أخرى"
 }

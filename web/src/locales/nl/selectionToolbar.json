@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "Tekstopmaak"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "Omzetten naar",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
+      "text": "Tekst",
+      "heading1": "Kop 1",
+      "heading2": "Kop 2",
+      "heading3": "Kop 3",
+      "heading4": "Kop 4",
+      "toDoList": "Takenlijst",
+      "bulletedList": "Opsommingslijst",
+      "numberedList": "Genummerde lijst",
+      "toggleList": "Toggle-lijst",
+      "quote": "Citaat",
       "callout": "Callout",
       "code": "Code"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
+    "bold": "Vet",
+    "italic": "Cursief",
+    "underline": "Onderstrepen",
+    "strikethrough": "Doorhalen",
     "code": "Code",
     "link": "Link"
   },
   "comment": {
-    "label": "Comment"
+    "label": "Reactie"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "Tekstkleur: {{color}}",
+    "title": "Kleur: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "Gemengd",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "Tekstkleur",
+      "default": "Standaard",
+      "gray": "Grijs",
+      "brown": "Bruin",
+      "orange": "Oranje",
+      "yellow": "Geel",
+      "green": "Groen",
+      "blue": "Blauw",
+      "purple": "Paars",
+      "pink": "Roze",
+      "red": "Rood"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "Achtergrondkleur",
+      "gray": "Grijze achtergrond",
+      "brown": "Bruine achtergrond",
+      "orange": "Oranje achtergrond",
+      "yellow": "Gele achtergrond",
+      "green": "Groene achtergrond",
+      "blue": "Blauwe achtergrond",
+      "purple": "Paarse achtergrond",
+      "pink": "Roze achtergrond",
+      "red": "Rode achtergrond"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
+    "ariaLabel": "Link bewerken",
+    "placeholder": "Link plakken",
+    "urlAriaLabel": "Link-URL",
     "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "open": "Link openen",
+    "copy": "Link kopiëren",
+    "copied": "Gekopieerd",
+    "copiedLink": "Link gekopieerd",
+    "remove": "Verwijderen"
   }
 }

@@ -263,10 +263,26 @@ interface WorkspaceInvitation {
   updatedAt?: string;
 }
 
+interface WorkspaceOnboarding {
+  id: string;
+  workspaceId: string;
+  notionImportState?: string;
+  notionImportPresentedAt?: string | null;
+  notionImportPresentedBy?: string | null;
+  notionImportSuppressedAt?: string | null;
+  notionImportSuppressedBy?: string | null;
+}
+
 interface Page {
   id: string;
   workspaceId: string;
+  parentId?: string | null;
+  parentType?: string;
   kind?: string;
+  title?: string | null;
+  icon?: string | null;
+  iconType?: string | null;
+  inTrash?: boolean;
   createdBy?: string | null;
   lastEditedBy?: string | null;
 }
@@ -3728,6 +3744,112 @@ async function updateWorkspace(
   return { workspace: await ctx.workspaces.update(id, patch) };
 }
 
+function isStarterOnlyWorkspacePage(page: Page) {
+  return (
+    page.parentType === 'workspace' &&
+    page.kind === 'page' &&
+    (page.title === 'Welcome to Hanji!' || page.title === 'Hanji에 오신 것을 환영합니다!') &&
+    page.icon === '👋' &&
+    page.iconType === 'emoji'
+  );
+}
+
+function isInstanceAdministrator(settings: InstanceSettings, actorId: string) {
+  return (
+    settings.masterUserId === actorId ||
+    (Array.isArray(settings.instanceAdminUserIds) && settings.instanceAdminUserIds.includes(actorId))
+  );
+}
+
+async function claimNotionImportOnboarding(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+) {
+  const workspaceId = requireString(body.workspaceId ?? body.id, 'workspaceId');
+  const ctx = await workspaceContext(db, workspaceId, actorId);
+  assertWorkspaceAdmin(ctx.currentRole);
+  if (!isInstanceAdministrator(await getInstanceSettings(db), actorId)) {
+    return { show: false };
+  }
+
+  const onboarding = db.table<WorkspaceOnboarding>('workspace_onboarding');
+  if (await getExisting(onboarding, workspaceId)) return { show: false };
+
+  const contentDb = boundedDb(admin, workspaceId);
+  const [pages, jobs, connections] = await Promise.all([
+    listAll(contentDb.table<Page>('pages').where('workspaceId', '==', workspaceId)),
+    listAll(db.table<{ id: string }>('notion_import_jobs').where('workspaceId', '==', workspaceId)),
+    listAll(db.table<{ id: string }>('notion_import_connections').where('workspaceId', '==', workspaceId)),
+  ]);
+  const activePages = pages.filter((page) => !page.inTrash);
+  const starterOnly =
+    activePages.length === 0 ||
+    (activePages.length === 1 && isStarterOnlyWorkspacePage(activePages[0]));
+  if (!starterOnly || jobs.length > 0 || connections.length > 0) {
+    return { show: false };
+  }
+
+  const now = nowIso();
+  try {
+    await db.transact([
+      { table: 'workspace_onboarding', op: 'expect', id: workspaceId, exists: false },
+      {
+        table: 'workspace_onboarding',
+        op: 'insert',
+        data: {
+          id: workspaceId,
+          workspaceId,
+          notionImportState: 'presented',
+          notionImportPresentedAt: now,
+          notionImportPresentedBy: actorId,
+        },
+      },
+    ]);
+    return { show: true };
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Transaction expectation failed')) {
+      return { show: false };
+    }
+    throw error;
+  }
+}
+
+async function suppressNotionImportOnboarding(
+  db: DbRef,
+  body: Record<string, unknown>,
+  actorId: string,
+) {
+  const workspaceId = requireString(body.workspaceId ?? body.id, 'workspaceId');
+  const ctx = await workspaceContext(db, workspaceId, actorId);
+  assertWorkspaceAdmin(ctx.currentRole);
+  const onboarding = db.table<WorkspaceOnboarding>('workspace_onboarding');
+  if (await getExisting(onboarding, workspaceId)) return { suppressed: true };
+  const now = nowIso();
+  try {
+    await db.transact([
+      { table: 'workspace_onboarding', op: 'expect', id: workspaceId, exists: false },
+      {
+        table: 'workspace_onboarding',
+        op: 'insert',
+        data: {
+          id: workspaceId,
+          workspaceId,
+          notionImportState: 'suppressed',
+          notionImportSuppressedAt: now,
+          notionImportSuppressedBy: actorId,
+        },
+      },
+    ]);
+  } catch (error) {
+    if (!(error instanceof Error && error.message.includes('Transaction expectation failed'))) {
+      throw error;
+    }
+  }
+  return { suppressed: true };
+}
+
 async function transferWorkspaceOwner(db: DbRef, body: Record<string, unknown>, actorId: string) {
   const id = requireString(body.id ?? body.workspaceId, 'workspaceId');
   const ctx = await workspaceContext(db, id, actorId);
@@ -4495,6 +4617,10 @@ export const POST = defineFunction(async (context) => {
         return await getMembers(db, body, auth.id, normalizeEmail(auth.email));
       case 'update':
         return await updateWorkspace(db, body, auth.id, request);
+      case 'claimNotionImportOnboarding':
+        return await claimNotionImportOnboarding(db, admin, body, auth.id);
+      case 'suppressNotionImportOnboarding':
+        return await suppressNotionImportOnboarding(db, body, auth.id);
       case 'transferWorkspaceOwner':
         return await transferWorkspaceOwner(db, body, auth.id);
       case 'delete':

@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "തീയതി പ്രോപ്പർട്ടി ചേർക്കുക",
+    "description": "കലണ്ടർ കാഴ്ചകൾക്ക് മാസത്തിൽ പേജുകൾ സ്ഥാപിക്കാൻ ഒരു തീയതി പ്രോപ്പർട്ടി ആവശ്യമാണ്.",
+    "addDateButton": "തീയതി"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "കലണ്ടർ അനുസരിച്ച്",
+    "today": "ഇന്ന്",
+    "previousWeek": "മുൻ ആഴ്ച",
+    "previousMonth": "കഴിഞ്ഞ മാസം",
+    "nextWeek": "അടുത്ത ആഴ്ച",
+    "nextMonth": "അടുത്ത മാസം"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "ഞായർ",
+    "mon": "തിങ്കൾ",
+    "tue": "ചൊവ്വ",
+    "wed": "ബുധൻ",
+    "thu": "വ്യാഴം",
+    "fri": "വെള്ളി",
+    "sat": "ശനി"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} കലണ്ടർ",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ഇനങ്ങൾ",
+    "newRowAriaLabel": "{{date}}-ൽ പുതിയ വരി",
+    "newRowTitle": "പുതിയത്",
+    "showLess": "കുറച്ച് കാണിക്കുക",
+    "showMore": "+{{count}} കൂടുതൽ"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} തുറക്കുക",
+    "openAriaLabelWithDate": "{{title}} തുറക്കുക, {{date}}-ന് ഷെഡ്യൂൾ ചെയ്തിരിക്കുന്നു",
+    "openNoDateAriaLabel": "{{title}} തുറക്കുക, തീയതിയില്ല"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "തീയതിയില്ല ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ശീർഷകമില്ലാത്ത",
+    "dateDefaultName": "തീയതി"
   }
 }

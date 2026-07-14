@@ -86,7 +86,10 @@ export function WorkspaceCreateDialog({
       <button
         type="button"
         className={styles.backdrop}
-        onClick={onClose}
+        onClick={() => {
+          if (!busy) onClose();
+        }}
+        disabled={busy}
         tabIndex={-1}
         aria-label={t("common:actions.close")}
       />
@@ -96,10 +99,11 @@ export function WorkspaceCreateDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-busy={busy || undefined}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();
-            onClose();
+            if (!busy) onClose();
             return;
           }
           trapModalTab(event, dialogRef.current);
@@ -111,6 +115,7 @@ export function WorkspaceCreateDialog({
             type="button"
             className={styles.close}
             onClick={onClose}
+            disabled={busy}
             aria-label={t("common:actions.close")}
           >
             <X size={18} aria-hidden="true" />

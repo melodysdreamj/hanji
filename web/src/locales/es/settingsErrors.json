@@ -1,6 +1,6 @@
 {
   "rateLimited": "Demasiadas solicitudes en este momento. Inténtalo de nuevo en un momento.",
-  "requestFailed": "No pudimos completar esa solicitud. Inténtalo de nuevo.",
+  "requestFailed": "No pudimos completar la solicitud. Inténtalo de nuevo.",
   "backend": {
     "workspaceAdminRequired": "Se requiere acceso de administrador del espacio de trabajo.",
     "workspaceOwnerRequired": "Se requiere acceso de propietario del espacio de trabajo.",
@@ -8,17 +8,17 @@
     "onlyOwnersManageAdmins": "Solo los propietarios del espacio de trabajo pueden gestionar administradores.",
     "onlyOwnersRemoveAdmins": "Solo los propietarios del espacio de trabajo pueden eliminar administradores.",
     "ownersCannotChangeRole": "El rol del propietario del espacio de trabajo no se puede cambiar aquí. Transfiere la propiedad primero.",
-    "ownersCannotBeRemoved": "El propietario del espacio de trabajo no se puede eliminar. Transfiere la propiedad primero.",
-    "cannotChangeOwnRole": "No puedes cambiar tu propio rol en el espacio de trabajo.",
+    "ownersCannotBeRemoved": "El propietario del espacio de trabajo no puede eliminarse. Transfiere la propiedad primero.",
+    "cannotChangeOwnRole": "No puedes cambiar tu propio rol del espacio de trabajo.",
     "cannotRemoveSelf": "No puedes eliminarte del espacio de trabajo.",
     "onlyAssignableRoles": "Solo se pueden asignar los roles de administrador, miembro e invitado.",
-    "memberNotFound": "Ese miembro del espacio de trabajo no se encontró.",
-    "invitationNotFound": "Esa invitación no se encontró.",
-    "transferTargetMustBeMember": "Elige otro miembro para transferirle la propiedad.",
-    "emailRequired": "Se requiere el correo electrónico.",
-    "emailInvalid": "Esa dirección de correo electrónico no parece correcta.",
-    "externalGuestDisabled": "Las invitaciones de invitados externos están desactivadas por la política de la organización.",
-    "verifiedDomainRequired": "Los miembros de la organización deben usar un dominio verificado de la organización.",
+    "memberNotFound": "No se encontró ese miembro del espacio de trabajo.",
+    "invitationNotFound": "No se encontró esa invitación.",
+    "transferTargetMustBeMember": "Elige otro miembro para transferir la propiedad.",
+    "emailRequired": "El correo electrónico es obligatorio.",
+    "emailInvalid": "Esa dirección de correo no parece correcta.",
+    "externalGuestDisabled": "Las invitaciones a invitados externos están desactivadas por política de la organización.",
+    "verifiedDomainRequired": "Los miembros de la organización deben usar un dominio de organización verificado.",
     "workspaceUrlInUse": "Esa URL del espacio de trabajo ya está en uso."
   }
 }

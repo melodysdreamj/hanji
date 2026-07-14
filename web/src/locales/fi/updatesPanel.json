@@ -1,79 +1,79 @@
 {
-  "filters": {
-    "all": "All",
-    "unread": "Unread",
-    "comments": "Comments",
-    "mentions": "Mentions",
-    "edits": "Edits"
-  },
-  "header": {
-    "closeUpdates": "Close updates",
-    "markAllRead": "Mark all as read",
-    "markAllReadAria": "Mark all updates as read",
-    "pageHistory": "Page history",
-    "recentUpdates_one": "{{count}} recent update",
-    "recentUpdates_other": "{{count}} recent updates",
-    "unreadOfTotal": "{{unread}} unread of {{total}} updates",
-    "updateType": "Update type",
-    "updates": "Updates",
-    "modeUpdates": "Updates",
-    "modeChats": "Chats",
-    "inboxMode": "Inbox mode"
-  },
-  "time": {
-    "justNow": "Just now",
-    "today": "Today",
-    "yesterday": "Yesterday"
-  },
-  "versions": {
-    "blockCount_one": "{{count}} block",
-    "blockCount_other": "{{count}} blocks",
-    "currentVersion": "Current version",
-    "currentVersionOnly": "Current version only",
-    "next": "Next",
-    "nextVersion": "Next version",
-    "noVersionPrevious": "No previous version",
-    "noVersionNext": "No next version",
-    "pageLocked": "Page locked",
-    "previous": "Previous",
-    "previousSnapshots_one": "{{count}} previous snapshot",
-    "previousSnapshots_other": "{{count}} previous snapshots",
-    "previousVersion": "Previous version",
-    "restoredPrevious": "Restored previous version",
-    "restoredNext": "Restored next version",
-    "restoredVersions": "Restored {{count}} versions",
-    "versionCount_one": "{{count}} version",
-    "versionCount_other": "{{count}} versions",
-    "versionsAgo": "{{count}} versions ago",
-    "versionsAhead": "{{count}} versions ahead",
-    "versionsAria": "Versions"
-  },
   "badges": {
-    "comment": "Comment",
-    "edited": "Edited",
-    "linked": "Linked",
-    "member": "Member",
-    "mention": "Mention",
-    "reply": "Reply",
-    "replyMention": "Reply mention",
-    "shared": "Shared",
-    "system": "System"
-  },
-  "rows": {
-    "byActor": "by {{name}}",
-    "emptyComment": "Empty comment",
-    "forYou": "for you",
-    "notification": "Notification",
-    "referenceMention": "Mentioned {{title}} · {{preview}}",
-    "referenceLink": "Linked to {{title}} · {{preview}}",
-    "unreadDot": "Unread",
-    "workspaceUpdate": "Workspace update"
+    "comment": "Kommentti",
+    "edited": "Muokattu",
+    "linked": "Linkitetty",
+    "member": "Jäsen",
+    "mention": "Maininta",
+    "reply": "Vastaus",
+    "replyMention": "Vastausmaininta",
+    "shared": "Jaettu",
+    "system": "Järjestelmä"
   },
   "empty": {
-    "allCaughtUp": "You're all caught up.",
-    "loadingUpdates": "Loading updates...",
-    "noFilteredUpdatesYet": "No {{filter}} yet.",
-    "noPageHistoryYet": "No page history yet.",
-    "noUpdatesYet": "No updates yet."
+    "allCaughtUp": "Kaikki ajantasalla.",
+    "loadingUpdates": "Ladataan päivityksiä...",
+    "noFilteredUpdatesYet": "Ei vielä {{filter}}.",
+    "noPageHistoryYet": "Ei sivuhistoriaa vielä.",
+    "noUpdatesYet": "Ei päivityksiä vielä."
+  },
+  "filters": {
+    "all": "Kaikki",
+    "comments": "Kommentit",
+    "edits": "Muokkaukset",
+    "mentions": "Maininnat",
+    "unread": "Lukemattomat"
+  },
+  "header": {
+    "closeUpdates": "Sulje päivitykset",
+    "inboxMode": "Saapuneet-tila",
+    "markAllRead": "Merkitse kaikki luetuksi",
+    "markAllReadAria": "Merkitse kaikki päivitykset luetuiksi",
+    "modeChats": "Keskustelut",
+    "modeUpdates": "Päivitykset",
+    "pageHistory": "Sivuhistoria",
+    "recentUpdates_one": "{{count}} viimeisin päivitys",
+    "recentUpdates_other": "{{count}} viimeisintä päivitystä",
+    "unreadOfTotal": "{{unread}} lukematonta {{total}} päivityksestä",
+    "updates": "Päivitykset",
+    "updateType": "Päivitystyyppi"
+  },
+  "rows": {
+    "byActor": "– {{name}}",
+    "emptyComment": "Tyhjä kommentti",
+    "forYou": "sinulle",
+    "notification": "Ilmoitus",
+    "referenceLink": "Linkitetty {{title}} · {{preview}}",
+    "referenceMention": "Mainittu {{title}} · {{preview}}",
+    "unreadDot": "Lukematon",
+    "workspaceUpdate": "Työtilan päivitys"
+  },
+  "time": {
+    "justNow": "Juuri nyt",
+    "today": "Tänään",
+    "yesterday": "Eilen"
+  },
+  "versions": {
+    "blockCount_one": "{{count}} lohko",
+    "blockCount_other": "{{count}} lohkoa",
+    "currentVersion": "Nykyinen versio",
+    "currentVersionOnly": "Vain nykyinen versio",
+    "next": "Seuraava",
+    "nextVersion": "Seuraava versio",
+    "noVersionNext": "Ei seuraavaa versiota",
+    "noVersionPrevious": "Ei edellistä versiota",
+    "pageLocked": "Sivu lukittu",
+    "previous": "Edellinen",
+    "previousSnapshots_one": "{{count}} edellinen tilannekuva",
+    "previousSnapshots_other": "{{count}} edellistä tilannekuvaa",
+    "previousVersion": "Edellinen versio",
+    "restoredNext": "Seuraava versio palautettu",
+    "restoredPrevious": "Edellinen versio palautettu",
+    "restoredVersions": "Palautettu {{count}} versiota",
+    "versionCount_one": "{{count}} versio",
+    "versionCount_other": "{{count}} versiota",
+    "versionsAgo": "{{count}} versiota sitten",
+    "versionsAhead": "{{count}} versiota edellä",
+    "versionsAria": "Versiot"
   }
 }

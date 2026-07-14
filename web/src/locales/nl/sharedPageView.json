@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Gedeelde pagina",
+  "loading": "Gedeelde pagina laden",
+  "unavailable": "Deze gedeelde pagina is niet beschikbaar.",
+  "notFound": "Gedeelde pagina niet gevonden.",
+  "outsideShare": "De pagina maakt geen deel uit van deze openbare share.",
+  "tryAgain": "Opnieuw proberen",
+  "errors": {
+    "not-found": "Deze link is mogelijk verlopen, niet meer gepubliceerd, of verkeerd gekopieerd.",
+    "rate-limited": "Deze gedeelde pagina ontvangt te veel verzoeken. Wacht even en probeer het opnieuw.",
+    "offline": "Controleer je verbinding en probeer de gedeelde pagina opnieuw te openen.",
+    "unavailable": "Hanji kon deze gedeelde pagina nu niet openen. Probeer het over een moment opnieuw."
+  }
 }

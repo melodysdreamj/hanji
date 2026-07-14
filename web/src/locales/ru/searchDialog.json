@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Поиск или переход...",
+  "quickFind": "Быстрый поиск",
+  "closeSearch": "Закрыть поиск",
+  "quickFindResults": "Результаты быстрого поиска",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Недавно просмотренные",
+    "recentSearches": "Недавние поиски",
+    "pages": "Страницы",
+    "pageContent": "Содержимое страницы",
+    "favorites": "Избранное"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "на странице",
+  "searchingDetail": "Поиск...",
+  "searchAgain": "Повторить поиск",
+  "searchingPageContent": "Поиск содержимого страницы...",
+  "noResultsFor": "Нет результатов для \"{{query}}\"",
+  "noPagesFound": "Страницы не найдены",
+  "creating": "Создание...",
+  "newPage": "Новая страница \"{{query}}\"",
+  "couldntCreatePage": "Не удалось создать страницу",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Выбрать",
+    "open": "Открыть",
+    "newTab": "Новая вкладка"
   }
 }

@@ -23,11 +23,16 @@ export function useCreditRoll(options: {
   useEffect(() => {
     if (!enabled) return;
     let mounted = true;
-    fetchSponsorsRemote().then((feed) => {
-      if (!mounted) return;
-      setSponsors(feed.sponsors);
-      setDisabled(feed.disabled);
-    });
+    fetchSponsorsRemote()
+      .then((feed) => {
+        if (!mounted) return;
+        setSponsors(feed.sponsors);
+        setDisabled(feed.disabled);
+      })
+      .catch(() => {
+        // The static built-with roll remains a useful fallback when the sponsor
+        // feed is unavailable, including during an offline/local-first boot.
+      });
     return () => {
       mounted = false;
     };

@@ -1,10 +1,10 @@
 {
-  "empty": "No conversations yet. Comment on a page or mention someone to start one.",
-  "leave": "Leave",
-  "leaveAria": "Leave the conversation on {{title}}",
-  "open": "Open the conversation on {{title}}",
-  "participants_one": "{{count}} participant",
-  "participants_other": "{{count}} participants",
-  "untitled": "Untitled",
-  "loading": "Loading conversations…"
+  "empty": "अद्याप कोणतेही संभाषण नाही. पृष्ठावर टिप्पणी करा किंवा एखाद्याचा उल्लेख करून सुरू करा.",
+  "leave": "सोडा",
+  "leaveAria": "{{title}} वरील संभाषण सोडा",
+  "open": "{{title}} वरील संभाषण उघडा",
+  "participants_one": "{{count}} सहभागी",
+  "participants_other": "{{count}} सहभागी",
+  "untitled": "शीर्षकहीन",
+  "loading": "संभाषणे लोड करत आहे..."
 }

@@ -1,13 +1,13 @@
 {
-  "databaseLockedSave": "Este banco de dados está bloqueado, então suas alterações não puderam ser salvas.",
-  "databaseRowsLoadFailed": "Não foi possível carregar as linhas do banco de dados. Tente novamente em instantes.",
-  "editAccessDeniedSave": "Você não tem acesso de edição, então suas alterações não puderam ser salvas.",
-  "lockedSave": "A página ou o banco de dados está bloqueado, então suas alterações não puderam ser salvas.",
-  "pageLockedSave": "Esta página está bloqueada, então suas alterações não puderam ser salvas.",
-  "pageMissingSave": "A página não pôde ser encontrada, então suas alterações não puderam ser salvas.",
+  "databaseLockedSave": "Este banco de dados está bloqueado, portanto suas alterações não puderam ser salvas.",
+  "databaseRowsLoadFailed": "Não foi possível carregar as linhas do banco de dados. Tente novamente em um momento.",
+  "editAccessDeniedSave": "Você não tem acesso de edição, portanto suas alterações não puderam ser salvas.",
+  "lockedSave": "A página ou o banco de dados está bloqueado, portanto suas alterações não puderam ser salvas.",
+  "pageLockedSave": "Esta página está bloqueada, portanto suas alterações não puderam ser salvas.",
+  "pageMissingSave": "A página não pôde ser encontrada, portanto suas alterações não puderam ser salvas.",
   "saveFailed": "Suas alterações não puderam ser salvas.",
   "sessionExpired": "Sua sessão expirou ou a solicitação não pôde ser autenticada. Tente novamente.",
-  "blockConflictSave": "Este bloco foi editado em outro dispositivo, então sua alteração offline não foi aplicada.",
+  "blockConflictSave": "Este bloco foi editado em outro dispositivo, portanto sua alteração offline não foi aplicada.",
   "blockConflictKeepMine": "Aplicar minha versão",
   "blockMoveCommentsSkipped": "O bloco foi movido, mas seus comentários não puderam ser movidos com ele."
 }

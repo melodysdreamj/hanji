@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "ရက်စွဲပိုင်ဆိုင်မှု ထည့်ပါ",
+    "description": "ပြက္ခဒိန်မြင်ကွင်းများသည် စာမျက်နှာများကို လပေါ်တွင် နေရာချရန် ရက်စွဲပိုင်ဆိုင်မှု လိုအပ်ပါသည်။",
+    "addDateButton": "ရက်စွဲ"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "ပြက္ခဒိန်အလိုက်",
+    "today": "ယနေ့",
+    "previousWeek": "ယခင်အပတ်",
+    "previousMonth": "ယခင်လ",
+    "nextWeek": "နောက်အပတ်",
+    "nextMonth": "နောက်လ"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "တနင်္ဂနွေ",
+    "mon": "တနင်္လာ",
+    "tue": "အင်္ဂါ",
+    "wed": "ဗုဒ္ဓဟူး",
+    "thu": "ကြာသပတေး",
+    "fri": "သောကြာ",
+    "sat": "စနေ"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} ပြက္ခဒိန်",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} ခု",
+    "newRowAriaLabel": "{{date}} တွင် အတန်းအသစ်",
+    "newRowTitle": "အသစ်",
+    "showLess": "လျှော့ပြပါ",
+    "showMore": "+{{count}} ခု နောက်ထပ်"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} ကိုဖွင့်ပါ",
+    "openAriaLabelWithDate": "{{title}} ကိုဖွင့်ပါ၊ {{date}} အတွက် စီစဉ်ထားသည်",
+    "openNoDateAriaLabel": "{{title}} ကိုဖွင့်ပါ၊ ရက်စွဲမရှိ"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "ရက်စွဲမရှိ ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "ခေါင်းစဉ်မရှိ",
+    "dateDefaultName": "ရက်စွဲ"
   }
 }

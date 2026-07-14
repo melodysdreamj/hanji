@@ -1,7 +1,14 @@
 {
-  "title": "Shared page",
-  "loading": "Loading shared page",
-  "unavailable": "This shared page is unavailable.",
-  "notFound": "Shared page was not found.",
-  "outsideShare": "The page is not part of this public share."
+  "title": "Halaman kongsi",
+  "loading": "Memuatkan halaman kongsi",
+  "unavailable": "Halaman kongsi ini tidak tersedia.",
+  "notFound": "Halaman kongsi tidak ditemui.",
+  "outsideShare": "Halaman ini bukan sebahagian daripada kongsi awam ini.",
+  "errors": {
+    "not-found": "Pautan ini mungkin telah tamat tempoh, tidak diterbitkan, atau disalin dengan salah.",
+    "offline": "Periksa sambungan anda, kemudian cuba buka halaman kongsi semula.",
+    "rate-limited": "Halaman kongsi ini menerima terlalu banyak permintaan. Tunggu sebentar dan cuba lagi.",
+    "unavailable": "Hanji tidak dapat membuka halaman kongsi ini sekarang. Cuba lagi sebentar lagi."
+  },
+  "tryAgain": "Cuba lagi"
 }

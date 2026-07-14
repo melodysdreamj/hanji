@@ -1,44 +1,44 @@
 {
   "empty": {
-    "title": "Add a date property",
-    "description": "Calendar views need a date property to place pages on the month.",
-    "addDateButton": "Date"
+    "title": "Dátum tulajdonság hozzáadása",
+    "description": "A naptárnézetekben dátum tulajdonság szükséges az oldalak hónapba helyezéséhez.",
+    "addDateButton": "Dátum"
   },
   "toolbar": {
-    "calendarByAriaLabel": "Calendar by",
-    "today": "Today",
-    "previousWeek": "Previous week",
-    "previousMonth": "Previous month",
-    "nextWeek": "Next week",
-    "nextMonth": "Next month"
+    "calendarByAriaLabel": "Naptár e szerint:",
+    "today": "Ma",
+    "previousWeek": "Előző hét",
+    "previousMonth": "Előző hónap",
+    "nextWeek": "Következő hét",
+    "nextMonth": "Következő hónap"
   },
   "weekdays": {
-    "sun": "Sun",
-    "mon": "Mon",
-    "tue": "Tue",
-    "wed": "Wed",
-    "thu": "Thu",
-    "fri": "Fri",
-    "sat": "Sat"
+    "sun": "V",
+    "mon": "H",
+    "tue": "K",
+    "wed": "Sze",
+    "thu": "Cs",
+    "fri": "P",
+    "sat": "Szo"
   },
-  "gridAriaLabel": "{{title}} calendar",
+  "gridAriaLabel": "{{title}} naptár",
   "cell": {
-    "ariaLabel": "{{date}}, {{count}} items",
-    "newRowAriaLabel": "New row on {{date}}",
-    "newRowTitle": "New",
-    "showLess": "Show less",
-    "showMore": "+{{count}} more"
+    "ariaLabel": "{{date}}, {{count}} elem",
+    "newRowAriaLabel": "Új sor ekkor: {{date}}",
+    "newRowTitle": "Új",
+    "showLess": "Kevesebb mutatása",
+    "showMore": "+{{count}} további"
   },
   "card": {
-    "openAriaLabel": "Open {{title}}",
-    "openAriaLabelWithDate": "Open {{title}}, scheduled for {{date}}",
-    "openNoDateAriaLabel": "Open {{title}}, no date"
+    "openAriaLabel": "{{title}} megnyitása",
+    "openAriaLabelWithDate": "{{title}} megnyitása, időpont: {{date}}",
+    "openNoDateAriaLabel": "{{title}} megnyitása, dátum nélkül"
   },
   "noDate": {
-    "heading": "No date ({{count}})"
+    "heading": "Nincs dátum ({{count}})"
   },
   "property": {
-    "untitled": "Untitled",
-    "dateDefaultName": "Date"
+    "untitled": "Cím nélkül",
+    "dateDefaultName": "Dátum"
   }
 }

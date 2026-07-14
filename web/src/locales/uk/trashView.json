@@ -1,39 +1,39 @@
 {
-  "trash": "Trash",
-  "empty": "Pages you delete land here. Nothing in the trash.",
-  "searchTrash": "Search trash",
-  "deletedPages": "Deleted pages",
-  "noSearchMatches": "No deleted pages match your search.",
-  "pageCount_one": "{{count}} page",
-  "pageCount_other": "{{count}} pages",
-  "deletedJustNow": "Deleted just now",
-  "deletedOn": "Deleted {{date}}",
+  "trash": "Кошик",
+  "empty": "Сторінки, які ви видаляєте, потрапляють сюди. Кошик порожній.",
+  "searchTrash": "Пошук у кошику",
+  "deletedPages": "Видалені сторінки",
+  "noSearchMatches": "Немає видалених сторінок, які відповідають вашому пошуку.",
+  "pageCount_one": "{{count}} сторінка",
+  "pageCount_other": "{{count}} сторінок",
+  "deletedJustNow": "Щойно видалено",
+  "deletedOn": "Видалено {{date}}",
   "actions": {
-    "restore": "Restore",
-    "deleteForever": "Delete forever",
-    "emptyTrash": "Empty trash"
+    "restore": "Відновити",
+    "deleteForever": "Видалити назавжди",
+    "emptyTrash": "Очистити кошик"
   },
   "aria": {
-    "openFromTrash": "Open {{title}} from trash",
-    "restorePage": "Restore {{title}}",
-    "deletePageForever": "Delete {{title}} forever",
-    "cancelPermanentDelete": "Cancel permanent delete",
-    "cancelEmptyTrash": "Cancel emptying trash"
+    "openFromTrash": "Відкрити {{title}} із кошика",
+    "restorePage": "Відновити {{title}}",
+    "deletePageForever": "Видалити {{title}} назавжди",
+    "cancelPermanentDelete": "Скасувати остаточне видалення",
+    "cancelEmptyTrash": "Скасувати очищення кошика"
   },
   "confirm": {
-    "deleteTitle": "Delete forever?",
-    "deleteBodyPrefix": "This will permanently delete ",
-    "deleteBodySuffix": ". You can't undo this action.",
-    "emptyTitle": "Empty trash?",
-    "emptyBody_one": "This will permanently delete all {{count}} page in the trash. You can't undo this action.",
-    "emptyBody_other": "This will permanently delete all {{count}} pages in the trash. You can't undo this action."
+    "deleteTitle": "Видалити назавжди?",
+    "deleteBodyPrefix": "Це назавжди видалить ",
+    "deleteBodySuffix": ". Цю дію не можна скасувати.",
+    "emptyTitle": "Очистити кошик?",
+    "emptyBody_one": "Це назавжди видалить {{count}} сторінку в кошику. Цю дію не можна скасувати.",
+    "emptyBody_other": "Це назавжди видалить усі {{count}} сторінки в кошику. Цю дію не можна скасувати."
   },
   "toast": {
-    "deletedForever": "Deleted forever",
-    "couldntDelete": "Couldn't delete page",
-    "restored": "Restored page",
-    "couldntRestore": "Couldn't restore page",
-    "emptied": "Trash emptied",
-    "couldntEmpty": "Couldn't empty trash"
+    "deletedForever": "Видалено назавжди",
+    "couldntDelete": "Не вдалося видалити сторінку",
+    "restored": "Сторінку відновлено",
+    "couldntRestore": "Не вдалося відновити сторінку",
+    "emptied": "Кошик очищено",
+    "couldntEmpty": "Не вдалося очистити кошик"
   }
 }

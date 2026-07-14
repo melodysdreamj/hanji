@@ -1,23 +1,23 @@
 {
   "toggle": {
-    "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_one": "{{count}} બેકલિંક",
+    "count_other": "{{count}} બેકલિંકો"
   },
   "header": {
-    "title": "Linked mentions"
+    "title": "લિંક્ડ મેન્શન"
   },
   "summary": {
-    "mention_one": "{{count}} mention",
-    "mention_other": "{{count}} mentions",
-    "link_one": "{{count}} link",
-    "link_other": "{{count}} links"
+    "mention_one": "{{count}} મેન્શન",
+    "mention_other": "{{count}} મેન્શનો",
+    "link_one": "{{count}} લિંક",
+    "link_other": "{{count}} લિંકો"
   },
   "kind": {
-    "mention": "Mention",
-    "link": "Link"
+    "mention": "મેન્શન",
+    "link": "લિંક"
   },
   "more": {
-    "count_one": "{{count}} more backlink",
-    "count_other": "{{count}} more backlinks"
+    "count_one": "{{count}} વધુ બેકલિંક",
+    "count_other": "{{count}} વધુ બેકલિંકો"
   }
 }

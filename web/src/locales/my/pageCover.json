@@ -1,53 +1,53 @@
 {
   "actions": {
-    "changeCover": "Change cover",
-    "reposition": "Reposition",
-    "remove": "Remove",
-    "uploadFile": "Upload file",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "savePosition": "Save position"
+    "changeCover": "ကာဗာပြောင်းရန်",
+    "reposition": "နေရာပြောင်းရန်",
+    "remove": "ဖယ်ရှားရန်",
+    "uploadFile": "ဖိုင်တင်ရန်",
+    "uploading": "တင်နေသည်...",
+    "submit": "တင်သွင်းရန်",
+    "savePosition": "နေရာသိမ်းရန်"
   },
   "tabs": {
-    "gallery": "Gallery",
-    "upload": "Upload",
-    "link": "Link"
+    "gallery": "ပြခန်း",
+    "upload": "တင်ရန်",
+    "link": "လင့်"
   },
   "link": {
-    "placeholder": "Paste image link",
-    "invalid": "Paste an http or https image link."
+    "placeholder": "ပုံလင့်ကူးထည့်ရန်",
+    "invalid": "http သို့မဟုတ် https ပုံလင့်ကိုကူးထည့်ပါ။"
   },
   "upload": {
-    "error": "Could not upload that image.",
-    "defaultFileName": "Cover image"
+    "error": "ထိုပုံကို အပ်လုဒ်မတင်နိုင်ပါ။",
+    "defaultFileName": "ကာဗာပုံ"
   },
   "reposition": {
-    "hint": "Drag image to reposition"
+    "hint": "နေရာပြောင်းရန်ပုံကိုဆွဲယူပါ"
   },
   "progress": {
-    "preparing": "Preparing upload",
-    "finalizing": "Finalizing",
-    "complete": "Complete",
-    "uploading": "Uploading"
+    "preparing": "အပ်လုဒ်ပြင်ဆင်နေသည်",
+    "finalizing": "နောက်ဆုံးသတ်မှတ်နေသည်",
+    "complete": "ပြီးဆုံးသည်",
+    "uploading": "တင်နေသည်"
   },
   "toast": {
-    "removed": "Removed cover",
-    "restored": "Restored cover",
-    "undo": "Undo"
+    "removed": "ကာဗာကိုဖယ်ရှားလိုက်သည်",
+    "restored": "ကာဗာကိုပြန်လည်ထားရှိသည်",
+    "undo": "နောက်ပြန်"
   },
   "aria": {
-    "pageCover": "Page cover",
-    "coverVerticalPosition": "Cover vertical position",
-    "positionFromTop": "{{position}}% from top",
-    "closeCoverMenu": "Close cover menu",
-    "changePageCover": "Change page cover",
-    "repositionPageCover": "Reposition page cover",
-    "removePageCover": "Remove page cover",
-    "changeCoverDialog": "Change cover",
-    "coverSource": "Cover source",
-    "selectCover": "Select cover {{number}}",
-    "uploadFromDevice": "Upload cover image from this device",
-    "uploadingFile": "Uploading {{fileName}}",
-    "coverImageLink": "Cover image link"
+    "pageCover": "စာမျက်နှာကာဗာ",
+    "coverVerticalPosition": "ကာဗာဒေါင်လိုက်အနေအထား",
+    "positionFromTop": "အပေါ်မှ {{position}}%",
+    "closeCoverMenu": "ကာဗာမီနူးပိတ်ရန်",
+    "changePageCover": "စာမျက်နှာကာဗာပြောင်းရန်",
+    "repositionPageCover": "စာမျက်နှာကာဗာနေရာပြောင်းရန်",
+    "removePageCover": "စာမျက်နှာကာဗာဖယ်ရှားရန်",
+    "changeCoverDialog": "ကာဗာပြောင်းရန်",
+    "coverSource": "ကာဗာအရင်းအမြစ်",
+    "selectCover": "ကာဗာ {{number}} ကိုရွေးရန်",
+    "uploadFromDevice": "ဤစက်ပစ္စည်းမှကာဗာပုံတင်ရန်",
+    "uploadingFile": "{{fileName}} တင်နေသည်",
+    "coverImageLink": "ကာဗာပုံလင့်"
   }
 }

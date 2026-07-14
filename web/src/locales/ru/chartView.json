@@ -1,31 +1,31 @@
 {
   "aggregates": {
-    "count": "Count",
-    "sum": "Sum",
-    "average": "Average",
-    "min": "Min",
-    "max": "Max"
+    "count": "Количество",
+    "sum": "Сумма",
+    "average": "Среднее",
+    "min": "Мин",
+    "max": "Макс"
   },
-  "chartAria": "{{name}} chart",
-  "chartType": "Chart type",
+  "chartAria": "{{name}} диаграмма",
+  "chartType": "Тип диаграммы",
   "chartTypes": {
-    "bar": "Bar",
-    "horizontal_bar": "Horizontal bar",
-    "line": "Line",
-    "donut": "Donut"
+    "bar": "Гистограмма",
+    "horizontal_bar": "Линейчатая",
+    "line": "График",
+    "donut": "Кольцевая"
   },
-  "checked": "Checked",
-  "empty": "Empty",
-  "legend": "Chart legend",
+  "checked": "Отмечено",
+  "empty": "Пусто",
+  "legend": "Легенда диаграммы",
   "monthLabel": "{{month}} {{year}}",
-  "noData": "No data",
-  "noDataDesc": "No rows match the current filters or search.",
-  "noGroupProperty": "Nothing to chart yet",
-  "noGroupPropertyDesc": "Add a select, status, person, checkbox, or date property to group this chart.",
-  "total": "Total",
-  "unchecked": "Unchecked",
-  "untitledProperty": "Untitled",
-  "valueProperty": "Value property",
-  "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "noData": "Нет данных",
+  "noDataDesc": "Нет строк, соответствующих текущим фильтрам или поиску.",
+  "noGroupProperty": "Нет данных для диаграммы",
+  "noGroupPropertyDesc": "Добавьте свойство «Выбор», «Статус», «Человек», «Флажок» или «Дата» для группировки диаграммы.",
+  "total": "Итого",
+  "unchecked": "Не отмечено",
+  "untitledProperty": "Без названия",
+  "valueProperty": "Свойство значения",
+  "xAxis": "Ось X",
+  "yAxis": "Ось Y"
 }

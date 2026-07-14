@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
+  "title": "I-unlock ang lokal na data",
+  "description": "Ang offline data sa device na ito ay naka-lock gamit ang passphrase. Ang pag-unlock ay muling magpapagana ng offline na paggamit at pag-save.",
   "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "unlock": "I-unlock",
+  "continueOnline": "Magpatuloy online lang",
+  "continueOnlineHint": "Ang 'Magpatuloy online lang' ay pinananatiling naka-seal ang mga naka-lock na offline edits ng device na ito — mananatili sila sa device na ito at hindi magsi-sync hanggang i-unlock mo ang mga ito gamit ang tamang passphrase.",
+  "wrongPassphrase": "Hindi tama ang passphrase na iyon.",
+  "unsupportedBrowser": "Hindi available ang lokal na lock sa browser na ito."
 }

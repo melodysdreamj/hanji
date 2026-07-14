@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "ရှာဖွေရန် သို့မဟုတ် သွားရန်...",
+  "quickFind": "အမြန်ရှာဖွေခြင်း",
+  "closeSearch": "ရှာဖွေမှု ပိတ်ရန်",
+  "quickFindResults": "အမြန်ရှာဖွေမှုရလဒ်များ",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "မကြာသေးမီက ကြည့်ရှုခဲ့သည်များ",
+    "recentSearches": "မကြာသေးမီက ရှာဖွေမှုများ",
+    "pages": "စာမျက်နှာများ",
+    "pageContent": "စာမျက်နှာအကြောင်းအရာ",
+    "favorites": "အကြိုက်ဆုံးများ"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "စာမျက်နှာအတွင်း",
+  "searchingDetail": "ရှာဖွေနေသည်...",
+  "searchAgain": "ထပ်မံရှာဖွေပါ",
+  "searchingPageContent": "စာမျက်နှာအကြောင်းအရာရှာဖွေနေသည်...",
+  "noResultsFor": "\"{{query}}\" အတွက် ရလဒ်မရှိပါ",
+  "noPagesFound": "စာမျက်နှာမတွေ့ပါ",
+  "creating": "ဖန်တီးနေသည်...",
+  "newPage": "စာမျက်နှာအသစ် \"{{query}}\"",
+  "couldntCreatePage": "စာမျက်နှာကို ဖန်တီးမရပါ",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "ရွေးပါ",
+    "open": "ဖွင့်ရန်",
+    "newTab": "တက်ဘ်အသစ်"
   }
 }

@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Ново работно пространство",
   "name": {
-    "label": "Workspace name",
+    "label": "Име на работното пространство",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Старт от",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Празно работно пространство",
+      "body": "Започнете празно с началните страници."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Импортиране от Notion",
+      "body": "Създайте работното пространство, след което мигрирайте работно пространство от Notion в него."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Импортиране от друг Hanji",
+      "body": "Създайте работното пространство, след което изтеглете работно пространство от друг сървър на Hanji или файл."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Създаване на работно пространство",
+  "creating": "Създаване…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Не може да се създаде работно пространство."
   }
 }

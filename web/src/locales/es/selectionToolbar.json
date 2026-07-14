@@ -13,9 +13,9 @@
       "toDoList": "Lista de tareas",
       "bulletedList": "Lista con viñetas",
       "numberedList": "Lista numerada",
-      "toggleList": "Lista plegable",
+      "toggleList": "Lista conmutada",
       "quote": "Cita",
-      "callout": "Llamada",
+      "callout": "Destacado",
       "code": "Código"
     }
   },
@@ -45,7 +45,7 @@
       "yellow": "Amarillo",
       "green": "Verde",
       "blue": "Azul",
-      "purple": "Morado",
+      "purple": "Púrpura",
       "pink": "Rosa",
       "red": "Rojo"
     },
@@ -66,11 +66,11 @@
     "ariaLabel": "Editar enlace",
     "placeholder": "Pegar enlace",
     "urlAriaLabel": "URL del enlace",
-    "apply": "Enlazar",
+    "apply": "Enlace",
     "open": "Abrir enlace",
     "copy": "Copiar enlace",
     "copied": "Copiado",
     "copiedLink": "Enlace copiado",
-    "remove": "Quitar"
+    "remove": "Eliminar"
   }
 }

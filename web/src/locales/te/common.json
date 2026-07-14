@@ -1,41 +1,41 @@
 {
   "actions": {
-    "cancel": "Cancel",
-    "save": "Save",
-    "close": "Close",
-    "search": "Search",
-    "create": "Create",
-    "delete": "Delete",
-    "clearAll": "Clear all",
-    "done": "Done",
-    "add": "Add"
+    "cancel": "రద్దు",
+    "save": "సేవ్",
+    "close": "మూసివేయి",
+    "search": "శోధన",
+    "create": "సృష్టించు",
+    "delete": "తొలగించు",
+    "clearAll": "అన్నీ క్లియర్ చేయి",
+    "done": "పూర్తి",
+    "add": "జోడించు"
   },
   "labels": {
-    "untitled": "Untitled"
+    "untitled": "శీర్షిక లేదు"
   },
   "generated": {
-    "copyName": "{{name}} copy",
-    "columnName": "Column {{number}}",
-    "importedDatabase": "Imported database",
-    "uploadedFile": "Uploaded file",
-    "image": "Image",
+    "copyName": "{{name}} కాపీ",
+    "columnName": "కాలమ్ {{number}}",
+    "importedDatabase": "దిగుమతి చేసిన డేటాబేస్",
+    "uploadedFile": "అప్లోడ్ చేసిన ఫైల్",
+    "image": "చిత్రం",
     "propertyNames": {
-      "name": "Name",
-      "status": "Status",
-      "select": "Select",
-      "date": "Date"
+      "name": "పేరు",
+      "status": "స్థితి",
+      "select": "ఎంపిక",
+      "date": "తేదీ"
     },
     "statusOptions": {
-      "todo": "Not started",
-      "doing": "In progress",
-      "done": "Done"
+      "todo": "ప్రారంభించలేదు",
+      "doing": "ప్రగతిలో",
+      "done": "పూర్తయింది"
     },
     "selectOptions": {
-      "first": "Option 1",
-      "second": "Option 2"
+      "first": "ఎంపిక 1",
+      "second": "ఎంపిక 2"
     },
     "viewNames": {
-      "table": "Table"
+      "table": "పట్టిక"
     }
   }
 }

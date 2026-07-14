@@ -1,10 +1,10 @@
 {
-  "offline": "Offline",
-  "offlinePending_one": "Offline · {{count}} change pending",
-  "offlinePending_other": "Offline · {{count}} changes pending",
-  "syncing": "Syncing · {{count}}",
-  "unreachable": "Can't reach the server",
-  "unreachablePending_one": "Can't reach the server · {{count}} change pending",
-  "unreachablePending_other": "Can't reach the server · {{count}} changes pending",
-  "retryHint": "Click to retry now"
+  "offline": "Brez povezave",
+  "offlinePending_one": "Brez povezave · {{count}} sprememba v čakanju",
+  "offlinePending_other": "Brez povezave · {{count}} sprememb v čakanju",
+  "syncing": "Sinhronizacija · {{count}}",
+  "unreachable": "Strežnik ni dosegljiv",
+  "unreachablePending_one": "Strežnik ni dosegljiv · {{count}} sprememba čaka",
+  "unreachablePending_other": "Strežnik ni dosegljiv · {{count}} spremembe čakajo",
+  "retryHint": "Kliknite za ponoven poskus"
 }

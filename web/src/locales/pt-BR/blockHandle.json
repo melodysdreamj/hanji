@@ -14,10 +14,10 @@
     "copy": "Copiar",
     "copyMany": "Copiar {{num}} blocos",
     "copied": "Copiado",
-    "copyLinkToBlock": "Copiar link do bloco",
+    "copyLinkToBlock": "Copiar link para bloco",
     "copiedBlockLink": "Link do bloco copiado",
     "moveTo": "Mover para",
-    "moveToMany": "Mover para {{num}} blocos",
+    "moveToMany": "Mover {{num}} blocos para",
     "moveUp": "Mover para cima",
     "moveUpMany": "Mover {{num}} blocos para cima",
     "moveDown": "Mover para baixo",
@@ -26,10 +26,10 @@
     "commentMany": "Comentar {{num}} blocos",
     "addCaption": "Adicionar legenda",
     "removeCaption": "Remover legenda",
-    "unsyncSyncedBlock": "Dessincronizar bloco sincronizado",
+    "unsyncSyncedBlock": "Desfazer sincronização do bloco",
     "copySyncedBlock": "Copiar bloco sincronizado",
     "color": "Cor",
-    "mixed": "Misturada",
+    "mixed": "Misto",
     "textFallback": "Texto"
   },
   "turnMenu": {
@@ -65,7 +65,7 @@
     "duplicatedBlocks": "{{num}} blocos duplicados",
     "undo": "Desfazer",
     "undidDuplicate": "Duplicação desfeita",
-    "nothingToUndo": "Nada para desfazer",
+    "nothingToUndo": "Nada a desfazer",
     "deletedBlock": "Bloco excluído",
     "deletedBlocks": "{{num}} blocos excluídos",
     "restoredBlock": "Bloco restaurado",
@@ -83,10 +83,10 @@
     "title": "Mover {{num}} blocos para"
   },
   "edited": {
-    "justNow": "Última edição agora há pouco",
-    "minutesAgo": "Última edição há {{minutes}}min",
-    "hoursAgo": "Última edição há {{hours}}h",
-    "daysAgo": "Última edição há {{days}}d",
-    "on": "Última edição em {{date}}"
+    "justNow": "Editado agora mesmo",
+    "minutesAgo": "Editado há {{minutes}}m",
+    "hoursAgo": "Editado há {{hours}}h",
+    "daysAgo": "Editado há {{days}}d",
+    "on": "Editado em {{date}}"
   }
 }

@@ -1,10 +1,10 @@
 {
-  "title": "Unlock local data",
-  "description": "Offline data on this device is locked with a passphrase. Unlocking turns offline use and saving back on.",
-  "passphrasePlaceholder": "Passphrase",
-  "unlock": "Unlock",
-  "continueOnline": "Continue online only",
-  "continueOnlineHint": "\"Continue online only\" keeps this device's locked offline edits sealed — they stay on this device and won't sync until you unlock them with the right passphrase.",
-  "wrongPassphrase": "That passphrase isn't right.",
-  "unsupportedBrowser": "Local lock isn't available in this browser."
+  "continueOnline": "Pokračovat jen online",
+  "continueOnlineHint": "„Pokračovat jen online“ ponechá uzamčené offline úpravy na tomto zařízení zapečetěné – zůstanou na tomto zařízení a nebudou synchronizovány, dokud je neodemknete správným heslem.",
+  "description": "Offline data na tomto zařízení jsou uzamčena heslem. Odemčení znovu povolí offline používání a ukládání.",
+  "passphrasePlaceholder": "Heslo",
+  "title": "Odemknout místní data",
+  "unlock": "Odemknout",
+  "unsupportedBrowser": "Místní zámek není v tomto prohlížeči k dispozici.",
+  "wrongPassphrase": "Toto heslo není správné."
 }

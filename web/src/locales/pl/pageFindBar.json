@@ -1,14 +1,14 @@
 {
+  "actions": {
+    "close": "Zamknij wyszukiwanie",
+    "next": "Następne dopasowanie",
+    "previous": "Poprzednie dopasowanie"
+  },
   "dialog": {
-    "label": "Find in page"
+    "label": "Znajdź na stronie"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
-  },
-  "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "label": "Znajdź na stronie",
+    "placeholder": "Znajdź na stronie"
   }
 }

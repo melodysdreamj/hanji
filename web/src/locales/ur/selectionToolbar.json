@@ -1,76 +1,76 @@
 {
   "toolbar": {
-    "ariaLabel": "Text formatting"
+    "ariaLabel": "متن کی فارمیٹنگ"
   },
   "turnInto": {
-    "label": "Turn into",
+    "label": "تبدیل کریں",
     "options": {
-      "text": "Text",
-      "heading1": "Heading 1",
-      "heading2": "Heading 2",
-      "heading3": "Heading 3",
-      "heading4": "Heading 4",
-      "toDoList": "To-do list",
-      "bulletedList": "Bulleted list",
-      "numberedList": "Numbered list",
-      "toggleList": "Toggle list",
-      "quote": "Quote",
-      "callout": "Callout",
-      "code": "Code"
+      "text": "متن",
+      "heading1": "عنوان 1",
+      "heading2": "عنوان 2",
+      "heading3": "عنوان 3",
+      "heading4": "عنوان 4",
+      "toDoList": "کاموں کی فہرست",
+      "bulletedList": "بلیٹ والی فہرست",
+      "numberedList": "نمبر والی فہرست",
+      "toggleList": "ٹوگل فہرست",
+      "quote": "اقتباس",
+      "callout": "کال آؤٹ",
+      "code": "کوڈ"
     }
   },
   "marks": {
-    "bold": "Bold",
-    "italic": "Italic",
-    "underline": "Underline",
-    "strikethrough": "Strikethrough",
-    "code": "Code",
-    "link": "Link"
+    "bold": "بولڈ",
+    "italic": "ترچھا",
+    "underline": "زیر خط",
+    "strikethrough": "خط کشیدہ",
+    "code": "کوڈ",
+    "link": "لنک"
   },
   "comment": {
-    "label": "Comment"
+    "label": "تبصرہ"
   },
   "colorButton": {
-    "ariaLabel": "Text color: {{color}}",
-    "title": "Color: {{color}}"
+    "ariaLabel": "متن کا رنگ: {{color}}",
+    "title": "رنگ: {{color}}"
   },
   "colors": {
-    "mixed": "Mixed",
+    "mixed": "مخلوط",
     "text": {
-      "heading": "Text color",
-      "default": "Default",
-      "gray": "Gray",
-      "brown": "Brown",
-      "orange": "Orange",
-      "yellow": "Yellow",
-      "green": "Green",
-      "blue": "Blue",
-      "purple": "Purple",
-      "pink": "Pink",
-      "red": "Red"
+      "heading": "متن کا رنگ",
+      "default": "طے شدہ",
+      "gray": "خاکستری",
+      "brown": "بھورا",
+      "orange": "نارنجی",
+      "yellow": "پیلا",
+      "green": "سبز",
+      "blue": "نیلا",
+      "purple": "جامنی",
+      "pink": "گلابی",
+      "red": "لال"
     },
     "background": {
-      "heading": "Background color",
-      "gray": "Gray background",
-      "brown": "Brown background",
-      "orange": "Orange background",
-      "yellow": "Yellow background",
-      "green": "Green background",
-      "blue": "Blue background",
-      "purple": "Purple background",
-      "pink": "Pink background",
-      "red": "Red background"
+      "heading": "پس منظر کا رنگ",
+      "gray": "سرمئی پس منظر",
+      "brown": "بھورا پس منظر",
+      "orange": "نارنجی پس منظر",
+      "yellow": "پیلا پس منظر",
+      "green": "سبز پس منظر",
+      "blue": "نیلا پس منظر",
+      "purple": "جامنی پس منظر",
+      "pink": "گلابی پس منظر",
+      "red": "سرخ پس منظر"
     }
   },
   "linkEditor": {
-    "ariaLabel": "Edit link",
-    "placeholder": "Paste link",
-    "urlAriaLabel": "Link URL",
-    "apply": "Link",
-    "open": "Open link",
-    "copy": "Copy link",
-    "copied": "Copied",
-    "copiedLink": "Copied link",
-    "remove": "Remove"
+    "ariaLabel": "لنک میں ترمیم",
+    "placeholder": "لنک پیسٹ کریں",
+    "urlAriaLabel": "لنک یو آر ایل",
+    "apply": "لنک",
+    "open": "لنک کھولیں",
+    "copy": "لنک کاپی کریں",
+    "copied": "کاپی شدہ",
+    "copiedLink": "لنک کاپی شدہ",
+    "remove": "ہٹائیں"
   }
 }

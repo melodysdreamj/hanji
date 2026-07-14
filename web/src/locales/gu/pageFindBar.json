@@ -1,14 +1,14 @@
 {
   "dialog": {
-    "label": "Find in page"
+    "label": "પૃષ્ઠમાં શોધો"
   },
   "input": {
-    "label": "Find in page",
-    "placeholder": "Find in page"
+    "label": "પૃષ્ઠમાં શોધો",
+    "placeholder": "પૃષ્ઠમાં શોધો"
   },
   "actions": {
-    "previous": "Previous match",
-    "next": "Next match",
-    "close": "Close find"
+    "previous": "પાછલો મેળ",
+    "next": "આગલો મેળ",
+    "close": "શોધ બંધ કરો"
   }
 }

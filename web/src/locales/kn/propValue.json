@@ -1,11 +1,11 @@
 {
-  "relationLoading": "Loading relation items",
-  "relationUnavailable": "Relation items unavailable",
-  "unavailable": "Unavailable",
+  "relationLoading": "ಸಂಬಂಧಿತ ವಸ್ತುಗಳನ್ನು ಲೋಡ್ ಮಾಡುತ್ತಿದೆ",
+  "relationUnavailable": "ಸಂಬಂಧಿತ ವಸ್ತುಗಳು ಲಭ್ಯವಿಲ್ಲ",
+  "unavailable": "ಲಭ್ಯವಿಲ್ಲ",
   "checkbox": {
-    "checked": "Checked",
-    "unchecked": "Unchecked"
+    "checked": "ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ",
+    "unchecked": "ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ"
   },
-  "openRelation": "Open {{title}}",
-  "openOrDownloadFile": "Open or download {{name}}"
+  "openRelation": "{{title}} ತೆರೆಯಿರಿ",
+  "openOrDownloadFile": "{{name}} ತೆರೆಯಿರಿ ಅಥವಾ ಡೌನ್ಲೋಡ್ ಮಾಡಿ"
 }

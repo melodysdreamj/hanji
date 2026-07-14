@@ -1,27 +1,27 @@
 {
-  "searchPlaceholder": "Search or jump to...",
-  "quickFind": "Quick Find",
-  "closeSearch": "Close search",
-  "quickFindResults": "Quick Find results",
+  "searchPlaceholder": "Pesquisar ou ir para...",
+  "quickFind": "Pesquisa rápida",
+  "closeSearch": "Fechar pesquisa",
+  "quickFindResults": "Resultados da pesquisa rápida",
   "sections": {
-    "recentlyViewed": "Recently viewed",
-    "recentSearches": "Recent searches",
-    "pages": "Pages",
-    "pageContent": "Page content",
-    "favorites": "Favorites"
+    "recentlyViewed": "Visualizados recentemente",
+    "recentSearches": "Pesquisas recentes",
+    "pages": "Páginas",
+    "pageContent": "Conteúdo da página",
+    "favorites": "Favoritos"
   },
-  "inPage": "in page",
-  "searchingDetail": "Searching...",
-  "searchAgain": "Search again",
-  "searchingPageContent": "Searching page content...",
-  "noResultsFor": "No results for \"{{query}}\"",
-  "noPagesFound": "No pages found",
-  "creating": "Creating...",
-  "newPage": "New page \"{{query}}\"",
-  "couldntCreatePage": "Couldn't create page",
+  "inPage": "na página",
+  "searchingDetail": "A pesquisar...",
+  "searchAgain": "Pesquisar novamente",
+  "searchingPageContent": "A pesquisar conteúdo da página...",
+  "noResultsFor": "Sem resultados para \"{{query}}\"",
+  "noPagesFound": "Nenhuma página encontrada",
+  "creating": "A criar...",
+  "newPage": "Nova página \"{{query}}\"",
+  "couldntCreatePage": "Falha ao criar página",
   "hints": {
-    "select": "Select",
-    "open": "Open",
-    "newTab": "New tab"
+    "select": "Selecionar",
+    "open": "Abrir",
+    "newTab": "Novo separador"
   }
 }

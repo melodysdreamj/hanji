@@ -1,73 +1,73 @@
 {
-  "title": "Comments",
-  "closeAria": "Close comments",
+  "title": "கருத்துகள்",
+  "closeAria": "கருத்துகளை மூடு",
   "subtitle": {
-    "block": "Block discussion",
-    "page": "Page discussion"
+    "block": "தொகுதி விவாதம்",
+    "page": "பக்கம் விவாதம்"
   },
   "status": {
-    "aria": "Comment status",
-    "open": "Open",
-    "resolved": "Resolved"
+    "aria": "கருத்து நிலை",
+    "open": "திறந்த",
+    "resolved": "தீர்க்கப்பட்டது"
   },
   "anchor": {
-    "commentingOn": "Commenting on",
-    "commentingOnSelectedText": "Commenting on selected text",
-    "selectedBlock": "Selected block",
-    "onSelectedText": "On selected text",
-    "onSelectedBlock": "On selected block",
-    "onABlock": "On a block"
+    "commentingOn": "இதில் கருத்து",
+    "commentingOnSelectedText": "தேர்ந்தெடுத்த உரையில் கருத்து",
+    "selectedBlock": "தேர்ந்தெடுத்த தொகுதி",
+    "onSelectedText": "தேர்ந்தெடுத்த உரையில்",
+    "onSelectedBlock": "தேர்ந்தெடுத்த தொகுதியில்",
+    "onABlock": "ஒரு தொகுதியில்"
   },
   "composer": {
-    "addBlockComment": "Add a block comment",
-    "addPageComment": "Add a page comment",
-    "blockPlaceholder": "Comment on this block...",
-    "pagePlaceholder": "Add a comment...",
-    "submit": "Comment"
+    "addBlockComment": "தொகுதி கருத்தைச் சேர்",
+    "addPageComment": "பக்க கருத்தைச் சேர்",
+    "blockPlaceholder": "இந்தத் தொகுதியில் கருத்து...",
+    "pagePlaceholder": "கருத்துச் சேர்...",
+    "submit": "கருத்து"
   },
   "mention": {
-    "commentPeopleAria": "Comment mention people",
-    "replyPeopleAria": "Reply mention people",
-    "trigger": "Mention people",
-    "noMatches": "No matching people",
-    "title": "Mention {{name}}",
-    "person": "Person",
-    "you": "You",
-    "organizationPerson": "Organization person",
-    "roleInOrganization": "{{role}} in organization"
+    "commentPeopleAria": "கருத்தில் நபர்களைக் குறிப்பிடுக",
+    "replyPeopleAria": "பதிலில் நபர்களைக் குறிப்பிடுக",
+    "trigger": "நபர்களைக் குறிப்பிடுக",
+    "noMatches": "பொருந்தும் நபர்கள் இல்லை",
+    "title": "{{name}}ஐக் குறிப்பிடுக",
+    "person": "நபர்",
+    "you": "நீங்கள்",
+    "organizationPerson": "நிறுவன நபர்",
+    "roleInOrganization": "நிறுவனத்தில் {{role}}"
   },
   "list": {
-    "threadsAria": "Comment threads",
-    "empty": "No comments yet",
-    "noOpen": "No open comments",
-    "noResolved": "No resolved comments"
+    "threadsAria": "கருத்து நூல்கள்",
+    "empty": "இன்னும் கருத்துகள் இல்லை",
+    "noOpen": "திறந்த கருத்துகள் இல்லை",
+    "noResolved": "தீர்க்கப்பட்ட கருத்துகள் இல்லை"
   },
   "card": {
-    "commentAria": "{{author}} comment, {{time}}",
-    "commentAriaResolved": "{{author}} comment, {{time}}, resolved",
-    "replyAria": "{{author}} reply, {{time}}",
-    "repliesAria": "{{count}} replies",
-    "edited": "(edited)",
-    "emptyComment": "(empty comment)",
-    "emptyReply": "(empty reply)",
-    "justNow": "Just now"
+    "commentAria": "{{author}} கருத்து, {{time}}",
+    "commentAriaResolved": "{{author}} கருத்து, {{time}}, தீர்க்கப்பட்டது",
+    "replyAria": "{{author}} பதில், {{time}}",
+    "repliesAria": "{{count}} பதில்கள்",
+    "edited": "(திருத்தப்பட்டது)",
+    "emptyComment": "(காலி கருத்து)",
+    "emptyReply": "(காலி பதில்)",
+    "justNow": "இப்போது"
   },
   "actions": {
-    "reply": "Reply",
-    "showInPage": "Show in page",
-    "resolve": "Resolve",
-    "reopen": "Reopen",
-    "edit": "Edit"
+    "reply": "பதில்",
+    "showInPage": "பக்கத்தில் காட்டு",
+    "resolve": "தீர்க்க",
+    "reopen": "மீண்டும் திற",
+    "edit": "திருத்து"
   },
   "reply": {
-    "placeholder": "Reply..."
+    "placeholder": "பதில்..."
   },
   "edit": {
-    "aria": "Edit comment"
+    "aria": "கருத்தைத் திருத்து"
   },
   "delete": {
-    "commentConfirm": "Delete this comment?",
-    "threadConfirm_one": "Delete this comment and its reply?",
-    "threadConfirm_other": "Delete this comment and its {{count}} replies?"
+    "commentConfirm": "இந்தக் கருத்தை நீக்கவா?",
+    "threadConfirm_one": "இந்த கருத்தையும் அதன் பதிலையும் நீக்கவா?",
+    "threadConfirm_other": "இந்த கருத்தையும் அதன் {{count}} பதில்களையும் நீக்கவா?"
   }
 }

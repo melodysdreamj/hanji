@@ -1,27 +1,27 @@
 {
-  "title": "New workspace",
+  "title": "Workspace nou",
   "name": {
-    "label": "Workspace name",
+    "label": "Nume spațiu de lucru",
     "placeholder": "Acme Inc."
   },
-  "startLabel": "Start from",
+  "startLabel": "Începe de la",
   "options": {
     "blank": {
-      "title": "Blank workspace",
-      "body": "Start empty with the starter pages."
+      "title": "Workspace gol",
+      "body": "Începe gol cu paginile de start."
     },
     "notion": {
-      "title": "Import from Notion",
-      "body": "Create the workspace, then migrate a Notion workspace into it."
+      "title": "Importă din Notion",
+      "body": "Creează workspace-ul, apoi migrează un workspace Notion în el."
     },
     "hanji": {
-      "title": "Import from another Hanji",
-      "body": "Create the workspace, then pull a workspace from another Hanji server or file."
+      "title": "Importă din alt Hanji",
+      "body": "Creează workspace-ul, apoi importă un workspace de pe un alt server Hanji sau dintr-un fișier."
     }
   },
-  "create": "Create workspace",
-  "creating": "Creating…",
+  "create": "Creează spațiu de lucru",
+  "creating": "Se creează…",
   "error": {
-    "couldntCreate": "Couldn't create workspace."
+    "couldntCreate": "Nu s-a putut crea spațiul de lucru."
   }
 }
