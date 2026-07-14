@@ -49,6 +49,10 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
       }],
       connectionStorageAvailable: true,
     })),
+    repairNotionImportPageIndexesRemote: vi.fn(async () => ({
+      unwrapped: 0,
+      trashed: 0,
+    })),
     discoverNotionImportJobRemote: vi.fn(async () => ({
       job: {
         id: "job-live-1",
@@ -89,6 +93,7 @@ import {
   fetchRuntimeConfigRemote,
   listNotionImportConnectionsRemote,
   listNotionImportJobsRemote,
+  repairNotionImportPageIndexesRemote,
 } from "@/lib/edgebase";
 import { useStore } from "@/lib/store";
 import { resetStore, seedUser } from "./components/storeTestUtils";
@@ -173,6 +178,19 @@ afterEach(() => {
 });
 
 describe("ImportDialog default source", () => {
+  it("does not probe protected Notion import state while the persistent dialog is closed", async () => {
+    render(<ImportDialog open={false} onClose={vi.fn()} />);
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(listJobsMock).not.toHaveBeenCalled();
+    expect(listConnectionsMock).not.toHaveBeenCalled();
+    expect(vi.mocked(repairNotionImportPageIndexesRemote)).not.toHaveBeenCalled();
+  });
+
   it("opens on the Notion tab, not the file tab", async () => {
     render(<ImportDialog onClose={vi.fn()} />);
     await act(async () => {

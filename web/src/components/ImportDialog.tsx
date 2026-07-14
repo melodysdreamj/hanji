@@ -1160,7 +1160,7 @@ export function ImportDialog({
   }, [workspace?.id]);
 
   useEffect(() => {
-    if (source !== "notion" || !workspace?.id) return;
+    if (!open || source !== "notion" || !workspace?.id) return;
     let mounted = true;
     refreshNotionImportState()
       .catch(() => {
@@ -1171,14 +1171,14 @@ export function ImportDialog({
     return () => {
       mounted = false;
     };
-  }, [source, workspace?.id, refreshNotionImportState]);
+  }, [open, source, workspace?.id, refreshNotionImportState]);
 
   // One-shot self-heal for legacy/interrupted imports: rebuild page routing,
   // unwrap completed staging roots, and hide failed partial output.
   const repairedWorkspacesRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     const workspaceId = workspace?.id;
-    if (source !== "notion" || !workspaceId) return;
+    if (!open || source !== "notion" || !workspaceId) return;
     if (repairedWorkspacesRef.current.has(workspaceId)) return;
     repairedWorkspacesRef.current.add(workspaceId);
     void repairNotionImportPageIndexesRemote(workspaceId)
@@ -1190,7 +1190,7 @@ export function ImportDialog({
       .catch(() => {
         repairedWorkspacesRef.current.delete(workspaceId);
       });
-  }, [refreshWorkspacePages, source, workspace?.id]);
+  }, [open, refreshWorkspacePages, source, workspace?.id]);
 
   useEffect(() => {
     const workspaceId = workspace?.id;
