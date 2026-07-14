@@ -271,7 +271,7 @@ curl --http1.1 --max-time 4 -sS -D - -o /dev/null \
   -H 'Connection: Upgrade' \
   -H 'Upgrade: websocket' \
   -H 'Sec-WebSocket-Version: 13' \
-  -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+  -H "Sec-WebSocket-Key: $(openssl rand -base64 16)" \
   "$PUBLIC_ORIGIN/api/db/subscribe?namespace=app&table=workspaces" || true
 ```
 

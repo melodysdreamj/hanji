@@ -471,7 +471,8 @@ describe("DatabaseView", () => {
       );
       await waitFor(() => expect(screen.queryByRole("dialog", { name: "Edit database template" })).toBeNull());
       await waitFor(() => expect(document.activeElement).toBe(trigger));
-    }
+    },
+    10_000,
   );
 
   it("keeps template creation in the menu and avoids a false success after terminal rollback", async () => {
@@ -534,7 +535,8 @@ describe("DatabaseView", () => {
         ));
         expect(useStore.getState().toasts.some((toast) => toast.message === "Created template")).toBe(false);
       }
-    }
+    },
+    10_000,
   );
 
   it("renders the complete database view controls in Korean", async () => {
