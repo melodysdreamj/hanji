@@ -231,7 +231,7 @@ async function assertOfflineBootServesCacheAndReplays(browser, appUrl, apiUrl, s
 // ── phase D: service-worker offline reload (network fully off) ─────────────
 
 async function assertServiceWorkerOfflineReload(browser, appUrl, apiUrl, seed) {
-  const context = await newSeededContext(browser, seed);
+  const context = await newSeededContext(browser, seed, {}, { serviceWorkers: 'allow' });
 
   // First visit registers the worker. Install stages only the boot graph; the
   // active client then asks it to warm the complete product graph in a
@@ -299,7 +299,12 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
   };
 
   // Session 1 (online): unlock creates the wrapped key; caches fill sealed.
-  const context = await newSeededContext(browser, seed, lockStorage);
+  const context = await newSeededContext(
+    browser,
+    seed,
+    lockStorage,
+    { serviceWorkers: 'allow' },
+  );
   const first = await context.newPage();
   await first.goto(resolveUrl(appUrl, `/p/${seed.pageId}`), {
     waitUntil: 'domcontentloaded',
@@ -378,8 +383,14 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
-async function newSeededContext(browser, seed, extraLocalStorage = {}) {
-  const context = await browser.newContext();
+async function newSeededContext(browser, seed, extraLocalStorage = {}, contextOptions = {}) {
+  // A-C exercise IndexedDB/outbox behavior with the application network
+  // available (or selectively routed offline); they do not own the service
+  // worker contract. Blocking registration there prevents several abandoned
+  // complete-graph warmups from competing with D/E in one CI browser.
+  const context = await browser.newContext({
+    serviceWorkers: contextOptions.serviceWorkers ?? 'block',
+  });
   // First context bootstraps from the API-issued refresh token; later contexts
   // transplant the rotated HttpOnly cookie (rotation reuse detection forbids
   // replaying the original token across contexts).
