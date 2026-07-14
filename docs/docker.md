@@ -13,7 +13,7 @@ WebSocket settings, use the separate
 Use the immutable release tag:
 
 ```text
-melodysdreamj/hanji:0.1.0-alpha.2
+melodysdreamj/hanji:0.1.0-alpha.3
 ```
 
 The Docker Hub image supports Linux AMD64 and ARM64. Docker selects the correct
@@ -27,7 +27,7 @@ anonymous client.
 
 ## Docker Desktop or another container UI
 
-1. Pull `melodysdreamj/hanji:0.1.0-alpha.2` from Docker Hub.
+1. Pull `melodysdreamj/hanji:0.1.0-alpha.3` from Docker Hub.
 2. Create a container and enable automatic restart.
 3. Publish an unused host port to container `8787/TCP`. On a personal computer,
    host port `8787` is the simplest choice.
@@ -54,7 +54,7 @@ docker run -d \
   --restart unless-stopped \
   -p 127.0.0.1:8787:8787 \
   -v hanji-data:/data \
-  melodysdreamj/hanji:0.1.0-alpha.2
+  melodysdreamj/hanji:0.1.0-alpha.3
 ```
 
 Open [http://localhost:8787](http://localhost:8787). The first browser visit
@@ -108,7 +108,7 @@ Back up `/data`, then pull the new immutable tag and recreate only the
 replaceable container. The named volume remains intact:
 
 ```bash
-HANJI_VERSION=0.1.0-alpha.2 # replace with the new immutable release tag
+HANJI_VERSION=0.1.0-alpha.3 # replace with the new immutable release tag
 docker pull "melodysdreamj/hanji:$HANJI_VERSION"
 docker rm -f hanji
 docker run -d \
