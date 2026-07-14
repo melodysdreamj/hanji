@@ -87,6 +87,7 @@ import {
   outboxRekey,
   outboxSet,
   resetOutboxForTests,
+  type DatabaseCreateEffect,
   type OutboxEntry,
   type OutboxOp,
   type RemoteCallEffect,
@@ -97,6 +98,7 @@ import {
   cacheListTable,
   cacheReplaceTable,
   cacheSetMeta,
+  cacheUpsertRecord,
   getOfflinePins,
   hashCacheKey,
   recordCacheClear,
@@ -1038,6 +1040,12 @@ const pendingBlockPage = new Map<string, string>();
 // patch must not silently clobber what another device wrote meanwhile.
 const pendingBlockBase = new Map<string, string>();
 const pendingPage = new Map<string, Partial<Page>>();
+// A row/page patch stays projected over delayed server snapshots until a
+// response actually contains it. `pendingPage` deliberately removes a patch
+// while its request is in flight, which used to let an older forced database
+// query visually resurrect a relation/value and feed that stale state into a
+// later cell edit on high-latency appliances.
+const optimisticPageOverlays = new Map<string, Partial<Page>>();
 type PendingPageCreate = { originHref: string; page: Page; userId: string };
 const pendingPageCreate = new Map<string, PendingPageCreate>();
 const pageCreateTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -1155,6 +1163,22 @@ function mirrorPendingPage(id: string) {
   });
 }
 
+function remotePageWithOptimisticOverlay(page: Page): Page {
+  let optimistic = optimisticPageOverlays.get(page.id);
+  if (
+    optimistic &&
+    Object.entries(optimistic).every(([key, value]) =>
+      jsonValuesEqual((page as unknown as Record<string, unknown>)[key], value)
+    )
+  ) {
+    optimisticPageOverlays.delete(page.id);
+    optimistic = undefined;
+  }
+  const pending = pendingPage.get(page.id);
+  if (!optimistic && (!pending || Object.keys(pending).length === 0)) return page;
+  return { ...page, ...(optimistic ?? {}), ...(pending ?? {}) };
+}
+
 function mirrorPendingBlock(id: string) {
   const patch = pendingBlock.get(id);
   if (!patch || !Object.keys(patch).length) return;
@@ -1213,8 +1237,11 @@ function valueReferencesMatchingId(
   );
 }
 
-function valueReferencesPendingCreate(value: unknown) {
-  return valueReferencesMatchingId(value, pendingOptimisticCreateHas);
+function valueReferencesPendingCreate(value: unknown, ignoredId?: string) {
+  return valueReferencesMatchingId(
+    value,
+    (candidate) => candidate !== ignoredId && pendingOptimisticCreateHas(candidate)
+  );
 }
 
 function valueReferencesId(value: unknown, id: string) {
@@ -1357,6 +1384,7 @@ function publishDatabaseRowsMutation(databaseId: string, reason: string, rowIds?
 }
 
 function publishDatabaseSchemaMutation(databaseId: string, reason: string, propertyIds?: string[]) {
+  cacheCurrentDatabaseMetadata(databaseId);
   publishLocalDatabaseMutation({
     databaseId,
     kind: "database_schema_changed",
@@ -1368,6 +1396,7 @@ function publishDatabaseSchemaMutation(databaseId: string, reason: string, prope
 }
 
 function publishDatabaseViewsMutation(databaseId: string, reason: string, viewIds?: string[]) {
+  cacheCurrentDatabaseMetadata(databaseId);
   publishLocalDatabaseMutation({
     databaseId,
     kind: "database_views_changed",
@@ -1379,6 +1408,7 @@ function publishDatabaseViewsMutation(databaseId: string, reason: string, viewId
 }
 
 function publishDatabaseTemplatesMutation(databaseId: string, reason: string) {
+  cacheCurrentDatabaseMetadata(databaseId);
   publishLocalDatabaseMutation({
     databaseId,
     kind: "database_templates_changed",
@@ -1473,6 +1503,7 @@ function cancelPendingPage(id: string) {
     pageTimers.delete(id);
   }
   pendingPage.delete(id);
+  optimisticPageOverlays.delete(id);
   outboxAck(outboxUserId(), `page:${id}`);
 }
 
@@ -1518,6 +1549,26 @@ function rollbackDependentWritesForFailedCreate(id: string) {
   const reloadDatabases = new Set<string>();
   const reloadPages = new Set<string>();
   const removeLocalBlockIds = new Set<string>();
+
+  // Relation reciprocals and rollups are reflected optimistically before
+  // their dependent create is acknowledged. If that create is rejected,
+  // reload every schema that still points at the failed id so a phantom
+  // relatedPropertyId/rollup dependency cannot survive in local state.
+  for (const [databaseId, properties] of Object.entries(state.propsByDb)) {
+    if (properties.some((property) => valueReferencesId(property, id))) {
+      reloadDatabases.add(databaseId);
+    }
+  }
+  for (const [databaseId, views] of Object.entries(state.viewsByDb)) {
+    if (views.some((view) => valueReferencesId(view, id))) {
+      reloadDatabases.add(databaseId);
+    }
+  }
+  for (const [databaseId, templates] of Object.entries(state.templatesByDb)) {
+    if (templates.some((template) => valueReferencesId(template, id))) {
+      reloadDatabases.add(databaseId);
+    }
+  }
 
   for (const [blockId, patch] of pendingBlock) {
     if (!valueReferencesId(patch, id)) continue;
@@ -1963,6 +2014,7 @@ export async function clearDurableOutboxOnSignOut() {
 export function resetBootstrapForTests() {
   bootPromise = null;
   bootKey = "";
+  databaseMetadataRevalidated.clear();
 }
 
 /** Test-only isolation for module-level persistence lanes. */
@@ -1973,13 +2025,18 @@ export function resetPendingPersistenceForTests() {
   for (const timer of pageCreateTimers.values()) clearTimeout(timer);
   for (const timer of backgroundDurableTimers.values()) clearTimeout(timer);
   for (const timer of deferredDurableTimers.values()) clearTimeout(timer);
+  for (const timer of replayQueueTimers.values()) clearTimeout(timer);
   pageTimers.clear();
   blockTimers.clear();
   blockCreateTimers.clear();
   pageCreateTimers.clear();
   backgroundDurableTimers.clear();
   deferredDurableTimers.clear();
+  replayQueueTimers.clear();
+  replayQueues.clear();
+  replayQueueRuns.clear();
   pendingPage.clear();
+  optimisticPageOverlays.clear();
   pendingBlock.clear();
   pendingBlockPage.clear();
   pendingBlockBase.clear();
@@ -1998,6 +2055,8 @@ export function resetPendingPersistenceForTests() {
   blockCreateInFlight.clear();
   pageCreateInFlight.clear();
   backgroundDurableInFlight.clear();
+  databaseMetadataRevalidated.clear();
+  databaseRowsForcedAgain.clear();
 }
 
 // ── offline scope warmer (local-first Phase 3 v2) ───────────────────────────
@@ -2188,29 +2247,91 @@ export async function warmOfflineScope(userId: string) {
   }
 }
 
-export async function replayDurableOutbox(userId: string) {
-  const entries = await outboxClaimAbandoned(userId);
-  for (const entry of entries) {
-    // Sequential on purpose: enqueue order is the causality order (a create
-    // replays before a later update or delete that references it).
-    await replayOutboxOp(userId, entry.entryKey, entry.value).catch(() => {});
+type ReplayOutcome = "complete" | "retry";
+
+type ReplayQueue = {
+  entries: OutboxEntry[];
+  index: number;
+};
+
+const replayQueues = new Map<string, ReplayQueue>();
+const replayQueueTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const replayQueueRuns = new Map<string, Promise<void>>();
+
+function scheduleReplayQueue(userId: string) {
+  if (replayQueueTimers.has(userId)) return;
+  replayQueueTimers.set(
+    userId,
+    setTimeout(() => {
+      replayQueueTimers.delete(userId);
+      void runReplayQueue(userId);
+    }, PERSIST_RETRY_MS)
+  );
+}
+
+async function runReplayQueue(userId: string) {
+  const active = replayQueueRuns.get(userId);
+  if (active) return active;
+  const run = (async () => {
+    const queue = replayQueues.get(userId);
+    if (!queue) return;
+    while (queue.index < queue.entries.length) {
+      const entry = queue.entries[queue.index]!;
+      // Sequential on purpose: enqueue order is the causality order (a create
+      // replays before a later update or delete that references it). A transient
+      // create failure pauses the whole claimed lane instead of allowing its
+      // dependent block/schema writes to race into terminal 404s.
+      const outcome = await replayOutboxOp(userId, entry.entryKey, entry.value).catch(
+        () => "retry" as const
+      );
+      if (outcome === "retry") {
+        scheduleReplayQueue(userId);
+        return;
+      }
+      queue.index += 1;
+    }
+    replayQueues.delete(userId);
+  })();
+  replayQueueRuns.set(userId, run);
+  try {
+    await run;
+  } finally {
+    if (replayQueueRuns.get(userId) === run) replayQueueRuns.delete(userId);
   }
 }
 
-async function replayOutboxOp(userId: string, entryKey: string, op: OutboxOp) {
+export async function replayDurableOutbox(userId: string) {
+  const existing = replayQueues.get(userId);
+  if (existing) {
+    const timer = replayQueueTimers.get(userId);
+    if (timer) clearTimeout(timer);
+    replayQueueTimers.delete(userId);
+    await runReplayQueue(userId);
+    return;
+  }
+  const entries = await outboxClaimAbandoned(userId);
+  if (!entries.length) return;
+  replayQueues.set(userId, { entries, index: 0 });
+  await runReplayQueue(userId);
+}
+
+async function replayOutboxOp(
+  userId: string,
+  entryKey: string,
+  op: OutboxOp
+): Promise<ReplayOutcome> {
   switch (op.kind) {
     case "page_update": {
       if (pendingPage.has(op.id) || useStore.getState().pagesById[op.id]) {
         pendingPage.set(op.id, { ...op.patch, ...(pendingPage.get(op.id) ?? {}) });
         mirrorPendingPage(op.id);
         await flushPage(op.id);
-        return;
+        return "complete";
       }
-      await replayRemote(userId, entryKey, op, async () => {
+      return replayRemote(userId, entryKey, op, async () => {
         if (op.target === "database_row") await updateDatabaseRowRemote(op.id, op.patch);
         else await updatePageRemote(op.id, op.patch);
       });
-      return;
     }
     case "block_update": {
       if (pendingBlock.has(op.id)) {
@@ -2220,33 +2341,30 @@ async function replayOutboxOp(userId: string, entryKey: string, op: OutboxOp) {
         }
         mirrorPendingBlock(op.id);
         await flushBlock(op.id);
-        return;
+        return "complete";
       }
-      await replayRemote(userId, entryKey, op, async () => {
+      return replayRemote(userId, entryKey, op, async () => {
         // Replayed offline edits carry the optimistic-concurrency guard: if the
         // block changed on another device meanwhile, the server 409s and the
         // conflict path below keeps the server version + offers "apply mine".
-        await updateBlockRemote(op.id, op.patch, op.hintPageId, op.expectedUpdatedAt);
+        return updateBlockRemote(op.id, op.patch, op.hintPageId, op.expectedUpdatedAt);
       });
-      return;
     }
     case "block_create":
-      await replayRemote(userId, entryKey, op, async () => {
+      return replayRemote(userId, entryKey, op, async () => {
         await createBlockRemote(op.block);
       });
-      return;
     case "block_delete":
-      await replayRemote(userId, entryKey, op, async () => {
+      return replayRemote(userId, entryKey, op, async () => {
         await deleteBlocksRemote(op.ids, op.hintPageId);
       });
-      return;
     case "remote_call": {
       const entry = DURABLE_REMOTE_CALLS[op.fn];
       if (!entry) {
         // Unknown fn (schema drift across app versions) — drop rather than
         // wedge the replay loop on an op we can no longer execute.
         outboxAck(userId, entryKey);
-        return;
+        return "complete";
       }
       if (op.effect?.kind === "row_file_remove") {
         await startSerializedRowFileRemovalCall(
@@ -2255,10 +2373,9 @@ async function replayOutboxOp(userId: string, entryKey: string, op: OutboxOp) {
           op.fn,
           op.effect
         );
-        return;
+        return "complete";
       }
-      await replayRemote(userId, entryKey, op, () => entry.fn(...op.args));
-      return;
+      return replayRemote(userId, entryKey, op, () => entry.fn(...op.args));
     }
   }
 }
@@ -2294,14 +2411,18 @@ async function replayRemote(
   entryKey: string,
   op: OutboxOp,
   run: () => Promise<unknown>
-) {
+): Promise<ReplayOutcome> {
   try {
     const result = await run();
+    if (op.kind === "block_update") {
+      await reconcileReplayedBlockUpdate(userId, op, result);
+    }
     if (op.kind === "remote_call" && op.effect) {
       await applyRemoteCallEffectSuccess(op.effect, result);
     }
     outboxAck(userId, entryKey);
     noteSyncSuccess();
+    return "complete";
   } catch (error) {
     if (shouldDropRemoteCallEffectError(op, error)) {
       outboxAck(userId, entryKey);
@@ -2311,19 +2432,75 @@ async function replayRemote(
         persistErrorStatus(error) === 409
       ) {
         handleBlockReplayConflict(op);
-        return;
+        return "complete";
       }
+      const benign = replayDropIsBenign(op, persistErrorStatus(error));
       if (op.kind === "remote_call" && op.effect) {
-        await applyRemoteCallEffectDrop(op.effect, error);
+        if (benign) await applyRemoteCallEffectSuccess(op.effect, undefined);
+        else await applyRemoteCallEffectDrop(op.effect, error);
       }
-      if (!replayDropIsBenign(op, persistErrorStatus(error))) notifyPersistDrop(error);
-      return;
+      if (!benign) notifyPersistDrop(error);
+      else noteSyncSuccess();
+      return "complete";
     }
     noteSyncFailure();
-    // Transient: the claimed entry stays durable under this tab; retry like the
-    // live queues do.
-    setTimeout(() => void replayRemote(userId, entryKey, op, run), PERSIST_RETRY_MS);
+    // The queue owns the retry so later claimed operations cannot overtake
+    // this one while the durable create/update is still unavailable.
+    return "retry";
   }
+}
+
+async function reconcileReplayedBlockUpdate(
+  userId: string,
+  op: Extract<OutboxOp, { kind: "block_update" }>,
+  result: unknown
+) {
+  const direct = recordValue(result);
+  const nested = recordValue(direct?.block);
+  let authoritative = (
+    typeof nested?.id === "string"
+      ? nested
+      : typeof direct?.id === "string"
+        ? direct
+        : undefined
+  ) as Block | undefined;
+  const pageId = op.hintPageId ?? authoritative?.pageId;
+  if (!pageId) return;
+  if (!authoritative) {
+    const live = useStore
+      .getState()
+      .blocksByPage[pageId]
+      ?.find((block) => block.id === op.id);
+    const cached = live
+      ? undefined
+      : (await cacheListTable<Block>(userId, `blocks:${pageId}`)).find(
+          (record) => record.id === op.id
+        )?.value;
+    const baseline = live ?? cached;
+    if (!baseline) return;
+    authoritative = { ...baseline, ...op.patch, id: op.id, pageId };
+  }
+
+  useStore.setState((state) => {
+    const blocks = state.blocksByPage[pageId];
+    if (!blocks?.some((block) => block.id === authoritative.id)) return {};
+    return {
+      blocksByPage: {
+        ...state.blocksByPage,
+        [pageId]: blocks.map((block) =>
+          block.id === authoritative.id ? authoritative : block
+        ),
+      },
+    };
+  });
+  await cacheUpsertRecord(userId, `blocks:${pageId}`, {
+    id: authoritative.id,
+    value: authoritative,
+  });
+  // Updating a block also touches its page on the server. The locally cached
+  // page timestamp may not have arrived yet, so force the next online load to
+  // revalidate while still retaining this authoritative block for offline use.
+  await cacheSetMeta(userId, `blocksStamp:${pageId}`, "");
 }
 
 /**
@@ -2760,6 +2937,7 @@ async function retryDurableRemoteCall(
 
 type BackgroundDurableCallSpec = {
   args: unknown[];
+  effect?: RemoteCallEffect;
   fnKey: keyof typeof DURABLE_REMOTE_CALLS & string;
   onDrop: (error: unknown) => void | Promise<void>;
   onSuccess: (result: unknown | undefined) => void | Promise<void>;
@@ -2849,6 +3027,7 @@ function startBackgroundDurableCall(spec: BackgroundDurableCallSpec) {
   backgroundDurableCalls.set(spec.opKey, spec);
   outboxSet(spec.userId, spec.opKey, {
     args: spec.args,
+    effect: spec.effect,
     fn: spec.fnKey,
     kind: "remote_call",
   });
@@ -2898,6 +3077,7 @@ function persistOptimisticTemplateCreate(template: DbTemplate, reason: string) {
           ),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
     },
   });
 }
@@ -3176,8 +3356,214 @@ function remotePageResult(result: unknown): Page | null {
   return record && typeof record.id === "string" ? (record as unknown as Page) : null;
 }
 
+function databaseCreateRowsQueryKey(effect: DatabaseCreateEffect) {
+  const viewId = effect.views[0]?.id;
+  if (!viewId) return undefined;
+  return databaseRowsQueryKey({
+    viewId,
+    ...(effect.page.parentType === "page" && effect.page.parentId
+      ? { currentPageId: effect.page.parentId }
+      : {}),
+  });
+}
+
+function mergeOptimisticRecords<T extends { id: string }>(snapshot: T[], current: T[]) {
+  const currentById = new Map(current.map((item) => [item.id, item]));
+  const snapshotIds = new Set(snapshot.map((item) => item.id));
+  return [
+    ...snapshot.map((item) => ({ ...item, ...(currentById.get(item.id) ?? {}) })),
+    ...current.filter((item) => !snapshotIds.has(item.id)),
+  ];
+}
+
+/** Rebuild a queued atomic database create before exposing a booted route. */
+function materializeDatabaseCreateEffect(effect: DatabaseCreateEffect) {
+  const id = effect.databaseId;
+  pendingDatabaseCreate.set(id, effect.page.parentId ?? "");
+  useStore.setState((state) => {
+    const rows = mergeOptimisticRecords(
+      effect.rows,
+      (state.databaseRowIdsByDb[id] ?? [])
+        .map((rowId) => state.pagesById[rowId])
+        .filter((row): row is Page => !!row)
+    ).sort(bySortPos);
+    const currentRowPage = state.databaseRowPagesByDb[id];
+    return {
+      pagesById: {
+        ...state.pagesById,
+        [id]: { ...effect.page, ...(state.pagesById[id] ?? {}) },
+        ...Object.fromEntries(rows.map((row) => [row.id, row])),
+      },
+      pageRolesById: { ...state.pageRolesById, [id]: state.pageRolesById[id] ?? "edit" },
+      propsByDb: {
+        ...state.propsByDb,
+        [id]: mergeOptimisticRecords(effect.properties, state.propsByDb[id] ?? []).sort(bySortPos),
+      },
+      viewsByDb: {
+        ...state.viewsByDb,
+        [id]: mergeOptimisticRecords(effect.views, state.viewsByDb[id] ?? []).sort(bySortPos),
+      },
+      templatesByDb: {
+        ...state.templatesByDb,
+        [id]: mergeOptimisticRecords(effect.templates, state.templatesByDb[id] ?? []).sort(bySortPos),
+      },
+      databaseRowIdsByDb: { ...state.databaseRowIdsByDb, [id]: rows.map((row) => row.id) },
+      databaseRowPagesByDb: {
+        ...state.databaseRowPagesByDb,
+        [id]: currentRowPage ?? {
+          queryKey: databaseCreateRowsQueryKey(effect),
+          loadedCount: rows.length,
+          totalCount: rows.length,
+          hasMore: false,
+          loading: false,
+          loadingMore: false,
+        },
+      },
+      loadedDbs: new Set(state.loadedDbs).add(id),
+    };
+  });
+}
+
+function finishOptimisticDatabaseCreate(
+  effect: DatabaseCreateEffect,
+  rawResult: unknown | undefined
+) {
+  const id = effect.databaseId;
+  pendingDatabaseCreate.delete(id);
+  const result = rawResult as Awaited<ReturnType<typeof createDatabaseRemote>> | undefined;
+  if (result) {
+    useStore.setState((state) => {
+      const currentPage = state.pagesById[id];
+      const rows = (result.rows ?? []).slice().sort(bySortPos);
+      const currentRowPage = state.databaseRowPagesByDb[id];
+      return {
+        pagesById: {
+          ...state.pagesById,
+          [id]: currentPage ? { ...result.page, ...currentPage } : result.page,
+          ...Object.fromEntries(rows.map((row) => [row.id, row])),
+        },
+        propsByDb: {
+          ...state.propsByDb,
+          [id]: mergeOptimisticRecords(result.properties ?? [], state.propsByDb[id] ?? []).sort(bySortPos),
+        },
+        viewsByDb: {
+          ...state.viewsByDb,
+          [id]: mergeOptimisticRecords(result.views ?? [], state.viewsByDb[id] ?? []).sort(bySortPos),
+        },
+        templatesByDb: {
+          ...state.templatesByDb,
+          [id]: mergeOptimisticRecords(result.templates ?? [], state.templatesByDb[id] ?? []).sort(bySortPos),
+        },
+        databaseRowIdsByDb: {
+          ...state.databaseRowIdsByDb,
+          [id]: rows.map((row) => row.id),
+        },
+        databaseRowPagesByDb: {
+          ...state.databaseRowPagesByDb,
+          [id]: {
+            queryKey: currentRowPage?.queryKey ?? databaseCreateRowsQueryKey(effect),
+            loadedCount: rows.length,
+            totalCount: rows.length,
+            hasMore: false,
+            loading: false,
+            loadingMore: false,
+          },
+        },
+        loadedDbs: new Set(state.loadedDbs).add(id),
+      };
+    });
+  } else {
+    void useStore.getState().loadDatabase(id, { force: true, rows: true });
+  }
+  releaseOptimisticCreateDependents(id);
+}
+
+function rollbackOptimisticDatabaseCreate(effect: DatabaseCreateEffect) {
+  const id = effect.databaseId;
+  pendingDatabaseCreate.delete(id);
+  const dependentIds = cancelPendingCreatesUnderDatabase(id);
+  rollbackDependentWritesForFailedCreate(id);
+  useStore.setState((state) => {
+    const failedPageIds = new Set([id, ...dependentIds]);
+    let foundChild = true;
+    while (foundChild) {
+      foundChild = false;
+      for (const page of Object.values(state.pagesById)) {
+        if (failedPageIds.has(page.id) || !page.parentId || !failedPageIds.has(page.parentId)) {
+          continue;
+        }
+        failedPageIds.add(page.id);
+        foundChild = true;
+      }
+    }
+    const pagesById = { ...state.pagesById };
+    const pageRolesById = { ...state.pageRolesById };
+    const blocksByPage = { ...state.blocksByPage };
+    const blockHistoryByPage = { ...state.blockHistoryByPage };
+    const commentsByPage = { ...state.commentsByPage };
+    const propsByDb = { ...state.propsByDb };
+    const viewsByDb = { ...state.viewsByDb };
+    const templatesByDb = { ...state.templatesByDb };
+    const databaseRowIdsByDb = { ...state.databaseRowIdsByDb };
+    const databaseRowPagesByDb = { ...state.databaseRowPagesByDb };
+    const loadedBlockPages = new Set(state.loadedBlockPages);
+    const loadedCommentPages = new Set(state.loadedCommentPages);
+    for (const pageId of failedPageIds) {
+      delete pagesById[pageId];
+      delete pageRolesById[pageId];
+      delete blocksByPage[pageId];
+      delete blockHistoryByPage[pageId];
+      delete commentsByPage[pageId];
+      loadedBlockPages.delete(pageId);
+      loadedCommentPages.delete(pageId);
+    }
+    for (const [pageId, blocks] of Object.entries(blocksByPage)) {
+      blocksByPage[pageId] = blocks.filter(
+        (block) => !Array.from(failedPageIds).some((failedId) => valueReferencesId(block, failedId))
+      );
+    }
+    delete propsByDb[id];
+    delete viewsByDb[id];
+    delete templatesByDb[id];
+    delete databaseRowIdsByDb[id];
+    delete databaseRowPagesByDb[id];
+    const loadedDbs = new Set(state.loadedDbs);
+    loadedDbs.delete(id);
+    return {
+      pagesById,
+      pageRolesById,
+      blocksByPage,
+      blockHistoryByPage,
+      commentsByPage,
+      propsByDb,
+      viewsByDb,
+      templatesByDb,
+      databaseRowIdsByDb,
+      databaseRowPagesByDb,
+      loadedBlockPages,
+      loadedCommentPages,
+      loadedDbs,
+      recentPageIds: state.recentPageIds.filter((pageId) => !failedPageIds.has(pageId)),
+      ...(state.focusPageId && failedPageIds.has(state.focusPageId)
+        ? { focusPageId: undefined, focusPageTarget: undefined }
+        : {}),
+    };
+  });
+  if (typeof window === "undefined") return;
+  const route = routeInfoFromPath(window.location.pathname);
+  if (
+    (route.kind === "page" && route.pageId === id) ||
+    (route.kind === "database" && route.databaseId === id)
+  ) {
+    replaceRoute(effect.originHref);
+  }
+}
+
 async function applyRemoteCallEffectSuccess(effect: RemoteCallEffect, result: unknown) {
-  if (effect.kind !== "row_file_remove") return;
+  if (effect.kind === "database_create") {
+    finishOptimisticDatabaseCreate(effect, result);
+    return;
+  }
   const remote = remotePageResult(result);
   if (remote) {
     useStore.setState((state) => {
@@ -3306,7 +3692,10 @@ async function applyRemoteCallEffectDrop(
   effect: RemoteCallEffect,
   error: unknown
 ): Promise<RemoteCallEffectDropResult | undefined> {
-  if (effect.kind !== "row_file_remove") return undefined;
+  if (effect.kind === "database_create") {
+    rollbackOptimisticDatabaseCreate(effect);
+    return { unavailable: false };
+  }
   let authoritative: Page | null = null;
   let authoritativeError: unknown;
   try {
@@ -3541,9 +3930,7 @@ function applyBootstrapResult(
         }
       }
       for (const [id, page] of Object.entries(pagesById)) {
-        const pending = pendingPage.get(id);
-        merged[id] =
-          pending && Object.keys(pending).length ? { ...page, ...pending } : page;
+        merged[id] = remotePageWithOptimisticOverlay(page);
       }
       return {
         ready: true,
@@ -3721,33 +4108,70 @@ async function hydrateCurrentRouteFromCache(input: WorkspaceBootstrapInput) {
   );
 }
 
+async function revalidateHydratedCurrentRouteBlocks(input: WorkspaceBootstrapInput) {
+  const pageId = cachedBootTargetPageId(input);
+  if (!pageId || !useStore.getState().loadedBlockPages.has(pageId)) return;
+  if (await blocksCacheFresh(pageId)) return;
+  await useStore.getState().loadBlocks(pageId, { force: true });
+}
+
 /** Merge still-queued outbox page patches over a cached page list. */
 function overlayOutboxOnPages(entries: OutboxEntry[], pages: Page[]): Page[] {
   if (!entries.length) return pages;
-  return pages.map((page) => {
-    let current = page;
-    for (const entry of entries) {
-      const op = entry.value;
-      if (op.kind === "page_update" && op.id === page.id) {
-        current = { ...current, ...op.patch };
-        continue;
+  const byId = new Map(pages.map((page) => [page.id, page]));
+  for (const entry of entries) {
+    const op = entry.value;
+    if (op.kind === "remote_call") {
+      const createdPage =
+        op.effect?.kind === "database_create"
+          ? op.effect.page
+          : op.fn === "createPageRemote" && recordValue(op.args[0])
+            ? (op.args[0] as Page)
+            : undefined;
+      if (createdPage && !byId.has(createdPage.id)) byId.set(createdPage.id, createdPage);
+      if (op.effect?.kind === "row_file_remove") {
+        const current = byId.get(op.effect.rowId);
+        if (current) {
+          byId.set(current.id, {
+            ...current,
+            properties: {
+              ...(current.properties ?? {}),
+              [op.effect.propertyId]: op.effect.nextValue,
+            },
+          });
+        }
       }
-      if (
-        op.kind === "remote_call" &&
-        op.effect?.kind === "row_file_remove" &&
-        op.effect.rowId === page.id
-      ) {
-        current = {
-          ...current,
-          properties: {
-            ...(current.properties ?? {}),
-            [op.effect.propertyId]: op.effect.nextValue,
-          },
-        };
-      }
+      continue;
     }
-    return current;
-  });
+    if (op.kind === "page_update") {
+      const current = byId.get(op.id);
+      if (current) byId.set(op.id, { ...current, ...op.patch });
+    }
+  }
+  return Array.from(byId.values());
+}
+
+function materializeOutboxEffects(entries: OutboxEntry[]) {
+  for (const entry of entries) {
+    const effect = entry.value.kind === "remote_call" ? entry.value.effect : undefined;
+    if (effect?.kind === "database_create") materializeDatabaseCreateEffect(effect);
+  }
+}
+
+function applyBootstrapResultWithOutbox(
+  result: WorkspaceBootstrapResult,
+  entries: OutboxEntry[],
+  mode: "initial" | "reconcile",
+  previousServerPageIds?: Set<string>,
+  exposeReady = true
+) {
+  applyBootstrapResult(
+    { ...result, pages: overlayOutboxOnPages(entries, result.pages ?? []) },
+    mode,
+    previousServerPageIds,
+    exposeReady
+  );
+  materializeOutboxEffects(entries);
 }
 
 /**
@@ -3846,8 +4270,9 @@ async function hydrateBootstrapFromCache(
   const userId = useStore.getState().userId || readLastUserId();
   if (!userId) return false;
   const entries = await outboxAllEntries(userId);
-  applyBootstrapResult(
-    { ...blob, pages: overlayOutboxOnPages(entries, blob.pages ?? []) },
+  applyBootstrapResultWithOutbox(
+    blob,
+    entries,
     "initial",
     undefined,
     false
@@ -4013,8 +4438,10 @@ async function refreshWorkspaceDelta() {
     }
     applyBootFeedHints(result, changesCursor);
     if (!quietDelta) {
-      applyBootstrapResult(
+      const entries = await outboxAllEntries(result.userId);
+      applyBootstrapResultWithOutbox(
         result,
+        entries,
         "reconcile",
         new Set((blob.pages ?? []).map((page) => page.id))
       );
@@ -4122,13 +4549,11 @@ async function hydrateBlocksFromCache(pageId: string): Promise<boolean> {
 async function hydrateDatabaseMetaFromCache(dbId: string): Promise<boolean> {
   const userId = outboxUserId();
   if (!userId || permanentDeleteIds(userId).has(dbId)) return false;
-  const [props, views, templates, metaStamp] = await Promise.all([
+  const [props, views, templates] = await Promise.all([
     cacheListTable<DbProperty>(userId, `props:${dbId}`),
     cacheListTable<DbView>(userId, `views:${dbId}`),
     cacheListTable<DbTemplate>(userId, `templates:${dbId}`),
-    cacheGetMeta<string>(userId, `dbMetaStamp:${dbId}`),
   ]);
-  lastHydratedDbMetaFeedStamp.set(dbId, metaStamp ?? "");
   if (!props.length && !views.length) return false;
   useStore.setState((s) => {
     if (s.propsByDb[dbId] || s.viewsByDb[dbId] || s.templatesByDb[dbId]) return {};
@@ -4144,11 +4569,23 @@ async function hydrateDatabaseMetaFromCache(dbId: string): Promise<boolean> {
   return true;
 }
 
-function cacheCurrentDatabaseViews(dbId: string) {
+function cacheCurrentDatabaseMetadata(dbId: string) {
   const userId = outboxUserId();
   if (!userId) return;
+  const properties = useStore.getState().propsByDb[dbId] ?? [];
   const views = useStore.getState().viewsByDb[dbId] ?? [];
+  const templates = useStore.getState().templatesByDb[dbId] ?? [];
+  cacheReplaceTable(
+    userId,
+    `props:${dbId}`,
+    properties.map((property) => ({ id: property.id, value: property }))
+  );
   cacheReplaceTable(userId, `views:${dbId}`, views.map((view) => ({ id: view.id, value: view })));
+  cacheReplaceTable(
+    userId,
+    `templates:${dbId}`,
+    templates.map((template) => ({ id: template.id, value: template }))
+  );
 }
 
 interface CachedRowsMeta {
@@ -4163,7 +4600,6 @@ interface CachedRowsMeta {
 
 // Per-db stamps observed while hydrating this boot (consumed by feed skips).
 const lastHydratedRowsFeedStamp = new Map<string, string>();
-const lastHydratedDbMetaFeedStamp = new Map<string, string>();
 
 /**
  * A cached container is provably fresh when this boot's feed is complete,
@@ -4249,12 +4685,10 @@ async function hydrateRowsViaLocalEngine(
     const pagesById = { ...s.pagesById };
     for (const page of related) pagesById[page.id] = pagesById[page.id] ?? page;
     filtered.forEach((row, index) => {
-      const pending = pendingPage.get(row.id);
-      pagesById[row.id] = {
+      pagesById[row.id] = remotePageWithOptimisticOverlay({
         ...row,
         __databaseRowOrder: index + 1,
-        ...(pending && Object.keys(pending).length ? pending : {}),
-      };
+      });
     });
     return {
       pagesById,
@@ -4316,12 +4750,10 @@ async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Pro
     rowIds.forEach((id, index) => {
       const row = rowsById.get(id);
       if (!row) return;
-      const pending = pendingPage.get(id);
-      pagesById[id] = {
+      pagesById[id] = remotePageWithOptimisticOverlay({
         ...row,
         __databaseRowOrder: index + 1,
-        ...(pending && Object.keys(pending).length ? pending : {}),
-      };
+      });
     });
     return {
       pagesById,
@@ -4352,8 +4784,13 @@ async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Pro
 let bootPromise: Promise<void> | null = null;
 let bootKey = "";
 const databaseLoadPromises = new Map<string, Promise<void>>();
+const databaseMetadataRevalidated = new Set<string>();
 const databaseRowLoadMorePromises = new Map<string, Promise<void>>();
 const databaseRowsQueryPromises = new Map<string, Promise<void>>();
+// Multiple mutation events for the same forced row query share the active
+// request, but at least one trailing request must run after it. Otherwise the
+// shared response may predate the last mutation and become permanent state.
+const databaseRowsForcedAgain = new Set<string>();
 const DATABASE_INITIAL_ROW_LIMIT = 50;
 const DATABASE_ROW_LOAD_MORE_LIMIT = 50;
 
@@ -4768,6 +5205,53 @@ function canEditPageInState(state: AppState, page: Page | undefined, userId = st
   });
 }
 
+function withoutLoadedDatabaseProperty(state: AppState, databaseId: string, propertyId: string) {
+  const properties = (state.propsByDb[databaseId] ?? [])
+    .filter((property) => property.id !== propertyId)
+    .map((property) => {
+      const config = { ...(property.config ?? {}) };
+      let changed = false;
+      if (config.rollupRelationPropertyId === propertyId) {
+        config.rollupRelationPropertyId = undefined;
+        config.rollupTargetPropertyId = undefined;
+        changed = true;
+      }
+      if (config.rollupTargetPropertyId === propertyId) {
+        config.rollupTargetPropertyId = undefined;
+        changed = true;
+      }
+      return changed ? { ...property, config } : property;
+    });
+  const pagesById = { ...state.pagesById };
+  for (const rowId of state.databaseRowIdsByDb[databaseId] ?? []) {
+    const row = pagesById[rowId];
+    if (!row?.properties || !(propertyId in row.properties)) continue;
+    const rowProperties = { ...row.properties };
+    delete rowProperties[propertyId];
+    pagesById[rowId] = { ...row, properties: rowProperties };
+  }
+  return {
+    pagesById,
+    propsByDb: { ...state.propsByDb, [databaseId]: properties },
+    templatesByDb: {
+      ...state.templatesByDb,
+      [databaseId]: (state.templatesByDb[databaseId] ?? []).map((template) => {
+        if (!template.properties || !(propertyId in template.properties)) return template;
+        const templateProperties = { ...template.properties };
+        delete templateProperties[propertyId];
+        return { ...template, properties: templateProperties };
+      }),
+    },
+    viewsByDb: {
+      ...state.viewsByDb,
+      [databaseId]: (state.viewsByDb[databaseId] ?? []).map((view) => ({
+        ...view,
+        config: viewConfigWithoutProperty(view.config, propertyId),
+      })),
+    },
+  };
+}
+
 function canCommentPageInState(state: AppState, page: Page | undefined, userId = state.userId) {
   if (state.activeDataScope?.kind === "public_share") return false;
   return canCommentPage({
@@ -5094,11 +5578,20 @@ export const useStore = create<AppState>((set, get) => ({
           result = resolveBootstrapDelta(blob, result) ?? (await bootstrapWorkspace(input));
         }
         applyBootFeedHints(result, changesCursor);
-        applyBootstrapResult(
+        const entries = await outboxAllEntries(result.userId);
+        applyBootstrapResultWithOutbox(
           result,
+          entries,
           hydrated ? "reconcile" : "initial",
           blob ? new Set((blob.pages ?? []).map((page) => page.id)) : undefined
         );
+        // Cache hydration marks the current page's blocks loaded before the
+        // network bootstrap resolves. If the fresh page stamp moved, the
+        // editor's normal load effect would otherwise hit the loaded shortcut
+        // and leave stale blocks visible until a later refresh. Revalidate in
+        // the already-visible background boot and keep queued outbox edits
+        // projected by the forced network load.
+        if (hydrated) await revalidateHydratedCurrentRouteBlocks(input);
         rememberLastUserId(result.userId);
         cacheSetMeta(result.userId, `bootstrap:${key}`, bootstrapBlobForCache(result));
         bootInputForRefresh = input;
@@ -5243,7 +5736,9 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   applyRemotePage(page) {
-    set((s) => ({ pagesById: { ...s.pagesById, [page.id]: page } }));
+    set((s) => ({
+      pagesById: { ...s.pagesById, [page.id]: remotePageWithOptimisticOverlay(page) },
+    }));
   },
 
   applyRemotePagePatch(id, patch) {
@@ -5261,9 +5756,11 @@ export const useStore = create<AppState>((set, get) => ({
     const ws = get().workspace;
     if (!ws) return;
     const { pages = [], pageRoles = {}, sharedPageIds = [] } = await bootstrapWorkspace({ workspaceId: ws.id });
+    const entries = await outboxAllEntries(get().userId ?? "");
+    const projectedPages = overlayOutboxOnPages(entries, pages);
     set((s) => {
       const pagesById = { ...s.pagesById };
-      for (const page of pages) pagesById[page.id] = page;
+      for (const page of projectedPages) pagesById[page.id] = page;
       return {
         activeDataScope: { kind: "workspace" as const, workspaceId: ws.id },
         pagesById,
@@ -5271,6 +5768,7 @@ export const useStore = create<AppState>((set, get) => ({
         sharedPageIds: new Set(sharedPageIds),
       };
     });
+    materializeOutboxEffects(entries);
   },
 
   async refreshPageAccess(pageId) {
@@ -5287,10 +5785,12 @@ export const useStore = create<AppState>((set, get) => ({
       workspaces = [],
       organizationProfiles = [],
     } = await bootstrapWorkspace({ pageId: targetPageId });
+    const entries = await outboxAllEntries(get().userId ?? "");
+    const projectedPages = overlayOutboxOnPages(entries, pages);
     setWorkspacePeople(members, organizationProfiles);
     set((s) => {
       const pagesById = { ...s.pagesById };
-      for (const page of pages) pagesById[page.id] = page;
+      for (const page of projectedPages) pagesById[page.id] = page;
       return {
         workspace: ws,
         activeDataScope: { kind: "workspace" as const, workspaceId: ws.id },
@@ -5302,6 +5802,7 @@ export const useStore = create<AppState>((set, get) => ({
         sharedPageIds: new Set(sharedPageIds),
       };
     });
+    materializeOutboxEffects(entries);
   },
 
   applySharedPageSnapshot(snapshot, shareKey) {
@@ -5428,6 +5929,10 @@ export const useStore = create<AppState>((set, get) => ({
     });
     if (isTemplateEditorPageId(id)) return;
     pendingPage.set(id, { ...(pendingPage.get(id) ?? {}), ...nextPatch });
+    optimisticPageOverlays.set(id, {
+      ...(optimisticPageOverlays.get(id) ?? {}),
+      ...nextPatch,
+    });
     mirrorPendingPage(id);
     if (opts?.debounce) {
       const t = pageTimers.get(id);
@@ -6154,14 +6659,21 @@ export const useStore = create<AppState>((set, get) => ({
         if (
           loadUserId && permanentDeleteIds(loadUserId).has(pageId)
         ) return;
+        const entries = loadUserId ? await outboxAllEntries(loadUserId) : [];
+        const projectedBlocks = overlayOutboxOnBlocks(entries, pageId, blocks);
         set((s) => {
-          const fetchedIds = new Set(blocks.map((block) => block.id));
-          const optimisticBlocks = (s.blocksByPage[pageId] ?? []).filter(
+          const fetchedIds = new Set(projectedBlocks.map((block) => block.id));
+          const currentBlocks = overlayOutboxOnBlocks(
+            entries,
+            pageId,
+            s.blocksByPage[pageId] ?? []
+          );
+          const optimisticBlocks = currentBlocks.filter(
             (block) => !fetchedIds.has(block.id)
           );
           // Overlay still-pending debounced edits so a patch typed between the
           // cache render and this refresh isn't visually reverted.
-          const withPending = blocks.map((block) => {
+          const withPending = projectedBlocks.map((block) => {
             const pending = pendingBlock.get(block.id);
             return pending && Object.keys(pending).length ? { ...block, ...pending } : block;
           });
@@ -7305,8 +7817,26 @@ export const useStore = create<AppState>((set, get) => ({
       !!get().propsByDb[dbId] ||
       !!get().viewsByDb[dbId] ||
       !!get().templatesByDb[dbId];
-    if (!force && includeRows && get().loadedDbs.has(dbId) && !needsLinkedDatabaseResolution && !needsRequestedViews) return;
-    if (!force && !includeRows && hasMetadata && !needsLinkedDatabaseResolution && !needsRequestedViews) return;
+    const metadataRevalidated = databaseMetadataRevalidated.has(dbId);
+    const currentRowPage = get().databaseRowPagesByDb[dbId];
+    const rowRefreshPending = currentRowPage?.loading === true || currentRowPage?.loadingMore === true;
+    if (
+      !force
+      && metadataRevalidated
+      && includeRows
+      && get().loadedDbs.has(dbId)
+      && !rowRefreshPending
+      && !needsLinkedDatabaseResolution
+      && !needsRequestedViews
+    ) return;
+    if (
+      !force
+      && metadataRevalidated
+      && !includeRows
+      && hasMetadata
+      && !needsLinkedDatabaseResolution
+      && !needsRequestedViews
+    ) return;
     const promiseKey = `${dbId}:${includeRows ? "rows" : "metadata"}:${requestedViewIds.join(",")}:${force ? "force" : "cached"}`;
     const pending = databaseLoadPromises.get(promiseKey);
     if (pending) return pending;
@@ -7315,14 +7845,17 @@ export const useStore = create<AppState>((set, get) => ({
       // fetch below still runs and reconciles.
       const hydratedMeta =
         !force && !hasMetadata ? await hydrateDatabaseMetaFromCache(dbId) : false;
-      // §7 v2: feed-proven-fresh schema hydration replaces the snapshot fetch.
-      const metaFresh =
-        hydratedMeta && feedSaysUnchanged(dbId, lastHydratedDbMetaFeedStamp.get(dbId));
+      // Always revalidate hydrated database metadata. The workspace feed is a
+      // page/change accelerator, but a schema/view/template mutation can land
+      // without a changedDatabaseIds entry that covers this cache generation.
+      // Treating that absence as proof of freshness was the reload bug: rows
+      // returned while recently-created properties/views stayed missing.
       const needsSnapshot =
         force ||
         needsLinkedDatabaseResolution ||
         needsRequestedViews ||
-        (!hasMetadata && !metaFresh);
+        !metadataRevalidated ||
+        !hasMetadata;
       if (needsSnapshot) {
         let snapshot: Awaited<ReturnType<typeof getDatabaseSnapshotRemote>>;
         try {
@@ -7373,18 +7906,27 @@ export const useStore = create<AppState>((set, get) => ({
           };
         });
         const cacheUserId = outboxUserId();
-        cacheReplaceTable(cacheUserId, `props:${dbId}`, props.map((p) => ({ id: p.id, value: p })));
-        cacheReplaceTable(cacheUserId, `views:${dbId}`, views.map((v) => ({ id: v.id, value: v })));
-        cacheReplaceTable(
-          cacheUserId,
-          `templates:${dbId}`,
-          templates.map((t) => ({ id: t.id, value: t }))
-        );
+        // A snapshot can have started before a local-first view/property
+        // mutation committed. State reconciliation above preserves local
+        // records by id; cache that reconciled state too. Persisting the raw
+        // earlier snapshot here made a reload hydrate an old schema even
+        // though the server and the just-finished tab already had the change.
+        cacheCurrentDatabaseMetadata(dbId);
         cacheSetMeta(cacheUserId, `dbMetaStamp:${dbId}`, currentChangesSyncedAt || "");
         stampDatabaseCached(cacheUserId, dbId);
+        databaseMetadataRevalidated.add(dbId);
       }
 
-      if (includeRows && (force || !get().loadedDbs.has(dbId))) {
+      const rowPage = get().databaseRowPagesByDb[dbId];
+      if (
+        includeRows
+        && (
+          force
+          || !get().loadedDbs.has(dbId)
+          || rowPage?.loading === true
+          || rowPage?.loadingMore === true
+        )
+      ) {
         await get().loadDatabaseRows(dbId, {
           force,
           limit: DATABASE_INITIAL_ROW_LIMIT,
@@ -7404,7 +7946,25 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   async loadDatabaseRows(dbId, query = {}) {
-    if (pendingDatabaseCreate.has(dbId)) return;
+    if (pendingDatabaseCreate.has(dbId)) {
+      const queryKey = databaseRowsQueryKey(query);
+      set((state) => {
+        const current = state.databaseRowPagesByDb[dbId];
+        return {
+          databaseRowPagesByDb: {
+            ...state.databaseRowPagesByDb,
+            [dbId]: {
+              ...(current ?? { loadedCount: 0, totalCount: 0, hasMore: false }),
+              queryKey,
+              loading: false,
+              loadingMore: false,
+              error: undefined,
+            },
+          },
+        };
+      });
+      return;
+    }
     const loadUserId = outboxUserId();
     if (loadUserId && permanentDeleteIds(loadUserId).has(dbId)) return;
     const force = query.force === true;
@@ -7416,7 +7976,14 @@ export const useStore = create<AppState>((set, get) => ({
     const promiseKey = `${dbId}:${queryKey}:${offset}:${limit}:${reset ? "reset" : "append"}:${force ? "force" : "cached"}`;
     const pending = databaseRowsQueryPromises.get(promiseKey);
     if (pending) {
+      if (force) databaseRowsForcedAgain.add(promiseKey);
       await pending;
+      if (force && databaseRowsForcedAgain.delete(promiseKey)) {
+        if (databaseRowsQueryPromises.get(promiseKey) === pending) {
+          databaseRowsQueryPromises.delete(promiseKey);
+        }
+        return get().loadDatabaseRows(dbId, query);
+      }
       // A competing query for the same database can supersede this pending
       // request. Its response is then deliberately discarded by the queryKey
       // guard below. A caller that joined the old promise must verify that the
@@ -7524,16 +8091,16 @@ export const useStore = create<AppState>((set, get) => ({
         set((s) => {
           const current = s.databaseRowPagesByDb[dbId];
           if (current?.queryKey !== queryKey) return {};
-          // Overlay still-pending optimistic edits on top of the server snapshot
-          // so a row edit that is mid-debounce isn't visually reverted by a
-          // concurrent refetch/view-switch. The pending write still flushes.
+          // Overlay queued, in-flight, or not-yet-observed optimistic edits on
+          // top of the server snapshot. High-latency mutation events can make
+          // an earlier forced query finish after a later local edit.
           const withPendingEdits = (byId: Record<string, Page>) => {
             let merged: Record<string, Page> | null = null;
             for (const id of Object.keys(byId)) {
-              const pending = pendingPage.get(id);
-              if (pending && Object.keys(pending).length) {
+              const projected = remotePageWithOptimisticOverlay(byId[id]);
+              if (projected !== byId[id]) {
                 merged ??= { ...byId };
-                merged[id] = { ...byId[id], ...pending };
+                merged[id] = projected;
               }
             }
             return merged ?? byId;
@@ -7760,6 +8327,16 @@ export const useStore = create<AppState>((set, get) => ({
       createdAt: now,
       updatedAt: now,
     };
+    const createEffect: DatabaseCreateEffect = {
+      databaseId: id,
+      kind: "database_create",
+      originHref,
+      page,
+      properties,
+      rows: [],
+      templates: [],
+      views: [view],
+    };
     set((s) => ({
       pagesById: { ...s.pagesById, [id]: page },
       pageRolesById: { ...s.pageRolesById, [id]: "edit" },
@@ -7770,9 +8347,12 @@ export const useStore = create<AppState>((set, get) => ({
       databaseRowPagesByDb: {
         ...s.databaseRowPagesByDb,
         [id]: {
+          queryKey: databaseCreateRowsQueryKey(createEffect),
           loadedCount: 0,
           totalCount: 0,
           hasMore: false,
+          loading: false,
+          loadingMore: false,
         },
       },
       loadedDbs: new Set(s.loadedDbs).add(id),
@@ -7794,130 +8374,13 @@ export const useStore = create<AppState>((set, get) => ({
           properties,
         },
       ],
+      effect: createEffect,
       fnKey: "createDatabaseRemote",
       opKey: `create-database:${id}`,
       userId: userId || "",
       waitsFor: () => pendingPageLikeCreateHas(opts.parentId),
-      onSuccess: (rawResult) => {
-        pendingDatabaseCreate.delete(id);
-        const result = rawResult as Awaited<ReturnType<typeof createDatabaseRemote>> | undefined;
-        if (result) {
-          useStore.setState((state) => {
-            const currentPage = state.pagesById[id];
-            const currentProps = new Map(
-              (state.propsByDb[id] ?? []).map((property) => [property.id, property])
-            );
-            const currentViews = new Map(
-              (state.viewsByDb[id] ?? []).map((current) => [current.id, current])
-            );
-            const rows = (result.rows ?? []).slice().sort(bySortPos);
-            return {
-              pagesById: {
-                ...state.pagesById,
-                [id]: currentPage ? { ...result.page, ...currentPage } : result.page,
-                ...Object.fromEntries(rows.map((row) => [row.id, row])),
-              },
-              propsByDb: {
-                ...state.propsByDb,
-                [id]: (result.properties ?? [])
-                  .map((property) => ({ ...property, ...(currentProps.get(property.id) ?? {}) }))
-                  .sort(bySortPos),
-              },
-              viewsByDb: {
-                ...state.viewsByDb,
-                [id]: (result.views ?? [])
-                  .map((persisted) => ({ ...persisted, ...(currentViews.get(persisted.id) ?? {}) }))
-                  .sort(bySortPos),
-              },
-              templatesByDb: {
-                ...state.templatesByDb,
-                [id]: (result.templates ?? []).slice().sort(bySortPos),
-              },
-              databaseRowIdsByDb: {
-                ...state.databaseRowIdsByDb,
-                [id]: rows.map((row) => row.id),
-              },
-              databaseRowPagesByDb: {
-                ...state.databaseRowPagesByDb,
-                [id]: {
-                  loadedCount: rows.length,
-                  totalCount: rows.length,
-                  hasMore: false,
-                },
-              },
-            };
-          });
-        } else {
-          void useStore.getState().loadDatabase(id, { force: true, rows: true });
-        }
-        releaseOptimisticCreateDependents(id);
-      },
-      onDrop: () => {
-        pendingDatabaseCreate.delete(id);
-        const dependentIds = cancelPendingCreatesUnderDatabase(id);
-        rollbackDependentWritesForFailedCreate(id);
-        useStore.setState((state) => {
-          const pagesById = { ...state.pagesById };
-          const pageRolesById = { ...state.pageRolesById };
-          const propsByDb = { ...state.propsByDb };
-          const viewsByDb = { ...state.viewsByDb };
-          const templatesByDb = { ...state.templatesByDb };
-          const databaseRowIdsByDb = { ...state.databaseRowIdsByDb };
-          const databaseRowPagesByDb = { ...state.databaseRowPagesByDb };
-          const blocksByPage = { ...state.blocksByPage };
-          const blockHistoryByPage = { ...state.blockHistoryByPage };
-          const commentsByPage = { ...state.commentsByPage };
-          const loadedBlockPages = new Set(state.loadedBlockPages);
-          const loadedCommentPages = new Set(state.loadedCommentPages);
-          for (const pageId of new Set([id, ...dependentIds])) {
-            delete pagesById[pageId];
-            delete pageRolesById[pageId];
-            delete blocksByPage[pageId];
-            delete blockHistoryByPage[pageId];
-            delete commentsByPage[pageId];
-            loadedBlockPages.delete(pageId);
-            loadedCommentPages.delete(pageId);
-          }
-          delete propsByDb[id];
-          delete viewsByDb[id];
-          delete templatesByDb[id];
-          delete databaseRowIdsByDb[id];
-          delete databaseRowPagesByDb[id];
-          const loadedDbs = new Set(state.loadedDbs);
-          loadedDbs.delete(id);
-          return {
-            pagesById,
-            pageRolesById,
-            blocksByPage,
-            blockHistoryByPage,
-            commentsByPage,
-            propsByDb,
-            viewsByDb,
-            templatesByDb,
-            databaseRowIdsByDb,
-            databaseRowPagesByDb,
-            loadedBlockPages,
-            loadedCommentPages,
-            loadedDbs,
-            recentPageIds: state.recentPageIds.filter(
-              (pageId) => pageId !== id && !dependentIds.has(pageId)
-            ),
-            ...(state.focusPageId && dependentIds.has(state.focusPageId)
-              ? { focusPageId: undefined, focusPageTarget: undefined }
-              : {}),
-          };
-        });
-        if (typeof window !== "undefined") {
-          const route = routeInfoFromPath(window.location.pathname);
-          if (
-            (route.kind === "page" &&
-              (route.pageId === id || dependentIds.has(route.pageId))) ||
-            (route.kind === "database" && route.databaseId === id)
-          ) {
-            replaceRoute(originHref);
-          }
-        }
-      },
+      onSuccess: (rawResult) => finishOptimisticDatabaseCreate(createEffect, rawResult),
+      onDrop: () => rollbackOptimisticDatabaseCreate(createEffect),
     });
     return page;
   },
@@ -7960,13 +8423,22 @@ export const useStore = create<AppState>((set, get) => ({
             }
           : s.viewsByDb,
     }));
+    cacheCurrentDatabaseMetadata(dbId);
     pendingPropertyCreate.set(prop.id, dbId);
     startBackgroundDurableCall({
       args: [prop as Partial<DbProperty>],
       fnKey: "createPropertyRemote",
       opKey: `create-property:${prop.id}`,
       userId: outboxUserId(),
-      waitsFor: () => pendingDatabaseCreate.has(dbId),
+      // A newly-created reciprocal relation points at the still-creating
+      // primary relation, and a newly-created rollup can point at a
+      // still-creating relation/target property. Sending those inserts in
+      // parallel lets the dependent insert overtake its prerequisite and
+      // leaves a one-sided relation or a missing rollup after reload. Ignore
+      // only this property's own id; every other pending id in the record is a
+      // real create dependency.
+      waitsFor: () =>
+        pendingDatabaseCreate.has(dbId) || valueReferencesPendingCreate(prop, prop.id),
       onSuccess: (result) => {
         pendingPropertyCreate.delete(prop.id);
         const persisted = result as DbProperty | undefined;
@@ -8032,6 +8504,7 @@ export const useStore = create<AppState>((set, get) => ({
             })),
           },
         }));
+        cacheCurrentDatabaseMetadata(dbId);
       },
     });
     // Back-fill sequential ids for a new unique_id property so existing rows aren't blank.
@@ -8067,6 +8540,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
       return { propsByDb: next };
     });
+    if (dbId) cacheCurrentDatabaseMetadata(dbId);
     // dbId is the routing hint (workspace-per-DO). It is derived from the same
     // cache the optimistic set above walked, so an unresolved dbId means the
     // edit already no-op'd locally — firing a hint-less remote mutation would
@@ -8126,15 +8600,49 @@ export const useStore = create<AppState>((set, get) => ({
     if (!prop || prop.type !== "relation") return;
     const currentTarget = prop.config?.relationDatabaseId ?? prop.databaseId;
     if (currentTarget === targetDatabaseId) return;
-    // Changing the target invalidates any existing two-way pair; tear it down
-    // first so the reciprocal doesn't strand on the old target database.
-    if (prop.config?.relatedPropertyId) {
-      await get().setRelationTwoWay(id, false);
+    const previousRelatedPropertyId = prop.config?.relatedPropertyId;
+    const config: PropertyConfig = {
+      ...(prop.config ?? {}),
+      relationDatabaseId: targetDatabaseId,
+      relatedPropertyId: undefined,
+    };
+    // Repointing a paired relation used to enqueue unlink, reciprocal delete,
+    // and target update as three independent requests. A slower unlink could
+    // overtake the new target and leave the old reciprocal orphaned. Persist a
+    // single source update instead; the backend uses the previous pair id to
+    // finish reciprocal cleanup idempotently, including after a retry.
+    set((state) => ({
+      propsByDb: {
+        ...state.propsByDb,
+        [dbId]: (state.propsByDb[dbId] ?? []).map((item) =>
+          item.id === id ? { ...item, config } : item
+        ),
+      },
+    }));
+    if (previousRelatedPropertyId) {
+      set((state) => withoutLoadedDatabaseProperty(state, currentTarget, previousRelatedPropertyId));
     }
-    const fresh = get().dbProperties(dbId).find((item) => item.id === id);
-    get().updateProperty(id, {
-      config: { ...(fresh?.config ?? {}), relationDatabaseId: targetDatabaseId },
-    });
+    cacheCurrentDatabaseMetadata(dbId);
+    if (previousRelatedPropertyId) cacheCurrentDatabaseMetadata(currentTarget);
+    const call = await durableRemoteCall("updatePropertyRemote", [
+      id,
+      { config } as Partial<DbProperty>,
+      dbId,
+      previousRelatedPropertyId,
+    ]);
+    if (call.status === "ok") {
+      publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
+      if (previousRelatedPropertyId) {
+        publishDatabaseSchemaMutation(currentTarget, "property_deleted", [
+          previousRelatedPropertyId,
+        ]);
+      }
+    } else if (call.status === "dropped") {
+      void get().loadDatabase(dbId, { force: true, rows: false });
+      if (previousRelatedPropertyId) {
+        void get().loadDatabase(currentTarget, { force: true, rows: true });
+      }
+    }
   },
 
   async setRelationTwoWay(id, enabled, reciprocalName) {
@@ -8175,18 +8683,41 @@ export const useStore = create<AppState>((set, get) => ({
       return;
     }
 
-    // Disable: unlink this side first, then delete the reciprocal (skipping its
-    // own cascade so it does not try to re-delete this property).
+    // Disable is one durable source mutation. The backend removes the exact
+    // previous reciprocal before acknowledging success, and the previous id is
+    // retained in the outbox payload so a retry can finish cleanup even when
+    // the source unlink itself already committed.
     const reciprocalId = prop.config?.relatedPropertyId;
-    get().updateProperty(id, {
-      config: { ...(prop.config ?? {}), relatedPropertyId: undefined },
-    });
-    if (!reciprocalId) return;
-    const reciprocal = (get().propsByDb[targetDbId] ?? []).find(
-      (item) => item.id === reciprocalId && item.type === "relation"
-    );
-    if (reciprocal) {
-      await get().deleteProperty(reciprocal.id, { skipReciprocal: true }).catch(() => null);
+    const config: PropertyConfig = { ...(prop.config ?? {}), relatedPropertyId: undefined };
+    set((state) => ({
+      propsByDb: {
+        ...state.propsByDb,
+        [dbId]: (state.propsByDb[dbId] ?? []).map((item) =>
+          item.id === id ? { ...item, config } : item
+        ),
+      },
+    }));
+    if (reciprocalId) {
+      set((state) => withoutLoadedDatabaseProperty(state, targetDbId, reciprocalId));
+    }
+    cacheCurrentDatabaseMetadata(dbId);
+    if (reciprocalId) cacheCurrentDatabaseMetadata(targetDbId);
+    const call = await durableRemoteCall("updatePropertyRemote", [
+      id,
+      { config } as Partial<DbProperty>,
+      dbId,
+      reciprocalId,
+    ]);
+    if (call.status === "ok") {
+      publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
+      if (reciprocalId) {
+        publishDatabaseSchemaMutation(targetDbId, "property_deleted", [reciprocalId]);
+      }
+    } else if (call.status === "dropped") {
+      void get().loadDatabase(dbId, { force: true, rows: false });
+      if (reciprocalId) {
+        void get().loadDatabase(targetDbId, { force: true, rows: true });
+      }
     }
   },
 
@@ -8219,6 +8750,7 @@ export const useStore = create<AppState>((set, get) => ({
           },
         };
       });
+      cacheCurrentDatabaseMetadata(targetDbId);
     }
 
     const updatedRows: Page[] = [];
@@ -8315,11 +8847,17 @@ export const useStore = create<AppState>((set, get) => ({
       for (const row of updatedRows) pagesById[row.id] = row;
       return { propsByDb, viewsByDb, templatesByDb, pagesById };
     });
+    cacheCurrentDatabaseMetadata(dbId);
 
     // The backend owns the whole tombstone + row/view/template cleanup now.
     // Sending the same dependent writes concurrently can race the tombstone
     // and produce false terminal failures, so persist one durable delete.
-    const deleteCall = await durableRemoteCall("deletePropertyRemote", [id, dbId, opts?.skipReciprocal]);
+    const deleteCall = await durableRemoteCall("deletePropertyRemote", [
+      id,
+      dbId,
+      opts?.skipReciprocal,
+      prop.type === "relation" ? prop.config?.relatedPropertyId : undefined,
+    ]);
     if (deleteCall.status === "dropped") {
       const status = persistErrorStatus(deleteCall.error);
       if (status !== 401 && status !== 403 && status !== 404) {
@@ -8861,6 +9399,7 @@ export const useStore = create<AppState>((set, get) => ({
     set((s) => ({
       viewsByDb: { ...s.viewsByDb, [dbId]: [...(s.viewsByDb[dbId] ?? []), view] },
     }));
+    cacheCurrentDatabaseMetadata(dbId);
     pendingViewCreate.set(view.id, dbId);
     startBackgroundDurableCall({
       args: [view as Partial<DbView>],
@@ -8892,6 +9431,7 @@ export const useStore = create<AppState>((set, get) => ({
             [dbId]: (state.viewsByDb[dbId] ?? []).filter((item) => item.id !== view.id),
           },
         }));
+        cacheCurrentDatabaseMetadata(dbId);
       },
     });
     return view;
@@ -8922,7 +9462,7 @@ export const useStore = create<AppState>((set, get) => ({
       // The durable call is already in the outbox. Mirror the optimistic view
       // set into the record cache as well so a reload cannot hydrate the
       // pre-edit config while that call lands or waits for retry.
-      cacheCurrentDatabaseViews(dbId);
+      cacheCurrentDatabaseMetadata(dbId);
       void callPromise.then(
         (call) => {
           if (call.status === "ok") publishDatabaseViewsMutation(dbId, "view_updated", [id]);
@@ -8945,6 +9485,7 @@ export const useStore = create<AppState>((set, get) => ({
       const next = { ...s.viewsByDb, [dbId]: (s.viewsByDb[dbId] ?? []).filter((v) => v.id !== id) };
       return { viewsByDb: next };
     });
+    cacheCurrentDatabaseMetadata(dbId);
     const call = await durableRemoteCall("deleteViewRemote", [id, dbId]);
     if (call.status === "dropped") {
       set((s) => ({
@@ -8955,6 +9496,7 @@ export const useStore = create<AppState>((set, get) => ({
             : [...(s.viewsByDb[dbId] ?? []), cloneJson(snapshot)].sort(bySortPos),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
       return null;
     }
@@ -8973,6 +9515,7 @@ export const useStore = create<AppState>((set, get) => ({
         [dbId]: [...(s.viewsByDb[dbId] ?? []), restored].sort(bySortPos),
       },
     }));
+    cacheCurrentDatabaseMetadata(dbId);
     const call = await durableRemoteCall("createViewRemote", [restored as Partial<DbView>]);
     if (call.status === "dropped") {
       set((s) => ({
@@ -8981,6 +9524,7 @@ export const useStore = create<AppState>((set, get) => ({
           [dbId]: (s.viewsByDb[dbId] ?? []).filter((item) => item.id !== restored.id),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
       return false;
     }
@@ -9007,6 +9551,7 @@ export const useStore = create<AppState>((set, get) => ({
         [dbId]: [...(s.templatesByDb[dbId] ?? []), template].sort(bySortPos),
       },
     }));
+    cacheCurrentDatabaseMetadata(dbId);
     persistOptimisticTemplateCreate(template, "template_created");
     return template;
   },
@@ -9049,6 +9594,7 @@ export const useStore = create<AppState>((set, get) => ({
         [dbId]: [...(s.templatesByDb[dbId] ?? []), copy].sort(bySortPos),
       },
     }));
+    cacheCurrentDatabaseMetadata(dbId);
     persistOptimisticTemplateCreate(copy, "template_duplicated");
     return copy;
   },
@@ -9084,6 +9630,7 @@ export const useStore = create<AppState>((set, get) => ({
       return { templatesByDb };
     });
     if (!dbId) return false;
+    cacheCurrentDatabaseMetadata(dbId);
 
     // Persist the selected template before clearing the prior default(s). A
     // primary terminal rejection must not strand the database with no default.
@@ -9107,6 +9654,7 @@ export const useStore = create<AppState>((set, get) => ({
           }),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
       return false;
     }
@@ -9143,6 +9691,7 @@ export const useStore = create<AppState>((set, get) => ({
           }),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       if (
         primaryCall.status === "ok" &&
         secondaryCalls.every((call) => call.status !== "queued")
@@ -9173,6 +9722,7 @@ export const useStore = create<AppState>((set, get) => ({
       templatesByDb[dbId] = (templatesByDb[dbId] ?? []).filter((template) => template.id !== id);
       return { templatesByDb };
     });
+    cacheCurrentDatabaseMetadata(dbId);
     const call = await durableRemoteCall("deleteTemplateRemote", [id, dbId]);
     if (call.status === "dropped") {
       set((s) => ({
@@ -9185,6 +9735,7 @@ export const useStore = create<AppState>((set, get) => ({
             : [...(s.templatesByDb[dbId] ?? []), cloneJson(snapshot)].sort(bySortPos),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
       return null;
     }
@@ -9214,6 +9765,7 @@ export const useStore = create<AppState>((set, get) => ({
         },
       };
     });
+    cacheCurrentDatabaseMetadata(dbId);
     const createCall = await durableRemoteCall("createTemplateRemote", [
       restored as Partial<DbTemplate>,
     ]);
@@ -9231,6 +9783,7 @@ export const useStore = create<AppState>((set, get) => ({
             }),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
       return false;
     }
@@ -9258,6 +9811,7 @@ export const useStore = create<AppState>((set, get) => ({
           }),
         },
       }));
+      cacheCurrentDatabaseMetadata(dbId);
       if (
         createCall.status === "ok" &&
         secondaryCalls.every((call) => call.status !== "queued")

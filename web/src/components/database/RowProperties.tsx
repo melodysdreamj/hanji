@@ -292,7 +292,9 @@ export function RowProperties({
   }, [pagesById, propsByDb, row.id]);
 
   useEffect(() => {
-    void loadDatabase(dbId);
+    // The row is already supplied by the active database query. This panel
+    // needs schema/back-reference metadata, not a competing default row query.
+    void loadDatabase(dbId, { rows: false });
   }, [dbId, loadDatabase]);
 
   useEffect(() => {

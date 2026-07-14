@@ -53,12 +53,16 @@ async function main() {
     console.log(`Cover dark screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-cover-dark.png')}`);
     console.log(`Cover + icon screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-cover-icon.png')}`);
     console.log(`Cover + icon inventory: ${join(options.screenshotDir, 'desktop-page-chrome-inventory-cover-icon-idle.json')}`);
+    console.log(`Cover + icon options screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-cover-icon-options-hover.png')}`);
+    console.log(`Cover + icon options inventory: ${join(options.screenshotDir, 'desktop-page-chrome-inventory-cover-icon-options-hover.json')}`);
     console.log(`Cover + icon dark screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-cover-icon-dark.png')}`);
     console.log(`Cover mobile screenshot: ${join(options.screenshotDir, 'mobile-page-chrome-cover.png')}`);
     console.log(`Cover mobile inventory: ${join(options.screenshotDir, 'mobile-page-chrome-inventory-cover-idle.json')}`);
     console.log(`Cover mobile dark screenshot: ${join(options.screenshotDir, 'mobile-page-chrome-cover-dark.png')}`);
     console.log(`Korean chrome screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-ko-locale.png')}`);
     console.log(`Korean chrome inventory: ${join(options.screenshotDir, 'desktop-page-chrome-ko-locale.json')}`);
+    console.log(`Korean cover + icon options screenshot: ${join(options.screenshotDir, 'desktop-page-chrome-cover-icon-options-ko-dark.png')}`);
+    console.log(`Korean cover + icon options inventory: ${join(options.screenshotDir, 'desktop-page-chrome-inventory-cover-icon-options-ko-dark.json')}`);
   } finally {
     await browser.close().catch(() => {});
     await cleanupSeed(apiUrl, seed).catch(() => {});
@@ -80,7 +84,7 @@ async function assertPageChromeUi(browser, appUrl, apiUrl, seed) {
     await closeSeededContext(context, seed);
   }
 
-  await step('capture Korean page chrome locale', () => assertKoreanPageChromeLocale(browser, appUrl, seed));
+  await step('capture Korean page chrome locale', () => assertKoreanPageChromeLocale(browser, appUrl, apiUrl, seed));
 }
 
 async function step(label, fn) {
@@ -138,7 +142,7 @@ async function captureNoCoverPageChrome(page, seed) {
   });
 }
 
-async function assertKoreanPageChromeLocale(browser, appUrl, seed) {
+async function assertKoreanPageChromeLocale(browser, appUrl, apiUrl, seed) {
   const context = await browser.newContext({ locale: 'ko-KR' });
   const page = await context.newPage();
   const errors = [];
@@ -175,6 +179,37 @@ async function assertKoreanPageChromeLocale(browser, appUrl, seed) {
     await page.screenshot({
       path: join(options.screenshotDir, 'desktop-page-chrome-ko-locale.png'),
       fullPage: false,
+    });
+
+    const cover = 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)';
+    await callFunction(apiUrl, seed.accessToken, 'page-mutation', {
+      action: 'update',
+      id: seed.pageId,
+      workspaceId: seed.workspaceId,
+      patch: { cover, coverPosition: 50, icon: '💡', iconType: 'emoji' },
+    });
+    await waitForSeedPage(
+      apiUrl,
+      seed,
+      (persisted) => persisted?.cover === cover && persisted?.icon === '💡' && persisted?.iconType === 'emoji',
+      'prepared Korean cover + icon page chrome',
+    );
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+    await page.waitForFunction(
+      (expected) => document.querySelector('[data-page-header-root] [role="textbox"]')?.textContent?.trim() === expected,
+      seed.editedTitle,
+      { timeout: options.timeoutMs },
+    );
+    await setTheme(page, 'dark');
+    await assertCoverIconPageOptionsLayout(page, seed, {
+      controlText: '인증 추가',
+      iconLabel: '페이지 아이콘 변경',
+      titleLabel: '페이지 제목',
+      coverLabel: '페이지 커버',
+      toolbarLabel: '페이지 옵션',
+      state: 'desktop-cover-icon-options-ko-dark',
+      screenshotFile: 'desktop-page-chrome-cover-icon-options-ko-dark.png',
+      inventoryFile: 'desktop-page-chrome-inventory-cover-icon-options-ko-dark.json',
     });
     assertNoBrowserErrors(errors, 'Korean page chrome locale');
   } finally {
@@ -643,6 +678,7 @@ async function captureCoverIconPageChrome(page, seed) {
     path: join(options.screenshotDir, 'desktop-page-chrome-cover-icon.png'),
     fullPage: false,
   });
+  await assertCoverIconPageOptionsLayout(page, seed);
 
   await setTheme(page, 'dark');
   await settleIdleChrome(page);
@@ -660,6 +696,118 @@ async function captureCoverIconPageChrome(page, seed) {
   });
 
   await setTheme(page, 'light');
+}
+
+async function assertCoverIconPageOptionsLayout(page, seed, config = {}) {
+  const {
+    controlText = 'Add verification',
+    iconLabel = 'Change page icon',
+    titleLabel = 'Page title',
+    coverLabel = 'Page cover',
+    toolbarLabel = 'Page options',
+    state = 'desktop-cover-icon-options-hover',
+    screenshotFile = 'desktop-page-chrome-cover-icon-options-hover.png',
+    inventoryFile = 'desktop-page-chrome-inventory-cover-icon-options-hover.json',
+  } = config;
+  await page.waitForFunction(
+    ({ iconLabel, titleLabel, coverLabel }) => {
+      const hasGeometry = (element) => {
+        if (!(element instanceof Element)) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      };
+      const icon = Array.from(document.querySelectorAll('[data-page-header-root] button')).find(
+        (button) => button.getAttribute('aria-label') === iconLabel,
+      );
+      const title = Array.from(document.querySelectorAll('[data-page-header-root] [role="textbox"]')).find(
+        (element) => element.getAttribute('aria-label') === titleLabel,
+      );
+      const cover = Array.from(document.querySelectorAll('[role="group"]')).find(
+        (element) => element.getAttribute('aria-label') === coverLabel,
+      );
+      return hasGeometry(icon) && hasGeometry(title) && hasGeometry(cover);
+    },
+    { iconLabel, titleLabel, coverLabel },
+    { timeout: options.timeoutMs },
+  );
+  await revealPageOptions(page, { titleLabel, toolbarLabel });
+  const metrics = await page.evaluate(({ iconLabel, titleLabel, coverLabel }) => {
+    const readRect = (node) => {
+      if (!(node instanceof Element)) return null;
+      const rect = node.getBoundingClientRect();
+      return {
+        top: Math.round(rect.top * 100) / 100,
+        bottom: Math.round(rect.bottom * 100) / 100,
+        left: Math.round(rect.left * 100) / 100,
+        right: Math.round(rect.right * 100) / 100,
+        width: Math.round(rect.width * 100) / 100,
+        height: Math.round(rect.height * 100) / 100,
+      };
+    };
+    const toolbar = document.querySelector('[data-page-header-controls]');
+    const icon = Array.from(document.querySelectorAll('[data-page-header-root] button')).find(
+      (button) => button.getAttribute('aria-label') === iconLabel,
+    );
+    const title = Array.from(document.querySelectorAll('[data-page-header-root] [role="textbox"]')).find(
+      (element) => element.getAttribute('aria-label') === titleLabel,
+    );
+    const cover = Array.from(document.querySelectorAll('[role="group"]')).find(
+      (element) => element.getAttribute('aria-label') === coverLabel,
+    );
+    const toolbarStyle = toolbar instanceof HTMLElement ? getComputedStyle(toolbar) : null;
+    const controls = Array.from(toolbar?.querySelectorAll('button') ?? []).map((button) => ({
+      label: button.getAttribute('aria-label') ?? '',
+      text: button.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      rect: readRect(button),
+    }));
+    return {
+      toolbar: readRect(toolbar),
+      toolbarOpacity: toolbarStyle ? Number.parseFloat(toolbarStyle.opacity) : null,
+      icon: readRect(icon),
+      title: readRect(title),
+      cover: readRect(cover),
+      controls,
+    };
+  }, { iconLabel, titleLabel, coverLabel });
+
+  const artifact = {
+    surface: 'page-chrome',
+    state,
+    expected: {
+      title: seed.editedTitle,
+      relationship: 'page options occupy a reserved row below the icon and above the title',
+    },
+    reference: pageChromeReferenceInventory(),
+    local: metrics,
+  };
+  writeJsonArtifact(inventoryFile, artifact);
+  await page.screenshot({
+    path: join(options.screenshotDir, screenshotFile),
+    fullPage: false,
+  });
+
+  assert(metrics.toolbar && metrics.icon && metrics.title && metrics.cover, `cover + icon options need complete geometry: ${JSON.stringify(metrics)}`);
+  assert(metrics.toolbarOpacity >= 0.8, `cover + icon options should reveal on header hover: ${JSON.stringify(metrics)}`);
+  assert(
+    metrics.controls.some((control) => control.text === controlText),
+    `cover + icon options should include ${controlText}: ${JSON.stringify(metrics.controls)}`,
+  );
+  assert(
+    metrics.toolbar.top >= metrics.icon.bottom + 8,
+    `cover + icon options must sit below the icon instead of overlapping it: ${JSON.stringify(metrics)}`,
+  );
+  assert(
+    metrics.toolbar.top >= metrics.cover.bottom + 8,
+    `cover + icon options must clear the cover edge: ${JSON.stringify(metrics)}`,
+  );
+  assert(
+    metrics.toolbar.bottom <= metrics.title.top - 8,
+    `cover + icon options must keep a clear gap before the title: ${JSON.stringify(metrics)}`,
+  );
+  assert(
+    Math.abs(metrics.toolbar.left - metrics.icon.left) <= 4 && Math.abs(metrics.toolbar.left - metrics.title.left) <= 4,
+    `cover + icon, options, and title should share the document-column axis: ${JSON.stringify(metrics)}`,
+  );
 }
 
 function pageChromeReferenceInventory() {
@@ -688,6 +836,7 @@ function pageChromeReferenceInventory() {
         'large page icons are page-chrome scale, not body/sidebar icon scale',
         'cover actions reveal only on cover hover/focus',
         'cover plus icon states visibly overlap the icon across the cover edge',
+        'page options occupy a reserved row below the icon and above the title without overlap',
       ],
       localDeviationPolicy:
         'Use Hanji labels/tokens and responsive gutters while preserving the current-Notion reveal rules and hierarchy.',
@@ -952,14 +1101,16 @@ function assertTopbarSurfaceInventory(topbar, mobile, viewport) {
   );
 }
 
-async function revealPageOptions(page) {
-  await page.getByRole('textbox', { name: 'Page title' }).hover({ timeout: options.timeoutMs });
+async function revealPageOptions(page, { titleLabel = 'Page title', toolbarLabel = 'Page options' } = {}) {
+  await page.getByRole('textbox', { name: titleLabel }).hover({ timeout: options.timeoutMs });
   await page.waitForFunction(
-    () => {
-      const toolbar = document.querySelector('[role="toolbar"][aria-label="Page options"]');
+    (expectedToolbarLabel) => {
+      const toolbar = Array.from(document.querySelectorAll('[role="toolbar"]')).find(
+        (element) => element.getAttribute('aria-label') === expectedToolbarLabel,
+      );
       return toolbar instanceof HTMLElement && Number.parseFloat(getComputedStyle(toolbar).opacity) >= 0.8;
     },
-    undefined,
+    toolbarLabel,
     { timeout: options.timeoutMs },
   );
 }

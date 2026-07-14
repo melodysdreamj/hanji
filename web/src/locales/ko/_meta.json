@@ -2522,6 +2522,7 @@
   "syncStatusBadge:offline": "e01fa717bacc",
   "syncStatusBadge:offlinePending_other": "50d9b98dcb4e",
   "syncStatusBadge:syncing": "67666b78c3af",
+  "syncStatusBadge:confirmed": "8915a3ee41b0",
   "syncStatusBadge:unreachable": "73079bd00fe6",
   "syncStatusBadge:unreachablePending_other": "7215e37a7583",
   "syncStatusBadge:retryHint": "29105758839c",

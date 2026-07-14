@@ -150,17 +150,30 @@ describe("frontend structural guards", () => {
     expect(serviceWorker).toContain("manifest.assets.includes(pathname)");
     expect(serviceWorker).toContain("event.waitUntil(precacheBoot().then(() => self.skipWaiting()))");
     expect(serviceWorker).toContain('const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets"');
+    expect(serviceWorker).toContain(
+      'const PAUSE_OFFLINE_WARM_MESSAGE = "hanji:pause-offline-assets"',
+    );
     expect(serviceWorker).toContain("const BOOT_PRECACHE_BATCH_SIZE = 4");
+    expect(serviceWorker).toContain("const FULL_PRECACHE_BATCH_SIZE = 1");
     expect(serviceWorker).toContain('await boot.put("/", await fetchAndValidateAsset("/"))');
     expect(serviceWorker).toContain("offset += BOOT_PRECACHE_BATCH_SIZE");
     expect(serviceWorker).toContain(
       "event.waitUntil(ensureFullPrecache().catch(() => undefined))",
     );
-    expect(serviceWorkerClient).toContain("registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE })");
+    expect(serviceWorkerClient).toContain(
+      "registration.active.postMessage({ type: WARM_OFFLINE_MESSAGE })",
+    );
     expect(serviceWorker).not.toContain(
       "event.respondWith(navigationNetworkFirst(request));\n    event.waitUntil(ensureFullPrecache()",
     );
     expect(serviceWorkerClient).toContain("onAppInteractiveForOfflineWarm(requestOfflineWarm)");
+    expect(serviceWorkerClient).toContain("const OFFLINE_WARM_QUIET_MS = 10_000");
+    expect(serviceWorkerClient).toContain(
+      'window.addEventListener("pointerdown", postponeOfflineWarmForActivity',
+    );
+    expect(serviceWorkerClient).toContain(
+      "registeredWorker.active?.postMessage({ type: PAUSE_OFFLINE_WARM_MESSAGE })",
+    );
     expect(appInteractive).toContain("markAppInteractiveForOfflineWarm");
 
     const manifest = JSON.parse(source("public/manifest.webmanifest")) as {

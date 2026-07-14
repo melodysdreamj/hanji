@@ -7007,9 +7007,9 @@ function RelationFilterValue({
       : [];
 
   useEffect(() => {
-    if (!targetDbId) return;
+    if (!targetDbId || targetDbId === prop.databaseId) return;
     void loadDatabase(targetDbId);
-  }, [loadDatabase, targetDbId]);
+  }, [loadDatabase, prop.databaseId, targetDbId]);
 
   return (
     <NotionSelect

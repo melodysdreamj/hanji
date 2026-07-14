@@ -8,6 +8,8 @@
 //  C. Phase 1/2 — with the API unreachable (offline boot: assets served, /api
 //     aborted), a previously visited page renders from the record cache, takes
 //     an edit into the outbox, and replays once the API returns.
+//  F. Phase 0/1 — an inline database whose create call is queued survives an
+//     online reload without a permanent row skeleton, then replays in order.
 //
 // Browser console errors are deliberately not asserted — the offline phases
 // necessarily produce failed-fetch noise.
@@ -105,6 +107,13 @@ async function main() {
       seeds.push(seedE);
       await assertPassphraseCustodyGate(browser, appUrl, seedE);
       console.log('PASS E: passphrase custody — unlock gates offline data; wrong pass refused; skip stays network-only.');
+    }
+
+    if (options.phases.has('F')) {
+      const seedF = await seedInlineDatabasePage(apiUrl);
+      seeds.push(seedF);
+      await assertQueuedInlineDatabaseSurvivesReload(browser, appUrl, apiUrl, seedF);
+      console.log('PASS F: queued inline database survived reload without a stuck row loader, then replayed.');
     }
 
     console.log('\nPASS durable outbox + record cache local-first flows.');
@@ -387,6 +396,124 @@ async function assertPassphraseCustodyGate(browser, appUrl, seed) {
   await context.close();
 }
 
+// ── phase F: queued inline database reload ─────────────────────────────────
+
+async function assertQueuedInlineDatabaseSurvivesReload(browser, appUrl, apiUrl, seed) {
+  const context = await newSeededContext(browser, seed);
+  const page = await context.newPage();
+  await openSeededPage(page, appUrl, seed, 'phase-f-warm');
+
+  const commandBlock = page
+    .locator(`[data-block-id="${seed.commandBlockId}"]`)
+    .getByRole('textbox');
+  await commandBlock.click({ timeout: options.timeoutMs });
+  await commandBlock.fill('/database');
+
+  const inlineDatabaseCommand = page
+    .locator('button')
+    .filter({ hasText: /Database - Inline|데이터베이스 - 인라인/ })
+    .first();
+  try {
+    await inlineDatabaseCommand.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  } catch (error) {
+    const snapshot = await page.evaluate(() => ({
+      bodyText: (document.body?.innerText ?? '').slice(-2_000),
+      buttons: [...document.querySelectorAll('button')]
+        .map((button) => (button.innerText || button.getAttribute('aria-label') || '').trim())
+        .filter(Boolean)
+        .slice(-80),
+    }));
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`inline database slash command did not open (${detail}): ${JSON.stringify(snapshot)}`);
+  }
+  await inlineDatabaseCommand.click();
+
+  const createDatabaseButton = page
+    .locator('button')
+    .filter({ hasText: /New database|새 데이터베이스/ })
+    .first();
+  await createDatabaseButton.waitFor({ state: 'visible', timeout: options.timeoutMs });
+
+  let blockedDatabaseCreates = 0;
+  const databaseMutationRoute = '**/api/functions/database-mutation*';
+  await context.route(databaseMutationRoute, (route) => {
+    blockedDatabaseCreates += 1;
+    return route.abort('failed');
+  });
+  await createDatabaseButton.click();
+
+  await assertInlineDatabaseReady(page, 'queued inline database before reload');
+  await pollUntil(
+    () => countOutboxEntries(page, seed.outboxDbName),
+    (count) => count > 0,
+    'database create to enter the durable outbox'
+  );
+  assert(blockedDatabaseCreates > 0, 'database create route must observe a blocked request');
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+  await page.getByRole('region', { name: 'Page body' }).waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+  await assertInlineDatabaseReady(page, 'queued inline database after reload');
+  await pollUntil(
+    () => countOutboxEntries(page, seed.outboxDbName),
+    (count) => count > 0,
+    'database create to remain queued after reload'
+  );
+
+  mkdirSync(FAILURE_SHOT_DIR, { recursive: true });
+  await page.screenshot({
+    path: join(FAILURE_SHOT_DIR, 'phase-f-queued-inline-database-after-reload.png'),
+    fullPage: false,
+  });
+
+  await context.unroute(databaseMutationRoute);
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));
+  await pollUntil(
+    () => countOutboxEntries(page, seed.outboxDbName),
+    (count) => count === 0,
+    'queued inline database create to replay'
+  );
+  const persistedBlock = await pollServerBlock(
+    apiUrl,
+    seed,
+    (block) => block?.type === 'inline_database' && Boolean(block?.content?.childPageId)
+  );
+  seed.databaseId = persistedBlock.content.childPageId;
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+  await assertInlineDatabaseReady(page, 'persisted inline database after replay');
+  await context.close();
+}
+
+async function assertInlineDatabaseReady(page, label) {
+  const table = page.locator('[role="table"], [role="grid"]').first();
+  try {
+    await table.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  } catch (error) {
+    const snapshot = await page.evaluate(() => ({
+      bodyText: (document.body?.innerText ?? '').slice(-3_000),
+      title: document.title,
+      url: location.href,
+    }));
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`${label} did not render a table (${detail}): ${JSON.stringify(snapshot)}`);
+  }
+  const text = (await table.innerText()) ?? '';
+  assert(/\bName\b|이름/.test(text), `${label} must render the title property header (got "${text}")`);
+  await pollUntil(
+    () => page.locator('[data-table-rows-loading], [aria-busy="true"]').count(),
+    (count) => count === 0,
+    `${label} row loaders to settle`
+  );
+  await pollUntil(
+    () => table.locator('[class*="skeleton" i], [class*="shimmer" i]').count(),
+    (count) => count === 0,
+    `${label} row skeletons to settle`
+  );
+}
+
 // ── helpers ─────────────────────────────────────────────────────────────────
 
 async function newSeededContext(browser, seed, extraLocalStorage = {}, contextOptions = {}) {
@@ -529,6 +656,20 @@ async function pollServerBlockText(apiUrl, seed, accept) {
     },
     accept,
     'server block text to converge'
+  );
+}
+
+async function pollServerBlock(apiUrl, seed, accept) {
+  return pollUntil(
+    async () => {
+      const result = await callFunction(apiUrl, seed.accessToken, 'page-query', {
+        action: 'blocks',
+        pageId: seed.pageId,
+      });
+      return result?.blocks?.find((candidate) => candidate.id === seed.commandBlockId) ?? null;
+    },
+    accept,
+    'server inline database block to converge'
   );
 }
 
@@ -776,8 +917,32 @@ async function seedPage(baseUrl) {
   };
 }
 
+async function seedInlineDatabasePage(baseUrl) {
+  const seed = await seedPage(baseUrl);
+  const commandBlockId = randomUUID();
+  const commandText = '/database';
+  const createdBlock = await callFunction(baseUrl, seed.accessToken, 'block-mutation', {
+    action: 'create',
+    id: commandBlockId,
+    pageId: seed.pageId,
+    parentId: null,
+    type: 'paragraph',
+    content: { rich: [{ text: commandText }] },
+    plainText: commandText,
+    position: 2,
+  });
+  assert(
+    createdBlock?.block?.id === commandBlockId,
+    'durable outbox inline database command block must be created'
+  );
+  return { ...seed, commandBlockId };
+}
+
 async function cleanupSeed(baseUrl, seed) {
   if (!seed?.accessToken || !seed?.pageId) return;
+  if (seed.databaseId) {
+    await permanentlyDeletePage(baseUrl, seed.accessToken, seed.databaseId, 10_000).catch(() => {});
+  }
   await permanentlyDeletePage(baseUrl, seed.accessToken, seed.pageId, 10_000).catch(() => {});
 }
 
@@ -786,7 +951,7 @@ function parseArgs(args) {
     apiUrl: process.env.HANJI_EDGEBASE_API_URL ?? DEFAULT_BASE_URL,
     diagnostics: false,
     headed: false,
-    phases: new Set(['A', 'B', 'C', 'D', 'E']),
+    phases: new Set(['A', 'B', 'C', 'D', 'E', 'F']),
     timeoutMs: 20_000,
     url: DEFAULT_BASE_URL,
   };
@@ -800,7 +965,7 @@ function parseArgs(args) {
       const phases = (args[++i] ?? '')
         .split(',')
         .map((phase) => phase.trim().toUpperCase())
-        .filter((phase) => /^[A-E]$/.test(phase));
+        .filter((phase) => /^[A-F]$/.test(phase));
       if (phases.length > 0) parsed.phases = new Set(phases);
     }
     else if (arg === '--timeout-ms') parsed.timeoutMs = Number(args[++i] ?? parsed.timeoutMs) || parsed.timeoutMs;

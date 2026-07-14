@@ -11,6 +11,7 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
     createPropertyRemote: vi.fn(async (property) => property),
     createTemplateRemote: vi.fn(async (template) => template),
     createViewRemote: vi.fn(async (view) => view),
+    deletePropertyRemote: vi.fn(async () => undefined),
     updateCommentRemote: vi.fn(async () => undefined),
     updateDatabaseRowRemote: vi.fn(async () => undefined),
     updatePageRemote: vi.fn(async () => undefined),
@@ -27,6 +28,7 @@ import {
   createPropertyRemote,
   createTemplateRemote,
   createViewRemote,
+  deletePropertyRemote,
   updateCommentRemote,
   updateDatabaseRowRemote,
   updatePageRemote,
@@ -35,7 +37,7 @@ import {
   updateViewRemote,
 } from "@/lib/edgebase";
 import type { CreateDatabaseResult } from "@/lib/edgebase";
-import { useStore } from "@/lib/store";
+import { databaseRowsQueryKey, useStore } from "@/lib/store";
 import type { Comment, DbProperty, DbTemplate, DbView, Page } from "@/lib/types";
 import {
   makePage,
@@ -69,6 +71,29 @@ function seedDatabase() {
   const title = makeProp(db.id, { id: "title", type: "title", name: "Name" });
   const view: DbView = {
     id: "view",
+    databaseId: db.id,
+    name: "Table",
+    type: "table",
+    position: 1,
+    config: { propertyOrder: [title.id], visibleProperties: [title.id] },
+  };
+  seedPages([db]);
+  useStore.setState((state) => ({
+    pageRolesById: { ...state.pageRolesById, [db.id]: "edit" },
+    propsByDb: { ...state.propsByDb, [db.id]: [title] },
+    viewsByDb: { ...state.viewsByDb, [db.id]: [view] },
+    templatesByDb: { ...state.templatesByDb, [db.id]: [] },
+    databaseRowIdsByDb: { ...state.databaseRowIdsByDb, [db.id]: [] },
+    loadedDbs: new Set(state.loadedDbs).add(db.id),
+  }));
+  return { db, title, view };
+}
+
+function seedRelatedDatabase() {
+  const db = makePage({ id: "related-db", kind: "database", title: "Related" });
+  const title = makeProp(db.id, { id: "related-title", type: "title", name: "Name" });
+  const view: DbView = {
+    id: "related-view",
     databaseId: db.id,
     name: "Table",
     type: "table",
@@ -165,6 +190,111 @@ describe("optimistic create UI handoffs", () => {
     expect(updateViewRemote).toHaveBeenCalled();
   });
 
+  it("orders reciprocal and rollup property creates behind their pending property ids", async () => {
+    const sourceGate = deferred<DbProperty>();
+    const reciprocalGate = deferred<DbProperty>();
+    const rollupGate = deferred<DbProperty>();
+    vi.mocked(createPropertyRemote)
+      .mockImplementationOnce(() => sourceGate.promise)
+      .mockImplementationOnce(() => reciprocalGate.promise)
+      .mockImplementationOnce(() => rollupGate.promise);
+    seedDatabase();
+    const related = seedRelatedDatabase();
+
+    const relation = await useStore.getState().addProperty("db", "relation", "Related", {
+      relationDatabaseId: related.db.id,
+    });
+    expect(relation).toBeTruthy();
+    await useStore.getState().setRelationTwoWay(relation!.id, true, "Projects");
+    const reciprocal = useStore
+      .getState()
+      .dbProperties(related.db.id)
+      .find((property) => property.config?.relatedPropertyId === relation!.id);
+    expect(reciprocal).toBeTruthy();
+
+    const rollup = await useStore.getState().addProperty("db", "rollup", "Related count", {
+      rollupRelationPropertyId: relation!.id,
+      rollupTargetPropertyId: related.title.id,
+      rollupFunction: "count_all",
+    });
+    expect(rollup).toBeTruthy();
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(createPropertyRemote).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(createPropertyRemote).mock.calls[0]?.[0]).toMatchObject({
+      id: relation!.id,
+    });
+    expect(updatePropertyRemote).not.toHaveBeenCalled();
+
+    sourceGate.resolve(relation!);
+    await settle();
+    expect(createPropertyRemote).toHaveBeenCalledTimes(3);
+    expect(vi.mocked(createPropertyRemote).mock.calls[1]?.[0]).toMatchObject({
+      id: reciprocal!.id,
+    });
+    expect(vi.mocked(createPropertyRemote).mock.calls[2]?.[0]).toMatchObject({
+      id: rollup!.id,
+    });
+    expect(updatePropertyRemote).not.toHaveBeenCalled();
+
+    reciprocalGate.resolve(reciprocal!);
+    rollupGate.resolve(rollup!);
+    await settle();
+    expect(updatePropertyRemote).toHaveBeenCalledWith(
+      relation!.id,
+      expect.objectContaining({
+        config: expect.objectContaining({ relatedPropertyId: reciprocal!.id }),
+      }),
+      "db"
+    );
+  });
+
+  it("repoints a paired relation with one retryable source update", async () => {
+    seedDatabase();
+    const related = seedRelatedDatabase();
+    const relation = makeProp("db", {
+      id: "source-relation",
+      type: "relation",
+      name: "Related",
+      config: {
+        relationDatabaseId: related.db.id,
+        relatedPropertyId: "reciprocal-relation",
+      },
+    });
+    const reciprocal = makeProp(related.db.id, {
+      id: "reciprocal-relation",
+      type: "relation",
+      name: "Database",
+      config: { relationDatabaseId: "db", relatedPropertyId: relation.id },
+    });
+    useStore.setState((state) => ({
+      propsByDb: {
+        ...state.propsByDb,
+        db: [...(state.propsByDb.db ?? []), relation],
+        [related.db.id]: [...(state.propsByDb[related.db.id] ?? []), reciprocal],
+      },
+    }));
+
+    await useStore.getState().setRelationDatabase(relation.id, "new-target-db");
+
+    expect(updatePropertyRemote).toHaveBeenCalledTimes(1);
+    expect(updatePropertyRemote).toHaveBeenCalledWith(
+      relation.id,
+      {
+        config: expect.objectContaining({
+          relationDatabaseId: "new-target-db",
+          relatedPropertyId: undefined,
+        }),
+      },
+      "db",
+      reciprocal.id
+    );
+    expect(deletePropertyRemote).not.toHaveBeenCalled();
+    expect(
+      useStore.getState().dbProperties(related.db.id).some((property) => property.id === reciprocal.id)
+    ).toBe(false);
+  });
+
   it("returns a template locally while edits wait for create", async () => {
     const gate = deferred<DbTemplate>();
     vi.mocked(createTemplateRemote).mockImplementationOnce(() => gate.promise);
@@ -206,10 +336,12 @@ describe("optimistic create UI handoffs", () => {
   it("returns a renderable database before I/O and holds page writes behind atomic create", async () => {
     const gate = deferred<CreateDatabaseResult>();
     vi.mocked(createDatabaseRemote).mockImplementationOnce(() => gate.promise);
+    const parent = makePage({ id: "inline-parent", title: "Parent" });
+    seedPages([parent]);
 
     const database = await useStore.getState().createDatabase({
-      parentId: null,
-      parentType: "workspace",
+      parentId: parent.id,
+      parentType: "page",
       seedRows: false,
       title: "Immediate database",
       viewType: "table",
@@ -217,6 +349,20 @@ describe("optimistic create UI handoffs", () => {
     expect(createDatabaseRemote).not.toHaveBeenCalled();
     expect(useStore.getState().dbProperties(database.id).length).toBeGreaterThan(0);
     expect(useStore.getState().dbViews(database.id)).toHaveLength(1);
+    const viewId = useStore.getState().dbViews(database.id)[0]!.id;
+    const activeRowsQuery = { viewId, currentPageId: parent.id, limit: 50 };
+    await useStore.getState().loadDatabaseRows(database.id, {
+      ...activeRowsQuery,
+      reset: true,
+    });
+    expect(useStore.getState().databaseRowPagesByDb[database.id]).toMatchObject({
+      queryKey: databaseRowsQueryKey(activeRowsQuery),
+      loadedCount: 0,
+      totalCount: 0,
+      hasMore: false,
+      loading: false,
+      loadingMore: false,
+    });
     useStore.getState().updatePage(database.id, { title: "Renamed immediately" });
     expect(updatePageRemote).not.toHaveBeenCalled();
 

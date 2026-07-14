@@ -43,11 +43,19 @@ import {
 } from "@/lib/edgebase";
 import {
   outboxClear,
+  outboxAck,
+  outboxPendingHintCount,
+  outboxSet,
   outboxIdleForTests,
   resetOutboxForTests,
+  subscribeOutboxPending,
   type OutboxOp,
 } from "@/lib/outbox";
 import { legacyOutboxDatabaseName } from "@/lib/legacyNamespace";
+import {
+  recordCacheIdleForTests,
+  resetRecordCacheForTests,
+} from "@/lib/recordCache";
 import { replayDurableOutbox, useStore } from "@/lib/store";
 import {
   makePage,
@@ -105,6 +113,7 @@ async function outboxSettled() {
   // Mirror writes ride a FIFO promise chain over real (fake-indexeddb) async
   // work; two rounds let an ack scheduled from a flush land too.
   await outboxIdleForTests();
+  await recordCacheIdleForTests();
   await outboxIdleForTests();
 }
 
@@ -125,6 +134,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
   globalThis.indexedDB = new IDBFactory();
   resetOutboxForTests();
+  resetRecordCacheForTests();
   resetStore();
   seedUser();
   seedPages([makePage({ id: "p1", title: "Page" })]);
@@ -136,6 +146,26 @@ afterEach(() => {
 });
 
 describe("durable outbox mirroring", () => {
+  it("signals pending work immediately and clears the hint on server ack", async () => {
+    const signals: number[] = [];
+    const unsubscribe = subscribeOutboxPending((userId, pending) => {
+      if (userId === TEST_USER) signals.push(pending);
+    });
+    outboxSet(TEST_USER, "page:p1", {
+      id: "p1",
+      kind: "page_update",
+      patch: { title: "Queued" },
+      target: "page",
+    });
+    expect(outboxPendingHintCount(TEST_USER)).toBe(1);
+    expect(signals).toEqual([1]);
+
+    outboxAck(TEST_USER, "page:p1");
+    expect(outboxPendingHintCount(TEST_USER)).toBe(0);
+    expect(signals).toEqual([1, 0]);
+    unsubscribe();
+  });
+
   it("explicit clear removes the retained legacy outbox so it cannot resurrect", async () => {
     const legacyName = legacyOutboxDatabaseName(TEST_USER);
     const legacyRaw = createIndexedDbOutboxAdapter<unknown>(legacyName);
@@ -399,6 +429,36 @@ describe("durable outbox replay", () => {
       "elsewhere",
       expect.objectContaining({ title: "Queued title" })
     );
+    expect(await storedEntries()).toHaveLength(0);
+  });
+
+  it("pauses later replay work while a prerequisite create is retrying", async () => {
+    const block = seedBlock("p1", "retry-created");
+    vi.mocked(createBlockRemote)
+      .mockRejectedValueOnce(new Error("network down"))
+      .mockResolvedValueOnce(undefined as never);
+    await seedDeadTabEntry("create:retry-created", { block, kind: "block_create" });
+    await seedDeadTabEntry("block:retry-created", {
+      hintPageId: "p1",
+      id: block.id,
+      kind: "block_update",
+      patch: { plainText: "after create" },
+    });
+
+    await replayDurableOutbox(TEST_USER);
+    expect(createBlockRemote).toHaveBeenCalledTimes(1);
+    expect(updateBlockRemote).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(PAST_RETRY_MS);
+    // The retry timer intentionally starts the async replay lane without
+    // returning its promise. Join the active lane explicitly before reading
+    // IndexedDB so a loaded Linux worker cannot observe the final ack between
+    // the remote call and the mirror-chain enqueue.
+    await replayDurableOutbox(TEST_USER);
+    await outboxSettled();
+
+    expect(createBlockRemote).toHaveBeenCalledTimes(2);
+    expect(updateBlockRemote).toHaveBeenCalledTimes(1);
     expect(await storedEntries()).toHaveLength(0);
   });
 

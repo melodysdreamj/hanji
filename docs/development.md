@@ -144,6 +144,90 @@ than `web/dist/index.html` and rebuilds `web/dist` first when needed:
 npm --prefix backend run dev:refresh
 ```
 
+## Synology-like Docker stress profile
+
+Fast localhost requests can hide create-before-save races, stale-cache merges,
+and realtime reconnect gaps. The development-only Synology simulator runs the
+production Docker image with one CPU, 1.5 GiB of memory, a persistent volume,
+and a loopback-only Toxiproxy path that also carries WebSocket traffic.
+
+Build the current checkout, start the normal NAS profile, and open the printed
+URL. The build command always rebuilds `web/dist` first so the image cannot
+silently reuse an older browser bundle while testing newer source:
+
+```bash
+npm run sim:synology:build
+npm run sim:synology -- up
+# http://127.0.0.1:18787
+```
+
+The `nas` profile adds about 500 ms of round-trip delay with jitter and caps
+downloads at 4 MiB/s. `nas-slow` adds about 1.1 seconds of round-trip delay and
+tighter bandwidth. Change profiles without replacing the data volume, or drop
+every active HTTP/WebSocket connection to exercise reconnect and durable
+outbox recovery:
+
+```bash
+npm run sim:synology -- profile nas-slow
+npm run sim:synology -- cut 5
+npm run sim:synology -- profile nas
+npm run sim:synology -- status
+```
+
+To reproduce a memory-starved NAS separately, recreate the stack with a lower
+limit. `768m` is intentionally below the observed startup peak and may produce
+a real OOM restart, which is useful as a failure test but too unstable for the
+default functional profile:
+
+```bash
+npm run sim:synology -- down
+HANJI_SIM_MEMORY=768m npm run sim:synology -- up nas
+```
+
+Verify that the delay, container limits, authentication path, forced outage,
+and recovery are real. The same check signs in through the synthetic master,
+creates two databases with relation and rollup properties, creates related
+rows, verifies the authoritative rollup result, and removes its test data:
+
+```bash
+npm run verify:synology-sim
+```
+
+The safe single-user content smokes can also run unchanged in intent through
+the impaired production path. The launcher selects the shared harness's
+synthetic-master mode; it never registers or deletes that durable account. It
+temporarily aligns the synthetic account to the smoke's English selectors and
+restores the prior account language in `finally`:
+
+```bash
+# all: relations/rollups, property editing + reload, outbox/cache reload,
+# and representative block focus/continuation
+npm run verify:synology-existing
+
+# or select one or more surfaces
+npm run verify:synology-existing -- relations properties
+npm run verify:synology-existing -- outbox blocks
+```
+
+The ordinary isolated-runtime default remains anonymous sign-in. Account
+lifecycle, auth, admin provisioning, permissions, and multi-user smokes are
+not redirected to the persistent master account; run those against their
+normal disposable local runtime. The production Docker anonymous-auth route
+remains closed.
+
+Stop the containers without deleting the simulated appliance data:
+
+```bash
+npm run sim:synology -- down
+```
+
+This catches latency, bandwidth, resource-pressure, connection-loss, reload,
+and WebSocket reconnect classes on macOS. It does not reproduce the exact DSM
+kernel, NAS disk, certificate, or reverse-proxy configuration; the exact image
+must still be deployed and replayed on Synology before claiming production
+verification. The proxy control port binds only to loopback and the simulator
+uses synthetic development credentials.
+
 ## Email delivery
 
 Hanji uses Cloudflare Email Service as its first-party mail path. For local,

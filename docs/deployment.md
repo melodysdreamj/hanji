@@ -20,7 +20,7 @@ docker run -d \
   --name hanji \
   --restart unless-stopped \
   -p 8787:8787 \
-  melodysdreamj/hanji:0.1.0-alpha.3
+  melodysdreamj/hanji:0.1.0-alpha.4
 ```
 
 Then open `http://localhost:8787` and create the first server administrator in
@@ -39,7 +39,7 @@ import-encryption, and MCP OAuth secrets on first start and stores them under
 `/data/.hanji/`; browser setup closes through durable database state rather
 than a persisted terminal code.
 
-**Publication status:** `0.1.0-alpha.3` is publicly pullable from Docker Hub and
+**Publication status:** `0.1.0-alpha.4` is publicly pullable from Docker Hub and
 GHCR as a multi-platform Linux AMD64/ARM64 image. Use the immutable version tag
 for deployments; `alpha` follows the newest alpha, while `latest` is reserved
 for a future stable release. Each new container release builds every platform
@@ -166,7 +166,7 @@ Synology DSM can use the published registry image directly:
 1. Confirm the NAS reports `x86_64` or `aarch64`. Published releases target
    `linux/amd64` and `linux/arm64`; older 32-bit ARM models are unsupported.
 2. In **Container Manager → Registry**, search for and download
-   `melodysdreamj/hanji:0.1.0-alpha.3` from Docker Hub. GHCR remains available
+   `melodysdreamj/hanji:0.1.0-alpha.4` from Docker Hub. GHCR remains available
    by full image name when DSM supports custom registries.
 3. Enable automatic restart and map a fixed, unused NAS host port (for example
    `18787`) to container port `8787/TCP`. Do not leave the port table empty. An
@@ -211,7 +211,7 @@ parts of the setup.
 ![Synology-style registry screen selecting the Hanji image and version tag](./assets/synology/image-pull.svg)
 
 1. Search Docker Hub for the exact repository `melodysdreamj/hanji`.
-2. Select the immutable version tag `0.1.0-alpha.3`. DSM automatically chooses
+2. Select the immutable version tag `0.1.0-alpha.4`. DSM automatically chooses
    AMD64 or ARM64 for the NAS. Do not use `latest` for this alpha release.
 
 Create the container with the image defaults. No environment file, setup code,

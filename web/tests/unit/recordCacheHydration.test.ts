@@ -18,6 +18,7 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
     // Identity unknown by default (offline cold-boot shape); the shared-browser
     // guard test overrides this per-case.
     currentUserId: vi.fn(() => ""),
+    createDatabaseRemote: vi.fn(() => new Promise(() => {})),
     getPageBlocksRemote: vi.fn(async () => ({ blocks: [] })),
     getDatabaseRowsRemote: vi.fn(async () => ({ rows: [] })),
     createBlockRemote: vi.fn(async () => undefined),
@@ -34,6 +35,7 @@ import {
   currentUserId,
   getDatabaseRowsRemote,
   getPageBlocksRemote,
+  updateBlockRemote,
 } from "@/lib/edgebase";
 import { outboxIdleForTests, resetOutboxForTests, type OutboxOp } from "@/lib/outbox";
 import {
@@ -42,7 +44,12 @@ import {
   recordCacheIdleForTests,
   resetRecordCacheForTests,
 } from "@/lib/recordCache";
-import { databaseRowsQueryKey, resetBootstrapForTests, useStore } from "@/lib/store";
+import {
+  databaseRowsQueryKey,
+  replayDurableOutbox,
+  resetBootstrapForTests,
+  useStore,
+} from "@/lib/store";
 import { rememberPermanentDeleteIds } from "@/lib/permanentDeleteTombstones";
 import {
   createIndexedDbOutboxAdapter,
@@ -117,6 +124,75 @@ afterEach(() => {
 });
 
 describe("bootstrap hydration", () => {
+  it("rebuilds a queued inline database over an online server snapshot before ready", async () => {
+    const parent = makePage({ id: "p-inline", title: "Server title" });
+    const database = makePage({
+      id: "db-queued",
+      kind: "database",
+      parentId: parent.id,
+      parentType: "page",
+      title: "Queued database",
+    });
+    const titleProperty = makeProp(database.id, {
+      id: "db-queued-title",
+      name: "Name",
+      type: "title",
+      position: 1,
+    });
+    const view: DbView = {
+      id: "db-queued-view",
+      databaseId: database.id,
+      name: "Table",
+      type: "table",
+      position: 1,
+      config: {
+        propertyOrder: [titleProperty.id],
+        visibleProperties: [titleProperty.id],
+      },
+    };
+    await seedOutboxEntry(`create-database:${database.id}`, {
+      args: [{ id: database.id, viewId: view.id, workspaceId: database.workspaceId }],
+      effect: {
+        databaseId: database.id,
+        kind: "database_create",
+        originHref: `/p/${parent.id}`,
+        page: database,
+        properties: [titleProperty],
+        rows: [],
+        templates: [],
+        views: [view],
+      },
+      fn: "createDatabaseRemote",
+      kind: "remote_call",
+    });
+    await seedOutboxEntry(`page:${parent.id}`, {
+      id: parent.id,
+      kind: "page_update",
+      patch: { title: "Queued title" },
+      target: "page",
+    });
+    vi.mocked(bootstrapWorkspace).mockResolvedValue(bootstrapResult([parent]));
+
+    await useStore.getState().bootstrap({ workspaceId: "ws-1", pageId: parent.id });
+
+    const state = useStore.getState();
+    expect(state.ready).toBe(true);
+    expect(state.pagesById[parent.id]?.title).toBe("Queued title");
+    expect(state.pagesById[database.id]?.title).toBe("Queued database");
+    expect(state.dbProperties(database.id).map((property) => property.id)).toEqual([
+      titleProperty.id,
+    ]);
+    expect(state.dbViews(database.id).map((candidate) => candidate.id)).toEqual([view.id]);
+    expect(state.databaseRowPagesByDb[database.id]).toMatchObject({
+      queryKey: databaseRowsQueryKey({ viewId: view.id, currentPageId: parent.id }),
+      loadedCount: 0,
+      totalCount: 0,
+      hasMore: false,
+      loading: false,
+      loadingMore: false,
+    });
+  });
+
   it("never rehydrates a permanently deleted page from a stale bootstrap blob", async () => {
     vi.mocked(bootstrapWorkspace).mockResolvedValue(
       bootstrapResult([makePage({ id: "deleted-page", title: "Must stay deleted" })])
@@ -195,6 +271,35 @@ describe("bootstrap hydration", () => {
     expect(state.ready).toBe(true);
     expect(state.loadedBlockPages.has("p1")).toBe(true);
     expect(state.blocksByPage.p1?.[0]?.plainText).toBe("cached body");
+  });
+
+  it("revalidates hydrated current-page blocks when the network page stamp advanced", async () => {
+    const cachedPage = makePage({ id: "p1", title: "Cached page", updatedAt: "T1" });
+    const cachedBlock = makeBlock("p1", "b1", "cached body");
+    vi.mocked(bootstrapWorkspace).mockResolvedValue(bootstrapResult([cachedPage]));
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({ blocks: [cachedBlock] } as never);
+    seedUser();
+    await useStore.getState().bootstrap({ workspaceId: "ws-1", pageId: "p1" });
+    await useStore.getState().loadBlocks("p1");
+    await settled();
+
+    resetStore();
+    resetBootstrapForTests();
+    resetOutboxForTests();
+    window.localStorage.setItem("hanji.lastUserId", TEST_USER);
+    vi.mocked(bootstrapWorkspace).mockResolvedValue(
+      bootstrapResult([makePage({ id: "p1", title: "Fresh page", updatedAt: "T2" })])
+    );
+    vi.mocked(getPageBlocksRemote).mockClear();
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({
+      blocks: [makeBlock("p1", "b1", "fresh body")],
+    } as never);
+
+    await useStore.getState().bootstrap({ workspaceId: "ws-1", pageId: "p1" });
+    await settled();
+
+    expect(vi.mocked(getPageBlocksRemote)).toHaveBeenCalledTimes(1);
+    expect(useStore.getState().blocksByPage.p1?.[0]?.plainText).toBe("fresh body");
   });
 
   it("reconciles a cached boot with the fresh server result", async () => {
@@ -287,6 +392,84 @@ describe("bootstrap hydration", () => {
 });
 
 describe("block hydration", () => {
+  it("keeps an authoritative replayed block in the record cache after the outbox drains", async () => {
+    seedUser();
+    useStore.setState({ pagesById: { p1: makePage({ id: "p1" }) } });
+    const cached = makeBlock("p1", "b1", "/database");
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({ blocks: [cached] } as never);
+    await useStore.getState().loadBlocks("p1");
+    await settled();
+
+    const authoritative = {
+      ...cached,
+      type: "inline_database",
+      content: { childPageId: "db-1" },
+      plainText: "",
+      updatedAt: new Date(1).toISOString(),
+    } as Block;
+    vi.mocked(updateBlockRemote).mockReset();
+    vi.mocked(updateBlockRemote).mockResolvedValue(authoritative);
+    await seedOutboxEntry("block:b1", {
+      hintPageId: "p1",
+      id: "b1",
+      kind: "block_update",
+      patch: {
+        type: "inline_database",
+        content: { childPageId: "db-1" },
+        plainText: "",
+      },
+    });
+
+    await replayDurableOutbox(TEST_USER);
+    await settled();
+    expect(updateBlockRemote).toHaveBeenCalledWith(
+      "b1",
+      expect.objectContaining({ type: "inline_database" }),
+      "p1",
+      undefined
+    );
+    expect(updateBlockRemote).toHaveBeenCalledTimes(1);
+    expect(useStore.getState().blocksByPage.p1).toEqual([authoritative]);
+    expect(await cacheListTable<Block>(TEST_USER, "blocks:p1")).toEqual([
+      { id: authoritative.id, value: authoritative },
+    ]);
+
+    resetStore();
+    resetOutboxForTests();
+    seedUser();
+    useStore.setState({ pagesById: { p1: makePage({ id: "p1" }) } });
+    vi.mocked(getPageBlocksRemote).mockRejectedValue(new Error("network down"));
+    await useStore.getState().loadBlocks("p1");
+    await settled();
+
+    expect(useStore.getState().blocksByPage.p1).toEqual([authoritative]);
+    expect(await cacheListTable<Block>(TEST_USER, "blocks:p1")).toEqual([
+      { id: authoritative.id, value: authoritative },
+    ]);
+  });
+
+  it("overlays queued block edits and creates over a stale online response", async () => {
+    seedUser();
+    useStore.setState({ pagesById: { p1: makePage({ id: "p1" }) } });
+    const serverBlock = makeBlock("p1", "b1", "server text");
+    const queuedBlock = makeBlock("p1", "b2", "created while disconnected");
+    await seedOutboxEntry("block:b1", {
+      hintPageId: "p1",
+      id: serverBlock.id,
+      kind: "block_update",
+      patch: { plainText: "edited while disconnected" },
+    });
+    await seedOutboxEntry("create:b2", { block: queuedBlock, kind: "block_create" });
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({ blocks: [serverBlock] } as never);
+
+    await useStore.getState().loadBlocks("p1");
+
+    expect((useStore.getState().blocksByPage.p1 ?? []).map((block) => block.plainText)).toEqual([
+      "edited while disconnected",
+      "created while disconnected",
+    ]);
+  });
+
   it("serves cached blocks offline with queued edits overlaid", async () => {
     seedUser();
     useStore.setState({ pagesById: { p1: makePage({ id: "p1" }) } });

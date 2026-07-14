@@ -3005,9 +3005,10 @@ async function deleteRecord<T extends DatabaseRecord>(
 //     property too, matching Notion where removing either side removes both.
 // Both call the per-record insert/delete helpers directly (never the
 // dispatcher), so the reciprocal's own mutation never re-triggers this
-// reconciliation. Reciprocal management is a best-effort post-step: the primary
-// mutation is already committed, so a rare reciprocal failure degrades to a
-// one-way relation (recoverable) instead of a false failure on the primary.
+// reconciliation. Single-record relation insert/update requests do not report
+// success until the reciprocal and its configured target views are reconciled;
+// an idempotent retry path below repairs a primary insert whose first response
+// was interrupted during that reconciliation.
 function relationReciprocalId(property: DbProperty): string {
   const value = property.config?.relatedPropertyId;
   return typeof value === 'string' && value.trim() ? value.trim() : '';
@@ -3025,11 +3026,12 @@ async function ensureReciprocalRelationProperty(
   const reciprocalId = relationReciprocalId(property);
   if (!reciprocalId) return;
   const properties = db.table<DbProperty>('db_properties');
-  if (await getExisting(properties, reciprocalId)) return; // already paired (idempotent)
 
   const targetDbId = relationTargetDatabaseId(property);
   const targetDb = await getExistingRow(pages, targetDbId);
-  if (!targetDb || targetDb.kind !== 'database' || targetDb.inTrash) return; // target gone → stay one-way
+  if (!targetDb || targetDb.kind !== 'database' || targetDb.inTrash) {
+    throw Object.assign(new Error('Relation target database not found.'), { status: 409 });
+  }
 
   const sourceDb = await getExistingRow(pages, property.databaseId);
   const requestedName = typeof reciprocalName === 'string' ? reciprocalName.trim() : '';
@@ -3039,15 +3041,44 @@ async function ensureReciprocalRelationProperty(
   const targetProps = await propertiesForDatabase(properties, targetDbId);
   const maxPosition = targetProps.reduce((max, item) => Math.max(max, item.position ?? 0), 0);
 
-  const reciprocal: Record<string, unknown> = {
-    id: reciprocalId,
-    databaseId: targetDbId,
-    name,
-    type: 'relation',
-    config: { relationDatabaseId: property.databaseId, relatedPropertyId: property.id },
-    position: maxPosition + 1,
-  };
-  await insertRecord(db, pages, 'db_properties', reciprocal, actorId, actorEmail);
+  const existingReciprocal = await getExisting(properties, reciprocalId);
+  const existingPairId = existingReciprocal ? relationReciprocalId(existingReciprocal) : '';
+  if (
+    existingReciprocal
+    && (
+      existingReciprocal.type !== 'relation'
+      || existingReciprocal.databaseId !== targetDbId
+      || relationTargetDatabaseId(existingReciprocal) !== property.databaseId
+      || (existingPairId !== '' && existingPairId !== property.id)
+    )
+  ) {
+    throw Object.assign(new Error('Reciprocal relation property conflicts with the requested pair.'), { status: 409 });
+  }
+  if (existingReciprocal && !existingPairId) {
+    // The web client creates both relation records local-first. Its second
+    // insert can therefore encounter the first side before the follow-up
+    // relatedPropertyId update has committed; complete that link here.
+    await updateRecord(
+      db,
+      pages,
+      'db_properties',
+      existingReciprocal.id,
+      { config: { ...existingReciprocal.config, relatedPropertyId: property.id } },
+      actorId,
+      existingReciprocal.databaseId,
+      actorEmail,
+    );
+  } else if (!existingReciprocal) {
+    const reciprocal: Record<string, unknown> = {
+      id: reciprocalId,
+      databaseId: targetDbId,
+      name,
+      type: 'relation',
+      config: { relationDatabaseId: property.databaseId, relatedPropertyId: property.id },
+      position: maxPosition + 1,
+    };
+    await insertRecord(db, pages, 'db_properties', reciprocal, actorId, actorEmail);
+  }
 
   // Mirror the web app's addProperty view handling: append the reciprocal to any
   // target view that pins an explicit property order / visible list, so the new
@@ -3073,6 +3104,28 @@ async function ensureReciprocalRelationProperty(
   }
 }
 
+function isIdempotentTwoWayRelationInsert(
+  existing: DbProperty | null,
+  requested: Record<string, unknown>,
+): existing is DbProperty {
+  if (!existing || existing.type !== 'relation' || requested.type !== 'relation') return false;
+  const requestedConfig = requested.config && typeof requested.config === 'object'
+    ? requested.config as Record<string, unknown>
+    : {};
+  const requestedTarget = optionalString(requestedConfig.relationDatabaseId)
+    ?? optionalString(requestedConfig.databaseId)
+    ?? '';
+  const requestedReciprocal = optionalString(requestedConfig.relatedPropertyId) ?? '';
+  return (
+    existing.id === requested.id
+    && existing.databaseId === requested.databaseId
+    && existing.name === requested.name
+    && existing.position === requested.position
+    && relationTargetDatabaseId(existing) === requestedTarget
+    && relationReciprocalId(existing) === requestedReciprocal
+  );
+}
+
 async function deleteReciprocalRelationProperty(
   db: DbRef,
   pages: TableRef<Page>,
@@ -3092,6 +3145,7 @@ async function deleteReciprocalRelationProperty(
     !reciprocal
     || reciprocal.type !== 'relation'
     || relationTargetDatabaseId(reciprocal) !== property.databaseId
+    || relationReciprocalId(reciprocal) !== property.id
   ) return;
   await deleteRecord(db, pages, 'db_properties', reciprocal.id, actorId, reciprocal.databaseId, actorEmail);
 }
@@ -3130,13 +3184,29 @@ export const POST = defineFunction({
           body.record && typeof body.record === 'object'
             ? (body.record as Record<string, unknown>)
             : {};
-        const inserted = await insertRecord(db, pages, table, record, auth.id, actorEmail);
+        let inserted: DatabaseRecord;
+        try {
+          inserted = await insertRecord(db, pages, table, record, auth.id, actorEmail);
+        } catch (error) {
+          const explicitStatus = error && typeof error === 'object'
+            ? Number((error as { status?: unknown; code?: unknown }).status
+              ?? (error as { status?: unknown; code?: unknown }).code)
+            : NaN;
+          const requestedId = optionalString(record.id);
+          const existing = table === 'db_properties' && requestedId && explicitStatus === 409
+            ? await getExisting(db.table<DbProperty>('db_properties'), requestedId)
+            : null;
+          if (!isIdempotentTwoWayRelationInsert(existing, record)) throw error;
+
+          // The primary relation may already be durable because an earlier
+          // request failed while creating its reciprocal or updating target
+          // view configuration. Treat the exact same insert as a repairable
+          // retry instead of acknowledging a duplicate without reconciliation.
+          inserted = existing;
+        }
         if (table === 'db_properties') {
-          await bestEffort(
-            'database-mutation ensureReciprocalRelationProperty after insert',
-            ensureReciprocalRelationProperty(
-              db, pages, inserted as unknown as DbProperty, auth.id, actorEmail, optionalString(body.reciprocalName),
-            ),
+          await ensureReciprocalRelationProperty(
+            db, pages, inserted as unknown as DbProperty, auth.id, actorEmail, optionalString(body.reciprocalName),
           );
         }
         return { record: inserted };
@@ -3171,28 +3241,28 @@ export const POST = defineFunction({
           table === 'db_properties'
             ? await getExisting(db.table<DbProperty>('db_properties'), id)
             : null;
-        const previousReciprocalId = beforeUpdate ? relationReciprocalId(beforeUpdate) : '';
+        // The client includes the previous pair id on retry. The source update
+        // may already be durable while reciprocal cleanup failed, so reading
+        // only the now-one-way source record would otherwise lose the cleanup
+        // target and acknowledge an orphaned reciprocal on the next attempt.
+        const previousReciprocalId = (beforeUpdate ? relationReciprocalId(beforeUpdate) : '')
+          || optionalString(body.previousRelatedPropertyId)
+          || '';
         const updated = await updateRecord(db, pages, table, id, patch, auth.id, optionalString(body.databaseId), actorEmail);
         if (table === 'db_properties') {
           const updatedProp = updated as unknown as DbProperty;
           const nextReciprocalId = relationReciprocalId(updatedProp);
           if (nextReciprocalId) {
-            await bestEffort(
-              'database-mutation ensureReciprocalRelationProperty after update',
-              ensureReciprocalRelationProperty(
-                db, pages, updatedProp, auth.id, actorEmail, optionalString(body.reciprocalName),
-              ),
+            await ensureReciprocalRelationProperty(
+              db, pages, updatedProp, auth.id, actorEmail, optionalString(body.reciprocalName),
             );
           } else if (previousReciprocalId) {
-            await bestEffort(
-              'database-mutation deleteReciprocalRelationProperty after two-way toggle-off',
-              deleteReciprocalRelationProperty(
-                db,
-                pages,
-                { ...updatedProp, config: { ...updatedProp.config, relatedPropertyId: previousReciprocalId } },
-                auth.id,
-                actorEmail,
-              ),
+            await deleteReciprocalRelationProperty(
+              db,
+              pages,
+              { ...updatedProp, config: { ...updatedProp.config, relatedPropertyId: previousReciprocalId } },
+              auth.id,
+              actorEmail,
             );
           }
         }
@@ -3222,6 +3292,11 @@ export const POST = defineFunction({
           table === 'db_properties' && !skipReciprocal
             ? await getExisting(db.table<DbProperty>('db_properties'), id)
             : null;
+        const previousRelatedPropertyId = !skipReciprocal
+          ? (deletingProperty ? relationReciprocalId(deletingProperty) : '')
+            || optionalString(body.previousRelatedPropertyId)
+            || ''
+          : '';
         const result = await deleteRecord(
           db,
           pages,
@@ -3232,10 +3307,21 @@ export const POST = defineFunction({
           actorEmail,
           optionalString(body.workspaceId),
         );
-        if (deletingProperty && relationReciprocalId(deletingProperty)) {
-          await bestEffort(
-            'database-mutation deleteReciprocalRelationProperty after delete',
-            deleteReciprocalRelationProperty(db, pages, deletingProperty, auth.id, actorEmail),
+        if (previousRelatedPropertyId) {
+          const sourceProperty = deletingProperty ?? {
+            id,
+            databaseId: requireString(body.databaseId, 'databaseId'),
+            name: '',
+            type: 'relation',
+            config: { relatedPropertyId: previousRelatedPropertyId },
+            position: 0,
+          };
+          await deleteReciprocalRelationProperty(
+            db,
+            pages,
+            sourceProperty,
+            auth.id,
+            actorEmail,
           );
         }
         return result;

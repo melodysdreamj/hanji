@@ -101,7 +101,7 @@ export function PropertyTypeConfig({ prop, onClose }: { prop: DbProperty; onClos
   }));
 
   useEffect(() => {
-    if (rollupDatabaseId) void loadDatabase(rollupDatabaseId);
+    if (rollupDatabaseId) void loadDatabase(rollupDatabaseId, { rows: false });
   }, [loadDatabase, rollupDatabaseId]);
 
   // A freshly created rollup has no relation set; persist the fallback so the cell

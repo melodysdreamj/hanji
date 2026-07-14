@@ -8,15 +8,20 @@
 // wifi, so the store's syncDegraded flag (consecutive persist failures)
 // drives an additional "can't reach server" state with a click-to-retry.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { outboxAllEntries } from "@/lib/outbox";
+import {
+  outboxAllEntries,
+  outboxPendingHintCount,
+  subscribeOutboxPending,
+} from "@/lib/outbox";
 import { flushAllPending, useStore } from "@/lib/store";
 
 import styles from "./SyncStatusBadge.module.css";
 
 const POLL_MS = 2500;
+const CONFIRMED_VISIBLE_MS = 2500;
 
 export default function SyncStatusBadge() {
   const { t } = useTranslation(["syncStatusBadge", "common"]);
@@ -26,6 +31,8 @@ export default function SyncStatusBadge() {
     () => typeof navigator !== "undefined" && navigator.onLine === false
   );
   const [pending, setPending] = useState(0);
+  const [confirmed, setConfirmed] = useState(false);
+  const sawPending = useRef(false);
 
   useEffect(() => {
     const goOnline = () => {
@@ -47,20 +54,46 @@ export default function SyncStatusBadge() {
     let mounted = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const poll = async () => {
+      if (timer) clearTimeout(timer);
       const entries = await outboxAllEntries(userId).catch(() => []);
       if (!mounted) return;
-      setPending(entries.length);
+      setPending(Math.max(entries.length, outboxPendingHintCount(userId)));
       timer = setTimeout(() => void poll(), POLL_MS);
     };
+    const unsubscribe = subscribeOutboxPending((changedUserId, pendingHint) => {
+      if (!mounted || changedUserId !== userId) return;
+      // Paint the local->server pending transition immediately; the async read
+      // below then reconciles this tab's hint with every tab's durable queue.
+      setPending(pendingHint);
+      void poll();
+    });
     void poll();
     return () => {
       mounted = false;
+      unsubscribe();
       if (timer) clearTimeout(timer);
     };
   }, [userId]);
 
+  useEffect(() => {
+    if (offline || degraded) {
+      setConfirmed(false);
+      return;
+    }
+    if (pending > 0) {
+      sawPending.current = true;
+      setConfirmed(false);
+      return;
+    }
+    if (!sawPending.current) return;
+    sawPending.current = false;
+    setConfirmed(true);
+    const timer = setTimeout(() => setConfirmed(false), CONFIRMED_VISIBLE_MS);
+    return () => clearTimeout(timer);
+  }, [degraded, offline, pending]);
+
   const showDegraded = degraded && !offline;
-  if (!offline && !showDegraded && pending === 0) return null;
+  if (!offline && !showDegraded && pending === 0 && !confirmed) return null;
   const text = offline
     ? pending > 0
       ? t("syncStatusBadge:offlinePending", { count: pending })
@@ -69,7 +102,9 @@ export default function SyncStatusBadge() {
       ? pending > 0
         ? t("syncStatusBadge:unreachablePending", { count: pending })
         : t("syncStatusBadge:unreachable")
-      : t("syncStatusBadge:syncing", { count: pending });
+      : confirmed
+        ? t("syncStatusBadge:confirmed")
+        : t("syncStatusBadge:syncing", { count: pending });
   const content = (
     <>
       <span aria-hidden className={styles.dot} />
@@ -96,6 +131,7 @@ export default function SyncStatusBadge() {
   return (
     <div
       className={styles.badge}
+      data-confirmed={confirmed ? "true" : undefined}
       data-offline={offline ? "true" : undefined}
       data-testid="sync-status-badge"
       role="status"

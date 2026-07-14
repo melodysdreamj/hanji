@@ -93,7 +93,7 @@ No source checkout, environment file, or terminal setup code is required.
 #### Docker Hub / container UI
 
 In Docker Desktop, Synology Container Manager, or another container UI, pull
-[`melodysdreamj/hanji:0.1.0-alpha.3`](https://hub.docker.com/r/melodysdreamj/hanji),
+[`melodysdreamj/hanji:0.1.0-alpha.4`](https://hub.docker.com/r/melodysdreamj/hanji),
 publish any unused host port to container `8787/TCP`, and start it. For durable
 storage, map a named volume or dedicated folder to `/data`; skipping that
 mapping still starts with an automatically created anonymous volume.
@@ -106,10 +106,10 @@ docker run -d \
   --restart unless-stopped \
   -p 127.0.0.1:8787:8787 \
   -v hanji-data:/data \
-  melodysdreamj/hanji:0.1.0-alpha.3
+  melodysdreamj/hanji:0.1.0-alpha.4
 ```
 
-> **Current release:** `0.1.0-alpha.3` is an early self-hosted beta. Back up
+> **Current release:** `0.1.0-alpha.4` is an early self-hosted beta. Back up
 > `/data` before upgrading. The moving `alpha` tag is available, but `latest`
 > is intentionally not published until the first stable release.
 

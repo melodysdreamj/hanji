@@ -7,6 +7,10 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "sim:synology": "node scripts/synology-sim.mjs",
+    "sim:synology:build": "npm --prefix web run build && node scripts/build-hanji-docker-image.mjs --tag hanji:synology-sim",
+    "verify:synology-sim": "node scripts/synology-sim-smoke.mjs",
+    "verify:synology-existing": "node scripts/synology-existing-smokes.mjs",
     "verify:namespace": "node scripts/verify-hanji-namespace.mjs",
     "verify:namespace:generated": "node scripts/verify-hanji-namespace.mjs --generated",
     "test:namespace": "node --test scripts/verify-hanji-namespace.test.mjs scripts/migrate-hanji-local-namespace.test.mjs"

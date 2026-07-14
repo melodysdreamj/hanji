@@ -440,6 +440,16 @@ export function getClient(): Client {
   return _client;
 }
 
+const INTERACTIVE_MUTATION_TIMEOUT_MS = 15_000;
+
+function callInteractiveMutation<T>(name: string, body: Record<string, unknown>) {
+  return getClient().functions.call<T>(name, {
+    method: "POST",
+    body,
+    timeoutMs: INTERACTIVE_MUTATION_TIMEOUT_MS,
+  });
+}
+
 function authFailureStatus(error: unknown): number | null {
   if (!error || typeof error !== "object") return null;
   const record = error as Record<string, unknown>;
@@ -1151,6 +1161,8 @@ export interface CreateWorkspaceInput {
   organizationId?: string | null;
   /** Skip the starter pages when the creation flow imports content next. */
   skipDefaultPages?: boolean;
+  /** Record that this flow already asked how the workspace should start. */
+  suppressNotionImportOnboarding?: boolean;
 }
 
 export async function createWorkspaceRemote(
@@ -2122,7 +2134,7 @@ export interface DuplicatePageResult {
 }
 
 export async function createPageRemote(page: Page): Promise<Page> {
-  const result = await getClient().functions.post<{ page: Page }>("page-mutation", {
+  const result = await callInteractiveMutation<{ page: Page }>("page-mutation", {
     action: "create",
     ...page,
   });
@@ -2130,7 +2142,7 @@ export async function createPageRemote(page: Page): Promise<Page> {
 }
 
 export async function updatePageRemote(id: string, patch: Partial<Page>): Promise<Page> {
-  const result = await getClient().functions.post<{ page: Page }>("page-mutation", {
+  const result = await callInteractiveMutation<{ page: Page }>("page-mutation", {
     action: "update",
     id,
     patch,
@@ -2139,7 +2151,7 @@ export async function updatePageRemote(id: string, patch: Partial<Page>): Promis
 }
 
 export async function trashPageRemote(id: string): Promise<Page[]> {
-  const result = await getClient().functions.post<PageMutationPagesResult>("page-mutation", {
+  const result = await callInteractiveMutation<PageMutationPagesResult>("page-mutation", {
     action: "trash",
     id,
   });
@@ -2147,7 +2159,7 @@ export async function trashPageRemote(id: string): Promise<Page[]> {
 }
 
 export async function restorePageRemote(id: string): Promise<Page[]> {
-  const result = await getClient().functions.post<PageMutationPagesResult>("page-mutation", {
+  const result = await callInteractiveMutation<PageMutationPagesResult>("page-mutation", {
     action: "restore",
     id,
   });
@@ -2155,7 +2167,7 @@ export async function restorePageRemote(id: string): Promise<Page[]> {
 }
 
 export async function deletePageRemote(id: string, workspaceId?: string): Promise<string[]> {
-  const result = await getClient().functions.post<PageMutationDeleteResult>("page-mutation", {
+  const result = await callInteractiveMutation<PageMutationDeleteResult>("page-mutation", {
     action: "delete",
     id,
     workspaceId,
@@ -2768,7 +2780,7 @@ export async function removePagePermissionRemote(permissionId: string): Promise<
 }
 
 export async function createBlockRemote(block: Block): Promise<Block> {
-  const result = await getClient().functions.post<{ block: Block }>("block-mutation", {
+  const result = await callInteractiveMutation<{ block: Block }>("block-mutation", {
     action: "create",
     ...block,
   });
@@ -2776,7 +2788,7 @@ export async function createBlockRemote(block: Block): Promise<Block> {
 }
 
 export async function createBlocksRemote(blocks: Block[]): Promise<Block[]> {
-  const result = await getClient().functions.post<{ blocks: Block[] }>("block-mutation", {
+  const result = await callInteractiveMutation<{ blocks: Block[] }>("block-mutation", {
     action: "createMany",
     blocks,
   });
@@ -2789,7 +2801,7 @@ export async function updateBlockRemote(
   pageId?: string,
   expectedUpdatedAt?: string
 ): Promise<Block> {
-  const result = await getClient().functions.post<{ block: Block }>("block-mutation", {
+  const result = await callInteractiveMutation<{ block: Block }>("block-mutation", {
     action: "update",
     id,
     patch,
@@ -2806,7 +2818,7 @@ export async function updateBlocksRemote(
   updates: Array<{ id: string; patch: Partial<Block> }>,
   pageId?: string
 ): Promise<Block[]> {
-  const result = await getClient().functions.post<{ blocks: Block[] }>("block-mutation", {
+  const result = await callInteractiveMutation<{ blocks: Block[] }>("block-mutation", {
     action: "updateMany",
     updates,
     pageId,
@@ -2815,7 +2827,7 @@ export async function updateBlocksRemote(
 }
 
 export async function deleteBlockRemote(id: string, pageId?: string): Promise<string[]> {
-  const result = await getClient().functions.post<{ deletedIds: string[] }>("block-mutation", {
+  const result = await callInteractiveMutation<{ deletedIds: string[] }>("block-mutation", {
     action: "delete",
     id,
     pageId,
@@ -2824,7 +2836,7 @@ export async function deleteBlockRemote(id: string, pageId?: string): Promise<st
 }
 
 export async function deleteBlocksRemote(ids: string[], pageId?: string): Promise<string[]> {
-  const result = await getClient().functions.post<{ deletedIds: string[] }>("block-mutation", {
+  const result = await callInteractiveMutation<{ deletedIds: string[] }>("block-mutation", {
     action: "deleteMany",
     ids,
     pageId,
@@ -2997,7 +3009,7 @@ export interface CreateDatabaseResult {
 }
 
 export async function createDatabaseRemote(input: CreateDatabaseInput): Promise<CreateDatabaseResult> {
-  return getClient().functions.post<CreateDatabaseResult>("database-mutation", {
+  return callInteractiveMutation<CreateDatabaseResult>("database-mutation", {
     action: "createDatabase",
     ...input,
   });
@@ -3006,7 +3018,7 @@ export async function createDatabaseRemote(input: CreateDatabaseInput): Promise<
 export async function createDatabaseRowRemote(
   input: CreateDatabaseRowInput
 ): Promise<{ row: Page; blocks: Block[] }> {
-  return getClient().functions.post<{ row: Page; blocks: Block[] }>("database-row-mutation", {
+  return callInteractiveMutation<{ row: Page; blocks: Block[] }>("database-row-mutation", {
     action: "create",
     ...input,
   });
@@ -3016,7 +3028,7 @@ export async function updateDatabaseRowRemote(
   id: string,
   patch: Partial<Page>
 ): Promise<Page> {
-  const result = await getClient().functions.post<{ row: Page }>("database-row-mutation", {
+  const result = await callInteractiveMutation<{ row: Page }>("database-row-mutation", {
     action: "update",
     id,
     patch,
@@ -3029,7 +3041,7 @@ export async function moveDatabaseRowRemote(
   targetId: string,
   side: "before" | "after"
 ): Promise<Page> {
-  const result = await getClient().functions.post<{ row: Page }>("database-row-mutation", {
+  const result = await callInteractiveMutation<{ row: Page }>("database-row-mutation", {
     action: "move",
     id,
     targetId,
@@ -3039,7 +3051,7 @@ export async function moveDatabaseRowRemote(
 }
 
 export async function trashDatabaseRowRemote(id: string): Promise<Page[]> {
-  const result = await getClient().functions.post<PageMutationPagesResult>("database-row-mutation", {
+  const result = await callInteractiveMutation<PageMutationPagesResult>("database-row-mutation", {
     action: "trash",
     id,
   });
@@ -3047,7 +3059,7 @@ export async function trashDatabaseRowRemote(id: string): Promise<Page[]> {
 }
 
 export async function restoreDatabaseRowRemote(id: string): Promise<Page[]> {
-  const result = await getClient().functions.post<PageMutationPagesResult>("database-row-mutation", {
+  const result = await callInteractiveMutation<PageMutationPagesResult>("database-row-mutation", {
     action: "restore",
     id,
   });
@@ -3055,7 +3067,7 @@ export async function restoreDatabaseRowRemote(id: string): Promise<Page[]> {
 }
 
 export async function deleteDatabaseRowRemote(id: string, workspaceId?: string): Promise<string[]> {
-  const result = await getClient().functions.post<PageMutationDeleteResult>("database-row-mutation", {
+  const result = await callInteractiveMutation<PageMutationDeleteResult>("database-row-mutation", {
     action: "delete",
     id,
     workspaceId,
@@ -3069,7 +3081,7 @@ async function insertDatabaseRecordRemote<T>(
   table: DatabaseMutationTable,
   record: Partial<T>
 ): Promise<T> {
-  const result = await getClient().functions.post<{ record: T }>("database-mutation", {
+  const result = await callInteractiveMutation<{ record: T }>("database-mutation", {
     action: "insert",
     table,
     record,
@@ -3081,7 +3093,7 @@ async function insertDatabaseRecordsRemote<T>(
   table: DatabaseMutationTable,
   records: Array<Partial<T>>
 ): Promise<T[]> {
-  const result = await getClient().functions.post<{ records: T[] }>("database-mutation", {
+  const result = await callInteractiveMutation<{ records: T[] }>("database-mutation", {
     action: "insertMany",
     table,
     records,
@@ -3093,15 +3105,17 @@ async function updateDatabaseRecordRemote<T>(
   table: DatabaseMutationTable,
   id: string,
   patch: Partial<T>,
-  databaseId?: string
+  databaseId?: string,
+  extraBody?: Record<string, unknown>
 ): Promise<T> {
-  const result = await getClient().functions.post<{ record: T }>("database-mutation", {
+  const result = await callInteractiveMutation<{ record: T }>("database-mutation", {
     action: "update",
     table,
     id,
     patch,
     // Routing hint for the workspace-DO split; harmless before the flip.
     databaseId,
+    ...extraBody,
   });
   return result.record;
 }
@@ -3111,7 +3125,7 @@ async function updateDatabaseRecordsRemote<T>(
   updates: Array<{ id: string; patch: Partial<T> }>,
   databaseId?: string
 ): Promise<T[]> {
-  const result = await getClient().functions.post<{ records: T[] }>("database-mutation", {
+  const result = await callInteractiveMutation<{ records: T[] }>("database-mutation", {
     action: "updateMany",
     table,
     updates,
@@ -3124,9 +3138,10 @@ async function deleteDatabaseRecordRemote(
   table: DatabaseMutationTable,
   id: string,
   databaseId?: string,
-  skipReciprocal?: boolean
+  skipReciprocal?: boolean,
+  previousRelatedPropertyId?: string
 ) {
-  await getClient().functions.post("database-mutation", {
+  await callInteractiveMutation("database-mutation", {
     action: "delete",
     table,
     id,
@@ -3134,6 +3149,7 @@ async function deleteDatabaseRecordRemote(
     // Two-way relations: suppress the backend reciprocal cascade when deleting
     // only the paired property during a two-way→one-way toggle.
     ...(skipReciprocal ? { skipReciprocal: true } : {}),
+    ...(previousRelatedPropertyId ? { previousRelatedPropertyId } : {}),
   });
 }
 
@@ -3145,16 +3161,34 @@ export function createPropertyRemote(record: Partial<DbProperty>) {
   return insertDatabaseRecordRemote<DbProperty>("db_properties", record);
 }
 
-export function updatePropertyRemote(id: string, patch: Partial<DbProperty>, databaseId?: string) {
-  return updateDatabaseRecordRemote<DbProperty>("db_properties", id, patch, databaseId);
+export function updatePropertyRemote(
+  id: string,
+  patch: Partial<DbProperty>,
+  databaseId?: string,
+  previousRelatedPropertyId?: string
+) {
+  return updateDatabaseRecordRemote<DbProperty>("db_properties", id, patch, databaseId, {
+    ...(previousRelatedPropertyId ? { previousRelatedPropertyId } : {}),
+  });
 }
 
 export function updatePropertiesRemote(updates: Array<{ id: string; patch: Partial<DbProperty> }>, databaseId?: string) {
   return updateDatabaseRecordsRemote<DbProperty>("db_properties", updates, databaseId);
 }
 
-export function deletePropertyRemote(id: string, databaseId?: string, skipReciprocal?: boolean) {
-  return deleteDatabaseRecordRemote("db_properties", id, databaseId, skipReciprocal);
+export function deletePropertyRemote(
+  id: string,
+  databaseId?: string,
+  skipReciprocal?: boolean,
+  previousRelatedPropertyId?: string
+) {
+  return deleteDatabaseRecordRemote(
+    "db_properties",
+    id,
+    databaseId,
+    skipReciprocal,
+    previousRelatedPropertyId
+  );
 }
 
 export function createViewRemote(record: Partial<DbView>) {

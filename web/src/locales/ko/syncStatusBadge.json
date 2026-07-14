@@ -2,6 +2,7 @@
   "offline": "오프라인",
   "offlinePending_other": "오프라인 · 변경 {{count}}개 대기 중",
   "syncing": "동기화 중 · {{count}}개",
+  "confirmed": "서버 저장 완료",
   "unreachable": "서버에 연결할 수 없어요",
   "unreachablePending_other": "서버에 연결할 수 없어요 · 변경 {{count}}개 대기 중",
   "retryHint": "지금 다시 시도하려면 클릭하세요"

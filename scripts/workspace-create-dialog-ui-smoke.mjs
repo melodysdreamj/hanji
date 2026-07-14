@@ -43,6 +43,34 @@ async function signinToken() {
   return json.accessToken ?? json.session?.accessToken;
 }
 
+async function suppressExistingWorkspaceOnboarding(token) {
+  // A clean self-host runtime creates its first workspace lazily during
+  // workspace-bootstrap. Listing before this call can legitimately return an
+  // empty array and leave the later UI-created workspace unsuppressed.
+  const bootstrap = await api('/api/functions/workspace-bootstrap', {}, token);
+  assert(
+    bootstrap.status === 200 && bootstrap.json.workspace?.id,
+    `workspace bootstrap for onboarding suppression failed: ${bootstrap.status}`,
+  );
+  const list = await api('/api/functions/workspace-mutation', { action: 'list' }, token);
+  assert(list.status === 200, `workspace list for onboarding suppression failed: ${list.status}`);
+  assert(
+    (list.json.workspaces ?? []).length > 0,
+    'workspace bootstrap should create an accessible workspace',
+  );
+  for (const workspace of list.json.workspaces ?? []) {
+    const suppressed = await api(
+      '/api/functions/workspace-mutation',
+      { action: 'suppressNotionImportOnboarding', workspaceId: workspace.id },
+      token,
+    );
+    assert(
+      suppressed.status === 200 && suppressed.json.suppressed === true,
+      `workspace onboarding suppression failed for ${workspace.id}: ${suppressed.status}`,
+    );
+  }
+}
+
 async function signInThroughUi(page) {
   await page.goto(resolveUrl(BASE, '/'), { waitUntil: 'domcontentloaded' });
   const passwordField = page.getByLabel('Password', { exact: true }).first();
@@ -50,7 +78,7 @@ async function signInThroughUi(page) {
   await page.getByRole('textbox', { name: 'Email' }).fill(MASTER_EMAIL);
   await passwordField.fill(MASTER_PASSWORD);
   await page.getByRole('button', { name: 'Continue', exact: true }).click({ timeout: TIMEOUT_MS });
-  const workspaceMenu = page.locator('button[aria-label="Open workspace menu"]');
+  const workspaceMenu = page.locator('[data-sidebar-workspace-button]');
   const languageOnboarding = page.locator('[data-testid="language-onboarding"]');
   const firstSurface = await Promise.race([
     workspaceMenu.waitFor({ state: 'visible', timeout: TIMEOUT_MS }).then(() => 'workspace'),
@@ -63,13 +91,34 @@ async function signInThroughUi(page) {
 }
 
 async function openCreateDialog(page) {
-  await page.locator('button[aria-label="Open workspace menu"]').click({ timeout: TIMEOUT_MS });
-  await page
-    .getByRole('menuitem', { name: /New workspace|새 워크스페이스/ })
-    .click({ timeout: TIMEOUT_MS });
   const dialog = page.getByRole('dialog', { name: /New workspace|새 워크스페이스/ });
-  await dialog.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-  return dialog;
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    if (await dialog.isVisible().catch(() => false)) return dialog;
+    await page.keyboard.press('Escape').catch(() => {});
+    const workspaceMenu = page.locator('[data-sidebar-workspace-button]');
+    await workspaceMenu.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
+    const createItem = page.getByRole('menuitem', { name: /New workspace|새 워크스페이스/ });
+    try {
+      await workspaceMenu.click({ timeout: Math.min(TIMEOUT_MS, 5_000) });
+      await createItem.waitFor({ state: 'visible', timeout: Math.min(TIMEOUT_MS, 5_000) });
+      await createItem.click({ timeout: TIMEOUT_MS });
+      await dialog.waitFor({ state: 'visible', timeout: Math.min(TIMEOUT_MS, 5_000) });
+      return dialog;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  const state = await page.evaluate(() => ({
+    body: document.body.innerText.replace(/\s+/g, ' ').trim().slice(0, 800),
+    url: window.location.href,
+    workspaceMenuOpen: document.querySelector('[role="menu"]') instanceof HTMLElement,
+    importOnboardingOpen: document.querySelector('[data-notion-import-onboarding]') instanceof HTMLElement,
+  }));
+  throw new Error(
+    `workspace create dialog did not open after two bounded attempts; state=${JSON.stringify(state)}; `
+      + `lastError=${lastError instanceof Error ? lastError.message : String(lastError)}`,
+  );
 }
 
 async function createFromDialog(page, dialog, name, optionPattern) {
@@ -98,6 +147,7 @@ async function workspacePages(token, workspaceName) {
 async function main() {
   await assertRuntimeReachable(BASE);
   const token = await signinToken();
+  await suppressExistingWorkspaceOnboarding(token);
   const suffix = Date.now();
   const createdWorkspaces = [];
   const createdWorkspaceNames = new Set();
@@ -115,7 +165,7 @@ async function main() {
     let dialog = await openCreateDialog(page);
     await createFromDialog(page, dialog, blankName, /Blank workspace|빈 워크스페이스/);
     await page
-      .locator('button[aria-label="Open workspace menu"]')
+      .locator('[data-sidebar-workspace-button]')
       .filter({ hasText: blankName })
       .waitFor({ state: 'visible', timeout: TIMEOUT_MS });
     const blank = await workspacePages(token, blankName);

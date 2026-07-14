@@ -63,6 +63,34 @@ npm --prefix backend run verify:deployment
 Verifies the deployable EdgeBase app surfaces — see
 [deployment.md](deployment.md#deployment-verification).
 
+For a production Docker image behind repeatable NAS-like latency, bandwidth,
+resource, and disconnect pressure, start the
+[Synology-like Docker stress profile](development.md#synology-like-docker-stress-profile)
+and run:
+
+```bash
+npm run verify:synology-sim
+```
+
+This check proves the impaired path and recovery, then uses the synthetic
+master account to verify database creation, relations, rollups, related rows,
+and authoritative computed output. Run the selected existing single-user
+content smokes through the same master session with:
+
+```bash
+npm run verify:synology-existing
+npm run verify:synology-existing -- relations properties
+npm run verify:synology-existing -- outbox blocks
+```
+
+These cover the full relation/rollup API matrix, table property editing and
+reload persistence, cache/outbox reload recovery, and representative block
+creation/focus. Auth, provisioning, permissions, and other multi-user/account
+lifecycle smokes still belong on the disposable isolated runtime; the
+production appliance's anonymous route remains closed. The launcher restores
+the synthetic master's prior language after each selected run, including a
+failing run.
+
 ## Runtime and auth
 
 | Command | What it checks |

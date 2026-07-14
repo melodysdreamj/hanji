@@ -4,7 +4,12 @@ import { createRequire } from 'node:module';
 import { existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { browserAuthStorageKeys, permanentlyDeletePage } from './lib/harness.mjs';
+import {
+  finalizeRegisteredSmokeAccounts,
+  installBrowserSession,
+  permanentlyDeletePage,
+  signIn as signInForSmoke,
+} from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
@@ -21,6 +26,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('database property edit smoke');
 }
 
 async function main() {
@@ -51,20 +58,20 @@ async function assertPropertyEditing(browser, baseUrl, seed) {
 
   try {
     await openDatabase(page, baseUrl, seed);
-    await editTextCell(page, 0, 0, seed.editedTitle);
-    await editTextCell(page, 0, 1, seed.editedNotes);
-    await checkCell(page, 0, 2);
-    await editDateCell(page, 0, 3, seed.editedDateInput, seed.editedDateExpectation);
-    await editSelectCell(page, 0, 4, 'Doing');
-    await editButtonBackedTextCell(page, 0, 5, 'Edit Score', seed.editedScoreInput, seed.editedScoreDisplay);
-    await editButtonBackedTextCell(page, 0, 6, 'Edit Website', seed.editedWebsite);
-    await editButtonBackedTextCell(page, 0, 7, 'Edit Contact email', seed.editedEmail);
-    await editButtonBackedTextCell(page, 0, 8, 'Edit Phone', seed.editedPhone);
-    await editMultiSelectCell(page, 0, 9, ['Design', 'Ops']);
-    await editRelationCell(page, 0, 10, seed.targetRowTitle, seed.secondTargetRowTitle);
-    await editFilesCell(page, 0, 11, seed);
-    await assertFileOpenLinks(page, 0, 11, seed);
-    await assertEditedValues(page, seed);
+    await step('edit title', () => editTextCell(page, 0, 0, seed.editedTitle));
+    await step('edit rich text', () => editTextCell(page, 0, 1, seed.editedNotes));
+    await step('edit checkbox', () => checkCell(page, 0, 2));
+    await step('edit date', () => editDateCell(page, 0, 3, seed.editedDateInput, seed.editedDateExpectation));
+    await step('edit select', () => editSelectCell(page, 0, 4, 'Doing'));
+    await step('edit number', () => editButtonBackedTextCell(page, 0, 5, 'Edit Score', seed.editedScoreInput, seed.editedScoreDisplay));
+    await step('edit URL', () => editButtonBackedTextCell(page, 0, 6, 'Edit Website', seed.editedWebsite));
+    await step('edit email', () => editButtonBackedTextCell(page, 0, 7, 'Edit Contact email', seed.editedEmail));
+    await step('edit phone', () => editButtonBackedTextCell(page, 0, 8, 'Edit Phone', seed.editedPhone));
+    await step('edit multi-select', () => editMultiSelectCell(page, 0, 9, ['Design', 'Ops']));
+    await step('edit reciprocal relation', () => editRelationCell(page, 0, 10, seed.targetRowTitle, seed.secondTargetRowTitle));
+    await step('edit files', () => editFilesCell(page, 0, 11, seed));
+    await step('open signed files', () => assertFileOpenLinks(page, 0, 11, seed));
+    await step('verify edited DOM values', () => assertEditedValues(page, seed));
 
     await page.waitForTimeout(900);
     await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
@@ -72,12 +79,22 @@ async function assertPropertyEditing(browser, baseUrl, seed) {
       state: 'visible',
       timeout: options.timeoutMs,
     });
-    await assertEditedValues(page, seed);
-    await assertFileOpenLinks(page, 0, 11, seed);
-    await assertPersistedRow(baseUrl, seed);
+    await step('verify values after reload', () => assertEditedValues(page, seed));
+    await step('verify signed files after reload', () => assertFileOpenLinks(page, 0, 11, seed));
+    await step('verify authoritative row after reload', () => assertPersistedRow(baseUrl, seed));
     assertNoBrowserErrors(errors, 'database property edit UI flow');
   } finally {
     await context.close().catch(() => {});
+  }
+}
+
+async function step(label, operation) {
+  try {
+    await operation();
+    console.log(`  PASS ${label}`);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`${label}: ${detail}`, { cause: error });
   }
 }
 
@@ -128,7 +145,9 @@ async function checkCell(page, rowIndex, colIndex) {
 async function editDateCell(page, rowIndex, colIndex, inputValue, expectedText) {
   const target = cell(page, rowIndex, colIndex);
   await target.scrollIntoViewIfNeeded({ timeout: options.timeoutMs });
-  await target.getByRole('button', { name: /^Edit date/ }).click({
+  // The accessible label includes the property name (for example
+  // "Edit Due date"), and includes the current value once populated.
+  await target.getByRole('button', { name: /^Edit (?:date|.+ date(?:,|$))/ }).click({
     timeout: options.timeoutMs,
   });
   const dialog = page.getByRole('dialog', { name: 'Edit date property' });
@@ -259,46 +278,75 @@ async function assertFileOpenLinks(page, rowIndex, colIndex, seed) {
 
   const uploadedHref = await waitForFileOpenHref(page, seed.uploadedFileName);
   assert(
-    uploadedHref.includes('/api/storage/files/workspaces/') && uploadedHref.includes('token='),
+    isSignedWorkspaceFileUrl(uploadedHref),
     `uploaded file link should resolve to a signed storage URL; href=${uploadedHref}`,
   );
 
   const target = cell(page, rowIndex, colIndex);
   const uploadedLink = target.getByRole('link', { name: `Open ${seed.uploadedFileName}` });
-  const popupPromise = page.context().waitForEvent('page', { timeout: options.timeoutMs })
-    .catch(() => null);
+  const openedPromise = Promise.race([
+    page.context().waitForEvent('page', { timeout: options.timeoutMs })
+      .then((popup) => ({ kind: 'page', popup })),
+    page.waitForEvent('download', { timeout: options.timeoutMs })
+      .then((download) => ({ kind: 'download', download })),
+  ]).catch(() => null);
   await uploadedLink.click({ timeout: options.timeoutMs });
-  const popup = await popupPromise;
-  assert(popup, 'clicking an uploaded file chip should open a new page');
-  await popup.waitForURL(/\/api\/storage\/files\/workspaces\/.*token=/, {
+  const opened = await openedPromise;
+  assert(opened, 'clicking an uploaded file chip should open or download the stored file');
+  if (opened.kind === 'download') {
+    assert(
+      isSignedWorkspaceFileUrl(opened.download.url()),
+      `uploaded file download should use a signed storage URL; opened=${opened.download.url()}`,
+    );
+    assert(
+      opened.download.suggestedFilename() === seed.uploadedFileName,
+      `uploaded file download should preserve its name; got=${opened.download.suggestedFilename()}`,
+    );
+    return;
+  }
+  const popup = opened.popup;
+  await popup.waitForURL((url) => isSignedWorkspaceFileUrl(url.href), {
     timeout: options.timeoutMs,
   }).catch(() => {});
   const openedUrl = popup.url();
   await popup.close().catch(() => {});
   assert(
-    openedUrl.includes('/api/storage/files/workspaces/') && openedUrl.includes('token='),
+    isSignedWorkspaceFileUrl(openedUrl),
     `uploaded file chip click should open a signed storage URL; opened=${openedUrl}`,
   );
 }
 
+function isSignedWorkspaceFileUrl(value) {
+  try {
+    const url = new URL(value);
+    // EdgeBase accepts the object key as either path segments or one encoded
+    // segment. Decode before checking so the smoke follows both equivalent
+    // SDK URL shapes while still requiring a signed workspace-scoped object.
+    return decodeURIComponent(url.pathname).includes('/api/storage/files/workspaces/')
+      && url.searchParams.has('token');
+  } catch {
+    return false;
+  }
+}
+
 async function assertEditedValues(page, seed) {
-  await expectCellInputValue(page, 0, 0, seed.editedTitle);
-  await expectCellInputValue(page, 0, 1, seed.editedNotes);
-  await expectCellCheckboxChecked(page, 0, 2, true);
-  await expectCellText(page, 0, 3, seed.editedDateExpectation);
-  await expectCellText(page, 0, 4, 'Doing');
-  await expectCellText(page, 0, 5, seed.editedScoreDisplay);
-  await expectCellText(page, 0, 6, seed.editedWebsite);
-  await expectCellText(page, 0, 7, seed.editedEmail);
-  await expectCellText(page, 0, 8, seed.editedPhone);
-  await expectCellText(page, 0, 9, 'Design');
-  await expectCellText(page, 0, 9, 'Ops');
-  await expectCellText(page, 0, 10, seed.secondTargetRowTitle);
-  await expectCellNotText(page, 0, 10, seed.targetRowTitle);
-  await expectCellText(page, 0, 11, seed.editedFileName);
-  await expectCellText(page, 0, 11, seed.uploadedFileName);
-  await expectCellNotText(page, 0, 11, seed.removedFileName);
-  await expectCellNotText(page, 0, 11, seed.deletedUploadFileName);
+  await step('DOM title value', () => expectCellInputValue(page, 0, 0, seed.editedTitle));
+  await step('DOM rich-text value', () => expectCellInputValue(page, 0, 1, seed.editedNotes));
+  await step('DOM checkbox value', () => expectCellCheckboxChecked(page, 0, 2, true));
+  await step('DOM date value', () => expectCellText(page, 0, 3, seed.editedDateExpectation));
+  await step('DOM select value', () => expectCellText(page, 0, 4, 'Doing'));
+  await step('DOM number value', () => expectCellText(page, 0, 5, seed.editedScoreDisplay));
+  await step('DOM URL value', () => expectCellText(page, 0, 6, seed.editedWebsite));
+  await step('DOM email value', () => expectCellText(page, 0, 7, seed.editedEmail));
+  await step('DOM phone value', () => expectCellText(page, 0, 8, seed.editedPhone));
+  await step('DOM Design tag', () => expectCellText(page, 0, 9, 'Design'));
+  await step('DOM Ops tag', () => expectCellText(page, 0, 9, 'Ops'));
+  await step('DOM selected relation', () => expectCellText(page, 0, 10, seed.secondTargetRowTitle));
+  await step('DOM removed relation', () => expectCellNotText(page, 0, 10, seed.targetRowTitle));
+  await step('DOM linked file', () => expectCellText(page, 0, 11, seed.editedFileName));
+  await step('DOM uploaded file', () => expectCellText(page, 0, 11, seed.uploadedFileName));
+  await step('DOM removed linked file', () => expectCellNotText(page, 0, 11, seed.removedFileName));
+  await step('DOM removed uploaded file', () => expectCellNotText(page, 0, 11, seed.deletedUploadFileName));
 }
 
 async function assertPersistedRow(baseUrl, seed) {
@@ -393,17 +441,17 @@ async function assertFileUploadState(baseUrl, seed, uploadedFile) {
     'file upload listing should hide the upload removed from the Files property',
   );
 
-  const deleted = await callFunction(baseUrl, seed.accessToken, 'file-mutation', {
+  const deleting = await callFunction(baseUrl, seed.accessToken, 'file-mutation', {
     action: 'list',
     pageId: seed.rowId,
     databaseId: seed.databaseId,
     propertyId: seed.filesPropId,
     scope: 'database/files',
-    status: 'deleted',
+    status: 'deleting',
   });
   assert(
-    (deleted?.uploads ?? []).some((upload) => upload.name === seed.deletedUploadFileName),
-    'file upload listing should expose the removed database file upload as deleted when requested',
+    (deleting?.uploads ?? []).some((upload) => upload.name === seed.deletedUploadFileName),
+    `file upload listing should expose the removed database file upload in its grace-period deletion state: ${JSON.stringify(deleting?.uploads ?? [])}`,
   );
 }
 
@@ -507,7 +555,7 @@ async function waitForFileOpenHref(page, fileName) {
 }
 
 async function seedDatabase(baseUrl) {
-  const session = await signIn(baseUrl);
+  const session = await signInForSmoke(baseUrl, { timeoutMs: options.timeoutMs });
   const bootstrap = await callFunction(baseUrl, session.accessToken, 'workspace-bootstrap', {});
   const workspaceId = bootstrap?.workspace?.id;
   assert(workspaceId, 'workspace-bootstrap must return a workspace id for database property edit smoke');
@@ -654,6 +702,7 @@ async function seedDatabase(baseUrl) {
   return {
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
+    userId: session.userId,
     workspaceId,
     databaseId,
     rowId: row.id,
@@ -715,12 +764,9 @@ async function cleanupSeed(baseUrl, seed) {
 }
 
 async function seedSession(context, seed) {
-  await context.addInitScript(({ refreshToken, refreshTokenKey, workspaceId }) => {
-    window.localStorage.setItem(refreshTokenKey, refreshToken);
-    window.localStorage.setItem('hanji.workspaceId', workspaceId);
-  }, {
-    refreshTokenKey: browserAuthStorageKeys(normalizeBaseUrl(options.apiUrl ?? options.url)).refreshTokenKey,
-    refreshToken: seed.refreshToken,
+  await installBrowserSession(context, seed, {
+    appOrigin: normalizeBaseUrl(options.url),
+    authOrigin: normalizeBaseUrl(options.apiUrl ?? options.url),
     workspaceId: seed.workspaceId,
   });
 }
@@ -758,23 +804,6 @@ async function assertRuntimeReachable(baseUrl) {
   });
   const body = await response.text();
   assert(response.ok, `/api/health returned HTTP ${response.status}: ${body.slice(0, 200)}`);
-}
-
-async function signIn(baseUrl) {
-  const response = await fetch(resolveUrl(baseUrl, '/api/auth/signin/anonymous'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: '{}',
-    signal: AbortSignal.timeout(options.timeoutMs),
-  });
-  const body = await readJson(response);
-  assert(response.status === 201 || response.ok, `anonymous sign-in returned HTTP ${response.status}`);
-  assert(typeof body?.accessToken === 'string' && body.accessToken, 'anonymous sign-in must return an access token');
-  assert(typeof body?.refreshToken === 'string' && body.refreshToken, 'anonymous sign-in must return a refresh token');
-  return {
-    accessToken: body.accessToken,
-    refreshToken: body.refreshToken,
-  };
 }
 
 async function callFunction(baseUrl, token, name, body) {

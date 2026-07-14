@@ -33,6 +33,10 @@
   background: var(--text-tertiary);
 }
 
+.badge[data-confirmed="true"] .dot {
+  background: var(--accent-green, #0f9d58);
+}
+
 /* Server unreachable while the browser reports online: clickable retry. */
 .badge[data-degraded="true"] {
   pointer-events: auto;

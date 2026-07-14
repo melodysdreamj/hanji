@@ -1711,8 +1711,11 @@ function RelationCell({
   const listId = `relation-list-${prop.id}-${row.id}`;
 
   useEffect(() => {
-    if (targetDbId) void loadDatabase(targetDbId);
-  }, [loadDatabase, targetDbId]);
+    // A self-relation already shares this database's active row query. Loading
+    // the default query here makes every relation cell fight the visible view
+    // query, alternating requests forever and leaving reload skeletons stuck.
+    if (targetDbId && targetDbId !== prop.databaseId) void loadDatabase(targetDbId);
+  }, [loadDatabase, prop.databaseId, targetDbId]);
 
   useEffect(() => {
     if (!open) return;
@@ -2041,8 +2044,8 @@ function RollupCell({ row, prop }: { row: Page; prop: DbProperty }) {
   const secondHopDbId = secondHopDatabaseId(prop, targetProps, propsByDb);
 
   useEffect(() => {
-    if (targetDbId) void loadDatabase(targetDbId);
-    if (secondHopDbId) void loadDatabase(secondHopDbId);
+    if (targetDbId) void loadDatabase(targetDbId, { rows: false });
+    if (secondHopDbId) void loadDatabase(secondHopDbId, { rows: false });
   }, [loadDatabase, targetDbId, secondHopDbId]);
 
   // Avoid flashing a wrong/empty value before the related database's

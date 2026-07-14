@@ -66,8 +66,9 @@ async function main() {
 
     try {
       await assertNotionImportUi(browser, appUrl, apiUrl, seed);
-      console.log('PASS Notion import wizard walks connect → scope → discover → apply with a live activity feed, reviews, and checks stored connections when available.');
+      console.log('PASS Notion import wizard walks connect → scope → continuous discover/apply with a live activity feed and checks stored connections when available.');
       console.log(`Screenshot: ${join(SCREENSHOT_DIR, 'browser-runner-warning.png')}`);
+      console.log(`Screenshot: ${join(SCREENSHOT_DIR, 'continuous-import-complete.png')}`);
     } finally {
       await browser.close().catch(() => {});
     }
@@ -101,8 +102,8 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
     await step('scan accessible Notion roots from UI', () => assertRootScanUi(page));
     await step('discover and apply import through the wizard', async () => {
       // Wizard flow: token on step 1 → Next → Start discovery on step 2 →
-      // run panel (step 3) with the installer-style live feed → Apply from the
-      // footer → apply run panel (step 4) → completed.
+      // installer-style live feed → automatic apply run panel (step 4) →
+      // completed. Discovery finishing is not a second confirmation point.
       const dialog = page.getByRole('dialog', { name: 'Import' });
       await gotoWizardStep(dialog, 1);
       await openManualTokenDetails(dialog);
@@ -120,32 +121,9 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
         path: join(SCREENSHOT_DIR, 'browser-runner-warning.png'),
         fullPage: false,
       });
-      // Inline discovery against the mock finishes to a Ready job with items,
-      // and the wizard auto-advances to the discover run panel.
-      await dialog.locator('[data-run-panel="discover"]').waitFor({ state: 'visible', timeout: options.timeoutMs });
-      await expectRunStatus(page, 'Ready');
-      const discoverPanel = dialog.locator('[data-run-panel="discover"]');
-      assert(
-        await discoverPanel.getByRole('progressbar').count() === 0,
-        'Ready Notion discovery must not retain a determinate progress bar',
-      );
-      assert(
-        !/\b\d{1,3}%\b/.test((await discoverPanel.textContent()) ?? ''),
-        'Ready Notion discovery must not display a percentage',
-      );
-      // The installer-style live feed carries the discovery activity ring.
-      await dialog.locator('[aria-label="Live activity"]').getByText(/Search finished|Reading page/).first().waitFor({
-        state: 'visible',
-        timeout: options.timeoutMs,
-      });
-      await dialog.getByRole('button', { name: 'Review', exact: true }).click({ timeout: options.timeoutMs });
-      await page.getByText('Notion import review ready.', { exact: true }).waitFor({
-        state: 'visible',
-        timeout: options.timeoutMs,
-      });
-      // Apply from the wizard footer: advances to the apply run panel and
-      // finishes against the mock graph.
-      await dialog.getByRole('button', { name: 'Apply import', exact: true }).click({ timeout: options.timeoutMs });
+      // The apply panel must appear and complete without clicking Review or
+      // Apply import. Waiting here is the regression guard for the continuous
+      // discovery→apply handoff.
       await dialog.locator('[data-run-panel="apply"]').waitFor({ state: 'visible', timeout: options.timeoutMs });
       await expectRunStatus(page, 'Complete');
       const applyPanel = dialog.locator('[data-run-panel="apply"]');
@@ -157,8 +135,12 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
         !/\b\d{1,3}%\b/.test((await applyPanel.textContent()) ?? ''),
         'Completed Notion apply must not display a percentage',
       );
-      // The live feed now carries apply activity, and the footer resolves to a
-      // Done action (workspace-scope imports have no single root page to open).
+      // The rolling feed retains discovery activity and adds apply activity;
+      // the footer resolves to Done (workspace-scope imports have no root page).
+      await dialog.locator('[aria-label="Live activity"]').getByText(/Search finished|Reading page/).first().waitFor({
+        state: 'visible',
+        timeout: options.timeoutMs,
+      });
       await dialog.locator('[aria-label="Live activity"]').getByText(/Created (page|row|database)/).first().waitFor({
         state: 'visible',
         timeout: options.timeoutMs,
@@ -166,6 +148,10 @@ async function assertNotionImportUi(browser, appUrl, apiUrl, seed) {
       await dialog.getByRole('button', { name: 'Done', exact: true }).waitFor({
         state: 'visible',
         timeout: options.timeoutMs,
+      });
+      await page.screenshot({
+        path: join(SCREENSHOT_DIR, 'continuous-import-complete.png'),
+        fullPage: false,
       });
     });
     // NOTE: The "reopen must not resurface a finished job in the step-3 Progress
@@ -280,17 +266,18 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
 
   const job = await waitForImportJob(apiUrl, seed, (candidate) => (
     candidate.connectionId === connection.id &&
-    candidate.status === 'ready' &&
+    candidate.status === 'completed' &&
     candidate.options?.credentialSource === 'connection' &&
     candidate.options?.tokenStored === false
-  ), 'stored connection discovery job');
-  assert(job.report?.credentialSource === 'connection', 'Stored connection discovery report must record the credential source');
-  await expectRunStatus(page, 'Ready');
+  ), 'stored connection import job');
+  assert(job.report?.credentialSource === 'connection', 'Stored connection import report must record the credential source');
+  await expectRunStatus(page, 'Complete');
 
   // Simulate the durable state left behind when the browser or local runtime
   // disappears between chunks: create a deferred job through the product API,
   // then reload the SPA. The remounted dialog must use the job's exact stored
-  // connection and drive it to Ready without asking for or retaining a token.
+  // connection and drive discovery through apply without asking for or
+  // retaining a token.
   const deferred = await callFunction(apiUrl, seed.accessToken, 'notion-import', {
     action: 'create',
     workspaceId: seed.workspaceId,
@@ -312,13 +299,13 @@ async function assertStoredTokenConnectionUi(page, apiUrl, seed) {
   await openNotionImportTab(page, { expectTokenInput: false });
   const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
     candidate.id === deferred.job.id &&
-    candidate.status === 'ready' &&
+    candidate.status === 'completed' &&
     candidate.connectionId === connection.id &&
     candidate.options?.credentialSource === 'connection' &&
     candidate.options?.tokenStored === false
-  ), 'reloaded stored-connection discovery job');
-  assert(resumed.report?.credentialSource === 'connection', 'Reloaded discovery must keep the stored connection authority');
-  await expectRunStatus(page, 'Ready');
+  ), 'reloaded stored-connection import job');
+  assert(resumed.report?.credentialSource === 'connection', 'Reloaded import must keep the stored connection authority');
+  await expectRunStatus(page, 'Complete');
 
   await gotoWizardStep(dialog, 1);
   const picker = dialog.getByLabel('Saved connection');
@@ -391,7 +378,7 @@ async function assertManualTokenReloadResume(page, apiUrl, seed) {
   await dialog.getByRole('button', { name: 'Resume discovery', exact: true }).click({ timeout: options.timeoutMs });
   const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
     candidate.id === deferred.job.id &&
-    candidate.status === 'ready' &&
+    candidate.status === 'completed' &&
     (storageAvailable
       ? Boolean(candidate.connectionId) && candidate.options?.credentialSource === 'connection'
       : !candidate.connectionId && candidate.options?.credentialSource === 'request') &&
@@ -401,7 +388,7 @@ async function assertManualTokenReloadResume(page, apiUrl, seed) {
     resumed.report?.credentialSource === (storageAvailable ? 'connection' : 'request'),
     'Manual resume must use the server-stored connection whenever connection storage is available',
   );
-  await expectRunStatus(page, 'Ready');
+  await expectRunStatus(page, 'Complete');
   if (storageAvailable && resumed.connectionId) {
     await callFunction(apiUrl, seed.accessToken, 'notion-import', {
       action: 'revokeConnection',
@@ -449,16 +436,16 @@ async function assertStoredConnectionReloadResume(page, apiUrl, seed) {
     await openNotionImportTab(page, { expectTokenInput: false });
     const resumed = await waitForImportJob(apiUrl, seed, (candidate) => (
       candidate.id === deferred.job.id &&
-      candidate.status === 'ready' &&
+      candidate.status === 'completed' &&
       candidate.connectionId === connection.id &&
       candidate.options?.credentialSource === 'connection' &&
       candidate.options?.tokenStored === false
-    ), 'reloaded stored-connection discovery job');
+    ), 'reloaded stored-connection import job');
     assert(
       resumed.report?.credentialSource === 'connection',
-      'Reloaded discovery must keep the exact stored connection authority',
+      'Reloaded import must keep the exact stored connection authority',
     );
-    await expectRunStatus(page, 'Ready');
+    await expectRunStatus(page, 'Complete');
   } finally {
     await callFunction(apiUrl, seed.accessToken, 'notion-import', {
       action: 'revokeConnection',
@@ -980,8 +967,8 @@ function resolveValue(args, index, label) {
 function printHelp() {
   console.log(`Usage: node scripts/notion-import-ui-smoke.mjs [options]
 
-Checks Notion import UI discovery state, open-panel job refresh, expansion, and
-review controls through DOM and product API assertions only.
+Checks Notion import UI discovery state, automatic apply handoff, open-panel
+job refresh, and resume controls through DOM and product API assertions only.
 
 Start EdgeBase with HANJI_NOTION_API_BASE set to the same mock API base.
 

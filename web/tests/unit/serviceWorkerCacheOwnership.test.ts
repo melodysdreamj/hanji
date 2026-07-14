@@ -238,6 +238,10 @@ describe("service-worker cache ownership", () => {
       assets: ["/", "/theme-init.js", "/assets/app-Abc123Xy.js", "/assets/lazy-Def456Uv.js", reusable],
       bootAssets: ["/", "/theme-init.js"],
     };
+    let releaseAppFetch!: () => void;
+    let markAppFetchStarted!: () => void;
+    const appFetchGate = new Promise<void>((resolve) => { releaseAppFetch = resolve; });
+    const appFetchStarted = new Promise<void>((resolve) => { markAppFetchStarted = resolve; });
     const fetchMock = vi.fn(async (input: string) => {
       if (input === "/sw-precache.json") {
         return new Response(JSON.stringify(manifest), {
@@ -246,6 +250,10 @@ describe("service-worker cache ownership", () => {
       }
       if (input === "/") {
         return new Response("new shell", { headers: { "content-type": "text/html" } });
+      }
+      if (input === "/assets/app-Abc123Xy.js") {
+        markAppFetchStarted();
+        await appFetchGate;
       }
       return new Response(`new ${input}`, {
         headers: { "content-type": "application/javascript" },
@@ -290,7 +298,30 @@ describe("service-worker cache ownership", () => {
       data: { type: "hanji:warm-offline-assets" },
       waitUntil: (value) => { warming = value; },
     });
+    await appFetchStarted;
+    message({
+      origin: "https://hanji.example",
+      data: { type: "hanji:pause-offline-assets" },
+      waitUntil: vi.fn(),
+    });
+    releaseAppFetch();
     await warming;
+
+    expect(fetchMock.mock.calls.filter(([input]) => input === "/assets/lazy-Def456Uv.js")).toHaveLength(0);
+    await expect(active.get("/__hanji_shell__")?.clone().text()).resolves.toBe("old shell");
+    await expect(active.get("/__hanji_precache__")?.clone().json()).resolves.toMatchObject({
+      version: "old",
+      complete: true,
+    });
+    expect(active.has("/assets/app-Abc123Xy.js")).toBe(true);
+
+    let resumedWarming!: Promise<unknown>;
+    message({
+      origin: "https://hanji.example",
+      data: { type: "hanji:warm-offline-assets" },
+      waitUntil: (value) => { resumedWarming = value; },
+    });
+    await resumedWarming;
 
     expect(fetchMock.mock.calls.filter(([input]) => input === "/")).toHaveLength(1);
     expect(fetchMock.mock.calls.filter(([input]) => input === "/theme-init.js")).toHaveLength(1);

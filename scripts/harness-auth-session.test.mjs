@@ -21,7 +21,6 @@ const LOCAL_ANONYMOUS_SIGNIN_RESIDUALS = [
   './block-actions-ui-smoke.mjs',
   './block-actions-visual-smoke.mjs',
   './block-drag-ui-smoke.mjs',
-  './block-editor-ui-smoke.mjs',
   './block-reorder-ui-smoke.mjs',
   './comment-ui-smoke.mjs',
   './comments-panel-visual-smoke.mjs',
@@ -31,11 +30,9 @@ const LOCAL_ANONYMOUS_SIGNIN_RESIDUALS = [
   './database-imported-view-config-ui-smoke.mjs',
   './database-permission-ui-smoke.mjs',
   './database-property-drag-ui-smoke.mjs',
-  './database-property-edit-smoke.mjs',
   './database-property-menu-ui-smoke.mjs',
   './database-property-resize-ui-smoke.mjs',
   './database-property-visual-smoke.mjs',
-  './database-relation-smoke.mjs',
   './database-row-drag-ui-smoke.mjs',
   './database-row-peek-smoke.mjs',
   './database-row-peek-visual-smoke.mjs',
@@ -135,7 +132,7 @@ test('shared anonymous sign-in users explicitly finalize the current-process reg
     assert(imported.includes('finalizeRegisteredSmokeAccounts'), `${path} must import the registry finalizer`);
     assert.match(source, /finally\s*\{[\s\S]*finalizeRegisteredSmokeAccounts\s*\(/, `${path} must finalize from top-level finally`);
   }
-  assert.equal(users.length, 20, `unexpected shared anonymous sign-in inventory: ${JSON.stringify(users)}`);
+  assert.equal(users.length, 24, `unexpected shared anonymous sign-in inventory: ${JSON.stringify(users)}`);
 });
 
 test('local anonymous sign-in copies cannot grow outside the audited residual list', () => {
@@ -200,6 +197,36 @@ test('shared anonymous sign-in cleanup targets only accounts registered by this 
   assert.deepEqual(empty, { deletedUserIds: [], remainingUserIds: [] });
 });
 
+test('master smoke sign-in uses password auth and never registers the durable master account for deletion', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url: String(url), body: JSON.parse(init.body) });
+    return new Response(JSON.stringify({
+      accessToken: 'master-token',
+      refreshToken: 'master-refresh',
+      user: { id: 'durable-master-user' },
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const session = await signIn('http://127.0.0.1:18787', {
+      mode: 'master',
+      credentials: { email: 'synthetic@example.com', password: 'synthetic-password' },
+    });
+    assert.equal(session.userId, 'durable-master-user');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.deepEqual(requests, [{
+    url: 'http://127.0.0.1:18787/api/auth/signin',
+    body: { email: 'synthetic@example.com', password: 'synthetic-password' },
+  }]);
+  const cleanup = await cleanupRegisteredSmokeAccounts({
+    signInAdmin: async () => { throw new Error('master account must not enter cleanup'); },
+  });
+  assert.deepEqual(cleanup, { deletedUserIds: [], remainingUserIds: [] });
+});
+
 test('shared anonymous registry survives a cleanup credential failure for an explicit retry', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({
@@ -240,11 +267,13 @@ test('browser smoke sessions migrate once, then move only the HttpOnly cookie be
   await installBrowserSession(first, session, {
     appOrigin: 'http://localhost:3000',
     authOrigin: 'http://127.0.0.1:8787',
+    language: 'en',
     localStorage: { 'hanji.debugPresence': '1' },
   });
   assert.equal(first.addedCookies.length, 0);
   assert.equal(first.initPayload.legacyRefreshToken, 'legacy-refresh-secret');
   assert.equal(first.initPayload.workspaceId, 'workspace-1');
+  assert.equal(first.initPayload.storage['hanji:language:user-1'], 'en');
   assert.equal(
     first.initPayload.refreshTokenKey,
     'edgebase:http%3A%2F%2F127.0.0.1%3A8787:refresh-token',

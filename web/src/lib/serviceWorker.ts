@@ -11,9 +11,13 @@ import { useStore } from "@/lib/store";
 
 const DISABLE_KEY = "hanji.sw.disabled";
 const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
+const PAUSE_OFFLINE_WARM_MESSAGE = "hanji:pause-offline-assets";
+const OFFLINE_WARM_QUIET_MS = 10_000;
 let registeredWorker: ServiceWorkerRegistration | undefined;
 let offlineWarmRequested = false;
-let offlineWarmScheduled = false;
+let offlineWarmStarted = false;
+let offlineWarmTimer: ReturnType<typeof globalThis.setTimeout> | undefined;
+let offlineWarmIdleId: number | undefined;
 
 function swDisabled(): boolean {
   try {
@@ -49,32 +53,61 @@ function watchForUpdates(registration: ServiceWorkerRegistration) {
   registration.addEventListener("updatefound", () => track(registration.installing));
 }
 
-function warmOfflineAssets(registration: ServiceWorkerRegistration) {
-  registration.active?.postMessage({ type: WARM_OFFLINE_MESSAGE });
+function warmOfflineAssets(registration: ServiceWorkerRegistration): boolean {
+  if (!registration.active) return false;
+  registration.active.postMessage({ type: WARM_OFFLINE_MESSAGE });
+  return true;
+}
+
+function cancelScheduledOfflineWarm() {
+  if (offlineWarmTimer !== undefined) {
+    globalThis.clearTimeout(offlineWarmTimer);
+    offlineWarmTimer = undefined;
+  }
+  const idleWindow = window as Window & {
+    cancelIdleCallback?: (handle: number) => void;
+  };
+  if (offlineWarmIdleId !== undefined) {
+    idleWindow.cancelIdleCallback?.(offlineWarmIdleId);
+    offlineWarmIdleId = undefined;
+  }
 }
 
 function scheduleOfflineWarm() {
-  if (!offlineWarmRequested || offlineWarmScheduled) return;
-  offlineWarmScheduled = true;
+  if (!offlineWarmRequested || !registeredWorker || offlineWarmStarted) return;
+  cancelScheduledOfflineWarm();
   const run = () => {
-    offlineWarmScheduled = false;
+    offlineWarmIdleId = undefined;
     void navigator.serviceWorker.ready
-      .then((readyRegistration) => warmOfflineAssets(readyRegistration))
+      .then((readyRegistration) => {
+        if (offlineWarmStarted) return;
+        offlineWarmStarted = warmOfflineAssets(readyRegistration);
+      })
       .catch(() => {});
   };
   const idleWindow = window as Window & {
     requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
   };
-  if (typeof idleWindow.requestIdleCallback === "function") {
-    idleWindow.requestIdleCallback(run, { timeout: 10_000 });
-  } else {
-    globalThis.setTimeout(run, 1_500);
-  }
+  offlineWarmTimer = globalThis.setTimeout(() => {
+    offlineWarmTimer = undefined;
+    if (typeof idleWindow.requestIdleCallback === "function") {
+      offlineWarmIdleId = idleWindow.requestIdleCallback(run, { timeout: 10_000 });
+    } else run();
+  }, OFFLINE_WARM_QUIET_MS);
 }
 
 function requestOfflineWarm() {
   offlineWarmRequested = true;
   if (registeredWorker) scheduleOfflineWarm();
+}
+
+function postponeOfflineWarmForActivity() {
+  if (!offlineWarmRequested || !registeredWorker) return;
+  if (offlineWarmStarted) {
+    registeredWorker.active?.postMessage({ type: PAUSE_OFFLINE_WARM_MESSAGE });
+    offlineWarmStarted = false;
+  }
+  scheduleOfflineWarm();
 }
 
 export function registerServiceWorker() {
@@ -89,8 +122,15 @@ export function registerServiceWorker() {
     return;
   }
   onAppInteractiveForOfflineWarm(requestOfflineWarm);
+  window.addEventListener("pointerdown", postponeOfflineWarmForActivity, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener("keydown", postponeOfflineWarmForActivity, { capture: true });
+  window.addEventListener("input", postponeOfflineWarmForActivity, { capture: true });
   window.addEventListener("load", () => {
     const warmActiveWorker = () => {
+      offlineWarmStarted = false;
       if (registeredWorker) scheduleOfflineWarm();
     };
     navigator.serviceWorker.addEventListener("controllerchange", warmActiveWorker);

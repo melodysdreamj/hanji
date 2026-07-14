@@ -65,6 +65,10 @@
 }
 .header[data-has-cover="true"][data-has-icon="true"] .iconWrap {
   margin-top: -42px;
+  /* Keep a stable band for the hover/focus page options below the icon. The
+     controls stay in that band even while transparent, so revealing them does
+     not collide with the icon or shift the title. */
+  margin-bottom: 40px;
   /* The wrap is a full-width block overlapping the cover; only its real
      children (icon button, picker) may take pointer events so the empty strip
      keeps the cover's :hover — and its action buttons — alive. */
@@ -75,9 +79,9 @@
 }
 .header[data-has-cover="true"][data-has-icon="true"] .controls {
   position: absolute;
-  /* -34px = the old 8px offset against the collapsed (-42px-shifted) header
-     box; flow-root stopped that shift, so keep the rendered position. */
-  top: -34px;
+  /* The icon spans -42px..36px relative to the header. Start this 24px row
+     8px below it, matching Notion's icon → options → title rhythm. */
+  top: 44px;
   left: 0;
   z-index: 2;
 }

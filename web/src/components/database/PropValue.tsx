@@ -67,9 +67,9 @@ export function PropValue({
     prop.type === "rollup" ? secondHopDatabaseId(prop, targetProps, propsByDb) : undefined;
 
   useEffect(() => {
-    if (relationTargetDbId) void loadDatabase(relationTargetDbId);
-    if (prop.type === "rollup" && targetDbId) void loadDatabase(targetDbId);
-    if (secondHopDbId) void loadDatabase(secondHopDbId);
+    if (relationTargetDbId) void loadDatabase(relationTargetDbId, { rows: false });
+    if (prop.type === "rollup" && targetDbId) void loadDatabase(targetDbId, { rows: false });
+    if (secondHopDbId) void loadDatabase(secondHopDbId, { rows: false });
   }, [loadDatabase, prop.type, relationTargetDbId, targetDbId, secondHopDbId]);
 
   if (prop.type === "title") {

@@ -128,8 +128,9 @@ async function main() {
     }
     if (options.onlyImmediateCreates) {
       await assertImmediateDatabaseCreates(browser, appUrl, apiUrl);
-      console.log('PASS database rows, views, and properties render before their held create responses.');
+      console.log('PASS database rows, views, and properties render before I/O, reach server confirmation, and survive a warm reload.');
       console.log(`Immediate-create screenshot: ${join(options.screenshotDir, 'desktop-immediate-database-creates.png')}`);
+      console.log(`Immediate-create reload screenshot: ${join(options.screenshotDir, 'desktop-immediate-database-creates-reloaded.png')}`);
       return;
     }
     await assertDatabaseViews(browser, appUrl, seed);
@@ -205,6 +206,18 @@ async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
     locale: 'en-US',
   });
   let seed;
+  let createdPropertyId = '';
+  let createdRowId = '';
+  let createdViewId = '';
+  const pageQueryRequests = [];
+  page.on('request', (request) => {
+    if (!request.url().includes('/api/functions/page-query')) return;
+    try {
+      pageQueryRequests.push(request.postDataJSON());
+    } catch {
+      pageQueryRequests.push({ unreadable: true });
+    }
+  });
 
   try {
     await context.addInitScript(() => {
@@ -256,6 +269,7 @@ async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
         page.waitForTimeout(1500).then(() => null),
       ]);
       assert(rowBody?.id, 'row create request should be intercepted after the local insert');
+      createdRowId = rowBody.id;
       await page.locator(`[data-table-row-id="${rowBody.id}"]`).waitFor({
         state: 'visible',
         timeout: 500,
@@ -292,6 +306,7 @@ async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
         page.waitForTimeout(1500).then(() => null),
       ]);
       assert(viewBody?.record?.id, 'view create request should be intercepted after local activation');
+      createdViewId = viewBody.record.id;
       await page.getByRole('tab', { name: 'Latency view', exact: true }).waitFor({
         state: 'visible',
         timeout: 500,
@@ -318,6 +333,7 @@ async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
         page.waitForTimeout(1500).then(() => null),
       ]);
       assert(propertyBody?.record?.id, 'property create request should be intercepted after local insertion');
+      createdPropertyId = propertyBody.record.id;
       await page.locator(`[data-table-property-header="${propertyBody.record.id}"]`).waitFor({
         state: 'visible',
         timeout: 500,
@@ -332,6 +348,97 @@ async function assertImmediateDatabaseCreates(browser, baseUrl, apiUrl) {
       if (propertyHold.body) await propertyHold.continued;
       await propertyHold.dispose();
     }
+
+    await page.locator('[data-testid="sync-status-badge"][data-confirmed="true"]').waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    const [serverDatabase, serverRows] = await Promise.all([
+      callFunction(apiUrl, seed.accessToken, 'page-query', {
+        action: 'database',
+        databaseId: seed.databaseId,
+      }),
+      callFunction(apiUrl, seed.accessToken, 'page-query', {
+        action: 'databaseRows',
+        databaseId: seed.databaseId,
+      }),
+    ]);
+    assert(
+      (serverDatabase?.properties ?? []).some((property) => property.id === createdPropertyId),
+      'server-confirmed property must be present in an authoritative database query',
+    );
+    assert(
+      (serverDatabase?.views ?? []).some((view) => view.id === createdViewId),
+      'server-confirmed view must be present in an authoritative database query',
+    );
+    assert(
+      (serverRows?.rows ?? []).some((row) => row.id === createdRowId),
+      'server-confirmed row must be present in an authoritative database query',
+    );
+
+    const reloadStartedAt = Date.now();
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: options.timeoutMs });
+    try {
+      // Table title cells are inputs, so their current value is not exposed by
+      // getByText()/innerText after reload. Wait for the actual cell value;
+      // this also proves the row payload has replaced the loading skeleton.
+      await expectCellInputValue(page, 0, 0, seed.rowTitles[0]);
+    } catch (error) {
+      const diagnostic = await page.evaluate(() => ({
+        busy: document.querySelectorAll('[data-table-rows-loading], [aria-busy="true"]').length,
+        body: document.body.innerText.replace(/\s+/g, ' ').trim().slice(-1200),
+        firstRowInputs: [...document.querySelectorAll('[data-table-row-id] input')]
+          .slice(0, 8)
+          .map((input) => input.value),
+      }));
+      throw new Error(
+        `reloaded rows did not resolve (${error instanceof Error ? error.message : String(error)}): `
+        + `${JSON.stringify({ diagnostic, pageQueryRequests: pageQueryRequests.slice(-30) })}`,
+      );
+    }
+    await page.waitForFunction(
+      () => document.querySelectorAll('[data-table-rows-loading], [aria-busy="true"]').length === 0,
+      undefined,
+      { timeout: options.timeoutMs },
+    );
+    await page.locator(`[data-table-row-id="${createdRowId}"]`).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    const reloadedViewTab = page.locator(`[data-view-tab="${createdViewId}"]`);
+    if (!(await reloadedViewTab.isVisible().catch(() => false))) {
+      const overflow = page.locator('[data-view-overflow]');
+      if (!(await overflow.isVisible().catch(() => false))) {
+        const diagnostic = await page.evaluate(() => ({
+          body: document.body.innerText.replace(/\s+/g, ' ').trim().slice(-1500),
+          propertyHeaders: [...document.querySelectorAll('[data-table-property-header]')]
+            .map((element) => element.getAttribute('data-table-property-header')),
+          tabs: [...document.querySelectorAll('[data-view-tab]')].map((element) => ({
+            id: element.getAttribute('data-view-tab'),
+            text: element.textContent?.trim(),
+          })),
+          url: location.href,
+        }));
+        throw new Error(`reloaded database view is missing from tabs and overflow: ${JSON.stringify(diagnostic)}`);
+      }
+      await overflow.click({ timeout: options.timeoutMs });
+      await page.getByRole('menuitemradio', { name: 'Latency view', exact: true }).waitFor({
+        state: 'visible',
+        timeout: options.timeoutMs,
+      });
+    }
+    await page.locator(`[data-table-property-header="${createdPropertyId}"]`).waitFor({
+      state: 'visible',
+      timeout: options.timeoutMs,
+    });
+    assert(
+      Date.now() - reloadStartedAt < 5_000,
+      'a warm reload should restore the confirmed database row, view, and property within 5 seconds',
+    );
+    await page.screenshot({
+      path: join(options.screenshotDir, 'desktop-immediate-database-creates-reloaded.png'),
+      fullPage: false,
+    });
 
     assertNoBrowserErrors(errors, 'immediate database create flow');
   } finally {
@@ -1730,6 +1837,16 @@ async function assertDefaultSummaryControlsStayQuiet(page, baseUrl, seed) {
     await openDatabase(page, baseUrl, seed);
     await moveMouseToIdleChrome(page);
 
+    await page.waitForFunction(
+      () => {
+        const row = document.querySelector('[data-table-summary-row]');
+        if (!(row instanceof HTMLElement)) return false;
+        return Array.from(row.querySelectorAll('button[data-empty="true"]')).length >= 2;
+      },
+      undefined,
+      { timeout: options.timeoutMs },
+    );
+
     const idle = await collectTableSummaryButtonMetrics(page);
     assert(
       idle.emptyButtons.length >= 2,
@@ -1863,6 +1980,42 @@ async function assertDirectViewUrl(page, baseUrl, seed) {
 
 async function assertFirstDatabaseVisualContract(page, seed) {
   await assertSidebarTopActionRail(page);
+
+  // openDatabase deliberately waits only for the first row so interaction
+  // tests can start quickly. The visual contract below also measures the
+  // second row and new-row rail; under a loaded Linux worker those can commit
+  // a render later. Wait for the exact marker set we measure instead of
+  // sampling an otherwise healthy table during that narrow render gap.
+  await page.waitForFunction(() => {
+    const doc = document.querySelector('[data-page-search-root]');
+    const scroll = doc?.parentElement;
+    const title = document.querySelector('[role="textbox"][aria-label="Page title"]');
+    const tablist = document.querySelector('[role="tablist"][aria-label$=" views"]');
+    const selectedTab = document.querySelector('[role="tab"][aria-selected="true"]');
+    const selectedTabWrap = selectedTab?.closest('[data-view-tab-wrap]');
+    const toolbar = document.querySelector('[role="toolbar"][aria-label="Database toolbar"]');
+    const firstCell = document.querySelector(
+      '[data-table-cell][data-row-index="0"][data-col-index="0"]',
+    );
+    const firstCellInput = firstCell?.querySelector('input[type="text"]');
+    const secondRowCell = document.querySelector(
+      '[data-table-cell][data-row-index="1"][data-col-index="0"]',
+    );
+    const newRow = document.querySelector('[data-table-new-row]');
+    return (
+      doc instanceof HTMLElement &&
+      scroll instanceof HTMLElement &&
+      title instanceof HTMLElement &&
+      tablist instanceof HTMLElement &&
+      selectedTab instanceof HTMLElement &&
+      selectedTabWrap instanceof HTMLElement &&
+      toolbar instanceof HTMLElement &&
+      firstCell instanceof HTMLElement &&
+      firstCellInput instanceof HTMLInputElement &&
+      secondRowCell instanceof HTMLElement &&
+      newRow instanceof HTMLElement
+    );
+  }, { timeout: options.timeoutMs });
 
   const metrics = await page.evaluate((expected) => {
     const visibleElement = (element) => element instanceof HTMLElement && element.offsetParent !== null;

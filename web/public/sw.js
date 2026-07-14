@@ -26,8 +26,13 @@ const PRECACHE_MANIFEST_KEY = "/__hanji_precache__";
 const BOOT_MANIFEST_KEY = "/__hanji_boot__";
 const BOOT_CACHE_PREFIX = `${CACHE_PREFIX}boot-`;
 const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
+const PAUSE_OFFLINE_WARM_MESSAGE = "hanji:pause-offline-assets";
 const BOOT_PRECACHE_BATCH_SIZE = 4;
-const FULL_PRECACHE_BATCH_SIZE = 4;
+// The complete graph is nonessential background work. Fetching four large
+// chunks at once can monopolize a small NAS worker/cache process long enough
+// to delay an interactive navigation, so warm it serially after the boot graph
+// while still preserving resumable immutable entries.
+const FULL_PRECACHE_BATCH_SIZE = 1;
 // Upper bound on runtime-cached hashed assets. Content-hashed files are
 // immutable, so previous releases' lazy chunks are harmless (and necessary for
 // offline-pinned pages after a deploy) — we keep them and only evict the oldest
@@ -42,10 +47,12 @@ self.addEventListener("install", (event) => {
 });
 
 let fullPrecacheInFlight;
+let fullPrecacheGeneration = 0;
 
 function ensureFullPrecache() {
   if (!fullPrecacheInFlight) {
-    fullPrecacheInFlight = precacheFull().finally(() => {
+    const generation = fullPrecacheGeneration;
+    fullPrecacheInFlight = precacheFull(generation).finally(() => {
       fullPrecacheInFlight = undefined;
     });
   }
@@ -179,7 +186,7 @@ async function precacheBoot() {
   }
 }
 
-async function precacheFull() {
+async function precacheFull(generation) {
   const manifest = await fetchPrecacheManifest();
   const { assets } = manifest;
   const cache = await caches.open(CACHE);
@@ -209,6 +216,9 @@ async function precacheFull() {
   const bootAssetSet = new Set(manifest.bootAssets);
   try {
     for (let offset = 0; offset < assets.length; offset += FULL_PRECACHE_BATCH_SIZE) {
+      if (generation !== fullPrecacheGeneration) {
+        throw new Error("Offline asset warming paused for interactive work.");
+      }
       await Promise.all(
         assets.slice(offset, offset + FULL_PRECACHE_BATCH_SIZE).map(async (url) => {
           const bootResponse = bootAssetSet.has(url) ? await boot.match(url) : undefined;
@@ -358,6 +368,12 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.origin !== self.location.origin) return;
+  if (event.data?.type === PAUSE_OFFLINE_WARM_MESSAGE) {
+    // The already-verified immutable entries remain in CACHE, so aborting the
+    // staging pass is cheap and the next quiet-window warm resumes from them.
+    fullPrecacheGeneration += 1;
+    return;
+  }
   if (event.data?.type !== WARM_OFFLINE_MESSAGE) return;
   // A message event extends the worker lifetime without delaying install or
   // activation. The warm remains all-or-nothing at the active shell boundary.

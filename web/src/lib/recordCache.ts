@@ -128,7 +128,7 @@ function isQuotaError(error: unknown): boolean {
   );
 }
 
-function enqueue(task: (cache: RecordCache) => Promise<void>, userId: string) {
+function enqueue(task: (cache: RecordCache) => Promise<void>, userId: string): Promise<void> {
   const generation = cacheGeneration;
   chain = chain
     .then(async () => {
@@ -148,6 +148,7 @@ function enqueue(task: (cache: RecordCache) => Promise<void>, userId: string) {
       }
     })
     .catch(warn);
+  return chain;
 }
 
 // ── offline scope: pins + LRU eviction (local-first Phase 3) ────────────────
@@ -303,7 +304,27 @@ export function cacheReplaceTable(userId: string, table: string, records: Record
 
 /** Fire-and-forget meta write (bootstrap payloads, per-table stamps). */
 export function cacheSetMeta(userId: string, key: string, value: unknown) {
-  enqueue((cache) => cache.setMeta(key, value), userId);
+  return enqueue((cache) => cache.setMeta(key, value), userId);
+}
+
+/**
+ * Durably merge one authoritative record into an existing cached table.
+ * Replay callers await this before acknowledging their outbox entry so a
+ * reload cannot observe the old cache after the server mutation has landed.
+ */
+export function cacheUpsertRecord(
+  userId: string,
+  table: string,
+  record: RecordCacheRecord
+): Promise<void> {
+  return enqueue(async (cache) => {
+    const records = await cache.listTable(table);
+    const index = records.findIndex((current) => current.id === record.id);
+    const next = records.slice();
+    if (index >= 0) next[index] = record;
+    else next.push(record);
+    await cache.replaceTable(table, next);
+  }, userId);
 }
 
 export async function cacheListTable<V = unknown>(

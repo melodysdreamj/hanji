@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/edgebase", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/edgebase")>();
@@ -12,16 +12,21 @@ vi.mock("@/lib/edgebase", async (importOriginal) => {
       totalCount: 0,
       hasMore: false,
     })),
+    updateDatabaseRowRemote: vi.fn(async (id, patch) => ({ id, ...patch })),
   };
 });
 
-import { getDatabaseRowsRemote } from "@/lib/edgebase";
-import { databaseRowsQueryKey, useStore } from "@/lib/store";
-import { makePage, makeRow, resetStore, seedPages } from "./components/storeTestUtils";
+import { getDatabaseRowsRemote, updateDatabaseRowRemote } from "@/lib/edgebase";
+import { databaseRowsQueryKey, flushAllPending, useStore } from "@/lib/store";
+import { makePage, makeRow, resetStore, seedPages, seedUser } from "./components/storeTestUtils";
 
 beforeEach(() => {
   vi.clearAllMocks();
   resetStore();
+});
+
+afterEach(async () => {
+  await flushAllPending();
 });
 
 describe("database row loading", () => {
@@ -106,6 +111,74 @@ describe("database row loading", () => {
     });
     await Promise.all([first, duplicate]);
     expect(getDatabaseRowsRemote).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs one trailing forced fetch when another mutation refresh joins an in-flight query", async () => {
+    const db = makePage({ id: "db", kind: "database", title: "Tasks" });
+    const stale = makeRow(db.id, { id: "row-1", title: "Before" });
+    const fresh = makeRow(db.id, { id: "row-1", title: "After" });
+    const requests: Array<{
+      resolve: (result: Awaited<ReturnType<typeof getDatabaseRowsRemote>>) => void;
+    }> = [];
+    vi.mocked(getDatabaseRowsRemote).mockImplementation(
+      () => new Promise((resolve) => requests.push({ resolve }))
+    );
+    seedPages([db]);
+
+    const first = useStore.getState().loadDatabaseRows(db.id, { force: true, reset: true });
+    await vi.waitFor(() => expect(requests).toHaveLength(1));
+    const joined = useStore.getState().loadDatabaseRows(db.id, { force: true, reset: true });
+    requests[0].resolve({
+      databaseId: db.id,
+      rows: [stale],
+      offset: 0,
+      totalCount: 1,
+      hasMore: false,
+    });
+
+    await vi.waitFor(() => expect(requests).toHaveLength(2));
+    requests[1].resolve({
+      databaseId: db.id,
+      rows: [fresh],
+      offset: 0,
+      totalCount: 1,
+      hasMore: false,
+    });
+    await Promise.all([first, joined]);
+
+    expect(getDatabaseRowsRemote).toHaveBeenCalledTimes(2);
+    expect(useStore.getState().pagesById[fresh.id]?.title).toBe("After");
+  });
+
+  it("keeps an optimistic row property over a stale forced snapshot until the server confirms it", async () => {
+    const db = makePage({ id: "db", kind: "database", title: "Tasks" });
+    const row = makeRow(db.id, {
+      id: "row-1",
+      title: "Row",
+      properties: { relation: ["old-target"] },
+    });
+    let resolveUpdate!: (value: Awaited<ReturnType<typeof updateDatabaseRowRemote>>) => void;
+    vi.mocked(updateDatabaseRowRemote).mockImplementationOnce(
+      () => new Promise((resolve) => { resolveUpdate = resolve; })
+    );
+    vi.mocked(getDatabaseRowsRemote).mockResolvedValueOnce({
+      databaseId: db.id,
+      rows: [row],
+      offset: 0,
+      totalCount: 1,
+      hasMore: false,
+    });
+    seedUser();
+    seedPages([db, row]);
+
+    useStore.getState().updatePage(row.id, {
+      properties: { relation: ["new-target"] },
+    }, { debounce: false });
+    await vi.waitFor(() => expect(updateDatabaseRowRemote).toHaveBeenCalledTimes(1));
+    await useStore.getState().loadDatabaseRows(db.id, { force: true, reset: true });
+
+    expect(useStore.getState().pagesById[row.id]?.properties?.relation).toEqual(["new-target"]);
+    resolveUpdate({ ...row, properties: { relation: ["new-target"] } });
   });
 
   it("retries a joined view query when a competing base query discarded its result", async () => {

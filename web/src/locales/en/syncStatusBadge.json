@@ -3,6 +3,7 @@
   "offlinePending_one": "Offline · {{count}} change pending",
   "offlinePending_other": "Offline · {{count}} changes pending",
   "syncing": "Syncing · {{count}}",
+  "confirmed": "Saved to server",
   "unreachable": "Can't reach the server",
   "unreachablePending_one": "Can't reach the server · {{count}} change pending",
   "unreachablePending_other": "Can't reach the server · {{count}} changes pending",

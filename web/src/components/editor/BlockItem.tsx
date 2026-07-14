@@ -5,7 +5,6 @@ import {
   Suspense,
   type CompositionEvent as ReactCompositionEvent,
   type CSSProperties,
-  type FormEvent as ReactFormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type RefObject,
@@ -8703,6 +8702,25 @@ function TextBlock({
     ops.splitBlock(block.id, before, after);
   }
 
+  function applyDefaultSlashCommandAt(
+    el: HTMLDivElement,
+    spans: TextSpan[],
+    offset: number
+  ) {
+    const beforeCaret = spansToPlainText(spans).slice(0, offset);
+    const slashMatch = beforeCaret.match(SLASH_RE);
+    const slashQuery = slashMatch?.[1] ?? "";
+    // An empty `/` menu can be reordered by recent commands, so its selected
+    // item must remain owned by SlashMenu. A non-empty query has a stable
+    // content-derived default that can safely recover when React menu state is
+    // one input behind the committed contenteditable DOM.
+    const slashDefinition = slashQuery ? matchBlocks(slashQuery)[0] : undefined;
+    if (!slashDefinition) return false;
+    placeCaret(el, offset);
+    applyType(slashDefinition);
+    return true;
+  }
+
   function runEnterFromCommittedComposition(
     el: HTMLDivElement,
     inputType: "insertParagraph" | "insertLineBreak" = "insertParagraph"
@@ -8710,6 +8728,14 @@ function TextBlock({
     const spans = htmlToSpans(el);
     const offset = compositionCommittedOffset(spans, caretOffset(el));
     const softBreak = inputType === "insertLineBreak" || compositionEnterShiftRef.current;
+    // Some IMEs report the Enter that commits an ASCII slash query as a
+    // composing key. The slash menu intentionally ignores composing keydown,
+    // so apply its default selected command after composition commits instead
+    // of falling through to a normal paragraph split.
+    if (!softBreak && applyDefaultSlashCommandAt(el, spans, offset)) {
+      compositionEnterHandledRef.current = true;
+      return;
+    }
     if (block.type === "code") {
       placeCaret(el, offset);
       insertCodeLineBreak(el);
@@ -8785,12 +8811,27 @@ function TextBlock({
     return true;
   }
 
-  function onBeforeInput(e: ReactFormEvent<HTMLDivElement>) {
-    const native = e.nativeEvent as InputEvent;
+  function onBeforeInput(native: InputEvent) {
     if (native.inputType !== "insertParagraph" && native.inputType !== "insertLineBreak") return;
+    // Some IMEs expose the committed slash query and the visible command menu,
+    // but report the confirming key only as an ambiguous Process/229 event.
+    // In that case keydown cannot prove that Enter was pressed; the subsequent
+    // paragraph beforeinput is the authoritative signal. Apply the visible
+    // menu's default command here instead of allowing a paragraph split.
+    if (native.inputType === "insertParagraph" && slash.open) {
+      const el = ref.current;
+      if (el && applyDefaultSlashCommandAt(el, htmlToSpans(el), caretOffset(el))) {
+        native.preventDefault();
+        composingEnterRef.current = false;
+        compositionEnterHandledRef.current = true;
+        compositionEnterGuardUntilRef.current = 0;
+        pendingCompositionParagraphInputRef.current = null;
+        return;
+      }
+    }
     if (!composingRef.current && compositionEnterGuardUntilRef.current <= 0) return;
 
-    e.preventDefault();
+    native.preventDefault();
     if (composingRef.current) {
       pendingCompositionParagraphInputRef.current = native.inputType;
       composingEnterRef.current = true;
@@ -8802,6 +8843,13 @@ function TextBlock({
       if (el) runEnterFromCommittedComposition(el, native.inputType);
     }
   }
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || ops.readOnly) return;
+    el.addEventListener("beforeinput", onBeforeInput);
+    return () => el.removeEventListener("beforeinput", onBeforeInput);
+  });
 
   function applyInlineMarkdownShortcut(el: HTMLDivElement, spans: TextSpan[]) {
     const off = caretOffset(el);
@@ -9383,8 +9431,58 @@ function TextBlock({
     const el = ref.current;
     if (!el) return;
 
-    if (isComposingKeyEvent(e) || composingRef.current) {
-      if (e.key === "Enter" || e.code === "Enter") {
+    // A portalled editor menu can own the native key during document capture.
+    // Its synchronous command may re-render this block before the same event
+    // reaches React; never run the newly rendered block's normal Enter path a
+    // second time after that menu already prevented the event.
+    if (e.defaultPrevented) return;
+
+    // The contenteditable DOM commits a keystroke before React's slash-menu
+    // state is guaranteed to render. Short commands such as /h1 can therefore
+    // receive Enter while `slash.open` is still false and incorrectly fall
+    // through to paragraph splitting. Re-read the active DOM at confirmation
+    // time. If SlashMenu already handled the capture-phase Enter it has
+    // synchronously stripped the trigger, so this cannot apply twice.
+    if (
+      !composingRef.current &&
+      !e.shiftKey &&
+      (e.key === "Enter" || e.code === "Enter") &&
+      applyDefaultSlashCommandAt(el, htmlToSpans(el), caretOffset(el))
+    ) {
+      e.preventDefault();
+      composingEnterRef.current = false;
+      compositionEnterHandledRef.current = true;
+      compositionEnterGuardUntilRef.current = 0;
+      return;
+    }
+
+    const composingKey = isComposingKeyEvent(e);
+    const ambiguousProcessSlashConfirm =
+      slash.open &&
+      !composingRef.current &&
+      !e.shiftKey &&
+      (e.key === "Process" || e.key === "Unidentified") &&
+      (e.keyCode === 229 || e.which === 229);
+    if (composingKey || composingRef.current) {
+      if (e.key === "Enter" || e.code === "Enter" || ambiguousProcessSlashConfirm) {
+        // Korean IMEs can report Enter as keyCode 229 even when no composition
+        // lifecycle was emitted for an ASCII slash query. Waiting for a
+        // compositionend that will never arrive leaves the visible menu stuck.
+        // If the committed DOM already contains a matching slash command,
+        // apply it immediately; a real active composition still waits for its
+        // normal compositionend path above.
+        if (
+          composingKey &&
+          !composingRef.current &&
+          !e.shiftKey &&
+          applyDefaultSlashCommandAt(el, htmlToSpans(el), caretOffset(el))
+        ) {
+          e.preventDefault();
+          composingEnterRef.current = false;
+          compositionEnterHandledRef.current = true;
+          compositionEnterGuardUntilRef.current = 0;
+          return;
+        }
         composingEnterRef.current = true;
         compositionEnterShiftRef.current = e.shiftKey;
       }
@@ -9887,10 +9985,16 @@ function TextBlock({
           publishEditableAwareness("editing");
         }
       }}
+      onBlur={() => {
+        // Slash and mention menus are portalled per block and listen on the
+        // document. Close the owner menu as soon as editing moves elsewhere so
+        // a stale menu cannot consume Enter intended for another block.
+        setSlash({ open: false, query: "" });
+        setMention({ open: false, query: "" });
+      }}
       onClick={onEditableClick}
       onCompositionStart={ops.readOnly ? undefined : onCompositionStart}
       onCompositionEnd={ops.readOnly ? undefined : onCompositionEnd}
-      onBeforeInput={ops.readOnly ? undefined : onBeforeInput}
       onKeyDown={ops.readOnly ? undefined : onKeyDown}
       onPaste={ops.readOnly ? undefined : onPaste}
     />
@@ -10206,6 +10310,7 @@ function TextBlock({
           anchor={slash.anchor}
           query={slash.query}
           templateMode={ops.templateMode}
+          ownerBlockId={block.id}
           onPick={applyType}
           onClose={dismissSlash}
         />

@@ -3684,6 +3684,13 @@ async function createWorkspace(
     createdAt: now,
     updatedAt: now,
   });
+  // The client cannot safely follow workspace creation with a fire-and-forget
+  // suppression request: on a slow runtime the newly selected workspace can
+  // claim the prompt first. Persist the explicit start choice before exposing
+  // the new workspace to the client.
+  if (body.suppressNotionImportOnboarding === true) {
+    await recordNotionImportOnboardingSuppression(db, workspace.id, actorId, now);
+  }
   // Content seeding writes to the workspace block; index rows are written
   // synchronously so the fresh workspace's pages route immediately. Creation
   // flows that immediately import (Notion/Hanji) skip the starter pages so
@@ -3780,8 +3787,8 @@ async function claimNotionImportOnboarding(
   const contentDb = boundedDb(admin, workspaceId);
   const [pages, jobs, connections] = await Promise.all([
     listAll(contentDb.table<Page>('pages').where('workspaceId', '==', workspaceId)),
-    listAll(db.table<{ id: string }>('notion_import_jobs').where('workspaceId', '==', workspaceId)),
-    listAll(db.table<{ id: string }>('notion_import_connections').where('workspaceId', '==', workspaceId)),
+    listAll(contentDb.table<{ id: string }>('notion_import_jobs').where('workspaceId', '==', workspaceId)),
+    listAll(contentDb.table<{ id: string }>('notion_import_connections').where('workspaceId', '==', workspaceId)),
   ]);
   const activePages = pages.filter((page) => !page.inTrash);
   const starterOnly =
@@ -3824,9 +3831,18 @@ async function suppressNotionImportOnboarding(
   const workspaceId = requireString(body.workspaceId ?? body.id, 'workspaceId');
   const ctx = await workspaceContext(db, workspaceId, actorId);
   assertWorkspaceAdmin(ctx.currentRole);
+  await recordNotionImportOnboardingSuppression(db, workspaceId, actorId);
+  return { suppressed: true };
+}
+
+async function recordNotionImportOnboardingSuppression(
+  db: DbRef,
+  workspaceId: string,
+  actorId: string,
+  suppressedAt = nowIso(),
+) {
   const onboarding = db.table<WorkspaceOnboarding>('workspace_onboarding');
-  if (await getExisting(onboarding, workspaceId)) return { suppressed: true };
-  const now = nowIso();
+  if (await getExisting(onboarding, workspaceId)) return;
   try {
     await db.transact([
       { table: 'workspace_onboarding', op: 'expect', id: workspaceId, exists: false },
@@ -3837,7 +3853,7 @@ async function suppressNotionImportOnboarding(
           id: workspaceId,
           workspaceId,
           notionImportState: 'suppressed',
-          notionImportSuppressedAt: now,
+          notionImportSuppressedAt: suppressedAt,
           notionImportSuppressedBy: actorId,
         },
       },
@@ -3847,7 +3863,6 @@ async function suppressNotionImportOnboarding(
       throw error;
     }
   }
-  return { suppressed: true };
 }
 
 async function transferWorkspaceOwner(db: DbRef, body: Record<string, unknown>, actorId: string) {

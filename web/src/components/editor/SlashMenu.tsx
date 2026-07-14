@@ -91,12 +91,14 @@ export function SlashMenu({
   anchor,
   query,
   templateMode = false,
+  ownerBlockId,
   onPick,
   onClose,
 }: {
   anchor?: SlashMenuAnchor;
   query: string;
   templateMode?: boolean;
+  ownerBlockId?: string;
   onPick: (def: BlockDef) => void;
   onClose: () => void;
 }) {
@@ -223,14 +225,31 @@ export function SlashMenu({
   }, []);
 
   useEffect(() => {
+    function ownKey(e: KeyboardEvent) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     function onKey(e: KeyboardEvent) {
+      const activeBlockId = (document.activeElement as HTMLElement | null)
+        ?.closest<HTMLElement>("[data-block-id]")
+        ?.dataset.blockId;
+      if (ownerBlockId) {
+        // Each text block owns its own portalled slash menu and document-level
+        // key listener. A menu left mounted during a focus transition must not
+        // apply its command to a different block's Enter.
+        if (activeBlockId !== ownerBlockId) {
+          onClose();
+          return;
+        }
+      }
       if (isComposingKeyEvent(e)) return;
 
       if (visibleItems.length === 0) {
         // Don't trap navigation when empty — let the caret move (which re-runs
         // slash detection and closes the menu). Only intercept Escape.
         if (e.key === "Escape") {
-          e.preventDefault();
+          ownKey(e);
           onClose();
         }
         return;
@@ -243,36 +262,36 @@ export function SlashMenu({
         pointerMoved.current = false;
       }
       if (e.key === "ArrowDown") {
-        e.preventDefault();
+        ownKey(e);
         setActive((active + 1) % visibleItems.length);
       } else if (e.key === "ArrowUp") {
-        e.preventDefault();
+        ownKey(e);
         setActive(active <= 0 ? visibleItems.length - 1 : active - 1);
       } else if (e.key === "Home") {
-        e.preventDefault();
+        ownKey(e);
         setActive(0);
       } else if (e.key === "End") {
-        e.preventDefault();
+        ownKey(e);
         setActive(visibleItems.length - 1);
       } else if (e.key === "PageDown") {
-        e.preventDefault();
+        ownKey(e);
         setActive(Math.min(active + 5, visibleItems.length - 1));
       } else if (e.key === "PageUp") {
-        e.preventDefault();
+        ownKey(e);
         setActive(Math.max(active - 5, 0));
       } else if (e.key === "Enter" || e.key === "Tab") {
-        e.preventDefault();
+        ownKey(e);
         const r = visibleItems[active];
         if (r) pick(r);
         else onClose();
       } else if (e.key === "Escape") {
-        e.preventDefault();
+        ownKey(e);
         onClose();
       }
     }
     document.addEventListener("keydown", onKey, true);
     return () => document.removeEventListener("keydown", onKey, true);
-  }, [visibleItems, active, pick, onClose, setActive]);
+  }, [visibleItems, active, ownerBlockId, pick, onClose, setActive]);
 
   useEffect(() => {
     listRef.current
@@ -289,6 +308,7 @@ export function SlashMenu({
           className={styles.slash}
           style={fixedStyle}
           role="listbox"
+          data-slash-owner-block-id={ownerBlockId}
           data-template-slash-menu={templateMode ? "true" : undefined}
           tabIndex={-1}
           aria-label={t("slashMenu:blockCommands")}
@@ -314,6 +334,7 @@ export function SlashMenu({
         ref={listRef}
         style={fixedStyle}
         role="listbox"
+        data-slash-owner-block-id={ownerBlockId}
         data-template-slash-menu={templateMode ? "true" : undefined}
         tabIndex={-1}
         aria-label={t("slashMenu:blockCommands")}

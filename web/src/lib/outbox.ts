@@ -30,7 +30,18 @@ import {
   migrateLegacyIndexedDbProvenance,
 } from "./legacyNamespace";
 import { recordCacheClear } from "./recordCache";
-import type { Block, Page } from "./types";
+import type { Block, DbProperty, DbTemplate, DbView, Page } from "./types";
+
+export interface DatabaseCreateEffect {
+  databaseId: string;
+  kind: "database_create";
+  originHref: string;
+  page: Page;
+  properties: DbProperty[];
+  rows: Page[];
+  templates: DbTemplate[];
+  views: DbView[];
+}
 
 export interface RowFileRemovalEffect {
   cacheKey?: string;
@@ -44,7 +55,7 @@ export interface RowFileRemovalEffect {
   rowId: string;
 }
 
-export type RemoteCallEffect = RowFileRemovalEffect;
+export type RemoteCallEffect = DatabaseCreateEffect | RowFileRemovalEffect;
 
 export type OutboxOp =
   | {
@@ -78,6 +89,40 @@ let current: { promise: Promise<DurableOutbox<OutboxOp> | null>; userId: string 
 // after a newer set must not delete the newer mirror).
 let chain: Promise<void> = Promise.resolve();
 let warnedOnce = false;
+
+type OutboxPendingListener = (userId: string, pendingHint: number) => void;
+const pendingHintKeys = new Map<string, Set<string>>();
+const pendingListeners = new Set<OutboxPendingListener>();
+
+function emitPendingHint(userId: string) {
+  const pendingHint = pendingHintKeys.get(userId)?.size ?? 0;
+  for (const listener of pendingListeners) listener(userId, pendingHint);
+}
+
+function markPendingHint(userId: string, entryKey: string, pending: boolean) {
+  if (!userId) return;
+  const keys = pendingHintKeys.get(userId) ?? new Set<string>();
+  if (pending) keys.add(entryKey);
+  else keys.delete(entryKey);
+  if (keys.size) pendingHintKeys.set(userId, keys);
+  else pendingHintKeys.delete(userId);
+  emitPendingHint(userId);
+}
+
+/**
+ * Immediate in-tab signal for the sync badge. IndexedDB remains authoritative;
+ * this hint closes the gap where a set and its later ack can both finish
+ * between the badge's polling intervals and the user never sees that a server
+ * confirmation is still outstanding.
+ */
+export function subscribeOutboxPending(listener: OutboxPendingListener) {
+  pendingListeners.add(listener);
+  return () => pendingListeners.delete(listener);
+}
+
+export function outboxPendingHintCount(userId: string) {
+  return pendingHintKeys.get(userId)?.size ?? 0;
+}
 
 // Structural subset of `navigator.locks` (mirrors the shape the @edge-base/web
 // DurableOutbox already feature-detects) so this stays testable and degrades
@@ -234,11 +279,13 @@ function enqueue(task: (outbox: DurableOutbox<OutboxOp>) => Promise<void>, userI
 
 /** Durably mirror (upsert) one queued mutation. Fire-and-forget, ordered. */
 export function outboxSet(userId: string, entryKey: string, op: OutboxOp) {
+  markPendingHint(userId, entryKey, true);
   enqueue((outbox) => withOutboxLock(userId, () => outbox.set(entryKey, op)), userId);
 }
 
 /** Remove a mirrored mutation once it is acked or terminally dropped. */
 export function outboxAck(userId: string, entryKey: string) {
+  markPendingHint(userId, entryKey, false);
   enqueue((outbox) => withOutboxLock(userId, () => outbox.ack(entryKey)), userId);
 }
 
@@ -282,6 +329,8 @@ export async function outboxAllEntries(userId: string): Promise<OutboxEntry[]> {
 /** Wipe the current user's outbox (logout / reset-local-data escape hatch). */
 export async function outboxClear(userId: string) {
   if (!userId) return;
+  pendingHintKeys.delete(userId);
+  emitPendingHint(userId);
   try {
     await chain;
     const outbox = await getOutbox(userId);
@@ -340,6 +389,7 @@ export function resetOutboxForTests() {
   current = null;
   chain = Promise.resolve();
   warnedOnce = false;
+  pendingHintKeys.clear();
 }
 
 /** Await all queued mirror writes — test hook for deterministic assertions. */

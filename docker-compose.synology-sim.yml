@@ -1,0 +1,32 @@
+name: hanji-synology-sim
+
+services:
+  hanji:
+    image: ${HANJI_SIM_IMAGE:-hanji:synology-sim}
+    environment:
+      PORT: "8787"
+      LOCAL_PROTOCOL: http
+      HANJI_APP_ORIGIN: http://localhost:${HANJI_SIM_PORT:-18787}
+      HANJI_PASSKEY_RP_ID: localhost
+      HANJI_PASSKEY_ORIGINS: http://localhost:${HANJI_SIM_PORT:-18787}
+      HANJI_MASTER_EMAIL: ${HANJI_SIM_MASTER_EMAIL:-master@hanji.local}
+      HANJI_MASTER_PASSWORD: ${HANJI_SIM_MASTER_PASSWORD:-HanjiMaster!2026}
+    volumes:
+      - hanji-synology-sim-data:/data
+    cpus: ${HANJI_SIM_CPUS:-1.0}
+    mem_limit: ${HANJI_SIM_MEMORY:-1536m}
+    pids_limit: ${HANJI_SIM_PIDS:-256}
+    restart: unless-stopped
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.12.0
+    depends_on:
+      hanji:
+        condition: service_healthy
+    ports:
+      - 127.0.0.1:${HANJI_SIM_PORT:-18787}:8787
+      - 127.0.0.1:${HANJI_SIM_ADMIN_PORT:-18474}:8474
+    restart: unless-stopped
+
+volumes:
+  hanji-synology-sim-data:

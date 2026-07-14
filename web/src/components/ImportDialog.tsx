@@ -967,6 +967,7 @@ export function ImportDialog({
   const [notionStep, setNotionStep] = useState(1);
   const notionStepJobKeyRef = useRef("");
   const autoResumeJobIdRef = useRef("");
+  const autoApplyJobIdRef = useRef("");
   const credentialPromptJobIdRef = useRef("");
   // 1s clock for the installer-style run panel (elapsed time keeps counting
   // between polls).
@@ -2544,13 +2545,6 @@ export function ImportDialog({
   const activeSteps = activeJob ? progressStepsOf(activeJob) : [];
   const activeApplied = activeJob ? appliedStats(activeJob) : undefined;
   const activeDiscovered = activeJob ? discoveredEntries(activeJob, L) : [];
-  // A settled discovery can become `ready` one render before the client runner
-  // releases its busy flag. Trust the durable job state there so the panel does
-  // not show a contradictory Ready pill plus a live progress bar. Apply keeps
-  // the immediate busy affordance while its first persisted chunk is starting.
-  const activeLive = activeJob
-    ? isLiveNotionJob(activeJob) || (notionBusy && notionStep === 4 && activeJob.status !== "completed")
-    : false;
   const selectedRoots = selectedRootCandidates(notionRootCandidates, selectedNotionRootKeys);
   const rootIdCount = rootIds().length + rootDataSourceIds().length;
   const activeCurrentStep =
@@ -2561,6 +2555,23 @@ export function ImportDialog({
         activeCurrentStep === "file_copy_retry" ||
         activeJob.status === "completed"),
   );
+  // Starting discovery is the user's import confirmation. Once the current
+  // run has a complete durable snapshot, applying it is the next phase of the
+  // same operation rather than a second decision point.
+  const automaticApplyPending = Boolean(
+    activeJob &&
+      notionResult?.job.id === activeJob.id &&
+      activeJob.status === "ready" &&
+      activeJob.progress?.hasMore !== true &&
+      !applyStarted,
+  );
+  // Keep the lifecycle guard and shell activity continuous across the brief
+  // durable ready boundary before the first apply request starts.
+  const activeLive = activeJob
+    ? isLiveNotionJob(activeJob) ||
+      automaticApplyPending ||
+      (notionBusy && notionStep === 4 && activeJob.status !== "completed")
+    : false;
   const interruptedApply = Boolean(
     activeJob &&
       activeJob.status === "ready" &&
@@ -2578,7 +2589,7 @@ export function ImportDialog({
 
   useEffect(() => {
     if (!onActivityChange) return;
-    if (!activeJob || !isLiveNotionJob(activeJob)) {
+    if (!activeJob || !activeLive) {
       onActivityChange(null);
       return;
     }
@@ -2588,10 +2599,10 @@ export function ImportDialog({
       : 0;
     onActivityChange({
       jobId: activeJob.id,
-      mode: applyStarted ? "apply" : "discover",
+      mode: applyStarted || automaticApplyPending ? "apply" : "discover",
       percent: Math.round(percent),
     });
-  }, [activeJob, applyStarted, onActivityChange]);
+  }, [activeJob, activeLive, applyStarted, automaticApplyPending, onActivityChange]);
 
   useEffect(() => () => onActivityChange?.(null), [onActivityChange]);
 
@@ -2614,7 +2625,7 @@ export function ImportDialog({
   const wizardStepUnlocked = (step: number) => {
     if (step <= 2) return true;
     if (step === 3) return Boolean(activeJob);
-    return applyStarted;
+    return applyStarted || automaticApplyPending;
   };
 
   // Follow job transitions (including dialog reopen onto a live job): jump to
@@ -2631,6 +2642,20 @@ export function ImportDialog({
     notionStepJobKeyRef.current = key;
     setNotionStep(applyStarted ? 4 : 3);
   }, [source, activeJob, applyStarted]);
+
+  // Discovery and apply are one continuous import run. Claim the ready job in
+  // a ref before starting so React Strict Mode or a fast status refresh cannot
+  // issue duplicate apply loops. The persisted apply cursor still owns reload
+  // resume after the first apply request begins.
+  useEffect(() => {
+    if (!automaticApplyPending || notionBusy || !activeJob) return;
+    if (autoApplyJobIdRef.current === activeJob.id) return;
+    autoApplyJobIdRef.current = activeJob.id;
+    void applyNotionImport(activeJob.id);
+    // applyNotionImport intentionally owns the long-running lifecycle; the
+    // stable job-state dependencies below are the only automatic trigger.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeJob?.id, automaticApplyPending, notionBusy]);
 
   // A stored connection can resume an interrupted/reloaded discovery without
   // asking for the secret again. A one-time token is deliberately never

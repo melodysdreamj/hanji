@@ -570,7 +570,7 @@ jobs:
         # passphrase-custody phase in a fresh browser process: phases A-D
         # intentionally stress offline tabs, service workers, and IndexedDB,
         # while E verifies an independent browser-start custody contract.
-        run: npm run verify:durable-outbox -- --phases A,B,C,D --timeout-ms 60000
+        run: npm run verify:durable-outbox -- --phases A,B,C,D,F --timeout-ms 60000
       - name: Passphrase custody smoke
         if: ${{ !cancelled() && steps.runtime.outcome == 'success' }}
         working-directory: backend

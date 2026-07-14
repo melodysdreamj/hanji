@@ -170,6 +170,22 @@ beforeEach(() => {
     connectionStorageAvailable: true,
   } as never);
   applyJobMock.mockReset();
+  applyJobMock.mockResolvedValue({
+    job: {
+      ...liveJob,
+      status: "completed",
+      phase: "applied",
+      progress: {
+        hasMore: false,
+        percent: 100,
+        currentStep: "apply",
+        currentStatus: "completed",
+        steps: [],
+      },
+    },
+    applied: { pages: 1 },
+    mappings: [],
+  } as never);
 });
 
 afterEach(() => {
@@ -323,6 +339,44 @@ describe("ImportDialog active-job selection on reopen", () => {
         incremental: true,
       });
     });
+  });
+
+  it("continues from completed discovery into apply without another click", async () => {
+    let finishDiscovery!: (value: Awaited<ReturnType<typeof discoverNotionImportJobRemote>>) => void;
+    vi.mocked(discoverNotionImportJobRemote).mockImplementationOnce(
+      () => new Promise((resolve) => {
+        finishDiscovery = resolve;
+      }),
+    );
+    listJobsMock.mockResolvedValue({ jobs: [liveJob] } as never);
+    await openNotionSource();
+
+    await waitFor(() => expect(vi.mocked(discoverNotionImportJobRemote)).toHaveBeenCalledTimes(1));
+    const discovered = {
+      ...liveJob,
+      status: "ready",
+      phase: "discovered",
+      progress: {
+        hasMore: false,
+        percent: 100,
+        currentStep: "discover",
+        currentStatus: "completed",
+        steps: [],
+      },
+    };
+    listJobsMock.mockResolvedValue({ jobs: [discovered] } as never);
+
+    await act(async () => {
+      finishDiscovery({ job: discovered, itemCount: 1 } as never);
+    });
+
+    await waitFor(() => expect(applyJobMock).toHaveBeenCalledTimes(1));
+    expect(applyJobMock).toHaveBeenCalledWith(expect.objectContaining({
+      workspaceId: "ws-1",
+      jobId: "job-live-1",
+      connectionId: "connection-1",
+    }));
+    expect(screen.queryByRole("button", { name: "Apply import" })).toBeNull();
   });
 
   it("keeps one runner alive while the modal is hidden and clears the activity when it settles", async () => {

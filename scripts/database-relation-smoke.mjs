@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
-import { permanentlyDeletePage } from './lib/harness.mjs';
+import {
+  finalizeRegisteredSmokeAccounts,
+  permanentlyDeletePage,
+  signIn as signInForSmoke,
+} from './lib/harness.mjs';
 
 const DEFAULT_BASE_URL = process.env.HANJI_EDGEBASE_URL ?? 'http://127.0.0.1:8787';
 const DEFAULT_TIMEOUT_MS = 8_000;
@@ -32,6 +36,7 @@ try {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`WARN cleanup failed: ${message}`);
   });
+  await finalizeRegisteredSmokeAccounts('database relation smoke');
 }
 
 async function main() {
@@ -39,7 +44,7 @@ async function main() {
   console.log(`Database relation smoke target: ${baseUrl}`);
 
   await assertRuntimeReachable(baseUrl);
-  owner = await signIn(baseUrl);
+  owner = await signInForSmoke(baseUrl, { timeoutMs: options.timeoutMs });
 
   const bootstrap = await callFunction(baseUrl, owner.token, 'workspace-bootstrap', {});
   workspaceId = bootstrap?.workspace?.id;
@@ -685,19 +690,30 @@ async function main() {
   authBDbId = await createDatabase(baseUrl, `Relation smoke authB ${suffix}`, suffix + 7);
   const authPrimaryPropId = crypto.randomUUID();
   const authReciprocalPropId = crypto.randomUUID();
+  const authPrimaryRecord = {
+    id: authPrimaryPropId,
+    databaseId: authADbId,
+    name: 'To B',
+    type: 'relation',
+    config: { relationDatabaseId: authBDbId, relatedPropertyId: authReciprocalPropId },
+    position: 1,
+  };
   await callFunction(baseUrl, owner.token, 'database-mutation', {
     action: 'insert',
     table: 'db_properties',
     reciprocalName: 'From A',
-    record: {
-      id: authPrimaryPropId,
-      databaseId: authADbId,
-      name: 'To B',
-      type: 'relation',
-      config: { relationDatabaseId: authBDbId, relatedPropertyId: authReciprocalPropId },
-      position: 1,
-    },
+    record: authPrimaryRecord,
   });
+  const retriedRelationInsert = await callFunction(baseUrl, owner.token, 'database-mutation', {
+    action: 'insert',
+    table: 'db_properties',
+    reciprocalName: 'From A',
+    record: authPrimaryRecord,
+  });
+  assert(
+    retriedRelationInsert?.record?.id === authPrimaryPropId,
+    'an exact two-way relation insert retry must reconcile and return the durable primary',
+  );
   const authBDatabase = await callFunction(baseUrl, owner.token, 'page-query', {
     action: 'database',
     databaseId: authBDbId,
@@ -714,7 +730,7 @@ async function main() {
     backendReciprocal.config?.relatedPropertyId === authPrimaryPropId,
     'backend-created reciprocal must be cross-linked to the primary relation property',
   );
-  console.log('PASS backend creates a cross-linked reciprocal for a two-way relation insert (MCP/API path).');
+  console.log('PASS backend creates and idempotently reconciles a cross-linked reciprocal (MCP/API path).');
 
   const authBRow = await callFunction(baseUrl, owner.token, 'database-row-mutation', {
     action: 'create',
@@ -736,12 +752,15 @@ async function main() {
   );
 
   // Deleting either side of a two-way relation cascades to the paired property.
-  await callFunction(baseUrl, owner.token, 'database-mutation', {
+  const deleteAuthPrimary = {
     action: 'delete',
     table: 'db_properties',
     id: authPrimaryPropId,
     databaseId: authADbId,
-  });
+    previousRelatedPropertyId: authReciprocalPropId,
+  };
+  await callFunction(baseUrl, owner.token, 'database-mutation', deleteAuthPrimary);
+  await callFunction(baseUrl, owner.token, 'database-mutation', deleteAuthPrimary);
   const authBAfterDelete = await callFunction(baseUrl, owner.token, 'page-query', {
     action: 'database',
     databaseId: authBDbId,
@@ -838,13 +857,16 @@ async function main() {
 
   // Clearing relatedPropertyId via update turns a two-way relation back to
   // one-way and deletes the paired property (MCP/API disable path).
-  await callFunction(baseUrl, owner.token, 'database-mutation', {
+  const disableRegTwoWay = {
     action: 'update',
     table: 'db_properties',
     id: regPrimaryPropId,
     databaseId: authADbId,
     patch: { config: { relationDatabaseId: authBDbId } },
-  });
+    previousRelatedPropertyId: regReciprocalPropId,
+  };
+  await callFunction(baseUrl, owner.token, 'database-mutation', disableRegTwoWay);
+  await callFunction(baseUrl, owner.token, 'database-mutation', disableRegTwoWay);
   const authBAfterToggleOff = await callFunction(baseUrl, owner.token, 'page-query', {
     action: 'database',
     databaseId: authBDbId,
@@ -1136,21 +1158,6 @@ async function assertRuntimeReachable(baseUrl) {
     headers: { Accept: 'application/json' },
   });
   assert(response.ok, `/api/health returned HTTP ${response.status}`);
-}
-
-async function signIn(baseUrl) {
-  const response = await fetchWithTimeout(resolveUrl(baseUrl, '/api/auth/signin/anonymous'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: '{}',
-  });
-  const body = await readJson(response);
-  assert(response.status === 201 || response.ok, `anonymous sign-in returned HTTP ${response.status}`);
-  const token = body?.accessToken;
-  const userId = body?.user?.id;
-  assert(typeof token === 'string' && token, 'anonymous sign-in must return an access token');
-  assert(typeof userId === 'string' && userId, 'anonymous sign-in must return a user id');
-  return { token, userId };
 }
 
 async function callFunction(baseUrl, token, name, body) {

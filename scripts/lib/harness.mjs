@@ -78,12 +78,6 @@ export async function assertRuntimeReachable(baseUrl, { timeoutMs = 5_000 } = {}
 }
 
 /**
- * Anonymous sign-in. Returns the union of the shapes the copied variants
- * produced: `{ token, accessToken, refreshToken, userId, user }` where
- * `token === accessToken`, so API smokes (`token`/`userId`) and visual smokes
- * (`accessToken`/`refreshToken`) both work unchanged.
- */
-/**
  * Master account credentials for smokes/tools. The dev server reads them from
  * backend/.dev.vars (written by scripts/setup-dev-env.mjs), so resolve in the
  * same order the runtime effectively sees: explicit env → backend/.dev.vars →
@@ -116,30 +110,70 @@ export function masterCredentials() {
 }
 
 /**
+ * Sign in through the runtime mode selected for the smoke. Anonymous remains
+ * the default for the isolated local/CI runtime. A production-like Docker
+ * runtime deliberately rejects anonymous bootstrap, so the Synology harness
+ * sets HANJI_SMOKE_AUTH_MODE=master and reuses its synthetic master account.
+ * Master sessions are never added to the disposable-account cleanup registry.
+ *
  * @param {string} baseUrl
- * @param {{ timeoutMs?: number }} [options]
+ * @param {{
+ *   timeoutMs?: number,
+ *   mode?: 'anonymous' | 'master',
+ *   credentials?: { email?: string, password?: string },
+ * }} [options]
  */
-export async function signIn(baseUrl, { timeoutMs } = {}) {
-  const response = await fetchWithTimeout(resolveUrl(baseUrl, '/api/auth/signin/anonymous'), {
+export async function signIn(baseUrl, { timeoutMs, mode, credentials } = {}) {
+  const selectedMode = (mode ?? process.env.HANJI_SMOKE_AUTH_MODE ?? 'anonymous').trim().toLowerCase();
+  assert(
+    selectedMode === 'anonymous' || selectedMode === 'master',
+    `HANJI_SMOKE_AUTH_MODE must be anonymous or master, got ${selectedMode || '(empty)'}`,
+  );
+  const passwordCredentials = selectedMode === 'master'
+    ? smokeMasterCredentials(credentials)
+    : undefined;
+  const response = await fetchWithTimeout(resolveUrl(
+    baseUrl,
+    selectedMode === 'master' ? '/api/auth/signin' : '/api/auth/signin/anonymous',
+  ), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: '{}',
+    body: JSON.stringify(passwordCredentials ?? {}),
   }, { timeoutMs });
   const body = await readJson(response);
-  assert(response.status === 201 || response.ok, `anonymous sign-in returned HTTP ${response.status}`);
+  assert(
+    response.status === 201 || response.ok,
+    `${selectedMode} sign-in returned HTTP ${response.status}`,
+  );
   const token = body?.accessToken;
   const refreshToken = body?.refreshToken;
   const userId = body?.user?.id;
-  assert(typeof token === 'string' && token, 'anonymous sign-in must return an access token');
-  assert(typeof refreshToken === 'string' && refreshToken, 'anonymous sign-in must return a refresh token');
-  assert(typeof userId === 'string' && userId, 'anonymous sign-in must return a user id');
-  const canonicalBaseUrl = normalizeBaseUrl(baseUrl);
-  registeredSmokeAccounts.set(`${canonicalBaseUrl}\n${userId}`, {
-    baseUrl: canonicalBaseUrl,
-    token,
-    userId,
-  });
+  assert(typeof token === 'string' && token, `${selectedMode} sign-in must return an access token`);
+  assert(typeof refreshToken === 'string' && refreshToken, `${selectedMode} sign-in must return a refresh token`);
+  assert(typeof userId === 'string' && userId, `${selectedMode} sign-in must return a user id`);
+  if (selectedMode === 'anonymous') {
+    const canonicalBaseUrl = normalizeBaseUrl(baseUrl);
+    registeredSmokeAccounts.set(`${canonicalBaseUrl}\n${userId}`, {
+      baseUrl: canonicalBaseUrl,
+      token,
+      userId,
+    });
+  }
   return { token, accessToken: token, refreshToken, userId, user: body.user };
+}
+
+function smokeMasterCredentials(credentials = {}) {
+  const fallback = masterCredentials();
+  const email = credentials.email?.trim()
+    || process.env.HANJI_SMOKE_MASTER_EMAIL?.trim()
+    || process.env.HANJI_SIM_MASTER_EMAIL?.trim()
+    || fallback.email;
+  const password = credentials.password?.trim()
+    || process.env.HANJI_SMOKE_MASTER_PASSWORD?.trim()
+    || process.env.HANJI_SIM_MASTER_PASSWORD?.trim()
+    || fallback.password;
+  assert(email && password, 'master smoke sign-in requires email and password credentials');
+  return { email, password };
 }
 
 /**
@@ -169,6 +203,7 @@ export function browserAuthStorageKeys(authOrigin, authNamespace) {
  *   authOrigin?: string,
  *   authNamespace?: string,
  *   workspaceId?: string,
+ *   language?: string,
  *   localStorage?: Record<string, string>,
  * }} [options]
  */
@@ -180,6 +215,7 @@ export async function installBrowserSession(
     authOrigin = appOrigin,
     authNamespace,
     workspaceId = session?.workspaceId,
+    language = process.env.HANJI_SMOKE_LANGUAGE?.trim(),
     localStorage = {},
   } = {},
 ) {
@@ -204,6 +240,13 @@ export async function installBrowserSession(
     })
     : [];
   if (cookies.length) await context.addCookies(cookies);
+  const sessionUserId = session?.userId ?? session?.user?.id ?? '';
+  const storage = {
+    ...localStorage,
+    ...(language && sessionUserId
+      ? { [`hanji:language:${encodeURIComponent(sessionUserId)}`]: language }
+      : {}),
+  };
 
   await context.addInitScript(({
     appOrigin: origin,
@@ -213,7 +256,7 @@ export async function installBrowserSession(
     refreshTokenKey,
     seedGuardKey,
     workspaceId: id,
-    storage,
+    storage: initialStorage,
   }) => {
     // Playwright context init scripts execute in every top-level document and
     // child frame. Never expose a fixture credential or product storage value
@@ -235,19 +278,19 @@ export async function installBrowserSession(
       }));
     }
     if (id) window.localStorage.setItem('hanji.workspaceId', id);
-    for (const [key, value] of Object.entries(storage)) {
+    for (const [key, value] of Object.entries(initialStorage)) {
       if (value === null || value === undefined) window.localStorage.removeItem(key);
       else window.localStorage.setItem(key, String(value));
     }
   }, {
     appOrigin: allowedOrigin,
-    cookieSessionUserId: cookies.length ? session?.userId ?? session?.user?.id ?? '' : '',
+    cookieSessionUserId: cookies.length ? sessionUserId : '',
     cookieSessionKey,
     legacyRefreshToken: cookies.length ? '' : session?.refreshToken ?? '',
     refreshTokenKey,
     seedGuardKey,
     workspaceId: workspaceId ?? '',
-    storage: localStorage,
+    storage,
   });
 }
 

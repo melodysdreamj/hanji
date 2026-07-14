@@ -7,9 +7,11 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   assertNoBrowserErrors,
+  finalizeRegisteredSmokeAccounts,
   installBrowserSession,
   newCheckedPage,
   permanentlyDeletePage,
+  signIn as signInForSmoke,
 } from './lib/harness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -32,6 +34,8 @@ try {
     console.error('Start the local EdgeBase runtime first: npm --prefix backend run dev');
   }
   process.exitCode = 1;
+} finally {
+  await finalizeRegisteredSmokeAccounts('block editor UI smoke');
 }
 
 async function main() {
@@ -75,7 +79,7 @@ async function main() {
     } else if (options.onlySelectionEdit) {
       console.log('PASS Enter and paste over a non-collapsed selection replace the selected text.');
     } else if (options.onlySlashKeepText) {
-      console.log('PASS slash text transforms preserve content in place while insert-style blocks are added below.');
+      console.log('PASS IME-reported Enter applies slash commands across text, media, layout, database, and action families.');
     } else {
       console.log('PASS block editor text input, rich HTML paste, keyboard formatting shortcuts, slash commands, synced blocks, tabs, pasted/imported tab icons, columns, buttons, Markdown shortcuts, to-dos, toggles, and dividers persist through the product API without screenshots.');
     }
@@ -157,7 +161,10 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
       await step('commit IME text and continue to the next block without copying the composing tail', () =>
         assertImeEnterContinuesAfterCompositionWithoutCopying(page, apiUrl, seed)
       );
-      assertNoBrowserErrors(errors, 'block editor IME flow');
+      assertNoBrowserErrors(
+        errors.filter((message) => !isExpectedExternalEmbedBrowserMessage(message)),
+        'block editor IME flow',
+      );
       return;
     }
     if (options.onlyEmptyListEnter) {
@@ -199,7 +206,7 @@ async function assertBlockEditorUi(browser, appUrl, apiUrl, seed) {
       return;
     }
     if (options.onlySlashKeepText) {
-      await step('transform text in place and insert media below without losing preceding text', () =>
+      await step('apply slash commands across representative families without losing preceding text', () =>
         assertSlashKeepsPrecedingText(page, apiUrl, seed)
       );
       assertNoBrowserErrors(
@@ -1127,7 +1134,13 @@ async function assertSlashKeepsPrecedingText(page, baseUrl, seed) {
 
   const menu = page.getByRole('listbox', { name: 'Block commands' });
   await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
-  await menu.getByRole('option', { name: /^Heading 1/ }).first().click({ timeout: options.timeoutMs });
+  const headingOption = menu.getByRole('option', { name: /^Heading 1/ }).first();
+  await headingOption.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  assert(
+    (await headingOption.getAttribute('aria-selected')) === 'true',
+    'slash /h1 must select Heading 1 before Enter',
+  );
+  await page.keyboard.press('Enter');
 
   const blocks = await waitForBlocks(
     baseUrl,
@@ -1147,6 +1160,229 @@ async function assertSlashKeepsPrecedingText(page, baseUrl, seed) {
     'text-formatting slash command must preserve the text and transform the current block in place',
   );
   await captureSlashEvidence(page, 'heading-in-place.png');
+
+  const composingTextbox = blockTextBox(page, seed.blockIds.slashComposingEnter, 'Text block text');
+  await composingTextbox.click({ timeout: options.timeoutMs });
+  await dispatchComposingSlashEnter(page, seed.blockIds.slashComposingEnter, '/h1');
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashComposingEnter,
+    (block) => block?.type === 'heading_1' && (block?.plainText ?? '') === '',
+    'composing slash Enter applies the selected heading command',
+  );
+  await captureSlashEvidence(page, 'heading-composing-enter.png');
+
+  await dispatchImmediateSlashEnterBeforeMenuState(
+    page,
+    seed.blockIds.slashImmediateHeading,
+    '/h1',
+  );
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashImmediateHeading,
+    (block) => block?.type === 'heading_1' && (block?.plainText ?? '') === '',
+    'committed /h1 DOM applies before slash menu state settles',
+  );
+  await captureSlashEvidence(page, 'heading-immediate-enter.png');
+
+  const blurredSlashTextbox = blockTextBox(
+    page,
+    seed.blockIds.slashBlurredHeading,
+    'Text block text',
+  );
+  await blurredSlashTextbox.click({ timeout: options.timeoutMs });
+  await page.keyboard.type('/h1');
+  await page.getByRole('listbox', { name: 'Block commands' }).waitFor({
+    state: 'visible',
+    timeout: options.timeoutMs,
+  });
+
+  const activeSlashTextbox = blockTextBox(
+    page,
+    seed.blockIds.slashActiveHeading,
+    'Text block text',
+  );
+  // A slash menu owns a full-page click backdrop. Move editing focus directly,
+  // as keyboard navigation and application-managed focus do, to cover the
+  // stale per-block document-listener race without dismissing via the backdrop.
+  await activeSlashTextbox.focus();
+  await page.keyboard.type('/h2');
+  const activeSlashMenu = page.getByRole('listbox', { name: 'Block commands' });
+  await activeSlashMenu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  assert(
+    (await page.getByRole('listbox', { name: 'Block commands' }).count()) === 1,
+    'only the active block may keep a slash menu open',
+  );
+  assert(
+    (await activeSlashMenu.getAttribute('data-slash-owner-block-id')) ===
+      seed.blockIds.slashActiveHeading,
+    'the visible slash menu must belong to the focused block',
+  );
+  assert(
+    await activeSlashTextbox.evaluate((element) => document.activeElement === element),
+    'the slash menu owner textbox must still hold DOM focus before Enter',
+  );
+  await activeSlashTextbox.press('Enter');
+  await page.waitForTimeout(250);
+  const activeLocalType = await page
+    .locator(`[data-block-id="${seed.blockIds.slashActiveHeading}"] > [data-type]`)
+    .getAttribute('data-type');
+  assert(
+    activeLocalType === 'heading_2',
+    `focused slash Enter must transform the local block before persistence (got ${activeLocalType})`,
+  );
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (items) => {
+      const blurred = items.find((block) => block.id === seed.blockIds.slashBlurredHeading);
+      const active = items.find((block) => block.id === seed.blockIds.slashActiveHeading);
+      return (
+        blurred?.type === 'paragraph' &&
+        blurred?.plainText === '/h1' &&
+        active?.type === 'heading_2' &&
+        (active?.plainText ?? '') === ''
+      );
+    },
+    'only the focused block applies slash Enter after a focus transition',
+  );
+  await captureSlashEvidence(page, 'heading-focused-menu-owner.png');
+
+  for (const processHeading of [
+    { blockId: seed.blockIds.slashProcessHeading1, query: '/h1', type: 'heading_1' },
+    { blockId: seed.blockIds.slashProcessHeading2, query: '/h2', type: 'heading_2' },
+    { blockId: seed.blockIds.slashProcessHeading3, query: '/h3', type: 'heading_3' },
+    { blockId: seed.blockIds.slashProcessHeading4, query: '/h4', type: 'heading_4' },
+  ]) {
+    await dispatchProcessSlashEnterWithoutCompositionLifecycle(
+      page,
+      processHeading.blockId,
+      processHeading.query,
+    );
+    await waitForBlock(
+      baseUrl,
+      seed,
+      processHeading.blockId,
+      (block) => block?.type === processHeading.type && (block?.plainText ?? '') === '',
+      `${processHeading.query} process-key Enter applies without a composition lifecycle`,
+    );
+  }
+  await captureSlashEvidence(page, 'heading-process-enter-matrix.png');
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(page, seed.blockIds.slashComposingList, '/todo');
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashComposingList,
+    (block) => block?.type === 'to_do' && (block?.plainText ?? '') === '',
+    'process-key slash Enter applies a list command without a composition lifecycle',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(
+    page,
+    seed.blockIds.slashComposingMedia,
+    'world /image',
+  );
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (items) => {
+      const paragraph = items.find((block) => block.id === seed.blockIds.slashComposingMedia);
+      if (!paragraph || paragraph.type !== 'paragraph' || paragraph.plainText.trim() !== 'world') return false;
+      const next = items
+        .filter(
+          (block) =>
+            (block.parentId ?? null) === (paragraph.parentId ?? null) &&
+            block.position > paragraph.position,
+        )
+        .sort((a, b) => a.position - b.position)[0];
+      return next?.type === 'image';
+    },
+    'process-key slash Enter preserves residual text and inserts media below',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(
+    page,
+    seed.blockIds.slashComposingDivider,
+    '/divider',
+  );
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (items) => {
+      const divider = items.find((block) => block.id === seed.blockIds.slashComposingDivider);
+      if (divider?.type !== 'divider') return false;
+      return items.some(
+        (block) =>
+          (block.parentId ?? null) === (divider.parentId ?? null) &&
+          block.position > divider.position &&
+          block.type === 'paragraph' &&
+          (block.plainText ?? '') === '',
+      );
+    },
+    'process-key slash Enter applies a divider and keeps a continuation paragraph',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(page, seed.blockIds.slashComposingTable, '/table');
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashComposingTable,
+    (block) => block?.type === 'simple_table' && Array.isArray(block?.content?.table),
+    'process-key slash Enter creates a simple table',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(page, seed.blockIds.slashComposingColumns, '/2');
+  await waitForBlocks(
+    baseUrl,
+    seed,
+    (items) => {
+      const columnList = items.find(
+        (block) => block.id === seed.blockIds.slashComposingColumns && block.type === 'column_list',
+      );
+      if (!columnList) return false;
+      const columns = items.filter(
+        (block) => block.parentId === columnList.id && block.type === 'column',
+      );
+      return (
+        columns.length === 2 &&
+        columns.every((column) =>
+          items.some((block) => block.parentId === column.id && block.type === 'paragraph'),
+        )
+      );
+    },
+    'process-key slash Enter creates a column layout',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(
+    page,
+    seed.blockIds.slashComposingDatabase,
+    '/database',
+  );
+  const databasePicker = page.getByRole('dialog', { name: 'Choose database source' });
+  await databasePicker.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await page.keyboard.press('Escape');
+  await databasePicker.waitFor({ state: 'hidden', timeout: options.timeoutMs });
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashComposingDatabase,
+    (block) => block?.type === 'paragraph' && (block?.plainText ?? '') === '',
+    'process-key slash Enter opens the database source picker after removing the trigger',
+  );
+
+  await dispatchProcessSlashEnterWithoutCompositionLifecycle(page, seed.blockIds.slashComposingColor, '/red');
+  await waitForBlock(
+    baseUrl,
+    seed,
+    seed.blockIds.slashComposingColor,
+    (block) => block?.type === 'paragraph' && block?.content?.color === 'red' && (block?.plainText ?? '') === '',
+    'process-key slash Enter applies a slash action command',
+  );
+
+  await captureSlashEvidence(page, 'composition-command-family-matrix.png');
 
   const mediaTextbox = blockTextBox(page, seed.blockIds.slashKeepTextMedia, 'Text block text');
   await mediaTextbox.click({ timeout: options.timeoutMs });
@@ -1270,17 +1506,21 @@ async function assertPastedUrlMention(page, baseUrl, seed) {
     'pasted external URL mention metadata',
   );
 
+  // The product contract is that fetched metadata persists and renders the
+  // favicon URL. Loading pixels from a third-party CDN is outside Hanji's
+  // control and must not make the Linux gate depend on that CDN's availability.
   await page.waitForFunction(
     ({ blockId, title }) => {
       const root = document.querySelector(`[data-block-id="${CSS.escape(blockId)}"]`);
       const mention = root?.querySelector('[data-mention="external"]');
       const icon = mention?.querySelector('img[data-mention-icon="external"]');
+      const iconUrl = mention?.getAttribute('data-icon-url');
       return (
         mention?.textContent?.trim() === title &&
         icon instanceof HTMLImageElement &&
-        icon.complete &&
-        icon.naturalWidth > 0 &&
-        icon.naturalHeight > 0
+        typeof iconUrl === 'string' &&
+        /^https?:/.test(iconUrl) &&
+        icon.getAttribute('src') === iconUrl
       );
     },
     { blockId: seed.blockIds.pastedUrlMention, title: seed.pastedUrlMentionTitle },
@@ -2217,6 +2457,120 @@ async function dispatchCompositionCommitWithoutEnter(page, blockId, text) {
   }, { blockId, text });
 }
 
+async function dispatchComposingSlashEnter(page, blockId, text) {
+  await page.evaluate(({ blockId, text }) => {
+    const editable = document.querySelector(`[data-block-id="${CSS.escape(blockId)}"] [data-rt-editable="true"]`);
+    if (!(editable instanceof HTMLElement)) throw new Error(`editable block ${blockId} missing`);
+    editable.focus();
+    const placeCaretAtEnd = () => {
+      const range = document.createRange();
+      range.selectNodeContents(editable);
+      range.collapse(false);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    };
+
+    editable.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true, data: text }));
+    editable.textContent = text;
+    placeCaretAtEnd();
+    editable.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: text,
+        inputType: 'insertCompositionText',
+        isComposing: true,
+      }),
+    );
+    editable.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Enter',
+        code: 'Enter',
+        keyCode: 229,
+        which: 229,
+        isComposing: true,
+      }),
+    );
+    editable.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: text }));
+  }, { blockId, text });
+}
+
+async function dispatchImmediateSlashEnterBeforeMenuState(page, blockId, text) {
+  await page.evaluate(({ blockId, text }) => {
+    const editable = document.querySelector(`[data-block-id="${CSS.escape(blockId)}"] [data-rt-editable="true"]`);
+    if (!(editable instanceof HTMLElement)) throw new Error(`editable block ${blockId} missing`);
+    editable.focus();
+    editable.textContent = text;
+    const range = document.createRange();
+    range.selectNodeContents(editable);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    editable.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: text,
+        inputType: 'insertText',
+      }),
+    );
+    editable.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Enter',
+        code: 'Enter',
+      }),
+    );
+  }, { blockId, text });
+}
+
+async function dispatchProcessSlashEnterWithoutCompositionLifecycle(page, blockId, text) {
+  await page.evaluate(({ blockId, text }) => {
+    const editable = document.querySelector(`[data-block-id="${CSS.escape(blockId)}"] [data-rt-editable="true"]`);
+    if (!(editable instanceof HTMLElement)) throw new Error(`editable block ${blockId} missing`);
+    editable.focus();
+    editable.textContent = text;
+    const range = document.createRange();
+    range.selectNodeContents(editable);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    editable.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: text,
+        inputType: 'insertText',
+      }),
+    );
+  }, { blockId, text });
+
+  const menu = page.getByRole('listbox', { name: 'Block commands' });
+  await menu.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  const selectedOption = menu.locator('[role="option"][aria-selected="true"]');
+  await selectedOption.waitFor({ state: 'visible', timeout: options.timeoutMs });
+
+  await page.evaluate((blockId) => {
+    const editable = document.querySelector(`[data-block-id="${CSS.escape(blockId)}"] [data-rt-editable="true"]`);
+    if (!(editable instanceof HTMLElement)) throw new Error(`editable block ${blockId} missing`);
+    editable.focus();
+    editable.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        key: 'Process',
+        code: '',
+        keyCode: 229,
+        which: 229,
+        isComposing: true,
+      }),
+    );
+  }, blockId);
+}
+
 async function pickSlashBlock(page, blockId, query, optionName) {
   try {
     await blockTextBox(page, blockId, 'Text block text').click({ timeout: options.timeoutMs });
@@ -2840,7 +3194,7 @@ async function fetchPage(baseUrl, seed, pageId) {
 }
 
 async function seedEditorPage(baseUrl) {
-  const session = await signIn(baseUrl);
+  const session = await signInForSmoke(baseUrl, { timeoutMs: options.timeoutMs });
   const bootstrap = await callFunction(baseUrl, session.accessToken, 'workspace-bootstrap', {});
   const workspaceId = bootstrap?.workspace?.id;
   assert(workspaceId, 'workspace-bootstrap must return a workspace id for block editor UI smoke');
@@ -2862,6 +3216,21 @@ async function seedEditorPage(baseUrl) {
     richInlinePaste: randomUUID(),
     todo: randomUUID(),
     slashKeepText: randomUUID(),
+    slashComposingEnter: randomUUID(),
+    slashImmediateHeading: randomUUID(),
+    slashBlurredHeading: randomUUID(),
+    slashActiveHeading: randomUUID(),
+    slashProcessHeading1: randomUUID(),
+    slashProcessHeading2: randomUUID(),
+    slashProcessHeading3: randomUUID(),
+    slashProcessHeading4: randomUUID(),
+    slashComposingList: randomUUID(),
+    slashComposingMedia: randomUUID(),
+    slashComposingDivider: randomUUID(),
+    slashComposingTable: randomUUID(),
+    slashComposingColumns: randomUUID(),
+    slashComposingDatabase: randomUUID(),
+    slashComposingColor: randomUUID(),
     slashKeepTextMedia: randomUUID(),
     slashPage: randomUUID(),
     pastedUrlMention: randomUUID(),
@@ -2957,6 +3326,21 @@ async function seedEditorPage(baseUrl) {
     blockIds.richInlinePaste,
     blockIds.todo,
     blockIds.slashKeepText,
+    blockIds.slashComposingEnter,
+    blockIds.slashImmediateHeading,
+    blockIds.slashBlurredHeading,
+    blockIds.slashActiveHeading,
+    blockIds.slashProcessHeading1,
+    blockIds.slashProcessHeading2,
+    blockIds.slashProcessHeading3,
+    blockIds.slashProcessHeading4,
+    blockIds.slashComposingList,
+    blockIds.slashComposingMedia,
+    blockIds.slashComposingDivider,
+    blockIds.slashComposingTable,
+    blockIds.slashComposingColumns,
+    blockIds.slashComposingDatabase,
+    blockIds.slashComposingColor,
     blockIds.slashKeepTextMedia,
     blockIds.slashPage,
     blockIds.pastedUrlMention,
@@ -3171,6 +3555,7 @@ async function seedEditorPage(baseUrl) {
   return {
     accessToken: session.accessToken,
     refreshToken: session.refreshToken,
+    userId: session.userId,
     workspaceId,
     pageId,
     title,
@@ -3299,23 +3684,6 @@ async function assertRuntimeReachable(baseUrl) {
   });
   const body = await response.text();
   assert(response.ok, `/api/health returned HTTP ${response.status}: ${body.slice(0, 200)}`);
-}
-
-async function signIn(baseUrl) {
-  const response = await fetch(resolveUrl(baseUrl, '/api/auth/signin/anonymous'), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: '{}',
-    signal: AbortSignal.timeout(options.timeoutMs),
-  });
-  const body = await readJson(response);
-  assert(response.status === 201 || response.ok, `anonymous sign-in returned HTTP ${response.status}`);
-  assert(typeof body?.accessToken === 'string' && body.accessToken, 'anonymous sign-in must return an access token');
-  assert(typeof body?.refreshToken === 'string' && body.refreshToken, 'anonymous sign-in must return a refresh token');
-  return {
-    accessToken: body.accessToken,
-    refreshToken: body.refreshToken,
-  };
 }
 
 async function callFunction(baseUrl, token, name, body, timeoutMs = options.timeoutMs) {
@@ -3530,7 +3898,7 @@ Options:
   --only-ime-flow         Check only IME Enter composition and next-block behavior.
   --only-slash-page-title
                           Check only blank /page creation title placeholder behavior.
-  --only-slash-keep-text  Check text transforms in place, media insertion below, and text preservation.
+  --only-slash-keep-text  Check IME Enter across text, media, layout, database, and action slash commands.
   --only-pasted-url-mention
                           Check only external URL paste-to-mention metadata behavior.
   --only-markdown-shortcuts

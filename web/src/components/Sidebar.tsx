@@ -27,7 +27,6 @@ import {
   claimNotionImportOnboardingRemote,
   listNotificationsRemote,
   signOutRemote,
-  suppressNotionImportOnboardingRemote,
 } from "@/lib/edgebase";
 import type { Block, Page } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
@@ -736,11 +735,13 @@ export function Sidebar({
       organizationId: organization?.id ?? null,
       // Import flows skip the starter pages so the imported tree arrives clean.
       skipDefaultPages: choice !== "blank",
+      // Persist this before createWorkspace returns. On a slow runtime, a
+      // follow-up fire-and-forget request can lose to the onboarding claim.
+      suppressNotionImportOnboarding: true,
     });
     // This flow already asked how the workspace should start, so it must not
     // trigger the first-login prompt on the newly selected workspace.
     notionOnboardingCheckedWorkspaceIdsRef.current.add(next.id);
-    void suppressNotionImportOnboardingRemote(next.id).catch(() => {});
     setWorkspaceCreateOpen(false);
     router.push(workspaceRoute(next));
     notify(labels.createdWorkspace, "success");
