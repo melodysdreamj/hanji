@@ -1,0 +1,5 @@
+# Exact historical false positives from the alpha.2 checkpoint. These entries
+# bind one commit, path, rule, and line; current-tree and all other history
+# findings remain blocking.
+7c1b9a22bfcd234a7b0189f2bb58e58e7b0d768d:docs/deployment.md:generic-api-key:274
+7c1b9a22bfcd234a7b0189f2bb58e58e7b0d768d:web/src/locales/sv/workspaceSettingsDialog.json:etsy-access-token:68
