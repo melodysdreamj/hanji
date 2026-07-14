@@ -96,8 +96,11 @@ import {
 import {
   cacheGetMeta,
   cacheListTable,
+  cacheRemoveRecords,
   cacheReplaceTable,
+  cacheReplaceRecordIfPresent,
   cacheSetMeta,
+  cacheUpdateMeta,
   cacheUpsertRecord,
   getOfflinePins,
   hashCacheKey,
@@ -1046,6 +1049,10 @@ const pendingPage = new Map<string, Partial<Page>>();
 // query visually resurrect a relation/value and feed that stale state into a
 // later cell edit on high-latency appliances.
 const optimisticPageOverlays = new Map<string, Partial<Page>>();
+// Block loads need the same protection as database rows: pendingBlock removes
+// a patch while its request is in flight, and the server/cache may still
+// return the older block during that window on a slow appliance.
+const optimisticBlockOverlays = new Map<string, Partial<Block>>();
 type PendingPageCreate = { originHref: string; page: Page; userId: string };
 const pendingPageCreate = new Map<string, PendingPageCreate>();
 const pageCreateTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -1179,6 +1186,116 @@ function remotePageWithOptimisticOverlay(page: Page): Page {
   return { ...page, ...(optimistic ?? {}), ...(pending ?? {}) };
 }
 
+function remoteBlockWithOptimisticOverlay(block: Block): Block {
+  let optimistic = optimisticBlockOverlays.get(block.id);
+  if (
+    optimistic &&
+    Object.entries(optimistic).every(([key, value]) =>
+      jsonValuesEqual((block as unknown as Record<string, unknown>)[key], value)
+    )
+  ) {
+    optimisticBlockOverlays.delete(block.id);
+    optimistic = undefined;
+  }
+  const pending = pendingBlock.get(block.id);
+  if (!optimistic && (!pending || Object.keys(pending).length === 0)) return block;
+  return { ...block, ...(optimistic ?? {}), ...(pending ?? {}) };
+}
+
+/**
+ * A successful mutation is not fully acknowledged locally until the warm
+ * caches can reproduce it. On a slow NAS, otherwise an immediate reload first
+ * renders the pre-save IndexedDB value and waits several seconds for network
+ * revalidation even though the server already returned the authoritative row.
+ */
+async function reconcilePersistedPageMutation(id: string, persisted: Page | undefined) {
+  const authoritative = persisted ?? useStore.getState().pagesById[id];
+  if (!authoritative) return;
+  const projected = remotePageWithOptimisticOverlay(authoritative);
+  useStore.setState((state) => {
+    if (!state.pagesById[authoritative.id]) return {};
+    return {
+      pagesById: {
+        ...state.pagesById,
+        [authoritative.id]: projected,
+      },
+    };
+  });
+
+  const userId = outboxUserId();
+  if (!userId) return;
+  const writes: Promise<void>[] = [];
+
+  // Workspace pages live in the bootstrap metadata blob rather than a table.
+  // Keep its feed watermark unchanged: advancing it to this single mutation's
+  // timestamp could skip unrelated server changes on the next delta boot.
+  if (bootKey) {
+    writes.push(
+      cacheUpdateMeta<WorkspaceBootstrapResult>(userId, `bootstrap:${bootKey}`, (current) => {
+        if (!current?.pages?.some((page) => page.id === authoritative.id)) return undefined;
+        return {
+          ...current,
+          pages: current.pages.map((page) =>
+            page.id === authoritative.id ? projected : page
+          ),
+        };
+      })
+    );
+  }
+
+  if (authoritative.parentType === "database" && authoritative.parentId) {
+    const queryKeys = new Set<string>([databaseRowsQueryKey({})]);
+    const activeQuery = useStore.getState().databaseRowPagesByDb[authoritative.parentId]?.queryKey;
+    if (activeQuery) queryKeys.add(activeQuery);
+    for (const queryKey of queryKeys) {
+      writes.push(
+        cacheReplaceRecordIfPresent(
+          userId,
+          `rowsdata:${authoritative.parentId}:${hashCacheKey(queryKey)}`,
+          { id: authoritative.id, value: projected }
+        )
+      );
+    }
+  }
+
+  await Promise.all(writes);
+}
+
+async function reconcilePersistedBlockMutation(
+  id: string,
+  persisted: Block | undefined,
+  pageIdHint?: string
+) {
+  const state = useStore.getState();
+  const pageId = persisted?.pageId ?? pageIdHint;
+  if (!pageId) return;
+  const live = state.blocksByPage[pageId]?.find((block) => block.id === id);
+  const authoritative = persisted ?? live;
+  if (!authoritative) return;
+  const projected = remoteBlockWithOptimisticOverlay(authoritative);
+  useStore.setState((current) => {
+    const blocks = current.blocksByPage[pageId];
+    if (!blocks?.some((block) => block.id === projected.id)) return {};
+    return {
+      blocksByPage: {
+        ...current.blocksByPage,
+        [pageId]: blocks
+          .map((block) => (block.id === projected.id ? projected : block))
+          .sort(bySortPos),
+      },
+    };
+  });
+  const userId = outboxUserId();
+  if (!userId) return;
+  await cacheUpsertRecord(userId, `blocks:${pageId}`, {
+    id: projected.id,
+    value: projected,
+  });
+  // The block value is authoritative, but its parent page timestamp can lag
+  // behind this response. Retain the block and force the next online refresh.
+  await cacheSetMeta(userId, `blocksStamp:${pageId}`, "");
+}
+
 function mirrorPendingBlock(id: string) {
   const patch = pendingBlock.get(id);
   if (!patch || !Object.keys(patch).length) return;
@@ -1293,14 +1410,16 @@ async function flushPageOnce(id: string) {
     try {
       const page = useStore.getState().pagesById[id];
       const persistablePatch = persistablePagePatch(patch, page);
+      let persisted: Page;
       if (page?.parentType === "database") {
         const filePropertyIds = databaseRowFilePropertyIds(page, persistablePatch);
-        await runSerializedRowFilePropertyPatch(id, filePropertyIds, () =>
+        persisted = await runSerializedRowFilePropertyPatch(id, filePropertyIds, () =>
           updateDatabaseRowRemote(id, persistablePatch)
         );
       } else {
-        await updatePageRemote(id, persistablePatch);
+        persisted = await updatePageRemote(id, persistablePatch);
       }
+      await reconcilePersistedPageMutation(id, persisted);
       publishPersistedPageMutation(id, patch, page);
       outboxAck(outboxUserId(), `page:${id}`);
       if (pendingPage.has(id)) mirrorPendingPage(id);
@@ -1460,7 +1579,8 @@ async function flushBlockOnce(id: string) {
   pendingBlock.delete(id);
   if (patch && Object.keys(patch).length) {
     try {
-      await updateBlockRemote(id, persistableBlockPatch(patch), hintPageId);
+      const persisted = await updateBlockRemote(id, persistableBlockPatch(patch), hintPageId);
+      await reconcilePersistedBlockMutation(id, persisted, hintPageId);
       // The server stored this patch's stamp; edits enqueued after this flush
       // conflict-check against it, not the pre-flush base.
       if (pendingBlock.has(id)) {
@@ -1515,6 +1635,7 @@ function cancelPendingBlock(id: string) {
   }
   pendingBlock.delete(id);
   pendingBlockBase.delete(id);
+  optimisticBlockOverlays.delete(id);
   outboxAck(outboxUserId(), `block:${id}`);
 }
 
@@ -1854,7 +1975,8 @@ async function flushBlockCreate(id: string) {
       }
     }
     try {
-      await createBlockRemote(block);
+      const persisted = await createBlockRemote(block);
+      await reconcilePersistedBlockMutation(id, persisted, block.pageId);
       pendingBlockCreate.delete(id);
       outboxAck(outboxUserId(), `create:${id}`);
       noteSyncSuccess();
@@ -1867,6 +1989,7 @@ async function flushBlockCreate(id: string) {
         // replayed create whose earlier attempt landed. That is idempotent
         // success (client UUIDs), not a user-facing drop.
         if (persistErrorStatus(error) === 409) {
+          await reconcilePersistedBlockMutation(id, block, block.pageId);
           noteSyncSuccess();
           if (pendingBlock.has(id)) void flushBlock(id);
         } else {
@@ -1914,6 +2037,12 @@ function cancelPendingBlockCreate(id: string) {
 async function runBlockDelete(ids: string[], hintPageId?: string, opKey?: string) {
   try {
     await deleteBlocksRemote(ids, hintPageId);
+    const userId = outboxUserId();
+    if (userId && hintPageId) {
+      await cacheRemoveRecords(userId, `blocks:${hintPageId}`, ids);
+      await cacheSetMeta(userId, `blocksStamp:${hintPageId}`, "");
+    }
+    for (const id of ids) optimisticBlockOverlays.delete(id);
     if (opKey) outboxAck(outboxUserId(), opKey);
     noteSyncSuccess();
   } catch (error) {
@@ -2037,6 +2166,7 @@ export function resetPendingPersistenceForTests() {
   replayQueueRuns.clear();
   pendingPage.clear();
   optimisticPageOverlays.clear();
+  optimisticBlockOverlays.clear();
   pendingBlock.clear();
   pendingBlockPage.clear();
   pendingBlockBase.clear();
@@ -6655,7 +6785,9 @@ export const useStore = create<AppState>((set, get) => ({
       const hydrated = force ? false : await hydrateBlocksFromCache(pageId);
       if (hydrated && (await blocksCacheFresh(pageId))) return;
       try {
-        const blocks = (await getPageBlocksRemote(pageId)).blocks.sort(bySortPos);
+        const blocks = (await getPageBlocksRemote(pageId)).blocks
+          .map(remoteBlockWithOptimisticOverlay)
+          .sort(bySortPos);
         if (
           loadUserId && permanentDeleteIds(loadUserId).has(pageId)
         ) return;
@@ -6785,6 +6917,12 @@ export const useStore = create<AppState>((set, get) => ({
     // therefore replay the same graph after a crash/reload without losing a
     // child or racing it ahead of its parent.
     const call = await durableRemoteCall("createBlocksRemote", [persistable]);
+    if (call.status === "ok") {
+      const persisted = Array.isArray(call.result) ? call.result as Block[] : persistable;
+      await Promise.all(
+        persisted.map((block) => reconcilePersistedBlockMutation(block.id, block, block.pageId))
+      );
+    }
     if (call.status === "dropped") {
       const ids = new Set(persistable.map((block) => block.id));
       const pageIds = Array.from(new Set(persistable.map((block) => block.pageId)));
@@ -6853,6 +6991,10 @@ export const useStore = create<AppState>((set, get) => ({
       else pendingBlockBase.delete(id);
     }
     pendingBlock.set(id, { ...(pendingBlock.get(id) ?? {}), ...nextPatch });
+    optimisticBlockOverlays.set(id, {
+      ...(optimisticBlockOverlays.get(id) ?? {}),
+      ...nextPatch,
+    });
     if (pageId) pendingBlockPage.set(id, pageId);
     mirrorPendingBlock(id);
     touchPageForBlockChange(get().updatePage, pageId, opts);
@@ -8142,12 +8284,18 @@ export const useStore = create<AppState>((set, get) => ({
           cacheReplaceTable(
             cacheUserId,
             `rowsdata:${dbId}:${suffix}`,
-            liveRows.map((row) => ({ id: row.id, value: row }))
+            liveRows.map((row) => ({
+              id: row.id,
+              value: remotePageWithOptimisticOverlay(row),
+            }))
           );
           cacheReplaceTable(
             cacheUserId,
             `rowsrelated:${dbId}:${suffix}`,
-            liveRelatedPages.map((page) => ({ id: page.id, value: page }))
+            liveRelatedPages.map((page) => ({
+              id: page.id,
+              value: remotePageWithOptimisticOverlay(page),
+            }))
           );
           cacheSetMeta(cacheUserId, `rows:${dbId}:${suffix}`, {
             hasMore: rowsResult.hasMore === true,

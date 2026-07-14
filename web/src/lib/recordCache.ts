@@ -299,12 +299,30 @@ export async function setOfflinePin(userId: string, pageId: string, pinned: bool
 
 /** Fire-and-forget write-through of a whole record table. */
 export function cacheReplaceTable(userId: string, table: string, records: RecordCacheRecord[]) {
-  enqueue((cache) => cache.replaceTable(table, records), userId);
+  return enqueue((cache) => cache.replaceTable(table, records), userId);
 }
 
 /** Fire-and-forget meta write (bootstrap payloads, per-table stamps). */
 export function cacheSetMeta(userId: string, key: string, value: unknown) {
   return enqueue((cache) => cache.setMeta(key, value), userId);
+}
+
+/**
+ * Rewrite a cached metadata value in the same serialized cache lane as table
+ * writes. Mutations use this to replace one authoritative page inside a warm
+ * bootstrap snapshot before acknowledging the durable outbox entry.
+ */
+export function cacheUpdateMeta<V>(
+  userId: string,
+  key: string,
+  update: (current: V | undefined) => V | undefined
+): Promise<void> {
+  return enqueue(async (cache) => {
+    const current = await cache.getMeta<V>(key);
+    const next = update(current);
+    if (next === undefined) return;
+    await cache.setMeta(key, next);
+  }, userId);
 }
 
 /**
@@ -325,6 +343,37 @@ export function cacheUpsertRecord(
     else next.push(record);
     await cache.replaceTable(table, next);
   }, userId);
+}
+
+/**
+ * Replace a cached record only when that query/table already contains it.
+ * This avoids inserting an updated row into a filtered cache where it may no
+ * longer belong, while still preventing an immediate reload from showing the
+ * pre-save value during stale-while-revalidate.
+ */
+export function cacheReplaceRecordIfPresent(
+  userId: string,
+  table: string,
+  record: RecordCacheRecord
+): Promise<void> {
+  return enqueue(async (cache) => {
+    const records = await cache.listTable(table);
+    const index = records.findIndex((current) => current.id === record.id);
+    if (index < 0) return;
+    const next = records.slice();
+    next[index] = record;
+    await cache.replaceTable(table, next);
+  }, userId);
+}
+
+/** Remove acknowledged records from a cached table before the outbox drains. */
+export function cacheRemoveRecords(
+  userId: string,
+  table: string,
+  ids: string[]
+): Promise<void> {
+  if (ids.length === 0) return Promise.resolve();
+  return enqueue((cache) => cache.removeRecords(table, ids), userId);
 }
 
 export async function cacheListTable<V = unknown>(

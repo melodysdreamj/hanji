@@ -110,8 +110,12 @@ function seedDeadTabEntry(entryKey: string, value: OutboxOp) {
 }
 
 async function outboxSettled() {
-  // Mirror writes ride a FIFO promise chain over real (fake-indexeddb) async
-  // work; two rounds let an ack scheduled from a flush land too.
+  // Mirror and acknowledged-record-cache writes ride separate FIFO promise
+  // chains over real (fake-indexeddb) async work. Alternate twice so a cache
+  // write scheduled after the remote resolves, followed by its outbox ack and
+  // the next serialized generation, has joined before assertions run.
+  await outboxIdleForTests();
+  await recordCacheIdleForTests();
   await outboxIdleForTests();
   await recordCacheIdleForTests();
   await outboxIdleForTests();

@@ -36,6 +36,7 @@ import {
   getDatabaseRowsRemote,
   getPageBlocksRemote,
   updateBlockRemote,
+  updateDatabaseRowRemote,
 } from "@/lib/edgebase";
 import { outboxIdleForTests, resetOutboxForTests, type OutboxOp } from "@/lib/outbox";
 import {
@@ -46,6 +47,7 @@ import {
 } from "@/lib/recordCache";
 import {
   databaseRowsQueryKey,
+  flushAllPending,
   replayDurableOutbox,
   resetBootstrapForTests,
   useStore,
@@ -60,6 +62,7 @@ import {
   makeProp,
   makeRow,
   resetStore,
+  seedPages,
   seedUser,
   TEST_USER,
 } from "./components/storeTestUtils";
@@ -613,6 +616,84 @@ describe("per-view row caches", () => {
     await useStore.getState().loadDatabaseRows("db1", { reset: true, offset: 0 });
     expect(useStore.getState().databaseRowIdsByDb["db1"]).toEqual(["rA"]);
     expect(useStore.getState().toasts).toHaveLength(0);
+  });
+});
+
+describe("acknowledged mutation cache durability", () => {
+  it("reloads an acknowledged row edit from cache before a slow network refresh", async () => {
+    seedUser();
+    const before = makeRow("db1", {
+      id: "r1",
+      title: "Budget",
+      properties: { amount: 50 },
+    });
+    const after = {
+      ...before,
+      properties: { amount: 51 },
+      updatedAt: new Date(Date.now() + 1000).toISOString(),
+    };
+    vi.mocked(getDatabaseRowsRemote).mockResolvedValue({
+      rows: [before],
+      hasMore: false,
+      totalCount: 1,
+      offset: 0,
+    } as never);
+    await useStore.getState().loadDatabaseRows("db1", { reset: true, offset: 0 });
+    await settled();
+
+    vi.mocked(updateDatabaseRowRemote).mockResolvedValueOnce(after);
+    useStore.getState().updatePage(
+      before.id,
+      { properties: after.properties },
+      { debounce: false }
+    );
+    await flushAllPending();
+    await settled();
+
+    resetStore();
+    resetOutboxForTests();
+    seedUser();
+    vi.mocked(getDatabaseRowsRemote).mockRejectedValue(new Error("slow refresh unavailable"));
+
+    await useStore.getState().loadDatabaseRows("db1", { reset: true, offset: 0 });
+
+    expect(useStore.getState().pagesById[before.id]?.properties?.amount).toBe(51);
+    expect(useStore.getState().databaseRowPagesByDb.db1?.error).toBeUndefined();
+  });
+
+  it("reloads an acknowledged block edit from cache before revalidation", async () => {
+    seedUser();
+    const page = makePage({ id: "p1", title: "Slow NAS page" });
+    const before = makeBlock(page.id, "b1", "before");
+    const after = {
+      ...before,
+      content: { rich: [{ text: "after" }] },
+      plainText: "after",
+      updatedAt: new Date(Date.now() + 1000).toISOString(),
+    };
+    seedPages([page]);
+    vi.mocked(getPageBlocksRemote).mockResolvedValue({ blocks: [before] } as never);
+    await useStore.getState().loadBlocks(page.id);
+    await settled();
+
+    vi.mocked(updateBlockRemote).mockResolvedValueOnce(after);
+    useStore.getState().updateBlock(
+      before.id,
+      { content: after.content, plainText: after.plainText },
+      { debounce: false, history: false }
+    );
+    await flushAllPending();
+    await settled();
+
+    resetStore();
+    resetOutboxForTests();
+    seedUser();
+    seedPages([page]);
+    vi.mocked(getPageBlocksRemote).mockRejectedValue(new Error("slow refresh unavailable"));
+
+    await useStore.getState().loadBlocks(page.id);
+
+    expect(useStore.getState().blocksByPage[page.id]?.[0]?.plainText).toBe("after");
   });
 });
 
