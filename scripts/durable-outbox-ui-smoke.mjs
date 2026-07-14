@@ -488,8 +488,8 @@ async function waitForOfflineShell(page) {
         }
         const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
         const required = [
+          '/__hanji_shell__',
           '/theme-init.js',
-          assets.find((path) => /\/PageView-[^/]+\.js$/.test(path)),
           assets.find((path) => /\/Editor-[^/]+\.js$/.test(path)),
         ].filter(Boolean);
         if (required.length !== 3) {
