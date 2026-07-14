@@ -1776,6 +1776,9 @@ async function assertExpandedTreeDisclosureLayout(page, seed) {
 
 async function assertPageTreeRowLayout(page, seed) {
   await privateTreeRow(page, seed.childPageId).waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await clearTreeHoverAndFocus(page);
+  await waitForTreeRowIdle(page, seed.rootPageId, seed.rootTitle);
+  await waitForTreeRowIdle(page, seed.childPageId, seed.childTitle);
   const metrics = await page.evaluate(
     ({ rootPageId, childPageId, rootTitle, childTitle }) => {
       const tree = document.querySelector('[role="tree"][aria-label="Pages"]');
@@ -3907,6 +3910,41 @@ async function clearTreeHoverAndFocus(page) {
   });
   await page.mouse.move(1, 1);
   await page.waitForTimeout(120);
+}
+
+async function waitForTreeRowIdle(page, pageId, title) {
+  await page.waitForFunction(
+    ([id, expectedTitle]) => {
+      const tree = document.querySelector('[role="tree"][aria-label="Pages"]');
+      const row = tree?.querySelector(`[data-tree-page-id="${CSS.escape(id)}"]`);
+      if (!(row instanceof HTMLElement) || row.matches(':hover') || row.matches(':focus-within')) {
+        return false;
+      }
+      const titleElement = Array.from(row.children).find(
+        (child) => child instanceof HTMLElement && child.textContent?.trim() === expectedTitle,
+      );
+      const actions = row.querySelector('button[aria-label^="Open page actions"]')?.parentElement;
+      const disclosure = row.querySelector('[data-tree-disclosure="true"]');
+      const icon = row.querySelector('[data-tree-icon="true"]');
+      if (!(titleElement instanceof HTMLElement) || !(actions instanceof HTMLElement)) return false;
+      const titlePaddingRight = Number.parseFloat(getComputedStyle(titleElement).paddingRight || '0');
+      const actionsOpacity = Number.parseFloat(getComputedStyle(actions).opacity);
+      const disclosureOpacity = disclosure instanceof HTMLElement
+        ? Number.parseFloat(getComputedStyle(disclosure).opacity)
+        : 0;
+      const iconOpacity = icon instanceof HTMLElement
+        ? Number.parseFloat(getComputedStyle(icon).opacity)
+        : 1;
+      return (
+        titlePaddingRight <= 1 &&
+        actionsOpacity <= 0.2 &&
+        disclosureOpacity <= 0.2 &&
+        iconOpacity >= 0.8
+      );
+    },
+    [pageId, title],
+    { timeout: options.timeoutMs },
+  );
 }
 
 async function treeDisclosureOpacity(page, pageId) {
