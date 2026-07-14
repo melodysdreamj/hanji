@@ -71,6 +71,11 @@ async function main() {
   createdUserId = memberId;
   const memberToken = await signin(memberEmail, tempPassword);
   await api('/api/functions/account-state', { action: 'clearMustChangePassword' }, memberToken);
+  await api(
+    '/api/functions/account-state',
+    { action: 'setLanguagePreference', languagePreference: 'system' },
+    memberToken,
+  );
 
   const ws = await api(
     '/api/functions/workspace-mutation',
