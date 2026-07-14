@@ -2,7 +2,7 @@
 
 import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { permanentlyDeletePage, captureBrowserSession, installBrowserSession } from './lib/harness.mjs';
@@ -69,6 +69,14 @@ async function assertPropertyMenuUi(browser, baseUrl, seed) {
       });
     });
     assertNoBrowserErrors(errors, 'database property menu UI flow');
+  } catch (error) {
+    const screenshotDir = join(root, '.edgebase', 'ui-discovery', 'database-property-menu');
+    mkdirSync(screenshotDir, { recursive: true });
+    await page.screenshot({
+      path: join(screenshotDir, 'reload-failure.png'),
+      fullPage: true,
+    }).catch(() => {});
+    throw error;
   } finally {
     await closeSeededContext(context, seed);
   }
@@ -144,18 +152,30 @@ async function openPropertyMenu(page, propertyName) {
 
 async function expectVisiblePropertyOrder(page, seed, expectedKeys) {
   const expectedLabels = expectedKeys.map((key) => seed.propertyNames[key]);
-  await page.waitForFunction(
-    (expected) => {
-      const expectedSet = new Set(expected);
-      const labels = Array.from(document.querySelectorAll('button[aria-label$=" property options"]'))
+  const knownLabels = Object.values(seed.propertyNames);
+  try {
+    await page.waitForFunction(
+      ({ expected, known }) => {
+        const knownSet = new Set(known);
+        const labels = Array.from(document.querySelectorAll('button[aria-label$=" property options"]'))
+          .filter((element) => element instanceof HTMLElement && element.offsetParent !== null)
+          .map((element) => element.getAttribute('aria-label')?.replace(/ property options$/, '') ?? '')
+          .filter((label) => knownSet.has(label));
+        return JSON.stringify(labels) === JSON.stringify(expected);
+      },
+      { expected: expectedLabels, known: knownLabels },
+      { timeout: options.timeoutMs },
+    );
+  } catch (error) {
+    const actualLabels = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('button[aria-label$=" property options"]'))
         .filter((element) => element instanceof HTMLElement && element.offsetParent !== null)
-        .map((element) => element.getAttribute('aria-label')?.replace(/ property options$/, '') ?? '')
-        .filter((label) => expectedSet.has(label));
-      return JSON.stringify(labels) === JSON.stringify(expected);
-    },
-    expectedLabels,
-    { timeout: options.timeoutMs },
-  );
+        .map((element) => element.getAttribute('aria-label')?.replace(/ property options$/, '') ?? ''),
+    );
+    throw new Error(
+      `visible property order did not settle; expected=${JSON.stringify(expectedLabels)} actual=${JSON.stringify(actualLabels)}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 }
 
 async function expectWrappedColumn(page, propertyName, wrapped) {

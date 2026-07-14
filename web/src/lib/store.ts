@@ -4144,6 +4144,13 @@ async function hydrateDatabaseMetaFromCache(dbId: string): Promise<boolean> {
   return true;
 }
 
+function cacheCurrentDatabaseViews(dbId: string) {
+  const userId = outboxUserId();
+  if (!userId) return;
+  const views = useStore.getState().viewsByDb[dbId] ?? [];
+  cacheReplaceTable(userId, `views:${dbId}`, views.map((view) => ({ id: view.id, value: view })));
+}
+
 interface CachedRowsMeta {
   hasMore: boolean;
   nextOffset?: number;
@@ -8911,7 +8918,12 @@ export const useStore = create<AppState>((set, get) => ({
     // Routing hint derived from viewsByDb (see updateProperty): only persist
     // when the view resolves to a database, else the mutation can't be routed.
     if (dbId) {
-      void durableRemoteCall("updateViewRemote", [id, patch as Partial<DbView>, dbId]).then(
+      const callPromise = durableRemoteCall("updateViewRemote", [id, patch as Partial<DbView>, dbId]);
+      // The durable call is already in the outbox. Mirror the optimistic view
+      // set into the record cache as well so a reload cannot hydrate the
+      // pre-edit config while that call lands or waits for retry.
+      cacheCurrentDatabaseViews(dbId);
+      void callPromise.then(
         (call) => {
           if (call.status === "ok") publishDatabaseViewsMutation(dbId, "view_updated", [id]);
           // Terminal rejection: reconcile the optimistic view edit from the

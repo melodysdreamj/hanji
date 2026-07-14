@@ -13,11 +13,15 @@ import { IDBFactory } from "fake-indexeddb";
 
 vi.mock("@/lib/edgebase", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/edgebase")>();
-  return { ...actual };
+  return {
+    ...actual,
+    updateViewRemote: vi.fn(async (_id, patch) => patch),
+  };
 });
 
 import { reorderGroupOptionsById } from "@/components/database/BoardView";
 import { shiftDateValueByDays } from "@/components/database/CalendarView";
+import { updateViewRemote } from "@/lib/edgebase";
 import {
   MAX_CACHED_DBS,
   cacheGetMeta,
@@ -29,8 +33,9 @@ import {
   stampDatabaseCached,
 } from "@/lib/recordCache";
 import { resetOutboxForTests } from "@/lib/outbox";
-import { resetStore, seedUser, TEST_USER } from "./components/storeTestUtils";
-import type { SelectOption } from "@/lib/types";
+import { useStore } from "@/lib/store";
+import { makePage, resetStore, seedPages, seedUser, TEST_USER } from "./components/storeTestUtils";
+import type { DbView, SelectOption } from "@/lib/types";
 
 // ── #5 filtered board group reorder never drops hidden options ──────────────
 describe("BoardView group-option reorder preserves hidden options (#5)", () => {
@@ -128,5 +133,38 @@ describe("record cache DB LRU exempts offline pins (#14)", () => {
     // Its cached tables are intact, while the victim's were emptied.
     expect(await cacheListTable(TEST_USER, "props:pinned-db")).toHaveLength(1);
     expect(await cacheListTable(TEST_USER, "props:victim-db")).toHaveLength(0);
+  });
+});
+
+describe("database view cache write-through", () => {
+  it("keeps an optimistic view config across a reload boundary", async () => {
+    const database = makePage({ id: "db-view-cache", kind: "database", title: "Tasks" });
+    const view: DbView = {
+      id: "view-cache",
+      databaseId: database.id,
+      name: "Table",
+      type: "table",
+      position: 1,
+      config: { visibleProperties: ["title", "notes"] },
+    };
+    seedPages([database]);
+    useStore.setState({
+      pageRolesById: { [database.id]: "edit" },
+      viewsByDb: { [database.id]: [view] },
+    });
+    cacheReplaceTable(TEST_USER, `views:${database.id}`, [{ id: view.id, value: view }]);
+    await recordCacheIdleForTests();
+
+    useStore.getState().updateView(view.id, {
+      config: { visibleProperties: ["title"], wrappedColumns: ["title"] },
+    });
+    await vi.waitFor(() => expect(updateViewRemote).toHaveBeenCalledTimes(1));
+    await recordCacheIdleForTests();
+
+    const cached = await cacheListTable<DbView>(TEST_USER, `views:${database.id}`);
+    expect(cached[0]?.value.config).toEqual({
+      visibleProperties: ["title"],
+      wrappedColumns: ["title"],
+    });
   });
 });
