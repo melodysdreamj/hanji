@@ -26,6 +26,7 @@ const PRECACHE_MANIFEST_KEY = "/__hanji_precache__";
 const BOOT_MANIFEST_KEY = "/__hanji_boot__";
 const BOOT_CACHE_PREFIX = `${CACHE_PREFIX}boot-`;
 const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets";
+const BOOT_PRECACHE_BATCH_SIZE = 4;
 const FULL_PRECACHE_BATCH_SIZE = 4;
 // Upper bound on runtime-cached hashed assets. Content-hashed files are
 // immutable, so previous releases' lazy chunks are harmless (and necessary for
@@ -142,11 +143,23 @@ async function precacheBoot() {
   await caches.delete(cacheName);
   const boot = await caches.open(cacheName);
   try {
-    for (let offset = 0; offset < manifest.bootAssets.length; offset += 16) {
+    // Fetch the mutable HTML shell by itself. On resource-constrained local or
+    // self-hosted runtimes it must not compete with a burst of large modules;
+    // one delayed shell would otherwise hold the whole install open even when
+    // every immutable asset has already arrived.
+    await boot.put("/", await fetchAndValidateAsset("/"));
+    const remainingBootAssets = manifest.bootAssets.filter((url) => url !== "/");
+    for (
+      let offset = 0;
+      offset < remainingBootAssets.length;
+      offset += BOOT_PRECACHE_BATCH_SIZE
+    ) {
       await Promise.all(
-        manifest.bootAssets.slice(offset, offset + 16).map(async (url) => {
-          await boot.put(url, await fetchAndValidateAsset(url));
-        })
+        remainingBootAssets
+          .slice(offset, offset + BOOT_PRECACHE_BATCH_SIZE)
+          .map(async (url) => {
+            await boot.put(url, await fetchAndValidateAsset(url));
+          })
       );
     }
     await cache.put(

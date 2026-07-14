@@ -150,6 +150,9 @@ describe("frontend structural guards", () => {
     expect(serviceWorker).toContain("manifest.assets.includes(pathname)");
     expect(serviceWorker).toContain("event.waitUntil(precacheBoot().then(() => self.skipWaiting()))");
     expect(serviceWorker).toContain('const WARM_OFFLINE_MESSAGE = "hanji:warm-offline-assets"');
+    expect(serviceWorker).toContain("const BOOT_PRECACHE_BATCH_SIZE = 4");
+    expect(serviceWorker).toContain('await boot.put("/", await fetchAndValidateAsset("/"))');
+    expect(serviceWorker).toContain("offset += BOOT_PRECACHE_BATCH_SIZE");
     expect(serviceWorker).toContain(
       "event.waitUntil(ensureFullPrecache().catch(() => undefined))",
     );
