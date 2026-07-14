@@ -167,6 +167,7 @@ async function assertPasswordSignup(browser, baseUrl, seed) {
     await page.getByRole('textbox', { name: 'Email' }).fill(seed.email, { timeout: options.timeoutMs });
     await page.getByLabel('Password').fill(seed.password, { timeout: options.timeoutMs });
     await page.getByRole('button', { name: 'Create account' }).click({ timeout: options.timeoutMs });
+    await completeLanguageOnboarding(page);
     await expectAppLoaded(page);
     assertNoBrowserErrors(errors, 'password account creation');
   } finally {
@@ -252,6 +253,12 @@ async function expectAppLoaded(page) {
     state: 'visible',
     timeout: options.timeoutMs,
   });
+}
+
+async function completeLanguageOnboarding(page) {
+  const onboarding = page.locator('[data-testid="language-onboarding"]');
+  await onboarding.waitFor({ state: 'visible', timeout: options.timeoutMs });
+  await onboarding.getByRole('button', { name: 'Continue' }).click({ timeout: options.timeoutMs });
 }
 
 async function seedStaleWorkspaceCache(page) {
