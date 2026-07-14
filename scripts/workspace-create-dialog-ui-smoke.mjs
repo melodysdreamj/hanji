@@ -131,7 +131,7 @@ async function main() {
     await createFromDialog(page, dialog, notionName, /Import from Notion|노션에서 가져오기/);
     const importDialog = page.getByRole('dialog').filter({ hasText: /Import|가져오기/ }).first();
     await importDialog.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-    const activeTab = importDialog.locator('[data-active="true"]');
+    const activeTab = importDialog.locator('aside button[data-active="true"]');
     assert(
       (await activeTab.first().innerText()).includes('Notion'),
       'import dialog should open on the Notion tab',
@@ -149,7 +149,7 @@ async function main() {
     await createFromDialog(page, dialog, hanjiName, /Import from another Hanji|다른 한지에서 가져오기/);
     const importDialog2 = page.getByRole('dialog').filter({ hasText: /Import|가져오기/ }).first();
     await importDialog2.waitFor({ state: 'visible', timeout: TIMEOUT_MS });
-    const activeTab2 = importDialog2.locator('[data-active="true"]');
+    const activeTab2 = importDialog2.locator('aside button[data-active="true"]');
     assert(
       /Hanji|한지/.test(await activeTab2.first().innerText()),
       'import dialog should open on the Hanji tab',

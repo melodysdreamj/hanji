@@ -185,6 +185,17 @@ describe("ImportDialog default source", () => {
     expect(screen.queryByText("Choose a file")).toBeNull();
   });
 
+  it("applies the requested source when the persistent dialog reopens", async () => {
+    const onClose = vi.fn();
+    const view = render(<ImportDialog open={false} onClose={onClose} />);
+
+    view.rerender(<ImportDialog open initialTab="hanji" onClose={onClose} />);
+
+    const hanjiSource = await screen.findByRole("button", { name: "Hanji" });
+    await waitFor(() => expect(hanjiSource.getAttribute("data-active")).toBe("true"));
+    expect(screen.getByText("Import from Hanji")).toBeTruthy();
+  });
+
   it("shows the OAuth start action only from the backend capability and begins with the exact SPA callback", async () => {
     render(<ImportDialog onClose={vi.fn()} />);
 

@@ -1098,6 +1098,19 @@ export function ImportDialog({
   }, [source]);
 
   useEffect(() => {
+    if (!open || !initialTab || initialTab === sourceRef.current) return;
+    sourceRef.current = initialTab;
+    notionRefreshRunRef.current += 1;
+    hanjiReadRunRef.current += 1;
+    remoteExportRunRef.current += 1;
+    remoteExportAbortRef.current?.abort();
+    remoteExportAbortRef.current = null;
+    setRemoteBusy(false);
+    setHanjiSelection(null);
+    setSource(initialTab);
+  }, [initialTab, open]);
+
+  useEffect(() => {
     let mounted = true;
     fetchRuntimeConfigRemote()
       .then((config) => {
