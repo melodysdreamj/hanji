@@ -137,14 +137,14 @@
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "@edge-base/cli": "0.4.6",
-    "@edge-base/shared": "0.4.6",
-    "@eslint/js": "^9.39.4",
+    "@edge-base/cli": "0.4.9",
+    "@edge-base/shared": "0.4.9",
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^9.39.4",
-    "globals": "^16.5.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.62.1",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.9"
   },
   "dependencies": {
