@@ -93,7 +93,7 @@ No source checkout, environment file, or terminal setup code is required.
 #### Docker Hub / container UI
 
 In a container UI that exposes per-container logging settings, pull
-[`melodysdreamj/hanji:0.2.0-alpha`](https://hub.docker.com/r/melodysdreamj/hanji),
+[`melodysdreamj/hanji:0.2.1-alpha`](https://hub.docker.com/r/melodysdreamj/hanji),
 publish any unused host port to container `8787/TCP`, map durable storage to
 `/data`, set the log driver to `local` with `max-size=10m` and `max-file=3`,
 and set both memory and memory-plus-swap to the value printed by the image's
@@ -108,7 +108,7 @@ uses a Container Manager Project/Compose configuration instead.
 #### One command
 
 ```bash
-HANJI_IMAGE=melodysdreamj/hanji:0.2.0-alpha
+HANJI_IMAGE=melodysdreamj/hanji:0.2.1-alpha
 HANJI_MEMORY_LIMIT="$(
   docker run --rm --entrypoint node "$HANJI_IMAGE" \
     /usr/local/bin/hanji-memory-limit.mjs
@@ -137,7 +137,7 @@ set `HANJI_MEMORY_LIMIT=1536m` on the sizing-helper command to retain the
 verified minimum tier, or choose another finite whole-MiB/GiB value; inspect
 the printed result before creating the long-lived container.
 
-> **Current release:** `0.2.0-alpha` is an early self-hosted beta. Back up
+> **Current release:** `0.2.1-alpha` is an early self-hosted beta. Back up
 > `/data` before upgrading. The moving `alpha` tag is available, but `latest`
 > is intentionally not published until the first stable release.
 
