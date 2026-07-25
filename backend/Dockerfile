@@ -18,7 +18,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates openssl tini && \
     rm -rf /var/lib/apt/lists/* && \
     npm install -g npm@12.0.1 && \
-    npm install -g --allow-scripts=esbuild,workerd,sharp wrangler@4.114.0 brace-expansion@5.0.8 && \
+    npm install -g --allow-scripts=esbuild,workerd,sharp wrangler@4.114.0 && \
+    npm install -g brace-expansion@5.0.8 && \
     rm -rf /usr/local/lib/node_modules/npm/node_modules/brace-expansion && \
     ln -s ../../brace-expansion /usr/local/lib/node_modules/npm/node_modules/brace-expansion
 
