@@ -21,7 +21,7 @@ RUN apt-get update && \
     npm install -g --allow-scripts=esbuild,workerd,sharp wrangler@4.114.0 && \
     npm install -g brace-expansion@5.0.8 && \
     rm -rf /usr/local/lib/node_modules/npm/node_modules/brace-expansion && \
-    ln -s ../../brace-expansion /usr/local/lib/node_modules/npm/node_modules/brace-expansion
+    cp -a /usr/local/lib/node_modules/brace-expansion /usr/local/lib/node_modules/npm/node_modules/brace-expansion
 
 WORKDIR /app
 
