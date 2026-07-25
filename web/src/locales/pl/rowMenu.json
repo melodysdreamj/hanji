@@ -9,7 +9,7 @@
     "duplicate": "Duplikuj",
     "editIcon": "Edytuj ikonę",
     "editProperties": "Edytuj właściwości",
-    "exportAsHanjiFile": "Eksportuj jako plik Hanji",
+    "exportAsHanjiFile": "Eksportuj JSON Hanji (bez plików)",
     "exportAsMarkdown": "Eksportuj jako Markdown",
     "fullPage": "Pełna strona",
     "importing": "Importowanie...",
@@ -26,7 +26,8 @@
     "sidePeek": "Podgląd boczny",
     "undo": "Cofnij",
     "unlockPage": "Odblokuj stronę",
-    "verifyPage": "Zweryfikuj stronę"
+    "verifyPage": "Zweryfikuj stronę",
+    "exportAsHanjiArchive": "Eksportuj archiwum Hanji (z plikami)"
   },
   "aria": {
     "backlinksDisplay": "Wyświetlanie odsyłaczy zwrotnych",
@@ -100,7 +101,9 @@
     "pageVerified": "Strona zweryfikowana",
     "removedFromFavorites": "Usunięto z ulubionych",
     "restoredPage": "Przywrócono stronę",
-    "verificationRemoved": "Usunięto weryfikację"
+    "verificationRemoved": "Usunięto weryfikację",
+    "couldntExportHanjiArchive": "Nie udało się wyeksportować archiwum Hanji.",
+    "exportedHanjiArchive": "Wyeksportowano archiwum Hanji z plikami."
   },
   "untitledDatabaseRow": "wiersz bazy danych bez tytułu"
 }

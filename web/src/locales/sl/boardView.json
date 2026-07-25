@@ -13,7 +13,7 @@
   "groupName": "Ime skupine",
   "groupOptions": "Možnosti skupine {{groupName}}",
   "groupThisBoard": "Združi to tablo",
-  "groupThisBoardDesc": "Dodajte lastnost Izbira ali Status za ustvarjanje stolpcev.",
+  "groupThisBoardDesc": "Dodajte ali izberite lastnost Izbor, Status, Oseba ali Večkratni izbor za ustvarjanje stolpcev.",
   "newGroup": "Nova skupina",
   "newGroupIn": "Nova skupina {{groupName}} v {{dbTitle}}",
   "newPage": "Nova stran",

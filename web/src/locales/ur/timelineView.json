@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "انحصاریں:",
     "hint": "ایک رشتے کی خصوصیت شامل کریں",
-    "relationPropertyAriaLabel": "انحصار رشتے کی خصوصیت"
+    "relationPropertyAriaLabel": "انحصار رشتے کی خصوصیت",
+    "makeDependOn": "{{title}} کو {{predecessor}} پر منحصر بنائیں",
+    "startFrom": "{{title}} سے انحصار شروع کریں"
   },
   "toolbar": {
     "today": "آج",

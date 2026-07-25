@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Тәуелділіктер:",
     "hint": "Қатынас қасиетін қосу",
-    "relationPropertyAriaLabel": "Тәуелділік қатынас қасиеті"
+    "relationPropertyAriaLabel": "Тәуелділік қатынас қасиеті",
+    "makeDependOn": "{{title}} {{predecessor}}-ге тәуелді ету",
+    "startFrom": "Тәуелділікті {{title}}-дан бастау"
   },
   "toolbar": {
     "today": "Бүгін",

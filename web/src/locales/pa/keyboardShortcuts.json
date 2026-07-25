@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "ਟਿੱਪਣੀ ਜੋੜੋ",
+    "addLink": "ਲਿੰਕ ਜੋੜੋ",
+    "blockColor": "ਆਖਰੀ ਵਰਤਿਆ ਰੰਗ ਲਾਗੂ ਕਰੋ",
+    "bold": "ਬੋਲਡ",
+    "copyPageLink": "ਪੰਨਾ ਲਿੰਕ ਕਾਪੀ ਕਰੋ",
+    "findInPage": "ਇਸ ਪੰਨੇ 'ਤੇ ਲੱਭੋ",
+    "inlineCode": "ਇਨਲਾਈਨ ਕੋਡ",
+    "italic": "ਇਟੈਲਿਕ",
+    "moveBlock": "ਬਲਾਕ ਨੂੰ ਦੂਜੇ ਪੰਨੇ 'ਤੇ ਲੈ ਜਾਓ",
+    "moveBlockDown": "ਬਲਾਕ ਨੂੰ ਹੇਠਾਂ ਲੈ ਜਾਓ",
+    "moveBlockUp": "ਬਲਾਕ ਨੂੰ ਉੱਪਰ ਲੈ ਜਾਓ",
+    "movePage": "ਮੌਜੂਦਾ ਪੰਨਾ ਲੈ ਜਾਓ",
+    "navigateBack": "ਵਾਪਸ ਜਾਓ",
+    "navigateForward": "ਅੱਗੇ ਜਾਓ",
+    "newPage": "ਨਵਾਂ ਪੰਨਾ",
+    "openBlockMenu": "ਬਲਾਕ ਕਾਰਵਾਈਆਂ ਖੋਲ੍ਹੋ",
+    "openKeyboardShortcuts": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ ਖੋਲ੍ਹੋ",
+    "openParentPage": "ਪੈਰੈਂਟ ਪੰਨਾ ਖੋਲ੍ਹੋ",
+    "quickFind": "ਤੁਰੰਤ ਲੱਭੋ",
+    "strikethrough": "ਸਟ੍ਰਾਈਕਥਰੂ",
+    "toggleAllToggles": "ਸਾਰੇ ਟੌਗਲ ਫੈਲਾਓ ਜਾਂ ਸੁੰਗੇੜੋ",
+    "toggleSidebar": "ਸਾਈਡਬਾਰ ਟੌਗਲ ਕਰੋ",
+    "toggleTheme": "ਡਾਰਕ ਮੋਡ ਟੌਗਲ ਕਰੋ",
+    "underline": "ਅੰਡਰਲਾਈਨ"
+  },
+  "categories": {
+    "createStyle": "ਬਣਾਓ ਅਤੇ ਸਟਾਈਲ",
+    "editMove": "ਸੰਪਾਦਿਤ ਕਰੋ ਅਤੇ ਲੈ ਜਾਓ",
+    "popular": "ਪ੍ਰਸਿੱਧ"
+  },
+  "categoriesLabel": "ਸ਼ਾਰਟਕੱਟ ਸ਼੍ਰੇਣੀਆਂ",
+  "close": "ਬੰਦ ਕਰੋ",
+  "closeBackdrop": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ ਬੰਦ ਕਰੋ",
+  "empty": "ਕੋਈ ਸ਼ਾਰਟਕੱਟ ਨਹੀਂ ਮਿਲੇ",
+  "keysFor": "{{action}} ਲਈ ਕੁੰਜੀਆਂ",
+  "or": "ਜਾਂ",
+  "searchLabel": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ ਖੋਜ",
+  "searchPlaceholder": "ਸ਼ਾਰਟਕੱਟ ਖੋਜ...",
+  "searchResults": "ਖੋਜ ਨਤੀਜੇ",
+  "searchTerms": {
+    "toggleTheme": "ਥੀਮ ਹਲਕਾ ਹਨੇਰਾ ਦਿੱਖ"
+  },
+  "title": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ"
+}

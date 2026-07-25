@@ -38,7 +38,7 @@
   "moveTo": "Di chuyển đến",
   "exporting": "Đang xuất…",
   "exportAsMarkdown": "Xuất dạng Markdown",
-  "exportAsHanji": "Xuất dạng tệp Hanji",
+  "exportAsHanji": "Xuất Hanji JSON (không bao gồm tệp)",
   "importing": "Đang nhập…",
   "importMarkdown": "Nhập Markdown",
   "unlockPage": "Mở khóa trang",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Không thể cập nhật quyền truy cập",
     "removedFromAccessList": "Đã xóa khỏi danh sách truy cập",
     "couldntRemoveAccess": "Không thể xóa quyền truy cập",
-    "couldntLoadAccessList": "Không thể tải danh sách truy cập"
+    "couldntLoadAccessList": "Không thể tải danh sách truy cập",
+    "couldntExportHanjiArchive": "Không thể xuất Hanji archive.",
+    "exportedHanjiArchive": "Đã xuất Hanji archive bao gồm tệp."
   },
   "user": "Người dùng",
   "whoHasAccess": "Ai có quyền truy cập",
   "workspace": "Không gian làm việc",
   "workspaceCount_one": "{{count}} không gian làm việc",
   "workspaceCount_other": "{{count}} không gian làm việc",
-  "you": "Bạn"
+  "you": "Bạn",
+  "exportAsHanjiArchive": "Xuất Hanji archive (bao gồm tệp)",
+  "turnIntoWiki": "Chuyển thành wiki",
+  "undoWiki": "Hoàn tác wiki",
+  "wikiCreated": "Đã chuyển trang thành wiki",
+  "wikiPageSettings": "Cài đặt trang wiki",
+  "wikiUndone": "Đã xóa wiki; nội dung trang được giữ nguyên",
+  "wikiUpdateFailed": "Không thể cập nhật wiki"
 }

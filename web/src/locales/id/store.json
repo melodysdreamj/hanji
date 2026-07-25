@@ -7,7 +7,8 @@
   "pageMissingSave": "Halaman tidak ditemukan, sehingga perubahan Anda tidak dapat disimpan.",
   "saveFailed": "Perubahan Anda tidak dapat disimpan.",
   "sessionExpired": "Sesi Anda kedaluwarsa atau permintaan tidak dapat diautentikasi. Silakan coba lagi.",
-  "blockConflictSave": "Blok ini diedit di perangkat lain, sehingga perubahan offline Anda tidak diterapkan.",
+  "blockConflictSave": "Perubahan yang diantrekan bertabrakan dengan versi server terbaru sehingga tidak dapat digabungkan secara otomatis.",
   "blockConflictKeepMine": "Terapkan versi saya",
-  "blockMoveCommentsSkipped": "Blok dipindahkan, tetapi komentarnya tidak dapat ikut dipindahkan."
+  "blockMoveCommentsSkipped": "Blok dipindahkan, tetapi komentarnya tidak dapat ikut dipindahkan.",
+  "conflictSave": "Konten ini berubah sebelum penyimpanan selesai, sehingga suntingan Anda tidak dapat disimpan."
 }

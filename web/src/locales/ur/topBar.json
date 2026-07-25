@@ -38,7 +38,7 @@
   "moveTo": "منتقل کریں",
   "exporting": "برآمد ہو رہا ہے…",
   "exportAsMarkdown": "مارک ڈاؤن کے طور پر برآمد کریں",
-  "exportAsHanji": "Hanji فائل کے طور پر برآمد کریں",
+  "exportAsHanji": "Hanji JSON برآمد کریں (فائلیں شامل نہیں)",
   "importing": "درآمد ہو رہا ہے…",
   "importMarkdown": "مارک ڈاؤن درآمد کریں",
   "unlockPage": "صفحہ غیر مقفل کریں",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "رسائی اپ ڈیٹ نہیں کر سکے",
     "removedFromAccessList": "رسائی کی فہرست سے ہٹا دیا گیا",
     "couldntRemoveAccess": "رسائی ہٹا نہیں سکے",
-    "couldntLoadAccessList": "رسائی کی فہرست لوڈ نہیں کر سکے"
+    "couldntLoadAccessList": "رسائی کی فہرست لوڈ نہیں کر سکے",
+    "couldntExportHanjiArchive": "Hanji آرکائیو برآمد نہیں کیا جا سکا۔",
+    "exportedHanjiArchive": "فائلوں کے ساتھ Hanji آرکائیو برآمد ہو گیا۔"
   },
   "user": "صارف",
   "whoHasAccess": "کس کو رسائی ہے",
   "workspace": "ورک اسپیس",
   "workspaceCount_one": "{{count}} ورک اسپیس",
   "workspaceCount_other": "{{count}} ورک اسپیسز",
-  "you": "آپ"
+  "you": "آپ",
+  "exportAsHanjiArchive": "Hanji آرکائیو برآمد کریں (فائلیں شامل)",
+  "turnIntoWiki": "ویکی میں تبدیل کریں",
+  "undoWiki": "ویکی کالعدم کریں",
+  "wikiCreated": "صفحہ ویکی میں تبدیل کر دیا گیا",
+  "wikiPageSettings": "ویکی صفحہ کی ترتیبات",
+  "wikiUndone": "ویکی ہٹا دی گئی؛ صفحے کا مواد محفوظ رہا",
+  "wikiUpdateFailed": "ویکی اپ ڈیٹ نہیں ہو سکی"
 }

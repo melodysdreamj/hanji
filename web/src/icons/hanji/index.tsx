@@ -14,6 +14,7 @@ import {
   Clock as PhosphorClock,
   Code as PhosphorCode,
   Columns as PhosphorColumns,
+  CornersOut as PhosphorCornersOut,
   CopySimple as PhosphorCopySimple,
   Database as PhosphorDatabase,
   DotsSixVertical as PhosphorDotsSixVertical,
@@ -25,6 +26,7 @@ import {
   GearSix as PhosphorGearSix,
   Globe as PhosphorGlobe,
   House as PhosphorHouse,
+  Keyboard as PhosphorKeyboard,
   LinkSimple as PhosphorLinkSimple,
   ListBullets as PhosphorListBullets,
   ListNumbers as PhosphorListNumbers,
@@ -225,6 +227,10 @@ export const Search = (p: HanjiIconProps) => (
   <PhosphorIconSvg {...p} icon={PhosphorMagnifyingGlass} />
 );
 
+export const KeyboardIcon = (p: HanjiIconProps) => (
+  <PhosphorIconSvg {...p} icon={PhosphorKeyboard} />
+);
+
 export const CommentIcon = (p: HanjiIconProps) => (
   <PhosphorIconSvg {...p} icon={PhosphorChatTeardropText} />
 );
@@ -243,6 +249,10 @@ export const Copy = (p: HanjiIconProps) => (
 
 export const Download = (p: HanjiIconProps) => (
   <PhosphorIconSvg {...p} icon={PhosphorDownloadSimple} />
+);
+
+export const FullscreenIcon = (p: HanjiIconProps) => (
+  <PhosphorIconSvg {...p} icon={PhosphorCornersOut} />
 );
 
 export const LogOutIcon = (p: HanjiIconProps) => (

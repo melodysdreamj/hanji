@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Videotext",
     "videoEmptyHint": "Ladda upp en videofil, klistra in en direktlänk, eller använd en YouTube-, Vimeo- eller Loom-länk.",
-    "videoLink": "Videolänk"
+    "videoLink": "Videolänk",
+    "audioPlaybackFailed": "Det här ljudet kunde inte spelas. Ersätt det eller öppna originalfilen.",
+    "videoPlaybackFailed": "Det här videoklippet kunde inte spelas. Ersätt det eller öppna originalfilen."
   },
   "bookmark": {
     "copy": "Kopiera bokmärkeslänk",

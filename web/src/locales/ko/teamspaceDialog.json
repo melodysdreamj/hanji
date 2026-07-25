@@ -1,0 +1,82 @@
+{
+  "title": "팀스페이스",
+  "subtitle": "함께 쓰는 작업을 정리하고 누가 찾거나 참여할 수 있는지 관리합니다.",
+  "tabs": {
+    "label": "팀스페이스 보기",
+    "browse": "둘러보기",
+    "create": "새 팀스페이스",
+    "manage": "관리",
+    "archived": "보관됨"
+  },
+  "joined": "내 팀스페이스",
+  "noneJoined": "아직 참여한 팀스페이스가 없습니다.",
+  "available": "참여 가능한 팀스페이스",
+  "noneAvailable": "참여할 수 있는 다른 팀스페이스가 없습니다.",
+  "noneArchived": "보관된 팀스페이스가 없습니다.",
+  "manage": "관리",
+  "open": "열기",
+  "join": "참여",
+  "request": "접근 요청",
+  "requestPending": "요청 대기 중",
+  "create": "팀스페이스 만들기",
+  "save": "변경사항 저장",
+  "selectTeamspace": "팀스페이스",
+  "members": "멤버",
+  "requests": "접근 요청",
+  "noRequests": "대기 중인 요청이 없습니다.",
+  "governance": "팀스페이스 설정",
+  "choosePrincipal": "사람 또는 그룹 선택",
+  "member": "멤버",
+  "owner": "소유자",
+  "add": "추가",
+  "remove": "제거",
+  "approve": "승인",
+  "deny": "거절",
+  "ownersOnlyCreate": "워크스페이스 소유자만 팀스페이스를 만들 수 있음",
+  "setDefault": "기본 팀스페이스로 설정",
+  "replacement": "대체할 기본 팀스페이스 선택",
+  "archive": "팀스페이스 보관",
+  "restore": "복원",
+  "loadMore": "더 보기",
+  "notOwner": "팀스페이스 소유자 또는 워크스페이스 관리자만 이 팀스페이스를 관리할 수 있습니다.",
+  "fields": {
+    "name": "이름",
+    "icon": "아이콘",
+    "description": "설명",
+    "access": "접근",
+    "memberRole": "멤버 페이지 접근 권한",
+    "openRole": "공개 방문자 페이지 접근 권한",
+    "membersCanInvite": "멤버가 사람을 초대할 수 있음",
+    "membersCanEditSidebar": "멤버가 페이지를 추가하고 순서를 바꿀 수 있음"
+  },
+  "access": {
+    "open": "공개",
+    "closed": "비공개 참여",
+    "private": "초대 전용"
+  },
+  "roles": {
+    "view": "보기 가능",
+    "comment": "댓글 가능",
+    "edit": "편집 가능",
+    "full_access": "전체 권한"
+  },
+  "notice": {
+    "created": "팀스페이스를 만들었습니다.",
+    "joined": "팀스페이스에 참여했습니다.",
+    "requested": "접근을 요청했습니다.",
+    "saved": "팀스페이스를 업데이트했습니다.",
+    "memberAdded": "멤버를 추가했습니다.",
+    "memberUpdated": "멤버 역할을 업데이트했습니다.",
+    "memberRemoved": "멤버를 제거했습니다.",
+    "approved": "요청을 승인했습니다.",
+    "denied": "요청을 거절했습니다.",
+    "policySaved": "팀스페이스 생성 정책을 업데이트했습니다.",
+    "defaultSet": "기본 팀스페이스를 업데이트했습니다.",
+    "archived": "팀스페이스를 보관했습니다.",
+    "restored": "팀스페이스를 복원했습니다."
+  },
+  "error": {
+    "load": "팀스페이스 정보를 불러오지 못했습니다.",
+    "action": "팀스페이스 작업을 완료하지 못했습니다."
+  }
+}

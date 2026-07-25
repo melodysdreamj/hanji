@@ -250,7 +250,9 @@
     "runningHint": "Hou hierdie blaaieroortjie oop terwyl die invoer loop.",
     "noJobHint": "Begin eers ontdekking vanaf die Omvang-stap.",
     "applyLocksHint": "Toepassing skryf die ontdekte items in hierdie werkruimte.",
-    "browserRunnerWarning": "Hierdie invoer loop in hierdie blaaieroortjie. Hou die oortjie oop totdat dit voltooi is. As u die oortjie sluit of herlaai, word die verwerking onderbreek; as u Hanji weer oopmaak, word vanaf die gestoorde vordering hervat."
+    "browserRunnerWarning": "Hierdie invoer loop in hierdie blaaieroortjie. Hou die oortjie oop totdat dit voltooi is. As u die oortjie sluit of herlaai, word die verwerking onderbreek; as u Hanji weer oopmaak, word vanaf die gestoorde vordering hervat.",
+    "serverRunnerStatus": "Hanji verwerk hierdie invoer op die bediener. Om hierdie oortjie te sluit of te herlaai sal dit nie onderbreek nie.",
+    "serverRunningHint": "Die invoer gaan voort in die agtergrond. Jy kan hierdie oortjie sluit."
   },
   "installer": {
     "elapsed": "Verstreke",
@@ -284,9 +286,9 @@
     "title": "Invoer van Hanji",
     "fromFile": "Van 'n lêer",
     "fromLive": "Van 'n lopende instansie",
-    "choose": "Kies 'n .hanji.json-lêer",
+    "choose": "Kies 'n .hanji.json of .hanji.zip lêer",
     "chooseButton": "Kies lêer",
-    "fileHint": "Voer 'n bladsy, databasis of werkruimte uit 'n ander Hanji uit, en voer dit dan hier in. Verwantskappe, oprolle, formules, aansigte en sjablone word behou. Aanhegsels word nie ingesluit nie.",
+    "fileHint": "Gebruik .hanji.json net vir struktuur (lêers uitgesluit), of .hanji.zip vir 'n verliesvrye oordrag (lêers ingesluit). Verwantskappe, oprolle, formules, aansigte en sjablone word behou.",
     "selected": "Gekies: {{name}}",
     "importButton": "Importeer",
     "importing": "Importeer...",
@@ -297,7 +299,7 @@
     "remoteTokenOptional": "opsioneel",
     "fetch": "Haal uitvoer",
     "fetching": "Haal...",
-    "liveHint": "Haal 'n werkruimte direk van 'n ander lopende Hanji af (byvoorbeeld 'n Docker-ontwikkelingsinstansie). Die afgeleë instansie moet versoeke van hierdie adres toelaat.",
+    "liveHint": "Trek 'n werkspasie direk van 'n ander lopende Hanji (byvoorbeeld 'n Docker-ontwikkelingsinstansie). Lêers word uitgesluit. Die afgeleë moet versoeke van hierdie adres toelaat.",
     "review": "Gereed om in te voer: {{summary}}",
     "placeholderNote": "Party aanhegsels is as plekhouers gelaat.",
     "importedItems_one": "{{count}} item uit die Hanji-lêer ingevoer.",
@@ -305,6 +307,12 @@
     "cantRead": "Kon nie die Hanji-lêer lees nie.",
     "cantImport": "Kon nie die Hanji-lêer invoer nie.",
     "needFile": "Kies eers 'n Hanji-lêer.",
-    "needRemote": "Voer die afgeleë Hanji-URL en werkruimte-ID in."
+    "needRemote": "Voer die afgeleë Hanji-URL en werkruimte-ID in.",
+    "filesExcluded": "Lêers uitgesluit.",
+    "filesIncluded": "Lêers ingesluit."
+  },
+  "terminal": {
+    "cancelled": "Die invoer is gekanselleer. Jy kan dit veilig weer begin wanneer jy gereed is.",
+    "failed": "Die invoer het veilig gestop voordat dit kon voltooi. Gaan die verbinding na en probeer weer. Tegniese besonderhede en identifiseerders word hier versteek."
   }
 }

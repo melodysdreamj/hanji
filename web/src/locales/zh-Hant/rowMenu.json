@@ -35,7 +35,7 @@
     "rename": "重新命名",
     "addPageInside": "在內部新增頁面",
     "exportAsMarkdown": "匯出為 Markdown",
-    "exportAsHanjiFile": "匯出為 Hanji 檔案",
+    "exportAsHanjiFile": "匯出 Hanji JSON（不包含檔案）",
     "importMarkdown": "匯入 Markdown",
     "importing": "匯入中...",
     "unlockPage": "解鎖頁面",
@@ -44,7 +44,8 @@
     "removeVerification": "移除驗證",
     "verifyPage": "驗證頁面",
     "customizePage": "自訂頁面",
-    "undo": "復原"
+    "undo": "復原",
+    "exportAsHanjiArchive": "匯出 Hanji 封存檔（包含檔案）"
   },
   "customize": {
     "summaryDefault": "預設",
@@ -101,6 +102,8 @@
     "movedToTrash": "已移至垃圾桶",
     "restoredPage": "已還原頁面",
     "couldntRestorePage": "無法還原頁面",
-    "couldntMoveToTrash": "無法移至垃圾桶"
+    "couldntMoveToTrash": "無法移至垃圾桶",
+    "couldntExportHanjiArchive": "無法匯出 Hanji 封存檔。",
+    "exportedHanjiArchive": "已匯出含檔案的 Hanji 封存檔。"
   }
 }

@@ -33,10 +33,15 @@
   "restoredOption": "Restored option",
   "rollupFunctions": {
     "show_original": "Show original",
+    "show_unique": "Show unique values",
+    "count": "Count all",
     "count_all": "Count all",
     "count_values": "Count values",
+    "unique": "Count unique values",
     "count_unique": "Count unique values",
+    "empty": "Count empty",
     "count_empty": "Count empty",
+    "not_empty": "Count not empty",
     "percent_empty": "Percent empty",
     "percent_not_empty": "Percent not empty",
     "checked": "Checked",
@@ -51,7 +56,9 @@
     "range": "Range",
     "earliest_date": "Earliest date",
     "latest_date": "Latest date",
-    "date_range": "Date range"
+    "date_range": "Date range",
+    "count_per_group": "Count per group",
+    "percent_per_group": "Percent per group"
   },
   "undo": "Undo",
   "untitled": "Untitled",

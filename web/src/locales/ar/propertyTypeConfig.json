@@ -51,7 +51,14 @@
     "range": "المدى",
     "earliest_date": "أقدم تاريخ",
     "latest_date": "أحدث تاريخ",
-    "date_range": "نطاق التاريخ"
+    "date_range": "نطاق التاريخ",
+    "count": "العدد الإجمالي",
+    "count_per_group": "العدد لكل مجموعة",
+    "empty": "عدد الفارغ",
+    "not_empty": "عدد غير الفارغ",
+    "percent_per_group": "النسبة لكل مجموعة",
+    "show_unique": "عرض القيم الفريدة",
+    "unique": "عدد القيم الفريدة"
   },
   "undo": "تراجع",
   "untitled": "بدون عنوان",

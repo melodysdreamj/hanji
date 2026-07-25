@@ -35,7 +35,7 @@
     "rename": "Badilisha jina",
     "addPageInside": "Ongeza ukurasa ndani",
     "exportAsMarkdown": "Hamisha kama Markdown",
-    "exportAsHanjiFile": "Hamisha kama faili ya Hanji",
+    "exportAsHanjiFile": "Hamisha Hanji JSON (faili hazijajumuishwa)",
     "importMarkdown": "Ingiza Markdown",
     "importing": "Inaingiza...",
     "unlockPage": "Fungua ukurasa",
@@ -44,7 +44,8 @@
     "removeVerification": "Ondoa uthibitishaji",
     "verifyPage": "Thibitisha ukurasa",
     "customizePage": "Geuza ukurasa",
-    "undo": "Tendua"
+    "undo": "Tendua",
+    "exportAsHanjiArchive": "Hamisha kumbukumbu ya Hanji (faili zimejumuishwa)"
   },
   "customize": {
     "summaryDefault": "Chaguomsingi",
@@ -101,6 +102,8 @@
     "movedToTrash": "Imehamishwa hadi Tupa",
     "restoredPage": "Ukurasa umerejeshwa",
     "couldntRestorePage": "Imeshindwa kurejesha ukurasa",
-    "couldntMoveToTrash": "Imeshindwa kuhamisha kwenye Tupio"
+    "couldntMoveToTrash": "Imeshindwa kuhamisha kwenye Tupio",
+    "couldntExportHanjiArchive": "Haikuweza kusafirisha kumbukumbu ya Hanji.",
+    "exportedHanjiArchive": "Imesafirisha kumbukumbu ya Hanji yenye faili."
   }
 }

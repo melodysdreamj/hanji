@@ -92,5 +92,8 @@
     "शु",
     "श"
   ],
-  "you": "आप"
+  "you": "आप",
+  "buttonExecutionFailed": "बटन चलाने में असमर्थ।",
+  "loadingMoreRelations": "और संबंध लोड हो रहे हैं...",
+  "loadMoreRelations": "और संबंध लोड करें"
 }

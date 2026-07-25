@@ -176,7 +176,9 @@
     "video": "Видео",
     "videoCaption": "Видео натпис",
     "videoEmptyHint": "Отпремите видео датотеку, налепите директан линк или користите YouTube, Vimeo или Loom линк.",
-    "videoLink": "Видео линк"
+    "videoLink": "Видео линк",
+    "audioPlaybackFailed": "Ovaj audio se ne može reprodukovati. Zamenite ga ili otvorite originalnu datoteku.",
+    "videoPlaybackFailed": "Ovaj video se ne može reprodukovati. Zamenite ga ili otvorite originalnu datoteku."
   },
   "bookmark": {
     "copy": "Kopiraj link bookmarka",

@@ -15,18 +15,52 @@ import {
 // must be classified here and in the migration/placement guard tests when it
 // is introduced.
 export const WORKSPACE_CONTENT_TABLES = [
+  'teamspaces',
+  'teamspace_members',
+  'teamspace_join_requests',
+  'teamspace_settings',
   'pages',
   'blocks',
   'comments',
   'db_properties',
   'db_property_indexes',
+  'database_automations',
+  'automation_execution_receipts',
+  'database_automation_events',
+  'database_automation_event_workers',
+  'database_automation_schedule_workers',
+  'database_automation_deliveries',
+  'database_automation_delivery_workers',
+  'database_dependency_edges',
+  'database_task_feature_config_receipts',
+  'database_task_feature_disable_jobs',
+  'database_dependency_validation_jobs',
+  'database_dependency_validation_items',
+  'database_dependency_mutation_receipts',
+  'database_dependency_date_shift_jobs',
+  'database_dependency_date_shift_items',
+  'database_dependency_date_shift_receipts',
+  'database_hierarchy_moves',
+  'database_hierarchy_move_receipts',
+  'database_hierarchy_lifecycle_jobs',
+  'database_hierarchy_lifecycle_items',
+  'database_hierarchy_relation_updates',
+  'database_query_snapshots',
+  'database_query_snapshot_rows',
   'db_views',
   'db_templates',
   'page_permissions',
+  'page_owners',
+  'search_group_authorities',
+  'search_group_memberships',
+  'search_group_membership_snapshots',
   'share_links',
+  'sites',
+  'form_links',
   'collaboration_operations',
   'collaboration_documents',
   'file_uploads',
+  'native_archive_imports',
   'file_workspace_locks',
   'notion_import_connections',
   'notion_import_jobs',
@@ -188,6 +222,48 @@ export async function boundedDbFromShareToken(
   return boundedDb(admin, workspaceId);
 }
 
+export interface FormTokenRoute {
+  db: DbRef;
+  linkId: string;
+  token: string;
+  workspaceId: string;
+  databaseId: string;
+  viewId: string;
+}
+
+/**
+ * Public form entry. The central row is routing-only and must itself be
+ * enabled; callers still revalidate the workspace link, view and database.
+ */
+export async function boundedDbFromFormToken(
+  admin: AdminDbAccessor,
+  tokenHint: unknown,
+): Promise<FormTokenRoute> {
+  const token = typeof tokenHint === 'string' ? tokenHint.trim() : '';
+  if (!token) throw Object.assign(new Error('Form was not found.'), { status: 404 });
+  const result = await admin.db('app').table<{
+    id: string;
+    token: string;
+    workspaceId: string;
+    databaseId: string;
+    viewId: string;
+    enabled?: boolean;
+  }>('form_link_index').where('token', '==', token).page(1).limit(2).getList();
+  const rows = (result.items ?? []).filter((row) => row.token === token);
+  const route = !result.hasMore && rows.length === 1 ? rows[0] : null;
+  if (!route || route.enabled !== true) {
+    throw Object.assign(new Error('Form was not found.'), { status: 404 });
+  }
+  return {
+    db: boundedDb(admin, route.workspaceId),
+    linkId: route.id,
+    token,
+    workspaceId: route.workspaceId,
+    databaseId: route.databaseId,
+    viewId: route.viewId,
+  };
+}
+
 /**
  * permissionId-only mutation entries (updatePermission/removePermission).
  * Resolves through the central page_permission_index — no client API change
@@ -292,6 +368,68 @@ export async function ensureShareLinkIndex(
   }
 }
 
+export async function ensureFormLinkIndex(
+  admin: AdminDbAccessor,
+  link: {
+    id: string;
+    token: string;
+    workspaceId: string;
+    databaseId: string;
+    viewId: string;
+    enabled?: boolean;
+  },
+): Promise<void> {
+  const table = admin.db('app').table<{
+    id: string;
+    token: string;
+    workspaceId: string;
+    databaseId: string;
+    viewId: string;
+    enabled?: boolean;
+  }>('form_link_index');
+  const data = {
+    token: link.token,
+    workspaceId: link.workspaceId,
+    databaseId: link.databaseId,
+    viewId: link.viewId,
+    enabled: link.enabled === true,
+  };
+  const existing = await getExisting(table, link.id);
+  try {
+    if (existing) await table.update(link.id, data);
+    else await table.insert({ id: link.id, ...data });
+  } catch (error) {
+    // The asynchronous DB trigger may win the foreground insert race. Accept
+    // only the exact route it was supposed to create; token collisions or a
+    // mismatched row still propagate as a hard failure.
+    const afterRace = await getExisting(table, link.id);
+    if (
+      !afterRace
+      || afterRace.token !== data.token
+      || afterRace.workspaceId !== data.workspaceId
+      || afterRace.databaseId !== data.databaseId
+      || afterRace.viewId !== data.viewId
+      || afterRace.enabled !== data.enabled
+    ) throw error;
+  }
+
+  // A shareable URL is returned only after its unique route is observable and
+  // matches the workspace-authoritative link exactly.
+  const confirmed = await table.where('token', '==', link.token).page(1).limit(2).getList();
+  const rows = (confirmed.items ?? []).filter((row) => row.token === link.token);
+  const match = !confirmed.hasMore && rows.length === 1 ? rows[0] : null;
+  if (
+    !match
+    || match.id !== link.id
+    || match.workspaceId !== link.workspaceId
+    || match.databaseId !== link.databaseId
+    || match.viewId !== link.viewId
+    || match.enabled !== (link.enabled === true)
+  ) {
+    throw new Error('Form link routing index could not be confirmed.');
+  }
+}
+
 /**
  * Bootstrap fallback discovery: workspaces that hold direct page grants for
  * this principal. Reads the central index; callers must still validate
@@ -341,9 +479,9 @@ export function boundedDbFromWorkspaceHint(
 }
 
 /**
- * Admin/maintenance sweeps that legitimately span workspaces (file cleanup
- * cron, instance-admin reporting). Yields a facade per workspace so content
- * tables resolve. Fan-out cost is acceptable at admin frequency (design doc).
+ * Infrequent administrator reads that legitimately span workspaces. Scheduled
+ * maintenance must use its bounded due/audit router instead of this helper.
+ * Yields a facade per workspace so content tables resolve.
  */
 export async function contentDbsForAllWorkspaces(
   admin: AdminDbAccessor,
@@ -453,11 +591,9 @@ export function isWorkspaceContentTable(name: string): boolean {
 // ── change log (local-first delta sync — docs/local-first-roadmap.md §7) ────
 // Every mutation to the tables below, applied through the boundedDb facade
 // (the single choke point every product function uses), appends a
-// per-workspace change entry. DELETES append atomically in the same transact,
-// because a deletion has no other trace — the entry is its tombstone.
-// Inserts/updates append best-effort: a missed entry self-heals through the
-// updatedAt watermark (bootstrap pagesSince) and the feed-completeness
-// fallback. `change_log` itself is never wrapped.
+// per-workspace change entry. Inserts, updates, and deletes commit their
+// product row and change entry atomically in the same workspace transaction.
+// `change_log` itself is never wrapped.
 
 export const CHANGE_LOG_TABLE = 'change_log';
 /** Sentinel row updated on prune; feed reads older than this are incomplete. */
@@ -467,8 +603,29 @@ function contentMutationTargetFields(table: string, data: Record<string, unknown
   if (!data) return [];
   return table === 'pages'
     ? (data.parentType === 'workspace' ? [] : ['parentId'])
-    : table === 'db_properties' || table === 'db_views' || table === 'db_templates'
+    : table === 'db_properties'
+      || table === 'db_views'
+      || table === 'db_templates'
+      || table === 'database_dependency_edges'
+      || table === 'database_automations'
+      || table === 'automation_execution_receipts'
+      || table === 'database_automation_events'
+      || table === 'database_automation_deliveries'
+      || table === 'database_dependency_validation_jobs'
+      || table === 'database_dependency_mutation_receipts'
+      || table === 'database_dependency_date_shift_jobs'
+      || table === 'database_dependency_date_shift_receipts'
+      || table === 'database_hierarchy_moves'
+      || table === 'database_hierarchy_move_receipts'
+      || table === 'database_hierarchy_lifecycle_jobs'
+      || table === 'database_hierarchy_relation_updates'
+      || table === 'form_links'
       ? ['databaseId']
+      : table === 'database_dependency_validation_items'
+        || table === 'database_dependency_date_shift_items'
+        ? ['databaseId']
+      : table === 'database_hierarchy_lifecycle_items'
+        ? ['databaseId']
       : table === 'file_uploads'
         ? ['pageId', 'databaseId']
         : [
@@ -614,6 +771,8 @@ const CHANGE_LOGGED_TABLES = new Set<string>([
   'db_properties',
   'db_views',
   'db_templates',
+  'database_automations',
+  'database_dependency_edges',
   'page_permissions',
 ]);
 
@@ -683,6 +842,7 @@ function changeScopeFromData(
     case 'db_properties':
     case 'db_views':
     case 'db_templates':
+    case 'database_automations':
       return typeof d.databaseId === 'string' && d.databaseId ? d.databaseId : undefined;
     case 'page_permissions':
       return typeof d.pageId === 'string' && d.pageId ? d.pageId : undefined;
@@ -728,6 +888,8 @@ function changeLogRow(
 export interface BoundedDbOptions {
   /** Internal permanent-workspace cleanup after its durable deletion fence. */
   allowWorkspaceDeletion?: boolean;
+  /** Internal reuse of an already-routed workspace handle in one worker. */
+  contentDb?: DbRef;
 }
 
 export function boundedDb(
@@ -736,7 +898,7 @@ export function boundedDb(
   options: BoundedDbOptions = {},
 ): DbRef {
   const central = admin.db('app');
-  const content = admin.db(WORKSPACE_BLOCK_NAMESPACE, workspaceId);
+  const content = options.contentDb ?? admin.db(WORKSPACE_BLOCK_NAMESPACE, workspaceId);
 
   const readContentWritableTargetPages = async (targetIds: string[] = []) => {
     if (options.allowWorkspaceDeletion) return new Map<string, WritableTargetPage>();
@@ -783,7 +945,8 @@ export function boundedDb(
     snapshot: UpdateFenceSnapshot,
     context: string,
   ) => {
-    if (!snapshot.after) return;
+    if (!snapshot.after) return true;
+    let complete = true;
     for (const fields of rollbackFieldGroups(snapshot)) {
       const data = rollbackPatch(snapshot, fields);
       const where = rollbackExpectation(snapshot, fields);
@@ -798,6 +961,7 @@ export function boundedDb(
         { table: snapshot.table, op: 'update', id: snapshot.id, data },
       ];
       await content.transact(rollbackOps).catch((rollbackError) => {
+        complete = false;
         // Field-scoped expectations prevent compensation from clobbering a
         // later update that already superseded this part of the mutation.
         console.error(
@@ -806,21 +970,7 @@ export function boundedDb(
         );
       });
     }
-  };
-
-  const appendEntry = async (
-    table: string,
-    recordId: string,
-    scope: string | null,
-    deleted: boolean,
-  ) => {
-    try {
-      await content
-        .table<Record<string, unknown>>(CHANGE_LOG_TABLE)
-        .insert(changeLogRow(workspaceId, table, recordId, scope, deleted));
-    } catch (error) {
-      console.error('[change-log] append failed:', error);
-    }
+    return complete;
   };
 
   const resolveScope = async (
@@ -848,10 +998,37 @@ export function boundedDb(
     const insert = async (data: Partial<T>) => {
       const targetIds = contentMutationTargetIds(name, data as Record<string, unknown>);
       await assertContentWritable(targetIds);
-      const row = await ref.insert(data);
-      const recordId = String(
-        (row as { id?: unknown })?.id ?? (data as { id?: unknown })?.id ?? '',
-      );
+      const logged = CHANGE_LOGGED_TABLES.has(name);
+      let recordId: string;
+      let changeEntry: Record<string, unknown> | null = null;
+      let row: T;
+      if (logged) {
+        const requestedId = (data as { id?: unknown }).id;
+        recordId = typeof requestedId === 'string' && requestedId.length > 0
+          ? requestedId
+          : crypto.randomUUID();
+        // Pin one concrete id before the transaction. The runtime treats
+        // null/empty ids like a missing id and may generate its own value;
+        // product, log, and any post-fence compensation must all address the
+        // same row instead of independently interpreting the caller's input.
+        const insertData = { ...data, id: recordId };
+        changeEntry = changeLogRow(
+          workspaceId,
+          name,
+          recordId,
+          changeScopeFromData(name, insertData as Record<string, unknown>) ?? null,
+          false,
+        );
+        row = (await content.transact([
+          { table: name, op: 'insert', data: insertData as Record<string, unknown> },
+          { table: CHANGE_LOG_TABLE, op: 'insert', data: changeEntry },
+        ])).results[0]?.inserted as T;
+      } else {
+        row = await ref.insert(data);
+        recordId = String(
+          (row as { id?: unknown })?.id ?? (data as { id?: unknown })?.id ?? '',
+        );
+      }
       try {
         // Close the check→insert window with workspace deletion: an insert
         // that began just before the durable fence must remove itself instead
@@ -859,26 +1036,32 @@ export function boundedDb(
         await assertContentWritable(targetIds);
       } catch (error) {
         if (recordId) {
-          await ref.delete(recordId).catch((rollbackError) => {
-            console.error('[workspace-delete] fenced insert rollback failed:', rollbackError);
-          });
+          if (changeEntry) {
+            await content.transact([
+              { table: name, op: 'delete', id: recordId },
+              {
+                table: CHANGE_LOG_TABLE,
+                op: 'delete',
+                id: String(changeEntry.id),
+              },
+            ]).catch((rollbackError) => {
+              console.error('[workspace-delete] fenced insert rollback failed:', rollbackError);
+            });
+          } else {
+            await ref.delete(recordId).catch((rollbackError) => {
+              console.error('[workspace-delete] fenced insert rollback failed:', rollbackError);
+            });
+          }
         }
         throw error;
-      }
-      if (recordId && CHANGE_LOGGED_TABLES.has(name)) {
-        await appendEntry(
-          name,
-          recordId,
-          changeScopeFromData(name, row as Record<string, unknown>) ?? null,
-          false,
-        );
       }
       return row;
     };
     const update = async (id: string, data: Partial<T>) => {
       const patch = data as Record<string, unknown>;
+      const logged = CHANGE_LOGGED_TABLES.has(name);
       const deletionLifecycle = isDeletionLifecycleUpdate(name, patch);
-      const existing = deletionLifecycle
+      const existing = deletionLifecycle && !logged
         ? null
         : await getExisting(ref as TableRefLike<Record<string, unknown>>, id);
       // Some adapters/test doubles return their live row object. Freeze the
@@ -888,10 +1071,26 @@ export function boundedDb(
         ? []
         : updateMutationTargetIds(name, id, before, patch);
       await assertContentWritable(targetIds);
-      const scope = CHANGE_LOGGED_TABLES.has(name)
+      if (logged && !existing) {
+        // Preserve the single-row endpoint's not-found semantics without a
+        // raw update fallback. Another writer can insert this id after our
+        // null read; updating it outside the atomic product+log transaction
+        // would otherwise create an unlogged mutation.
+        throw Object.assign(new Error(`${name}/${id} not found`), { code: 404 });
+      }
+      const scope = logged
         ? await resolveScope(name, id, patch)
         : null;
-      const row = await ref.update(id, data);
+      const changeEntry = logged
+        ? changeLogRow(workspaceId, name, id, scope, false)
+        : null;
+      const row = logged
+        ? (await content.transact([
+            { table: name, op: 'expect', id, exists: true },
+            { table: name, op: 'update', id, data: patch },
+            { table: CHANGE_LOG_TABLE, op: 'insert', data: changeEntry! },
+          ])).results[1]?.updated as T
+        : await ref.update(id, data);
       if (!deletionLifecycle && before) {
         const snapshot: UpdateFenceSnapshot = {
           table: name,
@@ -909,11 +1108,22 @@ export function boundedDb(
             ...updateMutationTargetIds(name, id, before, row as Record<string, unknown>),
           ]);
         } catch (error) {
-          await rollbackFencedUpdate(snapshot, 'table');
+          const rolledBack = await rollbackFencedUpdate(snapshot, 'table');
+          // A failed field-scoped compensation can leave part of the product
+          // mutation durable. Keep its change entry in that case: an extra
+          // refresh is safe, while deleting the log would create a false
+          // `unchanged` result for a mutation that still exists.
+          if (changeEntry && rolledBack) {
+            await content
+              .table<Record<string, unknown>>(CHANGE_LOG_TABLE)
+              .delete(String(changeEntry.id))
+              .catch((rollbackError) => {
+                console.error('[content-fence] table change-log rollback failed:', rollbackError);
+              });
+          }
           throw error;
         }
       }
-      if (CHANGE_LOGGED_TABLES.has(name)) await appendEntry(name, id, scope, false);
       return row;
     };
     const remove = async (id: string) => {

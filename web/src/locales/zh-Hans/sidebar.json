@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "打开工作区菜单",
   "closeWorkspaceMenu": "关闭工作区菜单",
   "workspaceMenu": "工作区菜单",
-  "exportWorkspace": "导出工作区",
+  "exportWorkspace": "导出工作空间 JSON（不含文件）",
   "exportedWorkspace": "已将工作区导出为Hanji文件。",
   "exportedWorkspaceWithPlaceholders": "已将工作区导出为Hanji文件 — 附件作为占位符保留。",
   "couldntExportWorkspace": "无法导出工作区。",
@@ -76,5 +76,12 @@
     "later": "以后再说",
     "note": "您以后随时可以从侧边栏的“导入”开始。",
     "title": "将您的Notion工作区导入Hanji？"
-  }
+  },
+  "addPageToTeamspace": "向 {{name}} 添加页面",
+  "couldntExportWorkspaceArchive": "无法导出工作空间归档。",
+  "exportedWorkspaceArchive": "已导出包含文件的工作空间归档。",
+  "exportWorkspaceArchive": "导出工作空间归档（含文件）",
+  "joinTeamspaces": "加入团队空间",
+  "keyboardShortcuts": "键盘快捷键",
+  "teamspacePages": "{{name}} 页面"
 }

@@ -58,7 +58,14 @@
     "range": "Område",
     "show_original": "Vis original",
     "sum": "Sum",
-    "unchecked": "Ikke avmerket"
+    "unchecked": "Ikke avmerket",
+    "count": "Tell alle",
+    "count_per_group": "Antall per gruppe",
+    "empty": "Antall tomme",
+    "not_empty": "Antall ikke-tomme",
+    "percent_per_group": "Prosent per gruppe",
+    "show_unique": "Vis unike verdier",
+    "unique": "Antall unike verdier"
   },
   "showOnDatabase": "Vis på {{name}}",
   "undo": "Angre",

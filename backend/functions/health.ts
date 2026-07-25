@@ -1,20 +1,23 @@
 import { defineFunction } from '@edge-base/shared';
 import { hanjiEnvValue } from '../lib/hanji-compat';
 
-interface TableQuery {
-  limit(value: number): TableQuery;
-  getList(): Promise<{ items?: unknown[] }>;
+type HealthProbeOperation =
+  | { table: string; op: 'insert'; data: Record<string, unknown> }
+  | { table: string; op: 'delete'; id: string }
+  | { table: string; op: 'expect'; id: string; exists: boolean };
+
+interface HealthDatabase {
+  transact(
+    operations: HealthProbeOperation[],
+    options: { resultMode: 'compact' },
+  ): Promise<{ committed: true; operationCount: number }>;
 }
 
 interface HealthContext {
   request?: Request;
   env?: Record<string, unknown>;
   admin: {
-    db(namespace: string): {
-      table(name: string): {
-        where(field: string, op: string, value: unknown): TableQuery;
-      };
-    };
+    db(namespace: string): HealthDatabase;
   };
 }
 
@@ -41,12 +44,19 @@ export const GET = defineFunction(async (rawContext: unknown) => {
   const id = requestId(context.request);
   const buildSha = hanjiEnvValue(context.env, 'HANJI_BUILD_SHA');
   try {
-    await context.admin
-      .db('app')
-      .table('instance_settings')
-      .where('id', '==', 'global')
-      .limit(1)
-      .getList();
+    const probeId = `health-probe-${crypto.randomUUID()}`;
+    const result = await context.admin.db('app').transact([
+      { table: 'health_write_probes', op: 'expect', id: probeId, exists: false },
+      {
+        table: 'health_write_probes',
+        op: 'insert',
+        data: { id: probeId, probeToken: probeId },
+      },
+      { table: 'health_write_probes', op: 'delete', id: probeId },
+    ], { resultMode: 'compact' });
+    if (result.committed !== true || result.operationCount !== 3) {
+      throw new Error('Database readiness probe returned an invalid commit receipt.');
+    }
 
     return healthResponse({
       ok: true,
@@ -56,7 +66,8 @@ export const GET = defineFunction(async (rawContext: unknown) => {
       ...(buildSha ? { buildSha } : {}),
       requestId: id,
     }, 200, id);
-  } catch {
+  } catch (error) {
+    console.error('[health] database readiness probe failed:', { requestId: id, error });
     return healthResponse({
       ok: false,
       status: 'not_ready',

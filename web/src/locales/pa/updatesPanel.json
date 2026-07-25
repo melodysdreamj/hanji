@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} ਹਾਲੀਆ ਅੱਪਡੇਟ",
     "unreadOfTotal": "{{total}} ਅੱਪਡੇਟਾਂ ਵਿੱਚੋਂ {{unread}} ਨਾ ਪੜ੍ਹਿਆ",
     "updateType": "ਅੱਪਡੇਟ ਕਿਸਮ",
-    "updates": "ਅੱਪਡੇਟ",
-    "modeUpdates": "ਅੱਪਡੇਟ",
-    "modeChats": "ਗੱਲਬਾਤ",
-    "inboxMode": "ਇਨਬਾਕਸ ਮੋਡ"
+    "updates": "ਅੱਪਡੇਟ"
   },
   "time": {
     "justNow": "ਹੁਣੇ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} ਵਰਜਨ",
     "versionsAgo": "{{count}} ਵਰਜਨ ਪਹਿਲਾਂ",
     "versionsAhead": "{{count}} ਵਰਜਨ ਅਗੇ",
-    "versionsAria": "ਵਰਜਨ"
+    "versionsAria": "ਵਰਜਨ",
+    "emptyBlock": "ਖਾਲੀ ਬਲਾਕ",
+    "emptyPreview": "ਇਸ ਸੰਸਕਰਣ ਵਿੱਚ ਪੰਨਾ ਸਮੱਗਰੀ ਨਹੀਂ ਹੈ।",
+    "previewAria": "ਸਿਰਫ-ਪੜ੍ਹਨ ਲਈ ਪੰਨਾ ਸੰਸਕਰਣ ਪੂਰਵ-ਦਰਸ਼ਨ",
+    "previewingCurrent": "ਮੌਜੂਦਾ ਪੰਨਾ ਦੇਖ ਰਹੇ ਹਾਂ",
+    "previewingSnapshot": "ਪਿਛਲਾ ਸੰਸਕਰਣ ਦੇਖ ਰਹੇ ਹਾਂ",
+    "previewOnlyHint": "ਕੋਈ ਸੰਸਕਰਣ ਚੁਣਨ ਨਾਲ ਸਿਰਫ ਉਸਦਾ ਪੂਰਵ-ਦਰਸ਼ਨ ਹੁੰਦਾ ਹੈ। ਮੌਜੂਦਾ ਪੰਨਾ 'Restore' ਕਰਨ ਤੋਂ ਬਾਅਦ ਹੀ ਬਦਲਦਾ ਹੈ।",
+    "restoreThisVersion": "ਬਹਾਲ ਕਰੋ",
+    "restoring": "ਬਹਾਲ ਕਰ ਰਿਹਾ ਹੈ...",
+    "versionHistory": "ਸੰਸਕਰਣ ਇਤਿਹਾਸ"
   },
   "badges": {
     "comment": "ਟਿੱਪਣੀ",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ਦਾ ਜ਼ਿਕਰ ਕੀਤਾ · {{preview}}",
     "referenceLink": "{{title}} ਨਾਲ ਜੁੜਿਆ · {{preview}}",
     "unreadDot": "ਨਾ ਪੜ੍ਹਿਆ",
-    "workspaceUpdate": "ਵਰਕਸਪੇਸ ਅਪਡੇਟ"
+    "workspaceUpdate": "ਵਰਕਸਪੇਸ ਅਪਡੇਟ",
+    "bySelf": "ਤੁਹਾਡੇ ਦੁਆਰਾ"
   },
   "empty": {
     "allCaughtUp": "ਤੁਸੀਂ ਸਭ ਕੁਝ ਦੇਖ ਲਿਆ ਹੈ।",

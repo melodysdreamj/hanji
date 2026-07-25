@@ -51,7 +51,14 @@
     "range": "Razpon",
     "earliest_date": "Najzgodnejši datum",
     "latest_date": "Najpoznejši datum",
-    "date_range": "Datumski razpon"
+    "date_range": "Datumski razpon",
+    "count": "Preštej vse",
+    "count_per_group": "Število na skupino",
+    "empty": "Število praznih",
+    "not_empty": "Število nepraznih",
+    "percent_per_group": "Odstotek na skupino",
+    "show_unique": "Prikaži unikatne vrednosti",
+    "unique": "Število unikatnih vrednosti"
   },
   "undo": "Razveljavi",
   "untitled": "Neimenovano",

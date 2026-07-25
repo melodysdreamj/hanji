@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Laluan",
+  "clearSearch": "Kosongkan carian",
+  "errors": {
+    "not-found": "Tapak ini mungkin telah dinyahterbitkan atau alamatnya telah berubah.",
+    "offline": "Periksa sambungan anda, kemudian cuba buka tapak semula.",
+    "rate-limited": "Tapak ini menerima terlalu banyak permintaan. Tunggu sebentar dan cuba lagi.",
+    "unavailable": "Hanji tidak dapat membuka tapak ini sekarang. Cuba lagi sebentar."
+  },
+  "madeWithHanji": "Dibuat dengan Hanji",
+  "navigation": "Navigasi tapak",
+  "noResults": "Tiada halaman ditemui",
+  "outsideSite": "Halaman ini bukan sebahagian daripada tapak yang diterbitkan ini.",
+  "search": "Cari tapak ini",
+  "tryAgain": "Cuba lagi",
+  "unavailable": "Tapak ini tidak tersedia."
+}

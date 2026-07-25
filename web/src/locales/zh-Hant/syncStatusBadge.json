@@ -6,5 +6,6 @@
   "unreachable": "無法連接伺服器",
   "unreachablePending_one": "無法連接伺服器 · {{count}} 項變更待處理",
   "unreachablePending_other": "無法連接伺服器 · {{count}} 項變更待處理",
-  "retryHint": "點擊立即重試"
+  "retryHint": "點擊立即重試",
+  "confirmed": "已儲存至伺服器"
 }

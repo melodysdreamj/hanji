@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Hanyoyi",
+  "clearSearch": "Share bincike",
+  "errors": {
+    "not-found": "Wannan shafin mai yiwuwa an soke bugawa ko kuma an canza adireshinsa.",
+    "offline": "Duba haɗin ka, sannan sake ƙoƙarin buɗe shafin.",
+    "rate-limited": "Wannan shafin yana karɓar buƙatoci da yawa. Jira na ɗan lokaci sannan a sake gwadawa.",
+    "unavailable": "Hanji ba zai iya buɗe wannan shafin a yanzu ba. Sake gwadawa cikin ɗan lokaci."
+  },
+  "madeWithHanji": "An yi da Hanji",
+  "navigation": "Kewayawar shafin",
+  "noResults": "Ba a sami shafuka ba",
+  "outsideSite": "Wannan shafi baya cikin wannan shafin da aka buga.",
+  "search": "Bincika wannan shafin",
+  "tryAgain": "Sake gwadawa",
+  "unavailable": "Wannan shafin ba shi da samuwa."
+}

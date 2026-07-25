@@ -3,18 +3,25 @@ import type { RoomConnectionState, RoomMember, RoomSignalMeta, Subscription } fr
 import { ensureAuth, getClient } from "./edgebase";
 import { i18next } from "@/i18n";
 import { useStore } from "./store";
+import { createBlockTextCrdtUpdateFromUndoSession } from "./collaborationCrdt";
 import {
   sanitizeTextSpanOperation,
   sanitizeTextSpans,
   type TextSpanOperation,
 } from "./textOperations";
 import {
+  createBlockStructureMutationBatcher,
   PAGE_ROOM_MUTATION_EVENT,
   PAGE_ROOM_MUTATION_RECEIVED_EVENT,
   PAGE_ROOM_MUTATION_SIGNAL,
   type PageRoomMutationChange,
   type PageRoomMutationReceived,
 } from "./pageRoomEvents";
+import {
+  createPageRoomOutboundScheduler,
+  PAGE_ROOM_SIGNAL_ACTIVE_SEND_TIMEOUT_MS,
+} from "./pageRoomOutboundScheduler";
+import { createPageTextUpdateBatcher } from "./pageTextUpdateBatcher";
 import {
   spansToPlainText,
   type CollaborationCrdtUpdateOperation,
@@ -34,8 +41,6 @@ export const PAGE_CRDT_UPDATE_RECEIVED_EVENT = "hanji:page-crdt-update-received"
 const PRESENCE_HEARTBEAT_MS = 25_000;
 const AWARENESS_TTL_MS = 15_000;
 const AWARENESS_SEND_THROTTLE_MS = 180;
-const TEXT_UPDATE_SEND_DEBOUNCE_MS = 90;
-const MAX_PENDING_TEXT_UPDATES = 200;
 const MAX_PENDING_CRDT_UPDATES = 200;
 
 export interface PagePresencePeer {
@@ -77,6 +82,7 @@ export interface PagePresenceAwareness {
 export interface PageTextUpdateChange {
   blockId: string;
   content: { rich: TextSpan[] };
+  crdtOperation?: CollaborationCrdtUpdateOperation;
   operation?: TextSpanOperation;
   pageId: string;
   plainText?: string;
@@ -314,13 +320,59 @@ export function usePagePresence(pageId: string, enabled: boolean) {
     let awarenessCleanup: number | undefined;
     let lastAwarenessSentAt = 0;
     let activeUserId = storedUserId || "";
-    const pendingTextUpdates: PageTextUpdateChange[] = [];
     const pendingCrdtUpdates: PageCrdtUpdateChange[] = [];
-    const queuedTextUpdates = new Map<string, PageTextUpdateChange>();
-    const textUpdateTimers = new Map<string, number>();
+    let crdtDrain: Promise<void> | undefined;
     const room = getClient().room(PAGE_PRESENCE_NAMESPACE, pageId, {
       maxReconnectAttempts: 8,
       heartbeatIntervalMs: 8000,
+      sendTimeout: PAGE_ROOM_SIGNAL_ACTIVE_SEND_TIMEOUT_MS,
+    });
+    const outboundScheduler = createPageRoomOutboundScheduler({
+      isConnected: () => Boolean(activeUserId) && room.getConnectionState() === "connected",
+    });
+    const sendPageMutation = async (detail: PageRoomMutationChange) => {
+      const now = Date.now();
+      await outboundScheduler.schedule(
+        detail.kind === "block_structure_changed" ? "structure" : "mutation",
+        () =>
+          room.signals.send(PAGE_ROOM_MUTATION_SIGNAL, {
+            ...detail,
+            color: colorForUser(activeUserId),
+            label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
+            revision: detail.revision ?? now,
+            updatedAt: detail.updatedAt ?? new Date().toISOString(),
+            userId: activeUserId,
+          }),
+      );
+    };
+    const blockStructureMutationBatcher = createBlockStructureMutationBatcher({
+      isConnected: () => Boolean(activeUserId) && room.getConnectionState() === "connected",
+      send: sendPageMutation,
+    });
+    const pageTextUpdateBatcher = createPageTextUpdateBatcher<PageTextUpdateChange>({
+      afterSend: async (detail) => {
+        const rich = sanitizeTextSpans(detail.content?.rich);
+        if (!rich) return;
+        const updatedAt = detail.updatedAt ?? new Date().toISOString();
+        const operation = detail.crdtOperation ?? await createBlockTextCrdtUpdateFromUndoSession({
+          blockId: detail.blockId,
+          rich,
+          updatedAt,
+        });
+        if (!operation) return;
+        // Reuse the existing bounded CRDT queue and outbound scheduler. The
+        // text batcher's fixed 90 ms generation ensures ordinary keystrokes
+        // contribute at most one latest Yjs state per block per generation.
+        publishPageCrdtUpdate({
+          blockId: detail.blockId,
+          operation,
+          pageId: detail.pageId,
+          revision: detail.revision,
+          updatedAt,
+        });
+      },
+      isConnected: () => Boolean(activeUserId) && room.getConnectionState() === "connected",
+      send: sendTextUpdateNow,
     });
     const subscriptions: Subscription[] = [];
 
@@ -532,22 +584,19 @@ export function usePagePresence(pageId: string, enabled: boolean) {
       if (detail.mode !== "idle" && now - lastAwarenessSentAt < AWARENESS_SEND_THROTTLE_MS) return;
       lastAwarenessSentAt = now;
       if (!activeUserId || room.getConnectionState() !== "connected") return;
-      void room.signals
-        .send(PAGE_AWARENESS_SIGNAL, {
-          ...detail,
-          color: colorForUser(activeUserId),
-          label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
-          selectedBlockIds: detail.selectedBlockIds?.slice(0, 20),
-          textRange: cleanTextRange(detail.textRange),
-          updatedAt: now,
-          userId: activeUserId,
-        })
+      void outboundScheduler
+        .schedule("awareness", () =>
+          room.signals.send(PAGE_AWARENESS_SIGNAL, {
+            ...detail,
+            color: colorForUser(activeUserId),
+            label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
+            selectedBlockIds: detail.selectedBlockIds?.slice(0, 20),
+            textRange: cleanTextRange(detail.textRange),
+            updatedAt: now,
+            userId: activeUserId,
+          }),
+        )
         .catch(() => {});
-    }
-
-    function queueTextUpdate(detail: PageTextUpdateChange) {
-      pendingTextUpdates.push(detail);
-      if (pendingTextUpdates.length > MAX_PENDING_TEXT_UPDATES) pendingTextUpdates.shift();
     }
 
     function queueCrdtUpdate(detail: PageCrdtUpdateChange) {
@@ -555,16 +604,16 @@ export function usePagePresence(pageId: string, enabled: boolean) {
       if (pendingCrdtUpdates.length > MAX_PENDING_CRDT_UPDATES) pendingCrdtUpdates.shift();
     }
 
-    function sendTextUpdateNow(detail: PageTextUpdateChange) {
-      if (!activeUserId || room.getConnectionState() !== "connected") return false;
+    async function sendTextUpdateNow(detail: PageTextUpdateChange) {
+      if (!activeUserId) return;
       const rich = sanitizeTextSpans(detail.content?.rich);
-      if (!rich) return true;
+      if (!rich) return;
       const operation = sanitizeTextSpanOperation(detail.operation);
       const plainText =
         typeof detail.plainText === "string" ? detail.plainText : spansToPlainText(rich);
       const now = Date.now();
-      void room.signals
-        .send(PAGE_TEXT_UPDATE_SIGNAL, {
+      await outboundScheduler.schedule("text", () =>
+        room.signals.send(PAGE_TEXT_UPDATE_SIGNAL, {
           blockId: detail.blockId,
           color: colorForUser(activeUserId),
           content: { rich },
@@ -575,105 +624,102 @@ export function usePagePresence(pageId: string, enabled: boolean) {
           revision: typeof detail.revision === "number" ? detail.revision : now,
           updatedAt: detail.updatedAt ?? new Date().toISOString(),
           userId: activeUserId,
-        })
-        .catch(() => {});
-      return true;
+        }),
+      );
     }
 
-    function flushPendingTextUpdates() {
-      if (!activeUserId || room.getConnectionState() !== "connected") return;
-      while (pendingTextUpdates.length) {
-        const detail = pendingTextUpdates.shift();
-        if (detail && !sendTextUpdateNow(detail)) {
-          queueTextUpdate(detail);
-          break;
-        }
-      }
-    }
-
-    function sendCrdtUpdateNow(detail: PageCrdtUpdateChange) {
+    async function sendCrdtUpdateNow(detail: PageCrdtUpdateChange) {
       if (!activeUserId || room.getConnectionState() !== "connected") return false;
       const operation = cleanCrdtUpdateOperation(detail.operation);
       if (!operation) return true;
       const now = Date.now();
-      void room.signals
-        .send(PAGE_CRDT_UPDATE_SIGNAL, {
-          blockId: detail.blockId,
-          color: colorForUser(activeUserId),
-          label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
-          operation,
-          pageId,
-          revision: typeof detail.revision === "number" ? detail.revision : now,
-          updatedAt: detail.updatedAt ?? new Date().toISOString(),
-          userId: activeUserId,
-        })
-        .catch(() => {});
+      await outboundScheduler.schedule("crdt", () =>
+          room.signals.send(PAGE_CRDT_UPDATE_SIGNAL, {
+            blockId: detail.blockId,
+            color: colorForUser(activeUserId),
+            label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
+            operation,
+            pageId,
+            revision: typeof detail.revision === "number" ? detail.revision : now,
+            updatedAt: detail.updatedAt ?? new Date().toISOString(),
+            userId: activeUserId,
+          }),
+        );
       return true;
     }
 
-    function flushPendingCrdtUpdates() {
-      if (!activeUserId || room.getConnectionState() !== "connected") return;
-      while (pendingCrdtUpdates.length) {
-        const detail = pendingCrdtUpdates.shift();
-        if (detail && !sendCrdtUpdateNow(detail)) {
-          queueCrdtUpdate(detail);
-          break;
-        }
+    function flushPendingCrdtUpdates(): Promise<void> {
+      if (crdtDrain) return crdtDrain;
+      if (!activeUserId || room.getConnectionState() !== "connected") {
+        return Promise.resolve();
       }
-    }
-
-    function sendTextUpdate(detail: PageTextUpdateChange) {
-      if (!sendTextUpdateNow(detail)) queueTextUpdate(detail);
-    }
-
-    function sendQueuedTextUpdate(blockId: string) {
-      const timer = textUpdateTimers.get(blockId);
-      if (timer) window.clearTimeout(timer);
-      textUpdateTimers.delete(blockId);
-      const detail = queuedTextUpdates.get(blockId);
-      queuedTextUpdates.delete(blockId);
-      if (!detail) return;
-      sendTextUpdate(detail);
+      const generation = (async () => {
+        while (
+          !cancelled &&
+          pendingCrdtUpdates.length > 0 &&
+          room.getConnectionState() === "connected"
+        ) {
+          const detail = pendingCrdtUpdates.shift();
+          if (!detail) continue;
+          try {
+            const accepted = await sendCrdtUpdateNow(detail);
+            if (!accepted) {
+              pendingCrdtUpdates.unshift(detail);
+              return;
+            }
+          } catch {
+            // CRDT wire failures remain item-isolated and non-retrying. Later
+            // queued operations retain their exact FIFO order.
+          }
+        }
+      })();
+      const settled = generation.finally(() => {
+        if (crdtDrain !== settled) return;
+        crdtDrain = undefined;
+        if (
+          !cancelled &&
+          pendingCrdtUpdates.length > 0 &&
+          room.getConnectionState() === "connected"
+        ) {
+          return flushPendingCrdtUpdates();
+        }
+      });
+      crdtDrain = settled;
+      return settled;
     }
 
     function publishTextUpdate(event: Event) {
       const detail = (event as TextUpdateEvent).detail;
       if (!detail || detail.pageId !== pageId || !detail.blockId) return;
-      if (detail.operation) {
-        sendTextUpdate(detail);
-        return;
-      }
-      queuedTextUpdates.set(detail.blockId, detail);
-      const timer = textUpdateTimers.get(detail.blockId);
-      if (timer) window.clearTimeout(timer);
-      textUpdateTimers.set(
-        detail.blockId,
-        window.setTimeout(() => sendQueuedTextUpdate(detail.blockId), TEXT_UPDATE_SEND_DEBOUNCE_MS),
-      );
+      pageTextUpdateBatcher.enqueue(detail);
     }
 
     function publishCrdtUpdate(event: Event) {
       const detail = (event as CrdtUpdateEvent).detail;
       if (!detail || detail.pageId !== pageId || !detail.blockId) return;
-      if (!sendCrdtUpdateNow(detail)) queueCrdtUpdate(detail);
+      queueCrdtUpdate(detail);
+      void flushPendingCrdtUpdates();
+    }
+
+    function flushPendingPageMutations() {
+      void blockStructureMutationBatcher.flush();
     }
 
     function publishPageMutation(event: Event) {
       const detail = (event as RoomMutationEvent).detail;
       const clean = cleanPageMutationPayload(detail, pageId);
       if (!clean) return;
-      if (!activeUserId || room.getConnectionState() !== "connected") return;
-      const now = Date.now();
-      void room.signals
-        .send(PAGE_ROOM_MUTATION_SIGNAL, {
+      if (clean.kind === "block_structure_changed") {
+        blockStructureMutationBatcher.enqueue({
           ...clean,
-          color: colorForUser(activeUserId),
-          label: presenceLabelForUser(workspaceMembersRef.current, activeUserId),
-          revision: clean.revision ?? now,
-          updatedAt: clean.updatedAt ?? new Date().toISOString(),
-          userId: activeUserId,
-        })
-        .catch(() => {});
+          kind: "block_structure_changed",
+        });
+        return;
+      }
+      // Non-structure room semantics retain their existing immediate path;
+      // only page-wide canonical structure invalidations are safe to summarize.
+      if (!activeUserId || room.getConnectionState() !== "connected") return;
+      void sendPageMutation(clean).catch(() => {});
     }
 
     async function connect() {
@@ -689,8 +735,10 @@ export function usePagePresence(pageId: string, enabled: boolean) {
         subscriptions.push(room.session.onConnectionStateChange((state) => {
           setStatus(state);
           if (state === "connected") {
-            flushPendingTextUpdates();
-            flushPendingCrdtUpdates();
+            flushPendingPageMutations();
+            void pageTextUpdateBatcher.flush();
+            void flushPendingCrdtUpdates();
+            void outboundScheduler.flush();
           }
         }));
         subscriptions.push(room.members.onSync(syncMembers));
@@ -710,8 +758,10 @@ export function usePagePresence(pageId: string, enabled: boolean) {
         if (cancelled) return;
         await publishState(userId);
         syncMembers();
-        flushPendingTextUpdates();
-        flushPendingCrdtUpdates();
+        flushPendingPageMutations();
+        void pageTextUpdateBatcher.flush();
+        void flushPendingCrdtUpdates();
+        void outboundScheduler.flush();
         heartbeat = window.setInterval(() => {
           void publishState(userId).catch(() => {});
         }, PRESENCE_HEARTBEAT_MS);
@@ -730,13 +780,21 @@ export function usePagePresence(pageId: string, enabled: boolean) {
       cancelled = true;
       if (heartbeat) window.clearInterval(heartbeat);
       if (awarenessCleanup) window.clearInterval(awarenessCleanup);
-      for (const timer of textUpdateTimers.values()) window.clearTimeout(timer);
+      outboundScheduler.cancelNonStructure();
+      void pageTextUpdateBatcher.dispose();
       window.removeEventListener(PAGE_AWARENESS_EVENT, publishAwareness);
       window.removeEventListener(PAGE_TEXT_UPDATE_EVENT, publishTextUpdate);
       window.removeEventListener(PAGE_CRDT_UPDATE_EVENT, publishCrdtUpdate);
       window.removeEventListener(PAGE_ROOM_MUTATION_EVENT, publishPageMutation);
       for (const subscription of subscriptions) subscription.unsubscribe();
-      room.leave();
+      // Defer leave until an already-started structure signal and its one
+      // trailing summary have drained, or disconnected queued structure has
+      // received its finite scheduler lifecycle cancellation. This closes the
+      // commit -> route-unmount loss window without keeping listeners alive.
+      void blockStructureMutationBatcher
+        .dispose()
+        .finally(() => outboundScheduler.dispose())
+        .finally(() => room.leave());
     };
   }, [enabled, pageId, storedUserId, workspaceId]);
 

@@ -9,10 +9,12 @@ import { pageDisplayTitle } from "@/lib/pageTitle";
 import type {
   DbProperty,
   Page,
+  NotionRollupFunction,
   PropertyConfig,
   RollupFunction,
   SelectOption,
 } from "@/lib/types";
+import { canonicalRollupFunction } from "../../../../shared/database/rollup-core";
 import { useStore } from "@/lib/store";
 import { NUMBER_FORMATS, numberFormatForProperty } from "./numberFormat";
 import { formulaWarnings } from "./formula";
@@ -24,18 +26,15 @@ import styles from "./database.module.css";
 
 const SELECT_OPTION_DRAG = "application/x-hanji-select-option-config";
 
-const ROLLUP_FUNCTION_VALUES: RollupFunction[] = [
-  "show_original",
-  "count_all",
+export const ROLLUP_FUNCTION_VALUES: NotionRollupFunction[] = [
+  "count",
   "count_values",
-  "count_unique",
-  "count_empty",
+  "empty",
+  "not_empty",
+  "unique",
+  "show_unique",
   "percent_empty",
   "percent_not_empty",
-  "checked",
-  "unchecked",
-  "percent_checked",
-  "percent_unchecked",
   "sum",
   "average",
   "median",
@@ -45,6 +44,13 @@ const ROLLUP_FUNCTION_VALUES: RollupFunction[] = [
   "earliest_date",
   "latest_date",
   "date_range",
+  "checked",
+  "unchecked",
+  "percent_checked",
+  "percent_unchecked",
+  "count_per_group",
+  "percent_per_group",
+  "show_original",
 ];
 
 /**
@@ -99,6 +105,8 @@ export function PropertyTypeConfig({ prop, onClose }: { prop: DbProperty; onClos
     value: fn,
     label: t(`propertyTypeConfig:rollupFunctions.${fn}`),
   }));
+  const selectedRollupFunction =
+    canonicalRollupFunction(prop.config?.rollupFunction) ?? "show_original";
 
   useEffect(() => {
     if (rollupDatabaseId) void loadDatabase(rollupDatabaseId, { rows: false });
@@ -197,7 +205,7 @@ export function PropertyTypeConfig({ prop, onClose }: { prop: DbProperty; onClos
               <span>{t("propertyTypeConfig:calculate")}</span>
               <NotionSelect
                 ariaLabel={t("propertyTypeConfig:ariaRollupCalculation")}
-                value={prop.config?.rollupFunction ?? "show_original"}
+                value={selectedRollupFunction}
                 options={rollupFunctionOptions}
                 onChange={(value) =>
                   updateProperty(prop.id, {

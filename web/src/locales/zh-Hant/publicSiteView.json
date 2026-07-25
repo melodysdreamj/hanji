@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "麵包屑",
+  "clearSearch": "清除搜尋",
+  "errors": {
+    "not-found": "此網站可能已取消發布或網址已變更。",
+    "offline": "請檢查您的連線，然後再試一次開啟網站。",
+    "rate-limited": "此網站接收太多請求。請稍後再試。",
+    "unavailable": "Hanji 目前無法開啟此網站。請稍後再試。"
+  },
+  "madeWithHanji": "使用 Hanji 製作",
+  "navigation": "網站導覽",
+  "noResults": "找不到頁面",
+  "outsideSite": "此頁面不屬於此已發布的網站。",
+  "search": "搜尋此網站",
+  "tryAgain": "再試一次",
+  "unavailable": "此網站無法使用。"
+}

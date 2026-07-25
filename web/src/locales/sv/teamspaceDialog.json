@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Stängd",
+    "open": "Öppen",
+    "private": "Privat"
+  },
+  "add": "Lägg till",
+  "approve": "Godkänn",
+  "archive": "Arkivera teamspace",
+  "available": "Tillgänglig för anslutning",
+  "choosePrincipal": "Välj person eller grupp",
+  "create": "Skapa teamspace",
+  "deny": "Avvisa",
+  "error": {
+    "action": "Kunde inte slutföra teamspace-åtgärden.",
+    "load": "Kunde inte ladda teamspace-information."
+  },
+  "fields": {
+    "access": "Åtkomst",
+    "description": "Beskrivning",
+    "icon": "Ikon",
+    "memberRole": "Medlems sidåtkomst",
+    "membersCanEditSidebar": "Medlemmar kan lägga till och ordna om sidor",
+    "membersCanInvite": "Medlemmar kan bjuda in personer",
+    "name": "Namn",
+    "openRole": "Öppen besökares sidåtkomst"
+  },
+  "governance": "Teamspaceinställningar",
+  "join": "Gå med",
+  "joined": "Dina teamspaces",
+  "loadMore": "Ladda fler",
+  "manage": "Hantera",
+  "member": "Medlem",
+  "members": "Medlemmar",
+  "noneArchived": "Det finns inga arkiverade teamspaces.",
+  "noneAvailable": "Det finns inga andra teamspaces tillgängliga.",
+  "noneJoined": "Du har inte gått med i några teamspaces än.",
+  "noRequests": "Det finns inga väntande förfrågningar.",
+  "notice": {
+    "approved": "Förfrågan godkänd.",
+    "archived": "Teamspace arkiverat.",
+    "created": "Teamspace skapat.",
+    "defaultSet": "Standardteamspace uppdaterat.",
+    "denied": "Förfrågan avvisad.",
+    "joined": "Teamspace anslutet.",
+    "memberAdded": "Medlem tillagd.",
+    "memberRemoved": "Medlem borttagen.",
+    "memberUpdated": "Medlemsroll uppdaterad.",
+    "policySaved": "Policy för teamspace-skapande uppdaterad.",
+    "requested": "Åtkomst begärd.",
+    "restored": "Teamspace återställt.",
+    "saved": "Teamspace uppdaterat."
+  },
+  "notOwner": "Endast en teamspace-ägare eller arbetsyta-administratör kan hantera denna teamspace.",
+  "open": "Öppna",
+  "owner": "Ägare",
+  "ownersOnlyCreate": "Endast arbetsyta-ägare kan skapa teamspaces",
+  "remove": "Ta bort",
+  "replacement": "Välj ett ersättande standardteamspace",
+  "request": "Begär åtkomst",
+  "requestPending": "Begäran väntar",
+  "requests": "Åtkomstbegäranden",
+  "restore": "Återställ",
+  "roles": {
+    "comment": "Kan kommentera",
+    "edit": "Kan redigera",
+    "full_access": "Full åtkomst",
+    "view": "Kan visa"
+  },
+  "save": "Spara ändringar",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Ange som standardteamspace",
+  "subtitle": "Organisera delat arbete och kontrollera vem som kan upptäcka eller gå med i det.",
+  "tabs": {
+    "archived": "Arkiverad",
+    "browse": "Bläddra",
+    "create": "Nytt teamspace",
+    "label": "Teamspace-vyer",
+    "manage": "Hantera"
+  },
+  "title": "Teamspaces"
+}

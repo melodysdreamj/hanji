@@ -1,5 +1,6 @@
 {
   "addFileOrImage": "파일 또는 이미지 추가",
+  "buttonExecutionFailed": "버튼을 실행하지 못했어요.",
   "clear": "지우기",
   "closeMenu": "메뉴 닫기",
   "closeOptionEditor": "옵션 편집기 닫기",
@@ -54,6 +55,8 @@
   "prevMonth": "이전 달",
   "relationDatabaseUnavailable": "관계형 데이터베이스를 사용할 수 없습니다",
   "relationLoading": "관계 항목 불러오는 중",
+  "loadMoreRelations": "관계 더 불러오기",
+  "loadingMoreRelations": "관계를 더 불러오는 중...",
   "relationUnavailable": "관계 항목을 표시할 수 없음",
   "relatedPages": "관련 페이지",
   "remove": "{{name}} 제거",

@@ -1,0 +1,199 @@
+.root {
+  min-height: 640px;
+  background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%);
+}
+
+.desktopBuilder {
+  display: grid;
+  grid-template-columns: minmax(330px, 440px) minmax(460px, 1fr);
+  min-height: 680px;
+}
+
+.editor {
+  box-sizing: border-box;
+  max-height: calc(100vh - 170px);
+  padding: 18px;
+  overflow: auto;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.shareBar,
+.panel,
+.questionEditor,
+.addQuestion,
+.unsupported {
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+}
+
+.shareBar > label,
+.field,
+.compactField {
+  display: grid;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shareBar select,
+.field input,
+.field textarea,
+.field select,
+.compactField input,
+.inlineSettings select,
+.addQuestion select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.field + .field { margin-top: 12px; }
+.field textarea { resize: vertical; }
+.field input:disabled { opacity: .6; }
+
+.shareActions,
+.inlineSettings,
+.addQuestion,
+.questionEditorTop,
+.iconActions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.shareActions { margin-top: 10px; }
+.shareActions button,
+.addQuestion button,
+.iconActions button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.shareActions .primary {
+  border-color: #2383e2;
+  background: #2383e2;
+  color: #fff;
+}
+
+.shareActions button:disabled,
+.addQuestion button:disabled,
+.iconActions button:disabled { cursor: default; opacity: .45; }
+
+.pending,
+.success,
+.error {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+.pending { color: var(--text-muted); }
+.success { color: #448361; }
+.error { color: #d04444; overflow-wrap: anywhere; }
+
+.questionEditors { display: grid; gap: 10px; }
+.questionEditor { margin: 0; }
+.questionEditorTop { margin-bottom: 12px; }
+.questionEditorTop strong {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.questionNumber {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--hover-bg);
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.iconActions button { width: 28px; padding: 0; }
+.checkField {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 9px 0;
+  color: var(--text);
+  font-size: 12px;
+}
+.inlineSettings {
+  align-items: end;
+  margin-top: 10px;
+}
+.inlineSettings > * { flex: 1; }
+.compactField { grid-template-columns: 1fr 66px; align-items: center; }
+
+.addQuestion { margin-top: 12px; }
+.addQuestion select { flex: 1; }
+.unsupported summary { color: var(--text); cursor: pointer; font-size: 12px; }
+.unsupported ul { margin: 10px 0 0; padding-left: 18px; color: var(--text-muted); font-size: 12px; }
+
+.preview {
+  box-sizing: border-box;
+  max-height: calc(100vh - 170px);
+  padding: 20px clamp(20px, 5vw, 64px) 70px;
+  overflow: auto;
+}
+.previewLabel {
+  margin: 0 auto 10px;
+  width: min(100%, 650px);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.previewCard { width: min(100%, 650px); margin: 0 auto; }
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: 9px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.readOnly { box-sizing: border-box; padding: 28px; background: color-mix(in srgb, var(--bg) 95%, var(--text) 5%); }
+.mobileUnsupported { display: none; }
+
+@media (max-width: 900px) {
+  .desktopBuilder { grid-template-columns: minmax(310px, 390px) minmax(390px, 1fr); }
+  .preview { padding-inline: 22px; }
+}
+
+@media (max-width: 720px) {
+  .desktopBuilder { display: none; }
+  .mobileUnsupported {
+    display: grid;
+    gap: 7px;
+    padding: 26px 22px;
+    color: var(--text);
+  }
+  .mobileUnsupported span { color: var(--text-muted); line-height: 1.5; }
+  .readOnly { padding: 16px 10px 42px; }
+}

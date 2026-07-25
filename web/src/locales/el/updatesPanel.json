@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} πρόσφατες ενημερώσεις",
     "unreadOfTotal": "{{unread}} αδιάβαστα από {{total}} ενημερώσεις",
     "updateType": "Τύπος ενημέρωσης",
-    "updates": "Ενημερώσεις",
-    "modeUpdates": "Ενημερώσεις",
-    "modeChats": "Συνομιλίες",
-    "inboxMode": "Λειτουργία εισερχομένων"
+    "updates": "Ενημερώσεις"
   },
   "time": {
     "justNow": "Μόλις τώρα",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} εκδόσεις",
     "versionsAgo": "{{count}} εκδόσεις πριν",
     "versionsAhead": "{{count}} εκδόσεις μπροστά",
-    "versionsAria": "Εκδόσεις"
+    "versionsAria": "Εκδόσεις",
+    "emptyBlock": "Κενό μπλοκ",
+    "emptyPreview": "Αυτή η έκδοση δεν έχει περιεχόμενο σελίδας.",
+    "previewAria": "Προεπισκόπηση έκδοσης σελίδας (μόνο ανάγνωση)",
+    "previewingCurrent": "Προβολή τρέχουσας σελίδας",
+    "previewingSnapshot": "Προβολή προηγούμενης έκδοσης",
+    "previewOnlyHint": "Η επιλογή μιας έκδοσης παρέχει μόνο προεπισκόπηση. Η τρέχουσα σελίδα αλλάζει μόνο μετά την Επαναφορά.",
+    "restoreThisVersion": "Επαναφορά",
+    "restoring": "Γίνεται επαναφορά…",
+    "versionHistory": "Ιστορικό εκδόσεων"
   },
   "badges": {
     "comment": "Σχόλιο",
@@ -67,7 +73,8 @@
     "referenceMention": "Αναφορά σε {{title}} · {{preview}}",
     "referenceLink": "Σύνδεσμος σε {{title}} · {{preview}}",
     "unreadDot": "Αδιάβαστα",
-    "workspaceUpdate": "Ενημέρωση χώρου εργασίας"
+    "workspaceUpdate": "Ενημέρωση χώρου εργασίας",
+    "bySelf": "από Εσάς"
   },
   "empty": {
     "allCaughtUp": "Είστε ενημερωμένοι.",

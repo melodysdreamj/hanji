@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} 个最近更新",
     "unreadOfTotal": "{{total}} 条更新，{{unread}} 条未读",
     "updateType": "更新类型",
-    "updates": "更新",
-    "modeUpdates": "更新",
-    "modeChats": "聊天",
-    "inboxMode": "收件箱模式"
+    "updates": "更新"
   },
   "time": {
     "justNow": "刚刚",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} 个版本",
     "versionsAgo": "{{count}} 个版本前",
     "versionsAhead": "{{count}} 个版本后",
-    "versionsAria": "版本列表"
+    "versionsAria": "版本列表",
+    "emptyBlock": "空块",
+    "emptyPreview": "此版本无页面内容。",
+    "previewAria": "只读页面版本预览",
+    "previewingCurrent": "查看当前页面",
+    "previewingSnapshot": "查看历史版本",
+    "previewOnlyHint": "选择版本后仅预览，需恢复后才更新当前页面。",
+    "restoreThisVersion": "恢复",
+    "restoring": "恢复中...",
+    "versionHistory": "版本历史"
   },
   "badges": {
     "comment": "评论",
@@ -67,7 +73,8 @@
     "referenceMention": "提及 {{title}} · {{preview}}",
     "referenceLink": "链接到 {{title}} · {{preview}}",
     "unreadDot": "未读",
-    "workspaceUpdate": "工作空间更新"
+    "workspaceUpdate": "工作空间更新",
+    "bySelf": "你"
   },
   "empty": {
     "allCaughtUp": "已全部读完。",

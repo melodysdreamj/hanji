@@ -92,5 +92,8 @@
     "F",
     "S"
   ],
-  "you": "Ikaw"
+  "you": "Ikaw",
+  "buttonExecutionFailed": "Hindi ma-execute ang button.",
+  "loadingMoreRelations": "Naglo-load ng higit pang mga relation...",
+  "loadMoreRelations": "Mag-load pa ng mga relation"
 }

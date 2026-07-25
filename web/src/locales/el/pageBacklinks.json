@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_other": "{{count}} backlinks",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlinks"
   },
   "header": {
     "title": "Συνδεδεμένες αναφορές"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} αναφορά",
     "mention_other": "{{count}} αναφορές",
     "link_one": "{{count}} σύνδεσμος",
-    "link_other": "{{count}} σύνδεσμοι"
+    "link_other": "{{count}} σύνδεσμοι",
+    "loaded": "Φορτώθηκε: {{summary}}"
   },
   "kind": {
     "mention": "Αναφορά",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ακόμη backlink",
-    "count_other": "{{count}} ακόμη backlinks"
+    "count_other": "{{count}} ακόμη backlinks",
+    "load": "Φόρτωση περισσότερων backlinks",
+    "loading": "Φόρτωση backlinks…",
+    "search": "Αναζήτηση backlinks"
   }
 }

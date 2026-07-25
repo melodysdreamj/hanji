@@ -51,7 +51,14 @@
     "range": "Rango",
     "earliest_date": "Fecha más temprana",
     "latest_date": "Fecha más tardía",
-    "date_range": "Rango de fechas"
+    "date_range": "Rango de fechas",
+    "count": "Contar todo",
+    "count_per_group": "Conteo por grupo",
+    "empty": "Conteo de vacíos",
+    "not_empty": "Conteo de no vacíos",
+    "percent_per_group": "Porcentaje por grupo",
+    "show_unique": "Mostrar valores únicos",
+    "unique": "Conteo de valores únicos"
   },
   "undo": "Deshacer",
   "untitled": "Sin título",

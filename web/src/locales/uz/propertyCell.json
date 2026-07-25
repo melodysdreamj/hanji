@@ -92,5 +92,8 @@
     "J",
     "S"
   ],
-  "you": "Siz"
+  "you": "Siz",
+  "buttonExecutionFailed": "Tugmani ishga tushirib bo‘lmadi.",
+  "loadingMoreRelations": "Ko‘proq munosabat yuklanmoqda...",
+  "loadMoreRelations": "Ko‘proq munosabat yuklash"
 }

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "相依關係：",
     "hint": "新增關聯屬性",
-    "relationPropertyAriaLabel": "相依關聯屬性"
+    "relationPropertyAriaLabel": "相依關聯屬性",
+    "makeDependOn": "讓 {{title}} 依賴於 {{predecessor}}",
+    "startFrom": "從 {{title}} 開始依賴關係"
   },
   "toolbar": {
     "today": "今天",

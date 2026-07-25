@@ -8,7 +8,8 @@
     "delete": "Izbriši",
     "clearAll": "Očisti sve",
     "done": "Gotovo",
-    "add": "Dodaj"
+    "add": "Dodaj",
+    "reportIssue": "Prijavi problem"
   },
   "labels": {
     "untitled": "Neimenovano"

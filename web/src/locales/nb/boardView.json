@@ -16,7 +16,7 @@
   "groupName": "Gruppenavn",
   "groupOptions": "{{groupName}} gruppealternativer",
   "groupThisBoard": "Grupper denne tavlen",
-  "groupThisBoardDesc": "Legg til en egenskap for valg eller status for å opprette kolonner.",
+  "groupThisBoardDesc": "Legg til eller velg en Velg-, Status-, Person- eller Flervalg-egenskap for å opprette kolonner.",
   "newGroup": "Ny gruppe",
   "newGroupIn": "Ny {{groupName}}-gruppe i {{dbTitle}}",
   "newPage": "Ny",

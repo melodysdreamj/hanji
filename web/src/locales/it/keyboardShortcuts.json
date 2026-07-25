@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Aggiungi commento",
+    "addLink": "Aggiungi link",
+    "blockColor": "Applica ultimo colore usato",
+    "bold": "Grassetto",
+    "copyPageLink": "Copia collegamento pagina",
+    "findInPage": "Trova in questa pagina",
+    "inlineCode": "Codice in linea",
+    "italic": "Corsivo",
+    "moveBlock": "Sposta blocco in un'altra pagina",
+    "moveBlockDown": "Sposta blocco in giù",
+    "moveBlockUp": "Sposta blocco in su",
+    "movePage": "Sposta pagina corrente",
+    "navigateBack": "Indietro",
+    "navigateForward": "Avanti",
+    "newPage": "Nuova pagina",
+    "openBlockMenu": "Apri azioni blocco",
+    "openKeyboardShortcuts": "Apri scorciatoie da tastiera",
+    "openParentPage": "Apri pagina principale",
+    "quickFind": "Ricerca rapida",
+    "strikethrough": "Barrato",
+    "toggleAllToggles": "Espandi o comprimi tutti i toggle",
+    "toggleSidebar": "Mostra/nascondi barra laterale",
+    "toggleTheme": "Attiva/disattiva modalità scura",
+    "underline": "Sottolineato"
+  },
+  "categories": {
+    "createStyle": "Crea e stile",
+    "editMove": "Modifica e sposta",
+    "popular": "Popolari"
+  },
+  "categoriesLabel": "Categorie di scorciatoie",
+  "close": "Chiudi",
+  "closeBackdrop": "Chiudi scorciatoie da tastiera",
+  "empty": "Nessuna scorciatoia trovata",
+  "keysFor": "Tasti per {{action}}",
+  "or": "o",
+  "searchLabel": "Cerca scorciatoie da tastiera",
+  "searchPlaceholder": "Cerca scorciatoie…",
+  "searchResults": "Risultati di ricerca",
+  "searchTerms": {
+    "toggleTheme": "tema chiaro scuro aspetto"
+  },
+  "title": "Scorciatoie da tastiera"
+}

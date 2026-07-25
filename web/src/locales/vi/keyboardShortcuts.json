@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Thêm bình luận",
+    "addLink": "Thêm liên kết",
+    "blockColor": "Áp dụng màu gần đây",
+    "bold": "Đậm",
+    "copyPageLink": "Sao chép liên kết trang",
+    "findInPage": "Tìm trên trang này",
+    "inlineCode": "Mã nội dòng",
+    "italic": "Nghiêng",
+    "moveBlock": "Di chuyển khối sang trang khác",
+    "moveBlockDown": "Di chuyển khối xuống",
+    "moveBlockUp": "Di chuyển khối lên",
+    "movePage": "Di chuyển trang hiện tại",
+    "navigateBack": "Quay lại",
+    "navigateForward": "Tiến tới",
+    "newPage": "Trang mới",
+    "openBlockMenu": "Mở tác vụ khối",
+    "openKeyboardShortcuts": "Mở phím tắt",
+    "openParentPage": "Mở trang cha",
+    "quickFind": "Tìm nhanh",
+    "strikethrough": "Gạch ngang",
+    "toggleAllToggles": "Mở/thu gọn tất cả bật/tắt",
+    "toggleSidebar": "Chuyển đổi thanh bên",
+    "toggleTheme": "Chuyển đổi chế độ tối",
+    "underline": "Gạch chân"
+  },
+  "categories": {
+    "createStyle": "Tạo & kiểu",
+    "editMove": "Chỉnh sửa & di chuyển",
+    "popular": "Phổ biến"
+  },
+  "categoriesLabel": "Danh mục phím tắt",
+  "close": "Đóng",
+  "closeBackdrop": "Đóng phím tắt",
+  "empty": "Không tìm thấy phím tắt",
+  "keysFor": "Phím cho {{action}}",
+  "or": "hoặc",
+  "searchLabel": "Tìm kiếm phím tắt",
+  "searchPlaceholder": "Tìm phím tắt…",
+  "searchResults": "Kết quả tìm kiếm",
+  "searchTerms": {
+    "toggleTheme": "chủ đề sáng tối giao diện"
+  },
+  "title": "Phím tắt"
+}

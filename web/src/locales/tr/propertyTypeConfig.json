@@ -51,7 +51,14 @@
     "range": "Aralık",
     "earliest_date": "En erken tarih",
     "latest_date": "En son tarih",
-    "date_range": "Tarih aralığı"
+    "date_range": "Tarih aralığı",
+    "count": "Tümünü say",
+    "count_per_group": "Grup başına sayı",
+    "empty": "Boş değer sayısı",
+    "not_empty": "Boş olmayan değer sayısı",
+    "percent_per_group": "Grup başına yüzde",
+    "show_unique": "Benzersiz değerleri göster",
+    "unique": "Benzersiz değer sayısı"
   },
   "undo": "Geri al",
   "untitled": "Başlıksız",

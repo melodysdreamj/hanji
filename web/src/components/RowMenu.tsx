@@ -198,7 +198,7 @@ export function RowMenu({
 
   useEffect(() => {
     if (page?.kind !== "page") return;
-    void loadBlocks(pageId);
+    void loadBlocks(pageId).catch(() => {});
   }, [loadBlocks, page?.kind, pageId]);
 
   // Positioning hook lives before the `!page` early return so hook order stays
@@ -426,23 +426,16 @@ export function RowMenu({
     }
   }
 
-  function toggleVerification() {
-    updatePage(
-      pageId,
-      pageVerified
-        ? {
-            verifiedAt: null,
-            verifiedBy: null,
-            verificationExpiresAt: null,
-          }
-        : {
-            verifiedAt: new Date().toISOString(),
-            verifiedBy: userId || "local-user",
-            verificationExpiresAt: null,
-          }
-    );
-    notify(pageVerified ? t("rowMenu:toast.verificationRemoved") : t("rowMenu:toast.pageVerified"), "success");
-    close();
+  async function exportNativeArchive() {
+    try {
+      const { exportPageAsNativeArchive } = await import("./nativeExport");
+      await exportPageAsNativeArchive(page);
+      notify(t("rowMenu:toast.exportedHanjiArchive"), "success");
+    } catch {
+      notify(t("rowMenu:toast.couldntExportHanjiArchive"), "error");
+    } finally {
+      close();
+    }
   }
 
   async function toggleFavoriteStatus() {
@@ -1014,6 +1007,17 @@ export function RowMenu({
               className={styles.item}
               data-menu-item
               role="menuitem"
+              onClick={() => void exportNativeArchive()}
+            >
+              <Download size={16} aria-hidden="true" />
+              <span>{t("rowMenu:actions.exportAsHanjiArchive")}</span>
+              <span className={styles.itemHint}>.hanji.zip</span>
+            </button>
+            <button
+              type="button"
+              className={styles.item}
+              data-menu-item
+              role="menuitem"
               disabled={!canEditThisPage || !!page.isLocked || importing}
               onClick={() => {
                 if (!canEditThisPage || page.isLocked || importing) return;
@@ -1053,18 +1057,6 @@ export function RowMenu({
             >
               <ClockIcon size={16} aria-hidden="true" />
               <span>{t("rowMenu:actions.pageHistory")}</span>
-            </button>
-            <button
-              type="button"
-              className={styles.item}
-              data-menu-item
-              role="menuitemcheckbox"
-              aria-checked={pageVerified}
-              disabled={!canEditThisPage}
-              onClick={toggleVerification}
-            >
-              <CheckIcon size={16} aria-hidden="true" />
-              <span>{pageVerified ? t("rowMenu:actions.removeVerification") : t("rowMenu:actions.verifyPage")}</span>
             </button>
             <button
               type="button"

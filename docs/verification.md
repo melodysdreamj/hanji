@@ -91,6 +91,28 @@ production appliance's anonymous route remains closed. The launcher restores
 the synthetic master's prior language after each selected run, including a
 failing run.
 
+### Synology support matrix gates
+
+The canonical support matrix separates exact physical evidence, simulator
+evidence, published platforms, and unattached hardware. Check its schema while
+editing deployment guidance:
+
+```bash
+node scripts/verify-synology-support-matrix.mjs --schema
+```
+
+The mutable physical discovery boundary and immutable final replay consume the
+same required cell set:
+
+```bash
+node scripts/verify-synology-support-matrix.mjs --gate mutable
+node scripts/verify-synology-support-matrix.mjs --gate final
+```
+
+Either command fails while any required cell is pending. A published
+multi-platform image or matching CPU architecture cannot satisfy a missing
+physical or simulator evidence cell.
+
 ## Runtime and auth
 
 | Command | What it checks |
@@ -132,6 +154,8 @@ All run as `npm --prefix backend run <command>`.
 | `verify:page-tree-ui` | Sidebar page tree keyboard expansion, focus movement, Home/End edge jumps, nested-page opening, page drag/drop movement, root/nested page reorder, Option/Alt page drag-copy, Private root page move/copy drops, editor block move/copy drops onto tree pages, private-root block drops that create new root pages, tree-menu rename/duplicate/trash persistence, view-only shared-page tree restrictions, and first-page creation in an empty workspace |
 | `verify:workspace-switcher-ui` | Creating a second workspace from the sidebar menu, switching back, and product API cleanup |
 | `verify:identity-lookup-ui` | Organization people lookup in the Share menu, comment/reply `@` mention composers, editor `@` mention picker, and database Person property picker |
+| `verify:multi-user-journey` | Four simultaneous owner/editor/commenter/viewer projections across representative blocks, child pages, databases, presence, live CRDT convergence, write denials, persistence, and cleanup |
+| `verify:admin-permission-journey` | Four live identities through workspace/organization admin promotion and demotion, member/guest transitions, group creation/membership/deletion, direct and group page-role changes, inherited child/database projections, deactivation/reactivation, removal, and explicit unavailable screens |
 
 ## Database UI smokes
 
@@ -176,21 +200,66 @@ HANJI_NOTION_API_BASE=http://127.0.0.1:9797/v1 npm --prefix backend run dev
 npm --prefix backend run verify:notion-import -- --mock-notion-api-base http://127.0.0.1:9797/v1
 ```
 
-To exercise the Notion import web UI, including incomplete discovery report
-surfacing from the same mock Notion API path:
+To exercise both Notion import execution owners from the web UI, including a
+stored-connection/server run and an explicit no-secret/browser run against the
+same mock Notion API contract:
 
 ```bash
 npm --prefix backend run verify:notion-import-ui -- --mock-notion-api-base http://127.0.0.1:9797/v1
 ```
 
-When `HANJI_NOTION_IMPORT_SECRET` is configured (see
-[development.md](development.md#notion-import-secret)), the UI smoke can also
-require the saved token connection path, connection-based discovery, and
-revoke-time UI removal:
+The managed wrapper supplies isolated test-only configuration for each lane,
+collects ordinary lane failures, and restores the normal local runtime once at
+the end. To run only the stored-connection/server lane, use:
 
 ```bash
-npm --prefix backend run verify:notion-import-ui -- --mock-notion-api-base http://127.0.0.1:9797/v1 --expect-stored-connection
+npm --prefix backend run verify:notion-import-ui -- --mock-notion-api-base http://127.0.0.1:9797/v1 --runner-mode stored
 ```
+
+The older `--expect-stored-connection` wrapper option remains accepted with
+the default `both` or explicit `stored` mode. It is consumed by the wrapper and
+is never forwarded into the no-secret browser lane.
+
+## Notion-compatible SQL, Admin API, and MCP governance
+
+Run the focused protocol checks from the repository root:
+
+```bash
+node --test mcp/tests/notion-sql-runtime.test.mjs
+node --test mcp/tests/notion-sql-cursor-admission.test.mjs
+npm --prefix mcp run typecheck
+npm --prefix backend run test -- \
+  tests/unit/mcp-grant-allowlist.test.ts \
+  tests/unit/notion-admin-api.test.ts \
+  tests/unit/mcp-oauth-authorize.test.ts \
+  tests/unit/enterprise-controls.test.ts \
+  tests/unit/workspace-mutation-mcp-governance.test.ts \
+  tests/unit/org-policy-version.test.ts
+```
+
+The SQL runtime suite covers parser and internal expression semantics,
+bind-injection resistance, physical-source discovery, missing-source denial,
+and parser/work/output caps. The cursor-admission and hosted grant suites lock
+the product execution boundary: one physical source, direct-property global
+ordering through canonical cursors, opaque request-bound replay beyond 5,000
+stored rows, bounded empty-window drain, and zero row reads for DISTINCT,
+aggregates/grouping, joins, CTEs/subqueries, unions, and computed ordering.
+
+The Admin API suite locks all 13 `2026-06-01` method/path/capability entries,
+the exact closed error schema, bearer/version/resource isolation, once-displayed
+secret provisioning and revocation, idempotency replay, legal-hold behavior,
+workspace export delegation, and the current PDF-renderer failure. The MCP
+governance suites verify authorization-time rejection, per-operation
+re-checking, all-workspaces filtering, approved-client recovery, blocked-call
+audit records, malformed-policy fail-closed behavior, idempotent retries, and
+atomic actor/control/policy-version/audit transactions under concurrent writes.
+
+`npm --prefix mcp run parity:notion` remains the offline 48-REST/20-MCP
+inventory guard for `2026-03-11`; it does not replace the focused Admin API,
+SQL runtime, or governance tests above. To inspect the corresponding admin UI,
+run `npm --prefix backend run verify:enterprise-settings-visual` against the
+local runtime; it checks the Admin API base/version/token panel and the MCP
+approved-connections controls with synthetic data.
 
 ## MCP live smoke
 

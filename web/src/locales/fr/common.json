@@ -8,7 +8,8 @@
     "delete": "Supprimer",
     "clearAll": "Tout effacer",
     "done": "Terminé",
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "reportIssue": "Signaler un problème"
   },
   "labels": {
     "untitled": "Sans titre"

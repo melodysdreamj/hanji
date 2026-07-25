@@ -4,7 +4,22 @@
     "count": "Antal",
     "max": "Maks",
     "min": "Min",
-    "sum": "Sum"
+    "sum": "Sum",
+    "checked": "Markeret",
+    "count_values": "Tæl værdier",
+    "date_range": "Datointerval",
+    "earliest_date": "Tidligste dato",
+    "empty": "Tæl tomme",
+    "latest_date": "Seneste dato",
+    "median": "Median",
+    "not_empty": "Tæl ikke tom",
+    "percent_checked": "Procent markeret",
+    "percent_empty": "Procent tom",
+    "percent_not_empty": "Procent ikke tom",
+    "percent_unchecked": "Procent ikke markeret",
+    "range": "Interval",
+    "unchecked": "Ikke markeret",
+    "unique": "Tæl unikke værdier"
   },
   "chartAria": "{{name}} diagram",
   "chartType": "Diagramtype",
@@ -27,5 +42,9 @@
   "untitledProperty": "Unavngivet",
   "valueProperty": "Værdiegenskab",
   "xAxis": "X-akse",
-  "yAxis": "Y-akse"
+  "yAxis": "Y-akse",
+  "dateRangeDays": "{{count}} dage",
+  "missingProperty": "den gemte egenskab",
+  "unsupportedAggregateDesc": "{{aggregate}} kan ikke beregnes ud fra {{property}}. Vælg en kompatibel egenskab eller beregning.",
+  "unsupportedAggregateTitle": "Denne diagramberegning er ikke tilgængelig"
 }

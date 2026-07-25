@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} ਬੈਕਲਿੰਕ",
-    "count_other": "{{count}} ਬੈਕਲਿੰਕ"
+    "count_other": "{{count}} ਬੈਕਲਿੰਕ",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlink"
   },
   "header": {
     "title": "ਲਿੰਕ ਕੀਤੇ ਜ਼ਿਕਰ"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ਜ਼ਿਕਰ",
     "mention_other": "{{count}} ਜ਼ਿਕਰ",
     "link_one": "{{count}} ਲਿੰਕ",
-    "link_other": "{{count}} ਲਿੰਕ"
+    "link_other": "{{count}} ਲਿੰਕ",
+    "loaded": "ਲੋਡ ਕੀਤਾ: {{summary}}"
   },
   "kind": {
     "mention": "ਜ਼ਿਕਰ",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ਹੋਰ ਬੈਕਲਿੰਕ",
-    "count_other": "{{count}} ਹੋਰ ਬੈਕਲਿੰਕ"
+    "count_other": "{{count}} ਹੋਰ ਬੈਕਲਿੰਕ",
+    "load": "ਹੋਰ ਬੈਕਲਿੰਕ ਲੋਡ ਕਰੋ",
+    "loading": "ਬੈਕਲਿੰਕ ਲੋਡ ਹੋ ਰਹੇ ਹਨ...",
+    "search": "ਬੈਕਲਿੰਕ ਖੋਜ"
   }
 }

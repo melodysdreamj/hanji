@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "面包屑",
+  "clearSearch": "清除搜索",
+  "errors": {
+    "not-found": "此站点可能已取消发布或其地址可能已更改。",
+    "offline": "检查你的连接，然后重新打开站点。",
+    "rate-limited": "此站点正在接收过多请求。请稍候再试。",
+    "unavailable": "Hanji 现在无法打开此站点。请稍后重试。"
+  },
+  "madeWithHanji": "使用 Hanji 制作",
+  "navigation": "站点导航",
+  "noResults": "未找到页面",
+  "outsideSite": "此页面不属于此已发布的站点。",
+  "search": "搜索此站点",
+  "tryAgain": "重试",
+  "unavailable": "此站点不可用。"
+}

@@ -22,15 +22,25 @@ import {
   applyView,
   applyViewFilterSeeds,
   effectiveFilterGroup,
+  projectCardViewSubitems,
   viewFilterSeedValues,
   visibleViewProperties,
 } from "./query";
+import { CardSubitemMeta } from "./CardSubitemMeta";
 import { cardCoverValue, coverBackground, hasCardPreview } from "./cardPreview";
 import { COLOR_NAMES, chipStyle, nextColor } from "./colors";
 import { NotionSelect } from "./NotionSelect";
 import { localizedPropertyTypeLabel } from "./propertyTypes";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
 import { PropValue } from "./PropValue";
+import {
+  boardGroupOptions,
+  boardGroupReplacementValue,
+  boardGroupValueIds,
+  hasEditableBoardGroupOptions,
+  isBoardMainGroupProperty,
+} from "./boardGrouping";
+import { personInitials } from "./people";
 import { useRowContextMenu, type RowOpenMode } from "./useRowContextMenu";
 import { Plus } from "../icons";
 import { PageIconGlyph } from "../PageIcon";
@@ -154,6 +164,7 @@ export function BoardView({
   db,
   view,
   rows: rowsProp,
+  rowsViewApplied = false,
   readOnly = false,
   search,
   contextPageId,
@@ -164,6 +175,7 @@ export function BoardView({
   db: Page;
   view: DbView;
   rows?: Page[];
+  rowsViewApplied?: boolean;
   readOnly?: boolean;
   search?: string;
   contextPageId?: string;
@@ -178,6 +190,8 @@ export function BoardView({
   const storeRows = useStore(useShallow((s) => s.dbRows(db.id)));
   const rows = rowsProp ?? storeRows;
   const pagesById = useStore(useShallow((s) => s.pagesById));
+  const workspaceMembers = useStore(useShallow((s) => s.workspaceMembers));
+  const currentUserId = useStore((s) => s.userId);
   const addRow = useStore((s) => s.addRow);
   const addProperty = useStore((s) => s.addProperty);
   const updateProperty = useStore((s) => s.updateProperty);
@@ -194,6 +208,7 @@ export function BoardView({
   const [groupNameDraft, setGroupNameDraft] = useState("");
   const [groupMenuPos, setGroupMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [moveAnnouncement, setMoveAnnouncement] = useState("");
+  const draggingSourceGroupRef = useRef<string | null>(null);
   const groupMenuReturnRef = useRef<HTMLButtonElement | null>(null);
   const groupMenuRef = useRef<HTMLDivElement>(null);
   const groupMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -204,17 +219,26 @@ export function BoardView({
       onOpenRowIn,
     });
 
-  const groupProp =
-    props.find((p) => p.id === view.config?.groupBy) ??
-    props.find((p) => p.type === "select" || p.type === "status");
+  const configuredGroupProp = props.find((p) => p.id === view.config?.groupBy);
+  const groupProp = isBoardMainGroupProperty(configuredGroupProp)
+    ? configuredGroupProp
+    : props.find(isBoardMainGroupProperty);
 
   // Memoized like TableView's `shown`: applyView runs a full search-filter +
   // filter-group + multi-key sort over every loaded row, and board renders on
   // high-frequency drag-over/hover state changes.
   const shown = useMemo(
-    () => applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
-    [rows, props, view, pagesById, search, contextPageId]
+    () =>
+      rowsViewApplied
+        ? rows
+        : applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
+    [rows, rowsViewApplied, props, view, pagesById, search, contextPageId]
   );
+  const cardSubitems = useMemo(
+    () => projectCardViewSubitems(db, view, shown),
+    [db, shown, view]
+  );
+  const cardRows = cardSubitems.rows;
   const cardProps = visibleViewProperties(props, view).filter(
     (p) => p.type !== "title" && p.id !== groupProp?.id
   );
@@ -348,7 +372,8 @@ export function BoardView({
     return subGroupOptions.some((o) => o.id === id) ? String(id) : "__none";
   };
 
-  const allGroupOptions = groupProp.config?.options ?? [];
+  const allGroupOptions = boardGroupOptions(groupProp, cardRows, workspaceMembers, currentUserId);
+  const groupOptionsEditable = hasEditableBoardGroupOptions(groupProp);
   const groupPropertyName = groupProp.name || generatedLabels.untitled;
   const subGroupPropertyName = subGroupProp?.name || generatedLabels.untitled;
   const allowedGroupIds = filteredBoardGroupOptions(view, groupProp.id, allGroupOptions);
@@ -368,11 +393,8 @@ export function BoardView({
   const knownGroupIds = new Set(allGroupOptions.map((option) => option.id));
   const unknownGroupOptions: SelectOption[] = Array.from(
     new Set(
-      shown
-        .map((row) => {
-          const v = row.properties?.[groupProp.id];
-          return Array.isArray(v) ? v[0] : v;
-        })
+      cardRows
+        .flatMap((row) => boardGroupValueIds(groupProp, row.properties?.[groupProp.id]))
         .filter((id): id is string => typeof id === "string" && id !== "" && !knownGroupIds.has(id))
     )
   ).map((id) => ({ id, name: id, color: "default" }));
@@ -389,18 +411,19 @@ export function BoardView({
   const newGroupText = t("boardView:newGroup");
   const newGroupLabel = t("boardView:newGroupIn", { dbTitle, groupName: groupPropertyName });
 
-  // One bucketing pass over `shown` instead of a full shown.filter per column
+  // One bucketing pass over the projected cards instead of a full filter per column
   // (O(rows) instead of O(rows × columns) per render). Ungrouped rows land in
   // the status-default column when one exists — same predicate the old
-  // per-column filter used — and shown order is preserved within each bucket.
+  // per-column filter used — and view order is preserved within each bucket.
   const rowsByGroup = new Map<string, Page[]>();
-  for (const r of shown) {
-    const v = r.properties?.[groupProp.id];
-    const id = Array.isArray(v) ? v[0] : v;
-    const key = !id ? statusDefault?.id ?? "__none" : String(id);
-    const bucket = rowsByGroup.get(key);
-    if (bucket) bucket.push(r);
-    else rowsByGroup.set(key, [r]);
+  for (const r of cardRows) {
+    const ids = boardGroupValueIds(groupProp, r.properties?.[groupProp.id]);
+    const keys = ids.length > 0 ? ids : [statusDefault?.id ?? "__none"];
+    for (const key of keys) {
+      const bucket = rowsByGroup.get(key);
+      if (bucket) bucket.push(r);
+      else rowsByGroup.set(key, [r]);
+    }
   }
   const rowsFor = (opt: SelectOption | null) => rowsByGroup.get(groupKey(opt)) ?? [];
 
@@ -429,7 +452,14 @@ export function BoardView({
     // For status group-by, ungrouped cards land in the default (first) option,
     // so seed that value when no explicit group was given (#89).
     const groupOpt = opt ?? statusDefault;
-    if (groupOpt) setRowProperty(row.id, groupProp!.id, groupOpt.id, { debounce: false });
+    if (groupOpt) {
+      setRowProperty(
+        row.id,
+        groupProp!.id,
+        boardGroupReplacementValue(groupProp!, groupOpt.id),
+        { debounce: false }
+      );
+    }
     openRow(row.id);
   }
 
@@ -460,6 +490,7 @@ export function BoardView({
   }
 
   function clearCardDrag() {
+    draggingSourceGroupRef.current = null;
     setDraggingId(null);
     setDragOverGroup(null);
     setDropTarget(null);
@@ -471,15 +502,18 @@ export function BoardView({
     if (readOnly) return clearCardDrag();
     const id = draggingId;
     if (!id) return;
+    const currentRow = cardRows.find((row) => row.id === id);
     const targetGroupId = opt?.id ?? (statusDefault ? statusDefault.id : null);
-    const cur = shown.find((r) => r.id === id);
-    const curGroup = (() => {
-      const v = cur?.properties?.[groupProp!.id];
-      const raw = Array.isArray(v) ? v[0] : v;
-      return raw ?? (statusDefault ? statusDefault.id : null);
-    })();
-    if (curGroup !== targetGroupId) {
-      setRowProperty(id, groupProp!.id, opt?.id ?? null, { debounce: false });
+    const targetGroupKey = targetGroupId ?? "__none";
+    const sourceGroupKey = draggingSourceGroupRef.current;
+    const sameMainGroup = sourceGroupKey === targetGroupKey;
+    if (!sameMainGroup) {
+      setRowProperty(
+        id,
+        groupProp!.id,
+        boardGroupReplacementValue(groupProp!, targetGroupId),
+        { debounce: false }
+      );
     }
     if (index != null) {
       // The drop index was computed against the full column (which may include
@@ -497,12 +531,12 @@ export function BoardView({
       // target sub-group from the drop neighbours so the card stays put; if the
       // neighbours disagree (a boundary), defer to the following card, falling
       // back to the preceding one at the very end of the column.
-      if (subGroupProp && curGroup === targetGroupId) {
+      if (subGroupProp && sameMainGroup) {
         const before = prev;
         const after = next;
         const targetSubKey =
           after != null ? subKeyOf(after) : before != null ? subKeyOf(before) : null;
-        if (targetSubKey != null && targetSubKey !== subKeyOf(cur!)) {
+        if (currentRow && targetSubKey != null && targetSubKey !== subKeyOf(currentRow)) {
           setRowProperty(id, subGroupProp.id, targetSubKey === "__none" ? null : targetSubKey, {
             debounce: false,
           });
@@ -515,12 +549,12 @@ export function BoardView({
   }
 
   function updateGroupOptions(next: SelectOption[]) {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     updateProperty(groupProp!.id, { config: { ...groupProp!.config, options: next } });
   }
 
   function reorderGroup(sourceId: string, targetId: string) {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     // Reorder within the FULL option list (allGroupOptions), not the filtered
     // visible subset, so hidden options survive a filtered-board reorder.
     const next = reorderGroupOptionsById(allGroupOptions, sourceId, targetId);
@@ -531,7 +565,7 @@ export function BoardView({
   }
 
   function moveGroupByKeyboard(sourceId: string, direction: -1 | 1) {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     const sourceIndex = allGroupOptions.findIndex((option) => option.id === sourceId);
     const targetIndex = sourceIndex + direction;
     if (sourceIndex < 0 || targetIndex < 0 || targetIndex >= allGroupOptions.length) return;
@@ -565,7 +599,12 @@ export function BoardView({
       const target = options[nextGroupIndex];
       if (currentGroupIndex < 0 || target === undefined) return false;
       event.preventDefault();
-      setRowProperty(row.id, groupProp!.id, target?.id ?? null, { debounce: false });
+      setRowProperty(
+        row.id,
+        groupProp!.id,
+        boardGroupReplacementValue(groupProp!, target?.id ?? null),
+        { debounce: false }
+      );
       const targetRows = colRowsFor(target).filter((candidate) => candidate.id !== row.id);
       const last = targetRows.at(-1);
       if (last) void moveDatabaseRow(row.id, last.id, "after");
@@ -590,14 +629,14 @@ export function BoardView({
   }
 
   function patchGroupOption(id: string, patch: Partial<SelectOption>) {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     // Patch by id across the FULL option list; mapping over the visible subset
     // would drop the filtered-out options when written back.
     updateGroupOptions(allGroupOptions.map((opt) => (opt.id === id ? { ...opt, ...patch } : opt)));
   }
 
   function openGroupMenu(opt: SelectOption, trigger?: HTMLButtonElement | null) {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     groupMenuReturnRef.current = trigger ?? null;
     groupMenuTriggerRef.current = trigger ?? null;
     setGroupMenuId(opt.id);
@@ -612,7 +651,7 @@ export function BoardView({
   }
 
   function addGroup() {
-    if (readOnly) return;
+    if (readOnly || !groupOptionsEditable) return;
     const opt: SelectOption = {
       id: newId(),
       name: newGroupText,
@@ -701,7 +740,7 @@ export function BoardView({
       data-size={cardSize}
       data-imported-notion={isImportedNotionView ? "true" : undefined}
     >
-      {shown.length === 0 && !isImportedNotionView && (
+      {cardRows.length === 0 && !isImportedNotionView && (
         <div className={styles.boardHint}>
           <div className={styles.viewEmptyTitle}>
             {rows.length === 0 ? t("boardView:emptyTitle") : t("boardView:noResultsTitle")}
@@ -724,7 +763,11 @@ export function BoardView({
             onDragOver={(e) => {
               if (readOnly) return;
               const types = Array.from(e.dataTransfer.types);
-              if (opt && (draggingGroupId || types.includes(BOARD_GROUP_DRAG))) {
+              if (
+                groupOptionsEditable &&
+                opt &&
+                (draggingGroupId || types.includes(BOARD_GROUP_DRAG))
+              ) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = "move";
                 setDragOverColumnId(key);
@@ -751,7 +794,7 @@ export function BoardView({
               if (readOnly) return;
               e.preventDefault();
               const sourceGroupId = e.dataTransfer.getData(BOARD_GROUP_DRAG) || draggingGroupId;
-              if (opt && sourceGroupId) {
+              if (groupOptionsEditable && opt && sourceGroupId) {
                 reorderGroup(sourceGroupId, opt.id);
                 return;
               }
@@ -763,10 +806,10 @@ export function BoardView({
           >
             <div
               className={styles.boardColHead}
-              draggable={!readOnly && !!opt}
+              draggable={!readOnly && groupOptionsEditable && !!opt}
               data-group-dragging={draggingGroupId === opt?.id ? "true" : undefined}
               onDragStart={(e) => {
-                if (readOnly || !opt) return;
+                if (readOnly || !groupOptionsEditable || !opt) return;
                 const target = e.target as HTMLElement;
                 if (target.closest("[data-no-group-drag]")) {
                   e.preventDefault();
@@ -781,7 +824,7 @@ export function BoardView({
                 setDragOverColumnId(null);
               }}
             >
-              {opt ? (
+              {opt && groupOptionsEditable ? (
                 <>
                   {!readOnly && (
                     <span
@@ -813,13 +856,20 @@ export function BoardView({
                     </span>
                   </button>
                 </>
+              ) : opt ? (
+                <span className={styles.personChip}>
+                  <span className={styles.personAvatar} aria-hidden="true">
+                    {personInitials(opt.id, currentUserId)}
+                  </span>
+                  <span>{opt.name}</span>
+                </span>
               ) : (
                 <span className={styles.boardNoGroup}>
                   {t("boardView:noValue", { groupName: groupPropertyName })}
                 </span>
               )}
               <span className={styles.boardCount}>{colRows.length}</span>
-              {opt && !readOnly && (
+              {opt && groupOptionsEditable && !readOnly && (
                 <>
                   <button
                     type="button"
@@ -964,6 +1014,7 @@ export function BoardView({
                           return;
                         }
                         setDraggingId(row.id);
+                        draggingSourceGroupRef.current = key;
                         e.dataTransfer.effectAllowed = "move";
                         e.dataTransfer.setData(BOARD_CARD_DRAG, row.id);
                       }}
@@ -1018,6 +1069,11 @@ export function BoardView({
                         {cardProps.map((p) => (
                           <PropValue key={p.id} row={row} prop={p} interactive={false} />
                         ))}
+                        <CardSubitemMeta
+                          row={row}
+                          pagesById={pagesById}
+                          presentation={cardSubitems}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1044,7 +1100,7 @@ export function BoardView({
           </div>
         );
       })}
-      {!readOnly && (
+      {!readOnly && groupOptionsEditable && (
         <button
           ref={addGroupButtonRef}
           type="button"

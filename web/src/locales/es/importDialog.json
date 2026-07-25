@@ -247,7 +247,9 @@
     "runningHint": "Mantén esta pestaña abierta mientras se ejecuta la importación.",
     "noJobHint": "Inicia el descubrimiento desde el paso Alcance primero.",
     "applyLocksHint": "Al aplicar se escriben los elementos descubiertos en este espacio de trabajo.",
-    "browserRunnerWarning": "Esta importación se está ejecutando en esta pestaña del navegador. Mantén la pestaña abierta hasta que finalice. Cerrar o recargar la pestaña pausa el procesamiento; al abrir Hanji de nuevo se reanuda desde el progreso guardado."
+    "browserRunnerWarning": "Esta importación se está ejecutando en esta pestaña del navegador. Mantén la pestaña abierta hasta que finalice. Cerrar o recargar la pestaña pausa el procesamiento; al abrir Hanji de nuevo se reanuda desde el progreso guardado.",
+    "serverRunnerStatus": "Hanji está procesando esta importación en el servidor. Cerrar o recargar la pestaña no la pausará.",
+    "serverRunningHint": "La importación continúa en segundo plano. Puedes cerrar esta pestaña."
   },
   "installer": {
     "elapsed": "Transcurrido",
@@ -281,9 +283,9 @@
     "title": "Importar desde Hanji",
     "fromFile": "Desde un archivo",
     "fromLive": "Desde una instancia activa",
-    "choose": "Elige un archivo .hanji.json",
+    "choose": "Selecciona un archivo .hanji.json o .hanji.zip",
     "chooseButton": "Seleccionar archivo",
-    "fileHint": "Exporta una página, base de datos o espacio de trabajo de otro Hanji e impórtalo aquí. Las relaciones, rollups, fórmulas, vistas y plantillas se conservan. No se incluyen archivos adjuntos.",
+    "fileHint": "Usa .hanji.json solo para la estructura (archivos excluidos), o .hanji.zip para una transferencia sin pérdidas (archivos incluidos). Las relaciones, rollups, fórmulas, vistas y plantillas se conservan.",
     "selected": "Seleccionado: {{name}}",
     "importButton": "Importar",
     "importing": "Importando...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "opcional",
     "fetch": "Obtener exportación",
     "fetching": "Obteniendo...",
-    "liveHint": "Obtén un espacio de trabajo directamente de otro Hanji en ejecución (por ejemplo, una instancia de desarrollo de Docker). El remoto debe permitir solicitudes desde esta dirección.",
+    "liveHint": "Extrae un espacio de trabajo directamente desde otra instancia de Hanji en ejecución (por ejemplo, una instancia de desarrollo de Docker). Los archivos se excluyen. El remoto debe permitir solicitudes desde esta dirección.",
     "review": "Listo para importar: {{summary}}",
     "placeholderNote": "Algunos archivos adjuntos quedaron como marcadores de posición.",
     "importedItems_one": "Importado {{count}} elemento del archivo de Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "No se pudo leer el archivo de Hanji.",
     "cantImport": "No se pudo importar el archivo de Hanji.",
     "needFile": "Primero elige un archivo de Hanji.",
-    "needRemote": "Ingresa la URL remota de Hanji y el ID del espacio de trabajo."
+    "needRemote": "Ingresa la URL remota de Hanji y el ID del espacio de trabajo.",
+    "filesExcluded": "Archivos excluidos.",
+    "filesIncluded": "Archivos incluidos."
   },
   "connectWithNotion": "Conectar con Notion",
   "oauthConfiguredHint": "Este servidor tiene una integración OAuth de Notion configurada. La configuración de tokens sigue disponible para conexiones autoalojadas.",
-  "cantStartOAuth": "No se pudo iniciar la conexión de Notion."
+  "cantStartOAuth": "No se pudo iniciar la conexión de Notion.",
+  "terminal": {
+    "cancelled": "La importación se canceló. Puedes iniciarla de nuevo cuando estés listo.",
+    "failed": "La importación se detuvo de forma segura antes de finalizar. Verifica la conexión y vuelve a intentarlo. Los detalles técnicos y los identificadores están ocultos aquí."
+  }
 }

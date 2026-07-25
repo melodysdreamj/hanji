@@ -4,7 +4,22 @@
     "sum": "Összeg",
     "average": "Átlag",
     "min": "Min",
-    "max": "Max"
+    "max": "Max",
+    "checked": "Bejelölve",
+    "count_values": "Értékek száma",
+    "date_range": "Dátumtartomány",
+    "earliest_date": "Legkorábbi dátum",
+    "empty": "Üresek száma",
+    "latest_date": "Legkésőbbi dátum",
+    "median": "Medián",
+    "not_empty": "Nem üresek száma",
+    "percent_checked": "Bejelöltek aránya",
+    "percent_empty": "Üresek aránya",
+    "percent_not_empty": "Nem üresek aránya",
+    "percent_unchecked": "Bejelöletlenek aránya",
+    "range": "Tartomány",
+    "unchecked": "Bejelöletlen",
+    "unique": "Egyedi értékek száma"
   },
   "chartAria": "{{name}} diagram",
   "chartType": "Diagram típusa",
@@ -27,5 +42,9 @@
   "untitledProperty": "Névtelen",
   "valueProperty": "Érték tulajdonság",
   "xAxis": "X-tengely",
-  "yAxis": "Y-tengely"
+  "yAxis": "Y-tengely",
+  "dateRangeDays": "{{count}} nap",
+  "missingProperty": "a mentett tulajdonság",
+  "unsupportedAggregateDesc": "{{aggregate}} nem számítható a {{property}} tulajdonságból. Válassz egy kompatibilis tulajdonságot vagy számítást.",
+  "unsupportedAggregateTitle": "Ez a diagramszámítás nem érhető el."
 }

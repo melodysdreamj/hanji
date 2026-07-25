@@ -6,8 +6,14 @@ import {
   type RollupPage,
   type RollupProperty,
 } from '../../shared/database/rollup-core';
-import { evaluateFormulaExpression } from '../../shared/database/formula-core';
 import {
+  evaluateFormulaExpression,
+  formatFormulaValue as formatFormulaCoreValue,
+  type FormulaValue,
+} from '../../shared/database/formula-core';
+import { formulaPropertyValue } from '../lib/formula-property-value';
+import {
+  boundedDb,
   boundedDbFromPageHint,
   boundedDbFromPermissionHint,
   boundedDbFromShareToken,
@@ -20,13 +26,16 @@ import { assertOrganizationDlpPolicy, organizationDlpPolicyAllows } from '../lib
 import { assertOrganizationSharingPolicy, organizationSharingPolicyAllows } from '../lib/org-policy';
 import {
   canManagePageAccess as sharedCanManagePageAccess,
-  pageAccessRole as sharedPageAccessRole,
+  pageAccessDecision as sharedPageAccessDecision,
 } from '../lib/page-access';
 import { upsertNotification } from '../lib/notifications';
-import { flushOrganizationAuditOutbox } from '../lib/organization-audit-outbox';
+import { workspaceMembershipForUser } from '../lib/notification-recipient-access';
+import { verifyDomainTxtRecord } from '../lib/domain-verification';
+import { customDomainCapability } from '../lib/custom-domain-config';
 
 import {
   bestEffort,
+  getExisting,
   listAll,
   requireString,
   nowIso,
@@ -50,6 +59,8 @@ import type {
   PagePermission,
   PrincipalType,
   ShareLink,
+  SiteConfig,
+  SiteRouteIndex,
   TableRef as AppTableRef,
   Workspace,
   WorkspaceMember,
@@ -86,17 +97,34 @@ interface DbRef extends TransactDb {
   table<T>(name: string): TableRef<T>;
 }
 
+interface NotionImportMapping {
+  id: string;
+  workspaceId: string;
+  jobId: string;
+  mappingKey?: string;
+  notionId: string;
+  notionType: string;
+  localId: string;
+  localType: string;
+  relationKind: string;
+}
+
 type FunctionContext = Omit<AppFunctionContext, 'admin' | 'storage'> & {
-  admin: { db(namespace: string): DbRef };
+  admin: { db(namespace: string, instanceId?: string): DbRef };
   storage?: FunctionStorageProxy;
 };
 
 
-type FormulaValue = string | number | boolean | null;
 type ComputedValue = FormulaValue;
 type ComputedMap = Record<string, Record<string, { value: ComputedValue; formatted: string }>>;
 
 const roles = new Set<ShareRole>(['view', 'comment', 'edit', 'full_access']);
+const PUBLIC_LINKED_DATABASE_MAPPING_LIMIT = 100;
+const PUBLIC_LINKED_DATABASE_VIEW_LIMIT = 10_000;
+const PUBLIC_LINKED_DATABASE_MAPPING_KINDS = new Set([
+  'database_container',
+  'database_container_inferred_from_view_context',
+]);
 const principalTypes = new Set<PrincipalType>(['user', 'email', 'group', 'integration']);
 const roleAliases: Record<string, ShareRole> = {
   view: 'view',
@@ -149,6 +177,36 @@ const permissionRefSchema = v.object({
 const publicPageSchema = v.object({
   token: v.optional(v.string({ min: 1, max: 256 })),
   shareId: v.optional(v.string({ min: 1, max: 256 })),
+  snapshotVersion: v.optional(v.string({ min: 1, max: 128 })),
+});
+
+const siteAppearanceSchema = v.object({
+  title: v.string({ min: 1, max: 200, trim: true }),
+  description: v.optional(v.string({ max: 2_000, trim: true })),
+  theme: v.oneOf(['system', 'light', 'dark'] as const),
+  showBreadcrumbs: v.boolean(),
+  showSearch: v.boolean(),
+  showBranding: v.boolean(),
+  navigationPageIds: v.array(v.id(), { max: 12 }),
+});
+
+const publishSiteSchema = v.object({
+  pageId: v.id(),
+  slug: v.string({ min: 1, max: 60, trim: true }),
+  customHostname: v.nullish(v.string({ max: 253, trim: true })),
+  config: siteAppearanceSchema,
+});
+
+const unpublishSiteSchema = v.object({
+  pageId: v.id(),
+});
+
+const validateSiteDomainSchema = v.object({
+  pageId: v.id(),
+});
+
+const publicSiteSchema = v.object({
+  slug: v.optional(v.string({ min: 1, max: 60, trim: true })),
   snapshotVersion: v.optional(v.string({ min: 1, max: 128 })),
 });
 
@@ -511,6 +569,24 @@ function pageNotionDatabaseId(page: Page) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
+function pageNotionImportJobId(page: Page) {
+  const value = page.notionImportJobId ?? page.properties?.notionImportJobId;
+  return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+function notionScopeIdQueryVariants(value: string) {
+  const raw = value
+    .trim()
+    .replace(/^collection:\/\//i, '')
+    .replace(/^data_source:\/\//i, '')
+    .toLowerCase();
+  const normalized = normalizeNotionScopeId(raw);
+  const canonicalUuid = normalized && /^[a-f0-9]{32}$/.test(normalized)
+    ? `${normalized.slice(0, 8)}-${normalized.slice(8, 12)}-${normalized.slice(12, 16)}-${normalized.slice(16, 20)}-${normalized.slice(20)}`
+    : undefined;
+  return Array.from(new Set([raw, normalized, canonicalUuid].filter((item): item is string => !!item)));
+}
+
 function isNotionLinkedDatabaseSourceUnavailable(page: Page) {
   return page.properties?.notionLinkedDatabaseSourceUnavailable === true;
 }
@@ -537,24 +613,191 @@ function notionParentDatabaseId(view: DbView) {
   return typeof fallback === 'string' ? fallback : undefined;
 }
 
+function isPublicLinkedDatabaseAliasMapping(
+  mapping: NotionImportMapping,
+  requestedDatabase: Page,
+  jobId: string,
+  targetNotionDatabaseId: string,
+) {
+  return mapping.workspaceId === requestedDatabase.workspaceId
+    && mapping.jobId === jobId
+    && mapping.localType === 'database'
+    && mapping.notionType === 'database'
+    && normalizeNotionScopeId(mapping.notionId) === targetNotionDatabaseId;
+}
+
+type PublicLinkedDatabaseSourceLocator =
+  | { mode: 'deny' }
+  | { mode: 'mapped'; sourceIds: string[] }
+  | { mode: 'job_views'; jobId: string };
+
+function classifyPublicLinkedDatabaseMappings(
+  mappings: NotionImportMapping[],
+  requestedDatabase: Page,
+  jobId: string,
+  targetNotionDatabaseId: string,
+): PublicLinkedDatabaseSourceLocator {
+  if (mappings.length === 0) return { mode: 'job_views', jobId };
+  if (mappings.some((mapping) => !isPublicLinkedDatabaseAliasMapping(
+    mapping,
+    requestedDatabase,
+    jobId,
+    targetNotionDatabaseId,
+  ))) {
+    return { mode: 'deny' };
+  }
+  if (mappings.every((mapping) => PUBLIC_LINKED_DATABASE_MAPPING_KINDS.has(mapping.relationKind))) {
+    return { mode: 'mapped', sourceIds: mappings.map((mapping) => mapping.localId) };
+  }
+  if (mappings.every((mapping) => (
+    mapping.relationKind === 'database_placeholder'
+    && mapping.localId === requestedDatabase.id
+  ))) {
+    return { mode: 'job_views', jobId };
+  }
+  return { mode: 'deny' };
+}
+
+async function publicLinkedDatabaseSourceLocator(
+  db: DbRef,
+  requestedDatabase: Page,
+  rawNotionDatabaseId: string,
+  targetNotionDatabaseId: string,
+): Promise<PublicLinkedDatabaseSourceLocator> {
+  const jobId = pageNotionImportJobId(requestedDatabase);
+  if (!jobId) return { mode: 'deny' };
+  const mappingsTable = db.table<NotionImportMapping>('notion_import_mappings');
+  const mappingKey = `${jobId}:${targetNotionDatabaseId}`;
+  const currentMappings = await listAll(
+    mappingsTable.where('mappingKey', '==', mappingKey),
+    {
+      maxItems: 1,
+      pageSize: 1,
+      label: 'Public linked-database current alias mapping',
+    },
+  );
+  // A present current mapping is the durable locator. Contradictory content
+  // fails closed instead of falling through to an older, weaker locator.
+  if (currentMappings.length > 0) {
+    return classifyPublicLinkedDatabaseMappings(
+      currentMappings,
+      requestedDatabase,
+      jobId,
+      targetNotionDatabaseId,
+    );
+  }
+
+  const notionIdVariants = notionScopeIdQueryVariants(rawNotionDatabaseId);
+  if (notionIdVariants.length === 0) return { mode: 'deny' };
+  const jobMappingsQuery = mappingsTable.where('jobId', '==', jobId);
+  if (typeof jobMappingsQuery.where !== 'function') {
+    throw new Error('Public linked-database legacy mapping lookup requires chained filters.');
+  }
+  const jobMappings = await listAll(
+    jobMappingsQuery.where('notionId', 'in', notionIdVariants),
+    {
+      maxItems: PUBLIC_LINKED_DATABASE_MAPPING_LIMIT,
+      pageSize: PUBLIC_LINKED_DATABASE_MAPPING_LIMIT,
+      label: 'Public linked-database legacy alias mappings',
+    },
+  );
+  return classifyPublicLinkedDatabaseMappings(
+    jobMappings,
+    requestedDatabase,
+    jobId,
+    targetNotionDatabaseId,
+  );
+}
+
 async function resolvePublicImportedLinkedDatabaseSource(
   db: DbRef,
   requestedDatabase: Page,
 ) {
   if (!isNotionLinkedDatabaseSourceUnavailable(requestedDatabase)) return null;
-  const targetNotionDatabaseId = normalizeNotionScopeId(pageNotionDatabaseId(requestedDatabase));
+  const rawNotionDatabaseId = pageNotionDatabaseId(requestedDatabase);
+  if (!rawNotionDatabaseId) return null;
+  const targetNotionDatabaseId = normalizeNotionScopeId(rawNotionDatabaseId);
   if (!targetNotionDatabaseId) return null;
 
-  const views = await listAll(db.table<DbView>('db_views'));
-  const scopedViews = views
+  const locator = await publicLinkedDatabaseSourceLocator(
+    db,
+    requestedDatabase,
+    rawNotionDatabaseId,
+    targetNotionDatabaseId,
+  );
+  if (locator.mode === 'deny') return null;
+
+  let candidateViews: DbView[];
+  let candidateSourceIds: string[];
+  if (locator.mode === 'mapped') {
+    candidateSourceIds = Array.from(new Set(
+      locator.sourceIds.filter((id) => id && id !== requestedDatabase.id),
+    ));
+    candidateViews = [];
+  } else {
+    const jobViews = await listAll(
+      db.table<DbView>('db_views').where('notionImportJobId', '==', locator.jobId),
+      {
+        maxItems: PUBLIC_LINKED_DATABASE_VIEW_LIMIT,
+        pageSize: 1_000,
+        label: 'Public linked-database legacy job views',
+      },
+    );
+    candidateViews = jobViews
+      .filter((view) => normalizeNotionScopeId(notionParentDatabaseId(view)) === targetNotionDatabaseId)
+      .sort(bySortPos);
+    candidateSourceIds = Array.from(new Set(
+      candidateViews
+        .map((view) => view.databaseId)
+        .filter((id) => id && id !== requestedDatabase.id),
+    ));
+  }
+  if (candidateSourceIds.length === 0) return null;
+  if (candidateSourceIds.length > PUBLIC_LINKED_DATABASE_MAPPING_LIMIT) {
+    throw Object.assign(
+      new Error(
+        `Public linked-database source candidate limit exceeded (${PUBLIC_LINKED_DATABASE_MAPPING_LIMIT} databases).`,
+      ),
+      { status: 413 },
+    );
+  }
+
+  const sourcePagesRead = listAll(
+    db.table<Page>('pages').where('id', 'in', candidateSourceIds),
+    {
+      maxItems: PUBLIC_LINKED_DATABASE_MAPPING_LIMIT,
+      pageSize: PUBLIC_LINKED_DATABASE_MAPPING_LIMIT,
+      label: 'Public linked-database source pages',
+    },
+  );
+  // Mapping-derived source ids let current imports fetch pages and views
+  // together. The legacy job lane already owns an exact indexed view result,
+  // so it reuses those rows rather than issuing a duplicate source query.
+  const sourceViewsRead = locator.mode === 'mapped'
+    ? listAll(
+        db.table<DbView>('db_views').where('databaseId', 'in', candidateSourceIds),
+        {
+          maxItems: PUBLIC_LINKED_DATABASE_VIEW_LIMIT,
+          pageSize: 1_000,
+          label: 'Public linked-database source views',
+        },
+      )
+    : Promise.resolve(candidateViews);
+  const [candidateDatabases, resolvedCandidateViews] = await Promise.all([
+    sourcePagesRead,
+    sourceViewsRead,
+  ]);
+  candidateViews = resolvedCandidateViews;
+  const scopedViews = candidateViews
     .filter((view) => normalizeNotionScopeId(notionParentDatabaseId(view)) === targetNotionDatabaseId)
     .sort(bySortPos);
   const sourceDatabaseIds = Array.from(
     new Set(scopedViews.map((view) => view.databaseId).filter((id) => id !== requestedDatabase.id)),
   );
+  const candidateDatabasesById = new Map(candidateDatabases.map((database) => [database.id, database]));
 
   for (const sourceDatabaseId of sourceDatabaseIds) {
-    const sourceDatabase = await db.table<Page>('pages').getOne(sourceDatabaseId);
+    const sourceDatabase = candidateDatabasesById.get(sourceDatabaseId);
     if (
       !sourceDatabase ||
       sourceDatabase.inTrash ||
@@ -658,10 +901,7 @@ function titleOf(page?: Page) {
 }
 
 function formatFormulaValue(value: FormulaValue) {
-  if (value == null || value === '') return '';
-  if (typeof value === 'boolean') return value ? 'true' : 'false';
-  if (typeof value === 'number') return compactNumber(value);
-  return String(value);
+  return formatFormulaCoreValue(value);
 }
 
 function computedValuePresent(value: FormulaValue) {
@@ -701,32 +941,12 @@ function rawPropertyValue(row: Page, prop: DbProperty): unknown {
   return row.properties?.[prop.id];
 }
 
-function propertyValue(row: Page, prop: DbProperty): FormulaValue {
-  if (prop.type === 'title') return row.title ?? '';
-  const value = row.properties?.[prop.id];
-  if (value == null) return '';
-  if (prop.type === 'number') return Number.isFinite(Number(value)) ? Number(value) : 0;
-  if (prop.type === 'checkbox') return value === true;
-  if (prop.type === 'select' || prop.type === 'status') return selectOptionName(prop, value);
-  if (prop.type === 'multi_select') {
-    const items = Array.isArray(value) ? value : [value];
-    return items.map((item) => selectOptionName(prop, item)).filter(Boolean).join(', ');
-  }
-  if (prop.type === 'date') {
-    if (typeof value === 'string') return value;
-    if (value && typeof value === 'object') {
-      const start = (value as { start?: unknown }).start;
-      const end = (value as { end?: unknown }).end;
-      if (typeof start === 'string' && typeof end === 'string' && end) return `${start}/${end}`;
-      return typeof start === 'string' ? start : '';
-    }
-  }
-  if (prop.type === 'formula' || prop.type === 'rollup') return '';
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return value;
-  return String(value);
-}
-
-function evaluateFormula(row: Page, prop: DbProperty, props: DbProperty[]): FormulaValue {
+function evaluateFormula(
+  row: Page,
+  prop: DbProperty,
+  props: DbProperty[],
+  pagesById: ReadonlyMap<string, Page>,
+): FormulaValue {
   const rawFormula = prop.config?.formula;
   const expression = typeof rawFormula === 'string' ? rawFormula.trim() : '';
   if (!expression) return '';
@@ -735,7 +955,7 @@ function evaluateFormula(row: Page, prop: DbProperty, props: DbProperty[]): Form
   return evaluateFormulaExpression(expression, (name) => {
     const target = props.find((item) => item.name === name || item.id === name);
     if (!target || target.id === prop.id) return '';
-    return propertyValue(row, target);
+    return formulaPropertyValue(row, target, pagesById);
   });
 }
 
@@ -751,7 +971,7 @@ function displayPropertyValue(
   if (prop.type === 'title') return titleOf(row);
   if (prop.type === 'formula') {
     const props = propsByDb.get(prop.databaseId) ?? [];
-    return formatFormulaValue(computedWithImportedFallback(row, prop, evaluateFormula(row, prop, props)));
+    return formatFormulaValue(computedWithImportedFallback(row, prop, evaluateFormula(row, prop, props, pagesById)));
   }
   if (prop.type === 'rollup') {
     return formatFormulaValue(computedWithImportedFallback(row, prop, evaluateRollup(row, prop, propsByDb, pagesById, depth + 1)));
@@ -846,7 +1066,7 @@ function computedPropertyValues(
       const evaluated =
         prop.type === 'rollup'
           ? evaluateRollup(row, prop, propsByDb, pagesById)
-          : evaluateFormula(row, prop, props);
+          : evaluateFormula(row, prop, props, pagesById);
       const value = computedWithImportedFallback(row, prop, evaluated);
       computed[row.id] = computed[row.id] ?? {};
       computed[row.id][prop.id] = { value, formatted: formatFormulaValue(value) };
@@ -1795,7 +2015,7 @@ export async function signSharedFileUrls(
   return out;
 }
 
-async function pageContext(db: DbRef, pageId: string) {
+async function pageBaseContext(db: DbRef, pageId: string) {
   const pages = db.table<Page>('pages');
   const workspaces = db.table<Workspace>('workspaces');
   const permissionsTable = db.table<PagePermission>('page_permissions');
@@ -1805,10 +2025,6 @@ async function pageContext(db: DbRef, pageId: string) {
   if (!page || page.inTrash) throw new Error('Page was not found.');
   const workspace = await workspaces.getOne(page.workspaceId);
   if (!workspace) throw new Error('Workspace was not found.');
-  const [permissions, links] = await Promise.all([
-    listAll(permissionsTable.where('pageId', '==', page.id)),
-    listAll(shareLinksTable.where('pageId', '==', page.id)),
-  ]);
 
   return {
     pages,
@@ -1816,16 +2032,25 @@ async function pageContext(db: DbRef, pageId: string) {
     shareLinksTable,
     page,
     workspace,
+  };
+}
+
+async function pageContext(db: DbRef, pageId: string) {
+  const ctx = await pageBaseContext(db, pageId);
+  const [permissions, links] = await Promise.all([
+    listAll(ctx.permissionsTable.where('pageId', '==', ctx.page.id)),
+    listAll(ctx.shareLinksTable.where('pageId', '==', ctx.page.id)),
+  ]);
+
+  return {
+    ...ctx,
     permissions: sortPermissions(permissions),
     shareLink: links.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''))[0] ?? null,
   };
 }
 
 async function userWorkspaceRole(db: DbRef, workspaceId: string, actorId: string) {
-  const members = await listAll(
-    db.table<WorkspaceMember>('workspace_members').where('workspaceId', '==', workspaceId),
-  );
-  return members.find((member) => member.userId === actorId)?.role;
+  return (await workspaceMembershipForUser(db, workspaceId, actorId))?.role;
 }
 
 // Re-asserts the actor's manage-access basis inside the write transaction, so
@@ -1895,7 +2120,6 @@ function auditInsertOp(
 }
 
 async function runShareTransact(
-  db: DbRef,
   admin: AdminDbAccessor,
   workspaceId: string,
   operations: TransactOperation[],
@@ -1917,27 +2141,6 @@ async function runShareTransact(
       };
     });
     await transactBySideSegments(admin, workspaceId, durableOperations);
-    try {
-      const auditFlush = await flushOrganizationAuditOutbox(
-        db,
-        admin.db('app'),
-        workspaceId,
-      );
-      if (auditFlush.failures.length > 0) {
-        console.warn('[organization-audit-outbox-pending]', JSON.stringify({
-          workspaceId,
-          failures: auditFlush.failures,
-        }));
-      }
-    } catch (error) {
-      // The content mutation and its outbox handoff are already durable.
-      // An opportunistic read/flush outage must not turn that success into a
-      // client-visible false failure; scheduled maintenance owns the retry.
-      console.warn('[organization-audit-outbox-pending]', JSON.stringify({
-        workspaceId,
-        failures: [{ message: error instanceof Error ? error.message : String(error) }],
-      }));
-    }
     // Segmented mode returns no per-op results; callers re-read what they
     // need. Provide an empty results shape for compatibility.
     return { results: [] as Array<Record<string, unknown>> };
@@ -1961,18 +2164,6 @@ async function canManagePageAccess(
 ) {
   void permissions;
   return sharedCanManagePageAccess(db, page, workspace, actorId, actorEmail);
-}
-
-async function pageAccessRole(
-  db: DbRef,
-  page: Page,
-  workspace: Workspace,
-  permissions: PagePermission[],
-  actorId: string,
-  actorEmail?: string | null,
-) {
-  void permissions;
-  return sharedPageAccessRole(db, page, actorId, workspace, actorEmail);
 }
 
 async function assertCanManagePageAccess(
@@ -2030,19 +2221,53 @@ async function accessPayload(
   requireManage = false,
   actorEmail?: string | null,
 ) {
-  const ctx = await pageContext(db, pageId);
-  const canManage = await canManagePageAccess(db, ctx.page, ctx.workspace, ctx.permissions, actorId, actorEmail);
-  const role = await pageAccessRole(db, ctx.page, ctx.workspace, ctx.permissions, actorId, actorEmail);
+  const ctx = await pageBaseContext(db, pageId);
+  const [decision, links] = await Promise.all([
+    sharedPageAccessDecision(
+      db,
+      ctx.page,
+      actorId,
+      ctx.workspace,
+      actorEmail,
+      { includeDirectPermissionMetadata: true },
+    ),
+    listAll(ctx.shareLinksTable.where('pageId', '==', ctx.page.id)),
+  ]);
+  const role = decision.role;
+  const canManage = decision.canManage;
+  const permissions = sortPermissions(decision.directPermissions as PagePermission[]);
+  const shareLink = links.sort(
+    (a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''),
+  )[0] ?? null;
   if (!role || roleRanks[role] < roleRanks.view) throw new Error('Forbidden.');
   if (requireManage && !canManage) throw new Error('Forbidden.');
+  const ownerId = ctx.workspace.ownerId || ctx.page.createdBy;
+  const ownerMember = ownerId && canManage
+    ? (await listAll(
+        db.table<WorkspaceMember>('workspace_members').where('workspaceId', '==', ctx.workspace.id),
+      )).find((member) => member.userId === ownerId)
+    : undefined;
+  const site = canManage
+    ? await getExisting(
+        db.table<SiteConfig>('sites'),
+        await stableSiteId('site', ctx.page.id),
+      )
+    : null;
   // Only managers may enumerate the full sharing roster (which includes other
   // principals' ids and external collaborators' email addresses). A view-only
   // actor sees just their own entry, not who else the page is shared with.
   return {
     page: ctx.page,
-    shareLink: ctx.shareLink,
-    permissions: visiblePermissionsForActor(ctx.permissions, canManage, actorId, actorEmail),
+    shareLink,
+    site,
+    permissions: visiblePermissionsForActor(permissions, canManage, actorId, actorEmail),
     canManage,
+    accessOwner: ownerId
+      ? {
+          displayName: ownerMember?.displayName?.trim() || null,
+          isCurrent: ownerId === actorId,
+        }
+      : undefined,
   };
 }
 
@@ -2148,7 +2373,7 @@ async function setWebSharing(db: DbRef, admin: AdminDbAccessor, body: Record<str
   });
   if (audit) operations.push(audit);
 
-  await runShareTransact(db, admin, ctx.page.workspaceId, operations);
+  await runShareTransact(admin, ctx.page.workspaceId, operations);
   const shareLink: ShareLink = ctx.shareLink
     ? ({ ...ctx.shareLink, ...linkPatch } as ShareLink)
     : ({
@@ -2172,6 +2397,610 @@ async function setWebSharing(db: DbRef, admin: AdminDbAccessor, body: Record<str
     permissions: ctx.permissions,
     canManage: true,
   };
+}
+
+const SITE_ROUTE_STATUS = {
+  provisioning: 'provisioning',
+  pendingValidation: 'pending_validation',
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+function normalizeSiteSlug(value: unknown) {
+  const slug = requireString(value, 'slug').trim().toLowerCase();
+  if (slug.length > 60 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new Error('slug must be composed of letters, numbers, and single hyphens.');
+  }
+  return slug;
+}
+
+function normalizeSiteHostname(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') return null;
+  const raw = requireString(value, 'custom hostname').trim().replace(/\.$/, '');
+  if (
+    raw.length > 253
+    || raw.includes('://')
+    || /[\/@?#:\s]/.test(raw)
+  ) {
+    throw new Error('custom hostname must be a hostname without a scheme, port, path, or query.');
+  }
+  let hostname: string;
+  try {
+    hostname = new URL(`https://${raw}`).hostname.toLowerCase().replace(/\.$/, '');
+  } catch {
+    throw new Error('custom hostname is invalid.');
+  }
+  const labels = hostname.split('.');
+  if (labels.length < 3) {
+    throw new Error('custom hostname must include a subdomain.');
+  }
+  if (labels.some((label) => (
+    label.length < 1
+    || label.length > 63
+    || !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(label)
+  ))) {
+    throw new Error('custom hostname is invalid.');
+  }
+  return hostname;
+}
+
+async function stableSiteId(prefix: 'site' | 'site_route', value: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  const hex = Array.from(
+    new Uint8Array(digest),
+    (byte) => byte.toString(16).padStart(2, '0'),
+  ).join('');
+  return `${prefix}_${hex}`;
+}
+
+function siteRouteKey(kind: 'slug' | 'host', value: string) {
+  return `${kind}:${value}`;
+}
+
+function sitePublicProjection(site: SiteConfig) {
+  return {
+    id: site.id,
+    pageId: site.pageId,
+    slug: site.slug,
+    published: site.published,
+    title: site.title,
+    description: site.description ?? '',
+    theme: site.theme,
+    showBreadcrumbs: site.showBreadcrumbs,
+    showSearch: site.showSearch,
+    showBranding: site.showBranding,
+    navigationPageIds: site.navigationPageIds,
+    customHostname: site.domainStatus === 'validated' ? site.customHostname ?? null : null,
+    revision: site.revision,
+  };
+}
+
+function sameSiteConfig(left: SiteConfig | null, right: SiteConfig) {
+  if (!left) return false;
+  return left.pageId === right.pageId
+    && left.workspaceId === right.workspaceId
+    && left.slug === right.slug
+    && left.published === right.published
+    && left.title === right.title
+    && (left.description ?? '') === (right.description ?? '')
+    && left.theme === right.theme
+    && left.showBreadcrumbs === right.showBreadcrumbs
+    && left.showSearch === right.showSearch
+    && left.showBranding === right.showBranding
+    && JSON.stringify(left.navigationPageIds ?? []) === JSON.stringify(right.navigationPageIds ?? [])
+    && (left.customHostname ?? null) === (right.customHostname ?? null)
+    && left.domainStatus === right.domainStatus;
+}
+
+async function readSiteRoute(admin: AdminDbAccessor, routeKey: string) {
+  const id = await stableSiteId('site_route', routeKey);
+  const route = await getExisting(
+    admin.db('app').table<SiteRouteIndex>('site_route_index'),
+    id,
+  );
+  return route?.routeKey === routeKey ? route : null;
+}
+
+async function writeSiteRoute(
+  admin: AdminDbAccessor,
+  input: Omit<SiteRouteIndex, 'id' | 'createdAt' | 'updatedAt'>,
+) {
+  const table = admin.db('app').table<SiteRouteIndex>('site_route_index');
+  const id = await stableSiteId('site_route', input.routeKey);
+  const existing = await getExisting(table, id);
+  if (existing && (existing.routeKey !== input.routeKey || existing.siteId !== input.siteId)) {
+    throw Object.assign(new Error(`${input.routeKind} route is already assigned to another site.`), { status: 409 });
+  }
+  const now = nowIso();
+  if (existing) {
+    return table.update(id, { ...input, updatedAt: now });
+  }
+  try {
+    return await table.insert({ id, ...input, createdAt: now, updatedAt: now });
+  } catch {
+    const afterRace = await getExisting(table, id);
+    if (afterRace?.routeKey !== input.routeKey || afterRace.siteId !== input.siteId) {
+      throw Object.assign(new Error(`${input.routeKind} route is already assigned to another site.`), { status: 409 });
+    }
+    return table.update(id, { ...input, updatedAt: now });
+  }
+}
+
+async function setSiteRouteStatus(
+  admin: AdminDbAccessor,
+  routeKey: string,
+  siteId: string,
+  status: SiteRouteIndex['status'],
+  revision: number,
+) {
+  const route = await readSiteRoute(admin, routeKey);
+  if (!route || route.siteId !== siteId) return null;
+  return admin.db('app').table<SiteRouteIndex>('site_route_index').update(route.id, {
+    status,
+    revision,
+    updatedAt: nowIso(),
+  });
+}
+
+function siteRouteInputs(site: SiteConfig) {
+  const inputs: Array<Pick<SiteRouteIndex, 'routeKey' | 'routeKind' | 'routeValue'>> = [{
+    routeKey: siteRouteKey('slug', site.slug),
+    routeKind: 'slug',
+    routeValue: site.slug,
+  }];
+  if (site.customHostname) {
+    inputs.push({
+      routeKey: siteRouteKey('host', site.customHostname),
+      routeKind: 'host',
+      routeValue: site.customHostname,
+    });
+  }
+  return inputs;
+}
+
+async function deactivateSiteRoutes(
+  admin: AdminDbAccessor,
+  site: SiteConfig,
+  revision: number,
+) {
+  return Promise.all(siteRouteInputs(site).map((route) => (
+    setSiteRouteStatus(admin, route.routeKey, site.id, SITE_ROUTE_STATUS.inactive, revision)
+  )));
+}
+
+function validatedSiteConfig(
+  body: Record<string, unknown>,
+  customDomainsEnabled: boolean,
+) {
+  const parsed = publishSiteSchema.parse(body);
+  const config = parsed.config as Record<string, unknown>;
+  const navigationPageIds = config.navigationPageIds as string[];
+  if (new Set(navigationPageIds).size !== navigationPageIds.length) {
+    throw new Error('navigation page ids must be unique.');
+  }
+  const customHostname = normalizeSiteHostname(parsed.customHostname);
+  if (customHostname && !customDomainsEnabled) {
+    throw Object.assign(
+      new Error('Custom domains are not enabled by this deployment.'),
+      { status: 400 },
+    );
+  }
+  return {
+    pageId: parsed.pageId,
+    slug: normalizeSiteSlug(parsed.slug),
+    customHostname,
+    title: config.title as string,
+    description: (config.description as string | undefined) ?? '',
+    theme: config.theme as SiteConfig['theme'],
+    showBreadcrumbs: config.showBreadcrumbs as boolean,
+    showSearch: config.showSearch as boolean,
+    showBranding: config.showBranding as boolean,
+    navigationPageIds,
+  };
+}
+
+async function publishSite(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail?: string | null,
+  customDomainsEnabled = false,
+) {
+  const input = validatedSiteConfig(body, customDomainsEnabled);
+  const ctx = await pageContext(db, input.pageId);
+  await assertCanManagePageAccess(db, ctx.page, ctx.workspace, ctx.permissions, actorId, actorEmail);
+  await assertOrganizationSharingPolicy(
+    db,
+    ctx.workspace.id,
+    'publicWebSharing',
+    'Public web sharing is disabled by organization policy.',
+  );
+  await assertOrganizationDlpPolicy(
+    db,
+    ctx.workspace.id,
+    'publicSharing',
+    'Public web sharing is blocked by organization DLP policy.',
+  );
+
+  const graph = await collectPublicSharePageGraphBounded(
+    ctx.pages,
+    db.table<Block>('blocks'),
+    ctx.page,
+  );
+  for (const navigationPageId of input.navigationPageIds) {
+    if (!graph.pageIds.has(navigationPageId)) {
+      throw new Error('navigation pages must belong to the published site graph.');
+    }
+  }
+
+  const siteId = await stableSiteId('site', ctx.page.id);
+  const siteTable = db.table<SiteConfig>('sites');
+  const existing = await getExisting(siteTable, siteId);
+  const sameCustomHostname = (existing?.customHostname ?? null) === input.customHostname;
+  const domainStatus: SiteConfig['domainStatus'] = input.customHostname
+    ? sameCustomHostname && existing?.domainStatus === 'validated'
+      ? 'validated'
+      : 'pending_validation'
+    : 'none';
+  const domainVerificationToken = input.customHostname
+    ? sameCustomHostname && existing?.domainVerificationToken
+      ? existing.domainVerificationToken
+      : newToken()
+    : null;
+  const candidate = {
+    id: siteId,
+    pageId: ctx.page.id,
+    workspaceId: ctx.page.workspaceId,
+    slug: input.slug,
+    published: true,
+    title: input.title,
+    description: input.description,
+    theme: input.theme,
+    showBreadcrumbs: input.showBreadcrumbs,
+    showSearch: input.showSearch,
+    showBranding: input.showBranding,
+    navigationPageIds: input.navigationPageIds,
+    customHostname: input.customHostname,
+    domainStatus,
+    domainVerificationToken,
+    revision: existing?.revision ?? 1,
+    createdBy: existing?.createdBy ?? actorId,
+    createdAt: existing?.createdAt ?? nowIso(),
+    updatedAt: nowIso(),
+  } satisfies SiteConfig;
+  const unchanged = sameSiteConfig(existing, candidate);
+  const site: SiteConfig = unchanged
+    ? { ...candidate, revision: existing!.revision, updatedAt: existing!.updatedAt ?? candidate.updatedAt }
+    : { ...candidate, revision: existing ? existing.revision + 1 : 1 };
+
+  const reservedRoutes = await Promise.all(siteRouteInputs(site).map((route) => writeSiteRoute(admin, {
+    ...route,
+    workspaceId: site.workspaceId,
+    siteId: site.id,
+    pageId: site.pageId,
+    status: route.routeKind === 'host'
+      ? SITE_ROUTE_STATUS.pendingValidation
+      : SITE_ROUTE_STATUS.provisioning,
+    revision: site.revision,
+  })));
+
+  if (existing) {
+    const nextKeys = new Set(siteRouteInputs(site).map((route) => route.routeKey));
+    await Promise.all(siteRouteInputs(existing).map((route) => (
+      nextKeys.has(route.routeKey)
+        ? Promise.resolve(null)
+        : setSiteRouteStatus(admin, route.routeKey, existing.id, SITE_ROUTE_STATUS.inactive, site.revision)
+    )));
+  }
+
+  const shareLinkId = ctx.shareLink?.id ?? newId();
+  const shareToken = ctx.shareLink?.token ?? newToken();
+  const shareLink: ShareLink = ctx.shareLink
+    ? {
+        ...ctx.shareLink,
+        enabled: true,
+        role: 'view',
+        expiresAt: null,
+        updatedAt: site.updatedAt,
+      }
+    : {
+        id: shareLinkId,
+        pageId: site.pageId,
+        workspaceId: site.workspaceId,
+        token: shareToken,
+        enabled: true,
+        role: 'view',
+        expiresAt: null,
+        createdBy: actorId,
+        createdAt: site.createdAt,
+        updatedAt: site.updatedAt,
+      };
+  const workspaceAlreadyDesired = unchanged
+    && ctx.page.isPublic === true
+    && ctx.shareLink?.enabled === true
+    && ctx.shareLink.role === 'view'
+    && !ctx.shareLink.expiresAt;
+
+  if (!workspaceAlreadyDesired) {
+    const guards = await manageAccessGuards(db, ctx.page, ctx.workspace, actorId);
+    const operations: TransactOperation[] = [
+      ...guards,
+      existing
+        ? { table: 'sites', op: 'update', id: site.id, data: site as unknown as Record<string, unknown> }
+        : { table: 'sites', op: 'insert', data: site as unknown as Record<string, unknown> },
+      ctx.shareLink
+        ? {
+            table: 'share_links',
+            op: 'update',
+            id: shareLink.id,
+            data: {
+              enabled: true,
+              role: 'view',
+              expiresAt: null,
+              updatedAt: site.updatedAt,
+            },
+          }
+        : { table: 'share_links', op: 'insert', data: shareLink as unknown as Record<string, unknown> },
+      {
+        table: 'pages',
+        op: 'update',
+        id: ctx.page.id,
+        data: { isPublic: true, lastEditedBy: actorId, updatedAt: site.updatedAt },
+      },
+    ];
+    const audit = auditInsertOp(ctx.workspace, {
+      actorId,
+      action: 'site.publish',
+      targetType: 'site',
+      targetId: site.id,
+      metadata: {
+        pageId: site.pageId,
+        slug: site.slug,
+        customHostname: site.customHostname ?? null,
+        revision: site.revision,
+      },
+    });
+    if (audit) operations.push(audit);
+    await runShareTransact(admin, site.workspaceId, operations);
+    await ensureShareLinkIndex(admin, shareLink);
+  }
+
+  const routes = await Promise.all(reservedRoutes.map((route) => writeSiteRoute(admin, {
+    routeKey: route.routeKey,
+    routeKind: route.routeKind,
+    routeValue: route.routeValue,
+    workspaceId: site.workspaceId,
+    siteId: site.id,
+    pageId: site.pageId,
+    status: route.routeKind === 'host' && site.domainStatus !== 'validated'
+      ? SITE_ROUTE_STATUS.pendingValidation
+      : SITE_ROUTE_STATUS.active,
+    revision: site.revision,
+  })));
+
+  return {
+    page: { ...ctx.page, isPublic: true, lastEditedBy: actorId, updatedAt: site.updatedAt },
+    shareLink,
+    site,
+    routes,
+    permissions: ctx.permissions,
+    canManage: true,
+  };
+}
+
+async function unpublishSite(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail?: string | null,
+) {
+  const { pageId } = unpublishSiteSchema.parse(body);
+  const ctx = await pageContext(db, pageId);
+  await assertCanManagePageAccess(db, ctx.page, ctx.workspace, ctx.permissions, actorId, actorEmail);
+  const siteId = await stableSiteId('site', pageId);
+  const existing = await getExisting(db.table<SiteConfig>('sites'), siteId);
+  if (!existing) throw new Error('Site was not found.');
+  const revision = existing.published ? existing.revision + 1 : existing.revision;
+  await deactivateSiteRoutes(admin, existing, revision);
+  const ts = nowIso();
+  const site: SiteConfig = { ...existing, published: false, revision, updatedAt: ts };
+  const guards = await manageAccessGuards(db, ctx.page, ctx.workspace, actorId);
+  const operations: TransactOperation[] = [
+    ...guards,
+    { table: 'sites', op: 'update', id: site.id, data: { published: false, revision, updatedAt: ts } },
+    ...(ctx.shareLink
+      ? [{
+          table: 'share_links',
+          op: 'update' as const,
+          id: ctx.shareLink.id,
+          data: { enabled: false, updatedAt: ts },
+        }]
+      : []),
+    {
+      table: 'pages',
+      op: 'update',
+      id: ctx.page.id,
+      data: { isPublic: false, lastEditedBy: actorId, updatedAt: ts },
+    },
+  ];
+  const audit = auditInsertOp(ctx.workspace, {
+    actorId,
+    action: 'site.unpublish',
+    targetType: 'site',
+    targetId: site.id,
+    metadata: { pageId, slug: site.slug, revision },
+  });
+  if (audit) operations.push(audit);
+  await runShareTransact(admin, site.workspaceId, operations);
+  if (ctx.shareLink) {
+    await ensureShareLinkIndex(admin, { ...ctx.shareLink, enabled: false });
+  }
+  return {
+    page: { ...ctx.page, isPublic: false, lastEditedBy: actorId, updatedAt: ts },
+    shareLink: ctx.shareLink ? { ...ctx.shareLink, enabled: false, updatedAt: ts } : null,
+    site,
+    routes: await Promise.all(siteRouteInputs(site).map((route) => readSiteRoute(admin, route.routeKey))),
+    permissions: ctx.permissions,
+    canManage: true,
+  };
+}
+
+async function validateSiteDomain(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail?: string | null,
+  customDomainsEnabled = false,
+) {
+  if (!customDomainsEnabled) {
+    throw Object.assign(
+      new Error('Custom domains are not enabled by this deployment.'),
+      { status: 400 },
+    );
+  }
+  const { pageId } = validateSiteDomainSchema.parse(body);
+  const ctx = await pageContext(db, pageId);
+  await assertCanManagePageAccess(db, ctx.page, ctx.workspace, ctx.permissions, actorId, actorEmail);
+  const siteId = await stableSiteId('site', pageId);
+  const siteTable = db.table<SiteConfig>('sites');
+  const existing = await getExisting(siteTable, siteId);
+  if (!existing || !existing.published) throw new Error('Published site was not found.');
+  if (!existing.customHostname || !existing.domainVerificationToken) {
+    throw new Error('Published site must have a custom hostname before domain validation.');
+  }
+
+  const verification = await verifyDomainTxtRecord(
+    existing.customHostname,
+    existing.domainVerificationToken,
+  );
+  if (!verification.verified) {
+    return { site: existing, verified: false, verification };
+  }
+
+  const revision = existing.domainStatus === 'validated'
+    ? existing.revision
+    : existing.revision + 1;
+  const site: SiteConfig = {
+    ...existing,
+    domainStatus: 'validated',
+    revision,
+    updatedAt: nowIso(),
+  };
+
+  // Both entry points carry the same site revision. Provision them before the
+  // workspace commit so every partial failure is fail-closed; a retry can
+  // safely finish activation using the already-validated authoritative row.
+  const reservedRoutes = await Promise.all(siteRouteInputs(site).map((route) => writeSiteRoute(admin, {
+    ...route,
+    workspaceId: site.workspaceId,
+    siteId: site.id,
+    pageId: site.pageId,
+    status: SITE_ROUTE_STATUS.provisioning,
+    revision,
+  })));
+
+  if (existing.domainStatus !== 'validated') {
+    const guards = await manageAccessGuards(db, ctx.page, ctx.workspace, actorId);
+    const operations: TransactOperation[] = [
+      ...guards,
+      {
+        table: 'sites',
+        op: 'update',
+        id: site.id,
+        data: { domainStatus: 'validated', revision, updatedAt: site.updatedAt },
+      },
+    ];
+    const audit = auditInsertOp(ctx.workspace, {
+      actorId,
+      action: 'site.domain.validate',
+      targetType: 'site',
+      targetId: site.id,
+      metadata: { pageId, customHostname: site.customHostname, revision },
+    });
+    if (audit) operations.push(audit);
+    await runShareTransact(admin, site.workspaceId, operations);
+  }
+
+  const routes = await Promise.all(reservedRoutes.map((route) => writeSiteRoute(admin, {
+    routeKey: route.routeKey,
+    routeKind: route.routeKind,
+    routeValue: route.routeValue,
+    workspaceId: site.workspaceId,
+    siteId: site.id,
+    pageId: site.pageId,
+    status: SITE_ROUTE_STATUS.active,
+    revision,
+  })));
+  return { site, routes, verified: true, verification };
+}
+
+async function publicSite(
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  request?: Request,
+  storage?: FunctionStorageProxy,
+  customDomainsEnabled = false,
+) {
+  const parsed = publicSiteSchema.parse(body);
+  let routeKey: string;
+  if (parsed.slug) {
+    routeKey = siteRouteKey('slug', normalizeSiteSlug(parsed.slug));
+  } else {
+    if (!customDomainsEnabled) throw new Error('Site was not found.');
+    try {
+      const hostname = normalizeSiteHostname(request ? new URL(request.url).hostname : null);
+      if (!hostname) throw new Error('missing');
+      routeKey = siteRouteKey('host', hostname);
+    } catch {
+      throw new Error('Site was not found.');
+    }
+  }
+
+  const route = await readSiteRoute(admin, routeKey);
+  if (!route || route.status !== SITE_ROUTE_STATUS.active) throw new Error('Site was not found.');
+  const db = boundedDb(admin, route.workspaceId) as DbRef;
+  const site = await getExisting(db.table<SiteConfig>('sites'), route.siteId);
+  if (
+    !site
+    || !site.published
+    || site.workspaceId !== route.workspaceId
+    || site.pageId !== route.pageId
+    || site.revision !== route.revision
+    || (route.routeKind === 'slug' && site.slug !== route.routeValue)
+    || (route.routeKind === 'host' && (
+      site.domainStatus !== 'validated'
+      || site.customHostname !== route.routeValue
+    ))
+  ) {
+    throw new Error('Site was not found.');
+  }
+
+  const result = await db.table<ShareLink>('share_links')
+    .where('pageId', '==', site.pageId)
+    .page(1)
+    .limit(2)
+    .getList();
+  const links = (result.items ?? []).filter(
+    (link) => link.pageId === site.pageId && link.enabled === true,
+  );
+  if (result.hasMore || links.length !== 1) throw new Error('Site was not found.');
+  const snapshot = await publicPage(db, { token: links[0].token }, storage, links[0]);
+  const navigable = new Set(snapshot.navigablePageIds ?? []);
+  const publicSiteConfig = {
+    ...sitePublicProjection(site),
+    navigationPageIds: site.navigationPageIds.filter((pageId) => navigable.has(pageId)),
+  };
+  const snapshotVersion = await publicSnapshotVersion({
+    content: snapshot.snapshotVersion,
+    site: publicSiteConfig,
+  });
+  if (parsed.snapshotVersion === snapshotVersion) {
+    return { notModified: true, snapshotVersion };
+  }
+  return { ...snapshot, site: publicSiteConfig, snapshotVersion };
 }
 
 async function invite(
@@ -2255,7 +3084,7 @@ async function invite(
   if (audit) operations.push(audit);
 
   try {
-    await runShareTransact(db, admin, ctx.page.workspaceId, operations);
+    await runShareTransact(admin, ctx.page.workspaceId, operations);
   } catch (error) {
     // Fresh concurrent grants derive the same primary key. The database lets
     // exactly one insert win; the loser re-runs once as an update of that
@@ -2354,7 +3183,7 @@ async function updatePermission(db: DbRef, admin: AdminDbAccessor, body: Record<
   });
   if (audit) operations.push(audit);
 
-  await runShareTransact(db, admin, ctx.page.workspaceId, operations);
+  await runShareTransact(admin, ctx.page.workspaceId, operations);
   const permission: PagePermission = { ...current, role, updatedAt };
 
   const permissions = sortPermissions([
@@ -2415,7 +3244,7 @@ async function removePermission(db: DbRef, admin: AdminDbAccessor, body: Record<
     },
   });
   if (audit) operations.push(audit);
-  await runShareTransact(db, admin, ctx.page.workspaceId, operations);
+  await runShareTransact(admin, ctx.page.workspaceId, operations);
   return {
     page: ctx.page,
     shareLink: ctx.shareLink,
@@ -2455,6 +3284,7 @@ async function publicPage(
   db: DbRef,
   body: Record<string, unknown>,
   storage?: FunctionStorageProxy,
+  knownLink?: ShareLink,
 ) {
   const token = requireString(body.token ?? body.shareId, 'token');
   const pagesTable = db.table<Page>('pages');
@@ -2463,7 +3293,9 @@ async function publicPage(
   const viewsTable = db.table<DbView>('db_views');
   const templatesTable = db.table<DbTemplate>('db_templates');
 
-  const links = await listAll(db.table<ShareLink>('share_links').where('token', '==', token));
+  const links = knownLink
+    ? [knownLink]
+    : await listAll(db.table<ShareLink>('share_links').where('token', '==', token));
   const link = links.find((item) => item.token === token);
   if (!link || !link.enabled) throw new Error('Shared page was not found.');
   if (link.expiresAt && new Date(link.expiresAt).getTime() <= Date.now()) {
@@ -2710,13 +3542,19 @@ async function publicPage(
 }
 
 export const POST = defineFunction(async (context) => {
-  const { auth, admin, request, storage } = context as FunctionContext;
+  const { auth, admin, request, storage, env } = context as FunctionContext;
   const body = await requestJson(request);
   const action = typeof body.action === 'string' ? body.action : '';
   const actorEmail = auth?.email ?? null;
-  if (action !== 'publicPage' && !auth?.id) return jsonError(401, 'Authentication required.');
+  const customDomains = customDomainCapability(env);
+  if (action !== 'publicPage' && action !== 'publicSite' && !auth?.id) {
+    return jsonError(401, 'Authentication required.');
+  }
 
   try {
+    if (action === 'publicSite') {
+      return await publicSite(admin, body, request, storage, customDomains.enabled);
+    }
     // Inside the try so routing misses (unknown token/permission/page) map to
     // 404 through the shared error translation below instead of a 500.
     const db = action === 'publicPage'
@@ -2733,6 +3571,12 @@ export const POST = defineFunction(async (context) => {
       }
       case 'setWebSharing':
         return await setWebSharing(db, admin, setWebSharingSchema.parse(body), auth!.id, actorEmail);
+      case 'publishSite':
+        return await publishSite(db, admin, body, auth!.id, actorEmail, customDomains.enabled);
+      case 'unpublishSite':
+        return await unpublishSite(db, admin, body, auth!.id, actorEmail);
+      case 'validateSiteDomain':
+        return await validateSiteDomain(db, admin, body, auth!.id, actorEmail, customDomains.enabled);
       case 'invite':
         return await invite(db, admin, inviteSchema.parse(body), auth!.id, actorEmail);
       case 'updatePermission':

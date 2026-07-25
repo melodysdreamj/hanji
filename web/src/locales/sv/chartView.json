@@ -4,7 +4,22 @@
     "sum": "Summa",
     "average": "Genomsnitt",
     "min": "Min",
-    "max": "Max"
+    "max": "Max",
+    "checked": "Kryssad",
+    "count_values": "Antal värden",
+    "date_range": "Datumintervall",
+    "earliest_date": "Tidigaste datum",
+    "empty": "Antal tomma",
+    "latest_date": "Senaste datum",
+    "median": "Median",
+    "not_empty": "Antal ej tomma",
+    "percent_checked": "Andel kryssade",
+    "percent_empty": "Andel tomma",
+    "percent_not_empty": "Andel ej tomma",
+    "percent_unchecked": "Andel okryssade",
+    "range": "Intervall",
+    "unchecked": "Okryssad",
+    "unique": "Antal unika"
   },
   "chartAria": "{{name}} diagram",
   "chartType": "Diagramtyp",
@@ -27,5 +42,9 @@
   "untitledProperty": "Utan titel",
   "valueProperty": "Värdeegenskap",
   "xAxis": "X-axel",
-  "yAxis": "Y-axel"
+  "yAxis": "Y-axel",
+  "dateRangeDays": "{{count}} dagar",
+  "missingProperty": "den sparade egenskapen",
+  "unsupportedAggregateDesc": "{{aggregate}} kan inte beräknas från {{property}}. Välj en kompatibel egenskap eller beräkning.",
+  "unsupportedAggregateTitle": "Denna diagramberäkning är inte tillgänglig."
 }

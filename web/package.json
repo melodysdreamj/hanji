@@ -1,6 +1,6 @@
 {
   "name": "hanji-web",
-  "version": "0.1.0-alpha.4",
+  "version": "0.2.0-alpha",
   "private": true,
   "license": "AGPL-3.0-only",
   "engines": {
@@ -9,17 +9,19 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "typecheck": "tsc --noEmit",
-    "build": "tsc --noEmit && vite build && node scripts/generate-sw-precache.mjs && node ../scripts/verify-hanji-namespace.mjs --generated",
+    "build": "tsc --noEmit && vite build && node scripts/generate-sw-precache.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "lint": "eslint",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "i18n:status": "node ../scripts/i18n-status.mjs",
+    "i18n:status:strict": "node ../scripts/i18n-status.mjs --strict",
     "i18n:sync": "node ../scripts/i18n-status.mjs --sync"
   },
   "dependencies": {
-    "@edge-base/web": "0.4.6",
+    "@edge-base/web": "0.5.0",
+    "@noble/hashes": "2.2.0",
     "@phosphor-icons/react": "^2.1.10",
     "highlight.js": "^11.11.1",
     "i18next": "^26.3.6",

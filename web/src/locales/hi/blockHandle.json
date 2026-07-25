@@ -88,5 +88,38 @@
     "hoursAgo": "{{hours}} घंटे पहले संपादित",
     "daysAgo": "{{days}} दिन पहले संपादित",
     "on": "{{date}} को संपादित"
+  },
+  "align": {
+    "center": "केंद्र",
+    "choose": "इमेज संरेखण चुनें",
+    "left": "बाएँ",
+    "right": "दाएँ"
+  },
+  "altText": {
+    "help": "Alt टेक्स्ट स्क्रीन रीडर का उपयोग करने वाले लोगों को इमेज समझने में मदद करता है।",
+    "label": "विवरण",
+    "placeholder": "इमेज का वर्णन करें",
+    "remove": "हटाएँ",
+    "save": "सहेजें",
+    "title": "Alt टेक्स्ट"
+  },
+  "imageLink": {
+    "invalid": "http:// या https:// से शुरू होने वाला पूर्ण URL दर्ज करें।",
+    "label": "इमेज पर क्लिक करने पर यह URL खोलें",
+    "remove": "हटाएँ",
+    "save": "सहेजें",
+    "title": "इमेज लिंक"
+  },
+  "media": {
+    "addImageLink": "लिंक जोड़ें",
+    "align": "संरेखण",
+    "altText": "Alt टेक्स्ट",
+    "copySourceLink": "स्रोत लिंक कॉपी करें",
+    "download": "डाउनलोड",
+    "editImageLink": "लिंक संपादित करें",
+    "fullScreen": "पूर्ण स्क्रीन",
+    "openLink": "लिंक खोलें",
+    "replace": "बदलें",
+    "viewOriginal": "मूल देखें"
   }
 }

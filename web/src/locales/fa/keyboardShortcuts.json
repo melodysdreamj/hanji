@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "افزودن نظر",
+    "addLink": "افزودن لینک",
+    "blockColor": "اعمال آخرین رنگ استفاده‌شده",
+    "bold": "پررنگ",
+    "copyPageLink": "کپی لینک صفحه",
+    "findInPage": "جستجو در این صفحه",
+    "inlineCode": "کد درون‌خطی",
+    "italic": "ایتالیک",
+    "moveBlock": "انتقال بلوک به صفحه دیگر",
+    "moveBlockDown": "انتقال بلوک به پایین",
+    "moveBlockUp": "انتقال بلوک به بالا",
+    "movePage": "انتقال صفحه فعلی",
+    "navigateBack": "بازگشت",
+    "navigateForward": "رفتن به جلو",
+    "newPage": "صفحه جدید",
+    "openBlockMenu": "باز کردن عملیات بلوک",
+    "openKeyboardShortcuts": "باز کردن میانبرهای صفحه کلید",
+    "openParentPage": "باز کردن صفحه والد",
+    "quickFind": "جستجوی سریع",
+    "strikethrough": "خط‌خورده",
+    "toggleAllToggles": "باز یا بستن همه تاگل‌ها",
+    "toggleSidebar": "تغییر وضعیت نوار کناری",
+    "toggleTheme": "تغییر وضعیت حالت تاریک",
+    "underline": "زیرخط"
+  },
+  "categories": {
+    "createStyle": "ایجاد و استایل",
+    "editMove": "ویرایش و انتقال",
+    "popular": "محبوب"
+  },
+  "categoriesLabel": "دسته‌های میانبر",
+  "close": "بستن",
+  "closeBackdrop": "بستن میانبرهای صفحه کلید",
+  "empty": "میانبری یافت نشد",
+  "keysFor": "کلیدهای {{action}}",
+  "or": "یا",
+  "searchLabel": "جستجوی میانبرهای صفحه‌کلید",
+  "searchPlaceholder": "جستجوی میانبرها…",
+  "searchResults": "نتایج جستجو",
+  "searchTerms": {
+    "toggleTheme": "تم روشن تاریک ظاهر"
+  },
+  "title": "میانبرهای صفحه‌کلید"
+}

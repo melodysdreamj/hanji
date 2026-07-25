@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} የኋላ አገናኝ",
-    "count_other": "{{count}} የኋላ አገናኞች"
+    "count_other": "{{count}} የኋላ አገናኞች",
+    "partial_one": "{{count}}+ የኋላ አገናኝ",
+    "partial_other": "{{count}}+ የኋላ አገናኞች"
   },
   "header": {
     "title": "የተገናኙ ማንሻዎች"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ማንሻ",
     "mention_other": "{{count}} ማንሻዎች",
     "link_one": "{{count}} አገናኝ",
-    "link_other": "{{count}} አገናኞች"
+    "link_other": "{{count}} አገናኞች",
+    "loaded": "ተጭኗል: {{summary}}"
   },
   "kind": {
     "mention": "ማንሻ",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ተጨማሪ የኋላ አገናኝ",
-    "count_other": "{{count}} ተጨማሪ የኋላ አገናኞች"
+    "count_other": "{{count}} ተጨማሪ የኋላ አገናኞች",
+    "load": "ተጨማሪ የኋላ አገናኞችን ጫን",
+    "loading": "የኋላ አገናኞችን በመጫን ላይ…",
+    "search": "የኋላ አገናኞችን ይፈልጉ"
   }
 }

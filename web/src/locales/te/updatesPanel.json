@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} తాజా నవీకరణలు",
     "unreadOfTotal": "{{total}} నవీకరణల్లో {{unread}} చదవనివి",
     "updateType": "నవీకరణ రకం",
-    "updates": "నవీకరణలు",
-    "modeUpdates": "నవీకరణలు",
-    "modeChats": "చాట్లు",
-    "inboxMode": "ఇన్బాక్స్ మోడ్"
+    "updates": "నవీకరణలు"
   },
   "time": {
     "justNow": "ఇప్పుడే",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} సంస్కరణలు",
     "versionsAgo": "{{count}} సంస్కరణల క్రితం",
     "versionsAhead": "{{count}} సంస్కరణలు ముందుకు",
-    "versionsAria": "సంస్కరణలు"
+    "versionsAria": "సంస్కరణలు",
+    "emptyBlock": "ఖాళీ బ్లాక్",
+    "emptyPreview": "ఈ వెర్షన్‌లో పేజీ కంటెంట్ లేదు.",
+    "previewAria": "చదవడానికి మాత్రమే పేజీ వెర్షన్ ప్రివ్యూ",
+    "previewingCurrent": "ప్రస్తుత పేజీని వీక్షిస్తోంది",
+    "previewingSnapshot": "గత వెర్షన్‌ను వీక్షిస్తోంది",
+    "previewOnlyHint": "వెర్షన్ ఎంచుకోవడం దాన్ని ప్రివ్యూ మాత్రమే చేస్తుంది. 'పునరుద్ధరించు' తర్వాత మాత్రమే ప్రస్తుత పేజీ మారుతుంది.",
+    "restoreThisVersion": "పునరుద్ధరించు",
+    "restoring": "పునరుద్ధరిస్తోంది...",
+    "versionHistory": "వెర్షన్ చరిత్ర"
   },
   "badges": {
     "comment": "వ్యాఖ్య",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ప్రస్తావన · {{preview}}",
     "referenceLink": "{{title}} లింక్ · {{preview}}",
     "unreadDot": "చదవని",
-    "workspaceUpdate": "వర్క్స్పేస్ నవీకరణ"
+    "workspaceUpdate": "వర్క్స్పేస్ నవీకరణ",
+    "bySelf": "మీ ద్వారా"
   },
   "empty": {
     "allCaughtUp": "మీరు తాజాగా ఉన్నారు",

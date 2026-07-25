@@ -1,4 +1,5 @@
 import { activeDateLocale } from "@/lib/i18n";
+import { differenceInCalendarDays } from "@/lib/calendarDay";
 import { i18next } from "@/i18n";
 import type { DbProperty } from "@/lib/types";
 
@@ -195,8 +196,7 @@ export function shiftDateValueToDay(value: unknown, targetDay: Date): string {
   const oldStart = parseDate(dateStart(value));
   const oldEnd = parseDate(endRaw);
   const targetDate = parseDate(targetDay) ?? targetDay;
-  const deltaDays =
-    oldStart && oldEnd ? Math.round((targetDate.getTime() - oldStart.getTime()) / 86_400_000) : 0;
+  const deltaDays = oldStart && oldEnd ? differenceInCalendarDays(targetDate, oldStart) : 0;
   const shiftedEndDay = oldEnd ? addDays(oldEnd, deltaDays) : targetDate;
   return `${start}/${withTimeOf(endRaw, shiftedEndDay)}`;
 }
@@ -259,7 +259,10 @@ export function formatDateForProperty(value: unknown, prop: Pick<DbProperty, "co
 export function formatNotionTimestamp(value: unknown) {
   const source = dateStart(value);
   if (source == null || source === "") return "";
-  const date = new Date(String(source));
+  const raw = String(source);
+  const trimmed = raw.trim();
+  const literalDay = /^\d{4}-\d{2}-\d{2}$/.test(trimmed) ? parseDate(trimmed) : null;
+  const date = literalDay ?? new Date(raw);
   if (Number.isNaN(date.getTime())) return String(source);
 
   const hour = date.getHours();
@@ -267,8 +270,9 @@ export function formatNotionTimestamp(value: unknown) {
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const period =
     hour < 12 ? i18next.t("dateUtils:period.am") : i18next.t("dateUtils:period.pm");
+  const locale = i18next.resolvedLanguage || i18next.language || activeDateLocale();
   return i18next.t("dateUtils:notionTimestamp", {
-    date: date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+    date: date.toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" }),
     year: date.getFullYear(),
     month: date.getMonth() + 1,
     day: date.getDate(),

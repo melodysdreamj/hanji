@@ -13,7 +13,7 @@
   "groupName": "গ্রুপের নাম",
   "groupOptions": "{{groupName}} গ্রুপ অপশন",
   "groupThisBoard": "এই বোর্ড গ্রুপ করুন",
-  "groupThisBoardDesc": "কলাম তৈরি করতে একটি সিলেক্ট বা স্ট্যাটাস প্রপার্টি যোগ করুন।",
+  "groupThisBoardDesc": "কলাম তৈরি করতে একটি নির্বাচন, অবস্থা, ব্যক্তি বা একাধিক নির্বাচন বৈশিষ্ট্য যোগ বা চয়ন করুন।",
   "newGroup": "নতুন গ্রুপ",
   "newGroupIn": "{{dbTitle}} এ নতুন {{groupName}} গ্রুপ",
   "newPage": "নতুন",

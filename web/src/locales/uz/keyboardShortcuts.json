@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Izoh qo'shish",
+    "addLink": "Havola qo'shish",
+    "blockColor": "Oxirgi rangni qo'llash",
+    "bold": "Qalin",
+    "copyPageLink": "Sahifa havolasini nusxalash",
+    "findInPage": "Bu sahifada topish",
+    "inlineCode": "Ichki kod",
+    "italic": "Kursiv",
+    "moveBlock": "Blokni boshqa sahifaga ko'chirish",
+    "moveBlockDown": "Blokni pastga ko'chirish",
+    "moveBlockUp": "Blokni yuqoriga ko'chirish",
+    "movePage": "Joriy sahifani ko'chirish",
+    "navigateBack": "Orqaga qaytish",
+    "navigateForward": "Oldinga o'tish",
+    "newPage": "Yangi sahifa",
+    "openBlockMenu": "Blok amallarini ochish",
+    "openKeyboardShortcuts": "Klaviatura yorliqlarini ochish",
+    "openParentPage": "Ota sahifani ochish",
+    "quickFind": "Tez qidirish",
+    "strikethrough": "Chizilgan",
+    "toggleAllToggles": "Barcha burmalarni ochish yoki yig'ish",
+    "toggleSidebar": "Yon panelni almashtirish",
+    "toggleTheme": "Tungi rejimni almashtirish",
+    "underline": "Tagiga chizish"
+  },
+  "categories": {
+    "createStyle": "Yaratish va uslublash",
+    "editMove": "Tahrirlash va ko'chirish",
+    "popular": "Ommabop"
+  },
+  "categoriesLabel": "Yorliq toifalari",
+  "close": "Yopish",
+  "closeBackdrop": "Klaviatura yorliqlarini yopish",
+  "empty": "Hech qanday yorliq topilmadi",
+  "keysFor": "{{action}} uchun tugmalar",
+  "or": "yoki",
+  "searchLabel": "Klaviatura yorliqlarini qidirish",
+  "searchPlaceholder": "Yorliqlarni qidirish…",
+  "searchResults": "Qidiruv natijalari",
+  "searchTerms": {
+    "toggleTheme": "mavzu yorug‘ qora ko‘rinish"
+  },
+  "title": "Klaviatura yorliqlari"
+}

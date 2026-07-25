@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Fungua menyu ya workspace",
   "closeWorkspaceMenu": "Funga menyu ya workspace",
   "workspaceMenu": "Menyu ya Workspace",
-  "exportWorkspace": "Safirisha workspace",
+  "exportWorkspace": "Safirisha JSON ya eneo la kazi (faili hazijumuishwa)",
   "exportedWorkspace": "Workspace imesafirishwa kama faili ya Hanji.",
   "exportedWorkspaceWithPlaceholders": "Workspace imesafirishwa kama faili ya Hanji — viambatisho vimeachwa kama viashiria.",
   "couldntExportWorkspace": "Haikuweza kuleta nje workspace.",
@@ -76,5 +76,12 @@
     "later": "Labda baadaye",
     "note": "Unaweza kuanza hili wakati wowote baadaye kutoka Ingiza kwenye upau wa pembeni.",
     "title": "Ungependa kuingiza nafasi yako ya kazi ya Notion kwenye Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Ongeza ukurasa kwa {{name}}",
+  "couldntExportWorkspaceArchive": "Haikuweza kusafirisha kumbukumbu ya eneo la kazi.",
+  "exportedWorkspaceArchive": "Imesafirisha kumbukumbu ya eneo la kazi yenye faili.",
+  "exportWorkspaceArchive": "Safirisha kumbukumbu ya eneo la kazi (faili zimejumuishwa)",
+  "joinTeamspaces": "Jiunga na teamspaces",
+  "keyboardShortcuts": "Njia za mkato za kibodi",
+  "teamspacePages": "Kurasa za {{name}}"
 }

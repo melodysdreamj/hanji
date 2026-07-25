@@ -3,6 +3,22 @@ type PageUrlOptions = {
   omitSearchParams?: string[];
 };
 
+const SITE_NAVIGATION_TOKEN_PREFIX = "hanji-site-path:";
+
+export function siteNavigationToken(basePath: string) {
+  return `${SITE_NAVIGATION_TOKEN_PREFIX}${encodeURIComponent(basePath)}`;
+}
+
+function sitePathFromNavigationToken(token: string) {
+  if (!token.startsWith(SITE_NAVIGATION_TOKEN_PREFIX)) return null;
+  try {
+    const path = decodeURIComponent(token.slice(SITE_NAVIGATION_TOKEN_PREFIX.length));
+    return path === "/" || /^\/site\/[^/?#]+$/.test(path) ? path : null;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeSearch(search?: string | URLSearchParams | null) {
   if (!search) return new URLSearchParams();
   if (typeof search === "string") {
@@ -50,7 +66,7 @@ export function sharedPageHref(
   pageId?: string | null,
   search?: string | URLSearchParams | null
 ) {
-  const path = `/share/${encodeURIComponent(token)}`;
+  const path = sitePathFromNavigationToken(token) ?? `/share/${encodeURIComponent(token)}`;
   const params = normalizeSearch(search);
   if (pageId) params.set("page", pageId);
   else params.delete("page");

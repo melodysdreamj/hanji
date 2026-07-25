@@ -35,7 +35,7 @@
     "rename": "ስም ቀይር",
     "addPageInside": "ውስጥ ገጽ አክል",
     "exportAsMarkdown": "እንደ ማርክዳውን ወደ ውጭ ላክ",
-    "exportAsHanjiFile": "እንደ ሃንጂ ፋይል ወደ ውጭ ላክ",
+    "exportAsHanjiFile": "የሀንጂ JSON ወደ ውጭ ላክ (ፋይሎችን ሳያካትት)",
     "importMarkdown": "ማርክዳውን አስመጣ",
     "importing": "በማስመጣት ላይ...",
     "unlockPage": "ገጽ ፍታ",
@@ -44,7 +44,8 @@
     "removeVerification": "ማረጋገጫ አስወግድ",
     "verifyPage": "ገጽ አረጋግጥ",
     "customizePage": "ገጽ አብጅ",
-    "undo": "ተመለስ"
+    "undo": "ተመለስ",
+    "exportAsHanjiArchive": "የሀንጂ ማህደር ወደ ውጭ ላክ (ፋይሎችን ጨምሮ)"
   },
   "customize": {
     "summaryDefault": "ነባሪ",
@@ -101,6 +102,8 @@
     "movedToTrash": "ወደ ቆሻሻ ተንቀሳቅሷል",
     "restoredPage": "ገጽ ተመልሷል",
     "couldntRestorePage": "ገፁን መልሶ ማቋቋም አልተቻለም",
-    "couldntMoveToTrash": "ወደ መጣያ ማዛወር አልተቻለም"
+    "couldntMoveToTrash": "ወደ መጣያ ማዛወር አልተቻለም",
+    "couldntExportHanjiArchive": "Hanji ማህደር ማስተላለፍ አልተቻለም።",
+    "exportedHanjiArchive": "Hanji ማህደር ከፋይሎች ጋር ተላልፏል።"
   }
 }

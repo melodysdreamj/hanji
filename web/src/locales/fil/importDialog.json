@@ -250,7 +250,9 @@
     "runningHint": "Panatilihing bukas ang browser tab na ito habang tumatakbo ang import.",
     "noJobHint": "Simulan ang discovery mula sa Scope step.",
     "applyLocksHint": "Isusulat ng pag-apply ang mga natuklasang item sa workspace na ito.",
-    "browserRunnerWarning": "Ang import na ito ay tumatakbo sa browser tab na ito. Panatilihing bukas ang tab hanggang matapos. Ang pagsara o pag-reload ng tab ay hihinto sa pagproseso; ang muling pagbukas ng Hanji ay magpapatuloy mula sa na-save na progreso."
+    "browserRunnerWarning": "Ang import na ito ay tumatakbo sa browser tab na ito. Panatilihing bukas ang tab hanggang matapos. Ang pagsara o pag-reload ng tab ay hihinto sa pagproseso; ang muling pagbukas ng Hanji ay magpapatuloy mula sa na-save na progreso.",
+    "serverRunnerStatus": "Pinoproseso ng Hanji ang pag-import na ito sa server. Ang pagsasara o pag-reload ng tab na ito ay hindi ito i-pause.",
+    "serverRunningHint": "Ang pag-import ay nagpapatuloy sa background. Maaari mong isara ang tab na ito."
   },
   "installer": {
     "elapsed": "Lumipas",
@@ -284,9 +286,9 @@
     "title": "I-import mula sa Hanji",
     "fromFile": "Mula sa file",
     "fromLive": "Mula sa live na instance",
-    "choose": "Pumili ng .hanji.json file",
+    "choose": "Pumili ng .hanji.json o .hanji.zip na file",
     "chooseButton": "Pumili ng file",
-    "fileHint": "I-export ang page, database, o workspace mula sa ibang Hanji, pagkatapos ay i-import ito rito. Napreserba ang mga relation, rollup, formula, view, at template. Hindi kasama ang mga attachment.",
+    "fileHint": "Gamitin ang .hanji.json para sa istruktura lamang (hindi kasama ang mga file), o .hanji.zip para sa lossless transfer (kasama ang mga file). Ang mga relation, rollup, formula, view, at template ay pinapanatili.",
     "selected": "Napili: {{name}}",
     "importButton": "I-import",
     "importing": "Nag-i-import...",
@@ -297,7 +299,7 @@
     "remoteTokenOptional": "opsyonal",
     "fetch": "Kunin ang export",
     "fetching": "Kumukuha...",
-    "liveHint": "Kunin ang workspace nang direkta mula sa ibang tumatakbong Hanji (halimbawa, isang Docker dev instance). Dapat payagan ng remote ang mga request mula sa address na ito.",
+    "liveHint": "Kunin ang workspace nang direkta mula sa isa pang tumatakbong Hanji (halimbawa isang Docker dev instance). Hindi kasama ang mga file. Dapat payagan ng remote ang mga request mula sa address na ito.",
     "review": "Handa nang i-import: {{summary}}",
     "placeholderNote": "Ang ilang attachment ay naiwan bilang placeholder.",
     "importedItems_one": "Na-import ang {{count}} item mula sa Hanji file.",
@@ -305,6 +307,12 @@
     "cantRead": "Hindi mabasa ang Hanji file.",
     "cantImport": "Hindi mai-import ang Hanji file.",
     "needFile": "Pumili muna ng Hanji file.",
-    "needRemote": "Ilagay ang remote Hanji URL at workspace ID."
+    "needRemote": "Ilagay ang remote Hanji URL at workspace ID.",
+    "filesExcluded": "Hindi kasama ang mga file.",
+    "filesIncluded": "Kasama ang mga file."
+  },
+  "terminal": {
+    "cancelled": "Kinansela ang pag-import. Maaari mo itong ligtas na simulan muli kapag handa ka na.",
+    "failed": "Ang pag-import ay ligtas na huminto bago ito matapos. Suriin ang koneksyon at subukan muli. Ang mga teknikal na detalye at identifier ay nakatago dito."
   }
 }

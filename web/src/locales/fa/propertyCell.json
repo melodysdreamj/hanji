@@ -92,5 +92,8 @@
     "ج",
     "ش"
   ],
-  "you": "شما"
+  "you": "شما",
+  "buttonExecutionFailed": "دکمه اجرا نشد.",
+  "loadingMoreRelations": "در حال بارگذاری روابط بیشتر...",
+  "loadMoreRelations": "بارگذاری روابط بیشتر"
 }

@@ -16,7 +16,7 @@
   "groupName": "Ryhmän nimi",
   "groupOptions": "Ryhmän {{groupName}} asetukset",
   "groupThisBoard": "Ryhmitä tämä taulu",
-  "groupThisBoardDesc": "Lisää Valinta- tai Tila-ominaisuus luodaksesi sarakkeita.",
+  "groupThisBoardDesc": "Lisää tai valitse Valinta-, Tila-, Henkilö- tai Monivalinta-ominaisuus luodaksesi sarakkeita.",
   "newGroup": "Uusi ryhmä",
   "newGroupIn": "Uusi {{groupName}}-ryhmä tietokannassa {{dbTitle}}",
   "newPage": "Uusi",

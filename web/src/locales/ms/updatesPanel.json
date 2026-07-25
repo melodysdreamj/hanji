@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} kemas kini terkini",
     "unreadOfTotal": "{{unread}} belum dibaca daripada {{total}} kemas kini",
     "updateType": "Jenis kemas kini",
-    "updates": "Kemas kini",
-    "modeUpdates": "Kemas kini",
-    "modeChats": "Sembang",
-    "inboxMode": "Mod peti masuk"
+    "updates": "Kemas kini"
   },
   "time": {
     "justNow": "Baru sahaja",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versi",
     "versionsAgo": "{{count}} versi lalu",
     "versionsAhead": "{{count}} versi ke hadapan",
-    "versionsAria": "Versi"
+    "versionsAria": "Versi",
+    "emptyBlock": "Blok kosong",
+    "emptyPreview": "Versi ini tidak mempunyai kandungan halaman.",
+    "previewAria": "Pratonton versi halaman baca sahaja",
+    "previewingCurrent": "Melihat halaman semasa",
+    "previewingSnapshot": "Melihat versi lalu",
+    "previewOnlyHint": "Memilih versi hanya mempratontonkannya. Halaman semasa berubah hanya selepas Pulihkan.",
+    "restoreThisVersion": "Pulihkan",
+    "restoring": "Memulihkan...",
+    "versionHistory": "Sejarah versi"
   },
   "badges": {
     "comment": "Komen",
@@ -67,7 +73,8 @@
     "referenceMention": "Menyebut {{title}} · {{preview}}",
     "referenceLink": "Dipaut ke {{title}} · {{preview}}",
     "unreadDot": "Belum dibaca",
-    "workspaceUpdate": "Kemas kini ruang kerja"
+    "workspaceUpdate": "Kemas kini ruang kerja",
+    "bySelf": "Oleh Anda"
   },
   "empty": {
     "allCaughtUp": "Anda sudah terkini.",

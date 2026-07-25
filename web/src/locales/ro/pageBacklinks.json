@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinkuri"
+    "count_other": "{{count}} backlinkuri",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlink-uri"
   },
   "header": {
     "title": "Mențiuni legate"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} mențiune",
     "mention_other": "{{count}} mențiuni",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} linkuri"
+    "link_other": "{{count}} linkuri",
+    "loaded": "Încărcat: {{summary}}"
   },
   "kind": {
     "mention": "Mențiune",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "încă {{count}} backlink",
-    "count_other": "încă {{count}} backlinkuri"
+    "count_other": "încă {{count}} backlinkuri",
+    "load": "Încarcă mai multe backlink-uri",
+    "loading": "Se încarcă backlink-urile...",
+    "search": "Caută backlink-uri"
   }
 }

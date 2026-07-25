@@ -176,7 +176,9 @@
     "video": "ቪዲዮ",
     "videoCaption": "የቪዲዮ ካፕሽን",
     "videoEmptyHint": "ቪዲዮ ፋይል አስቀምጥ፣ ቀጥተኛ አገናኝ ለጥፍ ወይም የYouTube፣ Vimeo፣ Loom አገናኝ ተጠቀም።",
-    "videoLink": "የቪዲዮ አገናኝ"
+    "videoLink": "የቪዲዮ አገናኝ",
+    "audioPlaybackFailed": "ይህ ኦዲዮ መጫወት አልተቻለም። ይቀይሩት ወይም ዋናውን ፋይል ይክፈቱ።",
+    "videoPlaybackFailed": "ይህ ቪዲዮ መጫወት አልተቻለም። ይቀይሩት ወይም ዋናውን ፋይል ይክፈቱ።"
   },
   "bookmark": {
     "copy": "ቡክማርክ አገናኝ ቅዳ",

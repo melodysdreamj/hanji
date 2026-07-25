@@ -247,7 +247,9 @@
     "runningHint": "匯入進行時請保持此瀏覽器分頁開啟。",
     "noJobHint": "請先從「範圍」步驟開始探索。",
     "applyLocksHint": "套用會將發現的項目寫入此工作空間。",
-    "browserRunnerWarning": "此匯入作業正在此瀏覽器分頁中執行。請保持分頁開啟直到完成。關閉或重新整理分頁會暫停處理；再次開啟 Hanji 將從已儲存的進度繼續。"
+    "browserRunnerWarning": "此匯入作業正在此瀏覽器分頁中執行。請保持分頁開啟直到完成。關閉或重新整理分頁會暫停處理；再次開啟 Hanji 將從已儲存的進度繼續。",
+    "serverRunnerStatus": "Hanji 正在伺服器上處理此匯入。關閉或重新載入此分頁不會暫停。",
+    "serverRunningHint": "匯入在背景中繼續。您可以關閉此分頁。"
   },
   "installer": {
     "elapsed": "已過",
@@ -281,9 +283,9 @@
     "title": "從 Hanji 匯入",
     "fromFile": "從檔案",
     "fromLive": "從即時執行個體",
-    "choose": "選擇 .hanji.json 檔案",
+    "choose": "選擇 .hanji.json 或 .hanji.zip 檔案",
     "chooseButton": "選擇檔案",
-    "fileHint": "從另一個 Hanji 匯出頁面、資料庫或工作區，然後在此匯入。關係、彙總、公式、檢視和範本都會保留。附件不包含在內。",
+    "fileHint": "使用 .hanji.json 僅轉移結構（不含檔案），或使用 .hanji.zip 進行無損轉移（含檔案）。關係、彙總、公式、檢視和範本都會保留。",
     "selected": "已選取：{{name}}",
     "importButton": "匯入",
     "importing": "正在匯入...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "選填",
     "fetch": "擷取匯出",
     "fetching": "載入中...",
-    "liveHint": "直接從另一個執行中的 Hanji（例如 Docker 開發執行個體）提取工作區。遠端必須允許來自此地址的請求。",
+    "liveHint": "直接從另一個執行中的 Hanji（例如 Docker 開發實例）拉取工作區。不包含檔案。遠端必須允許來自此位址的請求。",
     "review": "準備匯入：{{summary}}",
     "placeholderNote": "部分附件已保留為佔位符。",
     "importedItems_one": "已從 Hanji 檔案匯入 {{count}} 個項目。",
@@ -302,9 +304,15 @@
     "cantRead": "無法讀取 Hanji 檔案。",
     "cantImport": "無法匯入 Hanji 檔案。",
     "needFile": "請先選擇一個 Hanji 檔案。",
-    "needRemote": "請輸入遠端 Hanji 網址與工作區 ID。"
+    "needRemote": "請輸入遠端 Hanji 網址與工作區 ID。",
+    "filesExcluded": "檔案已排除。",
+    "filesIncluded": "檔案已包含。"
   },
   "connectWithNotion": "與 Notion 連線",
   "oauthConfiguredHint": "此伺服器已設定 Notion OAuth 整合。自託管連線仍可使用權杖設定。",
-  "cantStartOAuth": "無法啟動 Notion 連線。"
+  "cantStartOAuth": "無法啟動 Notion 連線。",
+  "terminal": {
+    "cancelled": "匯入已取消。準備好後可安全地重新開始。",
+    "failed": "匯入在完成前已安全停止。請檢查連線後重試。技術細節與識別碼已隱藏。"
+  }
 }

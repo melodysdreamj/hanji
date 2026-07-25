@@ -1,0 +1,82 @@
+{
+  "title": "Teamspaces",
+  "subtitle": "Organize shared work and control who can discover or join it.",
+  "tabs": {
+    "label": "Teamspace views",
+    "browse": "Browse",
+    "create": "New teamspace",
+    "manage": "Manage",
+    "archived": "Archived"
+  },
+  "joined": "Your teamspaces",
+  "noneJoined": "You haven't joined any teamspaces yet.",
+  "available": "Available to join",
+  "noneAvailable": "There aren't any other teamspaces available.",
+  "noneArchived": "There aren't any archived teamspaces.",
+  "manage": "Manage",
+  "open": "Open",
+  "join": "Join",
+  "request": "Request access",
+  "requestPending": "Request pending",
+  "create": "Create teamspace",
+  "save": "Save changes",
+  "selectTeamspace": "Teamspace",
+  "members": "Members",
+  "requests": "Access requests",
+  "noRequests": "There aren't any pending requests.",
+  "governance": "Teamspace settings",
+  "choosePrincipal": "Choose a person or group",
+  "member": "Member",
+  "owner": "Owner",
+  "add": "Add",
+  "remove": "Remove",
+  "approve": "Approve",
+  "deny": "Deny",
+  "ownersOnlyCreate": "Only workspace owners can create teamspaces",
+  "setDefault": "Make default teamspace",
+  "replacement": "Choose a replacement default",
+  "archive": "Archive teamspace",
+  "restore": "Restore",
+  "loadMore": "Load more",
+  "notOwner": "Only a teamspace owner or workspace administrator can manage this teamspace.",
+  "fields": {
+    "name": "Name",
+    "icon": "Icon",
+    "description": "Description",
+    "access": "Access",
+    "memberRole": "Member page access",
+    "openRole": "Open visitor page access",
+    "membersCanInvite": "Members can invite people",
+    "membersCanEditSidebar": "Members can add and reorder pages"
+  },
+  "access": {
+    "open": "Open",
+    "closed": "Closed",
+    "private": "Private"
+  },
+  "roles": {
+    "view": "Can view",
+    "comment": "Can comment",
+    "edit": "Can edit",
+    "full_access": "Full access"
+  },
+  "notice": {
+    "created": "Teamspace created.",
+    "joined": "Teamspace joined.",
+    "requested": "Access requested.",
+    "saved": "Teamspace updated.",
+    "memberAdded": "Member added.",
+    "memberUpdated": "Member role updated.",
+    "memberRemoved": "Member removed.",
+    "approved": "Request approved.",
+    "denied": "Request denied.",
+    "policySaved": "Teamspace creation policy updated.",
+    "defaultSet": "Default teamspace updated.",
+    "archived": "Teamspace archived.",
+    "restored": "Teamspace restored."
+  },
+  "error": {
+    "load": "Couldn't load teamspace details.",
+    "action": "Couldn't complete that teamspace action."
+  }
+}

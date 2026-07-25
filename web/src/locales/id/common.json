@@ -8,7 +8,8 @@
     "delete": "Hapus",
     "clearAll": "Hapus semua",
     "done": "Selesai",
-    "add": "Tambah"
+    "add": "Tambah",
+    "reportIssue": "Laporkan masalah"
   },
   "labels": {
     "untitled": "Tanpa judul"

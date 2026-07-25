@@ -35,7 +35,7 @@
     "rename": "नाम बदल्नुहोस्",
     "addPageInside": "भित्र पृष्ठ थप्नुहोस्",
     "exportAsMarkdown": "मार्कडाउनको रूपमा निर्यात गर्नुहोस्",
-    "exportAsHanjiFile": "Hanji फाइलको रूपमा निर्यात गर्नुहोस्",
+    "exportAsHanjiFile": "Hanji JSON निर्यात (फाइलहरू बाहेक)",
     "importMarkdown": "मार्कडाउन आयात गर्नुहोस्",
     "importing": "आयात गर्दै...",
     "unlockPage": "पृष्ठ अनलक गर्नुहोस्",
@@ -44,7 +44,8 @@
     "removeVerification": "प्रमाणीकरण हटाउनुहोस्",
     "verifyPage": "पृष्ठ प्रमाणित गर्नुहोस्",
     "customizePage": "पृष्ठ अनुकूलन गर्नुहोस्",
-    "undo": "पूर्ववत गर्नुहोस्"
+    "undo": "पूर्ववत गर्नुहोस्",
+    "exportAsHanjiArchive": "Hanji अभिलेख निर्यात (फाइलहरू सहित)"
   },
   "customize": {
     "summaryDefault": "पूर्वनिर्धारित",
@@ -101,6 +102,8 @@
     "movedToTrash": "रद्दीमा सारियो",
     "restoredPage": "पृष्ठ पुनर्स्थापित गरियो",
     "couldntRestorePage": "पृष्ठ पुनर्स्थापना गर्न सकिएन",
-    "couldntMoveToTrash": "रद्दीमा सार्न सकिएन"
+    "couldntMoveToTrash": "रद्दीमा सार्न सकिएन",
+    "couldntExportHanjiArchive": "Hanji आर्काइभ निर्यात गर्न सकिएन।",
+    "exportedHanjiArchive": "फाइलहरू सहितको Hanji आर्काइभ निर्यात गरियो।"
   }
 }

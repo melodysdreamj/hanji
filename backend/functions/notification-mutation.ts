@@ -2,7 +2,11 @@ import { defineFunction } from '@edge-base/shared';
 import { errorStatus } from '../lib/error-status';
 import { assertNotDeactivatedWorkspaceAccess } from '../lib/org-access';
 import { boundedDb, type AdminDbAccessor } from '../lib/workspace-db';
-import { assertNotificationTargetAvailable, recipientNotifications } from '../lib/notifications';
+import {
+  assertNotificationTargetAvailable,
+  notificationPatchMatches,
+  recipientNotifications,
+} from '../lib/notifications';
 import { actorPagePermissions, pageAccessRole } from '../lib/page-access';
 
 import {
@@ -283,8 +287,14 @@ async function notificationsForUser(
   actorEmail?: string | null,
 ) {
   const { items } = await recipientNotifications(db as unknown as AppDbRef, workspaceId, actorId);
+  // Inbox is a recipient notification surface, not an audit log. Old clients
+  // could persist the recipient's own locally observed activity; retire those
+  // rows from every response before target reads and unread aggregation. The
+  // bounded rows remain dormant in storage so a read does not manufacture a
+  // cleanup write.
+  const recipientItems = items.filter((record) => record.actorId !== actorId);
   const states = new Map<string, 'live' | 'hidden' | 'orphan'>();
-  const pageIds = Array.from(new Set(items.map(notificationPageId).filter((id): id is string => !!id)));
+  const pageIds = Array.from(new Set(recipientItems.map(notificationPageId).filter((id): id is string => !!id)));
   for (let index = 0; index < pageIds.length; index += 20) {
     const chunk = pageIds.slice(index, index + 20);
     const resolved = await Promise.all(chunk.map(async (pageId) => [
@@ -294,7 +304,7 @@ async function notificationsForUser(
     for (const [pageId, state] of resolved) states.set(pageId, state);
   }
 
-  const orphanIds = items.flatMap((record) => {
+  const orphanIds = recipientItems.flatMap((record) => {
     const pageId = notificationPageId(record);
     return pageId && states.get(pageId) === 'orphan' ? [record.id] : [];
   });
@@ -308,7 +318,7 @@ async function notificationsForUser(
     });
   }
 
-  return items.filter((record) => {
+  return recipientItems.filter((record) => {
     const pageId = notificationPageId(record);
     return !pageId || states.get(pageId) === 'live';
   });
@@ -368,7 +378,12 @@ async function syncNotifications(
   await assertNotificationScopeAccess(db, admin, workspaceId, actorId, actorEmail);
 
   const input = Array.isArray(body.activities) ? body.activities.slice(0, 100) : [];
-  const activities = input.map(sanitizeNotificationInput);
+  // The authenticated user is the recipient of this browser-owned sync lane.
+  // Drop self-authored items before target validation or writes, while a mixed
+  // bounded request continues draining every eligible sibling.
+  const activities = input
+    .map(sanitizeNotificationInput)
+    .filter((activity) => activity.actorId !== actorId);
   const notifications = db.table<NotificationRecord>('notifications');
   const existing = await notificationsForUser(db, admin, workspaceId, actorId, actorEmail);
   const byKey = new Map(existing.map((record) => [record.activityKey, record]));
@@ -392,10 +407,15 @@ async function syncNotifications(
       ...activity,
     } satisfies Partial<NotificationRecord>);
     if (current) {
-      const updated = await notifications.update(current.id, {
+      const patch = {
         ...data,
         readAt: current.readAt ?? null,
-      });
+      };
+      if (notificationPatchMatches(current, patch)) {
+        synced.push(current);
+        continue;
+      }
+      const updated = await notifications.update(current.id, patch);
       try {
         await assertNotificationTargetAvailable(routedDb, updated);
       } catch (error) {

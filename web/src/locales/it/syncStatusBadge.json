@@ -6,5 +6,6 @@
   "unreachable": "Server non raggiungibile",
   "unreachablePending_one": "Server non raggiungibile · {{count}} modifica in sospeso",
   "unreachablePending_other": "Server non raggiungibile · {{count}} modifiche in sospeso",
-  "retryHint": "Clicca per riprovare ora"
+  "retryHint": "Clicca per riprovare ora",
+  "confirmed": "Salvato sul server"
 }

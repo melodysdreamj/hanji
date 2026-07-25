@@ -9,7 +9,7 @@
     "duplicate": "Dupliser",
     "editIcon": "Rediger ikon",
     "editProperties": "Rediger egenskaper",
-    "exportAsHanjiFile": "Eksporter som Hanji-fil",
+    "exportAsHanjiFile": "Eksporter Hanji-JSON (filer ekskludert)",
     "exportAsMarkdown": "Eksporter som Markdown",
     "fullPage": "Full side",
     "importing": "Importerer...",
@@ -26,7 +26,8 @@
     "sidePeek": "Sideforhåndsvisning",
     "undo": "Angre",
     "unlockPage": "Lås opp side",
-    "verifyPage": "Verifiser side"
+    "verifyPage": "Verifiser side",
+    "exportAsHanjiArchive": "Eksporter Hanji-arkiv (filer inkludert)"
   },
   "aria": {
     "backlinksDisplay": "Tilbakelenkevisning",
@@ -100,7 +101,9 @@
     "pageVerified": "Side verifisert",
     "removedFromFavorites": "Fjernet fra favoritter",
     "restoredPage": "Gjenopprettet side",
-    "verificationRemoved": "Verifisering fjernet"
+    "verificationRemoved": "Verifisering fjernet",
+    "couldntExportHanjiArchive": "Kunne ikke eksportere Hanji-arkiv.",
+    "exportedHanjiArchive": "Eksporterte et Hanji-arkiv med filer."
   },
   "untitledDatabaseRow": "unavngitt databaserad"
 }

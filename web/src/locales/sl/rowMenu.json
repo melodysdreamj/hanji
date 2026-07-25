@@ -35,7 +35,7 @@
     "rename": "Preimenuj",
     "addPageInside": "Dodaj stran znotraj",
     "exportAsMarkdown": "Izvozi kot Markdown",
-    "exportAsHanjiFile": "Izvozi kot datoteko Hanji",
+    "exportAsHanjiFile": "Izvozi Hanji JSON (brez datotek)",
     "importMarkdown": "Uvozi Markdown",
     "importing": "Uvažanje...",
     "unlockPage": "Odkleni stran",
@@ -44,7 +44,8 @@
     "removeVerification": "Odstrani preverjanje",
     "verifyPage": "Preveri stran",
     "customizePage": "Prilagodi stran",
-    "undo": "Razveljavi"
+    "undo": "Razveljavi",
+    "exportAsHanjiArchive": "Izvozi Hanji arhiv (vključno z datotekami)"
   },
   "customize": {
     "summaryDefault": "Privzeto",
@@ -101,6 +102,8 @@
     "movedToTrash": "Premaknjeno v koš",
     "restoredPage": "Obnovljena stran",
     "couldntRestorePage": "Strani ni bilo mogoče obnoviti",
-    "couldntMoveToTrash": "Ni bilo mogoče premakniti v smeti"
+    "couldntMoveToTrash": "Ni bilo mogoče premakniti v smeti",
+    "couldntExportHanjiArchive": "Ni bilo mogoče izvoziti Hanji arhiva.",
+    "exportedHanjiArchive": "Izvozili ste Hanji arhiv z datotekami."
   }
 }

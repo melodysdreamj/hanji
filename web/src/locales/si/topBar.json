@@ -38,7 +38,7 @@
   "moveTo": "ගෙනයන්න",
   "exporting": "අපනයනය කරමින්…",
   "exportAsMarkdown": "Markdown ලෙස නිර්‍යාත කරන්න",
-  "exportAsHanji": "Hanji ගොනුවක් ලෙස නිර්‍යාත කරන්න",
+  "exportAsHanji": "Hanji JSON අපනයනය (ගොනු නොමැතිව)",
   "importing": "ආයාත කරමින්…",
   "importMarkdown": "මාර්ක්ඩවුන් ආයාත කරන්න",
   "unlockPage": "පිටුව අගුළු හරින්න",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ප්‍රවේශය යාවත්කාලීන කළ නොහැකි විය",
     "removedFromAccessList": "ප්‍රවේශ ලැයිස්තුවෙන් ඉවත් කර ඇත",
     "couldntRemoveAccess": "ප්‍රවේශය ඉවත් කළ නොහැකි විය",
-    "couldntLoadAccessList": "ප්‍රවේශ ලැයිස්තුව පූරණය කළ නොහැකි විය"
+    "couldntLoadAccessList": "ප්‍රවේශ ලැයිස්තුව පූරණය කළ නොහැකි විය",
+    "couldntExportHanjiArchive": "Hanji සංරක්ෂිතය අපනයනය කිරීමට නොහැකි විය.",
+    "exportedHanjiArchive": "ගොනු සහිත Hanji සංරක්ෂිතයක් අපනයනය කරන ලදී."
   },
   "user": "පරිශීලක",
   "whoHasAccess": "ප්‍රවේශය ඇති අය",
   "workspace": "වැඩබිම",
   "workspaceCount_one": "{{count}} වැඩබිම",
   "workspaceCount_other": "{{count}} වැඩබිම්",
-  "you": "ඔබ"
+  "you": "ඔබ",
+  "exportAsHanjiArchive": "Hanji සංරක්ෂිත අපනයනය (ගොනු ඇතුළත්)",
+  "turnIntoWiki": "විකියට හරවන්න",
+  "undoWiki": "විකි අහෝසි කරන්න",
+  "wikiCreated": "පිටුව විකියට හරවන ලදී",
+  "wikiPageSettings": "විකි පිටු සැකසුම්",
+  "wikiUndone": "විකි ඉවත් කරන ලදී; පිටු අන්තර්ගතය ආරක්ෂා කරන ලදී",
+  "wikiUpdateFailed": "විකි යාවත්කාල කිරීමට නොහැකි විය"
 }

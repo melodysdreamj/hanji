@@ -1,12 +1,212 @@
 import type { PersistentGeneratedLocale } from "./persistent-generated-labels";
+import {
+  normalizedNotionId,
+  type DiscoveredNotionItem,
+} from "./notion-import-request-limits";
 import type {
   ImportConversionReport,
   NotionImportItem,
   NotionImportJob,
   NotionImportPlan,
-  NotionImportPlanRuntime,
   NotionImportWarning,
-} from "../functions/notion-import";
+} from "./notion-import-contracts";
+
+export interface HiddenLinkedDatabaseDataSourceInference {
+  dataSourceItem: NotionImportItem;
+  heading?: string;
+  matchedLabel: string;
+  matchedView?: Record<string, unknown>;
+  matchedViewId?: string;
+  matchedViewIds?: string[];
+  inferredFrom: 'view_parent_database_id' | 'sibling_heading_view_name';
+}
+
+interface NotionImportPlanFileReference {
+  id: string;
+  name: string;
+  url: string;
+  type?: string;
+  size?: number;
+  notionFileSource: 'external' | 'notion_file' | 'direct_url' | 'unknown';
+  notionFileExpiryTime?: string;
+  notionFile?: Record<string, unknown>;
+  uploadId?: string;
+  bucket?: string;
+  key?: string;
+  sourceUrl?: string;
+  notionFileCopied?: boolean;
+  notionFileCopiedAt?: string | null;
+}
+
+interface NotionImportPlanUserReference {
+  id: string;
+  userId: string;
+  notionUserId: string;
+  displayName: string | undefined;
+  email: string | undefined;
+  avatarUrl: string | undefined;
+  notionUserType: string | undefined;
+  notion: Record<string, unknown>;
+}
+
+export interface NotionImportPlanRuntime {
+  asRecord(value: unknown): Record<string, unknown> | undefined;
+  augmentNotionPropertiesFromRowSnapshots(
+    sourceProperties: Record<string, unknown>,
+    dataSourceId: string,
+    items: NotionImportItem[],
+  ): { properties: Record<string, unknown>; inferred: number };
+  compareNotionImportViewItems(a: NotionImportItem, b: NotionImportItem): number;
+  dataSourceSnapshot(
+    item: NotionImportItem | DiscoveredNotionItem,
+  ): Record<string, unknown> | undefined;
+  emptyConversionReport(): ImportConversionReport;
+  finalizeConversionReport(report: ImportConversionReport): ImportConversionReport;
+  flattenImportablePageBlocksForPlan(
+    blocks: Record<string, unknown>[],
+  ): Record<string, unknown>[];
+  formulaPropertyReferences(expression: string): string[];
+  incrementReport(report: ImportConversionReport, key: string, by?: number): void;
+  inferDataSourceForHiddenLinkedDatabase(
+    databaseItem: NotionImportItem,
+    items: NotionImportItem[],
+    dataSourceItems: NotionImportItem[],
+  ): HiddenLinkedDatabaseDataSourceInference | undefined;
+  inspectViewPropertyReferences(
+    report: ImportConversionReport,
+    dataSourceId: string,
+    view: Record<string, unknown>,
+    propertyMappings: Map<string, string>,
+    sourceProperties?: Record<string, unknown>,
+  ): void;
+  itemMetadata(item: NotionImportItem | DiscoveredNotionItem): Record<string, unknown>;
+  linkedNotionTargetIdsFromBlock(block: Record<string, unknown>): string[];
+  linkedNotionViewIdsFromBlock(block: Record<string, unknown>): string[];
+  localBlockTypeFromNotion(
+    notionType: string,
+    block: Record<string, unknown>,
+  ): string;
+  localizedImportableNotionViews(
+    rawViews: Record<string, unknown>[],
+    locale: PersistentGeneratedLocale,
+  ): Record<string, unknown>[];
+  notionFilePropertyReferences(value: unknown): NotionImportPlanFileReference[];
+  notionObjectId(record: Record<string, unknown>): string | undefined;
+  notionPropertiesFromSnapshot(
+    snapshot: Record<string, unknown> | undefined,
+  ): Record<string, unknown>;
+  notionPropertyConfig(
+    prop: Record<string, unknown>,
+    notionType: string,
+  ): Record<string, unknown>;
+  notionPropertyReferenceVariants(value: unknown): string[];
+  notionUserReferencesFromPropertyValue(value: unknown): NotionImportPlanUserReference[];
+  nowIso(): string;
+  optionalString(value: unknown): string | undefined;
+  pageSnapshot(
+    item: NotionImportItem | DiscoveredNotionItem,
+  ): Record<string, unknown> | undefined;
+  parsePersistentGeneratedLocale(
+    value: unknown,
+    field?: string,
+  ): PersistentGeneratedLocale;
+  progressObject(value: unknown): Record<string, unknown>;
+  pushReportIssue(
+    list: NotionImportWarning[],
+    issue: NotionImportWarning,
+    maxItems?: number,
+  ): void;
+  rawTemplateBlocks(template: Record<string, unknown>): Record<string, unknown>[];
+  rawTemplatesFromSnapshot(
+    snapshot: Record<string, unknown> | undefined,
+  ): Record<string, unknown>[];
+  relationTargetNotionId(
+    config: Record<string, unknown> | undefined,
+  ): string | undefined;
+  reportBlockConversion(
+    report: ImportConversionReport | undefined,
+    block: Record<string, unknown>,
+    item: NotionImportItem,
+  ): void;
+  reportBlockFileReference(
+    report: ImportConversionReport | undefined,
+    item: NotionImportItem,
+    block: Record<string, unknown>,
+  ): void;
+  reportBlockRichTextUserReferences(
+    report: ImportConversionReport | undefined,
+    item: NotionImportItem,
+    block: Record<string, unknown>,
+  ): void;
+  reportNotionFileReferences(
+    report: ImportConversionReport | undefined,
+    notionId: string | undefined,
+    notionObject: string,
+    label: string,
+    references: Array<NotionImportPlanFileReference | undefined>,
+    options?: { needsCopy?: boolean },
+  ): void;
+  reportNotionUserReferences(
+    report: ImportConversionReport | undefined,
+    notionId: string | undefined,
+    notionObject: string,
+    label: string,
+    references: NotionImportPlanUserReference[],
+  ): void;
+  reportPageChromeFileReferences(
+    report: ImportConversionReport | undefined,
+    item: NotionImportItem,
+  ): void;
+  reportTemplateBlockRichTextUserReferences(
+    report: ImportConversionReport | undefined,
+    item: NotionImportItem,
+    block: Record<string, unknown>,
+  ): void;
+  reportUnresolvedFormulaPropertyReference(
+    report: ImportConversionReport,
+    dataSourceId: string,
+    notionPropertyId: string | undefined,
+    formulaPropertyName: string,
+    referencedProperty: string,
+  ): void;
+  reportUnsupportedFormulaFunctions(
+    report: ImportConversionReport,
+    dataSourceId: string,
+    notionPropertyId: string | undefined,
+    formulaPropertyName: string,
+    unsupportedFunctions: string[],
+  ): void;
+  reportUnsupportedProperty(
+    report: ImportConversionReport,
+    dataSourceId: string,
+    propertyId: string,
+    propertyName: string,
+    notionType: string,
+  ): void;
+  reportUnsupportedView(
+    report: ImportConversionReport,
+    dataSourceId: string,
+    view: Record<string, unknown>,
+  ): void;
+  rowDataSourceId(
+    item: NotionImportItem,
+    dataSourceIds: Set<string>,
+  ): string | undefined;
+  templatePropertiesFromNotion(
+    template: Record<string, unknown>,
+  ): Record<string, unknown> | undefined;
+  unsupportedFormulaFunctions(expression: string): string[];
+  viewPropertyMappingsFromRawProperties(
+    sourceProperties: Record<string, unknown>,
+  ): Map<string, string>;
+  viewSnapshot(
+    item: NotionImportItem | DiscoveredNotionItem,
+  ): Record<string, unknown> | undefined;
+  withGeneratedTitleProperty(
+    properties: Record<string, unknown>,
+    locale: PersistentGeneratedLocale,
+  ): Record<string, unknown>;
+}
 
 export function createNotionImportPlanner(runtime: NotionImportPlanRuntime) {
   const {
@@ -395,6 +595,13 @@ export function createNotionImportPlanner(runtime: NotionImportPlanRuntime) {
     const databaseItems = items.filter((item) => item.notionObject === 'database');
     const dataSourceItems = items.filter((item) => item.notionObject === 'data_source');
     const dataSourceIds = new Set(dataSourceItems.map((item) => item.notionId));
+    const templatePageIds = new Set(
+      dataSourceItems.flatMap((item) =>
+        rawTemplatesFromSnapshot(dataSourceSnapshot(item))
+          .map((template) => normalizedNotionId(notionObjectId(template)))
+          .filter((id): id is string => !!id),
+      ),
+    );
     const inferredLinkedDatabaseItems = new Map<string, ReturnType<typeof inferDataSourceForHiddenLinkedDatabase>>();
     const placeholderDatabaseItems = databaseItems.filter((item) => {
       const metadata = itemMetadata(item);
@@ -413,7 +620,14 @@ export function createNotionImportPlanner(runtime: NotionImportPlanRuntime) {
       }
       return true;
     });
-    const pageItems = items.filter((item) => item.notionObject === 'page');
+    // Notion can return a database template through workspace search as a page
+    // while also embedding the same object in the data source's templates.
+    // Apply gives the template mapping authority and skips that page mapping,
+    // so the review must not count the same object again as a page/row (or its
+    // page blocks) or the dry-run totals will exceed the durable writes.
+    const pageItems = items.filter(
+      (item) => item.notionObject === 'page' && !templatePageIds.has(normalizedNotionId(item.notionId)),
+    );
     const propertiesByDataSource = new Map<string, Record<string, unknown>>();
     for (const item of dataSourceItems) {
       const augmented = augmentNotionPropertiesFromRowSnapshots(

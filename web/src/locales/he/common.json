@@ -8,7 +8,8 @@
     "delete": "מחק",
     "clearAll": "נקה הכול",
     "done": "סיום",
-    "add": "הוסף"
+    "add": "הוסף",
+    "reportIssue": "דווח על בעיה"
   },
   "labels": {
     "untitled": "ללא שם"

@@ -6,5 +6,6 @@
   "unreachable": "Serverga ulanib bo'lmaydi",
   "unreachablePending_one": "Serverga ulanib bo'lmaydi · {{count}} o'zgarish kutilmoqda",
   "unreachablePending_other": "Serverga ulanib bo'lmaydi · {{count}} o'zgarish kutilmoqda",
-  "retryHint": "Qayta urinish uchun bosing"
+  "retryHint": "Qayta urinish uchun bosing",
+  "confirmed": "Serverga saqlandi"
 }

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Arbeitsbereichmenü öffnen",
   "closeWorkspaceMenu": "Workspace-Menü schließen",
   "workspaceMenu": "Workspace-Menü",
-  "exportWorkspace": "Arbeitsbereich exportieren",
+  "exportWorkspace": "Workspace-JSON exportieren (ohne Dateien)",
   "exportedWorkspace": "Arbeitsbereich als Hanji-Datei exportiert.",
   "exportedWorkspaceWithPlaceholders": "Arbeitsbereich als Hanji-Datei exportiert – Anhänge als Platzhalter belassen.",
   "couldntExportWorkspace": "Workspace konnte nicht exportiert werden.",
@@ -76,5 +76,12 @@
     "later": "Vielleicht später",
     "note": "Du kannst das später jederzeit über Import in der Seitenleiste starten.",
     "title": "Notion-Workspace zu Hanji importieren?"
-  }
+  },
+  "addPageToTeamspace": "Seite zu {{name}} hinzufügen",
+  "couldntExportWorkspaceArchive": "Workspace-Archiv konnte nicht exportiert werden.",
+  "exportedWorkspaceArchive": "Workspace-Archiv mit Dateien exportiert.",
+  "exportWorkspaceArchive": "Workspace-Archiv exportieren (mit Dateien)",
+  "joinTeamspaces": "Teamspaces beitreten",
+  "keyboardShortcuts": "Tastaturkürzel",
+  "teamspacePages": "{{name}}-Seiten"
 }

@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Cerrado",
+    "open": "Abierto",
+    "private": "Privado"
+  },
+  "add": "Agregar",
+  "approve": "Aprobar",
+  "archive": "Archivar teamspace",
+  "available": "Disponible para unirse",
+  "choosePrincipal": "Elegir una persona o grupo",
+  "create": "Crear teamspace",
+  "deny": "Denegar",
+  "error": {
+    "action": "No se pudo completar esa acción de teamspace.",
+    "load": "No se pudieron cargar los detalles del teamspace."
+  },
+  "fields": {
+    "access": "Acceso",
+    "description": "Descripción",
+    "icon": "Icono",
+    "memberRole": "Acceso de miembros a páginas",
+    "membersCanEditSidebar": "Los miembros pueden añadir y reordenar páginas",
+    "membersCanInvite": "Los miembros pueden invitar a personas",
+    "name": "Nombre",
+    "openRole": "Acceso de visitantes a páginas"
+  },
+  "governance": "Configuración del espacio de equipo",
+  "join": "Unirse",
+  "joined": "Tus espacios de equipo",
+  "loadMore": "Cargar más",
+  "manage": "Gestionar",
+  "member": "Miembro",
+  "members": "Miembros",
+  "noneArchived": "No hay espacios de equipo archivados.",
+  "noneAvailable": "No hay otros espacios de equipo disponibles.",
+  "noneJoined": "Aún no te has unido a ningún espacio de equipo.",
+  "noRequests": "No hay solicitudes pendientes.",
+  "notice": {
+    "approved": "Solicitud aprobada.",
+    "archived": "Espacio de equipo archivado.",
+    "created": "Espacio de equipo creado.",
+    "defaultSet": "Espacio de equipo predeterminado actualizado.",
+    "denied": "Solicitud rechazada.",
+    "joined": "Unido al espacio de equipo.",
+    "memberAdded": "Miembro añadido.",
+    "memberRemoved": "Miembro eliminado.",
+    "memberUpdated": "Rol de miembro actualizado.",
+    "policySaved": "Política de creación de espacios de equipo actualizada.",
+    "requested": "Acceso solicitado.",
+    "restored": "Espacio de equipo restaurado.",
+    "saved": "Espacio de equipo actualizado."
+  },
+  "notOwner": "Solo el propietario del espacio de equipo o el administrador del espacio de trabajo puede administrar este espacio de equipo.",
+  "open": "Abrir",
+  "owner": "Propietario",
+  "ownersOnlyCreate": "Solo los propietarios del espacio de trabajo pueden crear espacios de equipo",
+  "remove": "Eliminar",
+  "replacement": "Elegir un predeterminado de reemplazo",
+  "request": "Solicitar acceso",
+  "requestPending": "Solicitud pendiente",
+  "requests": "Solicitudes de acceso",
+  "restore": "Restaurar",
+  "roles": {
+    "comment": "Puede comentar",
+    "edit": "Puede editar",
+    "full_access": "Acceso completo",
+    "view": "Puede ver"
+  },
+  "save": "Guardar cambios",
+  "selectTeamspace": "Espacio de equipo",
+  "setDefault": "Establecer como espacio de equipo predeterminado",
+  "subtitle": "Organiza el trabajo compartido y controla quién puede descubrirlo o unirse.",
+  "tabs": {
+    "archived": "Archivados",
+    "browse": "Explorar",
+    "create": "Nuevo espacio de equipo",
+    "label": "Vistas del espacio de equipo",
+    "manage": "Administrar"
+  },
+  "title": "Espacios de equipo"
+}

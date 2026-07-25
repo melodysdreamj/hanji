@@ -4,7 +4,22 @@
     "sum": "மொத்தம்",
     "average": "சராசரி",
     "min": "குறைந்தபட்சம்",
-    "max": "அதிகபட்சம்"
+    "max": "அதிகபட்சம்",
+    "checked": "சரிபார்க்கப்பட்டது",
+    "count_values": "மதிப்புகளின் எண்ணிக்கை",
+    "date_range": "தேதி வரம்பு",
+    "earliest_date": "மிக முந்தைய தேதி",
+    "empty": "காலி எண்ணிக்கை",
+    "latest_date": "சமீபத்திய தேதி",
+    "median": "இடைநிலை",
+    "not_empty": "காலி இல்லாத எண்ணிக்கை",
+    "percent_checked": "சரிபார்க்கப்பட்ட சதவீதம்",
+    "percent_empty": "காலி சதவீதம்",
+    "percent_not_empty": "காலி இல்லாத சதவீதம்",
+    "percent_unchecked": "சரிபார்க்கப்படாத சதவீதம்",
+    "range": "வரம்பு",
+    "unchecked": "சரிபார்க்கப்படாதது",
+    "unique": "தனிப்பட்ட மதிப்புகளின் எண்ணிக்கை"
   },
   "chartAria": "{{name}} விளக்கப்படம்",
   "chartType": "விளக்கப்பட வகை",
@@ -27,5 +42,9 @@
   "untitledProperty": "தலைப்பில்லா",
   "valueProperty": "மதிப்புப் பண்பு",
   "xAxis": "X-அச்சு",
-  "yAxis": "Y-அச்சு"
+  "yAxis": "Y-அச்சு",
+  "dateRangeDays": "{{count}} நாட்கள்",
+  "missingProperty": "சேமிக்கப்பட்ட பண்பு",
+  "unsupportedAggregateDesc": "{{property}} இலிருந்து {{aggregate}} ஐ கணக்கிட முடியாது. இணக்கமான பண்பு அல்லது கணக்கீட்டைத் தேர்ந்தெடுக்கவும்.",
+  "unsupportedAggregateTitle": "இந்த விளக்கப்பட கணக்கீடு கிடைக்கவில்லை"
 }

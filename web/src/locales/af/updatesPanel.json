@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} onlangse opdaterings",
     "unreadOfTotal": "{{unread}} ongelees van {{total}} opdaterings",
     "updateType": "Opdateringstipe",
-    "updates": "Opdaterings",
-    "modeUpdates": "Opdaterings",
-    "modeChats": "Kletse",
-    "inboxMode": "Inkassie-modus"
+    "updates": "Opdaterings"
   },
   "time": {
     "justNow": "Nou net",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} weergawes",
     "versionsAgo": "{{count}} weergawes gelede",
     "versionsAhead": "{{count}} weergawes voor",
-    "versionsAria": "Weergawes"
+    "versionsAria": "Weergawes",
+    "emptyBlock": "Leë blok",
+    "emptyPreview": "Hierdie weergawe het geen bladsy-inhoud nie.",
+    "previewAria": "Leesalleen bladsyweergawe-vooruitsig",
+    "previewingCurrent": "Besig om huidige bladsy te bekyk",
+    "previewingSnapshot": "Besig om vorige weergawe te bekyk",
+    "previewOnlyHint": "Om 'n weergawe te kies, voorbeskou dit net. Die huidige bladsy verander eers na Herstel.",
+    "restoreThisVersion": "Herstel",
+    "restoring": "Besig om te herstel...",
+    "versionHistory": "Weergawegeskiedenis"
   },
   "badges": {
     "comment": "Opmerking",
@@ -67,7 +73,8 @@
     "referenceMention": "Melding {{title}} · {{preview}}",
     "referenceLink": "Gekoppel aan {{title}} · {{preview}}",
     "unreadDot": "Ongelees",
-    "workspaceUpdate": "Werkspasie-opdatering"
+    "workspaceUpdate": "Werkspasie-opdatering",
+    "bySelf": "deur jou"
   },
   "empty": {
     "allCaughtUp": "Jy is op datum.",

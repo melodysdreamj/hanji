@@ -1,0 +1,46 @@
+{
+  "title": "키보드 단축키",
+  "close": "닫기",
+  "closeBackdrop": "키보드 단축키 닫기",
+  "searchLabel": "키보드 단축키 검색",
+  "searchPlaceholder": "단축키 검색…",
+  "categoriesLabel": "단축키 범주",
+  "searchResults": "검색 결과",
+  "empty": "일치하는 단축키가 없습니다",
+  "or": "또는",
+  "keysFor": "{{action}} 단축키",
+  "categories": {
+    "popular": "인기",
+    "createStyle": "생성 및 스타일",
+    "editMove": "편집 및 이동"
+  },
+  "searchTerms": {
+    "toggleTheme": "테마 라이트 다크 화면 모드"
+  },
+  "actions": {
+    "openKeyboardShortcuts": "키보드 단축키 열기",
+    "newPage": "새 페이지",
+    "quickFind": "빠른 검색",
+    "findInPage": "현재 페이지에서 찾기",
+    "copyPageLink": "페이지 링크 복사",
+    "navigateBack": "뒤로 이동",
+    "navigateForward": "앞으로 이동",
+    "toggleTheme": "다크 모드 전환",
+    "openParentPage": "상위 페이지 열기",
+    "movePage": "현재 페이지 이동",
+    "toggleSidebar": "사이드바 전환",
+    "bold": "굵게",
+    "italic": "기울임꼴",
+    "underline": "밑줄",
+    "strikethrough": "취소선",
+    "inlineCode": "인라인 코드",
+    "addLink": "링크 추가",
+    "addComment": "댓글 추가",
+    "moveBlock": "블록을 다른 페이지로 이동",
+    "moveBlockUp": "블록을 위로 이동",
+    "moveBlockDown": "블록을 아래로 이동",
+    "blockColor": "마지막 사용 색상 적용",
+    "openBlockMenu": "블록 작업 열기",
+    "toggleAllToggles": "모든 토글 펼치기 또는 접기"
+  }
+}

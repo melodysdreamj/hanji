@@ -13,7 +13,7 @@
   "groupName": "Grup adı",
   "groupOptions": "{{groupName}} grup seçenekleri",
   "groupThisBoard": "Bu panoyu grupla",
-  "groupThisBoardDesc": "Sütun oluşturmak için bir Seçim veya Durum özelliği ekleyin.",
+  "groupThisBoardDesc": "Sütun oluşturmak için bir Seçenek, Durum, Kişi veya Çoklu seçim özelliği ekleyin veya seçin.",
   "newGroup": "Yeni grup",
   "newGroupIn": "{{dbTitle}} içinde yeni {{groupName}} grubu",
   "newPage": "Yeni",

@@ -38,7 +38,7 @@
   "moveTo": "நகர்த்து",
   "exporting": "ஏற்றுமதி செய்கிறது...",
   "exportAsMarkdown": "Markdown ஆக ஏற்றுமதி செய்",
-  "exportAsHanji": "Hanji கோப்பாக ஏற்றுமதி செய்",
+  "exportAsHanji": "Hanji JSON ஏற்றுமதி செய் (கோப்புகள் தவிர்த்து)",
   "importing": "இறக்குமதி செய்கிறது...",
   "importMarkdown": "Markdown இறக்குமதி",
   "unlockPage": "பக்கம் பூட்டு நீக்கு",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "அணுகலைப் புதுப்பிக்க முடியவில்லை",
     "removedFromAccessList": "அணுகல் பட்டியலில் இருந்து நீக்கப்பட்டது",
     "couldntRemoveAccess": "அணுகலை அகற்ற முடியவில்லை",
-    "couldntLoadAccessList": "அணுகல் பட்டியலை ஏற்ற முடியவில்லை"
+    "couldntLoadAccessList": "அணுகல் பட்டியலை ஏற்ற முடியவில்லை",
+    "couldntExportHanjiArchive": "Hanji காப்பகத்தை ஏற்றுமதி செய்ய முடியவில்லை.",
+    "exportedHanjiArchive": "கோப்புகளுடன் Hanji காப்பகம் ஏற்றுமதி செய்யப்பட்டது."
   },
   "user": "பயனர்",
   "whoHasAccess": "யாருக்கு அணுகல் உள்ளது",
   "workspace": "பணியிடம்",
   "workspaceCount_one": "{{count}} பணியிடம்",
   "workspaceCount_other": "{{count}} பணியிடங்கள்",
-  "you": "நீங்கள்"
+  "you": "நீங்கள்",
+  "exportAsHanjiArchive": "Hanji காப்பகத்தை ஏற்றுமதி செய் (கோப்புகள் உட்பட)",
+  "turnIntoWiki": "விக்கியாக மாற்று",
+  "undoWiki": "விக்கியைச் செயல்நீக்கு",
+  "wikiCreated": "பக்கம் விக்கியாக மாற்றப்பட்டது",
+  "wikiPageSettings": "விக்கி பக்கம் அமைப்புகள்",
+  "wikiUndone": "விக்கி நீக்கப்பட்டது; பக்க உள்ளடக்கம் பாதுகாக்கப்பட்டது",
+  "wikiUpdateFailed": "விக்கியைப் புதுப்பிக்க முடியவில்லை"
 }

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Afhanklikhede:",
     "hint": "voeg 'n verbandseienskap by",
-    "relationPropertyAriaLabel": "Afhanklikheidsverbandseienskap"
+    "relationPropertyAriaLabel": "Afhanklikheidsverbandseienskap",
+    "makeDependOn": "Maak {{title}} afhanklik van {{predecessor}}",
+    "startFrom": "Begin afhanklikheid vanaf {{title}}"
   },
   "toolbar": {
     "today": "Vandag",

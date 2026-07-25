@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Yo‘l-yo‘llar",
+  "clearSearch": "Qidiruvni tozalash",
+  "errors": {
+    "not-found": "Bu sayt nashrdan olingan yoki manzili o‘zgargan bo‘lishi mumkin.",
+    "offline": "Ulanishingizni tekshiring va saytni qayta ochishga harakat qiling.",
+    "rate-limited": "Bu saytga juda ko‘p so‘rovlar yuborilmoqda. Bir oz kutib, qayta urinib ko‘ring.",
+    "unavailable": "Hanji hozircha bu saytni ocha olmaydi. Bir ozdan keyin qayta urinib ko‘ring."
+  },
+  "madeWithHanji": "Hanji bilan yaratildi",
+  "navigation": "Sayt navigatsiyasi",
+  "noResults": "Hech qanday sahifa topilmadi",
+  "outsideSite": "Bu sahifa nashr qilingan saytga kirmaydi.",
+  "search": "Saytni qidirish",
+  "tryAgain": "Qayta urinish",
+  "unavailable": "Bu sayt mavjud emas."
+}

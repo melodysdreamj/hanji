@@ -8,6 +8,8 @@ import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { planOfflineFontFormatSelection } from './sw-precache-font-formats.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = resolve(root, 'dist');
 const html = readFileSync(resolve(dist, 'index.html'), 'utf8');
@@ -78,6 +80,8 @@ const deferredLanguageEntries = new Set(
   languageEntries.filter((key) => !bootLanguageEntries.includes(key)),
 );
 includeManifestEntry(entryKey, assets, true, new Set(), deferredLanguageEntries);
+const fontFormatSelection = planOfflineFontFormatSelection(viteManifest, assets, bootAssets);
+for (const asset of fontFormatSelection.removedAssets) assets.delete(asset);
 
 const sortedAssets = ['/', ...Array.from(assets).sort()];
 const versionHash = createHash('sha256');
@@ -104,9 +108,12 @@ const rawBytes = (urls) => urls.reduce((total, url) => {
 }, 0);
 const bootBytes = rawBytes(manifest.bootAssets);
 const totalBytes = rawBytes(manifest.assets);
+const removedFontBytes = rawBytes(fontFormatSelection.removedAssets);
 console.log(
   'sw-precache.json: install ' + manifest.bootAssets.length + ' entries / ' + bootBytes +
     ' raw bytes; background ' + (manifest.assets.length - manifest.bootAssets.length) +
     ' entries / ' + (totalBytes - bootBytes) + ' raw bytes; full ' + manifest.assets.length +
-    ' entries / ' + totalBytes + ' raw bytes (' + bootLanguageEntries.length + ' boot language chunks)'
+    ' entries / ' + totalBytes + ' raw bytes (' + bootLanguageEntries.length +
+    ' boot language chunks; ' + fontFormatSelection.removedAssets.length +
+    ' redundant font formats / ' + removedFontBytes + ' raw bytes omitted)'
 );

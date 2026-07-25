@@ -88,5 +88,38 @@
     "hoursAgo": "Senast redigerad {{hours}}h sedan",
     "daysAgo": "Senast redigerad {{days}}d sedan",
     "on": "Senast redigerad {{date}}"
+  },
+  "align": {
+    "center": "Centrera",
+    "choose": "Välj bildjustering",
+    "left": "Vänster",
+    "right": "Höger"
+  },
+  "altText": {
+    "help": "Alt-text hjälper personer som använder skärmläsare att förstå bilden.",
+    "label": "Beskrivning",
+    "placeholder": "Beskriv bilden",
+    "remove": "Ta bort",
+    "save": "Spara",
+    "title": "Alt-text"
+  },
+  "imageLink": {
+    "invalid": "Ange en fullständig http:// eller https:// URL.",
+    "label": "Öppna denna URL när bilden klickas",
+    "remove": "Ta bort",
+    "save": "Spara",
+    "title": "Bildlänk"
+  },
+  "media": {
+    "addImageLink": "Lägg till länk",
+    "align": "Justera",
+    "altText": "Alt-text",
+    "copySourceLink": "Kopiera källänk",
+    "download": "Ladda ned",
+    "editImageLink": "Redigera länk",
+    "fullScreen": "Fullskärm",
+    "openLink": "Öppna länk",
+    "replace": "Ersätt",
+    "viewOriginal": "Visa original"
   }
 }

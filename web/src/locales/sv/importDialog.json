@@ -247,7 +247,9 @@
     "runningHint": "Håll denna webbläsarflik öppen medan importen körs.",
     "noJobHint": "Börja upptäckten från steget Omfattning först.",
     "applyLocksHint": "Applicering skriver de funna objekten till denna arbetsyta.",
-    "browserRunnerWarning": "Denna import körs i denna webbläsarflik. Håll fliken öppen tills den är klar. Stängning eller omladdning av fliken pausar bearbetningen; att öppna Hanji igen återupptar från det sparade förloppet."
+    "browserRunnerWarning": "Denna import körs i denna webbläsarflik. Håll fliken öppen tills den är klar. Stängning eller omladdning av fliken pausar bearbetningen; att öppna Hanji igen återupptar från det sparade förloppet.",
+    "serverRunnerStatus": "Hanji bearbetar denna import på servern. Att stänga eller ladda om fliken pausar den inte.",
+    "serverRunningHint": "Importen fortsätter i bakgrunden. Du kan stänga denna flik."
   },
   "installer": {
     "elapsed": "Förfluten",
@@ -281,9 +283,9 @@
     "title": "Importera från Hanji",
     "fromFile": "Från en fil",
     "fromLive": "Från en aktiv instans",
-    "choose": "Välj en .hanji.json-fil",
+    "choose": "Välj en .hanji.json- eller .hanji.zip-fil",
     "chooseButton": "Välj fil",
-    "fileHint": "Exportera en sida, databas eller arbetsyta från en annan Hanji och importera den sedan här. Relationer, rollups, formler, vyer och mallar bevaras. Bilagor ingår inte.",
+    "fileHint": "Använd .hanji.json för endast struktur (filer exkluderas) eller .hanji.zip för en förlustfri överföring (filer inkluderas). Relationer, rollups, formler, vyer och mallar bevaras.",
     "selected": "Vald: {{name}}",
     "importButton": "Importera",
     "importing": "Importerar...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "valfritt",
     "fetch": "Hämta export",
     "fetching": "Hämtar...",
-    "liveHint": "Hämta en arbetsyta direkt från en annan aktiv Hanji (t.ex. en Docker-utvecklingsinstans). Fjärrinstansen måste tillåta förfrågningar från denna adress.",
+    "liveHint": "Hämta en arbetsyta direkt från en annan aktiv Hanji (t.ex. en Docker-utvecklingsinstans). Filer exkluderas. Den fjärranslutna måste tillåta begäranden från den här adressen.",
     "review": "Redo att importera: {{summary}}",
     "placeholderNote": "Vissa bilagor lämnades som platshållare.",
     "importedItems_one": "Importerade {{count}} objekt från Hanji-filen.",
@@ -302,9 +304,15 @@
     "cantRead": "Kunde inte läsa Hanji-filen.",
     "cantImport": "Kunde inte importera Hanji-filen.",
     "needFile": "Välj en Hanji-fil först.",
-    "needRemote": "Ange fjärr-Hanji-URL och arbetsyte-ID."
+    "needRemote": "Ange fjärr-Hanji-URL och arbetsyte-ID.",
+    "filesExcluded": "Filer exkluderade.",
+    "filesIncluded": "Filer inkluderade."
   },
   "connectWithNotion": "Anslut med Notion",
   "oauthConfiguredHint": "Den här servern har en Notion OAuth-integrering konfigurerad. Token-inställning finns fortfarande tillgänglig för självhostade anslutningar.",
-  "cantStartOAuth": "Kunde inte starta Notion-anslutningen."
+  "cantStartOAuth": "Kunde inte starta Notion-anslutningen.",
+  "terminal": {
+    "cancelled": "Importen avbröts. Du kan tryggt starta om den när du är redo.",
+    "failed": "Importen stoppades säkert innan den slutfördes. Kontrollera anslutningen och försök igen. Tekniska detaljer och identifierare döljs här."
+  }
 }

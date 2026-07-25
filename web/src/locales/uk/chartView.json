@@ -4,7 +4,22 @@
     "sum": "Сума",
     "average": "Середнє",
     "min": "Мін",
-    "max": "Макс"
+    "max": "Макс",
+    "checked": "Позначено",
+    "count_values": "Кількість значень",
+    "date_range": "Діапазон дат",
+    "earliest_date": "Найраніша дата",
+    "empty": "Кількість порожніх",
+    "latest_date": "Найпізніша дата",
+    "median": "Медіана",
+    "not_empty": "Кількість заповнених",
+    "percent_checked": "Відсоток позначених",
+    "percent_empty": "Відсоток порожніх",
+    "percent_not_empty": "Відсоток заповнених",
+    "percent_unchecked": "Відсоток непозначених",
+    "range": "Діапазон",
+    "unchecked": "Не позначено",
+    "unique": "Кількість унікальних значень"
   },
   "chartAria": "{{name}} діаграма",
   "chartType": "Тип діаграми",
@@ -27,5 +42,9 @@
   "untitledProperty": "Без назви",
   "valueProperty": "Властивість значення",
   "xAxis": "Вісь X",
-  "yAxis": "Вісь Y"
+  "yAxis": "Вісь Y",
+  "dateRangeDays": "{{count}} днів",
+  "missingProperty": "збережена властивість",
+  "unsupportedAggregateDesc": "{{aggregate}} не можна обчислити з {{property}}. Виберіть сумісну властивість або обчислення.",
+  "unsupportedAggregateTitle": "Це обчислення діаграми недоступне"
 }

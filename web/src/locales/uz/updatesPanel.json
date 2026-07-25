@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} ta so‘nggi yangilanish",
     "unreadOfTotal": "{{total}} ta yangilanishdan {{unread}} ta o‘qilmagan",
     "updateType": "Yangilanish turi",
-    "updates": "Yangilanishlar",
-    "modeUpdates": "Yangilanishlar",
-    "modeChats": "Chatlar",
-    "inboxMode": "Kirish qutisi rejimi"
+    "updates": "Yangilanishlar"
   },
   "time": {
     "justNow": "Hozirgina",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versiya",
     "versionsAgo": "{{count}} versiya oldin",
     "versionsAhead": "{{count}} keyingi versiya",
-    "versionsAria": "Versiyalar"
+    "versionsAria": "Versiyalar",
+    "emptyBlock": "Bo'sh blok",
+    "emptyPreview": "Bu versiyada sahifa mazmuni yo'q.",
+    "previewAria": "Faqat o'qish uchun sahifa versiyasi oldindan ko'rish",
+    "previewingCurrent": "Joriy sahifa ko'rilmoqda",
+    "previewingSnapshot": "O'tgan versiya ko'rilmoqda",
+    "previewOnlyHint": "Versiyani tanlash faqat oldindan ko'rishni o'zgartiradi. Joriy sahifa faqat 'Qayta tiklash' tugmasi bosilganda o'zgaradi.",
+    "restoreThisVersion": "Qayta tiklash",
+    "restoring": "Qayta tiklanmoqda...",
+    "versionHistory": "Versiyalar tarixi"
   },
   "badges": {
     "comment": "Izoh",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ga eslatma · {{preview}}",
     "referenceLink": "{{title}} ga havola · {{preview}}",
     "unreadDot": "O'qilmagan",
-    "workspaceUpdate": "Ish maydoni yangilanishi"
+    "workspaceUpdate": "Ish maydoni yangilanishi",
+    "bySelf": "Siz"
   },
   "empty": {
     "allCaughtUp": "Barcha yangilanishlar ko‘rilgan.",

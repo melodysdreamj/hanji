@@ -8,7 +8,8 @@
     "delete": "Smazat",
     "done": "Hotovo",
     "save": "Uložit",
-    "search": "Hledat"
+    "search": "Hledat",
+    "reportIssue": "Nahlásit problém"
   },
   "generated": {
     "columnName": "Sloupec {{number}}",

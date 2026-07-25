@@ -4,7 +4,22 @@
     "sum": "Sumă",
     "average": "Medie",
     "min": "Minim",
-    "max": "Maxim"
+    "max": "Maxim",
+    "checked": "Bifat",
+    "count_values": "Număr valori",
+    "date_range": "Interval dată",
+    "earliest_date": "Cea mai veche dată",
+    "empty": "Număr gol",
+    "latest_date": "Cea mai recentă dată",
+    "median": "Mediană",
+    "not_empty": "Număr ne-gol",
+    "percent_checked": "Procent bifat",
+    "percent_empty": "Procent gol",
+    "percent_not_empty": "Procent ne-gol",
+    "percent_unchecked": "Procent debifat",
+    "range": "Interval",
+    "unchecked": "Debifat",
+    "unique": "Număr valori unice"
   },
   "chartAria": "Grafic {{name}}",
   "chartType": "Tip grafic",
@@ -27,5 +42,9 @@
   "untitledProperty": "Fără titlu",
   "valueProperty": "Proprietate Valoare",
   "xAxis": "Axa X",
-  "yAxis": "Axa Y"
+  "yAxis": "Axa Y",
+  "dateRangeDays": "{{count}} zile",
+  "missingProperty": "proprietatea salvată",
+  "unsupportedAggregateDesc": "{{aggregate}} nu poate fi calculat din {{property}}. Alegeți o proprietate sau un calcul compatibil.",
+  "unsupportedAggregateTitle": "Acest calcul grafic nu este disponibil"
 }

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "சார்புகள்:",
     "hint": "தொடர்பு பண்பைச் சேர்க்கவும்",
-    "relationPropertyAriaLabel": "சார்பு தொடர்பு பண்பு"
+    "relationPropertyAriaLabel": "சார்பு தொடர்பு பண்பு",
+    "makeDependOn": "{{title}} {{predecessor}} சார்ந்திருக்க வை",
+    "startFrom": "{{title}} இலிருந்து சார்பைத் தொடங்கு"
   },
   "toolbar": {
     "today": "இன்று",

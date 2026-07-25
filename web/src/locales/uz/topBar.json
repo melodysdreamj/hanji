@@ -38,7 +38,7 @@
   "moveTo": "Ko'chirish",
   "exporting": "Eksport qilinmoqda…",
   "exportAsMarkdown": "Markdown sifatida eksport",
-  "exportAsHanji": "Hanji fayl sifatida eksport",
+  "exportAsHanji": "Hanji JSON ni eksport qilish (fayllar chiqarib tashlangan)",
   "importing": "Import qilinmoqda…",
   "importMarkdown": "Markdown import",
   "unlockPage": "Sahifa qulfini ochish",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Kirish huquqini yangilab boʻlmadi",
     "removedFromAccessList": "Kirish roʻyxatidan olib tashlandi",
     "couldntRemoveAccess": "Kirish huquqini olib tashlab boʻlmadi",
-    "couldntLoadAccessList": "Kirish roʻyxatini yuklab boʻlmadi"
+    "couldntLoadAccessList": "Kirish roʻyxatini yuklab boʻlmadi",
+    "couldntExportHanjiArchive": "Hanji arxivini eksport qilib bo‘lmadi.",
+    "exportedHanjiArchive": "Fayllar bilan Hanji arxivi eksport qilindi."
   },
   "user": "Foydalanuvchi",
   "whoHasAccess": "Kimda kirish bor",
   "workspace": "Workspace",
   "workspaceCount_one": "{{count}} ta workspace",
   "workspaceCount_other": "{{count}} ta workspace",
-  "you": "Siz"
+  "you": "Siz",
+  "exportAsHanjiArchive": "Hanji arxivini eksport qilish (fayllar bilan birga)",
+  "turnIntoWiki": "Vikiga aylantirish",
+  "undoWiki": "Vikini bekor qilish",
+  "wikiCreated": "Sahifa vikiga aylantirildi",
+  "wikiPageSettings": "Viki sahifa sozlamalari",
+  "wikiUndone": "Viki olib tashlandi; sahifa tarkibi saqlandi",
+  "wikiUpdateFailed": "Vikini yangilashning iloji bo‘lmadi"
 }

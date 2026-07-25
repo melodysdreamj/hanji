@@ -1,4 +1,10 @@
-import { listAll, getExisting, narrowWhere, type TableQuery } from './table-utils';
+import {
+  listAll,
+  getExisting,
+  narrowWhere,
+  projectFields,
+  type TableQuery,
+} from './table-utils';
 
 interface TableRef<T> {
   getOne(id: string): Promise<T | null>;
@@ -9,7 +15,7 @@ export interface DbRef {
   table<T>(name: string): TableRef<T>;
 }
 
-interface Workspace {
+export interface WorkspaceOrganizationLike {
   id: string;
   organizationId?: string | null;
 }
@@ -19,11 +25,51 @@ interface Organization {
   ownerId?: string | null;
 }
 
-interface OrganizationMember {
+export interface OrganizationAccessMemberLike {
   id: string;
   organizationId: string;
   userId: string;
   status?: string | null;
+}
+
+const ORGANIZATION_ACCESS_MEMBER_FIELDS = [
+  'id',
+  'organizationId',
+  'userId',
+  'status',
+] as const;
+
+export async function organizationMemberForNotDeactivatedWorkspace(
+  db: DbRef,
+  workspaceId: string,
+  actorId: string,
+  workspace?: WorkspaceOrganizationLike | null,
+) {
+  const resolvedWorkspace = workspace === undefined
+    ? await getExisting(db.table<WorkspaceOrganizationLike>('workspaces'), workspaceId)
+    : workspace;
+  if (!resolvedWorkspace?.organizationId) return null;
+  const organizationMembers = await listAll(
+    projectFields(
+      narrowWhere(
+        db.table<OrganizationAccessMemberLike>('organization_members').where(
+          'organizationId',
+          '==',
+          resolvedWorkspace.organizationId,
+        ),
+        'userId',
+        actorId,
+      ),
+      ORGANIZATION_ACCESS_MEMBER_FIELDS,
+    ),
+  );
+  const member = organizationMembers.find(
+    (item) => item.organizationId === resolvedWorkspace.organizationId && item.userId === actorId,
+  ) ?? null;
+  if ((member?.status ?? 'active') === 'deactivated') {
+    throw new Error('Organization active access required.');
+  }
+  return member;
 }
 
 export async function assertActiveWorkspaceAccess(
@@ -32,7 +78,7 @@ export async function assertActiveWorkspaceAccess(
   actorId: string,
 ) {
   if (!workspaceId || !actorId) return;
-  const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
+  const workspace = await getExisting(db.table<WorkspaceOrganizationLike>('workspaces'), workspaceId);
   if (!workspace?.organizationId) return;
   const organization = await getExisting(
     db.table<Organization>('organizations'),
@@ -42,7 +88,7 @@ export async function assertActiveWorkspaceAccess(
   if (organization.ownerId === actorId) return;
   const organizationMembers = await listAll(
     narrowWhere(
-      db.table<OrganizationMember>('organization_members').where(
+      db.table<OrganizationAccessMemberLike>('organization_members').where(
         'organizationId',
         '==',
         organization.id,
@@ -62,22 +108,7 @@ export async function assertNotDeactivatedWorkspaceAccess(
   actorId: string,
 ) {
   if (!workspaceId || !actorId) return;
-  const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
-  if (!workspace?.organizationId) return;
-  const organizationMembers = await listAll(
-    narrowWhere(
-      db.table<OrganizationMember>('organization_members').where(
-        'organizationId',
-        '==',
-        workspace.organizationId,
-      ),
-      'userId',
-      actorId,
-    ),
-  );
-  const member = organizationMembers.find((item) => item.userId === actorId) ?? null;
-  if ((member?.status ?? 'active') !== 'deactivated') return;
-  throw new Error('Organization active access required.');
+  await organizationMemberForNotDeactivatedWorkspace(db, workspaceId, actorId);
 }
 
 export async function assertActivePageWorkspaceAccess(

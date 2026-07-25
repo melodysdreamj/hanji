@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} cập nhật gần đây",
     "unreadOfTotal": "{{unread}} chưa đọc trong tổng số {{total}} cập nhật",
     "updateType": "Loại cập nhật",
-    "updates": "Cập nhật",
-    "modeUpdates": "Cập nhật",
-    "modeChats": "Trò chuyện",
-    "inboxMode": "Chế độ hộp thư đến"
+    "updates": "Cập nhật"
   },
   "time": {
     "justNow": "Vừa xong",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} phiên bản",
     "versionsAgo": "{{count}} phiên bản trước",
     "versionsAhead": "{{count}} phiên bản sau",
-    "versionsAria": "Danh sách phiên bản"
+    "versionsAria": "Danh sách phiên bản",
+    "emptyBlock": "Khối trống",
+    "emptyPreview": "Phiên bản này không có nội dung trang.",
+    "previewAria": "Xem trước phiên bản trang chỉ đọc",
+    "previewingCurrent": "Đang xem trang hiện tại",
+    "previewingSnapshot": "Đang xem phiên bản cũ",
+    "previewOnlyHint": "Chọn phiên bản chỉ xem trước. Trang hiện tại chỉ thay đổi sau khi nhấn Khôi phục.",
+    "restoreThisVersion": "Khôi phục",
+    "restoring": "Đang khôi phục...",
+    "versionHistory": "Lịch sử phiên bản"
   },
   "badges": {
     "comment": "Bình luận",
@@ -67,7 +73,8 @@
     "referenceMention": "Nhắc đến {{title}} · {{preview}}",
     "referenceLink": "Liên kết đến {{title}} · {{preview}}",
     "unreadDot": "Chưa đọc",
-    "workspaceUpdate": "Cập nhật không gian làm việc"
+    "workspaceUpdate": "Cập nhật không gian làm việc",
+    "bySelf": "bởi Bạn"
   },
   "empty": {
     "allCaughtUp": "Bạn đã xem hết.",

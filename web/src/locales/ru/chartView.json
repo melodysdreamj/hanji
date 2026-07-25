@@ -4,7 +4,22 @@
     "sum": "Сумма",
     "average": "Среднее",
     "min": "Мин",
-    "max": "Макс"
+    "max": "Макс",
+    "checked": "Отмечено",
+    "count_values": "Количество значений",
+    "date_range": "Диапазон дат",
+    "earliest_date": "Самая ранняя дата",
+    "empty": "Пустых",
+    "latest_date": "Самая поздняя дата",
+    "median": "Медиана",
+    "not_empty": "Не пустых",
+    "percent_checked": "Процент отмеченных",
+    "percent_empty": "Процент пустых",
+    "percent_not_empty": "Процент непустых",
+    "percent_unchecked": "Процент неотмеченных",
+    "range": "Диапазон",
+    "unchecked": "Не отмечено",
+    "unique": "Уникальных"
   },
   "chartAria": "{{name}} диаграмма",
   "chartType": "Тип диаграммы",
@@ -27,5 +42,9 @@
   "untitledProperty": "Без названия",
   "valueProperty": "Свойство значения",
   "xAxis": "Ось X",
-  "yAxis": "Ось Y"
+  "yAxis": "Ось Y",
+  "dateRangeDays": "{{count}} дн.",
+  "missingProperty": "сохраненное свойство",
+  "unsupportedAggregateDesc": "{{aggregate}} нельзя вычислить из {{property}}. Выберите совместимое свойство или расчет.",
+  "unsupportedAggregateTitle": "Этот расчет диаграммы недоступен"
 }

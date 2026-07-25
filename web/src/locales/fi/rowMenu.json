@@ -9,7 +9,7 @@
     "duplicate": "Luo kopio",
     "editIcon": "Muokkaa kuvaketta",
     "editProperties": "Muokkaa ominaisuuksia",
-    "exportAsHanjiFile": "Vie Hanji-tiedostona",
+    "exportAsHanjiFile": "Vie Hanji JSON (ilman tiedostoja)",
     "exportAsMarkdown": "Vie Markdownina",
     "fullPage": "Koko sivu",
     "importing": "Tuodaan...",
@@ -26,7 +26,8 @@
     "sidePeek": "Sivukatselu",
     "undo": "Kumoa",
     "unlockPage": "Poista sivun lukitus",
-    "verifyPage": "Vahvista sivu"
+    "verifyPage": "Vahvista sivu",
+    "exportAsHanjiArchive": "Vie Hanji-arkisto (tiedostot mukana)"
   },
   "aria": {
     "backlinksDisplay": "Takalinkkien näyttö",
@@ -100,7 +101,9 @@
     "pageVerified": "Sivu vahvistettu",
     "removedFromFavorites": "Poistettu suosikeista",
     "restoredPage": "Sivu palautettu",
-    "verificationRemoved": "Vahvistus poistettu"
+    "verificationRemoved": "Vahvistus poistettu",
+    "couldntExportHanjiArchive": "Hanji-arkiston vienti epäonnistui.",
+    "exportedHanjiArchive": "Hanji-arkisto viety tiedostoineen."
   },
   "untitledDatabaseRow": "nimetön tietokannan rivi"
 }

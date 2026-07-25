@@ -88,5 +88,38 @@
   },
   "turnMenu": {
     "chooseType": "Wybierz typ bloku"
+  },
+  "align": {
+    "center": "Środek",
+    "choose": "Wybierz wyrównanie obrazu",
+    "left": "Lewo",
+    "right": "Prawo"
+  },
+  "altText": {
+    "help": "Tekst alternatywny pomaga osobom korzystającym z czytników ekranu zrozumieć obraz.",
+    "label": "Opis",
+    "placeholder": "Opisz obraz",
+    "remove": "Usuń",
+    "save": "Zapisz",
+    "title": "Tekst alternatywny"
+  },
+  "imageLink": {
+    "invalid": "Wprowadź pełny adres http:// lub https:// URL.",
+    "label": "Otwórz ten URL po kliknięciu obrazu",
+    "remove": "Usuń",
+    "save": "Zapisz",
+    "title": "Link do obrazu"
+  },
+  "media": {
+    "addImageLink": "Dodaj link",
+    "align": "Wyrównaj",
+    "altText": "Tekst alternatywny",
+    "copySourceLink": "Kopiuj link źródłowy",
+    "download": "Pobierz",
+    "editImageLink": "Edytuj link",
+    "fullScreen": "Pełny ekran",
+    "openLink": "Otwórz link",
+    "replace": "Zastąp",
+    "viewOriginal": "Zobacz oryginał"
   }
 }

@@ -10,6 +10,7 @@ import { isSafeEmbedTarget } from "@/lib/fileSecurity";
 import { storageKeyFromUrl, useWorkspaceFileUrl } from "@/lib/fileUrls";
 import { positionBetween } from "@/lib/ids";
 import { isComposingKeyEvent } from "@/lib/keyboard";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
 import { motionSafeScrollBehavior } from "@/lib/motion";
 import { isolateBodyForModal, trapModalTab } from "@/lib/modalFocus";
 import { absolutePageUrl, absoluteSharedPageUrl, pageHref, sharedPageHref } from "@/lib/navigation";
@@ -17,10 +18,15 @@ import { pagePathOrWorkspaceRoot } from "@/lib/pagePath";
 import { linkedDatabaseResolvedTitle, pageDisplayTitle } from "@/lib/pageTitle";
 import type { PageAwarenessTextRange, PagePresenceAwareness } from "@/lib/pagePresence";
 import { uploadWorkspaceFile } from "@/lib/storage";
-import type { Block, BlockContent, BlockType, ButtonTemplateBlock, Page, TextSpan } from "@/lib/types";
+import type { AutomationAction, Block, BlockContent, BlockType, ButtonTemplateBlock, Page, TextSpan } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import { useNearViewportActivation } from "@/lib/viewportActivation";
 import { NotionSelect } from "../database/NotionSelect";
+import {
+  AutomationActionEditor,
+  automationEditorActionsValid,
+} from "../automation/AutomationActionEditor";
 import { BLOCK_DRAG_TYPE } from "../dndTypes";
 import { EmojiPicker } from "../EmojiPicker";
 import { PageIconGlyph } from "../PageIcon";
@@ -31,7 +37,7 @@ import { blockUploadErrorMessage, blockUploadProgressLabel, dataTransferHasFiles
 import { htmlToSpans, safeUrl, spansToHtml } from "./richtext";
 import { inlineDatabasePlaceholderTitle, inlineDatabaseTitleDisplay, meaningfulInlineDatabaseTitle } from "./databaseTitles";
 import { TEXT_BLOCKS } from "./blocks";
-import { BlockHandle } from "./BlockHandle";
+import { BlockHandle, type BlockMenuActions } from "./BlockHandle";
 import { BlockIcon } from "./BlockIcon";
 import { SimpleTableContent } from "./SimpleTableContent";
 import { pageTitle, type MentionTrigger } from "./BlockPickerMenus";
@@ -125,7 +131,9 @@ const MermaidPreview = lazy(() =>
 );
 
 // Open the slash menu only when "/" starts a token (block start or after space).
-const SLASH_RE = /(?:^|\s)\/([\p{L}\w]*)$/u;
+// A query may contain horizontal whitespace after its first term so localized
+// multi-word labels stay searchable, but it must never cross a block line.
+const SLASH_RE = /(?:^|\s)\/((?:[\p{L}\w]+(?:[\p{Zs}\t]+[\p{L}\w]*)*)?)$/u;
 const MENTION_RE = /(?:^|\s)@([\p{L}\p{N}_-]*)$/u;
 const PAGE_LINK_RE = /(?:^|\s)\[\[([^\]\n]*)$/u;
 const PASTED_URL_MENU_REQUEST = "hanji:pasted-url-menu-request";
@@ -148,11 +156,22 @@ const INLINE_DATABASE_MENU_WIDTH = 292;
 const INLINE_DATABASE_MENU_HEIGHT = 344;
 const INLINE_DATABASE_COMMAND_EVENT = "hanji:inline-database-command";
 const INLINE_DATABASE_TOOLBAR_MENU_EVENT = "hanji:open-inline-database-toolbar-menu";
+const NATIVE_RENDER_VIRTUALIZED_TEXT_BLOCKS: ReadonlySet<BlockType> = new Set([
+  "paragraph",
+  "bulleted_list_item",
+  "numbered_list_item",
+  "to_do",
+  "toggle",
+  "quote",
+]);
 
 const BlockFrameActionsContext = createContext<BlockFrameActions | null>(null);
 const PASTED_URL_MENU_WIDTH = 280;
 const PASTED_URL_MENU_HEIGHT = 220;
 const MENU_VIEWPORT_MARGIN = 8;
+const BUTTON_CONFIG_GAP = 8;
+const BUTTON_CONFIG_MAX_HEIGHT = 520;
+const BUTTON_CONFIG_WIDTH = 320;
 const HANGUL_RE = /[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/u;
 
 function inlineDatabaseTitleWidth(title: string): string {
@@ -248,6 +267,38 @@ function anchoredMenuPosition(
       Math.min(anchor.left, window.innerWidth - menuWidth - MENU_VIEWPORT_MARGIN)
     ),
     top,
+  };
+}
+
+function buttonConfigPosition(anchor: HTMLElement): CSSProperties {
+  const rect = anchor.getBoundingClientRect();
+  const viewportBottom = window.innerHeight - MENU_VIEWPORT_MARGIN;
+  const belowTop = rect.bottom + BUTTON_CONFIG_GAP;
+  const availableBelow = Math.max(0, viewportBottom - belowTop);
+  const availableAbove = Math.max(
+    0,
+    rect.top - BUTTON_CONFIG_GAP - MENU_VIEWPORT_MARGIN
+  );
+  const placeBelow =
+    availableBelow >= BUTTON_CONFIG_MAX_HEIGHT || availableBelow >= availableAbove;
+  const maxHeight = Math.min(
+    BUTTON_CONFIG_MAX_HEIGHT,
+    placeBelow ? availableBelow : availableAbove
+  );
+  const width = Math.min(
+    BUTTON_CONFIG_WIDTH,
+    Math.max(0, window.innerWidth - MENU_VIEWPORT_MARGIN * 2)
+  );
+
+  return {
+    left: Math.max(
+      MENU_VIEWPORT_MARGIN,
+      Math.min(rect.left, window.innerWidth - width - MENU_VIEWPORT_MARGIN)
+    ),
+    maxHeight,
+    top: placeBelow
+      ? belowTop
+      : Math.max(MENU_VIEWPORT_MARGIN, rect.top - BUTTON_CONFIG_GAP - maxHeight),
   };
 }
 
@@ -656,6 +707,7 @@ function BlockFrame({
   ops,
   depth,
   children,
+  mediaActions,
   renderChildren = true,
   allowInsideDrop = true,
 }: {
@@ -663,6 +715,7 @@ function BlockFrame({
   ops: EditorOps;
   depth: number;
   children: React.ReactNode;
+  mediaActions?: BlockMenuActions;
   renderChildren?: boolean;
   allowInsideDrop?: boolean;
 }) {
@@ -983,19 +1036,19 @@ function BlockFrame({
     }
     if ((e.metaKey || e.ctrlKey) && !e.altKey) {
       const key = e.key.toLowerCase();
-      if (e.shiftKey && key === "m") {
+      if (matchesKeyboardShortcut("addComment", e)) {
         e.preventDefault();
         openComments(block.pageId, block.id, {
           quote: multi ? quoteSelectedBlocks() : undefined,
         });
         return;
       }
-      if (e.shiftKey && key === "p") {
+      if (matchesKeyboardShortcut("moveBlock", e)) {
         e.preventDefault();
         ops.openMoveDialog(block.id);
         return;
       }
-      if (e.shiftKey && key === "h") {
+      if (matchesKeyboardShortcut("blockColor", e)) {
         e.preventDefault();
         ops.setSelectedBlockColor(block.id, getLastEditorColor());
         return;
@@ -1005,7 +1058,7 @@ function BlockFrame({
         ops.selectAllBlocks(block.id);
         return;
       }
-      if (!e.shiftKey && (key === "/" || e.code === "Slash")) {
+      if (matchesKeyboardShortcut("openBlockMenu", e)) {
         e.preventDefault();
         const rect = rowRef.current?.getBoundingClientRect();
         openBlockMenu(
@@ -1015,12 +1068,12 @@ function BlockFrame({
         );
         return;
       }
-      if (e.shiftKey && key === "arrowup") {
+      if (matchesKeyboardShortcut("moveBlockUp", e)) {
         e.preventDefault();
         ops.moveSelectedBlocks(block.id, "up");
         return;
       }
-      if (e.shiftKey && key === "arrowdown") {
+      if (matchesKeyboardShortcut("moveBlockDown", e)) {
         e.preventDefault();
         ops.moveSelectedBlocks(block.id, "down");
         return;
@@ -1220,6 +1273,9 @@ function BlockFrame({
       data-page-id={block.pageId}
       data-depth={depth}
       data-block-type={block.type}
+      data-native-render-virtualized={
+        NATIVE_RENDER_VIRTUALIZED_TEXT_BLOCKS.has(block.type) ? "true" : undefined
+      }
       role="group"
       aria-label={blockAriaLabel(block)}
     >
@@ -1253,7 +1309,10 @@ function BlockFrame({
         onContextMenu={(e) => {
           if (ops.readOnly) return;
           const target = e.target as HTMLElement;
-          if (target.closest("button, input, select, textarea, a")) return;
+          if (
+            target.closest("button, input, select, textarea, a") &&
+            !target.closest("[data-block-media-link]")
+          ) return;
           e.preventDefault();
           e.stopPropagation();
           if (!ops.selectedBlockIds.has(block.id)) {
@@ -1270,6 +1329,7 @@ function BlockFrame({
             onDragState={setDragging}
             menuOpen={menuOpen}
             menuAnchor={menuAnchor}
+            mediaActions={mediaActions}
             onMenuOpen={openBlockMenu}
             onMenuClose={closeBlockMenu}
           />
@@ -2435,7 +2495,12 @@ function ImageBlock({
   const titleId = useId();
   const hintId = useId();
   const errorId = useId();
-  const url = useWorkspaceFileUrl(block.content?.url, ["data:image/"]);
+  const storedImageKey = storageKeyFromUrl(block.content?.url);
+  const imageResolutionEnabled = useNearViewportActivation(imageRef, storedImageKey);
+  const url = useWorkspaceFileUrl(block.content?.url, ["data:image/"], {
+    enabled: imageResolutionEnabled,
+  });
+  const hasImageSource = Boolean(storedImageKey || url);
   const imageWidth =
     typeof block.content?.width === "number" ? clampImageWidth(block.content.width) : undefined;
   const imageAlign = block.content?.align ?? "left";
@@ -2598,75 +2663,101 @@ function ImageBlock({
     window.addEventListener("pointerup", onPointerUp);
   }
 
-  const body = url ? (
+  function replaceImage() {
+    // Don't seed the input with a data: URL (it can't be re-submitted through
+    // safeUrl). Keep http(s) links so they stay editable.
+    setDraft(url.startsWith("data:") ? "" : url);
+    updateBlock(block.id, { content: { ...block.content, url: "" } });
+  }
+
+  const renderedImage = url ? (
+    <img
+      src={url}
+      alt={block.content?.altText ?? captionText ?? ""}
+      loading="lazy"
+      onDoubleClick={() => setPreviewOpen(true)}
+    />
+  ) : null;
+
+  const body = hasImageSource ? (
     <figure
       ref={imageRef}
       className={styles.imageBlock}
+      data-image-load-state={url ? "loaded" : "pending"}
       data-sized={imageWidth ? "true" : undefined}
       data-resizing={imageResizing ? "true" : undefined}
       data-align={imageAlign}
       style={imageWidth ? { width: `${imageWidth}%` } : undefined}
     >
-      <div className={styles.imageFrame}>
-        <img
-          src={url}
-          alt={captionText || ""}
-          onDoubleClick={() => setPreviewOpen(true)}
-        />
-        <button
-          type="button"
-          className={`${styles.imageResizeHandle} ${styles.imageResizeLeft}`}
-          aria-label={blockItemText("image.resizeFromLeft")}
-          title={blockItemText("common.resize")}
-          onPointerDown={(e) => startImageResize("left", e)}
-        />
-        <button
-          type="button"
-          className={`${styles.imageResizeHandle} ${styles.imageResizeRight}`}
-          aria-label={blockItemText("image.resizeFromRight")}
-          title={blockItemText("common.resize")}
-          onPointerDown={(e) => startImageResize("right", e)}
-        />
-        <div className={styles.imageActions} contentEditable={false}>
-          {(["left", "center", "right"] as const).map((align) => (
-            <button
-              key={align}
-              type="button"
-              aria-label={blockItemText("image.alignAction", {
-                align: blockItemText(`image.align.${align}`),
-              })}
-              aria-pressed={imageAlign === align}
-              title={blockItemText("image.alignTitle", {
-                align: blockItemText(`image.align.${align}`),
-              })}
-              onClick={() =>
-                updateBlock(block.id, {
-                  content: { ...block.content, align },
-                })
-              }
-            >
-              {align === "left" ? (
-                <AlignLeftIcon size={14} aria-hidden="true" />
-              ) : align === "center" ? (
-                <AlignCenterIcon size={14} aria-hidden="true" />
-              ) : (
-                <AlignRightIcon size={14} aria-hidden="true" />
-              )}
-            </button>
-          ))}
-          <button
-            type="button"
-            aria-label={blockItemText("image.replace")}
-            onClick={() => {
-              // Don't seed the input with a data: URL (it can't be re-submitted
-              // through safeUrl). Keep http(s) links so they stay editable.
-              setDraft(url.startsWith("data:") ? "" : url);
-              updateBlock(block.id, { content: { ...block.content, url: "" } });
-            }}
+      <div className={styles.imageFrame} data-pending={url ? undefined : "true"}>
+        {!renderedImage ? (
+          <div className={styles.imagePending} aria-hidden="true">
+            <ImageIcon size={24} />
+          </div>
+        ) : block.content?.imageLink ? (
+          <a
+            href={block.content.imageLink}
+            target="_blank"
+            rel="noreferrer"
+            data-block-media-link="true"
+            aria-label={block.content.altText || blockItemText("image.link")}
           >
-            {blockItemText("common.replace")}
-          </button>
-        </div>
+            {renderedImage}
+          </a>
+        ) : renderedImage}
+        {url && (
+          <>
+            <button
+              type="button"
+              className={`${styles.imageResizeHandle} ${styles.imageResizeLeft}`}
+              aria-label={blockItemText("image.resizeFromLeft")}
+              title={blockItemText("common.resize")}
+              onPointerDown={(e) => startImageResize("left", e)}
+            />
+            <button
+              type="button"
+              className={`${styles.imageResizeHandle} ${styles.imageResizeRight}`}
+              aria-label={blockItemText("image.resizeFromRight")}
+              title={blockItemText("common.resize")}
+              onPointerDown={(e) => startImageResize("right", e)}
+            />
+            <div className={styles.imageActions} contentEditable={false}>
+              {(["left", "center", "right"] as const).map((align) => (
+                <button
+                  key={align}
+                  type="button"
+                  aria-label={blockItemText("image.alignAction", {
+                    align: blockItemText(`image.align.${align}`),
+                  })}
+                  aria-pressed={imageAlign === align}
+                  title={blockItemText("image.alignTitle", {
+                    align: blockItemText(`image.align.${align}`),
+                  })}
+                  onClick={() =>
+                    updateBlock(block.id, {
+                      content: { ...block.content, align },
+                    })
+                  }
+                >
+                  {align === "left" ? (
+                    <AlignLeftIcon size={14} aria-hidden="true" />
+                  ) : align === "center" ? (
+                    <AlignCenterIcon size={14} aria-hidden="true" />
+                  ) : (
+                    <AlignRightIcon size={14} aria-hidden="true" />
+                  )}
+                </button>
+              ))}
+              <button
+                type="button"
+                aria-label={blockItemText("image.replace")}
+                onClick={replaceImage}
+              >
+                {blockItemText("common.replace")}
+              </button>
+            </div>
+          </>
+        )}
       </div>
       {showCaption && (
         <figcaption
@@ -2781,14 +2872,25 @@ function ImageBlock({
       <img
         className={styles.imagePreviewImage}
         src={url}
-        alt={spansToPlainText(block.content?.caption) || blockItemText("image.label")}
+        alt={block.content?.altText || spansToPlainText(block.content?.caption) || blockItemText("image.label")}
       />
     </div>
   ) : null;
 
   return (
     <>
-      <BlockFrame block={block} ops={ops} depth={depth}>
+      <BlockFrame
+        block={block}
+        ops={ops}
+        depth={depth}
+        mediaActions={url ? {
+          url,
+          download: true,
+          fileName: block.content?.fileName || fileNameFromUrl(url) || blockItemText("image.label"),
+          replace: replaceImage,
+          fullScreen: () => setPreviewOpen(true),
+        } : undefined}
+      >
         {body}
       </BlockFrame>
       {preview &&
@@ -2811,19 +2913,29 @@ function MediaBlock({
   const updateBlock = useStore((s) => s.updateBlock);
   const captionRef = useRef<HTMLElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadInFlightRef = useRef(false);
   const [draft, setDraft] = useState(block.content?.url ?? "");
   const [error, setError] = useState("");
+  const [playbackError, setPlaybackError] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<BlockUploadProgress | null>(null);
   const [fileDrop, setFileDrop] = useState(false);
   const titleId = useId();
   const hintId = useId();
   const errorId = useId();
+  const playbackErrorId = useId();
   const isVideo = kind === "video";
   const url = useWorkspaceFileUrl(block.content?.url, isVideo ? ["data:video/"] : ["data:audio/"]);
   const title = blockItemText(isVideo ? "media.embedVideo" : "media.embedAudio");
   const hint = blockItemText(isVideo ? "media.videoEmptyHint" : "media.audioEmptyHint");
   const captionText = blockCaptionText(block);
   const showCaption = blockCaptionVisible(block);
+  const playbackErrorText = blockItemText(
+    isVideo ? "media.videoPlaybackFailed" : "media.audioPlaybackFailed"
+  );
+
+  useEffect(() => {
+    setPlaybackError(false);
+  }, [block.id, url]);
 
   useEffect(() => {
     const el = captionRef.current;
@@ -2849,35 +2961,40 @@ function MediaBlock({
   }
 
   async function pickMediaFile(file?: File) {
-    if (!file) return;
+    if (!file || uploadInFlightRef.current) return;
     if (!file.type.startsWith(`${kind}/`)) {
       setError(blockItemText(isVideo ? "media.chooseVideoFile" : "media.chooseAudioFile"));
       return;
     }
-    let uploadedUrl = "";
+    uploadInFlightRef.current = true;
     try {
-      const fallbackName = blockItemText(isVideo ? "media.video" : "media.audio");
+      let uploadedUrl = "";
+      try {
+        const fallbackName = blockItemText(isVideo ? "media.video" : "media.audio");
+        setError("");
+        setUploadProgress({ phase: "preparing", percent: 0, fileName: file.name || fallbackName });
+        uploadedUrl = (await uploadWorkspaceFile(file, isVideo ? "blocks/videos" : "blocks/audio", {
+          pageId: block.pageId,
+          blockId: block.id,
+        }, {
+          onProgress: (progress) =>
+            setUploadProgress({ ...progress, fileName: file.name || fallbackName }),
+        })).url;
+      } catch (err) {
+        setError(blockUploadErrorMessage(err, file.name));
+        return;
+      }
       setError("");
-      setUploadProgress({ phase: "preparing", percent: 0, fileName: file.name || fallbackName });
-      uploadedUrl = (await uploadWorkspaceFile(file, isVideo ? "blocks/videos" : "blocks/audio", {
-        pageId: block.pageId,
-        blockId: block.id,
-      }, {
-        onProgress: (progress) =>
-          setUploadProgress({ ...progress, fileName: file.name || fallbackName }),
-      })).url;
-    } catch (err) {
+      setDraft("");
+      updateBlock(block.id, {
+        content: { ...block.content, url: uploadedUrl, fileName: file.name },
+        plainText: file.name,
+      });
+      ops.insertAfter(block.id, "paragraph");
+    } finally {
+      uploadInFlightRef.current = false;
       setUploadProgress(null);
-      setError(blockUploadErrorMessage(err, file.name));
-      return;
     }
-    setError("");
-    setDraft("");
-    updateBlock(block.id, {
-      content: { ...block.content, url: uploadedUrl, fileName: file.name },
-      plainText: file.name,
-    });
-    ops.insertAfter(block.id, "paragraph");
   }
 
   function onMediaDragOver(e: React.DragEvent<HTMLFormElement>) {
@@ -2925,9 +3042,17 @@ function MediaBlock({
   }
 
   const videoEmbed = isVideo ? streamingVideoEmbed(url) : null;
+  function replaceMedia() {
+    setDraft(url.startsWith("data:") ? "" : url);
+    updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
+  }
+
   const body = url ? (
     <figure className={isVideo ? styles.videoBlock : styles.audioBlock} contentEditable={false}>
-      <div className={isVideo ? styles.videoFrame : styles.audioFrame}>
+      <div
+        className={isVideo ? styles.videoFrame : styles.audioFrame}
+        data-playback-error={playbackError ? "true" : undefined}
+      >
         {isVideo ? (
           videoEmbed ? (
             <iframe
@@ -2938,19 +3063,37 @@ function MediaBlock({
               allowFullScreen
             />
           ) : (
-            <video className={styles.videoPlayer} src={url} controls preload="metadata" />
+            <video
+              className={styles.videoPlayer}
+              src={url}
+              controls
+              preload="metadata"
+              aria-describedby={playbackError ? playbackErrorId : undefined}
+              onCanPlay={() => setPlaybackError(false)}
+              onError={() => setPlaybackError(true)}
+            />
           )
         ) : (
-          <audio className={styles.audioPlayer} src={url} controls preload="metadata" />
+          <audio
+            className={styles.audioPlayer}
+            src={url}
+            controls
+            preload="metadata"
+            aria-describedby={playbackError ? playbackErrorId : undefined}
+            onCanPlay={() => setPlaybackError(false)}
+            onError={() => setPlaybackError(true)}
+          />
+        )}
+        {playbackError && (
+          <div id={playbackErrorId} className={styles.mediaPlaybackError} role="alert">
+            {playbackErrorText}
+          </div>
         )}
         <div className={styles.mediaActions}>
           <button
             type="button"
             aria-label={blockItemText(isVideo ? "media.replaceVideo" : "media.replaceAudio")}
-            onClick={() => {
-              setDraft(url.startsWith("data:") ? "" : url);
-              updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
-            }}
+            onClick={replaceMedia}
           >
             {blockItemText("common.replace")}
           </button>
@@ -3045,7 +3188,17 @@ function MediaBlock({
   );
 
   return (
-    <BlockFrame block={block} ops={ops} depth={depth}>
+    <BlockFrame
+      block={block}
+      ops={ops}
+      depth={depth}
+      mediaActions={url ? {
+        url,
+        download: !videoEmbed,
+        fileName: block.content?.fileName || fileNameFromUrl(url) || title,
+        replace: replaceMedia,
+      } : undefined}
+    >
       {body}
     </BlockFrame>
   );
@@ -3092,6 +3245,11 @@ function BookmarkBlock({
     window.setTimeout(() => setCopied(false), 1200);
   }
 
+  function replaceBookmark() {
+    setDraft(url);
+    updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
+  }
+
   const body = url ? (
     <div className={styles.bookmarkWrap} contentEditable={false}>
       <a
@@ -3099,6 +3257,7 @@ function BookmarkBlock({
         href={url}
         target="_blank"
         rel="noreferrer"
+        data-block-media-link="true"
         aria-label={blockItemText("bookmark.openNamed", { title: displayUrl(url) })}
       >
         <span className={styles.bookmarkContent}>
@@ -3130,10 +3289,7 @@ function BookmarkBlock({
         <button
           type="button"
           aria-label={blockItemText("bookmark.replace")}
-          onClick={() => {
-            setDraft(url);
-            updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
-          }}
+          onClick={replaceBookmark}
         >
           {blockItemText("common.replace")}
         </button>
@@ -3178,7 +3334,12 @@ function BookmarkBlock({
   );
 
   return (
-    <BlockFrame block={block} ops={ops} depth={depth}>
+    <BlockFrame
+      block={block}
+      ops={ops}
+      depth={depth}
+      mediaActions={url ? { url, replace: replaceBookmark } : undefined}
+    >
       {body}
     </BlockFrame>
   );
@@ -3272,6 +3433,11 @@ function EmbedBlock({
     frameActions?.openBlockMenu(anchor ?? { x: e.clientX, y: e.clientY });
   }
 
+  function replaceEmbed() {
+    setDraft(url);
+    updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
+  }
+
   // Existing blocks (stored before normalization) still get the embeddable form.
   const embedAllowed = isSafeEmbedTarget(
     block.content?.url,
@@ -3309,10 +3475,7 @@ function EmbedBlock({
               <button
                 type="button"
                 aria-label={blockItemText("embed.replace")}
-                onClick={() => {
-                  setDraft(url);
-                  updateBlock(block.id, { content: { ...block.content, url: "" }, plainText: "" });
-                }}
+                onClick={replaceEmbed}
               >
                 {blockItemText("common.replace")}
               </button>
@@ -3415,7 +3578,12 @@ function EmbedBlock({
   );
 
   return (
-    <BlockFrame block={block} ops={ops} depth={depth}>
+    <BlockFrame
+      block={block}
+      ops={ops}
+      depth={depth}
+      mediaActions={url ? { url, replace: replaceEmbed } : undefined}
+    >
       {body}
     </BlockFrame>
   );
@@ -3516,6 +3684,14 @@ function FileBlock({
     );
   }
 
+  function replaceFile() {
+    setDraft(url.startsWith("data:") ? "" : url);
+    updateBlock(block.id, {
+      content: { ...block.content, url: "", fileName: undefined },
+      plainText: "",
+    });
+  }
+
   const body = url ? (
     <figure className={styles.fileBlock} contentEditable={false}>
       <div className={styles.fileCard}>
@@ -3530,13 +3706,7 @@ function FileBlock({
           <button
             type="button"
             aria-label={blockItemText("file.replaceNamed", { fileName })}
-            onClick={() => {
-              setDraft(url.startsWith("data:") ? "" : url);
-              updateBlock(block.id, {
-                content: { ...block.content, url: "", fileName: undefined },
-                plainText: "",
-              });
-            }}
+            onClick={replaceFile}
           >
             {blockItemText("common.replace")}
           </button>
@@ -3634,7 +3804,17 @@ function FileBlock({
   );
 
   return (
-    <BlockFrame block={block} ops={ops} depth={depth}>
+    <BlockFrame
+      block={block}
+      ops={ops}
+      depth={depth}
+      mediaActions={url ? {
+        url,
+        download: true,
+        fileName,
+        replace: replaceFile,
+      } : undefined}
+    >
       {body}
     </BlockFrame>
   );
@@ -4533,7 +4713,7 @@ function SyncedBlock({
   );
 
   useEffect(() => {
-    if (isCopy && !loaded) void loadBlocks(sourcePageId);
+    if (isCopy && !loaded) void loadBlocks(sourcePageId).catch(() => {});
   }, [isCopy, loadBlocks, loaded, sourcePageId]);
 
   function openOriginal() {
@@ -4766,9 +4946,24 @@ function ButtonBlock({
   depth: number;
 }) {
   const [configOpen, setConfigOpen] = useState(false);
+  const [configPosition, setConfigPosition] = useState<CSSProperties>({});
   const settingsRef = useRef<HTMLButtonElement>(null);
   const configRef = useRef<HTMLDivElement>(null);
   const updateBlock = useStore((s) => s.updateBlock);
+  const editorSources = useStore(useShallow((state) => ({
+    pagesById: state.pagesById,
+    propsByDb: state.propsByDb,
+    viewsByDb: state.viewsByDb,
+  })));
+  const editorContext = useMemo(() => {
+    const page = editorSources.pagesById[block.pageId];
+    const databaseId = page?.parentType === "database" ? page.parentId : null;
+    return {
+      pages: Object.values(editorSources.pagesById),
+      properties: databaseId ? editorSources.propsByDb[databaseId] ?? [] : [],
+      views: databaseId ? editorSources.viewsByDb[databaseId] ?? [] : [],
+    };
+  }, [block.pageId, editorSources]);
   const isPartialNotionButton = block.content?.notionButtonPartial === true;
   const templates = isPartialNotionButton
     ? block.content?.buttonTemplate ?? []
@@ -4779,14 +4974,32 @@ function ButtonBlock({
     : label.trim() || blockItemText("button.label");
   const [draftLabel, setDraftLabel] = useState(label);
   const [draftTemplates, setDraftTemplates] = useState<ButtonTemplateBlock[]>(templates);
+  const initialActions = (): AutomationAction[] => {
+    const stored = block.content?.buttonActionDocument?.actions;
+    if (stored?.length) return structuredClone(stored);
+    return templates.length > 0 ? [{
+      id: `page-button-insert:${block.id}`,
+      type: "insert_blocks",
+      target: "trigger_page",
+      blocks: structuredClone(templates),
+    }] : [];
+  };
+  const [draftActions, setDraftActions] = useState<AutomationAction[]>(initialActions);
   const draftLabelRef = useRef(draftLabel);
   const draftTemplatesRef = useRef(draftTemplates);
+  const draftActionsRef = useRef(draftActions);
 
   function openConfig() {
     draftLabelRef.current = label;
     draftTemplatesRef.current = templates;
+    const actions = initialActions();
+    draftActionsRef.current = actions;
     setDraftLabel(label);
     setDraftTemplates(templates);
+    setDraftActions(actions);
+    if (settingsRef.current) {
+      setConfigPosition(buttonConfigPosition(settingsRef.current));
+    }
     setConfigOpen(true);
   }
 
@@ -4807,7 +5020,18 @@ function ButtonBlock({
     });
   }, [configOpen]);
 
-  function saveConfig(next: {
+  useEffect(() => {
+    if (!configOpen) return;
+    const updatePosition = () => {
+      if (settingsRef.current) {
+        setConfigPosition(buttonConfigPosition(settingsRef.current));
+      }
+    };
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
+  }, [configOpen]);
+
+  function updateDraft(next: {
     label?: string;
     templates?: ButtonTemplateBlock[];
   }) {
@@ -4817,6 +5041,27 @@ function ButtonBlock({
     draftTemplatesRef.current = nextTemplates;
     setDraftLabel(nextLabel);
     setDraftTemplates(nextTemplates);
+    const currentActions = draftActionsRef.current;
+    const insertAction = {
+      id: currentActions.find((action) => action.type === "insert_blocks")?.id
+        ?? `page-button-insert:${block.id}`,
+      type: "insert_blocks" as const,
+      target: "trigger_page" as const,
+      blocks: nextTemplates,
+    };
+    const hasInsertAction = currentActions.some((action) => action.type === "insert_blocks");
+    const actions: AutomationAction[] = hasInsertAction
+      ? currentActions.map((action) => action.type === "insert_blocks" ? insertAction : action)
+      : [insertAction, ...currentActions];
+    draftActionsRef.current = actions;
+    setDraftActions(actions);
+  }
+
+  function saveConfig() {
+    const nextLabel = draftLabelRef.current.trim();
+    const nextTemplates = draftTemplatesRef.current;
+    const actions = draftActionsRef.current;
+    if (!nextLabel || !automationEditorActionsValid(actions, "page_button")) return;
     updateBlock(
       block.id,
       {
@@ -4825,12 +5070,18 @@ function ButtonBlock({
           rich: [],
           buttonLabel: nextLabel,
           buttonTemplate: nextTemplates,
+          buttonActionDocument: {
+            version: 1,
+            label: nextLabel,
+            actions: structuredClone(actions),
+          },
           notionButtonPartial: undefined,
         },
         plainText: nextLabel,
       },
-      { debounce: true, history: "merge" }
+      { debounce: true, history: "push" }
     );
+    closeConfig(true);
   }
 
   function updateTemplate(index: number, patch: { type?: BlockType; text?: string }) {
@@ -4840,7 +5091,7 @@ function ButtonBlock({
       const text = patch.text ?? buttonTemplateText(template);
       return { ...makeButtonTemplate(type, text), children: template.children };
     });
-    saveConfig({ templates: next });
+    updateDraft({ templates: next });
   }
 
   function moveTemplate(index: number, direction: -1 | 1) {
@@ -4849,12 +5100,12 @@ function ButtonBlock({
     if (target < 0 || target >= currentTemplates.length) return;
     const next = currentTemplates.slice();
     [next[index], next[target]] = [next[target], next[index]];
-    saveConfig({ templates: next });
+    updateDraft({ templates: next });
   }
 
   function removeTemplate(index: number) {
     const next = draftTemplatesRef.current.filter((_, itemIndex) => itemIndex !== index);
-    saveConfig({
+    updateDraft({
       templates: next.length > 0
         ? next
         : [makeButtonTemplate("to_do", blockItemText("button.newTask"))],
@@ -4862,7 +5113,7 @@ function ButtonBlock({
   }
 
   function addTemplate() {
-    saveConfig({
+    updateDraft({
       templates: [
         ...draftTemplatesRef.current,
         makeButtonTemplate("paragraph", blockItemText("button.newContent")),
@@ -4871,6 +5122,7 @@ function ButtonBlock({
   }
 
   function captureNextBlock() {
+    closeConfig();
     ops.captureNextBlockToButton(block.id);
   }
 
@@ -4927,6 +5179,7 @@ function ButtonBlock({
             <div
               className={styles.buttonConfig}
               ref={configRef}
+              style={configPosition}
               role="dialog"
               aria-label={blockItemText("button.configure")}
               onKeyDown={(e) => {
@@ -4940,9 +5193,25 @@ function ButtonBlock({
                 <input
                   value={draftLabel}
                   placeholder={blockItemText("button.label")}
-                  onChange={(e) => saveConfig({ label: e.target.value })}
+                  onChange={(e) => updateDraft({ label: e.target.value })}
                 />
               </label>
+              <AutomationActionEditor
+                surface="page_button"
+                actions={draftActions}
+                properties={editorContext.properties}
+                pages={editorContext.pages}
+                views={editorContext.views}
+                onChange={(actions) => {
+                  draftActionsRef.current = actions;
+                  setDraftActions(actions);
+                  const insertAction = actions.find((action) => action.type === "insert_blocks");
+                  if (insertAction) {
+                    draftTemplatesRef.current = insertAction.blocks;
+                    setDraftTemplates(insertAction.blocks);
+                  }
+                }}
+              />
               <div className={styles.buttonTemplateList}>
                 <div className={styles.buttonConfigLabel}>{blockItemText("button.insertBlocks")}</div>
                 {draftTemplates.map((template, index) => {
@@ -5021,6 +5290,14 @@ function ButtonBlock({
                   </button>
                 </div>
               </div>
+              <button
+                type="button"
+                className={styles.buttonConfigSave}
+                disabled={!draftLabel.trim() || !automationEditorActionsValid(draftActions, "page_button")}
+                onClick={saveConfig}
+              >
+                {i18next.t("common:actions.save")}
+              </button>
             </div>
           </>
         )}

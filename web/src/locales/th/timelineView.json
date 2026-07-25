@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "การพึ่งพา:",
     "hint": "เพิ่มคุณสมบัติความสัมพันธ์",
-    "relationPropertyAriaLabel": "คุณสมบัติความสัมพันธ์ที่พึ่งพา"
+    "relationPropertyAriaLabel": "คุณสมบัติความสัมพันธ์ที่พึ่งพา",
+    "makeDependOn": "ทำให้ {{title}} ขึ้นอยู่กับ {{predecessor}}",
+    "startFrom": "เริ่มการขึ้นต่อจาก {{title}}"
   },
   "toolbar": {
     "today": "วันนี้",

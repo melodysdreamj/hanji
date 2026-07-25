@@ -38,7 +38,7 @@
   "moveTo": "Verplaatsen naar",
   "exporting": "Exporteren…",
   "exportAsMarkdown": "Exporteren als Markdown",
-  "exportAsHanji": "Exporteren als Hanji-bestand",
+  "exportAsHanji": "Hanji JSON exporteren (zonder bestanden)",
   "importing": "Importeren…",
   "importMarkdown": "Markdown importeren",
   "unlockPage": "Pagina ontgrendelen",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Kon toegang niet bijwerken",
     "removedFromAccessList": "Verwijderd uit toegangslijst",
     "couldntRemoveAccess": "Kon toegang niet verwijderen",
-    "couldntLoadAccessList": "Kon toegangslijst niet laden"
+    "couldntLoadAccessList": "Kon toegangslijst niet laden",
+    "couldntExportHanjiArchive": "Kon Hanji-archief niet exporteren.",
+    "exportedHanjiArchive": "Hanji-archief met bestanden geëxporteerd."
   },
   "user": "Gebruiker",
   "whoHasAccess": "Wie heeft toegang",
   "workspace": "Werkruimte",
   "workspaceCount_one": "{{count}} werkruimte",
   "workspaceCount_other": "{{count}} werkruimtes",
-  "you": "Jij"
+  "you": "Jij",
+  "exportAsHanjiArchive": "Hanji-archief exporteren (met bestanden)",
+  "turnIntoWiki": "Omzetten naar wiki",
+  "undoWiki": "Wiki ongedaan maken",
+  "wikiCreated": "Pagina omgezet naar wiki",
+  "wikiPageSettings": "Wiki-pagina-instellingen",
+  "wikiUndone": "Wiki verwijderd; pagina-inhoud behouden",
+  "wikiUpdateFailed": "Kon de wiki niet bijwerken"
 }

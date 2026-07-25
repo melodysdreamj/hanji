@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Tilføj kommentar",
+    "addLink": "Tilføj link",
+    "blockColor": "Anvend sidst brugte farve",
+    "bold": "Fed",
+    "copyPageLink": "Kopier side-link",
+    "findInPage": "Find på denne side",
+    "inlineCode": "Indlejret kode",
+    "italic": "Kursiv",
+    "moveBlock": "Flyt blok til anden side",
+    "moveBlockDown": "Flyt blok ned",
+    "moveBlockUp": "Flyt blok op",
+    "movePage": "Flyt aktuel side",
+    "navigateBack": "Gå tilbage",
+    "navigateForward": "Gå frem",
+    "newPage": "Ny side",
+    "openBlockMenu": "Åbn blok-handlinger",
+    "openKeyboardShortcuts": "Åbn tastaturgenveje",
+    "openParentPage": "Åbn overordnet side",
+    "quickFind": "Hurtigsøgning",
+    "strikethrough": "Gennemstregning",
+    "toggleAllToggles": "Udvid eller skjul alle toggles",
+    "toggleSidebar": "Skift sidepanel",
+    "toggleTheme": "Skift mørk tilstand",
+    "underline": "Understreg"
+  },
+  "categories": {
+    "createStyle": "Opret & style",
+    "editMove": "Rediger & flyt",
+    "popular": "Populære"
+  },
+  "categoriesLabel": "Genvejskategorier",
+  "close": "Luk",
+  "closeBackdrop": "Luk tastaturgenveje",
+  "empty": "Ingen genveje fundet",
+  "keysFor": "Taster til {{action}}",
+  "or": "eller",
+  "searchLabel": "Søg tastaturgenveje",
+  "searchPlaceholder": "Søg genveje…",
+  "searchResults": "Søgeresultater",
+  "searchTerms": {
+    "toggleTheme": "tema lys mørk udseende"
+  },
+  "title": "Tastaturgenveje"
+}

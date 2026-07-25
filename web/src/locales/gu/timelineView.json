@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "અવલંબનો:",
     "hint": "સંબંધ ગુણધર્મ ઉમેરો",
-    "relationPropertyAriaLabel": "અવલંબન સંબંધ ગુણધર્મ"
+    "relationPropertyAriaLabel": "અવલંબન સંબંધ ગુણધર્મ",
+    "makeDependOn": "{{title}}ને {{predecessor}} પર નિર્ભર બનાવો",
+    "startFrom": "{{title}} થી નિર્ભરતા શરૂ કરો"
   },
   "toolbar": {
     "today": "આજે",

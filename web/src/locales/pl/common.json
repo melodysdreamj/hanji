@@ -8,7 +8,8 @@
     "delete": "Usuń",
     "done": "Gotowe",
     "save": "Zapisz",
-    "search": "Szukaj"
+    "search": "Szukaj",
+    "reportIssue": "Zgłoś problem"
   },
   "generated": {
     "columnName": "Kolumna {{number}}",

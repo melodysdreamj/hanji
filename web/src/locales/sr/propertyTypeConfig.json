@@ -51,7 +51,14 @@
     "range": "Opseg",
     "earliest_date": "Najraniji datum",
     "latest_date": "Najkasniji datum",
-    "date_range": "Opseg datuma"
+    "date_range": "Opseg datuma",
+    "count": "Prebroj sve",
+    "count_per_group": "Broj po grupi",
+    "empty": "Broj praznih",
+    "not_empty": "Broj ne-praznih",
+    "percent_per_group": "Procenat po grupi",
+    "show_unique": "Prikaži jedinstvene vrednosti",
+    "unique": "Broj jedinstvenih vrednosti"
   },
   "undo": "Poništi",
   "untitled": "Bez naslova",

@@ -15,10 +15,7 @@
     "recentUpdates_other": "မကြာသေးမီက အပ်ဒိတ် {{count}}ခု",
     "unreadOfTotal": "အပ်ဒိတ် {{total}}ခုအနက် {{unread}}ခု မဖတ်ရသေး",
     "updateType": "အပ်ဒိတ်အမျိုးအစား",
-    "updates": "အပ်ဒိတ်များ",
-    "modeUpdates": "အပ်ဒိတ်များ",
-    "modeChats": "ချတ်များ",
-    "inboxMode": "အင်ဘောက်မုဒ်"
+    "updates": "အပ်ဒိတ်များ"
   },
   "time": {
     "justNow": "ယခုလေးတင်",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} ဗားရှင်း",
     "versionsAgo": "ဗားရှင်း {{count}} ခုအကြာက",
     "versionsAhead": "နောက်ဗားရှင်း {{count}} ခု",
-    "versionsAria": "ဗားရှင်းများ"
+    "versionsAria": "ဗားရှင်းများ",
+    "emptyBlock": "ဗလာဘလောက်",
+    "emptyPreview": "ဤဗားရှင်းတွင် စာမျက်နှာအကြောင်းအရာ မပါဝင်ပါ။",
+    "previewAria": "ဖတ်ရန်သာ စာမျက်နှာဗားရှင်း အစမ်းကြည့်ရှုမှု",
+    "previewingCurrent": "လက်ရှိစာမျက်နှာကို ကြည့်ရှုနေသည်",
+    "previewingSnapshot": "ယခင်ဗားရှင်းကို ကြည့်ရှုနေသည်",
+    "previewOnlyHint": "ဗားရှင်းတစ်ခုကို ရွေးချယ်ပါက ၎င်းကို အစမ်းကြည့်ရှုရုံသာ ရပါသည်။ လက်ရှိစာမျက်နှာသည် Restore လုပ်ပြီးမှသာ ပြောင်းလဲပါသည်။",
+    "restoreThisVersion": "ပြန်လည်ရယူရန်",
+    "restoring": "ပြန်လည်ရယူနေသည်...",
+    "versionHistory": "ဗားရှင်းမှတ်တမ်း"
   },
   "badges": {
     "comment": "မှတ်ချက်",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ကို ဖော်ပြထားသည် · {{preview}}",
     "referenceLink": "{{title}} သို့ လင့်ခ်ချိတ်ထားသည် · {{preview}}",
     "unreadDot": "မဖတ်ရသေး",
-    "workspaceUpdate": "Workspace အပ်ဒိတ်"
+    "workspaceUpdate": "Workspace အပ်ဒိတ်",
+    "bySelf": "သင်က"
   },
   "empty": {
     "allCaughtUp": "အားလုံးကို စစ်ဆေးပြီးပါပြီ",

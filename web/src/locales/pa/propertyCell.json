@@ -92,5 +92,8 @@
     "ਸ਼ੁ",
     "ਸ਼ਨ"
   ],
-  "you": "ਮੈਂ"
+  "you": "ਮੈਂ",
+  "buttonExecutionFailed": "ਬਟਨ ਚਲਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ।",
+  "loadingMoreRelations": "ਹੋਰ ਸਬੰਧ ਲੋਡ ਹੋ ਰਹੇ ਹਨ...",
+  "loadMoreRelations": "ਹੋਰ ਸਬੰਧ ਲੋਡ ਕਰੋ"
 }

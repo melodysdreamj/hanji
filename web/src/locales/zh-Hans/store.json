@@ -7,7 +7,8 @@
   "pageMissingSave": "未找到页面，更改无法保存。",
   "saveFailed": "无法保存更改。",
   "sessionExpired": "会话已过期或请求认证失败，请重试。",
-  "blockConflictSave": "此块已在其他设备上编辑，离线更改未应用。",
+  "blockConflictSave": "待处理的编辑与服务器最新版本冲突，无法自动合并。",
   "blockConflictKeepMine": "应用我的版本",
-  "blockMoveCommentsSkipped": "块已移动，但评论未能随同移动。"
+  "blockMoveCommentsSkipped": "块已移动，但评论未能随同移动。",
+  "conflictSave": "保存完成前内容已更改，无法保存您的编辑。"
 }

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "פתח תפריט סביבת עבודה",
   "closeWorkspaceMenu": "סגור תפריט סביבת עבודה",
   "workspaceMenu": "תפריט סביבת עבודה",
-  "exportWorkspace": "ייצא סביבת עבודה",
+  "exportWorkspace": "ייצא JSON של סביבת העבודה (ללא קבצים)",
   "exportedWorkspace": "סביבת העבודה יוצאה כקובץ Hanji.",
   "exportedWorkspaceWithPlaceholders": "סביבת העבודה יוצאה כקובץ Hanji — קבצים מצורפים נשארו כממלאי מקום.",
   "couldntExportWorkspace": "לא ניתן היה לייצא את סביבת העבודה.",
@@ -76,5 +76,12 @@
     "later": "אולי אחר כך",
     "note": "תמיד אפשר להתחיל את זה מאוחר יותר מהייבוא בסרגל הצד.",
     "title": "האם להעביר את סביבת העבודה שלך מ-Notion להאנג'י?"
-  }
+  },
+  "addPageToTeamspace": "הוסף דף ל{{name}}",
+  "couldntExportWorkspaceArchive": "לא ניתן לייצא ארכיון סביבת העבודה.",
+  "exportedWorkspaceArchive": "ייצא ארכיון סביבת העבודה עם קבצים.",
+  "exportWorkspaceArchive": "ייצא ארכיון סביבת העבודה (עם קבצים)",
+  "joinTeamspaces": "הצטרף לסביבות צוות",
+  "keyboardShortcuts": "קיצורי מקלדת",
+  "teamspacePages": "דפי {{name}}"
 }

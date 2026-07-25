@@ -865,6 +865,7 @@ function PageTreeItemComponent({
           <button
             type="button"
             className={styles.iconBtn}
+            tabIndex={-1}
             title={t("pageTreeItem:actionsTitle")}
             aria-label={t("pageTreeItem:openActions", { title: pageTitle })}
             onClick={(e) => {
@@ -882,6 +883,7 @@ function PageTreeItemComponent({
             <button
               type="button"
               className={styles.iconBtn}
+              tabIndex={-1}
               title={t("pageTreeItem:addInsideTitle")}
               aria-label={t("pageTreeItem:addInside", { title: pageTitle })}
               onClick={addSubpage}

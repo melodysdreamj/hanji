@@ -233,7 +233,9 @@
     "video": "Video",
     "videoCaption": "Titulek videa",
     "videoEmptyHint": "Nahrajte video soubor, vložte přímý odkaz nebo použijte odkaz z YouTube, Vimeo nebo Loom.",
-    "videoLink": "Odkaz na video"
+    "videoLink": "Odkaz na video",
+    "audioPlaybackFailed": "Toto audio nelze přehrát. Nahraďte jej nebo otevřete původní soubor.",
+    "videoPlaybackFailed": "Toto video nelze přehrát. Nahraďte jej nebo otevřete původní soubor."
   },
   "mention": {
     "closeMenu": "Zavřít nabídku zmíněk",

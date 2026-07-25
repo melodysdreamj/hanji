@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} به‌روزرسانی اخیر",
     "unreadOfTotal": "{{unread}} نخوانده از {{total}} به‌روزرسانی",
     "updateType": "نوع به‌روزرسانی",
-    "updates": "به‌روزرسانی‌ها",
-    "modeUpdates": "به‌روزرسانی‌ها",
-    "modeChats": "گفت‌وگوها",
-    "inboxMode": "حالت صندوق ورودی"
+    "updates": "به‌روزرسانی‌ها"
   },
   "time": {
     "justNow": "همین الان",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} نسخه",
     "versionsAgo": "{{count}} نسخه قبل",
     "versionsAhead": "{{count}} نسخه بعد",
-    "versionsAria": "نسخه‌ها"
+    "versionsAria": "نسخه‌ها",
+    "emptyBlock": "بلوک خالی",
+    "emptyPreview": "این نسخه محتوای صفحه ندارد.",
+    "previewAria": "پیش‌نمایش نسخه صفحه فقط خواندنی",
+    "previewingCurrent": "مشاهده صفحه فعلی",
+    "previewingSnapshot": "مشاهده نسخه گذشته",
+    "previewOnlyHint": "انتخاب یک نسخه فقط پیش‌نمایش را نشان می‌دهد. صفحه فعلی تنها پس از «بازگردانی» تغییر می‌کند.",
+    "restoreThisVersion": "بازگردانی",
+    "restoring": "در حال بازگردانی...",
+    "versionHistory": "تاریخچه نسخه‌ها"
   },
   "badges": {
     "comment": "نظر",
@@ -67,7 +73,8 @@
     "referenceMention": "اشاره به {{title}} · {{preview}}",
     "referenceLink": "پیوند به {{title}} · {{preview}}",
     "unreadDot": "نخوانده",
-    "workspaceUpdate": "به‌روزرسانی فضای کاری"
+    "workspaceUpdate": "به‌روزرسانی فضای کاری",
+    "bySelf": "توسط شما"
   },
   "empty": {
     "allCaughtUp": "همه به‌روزرسانی‌ها را دیده‌اید.",

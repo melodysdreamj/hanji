@@ -88,5 +88,38 @@
     "hoursAgo": "{{hours}} ਘੰਟੇ ਪਹਿਲਾਂ ਸੰਪਾਦਿਤ",
     "daysAgo": "{{days}} ਦਿਨ ਪਹਿਲਾਂ ਸੰਪਾਦਿਤ",
     "on": "{{date}} ਨੂੰ ਸੰਪਾਦਿਤ"
+  },
+  "align": {
+    "center": "ਕੇਂਦਰ",
+    "choose": "ਚਿੱਤਰ ਅਲਾਈਨਮੈਂਟ ਚੁਣੋ",
+    "left": "ਖੱਬੇ",
+    "right": "ਸੱਜੇ"
+  },
+  "altText": {
+    "help": "Alt text ਸਕ੍ਰੀਨ ਰੀਡਰ ਵਰਤਣ ਵਾਲੇ ਲੋਕਾਂ ਨੂੰ ਚਿੱਤਰ ਸਮਝਣ ਵਿੱਚ ਮਦਦ ਕਰਦਾ ਹੈ।",
+    "label": "ਵਰਣਨ",
+    "placeholder": "ਚਿੱਤਰ ਦਾ ਵਰਣਨ ਕਰੋ",
+    "remove": "ਹਟਾਓ",
+    "save": "ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "title": "ਵਿਕਲਪਿਕ ਟੈਕਸਟ"
+  },
+  "imageLink": {
+    "invalid": "ਇੱਕ ਪੂਰਾ http:// ਜਾਂ https:// URL ਦਰਜ ਕਰੋ।",
+    "label": "ਚਿੱਤਰ 'ਤੇ ਕਲਿੱਕ ਕਰਨ 'ਤੇ ਇਹ URL ਖੋਲ੍ਹੋ",
+    "remove": "ਹਟਾਓ",
+    "save": "ਸੁਰੱਖਿਅਤ ਕਰੋ",
+    "title": "ਚਿੱਤਰ ਲਿੰਕ"
+  },
+  "media": {
+    "addImageLink": "ਲਿੰਕ ਸ਼ਾਮਲ ਕਰੋ",
+    "align": "ਅਲਾਈਨ",
+    "altText": "ਵਿਕਲਪਿਕ ਟੈਕਸਟ",
+    "copySourceLink": "ਸਰੋਤ ਲਿੰਕ ਕਾਪੀ ਕਰੋ",
+    "download": "ਡਾਊਨਲੋਡ",
+    "editImageLink": "ਲਿੰਕ ਸੰਪਾਦਿਤ ਕਰੋ",
+    "fullScreen": "ਪੂਰੀ ਸਕ੍ਰੀਨ",
+    "openLink": "ਲਿੰਕ ਖੋਲ੍ਹੋ",
+    "replace": "ਬਦਲੋ",
+    "viewOriginal": "ਮੂਲ ਦੇਖੋ"
   }
 }

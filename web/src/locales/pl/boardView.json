@@ -16,7 +16,7 @@
   "groupName": "Nazwa grupy",
   "groupOptions": "Opcje grupy {{groupName}}",
   "groupThisBoard": "Grupuj tę tablicę",
-  "groupThisBoardDesc": "Dodaj właściwość Wybór lub Status, aby utworzyć kolumny.",
+  "groupThisBoardDesc": "Dodaj lub wybierz właściwość typu Wybór, Status, Osoba lub Wielokrotny wybór, aby utworzyć kolumny.",
   "newGroup": "Nowa grupa",
   "newGroupIn": "Nowa grupa {{groupName}} w {{dbTitle}}",
   "newPage": "Nowa",

@@ -4,6 +4,7 @@ import { normalizePersonIds, personLabel } from "./people";
 import { evaluateFormula, formatFormulaValue } from "./formula";
 import { backendComputedText, backendComputedValue } from "./computed";
 import { dateKey as normalizeDateKey } from "./dateUtils";
+import { resolvedViewerTimeZone } from "@/lib/timeZone";
 import {
   compareKeys as coreCompareKeys,
   currentPageFilterValue as coreCurrentPageFilterValue,
@@ -18,6 +19,7 @@ import {
   type QueryProperty,
   type QueryViewConfig,
 } from "../../../../shared/database/query-core";
+import { foldNfcText } from "../../../../shared/database/natural-order.mjs";
 
 const NO_FILTER_SEED = Symbol("no-filter-seed");
 export const TABLE_INITIAL_LOAD_OPTIONS = [10, 25, 50, 100] as const;
@@ -42,11 +44,102 @@ export interface ApplyViewOptions {
   currentPageId?: string;
 }
 
+export type CardViewSubitemPresentationMode = "card_property" | "flattened" | "disabled";
+
+export interface CardViewSubitemPresentation {
+  rows: Page[];
+  mode: CardViewSubitemPresentationMode;
+  childCountByParent: ReadonlyMap<string, number>;
+}
+
+/**
+ * Derive the complete card-view sub-item presentation in one bounded pass.
+ * Card property consumes roots plus their server-owned direct-child count;
+ * Flattened list retains the ordinary flat row window for parent labels.
+ */
+export function projectCardViewSubitems(
+  database: Pick<Page, "databaseFeatures">,
+  view: Pick<DbView, "config" | "type">,
+  rows: Page[]
+): CardViewSubitemPresentation {
+  const isCardView =
+    view.type === "board" || view.type === "calendar" || view.type === "gallery";
+  if (!isCardView || database.databaseFeatures?.subitems?.enabled !== true) {
+    return { rows, mode: "disabled", childCountByParent: new Map() };
+  }
+
+  const displayMode = view.config?.subtasks?.displayMode ?? "show";
+  if (displayMode === "disabled") {
+    return { rows, mode: "disabled", childCountByParent: new Map() };
+  }
+
+  const childCountByParent = new Map<string, number>();
+  const exactChildCountByParent = new Map<string, number>();
+  for (const row of rows) {
+    if (row.subitemParentId) {
+      childCountByParent.set(
+        row.subitemParentId,
+        (childCountByParent.get(row.subitemParentId) ?? 0) + 1
+      );
+    }
+    if (
+      typeof row.subitemChildCount === "number"
+      && Number.isSafeInteger(row.subitemChildCount)
+      && row.subitemChildCount >= 0
+    ) {
+      exactChildCountByParent.set(row.id, row.subitemChildCount);
+    }
+  }
+  // The server scalar is exact even when the bounded window does not contain
+  // every child; loaded-row counts are only a standalone/local fallback.
+  for (const [parentId, count] of exactChildCountByParent) {
+    childCountByParent.set(parentId, count);
+  }
+
+  if (displayMode === "flattened") {
+    return { rows, mode: "flattened", childCountByParent };
+  }
+
+  // Board, Calendar and Gallery expose only the parents filter. Both the
+  // normalized Card property mode and a legacy hidden value therefore consume
+  // one root window; stale table-only filterScope values are intentionally ignored.
+  return {
+    rows: rows.filter((row) => !row.subitemParentId),
+    mode: "card_property",
+    childCountByParent,
+  };
+}
+
 export function tableInitialLoadLimit(view?: Pick<DbView, "config">) {
   const raw = Number(view?.config?.initialLoadLimit);
   return TABLE_INITIAL_LOAD_OPTIONS.includes(raw as (typeof TABLE_INITIAL_LOAD_OPTIONS)[number])
     ? raw
     : DEFAULT_TABLE_INITIAL_LOAD_LIMIT;
+}
+
+/**
+ * Select the exact hierarchy window a nested row-based view can render.
+ * An empty string is the backend's explicit root scope; undefined preserves
+ * the ordinary unscoped query for flat/sub-item-only presentations.
+ */
+export function databaseViewSubitemParentScope(
+  database: Pick<Page, "databaseFeatures">,
+  view?: Pick<DbView, "config" | "type">
+): "" | undefined {
+  if (database.databaseFeatures?.subitems?.enabled !== true) {
+    return undefined;
+  }
+  const rowHierarchyView =
+    view?.type === "table" || view?.type === "list" || view?.type === "timeline";
+  const cardView =
+    view?.type === "board" || view?.type === "calendar" || view?.type === "gallery";
+  if (!rowHierarchyView && !cardView) return undefined;
+  const displayMode = view.config?.subtasks?.displayMode ?? "show";
+  if (displayMode === "disabled") return undefined;
+  if (cardView) return displayMode === "flattened" ? undefined : "";
+  const filterScope = view.config?.subtasks?.filterScope ?? "parents_and_subitems";
+  if (displayMode === "hidden" || filterScope === "parents") return "";
+  return displayMode === "show" && filterScope === "parents_and_subitems" ? "" : undefined;
 }
 
 export function timelineLoadLimit(view?: Pick<DbView, "config">) {
@@ -387,13 +480,7 @@ function searchableText(row: Page, prop: DbProperty, ctx: QueryContext): string 
 // filtered/sorted on the same local calendar day the cell displays — without it
 // a KST user's post-15:00-UTC row keys to the previous day and drops out of a
 // "created today" filter.
-const viewerTimeZone: string | undefined = (() => {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
-  } catch {
-    return undefined;
-  }
-})();
+const viewerTimeZone = resolvedViewerTimeZone();
 
 // Web adapters over the shared filter/sort engine (shared/database/query-core.ts):
 // injects web value-reading (`cellValue` → precomputed `__computed`), display
@@ -445,11 +532,11 @@ export function applyView(
   const byId = new Map(props.map((p) => [p.id, p]));
   const coreById = byId as unknown as Map<string, QueryProperty>;
   let out = rows.slice();
-  const search = (options.search ?? view.config?.search ?? "").trim().toLowerCase();
+  const search = foldNfcText((options.search ?? view.config?.search ?? "").trim());
 
   if (search) {
     out = out.filter((row) =>
-      props.some((prop) => searchableText(row, prop, ctx).toLowerCase().includes(search))
+      props.some((prop) => foldNfcText(searchableText(row, prop, ctx)).includes(search))
     );
   }
 

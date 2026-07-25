@@ -4,7 +4,22 @@
     "sum": "Kabuuan",
     "average": "Katamtaman",
     "min": "Min",
-    "max": "Max"
+    "max": "Max",
+    "checked": "Naka-check",
+    "count_values": "Bilang ng value",
+    "date_range": "Saklaw ng petsa",
+    "earliest_date": "Pinakamaagang petsa",
+    "empty": "Bilang ng walang laman",
+    "latest_date": "Pinakahuling petsa",
+    "median": "Median",
+    "not_empty": "Bilang ng may laman",
+    "percent_checked": "Porsyento ng naka-check",
+    "percent_empty": "Porsyento ng walang laman",
+    "percent_not_empty": "Porsyento ng may laman",
+    "percent_unchecked": "Porsyento ng hindi naka-check",
+    "range": "Saklaw",
+    "unchecked": "Hindi naka-check",
+    "unique": "Bilang ng unique na value"
   },
   "chartAria": "{{name}} tsart",
   "chartType": "Uri ng tsart",
@@ -27,5 +42,9 @@
   "untitledProperty": "Walang pamagat",
   "valueProperty": "Value property",
   "xAxis": "X-axis",
-  "yAxis": "Y-axis"
+  "yAxis": "Y-axis",
+  "dateRangeDays": "{{count}} araw",
+  "missingProperty": "ang naka-save na property",
+  "unsupportedAggregateDesc": "Hindi makalkula ang {{aggregate}} mula sa {{property}}. Pumili ng tugmang property o calculation.",
+  "unsupportedAggregateTitle": "Hindi available ang chart calculation na ito"
 }

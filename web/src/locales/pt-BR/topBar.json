@@ -38,7 +38,7 @@
   "moveTo": "Mover para",
   "exporting": "Exportando…",
   "exportAsMarkdown": "Exportar como Markdown",
-  "exportAsHanji": "Exportar como arquivo Hanji",
+  "exportAsHanji": "Exportar Hanji JSON (arquivos excluídos)",
   "importing": "Importando…",
   "importMarkdown": "Importar Markdown",
   "unlockPage": "Desbloquear página",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Não foi possível atualizar o acesso",
     "removedFromAccessList": "Removido da lista de acesso",
     "couldntRemoveAccess": "Não foi possível remover o acesso",
-    "couldntLoadAccessList": "Não foi possível carregar a lista de acesso"
+    "couldntLoadAccessList": "Não foi possível carregar a lista de acesso",
+    "couldntExportHanjiArchive": "Não foi possível exportar o arquivo Hanji.",
+    "exportedHanjiArchive": "Arquivo Hanji exportado com arquivos."
   },
   "user": "Usuário",
   "whoHasAccess": "Quem tem acesso",
   "workspace": "Espaço de trabalho",
   "workspaceCount_one": "{{count}} espaço de trabalho",
   "workspaceCount_other": "{{count}} espaços de trabalho",
-  "you": "Você"
+  "you": "Você",
+  "exportAsHanjiArchive": "Exportar arquivo Hanji (com arquivos)",
+  "turnIntoWiki": "Converter em wiki",
+  "undoWiki": "Desfazer wiki",
+  "wikiCreated": "Página convertida em wiki",
+  "wikiPageSettings": "Configurações de página wiki",
+  "wikiUndone": "Wiki removida; conteúdo da página preservado",
+  "wikiUpdateFailed": "Não foi possível atualizar a wiki"
 }

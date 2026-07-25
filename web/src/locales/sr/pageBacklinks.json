@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} povratna veza",
-    "count_other": "{{count}} povratnih veza"
+    "count_other": "{{count}} povratnih veza",
+    "partial_one": "{{count}}+ povratni link",
+    "partial_other": "{{count}}+ povratnih linkova"
   },
   "header": {
     "title": "Povezani pomeni"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} pomen",
     "mention_other": "{{count}} pomena",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} linka"
+    "link_other": "{{count}} linka",
+    "loaded": "Učitano: {{summary}}"
   },
   "kind": {
     "mention": "Pomen",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Još {{count}} povratna veza",
-    "count_other": "Još {{count}} povratnih veza"
+    "count_other": "Još {{count}} povratnih veza",
+    "load": "Učitaj još povratnih linkova",
+    "loading": "Učitavanje povratnih linkova…",
+    "search": "Pretraga povratnih linkova"
   }
 }

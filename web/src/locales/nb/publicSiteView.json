@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Brødsmuler",
+  "clearSearch": "Tøm søk",
+  "errors": {
+    "not-found": "Dette nettstedet kan ha blitt avpublisert eller adressen endret.",
+    "offline": "Sjekk nettverkstilkoblingen, og prøv å åpne siden på nytt.",
+    "rate-limited": "Nettstedet mottar for mange forespørsler. Vent et øyeblikk og prøv igjen.",
+    "unavailable": "Hanji kunne ikke åpne dette nettstedet akkurat nå. Prøv igjen om et øyeblikk."
+  },
+  "madeWithHanji": "Laget med Hanji",
+  "navigation": "Sidenavigasjon",
+  "noResults": "Ingen sider funnet",
+  "outsideSite": "Siden er ikke en del av dette publiserte nettstedet.",
+  "search": "Søk på dette nettstedet",
+  "tryAgain": "Prøv igjen",
+  "unavailable": "Dette nettstedet er utilgjengelig."
+}

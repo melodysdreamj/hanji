@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} भर्खरका अद्यावधिकहरू",
     "unreadOfTotal": "{{total}} अद्यावधिकमध्ये {{unread}} नपढिएको",
     "updateType": "अद्यावधिक प्रकार",
-    "updates": "अद्यावधिक",
-    "modeUpdates": "अद्यावधिक",
-    "modeChats": "च्याट",
-    "inboxMode": "इनबक्स मोड"
+    "updates": "अद्यावधिक"
   },
   "time": {
     "justNow": "भर्खरै",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} संस्करणहरू",
     "versionsAgo": "{{count}} संस्करण अघि",
     "versionsAhead": "{{count}} संस्करण अगाडि",
-    "versionsAria": "संस्करणहरू"
+    "versionsAria": "संस्करणहरू",
+    "emptyBlock": "खाली ब्लक",
+    "emptyPreview": "यस संस्करणमा कुनै पृष्ठ सामग्री छैन।",
+    "previewAria": "पढ्न-मात्र पृष्ठ संस्करण पूर्वावलोकन",
+    "previewingCurrent": "वर्तमान पृष्ठ हेर्दै",
+    "previewingSnapshot": "विगतको संस्करण हेर्दै",
+    "previewOnlyHint": "संस्करण चयन गर्दा यसलाई मात्र पूर्वावलोकन गर्दछ। हालको पृष्ठ पुनर्स्थापना पछि मात्र परिवर्तन हुन्छ।",
+    "restoreThisVersion": "पुनर्स्थापना",
+    "restoring": "पुनर्स्थापना गर्दै...",
+    "versionHistory": "संस्करण इतिहास"
   },
   "badges": {
     "comment": "टिप्पणी",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} उल्लेख · {{preview}}",
     "referenceLink": "{{title}} मा लिङ्क गरिएको · {{preview}}",
     "unreadDot": "नपढिएको",
-    "workspaceUpdate": "कार्यक्षेत्र अपडेट"
+    "workspaceUpdate": "कार्यक्षेत्र अपडेट",
+    "bySelf": "तपाईंद्वारा"
   },
   "empty": {
     "allCaughtUp": "तपाईं सबै अद्यावधिक हेरिसक्नुभयो।",

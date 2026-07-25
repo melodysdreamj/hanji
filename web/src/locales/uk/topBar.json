@@ -38,7 +38,7 @@
   "moveTo": "Перемістити в",
   "exporting": "Експортування…",
   "exportAsMarkdown": "Експортувати як Markdown",
-  "exportAsHanji": "Експортувати як файл Hanji",
+  "exportAsHanji": "Експортувати JSON Hanji (без файлів)",
   "importing": "Імпортування…",
   "importMarkdown": "Імпортувати Markdown",
   "unlockPage": "Розблокувати сторінку",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Не вдалося оновити доступ",
     "removedFromAccessList": "Видалено зі списку доступу",
     "couldntRemoveAccess": "Не вдалося видалити доступ",
-    "couldntLoadAccessList": "Не вдалося завантажити список доступу"
+    "couldntLoadAccessList": "Не вдалося завантажити список доступу",
+    "couldntExportHanjiArchive": "Не вдалося експортувати архів Hanji.",
+    "exportedHanjiArchive": "Експортовано архів Hanji з файлами."
   },
   "user": "Користувач",
   "whoHasAccess": "Хто має доступ",
   "workspace": "Робочий простір",
   "workspaceCount_one": "{{count}} робочий простір",
   "workspaceCount_other": "{{count}} робочих просторів",
-  "you": "Ви"
+  "you": "Ви",
+  "exportAsHanjiArchive": "Експортувати архів Hanji (з файлами)",
+  "turnIntoWiki": "Перетворити на вікі",
+  "undoWiki": "Скасувати вікі",
+  "wikiCreated": "Сторінку перетворено на вікі",
+  "wikiPageSettings": "Налаштування вікі-сторінки",
+  "wikiUndone": "Вікі скасовано; вміст сторінки збережено",
+  "wikiUpdateFailed": "Не вдалося оновити вікі"
 }

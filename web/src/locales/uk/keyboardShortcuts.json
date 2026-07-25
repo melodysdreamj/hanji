@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Додати коментар",
+    "addLink": "Додати посилання",
+    "blockColor": "Застосувати останній колір",
+    "bold": "Жирний",
+    "copyPageLink": "Копіювати посилання сторінки",
+    "findInPage": "Знайти на сторінці",
+    "inlineCode": "Інлайн-код",
+    "italic": "Курсив",
+    "moveBlock": "Перемістити блок",
+    "moveBlockDown": "Перемістити блок вниз",
+    "moveBlockUp": "Перемістити блок вгору",
+    "movePage": "Перемістити сторінку",
+    "navigateBack": "Назад",
+    "navigateForward": "Вперед",
+    "newPage": "Нова сторінка",
+    "openBlockMenu": "Відкрити меню блоку",
+    "openKeyboardShortcuts": "Відкрити клавіатурні скорочення",
+    "openParentPage": "Відкрити батьківську сторінку",
+    "quickFind": "Швидкий пошук",
+    "strikethrough": "Закреслений",
+    "toggleAllToggles": "Розгорнути/згорнути всі тогли",
+    "toggleSidebar": "Перемкнути бічну панель",
+    "toggleTheme": "Перемкнути темний режим",
+    "underline": "Підкреслений"
+  },
+  "categories": {
+    "createStyle": "Створення та стиль",
+    "editMove": "Редагування та переміщення",
+    "popular": "Популярні"
+  },
+  "categoriesLabel": "Категорії скорочень",
+  "close": "Закрити",
+  "closeBackdrop": "Закрити клавіатурні скорочення",
+  "empty": "Не знайдено скорочень",
+  "keysFor": "Клавіші для {{action}}",
+  "or": "або",
+  "searchLabel": "Пошук клавіатурних скорочень",
+  "searchPlaceholder": "Пошук скорочень…",
+  "searchResults": "Результати пошуку",
+  "searchTerms": {
+    "toggleTheme": "тема світлий темний вигляд"
+  },
+  "title": "Клавіатурні скорочення"
+}

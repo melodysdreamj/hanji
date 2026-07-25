@@ -4,7 +4,22 @@
     "sum": "المجموع",
     "average": "المتوسط",
     "min": "الحد الأدنى",
-    "max": "الحد الأقصى"
+    "max": "الحد الأقصى",
+    "checked": "محدد",
+    "count_values": "عدد القيم",
+    "date_range": "نطاق التاريخ",
+    "earliest_date": "أقدم تاريخ",
+    "empty": "عدد الفارغ",
+    "latest_date": "أحدث تاريخ",
+    "median": "الوسيط",
+    "not_empty": "عدد غير الفارغ",
+    "percent_checked": "النسبة المئوية للمحدد",
+    "percent_empty": "النسبة المئوية للفارغ",
+    "percent_not_empty": "النسبة المئوية لغير الفارغ",
+    "percent_unchecked": "النسبة المئوية لغير المحدد",
+    "range": "النطاق",
+    "unchecked": "غير محدد",
+    "unique": "عدد القيم الفريدة"
   },
   "chartAria": "مخطط {{name}}",
   "chartType": "نوع المخطط",
@@ -27,5 +42,9 @@
   "untitledProperty": "بدون عنوان",
   "valueProperty": "خاصية القيمة",
   "xAxis": "المحور X",
-  "yAxis": "المحور Y"
+  "yAxis": "المحور Y",
+  "dateRangeDays": "{{count}} يوم",
+  "missingProperty": "الخاصية المحفوظة",
+  "unsupportedAggregateDesc": "لا يمكن حساب {{aggregate}} من {{property}}. اختر خاصية أو عملية حسابية متوافقة.",
+  "unsupportedAggregateTitle": "عملية حساب الرسم البياني هذه غير متاحة"
 }

@@ -30,8 +30,8 @@ HANJI_MCP_ALLOW_ANONYMOUS=false
 ## Access policy
 
 The authenticated EdgeBase user or service principal remains the real security
-boundary. Optional MCP policy variables can only narrow what this MCP process is
-allowed to do:
+boundary. A configured bearer-token session must also carry a non-empty
+workspace allowlist; policy variables may narrow it further:
 
 ```bash
 HANJI_MCP_READ_ONLY=true
@@ -78,7 +78,9 @@ instead of a file. Supported scope names are `pages`, `databases`, `comments`,
 `sharing`, `files`, `notifications`, `import_export`, `notion_import`,
 `workspace_admin`, `organization`, and `organization_admin`. Omit `scopes` to
 leave feature-level scope unrestricted and rely on the authenticated user's
-product permissions plus any allowlists.
+product permissions plus the required workspace allowlist. Anonymous local
+bootstrap is a separate development mode and does not require a provisioned
+user-token allowlist.
 
 `HANJI_MCP_ALLOW_WRITES=false` is also accepted as a read-only alias. Use
 `get_mcp_access_policy` from an MCP client to inspect the active local policy.
@@ -105,10 +107,10 @@ transport follows current MCP authorization guidance by reading credentials
 from the environment. Hanji also ships a hosted Streamable HTTP-compatible
 JSON-RPC transport backed by OAuth authorization-code + PKCE, protected-resource
 metadata, audience validation, scoped grants, and no bearer-token passthrough.
-The hosted surface is intentionally incremental: supported read/query,
-comment, duplicate/move, and database-view operations are live, while primary
-Notion-compatible create/update page and database writes fail closed until they
-delegate to Hanji's canonical stored-file lifecycle.
+The hosted surface routes supported read/query, comment, duplicate/move,
+database-view, and primary Notion-compatible page/database create and update
+operations through Hanji's canonical product mutation handlers. Semantic scope
+and resource-allowlist checks run before every hosted mutation.
 
 ## Tools
 
@@ -172,8 +174,8 @@ delegate to Hanji's canonical stored-file lifecycle.
 | `list_databases` | List local databases and row counts |
 | `create_database` | Create a database through the backend product API with default or custom properties, optional starter rows, and an initial view |
 | `describe_database` | Read database properties, views, and row count |
-| `create_database_view` | Create a database view with filters, grouping, date axes, display, and sort settings |
-| `update_database_view` | Update a database view's name, type, filters, display, grouping, date axes, and sorts |
+| `create_database_view` | Create any of the ten Notion-compatible view types (`table`, `board`, `list`, `calendar`, `timeline`, `gallery`, `form`, `chart`, `map`, or `dashboard`) with filters, sorts, grouping, date/map axes, chart/form settings, display, wrapping, and frozen columns |
+| `update_database_view` | Update a database view's name and Notion-compatible configuration, including clearable filters/sorts/groups, map/chart/form settings, wrapping, and frozen columns |
 | `delete_database_view` | Delete a saved database view while protecting the final remaining view |
 | `list_database_templates` | List database row/page templates |
 | `get_database_template` | Read a template's default properties and Markdown body |
@@ -206,6 +208,122 @@ links, and page mentions (`[[Page]](/p/page-id)`) are preserved in text-bearing
 blocks. Date mentions use `hanji://date/YYYY-MM-DD` links, and person
 mentions use `hanji://person/user-id` links.
 
+## Notion-compatible SQL queries
+
+The official `notion-query-data-sources` tool accepts the same `data.mode =
+"sql"` shape on hosted HTTP and stdio transports. Hanji does not add a
+Business, AI, or Enterprise plan gate. The caller still needs database-read
+scope and access to the referenced source.
+
+A SQL query executes against exactly one physical `collection://` data source.
+It is evaluated as bounded source windows and resumes with an opaque cursor
+bound to the workspace, SQL text, parameters, source, and canonical source
+order.
+
+```json
+{
+  "data": {
+    "mode": "sql",
+    "workspace_id": "WORKSPACE_ID",
+    "data_source_urls": [
+      "collection://TASKS_DATA_SOURCE_ID"
+    ],
+    "query": "SELECT tasks.\"Name\", tasks.\"Priority\" FROM \"collection://TASKS_DATA_SOURCE_ID\" AS tasks WHERE tasks.\"Status\" = ? ORDER BY tasks.\"Priority\" DESC, tasks.\"Name\" ASC LIMIT 100",
+    "params": ["Open"],
+    "start_cursor": "OPAQUE_CURSOR_FROM_THE_PREVIOUS_RESPONSE"
+  }
+}
+```
+
+The streaming read-only subset covers aliases and qualified columns, scalar
+projections and expressions, bind-safe `WHERE` predicates, direct
+data-source-property `ORDER BY` terms, and literal `LIMIT`/`OFFSET`.
+Supported scalar functions are `ABS`, `COALESCE`, `IFNULL`, `LENGTH`,
+`LOWER`, `NULLIF`, `ROUND`, and `UPPER`; expressions also cover `CASE`,
+arithmetic, and `||`. Bind values are never interpolated into SQL.
+
+Direct-property ordering is delegated to the canonical database query before
+any SQL filter or projection runs. It therefore uses the same global,
+deterministic order as database views and remains exact across continuation
+windows. A call reads at most ten source windows of at most 100 rows each and
+returns at most 500 projected rows; omitting `LIMIT` uses a 100-row response
+window. Empty progress windows can legitimately return `has_more: true` with
+a cursor while a durable global-order snapshot is being built. Continue with
+that cursor until rows arrive or `has_more` becomes false. The total number of
+stored source rows is not an execution ceiling.
+
+SQL forms that require state across source windows are rejected after source
+authorization and before any row read: `DISTINCT`, grouping/aggregates and
+`HAVING`, joins, CTEs/subqueries, `UNION`/`UNION ALL`, and computed or
+projected-alias ordering. The parser also fails closed above 32 KiB of SQL, 256
+bind parameters, AST depth 16, or 512 AST nodes, and rejects comments, write
+statements, window functions, parameterized `LIMIT`/`OFFSET`, and unlisted
+functions/operators. Use ordinary database queries or multiple bounded MCP
+calls when an operation needs more than one source.
+
+## Hosted MCP client governance
+
+Organization owners and security admins can enable an approved-client policy
+separately for each workspace in **Settings → Enterprise controls**. Once
+enabled, only listed hosted OAuth client IDs—whether pre-registered,
+dynamically registered, or the reserved `manual-token` client—may authorize or
+call MCP for that workspace. Removing a client takes effect on its next call
+even when an access token or all-workspaces grant already exists. An
+all-workspaces grant keeps working for other approved workspaces; the denied
+workspace is filtered rather than broadening or silently revoking unrelated
+access. The connection's own scopes and page/database allowlists continue to
+narrow every approved call.
+
+Authorization denials, blocked calls, policy enable/disable, and client
+add/remove/rename actions are organization-audited. This hosted control does
+not replace stdio's local process policy: use the environment or signed policy
+file controls above for a locally spawned stdio server.
+
+Policy changes use versioned compare-and-swap transactions: the administrator's
+current role, the controls row, organization policy version, and audit event are
+committed together. Exact retries are no-ops, concurrent changes are retried,
+and malformed or duplicate policy records fail closed. Unknown workspace/client
+metadata is retained so a newer policy writer is not silently downgraded.
+
+## Related Notion-compatible Admin API
+
+The same Hanji server exposes the current 13-operation Notion-compatible Admin
+API separately from MCP. It uses an `ntn_admin_...` organization bot token whose
+secret is displayed once and remains usable until it expires or is revoked, and
+requires `Notion-Version: 2026-06-01`; an MCP access token or ordinary Hanji
+session token is not interchangeable with that bot token. Organization
+owners and security admins provision and revoke tokens under **Settings →
+Enterprise controls → Notion-compatible Admin API**, choosing capabilities and
+workspace/legal-hold resource IDs that can only narrow access.
+
+| Method and path | Required capability |
+| --- | --- |
+| `POST /v1/legal_holds/{legal_hold_id}/export` | `legal-hold:export` |
+| `GET /v1/legal_holds/{legal_hold_id}` | `legal-hold:read` |
+| `PATCH /v1/legal_holds/{legal_hold_id}` | `legal-hold:write` |
+| `GET /v1/legal_holds/{legal_hold_id}/users` | `legal-hold:read` |
+| `POST /v1/legal_holds/{legal_hold_id}/users` | `legal-hold:write` |
+| `GET /v1/legal_holds` | `legal-hold:read` |
+| `POST /v1/legal_holds` | `legal-hold:write` |
+| `GET /v1/legal_holds/{legal_hold_id}/workspaces` | `legal-hold:read` |
+| `POST /v1/legal_holds/{legal_hold_id}/release` | `legal-hold:write-high-impact` |
+| `DELETE /v1/legal_holds/{legal_hold_id}/users/{user_id}` | `legal-hold:write` |
+| `POST /v1/exports` | `workspace:export` |
+| `GET /v1/legal_holds/{legal_hold_id}/spaces/{space_id}/pages` | `legal-hold:read` |
+| `POST /v1/managed_users/revoke_session` | `managed-user-session:write` |
+
+The public base for clients that append `/v1` is
+`https://HOST/api/functions/admin`; the explicit canonical base is
+`https://HOST/api/functions/notion/admin`. Legal-hold discovery export and
+workspace Markdown/HTML export delegate to canonical Hanji product handlers.
+The official workspace-export request accepts `export_type: "pdf"`, but Hanji
+currently fails that export job because no canonical PDF renderer is
+configured; PDF success is not claimed. Comment-inclusive, file-excluding,
+current-view-only, and teamspace-scoped workspace export options also fail
+closed where the canonical Markdown exporter cannot honor them. See the
+[Docker API guide](../docs/docker.md#admin-api) for endpoint and deployment
+details.
+
 ## Run
 
 ```bash
@@ -219,8 +337,20 @@ HANJI_EDGEBASE_URL=http://localhost:8787 node src/index.mjs
 ```bash
 cd mcp
 npm run check
+npm run parity:notion
 npm run smoke
 ```
+
+`npm run parity:notion` is the offline release guard for the official Notion
+compatibility surface. It reads the checked-in Notion `2026-03-11` manifest at
+`../scripts/fixtures/notion-official-parity-2026-03-11.json`, verifies all 48
+REST operations against the ordered compatibility dispatcher (including exact
+path boundaries and expected handler targets), compares the hosted MCP source,
+and compares a real stdio `tools/list` response with the 20 official Notion MCP
+tool names. It does not fetch Notion documentation during CI. When Notion
+publishes a new API version or MCP tool list, update the manifest from the
+official OpenAPI/tool documentation and review every resulting failure rather
+than weakening the expected set.
 
 `npm run smoke` starts the MCP server over stdio and verifies that the core tool
 list is advertised, required MCP resources including

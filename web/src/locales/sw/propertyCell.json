@@ -92,5 +92,8 @@
     "F",
     "S"
   ],
-  "you": "Wewe"
+  "you": "Wewe",
+  "buttonExecutionFailed": "Haikuweza kuendesha kitufe.",
+  "loadingMoreRelations": "Inapakia uhusiano zaidi...",
+  "loadMoreRelations": "Pakia uhusiano zaidi"
 }

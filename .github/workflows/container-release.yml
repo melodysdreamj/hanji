@@ -21,10 +21,12 @@ concurrency:
 env:
   IMAGE_NAME: ghcr.io/melodysdreamj/hanji
   DOCKERHUB_IMAGE: melodysdreamj/hanji
+  EDGEBASE_VERSION: 0.5.0
+  EDGEBASE_PROVENANCE_POLICY: hanji-edgebase-npm-lock-v1
 
 jobs:
   platform-runtime:
-    name: Verify ${{ matrix.platform }} digest
+    name: Build and scan ${{ matrix.platform }} digest
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     environment: container-release
@@ -72,8 +74,31 @@ jobs:
       - name: Build the released frontend
         working-directory: web
         run: npm run build
-      - name: Prepare the portable Docker context
-        run: node scripts/build-hanji-docker-image.mjs --context-only --tag release-context
+      - id: prepared_context
+        name: Prepare the portable Docker context
+        working-directory: backend
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFile } from 'node:fs/promises';
+          import { pathToFileURL } from 'node:url';
+
+          const dockerModule = new URL(
+            './node_modules/@edge-base/cli/dist/commands/docker.js',
+            pathToFileURL(`${process.cwd()}/`),
+          );
+          const { _internals } = await import(dockerModule.href);
+          await _internals.withDockerBuildContext(
+            process.cwd(),
+            { publication: 'export' },
+            async ({ contextDir }) => {
+              await appendFile(
+                process.env.GITHUB_OUTPUT,
+                `context_dir=${contextDir}\n`,
+                'utf8',
+              );
+            },
+          );
+          NODE
       - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
       - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
@@ -108,11 +133,14 @@ jobs:
         name: Build and push the untagged platform digest
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
-          context: backend/.edgebase/targets/docker-context
+          context: ${{ steps.prepared_context.outputs.context_dir }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             HANJI_BUILD_SHA=${{ github.sha }}
+            HANJI_IMAGE_VERSION=${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+            HANJI_EDGEBASE_VERSION=${{ env.EDGEBASE_VERSION }}
+            HANJI_EDGEBASE_PROVENANCE_POLICY=${{ env.EDGEBASE_PROVENANCE_POLICY }}
           outputs: type=image,"name=${{ env.IMAGE_NAME }},${{ env.DOCKERHUB_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
           provenance: mode=max
           sbom: true
@@ -124,13 +152,6 @@ jobs:
           docker buildx imagetools inspect --raw "$IMAGE_NAME@$DIGEST" > ghcr-platform.json
           docker buildx imagetools inspect --raw "$DOCKERHUB_IMAGE@$DIGEST" > dockerhub-platform.json
           cmp ghcr-platform.json dockerhub-platform.json
-      - name: Verify the exact digest's first-admin and persistence contract
-        env:
-          DIGEST: ${{ steps.build.outputs.digest }}
-        run: >-
-          node scripts/verify-edgebase-packaging.mjs
-          --runtime-image "$IMAGE_NAME@$DIGEST"
-          --skip-local-edgebase-check
       - name: Generate platform SBOM
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:

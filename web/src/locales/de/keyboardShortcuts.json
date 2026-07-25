@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Kommentar hinzufügen",
+    "addLink": "Link hinzufügen",
+    "blockColor": "Zuletzt verwendete Farbe anwenden",
+    "bold": "Fett",
+    "copyPageLink": "Seitenlink kopieren",
+    "findInPage": "Auf dieser Seite suchen",
+    "inlineCode": "Inline-Code",
+    "italic": "Kursiv",
+    "moveBlock": "Block in andere Seite verschieben",
+    "moveBlockDown": "Block nach unten verschieben",
+    "moveBlockUp": "Block nach oben verschieben",
+    "movePage": "Aktuelle Seite verschieben",
+    "navigateBack": "Zurück",
+    "navigateForward": "Vor",
+    "newPage": "Neue Seite",
+    "openBlockMenu": "Blockaktionen öffnen",
+    "openKeyboardShortcuts": "Tastaturkürzel öffnen",
+    "openParentPage": "Übergeordnete Seite öffnen",
+    "quickFind": "Schnellsuche",
+    "strikethrough": "Durchgestrichen",
+    "toggleAllToggles": "Alle Toggles ein- oder ausklappen",
+    "toggleSidebar": "Seitenleiste umschalten",
+    "toggleTheme": "Dark Mode umschalten",
+    "underline": "Unterstrichen"
+  },
+  "categories": {
+    "createStyle": "Erstellen & Gestalten",
+    "editMove": "Bearbeiten & Verschieben",
+    "popular": "Beliebt"
+  },
+  "categoriesLabel": "Kategorien",
+  "close": "Schließen",
+  "closeBackdrop": "Tastaturkürzel schließen",
+  "empty": "Keine Tastaturkürzel gefunden",
+  "keysFor": "Tasten für {{action}}",
+  "or": "oder",
+  "searchLabel": "Tastenkombinationen durchsuchen",
+  "searchPlaceholder": "Tastenkombinationen suchen…",
+  "searchResults": "Suchergebnisse",
+  "searchTerms": {
+    "toggleTheme": "design hell dunkel darstellung"
+  },
+  "title": "Tastenkombinationen"
+}

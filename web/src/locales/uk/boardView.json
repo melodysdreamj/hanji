@@ -13,7 +13,7 @@
   "groupName": "Назва групи",
   "groupOptions": "Параметри групи {{groupName}}",
   "groupThisBoard": "Згрупувати цю дошку",
-  "groupThisBoardDesc": "Додайте властивість Вибору або Статусу, щоб створити колонки.",
+  "groupThisBoardDesc": "Додайте або виберіть властивість Select, Status, Person або Multi-select для створення стовпців.",
   "newGroup": "Нова група",
   "newGroupIn": "Нова група {{groupName}} у {{dbTitle}}",
   "newPage": "Створити",

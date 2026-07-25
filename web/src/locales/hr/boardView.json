@@ -13,7 +13,7 @@
   "groupName": "Naziv grupe",
   "groupOptions": "Opcije grupe {{groupName}}",
   "groupThisBoard": "Grupiraj ovu ploču",
-  "groupThisBoardDesc": "Dodajte svojstvo Odabir ili Status za stvaranje stupaca.",
+  "groupThisBoardDesc": "Dodajte ili odaberite svojstvo Odabir, Status, Osoba ili Višestruki odabir za stvaranje stupaca.",
   "newGroup": "Nova grupa",
   "newGroupIn": "Nova grupa {{groupName}} u {{dbTitle}}",
   "newPage": "Nova",

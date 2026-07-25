@@ -7,7 +7,8 @@
   "pageMissingSave": "No se pudo encontrar la página, por lo que no se pudieron guardar tus cambios.",
   "saveFailed": "No se pudieron guardar tus cambios.",
   "sessionExpired": "Tu sesión expiró o no se pudo autenticar la solicitud. Inténtalo de nuevo.",
-  "blockConflictSave": "Este bloque fue editado en otro dispositivo, por lo que tu cambio sin conexión no se aplicó.",
+  "blockConflictSave": "Una edición en cola se superpone con la última versión del servidor, por lo que no se pudo fusionar automáticamente.",
   "blockConflictKeepMine": "Aplicar mi versión",
-  "blockMoveCommentsSkipped": "El bloque se movió, pero sus comentarios no pudieron moverse con él."
+  "blockMoveCommentsSkipped": "El bloque se movió, pero sus comentarios no pudieron moverse con él.",
+  "conflictSave": "Este contenido cambió antes de que se completara el guardado, por lo que no se pudo guardar tu edición."
 }

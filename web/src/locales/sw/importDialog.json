@@ -250,7 +250,9 @@
     "runningHint": "Weka kichupo hiki wazi uingizaji unapoendelea.",
     "noJobHint": "Anza ugunduzi kutoka hatua ya Scope kwanza.",
     "applyLocksHint": "Kutumika kunaandika vitu vilivyogunduliwa kwenye nafasi hii ya kazi.",
-    "browserRunnerWarning": "Uingizaji huu unaendelea kwenye kichupo hiki. Weka kichupo wazi hadi ukamilike. Kufunga au kupakia upya kichupo kunasimamisha usindikaji; kufungua Hanji tena kunaendelea kutoka maendeleo yaliyohifadhiwa."
+    "browserRunnerWarning": "Uingizaji huu unaendelea kwenye kichupo hiki. Weka kichupo wazi hadi ukamilike. Kufunga au kupakia upya kichupo kunasimamisha usindikaji; kufungua Hanji tena kunaendelea kutoka maendeleo yaliyohifadhiwa.",
+    "serverRunnerStatus": "Hanji inachakata uletaji huu kwenye seva. Kufunga au kupakia upya kichupo hiki hakutausitisha.",
+    "serverRunningHint": "Uletaji unaendelea nyuma. Unaweza kufunga kichupo hiki."
   },
   "installer": {
     "elapsed": "Muda uliopita",
@@ -284,9 +286,9 @@
     "title": "Ingiza kutoka Hanji",
     "fromFile": "Kutoka faili",
     "fromLive": "Kutoka kwa instance hai",
-    "choose": "Chagua faili ya .hanji.json",
+    "choose": "Chagua faili ya .hanji.json au .hanji.zip",
     "chooseButton": "Chagua faili",
-    "fileHint": "Toa ukurasa, hifadhidata, au workspace kutoka Hanji nyingine, kisha ingiza hapa. Mahusiano, rollups, fomula, mitazamo, na templates zinahifadhiwa. Viambatisho havijajumuishwa.",
+    "fileHint": "Tumia .hanji.json kwa muundo pekee (faili hazijajumuishwa), au .hanji.zip kwa uhamisho usio na hasara (faili zimejumuishwa). Mahusiano, rollup, fomula, mwonekano, na templeti huhifadhiwa.",
     "selected": "Imechaguliwa: {{name}}",
     "importButton": "Ingiza",
     "importing": "Inaingiza...",
@@ -297,7 +299,7 @@
     "remoteTokenOptional": "Hiari",
     "fetch": "Leta usafirishaji",
     "fetching": "Inapata...",
-    "liveHint": "Vuta workspace moja kwa moja kutoka Hanji nyingine inayoendesha (kwa mfano instance ya Docker dev). Seva ya mbali lazima iruhusu maombi kutoka anwani hii.",
+    "liveHint": "Vuta workspace moja kwa moja kutoka kwa Hanji nyingine inayoendelea (kwa mfano, tukio la maendeleo la Docker). Faili hazijajumuishwa. Sehemu ya mbali lazima iruhusu maombi kutoka anwani hii.",
     "review": "Tayari kuingiza: {{summary}}",
     "placeholderNote": "Baadhi ya viambatisho viliachwa kama vibadala.",
     "importedItems_one": "Kitu {{count}} kimeingizwa kutoka faili ya Hanji.",
@@ -305,6 +307,12 @@
     "cantRead": "Haikuweza kusoma faili ya Hanji.",
     "cantImport": "Haikuweza kuingiza faili ya Hanji.",
     "needFile": "Chagua faili ya Hanji kwanza.",
-    "needRemote": "Ingiza URL ya Hanji ya mbali na ID ya workspace."
+    "needRemote": "Ingiza URL ya Hanji ya mbali na ID ya workspace.",
+    "filesExcluded": "Faili hazijajumuishwa.",
+    "filesIncluded": "Faili zimejumuishwa."
+  },
+  "terminal": {
+    "cancelled": "Uletaji ulighairiwa. Unaweza kuuanzisha tena kwa usalama ukiwa tayari.",
+    "failed": "Uletaji ulisimama kwa usalama kabla ya kukamilika. Angalia muunganisho na ujaribu tena. Maelezo ya kiufundi na vitambulisho vimefichwa hapa."
   }
 }

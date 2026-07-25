@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Zamknięty",
+    "open": "Otwarty",
+    "private": "Prywatny"
+  },
+  "add": "Dodaj",
+  "approve": "Zatwierdź",
+  "archive": "Archiwizuj teamspace",
+  "available": "Dostępne do dołączenia",
+  "choosePrincipal": "Wybierz osobę lub grupę",
+  "create": "Utwórz teamspace",
+  "deny": "Odrzuć",
+  "error": {
+    "action": "Nie udało się wykonać tej akcji w teamspace.",
+    "load": "Nie udało się załadować szczegółów teamspace."
+  },
+  "fields": {
+    "access": "Dostęp",
+    "description": "Opis",
+    "icon": "Ikona",
+    "memberRole": "Dostęp do stron członków",
+    "membersCanEditSidebar": "Członkowie mogą dodawać i zmieniać kolejność stron",
+    "membersCanInvite": "Członkowie mogą zapraszać osoby",
+    "name": "Nazwa",
+    "openRole": "Dostęp do stron dla gości"
+  },
+  "governance": "Ustawienia przestrzeni zespołowej",
+  "join": "Dołącz",
+  "joined": "Twoje przestrzenie zespołowe",
+  "loadMore": "Pokaż więcej",
+  "manage": "Zarządzaj",
+  "member": "Członek",
+  "members": "Członkowie",
+  "noneArchived": "Brak zarchiwizowanych przestrzeni zespołowych.",
+  "noneAvailable": "Brak innych dostępnych przestrzeni zespołowych.",
+  "noneJoined": "Nie dołączyłeś jeszcze do żadnej przestrzeni zespołowej.",
+  "noRequests": "Brak oczekujących próśb.",
+  "notice": {
+    "approved": "Prośba zatwierdzona.",
+    "archived": "Przestrzeń zespołowa zarchiwizowana.",
+    "created": "Przestrzeń zespołowa utworzona.",
+    "defaultSet": "Domyślna przestrzeń zespołowa zaktualizowana.",
+    "denied": "Prośba odrzucona.",
+    "joined": "Dołączono do przestrzeni zespołowej.",
+    "memberAdded": "Członek dodany.",
+    "memberRemoved": "Członek usunięty.",
+    "memberUpdated": "Rola członka zaktualizowana.",
+    "policySaved": "Zasady tworzenia przestrzeni zespołowej zaktualizowane.",
+    "requested": "Poproszono o dostęp.",
+    "restored": "Przestrzeń zespołowa przywrócona.",
+    "saved": "Przestrzeń zespołowa zaktualizowana."
+  },
+  "notOwner": "Tylko właściciel przestrzeni lub administrator obszaru roboczego może zarządzać tą przestrzenią.",
+  "open": "Otwórz",
+  "owner": "Właściciel",
+  "ownersOnlyCreate": "Tylko właściciele obszaru roboczego mogą tworzyć przestrzenie zespołowe",
+  "remove": "Usuń",
+  "replacement": "Wybierz domyślną przestrzeń zastępczą",
+  "request": "Poproś o dostęp",
+  "requestPending": "Prośba oczekuje",
+  "requests": "Prośby o dostęp",
+  "restore": "Przywróć",
+  "roles": {
+    "comment": "Może komentować",
+    "edit": "Może edytować",
+    "full_access": "Pełny dostęp",
+    "view": "Może przeglądać"
+  },
+  "save": "Zapisz zmiany",
+  "selectTeamspace": "Przestrzeń zespołowa",
+  "setDefault": "Ustaw jako domyślną przestrzeń zespołową",
+  "subtitle": "Organizuj udostępnioną pracę i kontroluj, kto może ją znaleźć lub do niej dołączyć.",
+  "tabs": {
+    "archived": "Zarchiwizowane",
+    "browse": "Przeglądaj",
+    "create": "Nowa przestrzeń zespołowa",
+    "label": "Widoki przestrzeni zespołowej",
+    "manage": "Zarządzaj"
+  },
+  "title": "Przestrzenie zespołowe"
+}

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} ಬ್ಯಾಕ್ಲಿಂಕ್",
-    "count_other": "{{count}} ಬ್ಯಾಕ್ಲಿಂಕ್‌ಗಳು"
+    "count_other": "{{count}} ಬ್ಯಾಕ್ಲಿಂಕ್‌ಗಳು",
+    "partial_one": "{{count}}+ ಬ್ಯಾಕ್ಲಿಂಕ್",
+    "partial_other": "{{count}}+ ಬ್ಯಾಕ್ಲಿಂಕ್ಗಳು"
   },
   "header": {
     "title": "ಲಿಂಕ್ಡ್ ಮೆನ್ಷನ್ಗಳು"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ಮೆನ್ಷನ್",
     "mention_other": "{{count}} ಮೆನ್ಷನ್‌ಗಳು",
     "link_one": "{{count}} ಲಿಂಕ್",
-    "link_other": "{{count}} ಲಿಂಕ್‌ಗಳು"
+    "link_other": "{{count}} ಲಿಂಕ್‌ಗಳು",
+    "loaded": "ಲೋಡ್ ಮಾಡಲಾಗಿದೆ: {{summary}}"
   },
   "kind": {
     "mention": "ಮೆನ್ಷನ್",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ಹೆಚ್ಚಿನ ಬ್ಯಾಕ್ಲಿಂಕ್",
-    "count_other": "{{count}} ಹೆಚ್ಚಿನ ಬ್ಯಾಕ್ಲಿಂಕ್‌ಗಳು"
+    "count_other": "{{count}} ಹೆಚ್ಚಿನ ಬ್ಯಾಕ್ಲಿಂಕ್‌ಗಳು",
+    "load": "ಹೆಚ್ಚಿನ ಬ್ಯಾಕ್ಲಿಂಕ್ಗಳನ್ನು ಲೋಡ್ ಮಾಡಿ",
+    "loading": "ಬ್ಯಾಕ್ಲಿಂಕ್ಗಳನ್ನು ಲೋಡ್ ಮಾಡುತ್ತಿದೆ...",
+    "search": "ಬ್ಯಾಕ್ಲಿಂಕ್ಗಳನ್ನು ಹುಡುಕಿ"
   }
 }

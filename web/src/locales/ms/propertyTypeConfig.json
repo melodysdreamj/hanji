@@ -51,7 +51,14 @@
     "range": "Julat",
     "earliest_date": "Tarikh terawal",
     "latest_date": "Tarikh terkini",
-    "date_range": "Julat tarikh"
+    "date_range": "Julat tarikh",
+    "count": "Kira semua",
+    "count_per_group": "Kiraan per kumpulan",
+    "empty": "Kiraan kosong",
+    "not_empty": "Kiraan tidak kosong",
+    "percent_per_group": "Peratus per kumpulan",
+    "show_unique": "Tunjukkan nilai unik",
+    "unique": "Kiraan nilai unik"
   },
   "undo": "Buat asal",
   "untitled": "Tanpa tajuk",

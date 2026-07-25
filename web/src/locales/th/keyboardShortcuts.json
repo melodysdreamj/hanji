@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "เพิ่มความคิดเห็น",
+    "addLink": "เพิ่มลิงก์",
+    "blockColor": "ใช้สีล่าสุด",
+    "bold": "ตัวหนา",
+    "copyPageLink": "คัดลอกลิงก์หน้า",
+    "findInPage": "ค้นหาในหน้านี้",
+    "inlineCode": "โค้ดอินไลน์",
+    "italic": "ตัวเอียง",
+    "moveBlock": "ย้ายบล็อกไปยังหน้าอื่น",
+    "moveBlockDown": "ย้ายบล็อกลง",
+    "moveBlockUp": "ย้ายบล็อกขึ้น",
+    "movePage": "ย้ายหน้าปัจจุบัน",
+    "navigateBack": "ย้อนกลับ",
+    "navigateForward": "ไปข้างหน้า",
+    "newPage": "หน้าใหม่",
+    "openBlockMenu": "เปิดการทำงานของบล็อก",
+    "openKeyboardShortcuts": "เปิดทางลัดแป้นพิมพ์",
+    "openParentPage": "เปิดหน้าแม่",
+    "quickFind": "ค้นหาด่วน",
+    "strikethrough": "ขีดทับ",
+    "toggleAllToggles": "ขยายหรือยุบ toggle ทั้งหมด",
+    "toggleSidebar": "สลับแถบด้านข้าง",
+    "toggleTheme": "สลับโหมดมืด",
+    "underline": "ขีดเส้นใต้"
+  },
+  "categories": {
+    "createStyle": "สร้างและจัดรูปแบบ",
+    "editMove": "แก้ไขและย้าย",
+    "popular": "ยอดนิยม"
+  },
+  "categoriesLabel": "หมวดหมู่ทางลัด",
+  "close": "ปิด",
+  "closeBackdrop": "ปิดแป้นพิมพ์ลัด",
+  "empty": "ไม่พบทางลัด",
+  "keysFor": "แป้นสำหรับ {{action}}",
+  "or": "หรือ",
+  "searchLabel": "ค้นหาคีย์ลัด",
+  "searchPlaceholder": "ค้นหาคีย์ลัด…",
+  "searchResults": "ผลการค้นหา",
+  "searchTerms": {
+    "toggleTheme": "ธีม สว่าง มืด ลักษณะ"
+  },
+  "title": "คีย์ลัด"
+}

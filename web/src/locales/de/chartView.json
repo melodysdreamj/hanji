@@ -4,7 +4,22 @@
     "sum": "Summe",
     "average": "Durchschnitt",
     "min": "Min",
-    "max": "Max"
+    "max": "Max",
+    "checked": "Angekreuzt",
+    "count_values": "Anzahl Werte",
+    "date_range": "Datumsbereich",
+    "earliest_date": "Frühestes Datum",
+    "empty": "Leere zählen",
+    "latest_date": "Neuestes Datum",
+    "median": "Median",
+    "not_empty": "Nicht leere zählen",
+    "percent_checked": "Prozent angekreuzt",
+    "percent_empty": "Prozent leer",
+    "percent_not_empty": "Prozent nicht leer",
+    "percent_unchecked": "Prozent nicht angekreuzt",
+    "range": "Bereich",
+    "unchecked": "Nicht angekreuzt",
+    "unique": "Eindeutige Werte zählen"
   },
   "chartAria": "{{name}}-Diagramm",
   "chartType": "Diagrammtyp",
@@ -27,5 +42,9 @@
   "untitledProperty": "Unbenannt",
   "valueProperty": "Werteigenschaft",
   "xAxis": "X-Achse",
-  "yAxis": "Y-Achse"
+  "yAxis": "Y-Achse",
+  "dateRangeDays": "{{count}} Tage",
+  "missingProperty": "die gespeicherte Eigenschaft",
+  "unsupportedAggregateDesc": "{{aggregate}} kann nicht aus {{property}} berechnet werden. Wähle eine kompatible Eigenschaft oder Berechnung.",
+  "unsupportedAggregateTitle": "Diese Chart-Berechnung ist nicht verfügbar."
 }

@@ -38,7 +38,7 @@
   "moveTo": "Жылжыту",
   "exporting": "Экспорттау…",
   "exportAsMarkdown": "Markdown ретінде экспорттау",
-  "exportAsHanji": "Hanji файлы ретінде экспорттау",
+  "exportAsHanji": "Hanji JSON экспорттау (файлдарсыз)",
   "importing": "Импорттау…",
   "importMarkdown": "Markdown импорттау",
   "unlockPage": "Беттің құлпын ашу",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Қолжетімділікті жаңарту мүмкін болмады",
     "removedFromAccessList": "Қолжетімділік тізімінен жойылды",
     "couldntRemoveAccess": "Қолжетімділікті алып тастау мүмкін болмады",
-    "couldntLoadAccessList": "Қолжетімділік тізімін жүктеу мүмкін болмады"
+    "couldntLoadAccessList": "Қолжетімділік тізімін жүктеу мүмкін болмады",
+    "couldntExportHanjiArchive": "Hanji мұрағатын экспорттау мүмкін болмады.",
+    "exportedHanjiArchive": "Hanji мұрағаты файлдармен бірге экспортталды."
   },
   "user": "Пайдаланушы",
   "whoHasAccess": "Кімнің қолжетімділігі бар",
   "workspace": "Жұмыс кеңістігі",
   "workspaceCount_one": "{{count}} жұмыс кеңістігі",
   "workspaceCount_other": "{{count}} жұмыс кеңістігі",
-  "you": "Сіз"
+  "you": "Сіз",
+  "exportAsHanjiArchive": "Hanji мұрағатын экспорттау (файлдармен)",
+  "turnIntoWiki": "Викиге айналдыру",
+  "undoWiki": "Викиді болдырмау",
+  "wikiCreated": "Бет викиге айналдырылды",
+  "wikiPageSettings": "Вики бетінің параметрлері",
+  "wikiUndone": "Вики алынып тасталды; бет мазмұны сақталды",
+  "wikiUpdateFailed": "Викиді жаңарту мүмкін болмады"
 }

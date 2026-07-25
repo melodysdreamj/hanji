@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "ਨਿਰਭਰਤਾਵਾਂ:",
     "hint": "ਰਿਲੇਸ਼ਨ ਪ੍ਰਾਪਰਟੀ ਸ਼ਾਮਲ ਕਰੋ",
-    "relationPropertyAriaLabel": "ਨਿਰਭਰਤਾ ਰਿਲੇਸ਼ਨ ਪ੍ਰਾਪਰਟੀ"
+    "relationPropertyAriaLabel": "ਨਿਰਭਰਤਾ ਰਿਲੇਸ਼ਨ ਪ੍ਰਾਪਰਟੀ",
+    "makeDependOn": "{{title}} ਨੂੰ {{predecessor}} 'ਤੇ ਨਿਰਭਰ ਬਣਾਓ",
+    "startFrom": "{{title}} ਤੋਂ ਨਿਰਭਰਤਾ ਸ਼ੁਰੂ ਕਰੋ"
   },
   "toolbar": {
     "today": "ਅੱਜ",

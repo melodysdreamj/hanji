@@ -38,7 +38,7 @@
   "moveTo": "Pindah ke",
   "exporting": "Mengeksport…",
   "exportAsMarkdown": "Eksport sebagai Markdown",
-  "exportAsHanji": "Eksport sebagai fail Hanji",
+  "exportAsHanji": "Eksport Hanji JSON (kecuali fail)",
   "importing": "Mengimport…",
   "importMarkdown": "Import Markdown",
   "unlockPage": "Buka kunci halaman",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Tidak dapat mengemas kini akses",
     "removedFromAccessList": "Dibuang daripada senarai akses",
     "couldntRemoveAccess": "Tidak dapat mengalih keluar akses",
-    "couldntLoadAccessList": "Tidak dapat memuat senarai akses"
+    "couldntLoadAccessList": "Tidak dapat memuat senarai akses",
+    "couldntExportHanjiArchive": "Tidak dapat mengeksport arkib Hanji.",
+    "exportedHanjiArchive": "Mengeksport arkib Hanji dengan fail."
   },
   "user": "Pengguna",
   "whoHasAccess": "Siapa yang mempunyai akses",
   "workspace": "Ruang kerja",
   "workspaceCount_one": "{{count}} ruang kerja",
   "workspaceCount_other": "{{count}} ruang kerja",
-  "you": "Anda"
+  "you": "Anda",
+  "exportAsHanjiArchive": "Eksport arkib Hanji (fail disertakan)",
+  "turnIntoWiki": "Jadikan wiki",
+  "undoWiki": "Batal wiki",
+  "wikiCreated": "Halaman dijadikan wiki",
+  "wikiPageSettings": "Tetapan halaman wiki",
+  "wikiUndone": "Wiki dialih keluar; kandungan halaman dikekalkan",
+  "wikiUpdateFailed": "Gagal mengemas kini wiki"
 }

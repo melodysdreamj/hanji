@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Phụ thuộc:",
     "hint": "thêm thuộc tính quan hệ",
-    "relationPropertyAriaLabel": "Thuộc tính quan hệ phụ thuộc"
+    "relationPropertyAriaLabel": "Thuộc tính quan hệ phụ thuộc",
+    "makeDependOn": "Đặt {{title}} phụ thuộc vào {{predecessor}}",
+    "startFrom": "Bắt đầu phụ thuộc từ {{title}}"
   },
   "toolbar": {
     "today": "Hôm nay",

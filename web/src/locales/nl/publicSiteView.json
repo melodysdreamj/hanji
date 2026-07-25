@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Kruimelpad",
+  "clearSearch": "Zoekopdracht wissen",
+  "errors": {
+    "not-found": "Deze site is mogelijk niet langer gepubliceerd of het adres is gewijzigd.",
+    "offline": "Controleer je verbinding en probeer de site opnieuw te openen.",
+    "rate-limited": "Deze site ontvangt te veel verzoeken. Wacht even en probeer het opnieuw.",
+    "unavailable": "Hanji kon deze site nu niet openen. Probeer het over een moment opnieuw."
+  },
+  "madeWithHanji": "Gemaakt met Hanji",
+  "navigation": "Sitenavigatie",
+  "noResults": "Geen pagina's gevonden.",
+  "outsideSite": "Deze pagina maakt geen deel uit van deze gepubliceerde site.",
+  "search": "Doorzoek deze site",
+  "tryAgain": "Opnieuw proberen",
+  "unavailable": "Deze site is niet beschikbaar."
+}

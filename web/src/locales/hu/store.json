@@ -7,7 +7,8 @@
   "pageMissingSave": "Az oldal nem található, ezért a módosításaid nem menthetők.",
   "saveFailed": "A módosításaidat nem sikerült elmenteni.",
   "sessionExpired": "A munkamenet lejárt, vagy a kérést nem sikerült hitelesíteni. Kérjük, próbáld újra.",
-  "blockConflictSave": "Ezt a blokkot más eszközön módosították, így az offline változtatásod nem érvényesült.",
+  "blockConflictSave": "Egy várakozó szerkesztés ütközik a legutóbbi szerververzióval, így nem lehetett automatikusan egyesíteni.",
   "blockConflictKeepMine": "Saját verzió alkalmazása",
-  "blockMoveCommentsSkipped": "A blokk áthelyeződött, de a hozzászólásai nem kerültek áthelyezésre."
+  "blockMoveCommentsSkipped": "A blokk áthelyeződött, de a hozzászólásai nem kerültek áthelyezésre.",
+  "conflictSave": "A tartalom a mentés befejezése előtt megváltozott, ezért a módosítás mentése nem sikerült."
 }

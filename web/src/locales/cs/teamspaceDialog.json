@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Uzavřený",
+    "open": "Otevřený",
+    "private": "Soukromý"
+  },
+  "add": "Přidat",
+  "approve": "Schválit",
+  "archive": "Archivovat týmový prostor",
+  "available": "Dostupné k připojení",
+  "choosePrincipal": "Vyberte osobu nebo skupinu",
+  "create": "Vytvořit týmový prostor",
+  "deny": "Odmítnout",
+  "error": {
+    "action": "Nepodařilo se dokončit akci v týmovém prostoru.",
+    "load": "Nepodařilo se načíst podrobnosti týmového prostoru."
+  },
+  "fields": {
+    "access": "Přístup",
+    "description": "Popis",
+    "icon": "Ikona",
+    "memberRole": "Přístup členů ke stránkám",
+    "membersCanEditSidebar": "Členové mohou přidávat a přeskupovat stránky",
+    "membersCanInvite": "Členové mohou zvát",
+    "name": "Název",
+    "openRole": "Přístup ke stránkám pro otevřené návštěvníky"
+  },
+  "governance": "Nastavení týmového prostoru",
+  "join": "Připojit se",
+  "joined": "Vaše týmové prostory",
+  "loadMore": "Načíst další",
+  "manage": "Spravovat",
+  "member": "Člen",
+  "members": "Členové",
+  "noneArchived": "Nejsou žádné archivované týmové prostory.",
+  "noneAvailable": "Nejsou k dispozici žádné další týmové prostory.",
+  "noneJoined": "Zatím jste se nepřipojili k žádnému týmovému prostoru.",
+  "noRequests": "Nejsou žádné čekající žádosti.",
+  "notice": {
+    "approved": "Žádost schválena.",
+    "archived": "Týmový prostor archivován.",
+    "created": "Týmový prostor vytvořen.",
+    "defaultSet": "Výchozí týmový prostor aktualizován.",
+    "denied": "Žádost zamítnuta.",
+    "joined": "Připojení k týmovému prostoru.",
+    "memberAdded": "Člen přidán.",
+    "memberRemoved": "Člen odebrán.",
+    "memberUpdated": "Role člena aktualizována.",
+    "policySaved": "Zásady vytváření týmových prostorů aktualizovány.",
+    "requested": "Přístup požadován.",
+    "restored": "Týmový prostor obnoven.",
+    "saved": "Týmový prostor aktualizován."
+  },
+  "notOwner": "Pouze vlastník týmového prostoru nebo správce pracovního prostoru může spravovat tento týmový prostor.",
+  "open": "Otevřít",
+  "owner": "Vlastník",
+  "ownersOnlyCreate": "Jen vlastníci pracovního prostoru mohou vytvářet týmové prostory",
+  "remove": "Odstranit",
+  "replacement": "Vyberte náhradní výchozí",
+  "request": "Požádat o přístup",
+  "requestPending": "Žádost čeká",
+  "requests": "Žádosti o přístup",
+  "restore": "Obnovit",
+  "roles": {
+    "comment": "Může komentovat",
+    "edit": "Může upravovat",
+    "full_access": "Plný přístup",
+    "view": "Může prohlížet"
+  },
+  "save": "Uložit změny",
+  "selectTeamspace": "Týmový prostor",
+  "setDefault": "Nastavit jako výchozí",
+  "subtitle": "Uspořádejte sdílenou práci a spravujte, kdo ji může najít nebo se připojit.",
+  "tabs": {
+    "archived": "Archivované",
+    "browse": "Procházet",
+    "create": "Nový týmový prostor",
+    "label": "Zobrazení týmových prostorů",
+    "manage": "Spravovat"
+  },
+  "title": "Týmové prostory"
+}

@@ -176,7 +176,9 @@
     "video": "Videó",
     "videoCaption": "Videó felirat",
     "videoEmptyHint": "Tölts fel videófájlt, illessz be közvetlen hivatkozást, vagy használj YouTube, Vimeo vagy Loom hivatkozást.",
-    "videoLink": "Videóhivatkozás"
+    "videoLink": "Videóhivatkozás",
+    "audioPlaybackFailed": "Ezt a hangot nem lehet lejátszani. Cseréld ki, vagy nyisd meg az eredeti fájlt.",
+    "videoPlaybackFailed": "Ezt a videót nem lehet lejátszani. Cseréld ki, vagy nyisd meg az eredeti fájlt."
   },
   "bookmark": {
     "copy": "Könyvjelző link másolása",

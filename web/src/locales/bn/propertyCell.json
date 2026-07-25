@@ -92,5 +92,8 @@
     "শু",
     "শ"
   ],
-  "you": "আপনি"
+  "you": "আপনি",
+  "buttonExecutionFailed": "বাটনটি চালানো যায়নি।",
+  "loadingMoreRelations": "আরও সম্পর্ক লোড হচ্ছে…",
+  "loadMoreRelations": "আরও সম্পর্ক লোড করুন"
 }

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Зависимости:",
     "hint": "добавьте свойство связи",
-    "relationPropertyAriaLabel": "Свойство связи зависимостей"
+    "relationPropertyAriaLabel": "Свойство связи зависимостей",
+    "makeDependOn": "Сделать {{title}} зависимым от {{predecessor}}",
+    "startFrom": "Начать зависимость от {{title}}"
   },
   "toolbar": {
     "today": "Сегодня",

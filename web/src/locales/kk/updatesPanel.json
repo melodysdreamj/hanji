@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} соңғы жаңарту",
     "unreadOfTotal": "{{total}} ішінен {{unread}} оқылмаған",
     "updateType": "Жаңарту түрі",
-    "updates": "Жаңартулар",
-    "modeUpdates": "Жаңартулар",
-    "modeChats": "Чаттар",
-    "inboxMode": "Кіріс режимі"
+    "updates": "Жаңартулар"
   },
   "time": {
     "justNow": "Қазір ғана",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} нұсқа",
     "versionsAgo": "{{count}} нұсқа бұрын",
     "versionsAhead": "{{count}} нұсқа алда",
-    "versionsAria": "Нұсқалар"
+    "versionsAria": "Нұсқалар",
+    "emptyBlock": "Бос блок",
+    "emptyPreview": "Бұл нұсқада бет мазмұны жоқ.",
+    "previewAria": "Тек оқуға арналған бет нұсқасын алдын ала қарау",
+    "previewingCurrent": "Ағымдағы бетті қарау",
+    "previewingSnapshot": "Өткен нұсқаны қарау",
+    "previewOnlyHint": "Нұсқаны таңдау оны тек алдын ала көрсетеді. Ағымдағы бет тек Қалпына келтіруден кейін өзгереді.",
+    "restoreThisVersion": "Қалпына келтіру",
+    "restoring": "Қалпына келтірілуде...",
+    "versionHistory": "Нұсқа тарихы"
   },
   "badges": {
     "comment": "Пікір",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} атап өту · {{preview}}",
     "referenceLink": "{{title}} сілтеме · {{preview}}",
     "unreadDot": "Оқылмаған",
-    "workspaceUpdate": "Жұмыс кеңістігінің жаңартуы"
+    "workspaceUpdate": "Жұмыс кеңістігінің жаңартуы",
+    "bySelf": "Сіз"
   },
   "empty": {
     "allCaughtUp": "Барлығы қаралды.",

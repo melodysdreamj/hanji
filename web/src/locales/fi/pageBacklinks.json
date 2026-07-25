@@ -8,16 +8,22 @@
   },
   "more": {
     "count_one": "{{count}} lisätakalinkki",
-    "count_other": "{{count}} lisätakalinkkiä"
+    "count_other": "{{count}} lisätakalinkkiä",
+    "load": "Lataa lisää takalinkkejä",
+    "loading": "Ladataan takalinkkejä…",
+    "search": "Hae takalinkkejä"
   },
   "summary": {
     "link_one": "{{count}} linkki",
     "link_other": "{{count}} linkkiä",
     "mention_one": "{{count}} maininta",
-    "mention_other": "{{count}} mainintaa"
+    "mention_other": "{{count}} mainintaa",
+    "loaded": "Ladattu: {{summary}}"
   },
   "toggle": {
     "count_one": "{{count}} takalinkki",
-    "count_other": "{{count}} takalinkkiä"
+    "count_other": "{{count}} takalinkkiä",
+    "partial_one": "{{count}}+ takalinkki",
+    "partial_other": "{{count}}+ takalinkkiä"
   }
 }

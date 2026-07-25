@@ -176,7 +176,9 @@
     "video": "動画",
     "videoCaption": "動画キャプション",
     "videoEmptyHint": "動画ファイルをアップロード、または直接リンクやYouTube、Vimeo、Loomリンクを貼り付けてください。",
-    "videoLink": "動画リンク"
+    "videoLink": "動画リンク",
+    "audioPlaybackFailed": "この音声を再生できませんでした。ファイルを差し替えるか、元のファイルを開いてください。",
+    "videoPlaybackFailed": "この動画を再生できませんでした。ファイルを差し替えるか、元のファイルを開いてください。"
   },
   "bookmark": {
     "copy": "ブックマークリンクをコピー",

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "وابستگی‌ها:",
     "hint": "یک ویژگی رابطه اضافه کنید",
-    "relationPropertyAriaLabel": "ویژگی رابطه وابستگی"
+    "relationPropertyAriaLabel": "ویژگی رابطه وابستگی",
+    "makeDependOn": "{{title}} را وابسته به {{predecessor}} کنید",
+    "startFrom": "شروع وابستگی از {{title}}"
   },
   "toolbar": {
     "today": "امروز",

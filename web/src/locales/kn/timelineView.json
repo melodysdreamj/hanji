@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "ಅವಲಂಬನೆಗಳು:",
     "hint": "ಸಂಬಂಧದ ಆಸ್ತಿಯನ್ನು ಸೇರಿಸಿ",
-    "relationPropertyAriaLabel": "ಅವಲಂಬನೆ ಸಂಬಂಧ ಆಸ್ತಿ"
+    "relationPropertyAriaLabel": "ಅವಲಂಬನೆ ಸಂಬಂಧ ಆಸ್ತಿ",
+    "makeDependOn": "{{title}} ಅನ್ನು {{predecessor}} ಮೇಲೆ ಅವಲಂಬಿತವಾಗುವಂತೆ ಮಾಡಿ",
+    "startFrom": "{{title}} ನಿಂದ ಅವಲಂಬನೆ ಪ್ರಾರಂಭಿಸಿ"
   },
   "toolbar": {
     "today": "ಇಂದು",

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} actualizări recente",
     "unreadOfTotal": "{{unread}} necitite din {{total}} actualizări",
     "updateType": "Tip actualizare",
-    "updates": "Actualizări",
-    "modeUpdates": "Actualizări",
-    "modeChats": "Chaturi",
-    "inboxMode": "Mod inbox"
+    "updates": "Actualizări"
   },
   "time": {
     "justNow": "Acum",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versiuni",
     "versionsAgo": "acum {{count}} versiuni",
     "versionsAhead": "{{count}} versiuni înainte",
-    "versionsAria": "Versiuni"
+    "versionsAria": "Versiuni",
+    "emptyBlock": "Bloc gol",
+    "emptyPreview": "Această versiune nu are conținut de pagină.",
+    "previewAria": "Previzualizare versiune pagină doar citire",
+    "previewingCurrent": "Vizualizare pagină curentă",
+    "previewingSnapshot": "Vizualizare versiune anterioară",
+    "previewOnlyHint": "Selectarea unei versiuni doar o previzualizează. Pagina curentă se modifică doar după Restaurare.",
+    "restoreThisVersion": "Restaurare",
+    "restoring": "Se restaurează...",
+    "versionHistory": "Istoric versiuni"
   },
   "badges": {
     "comment": "Comentariu",
@@ -67,7 +73,8 @@
     "referenceMention": "Menționat {{title}} · {{preview}}",
     "referenceLink": "Legat de {{title}} · {{preview}}",
     "unreadDot": "Necitit",
-    "workspaceUpdate": "Actualizare spațiu de lucru"
+    "workspaceUpdate": "Actualizare spațiu de lucru",
+    "bySelf": "de tine"
   },
   "empty": {
     "allCaughtUp": "Ești la curent.",

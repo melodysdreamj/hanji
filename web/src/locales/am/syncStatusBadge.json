@@ -6,5 +6,6 @@
   "unreachable": "አገልጋዩ ላይ መድረስ አልተቻለም",
   "unreachablePending_one": "አገልጋዩ ላይ መድረስ አልተቻለም · {{count}} ለውጥ በመጠባበቅ ላይ",
   "unreachablePending_other": "አገልጋዩ ላይ መድረስ አልተቻለም · {{count}} ለውጦች በመጠባበቅ ላይ",
-  "retryHint": "አሁን እንደገና ለመሞከር ጠቅ ያድርጉ"
+  "retryHint": "አሁን እንደገና ለመሞከር ጠቅ ያድርጉ",
+  "confirmed": "ወደ ሰርቨር ተቀምጧል"
 }

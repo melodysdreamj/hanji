@@ -7,7 +7,8 @@
   "pageMissingSave": "Die bladsy kon nie gevind word nie, so jou veranderinge kon nie gestoor word nie.",
   "saveFailed": "Jou veranderinge kon nie gestoor word nie.",
   "sessionExpired": "Jou sessie het verval of die versoek kon nie geverifieer word nie. Probeer asseblief weer.",
-  "blockConflictSave": "Hierdie blok is op 'n ander toestel geredigeer, so jou offelyn-verandering is nie toegepas nie.",
+  "blockConflictSave": "Waglys-wysiging oorvleuel met nuutste bedienerweergawe, kon nie outomaties saamgevoeg word nie.",
   "blockConflictKeepMine": "Pas my weergawe toe",
-  "blockMoveCommentsSkipped": "Die blok is geskuif, maar sy kommentaar kon nie saamgeskuif word nie."
+  "blockMoveCommentsSkipped": "Die blok is geskuif, maar sy kommentaar kon nie saamgeskuif word nie.",
+  "conflictSave": "Hierdie inhoud het verander voordat die stoor voltooi is, so jou wysiging kon nie gestoor word nie."
 }

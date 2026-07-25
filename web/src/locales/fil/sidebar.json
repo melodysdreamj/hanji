@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Buksan ang workspace menu",
   "closeWorkspaceMenu": "Isara ang workspace menu",
   "workspaceMenu": "Menu ng workspace",
-  "exportWorkspace": "I-export ang workspace",
+  "exportWorkspace": "I-export ang workspace JSON (hindi kasama ang mga file)",
   "exportedWorkspace": "Na-export ang workspace bilang Hanji file.",
   "exportedWorkspaceWithPlaceholders": "Na-export ang workspace bilang Hanji file — ang mga attachment ay iniwan bilang placeholder.",
   "couldntExportWorkspace": "Hindi na-export ang workspace.",
@@ -76,5 +76,12 @@
     "later": "Mamaya na lang",
     "note": "Maaari mo itong simulan sa ibang pagkakataon mula sa Import sa sidebar.",
     "title": "Dalhin ang iyong Notion workspace sa Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Magdagdag ng pahina sa {{name}}",
+  "couldntExportWorkspaceArchive": "Hindi na-export ang workspace archive.",
+  "exportedWorkspaceArchive": "Na-export ang workspace archive kasama ang mga file.",
+  "exportWorkspaceArchive": "I-export ang workspace archive (kasama ang mga file)",
+  "joinTeamspaces": "Sumali sa mga teamspace",
+  "keyboardShortcuts": "Mga shortcut sa keyboard",
+  "teamspacePages": "Mga pahina ng {{name}}"
 }

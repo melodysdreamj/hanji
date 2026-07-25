@@ -51,7 +51,14 @@
     "range": "Kewayo",
     "earliest_date": "Mafi tsufa kwanan wata",
     "latest_date": "Mafi sabo kwanan wata",
-    "date_range": "Kewayon kwanaki"
+    "date_range": "Kewayon kwanaki",
+    "count": "Ƙidaya duka",
+    "count_per_group": "Ƙidaya ta rukuni",
+    "empty": "Ƙidaya marasa ciki",
+    "not_empty": "Ƙidaya masu ciki",
+    "percent_per_group": "Kashi ta rukuni",
+    "show_unique": "Nuna ƙima na musamman",
+    "unique": "Ƙidaya ƙima na musamman"
   },
   "undo": "Soke",
   "untitled": "Mara take",

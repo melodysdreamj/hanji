@@ -6,5 +6,6 @@
   "unreachable": "Servidor inacessível",
   "unreachablePending_one": "Servidor inacessível · {{count}} alteração pendente",
   "unreachablePending_other": "Servidor inacessível · {{count}} alterações pendentes",
-  "retryHint": "Clique para tentar novamente"
+  "retryHint": "Clique para tentar novamente",
+  "confirmed": "Guardado no servidor"
 }

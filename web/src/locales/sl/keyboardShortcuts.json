@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Dodaj komentar",
+    "addLink": "Dodaj povezavo",
+    "blockColor": "Uporabi zadnjo uporabljeno barvo",
+    "bold": "Krepko",
+    "copyPageLink": "Kopiraj povezavo strani",
+    "findInPage": "Najdi na tej strani",
+    "inlineCode": "Vrstična koda",
+    "italic": "Ležeče",
+    "moveBlock": "Premakni blok na drugo stran",
+    "moveBlockDown": "Premakni blok navzdol",
+    "moveBlockUp": "Premakni blok navzgor",
+    "movePage": "Premakni trenutno stran",
+    "navigateBack": "Nazaj",
+    "navigateForward": "Naprej",
+    "newPage": "Nova stran",
+    "openBlockMenu": "Odpri dejanja bloka",
+    "openKeyboardShortcuts": "Odpri bližnjice na tipkovnici",
+    "openParentPage": "Odpri nadrejeno stran",
+    "quickFind": "Hitro iskanje",
+    "strikethrough": "Prečrtano",
+    "toggleAllToggles": "Razširi ali strni vse preklope",
+    "toggleSidebar": "Preklopi stransko vrstico",
+    "toggleTheme": "Preklopi temni način",
+    "underline": "Podčrtano"
+  },
+  "categories": {
+    "createStyle": "Ustvarjanje in oblikovanje",
+    "editMove": "Urejanje in premikanje",
+    "popular": "Priljubljene"
+  },
+  "categoriesLabel": "Kategorije bližnjic",
+  "close": "Zapri",
+  "closeBackdrop": "Zapri bližnjice na tipkovnici",
+  "empty": "Ni najdenih bližnjic",
+  "keysFor": "Tipke za {{action}}",
+  "or": "ali",
+  "searchLabel": "Iskanje bližnjic na tipkovnici",
+  "searchPlaceholder": "Išči bližnjice…",
+  "searchResults": "Rezultati iskanja",
+  "searchTerms": {
+    "toggleTheme": "tema svetlo temno videz"
+  },
+  "title": "Bližnjice na tipkovnici"
+}

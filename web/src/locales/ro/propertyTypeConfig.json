@@ -51,7 +51,14 @@
     "range": "Interval",
     "earliest_date": "Cea mai veche dată",
     "latest_date": "Cea mai recentă dată",
-    "date_range": "Interval date"
+    "date_range": "Interval date",
+    "count": "Numără tot",
+    "count_per_group": "Număr per grup",
+    "empty": "Număr valori goale",
+    "not_empty": "Număr valori negoale",
+    "percent_per_group": "Procent per grup",
+    "show_unique": "Afișează valori unice",
+    "unique": "Număr valori unice"
   },
   "undo": "Anulează",
   "untitled": "Fără titlu",

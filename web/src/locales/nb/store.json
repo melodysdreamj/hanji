@@ -1,6 +1,6 @@
 {
   "blockConflictKeepMine": "Bruk min versjon",
-  "blockConflictSave": "Denne blokken ble redigert på en annen enhet, så offline-endringen din ble ikke brukt.",
+  "blockConflictSave": "En ventende redigering overlapper den nyeste serverversjonen, så den kunne ikke slås sammen automatisk.",
   "blockMoveCommentsSkipped": "Blokken ble flyttet, men kommentarene kunne ikke flyttes med den.",
   "databaseLockedSave": "Denne databasen er låst, så endringene dine kunne ikke lagres.",
   "databaseRowsLoadFailed": "Kunne ikke laste databaserader. Prøv igjen om et øyeblikk.",
@@ -9,5 +9,6 @@
   "pageLockedSave": "Denne siden er låst, så endringene dine kunne ikke lagres.",
   "pageMissingSave": "Siden ble ikke funnet, så endringene dine kunne ikke lagres.",
   "saveFailed": "Endringene dine kunne ikke lagres.",
-  "sessionExpired": "Sesjonen din utløp eller forespørselen kunne ikke autentiseres. Prøv igjen."
+  "sessionExpired": "Sesjonen din utløp eller forespørselen kunne ikke autentiseres. Prøv igjen.",
+  "conflictSave": "Dette innholdet ble endret før lagringen var fullført, så redigeringen din kunne ikke lagres."
 }

@@ -247,7 +247,9 @@
     "runningHint": "Tartsa nyitva ezt a böngészőlapot az importálás alatt.",
     "noJobHint": "Először a Hatókör lépésből indítsa a felderítést.",
     "applyLocksHint": "Az alkalmazás a felfedezett elemeket ebbe a munkaterületbe írja.",
-    "browserRunnerWarning": "Az importálás ebben a böngészőlapon fut. Tartsa nyitva a lapot a befejezésig. A lap bezárása vagy újratöltése szünetelteti a feldolgozást; a Hanji újranyitásakor a mentett állapotból folytatódik."
+    "browserRunnerWarning": "Az importálás ebben a böngészőlapon fut. Tartsa nyitva a lapot a befejezésig. A lap bezárása vagy újratöltése szünetelteti a feldolgozást; a Hanji újranyitásakor a mentett állapotból folytatódik.",
+    "serverRunnerStatus": "A Hanji szerveren dolgozza fel ezt az importálást. A lap bezárása vagy újratöltése nem szünetelteti.",
+    "serverRunningHint": "Az importálás a háttérben folytatódik. Bezárhatod ezt a lapot."
   },
   "installer": {
     "elapsed": "Eltelt",
@@ -281,9 +283,9 @@
     "title": "Importálás Hanjiból",
     "fromFile": "Fájlból",
     "fromLive": "Élő példányból",
-    "choose": "Válasszon egy .hanji.json fájlt",
+    "choose": "Válassz egy .hanji.json vagy .hanji.zip fájlt",
     "chooseButton": "Fájl kiválasztása",
-    "fileHint": "Exportálj egy oldalt, adatbázist vagy munkaterületet egy másik Hanjiból, majd importáld ide. A kapcsolatok, összegzések, képletek, nézetek és sablonok megmaradnak. A mellékletek nem kerülnek bele.",
+    "fileHint": "Használj .hanji.json-t csakis a struktúrához (fájlok nélkül), vagy .hanji.zip-et veszteségmentes átvitelhez (fájlokkal együtt). A kapcsolatok, rollupok, képletek, nézetek és sablonok megőrződnek.",
     "selected": "Kiválasztva: {{name}}",
     "importButton": "Importálás",
     "importing": "Importálás...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "Opcionális",
     "fetch": "Export lekérése",
     "fetching": "Betöltés...",
-    "liveHint": "Húzz be egy munkaterületet közvetlenül egy másik futó Hanjiból (pl. Docker fejlesztői példányból). A távoli gépnek engedélyeznie kell a kéréseket erről a címről.",
+    "liveHint": "Hozz be egy munkaterületet közvetlenül egy másik futó Hanji-ból (pl. Docker dev példány). A fájlok kizárva. A távolinak engedélyeznie kell a kéréseket erről a címről.",
     "review": "Importálásra kész: {{summary}}",
     "placeholderNote": "Néhány melléklet helyőrzőként maradt.",
     "importedItems_one": "Importált {{count}} elemet a Hanji fájlból.",
@@ -302,9 +304,15 @@
     "cantRead": "Nem sikerült beolvasni a Hanji fájlt.",
     "cantImport": "Nem sikerült importálni a Hanji fájlt.",
     "needFile": "Először válassz egy Hanji fájlt.",
-    "needRemote": "Add meg a távoli Hanji URL-t és a munkaterület azonosítóját."
+    "needRemote": "Add meg a távoli Hanji URL-t és a munkaterület azonosítóját.",
+    "filesExcluded": "Fájlok kizárva.",
+    "filesIncluded": "Fájlok mellékelve."
   },
   "cantStartOAuth": "Nem sikerült elindítani a Notion kapcsolatot.",
   "connectWithNotion": "Kapcsolódás Notionnal",
-  "oauthConfiguredHint": "Ezen a szerveren Notion OAuth-integráció van beállítva. A token beállítás továbbra is elérhető a saját üzemeltetésű kapcsolatokhoz."
+  "oauthConfiguredHint": "Ezen a szerveren Notion OAuth-integráció van beállítva. A token beállítás továbbra is elérhető a saját üzemeltetésű kapcsolatokhoz.",
+  "terminal": {
+    "cancelled": "Az importálás megszakadt. Ha készen állsz, biztonságosan újra elindíthatod.",
+    "failed": "Az importálás biztonságosan leállt, mielőtt befejeződött volna. Ellenőrizd a kapcsolatot, és próbáld újra. A technikai részletek és azonosítók nincsenek itt megjelenítve."
+  }
 }

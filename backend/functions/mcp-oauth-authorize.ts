@@ -1,5 +1,9 @@
 import { defineFunction } from '@edge-base/shared';
 import { bestEffort } from '../lib/table-utils';
+import {
+  assertMcpClientApprovedForWorkspaces,
+  filterMcpClientApprovedWorkspaces,
+} from '../lib/enterprise-controls';
 import { fetchPublicResource, normalizePublicUrl, readResponseBytesWithLimit } from '../lib/ssrf-guard';
 import {
   type DbRef,
@@ -313,7 +317,7 @@ async function renderConsent(
   const workspaceInputs = workspaces.length
     ? workspaces.map((workspace) => `
       <label>
-        <input type="checkbox" name="workspace:${escapeHtml(workspace.id)}" value="1" checked data-mcp-workspace disabled />
+        <input type="checkbox" name="workspace:${escapeHtml(workspace.id)}" value="1" data-mcp-workspace />
         <span>${escapeHtml(workspace.name || workspace.domain || 'Untitled Workspace')}<br /><span class="muted">${escapeHtml(workspace.id)}</span></span>
       </label>`).join('')
     : '<p class="muted">연결할 수 있는 워크스페이스가 없습니다.</p>';
@@ -325,16 +329,10 @@ async function renderConsent(
       <p class="muted">로그인 계정: ${escapeHtml(userEmail || '현재 Hanji 계정')}</p>
       <form method="post" data-mcp-consent>
         ${hidden('consent_request', consentRequest)}
+        ${hidden('workspace_access', 'selected')}
         <fieldset>
-          <legend>접근 범위</legend>
-          <label>
-            <input type="radio" name="workspace_access" value="all_accessible" checked />
-            <span>내가 접근 가능한 전체 워크스페이스<br /><span class="muted">새로 접근 권한을 얻는 워크스페이스도 현재 제품 권한 안에서만 허용됩니다.</span></span>
-          </label>
-          <label>
-            <input type="radio" name="workspace_access" value="selected" />
-            <span>특정 워크스페이스만 선택</span>
-          </label>
+          <legend>연결할 워크스페이스 선택</legend>
+          <p class="muted">하나 이상을 선택하세요. 이 연결은 선택한 워크스페이스에만 고정됩니다.</p>
           <div>
             ${workspaceInputs}
           </div>
@@ -349,19 +347,6 @@ async function renderConsent(
         </div>
         <p class="muted" data-mcp-status></p>
       </form>
-      <script>
-      (() => {
-        const form = document.querySelector('form[data-mcp-consent]');
-        if (!(form instanceof HTMLFormElement)) return;
-        const workspaceInputs = Array.from(form.querySelectorAll('[data-mcp-workspace]'));
-        const sync = () => {
-          const selected = new FormData(form).get('workspace_access') === 'selected';
-          for (const input of workspaceInputs) input.disabled = !selected;
-        };
-        form.addEventListener('change', sync);
-        sync();
-      })();
-      </script>
       ${consentBridgeScript()}
     `,
   );
@@ -390,10 +375,11 @@ export const GET = defineFunction(async (rawContext: unknown) => {
     if (!context.auth?.id) {
       return loginBridgePage(urls);
     }
+    const workspaces = await accessibleWorkspaces(db, context.auth.id);
     return await renderConsent(
       params,
       client,
-      await accessibleWorkspaces(db, context.auth.id),
+      await filterMcpClientApprovedWorkspaces(db, workspaces, client.clientId),
       context.auth.id,
       context.auth.email,
       context.request,
@@ -453,13 +439,24 @@ export const POST = defineFunction(async (rawContext: unknown) => {
     if (!allowedWorkspaces.length) {
       throw new Error('연결할 수 있는 활성 워크스페이스가 없습니다.');
     }
-    const workspaceAccess = stringValue(body.workspace_access, 'all_accessible') === 'selected'
-      ? 'selected'
-      : 'all_accessible';
-    const workspaceIds = workspaceAccess === 'selected' ? selectedWorkspaceIds(body, allowedWorkspaces) : [];
-    if (workspaceAccess === 'selected' && workspaceIds.length === 0) {
+    if (stringValue(body.workspace_access) !== 'selected') {
+      throw new Error('MCP 연결에는 명시적인 워크스페이스 선택이 필요합니다.');
+    }
+    const workspaceAccess = 'selected';
+    const workspaceIds = selectedWorkspaceIds(body, allowedWorkspaces);
+    if (workspaceIds.length === 0) {
       throw new Error('특정 워크스페이스 연결에는 하나 이상의 워크스페이스 선택이 필요합니다.');
     }
+    await assertMcpClientApprovedForWorkspaces(
+      db,
+      allowedWorkspaces.filter((workspace) => workspaceIds.includes(workspace.id)),
+      {
+        actorId: context.auth.id,
+        clientId: client.clientId,
+        clientName: client.clientName,
+        stage: 'authorization',
+      },
+    );
     const now = nowIso();
     const grant = await db.table<McpOAuthGrant>('mcp_oauth_grants').insert({
       userId: context.auth.id,

@@ -2,7 +2,9 @@
   position: fixed;
   left: 50%;
   bottom: 18px;
-  z-index: 140;
+  /* Toasts must stay readable above modal stacking contexts. Image preview
+     remains the intentional higher full-screen layer at 1300. */
+  z-index: 1250;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,6 +12,12 @@
   width: min(420px, calc(100vw - 32px));
   transform: translateX(-50%);
   pointer-events: none;
+}
+
+/* Keep modal feedback above the pinned footer instead of covering its primary
+   actions. Non-dialog pages retain the regular bottom-center 18px placement. */
+:global(body:has([role="dialog"][aria-modal="true"])) .stack {
+  bottom: calc(120px + env(safe-area-inset-bottom, 0px));
 }
 
 .toast {

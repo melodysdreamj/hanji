@@ -13,7 +13,7 @@
   "groupName": "Nama grup",
   "groupOptions": "Opsi grup {{groupName}}",
   "groupThisBoard": "Grupkan papan ini",
-  "groupThisBoardDesc": "Tambahkan properti Pilih atau Status untuk membuat kolom.",
+  "groupThisBoardDesc": "Tambah atau pilih properti Pilih, Status, Orang, atau Pilihan Ganda untuk membuat kolom.",
   "newGroup": "Grup baru",
   "newGroupIn": "Grup {{groupName}} baru di {{dbTitle}}",
   "newPage": "Baru",

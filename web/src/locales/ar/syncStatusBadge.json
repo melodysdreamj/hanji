@@ -6,5 +6,6 @@
   "unreachable": "تعذر الاتصال بالخادم",
   "unreachablePending_one": "تعذر الاتصال بالخادم · {{count}} تغيير معلق",
   "unreachablePending_other": "تعذر الاتصال بالخادم · {{count}} تغييرات معلقة",
-  "retryHint": "انقر لإعادة المحاولة الآن"
+  "retryHint": "انقر لإعادة المحاولة الآن",
+  "confirmed": "تم الحفظ على الخادم"
 }

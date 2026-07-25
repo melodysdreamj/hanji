@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "فتح قائمة مساحة العمل",
   "closeWorkspaceMenu": "إغلاق قائمة مساحة العمل",
   "workspaceMenu": "قائمة مساحة العمل",
-  "exportWorkspace": "تصدير مساحة العمل",
+  "exportWorkspace": "تصدير JSON لمساحة العمل (بدون ملفات)",
   "exportedWorkspace": "تم تصدير مساحة العمل كملف Hanji.",
   "exportedWorkspaceWithPlaceholders": "تم تصدير مساحة العمل كملف Hanji — تُركت المرفقات كعناصر نائبة.",
   "couldntExportWorkspace": "تعذر تصدير مساحة العمل.",
@@ -76,5 +76,12 @@
     "later": "ربما لاحقًا",
     "note": "يمكنك دائمًا بدء هذا لاحقًا من خيار الاستيراد في الشريط الجانبي.",
     "title": "هل تريد استيراد مساحة عمل Notion إلى Hanji؟"
-  }
+  },
+  "addPageToTeamspace": "إضافة صفحة إلى {{name}}",
+  "couldntExportWorkspaceArchive": "تعذر تصدير أرشيف مساحة العمل.",
+  "exportedWorkspaceArchive": "تم تصدير أرشيف مساحة العمل مع الملفات.",
+  "exportWorkspaceArchive": "تصدير أرشيف مساحة العمل (مع الملفات)",
+  "joinTeamspaces": "انضمام إلى مساحات الفرق",
+  "keyboardShortcuts": "اختصارات لوحة المفاتيح",
+  "teamspacePages": "صفحات {{name}}"
 }

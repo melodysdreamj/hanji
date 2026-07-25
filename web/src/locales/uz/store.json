@@ -7,7 +7,8 @@
   "pageMissingSave": "Sahifa topilmadi, shuning uchun o'zgarishlaringiz saqlanmadi.",
   "saveFailed": "O'zgarishlaringizni saqlab bo'lmadi.",
   "sessionExpired": "Seansingiz muddati tugadi yoki so'rov autentifikatsiya qilinmadi. Iltimos, qayta urinib ko'ring.",
-  "blockConflictSave": "Bu blok boshqa qurilmada tahrir qilingan, shuning uchun sizning oflayn o'zgarishingiz qo'llanilmadi.",
+  "blockConflictSave": "Serverdagi so'nggi versiya bilan navbatdagi tahrir mos kelmadi, shuning uchun avtomatik birlashtirilmadi.",
   "blockConflictKeepMine": "Mening versiyamni qo'llash",
-  "blockMoveCommentsSkipped": "Blok ko'chirildi, lekin uning izohlari u bilan birga ko'chirilmadi."
+  "blockMoveCommentsSkipped": "Blok ko'chirildi, lekin uning izohlari u bilan birga ko'chirilmadi.",
+  "conflictSave": "Saqlash tugashidan oldin kontent oʻzgargan, shuning uchun tahriringizni saqlab boʻlmadi."
 }

@@ -3,11 +3,16 @@ import {
   FORMULA_FUNCTIONS,
   FORMULA_LITERALS,
   evaluateFormulaExpression,
+  evaluateFormulaExpressionResult,
+  formulaPropertyReferences,
   formulaVariableNames,
   formatFormulaValue as formatFormulaCoreValue,
   tokenizeFormula,
+  type FormulaReference,
   type FormulaValue,
 } from "../../../../shared/database/formula-core";
+import { pageDisplayTitle } from "@/lib/pageTitle";
+import { normalizePersonIds, personLabel } from "./people";
 import { displayPropertyValue } from "./rollup";
 
 function rawValue(row: Page, prop: DbProperty): unknown {
@@ -17,6 +22,29 @@ function rawValue(row: Page, prop: DbProperty): unknown {
   if (prop.type === "created_by") return row.createdBy;
   if (prop.type === "last_edited_by") return row.lastEditedBy;
   return row.properties?.[prop.id];
+}
+
+function reference(kind: FormulaReference["kind"], id: string, name: string): FormulaReference {
+  return { kind, id, name: name || id };
+}
+
+function personName(value: unknown, id: string) {
+  if (value && typeof value === "object") {
+    const item = value as Record<string, unknown>;
+    const notion = item.notion && typeof item.notion === "object"
+      ? item.notion as Record<string, unknown>
+      : undefined;
+    for (const candidate of [item.name, item.displayName, notion?.name]) {
+      if (typeof candidate === "string" && candidate.trim()) return candidate.trim();
+    }
+  }
+  return personLabel(id) || id;
+}
+
+function listItems(value: unknown) {
+  if (Array.isArray(value)) return value;
+  if (value == null || value === "") return [];
+  return [value];
 }
 
 export function evaluateFormula({
@@ -39,6 +67,36 @@ export function evaluateFormula({
     if (typeof value === "number" || typeof value === "boolean") return value;
     if (value == null) return "";
     if (target.type === "number" || target.type === "checkbox") return value as FormulaValue;
+    if (target.type === "multi_select") {
+      return Array.from(new Set(listItems(value)
+        .map((item) => {
+          const id = String(item ?? "");
+          return target.config?.options?.find((option) => option.id === id || option.name === id)?.name ?? id;
+        })
+        .filter(Boolean)));
+    }
+    if (target.type === "relation") {
+      return listItems(value)
+        .map((item) => String(item ?? ""))
+        .filter(Boolean)
+        .flatMap((id) => {
+          const page = pagesById[id];
+          return page ? [reference("page", id, pageDisplayTitle(page))] : [];
+        });
+    }
+    if (["person", "created_by", "last_edited_by"].includes(target.type)) {
+      const source = target.type === "created_by"
+        ? row.createdBy
+        : target.type === "last_edited_by"
+          ? row.lastEditedBy
+          : value;
+      const values = listItems(source);
+      const byId = new Map<string, unknown>();
+      for (const item of values) {
+        for (const id of normalizePersonIds(item)) byId.set(id, item);
+      }
+      return Array.from(byId, ([id, item]) => reference("person", id, personName(item, id)));
+    }
     if (target.type === "date") {
       if (typeof value === "string") return value;
       if (value && typeof value === "object") {
@@ -83,6 +141,7 @@ export function formulaWarnings(
         pushWarning(`Unsupported formula function "${token.value}"`);
       }
       if (token.value === "prop") {
+        if (tokens[index - 1]?.type === "dot") return;
         const ref = tokens[index + 2]?.type === "string" ? tokens[index + 2]?.value : "";
         if (ref && !names.has(ref.toLowerCase()) && !ids.has(ref)) {
           pushWarning(`Unknown property "${ref}"`);
@@ -101,6 +160,18 @@ export function formulaWarnings(
     if (depth < 0) break;
   }
   if (depth !== 0) pushWarning("Unbalanced parentheses");
+  let listDepth = 0;
+  for (const token of tokens) {
+    if (token.type !== "bracket") continue;
+    if (token.value === "[") listDepth++;
+    else if (token.value === "]") listDepth--;
+    if (listDepth < 0) break;
+  }
+  if (listDepth !== 0) pushWarning("Unbalanced list brackets");
+  if (formulaPropertyReferences(tokens).size === 0) {
+    const result = evaluateFormulaExpressionResult(expr, () => "");
+    if (result.error) pushWarning(result.error);
+  }
   return warnings;
 }
 

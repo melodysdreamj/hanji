@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "ลิงก์ย้อนกลับ {{count}} รายการ",
-    "count_other": "ลิงก์ย้อนกลับ {{count}} รายการ"
+    "count_other": "ลิงก์ย้อนกลับ {{count}} รายการ",
+    "partial_one": "{{count}}+ ลิงก์ย้อนกลับ",
+    "partial_other": "{{count}}+ ลิงก์ย้อนกลับ"
   },
   "header": {
     "title": "การกล่าวถึงที่เชื่อมโยง"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} เมนชัน",
     "mention_other": "{{count}} เมนชัน",
     "link_one": "{{count}} ลิงก์",
-    "link_other": "{{count}} ลิงก์"
+    "link_other": "{{count}} ลิงก์",
+    "loaded": "โหลดแล้ว: {{summary}}"
   },
   "kind": {
     "mention": "เมนชัน",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "ลิงก์ย้อนกลับอีก {{count}} รายการ",
-    "count_other": "ลิงก์ย้อนกลับอีก {{count}} รายการ"
+    "count_other": "ลิงก์ย้อนกลับอีก {{count}} รายการ",
+    "load": "โหลดลิงก์ย้อนกลับเพิ่มเติม",
+    "loading": "กำลังโหลดลิงก์ย้อนกลับ…",
+    "search": "ค้นหาลิงก์ย้อนกลับ"
   }
 }

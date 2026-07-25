@@ -5,15 +5,23 @@ import type {
   CollaborationCrdtUpdateOperation,
   Comment,
   ComputedPropertyValue,
+  DatabaseAutomationDefinition,
   DbProperty,
   DbTemplate,
   DbView,
   DomainSignupPolicy,
   FileUsageReport,
   FileUpload,
+  FormAudience,
+  FormDefinitionResult,
+  FormLink,
+  FormOptionsResult,
+  FormSubmitResult,
+  FormViewConfig,
   InstanceBackupSnapshot,
   InstanceAdminUser,
   InstanceSettings,
+  MemberAddPolicy,
   McpOAuthGrant,
   NotionImportConnection,
   NotionImportConnectionKind,
@@ -24,10 +32,12 @@ import type {
   NotificationKind,
   NotificationRecord,
   Organization,
+  OrganizationAdminToken,
   OrganizationAuditEvent,
   OrganizationAuditExport,
   OrganizationBillingRecord,
   OrganizationDomain,
+  OrganizationDiscoveryExport,
   OrganizationEnterpriseControls,
   OrganizationGroup,
   OrganizationLegalHold,
@@ -36,13 +46,22 @@ import type {
   OrganizationProfile,
   OrganizationScimToken,
   OrganizationSharingPolicy,
+  NotionAdminCapability,
   Page,
+  PageOwner,
   PagePermission,
   PageParentType,
   ShareLink,
+  SiteConfig,
   SharePrincipalType,
   ShareRole,
   SignupPolicy,
+  Teamspace,
+  TeamspaceAccess,
+  TeamspaceJoinRequest,
+  TeamspaceMember,
+  TeamspaceMemberRole,
+  TeamspaceSettings,
   ServerAuditSummaryEvent,
   ServerBackupSummary,
   ServerImportJobSummary,
@@ -58,6 +77,14 @@ import type {
   WorkspaceMember,
 } from "./types";
 import type { TextSpanOperation } from "./textOperations";
+import type { NativeArchiveDocument, NativeArchiveManifest } from "./nativeArchive";
+import { createAsyncLimiter } from "./asyncLimiter";
+import { resolvedViewerTimeZone } from "./timeZone";
+import {
+  createPageReadBatcher,
+  type PageReadBatchRequest,
+  type PageReadBatchWireResponse,
+} from "./pageReadBatch";
 
 const runtimeOrigin =
   typeof window === "undefined" ? "http://localhost:8787" : window.location.origin;
@@ -102,6 +129,11 @@ export interface PublicRuntimeConfig {
   allowAnonymousBootstrap: boolean;
   oauthProviders: string[];
   notionOAuthConfigured: boolean;
+  appHostname?: string;
+  customDomains: {
+    enabled: boolean;
+    cnameTarget: string;
+  };
   legal: LegalLinks;
 }
 
@@ -114,6 +146,9 @@ export const DEFAULT_LEGAL_LINKS: LegalLinks = Object.freeze({
 let runtimeConfigPromise: Promise<PublicRuntimeConfig> | null = null;
 
 type Client = ReturnType<typeof createClient>;
+type ValidAccessTokenAuthClient = Client["auth"] & {
+  readonly hasValidAccessToken?: boolean;
+};
 type EdgeBaseMfaClient = Client["auth"]["mfa"];
 type PasswordChangeClient = Client["auth"] & {
   changePassword(input: {
@@ -136,6 +171,7 @@ export type WorkspaceMutationPatch = Omit<Partial<Workspace>, "icon" | "domain">
 
 let _client: Client | null = null;
 let ensureAuthPromise: Promise<string> | null = null;
+let restoreAuthSessionPromise: Promise<string> | null = null;
 let ensuredAuthUserId = "";
 
 function browserClientId() {
@@ -202,8 +238,16 @@ async function requestRuntimeConfig(): Promise<PublicRuntimeConfig> {
     allowAnonymousBootstrap?: unknown;
     oauthProviders?: unknown;
     notionOAuthConfigured?: unknown;
+    appHostname?: unknown;
+    customDomains?: unknown;
     legal?: unknown;
   };
+  const customDomains = json.customDomains && typeof json.customDomains === "object"
+    ? json.customDomains as { enabled?: unknown; cnameTarget?: unknown }
+    : {};
+  const cnameTarget = typeof customDomains.cnameTarget === "string"
+    ? customDomains.cnameTarget.trim().toLowerCase()
+    : "";
   return {
     allowAnonymousBootstrap: json.allowAnonymousBootstrap === true,
     oauthProviders: Array.isArray(json.oauthProviders)
@@ -213,6 +257,11 @@ async function requestRuntimeConfig(): Promise<PublicRuntimeConfig> {
           .filter((provider) => /^[a-z][a-z0-9_-]{0,31}$/.test(provider))))
       : [],
     notionOAuthConfigured: json.notionOAuthConfigured === true,
+    appHostname: typeof json.appHostname === "string" ? json.appHostname.trim().toLowerCase() : "",
+    customDomains: {
+      enabled: customDomains.enabled === true && Boolean(cnameTarget),
+      cnameTarget,
+    },
     legal: normalizeLegalLinks(json.legal),
   };
 }
@@ -235,6 +284,8 @@ export async function fetchRuntimeConfigRemote(): Promise<PublicRuntimeConfig> {
       allowAnonymousBootstrap: false,
       oauthProviders: [],
       notionOAuthConfigured: false,
+      appHostname: "",
+      customDomains: { enabled: false, cnameTarget: "" },
       legal: DEFAULT_LEGAL_LINKS,
     };
   }
@@ -311,15 +362,34 @@ export async function initializeInstanceRemote(
 }
 
 /** True when the signed-in account holds an admin-issued temporary password. */
+interface AccountStateResult {
+  ok?: boolean;
+  mustChangePassword?: boolean;
+  languagePreference?: unknown;
+  languageOnboardingCompleted?: unknown;
+}
+
+let accountStateRequest: Promise<AccountStateResult> | null = null;
+
+function getAccountStateRemote(): Promise<AccountStateResult> {
+  if (accountStateRequest) return accountStateRequest;
+  const request = getClient().functions.post<AccountStateResult>("account-state", {
+    action: "get",
+  });
+  accountStateRequest = request;
+  void request.finally(() => {
+    if (accountStateRequest === request) accountStateRequest = null;
+  }).catch(() => {});
+  return request;
+}
+
 export async function fetchMustChangePasswordRemote(): Promise<boolean> {
-  const result = await getClient().functions.post<{ ok?: boolean; mustChangePassword?: boolean }>(
-    "account-state",
-    { action: "get" },
-  );
+  const result = await getAccountStateRemote();
   return result?.mustChangePassword === true;
 }
 
 export async function clearMustChangePasswordRemote(): Promise<void> {
+  accountStateRequest = null;
   await getClient().functions.post("account-state", { action: "clearMustChangePassword" });
 }
 
@@ -330,10 +400,7 @@ export interface AccountLanguageState {
 
 /** Durable language preference for the current authenticated account. */
 export async function fetchAccountLanguageStateRemote(): Promise<AccountLanguageState> {
-  const result = await getClient().functions.post<{
-    languagePreference?: unknown;
-    languageOnboardingCompleted?: unknown;
-  }>("account-state", { action: "get" });
+  const result = await getAccountStateRemote();
   return {
     languagePreference:
       typeof result?.languagePreference === "string" ? result.languagePreference : null,
@@ -344,6 +411,7 @@ export async function fetchAccountLanguageStateRemote(): Promise<AccountLanguage
 export async function saveAccountLanguagePreferenceRemote(
   languagePreference: string,
 ): Promise<AccountLanguageState> {
+  accountStateRequest = null;
   const result = await getClient().functions.post<{
     languagePreference?: unknown;
     languageOnboardingCompleted?: unknown;
@@ -367,21 +435,32 @@ export interface SponsorFeed {
   disabled: boolean;
 }
 
+let sponsorFeedRequest: Promise<SponsorFeed> | null = null;
+
 /** Public sponsor feed for the sign-in banner (no auth required). */
-export async function fetchSponsorsRemote(): Promise<SponsorFeed> {
-  try {
-    const response = await fetch(`${EDGEBASE_URL}/api/functions/sponsors`, {
-      headers: { Accept: "application/json" },
-    });
-    if (!response.ok) return { sponsors: [], disabled: false };
-    const json = await response.json() as { sponsors?: unknown; disabled?: unknown };
-    const sponsors = Array.isArray(json.sponsors)
-      ? (json.sponsors as SponsorEntry[]).filter((item) => typeof item?.name === "string")
-      : [];
-    return { sponsors, disabled: json.disabled === true };
-  } catch {
-    return { sponsors: [], disabled: false };
-  }
+export function fetchSponsorsRemote(): Promise<SponsorFeed> {
+  if (sponsorFeedRequest) return sponsorFeedRequest;
+
+  const request = (async () => {
+    try {
+      const response = await fetch(`${EDGEBASE_URL}/api/functions/sponsors`, {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) return { sponsors: [], disabled: false };
+      const json = await response.json() as { sponsors?: unknown; disabled?: unknown };
+      const sponsors = Array.isArray(json.sponsors)
+        ? (json.sponsors as SponsorEntry[]).filter((item) => typeof item?.name === "string")
+        : [];
+      return { sponsors, disabled: json.disabled === true };
+    } catch {
+      return { sponsors: [], disabled: false };
+    }
+  })();
+  sponsorFeedRequest = request;
+  void request.finally(() => {
+    if (sponsorFeedRequest === request) sponsorFeedRequest = null;
+  }).catch(() => {});
+  return request;
 }
 
 export interface ImportedPersonEntry {
@@ -441,13 +520,61 @@ export function getClient(): Client {
 }
 
 const INTERACTIVE_MUTATION_TIMEOUT_MS = 15_000;
+// A single low-power self-hosted workerd can be saturated by one complex page
+// mounting several inline databases or flushing several newly-entered blocks
+// at once. Bound reads and user mutations independently: writes keep dedicated
+// capacity, while one burst cannot make every request time out together.
+const runPageQuery = createAsyncLimiter(3);
+const runInteractiveMutation = createAsyncLimiter(3);
+// Text history and CRDT checkpoints are background durability traffic. They
+// must not compete in a large parallel burst with the block saves they
+// describe on a low-power appliance.
+const runCollaborationWrite = createAsyncLimiter(1);
+
+const pageReadBatcher = createPageReadBatcher((requests) =>
+  runPageQuery(() =>
+    getClient().functions.post<PageReadBatchWireResponse>("page-query", {
+      action: "batch",
+      requests,
+    })
+  )
+);
+function callPageQuery<T>(body: PageReadBatchRequest): Promise<T> {
+  return pageReadBatcher.request<T>(body);
+}
+
+export function resetPageReadBatchForTests() {
+  pageReadBatcher.resetForTests();
+  databaseSnapshotInflight.clear();
+  databaseDependencyGraphInflight.clear();
+  databaseDependencyRelationInflight.clear();
+}
+
+function callUnbatchedPageQuery<T>(
+  body: Record<string, unknown>,
+  signal?: AbortSignal,
+): Promise<T> {
+  if (!signal) {
+    return runPageQuery(() => getClient().functions.post<T>("page-query", body));
+  }
+  return runPageQuery(
+    () => getClient().functions.call<T>("page-query", {
+      method: "POST",
+      body,
+      signal,
+    }),
+    { signal },
+  );
+}
 
 function callInteractiveMutation<T>(name: string, body: Record<string, unknown>) {
-  return getClient().functions.call<T>(name, {
-    method: "POST",
-    body,
-    timeoutMs: INTERACTIVE_MUTATION_TIMEOUT_MS,
-  });
+  return runInteractiveMutation(() =>
+    getClient().functions.call<T>(name, {
+      method: "POST",
+      body,
+      timeoutMs: INTERACTIVE_MUTATION_TIMEOUT_MS,
+    })
+  );
 }
 
 function authFailureStatus(error: unknown): number | null {
@@ -468,24 +595,60 @@ function isDefinitiveAuthFailure(error: unknown): boolean {
  * also handles the one-time migration from older localStorage refresh tokens.
  */
 export async function restoreAuthSessionRemote(): Promise<string> {
+  if (restoreAuthSessionPromise) return restoreAuthSessionPromise;
   const client = getClient();
   const current = () => client.auth.currentUser as { id?: string } | null;
-  try {
-    const result = await client.auth.refreshSession();
-    return result.user?.id ?? current()?.id ?? "";
-  } catch (error) {
-    // A server rejection is authoritative. EdgeBase has already cleared the
-    // stale local marker/migration token; never revive that cached identity.
-    if (isDefinitiveAuthFailure(error)) return "";
+  const currentId = current()?.id ?? "";
+  // A successful cookie refresh already established both the in-memory access
+  // token and the principal for this document. AuthGate can be re-entered by
+  // StrictMode, language initialization, or route-state reconciliation; those
+  // callers must reuse the verified session instead of rotating the shared
+  // cookie again for every effect pass.
+  if (
+    currentId
+    && (
+      currentId === ensuredAuthUserId
+      || (client.auth as ValidAccessTokenAuthClient).hasValidAccessToken === true
+    )
+  ) {
+    ensuredAuthUserId = currentId;
+    return currentId;
+  }
+  const restorePromise = (async () => {
+    try {
+      const result = await client.auth.refreshSession();
+      const userId = result.user?.id ?? current()?.id ?? "";
+      if (userId) ensuredAuthUserId = userId;
+      return userId;
+    } catch (error) {
+      // A server rejection is authoritative. EdgeBase has already cleared the
+      // stale local marker/migration token; never revive that cached identity.
+      if (isDefinitiveAuthFailure(error)) {
+        ensuredAuthUserId = "";
+        return "";
+      }
 
-    // On network/5xx failures only, an existing non-secret cached identity may
-    // continue in local-first mode. A browser with no cached user remains
-    // signed out until its cookie can be verified online.
-    const status = authFailureStatus(error);
-    if (status === 0 || (status !== null && status >= 500)) {
-      return current()?.id ?? "";
+      // On network/5xx failures only, an existing non-secret cached identity may
+      // continue in local-first mode. During an online reload with only the
+      // EdgeBase server stopped, the SDK intentionally keeps `currentUser`
+      // unverified until the failed refresh settles; use its last server-issued
+      // id-only cookie-session hint at this exact transient boundary. The hint
+      // is never accepted after a definitive rejection and carries no claims or
+      // bearer authority.
+      const status = authFailureStatus(error);
+      if (status === 0 || (status !== null && status >= 500)) {
+        return current()?.id ?? (client.auth.sessionUserIdHint ?? "").trim();
+      }
+      throw error;
     }
-    throw error;
+  })();
+  restoreAuthSessionPromise = restorePromise;
+  try {
+    return await restorePromise;
+  } finally {
+    if (restoreAuthSessionPromise === restorePromise) {
+      restoreAuthSessionPromise = null;
+    }
   }
 }
 
@@ -497,7 +660,16 @@ export async function ensureAuth(): Promise<string> {
   const client = getClient();
   const current = () => client.auth.currentUser as { id?: string } | null;
   const currentId = current()?.id ?? "";
-  if (currentId && currentId === ensuredAuthUserId) return currentId;
+  if (
+    currentId
+    && (
+      currentId === ensuredAuthUserId
+      || (client.auth as ValidAccessTokenAuthClient).hasValidAccessToken === true
+    )
+  ) {
+    ensuredAuthUserId = currentId;
+    return currentId;
+  }
   if (ensureAuthPromise) return ensureAuthPromise;
 
   ensureAuthPromise = (async () => {
@@ -910,10 +1082,14 @@ export async function revokeMcpConnectionRemote(grantId: string): Promise<McpCon
   });
 }
 
-export async function createManualMcpTokenRemote(clientName = "Manual MCP token"): Promise<McpCreateTokenResult> {
+export async function createManualMcpTokenRemote(
+  workspaceIds: string[],
+  clientName = "Manual MCP token",
+): Promise<McpCreateTokenResult> {
   return getClient().functions.post<McpCreateTokenResult>("mcp-connections", {
     action: "createManualToken",
     clientName,
+    workspaceIds,
   });
 }
 
@@ -993,6 +1169,7 @@ export async function signOutRemote(): Promise<void> {
   const remoteSignOut = getClient().auth.signOut();
   ensuredAuthUserId = "";
   ensureAuthPromise = null;
+  restoreAuthSessionPromise = null;
   clearWorkspaceCache();
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event("hanji:clear-signed-file-url-cache"));
@@ -1013,6 +1190,7 @@ export async function signInAnonymouslyForBootstrap(): Promise<string> {
 const WS_KEY = "hanji.workspaceId";
 
 function clearWorkspaceCache() {
+  pageReadBatcher.resetForTests();
   try {
     localStorage.removeItem(WS_KEY);
   } catch {
@@ -1045,10 +1223,14 @@ export interface WorkspaceBootstrapResult {
   organizationScimTokens?: OrganizationScimToken[];
   organizationLegalHolds?: OrganizationLegalHold[];
   organizationAuditExports?: OrganizationAuditExport[];
+  organizationDiscoveryExports?: OrganizationDiscoveryExport[];
   organizationBillingRecords?: OrganizationBillingRecord[];
   workspaces?: Workspace[];
   currentMember?: WorkspaceMember;
   members?: WorkspaceMember[];
+  teamspaces?: Teamspace[];
+  discoverableTeamspaces?: Teamspace[];
+  teamspaceSettings?: TeamspaceSettings;
   /** Full page list; absent when pagesDelta is true. */
   pages?: Page[];
   pageRoles?: Record<string, ShareRole>;
@@ -1057,6 +1239,8 @@ export interface WorkspaceBootstrapResult {
   pagesSyncedAt?: string;
   /** Change-feed cursor to echo back as changesSince (§7 v2). */
   changesSyncedAt?: string;
+  /** Opaque authority/content snapshot used by the lean foreground refresh probe. */
+  workspaceRefreshToken?: string;
   /** True when the response carries a delta instead of pages. */
   pagesDelta?: boolean;
   /** 'changes': O(changes) tombstone mode; 'ids': visible-id-list mode. */
@@ -1118,7 +1302,29 @@ export async function bootstrapWorkspace(
     pages: result.pages ?? [],
     pageRoles: result.pageRoles ?? {},
     sharedPageIds: result.sharedPageIds ?? [],
+    teamspaces: result.teamspaces ?? [],
+    discoverableTeamspaces: result.discoverableTeamspaces ?? [],
   };
+}
+
+export interface WorkspaceChangesProbeInput {
+  workspaceId: string;
+  workspaceRefreshToken: string;
+}
+
+export interface WorkspaceChangesProbeResult {
+  decision: "unchanged" | "bootstrap_required";
+  reason?: string;
+}
+
+/**
+ * Cheaply checks whether the cached workspace snapshot is still current.
+ * The token is opaque to the browser; only the backend may interpret it.
+ */
+export async function probeWorkspaceChanges(
+  input: WorkspaceChangesProbeInput
+): Promise<WorkspaceChangesProbeResult> {
+  return getClient().functions.post<WorkspaceChangesProbeResult>("workspace-changes", input);
 }
 
 export async function updateWorkspaceRemote(
@@ -1198,6 +1404,7 @@ export async function deleteWorkspaceRemote(
 export interface NotionImportJobResult {
   job: NotionImportJob;
   items?: NotionImportItem[];
+  activeOperation?: "discover" | "apply" | null;
 }
 
 export interface NotionImportPlanResult extends NotionImportJobResult {
@@ -1335,6 +1542,10 @@ export interface CreateNotionImportJobInput {
   // Create the job WITHOUT running discovery inline, so the client can drive
   // discovery in short chunks and keep the UI responsive on large workspaces.
   deferDiscovery?: boolean;
+  /** Saved-connection jobs run from the durable server queue. */
+  serverOwned?: boolean;
+  /** Opaque idempotency key retained across an ambiguous create response. */
+  serverRunRequestId?: string;
 }
 
 export async function createNotionImportJobRemote(
@@ -1370,11 +1581,16 @@ export async function repairNotionImportPageIndexesRemote(
   });
 }
 
-export async function getNotionImportJobRemote(jobId: string, workspaceId?: string): Promise<NotionImportJobResult> {
+export async function getNotionImportJobRemote(
+  jobId: string,
+  workspaceId?: string,
+  options: { compact?: boolean } = {},
+): Promise<NotionImportJobResult> {
   return getClient().functions.post<NotionImportJobResult>("notion-import", {
     action: "get",
     jobId,
     workspaceId,
+    ...options,
   });
 }
 
@@ -1398,6 +1614,7 @@ export async function discoverNotionImportJobRemote(input: {
   maxViewPages?: number;
   continueFromCursor?: boolean;
   incremental?: boolean;
+  compact?: boolean;
 }): Promise<NotionImportJobResult> {
   return getClient().functions.post<NotionImportJobResult>("notion-import", {
     action: "discover",
@@ -1419,8 +1636,12 @@ export interface ApplyNotionImportJobInput {
   notionToken?: string;
   connectionId?: string;
   importPagesFullWidth?: boolean;
+  compact?: boolean;
+  applyDataSourceBatchSize?: number;
+  applyFileBatchSize?: number;
   applyPageBatchSize?: number;
   applyDatabaseBatchSize?: number;
+  applyRemapBatchSize?: number;
 }
 
 export interface NotionImportAppliedMapping {
@@ -1431,12 +1652,14 @@ export interface NotionImportAppliedMapping {
 
 export async function applyNotionImportJobRemote(input: string | ApplyNotionImportJobInput): Promise<NotionImportJobResult & {
   applied?: Record<string, number>;
+  importedRootPageId?: string;
   mappings?: NotionImportAppliedMapping[];
   partial?: boolean;
 }> {
   const body = typeof input === "string" ? { jobId: input } : input;
   return getClient().functions.post<NotionImportJobResult & {
     applied?: Record<string, number>;
+    importedRootPageId?: string;
     mappings?: NotionImportAppliedMapping[];
     partial?: boolean;
   }>("notion-import", {
@@ -1467,6 +1690,8 @@ export async function retryNotionImportJobRemote(input: {
   maxViewPages?: number;
   importPagesFullWidth?: boolean;
   deferDiscovery?: boolean;
+  serverOwned?: boolean;
+  serverRunRequestId?: string;
   locale?: "en" | "ko";
 }): Promise<NotionImportJobResult> {
   return getClient().functions.post<NotionImportJobResult>("notion-import", {
@@ -1489,6 +1714,7 @@ export interface WorkspaceMembersResult {
   organizationScimTokens?: OrganizationScimToken[];
   organizationLegalHolds?: OrganizationLegalHold[];
   organizationAuditExports?: OrganizationAuditExport[];
+  organizationDiscoveryExports?: OrganizationDiscoveryExport[];
   organizationBillingRecords?: OrganizationBillingRecord[];
   workspaces?: Workspace[];
   currentMember?: WorkspaceMember;
@@ -1515,6 +1741,7 @@ export interface OrganizationDirectoryResult {
   organizationScimTokens?: OrganizationScimToken[];
   organizationLegalHolds?: OrganizationLegalHold[];
   organizationAuditExports?: OrganizationAuditExport[];
+  organizationDiscoveryExports?: OrganizationDiscoveryExport[];
   organizationBillingRecords?: OrganizationBillingRecord[];
   organizationAuditFilter?: {
     action?: string | null;
@@ -1545,6 +1772,88 @@ export interface SearchOrganizationPeopleResult {
   query?: string;
   limit?: number;
   people: OrganizationProfile[];
+}
+
+export interface SearchOrganizationPeopleRemoteOptions {
+  signal?: AbortSignal;
+}
+
+const ORGANIZATION_PEOPLE_SEARCH_WIRE_LIMIT = 50;
+interface OrganizationPeopleSearchRequest {
+  consumers: number;
+  controller: AbortController;
+  promise: Promise<SearchOrganizationPeopleResult>;
+  settled: boolean;
+}
+const organizationPeopleSearchRequests = new Map<
+  string,
+  OrganizationPeopleSearchRequest
+>();
+
+function organizationPeopleSearchLimit(value: number | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 10;
+  return Math.max(1, Math.min(ORGANIZATION_PEOPLE_SEARCH_WIRE_LIMIT, Math.floor(value)));
+}
+
+function organizationPeopleSearchKey(
+  principalId: string,
+  input: SearchOrganizationPeopleInput,
+  normalizedQuery: string,
+) {
+  return JSON.stringify([
+    principalId,
+    input.organizationId,
+    normalizedQuery,
+    input.includeInvited === true,
+    input.includeDeactivated === true,
+  ]);
+}
+
+function organizationPeopleSearchAbortReason(signal: AbortSignal) {
+  return signal.reason ?? new DOMException("Organization people search was aborted.", "AbortError");
+}
+
+function subscribeToOrganizationPeopleSearch(
+  key: string,
+  request: OrganizationPeopleSearchRequest,
+  signal?: AbortSignal,
+): Promise<SearchOrganizationPeopleResult> {
+  request.consumers += 1;
+  return new Promise((resolve, reject) => {
+    let active = true;
+    const release = (reason?: unknown) => {
+      if (!active) return;
+      active = false;
+      signal?.removeEventListener("abort", onAbort);
+      request.consumers -= 1;
+      if (request.consumers === 0 && !request.settled) {
+        if (organizationPeopleSearchRequests.get(key) === request) {
+          organizationPeopleSearchRequests.delete(key);
+        }
+        request.controller.abort(reason);
+      }
+    };
+    const onAbort = () => {
+      const reason = signal
+        ? organizationPeopleSearchAbortReason(signal)
+        : new DOMException("Organization people search was aborted.", "AbortError");
+      release(reason);
+      reject(reason);
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+    request.promise.then(
+      (result) => {
+        if (!active) return;
+        release();
+        resolve(result);
+      },
+      (error) => {
+        if (!active) return;
+        release(error);
+        reject(error);
+      },
+    );
+  });
 }
 
 export interface UpdateOrganizationSettingsInput {
@@ -1603,6 +1912,15 @@ export async function updateInstanceSignupPolicyRemote(
   return getClient().functions.post<InstanceAdminResult>("instance-admin", {
     action: "updateSignupPolicy",
     signupPolicy,
+  });
+}
+
+export async function updateInstanceMemberAddPolicyRemote(
+  memberAddPolicy: MemberAddPolicy,
+): Promise<InstanceAdminResult> {
+  return getClient().functions.post<InstanceAdminResult>("instance-admin", {
+    action: "updateMemberAddPolicy",
+    memberAddPolicy,
   });
 }
 
@@ -1704,13 +2022,54 @@ export async function getOrganizationDirectoryRemote(
   });
 }
 
-export async function searchOrganizationPeopleRemote(
-  input: SearchOrganizationPeopleInput
+export function searchOrganizationPeopleRemote(
+  input: SearchOrganizationPeopleInput,
+  options: SearchOrganizationPeopleRemoteOptions = {},
 ): Promise<SearchOrganizationPeopleResult> {
-  return getClient().functions.post<SearchOrganizationPeopleResult>("workspace-mutation", {
-    action: "searchOrganizationPeople",
-    ...input,
-  });
+  if (options.signal?.aborted) {
+    return Promise.reject(organizationPeopleSearchAbortReason(options.signal));
+  }
+  const normalizedQuery = input.query?.trim().toLowerCase() ?? "";
+  const callerLimit = organizationPeopleSearchLimit(input.limit);
+  const key = organizationPeopleSearchKey(currentUserId(), input, normalizedQuery);
+  let request = organizationPeopleSearchRequests.get(key);
+  if (!request) {
+    const controller = new AbortController();
+    const promise = getClient().functions.call<SearchOrganizationPeopleResult>("workspace-mutation", {
+      method: "POST",
+      body: {
+        action: "searchOrganizationPeople",
+        ...input,
+        query: normalizedQuery,
+        limit: ORGANIZATION_PEOPLE_SEARCH_WIRE_LIMIT,
+      },
+      signal: controller.signal,
+    });
+    const createdRequest: OrganizationPeopleSearchRequest = {
+      consumers: 0,
+      controller,
+      promise,
+      settled: false,
+    };
+    request = createdRequest;
+    organizationPeopleSearchRequests.set(key, createdRequest);
+    void promise.then(() => {
+      createdRequest.settled = true;
+      if (organizationPeopleSearchRequests.get(key) === createdRequest) {
+        organizationPeopleSearchRequests.delete(key);
+      }
+    }, () => {
+      createdRequest.settled = true;
+      if (organizationPeopleSearchRequests.get(key) === createdRequest) {
+        organizationPeopleSearchRequests.delete(key);
+      }
+    });
+  }
+  return subscribeToOrganizationPeopleSearch(key, request, options.signal).then((result) => ({
+    ...result,
+    limit: callerLimit,
+    people: Array.isArray(result.people) ? result.people.slice(0, callerLimit) : [],
+  }));
 }
 
 export async function updateOrganizationSettingsRemote(
@@ -1729,6 +2088,96 @@ export async function updateOrganizationEnterpriseControlsRemote(
     action: "updateOrganizationEnterpriseControls",
     ...input,
   });
+}
+
+export async function setOrganizationMcpGovernanceEnabledRemote(input: {
+  organizationId: string;
+  workspaceId: string;
+  enabled: boolean;
+}): Promise<OrganizationDirectoryResult> {
+  return getClient().functions.post<OrganizationDirectoryResult>("workspace-mutation", {
+    action: "setOrganizationMcpGovernanceEnabled",
+    ...input,
+  });
+}
+
+export async function approveOrganizationMcpClientRemote(input: {
+  organizationId: string;
+  workspaceId: string;
+  clientId: string;
+  name: string;
+}): Promise<OrganizationDirectoryResult> {
+  return getClient().functions.post<OrganizationDirectoryResult>("workspace-mutation", {
+    action: "approveOrganizationMcpClient",
+    ...input,
+  });
+}
+
+export async function removeOrganizationMcpClientRemote(input: {
+  organizationId: string;
+  workspaceId: string;
+  clientId: string;
+}): Promise<OrganizationDirectoryResult> {
+  return getClient().functions.post<OrganizationDirectoryResult>("workspace-mutation", {
+    action: "removeOrganizationMcpClient",
+    ...input,
+  });
+}
+
+export async function renameOrganizationMcpClientRemote(input: {
+  organizationId: string;
+  workspaceId: string;
+  clientId: string;
+  name: string;
+}): Promise<OrganizationDirectoryResult> {
+  return getClient().functions.post<OrganizationDirectoryResult>("workspace-mutation", {
+    action: "renameOrganizationMcpClient",
+    ...input,
+  });
+}
+
+export async function listOrganizationAdminTokensRemote(
+  organizationId: string,
+): Promise<OrganizationAdminToken[]> {
+  const result = await getClient().functions.post<{ adminTokens?: OrganizationAdminToken[] }>(
+    "notion-admin-tokens",
+    { action: "list", organizationId },
+  );
+  return Array.isArray(result?.adminTokens) ? result.adminTokens : [];
+}
+
+export async function createOrganizationAdminTokenRemote(input: {
+  organizationId: string;
+  label: string;
+  capabilities: NotionAdminCapability[];
+  workspaceIds: string[];
+  legalHoldIds: string[];
+  expiresAt?: string | null;
+}): Promise<{ adminToken?: OrganizationAdminToken; adminTokenSecret?: string }> {
+  return getClient().functions.post<{ adminToken?: OrganizationAdminToken; adminTokenSecret?: string }>(
+    "notion-admin-tokens",
+    {
+      action: "create",
+      organizationId: input.organizationId,
+      label: input.label,
+      capabilities: input.capabilities,
+      resources: {
+        workspaceIds: input.workspaceIds,
+        legalHoldIds: input.legalHoldIds,
+      },
+      expiresAt: input.expiresAt ?? null,
+    },
+  );
+}
+
+export async function revokeOrganizationAdminTokenRemote(input: {
+  organizationId: string;
+  tokenId: string;
+}): Promise<{ adminToken?: OrganizationAdminToken }> {
+  return getClient().functions.post<{ adminToken?: OrganizationAdminToken }>(
+    "notion-admin-tokens",
+    { action: "revoke", ...input },
+  );
 }
 
 export async function createOrganizationScimTokenRemote(input: {
@@ -1797,6 +2246,26 @@ export async function exportOrganizationAuditEventsRemote(input: {
     auditExportContent?: string;
   }>("workspace-mutation", {
     action: "exportOrganizationAuditEvents",
+    ...input,
+  });
+}
+
+export async function exportOrganizationDiscoveryRemote(input: {
+  organizationId: string;
+  query?: string | null;
+  userIds?: string[];
+  workspaceIds?: string[];
+  since?: string | null;
+  until?: string | null;
+  includeTrashed?: boolean;
+  format?: "jsonl" | "json";
+}): Promise<OrganizationDirectoryResult & {
+  discoveryExport?: OrganizationDiscoveryExport;
+}> {
+  return getClient().functions.post<OrganizationDirectoryResult & {
+    discoveryExport?: OrganizationDiscoveryExport;
+  }>("workspace-mutation", {
+    action: "exportOrganizationDiscovery",
     ...input,
   });
 }
@@ -2043,6 +2512,187 @@ export interface TransferWorkspaceOwnerInput {
   userId?: string;
 }
 
+export interface TeamspaceMutationResult {
+  teamspace?: Teamspace;
+  settings?: TeamspaceSettings;
+  membership?: TeamspaceMember;
+  request?: TeamspaceJoinRequest;
+  removed?: boolean;
+}
+
+export interface TeamspaceListMembersResult {
+  teamspace: Teamspace;
+  members: TeamspaceMember[];
+  hasMore: boolean;
+  nextCursor?: string | null;
+}
+
+export interface TeamspaceListRequestsResult {
+  teamspace: Teamspace;
+  requests: TeamspaceJoinRequest[];
+  hasMore: boolean;
+  nextCursor?: string | null;
+}
+
+export interface TeamspaceListArchivedResult {
+  teamspaces: Teamspace[];
+  hasMore: boolean;
+  nextCursor?: string | null;
+}
+
+export interface CreateTeamspaceInput {
+  workspaceId: string;
+  name: string;
+  icon?: string;
+  description?: string;
+  access?: TeamspaceAccess;
+  memberPageRole?: ShareRole;
+  openPageRole?: ShareRole;
+  membersCanInvite?: boolean;
+  membersCanEditSidebar?: boolean;
+}
+
+export interface UpdateTeamspaceInput extends Partial<Omit<CreateTeamspaceInput, "workspaceId">> {
+  workspaceId: string;
+  teamspaceId: string;
+}
+
+function teamspaceRead<T>(action: string, input: object) {
+  return getClient().functions.post<T>("workspace-mutation", { action, ...input });
+}
+
+function teamspaceWrite<T>(action: string, input: object) {
+  return callInteractiveMutation<T>("workspace-mutation", { action, ...input });
+}
+
+export function createTeamspaceRemote(input: CreateTeamspaceInput) {
+  return teamspaceWrite<TeamspaceMutationResult>("createTeamspace", input);
+}
+
+export function updateTeamspaceRemote(input: UpdateTeamspaceInput) {
+  return teamspaceWrite<TeamspaceMutationResult>("updateTeamspace", input);
+}
+
+export function joinTeamspaceRemote(workspaceId: string, teamspaceId: string) {
+  return teamspaceWrite<TeamspaceMutationResult>("joinTeamspace", { workspaceId, teamspaceId });
+}
+
+export function requestTeamspaceAccessRemote(workspaceId: string, teamspaceId: string) {
+  return teamspaceWrite<TeamspaceMutationResult>("requestTeamspaceAccess", { workspaceId, teamspaceId });
+}
+
+export function respondTeamspaceRequestRemote(
+  workspaceId: string,
+  teamspaceId: string,
+  userId: string,
+  decision: "approve" | "deny",
+) {
+  return teamspaceWrite<TeamspaceMutationResult>("respondTeamspaceRequest", {
+    workspaceId,
+    teamspaceId,
+    userId,
+    decision,
+  });
+}
+
+export function listTeamspaceMembersRemote(
+  workspaceId: string,
+  teamspaceId: string,
+  after?: string,
+) {
+  return teamspaceRead<TeamspaceListMembersResult>("listTeamspaceMembers", {
+    workspaceId,
+    teamspaceId,
+    limit: 100,
+    ...(after ? { after } : {}),
+  });
+}
+
+export function listTeamspaceRequestsRemote(
+  workspaceId: string,
+  teamspaceId: string,
+  after?: string,
+) {
+  return teamspaceRead<TeamspaceListRequestsResult>("listTeamspaceRequests", {
+    workspaceId,
+    teamspaceId,
+    limit: 100,
+    ...(after ? { after } : {}),
+  });
+}
+
+export function listArchivedTeamspacesRemote(workspaceId: string, after?: string) {
+  return teamspaceRead<TeamspaceListArchivedResult>("listArchivedTeamspaces", {
+    workspaceId,
+    limit: 100,
+    ...(after ? { after } : {}),
+  });
+}
+
+export function addTeamspaceMemberRemote(input: {
+  workspaceId: string;
+  teamspaceId: string;
+  principalType: "user" | "group";
+  principalId: string;
+  role: TeamspaceMemberRole;
+}) {
+  return teamspaceWrite<TeamspaceMutationResult>("addTeamspaceMember", input);
+}
+
+export function updateTeamspaceMemberRoleRemote(input: {
+  workspaceId: string;
+  teamspaceId: string;
+  membershipId: string;
+  role: TeamspaceMemberRole;
+}) {
+  return teamspaceWrite<TeamspaceMutationResult>("updateTeamspaceMemberRole", input);
+}
+
+export function removeTeamspaceMemberRemote(
+  workspaceId: string,
+  teamspaceId: string,
+  membershipId: string,
+) {
+  return teamspaceWrite<TeamspaceMutationResult>("removeTeamspaceMember", {
+    workspaceId,
+    teamspaceId,
+    membershipId,
+  });
+}
+
+export function updateTeamspaceSettingsRemote(workspaceId: string, ownersOnlyCreate: boolean) {
+  return teamspaceWrite<TeamspaceMutationResult>("updateTeamspaceSettings", {
+    workspaceId,
+    ownersOnlyCreate,
+  });
+}
+
+export function setDefaultTeamspaceRemote(workspaceId: string, teamspaceId: string) {
+  return teamspaceWrite<TeamspaceMutationResult>("setDefaultTeamspace", {
+    workspaceId,
+    teamspaceId,
+  });
+}
+
+export function archiveTeamspaceRemote(
+  workspaceId: string,
+  teamspaceId: string,
+  replacementDefaultTeamspaceId?: string,
+) {
+  return teamspaceWrite<TeamspaceMutationResult>("archiveTeamspace", {
+    workspaceId,
+    teamspaceId,
+    ...(replacementDefaultTeamspaceId ? { replacementDefaultTeamspaceId } : {}),
+  });
+}
+
+export function restoreTeamspaceRemote(workspaceId: string, teamspaceId: string) {
+  return teamspaceWrite<TeamspaceMutationResult>("restoreTeamspace", {
+    workspaceId,
+    teamspaceId,
+  });
+}
+
 export interface RemoveWorkspaceMemberInput {
   workspaceId: string;
   memberId?: string;
@@ -2114,6 +2764,107 @@ export interface PageMutationDeleteResult {
   deletedIds: string[];
 }
 
+export type WikiCollectionView = "all" | "owned";
+
+export interface WikiPageOwnersResult {
+  page: Page;
+  owners: PageOwner[];
+}
+
+export interface WikiCollectionResult {
+  view: WikiCollectionView;
+  pages: Page[];
+  owners: PageOwner[];
+  nextCursor: string | null;
+}
+
+export interface WikiConversionResult {
+  root: Page;
+  pages: Page[];
+  owners?: PageOwner[];
+}
+
+export interface WikiOwnerCandidatesResult {
+  members: WorkspaceMember[];
+  nextCursor: string | null;
+}
+
+export async function convertWikiRemote(pageId: string): Promise<WikiConversionResult> {
+  return callInteractiveMutation<WikiConversionResult>("wiki-mutation", {
+    action: "convert",
+    pageId,
+  });
+}
+
+export async function undoWikiRemote(pageId: string): Promise<WikiConversionResult> {
+  return callInteractiveMutation<WikiConversionResult>("wiki-mutation", {
+    action: "undo",
+    pageId,
+  });
+}
+
+export async function listWikiPagesRemote(
+  pageId: string,
+  view: WikiCollectionView,
+  options: { after?: string; limit?: number } = {},
+): Promise<WikiCollectionResult> {
+  return callInteractiveMutation<WikiCollectionResult>("wiki-mutation", {
+    action: "list",
+    pageId,
+    view,
+    after: options.after,
+    limit: options.limit ?? 50,
+  });
+}
+
+export async function getWikiPageOwnersRemote(pageId: string): Promise<WikiPageOwnersResult> {
+  return callInteractiveMutation<WikiPageOwnersResult>("wiki-mutation", {
+    action: "owners",
+    pageId,
+  });
+}
+
+export async function getWikiOwnerCandidatesRemote(
+  pageId: string,
+  options: { after?: string; limit?: number } = {},
+): Promise<WikiOwnerCandidatesResult> {
+  return callInteractiveMutation<WikiOwnerCandidatesResult>("wiki-mutation", {
+    action: "ownerCandidates",
+    pageId,
+    after: options.after,
+    limit: options.limit ?? 50,
+  });
+}
+
+export async function setWikiPageOwnersRemote(
+  pageId: string,
+  ownerIds: string[],
+): Promise<WikiPageOwnersResult> {
+  return callInteractiveMutation<WikiPageOwnersResult>("wiki-mutation", {
+    action: "setOwners",
+    pageId,
+    ownerIds,
+  });
+}
+
+export async function verifyWikiPageRemote(
+  pageId: string,
+  expiresAt: string | null,
+): Promise<WikiPageOwnersResult> {
+  return callInteractiveMutation<WikiPageOwnersResult>("wiki-mutation", {
+    action: "verify",
+    pageId,
+    expiresAt,
+  });
+}
+
+export async function unverifyWikiPageRemote(pageId: string): Promise<WikiPageOwnersResult> {
+  return callInteractiveMutation<WikiPageOwnersResult>("wiki-mutation", {
+    action: "unverify",
+    pageId,
+  });
+}
+
 export interface DuplicatePageResult {
   page: Page | null;
   source?: Page;
@@ -2141,11 +2892,20 @@ export async function createPageRemote(page: Page): Promise<Page> {
   return result.page;
 }
 
-export async function updatePageRemote(id: string, patch: Partial<Page>): Promise<Page> {
+export async function updatePageRemote(
+  id: string,
+  patch: Partial<Page>,
+  expectedUpdatedAt?: string,
+  mutationId?: string,
+  expectedMutationId?: string,
+): Promise<Page> {
   const result = await callInteractiveMutation<{ page: Page }>("page-mutation", {
     action: "update",
     id,
     patch,
+    ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+    ...(mutationId ? { mutationId } : {}),
+    ...(expectedMutationId ? { expectedMutationId } : {}),
   });
   return result.page;
 }
@@ -2189,11 +2949,49 @@ export async function duplicatePageRemote(
 export interface PageAccessResult {
   page: Page;
   shareLink: ShareLink | null;
+  site?: SiteConfig | null;
   permissions: PagePermission[];
   canManage?: boolean;
+  accessOwner?: {
+    displayName?: string | null;
+    isCurrent: boolean;
+  };
   permission?: PagePermission;
   deletedId?: string;
   warnings?: string[];
+}
+
+export interface SiteMutationResult extends PageAccessResult {
+  site: SiteConfig;
+  routes?: Array<{
+    routeKey: string;
+    routeKind: "slug" | "host";
+    routeValue: string;
+    status: "provisioning" | "pending_validation" | "active" | "inactive";
+    revision: number;
+  }>;
+  verified?: boolean;
+  verification?: {
+    verified: boolean;
+    recordName: string;
+    recordValue: string;
+    reason?: string;
+  };
+}
+
+export interface PublishSiteInput {
+  pageId: string;
+  slug: string;
+  customHostname?: string | null;
+  config: {
+    title: string;
+    description?: string;
+    theme: "system" | "light" | "dark";
+    showBreadcrumbs: boolean;
+    showSearch: boolean;
+    showBranding: boolean;
+    navigationPageIds: string[];
+  };
 }
 
 export interface SharedPageResult {
@@ -2208,13 +3006,35 @@ export interface SharedPageResult {
   snapshotVersion?: string;
 }
 
+export interface PublicSiteResult extends SharedPageResult {
+  site: SiteConfig;
+}
+
 export interface PageBlocksResult {
   pageId: string;
   blocks: Block[];
+  embeddedDatabases?: DatabaseSnapshotResult[];
+  embeddedDatabasesTruncated?: boolean;
 }
 
 export interface BlocksResult {
   blocks: Block[];
+  pages?: Page[];
+  truncated?: boolean;
+  hasMore?: boolean;
+  nextCursor?: string;
+}
+
+export interface SearchBlocksRemoteOptions {
+  /** Opaque continuation issued by the previous block-search response. */
+  sourceCursor?: string;
+  /** Cancels queued transport work and every source window in this request. */
+  signal?: AbortSignal;
+}
+
+export interface PageBacklinksRemoteOptions {
+  /** Opaque continuation issued by the previous backlinks response. */
+  sourceCursor?: string;
 }
 
 export interface PageCommentsResult {
@@ -2230,11 +3050,26 @@ export interface DatabaseSnapshotResult {
   properties: DbProperty[];
   views: DbView[];
   templates: DbTemplate[];
+  /** Related schemas prefetched as one metadata graph; row payloads stay separate. */
+  relatedDatabases?: DatabaseSnapshotResult[];
+  relatedDatabasesTruncated?: boolean;
+}
+
+export interface DatabaseStructuralRowMarker {
+  __structuralPlaceholder: true;
+  id: string;
+  subitemParentId: string;
+}
+
+export function isDatabaseStructuralRowMarker(
+  value: Page | DatabaseStructuralRowMarker,
+): value is DatabaseStructuralRowMarker {
+  return value.__structuralPlaceholder === true;
 }
 
 export interface DatabaseRowsResult {
   databaseId: string;
-  rows: Page[];
+  rows: Array<Page | DatabaseStructuralRowMarker>;
   relatedPages?: Page[];
   relationTargetIds?: string[];
   computed?: Record<string, Record<string, ComputedPropertyValue>>;
@@ -2243,6 +3078,68 @@ export interface DatabaseRowsResult {
   totalCount?: number;
   hasMore?: boolean;
   nextOffset?: number;
+  nextCursor?: string;
+}
+
+const databaseSnapshotInflight = new Map<string, Promise<DatabaseSnapshotResult>>();
+const databaseDependencyGraphInflight = new Map<
+  string,
+  Promise<DatabaseDependencyGraphResult>
+>();
+const databaseDependencyRelationInflight = new Map<
+  string,
+  Promise<DatabaseDependencyRelationResult>
+>();
+
+export type DatabaseDependencyDirection = "predecessors" | "successors";
+
+export interface DatabaseDependencyGraphEdge {
+  predecessorRowId: string;
+  successorRowId: string;
+}
+
+export interface DatabaseDependencyGraphResult {
+  databaseId: string;
+  dependencyRevision: number;
+  edges: DatabaseDependencyGraphEdge[];
+  visibleRowIds: string[];
+}
+
+interface DatabaseDependencyGraphPage extends DatabaseDependencyGraphResult {
+  hasMore: boolean;
+  nextCursor?: string;
+}
+
+export interface DatabaseDependencyRelationResult {
+  databaseId: string;
+  dependencyRevision: number;
+  direction: DatabaseDependencyDirection;
+  hasMore: boolean;
+  nextCursor?: string;
+  propertyId: string;
+  relatedRowIds: string[];
+  rowId: string;
+}
+
+export interface DatabaseDependencyMutationOperation {
+  addPredecessorIds: string[];
+  mutationId: string;
+  removePredecessorIds: string[];
+  rowId: string;
+}
+
+export interface UpdateDatabaseDependencyRelationInput {
+  databaseId: string;
+  direction: DatabaseDependencyDirection;
+  mutationId: string;
+  operations: DatabaseDependencyMutationOperation[];
+  propertyId: string;
+  rowId: string;
+}
+
+export interface UpdateDatabaseDependencyRelationResult {
+  mutationId: string;
+  relation: DatabaseDependencyRelationResult;
 }
 
 export interface ImportMarkdownPageInput {
@@ -2299,36 +3196,166 @@ export interface UrlMetadata {
 }
 
 export async function getPageBlocksRemote(pageId: string): Promise<PageBlocksResult> {
-  return getClient().functions.post<PageBlocksResult>("page-query", {
+  return callPageQuery<PageBlocksResult>({
     action: "blocks",
+    includeEmbeddedDatabases: true,
     pageId,
   });
 }
 
 export async function getPageRemote(pageId: string): Promise<Page> {
-  const result = await getClient().functions.post<{ page: Page }>("page-query", {
+  const result = await callPageQuery<{ page: Page }>({
     action: "page",
     pageId,
   });
   return result.page;
 }
 
-export async function getAllBlocksRemote(): Promise<BlocksResult> {
-  return getClient().functions.post<BlocksResult>("page-query", {
-    action: "allBlocks",
-  });
+export async function searchBlocksRemote(
+  query: string,
+  limit: number,
+  workspaceId: string,
+  options: SearchBlocksRemoteOptions = {},
+): Promise<BlocksResult> {
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error("Block search limit must be an integer between 1 and 100.");
+  }
+  if (options.sourceCursor !== undefined && options.sourceCursor.length === 0) {
+    throw new Error("Block search source cursor must not be empty.");
+  }
+
+  // A source window can contain no product matches (for example while a group
+  // authority projection advances, or when an indexed JSON candidate is an
+  // exact-text false positive). Follow a few such windows in one UI request,
+  // but always yield the latest opaque cursor instead of draining an
+  // unbounded workspace in one browser task.
+  const maxSourceWindows = 8;
+  const blocks: Block[] = [];
+  const pagesById = new Map<string, Page>();
+  let sourceCursor = options.sourceCursor;
+  let hasMore = false;
+  let sourceWindows = 0;
+  const seenCursors = new Set<string>(sourceCursor ? [sourceCursor] : []);
+  do {
+    sourceWindows += 1;
+    const remaining = Math.max(1, limit - blocks.length);
+    const result = await callUnbatchedPageQuery<BlocksResult>({
+      action: "searchBlocks",
+      query,
+      limit: remaining,
+      workspaceId,
+      includePages: true,
+      ...(sourceCursor ? { sourceCursor } : {}),
+    }, options.signal);
+    if (!Array.isArray(result.blocks) || result.blocks.length > remaining) {
+      throw new Error("Block search source returned a malformed window.");
+    }
+    if (result.pages !== undefined && !Array.isArray(result.pages)) {
+      throw new Error("Block search source returned malformed pages.");
+    }
+    blocks.push(...result.blocks);
+    for (const page of result.pages ?? []) {
+      if (!page || typeof page.id !== "string" || !page.id) {
+        throw new Error("Block search source returned a malformed page.");
+      }
+      pagesById.set(page.id, page);
+    }
+    hasMore = result.hasMore === true;
+    if (hasMore) {
+      if (!result.nextCursor || seenCursors.has(result.nextCursor)) {
+        throw new Error("Block search source returned a non-advancing cursor.");
+      }
+      sourceCursor = result.nextCursor;
+      seenCursors.add(sourceCursor);
+    } else if (result.nextCursor !== undefined) {
+      throw new Error("Block search source returned a cursor without more results.");
+    } else {
+      sourceCursor = undefined;
+    }
+  } while (hasMore && blocks.length < limit && sourceWindows < maxSourceWindows);
+  return {
+    blocks,
+    pages: Array.from(pagesById.values()),
+    hasMore,
+    ...(sourceCursor ? { nextCursor: sourceCursor } : {}),
+  };
 }
 
-export async function searchBlocksRemote(query: string, limit = 20): Promise<BlocksResult> {
-  return getClient().functions.post<BlocksResult>("page-query", {
-    action: "searchBlocks",
-    query,
-    limit,
-  });
+export async function getPageBacklinksRemote(
+  targetPageId: string,
+  limit: number,
+  workspaceId: string,
+  options: PageBacklinksRemoteOptions = {},
+): Promise<BlocksResult> {
+  if (!targetPageId.trim()) throw new Error("Backlinks target page id must not be empty.");
+  if (!workspaceId.trim()) throw new Error("Backlinks workspace id must not be empty.");
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error("Backlinks limit must be an integer between 1 and 100.");
+  }
+  if (options.sourceCursor !== undefined && options.sourceCursor.length === 0) {
+    throw new Error("Backlinks source cursor must not be empty.");
+  }
+
+  // Exact matches can be sparse inside the FTS candidate stream. Drain only a
+  // fixed number of advancing windows for one automatic/user action, then
+  // return the latest opaque cursor instead of scanning a workspace to the end.
+  const maxSourceWindows = 8;
+  const blocks: Block[] = [];
+  const pagesById = new Map<string, Page>();
+  let sourceCursor = options.sourceCursor;
+  let hasMore = false;
+  let sourceWindows = 0;
+  const seenCursors = new Set<string>(sourceCursor ? [sourceCursor] : []);
+  do {
+    sourceWindows += 1;
+    const remaining = Math.max(1, limit - blocks.length);
+    const body: PageReadBatchRequest = {
+      action: "backlinks",
+      targetPageId,
+      limit: remaining,
+      workspaceId,
+      ...(sourceCursor ? { sourceCursor } : {}),
+    };
+    const result = sourceWindows === 1 && options.sourceCursor === undefined
+      ? await callPageQuery<BlocksResult>(body)
+      : await callUnbatchedPageQuery<BlocksResult>(body);
+    if (!Array.isArray(result.blocks) || result.blocks.length > remaining) {
+      throw new Error("Backlinks source returned a malformed window.");
+    }
+    if (result.pages !== undefined && !Array.isArray(result.pages)) {
+      throw new Error("Backlinks source returned malformed pages.");
+    }
+    blocks.push(...result.blocks);
+    for (const page of result.pages ?? []) {
+      if (!page || typeof page.id !== "string" || !page.id) {
+        throw new Error("Backlinks source returned a malformed page.");
+      }
+      pagesById.set(page.id, page);
+    }
+    hasMore = result.hasMore === true;
+    if (hasMore) {
+      if (!result.nextCursor || seenCursors.has(result.nextCursor)) {
+        throw new Error("Backlinks source returned a non-advancing cursor.");
+      }
+      sourceCursor = result.nextCursor;
+      seenCursors.add(sourceCursor);
+    } else if (result.nextCursor !== undefined) {
+      throw new Error("Backlinks source returned a cursor without more results.");
+    } else {
+      sourceCursor = undefined;
+    }
+  } while (hasMore && blocks.length < limit && sourceWindows < maxSourceWindows);
+
+  return {
+    blocks,
+    pages: Array.from(pagesById.values()),
+    hasMore,
+    ...(sourceCursor ? { nextCursor: sourceCursor } : {}),
+  };
 }
 
 export async function getPageCommentsRemote(pageId: string): Promise<PageCommentsResult> {
-  return getClient().functions.post<PageCommentsResult>("page-query", {
+  return callPageQuery<PageCommentsResult>({
     action: "comments",
     pageId,
   });
@@ -2336,13 +3363,28 @@ export async function getPageCommentsRemote(pageId: string): Promise<PageComment
 
 export async function getDatabaseSnapshotRemote(
   databaseId: string,
-  opts: { viewIds?: string[] } = {}
+  opts: { force?: boolean; viewIds?: string[] } = {}
 ): Promise<DatabaseSnapshotResult> {
-  return getClient().functions.post<DatabaseSnapshotResult>("page-query", {
+  const viewIds = Array.from(new Set(opts.viewIds ?? [])).sort();
+  const key = JSON.stringify([databaseId, viewIds]);
+  if (!opts.force) {
+    const existing = databaseSnapshotInflight.get(key);
+    if (existing) return existing;
+  }
+  const request = callPageQuery<DatabaseSnapshotResult>({
     action: "database",
     databaseId,
-    ...(opts.viewIds?.length ? { viewIds: opts.viewIds } : {}),
+    includeRelatedDatabases: true,
+    ...(viewIds.length ? { viewIds } : {}),
   });
+  if (!opts.force) databaseSnapshotInflight.set(key, request);
+  try {
+    return await request;
+  } finally {
+    if (databaseSnapshotInflight.get(key) === request) {
+      databaseSnapshotInflight.delete(key);
+    }
+  }
 }
 
 export async function getDatabaseRowsRemote(
@@ -2353,23 +3395,382 @@ export async function getDatabaseRowsRemote(
     includeTrash?: boolean;
     limit?: number;
     offset?: number;
+    cursor?: string;
     viewId?: string;
     search?: string;
     currentPageId?: string;
-  } = {}
+    subitemParentId?: string;
+  } = {},
+  signal?: AbortSignal,
 ): Promise<DatabaseRowsResult> {
-  const result = await getClient().functions.post<DatabaseRowsResult>("page-query", {
+  const timeZone = resolvedViewerTimeZone();
+  const result = await callUnbatchedPageQuery<DatabaseRowsResult>({
     action: "databaseRows",
     databaseId,
     ...opts,
-  });
+    ...(timeZone ? { timeZone } : {}),
+  }, signal);
   const computed = result.computed ?? {};
   return {
     ...result,
     rows: (result.rows ?? []).map((row) =>
-      computed[row.id] ? { ...row, __computed: computed[row.id] } : row
+      !isDatabaseStructuralRowMarker(row) && computed[row.id]
+        ? { ...row, __computed: computed[row.id] }
+        : row
     ),
   };
+}
+
+function uniqueDependencyIds(value: unknown, label: string) {
+  if (!Array.isArray(value) || value.length > 50) {
+    throw new Error(`${label} is malformed.`);
+  }
+  const ids = value.map((item) => {
+    if (typeof item !== "string" || !item.trim() || item.trim().length > 256) {
+      throw new Error(`${label} is malformed.`);
+    }
+    return item.trim();
+  });
+  if (new Set(ids).size !== ids.length) throw new Error(`${label} contains duplicate ids.`);
+  return ids;
+}
+
+function canonicalDependencyGraphVisibleIds(value: unknown) {
+  if (!Array.isArray(value) || value.length < 1 || value.length > 100) {
+    throw new Error("Database dependency graph visible ids are malformed.");
+  }
+  const ids = value.map((item) => {
+    if (typeof item !== "string" || !item.trim() || item.trim().length > 256) {
+      throw new Error("Database dependency graph visible ids are malformed.");
+    }
+    return item.trim();
+  });
+  if (new Set(ids).size !== ids.length) {
+    throw new Error("Database dependency graph visible ids contain duplicates.");
+  }
+  return ids.sort((left, right) => left.localeCompare(right));
+}
+
+function validatedDatabaseDependencyGraphPage(
+  value: unknown,
+  expected: { databaseId: string; visibleRowIds: string[] },
+): DatabaseDependencyGraphPage {
+  const result = value && typeof value === "object"
+    ? value as Record<string, unknown>
+    : null;
+  const dependencyRevision = Number(result?.dependencyRevision ?? 0);
+  const nextCursor = typeof result?.nextCursor === "string"
+    ? result.nextCursor.trim()
+    : undefined;
+  let responseVisibleIds: string[];
+  try {
+    responseVisibleIds = canonicalDependencyGraphVisibleIds(result?.visibleRowIds);
+  } catch {
+    throw new Error("Database dependency graph response is malformed.");
+  }
+  if (
+    result?.databaseId !== expected.databaseId
+    || !Number.isSafeInteger(dependencyRevision)
+    || dependencyRevision < 1
+    || typeof result.hasMore !== "boolean"
+    || (result.hasMore && !nextCursor)
+    || (!result.hasMore && result.nextCursor !== undefined)
+    || responseVisibleIds.length !== expected.visibleRowIds.length
+    || responseVisibleIds.some((id, index) => id !== expected.visibleRowIds[index])
+    || !Array.isArray(result.edges)
+    || result.edges.length > 200
+  ) {
+    throw new Error("Database dependency graph response is malformed.");
+  }
+  const visible = new Set(expected.visibleRowIds);
+  const seen = new Set<string>();
+  const edges = result.edges.map((candidate) => {
+    const edge = candidate && typeof candidate === "object"
+      ? candidate as Record<string, unknown>
+      : null;
+    const predecessorRowId = typeof edge?.predecessorRowId === "string"
+      ? edge.predecessorRowId.trim()
+      : "";
+    const successorRowId = typeof edge?.successorRowId === "string"
+      ? edge.successorRowId.trim()
+      : "";
+    const key = `${predecessorRowId}\u0000${successorRowId}`;
+    if (
+      !predecessorRowId
+      || !successorRowId
+      || predecessorRowId === successorRowId
+      || !visible.has(predecessorRowId)
+      || !visible.has(successorRowId)
+      || seen.has(key)
+    ) {
+      throw new Error("Database dependency graph response is malformed.");
+    }
+    seen.add(key);
+    return { predecessorRowId, successorRowId };
+  });
+  return {
+    databaseId: expected.databaseId,
+    dependencyRevision,
+    edges,
+    hasMore: result.hasMore,
+    ...(nextCursor ? { nextCursor } : {}),
+    visibleRowIds: expected.visibleRowIds,
+  };
+}
+
+function dependencyGraphErrorStatus(error: unknown) {
+  const record = error && typeof error === "object"
+    ? error as { code?: unknown; status?: unknown }
+    : undefined;
+  const status = Number(record?.status ?? record?.code);
+  return Number.isSafeInteger(status) ? status : undefined;
+}
+
+async function drainDatabaseDependencyGraph(
+  databaseId: string,
+  visibleRowIds: string[],
+): Promise<DatabaseDependencyGraphResult> {
+  const maxEdges = visibleRowIds.length * Math.max(0, visibleRowIds.length - 1);
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const edges: DatabaseDependencyGraphEdge[] = [];
+      const seenEdges = new Set<string>();
+      const seenCursors = new Set<string>();
+      let cursor: string | undefined;
+      let dependencyRevision: number | undefined;
+      for (;;) {
+        const page = validatedDatabaseDependencyGraphPage(
+          await callUnbatchedPageQuery<unknown>({
+            action: "databaseDependencyGraph",
+            databaseId,
+            ...(cursor ? { cursor, expectedDependencyRevision: dependencyRevision } : {}),
+            limit: 200,
+            visibleRowIds,
+          }),
+          { databaseId, visibleRowIds },
+        );
+        if (
+          dependencyRevision !== undefined
+          && page.dependencyRevision !== dependencyRevision
+        ) {
+          throw new Error("Database dependency graph revision changed during its drain.");
+        }
+        dependencyRevision = page.dependencyRevision;
+        for (const edge of page.edges) {
+          const key = `${edge.predecessorRowId}\u0000${edge.successorRowId}`;
+          if (seenEdges.has(key)) {
+            throw new Error("Database dependency graph repeated an edge during its drain.");
+          }
+          seenEdges.add(key);
+          edges.push(edge);
+        }
+        if (edges.length > maxEdges) {
+          throw new Error("Database dependency graph exceeded its visible-set bound.");
+        }
+        if (!page.hasMore) {
+          return {
+            databaseId,
+            dependencyRevision,
+            edges,
+            visibleRowIds,
+          };
+        }
+        if (
+          page.edges.length === 0
+          || !page.nextCursor
+          || seenCursors.has(page.nextCursor)
+        ) {
+          throw new Error("Database dependency graph returned a non-advancing cursor.");
+        }
+        cursor = page.nextCursor;
+        seenCursors.add(cursor);
+      }
+    } catch (error) {
+      if (attempt === 0 && dependencyGraphErrorStatus(error) === 409) continue;
+      throw error;
+    }
+  }
+  throw new Error("Database dependency graph could not be read.");
+}
+
+export function getDatabaseDependencyGraphRemote(
+  databaseId: string,
+  visibleRowIds: string[],
+): Promise<DatabaseDependencyGraphResult> {
+  const canonicalVisibleRowIds = canonicalDependencyGraphVisibleIds(visibleRowIds);
+  const key = JSON.stringify([databaseId, canonicalVisibleRowIds]);
+  const pending = databaseDependencyGraphInflight.get(key);
+  if (pending) return pending;
+  const request = drainDatabaseDependencyGraph(databaseId, canonicalVisibleRowIds);
+  let tracked: Promise<DatabaseDependencyGraphResult> = request;
+  tracked = request.finally(() => {
+    if (databaseDependencyGraphInflight.get(key) === tracked) {
+      databaseDependencyGraphInflight.delete(key);
+    }
+  });
+  databaseDependencyGraphInflight.set(key, tracked);
+  return tracked;
+}
+
+function validatedDatabaseDependencyRelation(
+  value: unknown,
+  expected: {
+    databaseId: string;
+    direction: DatabaseDependencyDirection;
+    propertyId: string;
+    rowId: string;
+  },
+): DatabaseDependencyRelationResult {
+  const result = value && typeof value === "object"
+    ? value as Record<string, unknown>
+    : null;
+  const dependencyRevision = Number(result?.dependencyRevision ?? 0);
+  const nextCursor = typeof result?.nextCursor === "string"
+    ? result.nextCursor.trim()
+    : undefined;
+  if (
+    result?.databaseId !== expected.databaseId
+    || result.rowId !== expected.rowId
+    || result.direction !== expected.direction
+    || result.propertyId !== expected.propertyId
+    || !Number.isSafeInteger(dependencyRevision)
+    || dependencyRevision < 1
+    || typeof result.hasMore !== "boolean"
+    || (result.hasMore && !nextCursor)
+    || (!result.hasMore && result.nextCursor !== undefined)
+  ) {
+    throw new Error("Database dependency relation response is malformed.");
+  }
+  return {
+    databaseId: expected.databaseId,
+    dependencyRevision,
+    direction: expected.direction,
+    hasMore: result.hasMore,
+    ...(nextCursor ? { nextCursor } : {}),
+    propertyId: expected.propertyId,
+    relatedRowIds: uniqueDependencyIds(
+      result.relatedRowIds,
+      "Database dependency relation ids",
+    ),
+    rowId: expected.rowId,
+  };
+}
+
+export async function getDatabaseDependencyRelationRemote(
+  databaseId: string,
+  rowId: string,
+  direction: DatabaseDependencyDirection,
+  options: {
+    cursor?: string;
+    expectedDependencyRevision?: number;
+    force?: boolean;
+    propertyId: string;
+  },
+): Promise<DatabaseDependencyRelationResult> {
+  const key = JSON.stringify([
+    databaseId,
+    rowId,
+    direction,
+    options.propertyId,
+    options.cursor ?? "",
+    options.expectedDependencyRevision ?? null,
+  ]);
+  if (!options.force) {
+    const pending = databaseDependencyRelationInflight.get(key);
+    if (pending) return pending;
+  }
+  const request = callPageQuery<unknown>({
+    action: "databaseDependencyEdges",
+    databaseId,
+    direction,
+    expectedDependencyRevision: options.expectedDependencyRevision,
+    limit: 50,
+    propertyId: options.propertyId,
+    rowId,
+    ...(options.force ? { force: true } : {}),
+    ...(options.cursor ? { cursor: options.cursor } : {}),
+  }).then((value) => validatedDatabaseDependencyRelation(value, {
+    databaseId,
+    direction,
+    propertyId: options.propertyId,
+    rowId,
+  }));
+  if (!options.force) databaseDependencyRelationInflight.set(key, request);
+  try {
+    return await request;
+  } finally {
+    if (databaseDependencyRelationInflight.get(key) === request) {
+      databaseDependencyRelationInflight.delete(key);
+    }
+  }
+}
+
+function sameDependencyIds(actual: unknown, expected: string[]) {
+  if (!Array.isArray(actual)) return false;
+  const normalized = actual.filter((value): value is string => typeof value === "string").sort();
+  return normalized.length === actual.length
+    && normalized.length === expected.length
+    && normalized.every((value, index) => value === expected[index]);
+}
+
+export async function updateDatabaseDependencyRelationRemote(
+  input: UpdateDatabaseDependencyRelationInput,
+): Promise<UpdateDatabaseDependencyRelationResult> {
+  if (input.operations.length === 0 || input.operations.length > 50) {
+    throw new Error("Database dependency relation operations are malformed.");
+  }
+  for (const operation of input.operations) {
+    const additions = uniqueDependencyIds(
+      operation.addPredecessorIds,
+      "Dependency predecessor additions",
+    ).sort();
+    const removals = uniqueDependencyIds(
+      operation.removePredecessorIds,
+      "Dependency predecessor removals",
+    ).sort();
+    if (
+      !operation.mutationId
+      || !operation.rowId
+      || additions.length + removals.length === 0
+      || additions.some((id) => removals.includes(id))
+    ) {
+      throw new Error("Database dependency relation operation is malformed.");
+    }
+    for (;;) {
+      const result = await callInteractiveMutation<Record<string, unknown>>(
+        "database-row-mutation",
+        {
+          action: "updateDependencies",
+          addPredecessorIds: additions,
+          databaseId: input.databaseId,
+          mutationId: operation.mutationId,
+          removePredecessorIds: removals,
+          rowId: operation.rowId,
+        },
+      );
+      if (result.status === "pending") continue;
+      if (
+        result.status !== "completed"
+        || result.completedMutationId !== operation.mutationId
+        || result.completedRowId !== operation.rowId
+        || !sameDependencyIds(result.completedAddPredecessorIds, additions)
+        || !sameDependencyIds(result.completedRemovePredecessorIds, removals)
+      ) {
+        throw new Error("Completed dependency mutation response does not match its request.");
+      }
+      break;
+    }
+  }
+  const relation = await getDatabaseDependencyRelationRemote(
+    input.databaseId,
+    input.rowId,
+    input.direction,
+    { force: true, propertyId: input.propertyId },
+  );
+  if (relation.propertyId !== input.propertyId) {
+    throw new Error("Completed dependency relation response changed its property authority.");
+  }
+  return { mutationId: input.mutationId, relation };
 }
 
 export async function importMarkdownPageRemote(
@@ -2468,6 +3869,77 @@ export async function exportPageNativeRemote(
 export async function importNativeRemote(input: ImportNativeInput): Promise<ImportNativeResult> {
   return getClient().functions.post<ImportNativeResult>("import-export", {
     action: "importNative",
+    ...input,
+  });
+}
+
+export interface NativeArchiveImportInput {
+  workspaceId: string;
+  batchId: string;
+  parentId?: string | null;
+  parentType?: PageParentType;
+  document: NativeArchiveDocument;
+  manifest: NativeArchiveManifest;
+}
+
+export interface NativeArchiveUploadGrant {
+  id: string;
+  fileId: string;
+  key: string;
+  uploadUrl: string;
+  uploadExpiresAt: string;
+  uploadMaxBytes: number;
+}
+
+export interface PrepareNativeArchiveImportResult {
+  batchId: string;
+  files: NativeArchiveUploadGrant[];
+  completed?: ImportNativeResult;
+}
+
+export interface CancelNativeArchiveImportResult {
+  batchId: string;
+  cancelled: number;
+  completed?: ImportNativeResult;
+}
+
+export async function exportWorkspaceNativeArchiveRemote(workspaceId: string): Promise<Response> {
+  return getClient().functions.callRaw("import-export", {
+    method: "POST",
+    body: { action: "exportWorkspaceNativeArchive", workspaceId },
+  });
+}
+
+export async function exportPageNativeArchiveRemote(pageId: string): Promise<Response> {
+  return getClient().functions.callRaw("import-export", {
+    method: "POST",
+    body: { action: "exportPageNativeArchive", pageId },
+  });
+}
+
+export async function prepareNativeArchiveImportRemote(
+  input: NativeArchiveImportInput
+): Promise<PrepareNativeArchiveImportResult> {
+  return getClient().functions.post<PrepareNativeArchiveImportResult>("import-export", {
+    action: "prepareNativeArchiveImport",
+    ...input,
+  });
+}
+
+export async function importNativeArchiveRemote(
+  input: NativeArchiveImportInput
+): Promise<ImportNativeResult> {
+  return getClient().functions.post<ImportNativeResult>("import-export", {
+    action: "importNativeArchive",
+    ...input,
+  });
+}
+
+export async function cancelNativeArchiveImportRemote(
+  input: NativeArchiveImportInput
+): Promise<CancelNativeArchiveImportResult> {
+  return getClient().functions.post<CancelNativeArchiveImportResult>("import-export", {
+    action: "cancelNativeArchiveImport",
     ...input,
   });
 }
@@ -2574,6 +4046,8 @@ export interface ListNotificationsInput {
   limit?: number;
 }
 
+const notificationListRequests = new Map<string, Promise<NotificationMutationResult>>();
+
 export async function prepareFileUploadRemote(
   input: PrepareFileUploadInput
 ): Promise<PreparedFileUploadResult> {
@@ -2608,13 +4082,18 @@ export async function deleteFileUploadRemote(input: DeleteFileUploadInput): Prom
 }
 
 export async function createFileDownloadUrlRemote(
-  input: FileDownloadUrlInput
+  input: FileDownloadUrlInput,
+  options: { timeoutMs?: number } = {}
 ): Promise<{ upload: FileUpload; url: string; expiresAt: string }> {
-  return getClient().functions.post<{ upload: FileUpload; url: string; expiresAt: string }>(
+  return getClient().functions.call<{ upload: FileUpload; url: string; expiresAt: string }>(
     "file-mutation",
     {
-      action: "signedUrl",
-      ...input,
+      method: "POST",
+      body: {
+        action: "signedUrl",
+        ...input,
+      },
+      timeoutMs: options.timeoutMs,
     }
   );
 }
@@ -2640,10 +4119,23 @@ export async function getFileUsageReportRemote(
 export async function listNotificationsRemote(
   input: ListNotificationsInput
 ): Promise<NotificationMutationResult> {
-  return getClient().functions.post<NotificationMutationResult>("notification-mutation", {
-    action: "list",
-    ...input,
-  });
+  const key = JSON.stringify([
+    input.workspaceId,
+    input.includeRead === true,
+    input.kind ?? "",
+    input.limit ?? null,
+  ]);
+  const pending = notificationListRequests.get(key);
+  if (pending) return pending;
+  const request = getClient().functions.post<NotificationMutationResult>(
+    "notification-mutation",
+    { action: "list", ...input },
+  );
+  notificationListRequests.set(key, request);
+  void request.finally(() => {
+    if (notificationListRequests.get(key) === request) notificationListRequests.delete(key);
+  }).catch(() => {});
+  return request;
 }
 
 export async function syncNotificationsRemote(
@@ -2680,6 +4172,27 @@ export async function markAllNotificationsReadRemote(
 export async function getPageAccessRemote(pageId: string): Promise<PageAccessResult> {
   return getClient().functions.post<PageAccessResult>("share-mutation", {
     action: "get",
+    pageId,
+  });
+}
+
+export async function publishSiteRemote(input: PublishSiteInput): Promise<SiteMutationResult> {
+  return getClient().functions.post<SiteMutationResult>("share-mutation", {
+    action: "publishSite",
+    ...input,
+  });
+}
+
+export async function unpublishSiteRemote(pageId: string): Promise<SiteMutationResult> {
+  return getClient().functions.post<SiteMutationResult>("share-mutation", {
+    action: "unpublishSite",
+    pageId,
+  });
+}
+
+export async function validateSiteDomainRemote(pageId: string): Promise<SiteMutationResult> {
+  return getClient().functions.post<SiteMutationResult>("share-mutation", {
+    action: "validateSiteDomain",
     pageId,
   });
 }
@@ -2724,6 +4237,50 @@ export async function getSharedPageRemote(token: string): Promise<SharedPageResu
         cacheKey,
         JSON.stringify({ cachedAt: Date.now(), snapshot: result })
       );
+    } catch {
+      // Quota/privacy mode does not affect correctness.
+    }
+  }
+  return result;
+}
+
+export async function getPublicSiteRemote(slug?: string): Promise<PublicSiteResult> {
+  const routeKey = slug || (typeof window === "undefined" ? "custom-host" : window.location.hostname);
+  const cacheKey = `hanji:public-site-snapshot:${routeKey}`;
+  let cached: { cachedAt: number; snapshot: PublicSiteResult } | undefined;
+  try {
+    const raw = window.sessionStorage.getItem(cacheKey);
+    if (raw) {
+      const parsed = JSON.parse(raw) as typeof cached;
+      if (parsed?.snapshot?.site?.id && parsed.snapshot.page?.id && typeof parsed.cachedAt === "number") {
+        cached = parsed;
+      }
+    }
+  } catch {
+    // Storage is an optimization only; the route and site revision are always
+    // reauthorized by the server before a cached public snapshot is reused.
+  }
+  const reusable = cached && Date.now() - cached.cachedAt < 5 * 60_000 ? cached : undefined;
+  type ConditionalPublicSiteResult =
+    | PublicSiteResult
+    | { notModified: true; snapshotVersion: string };
+  let result = await getClient().functions.post<ConditionalPublicSiteResult>("share-mutation", {
+    action: "publicSite",
+    ...(slug ? { slug } : {}),
+    ...(reusable?.snapshot.snapshotVersion
+      ? { snapshotVersion: reusable.snapshot.snapshotVersion }
+      : {}),
+  });
+  if ("notModified" in result) {
+    if (reusable) return reusable.snapshot;
+    result = await getClient().functions.post<PublicSiteResult>("share-mutation", {
+      action: "publicSite",
+      ...(slug ? { slug } : {}),
+    });
+  }
+  if (result.snapshotVersion) {
+    try {
+      window.sessionStorage.setItem(cacheKey, JSON.stringify({ cachedAt: Date.now(), snapshot: result }));
     } catch {
       // Quota/privacy mode does not affect correctness.
     }
@@ -2779,10 +4336,14 @@ export async function removePagePermissionRemote(permissionId: string): Promise<
   });
 }
 
-export async function createBlockRemote(block: Block): Promise<Block> {
+export async function createBlockRemote(
+  block: Block,
+  options: { touchPage?: boolean } = {},
+): Promise<Block> {
   const result = await callInteractiveMutation<{ block: Block }>("block-mutation", {
     action: "create",
     ...block,
+    ...(options.touchPage === true ? { touchPage: true } : {}),
   });
   return result.block;
 }
@@ -2795,35 +4356,92 @@ export async function createBlocksRemote(blocks: Block[]): Promise<Block[]> {
   return result.blocks;
 }
 
+export interface BlockSnapshotManyInput {
+  creates: Block[];
+  deleteIds: string[];
+  pageId: string;
+  updates: Array<{ id: string; patch: Partial<Block> }>;
+}
+
+export interface BlockSnapshotManyResult {
+  blocks: Block[];
+  deletedIds: string[];
+}
+
+export async function applyBlockSnapshotRemote(
+  input: BlockSnapshotManyInput,
+): Promise<BlockSnapshotManyResult> {
+  return callInteractiveMutation<BlockSnapshotManyResult>("block-mutation", {
+    action: "snapshotMany",
+    ...input,
+  });
+}
+
+export interface BlockPageRecencyProof {
+  blockId: string;
+  blockUpdatedAt: string;
+  mutationId: string;
+  pageId: string;
+}
+
+export interface BlockUpdateRemoteResult {
+  block: Block;
+  pageRecency?: BlockPageRecencyProof;
+}
+
+export interface BlockBatchUpdateRemoteResult {
+  blocks: Block[];
+  pageRecencies: BlockPageRecencyProof[];
+}
+
 export async function updateBlockRemote(
   id: string,
   patch: Partial<Block>,
   pageId?: string,
-  expectedUpdatedAt?: string
-): Promise<Block> {
-  const result = await callInteractiveMutation<{ block: Block }>("block-mutation", {
+  expectedUpdatedAt?: string,
+  mutationId?: string,
+  expectedMutationId?: string
+): Promise<BlockUpdateRemoteResult> {
+  return callInteractiveMutation<BlockUpdateRemoteResult>("block-mutation", {
     action: "update",
     id,
     patch,
     // Routing hint for the workspace-DO split; harmless before the flip.
     pageId,
     // Optimistic-concurrency guard: the server 409s when the block changed
-    // since this stamp. Only sent on offline-outbox replay (see store.ts).
+    // since this stamp. Live and replayed durable generations share it.
     ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+    // Stable mutation receipts close the refresh window where a prior request
+    // committed under the server clock but its browser acknowledgement was lost.
+    ...(mutationId ? { mutationId } : {}),
+    ...(expectedMutationId ? { expectedMutationId } : {}),
   });
-  return result.block;
 }
 
 export async function updateBlocksRemote(
-  updates: Array<{ id: string; patch: Partial<Block> }>,
+  updates: Array<{
+    expectedMutationId?: string;
+    expectedUpdatedAt?: string;
+    id: string;
+    mutationId?: string;
+    patch: Partial<Block>;
+  }>,
   pageId?: string
-): Promise<Block[]> {
-  const result = await callInteractiveMutation<{ blocks: Block[] }>("block-mutation", {
+): Promise<BlockBatchUpdateRemoteResult> {
+  return callInteractiveMutation<BlockBatchUpdateRemoteResult>("block-mutation", {
     action: "updateMany",
     updates,
     pageId,
   });
-  return result.blocks;
+}
+
+export async function touchBlockPageRecencyRemote(
+  proof: BlockPageRecencyProof,
+): Promise<{ status: "committed" | "current" | "superseded" }> {
+  return callInteractiveMutation("block-mutation", {
+    action: "touchPageRecency",
+    ...proof,
+  });
 }
 
 export async function deleteBlockRemote(id: string, pageId?: string): Promise<string[]> {
@@ -2854,15 +4472,17 @@ export async function recordCollaborationOperationRemote(input: {
   revision?: number;
   occurredAt?: string;
 }): Promise<CollaborationOperationRecord> {
-  const result = await getClient().functions.post<{ operation: CollaborationOperationRecord }>(
-    "collaboration-mutation",
-    {
-      action: "create",
-      ...input,
-      clientId: browserClientId(),
-      kind: input.kind ?? "text",
-      occurredAt: input.occurredAt ?? new Date().toISOString(),
-    },
+  const result = await runCollaborationWrite(() =>
+    getClient().functions.post<{ operation: CollaborationOperationRecord }>(
+      "collaboration-mutation",
+      {
+        action: "create",
+        ...input,
+        clientId: browserClientId(),
+        kind: input.kind ?? "text",
+        occurredAt: input.occurredAt ?? new Date().toISOString(),
+      },
+    )
   );
   return result.operation;
 }
@@ -2981,6 +4601,7 @@ export interface CreateDatabaseInput {
   position?: number;
   afterPosition?: number;
   viewType?: Extract<ViewType, "table" | "board" | "list" | "gallery" | "calendar" | "timeline">;
+  /** Explicitly opt in to three durable starter rows. Omission creates none. */
   seedRows?: boolean;
   /** Locale for server-generated resource names. Omitted callers retain English defaults. */
   locale?: "en" | "ko";
@@ -3015,6 +4636,274 @@ export async function createDatabaseRemote(input: CreateDatabaseInput): Promise<
   });
 }
 
+export type ConfigureDatabaseTaskFeatureInput =
+  | {
+      databaseId: string;
+      enabled: false;
+      expectedBindingRevision: number;
+      expectedDatabaseFeaturesRevision: number;
+      feature: "dependencies" | "subitems";
+      operationId: string;
+      primaryPropertyId: string;
+      propertyDisposition: "keep" | "remove";
+      secondaryPropertyId: string;
+    }
+  | {
+      childrenProperty: { id: string; name: string };
+      databaseId: string;
+      enabled: true;
+      feature: "subitems";
+      nestedPropertyId: string;
+      parentProperty: { id: string; name: string };
+      showToggleOnTitle: boolean;
+    }
+  | ({
+      avoidWeekends: boolean;
+      databaseId: string;
+      enabled: true;
+      feature: "dependencies";
+      predecessorProperty: { id: string; name: string };
+      shiftMode: "overlap" | "maintain_spacing" | "none";
+      successorProperty: { id: string; name: string };
+    } & (
+      | {
+          dateMode?: "range";
+          datePropertyId: string;
+        }
+      | {
+          dateMode: "separate";
+          endDatePropertyId: string;
+          startDatePropertyId: string;
+        }
+    ));
+
+export interface ConfigureDatabaseTaskFeatureActivationResult {
+  database: Page;
+  properties: DbProperty[];
+  replayed: boolean;
+}
+
+export interface ConfigureDatabaseTaskFeatureTurnOffResult {
+  database: Page;
+  operationId: string;
+  properties: DbProperty[];
+  removedPropertyIds: string[];
+  replayed: boolean;
+  status: "completed" | "pending";
+}
+
+export type ConfigureDatabaseTaskFeatureResult =
+  | ConfigureDatabaseTaskFeatureActivationResult
+  | ConfigureDatabaseTaskFeatureTurnOffResult;
+
+export async function configureDatabaseTaskFeatureRemote(
+  input: ConfigureDatabaseTaskFeatureInput
+): Promise<ConfigureDatabaseTaskFeatureResult> {
+  const call = () => callInteractiveMutation<ConfigureDatabaseTaskFeatureResult>(
+    "database-mutation",
+    { action: "configureTaskFeature", ...input }
+  );
+  let result = await call();
+  if (input.enabled !== false) return result;
+  while ("status" in result && result.status === "pending") result = await call();
+  return result;
+}
+
+export interface ExecuteDatabaseButtonInput {
+  workspaceId: string;
+  databaseId: string;
+  rowId: string;
+  propertyId: string;
+  executionId: string;
+  confirmationToken?: string;
+}
+
+export interface ButtonExecutionConfirmation {
+  actionId: string;
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+}
+
+export interface ButtonConfirmationChallenge {
+  executionId: string;
+  replayed: false;
+  confirmationRequired: true;
+  confirmationToken: string;
+  confirmations: ButtonExecutionConfirmation[];
+}
+
+export interface ButtonClientOutcome {
+  actionId: string;
+  type: "focus_block" | "open_page" | "open_form" | "open_url";
+  blockId?: string;
+  pageId?: string;
+  databaseId?: string;
+  viewId?: string;
+  url?: string;
+}
+
+export interface ExecuteDatabaseButtonCompletedResult {
+  executionId: string;
+  replayed: boolean;
+  row: Page;
+  createdPages: Page[];
+  updatedPages: Page[];
+  clientOutcomes: ButtonClientOutcome[];
+}
+
+export type ExecuteDatabaseButtonResult =
+  | ButtonConfirmationChallenge
+  | ExecuteDatabaseButtonCompletedResult;
+
+export async function executeDatabaseButtonRemote(
+  input: ExecuteDatabaseButtonInput
+): Promise<ExecuteDatabaseButtonResult> {
+  return callInteractiveMutation<ExecuteDatabaseButtonResult>("automation-mutation", {
+    action: "executeDatabaseButton",
+    ...input,
+  });
+}
+
+export interface ExecutePageButtonInput {
+  workspaceId: string;
+  pageId: string;
+  blockId: string;
+  executionId: string;
+  confirmationToken?: string;
+}
+
+export interface ExecutePageButtonCompletedResult {
+  executionId: string;
+  replayed: boolean;
+  insertedBlocks: Block[];
+  createdPages: Page[];
+  updatedPages: Page[];
+  clientOutcomes: ButtonClientOutcome[];
+}
+
+export type ExecutePageButtonResult =
+  | ButtonConfirmationChallenge
+  | ExecutePageButtonCompletedResult;
+
+export function buttonResultRequiresConfirmation(
+  result: ExecuteDatabaseButtonResult | ExecutePageButtonResult,
+): result is ButtonConfirmationChallenge {
+  return "confirmationRequired" in result && result.confirmationRequired === true;
+}
+
+export async function executePageButtonRemote(
+  input: ExecutePageButtonInput
+): Promise<ExecutePageButtonResult> {
+  return callInteractiveMutation<ExecutePageButtonResult>("automation-mutation", {
+    action: "executePageButton",
+    ...input,
+  });
+}
+
+export async function listDatabaseAutomationsRemote(input: {
+  workspaceId: string;
+  databaseId: string;
+}): Promise<{ automations: DatabaseAutomationDefinition[]; complete: true }> {
+  return callInteractiveMutation("automation-mutation", {
+    action: "listDatabaseAutomations",
+    ...input,
+  });
+}
+
+export async function saveDatabaseAutomationRemote(input: {
+  workspaceId: string;
+  databaseId: string;
+  automationId: string;
+  expectedRevision?: number;
+  definition: unknown;
+}): Promise<{ automation: DatabaseAutomationDefinition }> {
+  return callInteractiveMutation("automation-mutation", {
+    action: "saveDatabaseAutomation",
+    ...input,
+  });
+}
+
+export async function setDatabaseAutomationEnabledRemote(input: {
+  workspaceId: string;
+  databaseId: string;
+  automationId: string;
+  expectedRevision: number;
+  enabled: boolean;
+}): Promise<{ automation: DatabaseAutomationDefinition }> {
+  return callInteractiveMutation("automation-mutation", {
+    action: "setDatabaseAutomationEnabled",
+    ...input,
+  });
+}
+
+export async function resumeDatabaseAutomationRemote(input: {
+  workspaceId: string;
+  databaseId: string;
+  automationId: string;
+  expectedRevision: number;
+}): Promise<{ automation: DatabaseAutomationDefinition }> {
+  return callInteractiveMutation("automation-mutation", {
+    action: "resumeDatabaseAutomation",
+    ...input,
+  });
+}
+
+export async function deleteDatabaseAutomationRemote(input: {
+  workspaceId: string;
+  databaseId: string;
+  automationId: string;
+  expectedRevision: number;
+}): Promise<{ automationId: string; deleted: true }> {
+  return callInteractiveMutation("automation-mutation", {
+    action: "deleteDatabaseAutomation",
+    ...input,
+  });
+}
+
+export async function configureFormRemote(input: {
+  databaseId: string;
+  viewId: string;
+  form: FormViewConfig;
+  audience?: FormAudience;
+}): Promise<{ form: FormViewConfig; formLink: FormLink; view: DbView }> {
+  return callInteractiveMutation("form-mutation", {
+    action: "configure",
+    ...input,
+  });
+}
+
+export async function getFormDefinitionRemote(token: string): Promise<FormDefinitionResult> {
+  return callInteractiveMutation<FormDefinitionResult>("form-mutation", {
+    action: "definition",
+    token,
+  });
+}
+
+export async function getFormOptionsRemote(input: {
+  token: string;
+  propertyId: string;
+  after?: string;
+}): Promise<FormOptionsResult> {
+  return callInteractiveMutation<FormOptionsResult>("form-mutation", {
+    action: "options",
+    ...input,
+  });
+}
+
+export async function submitFormRemote(input: {
+  token: string;
+  revision: string;
+  requestId: string;
+  answers: Record<string, unknown>;
+}): Promise<FormSubmitResult> {
+  return callInteractiveMutation<FormSubmitResult>("form-mutation", {
+    action: "submit",
+    ...input,
+  });
+}
+
 export async function createDatabaseRowRemote(
   input: CreateDatabaseRowInput
 ): Promise<{ row: Page; blocks: Block[] }> {
@@ -3024,16 +4913,41 @@ export async function createDatabaseRowRemote(
   });
 }
 
+export const DATABASE_ROW_AFFECTED_ROWS = Symbol("database-row-affected-rows");
+
+export type PersistedDatabaseRow = Page & {
+  [DATABASE_ROW_AFFECTED_ROWS]?: Page[];
+};
+
+export function affectedDatabaseRowsFromMutation(
+  row: Page | undefined
+): readonly Page[] {
+  return row
+    ? ((row as PersistedDatabaseRow)[DATABASE_ROW_AFFECTED_ROWS] ?? [])
+    : [];
+}
+
 export async function updateDatabaseRowRemote(
   id: string,
-  patch: Partial<Page>
-): Promise<Page> {
-  const result = await callInteractiveMutation<{ row: Page }>("database-row-mutation", {
+  patch: Partial<Page>,
+  expectedUpdatedAt?: string,
+  mutationId?: string,
+  expectedMutationId?: string,
+): Promise<PersistedDatabaseRow> {
+  const result = await callInteractiveMutation<{ row: Page; affectedRows?: Page[] }>("database-row-mutation", {
     action: "update",
     id,
     patch,
+    ...(expectedUpdatedAt ? { expectedUpdatedAt } : {}),
+    ...(mutationId ? { mutationId } : {}),
+    ...(expectedMutationId ? { expectedMutationId } : {}),
   });
-  return result.row;
+  const row = result.row as PersistedDatabaseRow;
+  Object.defineProperty(row, DATABASE_ROW_AFFECTED_ROWS, {
+    configurable: true,
+    value: result.affectedRows ?? [],
+  });
+  return row;
 }
 
 export async function moveDatabaseRowRemote(
@@ -3048,6 +4962,66 @@ export async function moveDatabaseRowRemote(
     side,
   });
   return result.row;
+}
+
+type DatabaseRowContinuationResult = {
+  completedMutationId?: string;
+  completedTargetParentId?: string;
+  database?: Page;
+  databaseFeaturesRevision?: number;
+  replayed: boolean;
+  row?: Page;
+  status: "completed" | "pending";
+};
+
+export async function reparentDatabaseSubitemRemote(
+  rowId: string,
+  targetParentId: string,
+  mutationId: string,
+): Promise<DatabaseRowContinuationResult & { database: Page; row: Page; status: "completed" }> {
+  for (;;) {
+    const result = await callInteractiveMutation<DatabaseRowContinuationResult>(
+      "database-row-mutation",
+      {
+        action: "reparentSubitem",
+        mutationId,
+        parentRowId: targetParentId,
+        rowId,
+      },
+    );
+    if (result.status === "completed") {
+      if (!result.row) {
+        throw new Error("Completed sub-item reparent response is missing its row.");
+      }
+      if (
+        result.completedMutationId !== mutationId
+        || result.completedTargetParentId !== targetParentId
+        || result.row.id !== rowId
+        || result.row.parentType !== "database"
+      ) {
+        throw new Error("Completed sub-item reparent response does not match its request.");
+      }
+      if (!result.database || result.database.id !== result.row.parentId) {
+        throw new Error("Completed sub-item reparent response is missing its database authority.");
+      }
+      const completedRevision = Number(result.databaseFeaturesRevision ?? 0);
+      const canonicalRevision = Number(result.database.databaseFeaturesRevision ?? 0);
+      if (
+        !Number.isSafeInteger(completedRevision)
+        || completedRevision < 1
+        || !Number.isSafeInteger(canonicalRevision)
+        || canonicalRevision < completedRevision
+      ) {
+        throw new Error("Completed sub-item reparent response has malformed revision authority.");
+      }
+      return {
+        ...result,
+        database: result.database,
+        row: result.row,
+        status: "completed",
+      };
+    }
+  }
 }
 
 export async function trashDatabaseRowRemote(id: string): Promise<Page[]> {

@@ -7,7 +7,8 @@
   "pageMissingSave": "Die Seite konnte nicht gefunden werden, daher konnten Ihre Änderungen nicht gespeichert werden.",
   "saveFailed": "Ihre Änderungen konnten nicht gespeichert werden.",
   "sessionExpired": "Ihre Sitzung ist abgelaufen oder die Anfrage konnte nicht authentifiziert werden. Bitte versuchen Sie es erneut.",
-  "blockConflictSave": "Dieser Block wurde auf einem anderen Gerät bearbeitet, daher wurde Ihre Offline-Änderung nicht übernommen.",
+  "blockConflictSave": "Eine ausstehende Bearbeitung überschneidet sich mit der letzten Server-Version und konnte nicht automatisch zusammengeführt werden.",
   "blockConflictKeepMine": "Meine Version übernehmen",
-  "blockMoveCommentsSkipped": "Der Block wurde verschoben, aber seine Kommentare konnten nicht mitverschoben werden."
+  "blockMoveCommentsSkipped": "Der Block wurde verschoben, aber seine Kommentare konnten nicht mitverschoben werden.",
+  "conflictSave": "Inhalt vor Speicherabschluss geändert, Bearbeitung nicht gespeichert."
 }

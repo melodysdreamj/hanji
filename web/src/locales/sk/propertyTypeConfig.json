@@ -51,7 +51,14 @@
     "range": "Rozsah",
     "earliest_date": "Najskorší dátum",
     "latest_date": "Najneskorší dátum",
-    "date_range": "Rozsah dátumov"
+    "date_range": "Rozsah dátumov",
+    "count": "Počítať všetky",
+    "count_per_group": "Počet na skupinu",
+    "empty": "Počet prázdnych",
+    "not_empty": "Počet neprázdnych",
+    "percent_per_group": "Percento na skupinu",
+    "show_unique": "Zobraziť jedinečné hodnoty",
+    "unique": "Počet jedinečných hodnôt"
   },
   "undo": "Vrátiť späť",
   "untitled": "Bez názvu",

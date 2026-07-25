@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Ƙara sharhi",
+    "addLink": "Ƙara hanyar haɗi",
+    "blockColor": "Aiwatar da kalar da aka yi amfani da ita ta ƙarshe",
+    "bold": "Mai ƙarfi",
+    "copyPageLink": "Kwafi hanyar shafi",
+    "findInPage": "Nemo a wannan shafi",
+    "inlineCode": "Lambar cikin layi",
+    "italic": "Mai karkata",
+    "moveBlock": "Matsar da bulogi zuwa wani shafi",
+    "moveBlockDown": "Matsar da bulogi ƙasa",
+    "moveBlockUp": "Matsar da bulogi sama",
+    "movePage": "Matsar da shafin yanzu",
+    "navigateBack": "Koma baya",
+    "navigateForward": "Ci gaba",
+    "newPage": "Sabon shafi",
+    "openBlockMenu": "Buɗe ayyukan bulogi",
+    "openKeyboardShortcuts": "Buɗe gajerun hanyoyin madannai",
+    "openParentPage": "Buɗe shafin iyaye",
+    "quickFind": "Nemo da Sauri",
+    "strikethrough": "Shafawa",
+    "toggleAllToggles": "Faɗa ko ɓoye duk toggles",
+    "toggleSidebar": "Kunna/kashe sidebar",
+    "toggleTheme": "Kunna/kashe yanayin duhu",
+    "underline": "Layi a ƙasa"
+  },
+  "categories": {
+    "createStyle": "Ƙirƙira & salo",
+    "editMove": "Gyara & matsar",
+    "popular": "Mashahuri"
+  },
+  "categoriesLabel": "Rukunin gajerun hanyoyi",
+  "close": "Rufe",
+  "closeBackdrop": "Rufe gajerun hanyoyin madannai",
+  "empty": "Ba a sami gajerun hanyoyi ba",
+  "keysFor": "Maɓallan {{action}}",
+  "or": "ko",
+  "searchLabel": "Nemo gajerun hanyoyin madannai",
+  "searchPlaceholder": "Nemo gajerun hanyoyi...",
+  "searchResults": "Sakamakon bincike",
+  "searchTerms": {
+    "toggleTheme": "jigo haske duhu bayyanar"
+  },
+  "title": "Gajerun hanyoyin madannai"
+}

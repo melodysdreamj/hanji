@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Kapalı",
+    "open": "Açık",
+    "private": "Özel"
+  },
+  "add": "Ekle",
+  "approve": "Onayla",
+  "archive": "Ekip alanını arşivle",
+  "available": "Katılmaya uygun",
+  "choosePrincipal": "Bir kişi veya grup seçin",
+  "create": "Ekip alanı oluştur",
+  "deny": "Reddet",
+  "error": {
+    "action": "Ekip alanı işlemi tamamlanamadı.",
+    "load": "Ekip alanı bilgileri yüklenemedi."
+  },
+  "fields": {
+    "access": "Erişim",
+    "description": "Açıklama",
+    "icon": "Simge",
+    "memberRole": "Üye sayfa erişimi",
+    "membersCanEditSidebar": "Üyeler sayfa ekleyip yeniden sıralayabilir",
+    "membersCanInvite": "Üyeler kişi davet edebilir",
+    "name": "Ad",
+    "openRole": "Açık ziyaretçi sayfa erişimi"
+  },
+  "governance": "Ekip alanı ayarları",
+  "join": "Katıl",
+  "joined": "Ekip alanlarınız",
+  "loadMore": "Daha fazla yükle",
+  "manage": "Yönet",
+  "member": "Üye",
+  "members": "Üyeler",
+  "noneArchived": "Arşivlenmiş ekip alanı yok.",
+  "noneAvailable": "Başka kullanılabilir ekip alanı yok.",
+  "noneJoined": "Henüz hiçbir ekip alanına katılmadınız.",
+  "noRequests": "Bekleyen talep yok.",
+  "notice": {
+    "approved": "Talep onaylandı.",
+    "archived": "Ekip alanı arşivlendi.",
+    "created": "Ekip alanı oluşturuldu.",
+    "defaultSet": "Varsayılan ekip alanı güncellendi.",
+    "denied": "Talep reddedildi.",
+    "joined": "Ekip alanına katıldınız.",
+    "memberAdded": "Üye eklendi.",
+    "memberRemoved": "Üye kaldırıldı.",
+    "memberUpdated": "Üye rolü güncellendi.",
+    "policySaved": "Ekip alanı oluşturma politikası güncellendi.",
+    "requested": "Erişim talep edildi.",
+    "restored": "Ekip alanı geri yüklendi.",
+    "saved": "Ekip alanı güncellendi."
+  },
+  "notOwner": "Bu takım alanını yalnızca bir takım alanı sahibi veya çalışma alanı yöneticisi yönetebilir.",
+  "open": "Aç",
+  "owner": "Sahip",
+  "ownersOnlyCreate": "Yalnızca çalışma alanı sahipleri takım alanı oluşturabilir",
+  "remove": "Kaldır",
+  "replacement": "Yedek varsayılan seç",
+  "request": "Erişim talep et",
+  "requestPending": "Talep beklemede",
+  "requests": "Erişim talepleri",
+  "restore": "Geri yükle",
+  "roles": {
+    "comment": "Yorum yapabilir",
+    "edit": "Düzenleyebilir",
+    "full_access": "Tam erişim",
+    "view": "Görüntüleyebilir"
+  },
+  "save": "Değişiklikleri kaydet",
+  "selectTeamspace": "Takım alanı",
+  "setDefault": "Varsayılan takım alanı yap",
+  "subtitle": "Paylaşılan çalışmayı düzenleyin ve kimin bulabileceğini veya katılabileceğini kontrol edin.",
+  "tabs": {
+    "archived": "Arşivlenenler",
+    "browse": "Gözat",
+    "create": "Yeni takım alanı",
+    "label": "Takım alanı görünümleri",
+    "manage": "Yönet"
+  },
+  "title": "Takım alanları"
+}

@@ -8,36 +8,36 @@ import { i18next } from "@/i18n";
 import { useRouter } from "@/lib/router";
 import { useShallow } from "zustand/react/shallow";
 import { copyTextWithBlocks } from "@/lib/clipboard";
+import { contentForBlockTypeChange } from "@/lib/blockDefaults";
 import {
-  listCollaborationOperationsRemote,
-  listCollaborationDocumentsRemote,
-  recordCollaborationOperationRemote,
-  type CollaborationDocumentRecord,
-  type CollaborationOperationRecord,
+  buttonResultRequiresConfirmation,
+  type ButtonConfirmationChallenge,
   type CreateDatabaseInput,
 } from "@/lib/edgebase";
+import { dispatchButtonClientOutcomes } from "@/lib/buttonExecution";
 import {
   applyBlockTextRemoteCrdtUpdatesToUndoSession,
   captureBlockTextLocalEdit,
   createBlockTextCrdtUpdateFromUndoSession,
-  markBlockTextCollaborationPristine,
   mergeBlockTextCrdtUpdates,
-  readBlockTextCrdtDocumentState,
   readBlockTextCrdtUpdate,
   redoBlockTextLocalEdit,
-  rememberBlockTextDurableState,
   syncBlockTextRemoteEdit,
   undoBlockTextLocalEdit,
   type BlockTextUndoResult,
 } from "@/lib/collaborationCrdt";
 import { pageHref } from "@/lib/navigation";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
+import {
+  isPageHierarchyProjectionBlock,
+  mergePageBodyBlocks,
+} from "@/lib/pageBodyProjection";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import { uploadWorkspaceFile } from "@/lib/storage";
 import { hasStoredFileReference } from "@/lib/storedFileReferences";
 import {
   PAGE_CRDT_UPDATE_RECEIVED_EVENT,
   PAGE_TEXT_UPDATE_RECEIVED_EVENT,
-  publishPageCrdtUpdate,
   publishPageAwareness,
   publishPageTextUpdate,
   type PageCrdtUpdateReceived,
@@ -50,11 +50,10 @@ import { useStore } from "@/lib/store";
 import {
   applyTextOperationToSpans,
   createTextOperation,
-  sanitizeTextSpanOperation,
+  textIsOrderedSubsequence,
   textSpansEqual,
 } from "@/lib/textOperations";
-import { sanitizeBlockStructureOperation } from "@/lib/blockStructureOperations";
-import { positionBetween } from "@/lib/ids";
+import { newId, positionBetween } from "@/lib/ids";
 import type { Block, BlockContent, BlockType, ButtonTemplateBlock, Page, TextSpan, ViewType } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import {
@@ -69,6 +68,7 @@ import {
   Upload,
 } from "@/icons/hanji";
 import { TemplatesDialog } from "../TemplatesDialog";
+import { ButtonConfirmationDialog } from "../automation/ButtonConfirmationDialog";
 import { blocksClipboardHtml, blockTreeHtml, blockTreeMarkdown } from "./blockMarkdown";
 import { BLOCK_DEFS, getDef, TEXT_BLOCKS } from "./blocks";
 import {
@@ -119,65 +119,14 @@ const TOGGLE_BLOCKS: Set<BlockType> = new Set([
 
 const STRUCTURAL_BLOCKS: Set<BlockType> = new Set(["column_list", "column"]);
 const EMPTY_BLOCKS: Block[] = [];
+const EMPTY_PAGES: Page[] = [];
 // Stable default for the remoteAwareness prop: a `= []` default would mint a
 // new array identity every render and defeat the memoized ops facade below.
 const EMPTY_AWARENESS: PagePresenceAwareness[] = [];
 
 const EDITOR_SELECTION_REQUEST = "hanji:editor-selection-request";
-const COLLABORATION_LOG_DEBOUNCE_MS = 750;
-// Batch size for the durable-CRDT resync request. This is NOT a correctness
-// cap — every text block is primed across batches; it only bounds per-request
-// payload size.
-const DURABLE_CRDT_RESYNC_BATCH_SIZE = 120;
-
-type PendingCollaborationTextLog = {
-  beforeSpans: TextSpan[];
-  latestSpans: TextSpan[];
-  revision: number;
-  timer?: number;
-  updatedAt: string;
-};
-
-type CollaborationReplayCursor = {
-  revision: number;
-  occurredAt: string;
-  id: string;
-};
-
-type PendingCrdtReplayBatch = {
-  afterCursor: CollaborationReplayCursor;
-  beforeCursor: CollaborationReplayCursor;
-  records: CollaborationOperationRecord[];
-};
-
-function collaborationRecordCursor(record: CollaborationOperationRecord): CollaborationReplayCursor {
-  return {
-    revision: record.revision ?? 0,
-    occurredAt: record.occurredAt ?? "",
-    id: record.id,
-  };
-}
-
-function collaborationDocumentCursor(
-  document: CollaborationDocumentRecord
-): CollaborationReplayCursor | undefined {
-  if (!document.lastOperationId) return undefined;
-  if (typeof document.lastOperationRevision !== "number") return undefined;
-  return {
-    revision: document.lastOperationRevision,
-    occurredAt: document.lastOperationOccurredAt ?? document.updatedAt ?? "",
-    id: document.lastOperationId,
-  };
-}
-
-function collaborationCursorIsAfter(
-  current: CollaborationReplayCursor,
-  cursor: CollaborationReplayCursor
-) {
-  if (current.revision !== cursor.revision) return current.revision > cursor.revision;
-  if (current.occurredAt !== cursor.occurredAt) return current.occurredAt > cursor.occurredAt;
-  return current.id > cursor.id;
-}
+const TEXT_BLOCK_SNAPSHOT_DEBOUNCE_MS = 1000;
+const MAX_PENDING_UNKNOWN_BLOCK_TEXT_UPDATES = 200;
 
 function activeEditorTextBlockId(editor: HTMLElement | null) {
   const active = document.activeElement;
@@ -386,7 +335,7 @@ export interface EditorOps {
   unsyncSyncedBlock: (id: string) => Promise<Block[]>;
   createButton: (id: string) => void;
   createTab: (id: string) => void;
-  runButton: (id: string) => void;
+  runButton: (id: string, confirmationToken?: string) => void;
   captureNextBlockToButton: (id: string) => void;
   publishAwareness: (
     blockId: string,
@@ -745,7 +694,7 @@ function EditorFileUploadProgress({
 
 export function Editor({
   pageId,
-  collaborationStatus,
+  hierarchyChildren = EMPTY_PAGES,
   readOnly = false,
   canComment = false,
   templateMode = false,
@@ -757,7 +706,7 @@ export function Editor({
   emptyBodyPrompt,
 }: {
   pageId: string;
-  collaborationStatus?: string;
+  hierarchyChildren?: Page[];
   readOnly?: boolean;
   canComment?: boolean;
   templateMode?: boolean;
@@ -771,27 +720,27 @@ export function Editor({
   const { t } = useTranslation(["editor", "common"]);
   const router = useRouter();
   const blocks = useStore(useShallow((s) => s.topLevelBlocks(pageId)));
+  const allBlocks = useStore((s) => s.blocksByPage[pageId] ?? EMPTY_BLOCKS);
   const blocksLoaded = useStore((s) => s.loadedBlockPages.has(pageId));
   const loadBlocks = useStore((s) => s.loadBlocks);
   const undoBlockChange = useStore((s) => s.undoBlockChange);
   const redoBlockChange = useStore((s) => s.redoBlockChange);
   const ensured = useRef<string | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const replayedCollaborationOperationIds = useRef<Set<string>>(new Set());
-  const collaborationReplayCursor = useRef({ revision: 0, occurredAt: "", id: "" });
-  const collaborationReplayInFlight = useRef(false);
-  const durableDocumentSyncInFlight = useRef(false);
-  const syncedDurableDocumentKeys = useRef<Set<string>>(new Set());
-  const durableCrdtReplayCursors = useRef<Map<string, CollaborationReplayCursor>>(new Map());
-  const pendingCollaborationTextLogs = useRef<Map<string, PendingCollaborationTextLog>>(
-    new Map()
-  );
+  const editorRouteRef = useRef({ generation: 0, pageId });
+  const pendingUnknownBlockTextRef = useRef(new Map<string, PageTextUpdateReceived>());
   const [selectedBlockId, setSelectedBlockIdState] = useState<string | null>(null);
   // The full multi-block selection. `selectedBlockId` is the anchor within it.
   const [selectedBlockIds, setSelectedBlockIds] = useState<Set<string>>(() => new Set());
   const [dismissedStarterBlockId, setDismissedStarterBlockId] = useState<string | null>(null);
   const [blockActionMenuFor, setBlockActionMenuFor] = useState<string | null>(null);
   const [moveDialogFor, setMoveDialogFor] = useState<string | null>(null);
+  const [buttonConfirmation, setButtonConfirmation] = useState<{
+    blockId: string;
+    challenge: ButtonConfirmationChallenge;
+  } | null>(null);
+  const [buttonConfirmationPending, setButtonConfirmationPending] = useState(false);
+  const buttonRunsRef = useRef(new Set<string>());
   const [fileDropIndicator, setFileDropIndicator] = useState<EditorFileDropIndicator | null>(null);
   const [fileUploadProgressByBlock, setFileUploadProgressByBlock] = useState<
     Record<string, BlockUploadProgress>
@@ -806,6 +755,13 @@ export function Editor({
     pointerId: number;
     moved: boolean;
   } | null>(null);
+  useLayoutEffect(() => {
+    if (editorRouteRef.current.pageId === pageId) return;
+    editorRouteRef.current = {
+      generation: editorRouteRef.current.generation + 1,
+      pageId,
+    };
+  }, [pageId]);
   // The visual selection rectangle, in viewport coordinates. `null` when idle.
   const [marquee, setMarquee] = useState<{
     left: number;
@@ -843,7 +799,19 @@ export function Editor({
     setSelectedBlockIds(id ? new Set([id]) : new Set());
     selectionFocusRef.current = id;
   };
+  const hasCanonicalHierarchyChildren = hierarchyChildren.some(
+    (child) =>
+      !child.inTrash && child.parentType === "page" && child.parentId === pageId,
+  );
+  const bodyBlocks = useMemo(
+    () =>
+      blocksLoaded || skipRemoteLoad
+        ? mergePageBodyBlocks(blocks, hierarchyChildren, pageId, allBlocks)
+        : blocks,
+    [allBlocks, blocks, blocksLoaded, hierarchyChildren, pageId, skipRemoteLoad],
+  );
   const pagePlaceholderBlockId =
+    !hasCanonicalHierarchyChildren &&
     blocks.length === 1 &&
     blocks[0].type === "paragraph" &&
     spansToPlainText(blocks[0].content?.rich).length === 0
@@ -878,29 +846,69 @@ export function Editor({
   }, [remoteAwareness]);
 
   useEffect(() => {
-    if (!blocksLoaded && !skipRemoteLoad) void loadBlocks(pageId);
+    if (!blocksLoaded && !skipRemoteLoad) void loadBlocks(pageId).catch(() => {});
   }, [blocksLoaded, loadBlocks, pageId, skipRemoteLoad]);
 
-  useEffect(() => {
-    replayedCollaborationOperationIds.current = new Set();
-    collaborationReplayCursor.current = { revision: 0, occurredAt: "", id: "" };
-    collaborationReplayInFlight.current = false;
-    durableDocumentSyncInFlight.current = false;
-    syncedDurableDocumentKeys.current = new Set();
-  }, [pageId]);
+  const bufferUnknownBlockText = useCallback((
+    detail: PageTextUpdateReceived,
+    options?: { keepExistingOnReceivedAtTie?: boolean },
+  ) => {
+    if (!detail.blockId.trim() || detail.pageId !== editorRouteRef.current.pageId) return;
+    const pending = pendingUnknownBlockTextRef.current;
+    const previous = pending.get(detail.blockId);
+    if (previous) {
+      const sameActorRevisionOrder =
+        previous.userId === detail.userId &&
+        typeof previous.revision === "number" &&
+        typeof detail.revision === "number";
+      if (sameActorRevisionOrder && detail.revision! < previous.revision!) return;
+      if (
+        (!sameActorRevisionOrder || detail.revision === previous.revision) &&
+        (detail.receivedAt < previous.receivedAt ||
+          (options?.keepExistingOnReceivedAtTie === true &&
+            detail.receivedAt === previous.receivedAt))
+      ) {
+        return;
+      }
+    }
+    // A buffered operation cannot assume its before-state reached this peer.
+    // Retain the sanitized full snapshot only, and make a newly refreshed key
+    // the newest capacity candidate.
+    pending.delete(detail.blockId);
+    pending.set(detail.blockId, {
+      ...detail,
+      content: { rich: cloneTextSpans(detail.content.rich) },
+      operation: undefined,
+    });
+    while (pending.size > MAX_PENDING_UNKNOWN_BLOCK_TEXT_UPDATES) {
+      const oldestBlockId = pending.keys().next().value;
+      if (typeof oldestBlockId !== "string") break;
+      pending.delete(oldestBlockId);
+    }
+  }, []);
 
   const applyRemoteTextUpdate = useCallback(
     (detail: PageTextUpdateReceived) => {
-      if (readOnly || templateMode || !detail || detail.pageId !== pageId) return false;
-      if (activeEditorTextBlockId(editorRef.current) === detail.blockId) return false;
+      // Read-only controls local mutation authority; it must not block remote
+      // page state from converging for comment/view collaborators.
+      if (templateMode || !detail || detail.pageId !== pageId) return false;
+      const active = activeEditorTextBlockId(editorRef.current) === detail.blockId;
       const state = useStore.getState();
       const block = state.blocksByPage[pageId]?.find((item) => item.id === detail.blockId);
-      if (!block) return false;
+      if (!block) {
+        bufferUnknownBlockText(detail);
+        return false;
+      }
       if (detail.operation) {
         const currentPlainText = spansToPlainText(block.content?.rich ?? []);
         if (currentPlainText === detail.operation.afterText) return true;
         const rich = applyTextOperationToSpans(block.content?.rich ?? [], detail.operation);
         if (!rich) return false;
+        const activeEditable = active ? getEditable(detail.blockId) : null;
+        const selection = activeEditable ? selectionOffsetsIn(activeEditable) : null;
+        const renderedOperation = selection
+          ? createTextOperation(block.content?.rich ?? [], rich)
+          : undefined;
         state.applyRemoteBlockText(detail.blockId, {
           content: { ...block.content, rich },
           plainText: spansToPlainText(rich),
@@ -911,8 +919,23 @@ export function Editor({
           rich,
           updatedAt: detail.updatedAt ?? new Date().toISOString(),
         }).catch(() => {});
+        if (selection) {
+          const start = renderedOperation?.start ?? 0;
+          const removed = renderedOperation?.deleteCount ?? 0;
+          const inserted = spansToPlainText(renderedOperation?.insert ?? []).length;
+          const remap = (offset: number) => {
+            if (!renderedOperation || offset <= start) return offset;
+            if (offset >= start + removed) return offset + inserted - removed;
+            return start + inserted;
+          };
+          window.requestAnimationFrame(() => {
+            const editable = getEditable(detail.blockId);
+            if (editable) selectEditableRange(editable, remap(selection.start), remap(selection.end));
+          });
+        }
         return true;
       }
+      if (active) return false;
       if (block.plainText === detail.plainText) return true;
       state.applyRemoteBlockText(detail.blockId, {
         content: detail.content,
@@ -926,8 +949,33 @@ export function Editor({
       }).catch(() => {});
       return true;
     },
-    [pageId, readOnly, templateMode],
+    [bufferUnknownBlockText, pageId, templateMode],
   );
+
+  useEffect(() => {
+    const pending = pendingUnknownBlockTextRef.current;
+    function drainKnownBlocks() {
+      if (pending.size === 0) return;
+      const knownBlockIds = new Set(
+        (useStore.getState().blocksByPage[pageId] ?? EMPTY_BLOCKS).map(({ id }) => id),
+      );
+      for (const [blockId, detail] of Array.from(pending.entries())) {
+        if (!knownBlockIds.has(blockId)) continue;
+        pending.delete(blockId);
+        applyRemoteTextUpdate(detail);
+      }
+    }
+
+    drainKnownBlocks();
+    const unsubscribe = useStore.subscribe((state, previous) => {
+      if (state.blocksByPage[pageId] === previous.blocksByPage[pageId]) return;
+      drainKnownBlocks();
+    });
+    return () => {
+      unsubscribe();
+      pending.clear();
+    };
+  }, [applyRemoteTextUpdate, pageId]);
 
   // Remote CRDT text queued while the target block is mid-IME-composition
   // (Hangul etc.): applying immediately would rewrite the editable's DOM under
@@ -960,7 +1008,7 @@ export function Editor({
       syncUndoSession?: boolean;
       updatedAt?: string;
     }) => {
-      if (readOnly || templateMode) return false;
+      if (templateMode) return false;
       // Defer while the target block is actively composing (BlockItem stamps
       // data-composing on its editable): the queued payload re-applies on
       // compositionend with the same guards, so a stale remote edit that no
@@ -1009,21 +1057,34 @@ export function Editor({
 
       const blockUpdatedAt = Date.parse(block.updatedAt ?? "");
       const remoteUpdatedAt = Date.parse(updatedAt ?? "");
+      const active = activeEditorTextBlockId(editorRef.current) === blockId;
+      const activeCurrentText = active ? spansToPlainText(block.content?.rich ?? []) : "";
       if (
         Number.isFinite(blockUpdatedAt) &&
         Number.isFinite(remoteUpdatedAt) &&
         remoteUpdatedAt < blockUpdatedAt
       ) {
-        return true;
+        // Wall-clock order is useful for inactive snapshot application, but it
+        // cannot establish causality while this browser is actively editing
+        // the same Yjs document. A local REST save can advance block.updatedAt
+        // milliseconds before a valid peer CRDT update arrives. Route that
+        // active conflict through the CRDT merge path instead of dropping it.
+        // If this payload is already the output of that merge, it contains the
+        // current local characters in order and is safe to render despite its
+        // older wall-clock timestamp.
+        if (!active) return true;
+        if (activeCurrentText && !textIsOrderedSubsequence(activeCurrentText, plainText)) {
+          return false;
+        }
       }
 
-      const active = activeEditorTextBlockId(editorRef.current) === blockId;
       let selection: { start: number; end: number } | null = null;
       if (active) {
         const editable = getEditable(blockId);
         selection = editable ? selectionOffsetsIn(editable) : null;
-        const currentText = spansToPlainText(block.content?.rich ?? []);
-        if (currentText && !plainText.includes(currentText)) return false;
+        if (activeCurrentText && !textIsOrderedSubsequence(activeCurrentText, plainText)) {
+          return false;
+        }
       }
 
       state.applyRemoteBlockText(blockId, {
@@ -1050,7 +1111,7 @@ export function Editor({
       }
       return true;
     },
-    [pageId, readOnly, templateMode],
+    [pageId, templateMode],
   );
 
   const mergeActiveEditorCrdtConflict = useCallback(
@@ -1090,7 +1151,7 @@ export function Editor({
       // state and silently reverted the peer's edit. Previewing keeps the
       // invariant "session state always matches rendered content" on the bail.
       const preview = await mergeBlockTextCrdtUpdates([localUpdate, ...operations], blockId);
-      if (!preview || !preview.plainText.includes(localPlainText)) return false;
+      if (!preview || !textIsOrderedSubsequence(localPlainText, preview.plainText)) return false;
 
       // Accepted: now commit the merge into the live session and the DOM.
       const sessionMerged = await applyBlockTextRemoteCrdtUpdatesToUndoSession({
@@ -1112,61 +1173,81 @@ export function Editor({
   );
 
   const applyRemoteCrdtUpdateWithActiveMerge = useCallback(
-    async (detail: {
-      blockId: string;
-      operation: unknown;
-      pageId: string;
-      receivedAt: number;
-      revision?: number;
-      updatedAt?: string;
-      userId: string;
-    }) => {
-      if (readOnly || templateMode || !detail || detail.pageId !== pageId) return false;
+    async (detail: PageCrdtUpdateReceived) => {
+      if (templateMode || !detail || detail.pageId !== pageId) return false;
+      const routeGeneration = editorRouteRef.current.generation;
       const snapshot = await readBlockTextCrdtUpdate(detail.operation, detail.blockId);
+      if (
+        editorRouteRef.current.generation !== routeGeneration ||
+        editorRouteRef.current.pageId !== pageId
+      ) {
+        return false;
+      }
       if (!snapshot) return true;
       const applied = applyRemoteCrdtBlockText({
         blockId: detail.blockId,
         plainText: snapshot.plainText,
         rich: snapshot.rich,
+        // This caller owns the validated raw CRDT operation below. Replaying
+        // only its decoded rich snapshot would seed a grown session without a
+        // provable shared base and make the next active divergent merge bail.
+        syncUndoSession: false,
         updatedAt: snapshot.updatedAt ?? detail.updatedAt,
       });
-      if (applied) return true;
+      if (applied) {
+        // Reuse the existing per-block session-write queue: no new I/O, timer,
+        // retry, event, or parallel lane. The raw update hydrates a base-safe
+        // session so a later local+remote conflict can emit and merge safely.
+        await applyBlockTextRemoteCrdtUpdatesToUndoSession({
+          blockId: detail.blockId,
+          fallbackRich: snapshot.rich,
+          operations: [detail.operation],
+          updatedAt: snapshot.updatedAt ?? detail.updatedAt ?? new Date().toISOString(),
+        });
+        return true;
+      }
+      const blockKnown = useStore
+        .getState()
+        .blocksByPage[pageId]
+        ?.some(({ id }) => id === detail.blockId);
+      if (!blockKnown) {
+        // The advisory text-snapshot signal may be rejected independently of
+        // this CRDT signal. Its decoded full snapshot is equally safe to hold
+        // until canonical structure introduces the id; no operation replay or
+        // second authority is retained in the buffer.
+        bufferUnknownBlockText(
+          {
+            blockId: detail.blockId,
+            color: detail.color,
+            content: { rich: snapshot.rich },
+            label: detail.label,
+            memberId: detail.memberId,
+            pageId: detail.pageId,
+            plainText: snapshot.plainText,
+            receivedAt: detail.receivedAt,
+            revision: detail.revision,
+            updatedAt: snapshot.updatedAt ?? detail.updatedAt,
+            userId: detail.userId,
+          },
+          // Decoding is asynchronous. If an equal-time full text snapshot is
+          // already buffered, do not let this older-started decode replace it.
+          { keepExistingOnReceivedAtTie: true },
+        );
+        return true;
+      }
       return mergeActiveEditorCrdtConflict({
         blockId: detail.blockId,
         operations: [detail.operation],
         updatedAt: snapshot.updatedAt ?? detail.updatedAt,
       });
     },
-    [applyRemoteCrdtBlockText, mergeActiveEditorCrdtConflict, pageId, readOnly, templateMode],
-  );
-
-  const applyMergedRemoteCrdtUpdates = useCallback(
-    async ({
-      blockId,
-      operations,
-      updatedAt,
-    }: {
-      blockId: string;
-      operations: unknown[];
-      updatedAt?: string;
-    }) => {
-      if (readOnly || templateMode || operations.length === 0) return false;
-      const merged = await mergeBlockTextCrdtUpdates(operations, blockId);
-      if (!merged) return true;
-      const applied = applyRemoteCrdtBlockText({
-        blockId,
-        plainText: merged.plainText,
-        rich: merged.rich,
-        updatedAt: merged.updatedAt ?? updatedAt,
-      });
-      if (applied) return true;
-      return mergeActiveEditorCrdtConflict({
-        blockId,
-        operations,
-        updatedAt: merged.updatedAt ?? updatedAt,
-      });
-    },
-    [applyRemoteCrdtBlockText, mergeActiveEditorCrdtConflict, readOnly, templateMode],
+    [
+      applyRemoteCrdtBlockText,
+      bufferUnknownBlockText,
+      mergeActiveEditorCrdtConflict,
+      pageId,
+      templateMode,
+    ],
   );
 
   // Flush remote CRDT text that was queued while its block was composing.
@@ -1188,315 +1269,24 @@ export function Editor({
   }, [applyRemoteCrdtBlockText]);
 
   useEffect(() => {
-    if (readOnly || templateMode || skipRemoteLoad || !blocksLoaded) return;
-    let cancelled = false;
-
-    async function resyncDurableCrdtDocuments() {
-      if (durableDocumentSyncInFlight.current) return;
-      durableDocumentSyncInFlight.current = true;
-      try {
-        const state = useStore.getState();
-        // Prime EVERY text block, not just the first N. The old 120-block cap
-        // was a correctness boundary: any text block past it (or edited before
-        // this resync ran) would seed its CRDT session from grown content with
-        // no durable base to prove it was the shared origin, reintroducing the
-        // H1 duplication. We now fetch all text blocks in batches and record
-        // both the blocks that HAVE a durable document and those that don't (so
-        // seeding a genuinely never-collaborated block stays safe-by-construction).
-        const candidates = (state.blocksByPage[pageId] ?? []).filter((block) =>
-          TEXT_BLOCKS.has(block.type),
-        );
-        if (candidates.length === 0) return;
-
-        const candidateIds = new Set(candidates.map((block) => block.id));
-        const returnedBlockIds = new Set<string>();
-        const allCandidateIds = Array.from(candidateIds);
-
-        for (let offset = 0; offset < allCandidateIds.length; offset += DURABLE_CRDT_RESYNC_BATCH_SIZE) {
-          if (cancelled) return;
-          const batchIds = allCandidateIds.slice(offset, offset + DURABLE_CRDT_RESYNC_BATCH_SIZE);
-          const documents = await listCollaborationDocumentsRemote({
-            pageId,
-            blockIds: batchIds,
-            limit: DURABLE_CRDT_RESYNC_BATCH_SIZE,
-            repair: "auto",
-          });
-          if (cancelled) return;
-
-          for (const documentState of documents) {
-          if (cancelled) return;
-          if (
-            documentState.engine !== "yjs" ||
-            !documentState.blockId ||
-            !candidateIds.has(documentState.blockId) ||
-            typeof documentState.stateBase64 !== "string"
-          ) {
-            continue;
-          }
-          returnedBlockIds.add(documentState.blockId);
-          // Prime the block-text session cache with the authoritative durable
-          // state so a subsequent local edit hydrates its CRDT session from the
-          // real shared base instead of re-seeding grown content (H1 duplication).
-          rememberBlockTextDurableState(documentState.blockId, documentState.stateBase64);
-          const syncKey = [
-            documentState.documentId,
-            documentState.updatedAt,
-            documentState.lastOperationId ?? "",
-            documentState.updateCount ?? 0,
-          ].join(":");
-          if (syncedDurableDocumentKeys.current.has(syncKey)) continue;
-
-          const snapshot = await readBlockTextCrdtDocumentState(
-            documentState.stateBase64,
-            documentState.blockId,
-          );
-          if (!snapshot) {
-            syncedDurableDocumentKeys.current.add(syncKey);
-            continue;
-          }
-          let applied = applyRemoteCrdtBlockText({
-            blockId: documentState.blockId,
-            plainText: snapshot.plainText,
-            rich: snapshot.rich,
-            updatedAt: snapshot.updatedAt ?? documentState.updatedAt,
-          });
-          if (!applied) {
-            applied = await mergeActiveEditorCrdtConflict({
-              blockId: documentState.blockId,
-              operations: [
-                {
-                  engine: "yjs",
-                  updateBase64: documentState.stateBase64,
-                },
-              ],
-              updatedAt: snapshot.updatedAt ?? documentState.updatedAt,
-            });
-          }
-          if (applied) {
-            syncedDurableDocumentKeys.current.add(syncKey);
-            const cursor = collaborationDocumentCursor(documentState);
-            if (cursor) durableCrdtReplayCursors.current.set(documentState.blockId, cursor);
-          }
-          }
-        }
-
-        // Every candidate the server did NOT return a durable document for has
-        // never been collaborated on — mark it pristine so seeding its content
-        // under the reserved base clientID stays safe-by-construction.
-        for (const blockId of candidateIds) {
-          if (!returnedBlockIds.has(blockId)) markBlockTextCollaborationPristine(blockId);
-        }
-      } catch {
-        // Durable state resync is a recovery path; operation replay still runs below.
-      } finally {
-        durableDocumentSyncInFlight.current = false;
-      }
-    }
-
-    void resyncDurableCrdtDocuments();
-
-    function resyncSoon() {
-      void resyncDurableCrdtDocuments();
-    }
-
-    window.addEventListener("focus", resyncSoon);
-    window.addEventListener("online", resyncSoon);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("focus", resyncSoon);
-      window.removeEventListener("online", resyncSoon);
-    };
-  }, [
-    applyRemoteCrdtBlockText,
-    mergeActiveEditorCrdtConflict,
-    blocks.length,
-    blocksLoaded,
-    pageId,
-    readOnly,
-    skipRemoteLoad,
-    templateMode,
-  ]);
-
-  useEffect(() => {
-    if (readOnly || templateMode) return;
+    if (templateMode) return;
     function onRemoteTextUpdate(event: Event) {
       const detail = (event as CustomEvent<PageTextUpdateReceived>).detail;
       if (detail) applyRemoteTextUpdate(detail);
     }
     window.addEventListener(PAGE_TEXT_UPDATE_RECEIVED_EVENT, onRemoteTextUpdate);
     return () => window.removeEventListener(PAGE_TEXT_UPDATE_RECEIVED_EVENT, onRemoteTextUpdate);
-  }, [applyRemoteTextUpdate, readOnly, templateMode]);
+  }, [applyRemoteTextUpdate, templateMode]);
 
   useEffect(() => {
-    if (readOnly || templateMode) return;
+    if (templateMode) return;
     function onRemoteCrdtUpdate(event: Event) {
       const detail = (event as CustomEvent<PageCrdtUpdateReceived>).detail;
       if (detail) void applyRemoteCrdtUpdateWithActiveMerge(detail).catch(() => {});
     }
     window.addEventListener(PAGE_CRDT_UPDATE_RECEIVED_EVENT, onRemoteCrdtUpdate);
     return () => window.removeEventListener(PAGE_CRDT_UPDATE_RECEIVED_EVENT, onRemoteCrdtUpdate);
-  }, [applyRemoteCrdtUpdateWithActiveMerge, readOnly, templateMode]);
-
-  useEffect(() => {
-    if (readOnly || templateMode || skipRemoteLoad || !blocksLoaded) return;
-    let cancelled = false;
-
-    async function replayCollaborationOperations() {
-      if (collaborationReplayInFlight.current) return;
-      collaborationReplayInFlight.current = true;
-      try {
-        for (let page = 0; page < 20; page += 1) {
-          const cursor = collaborationReplayCursor.current;
-          const operations = await listCollaborationOperationsRemote({
-            pageId,
-            afterId: cursor.id,
-            afterOccurredAt: cursor.occurredAt,
-            afterRevision: cursor.revision,
-            limit: 200,
-          });
-          if (cancelled || operations.length === 0) return;
-          let nextCursor = cursor;
-          let pendingCrdtBatch: PendingCrdtReplayBatch | null = null;
-          const flushPendingCrdtBatch = async () => {
-            if (!pendingCrdtBatch) return true;
-            const batch = pendingCrdtBatch;
-            const recordsByBlock = new Map<
-              string,
-              { records: CollaborationOperationRecord[]; updatedAt?: string }
-            >();
-            for (const record of batch.records) {
-              if (!record.blockId) continue;
-              const current = recordsByBlock.get(record.blockId) ?? { records: [] };
-              current.records.push(record);
-              current.updatedAt = record.occurredAt || current.updatedAt;
-              recordsByBlock.set(record.blockId, current);
-            }
-            for (const [blockId, group] of recordsByBlock) {
-              const durableCursor = durableCrdtReplayCursors.current.get(blockId);
-              const records = durableCursor
-                ? group.records.filter((record) =>
-                    collaborationCursorIsAfter(collaborationRecordCursor(record), durableCursor)
-                  )
-                : group.records;
-              if (records.length === 0) continue;
-              const applied = await applyMergedRemoteCrdtUpdates({
-                blockId,
-                operations: records.map((record) => record.operation),
-                updatedAt: group.updatedAt ?? batch.afterCursor.occurredAt,
-              });
-              if (!applied) {
-                collaborationReplayCursor.current = batch.beforeCursor;
-                return false;
-              }
-            }
-            for (const record of batch.records) {
-              replayedCollaborationOperationIds.current.add(record.id);
-            }
-            nextCursor = batch.afterCursor;
-            pendingCrdtBatch = null;
-            return true;
-          };
-          for (const record of operations) {
-            if (cancelled) return;
-            const recordCursor = collaborationRecordCursor(record);
-            // Structure operations (indent/move/create/delete/restore) carry
-            // block snapshots, not text spans — and create/delete records have
-            // no blockId — so handle them before the blockId guard below.
-            // Previously they fell through to sanitizeTextSpanOperation and
-            // were silently dropped, leaving remote structure changes
-            // invisible until a full reload.
-            if (record.kind === "block_structure") {
-              if (!(await flushPendingCrdtBatch())) return;
-              if (!replayedCollaborationOperationIds.current.has(record.id)) {
-                const structure = sanitizeBlockStructureOperation(record.operation);
-                if (structure) {
-                  useStore.getState().applyRemoteBlockStructure(pageId, structure);
-                }
-                replayedCollaborationOperationIds.current.add(record.id);
-              }
-              nextCursor = recordCursor;
-              continue;
-            }
-            if (!record.blockId || replayedCollaborationOperationIds.current.has(record.id)) {
-              if (!(await flushPendingCrdtBatch())) return;
-              nextCursor = recordCursor;
-              continue;
-            }
-            if (record.kind === "crdt_update") {
-              if (!pendingCrdtBatch) {
-                pendingCrdtBatch = {
-                  afterCursor: recordCursor,
-                  beforeCursor: nextCursor,
-                  records: [],
-                };
-              }
-              pendingCrdtBatch.records.push(record);
-              pendingCrdtBatch.afterCursor = recordCursor;
-              continue;
-            }
-            if (!(await flushPendingCrdtBatch())) return;
-            const operation = sanitizeTextSpanOperation(record.operation);
-            if (!operation) {
-              replayedCollaborationOperationIds.current.add(record.id);
-              nextCursor = recordCursor;
-              continue;
-            }
-            const applied = applyRemoteTextUpdate({
-              blockId: record.blockId,
-              color: undefined,
-              content: { rich: operation.insert },
-              label: undefined,
-              memberId: undefined,
-              operation,
-              pageId,
-              plainText: record.afterText ?? operation.afterText,
-              receivedAt: Date.now(),
-              revision: record.revision,
-              updatedAt: record.occurredAt,
-              userId: record.actorId ?? record.clientId,
-            });
-            if (!applied) {
-              collaborationReplayCursor.current = nextCursor;
-              return;
-            }
-            replayedCollaborationOperationIds.current.add(record.id);
-            nextCursor = recordCursor;
-          }
-          if (!(await flushPendingCrdtBatch())) return;
-          collaborationReplayCursor.current = nextCursor;
-          if (operations.length < 200) return;
-        }
-      } finally {
-        collaborationReplayInFlight.current = false;
-      }
-    }
-
-    void replayCollaborationOperations().catch(() => {});
-    if (collaborationStatus !== "connected") return () => {
-      cancelled = true;
-    };
-
-    function replaySoon() {
-      void replayCollaborationOperations().catch(() => {});
-    }
-
-    window.addEventListener("focus", replaySoon);
-    window.addEventListener("online", replaySoon);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("focus", replaySoon);
-      window.removeEventListener("online", replaySoon);
-    };
-  }, [
-    applyMergedRemoteCrdtUpdates,
-    applyRemoteTextUpdate,
-    blocksLoaded,
-    collaborationStatus,
-    pageId,
-    readOnly,
-    skipRemoteLoad,
-    templateMode,
-  ]);
+  }, [applyRemoteCrdtUpdateWithActiveMerge, templateMode]);
 
   useEffect(() => {
     if (readOnly || templateMode || selectedBlockIds.size === 0) return;
@@ -1508,19 +1298,27 @@ export function Editor({
     );
   }, [publishEditorAwareness, readOnly, selectedBlockId, selectedBlockIds, templateMode]);
 
-  // Ensure a fresh page always has one editable paragraph.
+  // Give a fresh page one editable local placeholder without turning a read
+  // into durable content. Its first real mutation promotes this exact id via
+  // the store's fenced block-create lane.
   useEffect(() => {
     const st = useStore.getState();
     if (
       !readOnly &&
       blocksLoaded &&
       st.topLevelBlocks(pageId).length === 0 &&
+      !hasCanonicalHierarchyChildren &&
       ensured.current !== pageId
     ) {
       ensured.current = pageId;
-      void st.createBlock({ pageId, position: 1 });
+      st.addBlockLocal({
+        pageId,
+        position: 1,
+        history: false,
+        deferPersistUntilMutation: true,
+      });
     }
-  }, [blocks.length, blocksLoaded, pageId, readOnly]);
+  }, [blocks.length, blocksLoaded, hasCanonicalHierarchyChildren, pageId, readOnly]);
 
   function applyBlockTextUndoResult(blockId: string, result: BlockTextUndoResult) {
     const st = useStore.getState();
@@ -1547,38 +1345,13 @@ export function Editor({
       publishPageTextUpdate({
         blockId,
         content: { rich: result.rich },
+        crdtOperation: result.operation,
         operation,
         pageId,
         plainText: result.plainText,
         revision,
         updatedAt: result.updatedAt,
       });
-      publishPageCrdtUpdate({
-        blockId,
-        operation: result.operation,
-        pageId,
-        revision,
-        updatedAt: result.updatedAt,
-      });
-
-      void recordCollaborationOperationRemote({
-        afterText: operation?.afterText ?? result.plainText,
-        beforeText: operation?.beforeText ?? spansToPlainText(beforeSpans),
-        blockId,
-        kind: operation ? "text" : "text_snapshot",
-        operation,
-        pageId,
-        revision,
-        occurredAt: result.updatedAt,
-      }).catch(() => {});
-      void recordCollaborationOperationRemote({
-        blockId,
-        kind: "crdt_update",
-        operation: result.operation,
-        pageId,
-        revision,
-        occurredAt: result.updatedAt,
-      }).catch(() => {});
     }
 
     const nextOffset = Math.min(selection?.start ?? result.plainText.length, result.plainText.length);
@@ -1611,12 +1384,10 @@ export function Editor({
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (readOnly) return;
-      if (!(e.metaKey || e.ctrlKey)) return;
-      const key = e.key.toLowerCase();
       const target = e.target as HTMLElement | null;
       if (!target?.closest(`[data-editor-page="${pageId}"]`)) return;
 
-      if (e.altKey && !e.shiftKey && key === "t") {
+      if (matchesKeyboardShortcut("toggleAllToggles", e)) {
         const st = useStore.getState();
         const toggles = (st.blocksByPage[pageId] ?? []).filter((block) =>
           TOGGLE_BLOCKS.has(block.type)
@@ -1637,6 +1408,8 @@ export function Editor({
         return;
       }
 
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const key = e.key.toLowerCase();
       if (e.altKey) return;
       if (key !== "z" && key !== "y") return;
       e.preventDefault();
@@ -1677,98 +1450,6 @@ export function Editor({
     }
     return out;
   }
-
-  function flushPendingCollaborationTextLog(blockId: string) {
-    if (templateMode) return;
-    const pending = pendingCollaborationTextLogs.current.get(blockId);
-    if (!pending) return;
-    if (pending.timer) window.clearTimeout(pending.timer);
-    pendingCollaborationTextLogs.current.delete(blockId);
-
-    const operation = createTextOperation(pending.beforeSpans, pending.latestSpans);
-    const spansChanged =
-      JSON.stringify(pending.beforeSpans) !== JSON.stringify(pending.latestSpans);
-    if (!operation && !spansChanged) return;
-
-    const plainText = spansToPlainText(pending.latestSpans);
-    void recordCollaborationOperationRemote({
-      afterText: operation?.afterText ?? plainText,
-      beforeText: operation?.beforeText ?? spansToPlainText(pending.beforeSpans),
-      blockId,
-      kind: operation ? "text" : "text_snapshot",
-      operation,
-      pageId,
-      revision: pending.revision,
-      occurredAt: pending.updatedAt,
-    }).catch(() => {});
-
-    void createBlockTextCrdtUpdateFromUndoSession({
-      blockId,
-      rich: pending.latestSpans,
-      updatedAt: pending.updatedAt,
-    })
-      .then((crdtUpdate) => {
-        // undefined => the block isn't base-safe yet (un-primed grown content).
-        // Skip the CRDT publish/record to avoid propagating a base-clientID copy
-        // that would duplicate on merge (H1). The plain-text operation recorded
-        // above still carries the edit; once primed, a later edit encodes CRDT.
-        if (!crdtUpdate) return;
-        publishPageCrdtUpdate({
-          blockId,
-          operation: crdtUpdate,
-          pageId,
-          revision: pending.revision,
-          updatedAt: pending.updatedAt,
-        });
-        return recordCollaborationOperationRemote({
-          blockId,
-          kind: "crdt_update",
-          operation: crdtUpdate,
-          pageId,
-          revision: pending.revision,
-          occurredAt: pending.updatedAt,
-        });
-      })
-      .catch(() => {});
-  }
-
-  function flushPendingCollaborationTextLogs() {
-    for (const blockId of Array.from(pendingCollaborationTextLogs.current.keys())) {
-      flushPendingCollaborationTextLog(blockId);
-    }
-  }
-
-  // The effect below only flushes on pageId change / unmount (via its cleanup),
-  // so it must not re-run on every render. Read the latest flush closure through
-  // a ref instead of listing the per-render function as a dependency.
-  const flushPendingCollaborationTextLogsRef = useRef(flushPendingCollaborationTextLogs);
-  useEffect(() => {
-    flushPendingCollaborationTextLogsRef.current = flushPendingCollaborationTextLogs;
-  });
-
-  function queueCollaborationTextLog(
-    blockId: string,
-    beforeSpans: TextSpan[],
-    latestSpans: TextSpan[],
-    updatedAt: string,
-    revision: number
-  ) {
-    const pending = pendingCollaborationTextLogs.current.get(blockId);
-    if (pending?.timer) window.clearTimeout(pending.timer);
-    const next: PendingCollaborationTextLog = {
-      beforeSpans: pending?.beforeSpans ?? cloneTextSpans(beforeSpans),
-      latestSpans: cloneTextSpans(latestSpans),
-      revision,
-      updatedAt,
-    };
-    next.timer = window.setTimeout(
-      () => flushPendingCollaborationTextLog(blockId),
-      COLLABORATION_LOG_DEBOUNCE_MS
-    );
-    pendingCollaborationTextLogs.current.set(blockId, next);
-  }
-
-  useEffect(() => () => flushPendingCollaborationTextLogsRef.current(), [pageId]);
 
   useEffect(() => {
     function onSelectionRequest(event: Event) {
@@ -1981,7 +1662,7 @@ export function Editor({
       patch.content = { rich: [] };
       patch.plainText = "";
     } else if (cur) {
-      const content = textBlockContentFrom(cur);
+      const content = contentForBlockTypeChange(textBlockContentFrom(cur), cur, type);
       if (type === "to_do") content.checked = false;
       if (type === "callout") content.icon = cur.content?.icon ?? "💡";
       patch.content = content;
@@ -2273,6 +1954,7 @@ export function Editor({
     if (readOnly) return;
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
+    if (!editorRef.current?.contains(target)) return;
     if (target !== e.currentTarget && !target.closest("[data-editor-tail]")) return;
     e.preventDefault();
     focusPageEnd();
@@ -2567,6 +2249,10 @@ export function Editor({
     if (readOnly) return;
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
+    // React portal events follow the component tree even when their DOM target
+    // is outside this editor. Coordinate selection belongs only to presses
+    // physically contained by this editor root.
+    if (!editorRef.current?.contains(target)) return;
     // Never start a rubber-band from inside editable text or an interactive
     // control — those own their own pointer/selection behavior.
     if (
@@ -3142,16 +2828,21 @@ export function Editor({
     setText(id, spans) {
       if (readOnly) return;
       if (selectedBlockId) setSelectedBlockId(null);
-      const beforeContent = currentContent(id);
+      const beforeContent = currentContent(pageId, id);
       const operation = createTextOperation(beforeContent.rich ?? [], spans);
       const plainText = spansToPlainText(spans);
       const updatedAt = new Date().toISOString();
       const revision = Date.now();
-      const spansChanged = JSON.stringify(beforeContent.rich ?? []) !== JSON.stringify(spans);
+      const spansChanged = !textSpansEqual(beforeContent.rich ?? [], spans);
       useStore.getState().updateBlock(
         id,
         { content: { ...beforeContent, rich: spans }, plainText, updatedAt },
-        { debounce: true, history: "merge" }
+        {
+          debounce: true,
+          debounceMs: TEXT_BLOCK_SNAPSHOT_DEBOUNCE_MS,
+          history: "merge",
+          pageId,
+        }
       );
       if (!templateMode) {
         publishPageTextUpdate({
@@ -3171,7 +2862,6 @@ export function Editor({
           rich: spans,
           updatedAt,
         }).catch(() => {});
-        queueCollaborationTextLog(id, beforeContent.rich ?? [], spans, updatedAt, revision);
       }
     },
 
@@ -4378,12 +4068,23 @@ export function Editor({
       const cur = blockById(id);
       if (!cur) return;
       const label = spansToPlainText(cur.content?.rich).trim() || "New button";
+      const template = defaultButtonTemplate();
       st.updateBlock(id, {
         type: "button",
         content: {
           rich: [],
           buttonLabel: label,
-          buttonTemplate: defaultButtonTemplate(),
+          buttonTemplate: template,
+          buttonActionDocument: {
+            version: 1,
+            label,
+            actions: [{
+              id: newId(),
+              type: "insert_blocks",
+              target: "trigger_page",
+              blocks: template,
+            }],
+          },
         },
         plainText: label,
       });
@@ -4450,62 +4151,49 @@ export function Editor({
       if (firstTabBody) focusEditableSettled(firstTabBody.id, "end");
     },
 
-    runButton(id) {
+    runButton(id, confirmationToken) {
       if (readOnly) return;
+      if (buttonRunsRef.current.has(id)) return;
       const st = useStore.getState();
       const cur = blockById(id);
       if (!cur) return;
       const hasImportedPartialButton = cur.content?.notionButtonPartial === true;
-      if (hasImportedPartialButton && (!cur.content?.buttonTemplate || cur.content.buttonTemplate.length === 0)) {
+      if (
+        hasImportedPartialButton
+        && !cur.content?.buttonActionDocument
+        && (!cur.content?.buttonTemplate || cur.content.buttonTemplate.length === 0)
+      ) {
         return;
       }
-      const template =
-        cur.content?.buttonTemplate && cur.content.buttonTemplate.length > 0
-          ? cur.content.buttonTemplate
-          : defaultButtonTemplate();
+      const actionDocument = cur.content?.buttonActionDocument;
+      const template = actionDocument?.actions.flatMap((action) => (
+        action.type === "insert_blocks" ? action.blocks : []
+      )) ?? cur.content?.buttonTemplate ?? [];
       if (hasStoredFileReference(template)) {
         notifyStoredFileCloneBlocked();
         return;
       }
-      const list = siblings(cur.parentId);
-      const idx = list.findIndex((b) => b.id === cur.id);
-      const next = list[idx + 1];
-      let previousPosition = cur.position;
-      let first: Block | undefined;
-
-      st.captureBlockHistory(pageId);
-      flushSync(() => {
-        for (const item of template) {
-          const position = positionBetween(previousPosition, next?.position);
-          const inserted = insertTemplateBlock(item, cur.parentId ?? null, position);
-          first ??= inserted;
-          previousPosition = position;
+      buttonRunsRef.current.add(id);
+      if (confirmationToken) setButtonConfirmationPending(true);
+      void st.runPageButton(pageId, id, confirmationToken).then((result) => {
+        if (!result) return;
+        if (buttonResultRequiresConfirmation(result)) {
+          setButtonConfirmation({ blockId: id, challenge: result });
+          return;
         }
-      });
-
-      if (first) focusOrSelectBlock(first.id, first.type, "end");
-
-      function insertTemplateBlock(
-        item: ButtonTemplateBlock,
-        parentId: string | null,
-        position: number
-      ): Block {
-        const inserted = st.addBlockLocal({
-          pageId,
-          parentId,
-          type: item.type,
-          content: cloneContent(item.content ?? { rich: [] }),
-          position,
-          history: false,
+        setButtonConfirmation(null);
+        dispatchButtonClientOutcomes(result.clientOutcomes ?? [], {
+          navigate: router.push,
+          focusBlock: (outcome) => {
+            if (!outcome.blockId) return;
+            const inserted = result.insertedBlocks.find((block) => block.id === outcome.blockId);
+            if (inserted) focusOrSelectBlock(inserted.id, inserted.type, "end");
+          },
         });
-        let childPosition: number | undefined;
-        for (const child of item.children ?? []) {
-          const nextChildPosition = positionBetween(childPosition, undefined);
-          insertTemplateBlock(child, inserted.id, nextChildPosition);
-          childPosition = nextChildPosition;
-        }
-        return inserted;
-      }
+      }).catch(() => {}).finally(() => {
+        buttonRunsRef.current.delete(id);
+        if (confirmationToken) setButtonConfirmationPending(false);
+      });
     },
 
     captureNextBlockToButton(id) {
@@ -4545,6 +4233,23 @@ export function Editor({
           rich: [],
           buttonLabel: cur.content?.buttonLabel ?? cur.plainText ?? "New button",
           buttonTemplate: [...template, cloneTemplate(source)],
+          buttonActionDocument: {
+            version: 1,
+            label: cur.content?.buttonLabel ?? cur.plainText ?? "New button",
+            actions: [
+              {
+                id: cur.content?.buttonActionDocument?.actions.find(
+                  (action) => action.type === "insert_blocks",
+                )?.id ?? newId(),
+                type: "insert_blocks",
+                target: "trigger_page",
+                blocks: [...template, cloneTemplate(source)],
+              },
+              ...(cur.content?.buttonActionDocument?.actions.filter(
+                (action) => action.type !== "insert_blocks",
+              ) ?? []),
+            ],
+          },
           notionButtonPartial: undefined,
         },
       });
@@ -4636,7 +4341,7 @@ export function Editor({
       unsyncSyncedBlock: (id) => opsRef.current.unsyncSyncedBlock(id),
       createButton: (id) => opsRef.current.createButton(id),
       createTab: (id) => opsRef.current.createTab(id),
-      runButton: (id) => opsRef.current.runButton(id),
+      runButton: (id, confirmationToken) => opsRef.current.runButton(id, confirmationToken),
       captureNextBlockToButton: (id) => opsRef.current.captureNextBlockToButton(id),
       publishAwareness: (blockId, mode, selectedIds, textRange) =>
         opsRef.current.publishAwareness(blockId, mode, selectedIds, textRange),
@@ -4657,6 +4362,11 @@ export function Editor({
   const dismissPageStarter = useCallback(() => {
     setDismissedStarterBlockId(pagePlaceholderBlockId);
   }, [pagePlaceholderBlockId]);
+
+  const projectedPageOps = useMemo<EditorOps>(
+    () => ({ ...ops, readOnly: true }),
+    [ops],
+  );
 
   return (
     <div
@@ -4679,11 +4389,11 @@ export function Editor({
       onDrop={onEditorFileDrop}
     >
       {contentLoadingVisible && <EditorContentLoadingFallback />}
-      {blocks.map((b) => (
+      {bodyBlocks.map((b) => (
         <BlockItem
           key={b.id}
           block={b}
-          ops={ops}
+          ops={isPageHierarchyProjectionBlock(b) ? projectedPageOps : ops}
           pagePlaceholder={b.id === pagePlaceholderBlockId}
           pagePlaceholderText={
             b.id === pagePlaceholderBlockId && emptyBodyPromptVisible
@@ -4752,6 +4462,22 @@ export function Editor({
             await ops.moveSelectedBlocksToPage(moveDialogFor, destinationPageId);
           }}
           onClose={() => setMoveDialogFor(null)}
+        />
+      )}
+      {buttonConfirmation && (
+        <ButtonConfirmationDialog
+          challenge={buttonConfirmation.challenge}
+          busy={buttonConfirmationPending}
+          onCancel={() => {
+            useStore.getState().discardPageButtonExecution(pageId, buttonConfirmation.blockId);
+            setButtonConfirmation(null);
+          }}
+          onConfirm={() => {
+            ops.runButton(
+              buttonConfirmation.blockId,
+              buttonConfirmation.challenge.confirmationToken,
+            );
+          }}
         />
       )}
       {/* Comment-role users are read-only for blocks but may still comment on a
@@ -5154,13 +4880,9 @@ function BlockSelectionToolbar({ ops }: { ops: EditorOps }) {
   );
 }
 
-function currentContent(id: string) {
+function currentContent(pageId: string, id: string) {
   const st = useStore.getState();
-  for (const pid of Object.keys(st.blocksByPage)) {
-    const b = st.blocksByPage[pid].find((x) => x.id === id);
-    if (b) return b.content ?? {};
-  }
-  return {};
+  return st.blocksByPage[pageId]?.find((block) => block.id === id)?.content ?? {};
 }
 
 function defaultButtonTemplate(): ButtonTemplateBlock[] {

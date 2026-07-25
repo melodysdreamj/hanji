@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} kamakailang update",
     "unreadOfTotal": "{{unread}} hindi nabasa sa {{total}} update",
     "updateType": "Uri ng update",
-    "updates": "Mga Update",
-    "modeUpdates": "Mga Update",
-    "modeChats": "Mga Chat",
-    "inboxMode": "Inbox mode"
+    "updates": "Mga Update"
   },
   "time": {
     "justNow": "Ngayon lang",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} bersyon",
     "versionsAgo": "{{count}} bersyon ang nakalipas",
     "versionsAhead": "{{count}} bersyon sa unahan",
-    "versionsAria": "Mga bersyon"
+    "versionsAria": "Mga bersyon",
+    "emptyBlock": "Walang laman na block",
+    "emptyPreview": "Walang nilalaman ang pahina sa bersyong ito.",
+    "previewAria": "Preview ng bersyon ng pahina na read-only",
+    "previewingCurrent": "Nakatingin sa kasalukuyang pahina",
+    "previewingSnapshot": "Nakatingin sa nakaraang bersyon",
+    "previewOnlyHint": "Ang pagpili ng bersyon ay nagpe-preview lamang nito. Ang kasalukuyang pahina ay magbabago lamang pagkatapos ng Ibalik.",
+    "restoreThisVersion": "Ibalik",
+    "restoring": "Ibinabalik...",
+    "versionHistory": "History ng bersyon"
   },
   "badges": {
     "comment": "Komento",
@@ -67,7 +73,8 @@
     "referenceMention": "Binanggit ang {{title}} · {{preview}}",
     "referenceLink": "Naka-link sa {{title}} · {{preview}}",
     "unreadDot": "Hindi nabasa",
-    "workspaceUpdate": "Update ng workspace"
+    "workspaceUpdate": "Update ng workspace",
+    "bySelf": "Ikaw"
   },
   "empty": {
     "allCaughtUp": "Naka-update ka na.",

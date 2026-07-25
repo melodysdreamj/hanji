@@ -6,5 +6,6 @@
   "unreachable": "サーバーに接続できません",
   "unreachablePending_one": "サーバーに接続できません · 変更{{count}}件保留中",
   "unreachablePending_other": "サーバーに接続できません · 変更{{count}}件保留中",
-  "retryHint": "クリックして再試行"
+  "retryHint": "クリックして再試行",
+  "confirmed": "サーバーに保存済み"
 }

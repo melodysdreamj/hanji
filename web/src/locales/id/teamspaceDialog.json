@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Tertutup",
+    "open": "Terbuka",
+    "private": "Pribadi"
+  },
+  "add": "Tambah",
+  "approve": "Setujui",
+  "archive": "Arsipkan teamspace",
+  "available": "Tersedia untuk bergabung",
+  "choosePrincipal": "Pilih orang atau grup",
+  "create": "Buat teamspace",
+  "deny": "Tolak",
+  "error": {
+    "action": "Tidak dapat menyelesaikan aksi teamspace tersebut.",
+    "load": "Tidak dapat memuat detail teamspace."
+  },
+  "fields": {
+    "access": "Akses",
+    "description": "Deskripsi",
+    "icon": "Ikon",
+    "memberRole": "Akses halaman anggota",
+    "membersCanEditSidebar": "Anggota dapat menambah dan mengurutkan ulang halaman",
+    "membersCanInvite": "Anggota dapat mengundang orang",
+    "name": "Nama",
+    "openRole": "Akses halaman pengunjung terbuka"
+  },
+  "governance": "Pengaturan Teamspace",
+  "join": "Bergabung",
+  "joined": "Teamspace Anda",
+  "loadMore": "Muat lebih banyak",
+  "manage": "Kelola",
+  "member": "Anggota",
+  "members": "Anggota",
+  "noneArchived": "Tidak ada teamspace yang diarsipkan.",
+  "noneAvailable": "Tidak ada teamspace lain yang tersedia.",
+  "noneJoined": "Anda belum bergabung dengan teamspace mana pun.",
+  "noRequests": "Tidak ada permintaan yang tertunda.",
+  "notice": {
+    "approved": "Permintaan disetujui.",
+    "archived": "Teamspace diarsipkan.",
+    "created": "Teamspace dibuat.",
+    "defaultSet": "Teamspace default diperbarui.",
+    "denied": "Permintaan ditolak.",
+    "joined": "Bergabung dengan teamspace.",
+    "memberAdded": "Anggota ditambahkan.",
+    "memberRemoved": "Anggota dihapus.",
+    "memberUpdated": "Peran anggota diperbarui.",
+    "policySaved": "Kebijakan pembuatan teamspace diperbarui.",
+    "requested": "Akses diminta.",
+    "restored": "Teamspace dipulihkan.",
+    "saved": "Teamspace diperbarui."
+  },
+  "notOwner": "Hanya pemilik teamspace atau administrator workspace yang dapat mengelola teamspace ini.",
+  "open": "Buka",
+  "owner": "Pemilik",
+  "ownersOnlyCreate": "Hanya pemilik workspace yang dapat membuat teamspace",
+  "remove": "Hapus",
+  "replacement": "Pilih default pengganti",
+  "request": "Minta akses",
+  "requestPending": "Permintaan tertunda",
+  "requests": "Permintaan akses",
+  "restore": "Pulihkan",
+  "roles": {
+    "comment": "Komentar",
+    "edit": "Edit",
+    "full_access": "Akses penuh",
+    "view": "Lihat"
+  },
+  "save": "Simpan perubahan",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Jadikan teamspace default",
+  "subtitle": "Atur pekerjaan bersama dan kontrol siapa yang dapat menemukan atau bergabung.",
+  "tabs": {
+    "archived": "Diarsipkan",
+    "browse": "Jelajahi",
+    "create": "Teamspace baru",
+    "label": "Tampilan teamspace",
+    "manage": "Kelola"
+  },
+  "title": "Teamspace"
+}

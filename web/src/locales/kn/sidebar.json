@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "ಕಾರ್ಯಕ್ಷೇತ್ರ ಮೆನು ತೆರೆಯಿರಿ",
   "closeWorkspaceMenu": "ವರ್ಕ್‌ಸ್ಪೇಸ್ ಮೆನು ಮುಚ್ಚಿ",
   "workspaceMenu": "ಕಾರ್ಯಸ್ಥಳ ಮೆನು",
-  "exportWorkspace": "ಕಾರ್ಯಕ್ಷೇತ್ರ ರಫ್ತು",
+  "exportWorkspace": "ಕಾರ್ಯಕ್ಷೇತ್ರ JSON ರಫ್ತು (ಫೈಲ್‌ಗಳಿಲ್ಲದೆ)",
   "exportedWorkspace": "ಕಾರ್ಯಕ್ಷೇತ್ರವನ್ನು Hanji ಫೈಲ್ ಆಗಿ ರಫ್ತು ಮಾಡಲಾಗಿದೆ.",
   "exportedWorkspaceWithPlaceholders": "ಕಾರ್ಯಕ್ಷೇತ್ರವನ್ನು Hanji ಫೈಲ್ ಆಗಿ ರಫ್ತು ಮಾಡಲಾಗಿದೆ — ಲಗತ್ತುಗಳು ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್‌ಗಳಾಗಿ ಉಳಿದಿವೆ.",
   "couldntExportWorkspace": "ವರ್ಕ್‌ಸ್ಪೇಸ್ ರಫ್ತು ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
@@ -76,5 +76,12 @@
     "later": "ನಂತರ",
     "note": "ನೀವು ಯಾವಾಗಲೂ ಸೈಡ್‌ಬಾರ್‌ನಲ್ಲಿರುವ ಆಮದಿನಿಂದ ಇದನ್ನು ನಂತರ ಪ್ರಾರಂಭಿಸಬಹುದು.",
     "title": "ನಿಮ್ಮ Notion ವರ್ಕ್‌ಸ್ಪೇಸ್ ಅನ್ನು Hanji ಗೆ ತರುವಿರಾ?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} ಗೆ ಪುಟ ಸೇರಿಸಿ",
+  "couldntExportWorkspaceArchive": "ಕಾರ್ಯಕ್ಷೇತ್ರದ ಆರ್ಕೈವ್ ರಫ್ತು ಆಗಲಿಲ್ಲ.",
+  "exportedWorkspaceArchive": "ಫೈಲ್‌ಗಳೊಂದಿಗೆ ಕಾರ್ಯಕ್ಷೇತ್ರದ ಆರ್ಕೈವ್ ರಫ್ತು ಮಾಡಲಾಗಿದೆ.",
+  "exportWorkspaceArchive": "ಕಾರ್ಯಕ್ಷೇತ್ರ ಆರ್ಕೈವ್ ರಫ್ತು (ಫೈಲ್‌ಗಳ ಸಹಿತ)",
+  "joinTeamspaces": "ಟೀಮ್‌ಸ್ಪೇಸ್‌ಗಳಿಗೆ ಸೇರಿ",
+  "keyboardShortcuts": "ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು",
+  "teamspacePages": "{{name}} ಪುಟಗಳು"
 }

@@ -4,7 +4,22 @@
     "sum": "સરવાળો",
     "average": "સરેરાશ",
     "min": "લઘુત્તમ",
-    "max": "મહત્તમ"
+    "max": "મહત્તમ",
+    "checked": "ચેક કરેલ",
+    "count_values": "મૂલ્યોની સંખ્યા",
+    "date_range": "તારીખ શ્રેણી",
+    "earliest_date": "સૌથી વહેલી તારીખ",
+    "empty": "ખાલી મૂલ્યોની સંખ્યા",
+    "latest_date": "નવીનતમ તારીખ",
+    "median": "મધ્યક",
+    "not_empty": "ખાલી ન હોય તેવા મૂલ્યોની સંખ્યા",
+    "percent_checked": "ચેક કરેલ ટકા",
+    "percent_empty": "ખાલી ટકા",
+    "percent_not_empty": "બિન-ખાલી ટકા",
+    "percent_unchecked": "ચેક ન કરેલ ટકા",
+    "range": "શ્રેણી",
+    "unchecked": "ચેક ન કરેલ",
+    "unique": "અનન્ય મૂલ્યોની સંખ્યા"
   },
   "chartAria": "{{name}} ચાર્ટ",
   "chartType": "ચાર્ટ પ્રકાર",
@@ -27,5 +42,9 @@
   "untitledProperty": "શીર્ષક વિનાનું",
   "valueProperty": "મૂલ્ય ગુણધર્મ",
   "xAxis": "X-અક્ષ",
-  "yAxis": "Y-અક્ષ"
+  "yAxis": "Y-અક્ષ",
+  "dateRangeDays": "{{count}} દિવસ",
+  "missingProperty": "સાચવેલ ગુણ",
+  "unsupportedAggregateDesc": "{{aggregate}} ની ગણતરી {{property}} થી કરી શકાતી નથી. સુસંગત ગુણ અથવા ગણતરી પસંદ કરો.",
+  "unsupportedAggregateTitle": "આ ચાર્ટ ગણતરી ઉપલબ્ધ નથી"
 }

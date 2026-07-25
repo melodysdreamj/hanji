@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} bakåtlänk",
-    "count_other": "{{count}} bakåtlänkar"
+    "count_other": "{{count}} bakåtlänkar",
+    "partial_one": "{{count}}+ bakåtlänk",
+    "partial_other": "{{count}}+ bakåtlänkar"
   },
   "header": {
     "title": "Länkade omnämnanden"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} omnämnande",
     "mention_other": "{{count}} omnämnanden",
     "link_one": "{{count}} länk",
-    "link_other": "{{count}} länkar"
+    "link_other": "{{count}} länkar",
+    "loaded": "Laddat: {{summary}}"
   },
   "kind": {
     "mention": "Omnämnande",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} mer bakåtlänk",
-    "count_other": "{{count}} fler bakåtlänkar"
+    "count_other": "{{count}} fler bakåtlänkar",
+    "load": "Ladda fler bakåtlänkar",
+    "loading": "Laddar bakåtlänkar…",
+    "search": "Sök bakåtlänkar"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Breadcrumbs",
+  "clearSearch": "Șterge căutarea",
+  "errors": {
+    "not-found": "Este posibil ca acest site să fi fost retras sau adresa sa s-a schimbat.",
+    "offline": "Verifică conexiunea, apoi încearcă să deschizi din nou site-ul.",
+    "rate-limited": "Acest site primește prea multe solicitări. Așteaptă un moment și încearcă din nou.",
+    "unavailable": "Hanji nu poate deschide acest site chiar acum. Încearcă din nou într-un moment."
+  },
+  "madeWithHanji": "Realizat cu Hanji",
+  "navigation": "Navigare site",
+  "noResults": "Nu s-au găsit pagini",
+  "outsideSite": "Această pagină nu face parte din acest site publicat.",
+  "search": "Caută în acest site",
+  "tryAgain": "Încearcă din nou",
+  "unavailable": "Acest site este indisponibil."
+}

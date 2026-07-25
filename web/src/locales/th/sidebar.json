@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "เปิดเมนูเวิร์กสเปซ",
   "closeWorkspaceMenu": "ปิดเมนูเวิร์กสเปซ",
   "workspaceMenu": "เมนูพื้นที่ทำงาน",
-  "exportWorkspace": "ส่งออกเวิร์กสเปซ",
+  "exportWorkspace": "ส่งออก JSON พื้นที่ทำงาน (ไม่รวมไฟล์)",
   "exportedWorkspace": "ส่งออกเวิร์กสเปซเป็นไฟล์ Hanji แล้ว.",
   "exportedWorkspaceWithPlaceholders": "ส่งออกเวิร์กสเปซเป็นไฟล์ Hanji — ไฟล์แนบเหลือเป็นตัวยึดตำแหน่ง.",
   "couldntExportWorkspace": "ไม่สามารถส่งออกเวิร์กสเปซได้",
@@ -76,5 +76,12 @@
     "later": "ไว้ทีหลัง",
     "note": "คุณสามารถเริ่มดำเนินการนี้ภายหลังจาก 'นำเข้า' ในแถบด้านข้างได้",
     "title": "นำพื้นที่ทำงาน Notion ของคุณมาที่ Hanji?"
-  }
+  },
+  "addPageToTeamspace": "เพิ่มหน้าไปยัง {{name}}",
+  "couldntExportWorkspaceArchive": "ส่งออกคลังพื้นที่ทำงานไม่สำเร็จ",
+  "exportedWorkspaceArchive": "ส่งออกคลังพื้นที่ทำงานพร้อมไฟล์แล้ว",
+  "exportWorkspaceArchive": "ส่งออกคลังพื้นที่ทำงาน (รวมไฟล์)",
+  "joinTeamspaces": "เข้าร่วมทีมสเปซ",
+  "keyboardShortcuts": "แป้นพิมพ์ลัด",
+  "teamspacePages": "หน้า {{name}}"
 }

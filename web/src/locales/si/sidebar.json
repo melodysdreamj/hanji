@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "වැඩබිම මෙනුව විවෘත කරන්න",
   "closeWorkspaceMenu": "වැඩබිම් මෙනුව වසන්න",
   "workspaceMenu": "වැඩබිම් මෙනුව",
-  "exportWorkspace": "වැඩබිම අපනයනය කරන්න",
+  "exportWorkspace": "වැඩබිම් JSON අපනයනය කරන්න (ගොනු බැහැර කර ඇත)",
   "exportedWorkspace": "වැඩබිම Hanji ගොනුවක් ලෙස අපනයනය කර ඇත.",
   "exportedWorkspaceWithPlaceholders": "වැඩබිම Hanji ගොනුවක් ලෙස අපනයනය කර ඇත — ඇමුණුම් ස්ථාන ධාරක ලෙස ඉතිරි කර ඇත.",
   "couldntExportWorkspace": "වැඩබිම නිර්යාත කළ නොහැකි විය.",
@@ -76,5 +76,12 @@
     "later": "පසුව",
     "note": "ඔබට මෙය පසුව සයිඩ්බාර් එකේ ආයාත කිරීමෙන් ආරම්භ කළ හැකිය.",
     "title": "ඔබේ Notion වැඩබිම Hanji වෙත ගෙන එනවාද?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} වෙත පිටුව එක් කරන්න",
+  "couldntExportWorkspaceArchive": "වැඩබිම් ලේඛනාගාරය අපනයනය කිරීමට නොහැකි විය.",
+  "exportedWorkspaceArchive": "ගොනු සහිත වැඩබිම් ලේඛනාගාරයක් අපනයනය කරන ලදී.",
+  "exportWorkspaceArchive": "වැඩබිම් ලේඛනාගාරය අපනයනය කරන්න (ගොනු ඇතුළත්)",
+  "joinTeamspaces": "කණ්ඩායම් අවකාශවලට සම්බන්ධ වන්න",
+  "keyboardShortcuts": "යතුරුපුවරු කෙටිමං",
+  "teamspacePages": "{{name}} පිටු"
 }

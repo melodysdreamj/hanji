@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} geri bağlantı",
-    "count_other": "{{count}} geri bağlantı"
+    "count_other": "{{count}} geri bağlantı",
+    "partial_one": "{{count}}+ geri bağlantı",
+    "partial_other": "{{count}}+ geri bağlantı"
   },
   "header": {
     "title": "Bağlantılı bahsedilenler"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} bahsedilme",
     "mention_other": "{{count}} bahsedilme",
     "link_one": "{{count}} bağlantı",
-    "link_other": "{{count}} bağlantı"
+    "link_other": "{{count}} bağlantı",
+    "loaded": "Yüklendi: {{summary}}"
   },
   "kind": {
     "mention": "Bahsedilme",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} daha fazla geri bağlantı",
-    "count_other": "{{count}} daha fazla geri bağlantı"
+    "count_other": "{{count}} daha fazla geri bağlantı",
+    "load": "Daha fazla geri bağlantı yükle",
+    "loading": "Geri bağlantılar yükleniyor…",
+    "search": "Geri bağlantı ara"
   }
 }

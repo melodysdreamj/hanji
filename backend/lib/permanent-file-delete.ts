@@ -5,6 +5,7 @@ import { releaseOrganizationStorage } from './storage-quota';
 import {
   fileUploadReferenceOwners,
   workspaceFileReferenceSnapshot,
+  type WorkspaceFileReferenceSnapshotOptions,
 } from './file-reference-lifecycle';
 import { workspaceDb, type AdminDbAccessor } from './workspace-db';
 
@@ -119,6 +120,10 @@ export async function deleteStoredUploadsBeforeMetadata(input: {
   leaseGuard?: FileWorkspaceLeaseGuard;
   excludePageIds?: string[];
   excludeWorkspaceMetadata?: boolean;
+  referenceSnapshotOptions?: Pick<
+    WorkspaceFileReferenceSnapshotOptions,
+    'preloadedPages' | 'preloadedFileProperties'
+  >;
 }) {
   const now = Date.now();
   const activeGrant = input.uploads.find((upload) => {
@@ -160,6 +165,7 @@ export async function deleteStoredUploadsBeforeMetadata(input: {
     input.workspace.id,
     input.admin.db('app'),
     {
+      ...input.referenceSnapshotOptions,
       excludePageIds: input.excludePageIds,
       excludeWorkspaceMetadata: input.excludeWorkspaceMetadata,
     },

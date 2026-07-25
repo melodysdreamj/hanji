@@ -9,6 +9,11 @@
   background: transparent;
 }
 
+.historyBackdrop {
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(1px);
+}
+
 .panel {
   position: fixed;
   z-index: 35;
@@ -32,6 +37,23 @@
   width: min(380px, calc(100vw - 24px));
   transform-origin: top right;
   animation-name: updatesPanelInRight;
+}
+
+.panel[data-page-history="true"] {
+  top: 44px;
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: min(1152px, calc(100vw - 40px));
+  height: min(786px, calc(100vh - 88px));
+  max-height: none;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--bg-app);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
+  transform: translateX(-50%);
+  transform-origin: top center;
+  animation: pageHistoryIn 160ms cubic-bezier(0.16, 0.82, 0.32, 1);
 }
 
 /* Inline placement: the feed lives inside the sidebar column and swaps the page
@@ -115,6 +137,17 @@
   }
 }
 
+@keyframes pageHistoryIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
 /* The inline inbox swaps in place of the page tree: a quiet fade + short rightward
    settle reads as the sidebar content changing, not a window appearing. */
 @keyframes sidebarInboxIn {
@@ -149,9 +182,8 @@
 
 .header {
   display: flex;
-  /* Korean action labels (알림/대화 toggle + 모두 읽음으로 표시) outgrow the
-     panel width; wrap the actions row below the title instead of squeezing
-     the title into per-syllable vertical line breaks. */
+  /* Long translated read/archive labels wrap below the title instead of
+     squeezing the title into per-syllable vertical line breaks. */
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
@@ -278,92 +310,259 @@
   outline: none;
 }
 
-.historyArea {
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid var(--border-default);
-  background: color-mix(in srgb, var(--bg-hover) 30%, transparent);
+.historyDialog {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 276px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
-.historyStrip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 9px 10px;
-}
-
-.historyText {
+.historyPreviewPane,
+.historyVersionPane {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  gap: 1px;
-  color: var(--text-default);
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.25;
+  min-height: 0;
 }
 
-.historyText span:last-child {
+.historyPreviewPane {
+  background: var(--bg-default);
+}
+
+.historyPreviewHeader,
+.historyVersionHeader {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 46px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.historyPreviewHeader {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.historyPreviewPageTitle {
   overflow: hidden;
-  color: var(--text-tertiary);
-  font-weight: 400;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.historyActions {
-  display: flex;
-  align-items: center;
+.historyPreviewState {
   flex: 0 0 auto;
-  gap: 4px;
-}
-
-.historyButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  height: 26px;
-  padding: 0 7px;
+  padding: 3px 7px;
   border-radius: 4px;
+  background: var(--bg-hover);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
 }
 
-.historyButton:hover,
-.historyButton:focus-visible {
-  background: var(--bg-hover);
+.historyPreviewState[data-history-preview-kind="snapshot"] {
+  background: color-mix(in srgb, var(--accent-blue) 12%, var(--bg-hover));
+  color: var(--accent-blue);
+}
+
+.historyPreviewCanvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 54px 56px 96px;
+}
+
+.historyPreviewDocument {
+  width: min(100%, 720px);
+  margin: 0 auto;
+}
+
+.historyPreviewIcon {
+  margin-bottom: 12px;
+  font-size: 58px;
+  line-height: 1;
+}
+
+.historyPreviewDocument h1 {
+  margin: 0;
   color: var(--text-default);
-  outline: none;
+  font-size: clamp(34px, 4vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
 }
 
-.historyButton:disabled {
-  cursor: default;
-  opacity: 0.38;
+.historyPreviewMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--text-tertiary);
+  font-size: 12px;
 }
 
-.historyButton:disabled:hover,
-.historyButton:disabled:focus-visible {
-  background: transparent;
+.historyPreviewBlocks {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 34px;
+}
+
+.historyPreviewBlock {
+  --history-depth: 0;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-height: 26px;
+  margin-left: calc(var(--history-depth) * 22px);
+  color: var(--text-default);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.historyPreviewBlock[data-type="heading_1"],
+.historyPreviewBlock[data-type="toggle_heading_1"] {
+  min-height: 40px;
+  margin-top: 22px;
+  font-size: 30px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.historyPreviewBlock[data-type="heading_2"],
+.historyPreviewBlock[data-type="toggle_heading_2"] {
+  min-height: 34px;
+  margin-top: 18px;
+  font-size: 23px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.historyPreviewBlock[data-type="heading_3"],
+.historyPreviewBlock[data-type="heading_4"],
+.historyPreviewBlock[data-type="toggle_heading_3"],
+.historyPreviewBlock[data-type="toggle_heading_4"] {
+  min-height: 31px;
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.historyPreviewBlock[data-type="code"] {
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--bg-active);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.historyPreviewBlock[data-type="callout"] {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--bg-hover);
+}
+
+.historyPreviewMarker {
+  flex: 0 0 18px;
   color: var(--text-secondary);
+  text-align: center;
+}
+
+.historyPreviewCheckbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  border: 1px solid var(--text-tertiary);
+  border-radius: 3px;
+  color: white;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.historyPreviewCheckbox[data-checked="true"] {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue);
+}
+
+.historyPreviewQuote {
+  align-self: stretch;
+  flex: 0 0 3px;
+  border-radius: 2px;
+  background: var(--text-default);
+}
+
+.historyPreviewBlockText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.historyPreviewBlockText:only-child {
+  width: 100%;
+}
+
+.historyPreviewDivider {
+  width: calc(100% - 2px);
+  margin: 10px 1px;
+  border: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.historyPreviewEmpty {
+  padding: 18px 0;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.historyVersionPane {
+  border-left: 1px solid var(--border-default);
+  background: var(--bg-app);
+}
+
+.historyVersionHeader {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px 9px 14px;
+}
+
+.historyVersionTitle {
+  color: var(--text-default);
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.historyVersionCount {
+  margin-top: 1px;
+  color: var(--text-tertiary);
+  font-size: 11px;
 }
 
 .versionList {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   gap: 1px;
-  padding: 0 8px 8px;
+  padding: 7px;
 }
 
 .versionRow {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  align-items: center;
-  gap: 7px;
+  display: block;
   width: 100%;
-  padding: 7px 8px;
+  padding: 8px 10px;
   border-radius: 5px;
   color: var(--text-default);
   text-align: left;
@@ -375,33 +574,19 @@
   outline: none;
 }
 
-.versionRow[data-current="true"] {
-  background: var(--bg-app);
-}
-
-.versionRow:disabled {
-  cursor: default;
-  opacity: 0.48;
-}
-
-.versionRow:disabled:hover,
-.versionRow:disabled:focus-visible {
-  background: transparent;
-}
-
-.versionIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
+.versionRow[data-selected="true"] {
   background: var(--bg-active);
-  color: var(--text-tertiary);
 }
 
-.versionRow[data-current="true"] .versionIcon {
-  color: var(--text-secondary);
+.versionRow[data-current="true"] .versionTitle::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 7px;
+  border-radius: 999px;
+  background: var(--accent-blue);
+  vertical-align: 1px;
 }
 
 .versionText {
@@ -428,6 +613,48 @@
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.historyRestoreFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 0 0 auto;
+  gap: 9px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--border-default);
+}
+
+.historyRestoreFooter p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.historyRestoreButton {
+  align-self: flex-end;
+  min-width: 78px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 5px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.historyRestoreButton:hover,
+.historyRestoreButton:focus-visible {
+  filter: brightness(1.06);
+  outline: none;
+}
+
+.historyRestoreButton:disabled {
+  cursor: default;
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+  filter: none;
 }
 
 .list {
@@ -609,6 +836,50 @@
     width: auto;
     max-height: calc(100vh - 60px);
   }
+
+  .panel[data-page-history="true"] {
+    top: 10px;
+    right: auto;
+    bottom: auto;
+    left: 10px;
+    width: calc(100vw - 20px);
+    height: calc(100vh - 20px);
+    max-height: none;
+    transform: none;
+    animation: updatesPanelIn 160ms cubic-bezier(0.16, 0.82, 0.32, 1);
+  }
+
+  .historyDialog {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(260px, 1fr) minmax(248px, 0.78fr);
+  }
+
+  .historyVersionPane {
+    border-top: 1px solid var(--border-default);
+    border-left: 0;
+  }
+
+  .historyPreviewCanvas {
+    padding: 30px 24px 54px;
+  }
+
+  .historyPreviewDocument h1 {
+    font-size: 30px;
+  }
+
+  .historyPreviewIcon {
+    font-size: 46px;
+  }
+
+  .historyRestoreFooter {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .historyRestoreFooter p {
+    max-width: 60%;
+  }
 }
 
 @media (max-width: 420px) {
@@ -621,37 +892,10 @@
     display: none;
   }
 
-  .historyStrip {
-    align-items: stretch;
-    flex-direction: column;
+  .historyPreviewState {
+    max-width: 46%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-
-  .historyActions {
-    justify-content: flex-end;
-  }
-}
-
-/* Inbox mode toggle (Updates | Chats) in the panel header. */
-.modeToggle {
-  display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: var(--radius);
-  background: var(--bg-hover);
-}
-.modeButton {
-  padding: 3px 9px;
-  border-radius: calc(var(--radius) - 1px);
-  color: var(--text-secondary);
-  font-size: 12.5px;
-  font-weight: 500;
-}
-.modeButton[aria-selected="true"] {
-  background: var(--bg-default);
-  color: var(--text-default);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-}
-.modeButton:focus-visible {
-  outline: 2px solid var(--accent, #2383e2);
-  outline-offset: 1px;
 }

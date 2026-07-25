@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "ዝግ",
+    "open": "ክፍት",
+    "private": "የግል"
+  },
+  "add": "አክል",
+  "approve": "አጽድቅ",
+  "archive": "የቡድን ቦታን አርክስት",
+  "available": "ለመቀላቀል የሚገኝ",
+  "choosePrincipal": "ሰው ወይም ቡድን ይምረጡ",
+  "create": "የቡድን ቦታ ፍጠር",
+  "deny": "እምቢ",
+  "error": {
+    "action": "ያንን የቡድን ቦታ ድርጊት ማጠናቀቅ አልተቻለም።",
+    "load": "የቡድን ቦታ ዝርዝሮችን መጫን አልተቻለም።"
+  },
+  "fields": {
+    "access": "መዳረሻ",
+    "description": "መግለጫ",
+    "icon": "አዶ",
+    "memberRole": "የአባል ገፅ መዳረሻ",
+    "membersCanEditSidebar": "አባላት ገፆችን ማከል እና ማስተካከል ይችላሉ",
+    "membersCanInvite": "አባላት ሰዎችን መጋበዝ ይችላሉ",
+    "name": "ስም",
+    "openRole": "የክፍት ጎብኝ ገፅ መዳረሻ"
+  },
+  "governance": "የቡድን ቦታ ቅንብሮች",
+  "join": "ተቀላቀል",
+  "joined": "የእርስዎ የቡድን ቦታዎች",
+  "loadMore": "ተጨማሪ ጫን",
+  "manage": "አስተዳድር",
+  "member": "አባል",
+  "members": "አባላት",
+  "noneArchived": "ምንም የተመዘገቡ የቡድን ቦታዎች የሉም።",
+  "noneAvailable": "ሌላ የሚገኙ የቡድን ቦታዎች የሉም።",
+  "noneJoined": "ገና ምንም የቡድን ቦታ አልተቀላቀሉም።",
+  "noRequests": "ምንም በመጠባበቅ ላይ ያሉ ጥያቄዎች የሉም።",
+  "notice": {
+    "approved": "ጥያቄ ጸድቋል።",
+    "archived": "የቡድን ቦታ ተመዝግቧል።",
+    "created": "የቡድን ቦታ ተፈጠረ።",
+    "defaultSet": "ነባሪ የቡድን ቦታ ተዘምኗል።",
+    "denied": "ጥያቄ ውድቅ ተደርጓል።",
+    "joined": "የቡድን ቦታ ተቀላቅሏል።",
+    "memberAdded": "አባል ተጨምሯል።",
+    "memberRemoved": "አባል ተወግዷል።",
+    "memberUpdated": "የአባል ሚና ተዘምኗል።",
+    "policySaved": "የቡድን ቦታ የመፍጠር ፖሊሲ ተዘምኗል።",
+    "requested": "መዳረሻ ተጠይቋል።",
+    "restored": "የቡድን ቦታ ተመልሷል።",
+    "saved": "የቡድን ቦታ ተዘምኗል።"
+  },
+  "notOwner": "የቡድን ቦታ ባለቤት ወይም የስራ ቦታ አስተዳዳሪ ብቻ ይህን የቡድን ቦታ ማስተዳደር ይችላል።",
+  "open": "ክፈት",
+  "owner": "ባለቤት",
+  "ownersOnlyCreate": "የስራ ቦታ ባለቤቶች ብቻ የቡድን ቦታዎችን መፍጠር ይችላሉ።",
+  "remove": "አስወግድ",
+  "replacement": "ምትክ ነባሪ ይምረጡ",
+  "request": "መዳረሻ ይጠይቁ",
+  "requestPending": "ጥያቄ በመጠባበቅ ላይ",
+  "requests": "የመዳረሻ ጥያቄዎች",
+  "restore": "መልስ",
+  "roles": {
+    "comment": "ማስተያየት ይችላል",
+    "edit": "አርትዕ ይችላል",
+    "full_access": "ሙሉ መዳረሻ",
+    "view": "ማየት ይችላል"
+  },
+  "save": "ለውጦችን አስቀምጥ",
+  "selectTeamspace": "የቡድን ቦታ",
+  "setDefault": "ነባሪ የቡድን ቦታ አድርግ",
+  "subtitle": "የተጋራ ስራዎችን ያደራጁ እና ማን ማግኘት ወይም መቀላቀል እንደሚችል ይቆጣጠሩ።",
+  "tabs": {
+    "archived": "የተመዘገበ",
+    "browse": "አስስ",
+    "create": "አዲስ የቡድን ቦታ",
+    "label": "የቡድን ቦታ እይታዎች",
+    "manage": "አስተዳድር"
+  },
+  "title": "የቡድን ቦታዎች"
+}

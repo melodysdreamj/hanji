@@ -4,7 +4,22 @@
     "count": "Počet",
     "max": "Max",
     "min": "Min",
-    "sum": "Součet"
+    "sum": "Součet",
+    "checked": "Zaškrtnuto",
+    "count_values": "Počet hodnot",
+    "date_range": "Rozsah dat",
+    "earliest_date": "Nejstarší datum",
+    "empty": "Počet prázdných",
+    "latest_date": "Nejnovější datum",
+    "median": "Medián",
+    "not_empty": "Počet neprázdných",
+    "percent_checked": "Procento zaškrtnutých",
+    "percent_empty": "Procento prázdných",
+    "percent_not_empty": "Procento neprázdných",
+    "percent_unchecked": "Procento nezaškrtnutých",
+    "range": "Rozsah",
+    "unchecked": "Nezaškrtnuto",
+    "unique": "Počet jedinečných"
   },
   "chartAria": "{{name}} graf",
   "chartType": "Typ grafu",
@@ -27,5 +42,9 @@
   "untitledProperty": "Bez názvu",
   "valueProperty": "Vlastnost hodnoty",
   "xAxis": "Osa X",
-  "yAxis": "Osa Y"
+  "yAxis": "Osa Y",
+  "dateRangeDays": "{{count}} dní",
+  "missingProperty": "uložená vlastnost",
+  "unsupportedAggregateDesc": "{{aggregate}} nelze vypočítat z {{property}}. Vyberte kompatibilní vlastnost nebo výpočet.",
+  "unsupportedAggregateTitle": "Tento výpočet grafu není k dispozici."
 }

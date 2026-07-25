@@ -38,7 +38,7 @@
   "moveTo": "ਇੱਥੇ ਲਿਜਾਓ",
   "exporting": "ਨਿਰਯਾਤ…",
   "exportAsMarkdown": "Markdown ਵਜੋਂ ਨਿਰਯਾਤ ਕਰੋ",
-  "exportAsHanji": "Hanji ਫਾਈਲ ਵਜੋਂ ਨਿਰਯਾਤ ਕਰੋ",
+  "exportAsHanji": "Hanji JSON ਨਿਰਯਾਤ ਕਰੋ (ਫਾਈਲਾਂ ਸ਼ਾਮਲ ਨਹੀਂ)",
   "importing": "ਇੰਪੋਰਟ…",
   "importMarkdown": "ਮਾਰਕਡਾਊਨ ਇੰਪੋਰਟ",
   "unlockPage": "ਪੰਨਾ ਅਨਲਾਕ ਕਰੋ",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ਐਕਸੈਸ ਅਪਡੇਟ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ",
     "removedFromAccessList": "ਪਹੁੰਚ ਸੂਚੀ ਤੋਂ ਹਟਾਇਆ",
     "couldntRemoveAccess": "ਐਕਸੈਸ ਹਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ",
-    "couldntLoadAccessList": "ਐਕਸੈਸ ਸੂਚੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ"
+    "couldntLoadAccessList": "ਐਕਸੈਸ ਸੂਚੀ ਲੋਡ ਨਹੀਂ ਕੀਤੀ ਜਾ ਸਕੀ",
+    "couldntExportHanjiArchive": "Hanji ਪੁਰਾਲੇਖ ਨਿਰਯਾਤ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।",
+    "exportedHanjiArchive": "ਫਾਈਲਾਂ ਸਮੇਤ Hanji ਪੁਰਾਲੇਖ ਨਿਰਯਾਤ ਕੀਤਾ।"
   },
   "user": "ਉਪਭੋਗਤਾ",
   "whoHasAccess": "ਕਿਸ ਦੀ ਪਹੁੰਚ ਹੈ",
   "workspace": "ਵਰਕਸਪੇਸ",
   "workspaceCount_one": "{{count}} ਵਰਕਸਪੇਸ",
   "workspaceCount_other": "{{count}} ਵਰਕਸਪੇਸਾਂ",
-  "you": "ਤੁਸੀਂ"
+  "you": "ਤੁਸੀਂ",
+  "exportAsHanjiArchive": "Hanji ਪੁਰਾਲੇਖ ਨਿਰਯਾਤ ਕਰੋ (ਫਾਈਲਾਂ ਸ਼ਾਮਲ)",
+  "turnIntoWiki": "ਵਿਕੀ ਵਿੱਚ ਬਦਲੋ",
+  "undoWiki": "ਵਿਕੀ ਪੂਰਵਵਤ ਕਰੋ",
+  "wikiCreated": "ਪੰਨਾ ਵਿਕੀ ਵਿੱਚ ਬਦਲਿਆ",
+  "wikiPageSettings": "ਵਿਕੀ ਪੰਨਾ ਸੈਟਿੰਗਾਂ",
+  "wikiUndone": "ਵਿਕੀ ਹਟਾਇਆ; ਪੰਨੇ ਦੀ ਸਮਗਰੀ ਬਰਕਰਾਰ ਰਹੀ",
+  "wikiUpdateFailed": "ਵਿਕੀ ਅਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ"
 }

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "टिप्पणी जोडा",
+    "addLink": "लिंक जोडा",
+    "blockColor": "शेवटचा वापरलेला रंग लावा",
+    "bold": "ठळक",
+    "copyPageLink": "पृष्ठ दुवा कॉपी करा",
+    "findInPage": "या पृष्ठावर शोधा",
+    "inlineCode": "इनलाइन कोड",
+    "italic": "तिरपे",
+    "moveBlock": "ब्लॉक दुसऱ्या पृष्ठावर हलवा",
+    "moveBlockDown": "ब्लॉक खाली हलवा",
+    "moveBlockUp": "ब्लॉक वर हलवा",
+    "movePage": "सध्याचे पृष्ठ हलवा",
+    "navigateBack": "मागे जा",
+    "navigateForward": "पुढे जा",
+    "newPage": "नवीन पृष्ठ",
+    "openBlockMenu": "ब्लॉक कृती उघडा",
+    "openKeyboardShortcuts": "कीबोर्ड शॉर्टकट उघडा",
+    "openParentPage": "मूळ पृष्ठ उघडा",
+    "quickFind": "द्रुत शोध",
+    "strikethrough": "काटेकोर",
+    "toggleAllToggles": "सर्व टॉगल विस्तृत किंवा संकुचित करा",
+    "toggleSidebar": "साइडबार टॉगल करा",
+    "toggleTheme": "डार्क मोड टॉगल करा",
+    "underline": "अधोरेखित"
+  },
+  "categories": {
+    "createStyle": "निर्मिती आणि शैली",
+    "editMove": "संपादन आणि हालचाल",
+    "popular": "लोकप्रिय"
+  },
+  "categoriesLabel": "शॉर्टकट श्रेण्या",
+  "close": "बंद करा",
+  "closeBackdrop": "कीबोर्ड शॉर्टकट बंद करा",
+  "empty": "कोणतेही शॉर्टकट सापडले नाहीत",
+  "keysFor": "{{action}} की",
+  "or": "किंवा",
+  "searchLabel": "कीबोर्ड शॉर्टकट शोधा",
+  "searchPlaceholder": "शॉर्टकट शोधा…",
+  "searchResults": "शोध परिणाम",
+  "searchTerms": {
+    "toggleTheme": "थीम लाइट डार्क दिसणे"
+  },
+  "title": "कीबोर्ड शॉर्टकट"
+}

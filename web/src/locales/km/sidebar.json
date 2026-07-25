@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "បើកម៉ឺនុយ workspace",
   "closeWorkspaceMenu": "បិទម៉ឺនុយកន្លែងធ្វើការ",
   "workspaceMenu": "ម៉ឺនុយតំបន់ការងារ",
-  "exportWorkspace": "នាំចេញ workspace",
+  "exportWorkspace": "នាំចេញ JSON លំហការងារ (មិនរាប់បញ្ចូលឯកសារ)",
   "exportedWorkspace": "បាននាំចេញ workspace ជាឯកសារ Hanji.",
   "exportedWorkspaceWithPlaceholders": "បាននាំចេញ workspace ជាឯកសារ Hanji — ឯកសារភ្ជាប់ត្រូវបានទុកជាសញ្ញាសម្គាល់កន្លែង។",
   "couldntExportWorkspace": "មិនអាចនាំចេញកន្លែងធ្វើការបានទេ។",
@@ -76,5 +76,12 @@
     "later": "ប្រហែលជាពេលក្រោយ",
     "note": "អ្នកតែងតែអាចចាប់ផ្តើមវាពេលក្រោយពីការនាំចូលនៅក្នុងរបារចំហៀង។",
     "title": "នាំយកលំហការងារ Notion របស់អ្នកមកកាន់ Hanji?"
-  }
+  },
+  "addPageToTeamspace": "បន្ថែមទំព័រទៅ {{name}}",
+  "couldntExportWorkspaceArchive": "មិនអាចនាំចេញបណ្ណសារលំហការងារបានទេ",
+  "exportedWorkspaceArchive": "បាននាំចេញបណ្ណសារលំហការងារជាមួយឯកសារ",
+  "exportWorkspaceArchive": "នាំចេញបណ្ណសារលំហការងារ (រួមបញ្ចូលឯកសារ)",
+  "joinTeamspaces": "ចូលរួមក្រុមការងារ",
+  "keyboardShortcuts": "ផ្លូវកាត់ក្ដារចុច",
+  "teamspacePages": "ទំព័រ {{name}}"
 }

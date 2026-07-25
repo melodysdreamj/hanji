@@ -7,18 +7,39 @@ import {
   type AdminDbAccessor,
 } from '../lib/workspace-db';
 import {
+  actorGroupIdsForWorkspace,
   actorPagePermissions,
   pageHasDirectAccess as sharedPageHasDirectAccess,
 } from '../lib/page-access';
+import {
+  isTeamspaceAccess,
+  isTeamspaceMemberRole,
+  isTeamspacePageRole,
+  workspaceRoleCanUseTeamspaces,
+  type TeamspaceLike,
+  type TeamspaceMemberLike,
+  type TeamspaceMemberRole,
+  type TeamspaceSettingsLike,
+} from '../lib/teamspace-access';
 import { conservativeChangeCursor, readChangeFeed } from '../lib/change-log';
+import {
+  createWorkspaceRefreshToken,
+  readBoundedActorAccessAuthority,
+  workspaceRefreshOrganizationAuthority,
+  workspaceRefreshOrganizationMemberAuthority,
+  workspaceRefreshWorkspaceAuthority,
+  workspaceRefreshWorkspaceMemberAuthority,
+} from '../lib/workspace-refresh-probe';
 import { defaultWorkspaceLocale, seedDefaultWorkspacePages } from '../lib/default-workspace-pages';
 import { upsertNotification } from '../lib/notifications';
-import { getInstanceSettings } from '../lib/instance-settings';
+import { getInstanceSettings, upsertInstanceSettings } from '../lib/instance-settings';
 
 import {
   bestEffort,
   listAll,
   getExisting,
+  narrowWhere,
+  projectFields,
   type TableQuery,
   type TransactDb,
 } from '../lib/table-utils';
@@ -37,6 +58,7 @@ interface Workspace {
   icon?: string;
   domain?: string;
   ownerId?: string;
+  deletionPendingAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -70,6 +92,28 @@ interface OrganizationMember {
   updatedAt?: string;
 }
 
+interface OrganizationGroup {
+  id: string;
+  organizationId: string;
+  name: string;
+  description?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface OrganizationGroupMember {
+  id: string;
+  organizationId?: string;
+  groupId: string;
+  organizationMemberId?: string;
+  userId: string;
+  role?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface OrganizationDomain {
   id: string;
   organizationId: string;
@@ -99,8 +143,11 @@ interface Page {
   workspaceId: string;
   parentId?: string | null;
   parentType?: string;
+  teamspaceId?: string | null;
+  teamspacePermissionMode?: 'inherit' | 'restricted' | string;
   kind?: string;
   title?: string;
+  notionImportStaging?: boolean;
   isFavorite?: boolean;
   isPublic?: boolean;
   inTrash?: boolean;
@@ -128,6 +175,39 @@ interface WorkspaceMember {
   avatar?: string | null;
   role: string;
   createdBy?: string;
+  updatedAt?: string;
+}
+
+interface BootstrapTeamspace extends TeamspaceLike {
+  access: 'open' | 'closed' | 'private';
+  joined: boolean;
+  membershipSource?: 'explicit' | 'default';
+  role?: TeamspaceMemberRole;
+  canJoin: boolean;
+  canRequest: boolean;
+  requestPending?: boolean;
+  isDefault: boolean;
+}
+
+interface BootstrapTeamspaceJoinRequest {
+  id: string;
+  workspaceId: string;
+  teamspaceId: string;
+  userId: string;
+  workspaceMemberId: string;
+  status: string;
+}
+
+interface BootstrapTeamspaceAuthority {
+  membershipRole?: TeamspaceMemberRole;
+  pageRole?: ShareRole;
+}
+
+interface BootstrapTeamspaceProjection {
+  teamspaces: BootstrapTeamspace[];
+  discoverableTeamspaces: BootstrapTeamspace[];
+  settings: TeamspaceSettingsLike;
+  authorityById: Map<string, BootstrapTeamspaceAuthority>;
 }
 
 type OrganizationMemberRole = 'owner' | 'admin' | 'member' | 'guest';
@@ -239,6 +319,209 @@ function workspaceMemberRole(
   return workspaceMemberShareRole(member?.role);
 }
 
+const TEAMSPACE_BOOTSTRAP_LIMIT = 100;
+const TEAMSPACE_BOOTSTRAP_GROUP_LIMIT = 100;
+const TEAMSPACE_BOOTSTRAP_MEMBERSHIP_LIMIT =
+  TEAMSPACE_BOOTSTRAP_LIMIT * (TEAMSPACE_BOOTSTRAP_GROUP_LIMIT + 1);
+
+function requiredBootstrapWhere<T>(
+  query: TableQuery<T>,
+  field: string,
+  op: string,
+  value: unknown,
+  label: string,
+) {
+  if (typeof query.where !== 'function') {
+    throw Object.assign(new Error(`${label} requires bounded server-side filters.`), { status: 500 });
+  }
+  return query.where(field, op, value);
+}
+
+function defaultTeamspaceSettings(workspaceId: string): TeamspaceSettingsLike {
+  return {
+    id: workspaceId,
+    workspaceId,
+    defaultTeamspaceId: null,
+    ownersOnlyCreate: false,
+  };
+}
+
+async function teamspacesForBootstrap(
+  contentDb: DbRef,
+  centralDb: AppDbRef,
+  workspace: Workspace,
+  currentMember: WorkspaceMember | undefined,
+  actorId: string,
+): Promise<BootstrapTeamspaceProjection> {
+  const teamspaceQuery = narrowWhere(
+    contentDb.table<TeamspaceLike>('teamspaces').where(
+      'workspaceId',
+      '==',
+      workspace.id,
+    ),
+    'archivedAt',
+    null,
+  );
+  const activeResult = await teamspaceQuery.limit(TEAMSPACE_BOOTSTRAP_LIMIT + 1).getList();
+  const activeTeamspaces = (activeResult.items ?? []).filter((teamspace) => (
+    teamspace.workspaceId === workspace.id && !teamspace.archivedAt
+  ));
+  if (activeTeamspaces.length > TEAMSPACE_BOOTSTRAP_LIMIT || activeResult.hasMore) {
+    throw Object.assign(
+      new Error(`Workspace Teamspace bootstrap exceeds ${TEAMSPACE_BOOTSTRAP_LIMIT} active rows.`),
+      { status: 409 },
+    );
+  }
+  const settings = await getExisting(
+    contentDb.table<TeamspaceSettingsLike>('teamspace_settings'),
+    workspace.id,
+  ) ?? defaultTeamspaceSettings(workspace.id);
+  const currentWorkspaceRole = workspace.ownerId === actorId ? 'owner' : currentMember?.role;
+  const activeWorkspaceMember = !!currentMember
+    && workspaceRoleCanUseTeamspaces(currentWorkspaceRole);
+  if (!activeWorkspaceMember || activeTeamspaces.length === 0) {
+    return {
+      teamspaces: [],
+      discoverableTeamspaces: [],
+      settings,
+      authorityById: new Map(),
+    };
+  }
+
+  const collectedGroupIds = await actorGroupIdsForWorkspace(centralDb, workspace.id, actorId);
+  // An over-cap group authority set cannot safely grant. Keep the exact user
+  // key and default/Open derivation, but ignore group Teamspace rows.
+  const groupIds = collectedGroupIds.size <= TEAMSPACE_BOOTSTRAP_GROUP_LIMIT
+    ? collectedGroupIds
+    : new Set<string>();
+  const principalIds = [actorId, ...groupIds];
+  const activeIds = new Set(activeTeamspaces.map((teamspace) => teamspace.id));
+  const [memberships, joinRequests] = await Promise.all([
+    listAll(
+      narrowWhere(
+        requiredBootstrapWhere(
+          contentDb.table<TeamspaceMemberLike>('teamspace_members').where(
+            'teamspaceId',
+            'in',
+            Array.from(activeIds),
+          ),
+          'principalId',
+          'in',
+          principalIds,
+          'Workspace bootstrap actor Teamspace memberships',
+        ),
+        'workspaceId',
+        workspace.id,
+      ),
+      {
+        maxItems: TEAMSPACE_BOOTSTRAP_MEMBERSHIP_LIMIT + 1,
+        pageSize: Math.min(1_000, TEAMSPACE_BOOTSTRAP_MEMBERSHIP_LIMIT + 1),
+        label: 'Workspace bootstrap actor Teamspace memberships',
+      },
+    ),
+    listAll(
+      narrowWhere(
+        narrowWhere(
+          contentDb.table<BootstrapTeamspaceJoinRequest>('teamspace_join_requests').where(
+            'teamspaceId',
+            'in',
+            Array.from(activeIds),
+          ),
+          'userId',
+          actorId,
+        ),
+        'workspaceId',
+        workspace.id,
+      ),
+      {
+        maxItems: TEAMSPACE_BOOTSTRAP_LIMIT + 1,
+        pageSize: TEAMSPACE_BOOTSTRAP_LIMIT + 1,
+        label: 'Workspace bootstrap actor Teamspace requests',
+      },
+    ),
+  ]);
+  if (memberships.length > TEAMSPACE_BOOTSTRAP_MEMBERSHIP_LIMIT) {
+    throw Object.assign(
+      new Error('Workspace bootstrap Teamspace membership authority is ambiguous.'),
+      { status: 409 },
+    );
+  }
+  const strongestMembershipByTeamspace = new Map<string, TeamspaceMemberLike>();
+  for (const membership of memberships) {
+    if (
+      membership.workspaceId !== workspace.id
+      || !activeIds.has(membership.teamspaceId)
+      || !isTeamspaceMemberRole(membership.role)
+    ) {
+      continue;
+    }
+    const applies = membership.principalType === 'user'
+      ? membership.principalId === actorId
+        && membership.workspaceMemberId === currentMember.id
+      : membership.principalType === 'group' && groupIds.has(membership.principalId);
+    if (!applies) continue;
+    const current = strongestMembershipByTeamspace.get(membership.teamspaceId);
+    if (!current || membership.role === 'owner' && current.role !== 'owner') {
+      strongestMembershipByTeamspace.set(membership.teamspaceId, membership);
+    }
+  }
+
+  const authorityById = new Map<string, BootstrapTeamspaceAuthority>();
+  const pendingRequestTeamspaceIds = new Set(
+    joinRequests
+      .filter((request) => (
+        request.workspaceId === workspace.id
+        && request.userId === actorId
+        && request.workspaceMemberId === currentMember.id
+        && request.status === 'pending'
+        && activeIds.has(request.teamspaceId)
+      ))
+      .map((request) => request.teamspaceId),
+  );
+  const joined: BootstrapTeamspace[] = [];
+  const discoverable: BootstrapTeamspace[] = [];
+  for (const teamspace of activeTeamspaces) {
+    const explicit = strongestMembershipByTeamspace.get(teamspace.id);
+    const explicitRole = isTeamspaceMemberRole(explicit?.role) ? explicit.role : undefined;
+    const isDefault = settings.defaultTeamspaceId === teamspace.id;
+    const membershipRole = explicitRole ?? (isDefault ? 'member' : undefined);
+    const membershipSource = explicitRole ? 'explicit' : isDefault ? 'default' : undefined;
+    const access = isTeamspaceAccess(teamspace.access) ? teamspace.access : 'closed';
+    let pageRole: ShareRole | undefined;
+    if (membershipRole === 'owner') pageRole = 'full_access';
+    else if (membershipRole === 'member' && isTeamspacePageRole(teamspace.memberPageRole)) {
+      pageRole = teamspace.memberPageRole;
+    } else if (!membershipRole && access === 'open' && isTeamspacePageRole(teamspace.openPageRole)) {
+      pageRole = teamspace.openPageRole;
+    }
+    authorityById.set(teamspace.id, { membershipRole, pageRole });
+    const visible = !!membershipRole || access === 'open' || access === 'closed';
+    if (!visible) continue;
+    const requestPending = !membershipRole
+      && access === 'closed'
+      && pendingRequestTeamspaceIds.has(teamspace.id);
+    const projected: BootstrapTeamspace = {
+      ...teamspace,
+      access,
+      joined: !!membershipRole,
+      membershipSource,
+      role: membershipRole,
+      canJoin: !membershipRole && access === 'open',
+      canRequest: !membershipRole && access === 'closed' && !requestPending,
+      requestPending,
+      isDefault,
+    };
+    if (membershipRole) joined.push(projected);
+    else discoverable.push(projected);
+  }
+  return {
+    teamspaces: joined,
+    discoverableTeamspaces: discoverable,
+    settings,
+    authorityById,
+  };
+}
+
 function sortOrganizations(items: Organization[]) {
   return items
     .slice()
@@ -269,6 +552,53 @@ function sortOrganizationMembers(items: OrganizationMember[]) {
     );
 }
 
+async function organizationGroupsForBootstrap(
+  db: AppDbRef,
+  organizationId: string,
+  members: OrganizationMember[],
+) {
+  const groups = await listAll(
+    db.table<OrganizationGroup>('organization_groups').where('organizationId', '==', organizationId),
+  );
+  const groupMembers = await listAll(
+    db.table<OrganizationGroupMember>('organization_group_members').where('organizationId', '==', organizationId),
+  );
+  const membersById = new Map(members.map((member) => [member.id, member]));
+  return groups
+    .map((group) => ({
+      ...group,
+      members: groupMembers
+        .filter((membership) => membership.groupId === group.id)
+        .map((membership) => {
+          const member = membership.organizationMemberId
+            ? membersById.get(membership.organizationMemberId)
+            : undefined;
+          return {
+            id: membership.id,
+            organizationMemberId: membership.organizationMemberId,
+            userId: membership.userId,
+            displayName: member?.displayName ?? null,
+            email: normalizeEmail(member?.email),
+            role: parseOrganizationRole(member?.role ?? membership.role, 'member'),
+            status: member?.status ?? 'active',
+          };
+        })
+        .sort(
+          (a, b) =>
+            String(a.status).localeCompare(String(b.status)) ||
+            String(a.displayName ?? a.email ?? a.userId).localeCompare(
+              String(b.displayName ?? b.email ?? b.userId),
+            ) ||
+            a.id.localeCompare(b.id),
+        ),
+    }))
+    .sort(
+      (a, b) =>
+        String(a.name ?? '').localeCompare(String(b.name ?? '')) ||
+        a.id.localeCompare(b.id),
+    );
+}
+
 function sortOrganizationDomains(items: OrganizationDomain[]) {
   const statusRank: Record<string, number> = { verified: 0, pending: 1, rejected: 2 };
   return items
@@ -292,7 +622,7 @@ async function recordOrganizationAudit(
   db: DbRef,
   event: Omit<OrganizationAuditEvent, 'id'>,
 ) {
-  await bestEffort('workspace-bootstrap db.table<OrganizationAuditEven', db.table<OrganizationAuditEvent>('organization_audit_events').insert(event));
+  await db.table<OrganizationAuditEvent>('organization_audit_events').insert(event);
 }
 
 // Atomic insert-if-absent for the check-then-insert ensure* helpers below:
@@ -499,7 +829,12 @@ async function organizationForWorkspace(
   const updated = await workspaces.update(workspace.id, {
     organizationId: ensured.organization.id,
   });
-  workspace.organizationId = updated.organizationId;
+  // Table reads and updates cross a runtime serialization boundary. Keep the
+  // in-memory bootstrap row identical to the persisted update (especially its
+  // automatic updatedAt advance), otherwise the refresh token is stale before
+  // the response reaches the browser and the first quiet probe false-falls
+  // back to another full bootstrap.
+  Object.assign(workspace, updated);
   await recordOrganizationAudit(db, {
     organizationId: ensured.organization.id,
     workspaceId: workspace.id,
@@ -685,54 +1020,23 @@ async function findWorkspace(
   return null;
 }
 
-function collectSubtreeIds(pages: Page[], rootId: string) {
-  const childrenByParent = new Map<string, Page[]>();
-  for (const page of pages) {
-    if (!page.parentId) continue;
-    const children = childrenByParent.get(page.parentId) ?? [];
-    children.push(page);
-    childrenByParent.set(page.parentId, children);
-  }
-
-  const out = new Set<string>();
-  const visit = (pageId: string) => {
-    if (out.has(pageId)) return;
-    out.add(pageId);
-    for (const child of childrenByParent.get(pageId) ?? []) visit(child.id);
-  };
-  visit(rootId);
-  return out;
-}
-
-async function visiblePagesForBootstrap(
+function visiblePagesForBootstrap(
   workspacePages: Page[],
-  directPermissions: PagePermission[],
-  workspace: Workspace,
-  hasWorkspaceAccess: boolean,
+  pageRoles: Record<string, ShareRole>,
   preferredPageId?: string | null,
 ) {
   const shouldInclude = (page: Page) => page.parentType !== 'database' || page.id === preferredPageId;
-
-  if (hasWorkspaceAccess) return workspacePages.filter(shouldInclude);
-
-  const visiblePageIds = new Set<string>();
-  for (const permission of directPermissions) {
-    for (const pageId of collectSubtreeIds(workspacePages, permission.pageId)) {
-      visiblePageIds.add(pageId);
-    }
-  }
-
-  return workspacePages.filter((page) => visiblePageIds.has(page.id) && shouldInclude(page));
+  return workspacePages.filter((page) => !!pageRoles[page.id] && shouldInclude(page));
 }
 
 function pageRolesForBootstrap(
-  visiblePages: Page[],
   workspacePages: Page[],
   directPermissions: PagePermission[],
   workspace: Workspace,
   currentMember: WorkspaceMember | undefined,
   actorId: string,
   hasWorkspaceAccess: boolean,
+  teamspaceAuthorityById: Map<string, BootstrapTeamspaceAuthority>,
 ) {
   const pagesById = new Map(workspacePages.map((page) => [page.id, page]));
   const permissionsByPage = new Map<string, PagePermission[]>();
@@ -746,22 +1050,41 @@ function pageRolesForBootstrap(
     ? workspaceMemberRole(workspace, currentMember, actorId)
     : undefined;
   const roles: Record<string, ShareRole> = {};
-  for (const page of visiblePages) {
-    let role = baseRole;
-    if (page.createdBy === actorId) role = maxRole(role, 'edit');
-
+  for (const page of workspacePages) {
     const visited = new Set<string>();
+    const ancestry: Page[] = [];
     let current: Page | undefined = page;
     while (current && !visited.has(current.id)) {
       visited.add(current.id);
-      for (const permission of permissionsByPage.get(current.id) ?? []) {
+      ancestry.push(current);
+      if (!current.parentId || current.parentType === 'workspace') break;
+      current = pagesById.get(current.parentId);
+    }
+    const teamspaceRoot = ancestry.find((candidate) => (
+      candidate.parentType === 'workspace'
+      && typeof candidate.teamspaceId === 'string'
+      && candidate.teamspaceId.length > 0
+    ));
+    const restrictedByTeamspacePage = !!teamspaceRoot && ancestry.some(
+      (candidate) => candidate.teamspacePermissionMode === 'restricted',
+    );
+    let role: ShareRole | undefined;
+    if (teamspaceRoot?.teamspaceId) {
+      const authority = teamspaceAuthorityById.get(teamspaceRoot.teamspaceId);
+      if (authority?.membershipRole === 'owner') role = 'full_access';
+      else if (!restrictedByTeamspacePage) role = authority?.pageRole;
+    } else {
+      role = baseRole;
+      if (page.createdBy === actorId) role = maxRole(role, 'edit');
+    }
+
+    for (const ancestor of ancestry) {
+      for (const permission of permissionsByPage.get(ancestor.id) ?? []) {
         const permissionRole = permission.role;
         if (isShareRole(permissionRole)) {
           role = maxRole(role, permissionRole);
         }
       }
-      if (!current.parentId || current.parentType === 'workspace') break;
-      current = pagesById.get(current.parentId);
     }
 
     if (role) roles[page.id] = role;
@@ -883,16 +1206,54 @@ function blockChildPageId(block: Block) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
+const CHILD_PAGE_PROJECTION_ANCHOR_CHUNK_SIZE = 100;
+const CHILD_PAGE_PROJECTION_QUERY_CONCURRENCY = 4;
+const CHILD_PAGE_PROJECTION_TYPES = ['child_page', 'child_database'] as const;
+const CHILD_PAGE_PROJECTION_FIELDS = ['id', 'pageId', 'type', 'content', 'position'] as const;
+
 async function childPageProjectionBlocks(blocks: TableRef<Block>, pages: Page[]) {
   const anchorPages = pages.filter((page) =>
     !page.inTrash &&
     page.parentType !== 'database' &&
     (page.isFavorite || page.isPublic || !page.parentId || page.parentType === 'workspace')
   );
+  const anchorIdChunks: string[][] = [];
+  for (let index = 0; index < anchorPages.length; index += CHILD_PAGE_PROJECTION_ANCHOR_CHUNK_SIZE) {
+    anchorIdChunks.push(
+      anchorPages
+        .slice(index, index + CHILD_PAGE_PROJECTION_ANCHOR_CHUNK_SIZE)
+        .map((page) => page.id),
+    );
+  }
+  const projectionTypes = new Set<string>(CHILD_PAGE_PROJECTION_TYPES);
   const groups = await mapLimit(
-    anchorPages,
-    8,
-    (page) => listAll(blocks.where('pageId', '==', page.id)),
+    anchorIdChunks,
+    CHILD_PAGE_PROJECTION_QUERY_CONCURRENCY,
+    async (anchorIds) => {
+      const anchorRank = new Map(anchorIds.map((pageId, index) => [pageId, index]));
+      const pageQuery = blocks.where('pageId', 'in', anchorIds);
+      // Current EdgeBase adapters support chained where() and field projection,
+      // reducing both rows and bytes. The authoritative filters below preserve
+      // correctness for older/narrow adapters that omit either optional method.
+      const typeQuery = typeof pageQuery.where === 'function'
+        ? pageQuery.where('type', 'in', CHILD_PAGE_PROJECTION_TYPES)
+        : pageQuery;
+      const rows = await listAll(
+        projectFields(typeQuery, CHILD_PAGE_PROJECTION_FIELDS),
+        { label: 'Workspace bootstrap child-page projection blocks' },
+      );
+      return rows
+        .map((block, originalIndex) => ({ block, originalIndex }))
+        .filter(({ block }) =>
+          anchorRank.has(block.pageId) && projectionTypes.has(block.type),
+        )
+        .sort((left, right) =>
+          (anchorRank.get(left.block.pageId) ?? Number.MAX_SAFE_INTEGER) -
+            (anchorRank.get(right.block.pageId) ?? Number.MAX_SAFE_INTEGER) ||
+          left.originalIndex - right.originalIndex,
+        )
+        .map(({ block }) => block);
+    },
   );
   return groups.flat();
 }
@@ -1049,8 +1410,12 @@ async function accessibleOrganizations(
 export function canUseChangesDeltaMode(
   hasWorkspaceAccess: boolean,
   feed: { complete: boolean; permissionsTouched: boolean },
+  teamspaceAuthorityStable = true,
 ): boolean {
-  return hasWorkspaceAccess && feed.complete && !feed.permissionsTouched;
+  return hasWorkspaceAccess
+    && feed.complete
+    && !feed.permissionsTouched
+    && teamspaceAuthorityStable;
 }
 
 export const POST = defineFunction(async (context) => {
@@ -1187,6 +1552,63 @@ export const POST = defineFunction(async (context) => {
   const currentMember = hasWorkspaceAccess
     ? await ensureWorkspaceMember(db, members, workspace, auth.id, authEmail)
     : undefined;
+  const [actorAccessAuthority, loadedInstanceSettings] = await Promise.all([
+    hasWorkspaceAccess
+      ? readBoundedActorAccessAuthority(db, {
+          organizationId: workspace.organizationId ?? null,
+          actorId: auth.id,
+          actorEmail: authEmail,
+        })
+      : Promise.resolve(null),
+    getInstanceSettings(db),
+  ]);
+  // Older rows predate the collision-proof scalar used by the lean probe.
+  // Full bootstrap is the authoritative/write-capable boundary, so migrate it
+  // once here; quiet probes themselves stay strictly read-only.
+  const instanceSettings = loadedInstanceSettings.authorityVersion
+    ? loadedInstanceSettings
+    : await upsertInstanceSettings(db, {});
+  const isInstanceAdmin = (
+    instanceSettings.masterUserId === auth.id
+    || (
+      Array.isArray(instanceSettings.instanceAdminUserIds)
+      && instanceSettings.instanceAdminUserIds.includes(auth.id)
+    )
+  );
+  const semanticRefreshAuthority = hasWorkspaceAccess
+    ? await Promise.all([
+        workspaceRefreshWorkspaceAuthority(workspace),
+        workspaceRefreshOrganizationAuthority(
+          organizationContext.currentOrganizationMember
+            ? organizationContext.organization
+            : null,
+        ),
+        workspaceRefreshWorkspaceMemberAuthority(currentMember),
+        workspaceRefreshOrganizationMemberAuthority(
+          organizationContext.currentOrganizationMember,
+        ),
+      ])
+    : null;
+  // Capture the cheap refresh baseline BEFORE materializing the authoritative
+  // workspace snapshot below. A mutation that commits after this point either
+  // joins the later snapshot or makes the next probe differ from this token;
+  // it can never be represented by the token while missing from the response.
+  const workspaceRefreshToken = hasWorkspaceAccess
+    && actorAccessAuthority?.supported
+    ? await createWorkspaceRefreshToken(contentDb, {
+        workspaceId: workspace.id,
+        actorId: auth.id,
+        ambiguous: actorAccessAuthority.ambiguous,
+        authority: {
+          workspace: semanticRefreshAuthority![0],
+          organization: semanticRefreshAuthority![1],
+          workspaceMember: semanticRefreshAuthority![2],
+          organizationMember: semanticRefreshAuthority![3],
+          actorAccess: actorAccessAuthority.authority,
+          instanceSettings: { authorityVersion: instanceSettings.authorityVersion },
+        },
+      })
+    : undefined;
   const workspaceMembers = hasWorkspaceAccess
     ? sortMembers(await listAll(members.where('workspaceId', '==', workspace.id)))
     : [];
@@ -1197,7 +1619,13 @@ export const POST = defineFunction(async (context) => {
     : currentMember
       ? [currentMember]
       : [];
-  const storedWorkspacePages = await listAll(pages.where('workspaceId', '==', workspace.id));
+  const [storedWorkspacePageRows, teamspaceProjection] = await Promise.all([
+    listAll(pages.where('workspaceId', '==', workspace.id)),
+    teamspacesForBootstrap(contentDb, db, workspace, currentMember, auth.id),
+  ]);
+  const storedWorkspacePages = storedWorkspacePageRows.filter(
+    (page) => page.notionImportStaging !== true,
+  );
   const allWorkspacePages = projectChildPageParentsForBootstrap(
     storedWorkspacePages,
     await childPageProjectionBlocks(blocks, storedWorkspacePages),
@@ -1207,27 +1635,40 @@ export const POST = defineFunction(async (context) => {
   const sharedPermissions = hasWorkspaceAccess
     ? await listAll(permissions.where('workspaceId', '==', workspace.id))
     : directPermissions;
-  let workspacePages = await visiblePagesForBootstrap(
-    allWorkspacePages,
-    directPermissions,
-    workspace,
-    hasWorkspaceAccess,
-    preferredPageId,
-  );
-  if (preferredPageId && workspacePages.some((page) => page.id === preferredPageId)) {
-    const layoutHints = await rootBlockLayoutHintsForPage(blocks, preferredPageId);
-    workspacePages = workspacePages.map((page) =>
-      page.id === preferredPageId ? { ...page, layoutHints } : page,
-    );
-  }
-  const pageRoles = pageRolesForBootstrap(
-    workspacePages,
+  const allPageRoles = pageRolesForBootstrap(
     allWorkspacePages,
     directPermissions,
     workspace,
     currentMember,
     auth.id,
     hasWorkspaceAccess,
+    teamspaceProjection.authorityById,
+  );
+  let workspacePages = visiblePagesForBootstrap(
+    allWorkspacePages,
+    allPageRoles,
+    preferredPageId,
+  );
+  if (
+    preferredPageId
+    && allWorkspacePages.some((page) => page.id === preferredPageId)
+    && !workspacePages.some((page) => page.id === preferredPageId)
+  ) {
+    return Response.json(
+      { code: 403, message: 'You do not have access to this page.' },
+      { status: 403 },
+    );
+  }
+  if (preferredPageId && workspacePages.some((page) => page.id === preferredPageId)) {
+    const layoutHints = await rootBlockLayoutHintsForPage(blocks, preferredPageId);
+    workspacePages = workspacePages.map((page) =>
+      page.id === preferredPageId ? { ...page, layoutHints } : page,
+    );
+  }
+  const pageRoles = Object.fromEntries(
+    workspacePages.flatMap((page) => (
+      allPageRoles[page.id] ? [[page.id, allPageRoles[page.id]]] : []
+    )),
   );
   const canReadOrganization = !!organizationContext.currentOrganizationMember;
   const currentOrganizationRole =
@@ -1238,6 +1679,20 @@ export const POST = defineFunction(async (context) => {
       : null;
   const canReadOrganizationDirectory =
     !!currentOrganizationRole && organizationAdminRoles.has(currentOrganizationRole);
+  const returnedOrganizationMembers = canReadOrganizationDirectory && organizationContext.organization
+    ? sortOrganizationMembers(
+        await listAll(
+          organizationMembers.where('organizationId', '==', organizationContext.organization.id),
+        ),
+      )
+    : [];
+  const returnedOrganizationGroups = canReadOrganizationDirectory && organizationContext.organization
+    ? await organizationGroupsForBootstrap(
+        db,
+        organizationContext.organization.id,
+        returnedOrganizationMembers,
+      )
+    : [];
 
   // Server-computed watermark: the max updatedAt across the visible set, so
   // client clocks never participate in the comparison. Returned as the true
@@ -1269,11 +1724,6 @@ export const POST = defineFunction(async (context) => {
   // server-console entry point in the sidebar so non-admins are not offered a
   // console that fails to load for them. (Master + explicitly-granted admins;
   // the backend still enforces access on every server-admin call.)
-  const instanceSettings = await getInstanceSettings(db);
-  const isInstanceAdmin =
-    instanceSettings.masterUserId === auth.id ||
-    (Array.isArray(instanceSettings.instanceAdminUserIds) &&
-      instanceSettings.instanceAdminUserIds.includes(auth.id));
   const common = {
     userId: auth.id,
     isInstanceAdmin,
@@ -1283,13 +1733,8 @@ export const POST = defineFunction(async (context) => {
     currentOrganizationMember: canReadOrganization
       ? organizationContext.currentOrganizationMember
       : null,
-    organizationMembers: canReadOrganizationDirectory && organizationContext.organization
-      ? sortOrganizationMembers(
-          await listAll(
-            organizationMembers.where('organizationId', '==', organizationContext.organization.id),
-          ),
-        )
-      : [],
+    organizationMembers: returnedOrganizationMembers,
+    organizationGroups: returnedOrganizationGroups,
     organizationDomains: canReadOrganizationDirectory && organizationContext.organization
       ? sortOrganizationDomains(
           await listAll(
@@ -1300,13 +1745,21 @@ export const POST = defineFunction(async (context) => {
     currentMember,
     members: returnedWorkspaceMembers,
     workspaces: await accessibleWorkspaces(admin, db, workspaces, members, auth.id, authEmail),
+    teamspaces: teamspaceProjection.teamspaces,
+    discoverableTeamspaces: teamspaceProjection.discoverableTeamspaces,
+    teamspaceSettings: teamspaceProjection.settings,
     pageRoles,
     sharedPageIds: sharedPageIdsForBootstrap(workspacePages, sharedPermissions),
     pagesSyncedAt,
     changesSyncedAt,
+    workspaceRefreshToken,
   };
   if (pagesSince) {
-    if (canUseChangesDeltaMode(hasWorkspaceAccess, changeFeed)) {
+    if (canUseChangesDeltaMode(
+      hasWorkspaceAccess,
+      changeFeed,
+      teamspaceProjection.authorityById.size === 0,
+    )) {
       // O(changes) mode: tombstones convey deletions; visibility could not
       // have shifted (no permission writes), so no id list is needed. Gated on
       // full workspace access — the change feed carries workspace-wide ids and

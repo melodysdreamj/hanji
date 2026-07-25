@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Adăugați comentariu",
+    "addLink": "Adăugați link",
+    "blockColor": "Aplică ultima culoare folosită",
+    "bold": "Aldin",
+    "copyPageLink": "Copiază linkul paginii",
+    "findInPage": "Caută în această pagină",
+    "inlineCode": "Cod inline",
+    "italic": "Cursiv",
+    "moveBlock": "Mută blocul în altă pagină",
+    "moveBlockDown": "Mută blocul mai jos",
+    "moveBlockUp": "Mută blocul mai sus",
+    "movePage": "Mută pagina curentă",
+    "navigateBack": "Înapoi",
+    "navigateForward": "Înainte",
+    "newPage": "Pagină nouă",
+    "openBlockMenu": "Deschide acțiunile blocului",
+    "openKeyboardShortcuts": "Deschide tastele rapide",
+    "openParentPage": "Deschide pagina părinte",
+    "quickFind": "Căutare rapidă",
+    "strikethrough": "Tăiat",
+    "toggleAllToggles": "Extinde sau restrânge toate comutatoarele",
+    "toggleSidebar": "Comută bara laterală",
+    "toggleTheme": "Comută modul întunecat",
+    "underline": "Subliniat"
+  },
+  "categories": {
+    "createStyle": "Creare și stil",
+    "editMove": "Editare și mutare",
+    "popular": "Populare"
+  },
+  "categoriesLabel": "Categorii de taste rapide",
+  "close": "Închide",
+  "closeBackdrop": "Închide tastele rapide",
+  "empty": "Nicio tastă rapidă găsită",
+  "keysFor": "Taste pentru {{action}}",
+  "or": "sau",
+  "searchLabel": "Căutare comenzi rapide",
+  "searchPlaceholder": "Caută comenzi rapide...",
+  "searchResults": "Rezultatele căutării",
+  "searchTerms": {
+    "toggleTheme": "temă luminos întunecat aspect"
+  },
+  "title": "Comenzi rapide"
+}

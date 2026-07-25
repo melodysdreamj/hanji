@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} nya uppdateringar",
     "unreadOfTotal": "{{unread}} olästa av {{total}} uppdateringar",
     "updateType": "Uppdateringstyp",
-    "updates": "Uppdateringar",
-    "modeUpdates": "Uppdateringar",
-    "modeChats": "Chattar",
-    "inboxMode": "Inkorgsläge"
+    "updates": "Uppdateringar"
   },
   "time": {
     "justNow": "Just nu",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versioner",
     "versionsAgo": "{{count}} versioner sedan",
     "versionsAhead": "{{count}} versioner framåt",
-    "versionsAria": "Versioner"
+    "versionsAria": "Versioner",
+    "emptyBlock": "Tomt block",
+    "emptyPreview": "Denna version har inget sidinnehåll.",
+    "previewAria": "Skrivskyddad förhandsvisning av sidversion",
+    "previewingCurrent": "Visar aktuell sida",
+    "previewingSnapshot": "Visar tidigare version",
+    "previewOnlyHint": "Att välja en version förhandsvisar den bara. Den aktuella sidan ändras först efter återställning.",
+    "restoreThisVersion": "Återställ",
+    "restoring": "Återställer...",
+    "versionHistory": "Versionshistorik"
   },
   "badges": {
     "comment": "Kommentar",
@@ -67,7 +73,8 @@
     "referenceMention": "Nämnde {{title}} · {{preview}}",
     "referenceLink": "Länkad till {{title}} · {{preview}}",
     "unreadDot": "Oläst",
-    "workspaceUpdate": "Uppdatering av arbetsyta"
+    "workspaceUpdate": "Uppdatering av arbetsyta",
+    "bySelf": "av dig"
   },
   "empty": {
     "allCaughtUp": "Du är helt uppdaterad.",

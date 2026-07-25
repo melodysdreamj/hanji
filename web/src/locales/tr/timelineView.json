@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Bağımlılıklar:",
     "hint": "ilişki özelliği ekleyin",
-    "relationPropertyAriaLabel": "Bağımlılık ilişki özelliği"
+    "relationPropertyAriaLabel": "Bağımlılık ilişki özelliği",
+    "makeDependOn": "{{title}} öğesinin {{predecessor}}'a bağımlı olmasını sağla",
+    "startFrom": "{{title}}'den bağımlılık başlat"
   },
   "toolbar": {
     "today": "Bugün",

@@ -38,7 +38,7 @@
   "moveTo": "Matsa zuwa",
   "exporting": "Ana fitarwa…",
   "exportAsMarkdown": "Fitarwa azaman Markdown",
-  "exportAsHanji": "Fitarwa azaman fayil ɗin Hanji",
+  "exportAsHanji": "Fitar da Hanji JSON (ban da fayiloli)",
   "importing": "Ana shigo da…",
   "importMarkdown": "Shigo da Markdown",
   "unlockPage": "Buɗe shafin",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "An kasa sabunta dama",
     "removedFromAccessList": "An cire daga jerin damar shiga",
     "couldntRemoveAccess": "An kasa cire dama",
-    "couldntLoadAccessList": "An kasa loda jerin dama"
+    "couldntLoadAccessList": "An kasa loda jerin dama",
+    "couldntExportHanjiArchive": "An kasa fitar da Hanji archive.",
+    "exportedHanjiArchive": "An fitar da Hanji archive tare da fayiloli."
   },
   "user": "Mai amfani",
   "whoHasAccess": "Wanene ke da damar shiga",
   "workspace": "Wurin aiki",
   "workspaceCount_one": "{{count}} wurin aiki",
   "workspaceCount_other": "{{count}} wuraren aiki",
-  "you": "Kai"
+  "you": "Kai",
+  "exportAsHanjiArchive": "Fitar da Hanji archive (tare da fayiloli)",
+  "turnIntoWiki": "Mai da zuwa wiki",
+  "undoWiki": "Soke wiki",
+  "wikiCreated": "An mai da shafin zuwa wiki",
+  "wikiPageSettings": "Saitunan shafin wiki",
+  "wikiUndone": "An cire wiki; an kiyaye abun cikin shafin",
+  "wikiUpdateFailed": "An kasa sabunta wiki"
 }

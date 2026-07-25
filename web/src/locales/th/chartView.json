@@ -4,7 +4,22 @@
     "sum": "รวม",
     "average": "ค่าเฉลี่ย",
     "min": "ต่ำสุด",
-    "max": "สูงสุด"
+    "max": "สูงสุด",
+    "checked": "ที่เลือก",
+    "count_values": "นับค่า",
+    "date_range": "ช่วงวันที่",
+    "earliest_date": "วันที่เร็วที่สุด",
+    "empty": "นับค่าว่าง",
+    "latest_date": "วันที่ช้าที่สุด",
+    "median": "มัธยฐาน",
+    "not_empty": "นับค่าที่ไม่ว่าง",
+    "percent_checked": "เปอร์เซ็นต์ที่เลือก",
+    "percent_empty": "เปอร์เซ็นต์ค่าว่าง",
+    "percent_not_empty": "เปอร์เซ็นต์ค่าที่ไม่ว่าง",
+    "percent_unchecked": "เปอร์เซ็นต์ที่ไม่ได้เลือก",
+    "range": "ช่วง",
+    "unchecked": "ที่ไม่ได้เลือก",
+    "unique": "นับค่าที่ไม่ซ้ำ"
   },
   "chartAria": "แผนภูมิ {{name}}",
   "chartType": "ประเภทแผนภูมิ",
@@ -27,5 +42,9 @@
   "untitledProperty": "ไม่มีชื่อ",
   "valueProperty": "คุณสมบัติค่า",
   "xAxis": "แกน X",
-  "yAxis": "แกน Y"
+  "yAxis": "แกน Y",
+  "dateRangeDays": "{{count}} วัน",
+  "missingProperty": "คุณสมบัติที่บันทึกไว้",
+  "unsupportedAggregateDesc": "ไม่สามารถคำนวณ {{aggregate}} จาก {{property}} ได้ เลือกคุณสมบัติหรือการคำนวณที่เข้ากันได้",
+  "unsupportedAggregateTitle": "ไม่สามารถใช้การคำนวณแผนภูมินี้ได้"
 }

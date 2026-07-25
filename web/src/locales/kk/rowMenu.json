@@ -35,7 +35,7 @@
     "rename": "Қайта атау",
     "addPageInside": "Ішіне бет қосу",
     "exportAsMarkdown": "Markdown ретінде экспорттау",
-    "exportAsHanjiFile": "Hanji файлы ретінде экспорттау",
+    "exportAsHanjiFile": "Hanji JSON экспорттау (файлдарсыз)",
     "importMarkdown": "Markdown импорттау",
     "importing": "Импорттау...",
     "unlockPage": "Бетті құлпынан босату",
@@ -44,7 +44,8 @@
     "removeVerification": "Растауды алып тастау",
     "verifyPage": "Бетті растау",
     "customizePage": "Бетті теңшеу",
-    "undo": "Болдырмау"
+    "undo": "Болдырмау",
+    "exportAsHanjiArchive": "Hanji мұрағатын экспорттау (файлдарды қоса)"
   },
   "customize": {
     "summaryDefault": "Әдепкі",
@@ -101,6 +102,8 @@
     "movedToTrash": "Себетке жылжытылды",
     "restoredPage": "Парақ қалпына келтірілді",
     "couldntRestorePage": "Бетті қалпына келтіру мүмкін болмады",
-    "couldntMoveToTrash": "Қоқысқа жылжыту мүмкін болмады"
+    "couldntMoveToTrash": "Қоқысқа жылжыту мүмкін болмады",
+    "couldntExportHanjiArchive": "Hanji мұрағатын экспорттау мүмкін болмады.",
+    "exportedHanjiArchive": "Файлдары бар Hanji мұрағаты экспортталды."
   }
 }

@@ -4,7 +4,22 @@
     "sum": "ആകെ",
     "average": "ശരാശരി",
     "min": "കുറഞ്ഞത്",
-    "max": "പരമാവധി"
+    "max": "പരമാവധി",
+    "checked": "ചെക്ക് ചെയ്തവ",
+    "count_values": "മൂല്യ എണ്ണം",
+    "date_range": "തീയതി ശ്രേണി",
+    "earliest_date": "ഏറ്റവും പഴയ തീയതി",
+    "empty": "ശൂന്യ എണ്ണം",
+    "latest_date": "ഏറ്റവും പുതിയ തീയതി",
+    "median": "മധ്യമം",
+    "not_empty": "ശൂന്യമല്ലാത്ത എണ്ണം",
+    "percent_checked": "ചെക്ക് ചെയ്ത ശതമാനം",
+    "percent_empty": "ശൂന്യ ശതമാനം",
+    "percent_not_empty": "ശൂന്യമല്ലാത്ത ശതമാനം",
+    "percent_unchecked": "ചെക്ക് ചെയ്യാത്ത ശതമാനം",
+    "range": "ശ്രേണി",
+    "unchecked": "ചെക്ക് ചെയ്യാത്തവ",
+    "unique": "അതുല്യ എണ്ണം"
   },
   "chartAria": "{{name}} ചാർട്ട്",
   "chartType": "ചാർട്ട് തരം",
@@ -27,5 +42,9 @@
   "untitledProperty": "ശീർഷകമില്ലാത്ത",
   "valueProperty": "മൂല്യ പ്രോപ്പർട്ടി",
   "xAxis": "X-അക്ഷം",
-  "yAxis": "Y-അക്ഷം"
+  "yAxis": "Y-അക്ഷം",
+  "dateRangeDays": "{{count}} ദിവസം",
+  "missingProperty": "സംരക്ഷിച്ച പ്രോപ്പർട്ടി",
+  "unsupportedAggregateDesc": "{{aggregate}} {{property}} എന്നതിൽ നിന്ന് കണക്കാക്കാൻ കഴിയില്ല. അനുയോജ്യമായ പ്രോപ്പർട്ടി അല്ലെങ്കിൽ കണക്കുകൂട്ടൽ തിരഞ്ഞെടുക്കുക.",
+  "unsupportedAggregateTitle": "ഈ ചാർട്ട് കണക്കുകൂട്ടൽ ലഭ്യമല്ല"
 }

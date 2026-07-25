@@ -51,7 +51,14 @@
     "range": "範圍",
     "earliest_date": "最早日期",
     "latest_date": "最晚日期",
-    "date_range": "日期範圍"
+    "date_range": "日期範圍",
+    "count": "全部計數",
+    "count_per_group": "每組計數",
+    "empty": "空值計數",
+    "not_empty": "非空值計數",
+    "percent_per_group": "每組百分比",
+    "show_unique": "顯示唯一值",
+    "unique": "唯一值計數"
   },
   "undo": "復原",
   "untitled": "未命名",

@@ -92,5 +92,8 @@
     "සිකු",
     "සෙන"
   ],
-  "you": "ඔබ"
+  "you": "ඔබ",
+  "buttonExecutionFailed": "බොත්තම ක්‍රියාත්මක කළ නොහැකි විය.",
+  "loadingMoreRelations": "තවත් සම්බන්ධතා පූරණය වෙමින්...",
+  "loadMoreRelations": "තවත් සම්බන්ධතා පූරණය කරන්න"
 }

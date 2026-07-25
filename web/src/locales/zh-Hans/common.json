@@ -8,7 +8,8 @@
     "delete": "删除",
     "clearAll": "全部清除",
     "done": "完成",
-    "add": "添加"
+    "add": "添加",
+    "reportIssue": "报告问题"
   },
   "labels": {
     "untitled": "无标题"

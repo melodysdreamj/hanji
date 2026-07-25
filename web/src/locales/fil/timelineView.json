@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Mga dependency:",
     "hint": "magdagdag ng relation property",
-    "relationPropertyAriaLabel": "Property ng dependency relation"
+    "relationPropertyAriaLabel": "Property ng dependency relation",
+    "makeDependOn": "Gawing nakadepende ang {{title}} sa {{predecessor}}",
+    "startFrom": "Simulan ang dependency mula sa {{title}}"
   },
   "toolbar": {
     "today": "Ngayon",

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} visszahivatkozás",
-    "count_other": "{{count}} visszahivatkozás"
+    "count_other": "{{count}} visszahivatkozás",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlink"
   },
   "header": {
     "title": "Linkelt említések"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} említés",
     "mention_other": "{{count}} említés",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} link"
+    "link_other": "{{count}} link",
+    "loaded": "Betöltve: {{summary}}"
   },
   "kind": {
     "mention": "Említés",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} további visszahivatkozás",
-    "count_other": "{{count}} további visszahivatkozás"
+    "count_other": "{{count}} további visszahivatkozás",
+    "load": "További backlinkek betöltése",
+    "loading": "Backlinkek betöltése…",
+    "search": "Backlinkek keresése"
   }
 }

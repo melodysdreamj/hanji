@@ -7,7 +7,8 @@
   "pageMissingSave": "Stránku sa nepodarilo nájsť, preto sa vaše zmeny nepodarilo uložiť.",
   "saveFailed": "Vaše zmeny sa nepodarilo uložiť.",
   "sessionExpired": "Vaša relácia vypršala alebo požiadavku nebolo možné overiť. Skúste to znova.",
-  "blockConflictSave": "Tento blok bol upravený na inom zariadení, preto vaša offline zmena nebola aplikovaná.",
+  "blockConflictSave": "Čakajúca úprava sa prekrýva s najnovšou verziou servera, takže ju nebolo možné automaticky zlúčiť.",
   "blockConflictKeepMine": "Použiť moju verziu",
-  "blockMoveCommentsSkipped": "Blok bol presunutý, ale jeho komentáre sa nepodarilo presunúť s ním."
+  "blockMoveCommentsSkipped": "Blok bol presunutý, ale jeho komentáre sa nepodarilo presunúť s ním.",
+  "conflictSave": "Tento obsah sa zmenil pred dokončením ukladania, takže úpravu nebolo možné uložiť."
 }

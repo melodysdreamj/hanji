@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Dependențe:",
     "hint": "adaugă o proprietate de relație",
-    "relationPropertyAriaLabel": "Proprietatea de relație pentru dependențe"
+    "relationPropertyAriaLabel": "Proprietatea de relație pentru dependențe",
+    "makeDependOn": "Fă ca {{title}} să depindă de {{predecessor}}",
+    "startFrom": "Pornește dependența de la {{title}}"
   },
   "toolbar": {
     "today": "Astăzi",

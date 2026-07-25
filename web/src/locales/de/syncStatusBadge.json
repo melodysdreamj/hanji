@@ -6,5 +6,6 @@
   "unreachable": "Server nicht erreichbar",
   "unreachablePending_one": "Server nicht erreichbar · {{count}} Änderung ausstehend",
   "unreachablePending_other": "Server nicht erreichbar · {{count}} Änderungen ausstehend",
-  "retryHint": "Klicken zum erneuten Versuchen"
+  "retryHint": "Klicken zum erneuten Versuchen",
+  "confirmed": "Auf Server gespeichert"
 }

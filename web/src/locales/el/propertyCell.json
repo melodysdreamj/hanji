@@ -92,5 +92,8 @@
     "Π",
     "Σ"
   ],
-  "you": "Εγώ"
+  "you": "Εγώ",
+  "buttonExecutionFailed": "Αδυναμία εκτέλεσης του κουμπιού.",
+  "loadingMoreRelations": "Φόρτωση περισσότερων σχέσεων...",
+  "loadMoreRelations": "Φόρτωση περισσότερων σχέσεων"
 }

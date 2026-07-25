@@ -92,5 +92,8 @@
     "Pe",
     "La"
   ],
-  "you": "Sinä"
+  "you": "Sinä",
+  "buttonExecutionFailed": "Painiketta ei voitu suorittaa.",
+  "loadingMoreRelations": "Ladataan lisää suhteita...",
+  "loadMoreRelations": "Lataa lisää suhteita"
 }

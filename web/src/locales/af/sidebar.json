@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Maak werkspasie kieslys oop",
   "closeWorkspaceMenu": "Maak werkruimte-kieslys toe",
   "workspaceMenu": "Werkruimte kieslys",
-  "exportWorkspace": "Voer werkspasie uit",
+  "exportWorkspace": "Voer werkspasie JSON uit (lêers uitgesluit)",
   "exportedWorkspace": "Werkspasie uitgevoer as 'n Hanji-lêer.",
   "exportedWorkspaceWithPlaceholders": "Werkspasie uitgevoer as 'n Hanji-lêer — aanhangsels is as plekhouers gelaat.",
   "couldntExportWorkspace": "Kon nie werkruimte uitvoer nie.",
@@ -76,5 +76,12 @@
     "later": "Miskien later",
     "note": "Jy kan altyd later hiermee begin vanaf Invoer in die systaaf.",
     "title": "Bring jou Notion-werkruimte na Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Voeg bladsy by {{name}}",
+  "couldntExportWorkspaceArchive": "Kon nie werkspasie-argief uitvoer nie.",
+  "exportedWorkspaceArchive": "Werkspasie-argief met lêers uitgevoer.",
+  "exportWorkspaceArchive": "Voer werkspasie-argief uit (lêers ingesluit)",
+  "joinTeamspaces": "Sluit aan by spanspasies",
+  "keyboardShortcuts": "Sneltoetse",
+  "teamspacePages": "{{name}} bladsye"
 }

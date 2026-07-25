@@ -35,7 +35,7 @@
     "rename": "Переименовать",
     "addPageInside": "Добавить страницу внутрь",
     "exportAsMarkdown": "Экспортировать как Markdown",
-    "exportAsHanjiFile": "Экспортировать как файл Hanji",
+    "exportAsHanjiFile": "Экспортировать Hanji JSON (без файлов)",
     "importMarkdown": "Импортировать Markdown",
     "importing": "Импортируется...",
     "unlockPage": "Разблокировать страницу",
@@ -44,7 +44,8 @@
     "removeVerification": "Удалить верификацию",
     "verifyPage": "Верифицировать страницу",
     "customizePage": "Настроить страницу",
-    "undo": "Отменить"
+    "undo": "Отменить",
+    "exportAsHanjiArchive": "Экспортировать архив Hanji (с файлами)"
   },
   "customize": {
     "summaryDefault": "По умолчанию",
@@ -101,6 +102,8 @@
     "movedToTrash": "Перемещено в корзину",
     "restoredPage": "Страница восстановлена",
     "couldntRestorePage": "Не удалось восстановить страницу",
-    "couldntMoveToTrash": "Не удалось переместить в корзину"
+    "couldntMoveToTrash": "Не удалось переместить в корзину",
+    "couldntExportHanjiArchive": "Не удалось экспортировать архив Hanji.",
+    "exportedHanjiArchive": "Экспортирован архив Hanji с файлами."
   }
 }

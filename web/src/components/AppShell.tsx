@@ -1,14 +1,16 @@
 "use client";
 
 import { lazy, Suspense, type CSSProperties, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { isPublicSharePath, routeInfoFromPath, usePathname, useRouter } from "@/lib/router";
+import { isPublicAnonymousPath, isPublicFormPath, routeInfoFromPath, usePathname, useRouter } from "@/lib/router";
 import { copyText } from "@/lib/clipboard";
 import { useTranslation } from "react-i18next";
 import { absolutePageUrl, pageHref } from "@/lib/navigation";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
 import { flushAllPending, handleLocalUnlock, readLastUserId, useStore } from "@/lib/store";
 import { resolveTheme, useTheme } from "@/lib/theme";
+import { usePublicSiteHost } from "@/lib/publicSiteHost";
 import LocalLockGate from "./LocalLockGate";
 import { ProductLoadingScreen } from "./ProductLoadingScreen";
 import { Sidebar } from "./Sidebar";
@@ -60,9 +62,16 @@ function workspaceSlugFromPath(pathname: string) {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation(["appShell", "common"]);
+  const { t } = useTranslation(["appShell", "common", "pageView", "formView"]);
   const router = useRouter();
+  const pathname = usePathname();
+  const siteHost = usePublicSiteHost();
+  const publicShareRoute = isPublicAnonymousPath(pathname) || (siteHost.custom && pathname === "/");
+  const publicFormRoute = isPublicFormPath(pathname);
+  const workspaceSlug = workspaceSlugFromPath(pathname);
+  const activePageId = pageIdFromPath(pathname);
   const ready = useStore((s) => s.ready);
+  const bootstrapFailure = useStore((s) => s.bootstrapFailure);
   const bootstrap = useStore((s) => s.bootstrap);
   const refreshPageAccess = useStore((s) => s.refreshPageAccess);
   const sidebarOpen = useStore((s) => s.sidebarOpen);
@@ -70,7 +79,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const searchOpen = useStore((s) => s.searchOpen);
   const commentPanel = useStore((s) => s.commentPanel);
   const updatesOpen = useStore((s) => s.updatesOpen);
-  const pagesById = useStore((s) => s.pagesById);
+  const activePage = useStore((s) => activePageId ? s.pagesById[activePageId] : undefined);
+  const activeParentPageId = activePage?.parentId &&
+    (activePage.parentType === "page" || activePage.parentType === "database")
+    ? activePage.parentId
+    : undefined;
+  const activeParentPage = useStore((s) =>
+    activeParentPageId ? s.pagesById[activeParentPageId] : undefined
+  );
   const userId = useStore((s) => s.userId);
   // The lock gate must be able to appear BEFORE bootstrap resolves a user
   // (offline boots), so fall back to the remembered id.
@@ -87,10 +103,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [moveDialogPageId, setMoveDialogPageId] = useState<string | null>(null);
-  const pathname = usePathname();
-  const publicShareRoute = isPublicSharePath(pathname);
-  const workspaceSlug = workspaceSlugFromPath(pathname);
-  const activePageId = pageIdFromPath(pathname);
   const mainRef = useRef<HTMLElement>(null);
   const previousPathnameRef = useRef(pathname);
   const navigationCleanupPathnameRef = useRef(pathname);
@@ -128,23 +140,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     bootstrap({ workspaceSlug, pageId: activePageId }).catch((e) => {
       if (mounted) setError(e instanceof Error ? e.message : String(e));
     });
-    const flush = () => void flushAllPending();
-    const flushWhenHidden = () => {
-      if (document.visibilityState === "hidden") flush();
-    };
-    window.addEventListener("beforeunload", flush);
-    window.addEventListener("blur", flush);
-    window.addEventListener("pagehide", flush);
-    document.addEventListener("visibilitychange", flushWhenHidden);
     return () => {
       mounted = false;
-      window.removeEventListener("beforeunload", flush);
-      window.removeEventListener("blur", flush);
-      window.removeEventListener("pagehide", flush);
-      document.removeEventListener("visibilitychange", flushWhenHidden);
-      void flushAllPending();
     };
   }, [activePageId, bootstrap, publicShareRoute, workspaceSlug]);
+
+  useEffect(() => {
+    if (publicShareRoute || !userId) return;
+    const flushWhenHidden = () => {
+      if (document.visibilityState !== "hidden") return;
+      // This is an ordinary authenticated request, not a close-time delivery
+      // guarantee. The durable outbox remains authoritative if it is cut off.
+      void flushAllPending().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", flushWhenHidden);
+    return () => document.removeEventListener("visibilitychange", flushWhenHidden);
+  }, [publicShareRoute, userId]);
 
   useEffect(() => {
     if (publicShareRoute || !activePageId) return;
@@ -240,55 +251,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     function onKeyDown(e: KeyboardEvent) {
       if (e.defaultPrevented) return;
       if (publicShareRoute) return;
-      const key = e.key.toLowerCase();
-      const mod = e.metaKey || e.ctrlKey;
       const target = e.target as HTMLElement | null;
-      if (
-        mod &&
-        !e.shiftKey &&
-        !e.altKey &&
-        !e.repeat &&
-        (key === "[" || key === "]" || e.code === "BracketLeft" || e.code === "BracketRight")
-      ) {
+      if (matchesKeyboardShortcut("navigateBack", e)) {
         e.preventDefault();
-        if (key === "[" || e.code === "BracketLeft") router.back();
-        else router.forward();
-      } else if (mod && !e.shiftKey && !e.altKey && (key === "k" || key === "p")) {
+        router.back();
+      } else if (matchesKeyboardShortcut("navigateForward", e)) {
+        e.preventDefault();
+        router.forward();
+      } else if (matchesKeyboardShortcut("quickFind", e)) {
         e.preventDefault();
         setSearchOpen(true);
-      } else if (mod && !e.shiftKey && !e.altKey && !e.repeat && key === "l") {
-        const activePageId = pageIdFromPath(pathname);
-        const activePage = activePageId ? pagesById[activePageId] : undefined;
+      } else if (matchesKeyboardShortcut("copyPageLink", e)) {
         if (!activePage || activePage.inTrash) return;
         e.preventDefault();
         const url = absolutePageUrl(activePage.id, { preserveCurrentSearch: true, omitSearchParams: ["p", "pm"] });
         void copyText(url).then((ok) => {
           notify(ok ? t("appShell:copiedLink") : t("appShell:couldntCopyLink"), ok ? "success" : "error");
         });
-      } else if (mod && e.shiftKey && !e.altKey && key === "l") {
+      } else if (matchesKeyboardShortcut("toggleTheme", e)) {
         e.preventDefault();
         const next = resolveTheme(themePref) === "dark" ? "light" : "dark";
         setThemePref(next);
         notify(next === "dark" ? t("appShell:darkMode") : t("appShell:lightMode"), "success");
-      } else if (mod && e.shiftKey && !e.altKey && key === "u") {
-        const activePageId = pageIdFromPath(pathname);
-        const activePage = activePageId ? pagesById[activePageId] : undefined;
-        const parentPage =
-          activePage?.parentId &&
-          (activePage.parentType === "page" || activePage.parentType === "database")
-            ? pagesById[activePage.parentId]
-            : undefined;
-        if (!parentPage || parentPage.inTrash) return;
+      } else if (matchesKeyboardShortcut("openParentPage", e)) {
+        if (!activeParentPage || activeParentPage.inTrash) return;
         e.preventDefault();
-        router.push(pageHref(parentPage.id));
-      } else if (mod && e.shiftKey && !e.altKey && !e.repeat && key === "p") {
+        router.push(pageHref(activeParentPage.id));
+      } else if (matchesKeyboardShortcut("movePage", e)) {
         if (isTextEntryTarget(target) || searchOpen || commentPanel || updatesOpen || moveDialogPageId) return;
-        const activePageId = pageIdFromPath(pathname);
-        const activePage = activePageId ? pagesById[activePageId] : undefined;
         if (!activePage || activePage.inTrash) return;
         e.preventDefault();
         setMoveDialogPageId(activePage.id);
-      } else if (mod && !e.altKey && !e.repeat && (e.code === "Backslash" || key === "\\")) {
+      } else if (matchesKeyboardShortcut("toggleSidebar", e)) {
         // Don't hijack a literal backslash typed inside an editable field.
         if (isTextEntryTarget(target)) return;
         e.preventDefault();
@@ -299,11 +293,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
+    activePage,
+    activeParentPage,
     commentPanel,
     isMobile,
     t,
     notify,
-    pagesById,
     pathname,
     publicShareRoute,
     router,
@@ -363,13 +358,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.localStorage.removeItem(SIDEBAR_WIDTH_KEY);
   }
 
-  if (error && !publicShareRoute) {
+  const routeBootstrapFailure = bootstrapFailure && (
+    bootstrapFailure.pageId
+      ? bootstrapFailure.pageId === activePageId
+      : bootstrapFailure.workspaceSlug
+        ? bootstrapFailure.workspaceSlug === workspaceSlug
+        : !activePageId && !workspaceSlug
+  )
+    ? bootstrapFailure
+    : undefined;
+  const visibleError = error || routeBootstrapFailure?.message || null;
+
+  if (visibleError && !publicShareRoute) {
+    const definitiveRouteDenial =
+      routeBootstrapFailure?.status === 401 ||
+      routeBootstrapFailure?.status === 403 ||
+      routeBootstrapFailure?.status === 404;
     const workspaceRouteError =
       !!workspaceSlug &&
-      /workspace url|workspace access/i.test(error);
+      (definitiveRouteDenial || /workspace url|workspace access/i.test(visibleError));
     const pageRouteError =
       !!activePageId &&
-      /page is unavailable|page access|access to this page|page was not found/i.test(error);
+      (definitiveRouteDenial || /page is unavailable|page access|access to this page|page was not found/i.test(visibleError));
     return (
       <div className={styles.boot}>
         {/* A locked OFFLINE boot lands here (network failed, cache still
@@ -390,7 +400,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 ? t("appShell:workspaceUnavailable")
                 : t("appShell:somethingWentWrong")}
           </strong>
-          <p>{pageRouteError || workspaceRouteError ? error : t("appShell:workspaceLoadTrouble")}</p>
+          <p>
+            {pageRouteError
+              ? t("pageView:pageUnavailableDetail")
+              : workspaceRouteError
+                ? visibleError
+                : t("appShell:workspaceLoadTrouble")}
+          </p>
           <div className={styles.bootActions}>
             <button type="button" className={styles.bootButton} onClick={() => void retryWorkspaceLoad()}>
               {t("appShell:tryAgain")}
@@ -426,20 +442,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const shellBackgroundInert =
     !publicShareRoute &&
     ((isMobile && sidebarOpen) || searchOpen || !!commentPanel || !!moveDialogPageId);
-  const routeLabel = activePageId && pagesById[activePageId]
-    ? pageDisplayTitle(pagesById[activePageId])
+  const routeLabel = activePage
+    ? pageDisplayTitle(activePage)
     : pathname === "/trash"
       ? t("appShell:route.trash")
       : pathname === "/settings" || pathname === "/account"
         ? t("appShell:route.settings")
-        : publicShareRoute
+        : publicFormRoute
+          ? t("formView:title")
+          : publicShareRoute
           ? t("appShell:route.sharedPage")
           : t("appShell:route.home");
 
   return (
     <div
       className={styles.shell}
-      data-public-share={publicShareRoute ? "true" : undefined}
+      data-public-anonymous={publicShareRoute ? "true" : undefined}
       style={shellStyle}
     >
       <a className={styles.skipLink} href="#app-main-content">

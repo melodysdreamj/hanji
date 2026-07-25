@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Breadcrumb",
+  "clearSearch": "Hapus pencarian",
+  "errors": {
+    "not-found": "Situs ini mungkin sudah tidak dipublikasikan atau alamatnya berubah.",
+    "offline": "Periksa koneksi Anda, lalu coba buka situs lagi.",
+    "rate-limited": "Situs ini menerima terlalu banyak permintaan. Tunggu sebentar dan coba lagi.",
+    "unavailable": "Hanji tidak dapat membuka situs ini saat ini. Coba lagi sebentar."
+  },
+  "madeWithHanji": "Dibuat dengan Hanji",
+  "navigation": "Navigasi situs",
+  "noResults": "Tidak ada halaman ditemukan",
+  "outsideSite": "Halaman ini bukan bagian dari situs yang dipublikasikan ini.",
+  "search": "Cari situs ini",
+  "tryAgain": "Coba lagi",
+  "unavailable": "Situs ini tidak tersedia."
+}

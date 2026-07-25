@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} legutóbbi frissítés",
     "unreadOfTotal": "{{total}} frissítésből {{unread}} olvasatlan",
     "updateType": "Frissítés típusa",
-    "updates": "Frissítések",
-    "modeUpdates": "Frissítések",
-    "modeChats": "Csevegések",
-    "inboxMode": "Postafiók mód"
+    "updates": "Frissítések"
   },
   "time": {
     "justNow": "Épp most",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} verzió",
     "versionsAgo": "{{count}} verzióval ezelőtt",
     "versionsAhead": "{{count}} verzióval később",
-    "versionsAria": "Verziók"
+    "versionsAria": "Verziók",
+    "emptyBlock": "Üres blokk",
+    "emptyPreview": "Ennek a verziónak nincs oldaltartalma.",
+    "previewAria": "Csak olvasható oldalverzió előnézete",
+    "previewingCurrent": "Aktuális oldal megtekintése",
+    "previewingSnapshot": "Korábbi verzió megtekintése",
+    "previewOnlyHint": "Egy verzió kiválasztásakor az csak előnézetben látható. Az aktuális oldal csak a Visszaállítás után módosul.",
+    "restoreThisVersion": "Visszaállítás",
+    "restoring": "Visszaállítás...",
+    "versionHistory": "Verzióelőzmények"
   },
   "badges": {
     "comment": "Megjegyzés",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} említés · {{preview}}",
     "referenceLink": "{{title}} hivatkozás · {{preview}}",
     "unreadDot": "Olvasatlan",
-    "workspaceUpdate": "Munkaterület frissítés"
+    "workspaceUpdate": "Munkaterület frissítés",
+    "bySelf": "Te"
   },
   "empty": {
     "allCaughtUp": "Minden naprakész.",

@@ -6,5 +6,6 @@
   "syncing": "Synchronizace · {{count}}",
   "unreachable": "Server nedostupný",
   "unreachablePending_one": "Server nedostupný · {{count}} změna čeká",
-  "unreachablePending_other": "Server nedostupný · {{count}} změn čeká"
+  "unreachablePending_other": "Server nedostupný · {{count}} změn čeká",
+  "confirmed": "Uloženo na server"
 }

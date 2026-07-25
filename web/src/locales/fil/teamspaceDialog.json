@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Sarado",
+    "open": "Bukas",
+    "private": "Pribado"
+  },
+  "add": "Idagdag",
+  "approve": "Aprubahan",
+  "archive": "I-archive ang teamspace",
+  "available": "Maaaring salihan",
+  "choosePrincipal": "Pumili ng tao o grupo",
+  "create": "Gumawa ng teamspace",
+  "deny": "Tanggihan",
+  "error": {
+    "action": "Hindi maisagawa ang teamspace action na iyon.",
+    "load": "Hindi makarga ang mga detalye ng teamspace."
+  },
+  "fields": {
+    "access": "Access",
+    "description": "Paglalarawan",
+    "icon": "Icon",
+    "memberRole": "Pag-access sa pahina ng miyembro",
+    "membersCanEditSidebar": "Maaaring magdagdag at mag-reorder ng mga pahina ang mga miyembro",
+    "membersCanInvite": "Maaaring mag-imbita ang mga miyembro",
+    "name": "Pangalan",
+    "openRole": "Pag-access sa pahina ng bisita"
+  },
+  "governance": "Mga setting ng teamspace",
+  "join": "Sumali",
+  "joined": "Iyong mga teamspace",
+  "loadMore": "Mag-load pa",
+  "manage": "Pamahalaan",
+  "member": "Miyembro",
+  "members": "Mga miyembro",
+  "noneArchived": "Walang naka-archive na mga teamspace.",
+  "noneAvailable": "Walang ibang magagamit na teamspace.",
+  "noneJoined": "Wala ka pang nasasalihang teamspace.",
+  "noRequests": "Walang nakabinbing kahilingan.",
+  "notice": {
+    "approved": "Naaprubahan ang kahilingan.",
+    "archived": "Na-archive ang teamspace.",
+    "created": "Nagawa ang teamspace.",
+    "defaultSet": "Na-update ang default na teamspace.",
+    "denied": "Tinanggihan ang kahilingan.",
+    "joined": "Sumali sa teamspace.",
+    "memberAdded": "Naidagdag ang miyembro.",
+    "memberRemoved": "Inalis ang miyembro.",
+    "memberUpdated": "Na-update ang tungkulin ng miyembro.",
+    "policySaved": "Na-update ang patakaran sa paggawa ng teamspace.",
+    "requested": "Hiniling ang pag-access.",
+    "restored": "Na-restore ang teamspace.",
+    "saved": "Na-update ang teamspace."
+  },
+  "notOwner": "Tanging ang may-ari ng teamspace o administrator ng workspace ang maaaring mamahala ng teamspace na ito.",
+  "open": "Buksan",
+  "owner": "May-ari",
+  "ownersOnlyCreate": "Tanging mga may-ari ng workspace lang ang makakagawa ng teamspace",
+  "remove": "Alisin",
+  "replacement": "Pumili ng kapalit na default teamspace",
+  "request": "Humiling ng access",
+  "requestPending": "Nakabinbin ang request",
+  "requests": "Mga request ng access",
+  "restore": "Ibalik",
+  "roles": {
+    "comment": "Puwedeng magkomento",
+    "edit": "Puwedeng mag-edit",
+    "full_access": "Buong access",
+    "view": "Puwedeng tingnan"
+  },
+  "save": "I-save ang mga pagbabago",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Gawing default teamspace",
+  "subtitle": "Ayusin ang pinagsasaluhang gawain at kontrolin kung sino ang makakatuklas o sasali.",
+  "tabs": {
+    "archived": "Naka-archive",
+    "browse": "Browse",
+    "create": "Bagong teamspace",
+    "label": "Mga view ng teamspace",
+    "manage": "Pamahalaan"
+  },
+  "title": "Mga Teamspace"
+}

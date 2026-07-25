@@ -14,10 +14,7 @@
     "recentUpdates_other": "최근 업데이트 {{count}}개",
     "unreadOfTotal": "업데이트 {{total}}개 중 {{unread}}개 안 읽음",
     "updateType": "업데이트 유형",
-    "updates": "업데이트",
-    "modeUpdates": "알림",
-    "modeChats": "대화",
-    "inboxMode": "수신함 모드"
+    "updates": "업데이트"
   },
   "time": {
     "justNow": "방금 전",
@@ -28,6 +25,8 @@
     "blockCount_other": "블록 {{count}}개",
     "currentVersion": "현재 버전",
     "currentVersionOnly": "현재 버전만 있어요",
+    "emptyBlock": "빈 블록",
+    "emptyPreview": "이 버전에는 페이지 내용이 없어요.",
     "next": "다음",
     "nextVersion": "다음 버전",
     "noVersionPrevious": "이전 버전이 없어요",
@@ -36,13 +35,20 @@
     "previous": "이전",
     "previousSnapshots_other": "이전 스냅샷 {{count}}개",
     "previousVersion": "이전 버전",
+    "previewAria": "읽기 전용 페이지 버전 미리보기",
+    "previewingCurrent": "현재 페이지 보는 중",
+    "previewingSnapshot": "과거 버전 미리보기",
+    "previewOnlyHint": "버전을 선택해도 미리보기만 바뀝니다. 복원을 눌러야 현재 페이지가 변경됩니다.",
+    "restoreThisVersion": "복원",
+    "restoring": "복원 중...",
     "restoredPrevious": "이전 버전으로 복원했어요",
     "restoredNext": "다음 버전으로 복원했어요",
     "restoredVersions": "버전 {{count}}개를 복원했어요",
     "versionCount_other": "버전 {{count}}개",
     "versionsAgo": "{{count}}개 이전 버전",
     "versionsAhead": "{{count}}개 다음 버전",
-    "versionsAria": "버전 목록"
+    "versionsAria": "버전 목록",
+    "versionHistory": "버전 기록"
   },
   "badges": {
     "comment": "댓글",
@@ -57,6 +63,7 @@
   },
   "rows": {
     "byActor": "{{name}}님",
+    "bySelf": "나",
     "emptyComment": "빈 댓글",
     "forYou": "나에게",
     "notification": "알림",

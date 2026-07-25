@@ -92,24 +92,52 @@ No source checkout, environment file, or terminal setup code is required.
 
 #### Docker Hub / container UI
 
-In Docker Desktop, Synology Container Manager, or another container UI, pull
-[`melodysdreamj/hanji:0.1.0-alpha.4`](https://hub.docker.com/r/melodysdreamj/hanji),
-publish any unused host port to container `8787/TCP`, and start it. For durable
-storage, map a named volume or dedicated folder to `/data`; skipping that
-mapping still starts with an automatically created anonymous volume.
+In a container UI that exposes per-container logging settings, pull
+[`melodysdreamj/hanji:0.2.0-alpha`](https://hub.docker.com/r/melodysdreamj/hanji),
+publish any unused host port to container `8787/TCP`, map durable storage to
+`/data`, set the log driver to `local` with `max-size=10m` and `max-file=3`,
+and set both memory and memory-plus-swap to the value printed by the image's
+`hanji-memory-limit.mjs` helper before creating the container. Capable hosts use
+the larger of 2 GiB or half of detected RAM (for example 2 GiB on a 4 GiB host
+and 8 GiB on a 16 GiB host). Automatic sizing requires at least 4 GiB of host
+RAM. If the UI cannot express those settings, use the command below.
+Synology's normal container wizard does not
+expose them, so the [Synology guide](docs/deployment.md#synology-container-manager)
+uses a Container Manager Project/Compose configuration instead.
 
 #### One command
 
 ```bash
+HANJI_IMAGE=melodysdreamj/hanji:0.2.0-alpha
+HANJI_MEMORY_LIMIT="$(
+  docker run --rm --entrypoint node "$HANJI_IMAGE" \
+    /usr/local/bin/hanji-memory-limit.mjs
+)"
+printf 'Hanji memory limit: %s\n' "$HANJI_MEMORY_LIMIT"
 docker run -d \
   --name hanji \
   --restart unless-stopped \
+  --log-driver local \
+  --log-opt max-size=10m \
+  --log-opt max-file=3 \
+  --memory "$HANJI_MEMORY_LIMIT" \
+  --memory-swap "$HANJI_MEMORY_LIMIT" \
   -p 127.0.0.1:8787:8787 \
   -v hanji-data:/data \
-  melodysdreamj/hanji:0.1.0-alpha.4
+  "$HANJI_IMAGE"
 ```
 
-> **Current release:** `0.1.0-alpha.4` is an early self-hosted beta. Back up
+The logging options keep `docker logs` available while rotating the
+stdout/stderr stream instead of inheriting Docker's unbounded `json-file`
+default. They apply when the container is created; recreate an older `hanji`
+container to adopt them.
+The equal finite memory limits let Hanji shed new work with retryable 429
+responses before the container reaches its kernel OOM boundary. Operators may
+set `HANJI_MEMORY_LIMIT=1536m` on the sizing-helper command to retain the
+verified minimum tier, or choose another finite whole-MiB/GiB value; inspect
+the printed result before creating the long-lived container.
+
+> **Current release:** `0.2.0-alpha` is an early self-hosted beta. Back up
 > `/data` before upgrading. The moving `alpha` tag is available, but `latest`
 > is intentionally not published until the first stable release.
 
@@ -146,10 +174,13 @@ Clone the repository when changing Hanji itself. For local hot reload:
 ```bash
 git clone https://github.com/melodysdreamj/hanji && cd hanji
 npm --prefix backend install && npm --prefix web install && npm --prefix mcp install
-node scripts/setup-dev-env.mjs
 ```
 
-Then run the backend and frontend in separate terminals:
+Create `backend/.env.development` and `backend/.dev.vars` with independent
+development-only `JWT_USER_SECRET`, `JWT_ADMIN_SECRET`, and `SERVICE_KEY`
+values, plus `HANJI_BROWSER_SETUP=true` and
+`HANJI_WORKSPACE_DO_SPLIT=true`. Then run the backend and frontend in separate
+terminals:
 
 ```bash
 npm --prefix backend run dev        # backend API: http://localhost:8787
@@ -159,16 +190,8 @@ npm --prefix backend run dev        # backend API: http://localhost:8787
 npm --prefix web run dev            # frontend hot reload: http://localhost:3000
 ```
 
-To build and test a Docker image from that source checkout instead:
-
-```bash
-bash scripts/selfhost-docker.sh up --build
-```
-
-The source-build helper provides local HTTPS and prints the URL. Use `status`,
-`logs`, or `down` with the same script to manage it. For a locally trusted
-certificate, install [mkcert](https://github.com/FiloSottile/mkcert) first.
-Development details, local EdgeBase linking, and deployment internals live in
+The published multi-platform image is the supported Docker installation path.
+Development details and deployment configuration live in
 [docs/development.md](docs/development.md) and
 [docs/deployment.md](docs/deployment.md).
 
@@ -200,9 +223,24 @@ server**, so your AI agents can read and shape the workspace from the outside.
   account across dev, Docker, and Cloudflare.
 - **MCP server** — AI agents can list, search, create, and edit pages,
   databases, comments, files, and workspace/organization settings through
-  the product API, with read-only and allowlist narrowing. See
+  the product API, with read-only and allowlist narrowing plus per-workspace
+  approved-client governance for hosted MCP. See
   [`mcp/README.md`](mcp/README.md).
+- **Notion-compatible integration surfaces** — the checked-in compatibility
+  inventory covers 48 REST operations and 20 MCP tools at `2026-03-11`, plus
+  the current 13-operation Admin API at `2026-06-01`. MCP SQL streams one data
+  source with bind-safe filters, projections, direct-property multi-key
+  ordering, and opaque continuation without a Hanji plan gate or source-size
+  ceiling.
 - **Responsive** — desktop sidebar and Notion-style mobile drawer UX.
+
+Compatibility is intentionally fail-closed rather than a claim to contain all
+of SQLite or every Notion backend. MCP SQL forms that need cross-window state
+(joins, CTEs/subqueries, DISTINCT, grouping/aggregates, unions, and computed
+ordering), window functions, and a production PDF export renderer remain
+unsupported. See the [MCP guide](mcp/README.md#notion-compatible-sql-queries)
+and [Docker API guide](docs/docker.md#notion-compatible-api-and-hosted-mcp) for
+the exact dialect, operation list, scopes, and resource budgets.
 
 ## Screenshots
 
@@ -212,11 +250,9 @@ server**, so your AI agents can read and shape the workspace from the outside.
 
 <p align="center"><b>Notion &rarr; Hanji</b> — bring your whole Notion workspace to your own server in one import.</p>
 
-<p align="center"><sub>The banner is drawn entirely by code (<code>scripts/readme-hero-banner.mjs</code>) — no Notion assets, generic UI only.</sub></p>
+<p align="center"><sub>The banner and product captures use synthetic content only.</sub></p>
 
-The product hero at the top is regenerated from a temporary synthetic
-workspace in the live app by `scripts/readme-hero-capture.mjs`. Additional app
-captures:
+Additional app captures:
 
 <p align="center">
   <img src="assets/screenshots/import-from-notion.png" alt="Importing a Notion workspace into Hanji" width="860" />
@@ -291,13 +327,13 @@ still closing important parity or production-readiness gaps.
 | Page & organization permissions, public web sharing | 🧪 Beta | remaining policy surfaces and denial-state UX |
 | Full-text search (CJK-aware) | 🧪 Beta | ranking and keyboard edge cases |
 | Self-hosted auth — password + TOTP MFA, recovery, server accounts | 🧪 Beta | delivered-mail and hosted-runtime verification |
-| MCP server — scoped, product-API-backed | 🧪 Beta | hosted OAuth/runtime proof and broader production edge cases |
-| Deploy — local dev & Docker | ✅ Available | production-hardening and upgrade/restore rehearsals |
+| MCP and Notion-compatible APIs — scoped, product-API-backed | 🧪 Beta | hosted runtime proof, PDF export rendering, and remaining bounded-SQL grammar |
+| Deploy — local dev & Docker | ✅ Available | production-hardening and repeated multi-release upgrade/restore evidence |
 | Deploy — Cloudflare Workers | 🚧 Hardening | first public hosted-runtime proof |
 | Realtime collaboration — CRDT text merge, presence | 🧪 Beta | structural reconnect and production-grade selection mapping |
 | SSO (SAML / OIDC) & SCIM provisioning | 🚧 Hardening | real-IdP verification |
 | Native mobile apps | 🗺️ Planned | responsive web today |
-| Data migration / versioning story | 🗺️ Planned | — |
+| Data migration / versioning story | 🧪 Beta | destructive table migrations and longer multi-release history |
 
 <sub>✅ available = core workflow tested · 🧪 beta = usable with known gaps · 🚧 hardening = implemented but missing release evidence · 🗺️ planned = not built yet</sub>
 

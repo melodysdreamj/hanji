@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} spätný odkaz",
-    "count_other": "{{count}} spätných odkazov"
+    "count_other": "{{count}} spätných odkazov",
+    "partial_one": "{{count}}+ spätný odkaz",
+    "partial_other": "{{count}}+ spätné odkazy"
   },
   "header": {
     "title": "Prepojené zmienky"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} zmienka",
     "mention_other": "{{count}} zmienok",
     "link_one": "{{count}} odkaz",
-    "link_other": "{{count}} odkazov"
+    "link_other": "{{count}} odkazov",
+    "loaded": "Načítané: {{summary}}"
   },
   "kind": {
     "mention": "Zmienka",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ďalší spätný odkaz",
-    "count_other": "{{count}} ďalších spätných odkazov"
+    "count_other": "{{count}} ďalších spätných odkazov",
+    "load": "Načítať ďalšie spätné odkazy",
+    "loading": "Načítavajú sa spätné odkazy…",
+    "search": "Hľadať spätné odkazy"
   }
 }

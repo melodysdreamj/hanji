@@ -8,16 +8,22 @@
   },
   "more": {
     "count_one": "{{count}} tilbakekobling til",
-    "count_other": "{{count}} tilbakekoblinger til"
+    "count_other": "{{count}} tilbakekoblinger til",
+    "load": "Last inn flere tilbakelenker",
+    "loading": "Laster tilbakelenker…",
+    "search": "Søk etter tilbakelenker"
   },
   "summary": {
     "link_one": "{{count}} lenke",
     "link_other": "{{count}} lenker",
     "mention_one": "{{count}} omtale",
-    "mention_other": "{{count}} omtaler"
+    "mention_other": "{{count}} omtaler",
+    "loaded": "Lastet inn: {{summary}}"
   },
   "toggle": {
     "count_one": "{{count}} tilbakekobling",
-    "count_other": "{{count}} tilbakekoblinger"
+    "count_other": "{{count}} tilbakekoblinger",
+    "partial_one": "{{count}}+ tilbakelenke",
+    "partial_other": "{{count}}+ tilbakelenker"
   }
 }

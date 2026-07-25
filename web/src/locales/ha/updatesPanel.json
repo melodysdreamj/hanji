@@ -15,10 +15,7 @@
     "recentUpdates_other": "sabuntawa na kusa {{count}}",
     "unreadOfTotal": "{{unread}} daga cikin {{total}} sabuntawa ba a karanta ba",
     "updateType": "Nau'in sabuntawa",
-    "updates": "Sabuntawa",
-    "modeUpdates": "Sabuntawa",
-    "modeChats": "Taɗi",
-    "inboxMode": "Yanayin akwatin saƙo"
+    "updates": "Sabuntawa"
   },
   "time": {
     "justNow": "Yanzu",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versions",
     "versionsAgo": "{{count}} versions da suka wuce",
     "versionsAhead": "{{count}} versions a gaba",
-    "versionsAria": "Versions"
+    "versionsAria": "Versions",
+    "emptyBlock": "Block maras ciki",
+    "emptyPreview": "Wannan siga ba ta da abun ciki na shafi.",
+    "previewAria": "Preview sigar shafi mai karantawa kawai",
+    "previewingCurrent": "Kallon shafi na yanzu",
+    "previewingSnapshot": "Kallon sigar da ta gabata",
+    "previewOnlyHint": "Zaɓan siga yana nuna ta kawai. Shafin yanzu yana canzawa ne kawai bayan Maido.",
+    "restoreThisVersion": "Maido",
+    "restoring": "Ana maidowa...",
+    "versionHistory": "Tarihin siga"
   },
   "badges": {
     "comment": "Sharhi",
@@ -67,7 +73,8 @@
     "referenceMention": "An ambaci {{title}} · {{preview}}",
     "referenceLink": "An haɗa zuwa {{title}} · {{preview}}",
     "unreadDot": "Ba a karanta ba",
-    "workspaceUpdate": "Sabuntawar workspace"
+    "workspaceUpdate": "Sabuntawar workspace",
+    "bySelf": "Na kai"
   },
   "empty": {
     "allCaughtUp": "An ga duka.",

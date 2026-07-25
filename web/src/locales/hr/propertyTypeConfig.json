@@ -51,7 +51,14 @@
     "range": "Raspon",
     "earliest_date": "Najraniji datum",
     "latest_date": "Najkasniji datum",
-    "date_range": "Raspon datuma"
+    "date_range": "Raspon datuma",
+    "count": "Prebroji sve",
+    "count_per_group": "Broj po grupi",
+    "empty": "Broj praznih",
+    "not_empty": "Broj nepraznih",
+    "percent_per_group": "Postotak po grupi",
+    "show_unique": "Prikaži jedinstvene vrijednosti",
+    "unique": "Broj jedinstvenih vrijednosti"
   },
   "undo": "Poništi",
   "untitled": "Bez naslova",

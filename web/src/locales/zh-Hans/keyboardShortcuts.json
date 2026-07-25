@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "添加评论",
+    "addLink": "添加链接",
+    "blockColor": "应用最后使用的颜色",
+    "bold": "加粗",
+    "copyPageLink": "复制页面链接",
+    "findInPage": "在此页面查找",
+    "inlineCode": "行内代码",
+    "italic": "斜体",
+    "moveBlock": "将块移动到其他页面",
+    "moveBlockDown": "向下移动块",
+    "moveBlockUp": "向上移动块",
+    "movePage": "移动当前页面",
+    "navigateBack": "后退",
+    "navigateForward": "前进",
+    "newPage": "新建页面",
+    "openBlockMenu": "打开块操作菜单",
+    "openKeyboardShortcuts": "打开键盘快捷键",
+    "openParentPage": "打开父页面",
+    "quickFind": "快速查找",
+    "strikethrough": "删除线",
+    "toggleAllToggles": "展开或折叠所有切换",
+    "toggleSidebar": "切换侧边栏",
+    "toggleTheme": "切换深色模式",
+    "underline": "下划线"
+  },
+  "categories": {
+    "createStyle": "创建和样式",
+    "editMove": "编辑和移动",
+    "popular": "常用"
+  },
+  "categoriesLabel": "快捷键分类",
+  "close": "关闭",
+  "closeBackdrop": "关闭键盘快捷键",
+  "empty": "未找到快捷键",
+  "keysFor": "{{action}} 的快捷键",
+  "or": "或",
+  "searchLabel": "搜索键盘快捷键",
+  "searchPlaceholder": "搜索快捷键…",
+  "searchResults": "搜索结果",
+  "searchTerms": {
+    "toggleTheme": "主题 浅色 深色 外观"
+  },
+  "title": "键盘快捷键"
+}

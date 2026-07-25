@@ -6,5 +6,6 @@
   "syncing": "Synkroniserer · {{count}}",
   "unreachable": "Kan ikke nå serveren",
   "unreachablePending_one": "Kan ikke nå serveren · {{count}} endring venter",
-  "unreachablePending_other": "Kan ikke nå serveren · {{count}} endringer venter"
+  "unreachablePending_other": "Kan ikke nå serveren · {{count}} endringer venter",
+  "confirmed": "Lagret til server"
 }

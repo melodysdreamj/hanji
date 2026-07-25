@@ -92,5 +92,8 @@
     "V",
     "S"
   ],
-  "you": "Tu"
+  "you": "Tu",
+  "buttonExecutionFailed": "Impossibile eseguire il pulsante.",
+  "loadingMoreRelations": "Caricamento di più relazioni...",
+  "loadMoreRelations": "Carica più relazioni"
 }

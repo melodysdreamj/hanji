@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Εξαρτήσεις:",
     "hint": "προσθήκη ιδιότητας σχέσης",
-    "relationPropertyAriaLabel": "Ιδιότητα σχέσης εξάρτησης"
+    "relationPropertyAriaLabel": "Ιδιότητα σχέσης εξάρτησης",
+    "makeDependOn": "Κάντε το {{title}} να εξαρτάται από το {{predecessor}}",
+    "startFrom": "Έναρξη εξάρτησης από {{title}}"
   },
   "toolbar": {
     "today": "Σήμερα",

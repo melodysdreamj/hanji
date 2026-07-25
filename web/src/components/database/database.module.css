@@ -1786,6 +1786,340 @@
   width: 24px;
   padding: 0;
 }
+
+.automationRailBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  border: 0;
+  background: rgba(15, 15, 15, 0.18);
+}
+
+.automationRail {
+  position: fixed;
+  z-index: 1091;
+  inset: 0 0 0 auto;
+  width: min(386px, calc(100vw - 24px));
+  padding: 12px;
+  overflow: auto;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: -8px 0 28px rgba(15, 15, 15, 0.16);
+}
+
+.automationRailHeader,
+.automationEditorActions,
+.automationListActions {
+  display: flex;
+  align-items: center;
+}
+
+.automationRailHeader {
+  justify-content: space-between;
+  min-height: 36px;
+  margin-bottom: 10px;
+}
+
+.automationRailHeader button,
+.automationListActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+}
+
+.automationNewButton,
+.automationPrimaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 32px;
+  border: 0;
+  border-radius: 5px;
+  color: #fff;
+  background: var(--accent, #2383e2);
+}
+
+.automationList {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.automationListItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 9px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.automationListItem > div:first-child {
+  display: grid;
+  min-width: 0;
+}
+
+.automationListItem strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.automationListItem span,
+.automationRailHint,
+.automationRailEmpty {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.automationListActions {
+  gap: 2px;
+}
+
+.automationListActions button:hover,
+.automationRailHeader button:hover {
+  background: var(--hover);
+}
+
+.automationEditor {
+  display: grid;
+  gap: 12px;
+}
+
+.automationEditor label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.automationEditor input,
+.automationEditor select {
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-primary);
+  background: var(--bg);
+}
+
+.automationSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 8px;
+  border-radius: 5px;
+  background: var(--hover);
+}
+
+.automationEditorActions {
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.automationEditorActions .automationPrimaryButton {
+  width: auto;
+  min-width: 84px;
+  padding: 0 14px;
+}
+
+.automationRailError {
+  margin: 10px 0 0;
+  color: var(--danger, #eb5757);
+  font-size: 12px;
+}
+
+.automationRailHint {
+  margin: 12px 0 0;
+}
+.taskFeatureMenu {
+  width: 300px;
+}
+.taskFeatureMenu .toolbarMenuHead {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 24px;
+  padding: 0 0 4px;
+}
+.taskFeatureMenu .toolbarMenuHead .toolbarMenuLabel {
+  overflow: hidden;
+  color: var(--text-default);
+  font-size: 13px;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+.taskFeatureBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 6px 6px;
+}
+.taskFeatureBody > p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.subitemsPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+}
+.subitemsPreview > div {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 4px;
+  align-items: center;
+  min-height: 24px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.subitemsPreview > div:not(:first-child) {
+  padding-left: 18px;
+}
+.subitemsPreview > div:first-child {
+  color: var(--text-default);
+  font-weight: 600;
+}
+.taskFeaturePrimary {
+  width: 100%;
+  min-height: 32px;
+  border-radius: 5px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+.taskFeaturePrimary:hover:not(:disabled),
+.taskFeaturePrimary:focus-visible:not(:disabled) {
+  filter: brightness(1.05);
+  outline: none;
+}
+.taskFeaturePrimary:disabled {
+  opacity: 0.52;
+  cursor: default;
+}
+.taskFeatureDanger {
+  width: 100%;
+  min-height: 32px;
+  border-radius: 5px;
+  background: var(--accent-red, #eb5757);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+.taskFeatureDanger:hover:not(:disabled),
+.taskFeatureDanger:focus-visible:not(:disabled) {
+  filter: brightness(1.05);
+  outline: none;
+}
+.taskFeatureDanger:disabled {
+  opacity: 0.52;
+  cursor: default;
+}
+.taskFeatureSecondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  color: var(--text-default);
+  font-size: 13px;
+}
+.taskFeatureSecondary:hover,
+.taskFeatureSecondary:focus-visible {
+  background: var(--bg-hover);
+  outline: none;
+}
+.dependencyShiftOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.dependencyShiftOptions legend {
+  margin-bottom: 5px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.dependencyShiftOptions label {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  min-height: 30px;
+  padding: 7px 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  color: var(--text-default);
+  font-size: 12px;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.dependencyShiftOptions label:has(input:checked) {
+  border-color: var(--accent-blue);
+  background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
+}
+.dependencyShiftOptions input {
+  margin: 1px 0 0;
+  accent-color: var(--accent-blue);
+}
+.taskFeatureCheckbox,
+.taskFeatureSelect {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-default);
+  font-size: 12px;
+}
+.taskFeatureCheckbox > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.taskFeatureCheckbox strong {
+  font-weight: 600;
+}
+.taskFeatureCheckbox small {
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.3;
+}
+.taskFeatureCheckbox input {
+  flex: none;
+  accent-color: var(--accent-blue);
+}
+.taskFeatureSelect select {
+  max-width: 150px;
+  min-height: 28px;
+  padding: 3px 24px 3px 7px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  color: var(--text-default);
+  font: inherit;
+}
 .groupActions {
   display: flex;
   flex-direction: column;
@@ -1820,6 +2154,13 @@
   padding: 3px 4px;
   color: var(--text-secondary);
   font-size: 13px;
+}
+.layoutStaticValue {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-default);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .layoutTypeGrid {
   display: grid;
@@ -2893,6 +3234,187 @@
   border-radius: 10px;
   background: var(--bg-app);
   box-shadow: var(--shadow-menu);
+}
+.databaseButtonEditorOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.databaseButtonEditorBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(15, 15, 15, 0.24);
+}
+.databaseButtonEditor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(500px, calc(100vw - 32px));
+  max-height: min(720px, calc(100vh - 48px));
+  overflow-y: auto;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--bg-app);
+  box-shadow: var(--shadow-menu);
+  color: var(--text-default);
+}
+.databaseButtonEditorHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.databaseButtonEditorHeader strong {
+  font-size: 16px;
+  font-weight: 650;
+}
+.databaseButtonEditorHeader button,
+.databaseButtonActionHead button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+.databaseButtonEditorHeader button:hover,
+.databaseButtonEditorHeader button:focus-visible,
+.databaseButtonActionHead button:hover,
+.databaseButtonActionHead button:focus-visible {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+.databaseButtonEditorField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 550;
+}
+.databaseButtonEditorField input,
+.databaseButtonEditorField select {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-size: 13px;
+  outline: none;
+}
+.databaseButtonEditorField select[multiple] {
+  min-height: 68px;
+  padding: 5px;
+}
+.databaseButtonEditorField input:focus,
+.databaseButtonEditorField select:focus {
+  border-color: var(--accent-blue);
+}
+.databaseButtonTrigger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 14px 0 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+  background: var(--bg-hover);
+}
+.databaseButtonTrigger span {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 550;
+}
+.databaseButtonTrigger strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.databaseButtonActionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.databaseButtonActionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 11px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 7px;
+}
+.databaseButtonActionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 30px;
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 600;
+}
+.databaseButtonValueRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.databaseButtonAddAction,
+.databaseButtonSave {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 32px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.databaseButtonAddAction {
+  margin-top: 8px;
+  color: var(--text-secondary);
+}
+.databaseButtonAddAction:hover:not(:disabled),
+.databaseButtonAddAction:focus-visible:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-default);
+  outline: none;
+}
+.databaseButtonSave {
+  margin-top: 14px;
+  background: var(--accent-blue);
+  color: #fff;
+}
+.databaseButtonSave:hover:not(:disabled),
+.databaseButtonSave:focus-visible:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-blue) 86%, #000);
+  outline: none;
+}
+.databaseButtonAddAction:disabled,
+.databaseButtonSave:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+@media (max-width: 560px) {
+  .databaseButtonEditorOverlay {
+    align-items: end;
+    padding: 0;
+  }
+  .databaseButtonEditor {
+    width: 100%;
+    max-height: calc(100vh - 16px);
+    border-radius: 12px 12px 0 0;
+  }
 }
 .propertyHeaderSummary {
   display: grid;
@@ -4070,6 +4592,19 @@
   background: var(--bg-hover);
   color: var(--text-secondary);
 }
+.subitemParentIndicator,
+.subitemCount {
+  order: 2;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: 6px;
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .loadMoreRow {
   display: grid;
   width: 100%;
@@ -4373,6 +4908,35 @@
   padding: 4px 6px;
   color: var(--text-secondary);
   font-size: 13px;
+}
+.databaseButtonCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 8px);
+  min-height: 26px;
+  margin: 2px 4px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  color: var(--text-default);
+  font-size: 13px;
+  font-weight: 500;
+}
+.databaseButtonCell:hover:not(:disabled),
+.databaseButtonCell:focus-visible {
+  background: var(--bg-active);
+  outline: none;
+}
+.databaseButtonCell:disabled {
+  color: var(--text-tertiary);
+  cursor: default;
+}
+.databaseButtonCell span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cellEmpty {
   display: block;
@@ -4980,6 +5544,22 @@
   border-radius: 8px;
   background: var(--bg-app);
   box-shadow: var(--shadow-menu);
+}
+.filesMenuDropSurface {
+  border-radius: 6px;
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.filesMenuDropSurface[data-file-drop-active="true"] {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-blue) 88%, transparent);
+}
+.filesMenuDropSurface[data-file-drop-active="true"] .filesMenuAction:first-child {
+  background: color-mix(in srgb, var(--accent-blue) 18%, var(--bg-hover));
+  color: var(--accent-blue);
 }
 .filesMenuHeader {
   display: flex;
@@ -6189,6 +6769,35 @@
   flex-direction: column;
   border-top: 1px solid var(--border-default);
 }
+.listTreeRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-left: 6px;
+  border-bottom: 1px solid var(--border-default);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 36px;
+}
+.listTreeRow:hover,
+.listTreeRow:focus-within {
+  background: var(--bg-hover);
+}
+.listTreeRow > .listRow {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 2px;
+  border-bottom: 0;
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+.listTreeRow > .listRow:hover,
+.listTreeRow > .listRow:focus-visible {
+  background: transparent;
+}
+.listTreeRow .subitemParentIndicator,
+.listTreeRow .subitemCount {
+  order: 0;
+}
 .listRow {
   display: flex;
   align-items: center;
@@ -6597,6 +7206,9 @@
   gap: 4px;
 }
 .calendarNoDateItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   max-width: 220px;
   overflow: hidden;
   padding: 4px 8px;
@@ -6609,6 +7221,11 @@
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.calendarNoDateItem > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .calendarNoDateItem:hover,
 .calendarNoDateItem:focus-visible {
@@ -6714,12 +7331,19 @@
   min-height: 170px;
   padding: 8px 0;
 }
-.timelineTableRow {
+.timelineTableTreeRow {
   display: flex;
   align-items: center;
   min-width: 0;
   min-height: 28px;
   margin: 3px 6px;
+}
+.timelineTableRow {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 28px;
   padding: 0 8px;
   border-radius: 4px;
   color: var(--text-secondary);
@@ -6808,7 +7432,7 @@
   min-width: 0;
   min-height: 28px;
   margin: 3px 4px;
-  padding: 4px 8px;
+  padding: 0 8px;
   border: 1px solid var(--border-default);
   border-radius: 4px;
   background: var(--bg-app);
@@ -6824,9 +7448,27 @@
   cursor: grabbing;
 }
 .timelineBar:hover,
-.timelineBar:focus-visible {
+.timelineBar:focus-within {
   background: var(--bg-hover);
   outline: none;
+}
+.timelineBarOpen {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 14px;
+  min-height: 26px;
+  color: inherit;
+  cursor: inherit;
+}
+.timelineBarOpen:focus-visible {
+  outline: none;
+}
+.timelineSubitemIndent {
+  flex: 0 0 auto;
+  height: 1px;
 }
 .timelineDropPreview {
   z-index: 3;
@@ -6866,7 +7508,7 @@
   right: -1px;
 }
 .timelineBar:hover .timelineResizeHandle,
-.timelineBar:focus-visible .timelineResizeHandle,
+.timelineBar:focus-within .timelineResizeHandle,
 .timelineBar[data-moving="true"] .timelineResizeHandle {
   opacity: 1;
   pointer-events: auto;
@@ -7025,6 +7667,11 @@
   gap: 6px;
   padding: 4px 6px 8px;
 }
+.timelineNoDateTreeRow {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
 .timelineNoDateRow {
   display: inline-flex;
   align-items: center;
@@ -7037,6 +7684,11 @@
   color: var(--text-default);
   font-size: 13px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.timelineNoDateRow > span {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }

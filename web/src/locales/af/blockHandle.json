@@ -88,5 +88,38 @@
     "hoursAgo": "Laas geredigeer {{hours}}h gelede",
     "daysAgo": "Laas geredigeer {{days}}d gelede",
     "on": "Laas geredigeer {{date}}"
+  },
+  "align": {
+    "center": "Middel",
+    "choose": "Kies beeldbelyning",
+    "left": "Links",
+    "right": "Regs"
+  },
+  "altText": {
+    "help": "Alt-teks help mense wat skermlesers gebruik om die beeld te verstaan.",
+    "label": "Beskrywing",
+    "placeholder": "Beskryf die beeld",
+    "remove": "Verwyder",
+    "save": "Stoor",
+    "title": "Alt-teks"
+  },
+  "imageLink": {
+    "invalid": "Voer 'n volledige http:// of https:// URL in.",
+    "label": "Maak hierdie URL oop wanneer die beeld geklik word",
+    "remove": "Verwyder",
+    "save": "Stoor",
+    "title": "Beeldskakel"
+  },
+  "media": {
+    "addImageLink": "Voeg skakel by",
+    "align": "Belyn",
+    "altText": "Alt-teks",
+    "copySourceLink": "Kopieer bronskakel",
+    "download": "Aflaai",
+    "editImageLink": "Wysig skakel",
+    "fullScreen": "Volskerm",
+    "openLink": "Open skakel",
+    "replace": "Vervang",
+    "viewOriginal": "Bekyk oorspronklike"
   }
 }

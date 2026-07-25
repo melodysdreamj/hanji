@@ -9,9 +9,9 @@ export function registerDatabaseTools(runtime) {
     NOTION_UPDATE_VIEW_TOOL,
     NOTION_VIEW_TYPES,
     ROLLUP_FUNCTIONS,
-    UNSUPPORTED_NOTION_VIEW_TYPES,
     addPropertyToViews,
     applyDatabaseView,
+    assertRequiredNotionViewConfigure,
     blocksToMarkdown,
     clamp,
     clearOtherDefaultTemplates,
@@ -56,6 +56,7 @@ export function registerDatabaseTools(runtime) {
     templateBlocksToMarkdown,
     titleOf,
     trashPageTree,
+    validateNotionDdlOperations,
     viewByKey,
     viewConfigInputSchema,
     viewConfigPatchForInput,
@@ -147,7 +148,7 @@ export function registerDatabaseTools(runtime) {
     {
       title: "Create view",
       description:
-        "Notion-compatible database view creation. Hanji MCP is account-scoped, so workspace_id is required. Hanji supports table, board, list, calendar, timeline, and gallery views.",
+        "Notion-compatible database view creation for all ten official view types. Exactly one of database_id or parent_page_id is required. parent_page_id appends an inline linked view over data_source_id and therefore crosses both database and page product-permission/policy lanes. The connection is workspace-scoped, so workspace_id is required.",
       inputSchema: {
         workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
         teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -156,29 +157,27 @@ export function registerDatabaseTools(runtime) {
         data_source_id: z.string(),
         name: z.string(),
         type: z.enum(NOTION_VIEW_TYPES),
-        configure: z.string().optional(),
+        configure: z.string().optional().describe("Notion view DSL: FILTER, SORT BY, GROUP BY, CALENDAR BY, TIMELINE BY, MAP BY, CHART, FORM, SHOW, HIDE, COVER, WRAP CELLS, or FREEZE COLUMNS."),
       },
     },
     async ({ workspace_id, teamspace_id, database_id, parent_page_id, data_source_id, name, type, configure }) => {
       try {
+        const databaseId = stripHanjiId(data_source_id || database_id);
+        if ((database_id ? 1 : 0) + (parent_page_id ? 1 : 0) !== 1) {
+          throw new Error("Provide exactly one of database_id or parent_page_id.");
+        }
+        if (database_id && stripHanjiId(database_id) !== databaseId) {
+          throw new Error("database_id must identify the database that owns data_source_id.");
+        }
+        const normalizedConfigure = normalizeNotionViewConfigureInput(configure);
+        assertRequiredNotionViewConfigure(type, normalizedConfigure);
         const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_create_view");
         if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-        if (UNSUPPORTED_NOTION_VIEW_TYPES.includes(type)) {
-          return okJson({
-            is_unsupported: true,
-            unsupported_feature: `view_type:${type}`,
-            message: `Hanji does not provide a ${type} view type yet. Supported view types: ${DATABASE_VIEW_TYPES.join(", ")}.`,
-          });
-        }
-        const databaseId = stripHanjiId(data_source_id || database_id);
         const db = await eb.getOne("pages", databaseId);
         if (!db || db.kind !== "database") return ok(`Data source ${data_source_id} not found.`);
         const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, db, "_notion_create_view", "Data source");
         if (matched.errorResult) return matched.errorResult;
         if (db.isLocked) return ok(lockedPageMessage(db));
-        if ((database_id ? 1 : 0) + (parent_page_id ? 1 : 0) !== 1) {
-          throw new Error("Provide exactly one of database_id or parent_page_id.");
-        }
         // Validate the destination parent BEFORE inserting the view so a bad
         // parent_page_id cannot leave an orphaned view behind.
         let parent = null;
@@ -193,7 +192,7 @@ export function registerDatabaseTools(runtime) {
         const [props, views] = await Promise.all([eb.dbProperties(databaseId), eb.dbViews(databaseId)]);
         const duplicate = views.find((view) => view.name.trim().toLowerCase() === name.trim().toLowerCase());
         if (duplicate) return ok(`View "${duplicate.name}" already exists (id: ${duplicate.id}).`);
-        const { config } = viewConfigPatchForNotionInput(props, type, normalizeNotionViewConfigureInput(configure));
+        const { config } = viewConfigPatchForNotionInput(props, type, normalizedConfigure);
         const view = await eb.insert("db_views", {
           id: eb.newId(),
           databaseId,
@@ -218,6 +217,8 @@ export function registerDatabaseTools(runtime) {
                 childPageTitle: db.title || "Untitled",
                 childPageKind: "database",
                 databaseViewId: view.id,
+                databaseViewIds: [view.id],
+                linkedDatabaseSource: true,
                 rich: [{ text: db.title || "Untitled" }],
               },
               plainText: db.title || "Untitled",
@@ -306,7 +307,25 @@ export function registerDatabaseTools(runtime) {
     }
   );
 
-  registerToolAliases(["update_view", "_notion_update_view"], NOTION_UPDATE_VIEW_TOOL, handleNotionUpdateView);
+  server.registerTool(
+    "update_view",
+    {
+      ...NOTION_UPDATE_VIEW_TOOL,
+      description:
+        "Hanji-compatible extended view update. In addition to the official name/configure shape, this legacy alias accepts database hints, type changes, object configure, and direct view configuration fields.",
+      inputSchema: {
+        ...NOTION_UPDATE_VIEW_TOOL.inputSchema,
+        database_id: z.string().optional(),
+        data_source_id: z.string().optional(),
+        data_source_url: z.string().optional(),
+        type: z.enum(DATABASE_VIEW_TYPES).optional(),
+        configure: z.union([z.string(), JsonObjectSchema]).optional(),
+        ...viewConfigInputSchema,
+      },
+    },
+    handleNotionUpdateView
+  );
+  registerToolAliases(["_notion_update_view"], NOTION_UPDATE_VIEW_TOOL, handleNotionUpdateView);
 
   server.registerTool(
     "delete_database_view",
@@ -701,9 +720,28 @@ export function registerDatabaseTools(runtime) {
     {
       title: "Query data sources",
       description:
-        "Notion-compatible data source query. Hanji MCP is account-scoped, so data.workspace_id is required. Supports read-only SELECT SQL over collection:// tables and view-mode queries over Hanji database views.",
+        "Notion-compatible data source query. The connection is workspace-scoped, so data.workspace_id is required. SQL mode streams one collection:// source with bind-safe filters, projections, direct-property multi-key ordering, LIMIT/OFFSET, and opaque continuation; cross-window joins, CTEs/subqueries, DISTINCT, grouping/aggregates, unions, and computed ordering fail before row reads. View mode queries saved Hanji database views.",
       inputSchema: {
-        data: JsonObjectSchema.describe("SQL mode: {workspace_id, data_source_urls, query, params}; view mode: {workspace_id, mode:'view', view_url, page_size, start_cursor}. teamspace_id is accepted as an alias."),
+        data: z.union([
+          z.object({
+            workspace_id: z.string().optional(),
+            teamspace_id: z.string().optional(),
+            mode: z.literal("sql").optional(),
+            data_source_urls: z.array(z.string()).min(1).max(10),
+            query: z.string(),
+            params: z.array(z.union([z.string(), z.number().finite(), z.boolean(), z.null()])).max(256).optional(),
+            start_cursor: z.string().optional(),
+          }).strict(),
+          z.object({
+            workspace_id: z.string().optional(),
+            teamspace_id: z.string().optional(),
+            mode: z.literal("view"),
+            view_url: z.string(),
+            is_archived: z.boolean().optional(),
+            page_size: z.number().min(1).max(100).optional(),
+            start_cursor: z.string().optional(),
+          }).strict(),
+        ]),
       },
     },
     async ({ data }) => {
@@ -1104,7 +1142,7 @@ export function registerDatabaseTools(runtime) {
     {
       title: "Update data source",
       description:
-        "Notion-compatible data source schema/title/trash update. Hanji MCP is account-scoped, so workspace_id is required. Supports ADD/DROP/RENAME/ALTER COLUMN DDL for Hanji database properties.",
+        "Notion-compatible data source schema/title/trash update. The connection is workspace-scoped, so workspace_id is required. Supports ADD/DROP/RENAME/ALTER COLUMN DDL for Hanji database properties.",
       inputSchema: {
         workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
         teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -1127,19 +1165,34 @@ export function registerDatabaseTools(runtime) {
         if (matched.errorResult) return matched.errorResult;
         if (db.isLocked && in_trash !== true) return ok(lockedPageMessage(db));
         const notes = [];
-
-        if (title !== undefined) await eb.update("pages", databaseId, { title, ...pageEditAudit() });
+        const ddlOps = statements?.trim() ? parseNotionDdlStatements(statements) : [];
+        if (is_inline !== undefined) {
+          const parentDatabaseId = db.properties?.notionParentDatabaseId ?? db.id;
+          if (parentDatabaseId !== db.id) throw new Error("is_inline is only supported for single-source databases.");
+        }
+        const pagePatch = {
+          ...(title !== undefined ? { title } : {}),
+          ...(description !== undefined || is_inline !== undefined
+            ? {
+                properties: {
+                  ...(db.properties ?? {}),
+                  ...(description !== undefined ? { notionDescription: description } : {}),
+                  ...(is_inline !== undefined ? { notionIsInline: is_inline } : {}),
+                },
+              }
+            : {}),
+        };
+        if (Object.keys(pagePatch).length) await eb.update("pages", databaseId, { ...pagePatch, ...pageEditAudit() });
         if (in_trash === true) {
           await trashPageTree(databaseId);
         } else if (in_trash === false) {
           await restorePageTree(databaseId);
         }
-        if (description !== undefined) notes.push("Hanji does not currently store a separate data-source description field.");
-        if (is_inline !== undefined) notes.push("Hanji stores inline display on the page block, not on the data source.");
 
-        if (statements?.trim()) {
-          const ops = parseNotionDdlStatements(statements);
+        if (ddlOps.length) {
+          const ops = ddlOps;
           let props = await eb.dbProperties(databaseId);
+          validateNotionDdlOperations(props, ops);
           for (const op of ops) {
             if (op.action === "add") {
               if (op.property.type === "title") throw new Error("Cannot add a second title property.");
@@ -1151,6 +1204,14 @@ export function registerDatabaseTools(runtime) {
                 props.reduce((max, prop) => Math.max(max, prop.position ?? 0), 0) + 1
               );
               await eb.insert("db_properties", record);
+              if (op.property.twoWay && op.property.reciprocalName && record.config?.relatedPropertyId) {
+                await eb.update(
+                  "db_properties",
+                  record.config.relatedPropertyId,
+                  { name: op.property.reciprocalName },
+                  { databaseId: record.config.relationDatabaseId }
+                );
+              }
               await addPropertyToViews(databaseId, record.id);
               props = await eb.dbProperties(databaseId);
               continue;
@@ -1174,16 +1235,28 @@ export function registerDatabaseTools(runtime) {
               const prop = propertyByKey(props, op.name);
               if (!prop) throw new Error(`Property "${op.name}" not found.`);
               if (prop.type === "title" || op.property.type === "title") throw new Error("Cannot alter title property type.");
+              const nextConfig = propertyConfigForInput(op.property.type ?? prop.type, op.property, databaseId);
               await eb.update(
                 "db_properties",
                 prop.id,
                 {
                   type: op.property.type ?? prop.type,
                   description: op.property.description ?? prop.description ?? null,
-                  config: propertyConfigForInput(op.property.type ?? prop.type, op.property, databaseId),
+                  config: nextConfig,
                 },
                 { databaseId }
               );
+              if (op.property.twoWay && op.property.reciprocalName) {
+                const relatedPropertyId = nextConfig?.relatedPropertyId;
+                if (relatedPropertyId) {
+                  await eb.update(
+                    "db_properties",
+                    relatedPropertyId,
+                    { name: op.property.reciprocalName },
+                    { databaseId: op.property.relationDatabaseId ?? databaseId }
+                  );
+                }
+              }
               props = await eb.dbProperties(databaseId);
             }
           }

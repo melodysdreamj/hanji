@@ -29,6 +29,7 @@ export interface DuplicatePageRecoveryData {
   rootPageId: string;
   uploadIds: string[];
   stagingTrashAt: string;
+  subitemParentId?: string;
 }
 
 interface FileWorkspaceLock {
@@ -68,6 +69,9 @@ function parseRecoveryData(value: unknown): DuplicatePageRecoveryData {
     || uploadIds.length !== (Array.isArray(record.uploadIds) ? record.uploadIds.length : -1)
     || uploadIds.length > MAX_RECOVERY_UPLOADS
     || new Set(uploadIds).size !== uploadIds.length
+    || (record.subitemParentId !== undefined && (
+      typeof record.subitemParentId !== 'string' || !record.subitemParentId
+    ))
   ) {
     throw new Error('Duplicate-page recovery marker is malformed.');
   }
@@ -77,6 +81,9 @@ function parseRecoveryData(value: unknown): DuplicatePageRecoveryData {
     rootPageId: record.rootPageId,
     uploadIds,
     stagingTrashAt: record.stagingTrashAt,
+    ...(typeof record.subitemParentId === 'string'
+      ? { subitemParentId: record.subitemParentId }
+      : {}),
   };
 }
 
@@ -85,6 +92,7 @@ export function duplicatePageRecoveryData(input: {
   rootPageId: string;
   uploadIds: string[];
   stagingTrashAt: string;
+  subitemParentId?: string;
 }): DuplicatePageRecoveryData {
   return parseRecoveryData({ kind: DUPLICATE_PAGE_RECOVERY_KIND, ...input });
 }
@@ -92,10 +100,14 @@ export function duplicatePageRecoveryData(input: {
 function collectSubtree(pages: Page[], rootPageId: string) {
   const children = new Map<string, Page[]>();
   for (const page of pages) {
-    if (!page.parentId) continue;
-    const list = children.get(page.parentId) ?? [];
-    list.push(page);
-    children.set(page.parentId, list);
+    const parentIds = new Set([page.parentId, page.subitemParentId].filter(
+      (parentId): parentId is string => Boolean(parentId),
+    ));
+    for (const parentId of parentIds) {
+      const list = children.get(parentId) ?? [];
+      list.push(page);
+      children.set(parentId, list);
+    }
   }
   const ids: string[] = [];
   const seen = new Set<string>();
@@ -107,6 +119,14 @@ function collectSubtree(pages: Page[], rootPageId: string) {
   };
   visit(rootPageId);
   return ids;
+}
+
+function exactRecoverySubitemChildCount(page: Page) {
+  const count = Number(page.subitemChildCount ?? 0);
+  if (!Number.isSafeInteger(count) || count < 0 || !Number.isSafeInteger(count + 1)) {
+    throw new Error('Duplicate-page recovery sub-item child count is invalid.');
+  }
+  return count;
 }
 
 async function deleteCentralPageIndexes(admin: AdminDbAccessor, pageIds: string[]) {
@@ -272,7 +292,59 @@ async function finishCommittedOperation(
   }
   const currentRoot = await getExisting(pages, marker.rootPageId);
   if (currentRoot?.inTrash && currentRoot.trashedAt === marker.stagingTrashAt) {
-    await pages.update(marker.rootPageId, { inTrash: false, trashedAt: null });
+    if (marker.subitemParentId) {
+      const parent = workspacePages.find((page) => page.id === marker.subitemParentId);
+      if (
+        !parent
+        || currentRoot.subitemParentId !== parent.id
+        || parent.workspaceId !== workspaceId
+        || parent.parentId !== currentRoot.parentId
+        || parent.parentType !== 'database'
+        || parent.kind === 'database'
+      ) {
+        throw new Error('Duplicate-page recovery external sub-item parent changed.');
+      }
+      const parentCount = exactRecoverySubitemChildCount(parent);
+      await db.transact([
+        {
+          table: 'pages',
+          op: 'expect',
+          id: currentRoot.id,
+          where: [
+            ['inTrash', '==', true],
+            ['trashedAt', '==', marker.stagingTrashAt],
+            ['subitemParentId', '==', marker.subitemParentId],
+          ],
+          exists: true,
+        },
+        {
+          table: 'pages',
+          op: 'expect',
+          id: parent.id,
+          where: [
+            ['workspaceId', '==', parent.workspaceId],
+            ['parentId', '==', parent.parentId ?? null],
+            ['parentType', '==', parent.parentType],
+            ['subitemChildCount', '==', parentCount],
+          ],
+          exists: true,
+        },
+        {
+          table: 'pages',
+          op: 'update',
+          id: currentRoot.id,
+          data: { inTrash: false, trashedAt: null },
+        },
+        {
+          table: 'pages',
+          op: 'update',
+          id: parent.id,
+          data: { subitemChildCount: parentCount + 1 },
+        },
+      ]);
+    } else {
+      await pages.update(marker.rootPageId, { inTrash: false, trashedAt: null });
+    }
   }
   return true;
 }

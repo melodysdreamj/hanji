@@ -35,7 +35,7 @@
     "rename": "အမည်ပြောင်းရန်",
     "addPageInside": "အတွင်း စာမျက်နှာ ထည့်ပါ",
     "exportAsMarkdown": "Markdown အဖြစ် ထုတ်ယူပါ",
-    "exportAsHanjiFile": "Hanji ဖိုင်အဖြစ် ထုတ်ယူပါ",
+    "exportAsHanjiFile": "Hanji JSON ထုတ်ယူရန် (ဖိုင်များမပါ)",
     "importMarkdown": "Markdown တင်သွင်းရန်",
     "importing": "တင်သွင်းနေသည်...",
     "unlockPage": "စာမျက်နှာသော့ဖွင့်ရန်",
@@ -44,7 +44,8 @@
     "removeVerification": "အတည်ပြုခြင်းကိုဖယ်ရှားရန်",
     "verifyPage": "စာမျက်နှာအတည်ပြုရန်",
     "customizePage": "စာမျက်နှာ စိတ်ကြိုက်ပြင်ဆင်ပါ",
-    "undo": "ပြန်ဖျက်ရန်"
+    "undo": "ပြန်ဖျက်ရန်",
+    "exportAsHanjiArchive": "Hanji မှတ်တမ်းထုတ်ယူရန် (ဖိုင်များပါဝင်သည်)"
   },
   "customize": {
     "summaryDefault": "ပုံသေ",
@@ -101,6 +102,8 @@
     "movedToTrash": "အမှိုက်ပုံးသို့ ရွှေ့ပြီးပါပြီ",
     "restoredPage": "စာမျက်နှာ ပြန်လည်ရယူပြီးပါပြီ",
     "couldntRestorePage": "စာမျက်နှာကိုပြန်လည်ရယူ၍မရပါ",
-    "couldntMoveToTrash": "အမှိုက်ပုံးသို့ရွှေ့၍မရပါ"
+    "couldntMoveToTrash": "အမှိုက်ပုံးသို့ရွှေ့၍မရပါ",
+    "couldntExportHanjiArchive": "Hanji archive ကို ထုတ်ယူ၍မရခဲ့ပါ။",
+    "exportedHanjiArchive": "Hanji archive ကို ဖိုင်များနှင့်အတူ ထုတ်ယူပြီးပါပြီ။"
   }
 }

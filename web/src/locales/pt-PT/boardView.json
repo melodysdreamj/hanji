@@ -13,7 +13,7 @@
   "groupName": "Nome do grupo",
   "groupOptions": "Opções do grupo {{groupName}}",
   "groupThisBoard": "Agrupar este quadro",
-  "groupThisBoardDesc": "Adicione uma propriedade Selecionar ou Estado para criar colunas.",
+  "groupThisBoardDesc": "Adicione ou escolha uma propriedade de Seleção, Estado, Pessoa ou Seleção múltipla para criar colunas.",
   "newGroup": "Novo grupo",
   "newGroupIn": "Novo grupo {{groupName}} em {{dbTitle}}",
   "newPage": "Nova página",

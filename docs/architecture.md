@@ -56,9 +56,8 @@ the orchestrator composes that module while preserving the existing public API.
   runtimes under `mcp/src/`.
 
 Architecture-boundary tests assert these imports and reject moved
-responsibilities reappearing in the orchestrators. Current line-count budgets
-also prevent the original large modules from silently growing; further work
-must extract a responsibility before adding comparable orchestration weight.
+responsibilities reappearing in the orchestrators. File length itself is not a
+test gate; the guards enforce concrete ownership and dependency boundaries.
 
 ## Data model
 

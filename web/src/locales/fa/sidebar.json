@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "باز کردن منوی فضای کاری",
   "closeWorkspaceMenu": "بستن منوی فضای کاری",
   "workspaceMenu": "منوی فضای کاری",
-  "exportWorkspace": "صدور فضای کاری",
+  "exportWorkspace": "خروجی JSON فضای کاری (بدون فایل)",
   "exportedWorkspace": "فضای کاری به عنوان فایل Hanji صادر شد.",
   "exportedWorkspaceWithPlaceholders": "فضای کاری به عنوان فایل Hanji صادر شد — پیوست‌ها به صورت جای‌نشان باقی ماندند.",
   "couldntExportWorkspace": "نتوانست فضای کاری را صادر کند.",
@@ -76,5 +76,12 @@
     "later": "شاید بعداً",
     "note": "همیشه می‌توانید بعداً از «وارد کردن» در نوار کناری شروع کنید.",
     "title": "فضای کاری Notion خود را به Hanji وارد کنید؟"
-  }
+  },
+  "addPageToTeamspace": "افزودن صفحه به {{name}}",
+  "couldntExportWorkspaceArchive": "صادرات آرشیو فضای کاری ممکن نشد.",
+  "exportedWorkspaceArchive": "آرشیو فضای کاری به همراه فایل‌ها صادر شد.",
+  "exportWorkspaceArchive": "خروجی آرشیو فضای کاری (به همراه فایل‌ها)",
+  "joinTeamspaces": "پیوستن به فضاهای تیمی",
+  "keyboardShortcuts": "میانبرهای صفحه‌کلید",
+  "teamspacePages": "صفحات {{name}}"
 }

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Buɗe menu na wurin aiki",
   "closeWorkspaceMenu": "Rufe menu na workspace",
   "workspaceMenu": "Menu wurin aiki",
-  "exportWorkspace": "Fitar da wurin aiki",
+  "exportWorkspace": "Fitar da JSON na sararin aiki (fayiloli ba a haɗa su)",
   "exportedWorkspace": "An fitar da wurin aiki azaman fayil ɗin Hanji.",
   "exportedWorkspaceWithPlaceholders": "An fitar da wurin aiki azaman fayil ɗin Hanji — an bar haɗe-haɗe a matsayin wuraren riƙe.",
   "couldntExportWorkspace": "Ba a iya fitar da workspace ba.",
@@ -76,5 +76,12 @@
     "later": "Wataƙila daga baya",
     "note": "Kana iya fara wannan daga baya a kowane lokaci daga Shigo da ke cikin menu na gefe.",
     "title": "Shigo da filin aikinka na Notion zuwa Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Ƙara shafi zuwa {{name}}",
+  "couldntExportWorkspaceArchive": "An kasa fitar da ajiyar sararin aiki.",
+  "exportedWorkspaceArchive": "An fitar da ajiyar sararin aiki tare da fayiloli.",
+  "exportWorkspaceArchive": "Fitar da ajiyar sararin aiki (tare da fayiloli)",
+  "joinTeamspaces": "Shiga wuraren aiki na ƙungiya",
+  "keyboardShortcuts": "Gajerun hanyoyin madannai",
+  "teamspacePages": "Shafukan {{name}}"
 }

@@ -88,5 +88,38 @@
   },
   "turnMenu": {
     "chooseType": "Vælg bloktype"
+  },
+  "align": {
+    "center": "Centrer",
+    "choose": "Vælg billedjustering",
+    "left": "Venstre",
+    "right": "Højre"
+  },
+  "altText": {
+    "help": "Alt-tekst hjælper personer, der bruger skærmlæsere, med at forstå billedet.",
+    "label": "Beskrivelse",
+    "placeholder": "Beskriv billedet",
+    "remove": "Fjern",
+    "save": "Gem",
+    "title": "Alt-tekst"
+  },
+  "imageLink": {
+    "invalid": "Indtast en fuld http:// eller https:// URL.",
+    "label": "Åbn denne URL, når billedet klikkes",
+    "remove": "Fjern",
+    "save": "Gem",
+    "title": "Billedlink"
+  },
+  "media": {
+    "addImageLink": "Tilføj link",
+    "align": "Justér",
+    "altText": "Alt-tekst",
+    "copySourceLink": "Kopier kildelink",
+    "download": "Download",
+    "editImageLink": "Rediger link",
+    "fullScreen": "Fuld skærm",
+    "openLink": "Åbn link",
+    "replace": "Erstat",
+    "viewOriginal": "Se original"
   }
 }

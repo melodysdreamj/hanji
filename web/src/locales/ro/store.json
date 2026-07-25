@@ -7,7 +7,8 @@
   "pageMissingSave": "Pagina nu a putut fi găsită, deci modificările nu au putut fi salvate.",
   "saveFailed": "Modificările nu au putut fi salvate.",
   "sessionExpired": "Sesiunea dvs. a expirat sau cererea nu a putut fi autentificată. Vă rugăm să încercați din nou.",
-  "blockConflictSave": "Acest bloc a fost editat pe un alt dispozitiv, deci modificarea offline nu a fost aplicată.",
+  "blockConflictSave": "O modificare în așteptare se suprapune cu cea mai recentă versiune de pe server, deci nu a putut fi îmbinată automat.",
   "blockConflictKeepMine": "Aplică versiunea mea",
-  "blockMoveCommentsSkipped": "Blocul s-a mutat, dar comentariile nu au putut fi mutate odată cu el."
+  "blockMoveCommentsSkipped": "Blocul s-a mutat, dar comentariile nu au putut fi mutate odată cu el.",
+  "conflictSave": "Acest conținut s-a modificat înainte de finalizarea salvării, deci modificarea ta nu a putut fi salvată."
 }

@@ -88,5 +88,38 @@
     "hoursAgo": "Chỉnh sửa {{hours}} giờ trước",
     "daysAgo": "Chỉnh sửa {{days}} ngày trước",
     "on": "Chỉnh sửa {{date}}"
+  },
+  "align": {
+    "center": "Giữa",
+    "choose": "Chọn căn chỉnh hình ảnh",
+    "left": "Trái",
+    "right": "Phải"
+  },
+  "altText": {
+    "help": "Văn bản thay thế giúp người dùng trình đọc màn hình hiểu hình ảnh.",
+    "label": "Mô tả",
+    "placeholder": "Mô tả hình ảnh",
+    "remove": "Xóa",
+    "save": "Lưu",
+    "title": "Văn bản thay thế"
+  },
+  "imageLink": {
+    "invalid": "Nhập URL http:// hoặc https:// đầy đủ.",
+    "label": "Mở URL này khi nhấp vào hình ảnh",
+    "remove": "Xóa",
+    "save": "Lưu",
+    "title": "Liên kết hình ảnh"
+  },
+  "media": {
+    "addImageLink": "Thêm liên kết",
+    "align": "Căn chỉnh",
+    "altText": "Văn bản thay thế",
+    "copySourceLink": "Sao chép liên kết nguồn",
+    "download": "Tải xuống",
+    "editImageLink": "Chỉnh sửa liên kết",
+    "fullScreen": "Toàn màn hình",
+    "openLink": "Mở liên kết",
+    "replace": "Thay thế",
+    "viewOriginal": "Xem bản gốc"
   }
 }

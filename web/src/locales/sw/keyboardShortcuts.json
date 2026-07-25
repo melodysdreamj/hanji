@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Ongeza maoni",
+    "addLink": "Ongeza kiungo",
+    "blockColor": "Tumia rangi iliyotumiwa mwisho",
+    "bold": "Nene",
+    "copyPageLink": "Nakili kiungo cha ukurasa",
+    "findInPage": "Tafuta kwenye ukurasa huu",
+    "inlineCode": "Msimbo ndani ya mstari",
+    "italic": "Italiki",
+    "moveBlock": "Sogeza block hadi ukurasa mwingine",
+    "moveBlockDown": "Sogeza block chini",
+    "moveBlockUp": "Sogeza block juu",
+    "movePage": "Sogeza ukurasa wa sasa",
+    "navigateBack": "Rudi nyuma",
+    "navigateForward": "Nenda mbele",
+    "newPage": "Ukurasa mpya",
+    "openBlockMenu": "Fungua vitendo vya block",
+    "openKeyboardShortcuts": "Fungua njia za mkato za kibodi",
+    "openParentPage": "Fungua ukurasa mzazi",
+    "quickFind": "Tafuta Haraka",
+    "strikethrough": "Mstari wa kukata",
+    "toggleAllToggles": "Panua au kunja vituo vyote",
+    "toggleSidebar": "Badilisha sidebar",
+    "toggleTheme": "Badilisha hali ya giza",
+    "underline": "Mstari wa chini"
+  },
+  "categories": {
+    "createStyle": "Unda & staili",
+    "editMove": "Hariri & sogeza",
+    "popular": "Maarufu"
+  },
+  "categoriesLabel": "Kategoria za njia za mkato",
+  "close": "Funga",
+  "closeBackdrop": "Funga njia za mkato za kibodi",
+  "empty": "Hakuna njia za mkato zilizopatikana",
+  "keysFor": "Vitufe vya {{action}}",
+  "or": "au",
+  "searchLabel": "Tafuta njia za mkato za kibodi",
+  "searchPlaceholder": "Tafuta njia za mkato…",
+  "searchResults": "Matokeo ya utaftaji",
+  "searchTerms": {
+    "toggleTheme": "mandhari mwanga giza mwonekano"
+  },
+  "title": "Njia za mkato za kibodi"
+}

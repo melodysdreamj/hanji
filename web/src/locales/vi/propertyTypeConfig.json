@@ -51,7 +51,14 @@
     "range": "Phạm vi",
     "earliest_date": "Ngày sớm nhất",
     "latest_date": "Ngày muộn nhất",
-    "date_range": "Khoảng ngày"
+    "date_range": "Khoảng ngày",
+    "count": "Đếm tất cả",
+    "count_per_group": "Đếm theo nhóm",
+    "empty": "Đếm rỗng",
+    "not_empty": "Đếm không rỗng",
+    "percent_per_group": "Phần trăm theo nhóm",
+    "show_unique": "Hiển thị giá trị duy nhất",
+    "unique": "Đếm giá trị duy nhất"
   },
   "undo": "Hoàn tác",
   "untitled": "Chưa có tiêu đề",

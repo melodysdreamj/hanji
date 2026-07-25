@@ -26,11 +26,8 @@
   },
   "header": {
     "closeUpdates": "Lukk oppdateringer",
-    "inboxMode": "Innboksmodus",
     "markAllRead": "Merk alle som lest",
     "markAllReadAria": "Merk alle oppdateringer som lest",
-    "modeChats": "Samtaler",
-    "modeUpdates": "Oppdateringer",
     "pageHistory": "Sidehistorikk",
     "recentUpdates_one": "{{count}} nylig oppdatering",
     "recentUpdates_other": "{{count}} nylige oppdateringer",
@@ -46,7 +43,8 @@
     "referenceLink": "Lenket til {{title}} · {{preview}}",
     "referenceMention": "Nevnte {{title}} · {{preview}}",
     "unreadDot": "Ulest",
-    "workspaceUpdate": "Arbeidsområdeoppdatering"
+    "workspaceUpdate": "Arbeidsområdeoppdatering",
+    "bySelf": "av deg"
   },
   "time": {
     "justNow": "Akkurat nå",
@@ -74,6 +72,15 @@
     "versionCount_other": "{{count}} versjoner",
     "versionsAgo": "{{count}} versjoner siden",
     "versionsAhead": "{{count}} versjoner foran",
-    "versionsAria": "Versjoner"
+    "versionsAria": "Versjoner",
+    "emptyBlock": "Tom blokk",
+    "emptyPreview": "Denne versjonen har ikke noe sideinnhold.",
+    "previewAria": "Skrivebeskyttet forhåndsvisning av sideversjon",
+    "previewingCurrent": "Vis gjeldende side",
+    "previewingSnapshot": "Vis tidligere versjon",
+    "previewOnlyHint": "Å velge en versjon gir bare en forhåndsvisning. Den gjeldende siden endres bare etter gjenoppretting.",
+    "restoreThisVersion": "Gjenopprett",
+    "restoring": "Gjenoppretter...",
+    "versionHistory": "Versjonshistorikk"
   }
 }

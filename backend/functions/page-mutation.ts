@@ -6,7 +6,10 @@ import {
   boundedDbFromWorkspaceHint,
   ensurePageWorkspaceIndex,
 } from '../lib/workspace-db';
-import { assertNoActiveLegalHoldForPermanentDelete } from '../lib/enterprise-controls';
+import {
+  assertNoActiveLegalHoldForPermanentDelete,
+  assertOrganizationDlpContent,
+} from '../lib/enterprise-controls';
 import { recordWorkspaceAudit } from '../lib/org-audit';
 import { deleteStoredUploadsBeforeMetadata } from '../lib/permanent-file-delete';
 import { deleteNotificationsForDeletedContent } from '../lib/permanent-notification-delete';
@@ -28,13 +31,22 @@ import {
   updateWithFileReferenceLifecycle,
 } from '../lib/file-reference-lifecycle';
 import {
+  isExactPageMutationReplay,
+  optionalPageMutationId,
+  optionalPageMutationUpdatedAt,
+  pageMutationBaseMatches,
+} from '../lib/page-mutation-receipt';
+import {
+  actorGroupIdsForWorkspace,
+  assertMinimumWorkspaceAccessRole as sharedAssertMinimumWorkspaceAccessRole,
   canManagePageAccess as sharedCanManagePageAccess,
   pageAccessRole as sharedPageAccessRole,
-  workspaceAccessRole as sharedWorkspaceAccessRole,
 } from '../lib/page-access';
+import { teamspaceAccessDecision } from '../lib/teamspace-access';
 
 import {
   listAll,
+  narrowWhere,
   requireStringRaw as requireString,
   getExisting,
   nowIso,
@@ -52,17 +64,21 @@ import type {
   DbTemplate,
   DbView,
   FileUpload,
+  FormLink,
   FunctionContext,
   FunctionStorageProxy,
   Page,
+  PageOwner,
   PageKind,
   PagePermission,
   PageParentType,
   ShareLink,
   TableRef,
   Workspace,
+  WorkspaceMember,
 } from '../lib/app-types';
 import { pageAccessRoleRanks as roleRanks } from '../lib/page-access';
+import { wikiOwnerRecordId } from '../lib/wiki';
 
 type PagePatch = Partial<Page>;
 
@@ -71,11 +87,15 @@ const pageKinds = new Set<PageKind>(['page', 'database']);
 const patchKeys = new Set<keyof Page>([
   'parentId',
   'parentType',
+  'teamspaceId',
+  'teamspacePermissionMode',
   'kind',
   'title',
   'icon',
   'iconType',
   'cover',
+  'notionIcon',
+  'notionCover',
   'coverPosition',
   'font',
   'smallText',
@@ -104,6 +124,7 @@ const managedPatchKeys: Array<keyof Page> = [
   'verifiedAt',
   'verifiedBy',
   'verificationExpiresAt',
+  'teamspacePermissionMode',
 ];
 
 const lockedPatchKeys = new Set<keyof Page>([
@@ -117,6 +138,7 @@ const lockedPatchKeys = new Set<keyof Page>([
   'verificationExpiresAt',
   'parentId',
   'parentType',
+  'teamspaceId',
   'position',
   'inTrash',
   'trashedAt',
@@ -131,11 +153,15 @@ const pageKindSchema = v.oneOf(['page', 'database']);
 const pagePatchSchema = v.object({
   parentId: v.nullish(v.id()),
   parentType: v.optional(pageParentTypeSchema),
+  teamspaceId: v.nullish(v.id()),
+  teamspacePermissionMode: v.nullish(v.oneOf(['inherit', 'restricted'])),
   kind: v.optional(pageKindSchema),
   title: v.nullish(v.shortText()),
   icon: v.nullish(v.shortText()),
   iconType: v.nullish(v.oneOf(['none', 'emoji', 'image'])),
   cover: v.nullish(v.shortText()),
+  notionIcon: v.nullish(v.jsonRecord()),
+  notionCover: v.nullish(v.jsonRecord()),
   coverPosition: v.nullish(v.number()),
   font: v.nullish(v.oneOf(['default', 'serif', 'mono'])),
   smallText: v.nullish(v.boolean()),
@@ -159,11 +185,15 @@ const createBodySchema = v.object({
   workspaceId: v.id(),
   parentId: v.nullish(v.id()),
   parentType: pageParentTypeSchema,
+  teamspaceId: v.nullish(v.id()),
+  teamspacePermissionMode: v.nullish(v.oneOf(['inherit', 'restricted'])),
   kind: v.optional(pageKindSchema),
   title: v.nullish(v.shortText()),
   icon: v.nullish(v.shortText()),
   iconType: v.nullish(v.oneOf(['none', 'emoji', 'image'])),
   cover: v.nullish(v.shortText()),
+  notionIcon: v.nullish(v.jsonRecord()),
+  notionCover: v.nullish(v.jsonRecord()),
   coverPosition: v.nullish(v.number()),
   font: v.nullish(v.oneOf(['default', 'serif', 'mono'])),
   smallText: v.nullish(v.boolean()),
@@ -175,6 +205,8 @@ const createBodySchema = v.object({
 const updateBodySchema = v.object({
   id: v.id(),
   expectedUpdatedAt: v.nullish(v.shortText()),
+  expectedMutationId: v.nullish(v.shortText()),
+  mutationId: v.nullish(v.shortText()),
   patch: v.optional(pagePatchSchema),
 });
 
@@ -184,6 +216,10 @@ const pageIdBodySchema = v.object({
 
 function jsonError(status: number, message: string) {
   return Response.json({ code: status, message }, { status });
+}
+
+function statusError(status: number, message: string) {
+  return Object.assign(new Error(message), { status });
 }
 
 async function requestJson(request?: Request): Promise<Record<string, unknown>> {
@@ -213,6 +249,10 @@ function cleanPatch(patch: Record<string, unknown>): PagePatch {
   return out as PagePatch;
 }
 
+function cloneJson<T>(value: T): T {
+  return value == null ? value : JSON.parse(JSON.stringify(value));
+}
+
 function propertyKeys(value: unknown) {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? Object.keys(value as Record<string, unknown>)
@@ -227,14 +267,6 @@ function optionalParentId(value: unknown) {
   if (value === null || value === undefined) return null;
   if (typeof value !== 'string') throw new Error('parentId must be a string or null.');
   return value;
-}
-
-function optionalExpectedUpdatedAt(value: unknown) {
-  if (value === null || value === undefined) return undefined;
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error('expectedUpdatedAt must be a non-empty string when provided.');
-  }
-  return value.trim();
 }
 
 function parseParentType(value: unknown): PageParentType {
@@ -289,26 +321,64 @@ function collectSubtree(pagesById: Record<string, Page>, rootId: string) {
   return out;
 }
 
-// Role resolution is canonical in lib/page-access; these wrappers only pin
-// this function's "missing workspace is an error" contract.
-async function workspaceRole(db: DbRef, workspaceId: string, actorId: string): Promise<ShareRole | undefined> {
-  return sharedWorkspaceAccessRole(db, workspaceId, actorId, { requireWorkspace: true });
-}
-
 async function pageRole(db: DbRef, page: Page, actorId: string, actorEmail?: string | null): Promise<ShareRole | undefined> {
   return sharedPageAccessRole(db, page, actorId, undefined, actorEmail, { requireWorkspace: true });
-}
-
-async function assertWorkspaceEdit(db: DbRef, workspaceId: string, actorId: string) {
-  const role = await workspaceRole(db, workspaceId, actorId);
-  if (role && roleRanks[role] >= roleRanks.edit) return role;
-  throw new Error('Workspace access required.');
 }
 
 async function assertCanEditPage(db: DbRef, page: Page, actorId: string, actorEmail?: string | null) {
   const role = await pageRole(db, page, actorId, actorEmail);
   if (role && roleRanks[role] >= roleRanks.edit) return role;
   throw new Error('Page access required.');
+}
+
+async function assertMinimumTeamspacePageRole(
+  db: DbRef,
+  workspaceId: string,
+  teamspaceId: string,
+  actorId: string,
+  minimum: ShareRole,
+  requireSidebarEdit = false,
+) {
+  const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
+  if (!workspace) throw statusError(404, 'Workspace was not found.');
+  const memberships = await listAll(
+    narrowWhere(
+      db.table<WorkspaceMember>('workspace_members').where('workspaceId', '==', workspaceId),
+      'userId',
+      actorId,
+    ),
+    { maxItems: 2, pageSize: 2, label: 'Teamspace page actor workspace membership' },
+  );
+  const workspaceMember = memberships.find((membership) => (
+    membership.workspaceId === workspaceId && membership.userId === actorId
+  ));
+  const workspaceMemberRole = workspace.ownerId === actorId ? 'owner' : workspaceMember?.role;
+  const decision = await teamspaceAccessDecision(db, teamspaceId, {
+    actorId,
+    workspaceMemberId: workspaceMember?.id,
+    workspaceMemberRole,
+    groupIds: await actorGroupIdsForWorkspace(db, workspaceId, actorId),
+  });
+  const canEditSidebar = decision.membershipRole === 'owner'
+    || (
+      decision.membershipRole === 'member'
+      && decision.teamspace?.membersCanEditSidebar !== false
+    );
+  if (
+    decision.teamspace?.workspaceId === workspaceId
+    && !decision.teamspace.archivedAt
+    && (!requireSidebarEdit || canEditSidebar)
+    && decision.pageRole
+    && roleRanks[decision.pageRole] >= roleRanks[minimum]
+  ) {
+    return decision;
+  }
+  throw statusError(
+    403,
+    requireSidebarEdit
+      ? 'Teamspace sidebar edit access required.'
+      : `Teamspace ${minimum === 'edit' ? 'edit' : minimum} access required.`,
+  );
 }
 
 async function writableParent(
@@ -321,7 +391,13 @@ async function writableParent(
   actorEmail?: string | null,
 ) {
   if (!parentId || parentType === 'workspace') {
-    await assertWorkspaceEdit(db, workspaceId, actorId);
+    await sharedAssertMinimumWorkspaceAccessRole(
+      db,
+      workspaceId,
+      actorId,
+      'edit',
+      { requireWorkspace: true },
+    );
     return null;
   }
 
@@ -354,8 +430,45 @@ async function createPage(
   const parentType = parseParentType(body.parentType);
   const kind = parseKind(body.kind);
   const workspaceId = requireString(body.workspaceId, 'workspaceId');
+  const teamspaceId = typeof body.teamspaceId === 'string' && body.teamspaceId
+    ? body.teamspaceId
+    : null;
+  const teamspacePermissionMode = body.teamspacePermissionMode === 'restricted'
+    ? 'restricted'
+    : 'inherit';
 
-  await writableParent(db, workspaceId, parentId, parentType, kind, actorId, actorEmail);
+  if (parentType !== 'workspace' && teamspaceId) {
+    throw statusError(400, 'Only workspace-root pages can carry teamspaceId.');
+  }
+  if (parentType === 'workspace' && parentId) {
+    throw statusError(400, 'Workspace-root pages cannot have a parentId.');
+  }
+  if (!teamspaceId && teamspacePermissionMode === 'restricted') {
+    throw statusError(400, 'Only Teamspace roots can set teamspacePermissionMode.');
+  }
+
+  let parent: Page | null;
+  if (teamspaceId) {
+    await assertMinimumTeamspacePageRole(
+      db,
+      workspaceId,
+      teamspaceId,
+      actorId,
+      teamspacePermissionMode === 'restricted' ? 'full_access' : 'edit',
+      true,
+    );
+    parent = null;
+  } else {
+    parent = await writableParent(
+        db,
+        workspaceId,
+        parentId,
+        parentType,
+        kind,
+        actorId,
+        actorEmail,
+      );
+  }
   if (parentType === 'database') {
     throw Object.assign(
       new Error('Database rows must be created through the database-row mutation endpoint.'),
@@ -368,11 +481,18 @@ async function createPage(
     workspaceId,
     parentId,
     parentType,
+    ...(teamspaceId ? { teamspaceId, teamspacePermissionMode } : {}),
     kind,
     title: typeof body.title === 'string' ? body.title : '',
     icon: typeof body.icon === 'string' ? body.icon : undefined,
     iconType: typeof body.iconType === 'string' ? (body.iconType as Page['iconType']) : 'none',
     cover: typeof body.cover === 'string' ? body.cover : undefined,
+    notionIcon: body.notionIcon && typeof body.notionIcon === 'object'
+      ? cloneJson(body.notionIcon as Record<string, unknown>)
+      : null,
+    notionCover: body.notionCover && typeof body.notionCover === 'object'
+      ? cloneJson(body.notionCover as Record<string, unknown>)
+      : null,
     coverPosition: typeof body.coverPosition === 'number' ? body.coverPosition : undefined,
     font: typeof body.font === 'string' ? (body.font as Page['font']) : 'default',
     smallText: body.smallText === true,
@@ -393,6 +513,8 @@ async function createPage(
     createdAt: now,
     updatedAt: now,
   };
+  const wikiRootId = parent?.wikiRootId ?? (parent?.isWiki ? parent.id : null);
+  if (wikiRootId) page.wikiRootId = wikiRootId;
 
   await assertNoUnownedStoredFileReferences(db, {
     icon: page.icon,
@@ -403,7 +525,39 @@ async function createPage(
       Object.keys(page.properties ?? {}),
     ),
   }, { requestUrl });
-  return pages.insert(page);
+  if (!wikiRootId) return pages.insert(page);
+
+  const memberships = await listAll(
+    narrowWhere(
+      db.table<WorkspaceMember>('workspace_members').where('workspaceId', '==', workspaceId),
+      'userId',
+      actorId,
+    ),
+    { maxItems: 2, label: 'Wiki page creator membership' },
+  );
+  if (!memberships.some((member) => member.userId === actorId)) {
+    throw Object.assign(
+      new Error('A wiki page creator must be a current workspace member.'),
+      { status: 403 },
+    );
+  }
+  const owner: PageOwner = {
+    id: await wikiOwnerRecordId(page.id, actorId),
+    workspaceId,
+    pageId: page.id,
+    wikiRootId,
+    userId: actorId,
+    createdBy: actorId,
+    createdAt: now,
+    updatedAt: now,
+  };
+  await db.transact([
+    { table: 'pages', op: 'insert', data: { ...page } },
+    { table: 'page_owners', op: 'insert', data: { ...owner } },
+  ]);
+  const created = await getExisting(pages, page.id);
+  if (!created) throw new Error('Wiki page creation did not persist the page.');
+  return created;
 }
 
 async function updatePage(db: DbRef, body: Record<string, unknown>, actorId: string, actorEmail?: string | null) {
@@ -412,18 +566,37 @@ async function updatePage(db: DbRef, body: Record<string, unknown>, actorId: str
   const current = await getExisting(pages, id);
   if (!current) throw new Error('Page was not found.');
   if (current.inTrash) throw new Error('Page is in trash.');
-  // Optional optimistic-concurrency guard: when the client sends the
-  // updatedAt it loaded, reject stale whole-object property replacements.
-  // Absent, behavior stays last-write-wins for backwards compatibility.
-  const expectedUpdatedAt = optionalExpectedUpdatedAt(body.expectedUpdatedAt);
-  if (expectedUpdatedAt && current.updatedAt !== expectedUpdatedAt) {
-    throw new Error('Page changed since it was loaded.');
-  }
+  const expectedUpdatedAt = optionalPageMutationUpdatedAt(body.expectedUpdatedAt);
+  const expectedMutationId = optionalPageMutationId(body.expectedMutationId, 'expectedMutationId');
+  const mutationId = optionalPageMutationId(body.mutationId, 'mutationId');
   await assertCanEditPage(db, current, actorId, actorEmail);
 
   const patch = cleanPatch(
     body.patch && typeof body.patch === 'object' ? (body.patch as Record<string, unknown>) : {},
   );
+  if (isExactPageMutationReplay(current, mutationId, actorId)) return current;
+  if (
+    (expectedUpdatedAt || expectedMutationId)
+    && !pageMutationBaseMatches(current, expectedUpdatedAt, expectedMutationId, actorId)
+  ) {
+    // Block mutations own page recency either synchronously or through their
+    // durable recency proof. A legacy client touch carries no semantic page
+    // fields after cleanPatch(). If that touch loses its CAS race to a newer
+    // page generation, acknowledge the newer canonical row without another
+    // write instead of surfacing a false edit conflict.
+    if (Object.keys(patch).length === 0) return current;
+    throw new Error('Page changed since it was loaded.');
+  }
+
+  if (
+    current.wikiRootId
+    && ('verifiedAt' in patch || 'verifiedBy' in patch || 'verificationExpiresAt' in patch)
+  ) {
+    throw Object.assign(
+      new Error('Wiki verification must use the wiki-mutation endpoint.'),
+      { status: 409 },
+    );
+  }
 
   // Sharing and verification are manage-level, not plain edit: an edit-but-not
   // manage actor must not toggle public sharing or forge verifiedBy/verifiedAt
@@ -453,27 +626,75 @@ async function updatePage(db: DbRef, body: Record<string, unknown>, actorId: str
     );
   }
 
-  if (
-    ('parentId' in patch || 'parentType' in patch) &&
-    (patch.parentId !== current.parentId || patch.parentType !== current.parentType)
-  ) {
+  const parentPlacementChanged = (
+    ('parentId' in patch || 'parentType' in patch)
+    && (patch.parentId !== current.parentId || patch.parentType !== current.parentType)
+  );
+  const teamspacePlacementChanged = (
+    'teamspaceId' in patch && patch.teamspaceId !== current.teamspaceId
+  );
+  const teamspaceSidebarChanged = (
+    current.parentType === 'workspace'
+    && !!current.teamspaceId
+    && ('position' in patch || parentPlacementChanged || teamspacePlacementChanged)
+  );
+  if (teamspaceSidebarChanged) {
+    await assertMinimumTeamspacePageRole(
+      db,
+      current.workspaceId,
+      current.teamspaceId!,
+      actorId,
+      'edit',
+      true,
+    );
+  }
+  if (parentPlacementChanged || teamspacePlacementChanged) {
     const nextParentType = patch.parentType ?? current.parentType;
+    const nextParentId = patch.parentId === undefined
+      ? current.parentId ?? null
+      : patch.parentId ?? null;
     if (current.parentType === 'database' || nextParentType === 'database') {
       throw Object.assign(
         new Error('Database-row moves must use the dedicated database-row mutation endpoint.'),
         { status: 409 },
       );
     }
-    const targetParent = await writableParent(
-      db,
-      current.workspaceId,
-      patch.parentId === undefined ? current.parentId ?? null : patch.parentId ?? null,
-      patch.parentType ?? current.parentType,
-      patch.kind ?? current.kind,
-      actorId,
-      actorEmail,
-    );
-    if (targetParent) {
+    let nextTeamspaceId = 'teamspaceId' in patch
+      ? patch.teamspaceId ?? null
+      : current.teamspaceId ?? null;
+    if (nextParentType !== 'workspace') {
+      if ('teamspaceId' in patch && patch.teamspaceId) {
+        throw statusError(400, 'Only workspace-root pages can carry teamspaceId.');
+      }
+      if (nextTeamspaceId) patch.teamspaceId = null;
+      nextTeamspaceId = null;
+    } else if (nextParentId) {
+      throw statusError(400, 'Workspace-root pages cannot have a parentId.');
+    }
+
+    let targetParent: Page | null;
+    if (nextParentType === 'workspace' && nextTeamspaceId) {
+      await assertMinimumTeamspacePageRole(
+        db,
+        current.workspaceId,
+        nextTeamspaceId,
+        actorId,
+        'edit',
+        true,
+      );
+      targetParent = null;
+    } else {
+      targetParent = await writableParent(
+          db,
+          current.workspaceId,
+          nextParentId,
+          nextParentType,
+          patch.kind ?? current.kind,
+          actorId,
+          actorEmail,
+        );
+    }
+    if (targetParent && parentPlacementChanged) {
       const pagesById = Object.fromEntries(
         (await listAll(pages.where('workspaceId', '==', current.workspaceId))).map((page) => [page.id, page]),
       );
@@ -487,6 +708,7 @@ async function updatePage(db: DbRef, body: Record<string, unknown>, actorId: str
     ...patch,
     updatedAt: nowIso(),
     lastEditedBy: actorId,
+    ...(mutationId && body.dryRun !== true ? { lastMutationId: mutationId } : {}),
   };
   const currentFileReferences = {
     icon: current.icon,
@@ -506,22 +728,29 @@ async function updatePage(db: DbRef, body: Record<string, unknown>, actorId: str
       propertyKeys('properties' in nextPatch ? nextPatch.properties : current.properties),
     ),
   };
-  if (!storedFileReferencesChanged(currentFileReferences, nextFileReferences)) {
-    return pages.update(id, nextPatch);
-  }
-  if (current.parentType === 'database') {
+  const fileReferencesChanged = storedFileReferencesChanged(
+    currentFileReferences,
+    nextFileReferences,
+  );
+  if (fileReferencesChanged && current.parentType === 'database') {
     throw Object.assign(
       new Error('Database row files must be updated through the database-row mutation endpoint.'),
       { status: 409 },
     );
   }
+  if (body.dryRun === true) return { ...current, ...nextPatch } as Page;
+  if (!fileReferencesChanged) return pages.update(id, nextPatch);
 
   return withFileWorkspaceLease(db, current.workspaceId, actorId, 'page-file-reference-update', async (lease) => {
     await lease.assertOwned();
     const fresh = await getExisting(pages, id);
     if (!fresh) throw new Error('Page was not found.');
     if (fresh.inTrash) throw new Error('Page is in trash.');
-    if (expectedUpdatedAt && fresh.updatedAt !== expectedUpdatedAt) {
+    if (isExactPageMutationReplay(fresh, mutationId, actorId)) return fresh;
+    if (
+      (expectedUpdatedAt || expectedMutationId)
+      && !pageMutationBaseMatches(fresh, expectedUpdatedAt, expectedMutationId, actorId)
+    ) {
       throw new Error('Page changed since it was loaded.');
     }
     await assertCanEditPage(db, fresh, actorId, actorEmail);
@@ -612,7 +841,13 @@ async function restorePage(db: DbRef, body: Record<string, unknown>, actorId: st
         await writableParent(db, root.workspaceId, root.parentId, root.parentType, root.kind, actorId, actorEmail);
       }
     } else {
-      await assertWorkspaceEdit(db, root.workspaceId, actorId);
+      await sharedAssertMinimumWorkspaceAccessRole(
+        db,
+        root.workspaceId,
+        actorId,
+        'edit',
+        { requireWorkspace: true },
+      );
     }
     const workspacePages = await listAll(pages.where('workspaceId', '==', root.workspaceId));
     const pagesById = Object.fromEntries(workspacePages.map((page) => [page.id, page]));
@@ -692,7 +927,11 @@ async function deletePageUnderLease(
   const workspacePages = await listAll(pages.where('workspaceId', '==', root.workspaceId));
   const pagesById = Object.fromEntries(workspacePages.map((page) => [page.id, page]));
   const ids = collectSubtree(pagesById, id);
-  await assertNoActiveLegalHoldForPermanentDelete(db, root.workspaceId, ids);
+  const custodianUserIds = Array.from(new Set(ids.flatMap((pageId) => {
+    const page = pagesById[pageId];
+    return [page?.createdBy, page?.lastEditedBy].filter((userId): userId is string => Boolean(userId));
+  })));
+  await assertNoActiveLegalHoldForPermanentDelete(db, root.workspaceId, ids, custodianUserIds);
   await markFileDeletionPending(db, root.workspaceId, ids);
   const databaseIds = ids.filter((pageId) => pagesById[pageId]?.kind === 'database');
 
@@ -700,6 +939,7 @@ async function deletePageUnderLease(
   const commentsTable = db.table<Comment>('comments');
   const permissionsTable = db.table<PagePermission>('page_permissions');
   const shareLinksTable = db.table<ShareLink>('share_links');
+  const formLinksTable = db.table<FormLink>('form_links');
   const propertiesTable = db.table<DbProperty>('db_properties');
   const viewsTable = db.table<DbView>('db_views');
   const templatesTable = db.table<DbTemplate>('db_templates');
@@ -715,6 +955,7 @@ async function deletePageUnderLease(
     collaborationDocuments,
     permissions,
     shareLinks,
+    formLinks,
     properties,
     views,
     templates,
@@ -727,6 +968,7 @@ async function deletePageUnderLease(
     listByIds(collaborationDocumentsTable, 'pageId', ids),
     listByIds(permissionsTable, 'pageId', ids),
     listByIds(shareLinksTable, 'pageId', ids),
+    listByIds(formLinksTable, 'databaseId', databaseIds),
     listByIds(propertiesTable, 'databaseId', databaseIds),
     listByIds(viewsTable, 'databaseId', databaseIds),
     listByIds(templatesTable, 'databaseId', databaseIds),
@@ -750,6 +992,7 @@ async function deletePageUnderLease(
       ...collaborationDocuments.map((item) => item.id),
       ...permissions.map((item) => item.id),
       ...shareLinks.map((item) => item.id),
+      ...formLinks.map((item) => item.id),
       ...properties.map((item) => item.id),
       ...views.map((item) => item.id),
       ...templates.map((item) => item.id),
@@ -799,6 +1042,7 @@ async function deletePageUnderLease(
     ...collaborationDocuments.map((item): TransactOperation => ({ table: 'collaboration_documents', op: 'delete', id: item.id })),
     ...permissions.map((item): TransactOperation => ({ table: 'page_permissions', op: 'delete', id: item.id })),
     ...shareLinks.map((item): TransactOperation => ({ table: 'share_links', op: 'delete', id: item.id })),
+    ...formLinks.map((item): TransactOperation => ({ table: 'form_links', op: 'delete', id: item.id })),
     ...properties.map((item): TransactOperation => ({ table: 'db_properties', op: 'delete', id: item.id })),
     ...views.map((item): TransactOperation => ({ table: 'db_views', op: 'delete', id: item.id })),
     ...templates.map((item): TransactOperation => ({ table: 'db_templates', op: 'delete', id: item.id })),
@@ -839,6 +1083,7 @@ async function deletePageUnderLease(
     collaborationDocuments: collaborationDocuments.length,
     permissions: permissions.length,
     shareLinks: shareLinks.length,
+    formLinks: formLinks.length,
     databaseProperties: properties.length,
     databaseViews: views.length,
     databaseTemplates: templates.length,
@@ -883,6 +1128,9 @@ export const POST = defineFunction(async (context) => {
     const db = body.workspaceId
       ? boundedDbFromWorkspaceHint(admin, body.workspaceId)
       : await boundedDbFromPageHint(admin, body.id, body.pageId, body.parentId);
+    if (action === 'create' || action === 'update') {
+      await assertOrganizationDlpContent(db, body);
+    }
     const actorEmail = auth.email ?? null;
     switch (action) {
       case 'create': {

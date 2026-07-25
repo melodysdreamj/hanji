@@ -13,7 +13,7 @@
   "groupName": "ગ્રૂપ નામ",
   "groupOptions": "{{groupName}} ગ્રૂપ વિકલ્પો",
   "groupThisBoard": "આ બોર્ડ ગ્રૂપ કરો",
-  "groupThisBoardDesc": "કૉલમ બનાવવા માટે Select અથવા Status ગુણધર્મ ઉમેરો.",
+  "groupThisBoardDesc": "કૉલમ બનાવવા માટે Select, Status, Person કે Multi-select ગુણ ઉમેરો અથવા પસંદ કરો.",
   "newGroup": "નવું ગ્રૂપ",
   "newGroupIn": "{{dbTitle}} માં નવું {{groupName}} ગ્રૂપ",
   "newPage": "નવું",

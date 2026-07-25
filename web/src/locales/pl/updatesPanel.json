@@ -26,11 +26,8 @@
   },
   "header": {
     "closeUpdates": "Zamknij aktualizacje",
-    "inboxMode": "Tryb skrzynki odbiorczej",
     "markAllRead": "Oznacz wszystkie jako przeczytane",
     "markAllReadAria": "Oznacz wszystkie aktualizacje jako przeczytane",
-    "modeChats": "Czaty",
-    "modeUpdates": "Aktualizacje",
     "pageHistory": "Historia strony",
     "recentUpdates_one": "{{count}} ostatnia aktualizacja",
     "recentUpdates_other": "{{count}} ostatnich aktualizacji",
@@ -46,7 +43,8 @@
     "referenceLink": "Link do {{title}} · {{preview}}",
     "referenceMention": "Wzmianka o {{title}} · {{preview}}",
     "unreadDot": "Nieprzeczytane",
-    "workspaceUpdate": "Aktualizacja obszaru roboczego"
+    "workspaceUpdate": "Aktualizacja obszaru roboczego",
+    "bySelf": "przez Ciebie"
   },
   "time": {
     "justNow": "Przed chwilą",
@@ -74,6 +72,15 @@
     "versionCount_other": "{{count}} wersji",
     "versionsAgo": "{{count}} wersji temu",
     "versionsAhead": "{{count}} wersji do przodu",
-    "versionsAria": "Wersje"
+    "versionsAria": "Wersje",
+    "emptyBlock": "Pusty blok",
+    "emptyPreview": "Ta wersja nie ma treści strony.",
+    "previewAria": "Podgląd wersji strony (tylko do odczytu)",
+    "previewingCurrent": "Wyświetlanie bieżącej strony",
+    "previewingSnapshot": "Wyświetlanie wcześniejszej wersji",
+    "previewOnlyHint": "Wybranie wersji powoduje tylko jej podgląd. Bieżąca strona zmieni się dopiero po przywróceniu.",
+    "restoreThisVersion": "Przywróć",
+    "restoring": "Przywracanie...",
+    "versionHistory": "Historia wersji"
   }
 }

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "ಕಾಮೆಂಟ್ ಸೇರಿಸಿ",
+    "addLink": "ಲಿಂಕ್ ಸೇರಿಸಿ",
+    "blockColor": "ಕೊನೆಯ ಬಳಸಿದ ಬಣ್ಣ ಅನ್ವಯಿಸು",
+    "bold": "ದಪ್ಪ",
+    "copyPageLink": "ಪುಟ ಲಿಂಕ್ ನಕಲಿಸು",
+    "findInPage": "ಈ ಪುಟದಲ್ಲಿ ಹುಡುಕು",
+    "inlineCode": "ಇನ್‌ಲೈನ್ ಕೋಡ್",
+    "italic": "ಇಟಾಲಿಕ್",
+    "moveBlock": "ಬ್ಲಾಕ್ ಮತ್ತೊಂದು ಪುಟಕ್ಕೆ ಸರಿಸು",
+    "moveBlockDown": "ಬ್ಲಾಕ್ ಕೆಳಗೆ ಸರಿಸು",
+    "moveBlockUp": "ಬ್ಲಾಕ್ ಮೇಲೆ ಸರಿಸು",
+    "movePage": "ಪ್ರಸ್ತುತ ಪುಟ ಸರಿಸು",
+    "navigateBack": "ಹಿಂದಕ್ಕೆ ಹೋಗು",
+    "navigateForward": "ಮುಂದೆ ಹೋಗು",
+    "newPage": "ಹೊಸ ಪುಟ",
+    "openBlockMenu": "ಬ್ಲಾಕ್ ಕ್ರಿಯೆಗಳನ್ನು ತೆರೆ",
+    "openKeyboardShortcuts": "ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್ ತೆರೆ",
+    "openParentPage": "ಪೋಷಕ ಪುಟ ತೆರೆ",
+    "quickFind": "ತ್ವರಿತ ಹುಡುಕಾಟ",
+    "strikethrough": "ಸ್ಟ್ರೈಕ್‌ಥ್ರೂ",
+    "toggleAllToggles": "ಎಲ್ಲಾ ಟಾಗಲ್ ವಿಸ್ತರಿಸು/ಕುಗ್ಗಿಸು",
+    "toggleSidebar": "ಸೈಡ್‌ಬಾರ್ ಟಾಗಲ್",
+    "toggleTheme": "ಡಾರ್ಕ್ ಮೋಡ್ ಟಾಗಲ್",
+    "underline": "ಅಂಡರ್‌ಲೈನ್"
+  },
+  "categories": {
+    "createStyle": "ರಚಿಸು ಮತ್ತು ಶೈಲಿ",
+    "editMove": "ಸಂಪಾದಿಸು ಮತ್ತು ಸರಿಸು",
+    "popular": "ಜನಪ್ರಿಯ"
+  },
+  "categoriesLabel": "ಶಾರ್ಟ್‌ಕಟ್ ವರ್ಗಗಳು",
+  "close": "ಮುಚ್ಚು",
+  "closeBackdrop": "ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್ ಮುಚ್ಚು",
+  "empty": "ಯಾವುದೇ ಶಾರ್ಟ್‌ಕಟ್ ಕಂಡುಬಂದಿಲ್ಲ",
+  "keysFor": "{{action}} ಗಾಗಿ ಕೀಗಳು",
+  "or": "ಅಥವಾ",
+  "searchLabel": "ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್ಕಟ್ಗಳನ್ನು ಹುಡುಕಿ",
+  "searchPlaceholder": "ಶಾರ್ಟ್ಕಟ್ಗಳನ್ನು ಹುಡುಕಿ...",
+  "searchResults": "ಹುಡುಕಾಟ ಫಲಿತಾಂಶಗಳು",
+  "searchTerms": {
+    "toggleTheme": "ಥೀಮ್ ಲೈಟ್ ಡಾರ್ಕ್ ಗೋಚರತೆ"
+  },
+  "title": "ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್ಕಟ್ಗಳು"
+}

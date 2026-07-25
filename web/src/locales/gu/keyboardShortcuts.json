@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "ટિપ્પણી ઉમેરો",
+    "addLink": "લિંક ઉમેરો",
+    "blockColor": "છેલ્લો વપરાયેલ રંગ લાગુ કરો",
+    "bold": "બોલ્ડ",
+    "copyPageLink": "પાનાની લિંક કૉપિ કરો",
+    "findInPage": "આ પાના પર શોધો",
+    "inlineCode": "ઇનલાઇન કોડ",
+    "italic": "ઇટાલિક",
+    "moveBlock": "બ્લૉકને બીજા પાના પર ખસેડો",
+    "moveBlockDown": "બ્લૉકને નીચે ખસેડો",
+    "moveBlockUp": "બ્લૉકને ઉપર ખસેડો",
+    "movePage": "વર્તમાન પાનું ખસેડો",
+    "navigateBack": "પાછળ જાઓ",
+    "navigateForward": "આગળ જાઓ",
+    "newPage": "નવું પાનું",
+    "openBlockMenu": "બ્લૉક ક્રિયાઓ ખોલો",
+    "openKeyboardShortcuts": "કીબોર્ડ શૉર્ટકટ્સ ખોલો",
+    "openParentPage": "મૂળ પાનું ખોલો",
+    "quickFind": "ઝડપી શોધ",
+    "strikethrough": "સ્ટ્રાઇકથ્રૂ",
+    "toggleAllToggles": "બધા ટૉગલ્સ વિસ્તૃત કરો અથવા સંકુચિત કરો",
+    "toggleSidebar": "સાઇડબાર ટૉગલ કરો",
+    "toggleTheme": "ડાર્ક મોડ ટૉગલ કરો",
+    "underline": "અંડરલાઇન"
+  },
+  "categories": {
+    "createStyle": "બનાવો અને સ્ટાઇલ કરો",
+    "editMove": "સંપાદન અને ખસેડો",
+    "popular": "લોકપ્રિય"
+  },
+  "categoriesLabel": "શૉર્ટકટ શ્રેણીઓ",
+  "close": "બંધ કરો",
+  "closeBackdrop": "કીબોર્ડ શૉર્ટકટ્સ બંધ કરો",
+  "empty": "કોઈ શૉર્ટકટ મળ્યા નથી",
+  "keysFor": "{{action}} માટે કીઓ",
+  "or": "અથવા",
+  "searchLabel": "કીબોર્ડ શૉર્ટકટ્સ શોધો",
+  "searchPlaceholder": "શૉર્ટકટ્સ શોધો…",
+  "searchResults": "શોધ પરિણામો",
+  "searchTerms": {
+    "toggleTheme": "થીમ લાઇટ ડાર્ક દેખાવ"
+  },
+  "title": "કીબોર્ડ શૉર્ટકટ્સ"
+}

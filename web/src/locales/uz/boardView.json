@@ -13,7 +13,7 @@
   "groupName": "Guruh nomi",
   "groupOptions": "{{groupName}} guruh opsiyalari",
   "groupThisBoard": "Bu doskani guruhlash",
-  "groupThisBoardDesc": "Ustunlar yaratish uchun Tanlov yoki Holat xususiyatini qo'shing.",
+  "groupThisBoardDesc": "Ustunlar yaratish uchun Tanlash, Holat, Shaxs yoki Ko‘p tanlov xususiyatini qo‘shing yoki tanlang.",
   "newGroup": "Yangi guruh",
   "newGroupIn": "{{dbTitle}} da yangi {{groupName}} guruhi",
   "newPage": "Yangi",

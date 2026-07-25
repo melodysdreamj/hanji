@@ -6,40 +6,86 @@ import { pathToFileURL } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { eb, blockToMarkdown, blocksToMarkdown, markdownToBlocks } from "./edgebase.mjs";
+import { eb, blockToMarkdown, blocksToMarkdown, markdownToBlocks, parseInlineMarkdown } from "./edgebase.mjs";
 export { formulaDate, formulaReplace, formulaTest } from "./formula-runtime.mjs";
 import {
   applyDatabaseView,
-  compareViewSortKeys,
   databasePropsContext,
   formatDbValue,
   ids,
   optionId,
   personIds,
   propValue,
+  ROLLUP_FUNCTIONS,
   viewDisplayProperties,
 } from "./database-query-runtime.mjs";
-export { evaluateRollupValue } from "./database-query-runtime.mjs";
+export {
+  canonicalRollupFunction,
+  evaluateRollupValue,
+  LEGACY_ROLLUP_FUNCTION_ALIASES,
+  NOTION_ROLLUP_FUNCTIONS,
+  ROLLUP_FUNCTIONS,
+} from "./database-query-runtime.mjs";
 import {
-  applySimpleSqlWhere,
+  applyNotionViewCompatMetadata,
+  applyNotionViewPresentationConfig,
+  assertRequiredNotionViewConfigure,
+  executeStreamableNotionMcpSqlChunk,
   normalizeNotionViewConfig,
   normalizeNotionViewConfigureInput,
-  parseDataSourceSqlQuery,
+  notionMcpSqlStreamPlan,
+  NOTION_MCP_SQL_CROSS_WINDOW_ERROR,
+  notionTypedDatabaseProperties,
+  parseDataSourceSqlUnionQuery,
   parseNotionCreateTableSchema,
   parseNotionDdlStatements,
-  selectSqlColumns,
   stripHanjiId,
+  validateNotionDdlOperations,
 } from "./notion-tool-dsl.mjs";
-export { parseDataSourceSqlQuery } from "./notion-tool-dsl.mjs";
+export { parseDataSourceSqlQuery, parseDataSourceSqlUnionQuery } from "./notion-tool-dsl.mjs";
 import { hanjiEnv } from "./legacy-product-compat.mjs";
 import { registerFoundationTools } from "./tool-registry-foundation.mjs";
 import { registerDatabaseTools } from "./tool-registry-database.mjs";
 import { registerNotionTools } from "./tool-registry-notion.mjs";
+import {
+  createOfficialNotionToolRegistrar,
+  registerNotionAsyncTaskTool,
+} from "./notion-official-tools.mjs";
+import {
+  HANJI_CORE_DATABASE_VIEW_TYPES,
+  NOTION_DATABASE_VIEW_TYPES,
+} from "./database-view-types.mjs";
+import { isHanjiBoardMainGroupPropertyType } from "../../shared/board-group-types.mjs";
+import {
+  meetingTranscriptMarkdown,
+  withoutMeetingTranscriptSubtrees,
+} from "./notion-fetch-transcript.mjs";
+import {
+  createNotionAttachmentHandlers,
+  registerNotionAttachmentTools,
+} from "./notion-attachment-tools.mjs";
+import {
+  NOTION_MOVE_PAGES_MAX_IDS,
+} from "./notion-move-pages-contract.mjs";
+import { createNotionMovePagesHandler } from "./notion-move-pages-handler.mjs";
+import {
+  createNotionUpdatePageHandler,
+  NOTION_UPDATE_PAGE_MAX_CONTENT_UPDATES,
+} from "./notion-update-page-handler.mjs";
+import {
+  notionSearchCursorCodec,
+  notionSearchRequestFingerprint,
+} from "./notion-search-pagination.mjs";
+import {
+  notionSqlCursorCodec,
+  notionSqlRequestFingerprint,
+} from "./notion-sql-pagination.mjs";
 
 const server = new McpServer({
   name: "hanji",
   version: "0.1.0",
 });
+const toolRegistrar = createOfficialNotionToolRegistrar(server);
 
 const BASE_URL = (hanjiEnv("HANJI_EDGEBASE_URL") || "http://127.0.0.1:8787").replace(/\/$/, "");
 const ok = (text) => ({ content: [{ type: /** @type {"text"} */ ("text"), text: String(text) }] });
@@ -53,7 +99,7 @@ const fail = (e) => ({
 });
 const okJson = (payload) => ok(JSON.stringify(payload));
 const registerToolAliases = (names, definition, handler) => {
-  for (const name of names) server.registerTool(name, definition, handler);
+  for (const name of names) toolRegistrar.registerTool(name, definition, handler);
 };
 const resourceText = (uri, text) => ({
   contents: [{ uri, mimeType: "text/markdown", text }],
@@ -68,7 +114,7 @@ server.registerResource(
   {
     title: "Hanji Notion-compatible Markdown",
     description:
-      "Notion MCP-compatible Markdown subset supported by Hanji. Hanji does not provide a separate Notion AI layer.",
+      "Notion MCP-compatible Markdown subset supported by Hanji, including authorized stored meeting-note transcripts.",
     mimeType: "text/markdown",
   },
   (uri) =>
@@ -84,8 +130,9 @@ server.registerResource(
         "- `<database url=\"...\" data-source-url=\"collection://...\">Title</database>` references an existing database/data source.",
         "- `<data-source url=\"collection://...\">` appears in fetch results for database/data-source schema.",
         "- `<page-discussions>` and `discussion://...` IDs appear when comments are requested.",
+        "- `<meeting-notes><transcript>` appears only when fetch requests `include_transcript` and the caller is an authorized attendee.",
         "",
-        "Hanji intentionally does not claim support for Notion AI-only or connected-source syntax. If a Notion MCP workflow asks for Notion AI behavior, Hanji tools keep the call shape compatible but search only Hanji product data.",
+        "Hanji returns stored meeting-note transcripts but does not claim separate AI generation, AI search, or connected-source syntax. AI-search requests search only authorized Hanji product data.",
       ].join("\n")
     )
 );
@@ -105,8 +152,8 @@ server.registerResource(
       [
         "# Hanji Notion-Compatible View DSL",
         "",
-        "Supported view types: table, board, list, gallery, calendar, timeline.",
-        "Unsupported Notion-only/AI-adjacent or not-yet-productized view types are rejected explicitly: form, chart, map, dashboard.",
+        "Accepted Notion view types: table, board, list, calendar, timeline, gallery, form, chart, map, dashboard.",
+        "Hanji's six core view workflows remain table, board, list, gallery, calendar, and timeline. Other official types retain their exact type/configuration without being relabeled as a core renderer.",
         "",
         "Supported directives:",
         "- `SHOW \"Prop1\", \"Prop2\"` sets visible properties.",
@@ -119,8 +166,12 @@ server.registerResource(
         "- `GROUP BY \"Property\"` sets board grouping.",
         "- `CALENDAR BY \"Property\"` sets the calendar date property.",
         "- `TIMELINE BY \"Start\" TO \"End\"` sets timeline start/end date properties.",
+        "- `MAP BY \"Property\"` sets the location property for a map view.",
+        "- `CHART column|bar|line|donut|number` sets the chart type; optional clauses are `AGGREGATE <operator> [BY] \"Property\"`, `COLOR <theme>`, `HEIGHT <size>`, `SORT <order>`, `STACK BY \"Property\"`, and `CAPTION \"Text\"`.",
+        "- `FORM CLOSE|OPEN`, `FORM ANONYMOUS true|false`, and `FORM PERMISSIONS none|comment_only|reader|read_and_write|editor` configure form submissions.",
         "- `COVER \"Property\"` sets board/gallery cover property.",
         "- `WRAP CELLS` and `NO WRAP` toggle wrapping.",
+        "- `FREEZE COLUMNS <count>` freezes that many table columns from the left (`FREEZE COLUMNS` defaults to one).",
         "- `CLEAR FILTER`, `CLEAR SORT`, and `CLEAR GROUP BY` clear those settings.",
         "",
         "Unsupported directives fail clearly instead of pretending to use Notion AI or unavailable Hanji product features.",
@@ -143,15 +194,16 @@ server.registerResource(
       [
         "# Hanji MCP Compatibility Report",
         "",
-        "Last reviewed: 2026-07-12 against MCP authorization 2025-11-25 and MCP tools 2025-06-18.",
+        "Last reviewed: 2026-07-15 against MCP authorization 2025-11-25 and the current 20-tool Notion connector surface.",
         "",
         "- Transport: this package provides local stdio with credentials read from environment variables; Hanji also exposes a hosted Streamable HTTP-compatible JSON-RPC endpoint.",
         "- Hosted authorization: OAuth authorization-code + PKCE, protected-resource metadata, audience validation, scoped Hanji grants, and no bearer-token passthrough are implemented and smoke-tested.",
         "- Tool results: structured MCP results and output schemas are used for policy, workspace, database description, and database query tools.",
         "- Access control: every call stays on the Hanji product API, authenticates as the configured user or service principal, then applies optional read-only, allowlist, validity-window, and scope narrowing.",
         "- Auditability: mutating product-API calls record `mcp.client_action` organization audit events with client and provisioned subject metadata when a workspace can be resolved.",
-        "- Notion MCP compatibility: official-style tool aliases are exposed where Hanji has product-backed behavior. Notion AI-only, connected-source, and meeting-notes features return explicit fallback or unsupported responses instead of pretending to exist.",
-        "- Remote hosted MCP: the current hosted subset supports read/query, comments, duplicate/move, and database-view operations. Primary Notion-compatible page/database create and update calls validate scopes but fail closed until they use Hanji's canonical stored-file lifecycle.",
+        "- Notion MCP compatibility: all 20 current notion-* names are exposed. Native and preserved imported meeting notes are queryable with attendee/ACL checks, and fetch expands stored transcripts only on include_transcript.",
+        "- Attachments: create/download use real storage-backed uploads. Safe UTF-8 inline formats are capped at 200 KiB, public HTTPS imports at 5 MiB, and stdio downloads fail closed outside attachments created by the current process.",
+        "- Remote hosted MCP: read/query, attachments, comments, duplicate/move, database-view, and primary Notion-compatible page/database create/update calls route through Hanji's canonical product handlers after scope and resource checks. Connected-source and AI-search layers still return explicit fallback metadata.",
       ].join("\n")
     )
 );
@@ -298,29 +350,6 @@ const MCP_QUERY_DATABASE_OUTPUT_SCHEMA = {
 };
 /** @type {[string, ...string[]]} */
 const NOTION_IMPORT_CONNECTION_KINDS = ["oauth", "personal_access_token", "internal_integration", "manual_token"];
-/** @type {[string, ...string[]]} */
-const ROLLUP_FUNCTIONS = [
-  "show_original",
-  "count_all",
-  "count_values",
-  "count_unique",
-  "count_empty",
-  "percent_empty",
-  "percent_not_empty",
-  "checked",
-  "unchecked",
-  "percent_checked",
-  "percent_unchecked",
-  "sum",
-  "average",
-  "median",
-  "min",
-  "max",
-  "range",
-  "earliest_date",
-  "latest_date",
-  "date_range",
-];
 const MCP_ACTOR = "mcp-local";
 
 const pageCreateAudit = () => ({ createdBy: MCP_ACTOR, lastEditedBy: MCP_ACTOR });
@@ -482,6 +511,7 @@ function templateBlocksToMarkdown(blocks = [], depth = 0) {
       content: block.content,
       plainText:
         richPlain(block.content) ||
+        block.plainText ||
         block.content?.expression ||
         block.content?.url ||
         block.content?.fileName ||
@@ -561,10 +591,9 @@ const DATABASE_PROPERTY_TYPES = [
 /** @type {[string, ...string[]]} */
 const DATABASE_CREATE_PROPERTY_TYPES = ["title", ...DATABASE_PROPERTY_TYPES];
 /** @type {[string, ...string[]]} */
-const DATABASE_VIEW_TYPES = ["table", "board", "list", "gallery", "calendar", "timeline"];
+const DATABASE_VIEW_TYPES = /** @type {[string, ...string[]]} */ ([...NOTION_DATABASE_VIEW_TYPES]);
 /** @type {[string, ...string[]]} */
-const NOTION_VIEW_TYPES = [...DATABASE_VIEW_TYPES, "form", "chart", "map", "dashboard"];
-const UNSUPPORTED_NOTION_VIEW_TYPES = NOTION_VIEW_TYPES.filter((type) => !DATABASE_VIEW_TYPES.includes(type));
+const NOTION_VIEW_TYPES = /** @type {[string, ...string[]]} */ ([...NOTION_DATABASE_VIEW_TYPES]);
 /** @type {[string, ...string[]]} */
 const VIEW_CARD_SIZES = ["small", "medium", "large"];
 /** @type {[string, ...string[]]} */
@@ -670,9 +699,22 @@ function rowPatchFromProperties(props, input = {}) {
   return { patch, unknown, readonly };
 }
 
+const IMPORTED_DATABASE_ROW_METADATA_PROPERTY_IDS = new Set([
+  "notionImportJobId",
+  "notionPageId",
+  "notionDataSourceId",
+]);
+
+function isImportedDatabaseRowMetadataPropertyId(propId) {
+  const key = String(propId);
+  return key.startsWith("__") || IMPORTED_DATABASE_ROW_METADATA_PROPERTY_IDS.has(key);
+}
+
 function persistableDatabaseRowProperties(properties = {}) {
   return Object.fromEntries(
-    Object.entries(properties ?? {}).filter(([key]) => !String(key).startsWith("__"))
+    Object.entries(properties ?? {}).filter(
+      ([key]) => !isImportedDatabaseRowMetadataPropertyId(key)
+    )
   );
 }
 
@@ -1206,6 +1248,87 @@ function workspaceMemberLabel(member) {
   return member.displayName || member.email || member.userId || "Member";
 }
 
+function requireOfficialNotionUser(user) {
+  if (
+    !user
+    || typeof user !== "object"
+    || Array.isArray(user)
+    || user.object !== "user"
+    || typeof user.id !== "string"
+    || !user.id.trim()
+    || !["person", "bot"].includes(user.type)
+  ) {
+    throw new Error("Canonical user response was malformed.");
+  }
+  if (
+    user.type === "person"
+    && (
+      !user.person
+      || typeof user.person !== "object"
+      || Array.isArray(user.person)
+      || (user.person.email !== undefined && typeof user.person.email !== "string")
+    )
+  ) {
+    throw new Error("Canonical user response was malformed.");
+  }
+  if (
+    user.type === "bot"
+    && (
+      !user.bot
+      || typeof user.bot !== "object"
+      || Array.isArray(user.bot)
+    )
+  ) {
+    throw new Error("Canonical user response was malformed.");
+  }
+  return user;
+}
+
+function officialNotionUsers(payload, { direct = false } = {}) {
+  if (direct) {
+    return {
+      results: [requireOfficialNotionUser(payload)],
+      hasMore: false,
+      nextCursor: null,
+    };
+  }
+  if (
+    !payload
+    || typeof payload !== "object"
+    || Array.isArray(payload)
+    || payload.object !== "list"
+    || payload.type !== "user"
+    || !Array.isArray(payload.results)
+    || typeof payload.has_more !== "boolean"
+    || (payload.has_more === true && (typeof payload.next_cursor !== "string" || !payload.next_cursor.trim()))
+    || (payload.has_more === false && payload.next_cursor !== null)
+  ) {
+    throw new Error("Canonical user response was malformed.");
+  }
+  return {
+    results: payload.results.map(requireOfficialNotionUser),
+    hasMore: payload.has_more,
+    nextCursor: payload.has_more ? payload.next_cursor.trim() : null,
+  };
+}
+
+function officialNotionUserEmail(user) {
+  return user?.person && typeof user.person === "object" && typeof user.person.email === "string"
+    ? user.person.email
+    : "";
+}
+
+function flatNotionUser(user, workspaceId) {
+  const email = officialNotionUserEmail(user);
+  return {
+    type: "person",
+    id: String(user?.id ?? ""),
+    name: String(user?.name ?? user?.id ?? "Hanji user"),
+    ...(email ? { email } : {}),
+    workspace_id: workspaceId,
+  };
+}
+
 function workspaceMemberLines(result) {
   const members = result.members ?? [];
   const workspace = result.workspace ?? {};
@@ -1285,12 +1408,12 @@ function workspaceStructuredContent(result) {
     domain: typeof workspace?.domain === "string" && workspace.domain ? workspace.domain : null,
     ownerId: typeof workspace?.ownerId === "string" && workspace.ownerId ? workspace.ownerId : null,
     notionTeamspaceId: String(workspace?.id ?? ""),
-    scopeModel: "hanji_account_workspace",
+    scopeModel: "hanji_connection_workspace",
   });
   return {
-    scopeModel: "hanji_account_accessible_workspaces",
+    scopeModel: "hanji_connection_selected_workspaces",
     notionCompatibilityNote:
-      "Hanji MCP authenticates as an account. Choose one listed workspace id and pass it as workspace_id to workspace-bound tools. Notion-compatible teamspace_id is accepted as an alias.",
+      "This Hanji MCP connection exposes only its fixed selected workspaces. Choose one listed workspace id and pass it as workspace_id to workspace-bound tools. Notion-compatible teamspace_id is accepted as an alias.",
     count: workspaces.length,
     workspaces: workspaces.map(normalize).filter((workspace) => workspace.id),
   };
@@ -1426,7 +1549,7 @@ function xmlEscape(value) {
 // untrusted text. `data-source\b` also covers <data-source-state> (the "\b"
 // falls on the "-" before "state"); <page-discussions> is covered by "page".
 const FRAMING_TAG_PATTERN =
-  /<(?=\/?(?:content|page|properties|ancestor-path|discussions?|comment|quote|anchor|data-source|data-source-state|sqlite-table|columns?|empty-block|database)\b)/gi;
+  /<(?=\/?(?:content|page|properties|ancestor-path|discussions?|comment|quote|anchor|data-source|data-source-state|sqlite-table|columns?|empty-block|database|meeting-notes|transcript)\b)/gi;
 
 export function escapeFramingBreakouts(value) {
   return String(value ?? "").replace(FRAMING_TAG_PATTERN, "&lt;");
@@ -1466,12 +1589,12 @@ function selectedWorkspaceId(input = {}) {
   return String(raw ?? "").trim() ? stripHanjiId(raw) : "";
 }
 
-function accountWorkspaceSelectionPayload(workspaces, toolName) {
+function connectionWorkspaceSelectionPayload(workspaces, toolName) {
   return {
     error: "workspace_id_required",
     tool: toolName,
     message:
-      "Hanji MCP is account-scoped. Choose one workspace from this list and pass its id as workspace_id. Notion-compatible teamspace_id is accepted as an alias.",
+      "Choose one workspace authorized for this connection and pass its id as workspace_id. Notion-compatible teamspace_id is accepted as an alias.",
     required_argument: "workspace_id",
     accepted_aliases: ["teamspace_id", "workspaceId"],
     workspaces: workspaceStructuredContent({ workspaces }).workspaces,
@@ -1481,13 +1604,13 @@ function accountWorkspaceSelectionPayload(workspaces, toolName) {
 async function requireWorkspaceSelection(input, toolName) {
   const workspaceId = selectedWorkspaceId(input);
   if (workspaceId) return { workspaceId };
-  const workspaces = await accountAccessibleWorkspaces();
+  const workspaces = await connectionSelectedWorkspaces();
   return {
     errorResult: {
       content: [
         {
           type: /** @type {"text"} */ ("text"),
-          text: JSON.stringify(accountWorkspaceSelectionPayload(workspaces, toolName)),
+          text: JSON.stringify(connectionWorkspaceSelectionPayload(workspaces, toolName)),
         },
       ],
       isError: true,
@@ -1515,7 +1638,7 @@ function hanjiScopeMetadata({
   workspaceIds = [],
   requestedTeamspaceId = null,
   target = "workspace_search",
-  source = "account",
+  source = "connection",
   pageScopeWorkspaceId = null,
   conflict = null,
 } = {}) {
@@ -1523,7 +1646,7 @@ function hanjiScopeMetadata({
   return {
     scope: {
       provider: "hanji",
-      access_model: "account_accessible_workspaces",
+      access_model: "connection_selected_workspaces",
       notion_reference_model: "workspace_scoped_connection",
       target,
       source,
@@ -1533,12 +1656,12 @@ function hanjiScopeMetadata({
       page_scope_workspace_id: pageScopeWorkspaceId || null,
       conflict,
       note:
-        "Notion MCP is typically bound to one connected workspace. Hanji MCP is account-scoped, so workspace_id is required for workspace-bound tools. Notion-compatible teamspace_id is accepted as a Hanji workspace_id alias.",
+        "This connection is limited to its fixed selected workspaces. workspace_id is required for workspace-bound tools, and Notion-compatible teamspace_id is accepted as a Hanji workspace_id alias.",
     },
   };
 }
 
-async function accountAccessibleWorkspaces() {
+async function connectionSelectedWorkspaces() {
   const result = await eb.listWorkspaces();
   const listed = Array.isArray(result?.workspaces) ? result.workspaces.filter((workspace) => workspace?.id) : [];
   if (listed.length) return listed;
@@ -1649,6 +1772,11 @@ function dataSourceStateForNotion(db, props = [], templates = []) {
   return {
     name: db.title || "Untitled",
     url: collectionUrl(db.id),
+    description: typeof db.properties?.notionDescription === "string" ? db.properties.notionDescription : "",
+    is_inline: typeof db.properties?.notionIsInline === "boolean"
+      ? db.properties.notionIsInline
+      : db.parentType === "page",
+    ...(db.properties?.notionDatabaseType ? { database_type: db.properties.notionDatabaseType } : {}),
     default_page_template: templates.find((template) => template.isDefault)?.id ?? null,
     page_templates: templates.map((template) => ({
       name: template.name || "Untitled",
@@ -1797,13 +1925,18 @@ function enhancedBlocksToMarkdown(blocks, pagesById, parentId = null, depth = 0)
   return out.join("\n");
 }
 
-async function notionPageFetchPayload(page, includeDiscussions = false) {
+async function notionPageFetchPayload(page, includeDiscussions = false, transcripts = null) {
   const [blocks, pages] = await Promise.all([eb.blocks(page.id), eb.pageProjection({ workspaceId: page.workspaceId })]);
   const pagesById = Object.fromEntries(pages.map((item) => [item.id, item]));
   const props = page.parentType === "database" && page.parentId ? await eb.dbProperties(page.parentId) : [];
   const propsByDb = props.length ? await databasePropsContext(pages, page.parentId, props) : {};
   const properties = pagePropertiesForNotion(page, pagesById, props, propsByDb);
-  const content = enhancedBlocksToMarkdown(blocks, pagesById) || "<empty-block/>";
+  const visibleBlocks = withoutMeetingTranscriptSubtrees(blocks);
+  const regularContent = enhancedBlocksToMarkdown(visibleBlocks, pagesById) || "<empty-block/>";
+  const transcriptContent = transcripts === null
+    ? ""
+    : meetingTranscriptMarkdown(transcripts, { xmlEscape, escapeFramingBreakouts });
+  const content = [regularContent, transcriptContent].filter(Boolean).join("\n");
   let discussionSummary = "";
   if (includeDiscussions) {
     const comments = await eb.comments(page.id);
@@ -1836,35 +1969,189 @@ async function notionPageFetchPayload(page, includeDiscussions = false) {
     title: titleOf(page),
     url: pageUrl(page.id),
     text,
+    ...(transcripts === null ? {} : { transcripts }),
   };
 }
 
-async function databaseRowsForNotionSearch(databaseId, query, limit, filters = {}) {
+const NOTION_SEARCH_SOURCE_WINDOW = 100;
+const NOTION_SEARCH_MAX_WINDOWS_PER_CALL = 10;
+const NOTION_SEARCH_PENDING_REVISION = "pending-first-window";
+
+function searchCursorKind(state, allowedKinds) {
+  if (!state) return null;
+  if (!allowedKinds.includes(state.kind)) {
+    throw new Error("Search cursor does not match this search branch.");
+  }
+  return state.kind;
+}
+
+function searchSourcePage(payload, itemsKey, offsetsKey, requestedOffset) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Search source response was malformed.");
+  }
+  const items = payload[itemsKey];
+  if (!Array.isArray(items) || items.length > NOTION_SEARCH_SOURCE_WINDOW) {
+    throw new Error("Search source response was malformed.");
+  }
+  const revision = String(payload.revision ?? "").trim();
+  if (!revision || revision.length > 512) {
+    throw new Error("Search source revision was malformed.");
+  }
+  const suppliedOffsets = payload[offsetsKey];
+  const offsets = Array.isArray(suppliedOffsets)
+    ? suppliedOffsets
+    : items.map((_item, index) => requestedOffset + index);
+  if (
+    offsets.length !== items.length
+    || offsets.some((offset, index) =>
+      !Number.isSafeInteger(offset)
+      || offset < requestedOffset
+      || (index > 0 && offset <= offsets[index - 1]))
+  ) {
+    throw new Error("Search source offsets were malformed.");
+  }
+  const hasMore = payload.hasMore === true;
+  const nextOffset = hasMore ? payload.nextOffset : null;
+  if (
+    hasMore
+    && (!Number.isSafeInteger(nextOffset) || nextOffset <= requestedOffset)
+  ) {
+    throw new Error("Search source pagination was malformed.");
+  }
+  if (!hasMore && payload.nextOffset !== undefined && payload.nextOffset !== null) {
+    throw new Error("Search source pagination was malformed.");
+  }
+  return { items, offsets, revision, hasMore, nextOffset };
+}
+
+function workspaceSearchSourcePage(payload, itemsKey, requestedCursor, requestedLimit) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Workspace search source response was malformed.");
+  }
+  const items = payload[itemsKey];
+  if (
+    !Array.isArray(items)
+    || items.length > requestedLimit
+    || items.length > NOTION_SEARCH_SOURCE_WINDOW
+  ) {
+    throw new Error("Workspace search source response was malformed.");
+  }
+  const revision = String(payload.revision ?? "").trim();
+  if (!revision || revision.length > 512) {
+    throw new Error("Workspace search source revision was malformed.");
+  }
+  if (typeof payload.hasMore !== "boolean") {
+    throw new Error("Workspace search source pagination was malformed.");
+  }
+  const nextCursor = payload.hasMore ? payload.nextCursor : null;
+  if (
+    payload.hasMore
+    && (
+      typeof nextCursor !== "string"
+      || nextCursor.length === 0
+      || nextCursor.length > 16 * 1024
+      || nextCursor === requestedCursor
+    )
+  ) {
+    throw new Error("Workspace search source pagination did not advance.");
+  }
+  if (!payload.hasMore && payload.nextCursor !== undefined && payload.nextCursor !== null) {
+    throw new Error("Workspace search source pagination was malformed.");
+  }
+  return { items, revision, hasMore: payload.hasMore, nextCursor };
+}
+
+function requireStableSearchRevision(expected, actual) {
+  if (expected && expected !== NOTION_SEARCH_PENDING_REVISION && expected !== actual) {
+    throw new Error("Search cursor expired because the searchable source changed.");
+  }
+  return actual;
+}
+
+function sourceContinuation(kind, offset, revision) {
+  return {
+    kind,
+    offset,
+    revision,
+  };
+}
+
+function workspaceSourceContinuation(kind, sourceCursor, revision) {
+  return {
+    kind,
+    sourceCursor: sourceCursor ?? null,
+    revision,
+  };
+}
+
+async function databaseRowsForNotionSearch(
+  databaseId,
+  database,
+  query,
+  limit,
+  filters = {},
+  cursorState = null,
+) {
   const safeLimit = clamp(limit, 1, 25);
-  const db = await eb.getOne("pages", databaseId);
-  if (!db || db.kind !== "database") return [];
-  const [props, rows, pages] = await Promise.all([
+  searchCursorKind(cursorState, ["data_source"]);
+  if (!database || database.kind !== "database") {
+    return { results: [], nextState: null, requestStatus: null };
+  }
+  const [props, pages] = await Promise.all([
     eb.dbProperties(databaseId),
-    eb.dbRows(databaseId, { includeComputed: true }),
     eb.pages(),
   ]);
   const pagesById = Object.fromEntries(pages.map((page) => [page.id, page]));
   const needle = String(query ?? "").trim().toLowerCase();
-  const matches = [];
-  for (const row of rows) {
-    if (!matchesNotionSearchFilters(row, filters)) continue;
-    const haystack = [
-      row.title,
-      ...props.map((prop) => formatDbValue(row, prop, pagesById, props)),
-    ].join("\n");
-    if (needle && !haystack.toLowerCase().includes(needle)) continue;
-    const highlight = props
-      .map((prop) => formatDbValue(row, prop, pagesById, props))
-      .find((value) => needle && value.toLowerCase().includes(needle));
-    matches.push(notionSearchResult(row, highlight || row.title));
-    if (matches.length >= safeLimit) break;
+  const accepted = [];
+  let offset = cursorState?.offset ?? 0;
+  let revision = cursorState?.revision ?? null;
+  let hasPhysicalMore = false;
+  let nextPhysicalOffset = null;
+  let windows = 0;
+
+  while (accepted.length <= safeLimit && windows < NOTION_SEARCH_MAX_WINDOWS_PER_CALL) {
+    const payload = await eb.databaseRowsPage(databaseId, {
+      includeComputed: true,
+      limit: NOTION_SEARCH_SOURCE_WINDOW,
+      offset,
+    });
+    const page = searchSourcePage(payload, "rows", "rowOffsets", offset);
+    revision = requireStableSearchRevision(revision, page.revision);
+    for (let index = 0; index < page.items.length; index += 1) {
+      const row = page.items[index];
+      if (!row || typeof row !== "object" || !String(row.id ?? "").trim()) {
+        throw new Error("Search data-source row was malformed.");
+      }
+      if (!matchesNotionSearchFilters(row, filters)) continue;
+      const values = props.map((prop) => formatDbValue(row, prop, pagesById, props));
+      const haystack = [row.title, ...values].join("\n");
+      if (needle && !haystack.toLowerCase().includes(needle)) continue;
+      const highlight = values.find((value) => needle && value.toLowerCase().includes(needle));
+      accepted.push({
+        result: notionSearchResult(row, highlight || row.title),
+        sourceOffset: page.offsets[index],
+      });
+      if (accepted.length > safeLimit) break;
+    }
+    windows += 1;
+    hasPhysicalMore = page.hasMore;
+    nextPhysicalOffset = page.nextOffset;
+    if (accepted.length > safeLimit || !page.hasMore) break;
+    offset = page.nextOffset;
   }
-  return matches;
+
+  const lookahead = accepted[safeLimit];
+  const nextState = lookahead
+    ? sourceContinuation("data_source", lookahead.sourceOffset, revision)
+    : hasPhysicalMore && Number.isSafeInteger(nextPhysicalOffset)
+      ? sourceContinuation("data_source", nextPhysicalOffset, revision)
+      : null;
+  return {
+    results: accepted.slice(0, safeLimit).map(({ result }) => result),
+    nextState,
+    requestStatus: null,
+  };
 }
 
 function collectPageSubtree(pages, rootId) {
@@ -1959,8 +2246,13 @@ async function movePage(pageId, opts = {}) {
       ? positionBetween(after?.position, before?.position)
       : positionBetween(siblings[siblings.length - 1]?.position, undefined);
 
-  const updated = await eb.update("pages", pageId, { parentId, parentType, position, ...pageEditAudit() });
-  return { page: updated, parentId, parentType, position };
+  return eb.moveNotionPage(page, {
+    parentId,
+    parentType,
+    parent: parentId ? pagesById[parentId] : null,
+    position,
+    dryRun: opts.dryRun === true,
+  });
 }
 
 async function trashPageTree(pageId) {
@@ -2037,10 +2329,12 @@ function propertyConfigForInput(type, input = {}, databaseId) {
   if (type === "select" || type === "multi_select" || type === "status") {
     const names = Array.isArray(input.options) ? input.options : [];
     return withDisplayConfig({
-      options: names.map((name, index) => ({
+      options: names.map((option, index) => ({
         id: eb.newId(),
-        name: String(name),
-        color: OPTION_COLORS[index % OPTION_COLORS.length],
+        name: option && typeof option === "object" ? String(option.name ?? `Option ${index + 1}`) : String(option),
+        color: option && typeof option === "object" && typeof option.color === "string"
+          ? option.color
+          : OPTION_COLORS[index % OPTION_COLORS.length],
       })),
     });
   }
@@ -2051,7 +2345,7 @@ function propertyConfigForInput(type, input = {}, databaseId) {
     const config = { relationDatabaseId: input.relationDatabaseId ?? databaseId };
     // Notion-style two-way relation: setting relatedPropertyId makes the backend
     // create + cross-link a reciprocal relation property on the related database.
-    if (input.twoWay === true) config.relatedPropertyId = eb.newId();
+    if (input.twoWay === true) config.relatedPropertyId = input.relatedPropertyId || eb.newId();
     return withDisplayConfig(config);
   }
   if (type === "formula") {
@@ -2204,7 +2498,10 @@ function propertyIdForViewInput(props, value, label, allowedTypes) {
   const prop = propertyByKey(props, raw);
   if (!prop) throw new Error(`${label} property "${value}" not found.`);
   if (allowedTypes && !allowedTypes.includes(prop.type)) {
-    throw new Error(`${label} must use ${allowedTypes.join(" or ")} properties.`);
+    const formatted = allowedTypes.length < 3
+      ? allowedTypes.join(" or ")
+      : `${allowedTypes.slice(0, -1).join(", ")}, or ${allowedTypes.at(-1)}`;
+    throw new Error(`${label} must use ${formatted} properties.`);
   }
   return prop.id;
 }
@@ -2324,13 +2621,18 @@ function filterGroupFromInput(props, input) {
   return filterGroupHasTerms(group) ? group : undefined;
 }
 
-function defaultViewConfigForType(type, props, base = {}) {
+export function defaultViewConfigForType(type, props, base = {}) {
   const config = /** @type {Record<string, any>} */ ({ ...(base ?? {}) });
   const propIds = props.map((prop) => prop.id);
-  if (!Array.isArray(config.propertyOrder)) config.propertyOrder = propIds;
-  if (!Array.isArray(config.visibleProperties)) config.visibleProperties = propIds;
+  // Core product views keep their established defaults. Compatibility-only
+  // official types start from the caller's exact configuration, avoiding a
+  // fake table-shaped config on form/chart/map/dashboard records.
+  if (HANJI_CORE_DATABASE_VIEW_TYPES.includes(type)) {
+    if (!Array.isArray(config.propertyOrder)) config.propertyOrder = propIds;
+    if (!Array.isArray(config.visibleProperties)) config.visibleProperties = propIds;
+  }
   if (type === "board" && !config.groupBy) {
-    const groupProp = props.find((prop) => prop.type === "select" || prop.type === "status");
+    const groupProp = props.find((prop) => isHanjiBoardMainGroupPropertyType(prop.type));
     if (groupProp) config.groupBy = groupProp.id;
   }
   if ((type === "calendar" || type === "timeline") && !config.calendarBy && !config.timelineBy) {
@@ -2345,7 +2647,7 @@ function defaultViewConfigForType(type, props, base = {}) {
   return config;
 }
 
-function viewConfigPatchForInput(props, type, input = {}, base = {}) {
+export function viewConfigPatchForInput(props, type, input = {}, base = {}) {
   const config = defaultViewConfigForType(type, props, base);
   const changed = [];
   const setProperty = (key, value, label, allowedTypes) => {
@@ -2376,33 +2678,15 @@ function viewConfigPatchForInput(props, type, input = {}, base = {}) {
     );
     changed.push("tableCalculations");
   }
-  setProperty("groupBy", input.groupBy, "groupBy", ["select", "status"]);
-  if (input.subGroupBy !== undefined) {
-    if (type !== "board") throw new Error("subGroupBy can only be set on board views.");
-    const subGroupBy = propertyIdForViewInput(props, input.subGroupBy, "subGroupBy", ["select", "status"]);
-    if (subGroupBy && subGroupBy === config.groupBy) {
-      throw new Error("subGroupBy must be different from groupBy.");
-    }
-    if (subGroupBy) config.subGroupBy = subGroupBy;
-    else delete config.subGroupBy;
-    changed.push("subGroupBy");
-  }
-  setProperty("calendarBy", input.calendarBy, "calendarBy", ["date"]);
-  setProperty("timelineBy", input.timelineBy, "timelineBy", ["date"]);
-  setProperty("timelineEndBy", input.timelineEndBy, "timelineEndBy", ["date"]);
+  applyNotionViewPresentationConfig({
+    config,
+    changed,
+    props,
+    type,
+    input,
+    propertyIdForViewInput,
+  });
   setProperty("dependencyProperty", input.dependencyProperty, "dependencyProperty", ["relation"]);
-
-  if (input.coverProperty !== undefined) {
-    const raw = String(input.coverProperty).trim();
-    if (!raw || raw === "__page_cover" || raw.toLowerCase() === "page") config.coverProperty = undefined;
-    else if (raw === "__none" || raw.toLowerCase() === "none") config.coverProperty = "__none";
-    else config.coverProperty = propertyIdForViewInput(props, raw, "coverProperty", ["files", "url"]);
-    changed.push("coverProperty");
-  }
-  if (input.wrap !== undefined) {
-    config.wrap = input.wrap;
-    changed.push("wrap");
-  }
   if (input.cardSize !== undefined) {
     config.cardSize = input.cardSize;
     changed.push("cardSize");
@@ -2456,6 +2740,166 @@ function viewConfigPatchForInput(props, type, input = {}, base = {}) {
   return { config, changed: Array.from(new Set(changed)) };
 }
 
+function notionSearchPolicyBinding() {
+  const policy = typeof eb.mcpAccessPolicy === "function" ? eb.mcpAccessPolicy() : {};
+  const sorted = (value) => Array.isArray(value) ? value.map(String).sort() : [];
+  return {
+    readOnly: policy?.readOnly === true,
+    allowedWorkspaceIds: sorted(policy?.allowedWorkspaceIds),
+    allowedPageIds: sorted(policy?.allowedPageIds),
+    allowedDatabaseIds: sorted(policy?.allowedDatabaseIds),
+    scopes: sorted(policy?.scopes),
+    subjectType: policy?.subjectType ?? null,
+    subjectId: policy?.subjectId ?? null,
+    clientId: policy?.clientId ?? null,
+    provisioningId: policy?.provisioningId ?? null,
+    notBefore: policy?.notBefore ?? null,
+    expiresAt: policy?.expiresAt ?? null,
+  };
+}
+
+async function workspaceResultsForNotionSearch({
+  workspaceId,
+  query,
+  limit,
+  filters,
+  requiredAncestorIds,
+  trimHighlight,
+  cursorState,
+}) {
+  searchCursorKind(cursorState, ["workspace_pages", "workspace_blocks"]);
+  const accepted = [];
+  let phase = cursorState?.kind === "workspace_blocks" ? "blocks" : "pages";
+  let sourceCursor = cursorState?.sourceCursor ?? null;
+  let revision = cursorState?.revision ?? NOTION_SEARCH_PENDING_REVISION;
+  let windows = 0;
+  let nextState = null;
+  const seenSourceCursors = new Set(
+    sourceCursor ? [`${phase}:${sourceCursor}`] : [],
+  );
+
+  while (windows < NOTION_SEARCH_MAX_WINDOWS_PER_CALL) {
+    const remaining = Math.max(0, limit - accepted.length);
+    const requestLimit = Math.max(1, remaining);
+    const requestedCursor = sourceCursor;
+    if (phase === "pages") {
+      const payload = await eb.searchPagesPage(query, {
+        workspaceId,
+        limit: requestLimit,
+        ...(requiredAncestorIds?.length ? { requiredAncestorIds } : {}),
+        ...(requestedCursor ? { sourceCursor: requestedCursor } : {}),
+      });
+      const source = workspaceSearchSourcePage(
+        payload,
+        "pages",
+        requestedCursor,
+        requestLimit,
+      );
+      revision = source.revision;
+      for (const page of source.items) {
+        if (!page || typeof page !== "object" || !String(page.id ?? "").trim()) {
+          throw new Error("Workspace search page was malformed.");
+        }
+        if (!matchesNotionSearchFilters(page, filters)) continue;
+        if (accepted.length >= limit) {
+          nextState = workspaceSourceContinuation(
+            "workspace_pages",
+            requestedCursor,
+            revision,
+          );
+          break;
+        }
+        accepted.push(trimHighlight(notionSearchResult(page)));
+      }
+      windows += 1;
+      if (nextState) break;
+      if (source.hasMore) {
+        const cursorKey = `pages:${source.nextCursor}`;
+        if (seenSourceCursors.has(cursorKey)) {
+          throw new Error("Workspace search source pagination did not advance.");
+        }
+        seenSourceCursors.add(cursorKey);
+        sourceCursor = source.nextCursor;
+        if (windows >= NOTION_SEARCH_MAX_WINDOWS_PER_CALL) {
+          nextState = workspaceSourceContinuation("workspace_pages", sourceCursor, revision);
+          break;
+        }
+        continue;
+      }
+      phase = "blocks";
+      sourceCursor = null;
+      revision = NOTION_SEARCH_PENDING_REVISION;
+      if (windows >= NOTION_SEARCH_MAX_WINDOWS_PER_CALL) {
+        nextState = workspaceSourceContinuation(
+          "workspace_blocks",
+          null,
+          NOTION_SEARCH_PENDING_REVISION,
+        );
+        break;
+      }
+      continue;
+    }
+
+    const payload = await eb.searchBlocksPage(query, {
+      workspaceId,
+      limit: requestLimit,
+      excludeMetadataMatches: true,
+      ...(requiredAncestorIds?.length ? { requiredAncestorIds } : {}),
+      ...(requestedCursor ? { sourceCursor: requestedCursor } : {}),
+    });
+    const source = workspaceSearchSourcePage(
+      payload,
+      "blocks",
+      requestedCursor,
+      requestLimit,
+    );
+    revision = source.revision;
+    const pagesById = Object.fromEntries(
+      (Array.isArray(payload?.pages) ? payload.pages : [])
+        .filter((page) => page && typeof page === "object" && String(page.id ?? "").trim())
+        .map((page) => [page.id, page]),
+    );
+    for (const block of source.items) {
+      if (!block || typeof block !== "object" || !String(block.id ?? "").trim()) {
+        throw new Error("Workspace search block was malformed.");
+      }
+      const page = pagesById[block.pageId];
+      if (!page || !matchesNotionSearchFilters(page, filters)) continue;
+      if (accepted.length >= limit) {
+        nextState = workspaceSourceContinuation(
+          "workspace_blocks",
+          requestedCursor,
+          revision,
+        );
+        break;
+      }
+      accepted.push(trimHighlight(notionSearchResult(page, blockPreview(block))));
+    }
+    windows += 1;
+    if (nextState) break;
+    if (source.hasMore) {
+      const cursorKey = `blocks:${source.nextCursor}`;
+      if (seenSourceCursors.has(cursorKey)) {
+        throw new Error("Workspace search source pagination did not advance.");
+      }
+      seenSourceCursors.add(cursorKey);
+      sourceCursor = source.nextCursor;
+      nextState = windows >= NOTION_SEARCH_MAX_WINDOWS_PER_CALL
+        ? workspaceSourceContinuation("workspace_blocks", sourceCursor, revision)
+        : null;
+      if (nextState) break;
+      continue;
+    }
+    break;
+  }
+
+  return {
+    results: accepted,
+    nextState,
+    requestStatus: null,
+  };
+}
+
 const NOTION_SEARCH_INPUT_SCHEMA = {
   query: z.string().describe("Search query"),
   query_type: z.enum(["internal", "user"]).optional().describe("Use user to search workspace members; internal searches pages/databases/rows."),
@@ -2465,11 +2909,12 @@ const NOTION_SEARCH_INPUT_SCHEMA = {
   workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
   teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
   page_size: z.number().int().min(1).max(25).optional(),
+  start_cursor: z.string().optional().describe("Opaque continuation cursor returned by the previous identical search"),
   max_highlight_length: z.number().int().min(0).max(1000).optional(),
   filters: JsonValueSchema.optional().describe("Accepted for Notion MCP compatibility; unsupported filter keys are ignored."),
 };
 
-async function handleNotionSearch({
+export async function handleNotionSearch({
   query,
   query_type = "internal",
   content_search_mode = "workspace_search",
@@ -2478,6 +2923,7 @@ async function handleNotionSearch({
   workspace_id,
   teamspace_id,
   page_size = 10,
+  start_cursor = undefined,
   max_highlight_length = 200,
   filters,
 }) {
@@ -2493,74 +2939,126 @@ async function handleNotionSearch({
           ? ""
           : String(result.highlight ?? "").slice(0, max_highlight_length),
     });
+    const dataSourceId = stripHanjiId(data_source_url);
+    const pageScopeId = stripHanjiId(page_url);
+    const cursorFingerprint = notionSearchRequestFingerprint({
+      workspaceId: requiredWorkspace.workspaceId,
+      query: String(query ?? ""),
+      queryType: query_type,
+      contentSearchMode: content_search_mode,
+      dataSourceId,
+      pageScopeId,
+      pageSize: limit,
+      maxHighlightLength: max_highlight_length,
+      filters,
+      policy: notionSearchPolicyBinding(),
+    });
+    const cursorState = start_cursor
+      ? notionSearchCursorCodec.decode(start_cursor, cursorFingerprint)
+      : null;
 
     if (query_type === "user") {
+      searchCursorKind(cursorState, ["user"]);
       const people = [];
-      for (const workspace of scope.workspaces) {
-        const members = await eb.workspaceMembers(workspace.id);
-        for (const member of members.members ?? []) {
-          const label = workspaceMemberLabel(member);
-          const email = member.email ?? "";
-          const haystack = `${label}\n${email}\n${member.userId ?? ""}`.toLowerCase();
-          if (!haystack.includes(query.toLowerCase())) continue;
-          people.push({
-            id: member.userId || member.id,
-            title: label,
-            type: "user",
-            email: email || undefined,
-            workspace_id: workspace.id,
-            workspace: workspace.name,
-          });
-          if (people.length >= limit) break;
-        }
-        if (people.length >= limit) break;
+      const workspace = scope.workspaces[0] ?? {
+        id: requiredWorkspace.workspaceId,
+        name: requiredWorkspace.workspaceId,
+      };
+      const payload = await eb.notionUsers({
+        workspaceId: workspace.id,
+        query,
+        startCursor: cursorState?.upstreamCursor,
+        pageSize: limit,
+      });
+      const roster = officialNotionUsers(payload);
+      for (const user of roster.results) {
+        const email = officialNotionUserEmail(user);
+        people.push({
+          id: String(user?.id ?? ""),
+          title: String(user?.name ?? user?.id ?? "Hanji user"),
+          type: "user",
+          ...(email ? { email } : {}),
+          workspace_id: workspace.id,
+          workspace: workspace.name,
+        });
       }
+      const nextCursor = roster.hasMore
+        ? notionSearchCursorCodec.encode(
+            { kind: "user", upstreamCursor: roster.nextCursor },
+            cursorFingerprint,
+          )
+        : null;
       return okJson(notionSearchResponse(
         people,
         "user",
-        hanjiScopeMetadata({
-          workspaceIds: scope.workspaceIds,
-          requestedTeamspaceId: scope.requestedTeamspaceId,
-          target: "user_search",
-          source: scope.source,
-        })
+        {
+          ...hanjiScopeMetadata({
+            workspaceIds: scope.workspaceIds,
+            requestedTeamspaceId: scope.requestedTeamspaceId,
+            target: "user_search",
+            source: scope.source,
+          }),
+          has_more: roster.hasMore,
+          next_cursor: nextCursor,
+        },
       ));
     }
 
     if (data_source_url) {
-      const databaseId = stripHanjiId(data_source_url);
-      const db = await eb.getOne("pages", databaseId);
+      searchCursorKind(cursorState, ["data_source"]);
+      const db = await eb.getOne("pages", dataSourceId);
       const databaseWorkspaceId = db?.workspaceId ?? null;
       if (scope.requestedTeamspaceId && databaseWorkspaceId && scope.requestedTeamspaceId !== databaseWorkspaceId) {
         return okJson(notionSearchResponse(
           [],
           "workspace_search",
-          hanjiScopeMetadata({
-            workspaceIds: [scope.requestedTeamspaceId],
-            requestedTeamspaceId: scope.requestedTeamspaceId,
-            target: "data_source_search",
-            source: scope.source,
-            conflict: "data_source_workspace_does_not_match_teamspace_id",
-          })
+          {
+            ...hanjiScopeMetadata({
+              workspaceIds: [scope.requestedTeamspaceId],
+              requestedTeamspaceId: scope.requestedTeamspaceId,
+              target: "data_source_search",
+              source: scope.source,
+              conflict: "data_source_workspace_does_not_match_teamspace_id",
+            }),
+            has_more: false,
+            next_cursor: null,
+          },
         ));
       }
-      const results = (await databaseRowsForNotionSearch(databaseId, query, limit, filters)).map(trimHighlight);
+      const window = await databaseRowsForNotionSearch(
+        dataSourceId,
+        db,
+        query,
+        limit,
+        filters,
+        cursorState,
+      );
+      const nextCursor = window.nextState
+        ? notionSearchCursorCodec.encode(window.nextState, cursorFingerprint)
+        : null;
       return okJson(notionSearchResponse(
-        results,
+        window.results.map(trimHighlight),
         "workspace_search",
-        hanjiScopeMetadata({
-          workspaceIds: databaseWorkspaceId ? [databaseWorkspaceId] : scope.workspaceIds,
-          requestedTeamspaceId: scope.requestedTeamspaceId,
-          target: "data_source_search",
-          source: databaseWorkspaceId ? "data_source_url" : scope.source,
-        })
+        {
+          ...hanjiScopeMetadata({
+            workspaceIds: databaseWorkspaceId ? [databaseWorkspaceId] : scope.workspaceIds,
+            requestedTeamspaceId: scope.requestedTeamspaceId,
+            target: "data_source_search",
+            source: databaseWorkspaceId ? "data_source_url" : scope.source,
+          }),
+          data_source_id: dataSourceId,
+          has_more: nextCursor !== null,
+          next_cursor: nextCursor,
+          ...(window.requestStatus ? { request_status: window.requestStatus } : {}),
+        },
       ));
     }
 
-    let pageScopeIds = null;
+    let requiredAncestorIds = null;
     let pageScopeWorkspaceId = null;
     if (page_url) {
-      const rootId = stripHanjiId(page_url);
+      const rootId = pageScopeId;
+      requiredAncestorIds = [rootId];
       const root = await eb.getOne("pages", rootId);
       if (root?.workspaceId) {
         pageScopeWorkspaceId = root.workspaceId;
@@ -2568,86 +3066,80 @@ async function handleNotionSearch({
           return okJson(notionSearchResponse(
             [],
             "workspace_search",
-            hanjiScopeMetadata({
-              workspaceIds: [scope.requestedTeamspaceId],
-              requestedTeamspaceId: scope.requestedTeamspaceId,
-              target: "page_subtree_search",
-              source: scope.source,
-              pageScopeWorkspaceId,
-              conflict: "page_workspace_does_not_match_teamspace_id",
-            })
+            {
+              ...hanjiScopeMetadata({
+                workspaceIds: [scope.requestedTeamspaceId],
+                requestedTeamspaceId: scope.requestedTeamspaceId,
+                target: "page_subtree_search",
+                source: scope.source,
+                pageScopeWorkspaceId,
+                conflict: "page_workspace_does_not_match_teamspace_id",
+              }),
+              has_more: false,
+              next_cursor: null,
+            },
           ));
         }
-        const pages = await eb.pageProjection({ workspaceId: root.workspaceId });
-        pageScopeIds = collectPageSubtree(pages, rootId);
-      } else {
-        pageScopeIds = new Set([rootId]);
       }
+    }
+    if (!requiredAncestorIds) {
+      const policy = notionSearchPolicyBinding();
+      const resourceIds = Array.from(new Set([
+        ...policy.allowedPageIds,
+        ...policy.allowedDatabaseIds,
+      ]));
+      requiredAncestorIds = resourceIds.length ? resourceIds : null;
     }
 
     const workspaceIds = pageScopeWorkspaceId ? [pageScopeWorkspaceId] : scope.workspaceIds;
-    const scanLimit = Math.max(limit * 3, limit);
-    const results = [];
-    const seen = new Set();
-    for (const workspaceId of workspaceIds) {
-      const hits = await eb.searchPages(query, { workspaceId, limit: scanLimit });
-      for (const page of hits) {
-        if (pageScopeIds && !pageScopeIds.has(page.id)) continue;
-        if (!matchesNotionSearchFilters(page, filters)) continue;
-        if (seen.has(page.id)) continue;
-        seen.add(page.id);
-        results.push(trimHighlight(notionSearchResult(page)));
-        if (results.length >= limit) break;
-      }
-      if (results.length >= limit) break;
-    }
-
-    if (results.length < limit) {
-      for (const workspaceId of workspaceIds) {
-        const blocks = await eb.searchBlocks(query, { workspaceId, limit: scanLimit });
-        const pagesById = Object.fromEntries((await eb.pageProjection({ workspaceId })).map((page) => [page.id, page]));
-        for (const block of blocks) {
-          if (pageScopeIds && !pageScopeIds.has(block.pageId)) continue;
-          const page = pagesById[block.pageId];
-          if (page && !matchesNotionSearchFilters(page, filters)) continue;
-          if (!page || seen.has(page.id)) continue;
-          seen.add(page.id);
-          results.push(trimHighlight(notionSearchResult(page, blockPreview(block))));
-          if (results.length >= limit) break;
-        }
-        if (results.length >= limit) break;
-      }
-    }
+    const window = await workspaceResultsForNotionSearch({
+      workspaceId: workspaceIds[0] ?? requiredWorkspace.workspaceId,
+      query,
+      limit,
+      filters,
+      requiredAncestorIds,
+      trimHighlight,
+      cursorState,
+    });
+    const nextCursor = window.nextState
+      ? notionSearchCursorCodec.encode(window.nextState, cursorFingerprint)
+      : null;
 
     const scopeExtra = hanjiScopeMetadata({
       workspaceIds,
       requestedTeamspaceId: scope.requestedTeamspaceId,
-      target: pageScopeIds ? "page_subtree_search" : "workspace_search",
+      target: pageScopeId ? "page_subtree_search" : "workspace_search",
       source: pageScopeWorkspaceId ? "page_url_workspace" : scope.source,
       pageScopeWorkspaceId,
     });
+    const paginationExtra = {
+      has_more: nextCursor !== null,
+      next_cursor: nextCursor,
+      ...(window.requestStatus ? { request_status: window.requestStatus } : {}),
+    };
     return okJson(notionSearchResponse(
-      results,
+      window.results,
       "workspace_search",
       content_search_mode === "ai_search"
         ? {
             ...scopeExtra,
+            ...paginationExtra,
             requested_content_search_mode: "ai_search",
             effective_content_search_mode: "workspace_search",
             unsupported_features: ["notion_ai_search", "connected_source_search"],
             note: "Hanji does not provide a separate AI or connected-source search layer; searched account-accessible Hanji workspace data using the scope metadata above.",
           }
-        : scopeExtra
+        : { ...scopeExtra, ...paginationExtra },
     ));
   } catch (e) {
     return fail(e);
   }
 }
 
-const NOTION_SEARCH_TOOL = {
+export const NOTION_SEARCH_TOOL = {
   title: "Search",
   description:
-    "Notion-compatible search for Hanji. Hanji MCP is account-scoped, so workspace_id is required. Call list_workspaces or _notion_get_teams first, choose one Hanji workspace id, and pass it as workspace_id or Notion-compatible teamspace_id.",
+    "Notion-compatible search for Hanji. The connection is workspace-scoped, so workspace_id is required. Call list_workspaces or _notion_get_teams first, choose one authorized Hanji workspace id, and pass it as workspace_id or Notion-compatible teamspace_id.",
   inputSchema: NOTION_SEARCH_INPUT_SCHEMA,
 };
 
@@ -2663,25 +3155,55 @@ export async function handleNotionFetch({ id, workspace_id, teamspace_id, includ
   try {
     const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_fetch");
     if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
+    if (String(id ?? "").trim().toLowerCase() === "self") {
+      const workspaces = await connectionSelectedWorkspaces();
+      const workspace = workspaces.find((candidate) => candidate.id === requiredWorkspace.workspaceId);
+      if (!workspace) throw new Error(`Workspace ${requiredWorkspace.workspaceId} not found.`);
+      const authenticated = await eb.currentUser();
+      const authenticatedId = authenticated?.id ?? authenticated?.userId;
+      if (!authenticatedId) throw new Error("The authenticated Hanji user could not be resolved.");
+      const members = await eb.workspaceMembers(requiredWorkspace.workspaceId);
+      const memberList = Array.isArray(members?.members) ? members.members : [];
+      const member = memberList.find((candidate) => (
+        (candidate.userId ?? candidate.id) === authenticatedId
+      ));
+      return okJson({
+        self: {
+          workspace: {
+            id: workspace.id,
+            name: workspace.name ?? workspace.domain ?? "Untitled Workspace",
+          },
+          user: {
+            object: "user",
+            id: authenticatedId,
+            type: "person",
+            name: member
+              ? workspaceMemberLabel(member)
+              : authenticated.displayName ?? authenticated.name ?? authenticated.email ?? authenticatedId,
+            person: { email: member?.email ?? authenticated.email ?? null },
+          },
+        },
+        workspace_id: workspace.id,
+      });
+    }
     const isCollection = /^collection:\/\//i.test(String(id ?? "").trim());
     const entityId = stripHanjiId(id);
     const page = await eb.getOne("pages", entityId);
     if (!page || !page.id) throw new Error(`Page or data source ${id} not found.`);
     const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, page, "_fetch", "Page or data source");
     if (matched.errorResult) return matched.errorResult;
-    const payload = isCollection || page.kind === "database"
-      ? await notionDataSourceFetchPayload(page)
-      : await notionPageFetchPayload(page, include_discussions);
-    if (!include_transcript) return okJson(payload);
-    // Mirror the meeting-notes stub: declare the transcript layer unsupported
-    // explicitly instead of silently dropping the flag.
-    return okJson({
-      ...payload,
-      transcript: null,
-      unsupported_feature: "notion_ai_meeting_transcripts",
-      transcript_note:
-        "Hanji does not provide a separate Notion AI meeting-notes/transcript data source; include_transcript was ignored.",
-    });
+    if (isCollection || page.kind === "database") {
+      return okJson(await notionDataSourceFetchPayload(page));
+    }
+    const transcripts = include_transcript
+      ? (await eb.notionMeetingNotes({
+          workspace_id: requiredWorkspace.workspaceId,
+          page_id: page.id,
+          include_transcript: true,
+          limit: 50,
+        }))?.results ?? []
+      : null;
+    return okJson(await notionPageFetchPayload(page, include_discussions, transcripts));
   } catch (e) {
     return fail(e);
   }
@@ -2690,61 +3212,51 @@ export async function handleNotionFetch({ id, workspace_id, teamspace_id, includ
 const NOTION_FETCH_TOOL = {
   title: "Fetch",
   description:
-    "Notion-compatible fetch for Hanji pages, databases, and collection:// data sources. Hanji MCP is account-scoped, so workspace_id is required. Returns JSON text with metadata/title/url/text, using enhanced Notion-style Markdown tags such as <page>, <database>, <data-source>, and <sqlite-table>.",
+    "Notion-compatible fetch for Hanji pages, databases, and collection:// data sources. Set include_transcript to include real attendee-authorized meeting-note transcripts. The connection is workspace-scoped, so workspace_id is required. Returns JSON text with metadata/title/url/text, using enhanced Notion-style Markdown tags such as <page>, <meeting-notes>, <transcript>, <database>, <data-source>, and <sqlite-table>.",
   inputSchema: NOTION_FETCH_INPUT_SCHEMA,
 };
 
 const NOTION_GET_USERS_TOOL = {
   title: "Get users",
   description:
-    "Notion-compatible user listing. Hanji is account-scoped, so workspace_id is required and this returns members from the selected workspace with cursor pagination.",
+    "Notion-compatible user listing. The connection is workspace-scoped, so workspace_id is required and this returns members from the selected workspace with cursor pagination.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
-    user_id: z.string().optional().describe("Specific user id, or self for the first accessible member"),
+    user_id: z.string().optional().describe("Specific user id, or self for the authenticated Hanji actor"),
     query: z.string().optional(),
     start_cursor: z.string().optional(),
     page_size: z.number().int().min(1).max(100).optional(),
   },
 };
 
-async function handleNotionGetUsers({ workspace_id, teamspace_id, user_id, query, start_cursor, page_size = 100 }) {
+export async function handleNotionGetUsers({ workspace_id, teamspace_id, user_id, query, start_cursor, page_size = 100 }) {
   try {
     const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_get_users");
     if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-    const workspaces = [{ id: requiredWorkspace.workspaceId }];
-    const users = [];
-    const seen = new Set();
-    const needle = String(query ?? "").trim().toLowerCase();
-    for (const workspace of workspaces) {
-      const members = await eb.workspaceMembers(workspace.id);
-      for (const member of members.members ?? []) {
-        const id = member.userId || member.id;
-        if (!id || seen.has(id)) continue;
-        const label = workspaceMemberLabel(member);
-        const email = member.email ?? "";
-        if (needle && !`${label}\n${email}\n${id}`.toLowerCase().includes(needle)) continue;
-        seen.add(id);
-        users.push({
-          type: "person",
-          id,
-          name: label,
-          email: email || undefined,
-          workspace_id: workspace.id,
-        });
-      }
+    const payload = await eb.notionUsers({
+      workspaceId: requiredWorkspace.workspaceId,
+      userId: user_id,
+      query,
+      startCursor: start_cursor,
+      pageSize: clamp(page_size, 1, 100),
+    });
+    const direct = typeof user_id === "string" && user_id.trim().length > 0;
+    const roster = officialNotionUsers(payload, { direct });
+    let users = roster.results.map((user) =>
+      flatNotionUser(user, requiredWorkspace.workspaceId));
+    // Direct /users/:id retrieval ignores list query parameters. Preserve the
+    // tool's combined user_id + query behavior, but filter only the canonical
+    // redacted projection so another member's hidden email is never an oracle.
+    if (user_id && String(query ?? "").trim()) {
+      const needle = String(query).trim().toLowerCase();
+      users = users.filter((user) =>
+        `${user.name}\n${user.id}\n${user.email ?? ""}`.toLowerCase().includes(needle));
     }
-    const filtered = user_id && user_id !== "self"
-      ? users.filter((user) => user.id === user_id)
-      : user_id === "self"
-        ? users.slice(0, 1)
-        : users;
-    const start = Math.max(0, Number.parseInt(start_cursor ?? "0", 10) || 0);
-    const selected = filtered.slice(start, start + clamp(page_size, 1, 100));
     return okJson({
-      results: selected,
-      has_more: start + selected.length < filtered.length,
-      next_cursor: start + selected.length < filtered.length ? String(start + selected.length) : null,
+      results: users,
+      has_more: roster.hasMore,
+      next_cursor: roster.nextCursor,
     });
   } catch (e) {
     return fail(e);
@@ -2956,47 +3468,167 @@ function dataSourceRowObject(row, props, pagesById, propsByDb = {}) {
   return out;
 }
 
+const MCP_SQL_SOURCE_WINDOWS = 10;
+const MCP_SQL_CREATED_TIME_SORT_ID = "__hanji_database_rows_created_time";
+
+function sqlDatabaseRowsSorts(orderBy, props) {
+  return orderBy.map((order) => {
+    const name = String(order.property ?? "");
+    const property = props.find((candidate) =>
+      String(candidate.name ?? "").toLowerCase() === name.toLowerCase()
+    );
+    if (property) return { propertyId: property.id, direction: order.direction };
+    if (name === "createdTime") {
+      return { propertyId: MCP_SQL_CREATED_TIME_SORT_ID, direction: order.direction };
+    }
+    throw new Error(`SQL ORDER BY requires a data-source property: ${name}.`);
+  });
+}
+
+async function streamDataSourceSql({
+  databaseId,
+  sourceUrl,
+  props,
+  parsed,
+  params,
+  sorts,
+  fingerprint,
+  startCursor,
+}) {
+  const limit = Math.max(0, Math.min(500, parsed.cursor.limit ?? 100));
+  if (limit === 0) return { results: [], hasMore: false, nextCursor: null };
+  const resumed = startCursor ? notionSqlCursorCodec.decode(startCursor, fingerprint) : null;
+  let sourceCursor = resumed?.sourceCursor ?? null;
+  let remainingOffset = resumed?.remainingOffset ?? Math.max(0, parsed.cursor.offset ?? 0);
+  const results = [];
+  const propsByDb = { [databaseId]: props };
+
+  for (let window = 0; window < MCP_SQL_SOURCE_WINDOWS; window += 1) {
+    const sourceLimit = Math.max(1, Math.min(100, remainingOffset + limit - results.length));
+    const payload = await eb.databaseRowsPage(databaseId, {
+      includeComputed: true,
+      limit: sourceLimit,
+      ...(sourceCursor ? { cursor: sourceCursor } : {}),
+      ...(sorts.length ? { databaseRowsSorts: sorts } : {}),
+      databaseRowsCursorScope: JSON.stringify({ v: 1, sql: fingerprint }),
+    });
+    if (!payload || !Array.isArray(payload.rows)) {
+      throw new Error("Canonical database query returned malformed SQL rows.");
+    }
+    const sourceRows = payload.rows;
+    if (sourceRows.length > sourceLimit) {
+      throw new Error("Canonical database query exceeded the requested SQL window.");
+    }
+    const projected = executeStreamableNotionMcpSqlChunk(
+      parsed,
+      params,
+      sourceUrl,
+      sourceRows.map((row) => dataSourceRowObject(row, props, {}, propsByDb)),
+    );
+    for (const row of projected) {
+      if (remainingOffset > 0) {
+        remainingOffset -= 1;
+        continue;
+      }
+      results.push(row);
+    }
+    const hasMore = payload.hasMore === true;
+    const nextSourceCursor = hasMore && typeof payload.nextCursor === "string"
+      ? payload.nextCursor
+      : "";
+    if (hasMore && (!nextSourceCursor || nextSourceCursor === sourceCursor)) {
+      throw new Error("Canonical database query returned a non-advancing SQL cursor.");
+    }
+    if (results.length >= limit || !hasMore) {
+      const nextCursor = hasMore
+        ? notionSqlCursorCodec.encode({
+            sourceCursor: nextSourceCursor,
+            remainingOffset,
+          }, fingerprint)
+        : null;
+      return { results, hasMore, nextCursor };
+    }
+    sourceCursor = nextSourceCursor;
+  }
+
+  return {
+    results,
+    hasMore: true,
+    nextCursor: notionSqlCursorCodec.encode({ sourceCursor, remainingOffset }, fingerprint),
+  };
+}
+
+/** @returns {Promise<any>} */
 export async function queryDataSourceSql(data) {
   const requiredWorkspace = await requireWorkspaceSelection(data, "_notion_query_data_sources");
   if (requiredWorkspace.errorResult) return { __workspaceErrorResult: requiredWorkspace.errorResult };
-  const parsed = parseDataSourceSqlQuery(data.query);
-  const databaseId = stripHanjiId(parsed.dataSourceUrl);
-  const [db, props, rows, pages] = await Promise.all([
-    eb.getOne("pages", databaseId),
-    eb.dbProperties(databaseId),
-    eb.dbRows(databaseId, { includeComputed: true }),
-    eb.pages(),
-  ]);
-  if (!db || db.kind !== "database") throw new Error(`Data source ${parsed.dataSourceUrl} not found.`);
-  const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, db, "_notion_query_data_sources", "Data source");
-  if (matched.errorResult) return { __workspaceErrorResult: matched.errorResult };
-  const pagesById = Object.fromEntries(pages.map((page) => [page.id, page]));
-  const propsByDb = await databasePropsContext(pages, databaseId, props);
-  let records = rows.map((row) => dataSourceRowObject(row, props, pagesById, propsByDb));
-  records = applySimpleSqlWhere(records, parsed.where, [...(data.params ?? [])]);
-  if (parsed.orderBy) {
-    // Typed comparison via compareViewSortKeys (numbers numerically, strings
-    // with numeric collation) so numeric columns do not sort "10" < "9".
-    const direction = parsed.orderDirection === "desc" ? -1 : 1;
-    records.sort(
-      (a, b) => direction * compareViewSortKeys(a[parsed.orderBy] ?? "", b[parsed.orderBy] ?? "")
-    );
+  if (data.params !== undefined && !Array.isArray(data.params)) {
+    throw new Error("SQL params must be an array.");
   }
-  const limit = parsed.limit ? clamp(parsed.limit, 1, 500) : 100;
-  const offset = Math.max(0, Math.trunc(parsed.offset ?? 0));
-  const windowed = records.slice(offset, offset + limit);
-  const selected = selectSqlColumns(windowed, parsed.select);
-  const nextOffset = offset + windowed.length;
+  const parsed = parseDataSourceSqlUnionQuery(data.query);
+  if (
+    data.start_cursor !== undefined
+    && (typeof data.start_cursor !== "string" || !data.start_cursor.trim())
+  ) {
+    throw new Error("SQL start_cursor must be a non-empty opaque string.");
+  }
+  const explicitUrls = Array.isArray(data.data_source_urls) ? data.data_source_urls.map(String) : [];
+  const providedUrls = explicitUrls.length ? explicitUrls : parsed.dataSourceUrls;
+  if (providedUrls.length > 10) throw new Error("data_source_urls may contain at most 10 data sources.");
+  const providedIds = new Set(providedUrls.map((url) => stripHanjiId(url)));
+  const referencedUrls = parsed.dataSourceUrls;
+  for (const url of referencedUrls) {
+    if (!providedIds.has(stripHanjiId(url))) throw new Error(`SQL references an undeclared data source: ${url}.`);
+  }
+  const loadedDatabases = await Promise.allSettled(referencedUrls.map(async (url) => {
+    const databaseId = stripHanjiId(url);
+    const db = await eb.getOne("pages", databaseId);
+    if (!db || db.kind !== "database") throw new Error(`Data source ${url} not found.`);
+    const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, db, "_notion_query_data_sources", "Data source");
+    if (matched.errorResult) return { databaseId, url, workspaceErrorResult: matched.errorResult };
+    return { databaseId, url };
+  }));
+  const readySources = [];
+  for (const loaded of loadedDatabases) {
+    if (loaded.status === "rejected") throw loaded.reason;
+    if (loaded.value.workspaceErrorResult) {
+      return { __workspaceErrorResult: loaded.value.workspaceErrorResult };
+    }
+    readySources.push(loaded.value);
+  }
+  const streamPlan = notionMcpSqlStreamPlan(parsed);
+  if (!streamPlan || readySources.length !== 1) throw new Error(NOTION_MCP_SQL_CROSS_WINDOW_ERROR);
+  const params = data.params ?? [];
+  executeStreamableNotionMcpSqlChunk(parsed, params, streamPlan.sourceUrl, []);
+  const source = readySources[0];
+  const props = await eb.dbProperties(source.databaseId);
+  const sorts = sqlDatabaseRowsSorts(streamPlan.orderBy, props);
+  const fingerprint = notionSqlRequestFingerprint({
+    v: 1,
+    workspaceId: requiredWorkspace.workspaceId,
+    dataSourceUrls: referencedUrls,
+    query: data.query,
+    params,
+  });
+  const execution = await streamDataSourceSql({
+    databaseId: source.databaseId,
+    sourceUrl: source.url,
+    props,
+    parsed,
+    params,
+    sorts,
+    fingerprint,
+    startCursor: data.start_cursor,
+  });
   return {
     mode: "sql",
-    data_source_url: parsed.dataSourceUrl,
-    results: selected,
-    rows: selected,
-    returned: selected.length,
-    has_more: nextOffset < records.length,
-    // Cursor = the OFFSET of the next window; re-issue the query with
-    // "... LIMIT <n> OFFSET <next_cursor>" to page.
-    next_cursor: nextOffset < records.length ? String(nextOffset) : null,
+    data_source_urls: referencedUrls,
+    ...(referencedUrls.length === 1 ? { data_source_url: referencedUrls[0] } : {}),
+    results: execution.results,
+    rows: execution.results,
+    returned: execution.results.length,
+    has_more: execution.hasMore,
+    next_cursor: execution.nextCursor,
   };
 }
 
@@ -3011,17 +3643,20 @@ async function queryDataSourceView(data) {
   if (matched.errorResult) return { __workspaceErrorResult: matched.errorResult };
   const [props, rows, pages] = await Promise.all([
     eb.dbProperties(db.id),
-    eb.dbRows(db.id, { includeComputed: true }),
+    eb.dbRows(db.id, { includeComputed: true, includeTrash: true }),
     eb.pages(),
   ]);
   const pagesById = Object.fromEntries(pages.map((page) => [page.id, page]));
   const propsByDb = await databasePropsContext(pages, db.id, props);
-  const filtered = applyDatabaseView(rows, props, pagesById, view, undefined, propsByDb);
+  const archived = data.is_archived === true;
+  const partition = rows.filter((row) => (row.inTrash === true) === archived);
+  const filtered = applyDatabaseView(partition, props, pagesById, view, undefined, propsByDb);
   const start = Math.max(0, Number.parseInt(data.start_cursor ?? "0", 10) || 0);
   const pageSize = clamp(data.page_size ?? 100, 1, 100);
   const selected = filtered.slice(start, start + pageSize).map((row) => dataSourceRowObject(row, props, pagesById, propsByDb));
   return {
     mode: "view",
+    is_archived: archived,
     view_id: view.id,
     data_source_url: collectionUrl(db.id),
     results: selected,
@@ -3031,7 +3666,7 @@ async function queryDataSourceView(data) {
   };
 }
 
-function viewConfigPatchForNotionInput(props, type, input = {}, base = {}) {
+export function viewConfigPatchForNotionInput(props, type, input = {}, base = {}) {
   const normalized = normalizeNotionViewConfig(input);
   if (Array.isArray(normalized.hiddenProperties)) {
     const hidden = new Set(
@@ -3042,24 +3677,20 @@ function viewConfigPatchForNotionInput(props, type, input = {}, base = {}) {
     normalized.visibleProperties = props.filter((prop) => !hidden.has(prop.id)).map((prop) => prop.id);
     delete normalized.hiddenProperties;
   }
-  return viewConfigPatchForInput(props, type, normalized, base);
+  const result = viewConfigPatchForInput(props, type, normalized, base);
+  applyNotionViewCompatMetadata({ config: result.config, base, props, type, input: normalized });
+  return result;
 }
-
 const NOTION_UPDATE_VIEW_TOOL = {
   title: "Update view",
   description:
-    "Notion-compatible view update. Hanji MCP is account-scoped, so workspace_id is required. Accepts view_id plus optional name and configure DSL. Object configure and direct view fields are also accepted.",
+    "Notion-compatible view update. The connection is workspace-scoped, so workspace_id is required. Only include the optional name and configure fields that should change; configure uses the Notion view DSL and supports CLEAR directives.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
     view_id: z.string().describe("View id, view:// URI, Notion URL with ?v=, or local view name"),
-    database_id: z.string().optional().describe("Optional database page id to avoid scanning all data sources"),
-    data_source_id: z.string().optional().describe("Optional collection/data source id"),
-    data_source_url: z.string().optional().describe("Optional collection://<database-id> data source URL"),
     name: z.string().optional().describe("New view name"),
-    type: z.enum(DATABASE_VIEW_TYPES).optional().describe("New view type"),
-    configure: z.union([z.string(), JsonObjectSchema]).optional().describe("Notion-style view configuration DSL string, or a config object"),
-    ...viewConfigInputSchema,
+    configure: z.string().optional().describe("Notion view DSL: FILTER, SORT BY, GROUP BY, CALENDAR BY, TIMELINE BY, MAP BY, CHART, FORM, SHOW, HIDE, COVER, WRAP CELLS, FREEZE COLUMNS, or CLEAR."),
   },
 };
 
@@ -3126,7 +3757,7 @@ async function handleNotionUpdateView({ workspace_id, teamspace_id, view_id, dat
 const NOTION_CREATE_PAGES_TOOL = {
   title: "Create pages",
   description:
-    "Notion-compatible page creation. Hanji MCP is account-scoped, so workspace_id is required. Accepts a Notion-style parent object with page_id, database_id, or data_source_id and page objects with properties/content/icon/cover/template_id.",
+    "Notion-compatible page creation. The connection is workspace-scoped, so workspace_id is required. Accepts a Notion-style parent object with page_id, database_id, or data_source_id and page objects with properties/content/icon/cover/template_id.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -3265,7 +3896,7 @@ export async function handleNotionCreatePages({ workspace_id, teamspace_id, pare
 const NOTION_DUPLICATE_PAGE_TOOL = {
   title: "Duplicate page",
   description:
-    "Duplicate a page subtree. Hanji MCP is account-scoped, so workspace_id is required. Copies child pages, blocks, database schemas, views, templates, and rows with internal links remapped where possible.",
+    "Duplicate a page subtree. The connection is workspace-scoped, so workspace_id is required. Copies child pages, blocks, database schemas, views, templates, and rows with internal links remapped where possible.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     workspaceId: z.string().optional().describe("Hanji workspace id alias for workspace_id"),
@@ -3325,7 +3956,7 @@ async function handleNotionDuplicatePage({ workspace_id, workspaceId, teamspace_
 const NOTION_UPDATE_PAGE_TOOL = {
   title: "Update page",
   description:
-    "Update a page. Hanji MCP is account-scoped, so workspace_id is required. Supports Notion-compatible commands: update_properties, insert_content, update_content, replace_content, apply_template, and update_verification.",
+    "Update a page. The connection is workspace-scoped, so workspace_id is required. Supports Notion-compatible commands: update_properties, insert_content, update_content, replace_content, apply_template, and update_verification.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -3341,14 +3972,15 @@ const NOTION_UPDATE_PAGE_TOOL = {
     ]).optional(),
     title: z.string().optional(),
     properties: JsonObjectSchema.optional(),
-    content: z.string().optional(),
-    new_str: z.string().optional(),
+    content: z.string().optional().describe("Markdown content. For replace_content, content or new_str is required."),
+    new_str: z.string().optional().describe("Replacement Markdown. May be empty only when explicitly supplied."),
     content_updates: z.array(z.object({
       old_str: z.string(),
       new_str: z.string(),
       replace_all_matches: z.boolean().optional(),
-    })).optional(),
+    })).min(1).max(NOTION_UPDATE_PAGE_MAX_CONTENT_UPDATES).optional(),
     position: z.object({ type: z.enum(["start", "end"]) }).optional(),
+    after: z.string().min(1).optional(),
     template_id: z.string().optional(),
     verification_status: z.enum(["verified", "unverified"]).optional(),
     verification_expiry_days: z.number().int().positive().optional(),
@@ -3372,183 +4004,42 @@ const NOTION_UPDATE_PAGE_TOOL = {
   },
 };
 
-async function handleNotionUpdatePage({
-  workspace_id,
-  teamspace_id,
-  pageId,
-  page_id,
-  command,
-  title,
-  properties,
-  content,
-  new_str,
-  content_updates,
-  position,
-  template_id,
-  verification_status,
-  verification_expiry_days,
-  icon,
-  iconType,
-  cover,
-  coverPosition,
-  font,
-  smallText,
-  fullWidth,
-  backlinksDisplay,
-  pageCommentsDisplay,
-  locked,
-}) {
-  try {
-    const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_update_page");
-    if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-    const targetPageId = stripHanjiId(pageId ?? page_id);
-    if (!targetPageId) throw new Error("Provide pageId or page_id.");
-    const page = await eb.getOne("pages", targetPageId);
-    if (!page || !page.id) return ok(`Page ${targetPageId} not found.`);
-    const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, page, "_notion_update_page", "Page");
-    if (matched.errorResult) return matched.errorResult;
-    if (page.isLocked && locked !== false && command !== "update_verification") return ok(lockedPageMessage(page));
-
-    if (command) {
-      if (command === "update_properties") {
-        const patch = {};
-        if (page.parentType === "database" && page.parentId) {
-          const props = await eb.dbProperties(page.parentId);
-          const { patch: rowPatch, unknown, readonly } = rowPatchFromProperties(props, properties ?? {});
-          if (Object.keys(rowPatch.properties ?? {}).length || rowPatch.title !== undefined) {
-            const next = {};
-            if (rowPatch.title !== undefined) next.title = rowPatch.title;
-            if (Object.keys(rowPatch.properties ?? {}).length) {
-              next.properties = persistableDatabaseRowProperties({
-                ...(page.properties ?? {}),
-                ...(rowPatch.properties ?? {}),
-              });
-            }
-            await eb.updateDatabaseRow(page.id, { ...next, ...pageEditAudit() });
-          }
-          Object.assign(patch, pageIconPatch({ icon, iconType }, page), pagePresentationPatch({ cover }));
-          if (Object.keys(patch).length) await eb.update("pages", page.id, { ...patch, ...pageEditAudit() });
-          return okJson({
-            id: page.id,
-            url: pageUrl(page.id),
-            ignored_properties: unknown,
-            skipped_readonly_properties: readonly,
-          });
-        }
-        const nextTitle = properties?.title ?? properties?.Name ?? properties?.name;
-        if (nextTitle !== undefined) patch.title = String(nextTitle);
-        Object.assign(patch, pageIconPatch({ icon, iconType }, page), pagePresentationPatch({ cover }));
-        if (Object.keys(patch).length) await eb.update("pages", page.id, { ...patch, ...pageEditAudit() });
-        return okJson({ id: page.id, url: pageUrl(page.id) });
-      }
-
-      if (command === "insert_content") {
-        const markdown = content ?? new_str ?? "";
-        if (!markdown.trim()) throw new Error("insert_content requires content.");
-        if (position?.type === "start") {
-          const rootBlocks = (await eb.blocks(page.id)).filter((block) => !block.parentId);
-          const firstPosition = rootBlocks.reduce((min, block) => Math.min(min, block.position ?? 0), 1);
-          const parsed = markdownToBlocks(markdown);
-          await insertMarkdownBlocks(page.id, parsed, firstPosition - parsed.length - 1);
-        } else {
-          await appendMarkdown(page.id, markdown);
-        }
-        await eb.update("pages", page.id, pageEditAudit());
-        return okJson({ id: page.id, url: pageUrl(page.id) });
-      }
-
-      if (command === "replace_content") {
-        const markdown = new_str ?? content ?? "";
-        await replaceMarkdown(page.id, markdown);
-        await eb.update("pages", page.id, pageEditAudit());
-        return okJson({ id: page.id, url: pageUrl(page.id) });
-      }
-
-      if (command === "update_content") {
-        const updates = content_updates ?? [];
-        if (!updates.length) throw new Error("update_content requires content_updates.");
-        const blocks = await eb.blocks(page.id);
-        let markdown = blocksToMarkdown(blocks);
-        for (const update of updates) {
-          if (!markdown.includes(update.old_str)) {
-            throw new Error("Could not find old_str in page content.");
-          }
-          markdown = update.replace_all_matches
-            ? markdown.split(update.old_str).join(update.new_str)
-            : markdown.replace(update.old_str, update.new_str);
-        }
-        // Apply as an id-preserving diff instead of replaceMarkdown's
-        // delete-all+reinsert so unedited blocks keep their ids (comment
-        // anchors, buttons, and non-markdown media survive a targeted edit).
-        await updateMarkdownPreservingIds(page.id, markdown, blocks);
-        await eb.update("pages", page.id, pageEditAudit());
-        return okJson({ id: page.id, url: pageUrl(page.id) });
-      }
-
-      if (command === "apply_template") {
-        if (!template_id) throw new Error("apply_template requires template_id.");
-        let inserted = [];
-        if (page.parentType === "database" && page.parentId) {
-          const template = (await eb.dbTemplates(page.parentId)).find((item) => item.id === template_id);
-          if (!template) throw new Error(`Template ${template_id} not found.`);
-          inserted = await insertTemplateBlocks(page.id, template.blocks ?? []);
-        } else {
-          const template = PAGE_TEMPLATES.find((item) => item.id === template_id);
-          if (!template) throw new Error(`Template ${template_id} not found.`);
-          inserted = await insertTemplateBlocks(page.id, template.blocks ?? []);
-        }
-        await eb.update("pages", page.id, pageEditAudit());
-        return okJson({ id: page.id, url: pageUrl(page.id), appended_blocks: inserted.length });
-      }
-
-      if (command === "update_verification") {
-        const verified = verification_status === "verified";
-        const expiresAt = verified && verification_expiry_days
-          ? new Date(Date.now() + verification_expiry_days * 24 * 60 * 60 * 1000).toISOString()
-          : null;
-        await eb.update("pages", page.id, {
-          verifiedAt: verified ? new Date().toISOString() : null,
-          verifiedBy: verified ? MCP_ACTOR : null,
-          verificationExpiresAt: verified ? expiresAt : null,
-          ...pageEditAudit(),
-        });
-        return okJson({ id: page.id, url: pageUrl(page.id), verification_status: verified ? "verified" : "unverified" });
-      }
-    }
-
-    const patch = {};
-    if (title !== undefined) patch.title = title;
-    Object.assign(patch, pageIconPatch({ icon, iconType }, page));
-    Object.assign(
-      patch,
-      pagePresentationPatch({
-        cover,
-        coverPosition,
-        font,
-        smallText,
-        fullWidth,
-        backlinksDisplay,
-        pageCommentsDisplay,
-        locked,
-      })
-    );
-    if (Object.keys(patch).length === 0) return ok(`No changes supplied for "${titleOf(page)}".`);
-    const updated = await eb.update("pages", page.id, { ...patch, ...pageEditAudit() });
-    return ok(`Updated "${titleOf(updated)}".`);
-  } catch (e) {
-    return fail(e);
-  }
-}
+export const handleNotionUpdatePage = createNotionUpdatePageHandler({
+  MCP_ACTOR,
+  PAGE_TEMPLATES,
+  appendMarkdown,
+  blocksToMarkdown,
+  eb,
+  fail,
+  insertMarkdownBlocks,
+  insertTemplateBlocks,
+  lockedPageMessage,
+  markdownToBlocks,
+  ok,
+  okJson,
+  pageEditAudit,
+  pageIconPatch,
+  pagePresentationPatch,
+  pageUrl,
+  persistableDatabaseRowProperties,
+  replaceMarkdown,
+  requireMatchingWorkspace,
+  requireWorkspaceSelection,
+  rowPatchFromProperties,
+  stripHanjiId,
+  titleOf,
+  updateMarkdownPreservingIds,
+});
 
 const NOTION_MOVE_PAGES_TOOL = {
   title: "Move pages",
   description:
-    "Notion-compatible multi-page move. Hanji MCP is account-scoped, so workspace_id is required. Moves pages/databases to workspace root, under a page, or into a data source/database.",
+    "Notion-compatible multi-page move. The connection is workspace-scoped, so workspace_id is required. Moves pages/databases to workspace root, under a page, or into a data source/database.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
-    page_or_database_ids: z.array(z.string()).optional().describe("Page or database ids/URLs to move"),
-    page_ids: z.array(z.string()).optional().describe("Alternative page id list"),
+    page_or_database_ids: z.array(z.string()).min(1).max(NOTION_MOVE_PAGES_MAX_IDS).optional().describe("Page or database ids/URLs to move (maximum 100)"),
+    page_ids: z.array(z.string()).min(1).max(NOTION_MOVE_PAGES_MAX_IDS).optional().describe("Alternative page id list (maximum 100)"),
     page_id: z.string().optional().describe("Single page id"),
     new_parent: z.object({
       type: z.string().optional(),
@@ -3569,73 +4060,20 @@ const NOTION_MOVE_PAGES_TOOL = {
   },
 };
 
-async function handleNotionMovePages({ workspace_id, teamspace_id, page_or_database_ids, page_ids, page_id, new_parent, parent, after_page_id, before_page_id }) {
-  try {
-    const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_move_pages");
-    if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-    const ids = (page_or_database_ids ?? page_ids ?? (page_id ? [page_id] : []))
-      .map(stripHanjiId)
-      .filter(Boolean);
-    if (ids.length === 0) throw new Error("Provide page_or_database_ids, page_ids, or page_id.");
-
-    const destination = new_parent ?? parent ?? {};
-    const type = String(destination.type ?? "").toLowerCase();
-    const databaseId = destination.data_source_id ?? destination.database_id;
-    const parentPageId = destination.page_id ?? destination.parent_page_id;
-    const parentId = databaseId
-      ? stripHanjiId(databaseId)
-      : parentPageId
-        ? stripHanjiId(parentPageId)
-        : null;
-    const parentType = type === "workspace" || (!databaseId && !parentPageId)
-      ? "workspace"
-      : databaseId || type === "database" || type === "data_source" || type === "database_id" || type === "data_source_id"
-        ? "database"
-        : "page";
-    if (parentId) {
-      const parentPage = await eb.getOne("pages", parentId);
-      if (parentPage?.id) {
-        const parentMatched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, parentPage, "_notion_move_pages", "Destination parent");
-        if (parentMatched.errorResult) return parentMatched.errorResult;
-      }
-    }
-    const moved = [];
-    const notFound = [];
-    for (const id of ids) {
-      const page = await eb.getOne("pages", id);
-      if (page?.id) {
-        const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, page, "_notion_move_pages", "Page");
-        if (matched.errorResult) return matched.errorResult;
-      }
-      const result = await movePage(id, {
-        parentId,
-        parentType,
-        afterPageId: after_page_id ? stripHanjiId(after_page_id) : undefined,
-        beforePageId: before_page_id ? stripHanjiId(before_page_id) : undefined,
-      });
-      if (!result) {
-        notFound.push(id);
-        continue;
-      }
-      moved.push({
-        id: result.page.id,
-        title: titleOf(result.page),
-        url: pageUrl(result.page.id),
-        parent: result.parentType === "workspace"
-          ? { type: "workspace" }
-          : { type: result.parentType, id: result.parentId },
-      });
-    }
-    return okJson({ moved, not_found: notFound });
-  } catch (e) {
-    return fail(e);
-  }
-}
+export const handleNotionMovePages = createNotionMovePagesHandler({
+  eb,
+  stripHanjiId,
+  requireWorkspaceSelection,
+  titleOf,
+  pageUrl,
+  okJson,
+  fail,
+});
 
 const NOTION_GET_COMMENTS_TOOL = {
   title: "Get comments",
   description:
-    "Notion-compatible page comments fetch. Hanji MCP is account-scoped, so workspace_id is required. Returns discussions/comments in a compact XML-like payload; returns {} when there are no matching comments.",
+    "Notion-compatible page comments fetch. The connection is workspace-scoped, so workspace_id is required. Returns discussions/comments in a compact XML-like payload; returns {} when there are no matching comments.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -3646,7 +4084,7 @@ const NOTION_GET_COMMENTS_TOOL = {
   },
 };
 
-async function handleNotionGetComments({ workspace_id, teamspace_id, page_id, include_resolved = false, discussion_id }) {
+async function handleNotionGetComments({ workspace_id, teamspace_id, page_id, include_all_blocks = false, include_resolved = false, discussion_id }) {
   try {
     const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_get_comments");
     if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
@@ -3661,7 +4099,8 @@ async function handleNotionGetComments({ workspace_id, teamspace_id, page_id, in
     const roots = comments
       .filter((comment) => !comment.parentId)
       .filter((comment) => include_resolved || !comment.resolved)
-      .filter((comment) => !wantedDiscussionId || comment.id === wantedDiscussionId);
+      .filter((comment) => !wantedDiscussionId || comment.id === wantedDiscussionId)
+      .filter((comment) => wantedDiscussionId || include_all_blocks || !comment.blockId);
     if (roots.length === 0) return okJson({});
     const repliesByParent = new Map();
     for (const comment of comments) {
@@ -3697,7 +4136,7 @@ async function handleNotionGetComments({ workspace_id, teamspace_id, page_id, in
 const NOTION_CREATE_COMMENT_TOOL = {
   title: "Create comment",
   description:
-    "Notion-compatible comment creation. Hanji MCP is account-scoped, so workspace_id is required. Provide page_id and markdown or rich_text. discussion_id replies to an existing thread.",
+    "Notion-compatible comment creation. The connection is workspace-scoped, so workspace_id is required. Provide page_id and markdown or rich_text. discussion_id replies to an existing thread.",
   inputSchema: {
     workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
     teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -3719,22 +4158,72 @@ async function handleNotionCreateComment({ workspace_id, teamspace_id, page_id, 
     const matched = await requireMatchingWorkspace({ workspace_id: requiredWorkspace.workspaceId }, page, "_notion_create_comment", "Page");
     if (matched.errorResult) return matched.errorResult;
     if (page.inTrash) return ok(`"${titleOf(page)}" is in trash. Restore it before commenting.`);
-    const text = markdown ?? (rich_text ?? []).map((item) => item?.text?.content ?? item?.plain_text ?? "").join("");
-    const cleanText = String(text ?? "").trim();
-    if (!cleanText) return ok("Comment text is empty.");
+    if (Number(typeof markdown === "string") + Number(Array.isArray(rich_text)) !== 1) {
+      throw new Error("Provide exactly one of markdown or rich_text.");
+    }
+    const rich = typeof markdown === "string"
+      ? parseInlineMarkdown(markdown)
+      : (rich_text ?? []).map((item) => {
+          if (item?.type === "equation") return { text: item.equation?.expression ?? "", equation: true };
+          if (item?.type === "mention") {
+            const mention = item.mention ?? {};
+            if (mention.page?.id) return { text: mention.page.id, mention: "page", pageId: mention.page.id };
+            if (mention.database?.id) return { text: mention.database.id, mention: "page", pageId: mention.database.id };
+            if (mention.user?.id) return { text: mention.user.id, mention: "person", userId: mention.user.id };
+            if (mention.date?.start) return { text: mention.date.start, mention: "date", date: mention.date };
+          }
+          const annotations = item?.annotations ?? {};
+          return {
+            text: item?.text?.content ?? item?.plain_text ?? "",
+            ...(annotations.bold ? { bold: true } : {}),
+            ...(annotations.italic ? { italic: true } : {}),
+            ...(annotations.strikethrough ? { strikethrough: true } : {}),
+            ...(annotations.underline ? { underline: true } : {}),
+            ...(annotations.code ? { code: true } : {}),
+            ...(annotations.color && annotations.color !== "default" ? { color: annotations.color } : {}),
+            ...(item?.text?.link?.url ? { link: item.text.link.url } : {}),
+          };
+        });
+    if (!rich.some((span) => String(span.text ?? "").trim())) return ok("Comment text is empty.");
+    if (rich.length > 100) throw new Error("rich_text must contain at most 100 items.");
     const comments = await eb.comments(pageId);
     const parentId = discussion_id ? String(discussion_id).split("/").filter(Boolean).at(-1) : null;
-    const parent = parentId ? comments.find((comment) => comment.id === parentId) : null;
+    const requestedParent = parentId ? comments.find((comment) => comment.id === parentId) : null;
+    const parent = requestedParent?.parentId
+      ? comments.find((comment) => comment.id === requestedParent.parentId)
+      : requestedParent;
     if (parentId && !parent) return ok(`Discussion ${discussion_id} not found on page ${pageId}.`);
+    if (selection_with_ellipsis && discussion_id) throw new Error("selection_with_ellipsis cannot be combined with discussion_id.");
+    let selectionBlock = null;
+    if (selection_with_ellipsis) {
+      const selection = String(selection_with_ellipsis).replace(/\s+/g, " ").trim();
+      const ellipsis = selection.match(/^(.*?)(?:\.\.\.|…)(.*?)$/s);
+      const blocks = await eb.blocks(pageId);
+      const matches = blocks.filter((block) => {
+        const text = String(block.plainText ?? richPlain(block.content) ?? "").replace(/\s+/g, " ").trim();
+        if (!ellipsis) return text.includes(selection);
+        const start = ellipsis[1].trim();
+        const end = ellipsis[2].trim();
+        const startAt = start ? text.indexOf(start) : 0;
+        if (startAt < 0) return false;
+        return !end || text.indexOf(end, startAt + start.length) >= startAt + start.length;
+      });
+      if (matches.length !== 1) {
+        throw new Error(matches.length
+          ? "selection_with_ellipsis matched more than one block."
+          : "selection_with_ellipsis did not match page content.");
+      }
+      selectionBlock = matches[0];
+    }
     const comment = await eb.insert("comments", {
       id: eb.newId(),
       pageId,
-      blockId: parent?.blockId ?? null,
+      blockId: parent?.blockId ?? selectionBlock?.id ?? null,
       parentId: parent?.id ?? null,
       authorId: MCP_ACTOR,
       body: selection_with_ellipsis
-        ? { rich: [{ text: cleanText }], quote: selection_with_ellipsis }
-        : { rich: [{ text: cleanText }] },
+        ? { rich, quote: selection_with_ellipsis }
+        : { rich },
       resolved: false,
     });
     return okJson({
@@ -4067,12 +4556,12 @@ const toolRegistrationRuntime = {
   ROLLUP_FUNCTIONS,
   SHARE_PRINCIPAL_TYPES,
   SHARE_ROLES,
-  UNSUPPORTED_NOTION_VIEW_TYPES,
   WORKSPACE_MEMBER_ROLES,
-  accountAccessibleWorkspaces,
+  connectionSelectedWorkspaces,
   addPropertyToViews,
   appendMarkdown,
   applyDatabaseView,
+  assertRequiredNotionViewConfigure,
   blockPreview,
   blocksToMarkdown,
   clamp,
@@ -4114,6 +4603,7 @@ const toolRegistrationRuntime = {
   normalizeParentInput,
   notificationListLines,
   notionDataSourceFetchPayload,
+  notionTypedDatabaseProperties,
   notionImportConnectionSummary,
   notionImportItemPreview,
   notionImportJobSummary,
@@ -4130,6 +4620,7 @@ const toolRegistrationRuntime = {
   pageIconPatch,
   pageMetadataLines,
   pagePresentationPatch,
+  parseInlineMarkdown,
   parseNotionCreateTableSchema,
   parseNotionDdlStatements,
   persistableDatabaseRowProperties,
@@ -4147,12 +4638,13 @@ const toolRegistrationRuntime = {
   restorePageTree,
   rowPatchFromProperties,
   schemaLine,
-  server,
+  server: toolRegistrar,
   shareRoleLabel,
   stripHanjiId,
   templateBlocksToMarkdown,
   titleOf,
   trashPageTree,
+  validateNotionDdlOperations,
   viewByKey,
   viewConfigInputSchema,
   viewConfigPatchForInput,
@@ -4167,6 +4659,12 @@ const toolRegistrationRuntime = {
 registerFoundationTools(toolRegistrationRuntime);
 registerDatabaseTools(toolRegistrationRuntime);
 registerNotionTools(toolRegistrationRuntime);
+registerNotionAsyncTaskTool(toolRegistrar, z);
+registerNotionAttachmentTools({
+  registrar: toolRegistrar,
+  z,
+  handlers: createNotionAttachmentHandlers({ eb, requireWorkspaceSelection, okJson, fail }),
+});
 
 // Only connect the stdio transport when run as the entry point; importing this
 // module (e.g. from unit tests) must not start the server or consume stdin.

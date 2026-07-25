@@ -3,25 +3,38 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
+import {
+  NOTION_CHART_AGGREGATES,
+  normalizeNotionChartAggregate,
+  notionChartAggregateFamily,
+  notionChartAggregateRequiresProperty,
+  notionChartAggregateSupportsProperty,
+} from "../../../../shared/notion-chart-aggregates.mjs";
+import type { NotionChartAggregate } from "../../../../shared/notion-chart-aggregates.mjs";
 import { activeDateLocale, isKoreanLocale } from "@/lib/i18n";
 import { i18next } from "@/i18n";
 import type { DbProperty, DbView, Page, ViewConfig } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { applyView, cellValue } from "./query";
-import { dateKey } from "./dateUtils";
+import { dateKey, extractEnd, formatDate, parseDate } from "./dateUtils";
 import { normalizePersonIds, personLabel } from "./people";
 import { formatNumberValue, numberFormatForProperty } from "./numberFormat";
 import { nextColor } from "./colors";
 import { NotionSelect } from "./NotionSelect";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
+import {
+  effectiveSummaryValue,
+  summaryValuePieces,
+  summaryValuePresent,
+} from "./summaryValue";
 import styles from "./database.module.css";
 import chartStyles from "./chartView.module.css";
 
 export type ChartType = "bar" | "horizontal_bar" | "line" | "donut";
-export type ChartAggregate = "count" | "sum" | "average" | "min" | "max";
+export type ChartAggregate = NotionChartAggregate;
 
 const CHART_TYPES: ChartType[] = ["bar", "horizontal_bar", "line", "donut"];
-const CHART_AGGREGATES: ChartAggregate[] = ["count", "sum", "average", "min", "max"];
+const CHART_AGGREGATES: ChartAggregate[] = [...NOTION_CHART_AGGREGATES];
 const EMPTY_BUCKET_KEY = "__empty";
 
 const CHART_NS = "chartView";
@@ -96,7 +109,7 @@ function normalizedChartType(value: unknown): ChartType | undefined {
 }
 
 function normalizedChartAggregate(value: unknown): ChartAggregate | undefined {
-  return CHART_AGGREGATES.includes(value as ChartAggregate) ? (value as ChartAggregate) : undefined;
+  return normalizeNotionChartAggregate(value);
 }
 
 export function isChartGroupableProperty(prop: DbProperty) {
@@ -224,32 +237,93 @@ export function chartBuckets(
   return appendEmptyBucket(buckets, empty);
 }
 
-function bucketNumbers(rows: Page[], prop: DbProperty): number[] {
-  const out: number[] = [];
-  for (const row of rows) {
-    const raw = cellValue(row, prop);
-    if (raw == null || raw === "") continue;
-    const value = Number(raw);
-    if (Number.isFinite(value)) out.push(value);
-  }
-  return out;
+function aggregateRawValue(
+  row: Page,
+  prop: DbProperty,
+  props: DbProperty[],
+  pagesById: Record<string, Page>
+) {
+  return effectiveSummaryValue(row, prop, props, pagesById);
+}
+
+function numericAggregateValue(value: unknown): number | null {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string" || !value.trim()) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function aggregateDateValues(value: unknown): Date[] {
+  const values = [parseDate(value), parseDate(extractEnd(value))]
+    .filter((date): date is Date => !!date);
+  return values.sort((left, right) => left.getTime() - right.getTime());
 }
 
 export function aggregateChartValue(
   rows: Page[],
   aggregate: ChartAggregate,
-  prop?: DbProperty
+  prop?: DbProperty,
+  pagesById: Record<string, Page> = {},
+  props: DbProperty[] = []
 ): number | null {
-  if (aggregate === "count" || !prop) return rows.length;
-  const values = bucketNumbers(rows, prop);
-  // sum/count of an empty bucket is a real 0; average/min/max of no numeric
-  // values is "no data" — return null so the caller omits it instead of
-  // plotting a misleading 0.
-  if (aggregate === "sum") return values.reduce((sum, value) => sum + value, 0);
-  if (values.length === 0) return null;
-  if (aggregate === "average") return values.reduce((sum, value) => sum + value, 0) / values.length;
-  if (aggregate === "min") return Math.min(...values);
-  return Math.max(...values);
+  if (aggregate === "count") return rows.length;
+  if (!prop || !notionChartAggregateSupportsProperty(aggregate, prop.type)) return null;
+
+  const values = rows.map((row) => aggregateRawValue(row, prop, props, pagesById));
+  const present = values.filter((value) => summaryValuePresent(value, prop, pagesById));
+
+  if (aggregate === "count_values") return present.length;
+  if (aggregate === "unique") {
+    return new Set(values.flatMap((value) => summaryValuePieces(value, prop, pagesById))).size;
+  }
+  if (aggregate === "empty") return rows.length - present.length;
+  if (aggregate === "not_empty") return present.length;
+  if (aggregate === "percent_empty") {
+    return rows.length ? ((rows.length - present.length) / rows.length) * 100 : 0;
+  }
+  if (aggregate === "percent_not_empty") {
+    return rows.length ? (present.length / rows.length) * 100 : 0;
+  }
+
+  const checked = values.filter((value) => value === true).length;
+  if (aggregate === "checked") return checked;
+  if (aggregate === "unchecked") return rows.length - checked;
+  if (aggregate === "percent_checked") return rows.length ? (checked / rows.length) * 100 : 0;
+  if (aggregate === "percent_unchecked") {
+    return rows.length ? ((rows.length - checked) / rows.length) * 100 : 0;
+  }
+
+  const numbers = values
+    .map(numericAggregateValue)
+    .filter((value): value is number => value !== null)
+    .sort((left, right) => left - right);
+  if (aggregate === "sum") return numbers.reduce((sum, value) => sum + value, 0);
+  if (aggregate === "average") {
+    return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) / numbers.length : null;
+  }
+  if (aggregate === "median") {
+    if (!numbers.length) return null;
+    const middle = Math.floor(numbers.length / 2);
+    return numbers.length % 2
+      ? numbers[middle]
+      : (numbers[middle - 1] + numbers[middle]) / 2;
+  }
+  if (aggregate === "min") return numbers.length ? numbers[0] : null;
+  if (aggregate === "max") return numbers.length ? numbers[numbers.length - 1] : null;
+  if (aggregate === "range") {
+    return numbers.length ? numbers[numbers.length - 1] - numbers[0] : null;
+  }
+
+  const dates = values
+    .flatMap(aggregateDateValues)
+    .sort((left, right) => left.getTime() - right.getTime());
+  if (!dates.length) return null;
+  if (aggregate === "earliest_date") return dates[0].getTime();
+  if (aggregate === "latest_date") return dates[dates.length - 1].getTime();
+  if (aggregate === "date_range") {
+    return Math.round((dates[dates.length - 1].getTime() - dates[0].getTime()) / 86_400_000);
+  }
+  return null;
 }
 
 // ── imported Notion chart config recovery ───────────────────────────────
@@ -285,22 +359,6 @@ const NOTION_CHART_TYPE_TOKENS: Record<string, ChartType> = {
   pie: "donut",
   pie_chart: "donut",
   ring: "donut",
-};
-
-const NOTION_CHART_AGGREGATE_TOKENS: Record<string, ChartAggregate> = {
-  count: "count",
-  count_all: "count",
-  count_values: "count",
-  show_count: "count",
-  sum: "sum",
-  total: "sum",
-  average: "average",
-  avg: "average",
-  mean: "average",
-  min: "min",
-  minimum: "min",
-  max: "max",
-  maximum: "max",
 };
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
@@ -353,7 +411,7 @@ function scanNotionChartRecord(value: unknown, inChart: boolean, out: NotionChar
       out.chartType = NOTION_CHART_TYPE_TOKENS[normalizedToken(entry)];
     }
     if (!out.aggregate && key.startsWith("aggregat")) {
-      out.aggregate = NOTION_CHART_AGGREGATE_TOKENS[normalizedToken(entry)];
+      out.aggregate = normalizeNotionChartAggregate(normalizedToken(entry));
     }
     if (
       !out.groupByRef &&
@@ -392,16 +450,19 @@ function localPropertyForNotionRef(props: DbProperty[], ref?: string) {
 export function recoveredNotionChartConfig(view: DbView, props: DbProperty[]): RecoveredNotionChartConfig {
   const raw = asRecord(view.config?.notion);
   const notionType = view.config?.notionType ?? (typeof raw?.type === "string" ? raw.type : undefined);
-  if (!raw || notionType !== "chart") return {};
+  if (view.type !== "chart" && notionType !== "chart") return {};
   const scan: NotionChartScan = {};
-  scanNotionChartRecord(raw, false, scan);
+  scanNotionChartRecord(view.config, true, scan);
   const groupProp = localPropertyForNotionRef(props, scan.groupByRef);
   const aggregateProp = localPropertyForNotionRef(props, scan.aggregateByRef);
   return {
     chartType: scan.chartType,
     aggregate: scan.aggregate,
     groupById: groupProp && isChartGroupableProperty(groupProp) ? groupProp.id : undefined,
-    aggregateById: aggregateProp?.type === "number" ? aggregateProp.id : undefined,
+    aggregateById:
+      aggregateProp && notionChartAggregateSupportsProperty(scan.aggregate, aggregateProp.type)
+        ? aggregateProp.id
+        : undefined,
   };
 }
 
@@ -419,13 +480,16 @@ function niceStep(rough: number) {
   return step * magnitude;
 }
 
-function valueTicks(values: number[]): number[] {
-  let min = Math.min(0, ...values);
-  let max = Math.max(0, ...values);
+function valueTicks(values: number[], includeZero = true): number[] {
+  const finite = values.filter(Number.isFinite);
+  if (!finite.length) return [0, 1];
+  let min = includeZero ? Math.min(0, ...finite) : Math.min(...finite);
+  let max = includeZero ? Math.max(0, ...finite) : Math.max(...finite);
   if (min === max) max = min + 1;
   const step = niceStep((max - min) / 4);
   min = Math.floor(min / step) * step;
   max = Math.ceil(max / step) * step;
+  if (!includeZero && min >= Math.min(...finite)) min -= step;
   const ticks: number[] = [];
   for (let tick = min; tick <= max + step / 2; tick += step) {
     ticks.push(Math.abs(tick) < step / 1e6 ? 0 : Number(tick.toFixed(6)));
@@ -433,18 +497,18 @@ function valueTicks(values: number[]): number[] {
   return ticks;
 }
 
-function formatTick(value: number) {
-  return formatNumberValue(value, "number");
-}
-
 function ColumnOrLineChart({
   series,
   line,
   ariaLabel,
+  formatTick,
+  includeZero,
 }: {
   series: ChartSeriesEntry[];
   line: boolean;
   ariaLabel: string;
+  formatTick: (value: number) => string;
+  includeZero: boolean;
 }) {
   const width = 760;
   const height = 320;
@@ -452,7 +516,7 @@ function ColumnOrLineChart({
   const right = width - 16;
   const top = 16;
   const bottom = height - 40;
-  const ticks = valueTicks(series.map((entry) => entry.value));
+  const ticks = valueTicks(series.map((entry) => entry.value), includeZero);
   const min = ticks[0];
   const max = ticks[ticks.length - 1];
   const yFor = (value: number) => bottom - ((value - min) / (max - min)) * (bottom - top);
@@ -486,7 +550,7 @@ function ColumnOrLineChart({
         {!line &&
           series.map((entry, index) => {
             const x = left + slot * index + (slot - barWidth) / 2;
-            const zero = yFor(0);
+            const zero = yFor(includeZero ? 0 : min);
             const barTop = Math.min(yFor(entry.value), zero);
             const barHeight = Math.abs(yFor(entry.value) - zero);
             return (
@@ -545,14 +609,24 @@ function ColumnOrLineChart({
   );
 }
 
-function HorizontalBarChart({ series, ariaLabel }: { series: ChartSeriesEntry[]; ariaLabel: string }) {
+function HorizontalBarChart({
+  series,
+  ariaLabel,
+  formatTick,
+  includeZero,
+}: {
+  series: ChartSeriesEntry[];
+  ariaLabel: string;
+  formatTick: (value: number) => string;
+  includeZero: boolean;
+}) {
   const width = 760;
   const rowHeight = 30;
   const top = 12;
   const left = 150;
   const right = width - 20;
   const height = top + Math.max(1, series.length) * rowHeight + 34;
-  const ticks = valueTicks(series.map((entry) => entry.value));
+  const ticks = valueTicks(series.map((entry) => entry.value), includeZero);
   const min = ticks[0];
   const max = ticks[ticks.length - 1];
   const xFor = (value: number) => left + ((value - min) / (max - min)) * (right - left);
@@ -582,7 +656,7 @@ function HorizontalBarChart({ series, ariaLabel }: { series: ChartSeriesEntry[];
         ))}
         {series.map((entry, index) => {
           const y = top + rowHeight * index + 5;
-          const zero = xFor(0);
+          const zero = xFor(includeZero ? 0 : min);
           const barLeft = Math.min(xFor(entry.value), zero);
           const barWidth = Math.abs(xFor(entry.value) - zero);
           return (
@@ -727,6 +801,7 @@ export function ChartView({
   db,
   view,
   rows: rowsProp,
+  rowsViewApplied = false,
   readOnly = false,
   search,
   contextPageId,
@@ -734,6 +809,7 @@ export function ChartView({
   db: Page;
   view: DbView;
   rows?: Page[];
+  rowsViewApplied?: boolean;
   readOnly?: boolean;
   search?: string;
   contextPageId?: string;
@@ -746,7 +822,6 @@ export function ChartView({
   const { t } = useTranslation([CHART_NS, "common"]);
 
   const groupableProps = props.filter(isChartGroupableProperty);
-  const numberProps = props.filter((prop) => prop.type === "number");
   const recovered = recoveredNotionChartConfig(view, props);
 
   const chartType = normalizedChartType(view.config?.chartType) ?? recovered.chartType ?? "bar";
@@ -755,30 +830,54 @@ export function ChartView({
     groupableProps.find((prop) => prop.id === recovered.groupById) ??
     groupableProps.find((prop) => prop.type === "select" || prop.type === "status") ??
     groupableProps[0];
-  const aggregateBy =
-    numberProps.find((prop) => prop.id === view.config?.chartAggregateBy) ??
-    numberProps.find((prop) => prop.id === recovered.aggregateById) ??
-    numberProps[0];
   const requestedAggregate =
     normalizedChartAggregate(view.config?.chartAggregate) ?? recovered.aggregate ?? "count";
-  // Non-count aggregations need a number property to read from.
-  const aggregate: ChartAggregate = requestedAggregate !== "count" && !aggregateBy ? "count" : requestedAggregate;
+  const aggregate: ChartAggregate = requestedAggregate;
+  const aggregateByRef = view.config?.chartAggregateBy ?? recovered.aggregateById;
+  const configuredAggregateBy = props.find((prop) => prop.id === aggregateByRef);
+  const aggregateBy = configuredAggregateBy
+    && notionChartAggregateSupportsProperty(aggregate, configuredAggregateBy.type)
+    ? configuredAggregateBy
+    : undefined;
+  const compatibleAggregateProps = props.filter((prop) =>
+    notionChartAggregateSupportsProperty(aggregate, prop.type)
+  );
+  const aggregateSupported = !notionChartAggregateRequiresProperty(aggregate) || !!aggregateBy;
+  const aggregateFamily = notionChartAggregateFamily(aggregate);
 
   // Memoized like TableView's `shown`: applyView runs a full search-filter +
   // filter-group + multi-key sort over every loaded row on each render.
   const shown = useMemo(
-    () => applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
-    [rows, props, view, pagesById, search, contextPageId]
+    () =>
+      rowsViewApplied
+        ? rows
+        : applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
+    [rows, rowsViewApplied, props, view, pagesById, search, contextPageId]
   );
-  const numberFormat = aggregate !== "count" && aggregateBy ? numberFormatForProperty(aggregateBy) : "number";
-  const formatValue = (value: number) => formatNumberValue(value, numberFormat);
+  const numberFormat = aggregateFamily === "number" && aggregateBy?.type === "number"
+    ? numberFormatForProperty(aggregateBy)
+    : "number";
+  const formatValue = (value: number) => {
+    if (aggregateFamily === "percent" || aggregateFamily === "percent_checkbox") {
+      return formatNumberValue(value, "percent");
+    }
+    if (aggregateFamily === "date") {
+      return formatDate(dateKey(new Date(value)), { year: "always" });
+    }
+    if (aggregateFamily === "date_range") {
+      return t(`${CHART_NS}:dateRangeDays`, { count: value });
+    }
+    return formatNumberValue(value, numberFormat);
+  };
+  const includeZero = aggregateFamily !== "date";
   const buckets = groupProp ? chartBuckets(shown, groupProp, chartType === "line") : [];
-  const series: ChartSeriesEntry[] = buckets.flatMap((bucket) => {
-    const value = aggregateChartValue(bucket.rows, aggregate, aggregateBy);
-    // null => empty average/min/max bucket: omit rather than plot a false 0.
+  const series: ChartSeriesEntry[] = aggregateSupported ? buckets.flatMap((bucket) => {
+    const value = aggregateChartValue(bucket.rows, aggregate, aggregateBy, pagesById, props);
+    // null => no compatible values for this bucket: omit rather than plot a
+    // false zero or silently substitute a different aggregate.
     if (value === null) return [];
     return [{ ...bucket, value, formatted: formatValue(value) }];
-  });
+  }) : [];
   const ariaLabel = t(`${CHART_NS}:chartAria`, {
     name: view.name || t(`${CHART_NS}:untitledProperty`),
   });
@@ -786,6 +885,23 @@ export function ChartView({
   function updateChartConfig(patch: Partial<ViewConfig>) {
     if (readOnly) return;
     updateView(view.id, { config: { ...view.config, ...patch } });
+  }
+
+  function selectChartAggregate(value: string) {
+    const nextAggregate = normalizedChartAggregate(value);
+    if (!nextAggregate) return;
+    if (!notionChartAggregateRequiresProperty(nextAggregate)) {
+      updateChartConfig({ chartAggregate: nextAggregate, chartAggregateBy: undefined });
+      return;
+    }
+    const candidates = props.filter((prop) =>
+      notionChartAggregateSupportsProperty(nextAggregate, prop.type)
+    );
+    const current = candidates.find((prop) => prop.id === aggregateByRef) ?? candidates[0];
+    if (!current) return;
+    // One user choice produces one view mutation carrying both compatible
+    // fields, so observers never see a transient aggregate/property mismatch.
+    updateChartConfig({ chartAggregate: nextAggregate, chartAggregateBy: current.id });
   }
 
   if (!groupProp) {
@@ -811,19 +927,29 @@ export function ChartView({
   const yAxisOptions = CHART_AGGREGATES.map((item) => ({
     value: item,
     label: t(`${CHART_NS}:aggregates.${item}`),
-    disabled: item !== "count" && numberProps.length === 0,
+    disabled: notionChartAggregateRequiresProperty(item)
+      && !props.some((prop) => notionChartAggregateSupportsProperty(item, prop.type)),
   }));
-  const valuePropertyOptions = numberProps.map((prop) => ({
+  const valuePropertyOptions = compatibleAggregateProps.map((prop) => ({
     value: prop.id,
     label: prop.name || t(`${CHART_NS}:untitledProperty`),
     icon: <PropertyTypeIcon type={prop.type} size={14} />,
   }));
   const totalValue = series.reduce((sum, entry) => sum + Math.max(0, entry.value), 0);
   const donutCenterText =
-    aggregate === "count" || aggregate === "sum" ? formatValue(totalValue) : undefined;
+    aggregate === "count" || aggregate === "count_values" || aggregate === "sum"
+      ? formatValue(totalValue)
+      : undefined;
 
   return (
-    <div className={chartStyles.wrap} data-chart-view data-chart-type={chartType}>
+    <div
+      className={chartStyles.wrap}
+      data-chart-view
+      data-chart-type={chartType}
+      data-chart-aggregate={aggregate}
+      data-chart-aggregate-property={aggregateBy?.id ?? ""}
+      data-chart-unsupported={aggregateSupported ? undefined : "true"}
+    >
       {!readOnly && (
         <div className={chartStyles.toolbar} data-chart-config>
           <span className={chartStyles.toolbarLabel}>{t(`${CHART_NS}:chartType`)}</span>
@@ -848,20 +974,30 @@ export function ChartView({
             ariaLabel={t(`${CHART_NS}:yAxis`)}
             value={aggregate}
             options={yAxisOptions}
-            onChange={(value) => updateChartConfig({ chartAggregate: normalizedChartAggregate(value) ?? "count" })}
+            onChange={selectChartAggregate}
           />
-          {aggregate !== "count" && aggregateBy && (
+          {aggregate !== "count" && valuePropertyOptions.length > 0 && (
             <NotionSelect
               className={chartStyles.select}
               ariaLabel={t(`${CHART_NS}:valueProperty`)}
-              value={aggregateBy.id}
+              value={aggregateBy?.id ?? ""}
               options={valuePropertyOptions}
               onChange={(value) => updateChartConfig({ chartAggregateBy: value || undefined })}
             />
           )}
         </div>
       )}
-      {shown.length === 0 ? (
+      {!aggregateSupported ? (
+        <div className={styles.viewEmpty} data-chart-unsupported-state>
+          <div className={styles.viewEmptyTitle}>{t(`${CHART_NS}:unsupportedAggregateTitle`)}</div>
+          <div className={styles.viewEmptyDesc}>
+            {t(`${CHART_NS}:unsupportedAggregateDesc`, {
+              aggregate: t(`${CHART_NS}:aggregates.${aggregate}`),
+              property: configuredAggregateBy?.name ?? t(`${CHART_NS}:missingProperty`),
+            })}
+          </div>
+        </div>
+      ) : shown.length === 0 ? (
         <div className={styles.viewEmpty}>
           <div className={styles.viewEmptyTitle}>{t(`${CHART_NS}:noData`)}</div>
           <div className={styles.viewEmptyDesc}>{t(`${CHART_NS}:noDataDesc`)}</div>
@@ -869,9 +1005,20 @@ export function ChartView({
       ) : chartType === "donut" ? (
         <DonutChart series={series} ariaLabel={ariaLabel} centerText={donutCenterText} />
       ) : chartType === "horizontal_bar" ? (
-        <HorizontalBarChart series={series} ariaLabel={ariaLabel} />
+        <HorizontalBarChart
+          series={series}
+          ariaLabel={ariaLabel}
+          formatTick={formatValue}
+          includeZero={includeZero}
+        />
       ) : (
-        <ColumnOrLineChart series={series} line={chartType === "line"} ariaLabel={ariaLabel} />
+        <ColumnOrLineChart
+          series={series}
+          line={chartType === "line"}
+          ariaLabel={ariaLabel}
+          formatTick={formatValue}
+          includeZero={includeZero}
+        />
       )}
     </div>
   );

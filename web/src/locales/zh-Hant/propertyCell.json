@@ -92,5 +92,8 @@
     "五",
     "六"
   ],
-  "you": "你"
+  "you": "你",
+  "buttonExecutionFailed": "無法執行按鈕。",
+  "loadingMoreRelations": "正在載入更多關聯…",
+  "loadMoreRelations": "載入更多關聯"
 }

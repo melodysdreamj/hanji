@@ -4,7 +4,22 @@
     "count": "Liczba",
     "max": "Maks",
     "min": "Min",
-    "sum": "Suma"
+    "sum": "Suma",
+    "checked": "Zaznaczone",
+    "count_values": "Liczba wartości",
+    "date_range": "Zakres dat",
+    "earliest_date": "Najwcześniejsza data",
+    "empty": "Liczba pustych",
+    "latest_date": "Najpóźniejsza data",
+    "median": "Mediana",
+    "not_empty": "Liczba niepustych",
+    "percent_checked": "Procent zaznaczonych",
+    "percent_empty": "Procent pustych",
+    "percent_not_empty": "Procent niepustych",
+    "percent_unchecked": "Procent niezaznaczonych",
+    "range": "Zakres",
+    "unchecked": "Niezaznaczone",
+    "unique": "Liczba unikalnych wartości"
   },
   "chartAria": "Wykres {{name}}",
   "chartType": "Typ wykresu",
@@ -27,5 +42,9 @@
   "untitledProperty": "Bez nazwy",
   "valueProperty": "Właściwość wartości",
   "xAxis": "Oś X",
-  "yAxis": "Oś Y"
+  "yAxis": "Oś Y",
+  "dateRangeDays": "{{count}} dni",
+  "missingProperty": "zapisana właściwość",
+  "unsupportedAggregateDesc": "Nie można obliczyć {{aggregate}} na podstawie {{property}}. Wybierz zgodną właściwość lub obliczenie.",
+  "unsupportedAggregateTitle": "To obliczenie wykresu nie jest dostępne"
 }

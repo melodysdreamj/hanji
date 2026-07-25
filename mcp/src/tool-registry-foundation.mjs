@@ -11,7 +11,7 @@ export function registerFoundationTools(runtime) {
     NOTION_SEARCH_TOOL,
     PAGE_PARENT_TYPES,
     WORKSPACE_MEMBER_ROLES,
-    accountAccessibleWorkspaces,
+    connectionSelectedWorkspaces,
     blockPreview,
     createDatabasePropertyInputSchema,
     databaseViewLabel,
@@ -23,6 +23,7 @@ export function registerFoundationTools(runtime) {
     looksLikeImageIcon,
     normalizeParentInput,
     notionDataSourceFetchPayload,
+    notionTypedDatabaseProperties,
     notionImportConnectionSummary,
     notionImportItemPreview,
     notionImportJobSummary,
@@ -33,6 +34,7 @@ export function registerFoundationTools(runtime) {
     organizationLines,
     organizationMemberLines,
     organizationPeopleSearchLines,
+    pageEditAudit,
     parseNotionCreateTableSchema,
     registerToolAliases,
     requireMatchingWorkspace,
@@ -52,14 +54,14 @@ export function registerFoundationTools(runtime) {
     {
       title: "Get workspace",
       description:
-        "Get the account workspace selection context. Hanji MCP is account-scoped, so call this first and pass one returned workspace id as workspace_id to workspace-bound tools.",
+        "Get this connection's fixed workspace selection. Call this first and pass one returned workspace id as workspace_id to workspace-bound tools.",
       inputSchema: {},
     },
     async () => {
       try {
         const ws = await eb.workspace();
         const pages = await eb.pages();
-        const workspaces = await accountAccessibleWorkspaces();
+        const workspaces = await connectionSelectedWorkspaces();
         const icon = String(ws.icon ?? "").trim();
         const iconPrefix = icon && !looksLikeImageIcon(icon) ? `${icon} ` : "";
         const iconLine = icon
@@ -68,7 +70,7 @@ export function registerFoundationTools(runtime) {
         const selectionLines = workspaceLines({ workspaces });
         return ok(
           [
-            "Hanji MCP is account-scoped. Choose one workspace below and pass its id as workspace_id.",
+            "Choose one workspace authorized for this connection and pass its id as workspace_id.",
             "",
             `Current fallback workspace: ${iconPrefix}${ws.name}`,
             `current fallback id: ${ws.id}${iconLine}`,
@@ -88,7 +90,7 @@ export function registerFoundationTools(runtime) {
     {
       title: "Get MCP access policy",
       description:
-        "Show the local MCP client narrowing policy. Hanji MCP authenticates at account scope; product permissions still come from the authenticated EdgeBase user or service principal, and this policy can narrow that access.",
+        "Show the local MCP connection policy. A fixed non-empty workspace selection is required for configured bearer-token sessions; product permissions still come from the authenticated EdgeBase user or service principal.",
       inputSchema: {},
       outputSchema: MCP_ACCESS_POLICY_OUTPUT_SCHEMA,
     },
@@ -117,9 +119,9 @@ export function registerFoundationTools(runtime) {
           ].join("\n"),
           {
             ...policy,
-            scopeModel: "hanji_account_accessible_workspaces",
+            scopeModel: "hanji_connection_selected_workspaces",
             notionCompatibilityNote:
-              "Unlike a Notion MCP connection scoped to one workspace, Hanji authenticates at account scope. Workspace-bound tools require workspace_id, with Notion-compatible teamspace_id accepted as an alias.",
+              "Hanji follows Notion's connection-time workspace scoping. Workspace-bound tools require workspace_id, with Notion-compatible teamspace_id accepted as an alias.",
           }
         );
       } catch (e) {
@@ -137,13 +139,13 @@ export function registerFoundationTools(runtime) {
     {
       title: "List workspaces",
       description:
-        "List all Hanji workspaces accessible to the current account-scoped MCP user. Use a returned workspace id as Notion-compatible teamspace_id to narrow Notion-style tools.",
+        "List only the Hanji workspaces selected for this MCP connection. Use a returned workspace id as Notion-compatible teamspace_id to narrow Notion-style tools.",
       inputSchema: {},
       outputSchema: MCP_LIST_WORKSPACES_OUTPUT_SCHEMA,
     },
     async () => {
       try {
-        const result = { workspaces: await accountAccessibleWorkspaces() };
+        const result = { workspaces: await connectionSelectedWorkspaces() };
         return okStructured(workspaceLines(result).join("\n"), workspaceStructuredContent(result));
       } catch (e) {
         return fail(e);
@@ -165,7 +167,7 @@ export function registerFoundationTools(runtime) {
     },
     async ({ query }) => {
       try {
-        const workspaces = await accountAccessibleWorkspaces();
+        const workspaces = await connectionSelectedWorkspaces();
         const needle = String(query ?? "").trim().toLowerCase();
         const teams = workspaces
           .filter((workspace) => !needle || String(workspace.name ?? "").toLowerCase().includes(needle))
@@ -176,7 +178,7 @@ export function registerFoundationTools(runtime) {
             workspace_id: workspace.id,
             name: workspace.name || workspace.domain || "Workspace",
             type: "workspace_as_teamspace",
-            scope_model: "hanji_account_workspace",
+            scope_model: "hanji_connection_workspace",
             membership_status: "member",
             role: workspace.role ?? workspace.membershipRole ?? "member",
           }));
@@ -185,7 +187,7 @@ export function registerFoundationTools(runtime) {
           joined: teams,
           available: [],
           has_more: false,
-          provider_scope_model: "hanji_account_accessible_workspaces",
+          provider_scope_model: "hanji_connection_selected_workspaces",
           teamspace_id_alias: "Hanji workspace_id",
           note:
             "Hanji maps Notion teamspaces to accessible workspaces. Choose one of these ids and pass it as workspace_id or teamspace_id; workspace-bound compatible tools reject calls that omit a workspace id.",
@@ -201,27 +203,25 @@ export function registerFoundationTools(runtime) {
     {
       title: "Query meeting notes",
       description:
-        "Notion-compatible meeting notes query stub. Hanji MCP is account-scoped, so workspace_id is required, but Hanji does not provide a separate AI meeting-notes data source.",
+        "Query native or preserved imported Notion meeting-note blocks. The connection is workspace-scoped, so workspace_id is required; attendee, page ACL, and local MCP consent narrowing are enforced.",
       inputSchema: {
         workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
         teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
         filter: JsonValueSchema.optional(),
+        sort: z.array(JsonObjectSchema).optional(),
+        limit: z.number().int().min(1).max(50).optional(),
       },
     },
-    async ({ workspace_id, teamspace_id }) => {
+    async ({ workspace_id, teamspace_id, filter, sort, limit }) => {
       try {
         const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_query_meeting_notes");
         if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-        return okJson({
-          results: [],
-          has_more: false,
-          next_cursor: null,
-          is_unsupported: true,
-          unsupported_feature: "notion_ai_meeting_notes",
+        return okJson(await eb.notionMeetingNotes({
           workspace_id: requiredWorkspace.workspaceId,
-          message:
-            "Hanji does not provide a separate Notion AI meeting-notes data source. Use normal page/database search or a Hanji database dedicated to meetings.",
-        });
+          filter,
+          sort,
+          limit,
+        }));
       } catch (e) {
         return fail(e);
       }
@@ -900,10 +900,10 @@ export function registerFoundationTools(runtime) {
     "search_pages",
     {
       title: "Search pages",
-      description: "Full-text search page titles. Returns matching pages with their ids.",
+      description: "Search page titles within one workspace. Returns matching pages with their ids.",
       inputSchema: {
         query: z.string().describe("Search text"),
-        workspaceId: z.string().optional().describe("Optional workspace id to search within"),
+        workspaceId: z.string().optional().describe("Optional workspace id; defaults to the current workspace"),
         limit: z.number().int().min(1).max(100).optional().describe("Maximum pages to return"),
       },
     },
@@ -1555,11 +1555,11 @@ export function registerFoundationTools(runtime) {
         parentId: z.string().optional().describe("Parent page id; omit for a top-level database"),
         parentType: z.enum(["workspace", "page"]).optional().describe("Destination type; defaults to page when parentId is set"),
         viewType: z.enum(DATABASE_VIEW_TYPES).optional().describe("Initial view type"),
-        seedRows: z.boolean().optional().describe("Create three empty starter rows; default true"),
+        seedRows: z.boolean().optional().describe("Create three empty starter rows; default false"),
         properties: z.array(createDatabasePropertyInputSchema).optional().describe("Optional custom schema. If no title property is included, a title property is added automatically."),
       },
     },
-    async ({ title, parentId, parentType, viewType = "table", seedRows = true, properties }) => {
+    async ({ title, parentId, parentType, viewType = "table", seedRows = false, properties }) => {
       try {
         const { parentId: cleanParentId, parentType: cleanParentType } = normalizeParentInput(parentId, parentType);
         const result = await eb.createDatabase({
@@ -1593,7 +1593,7 @@ export function registerFoundationTools(runtime) {
     {
       title: "Create database",
       description:
-        "Notion-compatible database creation using a SQL DDL CREATE TABLE schema. Hanji MCP is account-scoped, so workspace_id is required. Hanji creates one local data source per database.",
+        "Notion-compatible database creation using a SQL DDL CREATE TABLE schema. The connection is workspace-scoped, so workspace_id is required. Hanji creates one local data source per database.",
       inputSchema: {
         workspace_id: z.string().optional().describe("Required Hanji workspace id. Call list_workspaces or _notion_get_teams first and choose one; calls without it return a workspace selection error."),
         teamspace_id: z.string().optional().describe("Notion-compatible alias for workspace_id. In Hanji this must be a Hanji workspace id."),
@@ -1603,15 +1603,36 @@ export function registerFoundationTools(runtime) {
           type: z.string().optional(),
           page_id: z.string().optional(),
         }).optional(),
-        schema: z.string().describe('CREATE TABLE statement, e.g. CREATE TABLE ("Name" TITLE, "Status" SELECT(...))'),
+        schema: z.string().optional().describe('CREATE TABLE statement, e.g. CREATE TABLE ("Name" TITLE, "Status" SELECT(...)). Exactly one of schema or database_type is required.'),
+        database_type: z.enum(["tasks", "projects", "skills"]).optional().describe("Create Notion's canonical tasks, projects, or skills database schema. Exactly one of schema or database_type is required."),
       },
     },
-    async ({ workspace_id, teamspace_id, title, description, parent, schema }) => {
+    async ({ workspace_id, teamspace_id, title, description, parent, schema, database_type }) => {
       try {
         const requiredWorkspace = await requireWorkspaceSelection({ workspace_id, teamspace_id }, "_notion_create_database");
         if (requiredWorkspace.errorResult) return requiredWorkspace.errorResult;
-        const properties = parseNotionCreateTableSchema(schema);
+        if (Number(typeof schema === "string" && !!schema.trim()) + Number(!!database_type) !== 1) {
+          throw new Error("Provide exactly one of schema or database_type.");
+        }
+        const properties = database_type
+          ? notionTypedDatabaseProperties(database_type)
+          : parseNotionCreateTableSchema(schema);
+        const dualRelations = properties.filter((property) => property.type === "relation" && property.twoWay);
+        for (const relation of dualRelations) {
+          const targetId = stripHanjiId(relation.relationDatabaseId);
+          if (!targetId) throw new Error(`Relation "${relation.name}" requires a data source id.`);
+          const target = await eb.getOne("pages", targetId);
+          if (!target || target.kind !== "database") throw new Error(`Relation target ${targetId} not found.`);
+          const matched = await requireMatchingWorkspace(
+            { workspace_id: requiredWorkspace.workspaceId },
+            target,
+            "_notion_create_database",
+            `Relation target for ${relation.name}`
+          );
+          if (matched.errorResult) return matched.errorResult;
+        }
         const parentId = parent?.page_id ? stripHanjiId(parent.page_id) : null;
+        if (parent?.type && parent.type !== "page_id") throw new Error("parent.type must be page_id.");
         if (parentId) {
           const parentPage = await eb.getOne("pages", parentId);
           if (!parentPage || !parentPage.id) throw new Error(`Parent page ${parentId} not found.`);
@@ -1622,14 +1643,50 @@ export function registerFoundationTools(runtime) {
           workspaceId: requiredWorkspace.workspaceId,
           parentId,
           parentType: parentId ? "page" : "workspace",
-          title: title ?? "Untitled",
+          title: title ?? (database_type ? database_type[0].toUpperCase() + database_type.slice(1) : "Untitled"),
           viewType: "table",
           seedRows: false,
           properties,
         });
-        const payload = await notionDataSourceFetchPayload(result.page);
-        const notes = description ? "\n\nNote: Hanji does not currently store a separate data-source description field." : "";
-        return ok(`${payload.text}${notes}`);
+        for (const relation of dualRelations) {
+          const created = result.properties?.find((property) => property.name === relation.name);
+          if (!created) throw new Error(`Created relation property "${relation.name}" was not returned.`);
+          const relatedPropertyId = relation.relatedPropertyId || eb.newId();
+          await eb.update(
+            "db_properties",
+            created.id,
+            {
+              config: {
+                ...(created.config ?? {}),
+                relationDatabaseId: stripHanjiId(relation.relationDatabaseId),
+                relatedPropertyId,
+              },
+            },
+            { databaseId: result.page.id }
+          );
+          if (relation.reciprocalName) {
+            await eb.update(
+              "db_properties",
+              relatedPropertyId,
+              { name: relation.reciprocalName },
+              { databaseId: stripHanjiId(relation.relationDatabaseId) }
+            );
+          }
+        }
+        const metadata = {
+          ...(result.page.properties ?? {}),
+          notionDescription: description ?? "",
+          notionIsInline: !!parentId,
+          ...(database_type ? { notionDatabaseType: database_type } : {}),
+        };
+        const updated = await eb.update("pages", result.page.id, { properties: metadata, ...pageEditAudit() });
+        const payload = await notionDataSourceFetchPayload(updated ?? { ...result.page, properties: metadata });
+        return okStructured(payload.text, {
+          ...payload,
+          data_source_id: result.page.id,
+          data_source_url: `collection://${result.page.id}`,
+          ...(database_type ? { database_type } : {}),
+        });
       } catch (e) {
         return fail(e);
       }

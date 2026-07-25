@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Abubuwan dogaro:",
     "hint": "ƙara sifa na dangantaka",
-    "relationPropertyAriaLabel": "Sifa na dangantaka dogaro"
+    "relationPropertyAriaLabel": "Sifa na dangantaka dogaro",
+    "makeDependOn": "Sa {{title}} ya dogara da {{predecessor}}",
+    "startFrom": "Fara dogaro daga {{title}}"
   },
   "toolbar": {
     "today": "Yau",

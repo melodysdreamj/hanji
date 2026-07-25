@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} ബാക്ക്ലിങ്ക്",
-    "count_other": "{{count}} ബാക്ക്ലിങ്കുകൾ"
+    "count_other": "{{count}} ബാക്ക്ലിങ്കുകൾ",
+    "partial_one": "{{count}}+ ബാക്ക്ലിങ്ക്",
+    "partial_other": "{{count}}+ ബാക്ക്ലിങ്കുകൾ"
   },
   "header": {
     "title": "ലിങ്കുചെയ്ത മെൻഷനുകൾ"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} മെൻഷൻ",
     "mention_other": "{{count}} മെൻഷനുകൾ",
     "link_one": "{{count}} ലിങ്ക്",
-    "link_other": "{{count}} ലിങ്കുകൾ"
+    "link_other": "{{count}} ലിങ്കുകൾ",
+    "loaded": "ലോഡ് ചെയ്തു: {{summary}}"
   },
   "kind": {
     "mention": "മെൻഷൻ",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} കൂടുതൽ ബാക്ക്ലിങ്ക്",
-    "count_other": "{{count}} കൂടുതൽ ബാക്ക്ലിങ്കുകൾ"
+    "count_other": "{{count}} കൂടുതൽ ബാക്ക്ലിങ്കുകൾ",
+    "load": "കൂടുതൽ ബാക്ക്ലിങ്കുകൾ ലോഡ് ചെയ്യുക",
+    "loading": "ബാക്ക്ലിങ്കുകൾ ലോഡ് ചെയ്യുന്നു...",
+    "search": "ബാക്ക്ലിങ്കുകൾ തിരയുക"
   }
 }

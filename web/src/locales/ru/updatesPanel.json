@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} недавних обновлений",
     "unreadOfTotal": "{{unread}} из {{total}} непрочитанных",
     "updateType": "Тип обновления",
-    "updates": "Обновления",
-    "modeUpdates": "Обновления",
-    "modeChats": "Чаты",
-    "inboxMode": "Режим входящих"
+    "updates": "Обновления"
   },
   "time": {
     "justNow": "Только что",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} версий",
     "versionsAgo": "{{count}} версий назад",
     "versionsAhead": "{{count}} версий вперед",
-    "versionsAria": "Версии"
+    "versionsAria": "Версии",
+    "emptyBlock": "Пустой блок",
+    "emptyPreview": "Эта версия не содержит содержимого страницы.",
+    "previewAria": "Предварительный просмотр версии страницы только для чтения",
+    "previewingCurrent": "Просмотр текущей страницы",
+    "previewingSnapshot": "Просмотр прошлой версии",
+    "previewOnlyHint": "Выбор версии отображает только предпросмотр. Текущая страница изменится только после восстановления.",
+    "restoreThisVersion": "Восстановить",
+    "restoring": "Восстановление...",
+    "versionHistory": "История версий"
   },
   "badges": {
     "comment": "Комментарий",
@@ -67,7 +73,8 @@
     "referenceMention": "Упоминание {{title}} · {{preview}}",
     "referenceLink": "Ссылка на {{title}} · {{preview}}",
     "unreadDot": "Непрочитано",
-    "workspaceUpdate": "Обновление рабочего пространства"
+    "workspaceUpdate": "Обновление рабочего пространства",
+    "bySelf": "Вами"
   },
   "empty": {
     "allCaughtUp": "Всё прочитано.",

@@ -13,7 +13,7 @@
   "groupName": "グループ名",
   "groupOptions": "{{groupName}}グループのオプション",
   "groupThisBoard": "このボードをグループ化",
-  "groupThisBoardDesc": "セレクトまたはステータスプロパティを追加して列を作成します。",
+  "groupThisBoardDesc": "列を作成するには、選択、ステータス、人物、または複数選択のプロパティを追加または選択してください。",
   "newGroup": "新規グループ",
   "newGroupIn": "{{dbTitle}}の新しい{{groupName}}グループ",
   "newPage": "新規",

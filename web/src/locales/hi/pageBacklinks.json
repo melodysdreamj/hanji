@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} बैकलिंक",
-    "count_other": "{{count}} बैकलिंक"
+    "count_other": "{{count}} बैकलिंक",
+    "partial_one": "{{count}}+ बैकलिंक",
+    "partial_other": "{{count}}+ बैकलिंक"
   },
   "header": {
     "title": "लिंक किए गए मेंशन"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} मेंशन",
     "mention_other": "{{count}} मेंशन",
     "link_one": "{{count}} लिंक",
-    "link_other": "{{count}} लिंक"
+    "link_other": "{{count}} लिंक",
+    "loaded": "लोड किया गया: {{summary}}"
   },
   "kind": {
     "mention": "मेंशन",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} और बैकलिंक",
-    "count_other": "{{count}} और बैकलिंक"
+    "count_other": "{{count}} और बैकलिंक",
+    "load": "और बैकलिंक लोड करें",
+    "loading": "बैकलिंक लोड हो रहे हैं…",
+    "search": "बैकलिंक खोजें"
   }
 }

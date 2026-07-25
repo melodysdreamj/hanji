@@ -1,12 +1,196 @@
 import { NOTION_REQUEST_MAX_ATTEMPTS, notionRequest, safeNotionRequest, type NotionRequestRetryInfo } from "./notion-api-client";
+import {
+  notionEnrichmentShouldStop,
+  notionDiscoveryItemNeedsEnrichment,
+  notionEnrichmentWaveSize,
+  pushImportActivity,
+  type DiscoveryProgressSnapshot,
+  type NotionImportActivityEntry,
+} from "./notion-import-discovery-progress";
 import { normalizedNotionId, type DiscoveredNotionItem } from "./notion-import-request-limits";
 import { newId } from "./table-utils";
 import type {
-  NotionImportDiscoveryRuntime,
   DiscoveryWarningBag,
-  DiscoveryProgressSnapshot,
-  NotionImportActivityEntry
-} from "../functions/notion-import";
+  NotionImportItem,
+} from "./notion-import-contracts";
+
+interface LinkedNotionTargetReference {
+  id: string;
+  notionObject: 'page' | 'database' | 'data_source' | 'block';
+  source?: 'block_payload' | 'rich_text_mention';
+}
+
+interface NotionDiscoveryPageSnapshot {
+  childBlocks: Record<string, unknown>[];
+  childPages: Array<{ id: string; title: string }>;
+  childPageIds: string[];
+  childDatabaseIds: string[];
+}
+
+interface NotionDiscoveryDataSourceSnapshot {
+  [key: string]: unknown;
+  dataSource: Record<string, unknown> | undefined;
+  relationTargetReferences: Array<{
+    id: string;
+    notionObject: 'data_source' | 'database';
+  }>;
+  rowReferences: Array<{
+    id: string | undefined;
+    object: unknown;
+    title: string;
+    parentId: string | undefined;
+    notionQueryOrder: number;
+    createdTime: string | undefined;
+    lastEditedTime: string | undefined;
+    properties: unknown;
+    icon: unknown;
+    cover: unknown;
+  }>;
+  views: Record<string, unknown>[];
+}
+
+interface NotionDiscoveryDatabaseSnapshot {
+  database: Record<string, unknown> | undefined;
+  error: string | undefined;
+  fetchStatus: 'retrieved' | 'retryable_error' | 'unavailable';
+}
+
+export interface NotionImportDiscoveryRuntime {
+  NOTION_PREFLIGHT_SAMPLE_LIMIT: number;
+  NOTION_DISCOVERY_PASS_SAFETY_LIMIT: number;
+  optionalString(value: unknown): string | undefined;
+  mapWithConcurrency<T>(
+    items: T[],
+    concurrency: number,
+    callback: (item: T, index: number) => Promise<void>,
+  ): Promise<void>;
+  notionTitle(record: Record<string, unknown>): string;
+  notionParentId(record: Record<string, unknown>): string | undefined;
+  compactNotionMetadata(record: Record<string, unknown>): Record<string, unknown>;
+  notionWorkspaceInfo(
+    me: Record<string, unknown>,
+  ): { id: string | undefined; name: string | undefined };
+  putDiscoveredItem(
+    items: Map<string, DiscoveredNotionItem>,
+    item: DiscoveredNotionItem,
+  ): void;
+  hasDiscoveredNotionId(
+    items: Map<string, DiscoveredNotionItem>,
+    notionId: string,
+  ): boolean;
+  notionObjectId(record: Record<string, unknown>): string | undefined;
+  itemMetadata(
+    item: NotionImportItem | DiscoveredNotionItem,
+  ): Record<string, unknown>;
+  notionPropertiesFromSnapshot(
+    snapshot: Record<string, unknown> | undefined,
+  ): Record<string, unknown>;
+  asRecord(value: unknown): Record<string, unknown> | undefined;
+  notionPageIdsFromViewFilters(
+    view: Record<string, unknown>,
+    sourceProperties: Record<string, unknown>,
+  ): string[];
+  rawTemplatesFromSnapshot(
+    snapshot: Record<string, unknown> | undefined,
+  ): Record<string, unknown>[];
+  flattenNotionBlocks(
+    blocks: Record<string, unknown>[],
+  ): Record<string, unknown>[];
+  rawTemplateBlocks(template: Record<string, unknown>): Record<string, unknown>[];
+  linkedNotionTargetReferencesFromBlock(
+    block: Record<string, unknown>,
+  ): LinkedNotionTargetReference[];
+  collectPageSnapshot(
+    token: string,
+    item: DiscoveredNotionItem,
+    apiVersion: string,
+    maxChildrenPages: number,
+    bag: DiscoveryWarningBag,
+    apiBase?: string,
+    onRetry?: (info: NotionRequestRetryInfo) => void,
+    includeMarkdownFallback?: boolean,
+  ): Promise<NotionDiscoveryPageSnapshot>;
+  collectDatabaseSnapshot(
+    token: string,
+    databaseId: string,
+    apiVersion: string,
+    bag: DiscoveryWarningBag,
+    apiBase?: string,
+    onRetry?: (info: NotionRequestRetryInfo) => void,
+  ): Promise<NotionDiscoveryDatabaseSnapshot>;
+  collectDataSourceSnapshot(
+    token: string,
+    item: DiscoveredNotionItem,
+    apiVersion: string,
+    maxRowsPages: number,
+    maxViewPages: number,
+    maxTemplatePages: number,
+    maxChildrenPages: number,
+    bag: DiscoveryWarningBag,
+    apiBase?: string,
+    onRetry?: (info: NotionRequestRetryInfo) => void,
+  ): Promise<{
+    snapshot: NotionDiscoveryDataSourceSnapshot;
+    reusableRowPagesById: Map<string, Record<string, unknown>>;
+  }>;
+  uniqueStrings(values: Array<string | undefined>): string[];
+}
+
+const NOTION_DISCOVERY_ENRICHMENT_TYPES = ['page', 'data_source', 'database'] as const;
+
+/**
+ * Builds one deterministic, bounded work window without letting a large page
+ * tail monopolize every incremental call. The rotation seed advances with the
+ * durable completed-item count, so even concurrency=1 plus a one-item deadline
+ * gives each resource type a turn across resumed calls.
+ */
+export function fairNotionDiscoveryEnrichmentCandidates<
+  T extends { notionObject: string },
+>(
+  pendingItems: readonly T[],
+  maxItems: number,
+  enrichmentBudget?: number,
+  rotationSeed = 0,
+): T[] {
+  const maxLimit = Number.isFinite(maxItems)
+    ? Math.max(0, Math.floor(maxItems))
+    : pendingItems.length;
+  const budgetLimit = enrichmentBudget !== undefined && Number.isFinite(enrichmentBudget)
+    ? Math.max(0, Math.floor(enrichmentBudget))
+    : pendingItems.length;
+  const limit = Math.min(pendingItems.length, maxLimit, budgetLimit);
+  if (limit === 0) return [];
+
+  const queues = new Map<string, T[]>(
+    NOTION_DISCOVERY_ENRICHMENT_TYPES.map((type) => [
+      type,
+      pendingItems.filter((item) => item.notionObject === type),
+    ]),
+  );
+  const offsets = new Map<string, number>();
+  const start = ((Math.floor(rotationSeed) % NOTION_DISCOVERY_ENRICHMENT_TYPES.length)
+    + NOTION_DISCOVERY_ENRICHMENT_TYPES.length)
+    % NOTION_DISCOVERY_ENRICHMENT_TYPES.length;
+  const typeOrder = [
+    ...NOTION_DISCOVERY_ENRICHMENT_TYPES.slice(start),
+    ...NOTION_DISCOVERY_ENRICHMENT_TYPES.slice(0, start),
+  ];
+  const selected: T[] = [];
+  while (selected.length < limit) {
+    let added = false;
+    for (const type of typeOrder) {
+      const queue = queues.get(type) ?? [];
+      const offset = offsets.get(type) ?? 0;
+      if (offset >= queue.length) continue;
+      selected.push(queue[offset]);
+      offsets.set(type, offset + 1);
+      added = true;
+      if (selected.length >= limit) break;
+    }
+    if (!added) break;
+  }
+  return selected;
+}
 
 export async function discoverNotionGraphWithRuntime(
   token: string,
@@ -27,6 +211,10 @@ export async function discoverNotionGraphWithRuntime(
     // a resumed call skips already-enriched work, and a per-call cap on how many
     // items may be enriched before returning (leaving the rest pending).
     seedItems?: DiscoveredNotionItem[];
+    // IDs represented by metadata-free projected seed rows whose durable item
+    // already owns a complete snapshot. They remain in the graph for dedupe,
+    // counts, roots, and relationship closure without being re-enriched.
+    completedSeedNotionIds?: Set<string>;
     enrichmentBudget?: number;
     perCallDeadlineMs?: number;
     // Once the workspace /search has been fully paged through, resumed
@@ -35,6 +223,10 @@ export async function discoverNotionGraphWithRuntime(
     // chunk time and re-triggers 503s). Referenced items still surface through
     // enrichment via seedItems, so search only needs to run to exhaustion once.
     skipSearch?: boolean;
+    // Connection metadata, or job metadata observed under the same token, can
+    // carry this display-only identity across incremental calls. Source reads
+    // still authorize independently through Notion on every request.
+    notionWorkspace?: { id?: string; name?: string };
     apiBase?: string;
     // Fired synchronously at search completion and after each item is enriched
     // so the caller can throttle-persist a live progress snapshot.
@@ -64,11 +256,6 @@ export async function discoverNotionGraphWithRuntime(
     collectPageSnapshot,
     collectDatabaseSnapshot,
     collectDataSourceSnapshot,
-    pushImportActivity,
-    notionEnrichmentShouldStop,
-    notionDiscoveryItemNeedsEnrichment,
-    notionDiscoveryEnrichmentCandidates,
-    notionEnrichmentWaveSize,
   } = runtime();
 
   // Live-activity ring surfaced through onProgress so the UI can show which
@@ -94,8 +281,9 @@ export async function discoverNotionGraphWithRuntime(
         `retrying attempt ${retry.nextAttempt}/${NOTION_REQUEST_MAX_ATTEMPTS}.`,
     });
   };
-  const me = await notionRequest(token, '/users/me', options.apiVersion, { apiBase: options.apiBase, onRetry });
-  const notionWorkspace = notionWorkspaceInfo(me);
+  const notionWorkspace = options.notionWorkspace ?? notionWorkspaceInfo(
+    await notionRequest(token, '/users/me', options.apiVersion, { apiBase: options.apiBase, onRetry }),
+  );
   const results: Record<string, unknown>[] = [];
   const searchStartCursor = options.startCursor;
   let cursor: string | undefined = searchStartCursor;
@@ -137,6 +325,12 @@ export async function discoverNotionGraphWithRuntime(
 
   const counts: Record<string, number> = {};
   const itemsById = new Map<string, DiscoveredNotionItem>();
+  const completedSeedNotionIds = new Set(
+    Array.from(options.completedSeedNotionIds ?? []).map(normalizedNotionId).filter(Boolean),
+  );
+  const needsEnrichment = (item: DiscoveredNotionItem) =>
+    !completedSeedNotionIds.has(normalizedNotionId(item.notionId))
+    && notionDiscoveryItemNeedsEnrichment(item);
 
   // Incremental resume: merge persisted items (status 'discovered'/'referenced',
   // with any snapshots already captured on earlier calls) into the in-memory
@@ -155,7 +349,7 @@ export async function discoverNotionGraphWithRuntime(
   const hasDataSourceSnapshot = (it: DiscoveredNotionItem) =>
     !!it.metadata && it.metadata.dataSourceSnapshot != null;
   const hasDatabaseSnapshot = (it: DiscoveredNotionItem) =>
-    it.notionObject === 'database' && !notionDiscoveryItemNeedsEnrichment(it);
+    it.notionObject === 'database' && !needsEnrichment(it);
 
   for (const record of results) {
     const notionObject = typeof record.object === 'string' ? record.object : 'unknown';
@@ -247,12 +441,22 @@ export async function discoverNotionGraphWithRuntime(
 
   const databaseIds = new Set<string>();
   const retrievedDatabaseIds = new Set<string>();
-  // Select pending work rather than slicing the whole graph. On a large graph,
-  // hundreds of completed rows can otherwise occupy the first page forever and
-  // starve later linked-database references.
-  const enrichable = notionDiscoveryEnrichmentCandidates(
-    Array.from(itemsById.values()),
+  // Select pending work rather than slicing the whole graph. Round-robin the
+  // three enrichable resource types inside the actual per-call budget: pages
+  // can continuously discover more pages, so processing every page before a
+  // data source/database would otherwise starve those types on a large graph.
+  const graphItemsBeforeEnrichment = Array.from(itemsById.values());
+  const pendingItems = graphItemsBeforeEnrichment.filter(needsEnrichment);
+  const completedEnrichmentCount = graphItemsBeforeEnrichment.filter((item) => (
+    NOTION_DISCOVERY_ENRICHMENT_TYPES.includes(
+      item.notionObject as (typeof NOTION_DISCOVERY_ENRICHMENT_TYPES)[number],
+    ) && !needsEnrichment(item)
+  )).length;
+  const enrichable = fairNotionDiscoveryEnrichmentCandidates(
+    pendingItems,
     options.maxEnrichedItems,
+    options.enrichmentBudget,
+    completedEnrichmentCount,
   );
   const enrichedPageIds = new Set<string>();
   // Per-call enrichment cap. Non-incremental callers leave it Infinity so the
@@ -307,32 +511,14 @@ export async function discoverNotionGraphWithRuntime(
     enrichBudget -= 1;
     enrichedThisCall += 1;
     let enrichedItem = item;
-    if (!asRecord(item.metadata?.page)) {
+    let pageData = asRecord(item.metadata?.page);
+    if (!pageData) {
       const page = await safeNotionRequest(token, `/pages/${encodeURIComponent(item.notionId)}`, options.apiVersion, {
         apiBase: options.apiBase,
         onRetry,
       });
       if (page.ok) {
-        const pageParent = asRecord(page.data.parent);
-        const pageParentId = notionParentId(page.data);
-        const pageDataSourceId = pageParent?.type === 'data_source_id'
-          ? optionalString(pageParent.data_source_id)
-          : undefined;
-        const pageProperties = asRecord(page.data.properties);
-        enrichedItem = {
-          ...item,
-          parentNotionId: pageParentId ?? item.parentNotionId,
-          title: item.title || notionTitle(page.data),
-          status: 'discovered',
-          metadata: {
-            ...item.metadata,
-            discoveredFrom: item.metadata?.discoveredFrom ?? 'page_reference',
-            page: page.data,
-            ...(pageDataSourceId ? { dataSourceId: pageDataSourceId } : {}),
-            ...(pageProperties ? { properties: pageProperties } : {}),
-            ...compactNotionMetadata(page.data),
-          },
-        };
+        pageData = page.data;
       } else {
         bag.missingPermissions.push({
           code: 'referenced_page_unavailable',
@@ -341,6 +527,28 @@ export async function discoverNotionGraphWithRuntime(
           message: page.error,
         });
       }
+    }
+    if (pageData) {
+      const pageParent = asRecord(pageData.parent);
+      const pageParentId = notionParentId(pageData);
+      const pageDataSourceId = pageParent?.type === 'data_source_id'
+        ? optionalString(pageParent.data_source_id)
+        : undefined;
+      const pageProperties = asRecord(pageData.properties);
+      enrichedItem = {
+        ...item,
+        parentNotionId: pageParentId ?? item.parentNotionId,
+        title: item.title || notionTitle(pageData),
+        status: 'discovered',
+        metadata: {
+          ...item.metadata,
+          discoveredFrom: item.metadata?.discoveredFrom ?? 'page_reference',
+          page: pageData,
+          ...(pageDataSourceId ? { dataSourceId: pageDataSourceId } : {}),
+          ...(pageProperties ? { properties: pageProperties } : {}),
+          ...compactNotionMetadata(pageData),
+        },
+      };
     }
     const pageSnapshot = await collectPageSnapshot(
       token,
@@ -397,7 +605,7 @@ export async function discoverNotionGraphWithRuntime(
     enrichedDataSourceIds.add(item.notionId);
     enrichBudget -= 1;
     enrichedThisCall += 1;
-    const dataSourceSnapshot = await collectDataSourceSnapshot(
+    const dataSourceResult = await collectDataSourceSnapshot(
       token,
       item,
       options.apiVersion,
@@ -409,6 +617,7 @@ export async function discoverNotionGraphWithRuntime(
       options.apiBase,
       onRetry,
     );
+    const dataSourceSnapshot = dataSourceResult.snapshot;
     putDiscoveredItem(itemsById, {
       ...item,
       phase: 'data_source_snapshot',
@@ -426,6 +635,7 @@ export async function discoverNotionGraphWithRuntime(
     for (let rowIndex = 0; rowIndex < dataSourceSnapshot.rowReferences.length; rowIndex += 1) {
       const row = dataSourceSnapshot.rowReferences[rowIndex];
       if (!row.id) continue;
+      const reusableRowPage = dataSourceResult.reusableRowPagesById.get(row.id);
       putDiscoveredItem(itemsById, {
         notionId: row.id,
         notionObject: String(row.object || 'page'),
@@ -439,6 +649,7 @@ export async function discoverNotionGraphWithRuntime(
           notionQueryOrder: typeof row.notionQueryOrder === 'number' ? row.notionQueryOrder : rowIndex,
           ...(row.createdTime ? { createdTime: row.createdTime } : {}),
           ...(row.lastEditedTime ? { lastEditedTime: row.lastEditedTime } : {}),
+          ...(reusableRowPage ? { page: reusableRowPage } : {}),
           properties: row.properties,
           icon: row.icon,
           cover: row.cover,
@@ -502,6 +713,56 @@ export async function discoverNotionGraphWithRuntime(
     });
     reportProgress('enrich');
   };
+  const enrichDatabaseReference = async (databaseId: string) => {
+    if (retrievedDatabaseIds.has(databaseId) || !canEnrich()) return;
+    retrievedDatabaseIds.add(databaseId);
+    enrichBudget -= 1;
+    enrichedThisCall += 1;
+    const result = await collectDatabaseSnapshot(
+      token,
+      databaseId,
+      options.apiVersion,
+      bag,
+      options.apiBase,
+      onRetry,
+    );
+    const database = result.database;
+    putDiscoveredItem(itemsById, {
+      notionId: databaseId,
+      notionObject: 'database',
+      title: database ? notionTitle(database) : undefined,
+      status: database ? 'discovered' : 'referenced',
+      phase: database ? 'database_snapshot' : 'database_reference',
+      metadata: {
+        discoveredFrom: database ? 'database_retrieve' : 'reference',
+        databaseFetchStatus: result.fetchStatus,
+        database,
+        dataSources: Array.isArray(database?.data_sources) ? database.data_sources : undefined,
+      },
+      error: database ? null : result.error ?? 'Database details unavailable.',
+    });
+    if (Array.isArray(database?.data_sources)) {
+      for (const dataSource of database.data_sources) {
+        if (!dataSource || typeof dataSource !== 'object') continue;
+        const dataSourceId = notionObjectId(dataSource as Record<string, unknown>);
+        if (!dataSourceId) continue;
+        putDiscoveredItem(itemsById, {
+          notionId: dataSourceId,
+          notionObject: 'data_source',
+          parentNotionId: databaseId,
+          title: notionTitle(dataSource as Record<string, unknown>),
+          status: 'referenced',
+          phase: 'database_data_source_reference',
+          metadata: {
+            discoveredFrom: 'database_data_sources',
+            databaseId,
+            dataSource,
+          },
+        });
+      }
+    }
+    reportProgress('enrich');
+  };
   const collectDatabaseReferences = async () => {
     const pendingDatabaseIds = Array.from(databaseIds)
       .filter((databaseId) => !retrievedDatabaseIds.has(databaseId))
@@ -519,57 +780,9 @@ export async function discoverNotionGraphWithRuntime(
       if (waveSize <= 0) break;
       const wave = pendingDatabaseIds.slice(offset, offset + waveSize);
       offset += wave.length;
-      for (const databaseId of wave) {
-        retrievedDatabaseIds.add(databaseId);
-        enrichBudget -= 1;
-        enrichedThisCall += 1;
-      }
       await mapWithConcurrency(wave, options.discoveryConcurrency, async (databaseId) => {
-        const result = await collectDatabaseSnapshot(
-          token,
-          databaseId,
-          options.apiVersion,
-          bag,
-          options.apiBase,
-          onRetry,
-        );
-        const database = result.database;
-        putDiscoveredItem(itemsById, {
-          notionId: databaseId,
-          notionObject: 'database',
-          title: database ? notionTitle(database) : undefined,
-          status: database ? 'discovered' : 'referenced',
-          phase: database ? 'database_snapshot' : 'database_reference',
-          metadata: {
-            discoveredFrom: database ? 'database_retrieve' : 'reference',
-            databaseFetchStatus: result.fetchStatus,
-            database,
-            dataSources: Array.isArray(database?.data_sources) ? database.data_sources : undefined,
-          },
-          error: database ? null : result.error ?? 'Database details unavailable.',
-        });
-        if (Array.isArray(database?.data_sources)) {
-          for (const dataSource of database.data_sources) {
-            if (!dataSource || typeof dataSource !== 'object') continue;
-            const dataSourceId = notionObjectId(dataSource as Record<string, unknown>);
-            if (!dataSourceId) continue;
-            putDiscoveredItem(itemsById, {
-              notionId: dataSourceId,
-              notionObject: 'data_source',
-              parentNotionId: databaseId,
-              title: notionTitle(dataSource as Record<string, unknown>),
-              status: 'referenced',
-              phase: 'database_data_source_reference',
-              metadata: {
-                discoveredFrom: 'database_data_sources',
-                databaseId,
-                dataSource,
-              },
-            });
-          }
-        }
+        await enrichDatabaseReference(databaseId);
       });
-      reportProgress('enrich');
     }
   };
   const enrichPendingDataSources = async () => {
@@ -629,7 +842,7 @@ export async function discoverNotionGraphWithRuntime(
       byType[item.notionObject] = (byType[item.notionObject] ?? 0) + 1;
     }
     const pendingEnrichment = Array.from(itemsById.values()).filter(
-      notionDiscoveryItemNeedsEnrichment,
+      needsEnrichment,
     ).length;
     options.onProgress?.({
       phase,
@@ -647,9 +860,9 @@ export async function discoverNotionGraphWithRuntime(
   // earlier call so this call's budget is spent only on still-pending work and
   // completed items are never re-fetched.
   for (const item of itemsById.values()) {
-    if (item.notionObject === 'page' && hasPageSnapshot(item)) {
+    if (item.notionObject === 'page' && (hasPageSnapshot(item) || !needsEnrichment(item))) {
       enrichedPageIds.add(item.notionId);
-    } else if (item.notionObject === 'data_source' && hasDataSourceSnapshot(item)) {
+    } else if (item.notionObject === 'data_source' && (hasDataSourceSnapshot(item) || !needsEnrichment(item))) {
       enrichedDataSourceIds.add(item.notionId);
     } else if (item.notionObject === 'database' && hasDatabaseSnapshot(item)) {
       retrievedDatabaseIds.add(item.notionId);
@@ -668,23 +881,16 @@ export async function discoverNotionGraphWithRuntime(
   }
   reportProgress('search');
 
-  for (const item of enrichable) {
-    if (item.notionObject === 'database') databaseIds.add(item.notionId);
-  }
-  await mapWithConcurrency(
-    enrichable.filter((item) => item.notionObject === 'page'),
-    options.discoveryConcurrency,
-    async (item) => {
+  await mapWithConcurrency(enrichable, options.discoveryConcurrency, async (item) => {
+    if (item.notionObject === 'page') {
       await enrichPageItem(item);
-    },
-  );
-  await mapWithConcurrency(
-    enrichable.filter((item) => item.notionObject === 'data_source'),
-    options.discoveryConcurrency,
-    async (item) => {
+    } else if (item.notionObject === 'data_source') {
       await enrichDataSourceItem(item);
-    },
-  );
+    } else if (item.notionObject === 'database') {
+      databaseIds.add(item.notionId);
+      await enrichDatabaseReference(item.notionId);
+    }
+  });
 
   let discoveryPasses = 0;
   for (let pass = 0; pass < NOTION_DISCOVERY_PASS_SAFETY_LIMIT; pass += 1) {
@@ -721,7 +927,7 @@ export async function discoverNotionGraphWithRuntime(
   // snapshot and databases not yet retrieved. In incremental mode a positive
   // count means the client should loop another discover call. In one-shot mode
   // the graph has converged so this is normally 0.
-  const pendingEnrichment = items.filter(notionDiscoveryItemNeedsEnrichment).length;
+  const pendingEnrichment = items.filter(needsEnrichment).length;
   if (!hasMore && pendingEnrichment === 0) {
     pushImportActivity(recentActivity, {
       kind: 'discovery_complete',

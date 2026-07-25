@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Abhängigkeiten:",
     "hint": "Relationseigenschaft hinzufügen",
-    "relationPropertyAriaLabel": "Abhängigkeitsrelationseigenschaft"
+    "relationPropertyAriaLabel": "Abhängigkeitsrelationseigenschaft",
+    "makeDependOn": "{{title}} von {{predecessor}} abhängig machen",
+    "startFrom": "Abhängigkeit von {{title}} starten"
   },
   "toolbar": {
     "today": "Heute",

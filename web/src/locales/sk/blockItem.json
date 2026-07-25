@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Popis videa",
     "videoEmptyHint": "Nahrajte video súbor, vložte priamy odkaz alebo použite odkaz z YouTube, Vimeo alebo Loom.",
-    "videoLink": "Video odkaz"
+    "videoLink": "Video odkaz",
+    "audioPlaybackFailed": "Toto audio sa nepodarilo prehrať. Vymeňte ho alebo otvorte pôvodný súbor.",
+    "videoPlaybackFailed": "Toto video sa nepodarilo prehrať. Vymeňte ho alebo otvorte pôvodný súbor."
   },
   "bookmark": {
     "copy": "Kopírovať odkaz záložky",

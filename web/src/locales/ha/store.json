@@ -7,7 +7,8 @@
   "pageMissingSave": "Ba a sami shafin ba, don haka ba a iya adana canjin ku ba.",
   "saveFailed": "Ba a iya adana canjin ku ba.",
   "sessionExpired": "Zaman ku ya ƙare ko kuma ba a iya tabbatar da buƙatar ba. Da fatan za a sake gwadawa.",
-  "blockConflictSave": "An gyara wannan bulogi a wata na'ura, don haka ba a yi amfani da canjin da kuka yi a layi ba.",
+  "blockConflictSave": "Wani gyara da aka jera ya ci karo da sabon sigar sabar, don haka ba a iya haɗa shi ta atomatik ba.",
   "blockConflictKeepMine": "Aiwatar da sigar tawa",
-  "blockMoveCommentsSkipped": "An motsa bulogin, amma sharhinsa ba a iya motsa su tare ba."
+  "blockMoveCommentsSkipped": "An motsa bulogin, amma sharhinsa ba a iya motsa su tare ba.",
+  "conflictSave": "Wannan abun ciki ya canza kafin ajiyewa ya kammala, don haka ba a iya ajiye gyaran ku ba."
 }

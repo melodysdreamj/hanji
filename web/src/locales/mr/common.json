@@ -8,7 +8,8 @@
     "delete": "हटवा",
     "clearAll": "सर्व साफ करा",
     "done": "पूर्ण",
-    "add": "जोडा"
+    "add": "जोडा",
+    "reportIssue": "समस्या नोंदवा"
   },
   "labels": {
     "untitled": "शीर्षक नसलेले"

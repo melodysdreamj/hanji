@@ -6,5 +6,6 @@
   "unreachable": "Tidak dapat terhubung ke server",
   "unreachablePending_one": "Tidak dapat terhubung ke server · {{count}} perubahan tertunda",
   "unreachablePending_other": "Tidak dapat terhubung ke server · {{count}} perubahan tertunda",
-  "retryHint": "Klik untuk mencoba lagi"
+  "retryHint": "Klik untuk mencoba lagi",
+  "confirmed": "Tersimpan ke server"
 }

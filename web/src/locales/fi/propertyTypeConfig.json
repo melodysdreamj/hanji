@@ -58,7 +58,14 @@
     "range": "Vaihteluväli",
     "show_original": "Näytä alkuperäinen",
     "sum": "Summa",
-    "unchecked": "Valitsematon"
+    "unchecked": "Valitsematon",
+    "count": "Laske kaikki",
+    "count_per_group": "Määrä per ryhmä",
+    "empty": "Tyhjien määrä",
+    "not_empty": "Täytettyjen määrä",
+    "percent_per_group": "Prosenttia per ryhmä",
+    "show_unique": "Näytä uniikit",
+    "unique": "Uniikkien määrä"
   },
   "showOnDatabase": "Näytä kohteessa {{name}}",
   "undo": "Kumoa",

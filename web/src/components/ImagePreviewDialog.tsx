@@ -10,12 +10,20 @@ export function ImagePreviewDialog({
   alt,
   label,
   closeLabel,
+  openLabel,
+  openText,
+  downloadLabel,
+  downloadText,
   onClose,
 }: {
   src: string;
   alt: string;
   label: string;
   closeLabel: string;
+  openLabel: string;
+  openText: string;
+  downloadLabel: string;
+  downloadText: string;
   onClose: () => void;
 }) {
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -63,6 +71,7 @@ export function ImagePreviewDialog({
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
+      onAuxClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.preventDefault();
@@ -72,6 +81,25 @@ export function ImagePreviewDialog({
         trapModalTab(event, backdropRef.current);
       }}
     >
+      <div className={styles.actions} data-attachment-image-preview-actions>
+        <a
+          className={styles.action}
+          href={src}
+          target="_blank"
+          rel="noreferrer noopener"
+          aria-label={openLabel}
+        >
+          {openText}
+        </a>
+        <a
+          className={styles.action}
+          href={src}
+          download={alt || undefined}
+          aria-label={downloadLabel}
+        >
+          {downloadText}
+        </a>
+      </div>
       <button
         ref={closeRef}
         type="button"

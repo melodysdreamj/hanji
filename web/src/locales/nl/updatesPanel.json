@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} recente updates",
     "unreadOfTotal": "{{unread}} ongelezen van {{total}} updates",
     "updateType": "Updatetype",
-    "updates": "Updates",
-    "modeUpdates": "Updates",
-    "modeChats": "Chats",
-    "inboxMode": "Inboxmodus"
+    "updates": "Updates"
   },
   "time": {
     "justNow": "Zojuist",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versies",
     "versionsAgo": "{{count}} versies geleden",
     "versionsAhead": "{{count}} versies vooruit",
-    "versionsAria": "Versies"
+    "versionsAria": "Versies",
+    "emptyBlock": "Leeg blok",
+    "emptyPreview": "Deze versie heeft geen pagina-inhoud.",
+    "previewAria": "Alleen-lezen paginaversie voorbeeld",
+    "previewingCurrent": "Huidige pagina bekijken",
+    "previewingSnapshot": "Eerdere versie bekijken",
+    "previewOnlyHint": "Selecteren van een versie geeft alleen een voorbeeld. De huidige pagina verandert pas na Herstellen.",
+    "restoreThisVersion": "Herstellen",
+    "restoring": "Herstellen...",
+    "versionHistory": "Versiegeschiedenis"
   },
   "badges": {
     "comment": "Reactie",
@@ -67,7 +73,8 @@
     "referenceMention": "Vermeld {{title}} · {{preview}}",
     "referenceLink": "Gelinkt aan {{title}} · {{preview}}",
     "unreadDot": "Ongelezen",
-    "workspaceUpdate": "Werkruimte-update"
+    "workspaceUpdate": "Werkruimte-update",
+    "bySelf": "Door jou"
   },
   "empty": {
     "allCaughtUp": "Je bent helemaal bij.",

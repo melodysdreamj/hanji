@@ -4,7 +4,22 @@
     "sum": "ድምር",
     "average": "አማካይ",
     "min": "ዝቅተኛ",
-    "max": "ከፍተኛ"
+    "max": "ከፍተኛ",
+    "checked": "ተመርጧል",
+    "count_values": "የእሴቶች ብዛት",
+    "date_range": "የቀን ክልል",
+    "earliest_date": "የመጀመሪያው ቀን",
+    "empty": "ባዶ ብዛት",
+    "latest_date": "የመጨረሻው ቀን",
+    "median": "ሜዲያን",
+    "not_empty": "እሴት ያላቸው ብዛት",
+    "percent_checked": "የተመረጡ መቶኛ",
+    "percent_empty": "ባዶ መቶኛ",
+    "percent_not_empty": "እሴት ያላቸው መቶኛ",
+    "percent_unchecked": "ያልተመረጡ መቶኛ",
+    "range": "ክልል",
+    "unchecked": "ያልተመረጠ",
+    "unique": "ልዩ እሴቶች ብዛት"
   },
   "chartAria": "{{name}} ቻርት",
   "chartType": "ቻርት አይነት",
@@ -27,5 +42,9 @@
   "untitledProperty": "ያልተሰየመ",
   "valueProperty": "የእሴት ባህሪ",
   "xAxis": "X-ዘንግ",
-  "yAxis": "Y-ዘንግ"
+  "yAxis": "Y-ዘንግ",
+  "dateRangeDays": "{{count}} ቀናት",
+  "missingProperty": "የተቀመጠው ንብረት",
+  "unsupportedAggregateDesc": "{{aggregate}} ከ{{property}} ሊሰላ አይችልም። ተኳሃኝ ንብረት ወይም ስሌት ይምረጡ።",
+  "unsupportedAggregateTitle": "ይህ የገበታ ስሌት አይገኝም"
 }

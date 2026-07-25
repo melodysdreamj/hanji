@@ -11,9 +11,11 @@ import { useStore } from "@/lib/store";
 import {
   applyView,
   applyViewFilterSeeds,
+  projectCardViewSubitems,
   viewFilterSeedValues,
   visibleViewProperties,
 } from "./query";
+import { CardSubitemMeta } from "./CardSubitemMeta";
 import { PropValue } from "./PropValue";
 import { cardCoverValue, coverBackground, hasCardPreview } from "./cardPreview";
 import { useRowContextMenu, type RowOpenMode } from "./useRowContextMenu";
@@ -25,6 +27,7 @@ export function GalleryView({
   db,
   view,
   rows: rowsProp,
+  rowsViewApplied = false,
   readOnly = false,
   search,
   contextPageId,
@@ -35,6 +38,7 @@ export function GalleryView({
   db: Page;
   view: DbView;
   rows?: Page[];
+  rowsViewApplied?: boolean;
   readOnly?: boolean;
   search?: string;
   contextPageId?: string;
@@ -60,9 +64,17 @@ export function GalleryView({
   // Memoized like TableView's `shown`: applyView runs a full search-filter +
   // filter-group + multi-key sort over every loaded row on each render.
   const shown = useMemo(
-    () => applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
-    [rows, props, view, pagesById, search, contextPageId]
+    () =>
+      rowsViewApplied
+        ? rows
+        : applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
+    [rows, rowsViewApplied, props, view, pagesById, search, contextPageId]
   );
+  const cardSubitems = useMemo(
+    () => projectCardViewSubitems(db, view, shown),
+    [db, shown, view]
+  );
+  const cardRows = cardSubitems.rows;
   const visible = visibleViewProperties(props, view);
   const others = visible.filter((p) => p.type !== "title");
   const cardSize = view.config?.cardSize ?? "medium";
@@ -112,7 +124,7 @@ export function GalleryView({
 
   return (
     <div className={styles.gallery} data-size={cardSize}>
-      {shown.length === 0 && (
+      {cardRows.length === 0 && (
         <div className={styles.viewEmpty}>
           <div className={styles.viewEmptyTitle}>
             {rows.length === 0 ? t("galleryView:emptyTitle") : t("galleryView:noResultsTitle")}
@@ -133,7 +145,7 @@ export function GalleryView({
           )}
         </div>
       )}
-      {shown.map((row) => {
+      {cardRows.map((row) => {
         const cover = cardCoverValue(row, props, view.config?.coverProperty);
         const title = pageDisplayTitle(row);
         return (
@@ -174,12 +186,17 @@ export function GalleryView({
                 {others.map((p) => (
                   <PropValue key={p.id} row={row} prop={p} interactive={false} />
                 ))}
+                <CardSubitemMeta
+                  row={row}
+                  pagesById={pagesById}
+                  presentation={cardSubitems}
+                />
               </div>
             </div>
           </div>
         );
       })}
-      {shown.length > 0 && !readOnly && (
+      {cardRows.length > 0 && !readOnly && (
         <button
           type="button"
           className={styles.galleryNew}

@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Ścieżka nawigacyjna",
+  "clearSearch": "Wyczyść wyszukiwanie",
+  "errors": {
+    "not-found": "Ta strona mogła zostać wycofana lub jej adres mógł się zmienić.",
+    "offline": "Sprawdź połączenie i spróbuj ponownie otworzyć witrynę.",
+    "rate-limited": "Ta witryna otrzymuje zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
+    "unavailable": "Hanji nie może teraz otworzyć tej witryny. Spróbuj ponownie za chwilę."
+  },
+  "madeWithHanji": "Stworzone w Hanji",
+  "navigation": "Nawigacja witryny",
+  "noResults": "Nie znaleziono stron",
+  "outsideSite": "Strona nie należy do tej opublikowanej witryny.",
+  "search": "Szukaj na tej witrynie",
+  "tryAgain": "Spróbuj ponownie",
+  "unavailable": "Ta witryna jest niedostępna."
+}

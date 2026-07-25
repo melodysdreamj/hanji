@@ -1,4 +1,11 @@
 import { normalizeLegacyHanjiUri } from "@/lib/legacyNamespace";
+import { pageIdFromPageHref as sharedPageIdFromPageHref } from "../../../shared/page-references.mjs";
+
+export function pageIdFromPageHref(href: unknown) {
+  return sharedPageIdFromPageHref(
+    typeof href === "string" ? normalizeLegacyHanjiUri(href) : href
+  );
+}
 
 export function decodePathPart(value: string) {
   try {
@@ -6,25 +13,6 @@ export function decodePathPart(value: string) {
   } catch {
     return value;
   }
-}
-
-export function pageIdFromPageHref(href: string | undefined) {
-  const raw = normalizeLegacyHanjiUri(href?.trim() ?? "");
-  if (!raw) return null;
-
-  const schemeMatch = raw.match(/^hanji:\/\/page\/([^/?#]+)(?:[?#].*)?$/i);
-  if (schemeMatch) return decodePathPart(schemeMatch[1]);
-
-  let path = raw;
-  try {
-    const url = raw.startsWith("/") ? new URL(raw, "http://hanji.local") : new URL(raw);
-    path = url.pathname;
-  } catch {
-    path = raw.split(/[?#]/, 1)[0];
-  }
-
-  const match = path.match(/^\/p\/([^/]+)/);
-  return match ? decodePathPart(match[1]) : null;
 }
 
 export function remapPageHref(href: string | undefined, pageMap?: Map<string, string>) {

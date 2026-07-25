@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Añadir comentario",
+    "addLink": "Añadir enlace",
+    "blockColor": "Aplicar último color usado",
+    "bold": "Negrita",
+    "copyPageLink": "Copiar enlace de página",
+    "findInPage": "Buscar en esta página",
+    "inlineCode": "Código en línea",
+    "italic": "Cursiva",
+    "moveBlock": "Mover bloque a otra página",
+    "moveBlockDown": "Mover bloque abajo",
+    "moveBlockUp": "Mover bloque arriba",
+    "movePage": "Mover página actual",
+    "navigateBack": "Ir atrás",
+    "navigateForward": "Ir adelante",
+    "newPage": "Nueva página",
+    "openBlockMenu": "Abrir acciones de bloque",
+    "openKeyboardShortcuts": "Abrir atajos de teclado",
+    "openParentPage": "Abrir página principal",
+    "quickFind": "Búsqueda rápida",
+    "strikethrough": "Tachado",
+    "toggleAllToggles": "Expandir o contraer todos los alternadores",
+    "toggleSidebar": "Alternar barra lateral",
+    "toggleTheme": "Alternar modo oscuro",
+    "underline": "Subrayado"
+  },
+  "categories": {
+    "createStyle": "Crear y estilo",
+    "editMove": "Editar y mover",
+    "popular": "Populares"
+  },
+  "categoriesLabel": "Categorías de atajos",
+  "close": "Cerrar",
+  "closeBackdrop": "Cerrar atajos de teclado",
+  "empty": "No se encontraron atajos",
+  "keysFor": "Teclas para {{action}}",
+  "or": "o",
+  "searchLabel": "Buscar atajos de teclado",
+  "searchPlaceholder": "Buscar atajos…",
+  "searchResults": "Resultados de búsqueda",
+  "searchTerms": {
+    "toggleTheme": "tema claro oscuro apariencia"
+  },
+  "title": "Atajos de teclado"
+}

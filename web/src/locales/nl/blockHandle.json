@@ -88,5 +88,38 @@
     "hoursAgo": "Laatst bewerkt {{hours}}h geleden",
     "daysAgo": "Laatst bewerkt {{days}}d geleden",
     "on": "Laatst bewerkt {{date}}"
+  },
+  "align": {
+    "center": "Midden",
+    "choose": "Kies uitlijning",
+    "left": "Links",
+    "right": "Rechts"
+  },
+  "altText": {
+    "help": "Alt-tekst helpt mensen die schermlezers gebruiken de afbeelding te begrijpen.",
+    "label": "Beschrijving",
+    "placeholder": "Beschrijf de afbeelding",
+    "remove": "Verwijderen",
+    "save": "Opslaan",
+    "title": "Alt-tekst"
+  },
+  "imageLink": {
+    "invalid": "Voer een volledige http:// of https:// URL in.",
+    "label": "Open deze URL wanneer op de afbeelding wordt geklikt",
+    "remove": "Verwijderen",
+    "save": "Opslaan",
+    "title": "Afbeeldingslink"
+  },
+  "media": {
+    "addImageLink": "Link toevoegen",
+    "align": "Uitlijning",
+    "altText": "Alt-tekst",
+    "copySourceLink": "Bronlink kopiëren",
+    "download": "Downloaden",
+    "editImageLink": "Link bewerken",
+    "fullScreen": "Volledig scherm",
+    "openLink": "Link openen",
+    "replace": "Vervangen",
+    "viewOriginal": "Origineel bekijken"
   }
 }

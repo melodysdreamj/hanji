@@ -4,7 +4,22 @@
     "sum": "එකතුව",
     "average": "සාමාන්‍ය",
     "min": "අවම",
-    "max": "උපරිම"
+    "max": "උපරිම",
+    "checked": "සලකුණු කළ",
+    "count_values": "අගයන් ගණන",
+    "date_range": "දින පරාසය",
+    "earliest_date": "මුල්ම දිනය",
+    "empty": "හිස් ගණන",
+    "latest_date": "නවතම දිනය",
+    "median": "මධ්යස්ථානය",
+    "not_empty": "හිස් නොවන ගණන",
+    "percent_checked": "සලකුණු කළ ප්‍රතිශතය",
+    "percent_empty": "හිස් ප්‍රතිශතය",
+    "percent_not_empty": "හිස් නොවන ප්‍රතිශතය",
+    "percent_unchecked": "සලකුණු නොකළ ප්‍රතිශතය",
+    "range": "පරාසය",
+    "unchecked": "සලකුණු නොකළ",
+    "unique": "අනන්ය අගයන් ගණන"
   },
   "chartAria": "{{name}} ප්‍රස්ථාරය",
   "chartType": "ප්‍රස්ථාර වර්ගය",
@@ -27,5 +42,9 @@
   "untitledProperty": "නම් නැති",
   "valueProperty": "අගය ගුණාංගය",
   "xAxis": "X-අක්ෂය",
-  "yAxis": "Y-අක්ෂය"
+  "yAxis": "Y-අක්ෂය",
+  "dateRangeDays": "{{count}} දින",
+  "missingProperty": "සුරකින ලද ගුණාංගය",
+  "unsupportedAggregateDesc": "{{aggregate}} {{property}} වෙතින් ගණනය කළ නොහැක. ගැළපෙන ගුණාංගයක් හෝ ගණනයක් තෝරන්න.",
+  "unsupportedAggregateTitle": "මෙම ප්‍රස්තාර ගණනය ලබා ගත නොහැක."
 }

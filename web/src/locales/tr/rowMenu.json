@@ -35,7 +35,7 @@
     "rename": "Yeniden adlandır",
     "addPageInside": "İçine sayfa ekle",
     "exportAsMarkdown": "Markdown olarak dışa aktar",
-    "exportAsHanjiFile": "Hanji dosyası olarak dışa aktar",
+    "exportAsHanjiFile": "Hanji JSON'ını dışa aktar (dosyalar hariç)",
     "importMarkdown": "Markdown içe aktar",
     "importing": "İçe aktarılıyor...",
     "unlockPage": "Sayfanın kilidini aç",
@@ -44,7 +44,8 @@
     "removeVerification": "Doğrulamayı kaldır",
     "verifyPage": "Sayfayı doğrula",
     "customizePage": "Sayfayı özelleştir",
-    "undo": "Geri al"
+    "undo": "Geri al",
+    "exportAsHanjiArchive": "Hanji arşivini dışa aktar (dosyalar dahil)"
   },
   "customize": {
     "summaryDefault": "Varsayılan",
@@ -101,6 +102,8 @@
     "movedToTrash": "Çöp Kutusu'na taşındı",
     "restoredPage": "Sayfa geri yüklendi",
     "couldntRestorePage": "Sayfa geri yüklenemedi",
-    "couldntMoveToTrash": "Çöp Kutusu'na taşınamadı"
+    "couldntMoveToTrash": "Çöp Kutusu'na taşınamadı",
+    "couldntExportHanjiArchive": "Hanji arşivi dışa aktarılamadı.",
+    "exportedHanjiArchive": "Dosyaları içeren bir Hanji arşivi dışa aktarıldı."
   }
 }

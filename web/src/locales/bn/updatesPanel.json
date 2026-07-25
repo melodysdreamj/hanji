@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}}টি সাম্প্রতিক আপডেট",
     "unreadOfTotal": "{{unread}}টি অপঠিত ({{total}}টির মধ্যে)",
     "updateType": "আপডেটের ধরন",
-    "updates": "আপডেট",
-    "modeUpdates": "আপডেট",
-    "modeChats": "চ্যাট",
-    "inboxMode": "ইনবক্স মোড"
+    "updates": "আপডেট"
   },
   "time": {
     "justNow": "এই মাত্র",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} টি সংস্করণ",
     "versionsAgo": "{{count}} টি সংস্করণ আগে",
     "versionsAhead": "{{count}} টি সংস্করণ এগিয়ে",
-    "versionsAria": "সংস্করণ"
+    "versionsAria": "সংস্করণ",
+    "emptyBlock": "খালি ব্লক",
+    "emptyPreview": "এই সংস্করণে কোনো পৃষ্ঠা বিষয়বস্তু নেই।",
+    "previewAria": "পৃষ্ঠা সংস্করণ প্রিভিউ (শুধু পঠনযোগ্য)",
+    "previewingCurrent": "বর্তমান পৃষ্ঠা দেখা হচ্ছে",
+    "previewingSnapshot": "পুরনো সংস্করণ দেখা হচ্ছে",
+    "previewOnlyHint": "একটি সংস্করণ নির্বাচন করলে তা শুধু প্রিভিউ দেখায়। পুনরুদ্ধার করার পরেই বর্তমান পৃষ্ঠা পরিবর্তিত হয়।",
+    "restoreThisVersion": "পুনরুদ্ধার",
+    "restoring": "পুনরুদ্ধার করা হচ্ছে...",
+    "versionHistory": "সংস্করণ ইতিহাস"
   },
   "badges": {
     "comment": "মন্তব্য",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} মেনশন · {{preview}}",
     "referenceLink": "{{title}} লিঙ্ক · {{preview}}",
     "unreadDot": "অপঠিত",
-    "workspaceUpdate": "ওয়ার্কস্পেস আপডেট"
+    "workspaceUpdate": "ওয়ার্কস্পেস আপডেট",
+    "bySelf": "আপনার দ্বারা"
   },
   "empty": {
     "allCaughtUp": "সব আপডেট দেখেছেন।",

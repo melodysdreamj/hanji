@@ -51,7 +51,14 @@
     "range": "ਸੀਮਾ",
     "earliest_date": "ਸਭ ਤੋਂ ਪੁਰਾਣੀ ਤਾਰੀਖ",
     "latest_date": "ਸਭ ਤੋਂ ਨਵੀਂ ਤਾਰੀਖ",
-    "date_range": "ਤਾਰੀਖ ਸੀਮਾ"
+    "date_range": "ਤਾਰੀਖ ਸੀਮਾ",
+    "count": "ਸਾਰੇ ਗਿਣੋ",
+    "count_per_group": "ਗਰੁੱਪ ਅਨੁਸਾਰ ਗਿਣਤੀ",
+    "empty": "ਖਾਲੀ ਗਿਣਤੀ",
+    "not_empty": "ਗੈਰ-ਖਾਲੀ ਗਿਣਤੀ",
+    "percent_per_group": "ਗਰੁੱਪ ਪ੍ਰਤੀਸ਼ਤ",
+    "show_unique": "ਵਿਲੱਖਣ ਮੁੱਲ ਦਿਖਾਓ",
+    "unique": "ਵਿਲੱਖਣ ਗਿਣਤੀ"
   },
   "undo": "ਵਾਪਸ ਕਰੋ",
   "untitled": "ਬੇ-ਸਿਰਲੇਖ",

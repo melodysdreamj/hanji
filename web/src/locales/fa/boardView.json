@@ -13,7 +13,7 @@
   "groupName": "نام گروه",
   "groupOptions": "گزینه‌های گروه {{groupName}}",
   "groupThisBoard": "گروه‌بندی این بورد",
-  "groupThisBoardDesc": "برای ایجاد ستون‌ها یک ویژگی انتخاب یا وضعیت اضافه کنید",
+  "groupThisBoardDesc": "برای ایجاد ستون‌ها، یک ویژگی انتخاب، وضعیت، شخص یا انتخاب چندگانه اضافه یا انتخاب کنید.",
   "newGroup": "گروه جدید",
   "newGroupIn": "گروه جدید {{groupName}} در {{dbTitle}}",
   "newPage": "جدید",

@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Đã đóng",
+    "open": "Mở",
+    "private": "Riêng tư"
+  },
+  "add": "Thêm",
+  "approve": "Phê duyệt",
+  "archive": "Lưu trữ teamspace",
+  "available": "Có thể tham gia",
+  "choosePrincipal": "Chọn một người hoặc nhóm",
+  "create": "Tạo teamspace",
+  "deny": "Từ chối",
+  "error": {
+    "action": "Không thể hoàn tất hành động teamspace đó.",
+    "load": "Không thể tải thông tin chi tiết teamspace."
+  },
+  "fields": {
+    "access": "Quyền truy cập",
+    "description": "Mô tả",
+    "icon": "Biểu tượng",
+    "memberRole": "Quyền truy cập trang của thành viên",
+    "membersCanEditSidebar": "Thành viên có thể thêm và sắp xếp lại trang",
+    "membersCanInvite": "Thành viên có thể mời người dùng",
+    "name": "Tên",
+    "openRole": "Quyền truy cập trang cho khách công khai"
+  },
+  "governance": "Cài đặt Teamspace",
+  "join": "Tham gia",
+  "joined": "Teamspace của bạn",
+  "loadMore": "Tải thêm",
+  "manage": "Quản lý",
+  "member": "Thành viên",
+  "members": "Thành viên",
+  "noneArchived": "Không có Teamspace nào được lưu trữ.",
+  "noneAvailable": "Không có Teamspace nào khác khả dụng.",
+  "noneJoined": "Bạn chưa tham gia Teamspace nào.",
+  "noRequests": "Không có yêu cầu đang chờ nào.",
+  "notice": {
+    "approved": "Đã duyệt yêu cầu.",
+    "archived": "Đã lưu trữ Teamspace.",
+    "created": "Đã tạo Teamspace.",
+    "defaultSet": "Đã cập nhật Teamspace mặc định.",
+    "denied": "Đã từ chối yêu cầu.",
+    "joined": "Đã tham gia Teamspace.",
+    "memberAdded": "Đã thêm thành viên.",
+    "memberRemoved": "Đã xóa thành viên.",
+    "memberUpdated": "Đã cập nhật vai trò thành viên.",
+    "policySaved": "Đã cập nhật chính sách tạo Teamspace.",
+    "requested": "Đã yêu cầu quyền truy cập.",
+    "restored": "Đã khôi phục Teamspace.",
+    "saved": "Đã cập nhật Teamspace."
+  },
+  "notOwner": "Chỉ chủ sở hữu teamspace hoặc quản trị viên workspace mới có thể quản lý teamspace này.",
+  "open": "Mở",
+  "owner": "Chủ sở hữu",
+  "ownersOnlyCreate": "Chỉ chủ sở hữu workspace mới có thể tạo teamspace",
+  "remove": "Xóa",
+  "replacement": "Chọn teamspace mặc định thay thế",
+  "request": "Yêu cầu quyền truy cập",
+  "requestPending": "Đang chờ yêu cầu",
+  "requests": "Yêu cầu truy cập",
+  "restore": "Khôi phục",
+  "roles": {
+    "comment": "Có thể bình luận",
+    "edit": "Có thể chỉnh sửa",
+    "full_access": "Toàn quyền truy cập",
+    "view": "Có thể xem"
+  },
+  "save": "Lưu thay đổi",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Đặt làm teamspace mặc định",
+  "subtitle": "Sắp xếp công việc chung và kiểm soát ai có thể khám phá hoặc tham gia.",
+  "tabs": {
+    "archived": "Đã lưu trữ",
+    "browse": "Duyệt",
+    "create": "Teamspace mới",
+    "label": "Chế độ xem teamspace",
+    "manage": "Quản lý"
+  },
+  "title": "Teamspaces"
+}

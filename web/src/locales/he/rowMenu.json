@@ -35,7 +35,7 @@
     "rename": "שנה שם",
     "addPageInside": "הוסף דף בתוך",
     "exportAsMarkdown": "ייצא כ-Markdown",
-    "exportAsHanjiFile": "ייצא כקובץ Hanji",
+    "exportAsHanjiFile": "ייצוא Hanji JSON (ללא קבצים)",
     "importMarkdown": "ייבוא Markdown",
     "importing": "מייבא...",
     "unlockPage": "בטל נעילת עמוד",
@@ -44,7 +44,8 @@
     "removeVerification": "הסר אימות",
     "verifyPage": "אמת עמוד",
     "customizePage": "התאם אישית דף",
-    "undo": "בטל"
+    "undo": "בטל",
+    "exportAsHanjiArchive": "ייצוא ארכיון Hanji (כולל קבצים)"
   },
   "customize": {
     "summaryDefault": "ברירת מחדל",
@@ -101,6 +102,8 @@
     "movedToTrash": "הועבר לפח",
     "restoredPage": "העמוד שוחזר",
     "couldntRestorePage": "לא ניתן היה לשחזר את הדף",
-    "couldntMoveToTrash": "לא ניתן היה להעביר לפח"
+    "couldntMoveToTrash": "לא ניתן היה להעביר לפח",
+    "couldntExportHanjiArchive": "לא ניתן לייצא ארכיון Hanji.",
+    "exportedHanjiArchive": "ייצא ארכיון Hanji עם קבצים."
   }
 }

@@ -36,7 +36,7 @@
   "enableWebSharing": "Włącz udostępnianie internetowe dla {{pageTitle}}",
   "expired": "Wygasło",
   "expiresAt": "Wygasa {{formatted}}",
-  "exportAsHanji": "Eksportuj jako plik Hanji",
+  "exportAsHanji": "Eksportuj Hanji JSON (bez plików)",
   "exportAsMarkdown": "Eksportuj jako Markdown",
   "exporting": "Eksportowanie…",
   "fontDefault": "Domyślny",
@@ -138,7 +138,9 @@
     "updatedWebLinkExpiration": "Zaktualizowano wygaśnięcie linku",
     "verificationRemoved": "Usunięto weryfikację",
     "webSharingDisabled": "Wyłączono udostępnianie przez internet",
-    "webSharingEnabled": "Włączono udostępnianie przez internet"
+    "webSharingEnabled": "Włączono udostępnianie przez internet",
+    "couldntExportHanjiArchive": "Nie można wyeksportować archiwum Hanji.",
+    "exportedHanjiArchive": "Wyeksportowano archiwum Hanji z plikami."
   },
   "todayAt": "Dzisiaj o {{time}}",
   "undo": "Cofnij",
@@ -153,5 +155,12 @@
   "workspaceCount_one": "{{count}} obszar roboczy",
   "workspaceCount_other": "{{count}} obszary robocze",
   "yesterdayAt": "Wczoraj o {{time}}",
-  "you": "Ja"
+  "you": "Ja",
+  "exportAsHanjiArchive": "Eksportuj archiwum Hanji (z plikami)",
+  "turnIntoWiki": "Zamień na wiki",
+  "undoWiki": "Cofnij wiki",
+  "wikiCreated": "Przekształcono stronę w wiki",
+  "wikiPageSettings": "Ustawienia strony wiki",
+  "wikiUndone": "Wiki usunięto; treść strony zachowano",
+  "wikiUpdateFailed": "Nie udało się zaktualizować wiki"
 }

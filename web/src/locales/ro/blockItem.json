@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Subtitrare video",
     "videoEmptyHint": "Încarcă un fișier video, lipește un link direct sau folosește un link YouTube, Vimeo sau Loom.",
-    "videoLink": "Link video"
+    "videoLink": "Link video",
+    "audioPlaybackFailed": "Acest fișier audio nu a putut fi redat. Înlocuiți-l sau deschideți fișierul original.",
+    "videoPlaybackFailed": "Acest videoclip nu a putut fi redat. Înlocuiți-l sau deschideți fișierul original."
   },
   "bookmark": {
     "copy": "Copiază linkul de bookmark",

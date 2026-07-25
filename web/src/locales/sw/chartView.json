@@ -4,7 +4,22 @@
     "sum": "Jumla",
     "average": "Wastani",
     "min": "Kichini",
-    "max": "Upeo"
+    "max": "Upeo",
+    "checked": "Imetiki",
+    "count_values": "Hesabu thamani",
+    "date_range": "Kipindi cha tarehe",
+    "earliest_date": "Tarehe ya mapema zaidi",
+    "empty": "Hesabu tupu",
+    "latest_date": "Tarehe ya mwisho",
+    "median": "Mediani",
+    "not_empty": "Hesabu zisizo tupu",
+    "percent_checked": "Asilimia iliyotiki",
+    "percent_empty": "Asilimia tupu",
+    "percent_not_empty": "Asilimia isiyo tupu",
+    "percent_unchecked": "Asilimia isiyotiki",
+    "range": "Masafa",
+    "unchecked": "Haijatiki",
+    "unique": "Hesabu thamani za kipekee"
   },
   "chartAria": "Chati ya {{name}}",
   "chartType": "Aina ya chati",
@@ -27,5 +42,9 @@
   "untitledProperty": "Isiyo na jina",
   "valueProperty": "Sifa ya thamani",
   "xAxis": "Mhimili wa X",
-  "yAxis": "Mhimili wa Y"
+  "yAxis": "Mhimili wa Y",
+  "dateRangeDays": "{{count}} siku",
+  "missingProperty": "sifa iliyohifadhiwa",
+  "unsupportedAggregateDesc": "{{aggregate}} haiwezi kuhesabiwa kutoka {{property}}. Chagua sifa au hesabu inayooana.",
+  "unsupportedAggregateTitle": "Hesabu hii ya chati haipatikani"
 }

@@ -13,7 +13,7 @@
   "groupName": "ชื่อกลุ่ม",
   "groupOptions": "ตัวเลือกกลุ่ม {{groupName}}",
   "groupThisBoard": "จัดกลุ่มบอร์ดนี้",
-  "groupThisBoardDesc": "เพิ่มพร็อพเพอร์ตี้เลือกหรือสถานะเพื่อสร้างคอลัมน์",
+  "groupThisBoardDesc": "เพิ่มหรือเลือกคุณสมบัติแบบ Select, Status, Person หรือ Multi-select เพื่อสร้างคอลัมน์",
   "newGroup": "กลุ่มใหม่",
   "newGroupIn": "กลุ่ม {{groupName}} ใหม่ใน {{dbTitle}}",
   "newPage": "ใหม่",

@@ -38,7 +38,7 @@
   "moveTo": "Ilipat sa",
   "exporting": "Nag-e-export…",
   "exportAsMarkdown": "I-export bilang Markdown",
-  "exportAsHanji": "I-export bilang Hanji file",
+  "exportAsHanji": "I-export ang Hanji JSON (hindi kasama ang mga file)",
   "importing": "Nag-i-import…",
   "importMarkdown": "Import Markdown",
   "unlockPage": "I-unlock ang pahina",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Hindi na-update ang access",
     "removedFromAccessList": "Inalis mula sa listahan ng access",
     "couldntRemoveAccess": "Hindi naalis ang access",
-    "couldntLoadAccessList": "Hindi na-load ang listahan ng access"
+    "couldntLoadAccessList": "Hindi na-load ang listahan ng access",
+    "couldntExportHanjiArchive": "Hindi mai-export ang Hanji archive.",
+    "exportedHanjiArchive": "Na-export ang Hanji archive kasama ang mga file."
   },
   "user": "User",
   "whoHasAccess": "Sino ang may access",
   "workspace": "Workspace",
   "workspaceCount_one": "{{count}} workspace",
   "workspaceCount_other": "{{count}} workspace",
-  "you": "Ikaw"
+  "you": "Ikaw",
+  "exportAsHanjiArchive": "I-export ang Hanji archive (kasama ang mga file)",
+  "turnIntoWiki": "Gawing wiki",
+  "undoWiki": "I-undo wiki",
+  "wikiCreated": "Ginawang wiki ang pahina",
+  "wikiPageSettings": "Setting ng wiki page",
+  "wikiUndone": "Inalis ang wiki; napanatili ang nilalaman ng pahina",
+  "wikiUpdateFailed": "Hindi na-update ang wiki"
 }

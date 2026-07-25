@@ -13,7 +13,7 @@
   "groupName": "ಗುಂಪು ಹೆಸರು",
   "groupOptions": "{{groupName}} ಗುಂಪು ಆಯ್ಕೆಗಳು",
   "groupThisBoard": "ಈ ಬೋರ್ಡ್ ಗುಂಪು ಮಾಡಿ",
-  "groupThisBoardDesc": "ಕಾಲಮ್ಗಳನ್ನು ರಚಿಸಲು ಸೆಲೆಕ್ಟ್ ಅಥವಾ ಸ್ಟೇಟಸ್ ಪ್ರಾಪರ್ಟಿಯನ್ನು ಸೇರಿಸಿ.",
+  "groupThisBoardDesc": "ಕಾಲಮ್ಗಳನ್ನು ರಚಿಸಲು ಆಯ್ಕೆ, ಸ್ಥಿತಿ, ವ್ಯಕ್ತಿ ಅಥವಾ ಬಹು-ಆಯ್ಕೆ ಗುಣವನ್ನು ಸೇರಿಸಿ ಅಥವಾ ಆರಿಸಿ.",
   "newGroup": "ಹೊಸ ಗುಂಪು",
   "newGroupIn": "{{dbTitle}} ನಲ್ಲಿ ಹೊಸ {{groupName}} ಗುಂಪು",
   "newPage": "ಹೊಸ",

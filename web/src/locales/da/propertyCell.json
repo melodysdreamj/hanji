@@ -92,5 +92,8 @@
     "F",
     "L"
   ],
-  "you": "Dig"
+  "you": "Dig",
+  "buttonExecutionFailed": "Kunne ikke køre knappen.",
+  "loadingMoreRelations": "Indlæser flere relationer…",
+  "loadMoreRelations": "Indlæs flere relationer"
 }

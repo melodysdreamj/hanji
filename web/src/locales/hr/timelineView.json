@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Ovisnosti:",
     "hint": "dodaj svojstvo veze",
-    "relationPropertyAriaLabel": "Svojstvo veze zavisnosti"
+    "relationPropertyAriaLabel": "Svojstvo veze zavisnosti",
+    "makeDependOn": "Neka {{title}} ovisi o {{predecessor}}",
+    "startFrom": "Započni ovisnost od {{title}}"
   },
   "toolbar": {
     "today": "Danas",

@@ -92,5 +92,8 @@
     "Пт",
     "Сб"
   ],
-  "you": "Вие"
+  "you": "Вие",
+  "buttonExecutionFailed": "Неуспешно изпълнение на бутона.",
+  "loadingMoreRelations": "Зареждане на още връзки…",
+  "loadMoreRelations": "Зареждане на още връзки"
 }

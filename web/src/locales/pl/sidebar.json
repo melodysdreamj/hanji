@@ -24,7 +24,7 @@
   "dismissInviteCard": "Odrzuć kartę członka",
   "exportedWorkspace": "Wyeksportowano przestrzeń roboczą jako plik Hanji.",
   "exportedWorkspaceWithPlaceholders": "Wyeksportowano przestrzeń roboczą jako plik Hanji — załączniki pozostawiono jako elementy zastępcze.",
-  "exportWorkspace": "Eksportuj przestrzeń roboczą",
+  "exportWorkspace": "Eksportuj workspace JSON (bez plików)",
   "favoritePages": "Ulubione strony",
   "favorites": "Ulubione",
   "home": "Strona główna",
@@ -76,5 +76,12 @@
     "later": "Później",
     "note": "Zawsze możesz to rozpocząć później z opcji Import w panelu bocznym.",
     "title": "Przenieść swoją przestrzeń roboczą Notion do Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Dodaj stronę do {{name}}",
+  "couldntExportWorkspaceArchive": "Nie udało się wyeksportować archiwum workspace.",
+  "exportedWorkspaceArchive": "Wyeksportowano archiwum workspace z plikami.",
+  "exportWorkspaceArchive": "Eksportuj archiwum workspace (z plikami)",
+  "joinTeamspaces": "Dołącz do teamspaces",
+  "keyboardShortcuts": "Skróty klawiaturowe",
+  "teamspacePages": "Strony {{name}}"
 }

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} скорошни актуализации",
     "unreadOfTotal": "{{unread}} непрочетени от {{total}} актуализации",
     "updateType": "Тип актуализация",
-    "updates": "Актуализации",
-    "modeUpdates": "Актуализации",
-    "modeChats": "Чатове",
-    "inboxMode": "Режим на входящи"
+    "updates": "Актуализации"
   },
   "time": {
     "justNow": "Току-що",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} версии",
     "versionsAgo": "преди {{count}} версии",
     "versionsAhead": "{{count}} версии напред",
-    "versionsAria": "Версии"
+    "versionsAria": "Версии",
+    "emptyBlock": "Празен блок",
+    "emptyPreview": "Тази версия няма съдържание на страницата.",
+    "previewAria": "Преглед на версия на страница само за четене",
+    "previewingCurrent": "Преглед на текуща страница",
+    "previewingSnapshot": "Преглед на предишна версия",
+    "previewOnlyHint": "Избирането на версия само я преглежда. Текущата страница се променя само след възстановяване.",
+    "restoreThisVersion": "Възстанови",
+    "restoring": "Възстановяване...",
+    "versionHistory": "История на версиите"
   },
   "badges": {
     "comment": "Коментар",
@@ -67,7 +73,8 @@
     "referenceMention": "Споменаване на {{title}} · {{preview}}",
     "referenceLink": "Връзка към {{title}} · {{preview}}",
     "unreadDot": "Непрочетено",
-    "workspaceUpdate": "Актуализация на работното пространство"
+    "workspaceUpdate": "Актуализация на работното пространство",
+    "bySelf": "от Вас"
   },
   "empty": {
     "allCaughtUp": "Всичко е прочетено.",

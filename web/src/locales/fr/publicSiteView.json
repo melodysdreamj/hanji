@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Fil d'Ariane",
+  "clearSearch": "Effacer la recherche",
+  "errors": {
+    "not-found": "Ce site a peut-être été dépublé ou son adresse a changé.",
+    "offline": "Vérifiez votre connexion, puis essayez d'ouvrir le site à nouveau.",
+    "rate-limited": "Ce site reçoit trop de demandes. Patientez un instant et réessayez.",
+    "unavailable": "Hanji n'a pas pu ouvrir ce site pour le moment. Réessayez dans un instant."
+  },
+  "madeWithHanji": "Créé avec Hanji",
+  "navigation": "Navigation du site",
+  "noResults": "Aucune page trouvée",
+  "outsideSite": "Cette page ne fait pas partie de ce site publié.",
+  "search": "Rechercher sur ce site",
+  "tryAgain": "Réessayer",
+  "unavailable": "Ce site est indisponible."
+}

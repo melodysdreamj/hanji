@@ -13,7 +13,7 @@
   "groupName": "गट नाव",
   "groupOptions": "{{groupName}} गट पर्याय",
   "groupThisBoard": "हा बोर्ड गट करा",
-  "groupThisBoardDesc": "स्तंभ तयार करण्यासाठी निवड किंवा स्थिती गुणधर्म जोडा.",
+  "groupThisBoardDesc": "स्तंभ तयार करण्यासाठी निवड, स्थिती, व्यक्ती किंवा बहु-निवड गुणधर्म जोडा किंवा निवडा.",
   "newGroup": "नवीन गट",
   "newGroupIn": "{{dbTitle}} मध्ये नवीन {{groupName}} गट.",
   "newPage": "नवीन",

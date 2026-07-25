@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "ورک‌اسپیس مینو کھولیں",
   "closeWorkspaceMenu": "ورک اسپیس مینو بند کریں",
   "workspaceMenu": "ورک اسپیس مینو",
-  "exportWorkspace": "ورک‌اسپیس برآمد کریں",
+  "exportWorkspace": "ورک اسپیس JSON برآمد کریں (فائلیں خارج)",
   "exportedWorkspace": "ورک‌اسپیس کو Hanji فائل کے طور پر برآمد کیا گیا۔",
   "exportedWorkspaceWithPlaceholders": "ورک‌اسپیس کو Hanji فائل کے طور پر برآمد کیا گیا — منسلکات کو پلیس ہولڈرز کے طور پر چھوڑ دیا گیا۔",
   "couldntExportWorkspace": "ورک اسپیس برآمد نہیں کر سکے۔",
@@ -76,5 +76,12 @@
     "later": "شاید بعد میں",
     "note": "آپ اسے بعد میں سائڈبار کے درآمد سے شروع کر سکتے ہیں۔",
     "title": "کیا آپ اپنا Notion ورک اسپیس Hanji میں درآمد کرنا چاہتے ہیں؟"
-  }
+  },
+  "addPageToTeamspace": "{{name}} میں صفحہ شامل کریں",
+  "couldntExportWorkspaceArchive": "ورک اسپیس آرکائیو برآمد نہیں کیا جا سکا۔",
+  "exportedWorkspaceArchive": "فائلوں سمیت ورک اسپیس آرکائیو برآمد کیا گیا۔",
+  "exportWorkspaceArchive": "ورک اسپیس آرکائیو برآمد کریں (فائلیں شامل)",
+  "joinTeamspaces": "ٹیم اسپیسز میں شامل ہوں",
+  "keyboardShortcuts": "کی بورڈ شارٹ کٹس",
+  "teamspacePages": "{{name}} کے صفحات"
 }

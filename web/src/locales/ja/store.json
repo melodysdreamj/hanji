@@ -7,7 +7,8 @@
   "pageMissingSave": "ページが見つからなかったため、変更を保存できませんでした。",
   "saveFailed": "変更を保存できませんでした。",
   "sessionExpired": "セッションの期限が切れたか、リクエストの認証に失敗しました。もう一度お試しください。",
-  "blockConflictSave": "このブロックは別のデバイスで編集されたため、オフラインでの変更は適用されませんでした。",
+  "blockConflictSave": "キュー内の編集が最新のサーバーバージョンと競合しているため、自動的にマージできませんでした。",
   "blockConflictKeepMine": "自分のバージョンを適用",
-  "blockMoveCommentsSkipped": "ブロックは移動しましたが、コメントは一緒に移動できませんでした。"
+  "blockMoveCommentsSkipped": "ブロックは移動しましたが、コメントは一緒に移動できませんでした。",
+  "conflictSave": "保存完了前に内容が変更されたため、編集内容を保存できませんでした。"
 }

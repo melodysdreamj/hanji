@@ -92,5 +92,8 @@
     "Пт",
     "Сб"
   ],
-  "you": "Ви"
+  "you": "Ви",
+  "buttonExecutionFailed": "Не вдалося виконати кнопку.",
+  "loadingMoreRelations": "Завантаження більше зв'язків…",
+  "loadMoreRelations": "Завантажити більше зв'язків"
 }

@@ -88,5 +88,38 @@
     "hoursAgo": "Szerkesztve {{hours}} órája",
     "daysAgo": "Szerkesztve {{days}} napja",
     "on": "Szerkesztve {{date}}"
+  },
+  "align": {
+    "center": "Középre",
+    "choose": "Képigazítás kiválasztása",
+    "left": "Balra",
+    "right": "Jobbra"
+  },
+  "altText": {
+    "help": "Az alternatív szöveg segít a képernyőolvasót használóknak a kép megértésében.",
+    "label": "Leírás",
+    "placeholder": "Írd le a képet",
+    "remove": "Eltávolítás",
+    "save": "Mentés",
+    "title": "Alternatív szöveg"
+  },
+  "imageLink": {
+    "invalid": "Adj meg egy teljes http:// vagy https:// URL-t.",
+    "label": "URL megnyitása a képre kattintáskor",
+    "remove": "Eltávolítás",
+    "save": "Mentés",
+    "title": "Képlink"
+  },
+  "media": {
+    "addImageLink": "Link hozzáadása",
+    "align": "Igazítás",
+    "altText": "Alternatív szöveg",
+    "copySourceLink": "Forráslink másolása",
+    "download": "Letöltés",
+    "editImageLink": "Link szerkesztése",
+    "fullScreen": "Teljes képernyő",
+    "openLink": "Link megnyitása",
+    "replace": "Csere",
+    "viewOriginal": "Eredeti megtekintése"
   }
 }

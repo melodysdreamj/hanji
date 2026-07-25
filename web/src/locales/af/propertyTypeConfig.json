@@ -51,7 +51,14 @@
     "range": "Reeks",
     "earliest_date": "Vroegste datum",
     "latest_date": "Jongste datum",
-    "date_range": "Datumreeks"
+    "date_range": "Datumreeks",
+    "count": "Tel alles",
+    "count_per_group": "Tel per groep",
+    "empty": "Tel leeg",
+    "not_empty": "Tel nie leeg nie",
+    "percent_per_group": "Persentasie per groep",
+    "show_unique": "Wys unieke waardes",
+    "unique": "Tel unieke waardes"
   },
   "undo": "Ontdoen",
   "untitled": "Geen titel",

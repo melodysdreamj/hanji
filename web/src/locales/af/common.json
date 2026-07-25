@@ -8,7 +8,8 @@
     "delete": "Verwyder",
     "clearAll": "Maak alles skoon",
     "done": "Klaar",
-    "add": "Voeg by"
+    "add": "Voeg by",
+    "reportIssue": "Meld probleem"
   },
   "labels": {
     "untitled": "Ongetiteld"

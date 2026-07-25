@@ -13,7 +13,7 @@
   "groupName": "Tên nhóm",
   "groupOptions": "Tùy chọn nhóm {{groupName}}",
   "groupThisBoard": "Nhóm bảng này",
-  "groupThisBoardDesc": "Thêm thuộc tính Select hoặc Status để tạo cột.",
+  "groupThisBoardDesc": "Thêm hoặc chọn một thuộc tính Lựa chọn, Trạng thái, Người hoặc Nhiều lựa chọn để tạo cột.",
   "newGroup": "Nhóm mới",
   "newGroupIn": "Nhóm {{groupName}} mới trong {{dbTitle}}",
   "newPage": "Mới",

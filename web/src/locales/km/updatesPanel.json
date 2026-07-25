@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} ការអាប់ដេតថ្មីៗ",
     "unreadOfTotal": "{{unread}}/{{total}} មិនទាន់អាន",
     "updateType": "ប្រភេទអាប់ដេត",
-    "updates": "ការអាប់ដេត",
-    "modeUpdates": "អាប់ដេត",
-    "modeChats": "ជជែក",
-    "inboxMode": "របៀបប្រអប់សារ"
+    "updates": "ការអាប់ដេត"
   },
   "time": {
     "justNow": "ទើបតែឥឡូវ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} កំណែ",
     "versionsAgo": "{{count}} កំណែមុន",
     "versionsAhead": "{{count}} កំណែបន្ទាប់",
-    "versionsAria": "កំណែ"
+    "versionsAria": "កំណែ",
+    "emptyBlock": "ប្លុកទទេ",
+    "emptyPreview": "កំណែនេះគ្មានមាតិកាទំព័រទេ។",
+    "previewAria": "មើលជាមុនកំណែទំព័រអានតែប៉ុណ្ណោះ",
+    "previewingCurrent": "កំពុងមើលទំព័របច្ចុប្បន្ន",
+    "previewingSnapshot": "កំពុងមើលកំណែអតីតកាល",
+    "previewOnlyHint": "ការជ្រើសរើសកំណែគ្រាន់តែមើលជាមុនប៉ុណ្ណោះ។ ទំព័របច្ចុប្បន្ននឹងផ្លាស់ប្តូរលុះត្រាតែអ្នកចុចស្ដារឡើងវិញ។",
+    "restoreThisVersion": "ស្ដារឡើងវិញ",
+    "restoring": "កំពុងស្ដារឡើងវិញ...",
+    "versionHistory": "ប្រវត្តិកំណែ"
   },
   "badges": {
     "comment": "មតិយោបល់",
@@ -67,7 +73,8 @@
     "referenceMention": "បានលើកឡើង {{title}} · {{preview}}",
     "referenceLink": "បានភ្ជាប់ទៅ {{title}} · {{preview}}",
     "unreadDot": "មិនទាន់អាន",
-    "workspaceUpdate": "បច្ចុប្បន្នភាពស្ថានីយការងារ"
+    "workspaceUpdate": "បច្ចុប្បន្នភាពស្ថានីយការងារ",
+    "bySelf": "ដោយអ្នក"
   },
   "empty": {
     "allCaughtUp": "គ្រប់យ៉ាងទាន់ហើយ",

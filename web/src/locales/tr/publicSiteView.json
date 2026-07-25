@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Gezinme yolu",
+  "clearSearch": "Aramayı temizle",
+  "errors": {
+    "not-found": "Bu site yayından kaldırılmış veya adresi değişmiş olabilir.",
+    "offline": "Bağlantınızı kontrol edin, ardından siteyi tekrar açmayı deneyin.",
+    "rate-limited": "Bu site çok fazla istek alıyor. Bir an bekleyip tekrar deneyin.",
+    "unavailable": "Hanji şu anda bu siteyi açamıyor. Biraz sonra tekrar deneyin."
+  },
+  "madeWithHanji": "Hanji ile yapıldı",
+  "navigation": "Site gezinmesi",
+  "noResults": "Sayfa bulunamadı",
+  "outsideSite": "Bu sayfa yayınlanan sitenin bir parçası değil.",
+  "search": "Bu siteyi ara",
+  "tryAgain": "Tekrar dene",
+  "unavailable": "Bu site kullanılamıyor."
+}

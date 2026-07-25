@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Subtítulo del video",
     "videoEmptyHint": "Sube un archivo de video, pega un enlace directo o usa un enlace de YouTube, Vimeo o Loom.",
-    "videoLink": "Enlace de video"
+    "videoLink": "Enlace de video",
+    "audioPlaybackFailed": "No se pudo reproducir este audio. Reemplázalo o abre el archivo original.",
+    "videoPlaybackFailed": "No se pudo reproducir este video. Reemplázalo o abre el archivo original."
   },
   "bookmark": {
     "copy": "Copiar enlace del marcador",

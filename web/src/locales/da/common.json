@@ -8,7 +8,8 @@
     "delete": "Slet",
     "done": "Færdig",
     "save": "Gem",
-    "search": "Søg"
+    "search": "Søg",
+    "reportIssue": "Rapporter problem"
   },
   "generated": {
     "columnName": "Kolonne {{number}}",

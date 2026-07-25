@@ -38,7 +38,7 @@
   "moveTo": "ย้ายไป",
   "exporting": "กำลังส่งออก…",
   "exportAsMarkdown": "ส่งออกเป็น Markdown",
-  "exportAsHanji": "ส่งออกเป็นไฟล์ Hanji",
+  "exportAsHanji": "ส่งออก Hanji JSON (ไม่รวมไฟล์)",
   "importing": "กำลังนำเข้า…",
   "importMarkdown": "นำเข้า Markdown",
   "unlockPage": "ปลดล็อกหน้า",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ไม่สามารถอัปเดตสิทธิ์เข้าถึงได้",
     "removedFromAccessList": "เอาออกจากรายการเข้าถึงแล้ว",
     "couldntRemoveAccess": "ไม่สามารถลบสิทธิ์เข้าถึงได้",
-    "couldntLoadAccessList": "ไม่สามารถโหลดรายการเข้าถึงได้"
+    "couldntLoadAccessList": "ไม่สามารถโหลดรายการเข้าถึงได้",
+    "couldntExportHanjiArchive": "ไม่สามารถส่งออก Hanji archive",
+    "exportedHanjiArchive": "ส่งออก Hanji archive พร้อมไฟล์แล้ว"
   },
   "user": "ผู้ใช้",
   "whoHasAccess": "ผู้มีสิทธิ์เข้าถึง",
   "workspace": "พื้นที่ทำงาน",
   "workspaceCount_one": "{{count}} พื้นที่ทำงาน",
   "workspaceCount_other": "{{count}} พื้นที่ทำงาน",
-  "you": "คุณ"
+  "you": "คุณ",
+  "exportAsHanjiArchive": "ส่งออก Hanji archive (รวมไฟล์)",
+  "turnIntoWiki": "เปลี่ยนเป็นวิกิ",
+  "undoWiki": "เลิกทำวิกิ",
+  "wikiCreated": "เปลี่ยนหน้าเป็นวิกิแล้ว",
+  "wikiPageSettings": "การตั้งค่าหน้าวิกิ",
+  "wikiUndone": "ลบวิกิออกแล้ว; เนื้อหาหน้าถูกเก็บไว้",
+  "wikiUpdateFailed": "ไม่สามารถอัปเดตวิกิได้"
 }

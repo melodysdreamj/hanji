@@ -13,7 +13,7 @@
   "groupName": "שם קבוצה",
   "groupOptions": "אפשרויות קבוצת {{groupName}}",
   "groupThisBoard": "קבץ לוח זה",
-  "groupThisBoardDesc": "הוסף מאפיין בחירה או סטטוס ליצירת עמודות.",
+  "groupThisBoardDesc": "הוסף או בחר מאפיין בחירה, סטטוס, אדם או ריבוי בחירה כדי ליצור עמודות.",
   "newGroup": "קבוצה חדשה",
   "newGroupIn": "קבוצת {{groupName}} חדשה ב-{{dbTitle}}",
   "newPage": "חדש",

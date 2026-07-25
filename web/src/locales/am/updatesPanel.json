@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} የቅርብ ጊዜ ማሻሻያዎች",
     "unreadOfTotal": "ከ {{total}} ማሻሻያዎች {{unread}} ያልተነበቡ",
     "updateType": "የማሻሻያ ዓይነት",
-    "updates": "ማሻሻያዎች",
-    "modeUpdates": "ማሻሻያዎች",
-    "modeChats": "ውይይቶች",
-    "inboxMode": "የመልዕክት ሳጥን ሁነታ"
+    "updates": "ማሻሻያዎች"
   },
   "time": {
     "justNow": "አሁን በቃ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} ስሪቶች",
     "versionsAgo": "ከ{{count}} ስሪቶች በፊት",
     "versionsAhead": "{{count}} ስሪቶች ቀጣይ",
-    "versionsAria": "ስሪቶች"
+    "versionsAria": "ስሪቶች",
+    "emptyBlock": "ባዶ ብሎክ",
+    "emptyPreview": "ይህ ስሪት የገጽ ይዘት የለውም",
+    "previewAria": "ለማንበብ ብቻ የገጽ ስሪት ቅድመ-እይታ",
+    "previewingCurrent": "የአሁኑን ገጽ እየተመለከቱ ነው",
+    "previewingSnapshot": "የቀድሞ ስሪትን እየተመለከቱ ነው",
+    "previewOnlyHint": "ስሪት መምረጥ ቅድመ-እይታን ብቻ ይቀይረዋል። የአሁኑ ገጽ የሚቀየረው ወደነበረበት ከተመለሰ በኋላ ነው።",
+    "restoreThisVersion": "ወደነበረበት መልስ",
+    "restoring": "ወደነበረበት በመመለስ ላይ...",
+    "versionHistory": "የስሪት ታሪክ"
   },
   "badges": {
     "comment": "አስተያየት",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ተጠቅሷል · {{preview}}",
     "referenceLink": "ከ {{title}} ጋር የተገናኘ · {{preview}}",
     "unreadDot": "ያልተነበበ",
-    "workspaceUpdate": "የስራ ቦታ ዝማኔ"
+    "workspaceUpdate": "የስራ ቦታ ዝማኔ",
+    "bySelf": "በእርስዎ"
   },
   "empty": {
     "allCaughtUp": "ሁሉም ወቅታዊ ናቸው።",

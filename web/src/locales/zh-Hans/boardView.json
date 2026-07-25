@@ -13,7 +13,7 @@
   "groupName": "组名",
   "groupOptions": "{{groupName}} 组选项",
   "groupThisBoard": "分组此看板",
-  "groupThisBoardDesc": "添加选择或状态属性以创建列。",
+  "groupThisBoardDesc": "添加或选择选择、状态、人员或多选属性来创建列。",
   "newGroup": "新建组",
   "newGroupIn": "在 {{dbTitle}} 中新建 {{groupName}} 组",
   "newPage": "新建",

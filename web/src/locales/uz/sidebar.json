@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Ish maydoni menyusini ochish",
   "closeWorkspaceMenu": "Ish maydoni menyusini yopish",
   "workspaceMenu": "Workspace menyusi",
-  "exportWorkspace": "Ish maydonini eksport qilish",
+  "exportWorkspace": "Workspace JSON eksporti (fayllarsiz)",
   "exportedWorkspace": "Ish maydoni Hanji fayli sifatida eksport qilindi.",
   "exportedWorkspaceWithPlaceholders": "Ish maydoni Hanji fayli sifatida eksport qilindi — biriktirmalar oʻrin belgilari sifatida qoldirildi.",
   "couldntExportWorkspace": "Ish maydonini eksport qilish mumkin bo'lmadi.",
@@ -76,5 +76,12 @@
     "later": "Keyinroq",
     "note": "Buni keyinroq yon paneldagi Import orqali boshlashingiz mumkin.",
     "title": "Notion ish maydonini Hanji ga olib kelishni xohlaysizmi?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} ga sahifa qo‘shish",
+  "couldntExportWorkspaceArchive": "Workspace arxivini eksport qilib bo‘lmadi.",
+  "exportedWorkspaceArchive": "Fayllar bilan workspace arxivi eksport qilindi.",
+  "exportWorkspaceArchive": "Workspace arxivi eksporti (fayllar bilan)",
+  "joinTeamspaces": "Teamspaces ga qo‘shilish",
+  "keyboardShortcuts": "Klaviatura yorliqlari",
+  "teamspacePages": "{{name}} sahifalari"
 }

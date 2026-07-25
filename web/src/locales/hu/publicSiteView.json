@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Útvonal",
+  "clearSearch": "Keresés törlése",
+  "errors": {
+    "not-found": "Lehetséges, hogy az oldal közzététele megszűnt, vagy a címe megváltozott.",
+    "offline": "Ellenőrizze a kapcsolatot, majd próbálja újra megnyitni az oldalt.",
+    "rate-limited": "Ez az oldal túl sok kérést kap. Várjon egy kicsit, majd próbálja újra.",
+    "unavailable": "A Hanji jelenleg nem tudja megnyitni ezt az oldalt. Próbálja újra egy pillanat múlva."
+  },
+  "madeWithHanji": "Hanji-val készült",
+  "navigation": "Webhely navigáció",
+  "noResults": "Nem található oldal",
+  "outsideSite": "Az oldal nem része ennek a közzétett webhelynek.",
+  "search": "Keresés ezen a webhelyen",
+  "tryAgain": "Próbálja újra",
+  "unavailable": "Ez a webhely nem elérhető."
+}

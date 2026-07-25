@@ -43,9 +43,16 @@ function oauthEnvName(provider: string, field: 'CLIENT_ID' | 'CLIENT_SECRET') {
   return provider.toUpperCase().replace(/[^A-Z0-9]+/g, '_') + `_${field}`;
 }
 
+function oauthEnvPrefix(provider: string) {
+  return provider.toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+}
+
 const APP_ORIGIN =
   envValue('HANJI_APP_ORIGIN', 'EDGEBASE_APP_ORIGIN') ??
   'http://localhost:8787';
+const AUTH_ORIGIN =
+  envValue('HANJI_AUTH_ORIGIN') ??
+  APP_ORIGIN;
 
 export function authEmailActionUrls(appOrigin: string) {
   const origin = appOrigin.replace(/\/+$/, '');
@@ -57,7 +64,7 @@ export function authEmailActionUrls(appOrigin: string) {
 }
 const PASSKEY_RP_ID =
   envValue('HANJI_PASSKEY_RP_ID', 'EDGEBASE_PASSKEY_RP_ID') ??
-  originHostname(APP_ORIGIN);
+  originHostname(AUTH_ORIGIN);
 const PASSKEY_ORIGINS = envList('HANJI_PASSKEY_ORIGINS', 'EDGEBASE_PASSKEY_ORIGINS');
 const AUTH_EMAIL_FROM =
   envValue('HANJI_AUTH_EMAIL_FROM', 'EDGEBASE_EMAIL_FROM') ??
@@ -77,8 +84,8 @@ const OAUTH_PROVIDER_NAMES = envListWithOffSentinel(
   'HANJI_AUTH_OAUTH_PROVIDERS',
   'EDGEBASE_AUTH_ALLOWED_OAUTH_PROVIDERS',
 );
-const OAUTH_PROVIDERS = Object.fromEntries(
-  OAUTH_PROVIDER_NAMES.map((provider) => {
+const BUILTIN_OAUTH_PROVIDERS = Object.fromEntries(
+  OAUTH_PROVIDER_NAMES.filter((provider) => !provider.startsWith('oidc:')).map((provider) => {
     const envKey = oauthEnvName(provider, 'CLIENT_ID');
     const secretKey = oauthEnvName(provider, 'CLIENT_SECRET');
     const clientId =
@@ -89,7 +96,52 @@ const OAUTH_PROVIDERS = Object.fromEntries(
     return [provider, { clientId, clientSecret }] as const;
   }).filter((entry): entry is readonly [string, { clientId: string; clientSecret: string }] => !!entry),
 );
-const ALLOWED_OAUTH_PROVIDERS = Object.keys(OAUTH_PROVIDERS);
+const OIDC_OAUTH_PROVIDERS = Object.fromEntries(
+  OAUTH_PROVIDER_NAMES.filter((provider) => /^oidc:[A-Za-z0-9._-]+$/.test(provider)).map((provider) => {
+    const name = provider.slice('oidc:'.length);
+    const envPrefix = oauthEnvPrefix(provider);
+    const clientId = envValue(
+      `HANJI_OAUTH_${envPrefix}_CLIENT_ID`,
+      `EDGEBASE_OAUTH_${envPrefix}_CLIENT_ID`,
+      `${envPrefix}_CLIENT_ID`,
+    );
+    const clientSecret = envValue(
+      `HANJI_OAUTH_${envPrefix}_CLIENT_SECRET`,
+      `EDGEBASE_OAUTH_${envPrefix}_CLIENT_SECRET`,
+      `${envPrefix}_CLIENT_SECRET`,
+    );
+    const issuer = envValue(
+      `HANJI_OAUTH_${envPrefix}_ISSUER`,
+      `EDGEBASE_OAUTH_${envPrefix}_ISSUER`,
+      `${envPrefix}_ISSUER`,
+    );
+    if (!clientId || !clientSecret || !issuer) return null;
+    const scopes = envList(
+      `HANJI_OAUTH_${envPrefix}_SCOPES`,
+      `EDGEBASE_OAUTH_${envPrefix}_SCOPES`,
+      `${envPrefix}_SCOPES`,
+    );
+    return [name, {
+      clientId,
+      clientSecret,
+      issuer,
+      ...(scopes.length ? { scopes } : {}),
+    }] as const;
+  }).filter((entry): entry is readonly [string, {
+    clientId: string;
+    clientSecret: string;
+    issuer: string;
+    scopes?: string[];
+  }] => !!entry),
+);
+const OAUTH_PROVIDERS = {
+  ...BUILTIN_OAUTH_PROVIDERS,
+  ...(Object.keys(OIDC_OAUTH_PROVIDERS).length ? { oidc: OIDC_OAUTH_PROVIDERS } : {}),
+};
+const ALLOWED_OAUTH_PROVIDERS = [
+  ...Object.keys(BUILTIN_OAUTH_PROVIDERS),
+  ...Object.keys(OIDC_OAUTH_PROVIDERS).map((name) => `oidc:${name}`),
+];
 const ALLOW_DEV_GUEST_LOGIN = envFlag('HANJI_ALLOW_DEV_GUEST_LOGIN');
 const TRUST_SELF_HOSTED_PROXY = envFlag('HANJI_TRUST_SELF_HOSTED_PROXY');
 const ALLOW_INSECURE_LOCALHOST_AUTH = ALLOW_DEV_GUEST_LOGIN || TRUST_SELF_HOSTED_PROXY;
@@ -152,6 +204,26 @@ function authEmail(auth: unknown) {
 function roomAccessDebugEnabled() {
   return envValue('HANJI_DEBUG_ROOM_ACCESS') === '1';
 }
+
+const ENTERPRISE_CONTROLS_DEDUPLICATE_SQL = `
+  DELETE FROM "organization_enterprise_controls"
+  WHERE "id" IN (
+    SELECT "id"
+    FROM (
+      SELECT
+        "id",
+        ROW_NUMBER() OVER (
+          PARTITION BY "organizationId"
+          ORDER BY
+            COALESCE("updatedAt", "createdAt") DESC NULLS LAST,
+            "createdAt" DESC NULLS LAST,
+            "id" DESC
+        ) AS "duplicateRank"
+      FROM "organization_enterprise_controls"
+    ) AS "rankedEnterpriseControls"
+    WHERE "duplicateRank" > 1
+  );
+`;
 
 function denyPagePresence(reason: string, details: Record<string, unknown>) {
   if (roomAccessDebugEnabled()) {
@@ -304,8 +376,19 @@ const appTables = {
             domainSignupPolicy: { type: 'string', default: 'invite_only' },
             sharingPolicy: { type: 'json' },
             storageLimitBytes: { type: 'number' },
+            // Cross-table governance writers increment this row so a
+            // PostgreSQL transaction takes a real write fence, rather than a
+            // lock-only snapshot that can miss a concurrent policy/hold write.
+            governanceVersion: { type: 'number', required: true, default: 0 },
+            // Monotonic SSO authorization fence. Required SSO becomes
+            // effective only after every pre-transition member session has
+            // been revoked and stamped for the next epoch.
+            ssoEnforcementEpoch: { type: 'number', required: true, default: 0 },
           },
-          indexes: [{ fields: ['ownerId'] }],
+          indexes: [
+            { fields: ['ownerId'] },
+            { fields: ['createdAt', 'id'] },
+          ],
         },
 
         // Central, organization-wide storage accounting. File rows live in
@@ -392,6 +475,41 @@ const appTables = {
           indexes: [{ fields: ['token'] }, { fields: ['workspaceId'] }],
         },
 
+        // Minimal unavoidable public-site router. The central block contains
+        // only exact slug/Host discovery metadata; site configuration and all
+        // content remain authoritative in the owning workspace block.
+        site_route_index: {
+          schema: {
+            routeKey: { type: 'string', required: true, unique: true },
+            routeKind: { type: 'string', required: true },
+            routeValue: { type: 'string', required: true },
+            workspaceId: { type: 'string', required: true },
+            siteId: { type: 'string', required: true },
+            pageId: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+            revision: { type: 'number', required: true },
+          },
+          indexes: [
+            { fields: ['routeKey'], unique: true },
+            { fields: ['workspaceId'] },
+            { fields: ['siteId'] },
+            { fields: ['status'] },
+          ],
+        },
+
+        // Routing-only form capability index. The workspace form_links row,
+        // exact form view and database remain authoritative.
+        form_link_index: {
+          schema: {
+            token: { type: 'string', required: true, unique: true },
+            workspaceId: { type: 'string', required: true },
+            databaseId: { type: 'string', required: true },
+            viewId: { type: 'string', required: true },
+            enabled: { type: 'boolean', default: false },
+          },
+          indexes: [{ fields: ['token'] }, { fields: ['workspaceId'] }],
+        },
+
         // Central policy-cache invalidation stamp (docs/workspace-do-migration.md):
         // bumped by every org policy / member-status / legal-hold mutation so
         // workspace DOs can validate their cached policy snapshot with one
@@ -412,10 +530,24 @@ const appTables = {
         instance_settings: {
           schema: {
             signupPolicy: { type: 'string', default: 'public' },
+            memberAddPolicy: { type: 'string' },
             instanceAdminUserIds: { type: 'json' },
+            // Collision-proof, bounded authority invalidation token. Every
+            // settings upsert replaces it; foreground workspace probes project
+            // this scalar instead of materializing the unbounded admin-id JSON.
+            authorityVersion: { type: 'string' },
             masterUserId: { type: 'string' },
             masterEmail: { type: 'string' },
             updatedBy: { type: 'string' },
+          },
+        },
+
+        // Product readiness proves a real application-database commit with one
+        // atomic expect/insert/delete transaction. The row never survives the
+        // transaction; a dedicated table keeps the probe out of product data.
+        health_write_probes: {
+          schema: {
+            probeToken: { type: 'string', required: true },
           },
         },
 
@@ -501,9 +633,12 @@ const appTables = {
             avatar: { type: 'string' },
             role: { type: 'string', default: 'member' }, // owner | admin | member | guest
             status: { type: 'string', default: 'active' }, // active | deactivated
+            externalId: { type: 'string' },
+            provisionedBy: { type: 'string' },
             createdBy: { type: 'string' },
             deactivatedAt: { type: 'datetime' },
             deactivatedBy: { type: 'string' },
+            ssoEnforcementEpoch: { type: 'number', default: 0 },
           },
           indexes: [
             { fields: ['organizationId'] },
@@ -523,6 +658,8 @@ const appTables = {
             },
             name: { type: 'string', required: true },
             description: { type: 'text' },
+            externalId: { type: 'string' },
+            provisionedBy: { type: 'string' },
             createdBy: { type: 'string' },
           },
           indexes: [
@@ -558,7 +695,10 @@ const appTables = {
             { fields: ['organizationMemberId'] },
             { fields: ['userId'] },
             { fields: ['organizationId', 'userId'] },
+            { fields: ['organizationId', 'userId', 'id'] },
             { fields: ['organizationId', 'organizationMemberId'] },
+            { fields: ['organizationId', 'organizationMemberId', 'userId', 'id'] },
+            { fields: ['organizationMemberId', 'groupId'], unique: true },
           ],
         },
 
@@ -571,6 +711,10 @@ const appTables = {
             },
             domain: { type: 'string', required: true },
             status: { type: 'string', default: 'pending' }, // pending | verified | rejected
+            verificationMethod: { type: 'string', default: 'dns_txt' },
+            verificationToken: { type: 'string' },
+            verificationCheckedAt: { type: 'datetime' },
+            verificationError: { type: 'string' },
             createdBy: { type: 'string' },
             verifiedAt: { type: 'datetime' },
             verifiedBy: { type: 'string' },
@@ -599,10 +743,89 @@ const appTables = {
           },
           indexes: [
             { fields: ['organizationId'] },
+            { fields: ['organizationId', 'occurredAt', 'id'] },
             { fields: ['workspaceId'] },
             { fields: ['actorId'] },
             { fields: ['action'] },
             { fields: ['occurredAt'] },
+          ],
+        },
+
+        enterprise_maintenance_state: {
+          schema: {
+            kind: { type: 'string', required: true, unique: true },
+            cursorOrganizationId: { type: 'string' },
+            cursorOrganizationCreatedAt: { type: 'datetime' },
+            version: { type: 'number', default: 0 },
+            leaseToken: { type: 'string' },
+            leaseExpiresAt: { type: 'datetime' },
+            lastCompletedAt: { type: 'datetime' },
+            nextDueAt: { type: 'datetime' },
+            sweepId: { type: 'string' },
+            sweepStartedAt: { type: 'datetime' },
+            sweepUpperCreatedAt: { type: 'datetime' },
+            discoveryComplete: { type: 'boolean', default: false },
+            discoveryFailureCount: { type: 'number', default: 0 },
+            discoveryNextAttemptAt: { type: 'datetime' },
+            discoveryLastFailure: { type: 'text' },
+            discoveryLastFailureAt: { type: 'datetime' },
+            selectionFailureCount: { type: 'number', default: 0 },
+            selectionNextAttemptAt: { type: 'datetime' },
+            selectionLastFailure: { type: 'text' },
+            selectionLastFailureAt: { type: 'datetime' },
+            pendingWorkCount: { type: 'number', default: 0 },
+            failedWorkCount: { type: 'number', default: 0 },
+            lastFailedWorkCount: { type: 'number', default: 0 },
+            currentDeliveryId: { type: 'string' },
+            currentDeliveryScheduledAt: { type: 'datetime' },
+            currentDeliveryAttempted: { type: 'number', default: 0 },
+            currentDeliveryRetryAttempted: { type: 'number', default: 0 },
+            currentDeliveryBacklogAttempted: { type: 'number', default: 0 },
+            currentDeliveryReadyAttempted: { type: 'number', default: 0 },
+            currentDeliverySettled: { type: 'boolean', default: false },
+            // Durable keyset for bounded retention-work orphan reclamation.
+            // It stays separate from daily organization discovery because
+            // terminal and historical work rows remain eligible.
+            orphanWorkCursorOrganizationId: { type: 'string' },
+            migrationCursorCreatedAt: { type: 'datetime' },
+            migrationCursorId: { type: 'string' },
+            migrationComplete: { type: 'boolean', default: false },
+            migrationConflictCount: { type: 'number', default: 0 },
+            migrationPassConflictCount: { type: 'number', default: 0 },
+            migrationLastConflict: { type: 'text' },
+            migrationLastConflictAt: { type: 'datetime' },
+            migrationScheduleIdentity: { type: 'string' },
+            migrationLimitProfile: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['kind'] },
+            { fields: ['leaseExpiresAt'] },
+            { fields: ['currentDeliveryScheduledAt'] },
+          ],
+        },
+
+        // One bounded, reusable row per organization. Campaign discovery
+        // resets these rows in bulk; backlog and retry lanes update them
+        // independently so a heavy or malformed tenant never waits for a full
+        // organization rescan and never blocks healthy work.
+        enterprise_retention_work: {
+          schema: {
+            organizationId: { type: 'string', required: true, unique: true },
+            organizationCreatedAt: { type: 'datetime', required: true },
+            sweepId: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+            version: { type: 'number', required: true, default: 0 },
+            nextAttemptAt: { type: 'datetime', required: true },
+            failureCount: { type: 'number', required: true, default: 0 },
+            lastFailure: { type: 'text' },
+            lastFailureAt: { type: 'datetime' },
+            lastDeliveryId: { type: 'string' },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['sweepId', 'status', 'nextAttemptAt', 'organizationId'] },
+            { fields: ['status', 'nextAttemptAt'] },
           ],
         },
 
@@ -611,24 +834,143 @@ const appTables = {
             organizationId: {
               type: 'string',
               required: true,
+              unique: true,
               references: { table: 'organizations', onDelete: 'CASCADE' },
             },
             ssoConfig: { type: 'json' },
             scimConfig: { type: 'json' },
             auditPolicy: { type: 'json' },
+            // Retention reads only these bounded scalars; it never fetches the
+            // potentially large auditPolicy document into a maintenance slice.
+            auditRetentionDays: { type: 'number' },
+            auditRetentionPolicyValid: { type: 'boolean' },
+            auditRetentionPolicyError: { type: 'string' },
             dataResidencyPolicy: { type: 'json' },
             dlpPolicy: { type: 'json' },
             legalPolicy: { type: 'json' },
             billingProfile: { type: 'json' },
+            mcpGovernancePolicy: { type: 'json' },
+            version: { type: 'number', default: 0 },
             updatedBy: { type: 'string' },
           },
+          // Historical versions created this row with read-then-insert and no
+          // physical uniqueness. EdgeBase runs this provider-native data
+          // repair after additive columns but before final UNIQUE reconcile.
+          migrations: [{
+            version: 2,
+            description: 'Keep the newest enterprise-controls row per organization',
+            up: ENTERPRISE_CONTROLS_DEDUPLICATE_SQL,
+            upPg: ENTERPRISE_CONTROLS_DEDUPLICATE_SQL,
+          }],
           indexes: [
             { fields: ['organizationId'] },
             { fields: ['updatedBy'] },
           ],
         },
 
+        // Required-SSO activation is a durable state machine because the
+        // external auth provider cannot participate in the controls
+        // transaction. One row per deterministic request owns a bounded,
+        // restart-safe membership rescan and becomes active atomically with
+        // the controls/policy versions.
+        organization_sso_transitions: {
+          schema: {
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            pendingOrganizationId: { type: 'string', unique: true },
+            actorId: { type: 'string', required: true },
+            controlsId: { type: 'string', required: true },
+            controlsVersion: { type: 'number', required: true },
+            controlsVersionWasMissing: { type: 'boolean', required: true, default: false },
+            requestHash: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            desiredPatch: { type: 'json', required: true },
+            desiredMetadata: { type: 'json', required: true },
+            previousEpoch: { type: 'number', required: true },
+            previousEpochWasMissing: { type: 'boolean', required: true, default: false },
+            desiredEpoch: { type: 'number', required: true },
+            status: { type: 'string', required: true, default: 'pending' },
+            version: { type: 'number', required: true, default: 0 },
+            scanGeneration: { type: 'number', required: true, default: 1 },
+            scanPage: { type: 'number', required: true, default: 1 },
+            passDiscovered: { type: 'number', required: true, default: 0 },
+            passIncomplete: { type: 'number', required: true, default: 0 },
+            stablePasses: { type: 'number', required: true, default: 0 },
+            leaseToken: { type: 'string' },
+            leaseExpiresAt: { type: 'datetime' },
+            lastError: { type: 'text' },
+            lastErrorAt: { type: 'datetime' },
+            activatedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['pendingOrganizationId'] },
+            { fields: ['organizationId', 'status'] },
+            { fields: ['status', 'leaseExpiresAt'] },
+          ],
+        },
+
+        // Per-member receipts isolate provider failures and make response-loss
+        // replay exact. They intentionally retain completed rows so a later
+        // membership rescan never repeats settled work.
+        organization_sso_revocation_receipts: {
+          schema: {
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            transitionId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organization_sso_transitions', onDelete: 'CASCADE' },
+            },
+            organizationMemberId: { type: 'string', required: true },
+            userId: { type: 'string', required: true },
+            scanGeneration: { type: 'number', required: true },
+            status: { type: 'string', required: true, default: 'pending' },
+            attemptCount: { type: 'number', required: true, default: 0 },
+            lastAttemptAt: { type: 'datetime' },
+            lastError: { type: 'text' },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['transitionId'] },
+            { fields: ['transitionId', 'status'] },
+            { fields: ['organizationMemberId'] },
+          ],
+        },
+
         organization_scim_tokens: {
+          schema: {
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            label: { type: 'string', required: true },
+            status: { type: 'string', default: 'active' },
+            tokenPrefix: { type: 'string' },
+            tokenHash: { type: 'string' },
+            scopes: { type: 'json' },
+            createdBy: { type: 'string' },
+            lastUsedAt: { type: 'datetime' },
+            expiresAt: { type: 'datetime' },
+            revokedAt: { type: 'datetime' },
+            revokedBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['status'] },
+            { fields: ['tokenPrefix'] },
+          ],
+        },
+
+        organization_admin_tokens: {
           schema: {
             organizationId: {
               type: 'string',
@@ -670,8 +1012,46 @@ const appTables = {
           },
           indexes: [
             { fields: ['organizationId'] },
+            { fields: ['organizationId', 'status'] },
             { fields: ['status'] },
             { fields: ['createdBy'] },
+          ],
+        },
+
+        organization_admin_export_tasks: {
+          schema: {
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            kind: { type: 'string', required: true },
+            workspaceId: { type: 'string' },
+            legalHoldId: { type: 'string' },
+            requestingUserId: { type: 'string', required: true },
+            exportType: { type: 'string', required: true },
+            requestedFormat: { type: 'string', required: true },
+            status: { type: 'string', default: 'queued' },
+            request: { type: 'json' },
+            requestHash: { type: 'string', required: true },
+            idempotencyKeyHash: { type: 'string' },
+            taskId: { type: 'string', required: true },
+            tokenId: { type: 'string', required: true },
+            result: { type: 'json' },
+            error: { type: 'json' },
+            createdBy: { type: 'string' },
+            startedAt: { type: 'datetime' },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['kind'] },
+            { fields: ['workspaceId'] },
+            { fields: ['legalHoldId'] },
+            { fields: ['status'] },
+            { fields: ['taskId'] },
+            { fields: ['tokenId'] },
+            { fields: ['idempotencyKeyHash'] },
           ],
         },
 
@@ -698,6 +1078,29 @@ const appTables = {
           ],
         },
 
+        organization_discovery_exports: {
+          schema: {
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            status: { type: 'string', default: 'completed' },
+            format: { type: 'string', default: 'jsonl' },
+            filter: { type: 'json' },
+            itemCount: { type: 'number' },
+            content: { type: 'text' },
+            createdBy: { type: 'string' },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['organizationId'] },
+            { fields: ['status'] },
+            { fields: ['createdBy'] },
+            { fields: ['completedAt'] },
+          ],
+        },
+
         organization_billing_records: {
           schema: {
             organizationId: {
@@ -708,6 +1111,7 @@ const appTables = {
             kind: { type: 'string', default: 'contract' },
             status: { type: 'string', default: 'draft' },
             title: { type: 'string', required: true },
+            externalId: { type: 'string' },
             amountCents: { type: 'number' },
             currency: { type: 'string', default: 'USD' },
             billingEmail: { type: 'string' },
@@ -720,9 +1124,30 @@ const appTables = {
           },
           indexes: [
             { fields: ['organizationId'] },
+            { fields: ['organizationId', 'externalId'] },
             { fields: ['kind'] },
             { fields: ['status'] },
             { fields: ['renewalAt'] },
+          ],
+        },
+
+        organization_billing_webhook_events: {
+          schema: {
+            eventId: { type: 'string', required: true, unique: true },
+            organizationId: {
+              type: 'string',
+              required: true,
+              references: { table: 'organizations', onDelete: 'CASCADE' },
+            },
+            eventType: { type: 'string', required: true },
+            billingRecordId: { type: 'string' },
+            receivedAt: { type: 'datetime', required: true },
+          },
+          indexes: [
+            { fields: ['eventId'] },
+            { fields: ['organizationId'] },
+            { fields: ['eventType'] },
+            { fields: ['receivedAt'] },
           ],
         },
 
@@ -746,6 +1171,119 @@ const appTables = {
           ],
         },
 
+        // ─── Teamspaces (workspace-local collaborative page areas) ────
+        teamspaces: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            name: { type: 'string', required: true },
+            icon: { type: 'string' },
+            description: { type: 'text' },
+            access: { type: 'string', required: true, default: 'open' }, // open | closed | private
+            memberPageRole: { type: 'string', required: true, default: 'edit' },
+            openPageRole: { type: 'string', required: true, default: 'view' },
+            membersCanInvite: { type: 'boolean', required: true, default: true },
+            membersCanEditSidebar: { type: 'boolean', required: true, default: true },
+            archivedAt: { type: 'datetime' },
+            archivedBy: { type: 'string' },
+            // Random compare-and-swap token for same-millisecond writes.
+            writeToken: { type: 'string' },
+            createdBy: { type: 'string', required: true },
+            updatedBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['workspaceId', 'archivedAt', 'id'] },
+            { fields: ['workspaceId', 'access', 'archivedAt', 'id'] },
+            { fields: ['workspaceId', 'name', 'id'] },
+          ],
+        },
+
+        teamspace_members: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            teamspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'teamspaces', onDelete: 'CASCADE' },
+            },
+            principalType: { type: 'string', required: true }, // user | group
+            principalId: { type: 'string', required: true },
+            // User principals bind to one exact workspace membership lifetime.
+            // Removing/re-adding a user cannot resurrect this row.
+            workspaceMemberId: { type: 'string' },
+            role: { type: 'string', required: true, default: 'member' }, // owner | member
+            createdBy: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['teamspaceId'] },
+            { fields: ['principalId'] },
+            { fields: ['workspaceId', 'principalId'] },
+            { fields: ['teamspaceId', 'role', 'id'] },
+            { fields: ['teamspaceId', 'principalType', 'principalId'], unique: true },
+          ],
+        },
+
+        teamspace_join_requests: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            teamspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'teamspaces', onDelete: 'CASCADE' },
+            },
+            userId: { type: 'string', required: true },
+            workspaceMemberId: { type: 'string', required: true },
+            status: { type: 'string', required: true, default: 'pending' }, // pending | approved | denied
+            createdBy: { type: 'string', required: true },
+            decidedBy: { type: 'string' },
+            decidedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['teamspaceId'] },
+            { fields: ['userId'] },
+            { fields: ['teamspaceId', 'status', 'id'] },
+            { fields: ['workspaceId', 'userId', 'status', 'id'] },
+            { fields: ['teamspaceId', 'userId'], unique: true },
+          ],
+        },
+
+        teamspace_settings: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            // Logical pointer so an archived/default transition can update both
+            // rows in one workspace transaction without a cyclic FK cascade.
+            defaultTeamspaceId: { type: 'string' },
+            ownersOnlyCreate: { type: 'boolean', required: true, default: false },
+            // Random compare-and-swap token for active-count/default/archive
+            // transitions. updatedAt alone can repeat within one millisecond.
+            lifecycleToken: { type: 'string' },
+            updatedBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'], unique: true },
+            { fields: ['defaultTeamspaceId'] },
+          ],
+        },
+
         // ─── Pages (documents AND database containers AND database rows) ──
         pages: {
           schema: {
@@ -758,12 +1296,29 @@ const appTables = {
             // Kept as a logical reference (no physical FK) to allow null roots.
             parentId: { type: 'string' },
             parentType: { type: 'string', default: 'workspace' }, // workspace | page | database
+            // Only workspace-root pages carry this scalar. Descendants derive
+            // their Teamspace through the bounded page ancestry walk.
+            teamspaceId: { type: 'string' },
+            teamspacePermissionMode: { type: 'string', default: 'inherit' }, // inherit | restricted
             kind: { type: 'string', default: 'page' }, // page | database
 
             title: { type: 'text' },
             icon: { type: 'string' }, // emoji char or image url/key
             iconType: { type: 'string', default: 'none' }, // none | emoji | image
+            notionIcon: { type: 'json' },
             cover: { type: 'string' }, // image url/key
+            notionCover: { type: 'json' },
+            // Database-wide sub-item/dependency bindings. Property names stay
+            // presentation-only; stable ids in this record own the feature.
+            databaseFeatures: { type: 'json' },
+            databaseFeaturesRevision: { type: 'number', default: 0 },
+            // Canonical sub-item hierarchy edge. Empty means a database root;
+            // children use the compound keyset below rather than an unbounded
+            // parent-side JSON array.
+            subitemParentId: { type: 'string', default: '' },
+            // Exact live direct-child summary for zero-probe root windows.
+            // Child IDs remain authoritative only through subitemParentId.
+            subitemChildCount: { type: 'number', default: 0 },
             coverPosition: { type: 'number', default: 50 }, // 0–100 vertical focal point
             font: { type: 'string', default: 'default' }, // default | serif | mono
             smallText: { type: 'boolean', default: false },
@@ -772,6 +1327,9 @@ const appTables = {
             isPublic: { type: 'boolean', default: false },
             backlinksDisplay: { type: 'string', default: 'default' }, // default | expanded | off
             pageCommentsDisplay: { type: 'string', default: 'default' }, // default | expanded | off
+            isWiki: { type: 'boolean', default: false },
+            // Root points to itself; descendants point to the owning wiki root.
+            wikiRootId: { type: 'string' },
             verifiedAt: { type: 'datetime' },
             verifiedBy: { type: 'string' },
             verificationExpiresAt: { type: 'datetime' },
@@ -779,7 +1337,19 @@ const appTables = {
             // Column values when this page is a row in a database: { [propertyId]: value }
             properties: { type: 'json' },
 
+            // Indexed import-owner locator. JSON properties keep the source
+            // metadata for product behavior, while these scalar fields make
+            // crash recovery/cancellation bounded and unambiguous.
+            notionImportJobId: { type: 'string' },
+            notionImportSourceId: { type: 'string' },
+            notionImportSourceKind: { type: 'string' },
+            // Native import owners stay durable but product-hidden until the
+            // lease-fenced remap/finalization publication boundary.
+            notionImportStaging: { type: 'boolean', default: false },
+
             isFavorite: { type: 'boolean', default: false },
+            // Server-authenticated receipt for idempotent page/row outbox replay.
+            lastMutationId: { type: 'string' },
             inTrash: { type: 'boolean', default: false },
             trashedAt: { type: 'datetime' },
             deletionPendingAt: { type: 'datetime' },
@@ -796,9 +1366,53 @@ const appTables = {
             { fields: ['inTrash'] },
             { fields: ['workspaceId', 'parentId'] },
             { fields: ['workspaceId', 'parentType'] },
+            { fields: ['workspaceId', 'teamspaceId'] },
+            { fields: ['workspaceId', 'parentType', 'teamspaceId', 'position', 'id'] },
             { fields: ['parentId', 'parentType'] },
+            { fields: ['parentId', 'parentType', 'position', 'id'] },
+            { fields: ['parentId', 'parentType', 'inTrash', 'position'] },
+            { fields: ['parentId', 'parentType', 'inTrash', 'position', 'id'] },
+            { fields: ['parentId', 'parentType', 'inTrash', 'id'] },
+            { fields: ['parentId', 'parentType', 'inTrash', 'trashedAt', 'position', 'id'] },
+            { fields: ['subitemParentId'] },
+            { fields: ['parentId', 'parentType', 'subitemParentId', 'inTrash', 'position', 'id'] },
+            { fields: ['parentId', 'parentType', 'subitemParentId', 'inTrash', 'trashedAt', 'position', 'id'] },
+            { fields: ['wikiRootId'] },
+            { fields: ['wikiRootId', 'inTrash', 'id'] },
+            { fields: ['verificationExpiresAt', 'id'] },
+            { fields: ['workspaceId', 'notionImportStaging', 'updatedAt', 'id'] },
+            { fields: ['notionImportJobId'] },
+            { fields: ['notionImportJobId', 'notionImportSourceId'] },
+            { fields: ['notionImportJobId', 'notionImportSourceId', 'notionImportSourceKind'] },
           ],
-          fts: ['title'],
+          fts: ['title', 'properties'],
+        },
+
+        // Indexed page ownership for native wiki collection views. The page
+        // row remains the authority; this table never grants access by itself.
+        page_owners: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            pageId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            wikiRootId: { type: 'string', required: true },
+            userId: { type: 'string', required: true },
+            createdBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['pageId'] },
+            { fields: ['pageId', 'userId'] },
+            { fields: ['wikiRootId'] },
+            { fields: ['wikiRootId', 'userId', 'pageId'] },
+          ],
         },
 
         // ─── Blocks (a page's body content) ──────────────────────────────
@@ -819,13 +1433,18 @@ const appTables = {
             plainText: { type: 'text' },
             position: { type: 'number', default: 0 },
             createdBy: { type: 'string' },
+            // Server-authenticated edit provenance and the latest idempotency
+            // receipt. Neither field is accepted inside a client block patch.
+            lastEditedBy: { type: 'string' },
+            lastMutationId: { type: 'string' },
           },
           indexes: [
             { fields: ['pageId'] },
+            { fields: ['pageId', 'id'] },
             { fields: ['parentId'] },
             { fields: ['pageId', 'parentId'] },
           ],
-          fts: ['plainText'],
+          fts: ['plainText', 'content'],
         },
 
         // ─── Database columns ────────────────────────────────────────────
@@ -836,11 +1455,16 @@ const appTables = {
               required: true,
               references: { table: 'pages', onDelete: 'CASCADE' },
             },
+            notionImportJobId: { type: 'string' },
+            notionDataSourceId: { type: 'string' },
+            notionPropertyId: { type: 'string' },
             name: { type: 'string', required: true },
             description: { type: 'text' },
             // title | rich_text | number | select | multi_select | status | date |
             // person | checkbox | url | email | phone | files |
-            // created_time | last_edited_time | created_by | last_edited_by | relation | rollup | formula
+            // created_time | last_edited_time | created_by | last_edited_by |
+            // relation | rollup | formula | unique_id | button | location |
+            // verification | last_visited_time | place
             type: { type: 'string', required: true },
             // Type-specific config: { options:[{id,name,color}], numberFormat, dateFormat, ... }
             config: { type: 'json' },
@@ -848,8 +1472,224 @@ const appTables = {
           },
           indexes: [
             { fields: ['databaseId'] },
+            { fields: ['notionImportJobId'] },
+            { fields: ['notionImportJobId', 'notionDataSourceId', 'notionPropertyId'] },
+            { fields: ['databaseId', 'notionImportJobId', 'notionDataSourceId', 'notionPropertyId'] },
             { fields: ['type'] },
+            { fields: ['type', 'id'] },
             { fields: ['databaseId', 'type'] },
+            { fields: ['databaseId', 'type', 'id'] },
+          ],
+        },
+
+        database_automations: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            name: { type: 'string', required: true },
+            enabled: { type: 'boolean', required: true },
+            scopeType: { type: 'string', required: true },
+            viewId: {
+              type: 'string',
+              references: { table: 'db_views', onDelete: 'SET NULL' },
+            },
+            triggerType: { type: 'string', required: true },
+            trigger: { type: 'json', required: true },
+            actionDocument: { type: 'json', required: true },
+            nextRunAt: { type: 'datetime' },
+            status: { type: 'string', required: true },
+            revision: { type: 'number', required: true },
+            createdBy: { type: 'string', required: true },
+            updatedBy: { type: 'string', required: true },
+            pausedAt: { type: 'datetime' },
+            pausedReason: { type: 'text' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'enabled', 'id'] },
+            { fields: ['databaseId', 'status', 'id'] },
+            { fields: ['databaseId', 'triggerType', 'enabled', 'status', 'id'] },
+            { fields: ['triggerType', 'status', 'nextRunAt', 'id'] },
+            { fields: ['viewId'] },
+          ],
+        },
+
+        automation_execution_receipts: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            sourceType: { type: 'string', required: true },
+            sourceId: { type: 'string', required: true },
+            triggerPageId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            requestedBy: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+            result: { type: 'json', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'triggerPageId', 'id'] },
+            { fields: ['databaseId', 'sourceId', 'id'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        database_automation_events: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            triggerKind: { type: 'string', required: true },
+            origin: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            changedPropertyIds: { type: 'json', required: true },
+            occurredAt: { type: 'string', required: true },
+            state: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['state', 'id'] },
+            { fields: ['state', 'occurredAt', 'id'] },
+            { fields: ['databaseId', 'state', 'id'] },
+            { fields: ['databaseId', 'rowId', 'id'] },
+            { fields: ['databaseId', 'rowId', 'occurredAt', 'id'] },
+            { fields: ['databaseId', 'mutationId'] },
+          ],
+        },
+
+        database_automation_event_workers: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            leaseToken: { type: 'string' },
+            leaseUntil: { type: 'datetime' },
+            cursorOccurredAt: { type: 'datetime' },
+            cursorEventId: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['leaseUntil', 'id'] },
+          ],
+        },
+
+        database_automation_schedule_workers: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            leaseToken: { type: 'string' },
+            leaseUntil: { type: 'datetime' },
+            cursorNextRunAt: { type: 'datetime' },
+            cursorAutomationId: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['leaseUntil', 'id'] },
+          ],
+        },
+
+        database_automation_deliveries: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            ownerPageId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            sourceType: { type: 'string', required: true },
+            sourceId: { type: 'string', required: true },
+            executionId: {
+              type: 'string',
+              references: { table: 'automation_execution_receipts', onDelete: 'CASCADE' },
+            },
+            automationId: {
+              type: 'string',
+              references: { table: 'database_automations', onDelete: 'CASCADE' },
+            },
+            automationRevision: { type: 'number' },
+            actionId: { type: 'string', required: true },
+            channel: { type: 'string', required: true },
+            scheduledFor: { type: 'datetime', required: true },
+            state: { type: 'string', required: true },
+            attempts: { type: 'number', required: true },
+            nextAttemptAt: { type: 'datetime', required: true },
+            payload: { type: 'json', required: true },
+            deliveredAt: { type: 'datetime' },
+            failedAt: { type: 'datetime' },
+            lastError: { type: 'text' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['ownerPageId'] },
+            { fields: ['sourceType', 'sourceId', 'id'] },
+            { fields: ['executionId', 'id'] },
+            { fields: ['state', 'nextAttemptAt', 'id'] },
+            { fields: ['automationId', 'scheduledFor', 'id'] },
+          ],
+        },
+
+        database_automation_delivery_workers: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            leaseToken: { type: 'string' },
+            leaseUntil: { type: 'datetime' },
+            cursorNextAttemptAt: { type: 'datetime' },
+            cursorDeliveryId: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['leaseUntil', 'id'] },
           ],
         },
 
@@ -894,6 +1734,8 @@ const appTables = {
             { fields: ['databaseId', 'propertyType'] },
             { fields: ['databaseId', 'valueKind'] },
             { fields: ['databaseId', 'valueKind', 'stringValue'] },
+            { fields: ['databaseId', 'propertyId', 'rowId'] },
+            { fields: ['databaseId', 'propertyId', 'stringValue', 'rowId'] },
             { fields: ['rowId'] },
             { fields: ['propertyId'] },
             { fields: ['propertyType'] },
@@ -905,6 +1747,518 @@ const appTables = {
           ],
         },
 
+        // Directed task dependencies stay one edge per row so predecessor and
+        // successor projections remain cursor-bounded at unbounded degree.
+        database_dependency_edges: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            dataKey: { type: 'string', default: '' },
+            predecessorRowId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            successorRowId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            createdBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'predecessorRowId', 'id'] },
+            { fields: ['databaseId', 'successorRowId', 'id'] },
+            { fields: ['databaseId', 'successorRowId', 'predecessorRowId', 'id'] },
+            { fields: ['databaseId', 'predecessorRowId', 'successorRowId'] },
+            { fields: ['databaseId', 'dataKey', 'predecessorRowId', 'id'] },
+            { fields: ['databaseId', 'dataKey', 'successorRowId', 'id'] },
+            { fields: ['databaseId', 'dataKey', 'successorRowId', 'predecessorRowId', 'id'] },
+            { fields: ['databaseId', 'dataKey', 'predecessorRowId', 'successorRowId'] },
+          ],
+        },
+
+        database_task_feature_config_receipts: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            feature: { type: 'string', required: true },
+            operationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            requestedBy: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+            result: { type: 'json', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId', 'feature', 'operationId'] },
+          ],
+        },
+
+        database_task_feature_disable_jobs: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            feature: { type: 'string', required: true },
+            operationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            requestedBy: { type: 'string', required: true },
+            phase: { type: 'string', required: true },
+            dataKey: { type: 'string' },
+            cursorPosition: { type: 'number', default: 0 },
+            cursorId: { type: 'string', default: '' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId', 'feature'] },
+            { fields: ['databaseId', 'feature', 'phase', 'cursorId'] },
+          ],
+        },
+
+        database_dependency_validation_jobs: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            featureRevision: { type: 'number', required: true },
+            dataKey: { type: 'string' },
+            requestedBy: { type: 'string', required: true },
+            additions: { type: 'json', required: true },
+            removals: { type: 'json', required: true },
+            validationAdditionIndexes: { type: 'json', required: true },
+            validationComplete: { type: 'boolean', required: true },
+            failureMessage: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        database_dependency_validation_items: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            jobId: {
+              type: 'string',
+              required: true,
+              references: { table: 'database_dependency_validation_jobs', onDelete: 'CASCADE' },
+            },
+            databaseId: { type: 'string', required: true },
+            featureRevision: { type: 'number', required: true },
+            additionIndex: { type: 'number', required: true },
+            rowId: { type: 'string', required: true },
+            edgeCursorId: { type: 'string', required: true },
+            proposedScanned: { type: 'boolean', required: true },
+            expanded: { type: 'boolean', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['jobId', 'id'] },
+            { fields: ['databaseId'] },
+            { fields: ['jobId', 'featureRevision', 'expanded', 'additionIndex', 'id'] },
+            { fields: ['jobId', 'featureRevision', 'additionIndex', 'rowId'] },
+          ],
+        },
+
+        database_dependency_mutation_receipts: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            resultRevision: { type: 'number', required: true },
+            requestedBy: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+            failureMessage: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        database_dependency_date_shift_jobs: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            featureRevision: { type: 'number', required: true },
+            dataKey: { type: 'string' },
+            requestedBy: { type: 'string', required: true },
+            dateMode: { type: 'string', required: true },
+            datePropertyId: { type: 'string', required: true },
+            startDatePropertyId: { type: 'string', required: true },
+            endDatePropertyId: { type: 'string', required: true },
+            shiftMode: { type: 'string', required: true },
+            avoidWeekends: { type: 'boolean', required: true },
+            deltaDays: { type: 'number', required: true },
+            scanComplete: { type: 'boolean', required: true, default: false },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        database_dependency_date_shift_items: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            jobId: {
+              type: 'string',
+              required: true,
+              references: { table: 'database_dependency_date_shift_jobs', onDelete: 'CASCADE' },
+            },
+            databaseId: { type: 'string', required: true },
+            rowId: { type: 'string', required: true },
+            depth: { type: 'number', required: true },
+            sourceUpdatedAt: { type: 'string', required: true },
+            previousValue: { type: 'string', required: true },
+            previousEndValue: { type: 'string', required: true },
+            nextValue: { type: 'string', required: true },
+            nextEndValue: { type: 'string', required: true },
+            edgeCursorId: { type: 'string', required: true },
+            expanded: { type: 'boolean', required: true, default: false },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['jobId', 'expanded', 'depth', 'id'] },
+            { fields: ['jobId', 'depth', 'id'] },
+            { fields: ['jobId', 'rowId'], unique: true },
+          ],
+        },
+
+        database_dependency_date_shift_receipts: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            mutationId: { type: 'string', required: true },
+            requestHash: { type: 'string', required: true },
+            requestedBy: { type: 'string', required: true },
+            status: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        // Deep sub-item moves validate one bounded ancestor window per call.
+        // Only this resumable cursor is persisted while the canonical page
+        // parent scalar remains unchanged; the terminal request publishes the
+        // row and database feature revision atomically, then removes the job.
+        database_hierarchy_moves: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            targetParentId: { type: 'string', required: true },
+            sourceParentId: { type: 'string', required: true },
+            cursorAncestorId: { type: 'string', required: true },
+            tortoiseAncestorId: { type: 'string', required: true },
+            hareAncestorId: { type: 'string', required: true },
+            featureRevision: { type: 'number', required: true },
+            requestedBy: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        // A completed move remains replayable after later moves replace the
+        // row-local lastMutationId. The receipt is immutable and is inserted
+        // in the same transaction that publishes the row and feature revision.
+        database_hierarchy_move_receipts: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rowId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            mutationId: { type: 'string', required: true },
+            targetParentId: { type: 'string', required: true },
+            resultRevision: { type: 'number', required: true },
+            requestedBy: { type: 'string', required: true },
+            completedAt: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rowId'] },
+            { fields: ['databaseId', 'requestedBy', 'id'] },
+          ],
+        },
+
+        database_hierarchy_lifecycle_jobs: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            rootRowId: { type: 'string', required: true },
+            operation: { type: 'string', required: true },
+            trashStamp: { type: 'string', required: true },
+            featureRevision: { type: 'number', required: true },
+            requestedBy: { type: 'string', required: true },
+            mutationId: { type: 'string' },
+            phase: { type: 'string' },
+            targetRootId: { type: 'string' },
+            sourceParentId: { type: 'string' },
+            relationPropertyCursorId: { type: 'string' },
+            relationRowPosition: { type: 'number' },
+            relationRowId: { type: 'string' },
+            relationValueOffset: { type: 'number' },
+            relationsPrepared: { type: 'boolean' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'rootRowId'] },
+          ],
+        },
+
+        database_hierarchy_lifecycle_items: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            jobId: {
+              type: 'string',
+              required: true,
+              references: { table: 'database_hierarchy_lifecycle_jobs', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            depth: { type: 'number', required: true },
+            scanned: { type: 'boolean', required: true },
+            scanLane: { type: 'string', required: true },
+            scanPosition: { type: 'number', required: true },
+            scanRowId: { type: 'string', required: true },
+            targetRowId: { type: 'string' },
+            prepared: { type: 'boolean' },
+            applied: { type: 'boolean' },
+            published: { type: 'boolean' },
+            sourceUpdatedAt: { type: 'string' },
+            blockScanId: { type: 'string' },
+            blocksPrepared: { type: 'boolean' },
+            blocksApplied: { type: 'boolean' },
+            dependencyLane: { type: 'string' },
+            dependencyCursorId: { type: 'string' },
+            dependenciesPrepared: { type: 'boolean' },
+            dependenciesApplied: { type: 'boolean' },
+            fileCursorId: { type: 'string' },
+            filesApplied: { type: 'boolean' },
+            relationPropertyCursorId: { type: 'string' },
+            relationValueOffset: { type: 'number' },
+            relationsPrepared: { type: 'boolean' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['jobId', 'scanned', 'depth', 'id'] },
+            { fields: ['jobId', 'depth', 'id'] },
+            { fields: ['jobId', 'rowId'] },
+            { fields: ['jobId', 'prepared', 'depth', 'id'] },
+            { fields: ['jobId', 'applied', 'depth', 'id'] },
+            { fields: ['jobId', 'published', 'depth', 'id'] },
+            { fields: ['jobId', 'blocksPrepared', 'depth', 'id'] },
+            { fields: ['jobId', 'blocksApplied', 'depth', 'id'] },
+            { fields: ['jobId', 'dependenciesApplied', 'depth', 'id'] },
+            { fields: ['jobId', 'dependenciesPrepared', 'depth', 'id'] },
+            { fields: ['jobId', 'filesApplied', 'depth', 'id'] },
+            { fields: ['jobId', 'relationsPrepared', 'depth', 'id'] },
+          ],
+        },
+
+        database_hierarchy_relation_updates: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            jobId: {
+              type: 'string',
+              required: true,
+              references: { table: 'database_hierarchy_lifecycle_jobs', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            sourceUpdatedAt: { type: 'string', required: true },
+            properties: { type: 'json', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['jobId', 'id'] },
+            { fields: ['jobId', 'rowId'] },
+          ],
+        },
+
+        // ─── Bounded global database-query sort snapshots ─────────────
+        database_query_snapshots: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            actorId: { type: 'string', required: true },
+            fingerprint: { type: 'string', required: true },
+            expiresAt: { type: 'datetime', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['actorId'] },
+            { fields: ['expiresAt', 'id'] },
+            { fields: ['workspaceId', 'expiresAt', 'id'] },
+          ],
+        },
+
+        database_query_snapshot_rows: {
+          schema: {
+            snapshotId: {
+              type: 'string',
+              required: true,
+              references: { table: 'database_query_snapshots', onDelete: 'CASCADE' },
+            },
+            rowId: { type: 'string', required: true },
+            sortKey: { type: 'text', required: true },
+          },
+          indexes: [
+            { fields: ['snapshotId'] },
+            { fields: ['snapshotId', 'rowId'] },
+            { fields: ['snapshotId', 'sortKey', 'id'] },
+          ],
+        },
+
         // ─── Database saved views ────────────────────────────────────────
         db_views: {
           schema: {
@@ -913,13 +2267,67 @@ const appTables = {
               required: true,
               references: { table: 'pages', onDelete: 'CASCADE' },
             },
+            notionImportJobId: { type: 'string' },
+            notionDataSourceId: { type: 'string' },
+            notionViewId: { type: 'string' },
+            notionViewStructuralIndex: { type: 'number' },
+            notionImportSnapshotRevision: { type: 'string' },
+            notionViewFingerprint: { type: 'string' },
+            notionRowContextJobId: { type: 'string' },
+            notionRowContextSnapshotRevision: { type: 'string' },
+            notionRowContextBlockId: { type: 'string' },
+            notionRowContextSourceViewId: { type: 'string' },
+            notionRowContextFingerprint: { type: 'string' },
             name: { type: 'string', default: 'Default view' },
             type: { type: 'string', required: true }, // table | board | list | gallery | calendar | timeline
             // { visibleProperties, propertyOrder, filters:[], sorts:[], groupBy, wrap, ... }
             config: { type: 'json' },
             position: { type: 'number', default: 0 },
           },
-          indexes: [{ fields: ['databaseId'] }],
+          indexes: [
+            { fields: ['databaseId'] },
+            { fields: ['notionImportJobId'] },
+            { fields: ['notionImportJobId', 'notionDataSourceId', 'notionViewId'] },
+            { fields: ['databaseId', 'notionImportJobId', 'notionDataSourceId', 'notionViewId'] },
+            { fields: ['databaseId', 'notionImportJobId', 'notionDataSourceId', 'notionViewStructuralIndex'] },
+            { fields: ['notionRowContextJobId'] },
+            { fields: ['notionRowContextJobId', 'notionRowContextSnapshotRevision', 'notionRowContextBlockId'] },
+            { fields: ['notionRowContextJobId', 'notionRowContextSnapshotRevision', 'notionRowContextBlockId', 'notionRowContextSourceViewId'] },
+          ],
+        },
+
+        // Notion-compatible view query snapshots are intentionally short
+        // lived. They preserve the official create/get/delete query contract
+        // without treating a cached query as a durable view mutation.
+        db_view_queries: {
+          schema: {
+            viewId: {
+              type: 'string',
+              required: true,
+              references: { table: 'db_views', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            workspaceId: { type: 'string', required: true },
+            rowIds: { type: 'json' },
+            sourceCursor: { type: 'text' },
+            hasMore: { type: 'boolean', default: false },
+            filter: { type: 'json' },
+            sorts: { type: 'json' },
+            pageSize: { type: 'number', default: 100 },
+            createdBy: { type: 'string' },
+            expiresAt: { type: 'datetime', required: true },
+          },
+          indexes: [
+            { fields: ['viewId'] },
+            { fields: ['databaseId'] },
+            { fields: ['workspaceId'] },
+            { fields: ['createdBy'] },
+            { fields: ['expiresAt'] },
+          ],
         },
 
         // ─── Database row/page templates ────────────────────────────────
@@ -930,6 +2338,12 @@ const appTables = {
               required: true,
               references: { table: 'pages', onDelete: 'CASCADE' },
             },
+            notionImportJobId: { type: 'string' },
+            notionTemplateId: { type: 'string' },
+            notionDataSourceId: { type: 'string' },
+            notionTemplateStructuralIndex: { type: 'number' },
+            notionImportSnapshotRevision: { type: 'string' },
+            notionTemplateFingerprint: { type: 'string' },
             name: { type: 'string', default: 'Untitled template' },
             icon: { type: 'string' },
             title: { type: 'text' },
@@ -938,7 +2352,56 @@ const appTables = {
             isDefault: { type: 'boolean', default: false },
             position: { type: 'number', default: 0 },
           },
-          indexes: [{ fields: ['databaseId'] }],
+          indexes: [
+            { fields: ['databaseId'] },
+            { fields: ['databaseId', 'position'] },
+            { fields: ['notionImportJobId', 'notionTemplateId'] },
+            { fields: ['notionImportJobId', 'notionTemplateId', 'notionDataSourceId'] },
+            {
+              fields: [
+                'notionImportJobId',
+                'notionDataSourceId',
+                'notionTemplateStructuralIndex',
+                'notionImportSnapshotRevision',
+                'notionTemplateFingerprint',
+              ],
+            },
+          ],
+        },
+
+        // ─── Durable server-owned Notion import queue ────────────────
+        // This control-plane row contains routing/lease metadata only.
+        // Credentials remain encrypted in the workspace connection table and
+        // are freshly decrypted by each bounded worker chunk.
+        notion_import_run_queue: {
+          schema: {
+            jobId: { type: 'string', required: true, unique: true },
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            actorId: { type: 'string', required: true },
+            state: { type: 'string', default: 'pending' }, // pending | leased
+            dueAt: { type: 'datetime', required: true },
+            leaseId: { type: 'string' },
+            leaseExpiresAt: { type: 'datetime' },
+            attempts: { type: 'number', default: 0 },
+            missingJobChecks: { type: 'number', default: 0 },
+            lastStartedAt: { type: 'datetime' },
+            lastSettledAt: { type: 'datetime' },
+            // Bounded machine code only; arbitrary upstream errors never enter
+            // the central queue or its logs.
+            lastErrorCode: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['jobId'] },
+            { fields: ['workspaceId'] },
+            { fields: ['state'] },
+            { fields: ['dueAt'] },
+            { fields: ['state', 'dueAt'] },
+            { fields: ['state', 'leaseExpiresAt'] },
+          ],
         },
 
         // ─── Notion API import connections/jobs ───────────────────────
@@ -986,6 +2449,9 @@ const appTables = {
             tokenEndpointAuthMethod: { type: 'string', default: 'none' },
             clientUri: { type: 'string' },
             logoUri: { type: 'string' },
+            // Confidential Notion-compatible clients store only a SHA-256
+            // verifier; the plaintext secret never enters durable storage.
+            notionCompatClientSecretHash: { type: 'string' },
             status: { type: 'string', default: 'active' },
             registeredBy: { type: 'string' },
             lastUsedAt: { type: 'datetime' },
@@ -1003,7 +2469,7 @@ const appTables = {
             clientName: { type: 'string', default: 'MCP client' },
             resource: { type: 'string', required: true },
             scopes: { type: 'json' },
-            workspaceAccess: { type: 'string', default: 'all_accessible' },
+            workspaceAccess: { type: 'string', default: 'selected' },
             workspaceIds: { type: 'json' },
             pageIds: { type: 'json' },
             databaseIds: { type: 'json' },
@@ -1129,14 +2595,28 @@ const appTables = {
             finishedAt: { type: 'datetime' },
             cancelledAt: { type: 'datetime' },
             cancelledBy: { type: 'string' },
+            // Terminal imports enqueue file checkpoint cleanup here. The
+            // request path never scans the whole workspace just to retire
+            // copied objects; scheduled maintenance drains this indexed,
+            // durable continuation and marks it complete.
+            fileCleanupStatus: { type: 'string' }, // pending | complete
+            fileCleanupRequestedAt: { type: 'datetime' },
+            fileCleanupCompletedAt: { type: 'datetime' },
             // Copy-on-write pointer for crash-safe discovery snapshot replacement.
             activeItemGeneration: { type: 'string' },
+            // Changes whenever the active discovery graph changes. Apply uses
+            // this internal revision to reuse one immutable graph snapshot
+            // across bounded HTTP chunks without accepting a stale append.
+            itemSnapshotRevision: { type: 'string' },
           },
           indexes: [
             { fields: ['workspaceId'] },
             { fields: ['actorId'] },
             { fields: ['status'] },
             { fields: ['source'] },
+            { fields: ['fileCleanupStatus'] },
+            { fields: ['fileCleanupStatus', 'fileCleanupRequestedAt'] },
+            { fields: ['fileCleanupStatus', 'status', 'fileCleanupRequestedAt'] },
           ],
         },
 
@@ -1160,6 +2640,9 @@ const appTables = {
             title: { type: 'text' },
             status: { type: 'string', default: 'discovered' },
             phase: { type: 'string', default: 'discovery' },
+            // Scalar companion to the heavy metadata snapshot. Incremental
+            // discovery projects this field without loading metadata JSON.
+            enrichmentComplete: { type: 'boolean' },
             localId: { type: 'string' },
             localType: { type: 'string' },
             metadata: { type: 'json' },
@@ -1209,6 +2692,7 @@ const appTables = {
             { fields: ['workspaceId', 'notionId'] },
             { fields: ['workspaceId', 'localId'] },
             { fields: ['jobId', 'notionId'] },
+            { fields: ['jobId', 'localType', 'relationKind', 'localId'] },
             { fields: ['workspaceId', 'relationKind'] },
           ],
         },
@@ -1277,6 +2761,10 @@ const appTables = {
               type: 'string',
               references: { table: 'blocks', onDelete: 'SET NULL' },
             },
+            commentId: {
+              type: 'string',
+              references: { table: 'comments', onDelete: 'SET NULL' },
+            },
             databaseId: {
               type: 'string',
               references: { table: 'pages', onDelete: 'SET NULL' },
@@ -1298,17 +2786,43 @@ const appTables = {
             createdBy: { type: 'string' },
             expiresAt: { type: 'datetime' },
             completedAt: { type: 'datetime' },
+            // Set only after maintenance proves an old completed upload still
+            // has an authoritative content owner. Later detach/restore writes
+            // change status through the file-reference state machine, so the
+            // same attached row never pins the first orphan candidate window.
+            orphanReferenceCheckedAt: { type: 'datetime' },
             expiredAt: { type: 'datetime' },
             deletedAt: { type: 'datetime' },
             deletedBy: { type: 'string' },
             deletionPreviousStatus: { type: 'string' },
+            // Durable Notion pre-copy locator. Keep this on the upload itself:
+            // a worker can die after writing bytes but before an owner exists.
+            notionImportJobId: { type: 'string' },
+            notionImportSnapshotRevision: { type: 'string' },
+            notionImportSlotKey: { type: 'string', unique: true },
+            // A failed pre-copy can finish its deterministic object PUT after
+            // the retiring worker deleted the key. Schedule one delayed
+            // idempotent delete beyond the maximum signed-PUT lifetime. The
+            // maintenance worker clears this marker after success, so old
+            // tombstones never consume the sweep budget forever.
+            notionImportTerminalSweepAfter: { type: 'datetime' },
+            notionImportTerminalSweepCompletedAt: { type: 'datetime' },
+            mode: { type: 'string' }, // single_part | multi_part | external_url
+            numberOfPartsTotal: { type: 'number' },
+            numberOfPartsSent: { type: 'number' },
+            multipartUploadId: { type: 'string' },
+            multipartParts: { type: 'json' },
+            externalUrl: { type: 'string' },
+            fileImportResult: { type: 'json' },
           },
           indexes: [
             { fields: ['workspaceId'] },
             { fields: ['key'] },
             { fields: ['url'] },
             { fields: ['pageId'] },
+            { fields: ['pageId', 'id'] },
             { fields: ['blockId'] },
+            { fields: ['commentId'] },
             { fields: ['databaseId'] },
             { fields: ['propertyId'] },
             { fields: ['templateId'] },
@@ -1316,15 +2830,61 @@ const appTables = {
             { fields: ['status'] },
             { fields: ['expiresAt'] },
             { fields: ['status', 'expiresAt'] },
+            { fields: ['status', 'expiresAt', 'updatedAt'] },
+            { fields: ['status', 'expiresAt', 'updatedAt', 'createdAt'] },
             { fields: ['status', 'completedAt'] },
+            { fields: ['status', 'orphanReferenceCheckedAt', 'completedAt'] },
+            { fields: ['status', 'orphanReferenceCheckedAt', 'completedAt', 'updatedAt'] },
+            { fields: ['status', 'orphanReferenceCheckedAt', 'completedAt', 'updatedAt', 'createdAt'] },
             { fields: ['status', 'updatedAt'] },
             { fields: ['status', 'createdAt'] },
             { fields: ['status', 'completedAt', 'updatedAt', 'createdAt'] },
+            { fields: ['notionImportJobId'] },
+            { fields: ['notionImportJobId', 'notionImportSnapshotRevision'] },
+            { fields: ['notionImportJobId', 'status'] },
+            { fields: ['notionImportSlotKey'] },
+            { fields: ['notionImportTerminalSweepAfter'] },
           ],
         },
 
-        // Serializes metadata/object/quota transitions with permanent content
-        // deletion. Ordinary expired leases are replaceable; a lease carrying
+        // Durable idempotency and terminal ownership for lossless native
+        // archive imports. One row per caller-generated batch makes an
+        // unobserved successful Function response replayable without reading
+        // storage again, and fences cancellation away from imported bytes.
+        native_archive_imports: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            batchId: { type: 'string', required: true },
+            actorId: { type: 'string', required: true },
+            documentSha256: { type: 'string', required: true },
+            fileCount: { type: 'number', required: true },
+            fileBytes: { type: 'number', required: true },
+            parentId: { type: 'string' },
+            parentType: { type: 'string', required: true },
+            status: { type: 'string', required: true, default: 'preparing' },
+            result: { type: 'json' },
+            expiresAt: { type: 'datetime' },
+            completedAt: { type: 'datetime' },
+            cancelledAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['batchId'] },
+            { fields: ['actorId'] },
+            { fields: ['status'] },
+            { fields: ['expiresAt'] },
+            { fields: ['workspaceId', 'status'] },
+          ],
+        },
+
+        // Atomically coordinates metadata/object/quota transitions with
+        // permanent deletion. Compatible database-local requests may share
+        // the row; workspace-wide and recovery owners remain exclusive.
+        // Ordinary expired leases are replaceable; a lease carrying
         // recoveryData must be completed by maintenance after a worker crash.
         file_workspace_locks: {
           schema: {
@@ -1341,6 +2901,11 @@ const appTables = {
             // Ordinary leases keep this null; an expired non-null marker must
             // be recovered before another operation may replace the lock.
             recoveryData: { type: 'json' },
+            // Short request-owned operations may share this one atomic
+            // workspace coordination row only when their exact resource keys
+            // are compatible. Workspace-wide/recovery owners leave it empty.
+            compatibleScopes: { type: 'json' },
+            revisionId: { type: 'string' },
             expiresAt: { type: 'datetime', required: true },
           },
           indexes: [
@@ -1375,6 +2940,78 @@ const appTables = {
             { fields: ['kind'] },
             { fields: ['status'] },
             { fields: ['startedAt'] },
+          ],
+        },
+
+        // Scalar routing hints for the scheduled workspace-local maintenance
+        // worker. Content remains in the per-workspace DO; generation fences a
+        // stale worker from clearing a newer best-effort DB-trigger hint.
+        file_maintenance_queue: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            dueAt: { type: 'datetime', required: true },
+            availableAt: { type: 'datetime', required: true },
+            claimUntil: { type: 'datetime' },
+            generation: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['dueAt'] },
+            { fields: ['dueAt', 'workspaceId'] },
+            { fields: ['availableAt'] },
+            { fields: ['availableAt', 'workspaceId'] },
+          ],
+        },
+
+        // One bounded rotating-audit cursor repairs any best-effort trigger
+        // hint that was lost across the workspace-DO -> central-DO boundary.
+        file_maintenance_sweep_state: {
+          schema: {
+            cursorWorkspaceId: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['cursorWorkspaceId'] },
+          ],
+        },
+
+        // One scalar route per workspace wakes the automation scheduler and
+        // delivery outbox without copying either authority into the central
+        // block. Generation fences preserve a newer hint across an older run.
+        database_automation_workspace_wakes: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            dueAt: { type: 'datetime', required: true },
+            availableAt: { type: 'datetime', required: true },
+            claimUntil: { type: 'datetime' },
+            generation: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['dueAt'] },
+            { fields: ['dueAt', 'workspaceId'] },
+            { fields: ['availableAt'] },
+            { fields: ['availableAt', 'workspaceId'] },
+          ],
+        },
+
+        // A separately reserved rotating audit lane repairs a lost best-effort
+        // workspace-to-central wake without scanning every tenant per minute.
+        database_automation_wake_sweep_state: {
+          schema: {
+            cursorWorkspaceId: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['cursorWorkspaceId'] },
           ],
         },
 
@@ -1420,6 +3057,58 @@ const appTables = {
           ],
         },
 
+        // Central routing-only expiry queue. Scheduled work must re-read the
+        // workspace page and current owners before delivering anything.
+        wiki_verification_queue: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            pageId: { type: 'string', required: true },
+            expiresAt: { type: 'datetime', required: true },
+            state: { type: 'string', required: true, default: 'pending' },
+            attempts: { type: 'number', required: true, default: 0 },
+            nextAttemptAt: { type: 'datetime' },
+            lastError: { type: 'text' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['pageId'] },
+            { fields: ['expiresAt'] },
+            { fields: ['state', 'expiresAt', 'id'] },
+            { fields: ['nextAttemptAt', 'id'] },
+          ],
+        },
+
+        // One durable delivery state per verification expiry and current owner.
+        // A deterministic idempotency key protects configured email webhooks
+        // across worker retries and post-send persistence failures.
+        wiki_verification_email_deliveries: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            pageId: { type: 'string', required: true },
+            userId: { type: 'string', required: true },
+            expiresAt: { type: 'datetime', required: true },
+            email: { type: 'string' },
+            status: { type: 'string', required: true },
+            attempts: { type: 'number', required: true, default: 0 },
+            lastError: { type: 'text' },
+            sentAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['pageId', 'expiresAt'] },
+            { fields: ['userId', 'status', 'id'] },
+            { fields: ['status', 'updatedAt', 'id'] },
+          ],
+        },
+
         // ─── Workspace members ─────────────────────────────────────────
         workspace_members: {
           schema: {
@@ -1439,6 +3128,7 @@ const appTables = {
             { fields: ['workspaceId'] },
             { fields: ['userId'] },
             { fields: ['workspaceId', 'userId'] },
+            { fields: ['workspaceId', 'id'] },
           ],
         },
 
@@ -1498,9 +3188,75 @@ const appTables = {
             { fields: ['workspaceId', 'pageId'] },
             { fields: ['workspaceId', 'principalId'] },
             { fields: ['pageId', 'principalId'] },
+            { fields: ['pageId', 'workspaceId', 'principalType', 'principalId', 'role'] },
           ],
         },
 
+        // Workspace-local authority cache for indexed search. Organization
+        // group membership remains centrally authoritative, but related-search
+        // SQL must apply every grant inside one workspace database before
+        // LIMIT/cursor state. Search refreshes these versioned rows in bounded
+        // keyset chunks and ignores stale versions immediately.
+        search_group_authorities: {
+          schema: {
+            workspaceId: { type: 'string', required: true },
+            organizationId: { type: 'string', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['organizationId'] },
+            { fields: ['workspaceId', 'organizationId'] },
+          ],
+        },
+        search_group_memberships: {
+          schema: {
+            workspaceId: { type: 'string', required: true },
+            organizationId: { type: 'string', required: true },
+            userId: { type: 'string', required: true },
+            organizationMemberId: { type: 'string', required: true },
+            groupId: {
+              type: 'string',
+              required: true,
+              references: { table: 'search_group_authorities', onDelete: 'CASCADE' },
+            },
+            sourceMembershipId: { type: 'string', required: true },
+            policyVersion: { type: 'number', required: true },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['groupId'] },
+            { fields: ['workspaceId', 'userId', 'policyVersion'] },
+            { fields: ['workspaceId', 'organizationMemberId', 'policyVersion'] },
+            {
+              fields: [
+                'groupId',
+                'workspaceId',
+                'organizationId',
+                'userId',
+                'organizationMemberId',
+                'policyVersion',
+              ],
+            },
+            { fields: ['workspaceId', 'userId', 'groupId'], unique: true },
+          ],
+        },
+        search_group_membership_snapshots: {
+          schema: {
+            workspaceId: { type: 'string', required: true },
+            organizationId: { type: 'string', required: true },
+            userId: { type: 'string', required: true },
+            organizationMemberId: { type: 'string', required: true },
+            policyVersion: { type: 'number', required: true },
+            syncAfter: { type: 'string' },
+            syncComplete: { type: 'boolean', default: false },
+            completedAt: { type: 'datetime' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['workspaceId', 'userId'], unique: true },
+            { fields: ['workspaceId', 'userId', 'policyVersion'] },
+          ],
+        },
         // ─── Public share links ────────────────────────────────────────
         share_links: {
           schema: {
@@ -1524,6 +3280,79 @@ const appTables = {
             { fields: ['pageId'] },
             { fields: ['workspaceId'] },
             { fields: ['token'] },
+            { fields: ['enabled'] },
+          ],
+        },
+
+        // Workspace-authoritative Notion-style site configuration. Route
+        // discovery is mirrored centrally, but anonymous reads must match this
+        // row's exact enabled revision before content can be exposed.
+        sites: {
+          schema: {
+            pageId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            slug: { type: 'string', required: true },
+            published: { type: 'boolean', required: true, default: false },
+            title: { type: 'string', required: true },
+            description: { type: 'string' },
+            theme: { type: 'string', required: true, default: 'system' },
+            showBreadcrumbs: { type: 'boolean', required: true, default: true },
+            showSearch: { type: 'boolean', required: true, default: true },
+            showBranding: { type: 'boolean', required: true, default: true },
+            navigationPageIds: { type: 'json', required: true },
+            customHostname: { type: 'string' },
+            domainStatus: { type: 'string', required: true, default: 'none' },
+            domainVerificationToken: { type: 'string' },
+            revision: { type: 'number', required: true, default: 1 },
+            createdBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['pageId'], unique: true },
+            { fields: ['workspaceId'] },
+            { fields: ['workspaceId', 'slug'], unique: true },
+            { fields: ['published'] },
+          ],
+        },
+
+        // Narrow definition/submit capability for one exact form view. This
+        // never grants page/database read access and is separate from shares.
+        form_links: {
+          schema: {
+            workspaceId: {
+              type: 'string',
+              required: true,
+              references: { table: 'workspaces', onDelete: 'CASCADE' },
+            },
+            databaseId: {
+              type: 'string',
+              required: true,
+              references: { table: 'pages', onDelete: 'CASCADE' },
+            },
+            viewId: {
+              type: 'string',
+              required: true,
+              unique: true,
+              references: { table: 'db_views', onDelete: 'CASCADE' },
+            },
+            token: { type: 'string', required: true, unique: true },
+            audience: { type: 'string', required: true, default: 'none' },
+            enabled: { type: 'boolean', default: false },
+            createdBy: { type: 'string' },
+          },
+          indexes: [
+            { fields: ['workspaceId'] },
+            { fields: ['databaseId'] },
+            { fields: ['viewId'], unique: true },
+            { fields: ['token'], unique: true },
             { fields: ['enabled'] },
           ],
         },
@@ -1617,6 +3446,7 @@ const appTables = {
           },
           indexes: [
             { fields: ['workspaceId'] },
+            { fields: ['workspaceId', 'id'] },
             { fields: ['organizationId'] },
             { fields: ['occurredAt'] },
           ],
@@ -1637,6 +3467,8 @@ const appTables = {
             { fields: ['workspaceId'] },
             { fields: ['at'] },
             { fields: ['tbl'] },
+            { fields: ['workspaceId', 'createdAt', 'id'] },
+            { fields: ['workspaceId', 'tbl'] },
           ],
         },
       } satisfies Record<string, unknown>;
@@ -1704,10 +3536,20 @@ const centralTables = Object.fromEntries(
 );
 
 export default defineConfig({
+  functions: {
+    // The self-host appliance advances file/object recovery in ten-row slices.
+    // Leave enough room for one large-workspace owner snapshot without letting
+    // a broken scheduled function monopolize the runtime indefinitely.
+    scheduleFunctionTimeout: '30s',
+  },
   // Product data is functions-only. Release mode makes every raw DB resource
   // without an explicit access rule deny-by-default in local, packaged, and
   // deployed runtimes instead of silently bypassing authorization in dev.
   release: true,
+  // OAuth callback construction must never inherit an arbitrary request Host.
+  // The localhost fallback fails closed for optional OAuth in release mode;
+  // operators enabling it provide HANJI_AUTH_ORIGIN (or the legacy app origin).
+  baseUrl: AUTH_ORIGIN,
   // The Docker appliance enables its browser installer and trusted proxy mode
   // together so NAS/Desktop users do not need to discover proxy env flags.
   // Other runtimes remain fail-closed unless they opt in explicitly.
@@ -1841,11 +3683,11 @@ export default defineConfig({
       enabled: false,
       rpName: 'Hanji',
       rpID: PASSKEY_RP_ID,
-      origin: PASSKEY_ORIGINS.length ? PASSKEY_ORIGINS : APP_ORIGIN,
+      origin: PASSKEY_ORIGINS.length ? PASSKEY_ORIGINS : AUTH_ORIGIN,
     },
     allowedRedirectUrls: [
-      APP_ORIGIN,
-      `${APP_ORIGIN}/auth/*`,
+      AUTH_ORIGIN,
+      `${AUTH_ORIGIN}/auth/*`,
     ],
   },
 
@@ -1860,8 +3702,8 @@ export default defineConfig({
     // EdgeBase's generic fragment-only fallbacks do not map to SPA routes.
     // Pin every emailed action to a real Hanji AuthGate screen while keeping
     // its bearer token in the fragment (outside HTTP requests/Referer).
-    ...authEmailActionUrls(APP_ORIGIN),
-    magicLinkUrl: `${APP_ORIGIN}/auth/magic-link#token={token}`,
+    ...authEmailActionUrls(AUTH_ORIGIN),
+    magicLinkUrl: `${AUTH_ORIGIN}/auth/magic-link#token={token}`,
     subjects: {
       magicLink: 'Sign in to {{appName}}',
       emailOtp: 'Your {{appName}} login code',
@@ -1928,14 +3770,15 @@ export default defineConfig({
     // Notion-compat surfaces are server-to-server, so no public origin belongs
     // here. Browser CORS remains available for the separate Vite dev server;
     // its proxy keeps application requests same-origin in the browser.
-    // APP_ORIGIN is included as an exact credentialed origin so a production
-    // same-site split works without source edits; wildcard origins remain
-    // intentionally rejected by EdgeBase.
+    // AUTH_ORIGIN is included as an exact credentialed origin so an explicitly
+    // configured production split works without coupling auth trust to custom
+    // site routing. Same-origin browser requests are verified from the request
+    // URL by EdgeBase and do not need an env allowlist entry.
     origin: [
       'http://localhost:3000',
       'http://127.0.0.1:3000',
       'http://[::1]:3000',
-      APP_ORIGIN,
+      AUTH_ORIGIN,
     ],
     credentials: true,
   },

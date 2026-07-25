@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}}个反向链接",
-    "count_other": "{{count}}个反向链接"
+    "count_other": "{{count}}个反向链接",
+    "partial_one": "{{count}}+ 个反向链接",
+    "partial_other": "{{count}}+ 个反向链接"
   },
   "header": {
     "title": "提及链接"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}}个提及",
     "mention_other": "{{count}}个提及",
     "link_one": "{{count}}个链接",
-    "link_other": "{{count}}个链接"
+    "link_other": "{{count}}个链接",
+    "loaded": "已加载：{{summary}}"
   },
   "kind": {
     "mention": "提及",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "还有{{count}}个反向链接",
-    "count_other": "还有{{count}}个反向链接"
+    "count_other": "还有{{count}}个反向链接",
+    "load": "加载更多反向链接",
+    "loading": "正在加载反向链接…",
+    "search": "搜索反向链接"
   }
 }

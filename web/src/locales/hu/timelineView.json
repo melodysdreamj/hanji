@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Függőségek:",
     "hint": "Relációs tulajdonság hozzáadása",
-    "relationPropertyAriaLabel": "Függőségi relációs tulajdonság"
+    "relationPropertyAriaLabel": "Függőségi relációs tulajdonság",
+    "makeDependOn": "Tedd {{title}} függővé {{predecessor}}-tól",
+    "startFrom": "Függőségi kapcsolat indítása {{title}}-ből"
   },
   "toolbar": {
     "today": "Ma",

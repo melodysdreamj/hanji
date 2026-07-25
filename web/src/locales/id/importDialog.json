@@ -247,7 +247,9 @@
     "runningHint": "Biarkan tab browser ini tetap terbuka selama impor berjalan.",
     "noJobHint": "Mulai penemuan dari langkah Lingkup terlebih dahulu.",
     "applyLocksHint": "Menerapkan akan menulis item yang ditemukan ke workspace ini.",
-    "browserRunnerWarning": "Impor ini berjalan di tab browser ini. Biarkan tab tetap terbuka hingga selesai. Menutup atau memuat ulang tab akan menjeda pemrosesan; membuka Hanji lagi akan melanjutkan dari progres yang tersimpan."
+    "browserRunnerWarning": "Impor ini berjalan di tab browser ini. Biarkan tab tetap terbuka hingga selesai. Menutup atau memuat ulang tab akan menjeda pemrosesan; membuka Hanji lagi akan melanjutkan dari progres yang tersimpan.",
+    "serverRunnerStatus": "Hanji sedang memproses impor ini di server. Menutup atau memuat ulang tab ini tidak akan menjedanya.",
+    "serverRunningHint": "Impor berlanjut di latar belakang. Anda dapat menutup tab ini."
   },
   "installer": {
     "elapsed": "Waktu berlalu",
@@ -281,9 +283,9 @@
     "title": "Impor dari Hanji",
     "fromFile": "Dari file",
     "fromLive": "Dari instance langsung",
-    "choose": "Pilih file .hanji.json",
+    "choose": "Pilih file .hanji.json atau .hanji.zip",
     "chooseButton": "Pilih file",
-    "fileHint": "Ekspor halaman, database, atau workspace dari Hanji lain, lalu impor di sini. Relasi, rollup, formula, view, dan template akan dipertahankan. Lampiran tidak disertakan.",
+    "fileHint": "Gunakan .hanji.json untuk struktur saja (file tidak termasuk), atau .hanji.zip untuk transfer tanpa kehilangan (file termasuk). Relasi, rollup, formula, tampilan, dan template dipertahankan.",
     "selected": "Dipilih: {{name}}",
     "importButton": "Impor",
     "importing": "Mengimpor...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "opsional",
     "fetch": "Ambil ekspor",
     "fetching": "Mengambil...",
-    "liveHint": "Ambil workspace langsung dari Hanji lain yang sedang berjalan (misalnya instance Docker dev). Remote harus mengizinkan permintaan dari alamat ini.",
+    "liveHint": "Tarik workspace langsung dari Hanji lain yang berjalan (misalnya instance Docker dev). File tidak termasuk. Remote harus mengizinkan permintaan dari alamat ini.",
     "review": "Siap diimpor: {{summary}}",
     "placeholderNote": "Beberapa lampiran dibiarkan sebagai placeholder.",
     "importedItems_one": "Mengimpor {{count}} item dari file Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "Tidak dapat membaca file Hanji.",
     "cantImport": "Tidak dapat mengimpor file Hanji.",
     "needFile": "Pilih file Hanji terlebih dahulu.",
-    "needRemote": "Masukkan URL Hanji remote dan ID workspace."
+    "needRemote": "Masukkan URL Hanji remote dan ID workspace.",
+    "filesExcluded": "File tidak termasuk.",
+    "filesIncluded": "File termasuk."
   },
   "connectWithNotion": "Hubungkan dengan Notion",
   "oauthConfiguredHint": "Server ini sudah memiliki integrasi Notion OAuth. Pengaturan token tetap tersedia untuk koneksi self-hosted.",
-  "cantStartOAuth": "Gagal memulai koneksi Notion."
+  "cantStartOAuth": "Gagal memulai koneksi Notion.",
+  "terminal": {
+    "cancelled": "Impor dibatalkan. Anda dapat memulainya lagi saat siap.",
+    "failed": "Impor berhenti dengan aman sebelum selesai. Periksa koneksi dan coba lagi. Detail teknis dan pengenal disembunyikan di sini."
+  }
 }

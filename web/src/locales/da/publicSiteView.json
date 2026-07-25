@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Brødkrummer",
+  "clearSearch": "Ryd søgning",
+  "errors": {
+    "not-found": "Dette site er muligvis blevet afpubliceret, eller adressen er blevet ændret.",
+    "offline": "Kontroller din forbindelse, og prøv at åbne siden igen.",
+    "rate-limited": "Dette site modtager for mange anmodninger. Vent et øjeblik og prøv igen.",
+    "unavailable": "Hanji kunne ikke åbne dette site lige nu. Prøv igen om et øjeblik."
+  },
+  "madeWithHanji": "Lavet med Hanji",
+  "navigation": "Sidenavigation",
+  "noResults": "Ingen sider fundet",
+  "outsideSite": "Siden er ikke en del af dette publicerede site.",
+  "search": "Søg på dette site",
+  "tryAgain": "Prøv igen",
+  "unavailable": "Dette site er ikke tilgængeligt."
+}

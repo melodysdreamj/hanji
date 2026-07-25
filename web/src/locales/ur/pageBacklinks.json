@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} بیک لنک",
-    "count_other": "{{count}} بیک لنکس"
+    "count_other": "{{count}} بیک لنکس",
+    "partial_one": "{{count}}+ بیک لنک",
+    "partial_other": "{{count}}+ بیک لنکس"
   },
   "header": {
     "title": "لنک شدہ ذکر"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ذکر",
     "mention_other": "{{count}} ذکر",
     "link_one": "{{count}} لنک",
-    "link_other": "{{count}} لنکس"
+    "link_other": "{{count}} لنکس",
+    "loaded": "لوڈ ہوا: {{summary}}"
   },
   "kind": {
     "mention": "ذکر",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} مزید بیک لنک",
-    "count_other": "{{count}} مزید بیک لنکس"
+    "count_other": "{{count}} مزید بیک لنکس",
+    "load": "مزید بیک لنکس لوڈ کریں",
+    "loading": "بیک لنکس لوڈ ہو رہے ہیں…",
+    "search": "بیک لنکس تلاش کریں"
   }
 }

@@ -247,7 +247,9 @@
     "runningHint": "A buɗe wannan shafin burauza yayin da ake shigo.",
     "noJobHint": "Fara ganowa daga matakin Scope da farko.",
     "applyLocksHint": "Aiwatarwa yana rubuta abubuwan da aka gano cikin wannan workspace.",
-    "browserRunnerWarning": "Wannan shigo yana gudana a wannan shafin burauza. A ci gaba da buɗe shafin har sai an gama. Rufe ko sake loda shafin yana dakatar da aiki; bude Hanji zai ci gaba daga inda aka ajiye."
+    "browserRunnerWarning": "Wannan shigo yana gudana a wannan shafin burauza. A ci gaba da buɗe shafin har sai an gama. Rufe ko sake loda shafin yana dakatar da aiki; bude Hanji zai ci gaba daga inda aka ajiye.",
+    "serverRunnerStatus": "Hanji tana sarrafa wannan shigo da kayan a uwar garken. Rufe ko sake loda wannan shafin ba zai dakatar da shi ba.",
+    "serverRunningHint": "Shigo da kayan yana ci gaba a bango. Kuna iya rufe wannan shafin."
   },
   "installer": {
     "elapsed": "Lokacin da ya wuce",
@@ -281,9 +283,9 @@
     "title": "Shigo daga Hanji",
     "fromFile": "Daga fayil",
     "fromLive": "Daga instance mai aiki",
-    "choose": "Zaɓi fayil ɗin .hanji.json",
+    "choose": "Zaɓi fayil ɗin .hanji.json ko .hanji.zip",
     "chooseButton": "Zaɓi fayil",
-    "fileHint": "Fitar da shafi, database, ko workspace daga wani Hanji, sannan ka shigo da shi nan. Relations, rollups, formulas, views, da templates ana kiyaye su. Ba a haɗa da attachments ba.",
+    "fileHint": "Yi amfani da .hanji.json don tsari kawai (an cire fayiloli), ko .hanji.zip don canja wuri marar asara (fayiloli a haɗe). Ana kiyaye alaƙa, naɗe-naɗe, lissafi, ra'ayoyi, da samfura.",
     "selected": "An zaɓi: {{name}}",
     "importButton": "Shigo da",
     "importing": "Ana shigo da...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "na zaɓi",
     "fetch": "Samo fitarwa",
     "fetching": "Ana ɗauka...",
-    "liveHint": "Cire workspace kai tsaye daga wani Hanji mai aiki (misali Docker dev instance). Dole ne remote ɗin ya ƙyale buƙatu daga wannan adireshin.",
+    "liveHint": "Ja sararin aiki kai tsaye daga wani Hanji mai aiki (misali misalin Docker dev). An cire fayiloli. Mai nesa dole ne ya ba da damar buƙatu daga wannan adireshin.",
     "review": "Shirye don shigo da: {{summary}}",
     "placeholderNote": "An bar wasu attachments a matsayin masu riƙe wuri.",
     "importedItems_one": "An shigo da abu {{count}} daga fayil ɗin Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "An kasa karanta fayil ɗin Hanji.",
     "cantImport": "An kasa shigo da fayil ɗin Hanji.",
     "needFile": "Zaɓi fayil ɗin Hanji tukuna.",
-    "needRemote": "Shigar da remote URL ɗin Hanji da workspace id."
+    "needRemote": "Shigar da remote URL ɗin Hanji da workspace id.",
+    "filesExcluded": "An cire fayiloli.",
+    "filesIncluded": "An haɗa fayiloli."
   },
   "cantStartOAuth": "An kasa fara haɗin Notion.",
   "connectWithNotion": "Haɗa da Notion",
-  "oauthConfiguredHint": "Wannan sabar tana da haɗin OAuth Notion da aka saita. Saitin token yana samuwa don haɗin kai masu ɗaukar nauyi."
+  "oauthConfiguredHint": "Wannan sabar tana da haɗin OAuth Notion da aka saita. Saitin token yana samuwa don haɗin kai masu ɗaukar nauyi.",
+  "terminal": {
+    "cancelled": "An soke shigo da kayan. Kuna iya sake farawa lafiya idan kun shirya.",
+    "failed": "Shigo da kayan ya tsaya lafiya kafin ya gama. Duba haɗin kuma sake gwadawa. Bayanan fasaha da alamomi sun ɓoye anan."
+  }
 }

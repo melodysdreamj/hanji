@@ -7,7 +7,7 @@
 // checks always re-read the workspace-block page_permissions row, so stale
 // index entries fail closed. Index rows reuse the permission id as their id.
 import { defineFunction } from '@edge-base/shared';
-import { bestEffort } from '../lib/table-utils';
+import { bestEffort, bestEffortIdempotentDelete } from '../lib/table-utils';
 
 interface PermissionRow {
   id: string;
@@ -90,6 +90,9 @@ export const onPagePermissionDelete = defineFunction({
     const ctx = context as TriggerContext;
     const before = ctx.data?.before;
     if (!before?.id) return;
-    await bestEffort('page_permission_index delete', indexTable(ctx).delete(before.id));
+    await bestEffortIdempotentDelete(
+      'page_permission_index delete',
+      indexTable(ctx).delete(before.id),
+    );
   },
 });

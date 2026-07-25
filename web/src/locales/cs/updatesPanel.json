@@ -26,11 +26,8 @@
   },
   "header": {
     "closeUpdates": "Zavřít aktualizace",
-    "inboxMode": "Režim doručené pošty",
     "markAllRead": "Označit vše jako přečtené",
     "markAllReadAria": "Označit všechny aktualizace jako přečtené",
-    "modeChats": "Konverzace",
-    "modeUpdates": "Aktualizace",
     "pageHistory": "Historie stránky",
     "recentUpdates_one": "{{count}} nedávná aktualizace",
     "recentUpdates_other": "{{count}} nedávných aktualizací",
@@ -46,7 +43,8 @@
     "referenceLink": "Odkaz na {{title}} · {{preview}}",
     "referenceMention": "Zmínka {{title}} · {{preview}}",
     "unreadDot": "Nepřečtené",
-    "workspaceUpdate": "Aktualizace pracovního prostoru"
+    "workspaceUpdate": "Aktualizace pracovního prostoru",
+    "bySelf": "Vy"
   },
   "time": {
     "justNow": "Právě teď",
@@ -74,6 +72,15 @@
     "versionCount_other": "{{count}} verzí",
     "versionsAgo": "Před {{count}} verzemi",
     "versionsAhead": "O {{count}} verzí napřed",
-    "versionsAria": "Verze"
+    "versionsAria": "Verze",
+    "emptyBlock": "Prázdný blok",
+    "emptyPreview": "Tato verze nemá obsah stránky.",
+    "previewAria": "Náhled verze stránky pouze pro čtení",
+    "previewingCurrent": "Prohlížení aktuální stránky",
+    "previewingSnapshot": "Prohlížení minulé verze",
+    "previewOnlyHint": "Výběr verze zobrazí pouze náhled. Aktuální stránka se změní až po obnovení.",
+    "restoreThisVersion": "Obnovit",
+    "restoring": "Obnovuje se...",
+    "versionHistory": "Historie verzí"
   }
 }

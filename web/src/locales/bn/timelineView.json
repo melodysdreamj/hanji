@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "নির্ভরতা:",
     "hint": "একটি সম্পর্ক বৈশিষ্ট্য যোগ করুন",
-    "relationPropertyAriaLabel": "নির্ভরতা সম্পর্ক বৈশিষ্ট্য"
+    "relationPropertyAriaLabel": "নির্ভরতা সম্পর্ক বৈশিষ্ট্য",
+    "makeDependOn": "{{title}}-কে {{predecessor}}-এর উপর নির্ভরশীল করুন",
+    "startFrom": "{{title}} থেকে নির্ভরতা শুরু করুন"
   },
   "toolbar": {
     "today": "আজ",

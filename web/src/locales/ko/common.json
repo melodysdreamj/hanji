@@ -8,7 +8,8 @@
     "delete": "삭제",
     "clearAll": "모두 지우기",
     "done": "완료",
-    "add": "추가"
+    "add": "추가",
+    "reportIssue": "문제 신고"
   },
   "labels": {
     "untitled": "제목 없음"

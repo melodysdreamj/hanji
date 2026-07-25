@@ -12,6 +12,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
 import { i18next } from "@/i18n";
 import type { Block, BlockType } from "@/lib/types";
 import { copyText } from "@/lib/clipboard";
@@ -30,14 +31,22 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
   CheckIcon,
   CommentIcon,
   Copy,
+  Download,
   DragHandleIcon,
+  FullscreenIcon,
   LinkIcon,
   MoveIcon,
+  OpenInNew,
   PaletteIcon,
+  Pencil,
   Plus,
+  TextIcon,
   Trash,
   TurnIntoIcon,
 } from "@/icons/hanji";
@@ -51,7 +60,15 @@ const BLOCK_MENU_MARGIN = 8;
 const EMPTY_BLOCKS: Block[] = [];
 
 type BlockMenuAnchor = { x: number; y: number; bottom?: number };
-type BlockMenuPanel = "main" | "turn" | "color";
+type BlockMenuPanel = "main" | "turn" | "color" | "align" | "imageLink" | "altText";
+
+export type BlockMenuActions = {
+  url: string;
+  download?: boolean;
+  fileName?: string;
+  replace?: () => void;
+  fullScreen?: () => void;
+};
 
 const TURN_INTO: BlockType[] = [
   "paragraph",
@@ -266,6 +283,7 @@ export function BlockHandle({
   onDragState,
   menuOpen,
   menuAnchor,
+  mediaActions,
   onMenuOpen,
   onMenuClose,
 }: {
@@ -275,6 +293,7 @@ export function BlockHandle({
   onDragState: (dragging: boolean) => void;
   menuOpen: boolean;
   menuAnchor: BlockMenuAnchor | null;
+  mediaActions?: BlockMenuActions;
   onMenuOpen: (anchor?: BlockMenuAnchor | null) => void;
   onMenuClose: () => void;
 }) {
@@ -284,10 +303,14 @@ export function BlockHandle({
   const [copiedBlock, setCopiedBlock] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [menuPanel, setMenuPanel] = useState<BlockMenuPanel>("main");
+  const [imageLinkDraft, setImageLinkDraft] = useState("");
+  const [altTextDraft, setAltTextDraft] = useState("");
+  const [imageLinkError, setImageLinkError] = useState(false);
   const [menuMeasuredHeight, setMenuMeasuredHeight] = useState<number | null>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const actionButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const panelInputRef = useRef<HTMLInputElement>(null);
   const mainMenuFocusRef = useRef<Exclude<BlockMenuPanel, "main"> | null>(null);
   const dragStartPointRef = useRef<{ x: number; y: number } | null>(null);
   const suppressNextClickRef = useRef(false);
@@ -295,14 +318,30 @@ export function BlockHandle({
   const notify = useStore((s) => s.notify);
   const updateBlock = useStore((s) => s.updateBlock);
   const undoBlockChange = useStore((s) => s.undoBlockChange);
-  const blocksOnPage = useStore((s) => s.blocksByPage[block.pageId] ?? EMPTY_BLOCKS);
+  const selectionCount =
+    ops.selectedBlockIds.has(block.id) && ops.selectedBlockIds.size > 1
+      ? ops.selectedBlockIds.size
+      : 1;
+  const selectedBlocksOnPage = useStore(
+    useShallow((s) =>
+      menuOpen && selectionCount > 1
+        ? (s.blocksByPage[block.pageId] ?? EMPTY_BLOCKS).filter((candidate) =>
+            ops.selectedBlockIds.has(candidate.id),
+          )
+        : EMPTY_BLOCKS,
+    ),
+  );
   const { t } = useTranslation(["blockHandle", "common"]);
 
   function menuItems() {
     return Array.from(
-      menuRef.current?.querySelectorAll<HTMLButtonElement>("[data-block-menu-item]") ??
+      menuRef.current?.querySelectorAll<HTMLElement>("[data-block-menu-item]") ??
         [],
-    ).filter((item) => !item.disabled && item.getClientRects().length > 0);
+    ).filter(
+      (item) =>
+        (!(item instanceof HTMLButtonElement || item instanceof HTMLInputElement) || !item.disabled) &&
+        item.getClientRects().length > 0
+    );
   }
 
   const closeAddMenu = useCallback((restoreFocus = false) => {
@@ -321,7 +360,7 @@ export function BlockHandle({
     }
   }, [onMenuClose]);
 
-  const focusMenuItem = useCallback((item?: HTMLButtonElement | null) => {
+  const focusMenuItem = useCallback((item?: HTMLElement | null) => {
     if (!item) return;
     item.focus({ preventScroll: true });
     const menu = menuRef.current;
@@ -342,6 +381,10 @@ export function BlockHandle({
       // In the turn/color submenus, focus the currently-active item (aria-checked)
       // and bring it into view instead of the "← back" button at the top.
       if (menuPanel !== "main") {
+        if (menuPanel === "imageLink" || menuPanel === "altText") {
+          focusMenuItem(panelInputRef.current);
+          return;
+        }
         const active = items.find(
           (item) => item.getAttribute("aria-checked") === "true"
         );
@@ -353,7 +396,7 @@ export function BlockHandle({
       const mainFocusPanel = mainMenuFocusRef.current;
       mainMenuFocusRef.current = null;
       const mainFocusTarget = mainFocusPanel
-        ? menuRef.current?.querySelector<HTMLButtonElement>(`[data-submenu="${mainFocusPanel}"]`)
+        ? menuRef.current?.querySelector<HTMLElement>(`[data-submenu="${mainFocusPanel}"]`)
         : null;
       focusMenuItem(mainFocusTarget ?? items[0]);
     });
@@ -388,6 +431,12 @@ export function BlockHandle({
   }, [menuOpen, menuPanel]);
 
   function openMenuPanel(panel: Exclude<BlockMenuPanel, "main">) {
+    if (panel === "imageLink") {
+      setImageLinkDraft(block.content?.imageLink ?? "");
+      setImageLinkError(false);
+    } else if (panel === "altText") {
+      setAltTextDraft(block.content?.altText ?? "");
+    }
     setMenuPanel(panel);
   }
 
@@ -419,7 +468,8 @@ export function BlockHandle({
       focusMenuItem(items[nextIndex]);
       return;
     }
-    if (e.key === "ArrowLeft" && menuPanel !== "main") {
+    const targetIsInput = e.target instanceof HTMLInputElement;
+    if (e.key === "ArrowLeft" && menuPanel !== "main" && !targetIsInput) {
       e.preventDefault();
       e.stopPropagation();
       returnToMainMenu(menuPanel);
@@ -428,13 +478,20 @@ export function BlockHandle({
     if (e.key === "ArrowRight" && menuPanel === "main") {
       const target = document.activeElement as HTMLElement | null;
       const panel = target?.dataset.submenu;
-      if (panel === "turn" || panel === "color") {
+      if (
+        panel === "turn" ||
+        panel === "color" ||
+        panel === "align" ||
+        panel === "imageLink" ||
+        panel === "altText"
+      ) {
         e.preventDefault();
         e.stopPropagation();
         openMenuPanel(panel);
       }
       return;
     }
+    if (targetIsInput) return;
     if (!["ArrowDown", "ArrowUp", "Home", "End", "PageDown", "PageUp"].includes(e.key)) {
       return;
     }
@@ -465,6 +522,67 @@ export function BlockHandle({
   function openActionMenu(anchor: BlockMenuAnchor | null = null) {
     setMenuPanel("main");
     onMenuOpen(anchor);
+  }
+
+  function runMediaAction(action?: () => void) {
+    action?.();
+    closeActionMenu(false);
+  }
+
+  function openMediaUrl() {
+    if (!mediaActions?.url) return;
+    const anchor = document.createElement("a");
+    anchor.href = mediaActions.url;
+    anchor.target = "_blank";
+    anchor.rel = "noreferrer noopener";
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    closeActionMenu(false);
+  }
+
+  function downloadMedia() {
+    if (!mediaActions?.url) return;
+    const anchor = document.createElement("a");
+    anchor.href = mediaActions.url;
+    anchor.download = mediaActions.fileName || "download";
+    anchor.rel = "noreferrer";
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    closeActionMenu(false);
+  }
+
+  async function copyMediaSourceLink() {
+    if (!mediaActions?.url) return;
+    const ok = await copyText(mediaActions.url);
+    notify(
+      ok
+        ? t("blockHandle:notifications.copiedToClipboard")
+        : t("blockHandle:notifications.couldNotCopyLink"),
+      ok ? "success" : "default"
+    );
+    closeActionMenu(false);
+  }
+
+  function saveImageLink() {
+    const value = imageLinkDraft.trim();
+    if (value && !/^https?:\/\//i.test(value)) {
+      setImageLinkError(true);
+      return;
+    }
+    updateBlock(block.id, {
+      content: { ...block.content, imageLink: value || undefined },
+    });
+    closeActionMenu(false);
+  }
+
+  function saveAltText() {
+    const value = altTextDraft.trim();
+    updateBlock(block.id, {
+      content: { ...block.content, altText: value || undefined },
+    });
+    closeActionMenu(false);
   }
 
   async function duplicate() {
@@ -555,6 +673,7 @@ export function BlockHandle({
     const selectedIds = ops.selectedBlockIds.has(block.id)
       ? ops.selectedBlockIds
       : new Set([block.id]);
+    const blocksOnPage = useStore.getState().blocksByPage[block.pageId] ?? EMPTY_BLOCKS;
     const blockById = new Map(blocksOnPage.map((candidate) => [candidate.id, candidate]));
     const hasSelectedAncestor = (candidate: Block) => {
       let parentId = candidate.parentId ?? null;
@@ -657,13 +776,9 @@ export function BlockHandle({
     ops.insertAfter(block.id, type);
   }
 
-  const selectionCount =
-    ops.selectedBlockIds.has(block.id) && ops.selectedBlockIds.size > 1
-      ? ops.selectedBlockIds.size
-      : 1;
   const selectedBlocks =
     selectionCount > 1
-      ? blocksOnPage.filter((candidate) => ops.selectedBlockIds.has(candidate.id))
+      ? selectedBlocksOnPage
       : [block];
   const selectedCaptionBlocks = selectedBlocks.filter((candidate) => CAPTION_BLOCK_TYPES.has(candidate.type));
   const captionActionAvailable = selectedCaptionBlocks.length > 0;
@@ -674,6 +789,15 @@ export function BlockHandle({
         candidate.content?.showCaption !== true &&
         spansToPlainText(candidate.content?.caption).length === 0
     );
+  const singleMediaActions = selectionCount === 1 ? mediaActions : undefined;
+  const hasSpecificMediaActions = !!singleMediaActions && [
+    "image",
+    "video",
+    "audio",
+    "bookmark",
+    "embed",
+    "file",
+  ].includes(block.type);
   const selectedTypes = new Set(selectedBlocks.map((candidate) => candidate.type));
   const selectedColors = new Set(
     selectedBlocks.map((candidate) => candidate.content?.color ?? "default")
@@ -744,7 +868,9 @@ export function BlockHandle({
     const isMobileMenu = window.innerWidth <= 430;
     const estimatedHeight =
       menuPanel === "main"
-        ? BLOCK_MENU_MAIN_HEIGHT
+        ? hasSpecificMediaActions
+          ? BLOCK_MENU_TALL_HEIGHT
+          : BLOCK_MENU_MAIN_HEIGHT
         : isMobileMenu
           ? BLOCK_MENU_MOBILE_TALL_HEIGHT
           : BLOCK_MENU_TALL_HEIGHT;
@@ -916,6 +1042,139 @@ export function BlockHandle({
                   <span className={styles.menuHint}>{activeBlockLabel} ›</span>
                 </button>
                 <div className={styles.menuDivider} />
+                {hasSpecificMediaActions && (
+                  <>
+                    {singleMediaActions?.download && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        data-block-menu-item
+                        role="menuitem"
+                        onClick={downloadMedia}
+                      >
+                        <Download size={16} aria-hidden="true" />
+                        <span>{t("blockHandle:media.download")}</span>
+                      </button>
+                    )}
+                    {block.type !== "bookmark" && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        data-block-menu-item
+                        role="menuitem"
+                        onClick={openMediaUrl}
+                      >
+                        <OpenInNew size={16} aria-hidden="true" />
+                        <span>{t("blockHandle:media.viewOriginal")}</span>
+                      </button>
+                    )}
+                    {block.type === "bookmark" && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        data-block-menu-item
+                        role="menuitem"
+                        onClick={openMediaUrl}
+                      >
+                        <OpenInNew size={16} aria-hidden="true" />
+                        <span>{t("blockHandle:media.openLink")}</span>
+                      </button>
+                    )}
+                    {(block.type === "bookmark" || block.type === "embed") && (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          data-block-menu-item
+                          role="menuitem"
+                          onClick={() => void copyMediaSourceLink()}
+                        >
+                          <LinkIcon size={16} aria-hidden="true" />
+                          <span>{t("blockHandle:media.copySourceLink")}</span>
+                        </button>
+                      </>
+                    )}
+                    {block.type === "image" && singleMediaActions?.fullScreen && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        data-block-menu-item
+                        role="menuitem"
+                        onClick={() => runMediaAction(singleMediaActions.fullScreen)}
+                      >
+                        <FullscreenIcon size={16} aria-hidden="true" />
+                        <span>{t("blockHandle:media.fullScreen")}</span>
+                      </button>
+                    )}
+                    {block.type === "image" && (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          data-block-menu-item
+                          data-submenu="align"
+                          role="menuitem"
+                          aria-haspopup="menu"
+                          aria-label={t("blockHandle:media.align")}
+                          onClick={() => openMenuPanel("align")}
+                        >
+                          <AlignCenterIcon size={16} aria-hidden="true" />
+                          <span>{t("blockHandle:media.align")}</span>
+                          <span className={styles.menuHint}>
+                            {t(`blockHandle:align.${block.content?.align ?? "left"}`)} ›
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          data-block-menu-item
+                          data-submenu="imageLink"
+                          role="menuitem"
+                          aria-haspopup="menu"
+                          aria-label={block.content?.imageLink
+                            ? t("blockHandle:media.editImageLink")
+                            : t("blockHandle:media.addImageLink")}
+                          onClick={() => openMenuPanel("imageLink")}
+                        >
+                          <LinkIcon size={16} aria-hidden="true" />
+                          <span>
+                            {block.content?.imageLink
+                              ? t("blockHandle:media.editImageLink")
+                              : t("blockHandle:media.addImageLink")}
+                          </span>
+                          <span className={styles.menuHint}>›</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          data-block-menu-item
+                          data-submenu="altText"
+                          role="menuitem"
+                          aria-haspopup="menu"
+                          aria-label={t("blockHandle:media.altText")}
+                          onClick={() => openMenuPanel("altText")}
+                        >
+                          <TextIcon size={16} aria-hidden="true" />
+                          <span>{t("blockHandle:media.altText")}</span>
+                          <span className={styles.menuHint}>›</span>
+                        </button>
+                      </>
+                    )}
+                    {singleMediaActions?.replace && (
+                      <button
+                        type="button"
+                        className={styles.menuItem}
+                        data-block-menu-item
+                        role="menuitem"
+                        onClick={() => runMediaAction(singleMediaActions.replace)}
+                      >
+                        <Pencil size={16} aria-hidden="true" />
+                        <span>{t("blockHandle:media.replace")}</span>
+                      </button>
+                    )}
+                    <div className={styles.menuDivider} />
+                  </>
+                )}
                 <button type="button" className={styles.menuItem} data-block-menu-item role="menuitem" onClick={copyBlock}>
                   <Copy size={16} aria-hidden="true" />
                   <span>
@@ -1109,6 +1368,160 @@ export function BlockHandle({
                   })}
                 </div>
               </>
+            )}
+            {menuPanel === "align" && (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.menuItem} ${styles.submenuBack}`}
+                  data-block-menu-item
+                  role="menuitem"
+                  onClick={() => returnToMainMenu("align")}
+                >
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>{t("blockHandle:media.align")}</span>
+                </button>
+                <div className={styles.menuCaption}>{t("blockHandle:align.choose")}</div>
+                {(["left", "center", "right"] as const).map((align) => {
+                  const Icon = align === "left"
+                    ? AlignLeftIcon
+                    : align === "center"
+                      ? AlignCenterIcon
+                      : AlignRightIcon;
+                  return (
+                    <button
+                      type="button"
+                      key={align}
+                      className={styles.menuItem}
+                      data-block-menu-item
+                      role="menuitemradio"
+                      aria-checked={(block.content?.align ?? "left") === align}
+                      onClick={() => {
+                        updateBlock(block.id, { content: { ...block.content, align } });
+                        closeActionMenu(false);
+                      }}
+                    >
+                      <Icon size={16} aria-hidden="true" />
+                      <span>{t(`blockHandle:align.${align}`)}</span>
+                      {(block.content?.align ?? "left") === align && (
+                        <CheckIcon className={styles.colorCheck} size={14} aria-hidden="true" />
+                      )}
+                    </button>
+                  );
+                })}
+              </>
+            )}
+            {menuPanel === "imageLink" && (
+              <form
+                className={styles.blockMenuForm}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  saveImageLink();
+                }}
+              >
+                <button
+                  type="button"
+                  className={`${styles.menuItem} ${styles.submenuBack}`}
+                  data-block-menu-item
+                  role="menuitem"
+                  onClick={() => returnToMainMenu("imageLink")}
+                >
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>{t("blockHandle:imageLink.title")}</span>
+                </button>
+                <label className={styles.blockMenuField}>
+                  <span>{t("blockHandle:imageLink.label")}</span>
+                  <input
+                    ref={panelInputRef}
+                    type="url"
+                    data-block-menu-item
+                    value={imageLinkDraft}
+                    aria-invalid={imageLinkError}
+                    placeholder="https://..."
+                    onChange={(event) => {
+                      setImageLinkDraft(event.target.value);
+                      if (imageLinkError) setImageLinkError(false);
+                    }}
+                  />
+                </label>
+                {imageLinkError && (
+                  <div className={styles.blockMenuFieldError} role="alert">
+                    {t("blockHandle:imageLink.invalid")}
+                  </div>
+                )}
+                <div className={styles.blockMenuFormActions}>
+                  {block.content?.imageLink && (
+                    <button
+                      type="button"
+                      data-block-menu-item
+                      onClick={() => {
+                        setImageLinkDraft("");
+                        updateBlock(block.id, {
+                          content: { ...block.content, imageLink: undefined },
+                        });
+                        closeActionMenu(false);
+                      }}
+                    >
+                      {t("blockHandle:imageLink.remove")}
+                    </button>
+                  )}
+                  <button type="submit" data-block-menu-item>
+                    {t("blockHandle:imageLink.save")}
+                  </button>
+                </div>
+              </form>
+            )}
+            {menuPanel === "altText" && (
+              <form
+                className={styles.blockMenuForm}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  saveAltText();
+                }}
+              >
+                <button
+                  type="button"
+                  className={`${styles.menuItem} ${styles.submenuBack}`}
+                  data-block-menu-item
+                  role="menuitem"
+                  onClick={() => returnToMainMenu("altText")}
+                >
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  <span>{t("blockHandle:altText.title")}</span>
+                </button>
+                <label className={styles.blockMenuField}>
+                  <span>{t("blockHandle:altText.label")}</span>
+                  <input
+                    ref={panelInputRef}
+                    type="text"
+                    data-block-menu-item
+                    value={altTextDraft}
+                    placeholder={t("blockHandle:altText.placeholder")}
+                    onChange={(event) => setAltTextDraft(event.target.value)}
+                  />
+                </label>
+                <div className={styles.blockMenuFieldHelp}>{t("blockHandle:altText.help")}</div>
+                <div className={styles.blockMenuFormActions}>
+                  {block.content?.altText && (
+                    <button
+                      type="button"
+                      data-block-menu-item
+                      onClick={() => {
+                        setAltTextDraft("");
+                        updateBlock(block.id, {
+                          content: { ...block.content, altText: undefined },
+                        });
+                        closeActionMenu(false);
+                      }}
+                    >
+                      {t("blockHandle:altText.remove")}
+                    </button>
+                  )}
+                  <button type="submit" data-block-menu-item>
+                    {t("blockHandle:altText.save")}
+                  </button>
+                </div>
+              </form>
             )}
             {menuPanel === "color" && (
               <>

@@ -51,7 +51,14 @@
     "range": "Intervall",
     "earliest_date": "Tidigaste datum",
     "latest_date": "Senaste datum",
-    "date_range": "Datumintervall"
+    "date_range": "Datumintervall",
+    "count": "Räkna alla",
+    "count_per_group": "Antal per grupp",
+    "empty": "Antal tomma",
+    "not_empty": "Antal icke tomma",
+    "percent_per_group": "Andel per grupp",
+    "show_unique": "Visa unika värden",
+    "unique": "Antal unika värden"
   },
   "undo": "Ångra",
   "untitled": "Namnlös",

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Legg til kommentar",
+    "addLink": "Legg til lenke",
+    "blockColor": "Bruk sist brukte farge",
+    "bold": "Fet",
+    "copyPageLink": "Kopier sidelenke",
+    "findInPage": "Finn på denne siden",
+    "inlineCode": "Innlinekode",
+    "italic": "Kursiv",
+    "moveBlock": "Flytt blokk til annen side",
+    "moveBlockDown": "Flytt blokk ned",
+    "moveBlockUp": "Flytt blokk opp",
+    "movePage": "Flytt gjeldende side",
+    "navigateBack": "Gå tilbake",
+    "navigateForward": "Gå fremover",
+    "newPage": "Ny side",
+    "openBlockMenu": "Åpne blokkhandlinger",
+    "openKeyboardShortcuts": "Åpne hurtigtaster",
+    "openParentPage": "Åpne overordnet side",
+    "quickFind": "Hurtigsøk",
+    "strikethrough": "Gjennomstreking",
+    "toggleAllToggles": "Utvid eller skjul alle toggles",
+    "toggleSidebar": "Veksle sidefelt",
+    "toggleTheme": "Veksle mørk modus",
+    "underline": "Understrek"
+  },
+  "categories": {
+    "createStyle": "Opprett & stil",
+    "editMove": "Rediger & flytt",
+    "popular": "Populære"
+  },
+  "categoriesLabel": "Hurtigtastkategorier",
+  "close": "Lukk",
+  "closeBackdrop": "Lukk hurtigtaster",
+  "empty": "Ingen hurtigtaster funnet",
+  "keysFor": "Taster for {{action}}",
+  "or": "eller",
+  "searchLabel": "Søk tastatursnarveier",
+  "searchPlaceholder": "Søk snarveier…",
+  "searchResults": "Søkeresultater",
+  "searchTerms": {
+    "toggleTheme": "tema lys mørk utseende"
+  },
+  "title": "Tastatursnarveier"
+}

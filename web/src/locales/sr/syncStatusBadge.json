@@ -6,5 +6,6 @@
   "unreachable": "Не могу да се повежем са сервером",
   "unreachablePending_one": "Не могу да се повежем са сервером · {{count}} промена на чекању",
   "unreachablePending_other": "Не могу да се повежем са сервером · {{count}} промена на чекању",
-  "retryHint": "Kliknite da ponovo pokušate"
+  "retryHint": "Kliknite da ponovo pokušate",
+  "confirmed": "Sačuvano na serveru"
 }

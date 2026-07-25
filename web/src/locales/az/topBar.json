@@ -38,7 +38,7 @@
   "moveTo": "Köçür",
   "exporting": "İxrac edilir…",
   "exportAsMarkdown": "Markdown kimi ixrac et",
-  "exportAsHanji": "Hanji faylı kimi ixrac et",
+  "exportAsHanji": "Hanji JSON ixrac et (fayllar xaric)",
   "importing": "İdxal edilir…",
   "importMarkdown": "Markdown idxal et",
   "unlockPage": "Səhifə kilidini aç",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Giriş yenilənə bilmədi",
     "removedFromAccessList": "Giriş siyahısından çıxarıldı",
     "couldntRemoveAccess": "Giriş silinə bilmədi",
-    "couldntLoadAccessList": "Giriş siyahısı yüklənə bilmədi"
+    "couldntLoadAccessList": "Giriş siyahısı yüklənə bilmədi",
+    "couldntExportHanjiArchive": "Hanji arxivini ixrac etmək mümkün olmadı.",
+    "exportedHanjiArchive": "Hanji arxivi fayllarla ixrac edildi."
   },
   "user": "İstifadəçi",
   "whoHasAccess": "Kimin girişi var",
   "workspace": "İş sahəsi",
   "workspaceCount_one": "{{count}} iş sahəsi",
   "workspaceCount_other": "{{count}} iş sahəsi",
-  "you": "Sən"
+  "you": "Sən",
+  "exportAsHanjiArchive": "Hanji arxivi ixrac et (fayllarla)",
+  "turnIntoWiki": "Vikiyə çevir",
+  "undoWiki": "Vikini geri al",
+  "wikiCreated": "Səhifə vikiyə çevrildi",
+  "wikiPageSettings": "Viki səhifəsi ayarları",
+  "wikiUndone": "Viki silindi; səhifə məzmunu qorundu",
+  "wikiUpdateFailed": "Viki yenilənə bilmədi"
 }

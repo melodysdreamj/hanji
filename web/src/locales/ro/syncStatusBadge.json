@@ -6,5 +6,6 @@
   "unreachable": "Serverul nu este accesibil",
   "unreachablePending_one": "Serverul nu este accesibil · {{count}} modificare în așteptare",
   "unreachablePending_other": "Serverul nu este accesibil · {{count}} modificări în așteptare",
-  "retryHint": "Click pentru a reîncerca acum"
+  "retryHint": "Click pentru a reîncerca acum",
+  "confirmed": "Salvat pe server"
 }

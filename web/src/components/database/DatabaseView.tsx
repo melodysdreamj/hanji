@@ -4,6 +4,7 @@ import {
   type CSSProperties,
   type DragEvent as ReactDragEvent,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
   useCallback,
@@ -15,7 +16,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "@/lib/router";
+import { useRouter, useSearchParams } from "@/lib/router";
 import { useShallow } from "zustand/react/shallow";
 import { useTranslation } from "react-i18next";
 import { isComposingKeyEvent } from "@/lib/keyboard";
@@ -36,7 +37,12 @@ import {
   type TextSpan,
   type ViewType,
 } from "@/lib/types";
-import { databaseRowsQueryKey, useStore, type DatabaseRowsQuery } from "@/lib/store";
+import {
+  databaseRowsQueryKey,
+  useStore,
+  type DatabaseRowPageState,
+  type DatabaseRowsQuery,
+} from "@/lib/store";
 import {
   LOCAL_DATABASE_MUTATION_EVENT,
   PAGE_ROOM_MUTATION_RECEIVED_EVENT,
@@ -86,6 +92,8 @@ import { ListView } from "./ListView";
 import { GalleryView } from "./GalleryView";
 import { CalendarView } from "./CalendarView";
 import { TimelineView } from "./TimelineView";
+import { FormView } from "./FormView";
+import { createDefaultFormViewConfig } from "@/lib/formView";
 import {
   appendScopedViewId,
   cloneInlineScopedViewConfig,
@@ -111,6 +119,7 @@ import {
 } from "./databaseViewShared";
 import {
   applyView,
+  databaseViewSubitemParentScope,
   tableInitialLoadLimit,
 } from "./query";
 import styles from "./database.module.css";
@@ -128,6 +137,11 @@ const INLINE_SCOPED_VIEW_TYPES: ViewType[] = [
 ];
 const INLINE_DATABASE_COMMAND_EVENT = "hanji:inline-database-command";
 const VIEW_TAB_DRAG = "application/x-hanji-db-view";
+const BOUNDED_CARD_VIEW_ROW_LIMIT = 50;
+
+function isBoundedCardView(view: DbView | undefined): view is DbView {
+  return view?.type === "board" || view?.type === "list" || view?.type === "gallery";
+}
 
 function isRenderableDatabaseView(view: DbView) {
   return RENDERABLE_IMPORTED_VIEW_TYPE_SET.has(view.type);
@@ -389,6 +403,113 @@ function rowPeekUrlOwnership(
   return "foreign";
 }
 
+function BoundedCardView({
+  db,
+  view,
+  rows,
+  rowPage,
+  rowQuery,
+  readOnly,
+  search,
+  contextPageId,
+  loadMoreDatabaseRows,
+  onEditRowProperties,
+  onOpenRow,
+  onOpenRowIn,
+}: {
+  db: Page;
+  view: DbView;
+  rows: Page[];
+  rowPage?: DatabaseRowPageState;
+  rowQuery: DatabaseRowsQuery;
+  readOnly: boolean;
+  search: string;
+  contextPageId?: string;
+  loadMoreDatabaseRows: (dbId: string, query?: DatabaseRowsQuery) => Promise<void>;
+  onEditRowProperties: (pageId: string) => void;
+  onOpenRow: (pageId: string) => void;
+  onOpenRowIn: (pageId: string, mode: "side" | "center" | "full") => void;
+}) {
+  const [visibleRowLimit, setVisibleRowLimit] = useState(BOUNDED_CARD_VIEW_ROW_LIMIT);
+  const renderedRows = rows.slice(0, visibleRowLimit);
+  const hasHiddenLocalRows = renderedRows.length < rows.length;
+  const hasRemoteMoreRows = rowPage?.hasMore === true;
+
+  function loadMoreRows() {
+    if (hasHiddenLocalRows) {
+      setVisibleRowLimit((current) =>
+        Math.min(rows.length, current + BOUNDED_CARD_VIEW_ROW_LIMIT)
+      );
+      return;
+    }
+    if (!hasRemoteMoreRows || rowPage?.loadingMore) return;
+    setVisibleRowLimit((current) => current + BOUNDED_CARD_VIEW_ROW_LIMIT);
+    void loadMoreDatabaseRows(db.id, rowQuery);
+  }
+
+  return (
+    <>
+      {view.type === "board" && (
+        <BoardView
+          db={db}
+          view={view}
+          rows={renderedRows}
+          rowsViewApplied
+          readOnly={readOnly}
+          search={search}
+          contextPageId={contextPageId}
+          onOpenRow={onOpenRow}
+          onEditRowProperties={onEditRowProperties}
+          onOpenRowIn={onOpenRowIn}
+        />
+      )}
+      {view.type === "list" && (
+        <ListView
+          db={db}
+          view={view}
+          rows={renderedRows}
+          rowsViewApplied
+          rowQuery={rowQuery}
+          readOnly={readOnly}
+          search={search}
+          contextPageId={contextPageId}
+          onOpenRow={onOpenRow}
+          onEditRowProperties={onEditRowProperties}
+          onOpenRowIn={onOpenRowIn}
+        />
+      )}
+      {view.type === "gallery" && (
+        <GalleryView
+          db={db}
+          view={view}
+          rows={renderedRows}
+          rowsViewApplied
+          readOnly={readOnly}
+          search={search}
+          contextPageId={contextPageId}
+          onOpenRow={onOpenRow}
+          onEditRowProperties={onEditRowProperties}
+          onOpenRowIn={onOpenRowIn}
+        />
+      )}
+      {(hasHiddenLocalRows || hasRemoteMoreRows) && (
+        <button
+          type="button"
+          className={styles.viewLoadMore}
+          data-view-load-more
+          disabled={rowPage?.loadingMore}
+          onClick={loadMoreRows}
+        >
+          <ArrowDown size={14} aria-hidden="true" />
+          {rowPage?.loadingMore
+            ? databaseViewLabels().loadingMore
+            : databaseViewLabels().loadMore}
+        </button>
+      )}
+    </>
+  );
+}
+
 export function DatabaseView({
   db,
   skipRemoteLoad = false,
@@ -431,6 +552,8 @@ export function DatabaseView({
 }) {
   useTranslation(["databaseView", "common"]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const routedViewId = searchParams.get("v");
   const reactSelectionSlotId = useId();
   const tableSelectionChromeSlotId = `table-selection-chrome-${reactSelectionSlotId.replace(/:/g, "")}`;
   const loadDatabase = useStore((s) => s.loadDatabase);
@@ -502,6 +625,7 @@ export function DatabaseView({
   const viewActionMenuRef = useRef<HTMLDivElement>(null);
   const viewOverflowMenuRef = useRef<HTMLDivElement>(null);
   const viewActionReturnRef = useRef<HTMLElement | null>(null);
+  const activeRowsRequestControllerRef = useRef<AbortController | null>(null);
 
   function focusViewTab(viewId: string) {
     viewTabsRef.current
@@ -723,6 +847,10 @@ export function DatabaseView({
     window.addEventListener("popstate", syncViewFromUrl);
     return () => window.removeEventListener("popstate", syncViewFromUrl);
   }, [containingRowPageId, db.id, pagesById, storeRows, syncRowUrl, syncUrl]);
+
+  useEffect(() => {
+    if (syncUrl) setActiveId(routedViewId);
+  }, [routedViewId, syncUrl]);
 
   useEffect(() => {
     if (!addOpen) return;
@@ -997,17 +1125,28 @@ export function DatabaseView({
   const activeViewId = active?.id;
   const activeInitialLoadLimit =
     active?.type === "table" ? tableInitialLoadLimit(active) : undefined;
+  const activeSubitemParentScope = databaseViewSubitemParentScope(db, active);
   const activeRowsQuery = useMemo<DatabaseRowsQuery | undefined>(
     () =>
-      activeViewId
+      activeViewId && active?.type !== "form"
         ? {
             viewId: activeViewId,
             search: activeSearch,
             currentPageId: contextPageId,
             limit: activeInitialLoadLimit,
+            ...(activeSubitemParentScope !== undefined
+              ? { subitemParentId: activeSubitemParentScope }
+              : {}),
           }
         : undefined,
-    [activeViewId, activeInitialLoadLimit, activeSearch, contextPageId]
+    [
+      active?.type,
+      activeViewId,
+      activeInitialLoadLimit,
+      activeSearch,
+      activeSubitemParentScope,
+      contextPageId,
+    ]
   );
   const activeRowsViewSignature = active
     ? JSON.stringify({
@@ -1017,19 +1156,55 @@ export function DatabaseView({
     : "";
   const activeRowsQueryKey = activeRowsQuery ? databaseRowsQueryKey(activeRowsQuery) : "";
   const activeRowPage = rowPage?.queryKey === activeRowsQueryKey ? rowPage : undefined;
-  const rowsReady = skipRemoteLoad || !active || rowPage?.queryKey === activeRowsQueryKey;
-  const rows = useMemo(() => (rowsReady ? storeRows : []), [rowsReady, storeRows]);
-  const rowsLoading = !skipRemoteLoad && !!active && (!activeRowPage || activeRowPage.loading === true);
-  const visibleRowIds = useMemo(
+  // A query-key transition means the next server page is still loading; it
+  // does not invalidate rows we already have. Keep rendering that stale-while-
+  // revalidating set through view-local filtering until the matching response
+  // replaces it. Clearing the render here made slow/self-hosted boots flash an
+  // empty database whenever metadata hydration and the network query briefly
+  // disagreed about the active query key.
+  const rows = storeRows;
+  const rowsLoading = !skipRemoteLoad
+    && !!active
+    && active.type !== "form"
+    && (!activeRowPage || activeRowPage.loading === true);
+  const visibleRows = useMemo(
     () =>
-      active
+      active && active.type !== "form"
         ? applyView(rows, props, active, pagesById, {
             search: activeSearch,
             currentPageId: contextPageId,
-          }).map((row) => row.id)
+          })
         : [],
     [active, activeSearch, contextPageId, pagesById, props, rows]
   );
+  const visibleRowIds = useMemo(() => visibleRows.map((row) => row.id), [visibleRows]);
+
+  useEffect(() => {
+    if (skipRemoteLoad || !activeRowsQuery) {
+      activeRowsRequestControllerRef.current = null;
+      return;
+    }
+    const controller = new AbortController();
+    activeRowsRequestControllerRef.current = controller;
+    return () => {
+      if (!controller.signal.aborted) {
+        controller.abort(new DOMException(
+          "The database row query was superseded.",
+          "AbortError",
+        ));
+      }
+      if (activeRowsRequestControllerRef.current === controller) {
+        activeRowsRequestControllerRef.current = null;
+      }
+    };
+  }, [
+    activeRowsQuery,
+    activeRowsQueryKey,
+    activeRowsQuery?.limit,
+    activeRowsViewSignature,
+    db.id,
+    skipRemoteLoad,
+  ]);
 
   const roomPageId = contextPageId || db.id;
 
@@ -1071,6 +1246,7 @@ export function DatabaseView({
       }
 
       if (detail.kind === "database_rows_changed") {
+        if (active?.type === "form") return;
         if (activeRowsQuery) {
           void loadDatabaseRows(db.id, { ...activeRowsQuery, force: true, reset: true });
         } else {
@@ -1094,6 +1270,7 @@ export function DatabaseView({
     window.addEventListener(PAGE_ROOM_MUTATION_RECEIVED_EVENT, onRoomMutation);
     return () => window.removeEventListener(PAGE_ROOM_MUTATION_RECEIVED_EVENT, onRoomMutation);
   }, [
+    active?.type,
     activeRowsQuery,
     db.id,
     loadDatabase,
@@ -1106,7 +1283,9 @@ export function DatabaseView({
   useEffect(() => {
     if (skipRemoteLoad || !metadataLoaded || !activeRowsQuery) return;
     const timer = window.setTimeout(() => {
-      void loadDatabaseRows(db.id, { ...activeRowsQuery, reset: true });
+      const signal = activeRowsRequestControllerRef.current?.signal;
+      if (!signal || signal.aborted) return;
+      void loadDatabaseRows(db.id, { ...activeRowsQuery, reset: true, signal });
     }, 100);
     return () => window.clearTimeout(timer);
   }, [
@@ -1409,9 +1588,15 @@ export function DatabaseView({
     const currentIndex = active ? views.findIndex((view) => view.id === active.id) : -1;
     const nextView = currentIndex >= 0 ? views[currentIndex + 1] : undefined;
     const next = await addView(db.id, type, newViewName.trim() || typeLabel, {
-      config: scopedViewOwnerId
-        ? cloneInlineScopedViewConfig(active?.config, scopedViewOwnerId, active?.id)
-        : undefined,
+      config: type === "form"
+        ? {
+            type: "form",
+            hanjiForm: createDefaultFormViewConfig(props, { title: db.title }),
+            hanjiFormAudience: "none",
+          }
+        : scopedViewOwnerId
+          ? cloneInlineScopedViewConfig(active?.config, scopedViewOwnerId, active?.id)
+          : undefined,
       position: active ? positionBetween(active.position, nextView?.position) : undefined,
     });
     if (!next) {
@@ -1844,7 +2029,7 @@ export function DatabaseView({
           data-table-selection-chrome-slot
           aria-live="polite"
         />
-        {active && (
+        {active && active.type !== "form" && (
           <DatabaseToolbar
             key={active.id}
             dbId={db.id}
@@ -1871,7 +2056,8 @@ export function DatabaseView({
           <TableView
             db={db}
             view={active}
-            rows={rows}
+            rows={visibleRows}
+            rowsViewApplied
             rowQuery={activeRowsQuery}
             readOnly={readOnly}
             search={activeSearch}
@@ -1887,40 +2073,18 @@ export function DatabaseView({
             onWarmRow={warmRowDetail}
           />
         )}
-        {active?.type === "board" && (
-          <BoardView
+        {isBoundedCardView(active) && activeRowsQuery && (
+          <BoundedCardView
+            key={`${active.id}:${activeRowsViewSignature}:${activeSearch}:${contextPageId ?? ""}`}
             db={db}
             view={active}
-            rows={rows}
+            rows={visibleRows}
+            rowPage={activeRowPage}
+            rowQuery={activeRowsQuery}
             readOnly={readOnly}
             search={activeSearch}
             contextPageId={contextPageId}
-            onOpenRow={openRowPeek}
-            onEditRowProperties={openRowPropertiesMenu}
-            onOpenRowIn={openRowInMode}
-          />
-        )}
-        {active?.type === "list" && (
-          <ListView
-            db={db}
-            view={active}
-            rows={rows}
-            readOnly={readOnly}
-            search={activeSearch}
-            contextPageId={contextPageId}
-            onOpenRow={openRowPeek}
-            onEditRowProperties={openRowPropertiesMenu}
-            onOpenRowIn={openRowInMode}
-          />
-        )}
-        {active?.type === "gallery" && (
-          <GalleryView
-            db={db}
-            view={active}
-            rows={rows}
-            readOnly={readOnly}
-            search={activeSearch}
-            contextPageId={contextPageId}
+            loadMoreDatabaseRows={loadMoreDatabaseRows}
             onOpenRow={openRowPeek}
             onEditRowProperties={openRowPropertiesMenu}
             onOpenRowIn={openRowInMode}
@@ -1930,7 +2094,8 @@ export function DatabaseView({
           <CalendarView
             db={db}
             view={active}
-            rows={rows}
+            rows={visibleRows}
+            rowsViewApplied
             readOnly={readOnly}
             search={activeSearch}
             contextPageId={contextPageId}
@@ -1943,7 +2108,9 @@ export function DatabaseView({
           <TimelineView
             db={db}
             view={active}
-            rows={rows}
+            rows={visibleRows}
+            rowsViewApplied
+            rowQuery={activeRowsQuery}
             readOnly={readOnly}
             search={activeSearch}
             contextPageId={contextPageId}
@@ -1956,17 +2123,22 @@ export function DatabaseView({
           <ChartView
             db={db}
             view={active}
-            rows={rows}
+            rows={visibleRows}
+            rowsViewApplied
             readOnly={readOnly}
             search={activeSearch}
             contextPageId={contextPageId}
           />
+        )}
+        {active?.type === "form" && (
+          <FormView db={db} view={active} readOnly={readOnly} />
         )}
         {/* Genuinely unsupported (unknown) view types keep the imported
             placeholder instead of rendering nothing. */}
         {active && !isRenderableDatabaseView(active) && <ImportedUnsupportedView view={active} />}
         {active &&
           active.type !== "table" &&
+          !isBoundedCardView(active) &&
           activeRowsQuery &&
           activeRowPage?.hasMore && (
             <button
@@ -2143,8 +2315,8 @@ function RowPeek({
 
   useEffect(() => {
     if (!ready) return;
-    void loadBlocks(pageId);
-    void loadComments(pageId);
+    void loadBlocks(pageId).catch(() => {});
+    void loadComments(pageId).catch(() => {});
   }, [ready, pageId, loadBlocks, loadComments]);
 
   useEffect(() => {
@@ -2465,6 +2637,37 @@ function RowPeek({
     else if (e.key === "End") commitSideWidth(rowPeekMaxWidth());
   }
 
+  function onRowPeekBlankPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (target !== e.currentTarget && !target.closest("[data-editor-tail]")) return;
+    // The scroll viewport is portaled from inside a host editor. Its blank
+    // surface owns the press and must not seed that editor's rubber band.
+    e.stopPropagation();
+  }
+
+  function onRowPeekBlankMouseDown(e: ReactMouseEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement;
+    if (target !== e.currentTarget) {
+      if (target.closest("[data-editor-tail]")) e.stopPropagation();
+      return;
+    }
+    e.stopPropagation();
+    if (readOnly || e.button !== 0) return;
+    const tail = findRootRef.current?.querySelector<HTMLElement>("[data-editor-tail]");
+    if (!tail) return;
+    e.preventDefault();
+    // Reuse Editor's canonical zero-or-one page-end mutation/focus authority.
+    // Forwarding to its real tail avoids a second row-page creation path.
+    tail.dispatchEvent(new MouseEvent("mousedown", {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      buttons: 1,
+      clientX: e.clientX,
+      clientY: e.clientY,
+    }));
+  }
+
   const rowPeekStyle =
     mode === "side"
       ? ({ "--row-peek-width": `${sideWidth}px` } as CSSProperties)
@@ -2676,7 +2879,11 @@ function RowPeek({
             }}
           />
         )}
-        <div className={`${styles.rowPeekScroll} nscroll`}>
+        <div
+          className={`${styles.rowPeekScroll} nscroll`}
+          onPointerDown={onRowPeekBlankPointerDown}
+          onMouseDown={onRowPeekBlankMouseDown}
+        >
           <PageCover pageId={pageId} compact readOnly={readOnly} />
           <div
             ref={findRootRef}

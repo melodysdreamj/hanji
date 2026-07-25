@@ -12,9 +12,11 @@ import { useStore } from "@/lib/store";
 import {
   applyView,
   applyViewFilterSeeds,
+  projectCardViewSubitems,
   viewFilterSeedValues,
   visibleViewProperties,
 } from "./query";
+import { CardSubitemMeta } from "./CardSubitemMeta";
 import { NotionSelect } from "./NotionSelect";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
 import { PropValue } from "./PropValue";
@@ -142,6 +144,7 @@ export function CalendarView({
   db,
   view,
   rows: rowsProp,
+  rowsViewApplied = false,
   readOnly = false,
   search,
   contextPageId,
@@ -152,6 +155,7 @@ export function CalendarView({
   db: Page;
   view: DbView;
   rows?: Page[];
+  rowsViewApplied?: boolean;
   readOnly?: boolean;
   search?: string;
   contextPageId?: string;
@@ -196,10 +200,18 @@ export function CalendarView({
   // Memoized like TableView's `shown`: applyView runs a full search-filter +
   // filter-group + multi-key sort over every loaded row on each render.
   const shown = useMemo(
-    () => applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
-    [rows, props, view, pagesById, search, contextPageId]
+    () =>
+      rowsViewApplied
+        ? rows
+        : applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
+    [rows, rowsViewApplied, props, view, pagesById, search, contextPageId]
   );
-  const suggestedMonthKey = monthKey(suggestedCalendarMonth(shown, dateProp));
+  const cardSubitems = useMemo(
+    () => projectCardViewSubitems(db, view, shown),
+    [db, shown, view]
+  );
+  const cardRows = cardSubitems.rows;
+  const suggestedMonthKey = monthKey(suggestedCalendarMonth(cardRows, dateProp));
   const [month, setMonth] = useState(() => monthFromKey(suggestedMonthKey));
   const monthAnchorRef = useRef("");
   const monthAnchor = `${db.id}:${view.id}:${dateProp?.id ?? ""}`;
@@ -225,13 +237,13 @@ export function CalendarView({
     }
   }, [monthAnchor, suggestedMonthKey]);
 
-  // Per-day bucketing + in-day sorting walk every shown row; memoize with
-  // `shown` so drag/hover re-renders don't redo the whole calendar layout.
+  // Per-day bucketing + in-day sorting walk every projected card once; memoize
+  // so drag/hover re-renders don't redo the whole calendar layout.
   const { rowsByDay, noDateRows } = useMemo(() => {
     const byDay = new Map<string, Page[]>();
     const undated: Page[] = [];
     if (dateProp) {
-      for (const row of shown) {
+      for (const row of cardRows) {
         const date = parseDate(valueFor(row, dateProp));
         if (!date) {
           undated.push(row);
@@ -253,7 +265,7 @@ export function CalendarView({
       }
     }
     return { rowsByDay: byDay, noDateRows: undated };
-  }, [shown, dateProp]);
+  }, [cardRows, dateProp]);
 
   async function createDateProperty() {
     if (readOnly) return;
@@ -565,6 +577,11 @@ export function CalendarView({
                         {metaProps.slice(0, 2).map((prop) => (
                           <PropValue key={prop.id} row={row} prop={prop} interactive={false} />
                         ))}
+                        <CardSubitemMeta
+                          row={row}
+                          pagesById={pagesById}
+                          presentation={cardSubitems}
+                        />
                       </span>
                     </button>
                   );
@@ -625,7 +642,12 @@ export function CalendarView({
                   }}
                   onContextMenu={(e) => openRowContextMenu(row.id, e)}
                 >
-                  {title}
+                  <span>{title}</span>
+                  <CardSubitemMeta
+                    row={row}
+                    pagesById={pagesById}
+                    presentation={cardSubitems}
+                  />
                 </button>
               );
             })}

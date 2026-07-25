@@ -4,7 +4,22 @@
     "sum": "योग",
     "average": "औसत",
     "min": "न्यूनतम",
-    "max": "अधिकतम"
+    "max": "अधिकतम",
+    "checked": "चेक गरिएको",
+    "count_values": "मानहरूको गणना",
+    "date_range": "मिति दायरा",
+    "earliest_date": "प्रारम्भिक मिति",
+    "empty": "खाली गणना",
+    "latest_date": "नवीनतम मिति",
+    "median": "मध्यिका",
+    "not_empty": "गैर-खाली गणना",
+    "percent_checked": "चेक गरिएको प्रतिशत",
+    "percent_empty": "खाली प्रतिशत",
+    "percent_not_empty": "गैर-खाली प्रतिशत",
+    "percent_unchecked": "अनचेक गरिएको प्रतिशत",
+    "range": "दायरा",
+    "unchecked": "अनचेक गरिएको",
+    "unique": "अद्वितीय मानहरूको गणना"
   },
   "chartAria": "{{name}} चार्ट",
   "chartType": "चार्ट प्रकार",
@@ -27,5 +42,9 @@
   "untitledProperty": "शीर्षकहीन",
   "valueProperty": "मान गुण",
   "xAxis": "X-अक्ष",
-  "yAxis": "Y-अक्ष"
+  "yAxis": "Y-अक्ष",
+  "dateRangeDays": "{{count}} दिन",
+  "missingProperty": "सुरक्षित गुण",
+  "unsupportedAggregateDesc": "{{aggregate}} लाई {{property}} बाट गणना गर्न सकिँदैन। अनुकूल गुण वा गणना चयन गर्नुहोस्।",
+  "unsupportedAggregateTitle": "यो चार्ट गणना उपलब्ध छैन"
 }

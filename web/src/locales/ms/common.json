@@ -8,7 +8,8 @@
     "delete": "Padam",
     "clearAll": "Kosongkan semua",
     "done": "Selesai",
-    "add": "Tambah"
+    "add": "Tambah",
+    "reportIssue": "Laporkan isu"
   },
   "labels": {
     "untitled": "Tanpa tajuk"

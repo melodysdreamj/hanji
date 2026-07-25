@@ -92,5 +92,8 @@
     "V",
     "S"
   ],
-  "you": "Jy"
+  "you": "Jy",
+  "buttonExecutionFailed": "Kon nie die knoppie uitvoer nie.",
+  "loadingMoreRelations": "Laai meer verwantskappe...",
+  "loadMoreRelations": "Laai meer verwantskappe"
 }

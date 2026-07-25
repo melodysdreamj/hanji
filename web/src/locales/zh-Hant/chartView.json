@@ -4,7 +4,22 @@
     "sum": "總和",
     "average": "平均",
     "min": "最小",
-    "max": "最大"
+    "max": "最大",
+    "checked": "已勾选",
+    "count_values": "计数值",
+    "date_range": "日期范围",
+    "earliest_date": "最早日期",
+    "empty": "空值计数",
+    "latest_date": "最晚日期",
+    "median": "中位数",
+    "not_empty": "非空计数",
+    "percent_checked": "勾选百分比",
+    "percent_empty": "空值百分比",
+    "percent_not_empty": "非空百分比",
+    "percent_unchecked": "未勾选百分比",
+    "range": "范围",
+    "unchecked": "未勾选",
+    "unique": "唯一值计数"
   },
   "chartAria": "{{name}} 圖表",
   "chartType": "圖表類型",
@@ -27,5 +42,9 @@
   "untitledProperty": "未命名",
   "valueProperty": "值屬性",
   "xAxis": "X軸",
-  "yAxis": "Y軸"
+  "yAxis": "Y軸",
+  "dateRangeDays": "{{count}}天",
+  "missingProperty": "已保存的属性",
+  "unsupportedAggregateDesc": "无法从{{property}}计算{{aggregate}}。请选择兼容的属性或计算。",
+  "unsupportedAggregateTitle": "此图表计算不可用"
 }

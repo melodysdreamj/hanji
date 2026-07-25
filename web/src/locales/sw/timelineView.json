@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Vitegemezi:",
     "hint": "ongeza sifa ya uhusiano",
-    "relationPropertyAriaLabel": "Sifa ya uhusiano wa utegemezi"
+    "relationPropertyAriaLabel": "Sifa ya uhusiano wa utegemezi",
+    "makeDependOn": "Fanya {{title}} itegemee {{predecessor}}",
+    "startFrom": "Anzisha tegemeo kutoka kwa {{title}}"
   },
   "toolbar": {
     "today": "Leo",

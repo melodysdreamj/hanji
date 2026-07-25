@@ -36,7 +36,7 @@
   "enableWebSharing": "Povolit webové sdílení pro {{pageTitle}}",
   "expired": "Vypršelo",
   "expiresAt": "Vyprší {{formatted}}",
-  "exportAsHanji": "Exportovat jako soubor Hanji",
+  "exportAsHanji": "Exportovat Hanji JSON (bez souborů)",
   "exportAsMarkdown": "Exportovat jako Markdown",
   "exporting": "Exportování…",
   "fontDefault": "Výchozí",
@@ -138,7 +138,9 @@
     "updatedWebLinkExpiration": "Vypršení webového odkazu aktualizováno",
     "verificationRemoved": "Ověření odebráno",
     "webSharingDisabled": "Sdílení na webu vypnuto",
-    "webSharingEnabled": "Sdílení na webu zapnuto"
+    "webSharingEnabled": "Sdílení na webu zapnuto",
+    "couldntExportHanjiArchive": "Nepodařilo se exportovat Hanji archiv.",
+    "exportedHanjiArchive": "Exportován Hanji archiv se soubory."
   },
   "todayAt": "Dnes v {{time}}",
   "undo": "Zpět",
@@ -153,5 +155,12 @@
   "workspaceCount_one": "{{count}} pracovní prostor",
   "workspaceCount_other": "{{count}} pracovní prostory",
   "yesterdayAt": "Včera v {{time}}",
-  "you": "Já"
+  "you": "Já",
+  "exportAsHanjiArchive": "Exportovat Hanji archiv (včetně souborů)",
+  "turnIntoWiki": "Převést na wiki",
+  "undoWiki": "Zrušit wiki",
+  "wikiCreated": "Stránka převedena na wiki",
+  "wikiPageSettings": "Nastavení wiki stránky",
+  "wikiUndone": "Wiki odebráno; obsah stránky zachován",
+  "wikiUpdateFailed": "Wiki se nepodařilo aktualizovat"
 }

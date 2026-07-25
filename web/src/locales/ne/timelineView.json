@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "निर्भरताहरू:",
     "hint": "सम्बन्ध गुण थप्नुहोस्",
-    "relationPropertyAriaLabel": "निर्भरता सम्बन्ध गुण"
+    "relationPropertyAriaLabel": "निर्भरता सम्बन्ध गुण",
+    "makeDependOn": "{{title}} लाई {{predecessor}} मा निर्भर बनाउनुहोस्",
+    "startFrom": "{{title}} बाट निर्भरता सुरु गर्नुहोस्"
   },
   "toolbar": {
     "today": "आज",

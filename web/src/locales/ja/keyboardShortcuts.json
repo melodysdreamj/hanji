@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "コメントを追加",
+    "addLink": "リンクを追加",
+    "blockColor": "最後に使用した色を適用",
+    "bold": "太字",
+    "copyPageLink": "ページリンクをコピー",
+    "findInPage": "このページ内を検索",
+    "inlineCode": "インラインコード",
+    "italic": "斜体",
+    "moveBlock": "ブロックを別のページに移動",
+    "moveBlockDown": "ブロックを下に移動",
+    "moveBlockUp": "ブロックを上に移動",
+    "movePage": "現在のページを移動",
+    "navigateBack": "戻る",
+    "navigateForward": "進む",
+    "newPage": "新規ページ",
+    "openBlockMenu": "ブロック操作を開く",
+    "openKeyboardShortcuts": "キーボードショートカットを開く",
+    "openParentPage": "親ページを開く",
+    "quickFind": "クイック検索",
+    "strikethrough": "取り消し線",
+    "toggleAllToggles": "すべてのトグルを展開/折りたたむ",
+    "toggleSidebar": "サイドバーを切り替え",
+    "toggleTheme": "ダークモードを切り替え",
+    "underline": "下線"
+  },
+  "categories": {
+    "createStyle": "作成とスタイル",
+    "editMove": "編集と移動",
+    "popular": "人気"
+  },
+  "categoriesLabel": "ショートカットカテゴリ",
+  "close": "閉じる",
+  "closeBackdrop": "キーボードショートカットを閉じる",
+  "empty": "ショートカットが見つかりません",
+  "keysFor": "{{action}}のショートカットキー",
+  "or": "または",
+  "searchLabel": "キーボードショートカットを検索",
+  "searchPlaceholder": "ショートカットを検索…",
+  "searchResults": "検索結果",
+  "searchTerms": {
+    "toggleTheme": "テーマ ライト ダーク 表示"
+  },
+  "title": "キーボードショートカット"
+}

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} පසු සම්බන්ධකයක්",
-    "count_other": "{{count}} පසු සම්බන්ධක"
+    "count_other": "{{count}} පසු සම්බන්ධක",
+    "partial_one": "{{count}}+ පසුසබැඳිය",
+    "partial_other": "{{count}}+ පසුසබැඳි"
   },
   "header": {
     "title": "සම්බන්ධිත සඳහන්"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} සඳහන",
     "mention_other": "{{count}} සඳහන්",
     "link_one": "{{count}} සබැඳිය",
-    "link_other": "{{count}} සබැඳි"
+    "link_other": "{{count}} සබැඳි",
+    "loaded": "පූරණය කරන ලදී: {{summary}}"
   },
   "kind": {
     "mention": "සඳහන",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} තවත් පසු සම්බන්ධකයක්",
-    "count_other": "{{count}} තවත් පසු සම්බන්ධක"
+    "count_other": "{{count}} තවත් පසු සම්බන්ධක",
+    "load": "වැඩි පසුසබැඳි පූරණය කරන්න",
+    "loading": "පසුසබැඳි පූරණය වෙමින්…",
+    "search": "පසුසබැඳි සොයන්න"
   }
 }

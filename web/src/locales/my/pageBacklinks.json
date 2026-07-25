@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "ဘက်ခ်လင့်ခ် {{count}} ခု",
-    "count_other": "ဘက်ခ်လင့်ခ် {{count}} ခု"
+    "count_other": "ဘက်ခ်လင့်ခ် {{count}} ခု",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlinks"
   },
   "header": {
     "title": "လင့်ခ်ချိတ်ထားသော ဖော်ပြချက်များ"
@@ -10,7 +12,8 @@
     "mention_one": "ဖော်ပြချက် {{count}} ခု",
     "mention_other": "ဖော်ပြချက် {{count}} ခု",
     "link_one": "လင့်ခ် {{count}} ခု",
-    "link_other": "လင့်ခ် {{count}} ခု"
+    "link_other": "လင့်ခ် {{count}} ခု",
+    "loaded": "တင်ပြီး: {{summary}}"
   },
   "kind": {
     "mention": "ဖော်ပြချက်",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "နောက်ထပ် ဘက်ခ်လင့်ခ် {{count}} ခု",
-    "count_other": "နောက်ထပ် ဘက်ခ်လင့်ခ် {{count}} ခု"
+    "count_other": "နောက်ထပ် ဘက်ခ်လင့်ခ် {{count}} ခု",
+    "load": "backlinks ထပ်ဖွင့်ရန်",
+    "loading": "backlinks တင်နေသည်...",
+    "search": "backlinks ရှာဖွေရန်"
   }
 }

@@ -7,7 +7,8 @@
   "pageMissingSave": "Halaman tidak dapat ditemui, jadi perubahan anda tidak dapat disimpan.",
   "saveFailed": "Perubahan anda tidak dapat disimpan.",
   "sessionExpired": "Sesi anda telah tamat atau permintaan tidak dapat disahkan. Sila cuba lagi.",
-  "blockConflictSave": "Blok ini telah diedit pada peranti lain, jadi perubahan luar talian anda tidak digunakan.",
+  "blockConflictSave": "Suntingan beratur bertindih dengan versi pelayan terkini, jadi ia tidak dapat digabung secara automatik.",
   "blockConflictKeepMine": "Gunakan versi saya",
-  "blockMoveCommentsSkipped": "Blok dipindahkan, tetapi komennya tidak dapat dipindahkan bersama."
+  "blockMoveCommentsSkipped": "Blok dipindahkan, tetapi komennya tidak dapat dipindahkan bersama.",
+  "conflictSave": "Kandungan ini berubah sebelum penyimpanan selesai, jadi suntingan anda tidak dapat disimpan."
 }

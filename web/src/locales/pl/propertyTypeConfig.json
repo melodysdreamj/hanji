@@ -58,7 +58,14 @@
     "range": "Zakres",
     "show_original": "Pokaż oryginał",
     "sum": "Suma",
-    "unchecked": "Niezaznaczone"
+    "unchecked": "Niezaznaczone",
+    "count": "Zlicz wszystko",
+    "count_per_group": "Liczba na grupę",
+    "empty": "Liczba pustych",
+    "not_empty": "Liczba niepustych",
+    "percent_per_group": "Procent na grupę",
+    "show_unique": "Pokaż unikalne wartości",
+    "unique": "Liczba unikalnych wartości"
   },
   "showOnDatabase": "Pokaż na {{name}}",
   "undo": "Cofnij",

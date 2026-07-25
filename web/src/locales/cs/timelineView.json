@@ -7,7 +7,9 @@
   "dependencies": {
     "hint": "přidat vlastnost relace",
     "label": "Závislosti:",
-    "relationPropertyAriaLabel": "Vlastnost vztahu závislostí"
+    "relationPropertyAriaLabel": "Vlastnost vztahu závislostí",
+    "makeDependOn": "Nastavit závislost {{title}} na {{predecessor}}",
+    "startFrom": "Vytvořit závislost z {{title}}"
   },
   "empty": {
     "description": "Časové osy vyžadují vlastnost počátečního data pro zobrazení stránek v čase.",

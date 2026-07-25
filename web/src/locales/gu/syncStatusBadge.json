@@ -6,5 +6,6 @@
   "unreachable": "સર્વર સાથે જોડાણ શક્ય નથી",
   "unreachablePending_one": "સર્વર સાથે જોડાણ શક્ય નથી · {{count}} ફેરફાર બાકી",
   "unreachablePending_other": "સર્વર સાથે જોડાણ શક્ય નથી · {{count}} ફેરફારો બાકી",
-  "retryHint": "ફરી પ્રયાસ કરવા ક્લિક કરો"
+  "retryHint": "ફરી પ્રયાસ કરવા ક્લિક કરો",
+  "confirmed": "સર્વર પર સાચવાયું"
 }

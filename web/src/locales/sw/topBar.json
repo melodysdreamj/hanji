@@ -38,7 +38,7 @@
   "moveTo": "Hamisha hadi",
   "exporting": "Inasafirisha nje…",
   "exportAsMarkdown": "Hamisha kama Markdown",
-  "exportAsHanji": "Hamisha kama faili ya Hanji",
+  "exportAsHanji": "Hamisha Hanji JSON (bila faili)",
   "importing": "Inaleta…",
   "importMarkdown": "Leta Markdown",
   "unlockPage": "Fungua ukurasa",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Haikuweza kusasisha ufikiaji",
     "removedFromAccessList": "Imeondolewa kwenye orodha ya ufikiaji",
     "couldntRemoveAccess": "Haikuweza kuondoa ufikiaji",
-    "couldntLoadAccessList": "Haikuweza kupakia orodha ya ufikiaji"
+    "couldntLoadAccessList": "Haikuweza kupakia orodha ya ufikiaji",
+    "couldntExportHanjiArchive": "Imeshindwa kuhama kumbukumbu ya Hanji.",
+    "exportedHanjiArchive": "Imehama kumbukumbu ya Hanji pamoja na faili."
   },
   "user": "Mtumiaji",
   "whoHasAccess": "Nani ana ufikiaji",
   "workspace": "Sehemu ya kazi",
   "workspaceCount_one": "{{count}} sehemu ya kazi",
   "workspaceCount_other": "{{count}} sehemu za kazi",
-  "you": "Mimi"
+  "you": "Mimi",
+  "exportAsHanjiArchive": "Hamisha kumbukumbu ya Hanji (pamoja na faili)",
+  "turnIntoWiki": "Geuza kuwa wiki",
+  "undoWiki": "Tendua wiki",
+  "wikiCreated": "Umegeuza ukurasa kuwa wiki",
+  "wikiPageSettings": "Mipangilio ya ukurasa wa wiki",
+  "wikiUndone": "Wiki imeondolewa; maudhui ya ukurasa yamehifadhiwa",
+  "wikiUpdateFailed": "Haikuweza kusasisha wiki"
 }

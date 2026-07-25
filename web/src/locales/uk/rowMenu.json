@@ -35,7 +35,7 @@
     "rename": "Перейменувати",
     "addPageInside": "Додати сторінку всередину",
     "exportAsMarkdown": "Експортувати як Markdown",
-    "exportAsHanjiFile": "Експортувати як Hanji файл",
+    "exportAsHanjiFile": "Експортувати Hanji JSON (без файлів)",
     "importMarkdown": "Імпортувати Markdown",
     "importing": "Імпортування...",
     "unlockPage": "Розблокувати сторінку",
@@ -44,7 +44,8 @@
     "removeVerification": "Видалити верифікацію",
     "verifyPage": "Верифікувати сторінку",
     "customizePage": "Налаштувати сторінку",
-    "undo": "Скасувати"
+    "undo": "Скасувати",
+    "exportAsHanjiArchive": "Експортувати архів Hanji (файли включено)"
   },
   "customize": {
     "summaryDefault": "За замовчуванням",
@@ -101,6 +102,8 @@
     "movedToTrash": "Переміщено до кошика",
     "restoredPage": "Сторінку відновлено",
     "couldntRestorePage": "Не вдалося відновити сторінку",
-    "couldntMoveToTrash": "Не вдалося перемістити до кошика"
+    "couldntMoveToTrash": "Не вдалося перемістити до кошика",
+    "couldntExportHanjiArchive": "Не вдалося експортувати архів Hanji.",
+    "exportedHanjiArchive": "Експортовано архів Hanji з файлами."
   }
 }

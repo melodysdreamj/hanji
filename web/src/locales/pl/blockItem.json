@@ -233,7 +233,9 @@
     "video": "Wideo",
     "videoCaption": "Podpis wideo",
     "videoEmptyHint": "Prześlij plik wideo, wklej bezpośredni link lub użyj linku z YouTube, Vimeo lub Loom.",
-    "videoLink": "Link wideo"
+    "videoLink": "Link wideo",
+    "audioPlaybackFailed": "Nie można odtworzyć tego pliku audio. Zastąp go lub otwórz oryginalny plik.",
+    "videoPlaybackFailed": "Nie można odtworzyć tego filmu. Zastąp go lub otwórz oryginalny plik."
   },
   "mention": {
     "closeMenu": "Zamknij menu wzmianki",

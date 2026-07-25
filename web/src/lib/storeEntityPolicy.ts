@@ -8,11 +8,23 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+const IMPORTED_DATABASE_ROW_METADATA_PROPERTY_IDS = new Set([
+  "notionImportJobId",
+  "notionPageId",
+  "notionDataSourceId",
+]);
+
+function isImportedDatabaseRowMetadataPropertyId(propId: string) {
+  return propId.startsWith("__") || IMPORTED_DATABASE_ROW_METADATA_PROPERTY_IDS.has(propId);
+}
+
 export function persistableDatabaseRowProperties(
   properties?: Record<string, unknown> | null
 ): Record<string, unknown> {
   return Object.fromEntries(
-    Object.entries(properties ?? {}).filter(([key]) => !key.startsWith("__"))
+    Object.entries(properties ?? {}).filter(
+      ([key]) => !isImportedDatabaseRowMetadataPropertyId(key)
+    )
   );
 }
 
@@ -28,9 +40,14 @@ export function persistablePagePatch(patch: Partial<Page>, page?: Page): Partial
   delete next.__databaseRowOrder;
   delete next.createdAt;
   delete next.updatedAt;
+  delete next.isWiki;
+  delete next.wikiRootId;
+  delete next.verifiedAt;
+  delete next.verifiedBy;
+  delete next.verificationExpiresAt;
   if (page?.parentType === "database" && isPlainObject(next.properties)) {
-    // Imported rows keep raw Notion snapshots under internal "__" keys; those
-    // are not database schema properties and make row mutations fail.
+    // Imported rows keep provenance beside schema values. Import metadata is
+    // server-owned and must not be sent as editable database properties.
     next.properties = persistableDatabaseRowProperties(next.properties);
   }
   return next;
@@ -49,6 +66,10 @@ export function persistableBlockPatch(patch: Partial<Block>): Partial<Block> {
   delete next.id;
   delete next.createdAt;
   delete next.updatedAt;
+  // These fields are server-authenticated mutation metadata. The client sends
+  // its mutation id beside the patch; it never writes either field directly.
+  delete next.lastEditedBy;
+  delete next.lastMutationId;
   return next;
 }
 

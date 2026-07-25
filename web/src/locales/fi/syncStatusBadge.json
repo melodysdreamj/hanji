@@ -6,5 +6,6 @@
   "syncing": "Synkronoidaan · {{count}}",
   "unreachable": "Palvelimeen ei saa yhteyttä",
   "unreachablePending_one": "Palvelimeen ei saa yhteyttä · {{count}} muutos odottaa",
-  "unreachablePending_other": "Palvelimeen ei saa yhteyttä · {{count}} muutosta odottaa"
+  "unreachablePending_other": "Palvelimeen ei saa yhteyttä · {{count}} muutosta odottaa",
+  "confirmed": "Tallennettu palvelimelle"
 }

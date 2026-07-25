@@ -7,7 +7,8 @@
   "pageMissingSave": "La pagina non è stata trovata, quindi le modifiche non sono state salvate.",
   "saveFailed": "Impossibile salvare le modifiche.",
   "sessionExpired": "La sessione è scaduta o la richiesta non è stata autenticata. Riprova.",
-  "blockConflictSave": "Questo blocco è stato modificato su un altro dispositivo, quindi la tua modifica offline non è stata applicata.",
+  "blockConflictSave": "Una modifica in coda è in conflitto con l'ultima versione del server e non può essere unita automaticamente.",
   "blockConflictKeepMine": "Applica la mia versione",
-  "blockMoveCommentsSkipped": "Il blocco è stato spostato, ma i suoi commenti non sono stati spostati con esso."
+  "blockMoveCommentsSkipped": "Il blocco è stato spostato, ma i suoi commenti non sono stati spostati con esso.",
+  "conflictSave": "Questo contenuto è cambiato prima del completamento del salvataggio, quindi la modifica non è stata salvata."
 }

@@ -4,7 +4,22 @@
     "sum": "合計",
     "average": "平均",
     "min": "最小",
-    "max": "最大"
+    "max": "最大",
+    "checked": "チェック済み",
+    "count_values": "値の数",
+    "date_range": "日付範囲",
+    "earliest_date": "最も早い日付",
+    "empty": "空の数",
+    "latest_date": "最も遅い日付",
+    "median": "中央値",
+    "not_empty": "空でない数",
+    "percent_checked": "チェック率",
+    "percent_empty": "空の割合",
+    "percent_not_empty": "空でない割合",
+    "percent_unchecked": "未チェック率",
+    "range": "範囲",
+    "unchecked": "未チェック",
+    "unique": "一意の値の数"
   },
   "chartAria": "{{name}} チャート",
   "chartType": "チャートタイプ",
@@ -27,5 +42,9 @@
   "untitledProperty": "無題",
   "valueProperty": "値プロパティ",
   "xAxis": "X軸",
-  "yAxis": "Y軸"
+  "yAxis": "Y軸",
+  "dateRangeDays": "{{count}}日",
+  "missingProperty": "保存されたプロパティ",
+  "unsupportedAggregateDesc": "{{aggregate}} は {{property}} から計算できません。互換性のあるプロパティまたは計算を選択してください。",
+  "unsupportedAggregateTitle": "このチャート計算は利用できません。"
 }

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} son yenilik",
     "unreadOfTotal": "{{total}} yenilikdən {{unread}} oxunmamış",
     "updateType": "Yenilik növü",
-    "updates": "Yeniliklər",
-    "modeUpdates": "Yeniliklər",
-    "modeChats": "Söhbətlər",
-    "inboxMode": "Gələnlər qutusu rejimi"
+    "updates": "Yeniliklər"
   },
   "time": {
     "justNow": "İndicə",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versiya",
     "versionsAgo": "{{count}} versiya əvvəl",
     "versionsAhead": "{{count}} versiya irəlidə",
-    "versionsAria": "Versiyalar"
+    "versionsAria": "Versiyalar",
+    "emptyBlock": "Boş blok",
+    "emptyPreview": "Bu versiyada səhifə məzmunu yoxdur.",
+    "previewAria": "Yalnız oxumaq üçün səhifə versiyası önizləməsi",
+    "previewingCurrent": "Hazırkı səhifə göstərilir",
+    "previewingSnapshot": "Keçmiş versiya göstərilir",
+    "previewOnlyHint": "Versiya seçmək yalnız onu önizləyir. Hazırkı səhifə yalnız Bərpa etdikdən sonra dəyişir.",
+    "restoreThisVersion": "Bərpa et",
+    "restoring": "Bərpa edilir...",
+    "versionHistory": "Versiya tarixçəsi"
   },
   "badges": {
     "comment": "Şərh",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} qeyd edildi · {{preview}}",
     "referenceLink": "{{title}} bağlantısı · {{preview}}",
     "unreadDot": "Oxunmamış",
-    "workspaceUpdate": "İş məkanı yeniləməsi"
+    "workspaceUpdate": "İş məkanı yeniləməsi",
+    "bySelf": "Siz"
   },
   "empty": {
     "allCaughtUp": "Hamısı oxundu.",

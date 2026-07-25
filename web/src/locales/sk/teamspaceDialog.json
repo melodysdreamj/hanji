@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Uzavreté",
+    "open": "Otvorené",
+    "private": "Súkromné"
+  },
+  "add": "Pridať",
+  "approve": "Schváliť",
+  "archive": "Archivovať tímový priestor",
+  "available": "Dostupné na pripojenie",
+  "choosePrincipal": "Vyberte osobu alebo skupinu",
+  "create": "Vytvoriť tímový priestor",
+  "deny": "Zamietnuť",
+  "error": {
+    "action": "Nepodarilo sa dokončiť akciu v tímovom priestore.",
+    "load": "Nepodarilo sa načítať podrobnosti tímového priestoru."
+  },
+  "fields": {
+    "access": "Prístup",
+    "description": "Popis",
+    "icon": "Ikona",
+    "memberRole": "Prístup členov na stránky",
+    "membersCanEditSidebar": "Členovia môžu pridávať a presúvať stránky",
+    "membersCanInvite": "Členovia môžu pozývať",
+    "name": "Názov",
+    "openRole": "Prístup návštevníkov na stránky"
+  },
+  "governance": "Nastavenia tímového priestoru",
+  "join": "Pripojiť sa",
+  "joined": "Vaše tímové priestory",
+  "loadMore": "Načítať viac",
+  "manage": "Spravovať",
+  "member": "Člen",
+  "members": "Členovia",
+  "noneArchived": "Nie sú žiadne archivované tímové priestory.",
+  "noneAvailable": "Nie sú k dispozícii žiadne ďalšie tímové priestory.",
+  "noneJoined": "Zatiaľ ste sa nepripojili k žiadnym tímovým priestorom.",
+  "noRequests": "Nie sú žiadne čakajúce žiadosti.",
+  "notice": {
+    "approved": "Žiadosť schválená.",
+    "archived": "Tímový priestor archivovaný.",
+    "created": "Tímový priestor vytvorený.",
+    "defaultSet": "Predvolený tímový priestor aktualizovaný.",
+    "denied": "Žiadosť zamietnutá.",
+    "joined": "Tímový priestor pripojený.",
+    "memberAdded": "Člen pridaný.",
+    "memberRemoved": "Člen odstránený.",
+    "memberUpdated": "Rola člena aktualizovaná.",
+    "policySaved": "Politika vytvárania tímových priestorov aktualizovaná.",
+    "requested": "Prístup vyžiadaný.",
+    "restored": "Tímový priestor obnovený.",
+    "saved": "Tímový priestor aktualizovaný."
+  },
+  "notOwner": "Iba vlastník tímu alebo správca pracovného priestoru môže spravovať tento tímový priestor.",
+  "open": "Otvoriť",
+  "owner": "Vlastník",
+  "ownersOnlyCreate": "Iba vlastníci pracovného priestoru môžu vytvárať tímové priestory",
+  "remove": "Odstrániť",
+  "replacement": "Vyberte náhradný predvolený",
+  "request": "Požiadať o prístup",
+  "requestPending": "Požiadavka čaká",
+  "requests": "Požiadavky na prístup",
+  "restore": "Obnoviť",
+  "roles": {
+    "comment": "Môže komentovať",
+    "edit": "Môže upravovať",
+    "full_access": "Plný prístup",
+    "view": "Môže zobraziť"
+  },
+  "save": "Uložiť zmeny",
+  "selectTeamspace": "Tímový priestor",
+  "setDefault": "Nastaviť ako predvolený tímový priestor",
+  "subtitle": "Usporiadajte zdieľanú prácu a kontrolujte, kto ju môže objaviť alebo sa k nej pripojiť.",
+  "tabs": {
+    "archived": "Archivované",
+    "browse": "Prehliadať",
+    "create": "Nový tímový priestor",
+    "label": "Zobrazenia tímového priestoru",
+    "manage": "Spravovať"
+  },
+  "title": "Tímové priestory"
+}

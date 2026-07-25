@@ -8,7 +8,8 @@
     "delete": "Xóa",
     "clearAll": "Xóa tất cả",
     "done": "Xong",
-    "add": "Thêm"
+    "add": "Thêm",
+    "reportIssue": "Báo lỗi"
   },
   "labels": {
     "untitled": "Chưa có tiêu đề"

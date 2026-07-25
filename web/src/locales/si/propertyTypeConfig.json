@@ -51,7 +51,14 @@
     "range": "පරාසය",
     "earliest_date": "මුල්ම දිනය",
     "latest_date": "නවතම දිනය",
-    "date_range": "දින පරාසය"
+    "date_range": "දින පරාසය",
+    "count": "සියල්ල ගණන් කරන්න",
+    "count_per_group": "කණ්ඩායම අනුව ගණන",
+    "empty": "හිස් ගණන",
+    "not_empty": "හිස් නොවන ගණන",
+    "percent_per_group": "කණ්ඩායම අනුව ප්‍රතිශතය",
+    "show_unique": "අනන්ය අගයන් පෙන්වන්න",
+    "unique": "අනන්ය ගණන"
   },
   "undo": "අහෝසි කරන්න",
   "untitled": "මාතෘකා රහිත",

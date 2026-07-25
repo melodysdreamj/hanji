@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "မှီခိုမှုများ:",
     "hint": "ဆက်စပ်မှု ပရောပတီတစ်ခု ထည့်ရန်",
-    "relationPropertyAriaLabel": "မှီခိုမှု ဆက်စပ်ပရောပတီ"
+    "relationPropertyAriaLabel": "မှီခိုမှု ဆက်စပ်ပရောပတီ",
+    "makeDependOn": "{{title}} က {{predecessor}} ကို မှီခိုစေရန်",
+    "startFrom": "{{title}} မှ မှီခိုမှုစတင်ရန်"
   },
   "toolbar": {
     "today": "ယနေ့",

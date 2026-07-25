@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Gesluit",
+    "open": "Oop",
+    "private": "Privaat"
+  },
+  "add": "Voeg by",
+  "approve": "Goedkeur",
+  "archive": "Argiveer teamspace",
+  "available": "Beskikbaar om aan te sluit",
+  "choosePrincipal": "Kies 'n persoon of groep",
+  "create": "Skep teamspace",
+  "deny": "Weier",
+  "error": {
+    "action": "Kon nie daardie teamspace-aksie voltooi nie.",
+    "load": "Kon nie teamspace-besonderhede laai nie."
+  },
+  "fields": {
+    "access": "Toegang",
+    "description": "Beskrywing",
+    "icon": "Ikoon",
+    "memberRole": "Lid se bladsytoegang",
+    "membersCanEditSidebar": "Lede kan bladsye byvoeg en herrangskik",
+    "membersCanInvite": "Lede kan mense nooi",
+    "name": "Naam",
+    "openRole": "Oop besoekerbladsytoegang"
+  },
+  "governance": "Spanruimte-instellings",
+  "join": "Sluit aan",
+  "joined": "Jou spanruimtes",
+  "loadMore": "Laai meer",
+  "manage": "Bestuur",
+  "member": "Lid",
+  "members": "Lede",
+  "noneArchived": "Daar is geen geargiveerde spanruimtes nie.",
+  "noneAvailable": "Daar is geen ander beskikbare spanruimtes nie.",
+  "noneJoined": "Jy het nog nie by enige spanruimtes aangesluit nie.",
+  "noRequests": "Daar is geen hangende versoeke nie.",
+  "notice": {
+    "approved": "Versoek goedgekeur.",
+    "archived": "Spanruimte geargiveer.",
+    "created": "Spanruimte geskep.",
+    "defaultSet": "Verstekspanruimte opgedateer.",
+    "denied": "Versoek geweier.",
+    "joined": "By spanruimte aangesluit.",
+    "memberAdded": "Lid bygevoeg.",
+    "memberRemoved": "Lid verwyder.",
+    "memberUpdated": "Lidrol opgedateer.",
+    "policySaved": "Spanruimteskeppingsbeleid opgedateer.",
+    "requested": "Toegang versoek.",
+    "restored": "Spanruimte herstel.",
+    "saved": "Spanruimte opgedateer."
+  },
+  "notOwner": "Slegs 'n teemspasie-eienaar of werkruimteadministrateur kan hierdie teemspasie bestuur.",
+  "open": "Maak oop",
+  "owner": "Eienaar",
+  "ownersOnlyCreate": "Slegs werkruimte-eienaars kan teemspasies skep",
+  "remove": "Verwyder",
+  "replacement": "Kies 'n plaasvervangerverstek",
+  "request": "Versoek toegang",
+  "requestPending": "Versoek hangend",
+  "requests": "Toegangsversoeke",
+  "restore": "Herstel",
+  "roles": {
+    "comment": "Kan kommentaar lewer",
+    "edit": "Kan redigeer",
+    "full_access": "Volle toegang",
+    "view": "Kan bekyk"
+  },
+  "save": "Stoor veranderinge",
+  "selectTeamspace": "Teemspasie",
+  "setDefault": "Maak verstekteemspasie",
+  "subtitle": "Organiseer gedeelde werk en beheer wie dit kan ontdek of daaraan kan deelneem.",
+  "tabs": {
+    "archived": "Geargiveer",
+    "browse": "Blaai",
+    "create": "Nuwe teemspasie",
+    "label": "Teemspasie-aansigte",
+    "manage": "Bestuur"
+  },
+  "title": "Teemspasies"
+}

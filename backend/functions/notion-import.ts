@@ -1,34 +1,15 @@
 import { defineFunction } from '@edge-base/shared';
+import { isHanjiBoardMainGroupPropertyType } from '../../shared/board-group-types.mjs';
 import { errorStatus } from '../lib/error-status';
 import {
   HANJI_CURRENT_PAGE_FILTER_KIND,
-  HANJI_IMPORTED_ROW_CONTEXT_FILTER_MARKER,
   hasHanjiImportedRowContextFilterMarker,
+  withoutHanjiImportedRowContextFilterMarkers,
   isHanjiCurrentPageFilterValue,
 } from '../lib/hanji-compat';
-import {
-  NOTION_CREDENTIAL_ALGORITHM,
-  NOTION_CREDENTIAL_KEY_ID,
-  NOTION_OAUTH_STATE_MAX_AGE_MS,
-  assertNotionOAuthEnabled,
-  base64EncodeText,
-  decodeNotionOAuthState,
-  decryptNotionCredential,
-  encodeNotionOAuthState,
-  encryptNotionCredential,
-  encryptNotionOAuthCredential,
-  envString,
-  notionApiBase,
-  notionConnectionStorageAvailable,
-  notionOAuthAuthorizeUrl,
-  notionOAuthClientId,
-  notionOAuthClientSecret,
-  notionOAuthRedirectUri,
-  type NotionOAuthStatePayload,
-} from '../lib/notion-import-credentials';
+import { envString, notionApiBase } from '../lib/notion-import-credentials';
 import {
   NotionApiError,
-  notionErrorFromResponse,
   notionIsoTimestamp,
   notionRequest,
   safeNotionRequest,
@@ -66,9 +47,126 @@ import {
 import {
   discoverNotionGraphWithRuntime,
   preflightNotionImportGraphWithRuntime,
+  type NotionImportDiscoveryRuntime,
 } from '../lib/notion-import-discovery';
-import { applyJobCoreWithRuntime } from '../lib/notion-import-apply';
-import { createNotionImportPlanner } from '../lib/notion-import-plan';
+export { type NotionImportDiscoveryRuntime } from '../lib/notion-import-discovery';
+import {
+  discoveryProgressPercent,
+  importActivityRingOf,
+  notionDiscoveryItemNeedsEnrichment,
+  pushImportActivity,
+} from '../lib/notion-import-discovery-progress';
+export {
+  discoveryProgressPercent,
+  notionDiscoveryEnrichmentCandidates,
+  notionDiscoveryItemNeedsEnrichment,
+  notionEnrichmentShouldStop,
+  notionEnrichmentWaveSize,
+  pushImportActivity,
+  type DiscoveryProgressSnapshot,
+  type NotionImportActivityEntry,
+} from '../lib/notion-import-discovery-progress';
+import {
+  applyJobCoreWithRuntime,
+  clearNotionImportApplySnapshotCache,
+  type Block,
+  type DbProperty,
+  type DbRef,
+  type DbTemplate,
+  type DbView,
+  type FunctionStorageProxy,
+  type ImportedBlockMapping,
+  type ImportedPageBlockContext,
+  type ImportedPropertyContext,
+  type ImportedRowContext,
+  type ImportedTemplateContext,
+  type NotionFileCopyContext,
+  type NotionImportApplyRuntime,
+  type NotionImportFileCopySlot,
+  type Page,
+} from '../lib/notion-import-apply';
+import { createNotionImportBlockApplyRuntime } from '../lib/notion-import-block-apply';
+export {
+  type Block,
+  type DbProperty,
+  type DbRef,
+  type DbTemplate,
+  type DbView,
+  type FunctionStorageProxy,
+  type ImportedBlockMapping,
+  type ImportedPageBlockContext,
+  type ImportedPropertyContext,
+  type ImportedRowContext,
+  type ImportedTemplateContext,
+  type NotionFileCopyContext,
+  type NotionImportApplyRuntime,
+  type NotionImportFileCopySlot,
+  type Page,
+} from '../lib/notion-import-apply';
+import {
+  createNotionImportPlanner,
+  type HiddenLinkedDatabaseDataSourceInference,
+  type NotionImportPlanRuntime,
+} from '../lib/notion-import-plan';
+export { type NotionImportPlanRuntime } from '../lib/notion-import-plan';
+import {
+  createNotionImportConnectionHandlers,
+  type NotionImportConnectionKind,
+  type NotionTokenSource,
+} from '../lib/notion-import-connections';
+import {
+  baseReport,
+  cleanItem,
+  cleanJob,
+  createNotionImportJobCreateHandlers,
+  createNotionImportJobLifecycleHandlers,
+  createNotionImportJobListingHandlers,
+  createNotionImportJobReaderHandlers,
+  progressObject,
+  withImportProgress,
+} from '../lib/notion-import-job-lifecycle';
+import {
+  createNotionImportJobDiscoveryHandlers,
+  createNotionImportJobReviewHandlers,
+} from '../lib/notion-import-job-discovery';
+import {
+  createNotionImportJobApplyHandlers,
+  createNotionImportJobRepairHandlers,
+} from '../lib/notion-import-job-apply';
+import {
+  SUPPORTED_NOTION_VIEW_TYPES,
+  emptyConversionReport,
+  finalizeConversionReport,
+  incrementReport,
+  mergeImportReportEntries,
+  pushReportIssue,
+  reportUnsupportedFormulaFunctions,
+  reportUnsupportedProperty,
+  reportUnsupportedView,
+  reportUnresolvedFormulaPropertyReference,
+} from '../lib/notion-import-report';
+import type {
+  DiscoveryWarningBag,
+  ImportConversionReport,
+  NotionImportItem,
+  NotionImportJob,
+  NotionImportMapping,
+  NotionImportStatus,
+} from '../lib/notion-import-contracts';
+export {
+  type DiscoveryWarningBag,
+  type ImportConversionReport,
+  type NotionImportItem,
+  type NotionImportJob,
+  type NotionImportMapping,
+  type NotionImportPlan,
+  type NotionImportWarning,
+} from '../lib/notion-import-contracts';
+import { createNotionImportServerRunner } from '../lib/notion-import-server-runner';
+export type {
+  NotionImportRootCandidate,
+  NotionImportRootScanItem,
+} from '../lib/notion-import-connections';
 export {
   assertBoundedRequestDiscoveredItems,
   dashedUuid,
@@ -96,39 +194,61 @@ import {
   MAX_RAW_TRANSACT_OPS,
   type AdminDbAccessor,
 } from '../lib/workspace-db';
-import { recordWorkspaceAudit } from '../lib/org-audit';
+import {
+  deleteNotionImportRun,
+  enqueueNotionImportRun,
+} from '../lib/notion-import-run-queue';
 import {
   pageAccessRole as sharedPageAccessRole,
   workspaceAccessRole as sharedWorkspaceAccessRole,
 } from '../lib/page-access';
-import { fetchPublicResource } from '../lib/ssrf-guard';
-import { normalizeFileContentType } from '../lib/file-security';
+import {
+  fetchFileForImport,
+  fileCopyFailureMessage,
+  normalizedImportedContentType,
+} from '../lib/notion-import-file-fetch';
+export {
+  MAX_UNKNOWN_LENGTH_IMPORTED_FILE_SIZE,
+  readResponseBodyWithByteCap,
+  responseBodyWithExactByteCount,
+} from '../lib/notion-import-file-fetch';
 import { assertFileTargetsNotDeleting, withFileWorkspaceLease } from '../lib/file-operation-lock';
 import {
   assertNoUnownedStoredFileReferences,
-  fileUploadReferenceOwners,
-  workspaceFileReferenceSnapshot,
 } from '../lib/file-reference-lifecycle';
 import {
   releaseOrganizationStorage,
   reserveOrganizationStorage,
-  type StorageQuotaReservation,
 } from '../lib/storage-quota';
 import {
   collectPermanentRoutingIndexPlan,
   deletePermanentRoutingIndexes,
 } from '../lib/permanent-routing-index-delete';
+import {
+  OMIT_DATABASE_PROPERTY_IMPORT_VALUE,
+  isDatabasePropertyType,
+  normalizeDatabasePropertyImportValue,
+  type DatabasePropertyType,
+} from '../lib/database-property-types';
+import {
+  normalizeDatabaseViewStorageRecord,
+  parseDatabaseViewType,
+  type NotionDatabaseViewType,
+} from '../lib/database-view-types';
 
 import {
+  DEFAULT_LIST_ALL_MAX_ITEMS,
   bestEffort,
   requireString,
   getExisting,
+  listAll as listAllComplete,
   nowIso,
   newId,
+  projectFields,
   type TableQuery,
   type TransactOperation,
-  type TransactDb,
 } from '../lib/table-utils';
+import { isTransientInfrastructureError } from '../lib/transient-error';
 import type { ShareRole } from '../lib/page-access';
 import { pageAccessRoleRanks as roleRanks } from '../lib/page-access';
 import {
@@ -137,13 +257,15 @@ import {
   type PersistentGeneratedLocale,
 } from '../lib/persistent-generated-labels';
 
-type NotionImportStatus = 'queued' | 'discovering' | 'ready' | 'completed' | 'failed' | 'cancelled';
-type NotionImportConnectionKind = 'oauth' | 'personal_access_token' | 'internal_integration' | 'manual_token';
-type NotionImportConnectionStatus = 'active' | 'revoked' | 'error';
-
 const NOTION_API_VERSION = '2026-03-11';
 const NOTION_PAGINATION_SAFETY_PAGE_LIMIT = 10_000;
 const NOTION_FILE_COPY_RECOVERY_TTL_MS = 2 * 60 * 60 * 1000;
+const NOTION_FILE_CHECKPOINT_RECOVERY_TTL_MS = 3 * 60 * 1000;
+// Signed PUTs expire after 30 minutes. A terminal checkpoint schedules one
+// extra deterministic-key delete a full hour later, covering a worker whose
+// object write completed after the first delete without retaining an eternal
+// maintenance tombstone.
+const NOTION_FILE_TERMINAL_RESWEEP_DELAY_MS = 60 * 60 * 1000;
 // Sane per-fetch pagination defaults. The hard clamp stays
 // NOTION_PAGINATION_SAFETY_PAGE_LIMIT (still overridable up to it), but the
 // default budgets below keep a single discover call from grinding through a
@@ -165,16 +287,6 @@ const NOTION_DISCOVER_CALL_DEADLINE_MS = 12_000;
 const NOTION_ROOT_SCAN_DEFAULT_PAGE_LIMIT = 10;
 const NOTION_ROOT_SCAN_MAX_PAGE_LIMIT = 50;
 const NOTION_IMPORT_ITEM_SAFETY_LIMIT = 100_000;
-// Housekeeping for the persisted job engine: there is no user-facing recent-jobs
-// list anymore, so finished/stale job records (and their discovered items) are
-// pruned opportunistically when a workspace lists its jobs. Live jobs (queued /
-// discovering / apply-in-progress) are NEVER pruned. Retention is by age with a
-// per-workspace keep cap; deletes are batched per call to bound request cost.
-const NOTION_IMPORT_JOB_RETENTION_DAYS_ENV = 'HANJI_NOTION_IMPORT_JOB_RETENTION_DAYS';
-const NOTION_IMPORT_JOB_RETENTION_MS_DEFAULT = 14 * 24 * 60 * 60 * 1000;
-const NOTION_IMPORT_JOB_RETENTION_DAYS_MAX = 365;
-const NOTION_IMPORT_JOB_KEEP_MAX = 25;
-const NOTION_IMPORT_JOB_PRUNE_BATCH_MAX = 12;
 const NOTION_APPLY_LEASE_TTL_MS = 30 * 60 * 1000;
 // Apply can legitimately run for many minutes, so its lease remains long and
 // is renewed at every durable progress checkpoint. If the owning request dies
@@ -185,7 +297,20 @@ const NOTION_APPLY_LEASE_STALE_MS = 5 * 60 * 1000;
 // Incremental discovery calls are bounded to a small wall-clock slice. Keep a
 // crashed worker from blocking resume for the apply lease's full 30 minutes.
 const NOTION_DISCOVER_LEASE_TTL_MS = 90 * 1000;
+// A single Notion item can remain inside transport retry/backoff longer than
+// the nominal 90-second discovery lease. Renew well inside that window so a
+// client reconnect cannot replace a still-running request's lock.
+const NOTION_DISCOVER_LEASE_HEARTBEAT_MS = 30 * 1000;
 const NOTION_APPLY_LEASE_CAS_ATTEMPTS = 8;
+const NOTION_APPLY_FAILURE_RENEW_ATTEMPTS = 3;
+const NOTION_APPLY_FAILURE_RENEW_BASE_DELAY_MS = 25;
+// Failure cleanup reserves three raw transaction slots for the exact ready-job
+// fence, the freshly observed apply-lock fence, and the lock heartbeat update.
+// The remaining slots form the declared bounded mutation chunk; overflow keeps
+// draining immediately instead of waiting for another collection window.
+const NOTION_APPLY_FAILURE_CLEANUP_FIXED_TRANSACT_OPS = 3;
+const NOTION_APPLY_FAILURE_CLEANUP_MUTATION_CHUNK_SIZE =
+  MAX_RAW_TRANSACT_OPS - NOTION_APPLY_FAILURE_CLEANUP_FIXED_TRANSACT_OPS;
 const NOTION_ENRICHMENT_BATCH_SIZE = 500;
 const NOTION_ENRICHMENT_BATCH_SIZE_MAX = 5_000;
 const NOTION_DISCOVERY_CONCURRENCY_DEFAULT = 4;
@@ -193,12 +318,6 @@ const NOTION_DISCOVERY_CONCURRENCY_MAX = 8;
 const NOTION_PREFLIGHT_SAMPLE_LIMIT = 20;
 const MAX_MARKDOWN_CHARS = 60_000;
 const FILE_BUCKET = 'files';
-const MAX_IMPORTED_FILE_SIZE = 5 * 1024 * 1024 * 1024;
-// Responses without Content-Length must be buffered to learn their exact size
-// before atomically reserving organization quota. Keep that buffer bounded far
-// below the 5 GiB normal-file ceiling so a chunked source cannot exhaust the
-// worker. Larger sources must provide an honest length.
-export const MAX_UNKNOWN_LENGTH_IMPORTED_FILE_SIZE = 64 * 1024 * 1024;
 const NOTION_PAGE_ICON_REFERENCE_KEY = '__notionPageIconReference';
 const NOTION_PAGE_COVER_REFERENCE_KEY = '__notionPageCoverReference';
 const NOTION_CREATED_TIME_KEY = '__notionCreatedTime';
@@ -206,6 +325,8 @@ const NOTION_LAST_EDITED_TIME_KEY = '__notionLastEditedTime';
 const NOTION_IMPORT_BLOCKS_COMPLETE_KEY = '__notionImportBlocksComplete';
 const NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION_KEY = '__notionImportBlockBoundaryRepairVersion';
 const NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION = 5;
+const NOTION_IMPORT_BLOCK_RECOVERY_KEY = '__notionImportBlockRecovery';
+const NOTION_IMPORT_PUBLICATION_BOUNDARY_VERSION = 1;
 const GENERATED_NOTION_TITLE_PROPERTY_ID = '__hanji_generated_title__';
 const NOTION_BLOCK_CHILD_DEPTH_LIMIT = 32;
 const NOTION_BLOCK_CHILD_TOTAL_LIMIT = 100_000;
@@ -215,79 +336,11 @@ const NOTION_DISCOVERY_PASS_SAFETY_LIMIT = 1_000;
 // the initial "25% · Discovering workspace graph" until the whole pass ends.
 const NOTION_DISCOVERY_PROGRESS_INTERVAL_MS = 1_000;
 
-export type NotionImportWarning = {
-  code: string;
-  message: string;
-  notionId?: string;
-  notionObject?: string;
-};
-
 interface Workspace {
   id: string;
   organizationId?: string | null;
   name?: string;
   ownerId?: string;
-}
-
-export interface Page {
-  id: string;
-  workspaceId: string;
-  parentId?: string | null;
-  parentType?: string;
-  kind?: string;
-  title?: string;
-  icon?: string;
-  iconType?: string;
-  cover?: string;
-  coverPosition?: number;
-  font?: string;
-  smallText?: boolean;
-  fullWidth?: boolean;
-  isLocked?: boolean;
-  isPublic?: boolean;
-  backlinksDisplay?: string;
-  pageCommentsDisplay?: string;
-  properties?: Record<string, unknown>;
-  isFavorite?: boolean;
-  inTrash?: boolean;
-  trashedAt?: string | null;
-  position?: number;
-  createdBy?: string;
-  lastEditedBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface Block {
-  id: string;
-  pageId: string;
-  parentId?: string | null;
-  type: string;
-  content?: Record<string, unknown>;
-  plainText?: string;
-  position: number;
-  createdBy?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface DbProperty {
-  id: string;
-  databaseId: string;
-  name: string;
-  description?: string;
-  type: string;
-  config?: Record<string, unknown>;
-  position: number;
-}
-
-export interface DbView {
-  id: string;
-  databaseId: string;
-  name: string;
-  type: string;
-  config?: Record<string, unknown>;
-  position: number;
 }
 
 type ViewFilterTerm = {
@@ -307,20 +360,6 @@ interface TemplateBlock {
   content?: Record<string, unknown>;
   plainText?: string;
   children?: TemplateBlock[];
-}
-
-export interface DbTemplate {
-  id: string;
-  databaseId: string;
-  name: string;
-  icon?: string;
-  title?: string;
-  properties?: Record<string, unknown>;
-  blocks?: TemplateBlock[];
-  isDefault?: boolean;
-  position: number;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 interface FileUpload {
@@ -347,79 +386,21 @@ interface FileUpload {
   deletedAt?: string | null;
   deletedBy?: string;
   deletionPreviousStatus?: 'preparing' | 'pending' | 'uploaded' | null;
+  /** Durable Notion pre-copy locator. These fields deliberately remain on the
+   * upload row so a crash between object write and owner attachment is still
+   * recoverable without worker memory or product mappings. */
+  notionImportJobId?: string;
+  notionImportSnapshotRevision?: string;
+  notionImportSlotKey?: string;
+  notionImportTerminalSweepAfter?: string | null;
+  notionImportTerminalSweepCompletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
-interface NotionImportConnection {
-  id: string;
-  workspaceId: string;
-  actorId?: string;
-  name?: string;
-  connectionKind: NotionImportConnectionKind;
-  status: NotionImportConnectionStatus;
-  apiVersion: string;
-  notionWorkspaceId?: string | null;
-  notionWorkspaceName?: string | null;
-  tokenFingerprint?: string | null;
-  credentialAlgorithm?: string | null;
-  credentialKeyId?: string | null;
-  credentialCiphertext?: string | null;
-  metadata?: Record<string, unknown>;
-  lastValidatedAt?: string | null;
-  lastUsedAt?: string | null;
-  revokedAt?: string | null;
-  revokedBy?: string | null;
-  error?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-type SafeNotionImportConnection = Omit<NotionImportConnection, 'credentialCiphertext'> & {
-  metadata: Record<string, unknown>;
-  hasStoredCredential: boolean;
-};
-
-interface NotionTokenSource {
-  token: string;
-  tokenStored: false;
-  credentialSource: 'request' | 'connection';
-  connectionId?: string;
-  connection?: SafeNotionImportConnection;
-  tokenFingerprint?: string | null;
-}
 
 
-export interface NotionImportJob {
-  id: string;
-  workspaceId: string;
-  source: 'notion_api';
-  connectionKind: NotionImportConnectionKind;
-  connectionId?: string | null;
-  status: NotionImportStatus;
-  phase: string;
-  actorId?: string;
-  parentPageId?: string | null;
-  rootNotionPageIds?: string[];
-  rootNotionDataSourceIds?: string[];
-  notionWorkspaceId?: string | null;
-  notionWorkspaceName?: string | null;
-  apiVersion: string;
-  options?: Record<string, unknown>;
-  counts?: Record<string, number>;
-  progress?: Record<string, unknown>;
-  report?: Record<string, unknown>;
-  error?: string | null;
-  retryOfJobId?: string | null;
-  startedAt?: string | null;
-  finishedAt?: string | null;
-  cancelledAt?: string | null;
-  cancelledBy?: string | null;
-  /** Internal pointer to the only discovery-item generation readers may use. */
-  activeItemGeneration?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-}
+
 
 interface NotionImportApplyLock {
   id: string;
@@ -433,68 +414,13 @@ interface NotionImportApplyLock {
   updatedAt?: string;
 }
 
-export interface NotionImportItem {
-  id: string;
-  workspaceId: string;
-  jobId: string;
-  /** Internal copy-on-write generation; legacy rows intentionally store null. */
-  itemGeneration?: string | null;
-  notionId: string;
-  notionObject: string;
-  parentNotionId?: string | null;
-  title?: string;
-  status: string;
-  phase: string;
-  localId?: string | null;
-  localType?: string | null;
-  metadata?: Record<string, unknown>;
-  error?: string | null;
-}
-
-export interface NotionImportRootCandidate {
-  id: string;
-  notionObject: 'page' | 'data_source';
-  title: string;
-  parentNotionId?: string | null;
-  parentType?: string | null;
-  createdTime?: string | null;
-  lastEditedTime?: string | null;
-  url?: string | null;
-  icon?: unknown;
-  reason: 'workspace_parent' | 'accessible_parent_missing';
-}
-
-export interface NotionImportRootScanItem {
-  id: string;
-  notionObject: 'page' | 'data_source';
-  title: string;
-  parentNotionId?: string | null;
-  parentType?: string | null;
-  createdTime?: string | null;
-  lastEditedTime?: string | null;
-  url?: string | null;
-  icon?: unknown;
-  archived?: boolean;
-  inTrash?: boolean;
-}
-
-export interface NotionImportMapping {
-  id: string;
-  workspaceId: string;
-  jobId: string;
-  mappingKey?: string;
-  notionId: string;
-  notionType: string;
-  localId: string;
-  localType: string;
-  relationKind: string;
-  metadata?: Record<string, unknown>;
-}
-
 export function notionAppliedCountsFromMappings(
   mappings: Pick<NotionImportMapping, 'localId' | 'localType' | 'relationKind'>[],
 ) {
   const productMappings = mappings.filter((mapping) => mapping.relationKind !== 'import_root');
+  const placeholderDatabases = productMappings.filter(
+    (mapping) => mapping.relationKind === 'database_placeholder',
+  ).length;
   return {
     pages: productMappings.filter((mapping) => mapping.relationKind === 'page').length,
     databases: new Set(
@@ -502,26 +428,19 @@ export function notionAppliedCountsFromMappings(
         .filter((mapping) => mapping.localType === 'database')
         .map((mapping) => mapping.localId),
     ).size,
-    properties: productMappings.filter((mapping) => mapping.relationKind === 'database_property').length,
-    views: productMappings.filter((mapping) => mapping.relationKind === 'database_view').length,
+    // A placeholder database mapping durably represents the fallback title
+    // property and table view created with that database. Include those
+    // implicit writes when a chunked apply reconstructs its counters.
+    properties:
+      productMappings.filter((mapping) => mapping.relationKind === 'database_property').length +
+      placeholderDatabases,
+    views:
+      productMappings.filter((mapping) => mapping.relationKind === 'database_view').length +
+      placeholderDatabases,
     templates: productMappings.filter((mapping) => mapping.relationKind === 'database_template').length,
     rows: productMappings.filter((mapping) => mapping.relationKind === 'database_row').length,
     mappings: productMappings.length,
   };
-}
-
-export interface DiscoveryWarningBag {
-  warnings: NotionImportWarning[];
-  missingPermissions: NotionImportWarning[];
-  unsupported: NotionImportWarning[];
-}
-
-export interface ImportConversionReport {
-  summary: Record<string, number>;
-  warnings: NotionImportWarning[];
-  unsupported: NotionImportWarning[];
-  missingPermissions: NotionImportWarning[];
-  unresolvedReferences: NotionImportWarning[];
 }
 
 interface ViewPropertyReferenceIssue {
@@ -566,25 +485,6 @@ interface NotionFileCopyStats {
   fileCopySkipped: number;
 }
 
-export interface NotionFileCopyContext {
-  db: DbRef;
-  admin: AdminDbAccessor;
-  job: NotionImportJob;
-  actorId: string;
-  storage?: FunctionStorageProxy;
-  request?: Request;
-  conversionReport?: ImportConversionReport;
-  requireStoredFileCopies: boolean;
-  notionToken?: string;
-  apiVersion: string;
-  apiBase?: string;
-  stats: NotionFileCopyStats;
-  /** Uploads finalized by the current operation. Apply failure compensation
-   * uses this in addition to the durable job-key scan so a just-created row is
-   * never missed by an eventually-consistent/query-limited lookup. */
-  createdUploadIds?: string[];
-}
-
 interface NotionFileCopyTarget {
   notionId?: string;
   notionObject: string;
@@ -602,58 +502,11 @@ interface NotionFileCopyTarget {
   notionFileIndex?: number;
   notionFileName?: string;
   notionPageFileKind?: 'icon' | 'cover';
-}
-
-export interface NotionImportPlan {
-  status: 'ready' | 'blocked';
-  generatedAt: string;
-  counts: Record<string, number>;
-  estimatedWrites: Record<string, number>;
-  conversion: ImportConversionReport;
-  canApply: boolean;
-}
-
-type NotionImportProgressStepKey = 'connect' | 'discover' | 'review' | 'apply' | 'file_copy_retry' | 'cancel';
-type NotionImportProgressStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
-
-interface NotionImportProgressEvent {
-  key: NotionImportProgressStepKey;
-  status: NotionImportProgressStatus;
-  legacyStep: string;
-  at?: string;
-  percent?: number;
-  message?: string;
-  counts?: Record<string, unknown>;
-}
-
-interface TableRef<T> extends TableQuery<T> {
-  getOne(id: string): Promise<T | null>;
-  insert(data: Partial<T>): Promise<T>;
-  update(id: string, data: Partial<T>): Promise<T>;
-  delete(id: string): Promise<void>;
-  where(field: string, op: string, value: unknown): TableQuery<T>;
-}
-
-export interface DbRef extends TransactDb {
-  table<T>(name: string): TableRef<T>;
-}
-
-export interface FunctionStorageProxy {
-  bucket?(bucket: string): FunctionStorageProxy;
-  put(
-    key: string,
-    value: ReadableStream | ArrayBuffer | string,
-    options?: { contentType?: string; customMetadata?: Record<string, string> },
-  ): Promise<void>;
-  head(key: string): Promise<{
-    key: string;
-    size: number;
-    etag?: string;
-    contentType: string;
-    customMetadata?: Record<string, string>;
-  } | null>;
-  delete(key: string): Promise<void>;
-  getSignedUrl?(key: string, options?: { expiresIn?: number }): Promise<string>;
+  /** Stable raw-snapshot coordinates. Local page/template/block ids are
+   * intentionally excluded so a worker restart can reuse the same slot. */
+  notionFileRole?: string;
+  notionFileStructuralPath?: string;
+  notionFileOrdinal?: number;
 }
 
 interface FunctionContext {
@@ -664,12 +517,6 @@ interface FunctionContext {
   storage?: FunctionStorageProxy;
 }
 
-const connectionKinds = new Set<NotionImportConnectionKind>([
-  'oauth',
-  'personal_access_token',
-  'internal_integration',
-  'manual_token',
-]);
 
 function jsonError(status: number, message: string) {
   return Response.json({ code: status, message }, { status });
@@ -683,102 +530,6 @@ async function requestJson(request?: Request): Promise<Record<string, unknown>> 
   } catch {
     return {};
   }
-}
-
-const importProgressOrder: NotionImportProgressStepKey[] = ['connect', 'discover', 'review', 'apply', 'file_copy_retry', 'cancel'];
-
-const importProgressLabels: Record<NotionImportProgressStepKey, string> = {
-  connect: 'Waiting for Notion connection',
-  discover: 'Discovering workspace graph',
-  review: 'Reviewing import plan',
-  apply: 'Applying to local workspace',
-  file_copy_retry: 'Retrying file copies',
-  cancel: 'Cancelled',
-};
-
-function progressObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? { ...(value as Record<string, unknown>) } : {};
-}
-
-function progressSteps(value: unknown): Record<string, unknown>[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-    : [];
-}
-
-function progressPercent(value: unknown) {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? Math.max(0, Math.min(100, Math.round(value)))
-    : undefined;
-}
-
-function progressCounts(counts: Record<string, unknown> | undefined) {
-  if (!counts) return undefined;
-  const next: Record<string, number> = {};
-  for (const [key, value] of Object.entries(counts)) {
-    if (typeof value === 'number' && Number.isFinite(value)) next[key] = value;
-  }
-  return Object.keys(next).length ? next : undefined;
-}
-
-function defaultProgressPercent(
-  previous: Record<string, unknown>,
-  event: NotionImportProgressEvent,
-) {
-  if (event.percent !== undefined) return progressPercent(event.percent);
-  if (event.status === 'failed' || event.status === 'cancelled') return progressPercent(previous.percent) ?? 100;
-  if (event.key === 'connect') return event.status === 'completed' ? 10 : 5;
-  if (event.key === 'discover') return event.status === 'completed' ? 50 : 25;
-  if (event.key === 'review') return event.status === 'completed' ? 60 : 55;
-  if (event.key === 'apply') return event.status === 'completed' ? 100 : 75;
-  if (event.key === 'file_copy_retry') return event.status === 'completed' ? 100 : 90;
-  return progressPercent(previous.percent) ?? 0;
-}
-
-function withImportProgress(
-  previousProgress: Record<string, unknown> | undefined,
-  event: NotionImportProgressEvent,
-) {
-  const previous = progressObject(previousProgress);
-  const at = event.at ?? nowIso();
-  const existingSteps = progressSteps(previous.steps);
-  const byKey = new Map<string, Record<string, unknown>>();
-  for (const step of existingSteps) {
-    const key = typeof step.key === 'string' ? step.key : undefined;
-    if (key) byKey.set(key, step);
-  }
-  const existing = byKey.get(event.key) ?? {};
-  const counts = progressCounts(event.counts);
-  const isTerminal = event.status === 'completed' || event.status === 'failed' || event.status === 'cancelled';
-  byKey.set(event.key, {
-    ...existing,
-    key: event.key,
-    label: importProgressLabels[event.key],
-    status: event.status,
-    startedAt: event.status === 'running' ? optionalString(existing.startedAt) ?? at : optionalString(existing.startedAt) ?? at,
-    // A resumed step is live again. Do not retain an older terminal timestamp:
-    // the run panel otherwise renders a still-running discovery as finished.
-    finishedAt: isTerminal ? at : undefined,
-    ...(event.message ? { message: event.message } : {}),
-    ...(counts ? { counts } : {}),
-  });
-
-  const steps = Array.from(byKey.values()).sort((a, b) => {
-    const aIndex = importProgressOrder.indexOf(a.key as NotionImportProgressStepKey);
-    const bIndex = importProgressOrder.indexOf(b.key as NotionImportProgressStepKey);
-    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
-  });
-  const percent = defaultProgressPercent(previous, event);
-  return {
-    ...previous,
-    step: event.legacyStep,
-    currentStep: event.key,
-    currentLabel: importProgressLabels[event.key],
-    currentStatus: event.status,
-    percent,
-    lastUpdatedAt: at,
-    steps,
-  };
 }
 
 export type ImportedTextSpan = {
@@ -811,12 +562,6 @@ function optionalString(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-function parseConnectionKind(value: unknown): NotionImportConnectionKind {
-  if (typeof value === 'string' && connectionKinds.has(value as NotionImportConnectionKind)) {
-    return value as NotionImportConnectionKind;
-  }
-  return 'personal_access_token';
-}
 
 function parseStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -849,14 +594,15 @@ async function mapWithConcurrency<T>(
 
 
 async function listAll<T>(query: TableQuery<T>, maxItems = 1000): Promise<T[]> {
-  const out: T[] = [];
-  for (let page = 1; page <= 200 && out.length < maxItems; page += 1) {
-    const res = await query.page(page).limit(Math.min(1000, maxItems - out.length)).getList();
-    const items = res.items ?? [];
-    out.push(...items);
-    if (!res.hasMore || items.length === 0) break;
-  }
-  return out;
+  const boundedMaxItems = Math.max(1, Math.floor(maxItems));
+  return listAllComplete(query, {
+    maxItems: boundedMaxItems,
+    pageSize: Math.min(1_000, boundedMaxItems),
+    label: 'Notion import query',
+    ...(boundedMaxItems > DEFAULT_LIST_ALL_MAX_ITEMS
+      ? { allowLargeMaterialization: true }
+      : {}),
+  });
 }
 
 // Role resolution is canonical in lib/page-access; these wrappers only pin
@@ -903,403 +649,13 @@ async function assertWritableJob(db: DbRef, job: NotionImportJob, actorId: strin
   await assertWorkspaceRole(db, job.workspaceId, actorId, 'edit');
 }
 
-async function beginOAuthConnection(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  assertNotionOAuthEnabled(env);
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  await assertWorkspaceRole(db, workspaceId, actorId, 'edit');
-  const redirectUri = notionOAuthRedirectUri(env, body);
-  const name = optionalString(body.name);
-  const now = nowIso();
-  const payload: NotionOAuthStatePayload = {
-    workspaceId,
-    actorId,
-    redirectUri,
-    name,
-    nonce: newId(),
-    createdAt: now,
-  };
-  const state = await encodeNotionOAuthState(payload, env);
-  const authorizationUrl = new URL(notionOAuthAuthorizeUrl(env));
-  authorizationUrl.searchParams.set('client_id', notionOAuthClientId(env));
-  authorizationUrl.searchParams.set('redirect_uri', redirectUri);
-  authorizationUrl.searchParams.set('response_type', 'code');
-  authorizationUrl.searchParams.set('owner', 'user');
-  authorizationUrl.searchParams.set('state', state);
-  const expiresAt = new Date(new Date(now).getTime() + NOTION_OAUTH_STATE_MAX_AGE_MS).toISOString();
 
-  await recordWorkspaceAudit(db, {
-    workspaceId,
-    actorId,
-    action: 'notion_import.oauth.begin',
-    targetType: 'notion_import_connection',
-    targetId: workspaceId,
-    metadata: {
-      redirectUri,
-      connectionKind: 'oauth',
-    },
-    occurredAt: now,
-  });
 
-  return {
-    authorizationUrl: authorizationUrl.toString(),
-    state,
-    redirectUri,
-    expiresAt,
-  };
-}
 
-async function completeOAuthConnection(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  assertNotionOAuthEnabled(env);
-  const oauthError = optionalString(body.error);
-  if (oauthError) throw new Error(`Notion OAuth failed: ${oauthError}`);
-  const code = requireString(body.code, 'code');
-  const state = requireString(body.state, 'state');
-  const payload = await decodeNotionOAuthState(state, env);
-  if (payload.actorId !== actorId) throw new Error('Notion OAuth state belongs to another user.');
-  await assertWorkspaceRole(db, payload.workspaceId, actorId, 'edit');
-  const redirectUri = notionOAuthRedirectUri(env, {
-    redirectUri: optionalString(body.redirectUri) ?? payload.redirectUri,
-  });
-  if (redirectUri !== payload.redirectUri) throw new Error('Notion OAuth redirect URI does not match the signed state.');
 
-  const apiVersion = optionalString(body.apiVersion) ?? NOTION_API_VERSION;
-  const apiBase = notionApiBase(env);
-  const tokenResponse = await notionOAuthTokenRequest({ code, redirectUri, apiVersion }, env);
-  const accessToken = requireString(tokenResponse.access_token, 'access_token');
-  const refreshToken = optionalString(tokenResponse.refresh_token);
-  const tokenType = optionalString(tokenResponse.token_type) ?? 'bearer';
-  const me = await notionRequest(accessToken, '/users/me', apiVersion, { apiBase });
-  const notionWorkspace = notionOAuthWorkspaceInfo(tokenResponse, me);
-  const name =
-    optionalString(body.name) ??
-    payload.name ??
-    notionWorkspace.name ??
-    optionalString(tokenResponse.workspace_name) ??
-    'Notion OAuth connection';
-  const now = nowIso();
-  const credentialCiphertext = await encryptNotionOAuthCredential({
-    accessToken,
-    refreshToken,
-    tokenType,
-  }, env);
-  const connection = await db.table<NotionImportConnection>('notion_import_connections').insert({
-    id: newId(),
-    workspaceId: payload.workspaceId,
-    actorId,
-    name,
-    connectionKind: 'oauth',
-    status: 'active',
-    apiVersion,
-    notionWorkspaceId: notionWorkspace.id,
-    notionWorkspaceName: notionWorkspace.name,
-    tokenFingerprint: await tokenFingerprint(accessToken),
-    credentialAlgorithm: NOTION_CREDENTIAL_ALGORITHM,
-    credentialKeyId: NOTION_CREDENTIAL_KEY_ID,
-    credentialCiphertext,
-    metadata: {
-      oauth: {
-        tokenType,
-        botId: optionalString(tokenResponse.bot_id),
-        workspaceIcon: optionalString(tokenResponse.workspace_icon),
-        duplicatedTemplateId: optionalString(tokenResponse.duplicated_template_id),
-        requestId: optionalString(tokenResponse.request_id),
-        hasRefreshToken: !!refreshToken,
-        owner: safeNotionOAuthOwner(tokenResponse.owner),
-      },
-      notionBot: {
-        id: typeof me.id === 'string' ? me.id : undefined,
-        type: typeof me.type === 'string' ? me.type : undefined,
-      },
-    },
-    lastValidatedAt: now,
-  });
 
-  await recordWorkspaceAudit(db, {
-    workspaceId: payload.workspaceId,
-    actorId,
-    action: 'notion_import.oauth.complete',
-    targetType: 'notion_import_connection',
-    targetId: connection.id,
-    metadata: {
-      connectionKind: 'oauth',
-      notionWorkspaceId: notionWorkspace.id,
-      notionWorkspaceName: notionWorkspace.name,
-      hasRefreshToken: !!refreshToken,
-    },
-    occurredAt: now,
-  });
 
-  return { connection: cleanConnection(connection) };
-}
 
-async function createConnection(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  await assertWorkspaceRole(db, workspaceId, actorId, 'edit');
-  const token = requireString(body.notionToken, 'notionToken');
-  const connectionKind = parseConnectionKind(body.connectionKind ?? 'internal_integration');
-  const name = optionalString(body.name) ?? 'Notion connection';
-  const apiVersion = optionalString(body.apiVersion) ?? NOTION_API_VERSION;
-  const apiBase = notionApiBase(env);
-  const now = nowIso();
-  const me = await notionRequest(token, '/users/me', apiVersion, { apiBase });
-  const notionWorkspace = notionWorkspaceInfo(me);
-  const credentialCiphertext = await encryptNotionCredential(token, env);
-  const connection = await db.table<NotionImportConnection>('notion_import_connections').insert({
-    id: newId(),
-    workspaceId,
-    actorId,
-    name,
-    connectionKind,
-    status: 'active',
-    apiVersion,
-    notionWorkspaceId: notionWorkspace.id,
-    notionWorkspaceName: notionWorkspace.name,
-    tokenFingerprint: await tokenFingerprint(token),
-    credentialAlgorithm: NOTION_CREDENTIAL_ALGORITHM,
-    credentialKeyId: NOTION_CREDENTIAL_KEY_ID,
-    credentialCiphertext,
-    metadata: {
-      notionBot: {
-        id: typeof me.id === 'string' ? me.id : undefined,
-        type: typeof me.type === 'string' ? me.type : undefined,
-      },
-    },
-    lastValidatedAt: now,
-  });
-
-  await recordWorkspaceAudit(db, {
-    workspaceId,
-    actorId,
-    action: 'notion_import.connection.create',
-    targetType: 'notion_import_connection',
-    targetId: connection.id,
-    metadata: {
-      connectionKind,
-      notionWorkspaceId: notionWorkspace.id,
-      notionWorkspaceName: notionWorkspace.name,
-    },
-    occurredAt: now,
-  });
-
-  return { connection: cleanConnection(connection) };
-}
-
-async function listConnections(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  await assertWorkspaceRole(db, workspaceId, actorId, 'view');
-  const limit = parsePositiveInt(body.limit, 20, 100);
-  const connections = await listAll(
-    db.table<NotionImportConnection>('notion_import_connections').where('workspaceId', '==', workspaceId),
-    500,
-  );
-  return {
-    connectionStorageAvailable: notionConnectionStorageAvailable(env),
-    connections: connections
-      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
-      .slice(0, limit)
-      .map(cleanConnection),
-  };
-}
-
-async function getActiveConnection(db: DbRef, connectionId: string, actorId: string) {
-  const connection = await getExisting(db.table<NotionImportConnection>('notion_import_connections'), connectionId);
-  if (!connection) throw new Error('Notion import connection was not found.');
-  await assertWorkspaceRole(db, connection.workspaceId, actorId, 'edit');
-  if (connection.status !== 'active') throw new Error('Notion import connection is not active.');
-  return connection;
-}
-
-async function revokeConnection(db: DbRef, body: Record<string, unknown>, actorId: string) {
-  const connectionId = requireString(body.connectionId, 'connectionId');
-  const connections = db.table<NotionImportConnection>('notion_import_connections');
-  const connection = await getActiveConnection(db, connectionId, actorId);
-  const now = nowIso();
-  const updated = await connections.update(connection.id, {
-    status: 'revoked',
-    credentialCiphertext: null,
-    revokedAt: now,
-    revokedBy: actorId,
-  });
-  await recordWorkspaceAudit(db, {
-    workspaceId: connection.workspaceId,
-    actorId,
-    action: 'notion_import.connection.revoke',
-    targetType: 'notion_import_connection',
-    targetId: connection.id,
-    occurredAt: now,
-  });
-  return { connection: cleanConnection(updated) };
-}
-
-async function tokenFromStoredConnection(
-  db: DbRef,
-  connection: NotionImportConnection,
-  env: Record<string, unknown> | undefined,
-) {
-  if (connection.connectionKind === 'oauth') assertNotionOAuthEnabled(env);
-  const credential = await decryptNotionCredential(connection, env);
-  if (credential.kind === 'token') {
-    const now = nowIso();
-    const updated = await db.table<NotionImportConnection>('notion_import_connections').update(connection.id, {
-      lastUsedAt: now,
-      error: null,
-    });
-    return {
-      token: credential.token,
-      connection: updated,
-      tokenFingerprint: connection.tokenFingerprint ?? await tokenFingerprint(credential.token),
-      refreshed: false,
-    };
-  }
-
-  assertNotionOAuthEnabled(env);
-
-  const refreshToken = optionalString(credential.refreshToken);
-  if (!refreshToken) {
-    const now = nowIso();
-    const updated = await db.table<NotionImportConnection>('notion_import_connections').update(connection.id, {
-      lastUsedAt: now,
-      error: null,
-    });
-    return {
-      token: credential.accessToken,
-      connection: updated,
-      tokenFingerprint: connection.tokenFingerprint ?? await tokenFingerprint(credential.accessToken),
-      refreshed: false,
-    };
-  }
-
-  const apiVersion = connection.apiVersion || NOTION_API_VERSION;
-  const refreshed = await notionOAuthRefreshTokenRequest({ refreshToken, apiVersion }, env);
-  const accessToken = requireString(refreshed.access_token, 'access_token');
-  const nextRefreshToken = optionalString(refreshed.refresh_token) ?? refreshToken;
-  const tokenType = optionalString(refreshed.token_type) ?? credential.tokenType ?? 'bearer';
-  const now = nowIso();
-  const credentialCiphertext = await encryptNotionOAuthCredential({
-    accessToken,
-    refreshToken: nextRefreshToken,
-    tokenType,
-    refreshedAt: now,
-  }, env);
-  const fingerprint = await tokenFingerprint(accessToken);
-  const existingMetadata = connection.metadata ?? {};
-  const existingOAuthMetadata = existingMetadata.oauth && typeof existingMetadata.oauth === 'object'
-    ? existingMetadata.oauth as Record<string, unknown>
-    : {};
-  const refreshedOwner = safeNotionOAuthOwner(refreshed.owner);
-  const updated = await db.table<NotionImportConnection>('notion_import_connections').update(connection.id, {
-    credentialCiphertext,
-    tokenFingerprint: fingerprint,
-    notionWorkspaceId: optionalString(refreshed.workspace_id) ?? connection.notionWorkspaceId,
-    notionWorkspaceName: optionalString(refreshed.workspace_name) ?? connection.notionWorkspaceName,
-    metadata: {
-      ...existingMetadata,
-      oauth: {
-        ...existingOAuthMetadata,
-        tokenType,
-        botId: optionalString(refreshed.bot_id) ?? optionalString(existingOAuthMetadata.botId),
-        workspaceIcon: optionalString(refreshed.workspace_icon) ?? optionalString(existingOAuthMetadata.workspaceIcon),
-        duplicatedTemplateId: optionalString(refreshed.duplicated_template_id) ??
-          optionalString(existingOAuthMetadata.duplicatedTemplateId),
-        requestId: optionalString(refreshed.request_id) ?? optionalString(existingOAuthMetadata.requestId),
-        hasRefreshToken: !!nextRefreshToken,
-        owner: refreshedOwner ?? existingOAuthMetadata.owner,
-        refreshedAt: now,
-      },
-    },
-    lastUsedAt: now,
-    lastValidatedAt: now,
-    error: null,
-  });
-  return {
-    token: accessToken,
-    connection: updated,
-    tokenFingerprint: fingerprint,
-    refreshed: true,
-  };
-}
-
-async function notionTokenForJob(
-  db: DbRef,
-  body: Record<string, unknown>,
-  job: Pick<NotionImportJob, 'connectionId' | 'options'>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-): Promise<NotionTokenSource> {
-  const directToken = optionalString(body.notionToken);
-  if (directToken) {
-    return {
-      token: directToken,
-      tokenStored: false,
-      credentialSource: 'request',
-      connectionId: optionalString(body.connectionId) ?? job.connectionId ?? undefined,
-      tokenFingerprint: await tokenFingerprint(directToken),
-    };
-  }
-
-  const options = job.options as { connectionId?: unknown } | undefined;
-  const connectionId = optionalString(body.connectionId) ?? optionalString(options?.connectionId) ?? job.connectionId ?? undefined;
-  if (!connectionId) throw new Error('notionToken or connectionId is required.');
-  const connection = await getActiveConnection(db, connectionId, actorId);
-  const tokenSource = await tokenFromStoredConnection(db, connection, env);
-  return {
-    token: tokenSource.token,
-    tokenStored: false,
-    credentialSource: 'connection',
-    connectionId: connection.id,
-    connection: cleanConnection(tokenSource.connection),
-    tokenFingerprint: tokenSource.tokenFingerprint,
-  };
-}
-
-function cleanJob(job: NotionImportJob) {
-  const { activeItemGeneration: _activeItemGeneration, ...publicJob } = job;
-  return {
-    ...publicJob,
-    options: job.options ?? {},
-    counts: job.counts ?? {},
-    progress: job.progress ?? {},
-    report: job.report ?? {},
-  };
-}
-
-function cleanConnection(connection: NotionImportConnection): SafeNotionImportConnection {
-  const safeConnection = { ...connection };
-  delete safeConnection.credentialCiphertext;
-  return {
-    ...safeConnection,
-    metadata: connection.metadata ?? {},
-    hasStoredCredential: !!connection.credentialCiphertext,
-  } as SafeNotionImportConnection;
-}
-
-function cleanItem(item: NotionImportItem) {
-  const { itemGeneration: _itemGeneration, ...publicItem } = item;
-  return {
-    ...publicItem,
-    metadata: item.metadata ?? {},
-  };
-}
 
 const NOTION_IMPORT_FILE_STRING_FIELDS = new Set([
   'url',
@@ -1372,11 +728,14 @@ export async function assertSafeNotionImportSourceReferences(db: DbRef, value: u
   ]);
 }
 
-function countImportItemsByObject(items: Array<Pick<NotionImportItem | DiscoveredNotionItem, 'notionObject'>>) {
-  return items.reduce<Record<string, number>>((acc, item) => {
-    acc[item.notionObject] = (acc[item.notionObject] ?? 0) + 1;
-    return acc;
-  }, {});
+function countImportItemsByObject(
+  items: Iterable<Pick<NotionImportItem | DiscoveredNotionItem, 'notionObject'>>,
+) {
+  const counts: Record<string, number> = {};
+  for (const item of items) {
+    counts[item.notionObject] = (counts[item.notionObject] ?? 0) + 1;
+  }
+  return counts;
 }
 
 function textFromRich(value: unknown): string {
@@ -1539,189 +898,38 @@ function compactNotionMetadata(record: Record<string, unknown>) {
   };
 }
 
-function notionRootCandidateObject(record: Record<string, unknown>) {
-  const object = optionalString(record.object);
-  return object === 'page' || object === 'data_source' ? object : undefined;
-}
 
-function compactNotionRootScanItem(record: Record<string, unknown>): NotionImportRootScanItem | null {
-  const notionObject = notionRootCandidateObject(record);
-  const id = notionObjectId(record);
-  if (!notionObject || !id) return null;
-  return {
-    id,
-    notionObject,
-    title: notionTitle(record),
-    parentNotionId: notionParentResourceId(record) ?? null,
-    parentType: notionParentType(record) ?? null,
-    createdTime: optionalString(record.created_time) ?? null,
-    lastEditedTime: optionalString(record.last_edited_time) ?? null,
-    url: optionalString(record.url) ?? null,
-    icon: asRecord(record.icon) ?? null,
-    archived: record.archived === true || record.is_archived === true,
-    inTrash: record.in_trash === true,
-  };
-}
 
-export function notionAccessibleRootCandidates(records: Record<string, unknown>[]): NotionImportRootCandidate[] {
-  const knownIds = new Set(
-    records
-      .map((record) => normalizedNotionId(notionObjectId(record)))
-      .filter(Boolean),
-  );
-  const byId = new Map<string, NotionImportRootCandidate>();
 
-  for (const record of records) {
-    const notionObject = notionRootCandidateObject(record);
-    if (!notionObject) continue;
-    if (record.archived === true || record.in_trash === true || record.is_archived === true) continue;
 
-    const id = notionObjectId(record);
-    const normalizedId = normalizedNotionId(id);
-    if (!id || !normalizedId || byId.has(normalizedId)) continue;
 
-    const parentType = notionParentType(record);
-    // Database rows (a page whose parent is a database/data source) are never
-    // standalone import roots — they come in with their database. Without this,
-    // a partial /search page flags rows as accessible_parent_missing (their data
-    // source isn't in that same page) and floods the root picker with rows.
-    if (parentType === 'database_id' || parentType === 'data_source_id') continue;
-    const parentNotionId = notionParentResourceId(record);
-    const normalizedParentId = normalizedNotionId(parentNotionId);
-    const isWorkspaceParent = parentType === 'workspace';
-    const isAccessibleParentMissing = !!normalizedParentId && !knownIds.has(normalizedParentId);
-    if (!isWorkspaceParent && !isAccessibleParentMissing) continue;
 
-    byId.set(normalizedId, {
-      id,
-      notionObject,
-      title: notionTitle(record),
-      parentNotionId: parentNotionId ?? null,
-      parentType: parentType ?? null,
-      createdTime: optionalString(record.created_time) ?? null,
-      lastEditedTime: optionalString(record.last_edited_time) ?? null,
-      url: optionalString(record.url) ?? null,
-      icon: asRecord(record.icon) ?? null,
-      reason: isWorkspaceParent ? 'workspace_parent' : 'accessible_parent_missing',
-    });
+function parseServerRunRequestId(value: unknown) {
+  const requestId = optionalString(value);
+  if (!requestId || !/^[A-Za-z0-9_-]{16,128}$/.test(requestId)) {
+    throw new Error('serverRunRequestId must be a 16-128 character opaque identifier.');
   }
-
-  return Array.from(byId.values()).sort((a, b) => {
-    const reasonScore = (root: NotionImportRootCandidate) => root.reason === 'workspace_parent' ? 0 : 1;
-    const scoreDelta = reasonScore(a) - reasonScore(b);
-    if (scoreDelta !== 0) return scoreDelta;
-    const editedDelta = String(b.lastEditedTime ?? '').localeCompare(String(a.lastEditedTime ?? ''));
-    if (editedDelta !== 0) return editedDelta;
-    return a.title.localeCompare(b.title);
-  });
+  return requestId;
 }
 
-async function notionOAuthTokenRequest(
-  input: {
-    code: string;
-    redirectUri: string;
-    apiVersion: string;
-  },
-  env: Record<string, unknown> | undefined,
+async function serverOwnedNotionImportJobId(
+  workspaceId: string,
+  actorId: string,
+  requestId: string,
 ) {
-  const url = `${notionApiBase(env)}/oauth/token`;
-  const clientId = notionOAuthClientId(env);
-  const clientSecret = notionOAuthClientSecret(env);
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${base64EncodeText(`${clientId}:${clientSecret}`)}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': input.apiVersion,
-    },
-    body: JSON.stringify({
-      grant_type: 'authorization_code',
-      code: input.code,
-      redirect_uri: input.redirectUri,
-    }),
-  });
-  if (!response.ok) throw await notionErrorFromResponse(response);
-  const data = await response.json().catch(() => ({}));
-  if (!data || typeof data !== 'object') throw new Error('Notion OAuth token response was invalid.');
-  const record = data as Record<string, unknown>;
-  if (!optionalString(record.access_token)) throw new Error('Notion OAuth token response did not include an access token.');
-  return record;
-}
-
-async function notionOAuthRefreshTokenRequest(
-  input: {
-    refreshToken: string;
-    apiVersion: string;
-  },
-  env: Record<string, unknown> | undefined,
-) {
-  const url = `${notionApiBase(env)}/oauth/token`;
-  const clientId = notionOAuthClientId(env);
-  const clientSecret = notionOAuthClientSecret(env);
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${base64EncodeText(`${clientId}:${clientSecret}`)}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': input.apiVersion,
-    },
-    body: JSON.stringify({
-      grant_type: 'refresh_token',
-      refresh_token: input.refreshToken,
-    }),
-  });
-  if (!response.ok) throw await notionErrorFromResponse(response);
-  const data = await response.json().catch(() => ({}));
-  if (!data || typeof data !== 'object') throw new Error('Notion OAuth refresh response was invalid.');
-  const record = data as Record<string, unknown>;
-  if (!optionalString(record.access_token)) throw new Error('Notion OAuth refresh response did not include an access token.');
-  return record;
-}
-
-async function tokenFingerprint(token: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
-  return Array.from(new Uint8Array(digest))
-    .slice(0, 8)
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(`${workspaceId}\u0000${actorId}\u0000${requestId}`),
+  );
+  const suffix = Array.from(new Uint8Array(digest))
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
+  return `notion-run-${suffix}`;
 }
 
-function notionWorkspaceInfo(me: Record<string, unknown>) {
-  const bot = me.bot;
-  const botRecord = bot && typeof bot === 'object' ? (bot as Record<string, unknown>) : {};
-  return {
-    id: typeof botRecord.workspace_id === 'string' ? botRecord.workspace_id : undefined,
-    name: typeof botRecord.workspace_name === 'string' ? botRecord.workspace_name : undefined,
-  };
-}
 
-function notionOAuthWorkspaceInfo(tokenResponse: Record<string, unknown>, me: Record<string, unknown>) {
-  const fromMe = notionWorkspaceInfo(me);
-  return {
-    id: fromMe.id ?? optionalString(tokenResponse.workspace_id),
-    name: fromMe.name ?? optionalString(tokenResponse.workspace_name),
-  };
-}
 
-function safeNotionOAuthOwner(owner: unknown) {
-  if (!owner || typeof owner !== 'object') return undefined;
-  const ownerRecord = owner as Record<string, unknown>;
-  const user = ownerRecord.user && typeof ownerRecord.user === 'object'
-    ? ownerRecord.user as Record<string, unknown>
-    : undefined;
-  return {
-    type: optionalString(ownerRecord.type),
-    user: user
-      ? {
-          id: optionalString(user.id),
-          object: optionalString(user.object),
-          type: optionalString(user.type),
-          name: optionalString(user.name),
-          avatarUrl: optionalString(user.avatar_url),
-        }
-      : undefined,
-  };
-}
+
 
 function mergeMetadata(
   current: Record<string, unknown> | undefined,
@@ -2253,34 +1461,6 @@ function relationTargetNotionId(config: Record<string, unknown> | undefined) {
   return undefined;
 }
 
-const SUPPORTED_NOTION_PROPERTY_TYPES = new Set([
-  'title',
-  'rich_text',
-  'number',
-  'select',
-  'multi_select',
-  'status',
-  'date',
-  'people',
-  'person',
-  'checkbox',
-  'url',
-  'email',
-  'phone_number',
-  'phone',
-  'files',
-  'created_time',
-  'last_edited_time',
-  'created_by',
-  'last_edited_by',
-  'relation',
-  'rollup',
-  'formula',
-  'unique_id',
-]);
-
-const SUPPORTED_NOTION_VIEW_TYPES = new Set(['table', 'board', 'list', 'gallery', 'calendar', 'timeline']);
-
 const LOCAL_TABLE_CALCULATIONS = new Set([
   'count_all',
   'count_values',
@@ -2474,98 +1654,6 @@ const SUPPORTED_NOTION_BLOCK_TYPES = new Set([
   'unsupported',
 ]);
 
-function emptyConversionReport(): ImportConversionReport {
-  return {
-    summary: {},
-    warnings: [],
-    unsupported: [],
-    missingPermissions: [],
-    unresolvedReferences: [],
-  };
-}
-
-function incrementReport(report: ImportConversionReport, key: string, by = 1) {
-  report.summary[key] = (report.summary[key] ?? 0) + by;
-}
-
-function pushReportIssue(
-  list: NotionImportWarning[],
-  issue: NotionImportWarning,
-  maxItems = 200,
-) {
-  if (list.length < maxItems) list.push(issue);
-}
-
-function reportUnresolvedFormulaPropertyReference(
-  report: ImportConversionReport,
-  dataSourceId: string,
-  notionPropertyId: string | undefined,
-  formulaPropertyName: string,
-  referencedProperty: string,
-) {
-  incrementReport(report, 'unresolvedFormulaPropertyReferences');
-  pushReportIssue(report.unresolvedReferences, {
-    code: 'formula_property_unresolved',
-    notionId: notionPropertyId ?? dataSourceId,
-    notionObject: 'property',
-    message:
-      `Formula property "${formulaPropertyName}" references unknown Notion property "${referencedProperty}" ` +
-      `in data source ${dataSourceId}. The original formula was preserved, but that property reference could not be remapped.`,
-  });
-}
-
-function reportUnsupportedFormulaFunctions(
-  report: ImportConversionReport,
-  dataSourceId: string,
-  notionPropertyId: string | undefined,
-  formulaPropertyName: string,
-  unsupportedFunctions: string[],
-) {
-  if (unsupportedFunctions.length === 0) return;
-  incrementReport(report, 'unsupportedFormulaFunctions', unsupportedFunctions.length);
-  pushReportIssue(report.unsupported, {
-    code: 'formula_function_unsupported',
-    notionId: notionPropertyId ?? dataSourceId,
-    notionObject: 'property',
-    message:
-      `Formula property "${formulaPropertyName}" uses unsupported function(s): ${unsupportedFunctions.join(', ')}. ` +
-      'The original formula and Notion-computed cell values were preserved for fallback.',
-  });
-}
-
-function reportUnsupportedProperty(
-  report: ImportConversionReport,
-  dataSourceId: string,
-  propertyId: string,
-  propertyName: string,
-  notionType: string,
-) {
-  if (SUPPORTED_NOTION_PROPERTY_TYPES.has(notionType.trim().toLowerCase())) return;
-  incrementReport(report, 'unsupportedProperties');
-  pushReportIssue(report.unsupported, {
-    code: 'unsupported_property_type',
-    notionId: propertyId,
-    notionObject: 'property',
-    message: `Property "${propertyName}" from data source ${dataSourceId} uses unsupported Notion type "${notionType}" and was imported as rich text fallback.`,
-  });
-}
-
-function reportUnsupportedView(
-  report: ImportConversionReport,
-  dataSourceId: string,
-  view: Record<string, unknown>,
-) {
-  const type = typeof view.type === 'string' ? view.type.trim().toLowerCase() : '';
-  if (SUPPORTED_NOTION_VIEW_TYPES.has(type)) return;
-  incrementReport(report, 'unsupportedViews');
-  pushReportIssue(report.unsupported, {
-    code: 'unsupported_view_type',
-    notionId: notionObjectId(view) ?? dataSourceId,
-    notionObject: 'view',
-    message: `View "${typeof view.name === 'string' ? view.name : 'Untitled'}" uses unsupported Notion type "${type || 'unknown'}" and was imported with a fallback renderer.`,
-  });
-}
-
 function reportUnresolvedViewPropertyReferences(
   report: ImportConversionReport | undefined,
   dataSourceId: string | undefined,
@@ -2682,10 +1770,6 @@ function assertNotionFileCopyNotDisabled(body?: Record<string, unknown>) {
   }
 }
 
-function normalizedImportedContentType(contentType: string | null | undefined, fallback?: string) {
-  return normalizeFileContentType(contentType, fallback);
-}
-
 function fileCopyScopeForBlockType(type: string): NotionFileCopyTarget['scope'] {
   if (type === 'image') return 'blocks/images';
   if (type === 'video') return 'blocks/videos';
@@ -2713,8 +1797,10 @@ function contentWithStoredNotionFile(
   content: Record<string, unknown> | undefined,
   copied: NotionFileReference,
 ) {
+  const rawNotionBlockId = notionObjectId(asRecord(content?.notionBlock) ?? {});
   const next: Record<string, unknown> = {
     ...(content ?? {}),
+    ...(rawNotionBlockId ? { notionBlockId: rawNotionBlockId } : {}),
     url: copied.url,
     fileName: copied.name,
     fileUploadId: copied.uploadId,
@@ -2755,138 +1841,6 @@ function storedNotionFileReference(value: unknown): NotionFileReference | undefi
     notionFileExpiryTime: optionalString(record.notionFileExpiryTime),
     notionFile,
   };
-}
-
-function sourceUrlCanBeCopied(url: string) {
-  return /^https?:\/\//i.test(url) || /^data:/i.test(url);
-}
-
-function responseContentLength(response: Response) {
-  const raw = response.headers.get('content-length');
-  if (!raw) return undefined;
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : undefined;
-}
-
-// No Content-Length: accumulate the body with a running byte cap and abort the
-// read as soon as the cap is crossed, instead of buffering the whole response
-// first — an attacker-controlled chunked response must not be able to exhaust
-// worker memory before the size check runs. Exported for the unit cap test.
-export async function readResponseBodyWithByteCap(response: Response, maxBytes: number): Promise<ArrayBuffer> {
-  const reader = response.body?.getReader();
-  if (!reader) {
-    // Runtimes that expose no readable stream (e.g. data: URL fetches) still
-    // get the post-hoc check.
-    const buffer = await response.arrayBuffer();
-    if (buffer.byteLength > maxBytes) throw new Error('source file is too large');
-    return buffer;
-  }
-  const parts: Uint8Array[] = [];
-  let total = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (!value || value.byteLength === 0) continue;
-    total += value.byteLength;
-    if (total > maxBytes) {
-      await reader.cancel('source file is too large').catch(() => {});
-      throw new Error('source file is too large');
-    }
-    parts.push(value);
-  }
-  const combined = new Uint8Array(total);
-  let offset = 0;
-  for (const part of parts) {
-    combined.set(part, offset);
-    offset += part.byteLength;
-  }
-  return combined.buffer;
-}
-
-// Content-Length is a claim made by the remote server. Stream through a
-// counter so a malicious source cannot advertise one byte and make R2 ingest
-// an unbounded body before the post-upload HEAD check notices.
-export function responseBodyWithExactByteCount(
-  body: ReadableStream<Uint8Array>,
-  expectedBytes: number,
-  maxBytes: number,
-  FixedLengthStreamCtor = (
-    globalThis as typeof globalThis & {
-      FixedLengthStream?: new (
-        length: number | bigint,
-      ) => ReadableWritablePair<Uint8Array, Uint8Array>;
-    }
-  ).FixedLengthStream,
-) {
-  let total = 0;
-  const validated = body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
-    transform(chunk, controller) {
-      total += chunk.byteLength;
-      if (total > maxBytes) throw new Error('source file is too large');
-      if (total > expectedBytes) throw new Error('source file size did not match Content-Length');
-      controller.enqueue(chunk);
-    },
-    flush() {
-      if (total !== expectedBytes) throw new Error('source file size did not match Content-Length');
-    },
-  }));
-  // R2 rejects an ordinary ReadableStream even when the source response
-  // advertised Content-Length. The validation TransformStream above strips
-  // the runtime's fixed-length brand, so restore it at the storage boundary.
-  // Node-based unit tests do not expose this Workers runtime primitive and use
-  // the validated stream directly; unknown-length responses are buffered into
-  // an ArrayBuffer before reaching this branch.
-  return FixedLengthStreamCtor
-    ? validated.pipeThrough(new FixedLengthStreamCtor(expectedBytes))
-    : validated;
-}
-
-async function fetchFileForImport(reference: NotionFileReference) {
-  if (!sourceUrlCanBeCopied(reference.url)) {
-    throw new Error('unsupported file URL scheme');
-  }
-  // A Notion workspace may contain arbitrary attachment formats, including
-  // SVG, HTML, XML, and source-code files. Preserve their declared MIME in
-  // storage; EdgeBase is the delivery security boundary and serves every
-  // non-passive type as an opaque, sandboxed attachment with nosniff. The
-  // importer still validates MIME syntax, source routing, size, byte count,
-  // storage integrity, ownership, and quota before committing the reference.
-  normalizedImportedContentType(reference.type, 'application/octet-stream');
-  // SSRF guard: `data:` URLs are inline payloads (no network fetch), but any
-  // http(s) source must resolve to a public host on every redirect hop.
-  // fetchPublicResource follows redirects manually and re-validates each one.
-  const isHttp = /^https?:\/\//i.test(reference.url);
-  const fetchInit = { signal: AbortSignal.timeout(60_000) };
-  const response = isHttp
-    ? await fetchPublicResource(reference.url, fetchInit)
-    : await fetch(reference.url, fetchInit);
-  if (!response.ok) throw new Error(`source returned HTTP ${response.status}`);
-  const contentLength = responseContentLength(response);
-  if (contentLength && contentLength > MAX_IMPORTED_FILE_SIZE) {
-    throw new Error('source file is too large');
-  }
-  const contentType = normalizedImportedContentType(
-    response.headers.get('content-type'),
-    reference.type,
-  );
-  if (response.body && contentLength) {
-    return {
-      body: responseBodyWithExactByteCount(response.body, contentLength, MAX_IMPORTED_FILE_SIZE),
-      size: contentLength,
-      contentType,
-    };
-  }
-  const buffer = await readResponseBodyWithByteCap(response, MAX_UNKNOWN_LENGTH_IMPORTED_FILE_SIZE);
-  if (buffer.byteLength <= 0) throw new Error('source file was empty');
-  return {
-    body: buffer,
-    size: buffer.byteLength,
-    contentType,
-  };
-}
-
-function fileCopyFailureMessage(label: string, reference: NotionFileReference, reason: string) {
-  return `Notion import could not copy file "${reference.name}" from ${label} into EdgeBase storage: ${reason}`;
 }
 
 function reportOrThrowNotionFileCopySkipped(
@@ -2935,6 +1889,10 @@ function refreshedPagePropertyFileReference(
   const targetName = optionalString(target.notionFileName) || staleReference.name;
   const targetIndex = typeof target.notionFileIndex === 'number' ? target.notionFileIndex : -1;
   const byIndex = targetIndex >= 0 ? references[targetIndex] : undefined;
+  // Durable pre-copy slots use the exact property coordinate plus ordinal.
+  // Filenames are not identifiers (duplicates are common), so never silently
+  // move an indexed slot to a same-name sibling after a signed URL refresh.
+  if (targetIndex >= 0) return byIndex;
   if (byIndex && (!targetName || byIndex.name === targetName)) return byIndex;
   return references.find((item) => item.name === targetName) ?? byIndex ?? references[0];
 }
@@ -3000,6 +1958,7 @@ async function storeNotionFileReference(
   context: NotionFileCopyContext,
   target: NotionFileCopyTarget,
   reference: NotionFileReference,
+  slotKey?: string,
 ) {
   const proxy = storageBucket(context.storage, FILE_BUCKET);
   if (!proxy?.put) throw new Error('EdgeBase storage is not available in this runtime');
@@ -3015,11 +1974,14 @@ async function storeNotionFileReference(
   const key = `workspaces/${context.job.workspaceId}/notion-import/${context.job.id}/${target.scope}/${id}-${base}${ext}`;
   const now = nowIso();
   const url = storageUrl(context.request, FILE_BUCKET, key);
-  const recoveryExpiresAt = new Date(Date.now() + NOTION_FILE_COPY_RECOVERY_TTL_MS).toISOString();
+  const recoveryExpiresAt = new Date(
+    Date.now() + (slotKey ? NOTION_FILE_CHECKPOINT_RECOVERY_TTL_MS : NOTION_FILE_COPY_RECOVERY_TTL_MS),
+  ).toISOString();
   const uploads = context.db.table<FileUpload>('file_uploads');
+  const ownerTarget = context.checkpointOnly
+    ? {} as Pick<NotionFileCopyTarget, 'pageId' | 'blockId' | 'databaseId' | 'propertyId' | 'templateId'>
+    : target;
 
-  let reservation: StorageQuotaReservation | null = null;
-  let objectWritten = false;
   let rowCreated = false;
   let upload: FileUpload | null = null;
   try {
@@ -3035,17 +1997,17 @@ async function storeNotionFileReference(
           context.job.workspaceId,
           [target.pageId, target.databaseId],
         );
-        await uploads.insert({
+        const uploadRow: FileUpload = {
           id,
           workspaceId: context.job.workspaceId,
           bucket: FILE_BUCKET,
           key,
           scope: target.scope,
-          pageId: target.pageId,
-          blockId: target.blockId,
-          databaseId: target.databaseId,
-          propertyId: target.propertyId,
-          templateId: target.templateId,
+          pageId: ownerTarget.pageId,
+          blockId: ownerTarget.blockId,
+          databaseId: ownerTarget.databaseId,
+          propertyId: ownerTarget.propertyId,
+          templateId: ownerTarget.templateId,
           name,
           contentType: file.contentType,
           size: file.size,
@@ -3053,13 +2015,53 @@ async function storeNotionFileReference(
           url,
           createdBy: context.actorId,
           expiresAt: recoveryExpiresAt,
+          ...(slotKey && context.itemSnapshotRevision
+            ? {
+                notionImportJobId: context.job.id,
+                notionImportSnapshotRevision: context.itemSnapshotRevision,
+                notionImportSlotKey: slotKey,
+              }
+            : {}),
           createdAt: now,
           updatedAt: now,
-        });
+        };
+        if (slotKey && context.applyLease && context.itemSnapshotRevision) {
+          await context.db.transact([
+            {
+              table: 'notion_import_jobs',
+              op: 'expect',
+              id: context.job.id,
+              where: [
+                ['status', '==', context.job.status],
+                ['itemSnapshotRevision', '==', context.itemSnapshotRevision],
+              ],
+              exists: true,
+            },
+            {
+              table: 'notion_import_apply_locks',
+              op: 'expect',
+              id: context.applyLease.id,
+              where: [
+                ['leaseId', '==', context.applyLease.leaseId],
+                ['purpose', '==', 'apply'],
+              ],
+              exists: true,
+            },
+            {
+              table: 'file_uploads',
+              op: 'expect',
+              id,
+              exists: false,
+            },
+            { table: 'file_uploads', op: 'insert', data: uploadRow as unknown as Record<string, unknown> },
+          ]);
+        } else {
+          await uploads.insert(uploadRow);
+        }
         rowCreated = true;
       },
     );
-    reservation = await reserveOrganizationStorage(context.admin, workspace, id, file.size);
+    await reserveOrganizationStorage(context.admin, workspace, id, file.size);
     await withFileWorkspaceLease(
       context.db,
       context.job.workspaceId,
@@ -3072,7 +2074,29 @@ async function storeNotionFileReference(
           context.job.workspaceId,
           [target.pageId, target.databaseId],
         );
-        await uploads.update(id, { status: 'pending', updatedAt: nowIso() });
+        const activatedAt = nowIso();
+        if (slotKey && context.applyLease && context.itemSnapshotRevision) {
+          await context.db.transact([
+            {
+              table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+              where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+              exists: true,
+            },
+            {
+              table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+              where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+              exists: true,
+            },
+            {
+              table: 'file_uploads', op: 'expect', id,
+              where: [['status', '==', 'preparing'], ['notionImportSlotKey', '==', slotKey]],
+              exists: true,
+            },
+            { table: 'file_uploads', op: 'update', id, data: { status: 'pending', updatedAt: activatedAt } },
+          ]);
+        } else {
+          await uploads.update(id, { status: 'pending', updatedAt: activatedAt });
+        }
       },
     );
 
@@ -3083,7 +2107,6 @@ async function storeNotionFileReference(
         notionFileSource: reference.notionFileSource,
       },
     });
-    objectWritten = true;
     const stored = await proxy.head(key);
     if (!stored) throw new Error('stored file was not found after copy');
     if (stored.size !== file.size) throw new Error('stored file size did not match the source');
@@ -3111,52 +2134,185 @@ async function storeNotionFileReference(
         if (!current || (current.status !== 'pending' && current.status !== 'preparing')) {
           throw new Error('Notion file copy state is no longer active.');
         }
-        return uploads.update(id, {
+        const finalizedAt = nowIso();
+        const patch = {
           status: 'uploaded',
           etag: stored.etag,
           expiresAt: null,
-          completedAt: nowIso(),
-          updatedAt: nowIso(),
-        });
+          completedAt: finalizedAt,
+          updatedAt: finalizedAt,
+        } as const;
+        if (slotKey && context.applyLease && context.itemSnapshotRevision) {
+          await context.db.transact([
+            {
+              table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+              where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+              exists: true,
+            },
+            {
+              table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+              where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+              exists: true,
+            },
+            {
+              table: 'file_uploads', op: 'expect', id,
+              where: [['status', '==', current.status], ['notionImportSlotKey', '==', slotKey]],
+              exists: true,
+            },
+            { table: 'file_uploads', op: 'update', id, data: patch },
+          ]);
+          return await getExisting(uploads, id) as FileUpload;
+        }
+        return uploads.update(id, patch);
       },
     );
   } catch (error) {
-    let objectCleanupSucceeded = !objectWritten;
-    if (objectWritten) {
-      objectCleanupSucceeded = await bestEffort('notion-import delete failed file copy', proxy.delete(key));
-    }
-    let quotaCleanupSucceeded = !reservation;
-    if (reservation && objectCleanupSucceeded) {
-      quotaCleanupSucceeded = await bestEffort(
-        'notion-import release failed file-copy reservation',
-        releaseOrganizationStorage(context.admin, reservation),
-      );
-    }
+    let cleanupCompleted = false;
     if (rowCreated) {
-      const cleanupAt = nowIso();
       await bestEffort(
-        'notion-import preserve failed file-copy cleanup state',
-        uploads.update(id, objectCleanupSucceeded && quotaCleanupSucceeded
-          ? {
-              status: 'expired',
-              expiresAt: cleanupAt,
-              expiredAt: cleanupAt,
-              deletedAt: cleanupAt,
-              deletedBy: context.actorId,
-              updatedAt: cleanupAt,
+        'notion-import preserve fenced failed file-copy cleanup state',
+        withFileWorkspaceLease(
+          context.db,
+          context.job.workspaceId,
+          context.actorId,
+          'notion-file-failed-copy-cleanup',
+          async (lease) => {
+            await lease.assertOwned();
+            const current = await getExisting(uploads, id);
+            if (!current) return;
+            // A recovery request may have completed this exact checkpoint
+            // while the failed worker was unwinding. Never let the stale
+            // catch path delete or expire a newly-published object.
+            if (current.status === 'uploaded') {
+              return;
             }
-          : {
-              status: 'pending',
-              expiresAt: cleanupAt,
-              updatedAt: cleanupAt,
-            }),
+            if (current.status === 'expired' || current.status === 'deleted') {
+              // The terminal cleanup may have observed HEAD-miss and retired
+              // the row while this old put was still in flight. Its unique key
+              // can appear afterwards; re-delete it idempotently, but do not
+              // mutate terminal metadata or quota under the stale apply lease.
+              await proxy.delete(key);
+              return;
+            }
+            if (!['preparing', 'pending', 'deleting'].includes(current.status)) return;
+
+            const claimedAt = nowIso();
+            const claimOperations: TransactOperation[] = [];
+            if (slotKey && context.applyLease && context.itemSnapshotRevision) {
+              claimOperations.push(
+                {
+                  table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+                  where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+                  exists: true,
+                },
+                {
+                  table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+                  where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+                  exists: true,
+                },
+              );
+            }
+            claimOperations.push(
+              {
+                table: 'file_uploads', op: 'expect', id,
+                where: [
+                  ['status', '==', current.status],
+                  ['updatedAt', '==', current.updatedAt ?? null],
+                  ['notionImportSlotKey', '==', current.notionImportSlotKey ?? null],
+                ],
+                exists: true,
+              },
+              {
+                table: 'file_uploads', op: 'update', id,
+                data: {
+                  status: 'deleting',
+                  deletionPreviousStatus: current.status,
+                  expiresAt: claimedAt,
+                  deletedBy: context.actorId,
+                  updatedAt: claimedAt,
+                },
+              },
+            );
+            await context.db.transact(claimOperations);
+
+            // Object deletion must complete before quota release, and quota
+            // release must complete before the row becomes terminal. Leaving
+            // `deleting` at either failure point makes recovery resumable.
+            // A storage driver may durably write the object and then fail the
+            // response/stream. Delete by the deterministic key even when the
+            // awaited put never returned; object deletion is idempotent.
+            await proxy.delete(key);
+            await lease.assertOwned();
+            if (workspace.organizationId) {
+              await releaseOrganizationStorage(context.admin, {
+                id,
+                organizationId: workspace.organizationId,
+                workspaceId: workspace.id,
+                bytes: current.size,
+              });
+            }
+            await lease.assertOwned();
+
+            const cleanupAt = nowIso();
+            const finishOperations: TransactOperation[] = [];
+            if (slotKey && context.applyLease && context.itemSnapshotRevision) {
+              finishOperations.push(
+                {
+                  table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+                  where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+                  exists: true,
+                },
+                {
+                  table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+                  where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+                  exists: true,
+                },
+              );
+            }
+            finishOperations.push(
+              {
+                table: 'file_uploads', op: 'expect', id,
+                where: [
+                  ['status', '==', 'deleting'],
+                  ['updatedAt', '==', claimedAt],
+                  ['notionImportSlotKey', '==', current.notionImportSlotKey ?? null],
+                ],
+                exists: true,
+              },
+              {
+                table: 'file_uploads', op: 'update', id,
+                data: {
+                  status: 'expired',
+                  ...(slotKey ? { notionImportSlotKey: null as unknown as string } : {}),
+                  expiresAt: cleanupAt,
+                  expiredAt: cleanupAt,
+                  deletedAt: cleanupAt,
+                  deletedBy: context.actorId,
+                  ...(slotKey ? {
+                    notionImportTerminalSweepAfter: new Date(
+                      Date.now() + NOTION_FILE_TERMINAL_RESWEEP_DELAY_MS,
+                    ).toISOString(),
+                    notionImportTerminalSweepCompletedAt: null,
+                  } : {}),
+                  updatedAt: cleanupAt,
+                },
+              },
+            );
+            await context.db.transact(finishOperations);
+            cleanupCompleted = true;
+          },
+        ),
       );
+    }
+    if (slotKey && cleanupCompleted) {
+      context.checkpointUploadsBySlotKey?.delete(slotKey);
     }
     throw error;
   }
 
   if (!upload) throw new Error('Notion file copy did not reach an uploaded state.');
   context.createdUploadIds?.push(upload.id);
+  if (slotKey) context.checkpointUploadsBySlotKey?.set(slotKey, upload);
   context.stats.fileCopies += 1;
   reportNotionFileCopy(
     context.conversionReport,
@@ -3169,20 +2325,439 @@ async function storeNotionFileReference(
   return localStoredFileReference(reference, upload);
 }
 
+async function retireIncompleteNotionFileCheckpoint(
+  context: NotionFileCopyContext,
+  upload: FileUpload,
+) {
+  if (upload.pageId || upload.blockId || upload.databaseId || upload.propertyId || upload.templateId) {
+    throw Object.assign(new Error('Notion import cannot retire a checkpoint that already has a product owner.'), { code: 409 });
+  }
+  const proxy = storageBucket(context.storage, upload.bucket || FILE_BUCKET);
+  if (!proxy) throw Object.assign(new Error('EdgeBase storage is unavailable for checkpoint recovery.'), { code: 409 });
+  const workspace = await getExisting(context.db.table<Workspace>('workspaces'), context.job.workspaceId);
+  if (!workspace) throw new Error('workspace was not found');
+  await withFileWorkspaceLease(
+    context.db,
+    context.job.workspaceId,
+    context.actorId,
+    'notion-file-checkpoint-retire',
+    async (lease) => {
+      await lease.assertOwned();
+      const uploads = context.db.table<FileUpload>('file_uploads');
+      const current = await getExisting(uploads, upload.id);
+      if (!current) return;
+      if (current.pageId || current.blockId || current.databaseId || current.propertyId || current.templateId) {
+        throw Object.assign(new Error('Notion import cannot retire a checkpoint that gained a product owner.'), { code: 409 });
+      }
+      if (current.status === 'expired' || current.status === 'deleted') return;
+      if (!['uploaded', 'preparing', 'pending', 'deleting'].includes(current.status)) {
+        throw Object.assign(new Error('Notion import checkpoint is not in a recoverable cleanup state.'), { code: 409 });
+      }
+      const recoveryExpiry = typeof current.expiresAt === 'string' ? Date.parse(current.expiresAt) : NaN;
+      if (
+        current.status !== 'uploaded'
+        && current.status !== 'deleting'
+        && (!Number.isFinite(recoveryExpiry) || recoveryExpiry > Date.now())
+      ) {
+        throw Object.assign(
+          new Error('Notion import checkpoint cleanup is waiting for the lost object write to expire.'),
+          { code: 503, notionImportFileRetryable: true },
+        );
+      }
+
+      let deleting = current;
+      if (current.status !== 'deleting') {
+        const deletingAt = nowIso();
+        const operations: TransactOperation[] = [];
+        if (context.applyLease && context.itemSnapshotRevision) {
+          operations.push(
+            {
+              table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+              where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+              exists: true,
+            },
+            {
+              table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+              where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+              exists: true,
+            },
+          );
+        }
+        operations.push(
+          {
+            table: 'file_uploads', op: 'expect', id: current.id,
+            where: [
+              ['status', '==', current.status],
+              ['updatedAt', '==', current.updatedAt ?? null],
+              ['notionImportSlotKey', '==', current.notionImportSlotKey ?? null],
+            ],
+            exists: true,
+          },
+          {
+            table: 'file_uploads', op: 'update', id: current.id,
+            data: {
+              status: 'deleting',
+              deletionPreviousStatus: current.status,
+              expiresAt: deletingAt,
+              deletedBy: context.actorId,
+              updatedAt: deletingAt,
+            },
+          },
+        );
+        await context.db.transact(operations);
+        deleting = await getExisting(uploads, current.id) as FileUpload;
+      }
+
+      const objectCleanupSucceeded = await bestEffort(
+        'notion-import retire incomplete checkpoint object',
+        proxy.delete(deleting.key),
+      );
+      if (!objectCleanupSucceeded) {
+        throw Object.assign(
+          new Error('Notion import checkpoint cleanup is pending because its object could not be deleted.'),
+          { code: 409, notionImportRecoveryPending: true },
+        );
+      }
+      await lease.assertOwned();
+      if (context.applyLease) await renewNotionApplyLease(context.db, context.applyLease);
+      if (workspace.organizationId) {
+        await releaseOrganizationStorage(context.admin, {
+          id: deleting.id,
+          organizationId: workspace.organizationId,
+          workspaceId: workspace.id,
+          bytes: deleting.size,
+        });
+      }
+      await lease.assertOwned();
+      const cleanupAt = nowIso();
+      const operations: TransactOperation[] = [];
+      if (context.applyLease && context.itemSnapshotRevision) {
+        operations.push(
+          {
+            table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+            where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+            exists: true,
+          },
+          {
+            table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+            where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+            exists: true,
+          },
+        );
+      }
+      operations.push(
+        {
+          table: 'file_uploads', op: 'expect', id: deleting.id,
+          where: [['status', '==', 'deleting'], ['updatedAt', '==', deleting.updatedAt ?? null]],
+          exists: true,
+        },
+        {
+          table: 'file_uploads', op: 'update', id: deleting.id,
+          data: {
+            status: 'expired',
+            notionImportSlotKey: null as unknown as string,
+            expiresAt: cleanupAt,
+            expiredAt: cleanupAt,
+            deletedAt: cleanupAt,
+            deletedBy: context.actorId,
+            notionImportTerminalSweepAfter: new Date(
+              Date.now() + NOTION_FILE_TERMINAL_RESWEEP_DELAY_MS,
+            ).toISOString(),
+            notionImportTerminalSweepCompletedAt: null,
+            updatedAt: cleanupAt,
+          },
+        },
+      );
+      await context.db.transact(operations);
+    },
+  );
+  if (upload.notionImportSlotKey) context.checkpointUploadsBySlotKey?.delete(upload.notionImportSlotKey);
+}
+
+async function recoverIncompleteNotionFileCheckpoint(
+  context: NotionFileCopyContext,
+  upload: FileUpload,
+) {
+  const expiresAt = typeof upload.expiresAt === 'string' ? Date.parse(upload.expiresAt) : NaN;
+  if (!Number.isFinite(expiresAt) || expiresAt > Date.now()) {
+    throw Object.assign(
+      new Error('Notion import file checkpoint is still being copied by the active or recently lost request.'),
+      { code: 503, notionImportFileRetryable: true },
+    );
+  }
+  const proxy = storageBucket(context.storage, upload.bucket || FILE_BUCKET);
+  const recovered = await withFileWorkspaceLease(
+    context.db,
+    context.job.workspaceId,
+    context.actorId,
+    'notion-file-checkpoint-recover',
+    async (lease) => {
+      await lease.assertOwned();
+      const uploads = context.db.table<FileUpload>('file_uploads');
+      const current = await getExisting(uploads, upload.id);
+      if (!current) return undefined;
+      if (current.status === 'uploaded') return current;
+      if (current.status === 'deleting') return undefined;
+      if (current.status !== 'preparing' && current.status !== 'pending') {
+        throw Object.assign(new Error('Notion import checkpoint is no longer recoverable.'), { code: 409 });
+      }
+      const currentExpiry = typeof current.expiresAt === 'string' ? Date.parse(current.expiresAt) : NaN;
+      if (!Number.isFinite(currentExpiry) || currentExpiry > Date.now()) {
+        throw Object.assign(
+          new Error('Notion import file checkpoint is still being copied by the active or recently lost request.'),
+          { code: 503, notionImportFileRetryable: true },
+        );
+      }
+      const stored = proxy?.head ? await proxy.head(current.key) : null;
+      if (
+        !stored
+        || stored.size !== current.size
+        || typeof stored.etag !== 'string'
+        || !stored.etag
+        || normalizedImportedContentType(stored.contentType) !== normalizedImportedContentType(current.contentType)
+      ) {
+        return undefined;
+      }
+      const workspace = await getExisting(context.db.table<Workspace>('workspaces'), context.job.workspaceId);
+      if (!workspace) throw new Error('workspace was not found');
+
+      // First claim recovery under all three ownership fences. Cancellation or
+      // apply takeover after this point can make publication fail, but cannot
+      // let a second recovery mutate the same upload while this file lease is
+      // held. The reservation id is the upload id, so crash retries are
+      // idempotent in the central quota ledger.
+      const recoveryAt = nowIso();
+      const recoveryExpiresAt = new Date(Date.now() + NOTION_FILE_CHECKPOINT_RECOVERY_TTL_MS).toISOString();
+      const claimOperations: TransactOperation[] = [];
+      if (context.applyLease && context.itemSnapshotRevision) {
+        claimOperations.push(
+          {
+            table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+            where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+            exists: true,
+          },
+          {
+            table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+            where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+            exists: true,
+          },
+        );
+      }
+      claimOperations.push(
+        {
+          table: 'file_uploads', op: 'expect', id: current.id,
+          where: [['status', '==', current.status], ['updatedAt', '==', current.updatedAt ?? null]],
+          exists: true,
+        },
+        {
+          table: 'file_uploads', op: 'update', id: current.id,
+          data: { status: 'pending', expiresAt: recoveryExpiresAt, updatedAt: recoveryAt },
+        },
+      );
+      await context.db.transact(claimOperations);
+      await reserveOrganizationStorage(context.admin, workspace, current.id, current.size);
+      await lease.assertOwned();
+      const completedAt = nowIso();
+      const publishOperations: TransactOperation[] = [];
+      if (context.applyLease && context.itemSnapshotRevision) {
+        publishOperations.push(
+          {
+            table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+            where: [['status', '==', context.job.status], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+            exists: true,
+          },
+          {
+            table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+            where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+            exists: true,
+          },
+        );
+      }
+      publishOperations.push(
+        {
+          table: 'file_uploads', op: 'expect', id: current.id,
+          where: [['status', '==', 'pending'], ['updatedAt', '==', recoveryAt]],
+          exists: true,
+        },
+        {
+          table: 'file_uploads', op: 'update', id: current.id,
+          data: {
+            status: 'uploaded', etag: stored.etag, expiresAt: null,
+            completedAt, updatedAt: completedAt,
+          },
+        },
+      );
+      await context.db.transact(publishOperations);
+      return await getExisting(uploads, current.id) ?? undefined;
+    },
+  );
+  if (recovered) {
+    const expectedSlotKey = optionalString(upload.notionImportSlotKey);
+    const recoveredSlotKey = optionalString(recovered.notionImportSlotKey);
+    if (!expectedSlotKey || recoveredSlotKey !== expectedSlotKey) {
+      throw Object.assign(
+        new Error('Notion import file checkpoint slot identity changed during recovery.'),
+        { code: 409, notionImportRecoveryPending: true },
+      );
+    }
+    context.checkpointUploadsBySlotKey?.set(recoveredSlotKey, recovered);
+    context.verifiedCheckpointUploadIds?.add(recovered.id);
+    return recovered;
+  }
+  await retireIncompleteNotionFileCheckpoint(context, upload);
+  return undefined;
+}
+
 async function copyNotionFileReference(
   context: NotionFileCopyContext,
   target: NotionFileCopyTarget,
   reference: NotionFileReference,
+  precomputedSlotKey?: string,
 ) {
+  const slotCoordinates = context.itemSnapshotRevision && target.notionFileRole && target.notionFileStructuralPath
+    ? notionImportFileSlotCoordinates(context.itemSnapshotRevision, target)
+    : undefined;
+  const slotKey = precomputedSlotKey
+    ?? (slotCoordinates ? context.checkpointSlotKeysByCoordinates?.get(slotCoordinates) : undefined)
+    ?? (context.itemSnapshotRevision && slotCoordinates
+      ? await notionImportFileSlotKey(context.itemSnapshotRevision, target)
+      : undefined);
+  let checkpoint = slotKey ? context.checkpointUploadsBySlotKey?.get(slotKey) : undefined;
+  if (slotKey && context.requireFileCopyCheckpoint && checkpoint) {
+    // The in-process inventory is only a hint. Maintenance/cancellation can
+    // CAS the durable row after cache hydration; re-read the exact id before
+    // consuming it so a stale `uploaded` object cannot reach the owner
+    // transaction and fail after product writes have begun.
+    const current = await getExisting(context.db.table<FileUpload>('file_uploads'), checkpoint.id);
+    if (
+      current
+      && current.workspaceId === context.job.workspaceId
+      && current.notionImportJobId === context.job.id
+      && current.notionImportSnapshotRevision === context.itemSnapshotRevision
+      && current.notionImportSlotKey === slotKey
+    ) {
+      checkpoint = current;
+      context.checkpointUploadsBySlotKey?.set(slotKey, current);
+    } else {
+      checkpoint = undefined;
+      context.checkpointUploadsBySlotKey?.delete(slotKey);
+    }
+  }
+  if (
+    slotKey
+    && context.requireFileCopyCheckpoint
+    && (!checkpoint || checkpoint.status !== 'uploaded')
+  ) {
+    if (context.onRequiredCheckpointUnavailable) {
+      return await context.onRequiredCheckpointUnavailable(
+        slotKey,
+        target,
+        checkpoint ? 'not_uploaded' : 'missing',
+      );
+    }
+    throw Object.assign(
+      new Error(
+        `Notion import required file checkpoint was ${checkpoint ? 'not uploaded' : 'missing'} for ` +
+        `"${target.notionFileRole ?? 'unknown'}" at ` +
+        `"${target.notionFileStructuralPath ?? 'unknown'}".`,
+      ),
+      { code: 503, notionImportRecoveryPending: true },
+    );
+  }
+  if (checkpoint) {
+    if (
+      checkpoint.workspaceId !== context.job.workspaceId
+      || checkpoint.notionImportJobId !== context.job.id
+      || checkpoint.notionImportSnapshotRevision !== context.itemSnapshotRevision
+      || checkpoint.notionImportSlotKey !== slotKey
+    ) {
+      throw Object.assign(new Error('Notion import file checkpoint identity did not match the active job.'), { code: 409 });
+    }
+    if (checkpoint.status !== 'uploaded') {
+      checkpoint = await recoverIncompleteNotionFileCheckpoint(context, checkpoint);
+    }
+    if (checkpoint?.status === 'uploaded') {
+      if (!optionalString(checkpoint.completedAt)) {
+        throw Object.assign(new Error('Notion import file checkpoint was uploaded without a completion marker.'), { code: 409 });
+      }
+      if (!context.verifiedCheckpointUploadIds?.has(checkpoint.id)) {
+        const proxy = storageBucket(context.storage, checkpoint.bucket || FILE_BUCKET);
+        const stored = proxy?.head ? await proxy.head(checkpoint.key) : null;
+        if (
+          !stored
+          || stored.size !== checkpoint.size
+          || typeof stored.etag !== 'string'
+          || !stored.etag
+          || (checkpoint.etag && stored.etag !== checkpoint.etag)
+          || normalizedImportedContentType(stored.contentType) !== normalizedImportedContentType(checkpoint.contentType)
+        ) {
+          throw Object.assign(new Error('Notion import file checkpoint object failed integrity verification.'), { code: 409 });
+        }
+        context.verifiedCheckpointUploadIds?.add(checkpoint.id);
+      }
+      context.pendingCheckpointTargets?.set(checkpoint.id, target);
+      if (context.checkpointOnly) {
+        // A worker can publish the durable upload and die before the file
+        // cursor/report transaction. `created.fileCopies` is reconstructed
+        // from uploaded checkpoints when the request starts, so incrementing
+        // stats here would double count. The conversion report is not
+        // reconstructible from the row, however: replay it only while the
+        // pre-copy cursor still owns this slot. A successful progress commit
+        // advances past the slot and makes this exact-once across restarts.
+        reportNotionFileCopy(
+          context.conversionReport,
+          target.notionId,
+          target.notionObject,
+          target.label,
+          reference,
+          checkpoint,
+        );
+      }
+      return localStoredFileReference(reference, checkpoint);
+    }
+  }
+  if (slotKey && context.requireFileCopyCheckpoint) {
+    throw Object.assign(
+      new Error(
+        `Notion import file pre-copy inventory did not contain required slot ` +
+        `"${target.notionFileRole ?? 'unknown'}" at "${target.notionFileStructuralPath ?? 'unknown'}".`,
+      ),
+      { code: 409 },
+    );
+  }
   try {
-    return await storeNotionFileReference(context, target, reference);
+    const copied = await storeNotionFileReference(context, target, reference, slotKey);
+    if (copied.uploadId) context.pendingCheckpointTargets?.set(copied.uploadId, target);
+    return copied;
   } catch (firstError) {
+    if (
+      firstError
+      && typeof firstError === 'object'
+      && ((firstError as { notionImportFileRetryable?: unknown }).notionImportFileRetryable === true
+        || (firstError as { notionImportRecoveryPending?: unknown }).notionImportRecoveryPending === true)
+    ) {
+      throw firstError;
+    }
+    if (isTransientInfrastructureError(firstError)) {
+      throw Object.assign(
+        new Error(firstError instanceof Error ? firstError.message : String(firstError)),
+        { code: 503, notionImportFileRetryable: true },
+      );
+    }
     const firstMessage = firstError instanceof Error ? firstError.message : String(firstError);
     const refreshed = await refreshNotionFileReference(context, target, reference);
     if (refreshed && refreshed.url && refreshed.url !== reference.url) {
       try {
-        return await storeNotionFileReference(context, target, refreshed);
+        const copied = await storeNotionFileReference(context, target, refreshed, slotKey);
+        if (copied.uploadId) context.pendingCheckpointTargets?.set(copied.uploadId, target);
+        return copied;
       } catch (secondError) {
+        if (isTransientInfrastructureError(secondError)) {
+          throw Object.assign(
+            new Error(secondError instanceof Error ? secondError.message : String(secondError)),
+            { code: 503, notionImportFileRetryable: true },
+          );
+        }
         const secondMessage = secondError instanceof Error ? secondError.message : String(secondError);
         reportOrThrowNotionFileCopySkipped(
           context,
@@ -3199,36 +2774,11 @@ async function copyNotionFileReference(
   }
 }
 
-function localPropertyType(notionType: string) {
+function localPropertyType(notionType: string): DatabasePropertyType {
   const normalized = notionType.trim().toLowerCase();
   if (normalized === 'phone_number') return 'phone';
   if (normalized === 'people') return 'person';
-  if (normalized === 'created_by' || normalized === 'last_edited_by') return normalized;
-  if (
-    [
-      'title',
-      'rich_text',
-      'number',
-      'select',
-      'multi_select',
-      'status',
-      'date',
-      'person',
-      'checkbox',
-      'url',
-      'email',
-      'phone',
-      'files',
-      'created_time',
-      'last_edited_time',
-      'relation',
-      'rollup',
-      'formula',
-      'unique_id',
-    ].includes(normalized)
-  ) {
-    return normalized;
-  }
+  if (isDatabasePropertyType(normalized)) return normalized;
   return 'rich_text';
 }
 
@@ -3320,11 +2870,12 @@ function rawNotionPropertiesHaveTitle(sourceProperties: Record<string, unknown>)
   });
 }
 
-function localViewType(value: unknown) {
-  const type = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  if (type === 'chart') return 'chart';
-  if (['table', 'board', 'list', 'gallery', 'calendar', 'timeline'].includes(type)) return type;
-  return 'table';
+function localViewType(value: unknown): NotionDatabaseViewType {
+  try {
+    return parseDatabaseViewType(value);
+  } catch {
+    return 'table';
+  }
 }
 
 function createViewPropertyReferenceCollector(): ViewPropertyReferenceCollector {
@@ -4307,7 +3858,7 @@ export function remappedViewFilterList(
   return remappedPropertyKeyedFilterList(propertyMappings, value, collector, localPropertiesById);
 }
 
-function dbViewFromNotion(
+export function dbViewFromNotion(
   databaseId: string,
   view: Record<string, unknown>,
   position: number,
@@ -4320,24 +3871,28 @@ function dbViewFromNotion(
   const type = localViewType(notionType);
   const unsupportedNotionViewType =
     notionType && !SUPPORTED_NOTION_VIEW_TYPES.has(notionType) ? notionType : undefined;
+  const typedView: Record<string, unknown> = unsupportedNotionViewType ? {} : view;
+  const officialConfiguration = !unsupportedNotionViewType
+    ? asRecord(view.configuration)
+    : undefined;
   const collector = createViewPropertyReferenceCollector();
-  const filterSource = firstDefinedViewValue(view, VIEW_FILTER_KEYS);
-  const sortsSource = firstDefinedViewValue(view, VIEW_SORT_KEYS);
-  const visiblePropertiesSource = firstDefinedViewValue(view, VIEW_VISIBLE_PROPERTY_KEYS);
-  const hiddenPropertiesSource = firstDefinedViewValue(view, VIEW_HIDDEN_PROPERTY_KEYS);
-  const propertyOrderSource = firstDefinedViewValue(view, VIEW_PROPERTY_ORDER_KEYS);
-  const propertySettingsSource = firstDefinedViewValue(view, VIEW_PROPERTY_SETTING_KEYS);
-  const propertyWidthsSource = firstDefinedViewValue(view, VIEW_PROPERTY_WIDTH_KEYS);
-  const tableCalculationsSource = firstDefinedViewValue(view, VIEW_TABLE_CALCULATION_KEYS);
-  const wrappedColumnsSource = firstDefinedViewValue(view, VIEW_WRAPPED_COLUMN_KEYS);
-  const quickFiltersSource = firstDefinedViewValue(view, VIEW_QUICK_FILTER_KEYS);
-  const groupBySource = firstDefinedViewValue(view, VIEW_GROUP_BY_KEYS);
-  const subGroupBySource = firstDefinedViewValue(view, VIEW_SUBGROUP_BY_KEYS);
-  const calendarBySource = firstDefinedViewValue(view, VIEW_CALENDAR_BY_KEYS);
-  const timelineBySource = firstDefinedViewValue(view, VIEW_TIMELINE_BY_KEYS);
-  const timelineEndBySource = firstDefinedViewValue(view, VIEW_TIMELINE_END_BY_KEYS);
-  const coverPropertySource = firstDefinedViewValue(view, VIEW_COVER_PROPERTY_KEYS);
-  const dependencyPropertySource = firstDefinedViewValue(view, VIEW_DEPENDENCY_PROPERTY_KEYS);
+  const filterSource = firstDefinedViewValue(typedView, VIEW_FILTER_KEYS);
+  const sortsSource = firstDefinedViewValue(typedView, VIEW_SORT_KEYS);
+  const visiblePropertiesSource = firstDefinedViewValue(typedView, VIEW_VISIBLE_PROPERTY_KEYS);
+  const hiddenPropertiesSource = firstDefinedViewValue(typedView, VIEW_HIDDEN_PROPERTY_KEYS);
+  const propertyOrderSource = firstDefinedViewValue(typedView, VIEW_PROPERTY_ORDER_KEYS);
+  const propertySettingsSource = firstDefinedViewValue(typedView, VIEW_PROPERTY_SETTING_KEYS);
+  const propertyWidthsSource = firstDefinedViewValue(typedView, VIEW_PROPERTY_WIDTH_KEYS);
+  const tableCalculationsSource = firstDefinedViewValue(typedView, VIEW_TABLE_CALCULATION_KEYS);
+  const wrappedColumnsSource = firstDefinedViewValue(typedView, VIEW_WRAPPED_COLUMN_KEYS);
+  const quickFiltersSource = firstDefinedViewValue(typedView, VIEW_QUICK_FILTER_KEYS);
+  const groupBySource = firstDefinedViewValue(typedView, VIEW_GROUP_BY_KEYS);
+  const subGroupBySource = firstDefinedViewValue(typedView, VIEW_SUBGROUP_BY_KEYS);
+  const calendarBySource = firstDefinedViewValue(typedView, VIEW_CALENDAR_BY_KEYS);
+  const timelineBySource = firstDefinedViewValue(typedView, VIEW_TIMELINE_BY_KEYS);
+  const timelineEndBySource = firstDefinedViewValue(typedView, VIEW_TIMELINE_END_BY_KEYS);
+  const coverPropertySource = firstDefinedViewValue(typedView, VIEW_COVER_PROPERTY_KEYS);
+  const dependencyPropertySource = firstDefinedViewValue(typedView, VIEW_DEPENDENCY_PROPERTY_KEYS);
   const localPropertiesById = new Map(localProperties.map((property) => [property.id, property]));
   const filterGroup = remappedViewFilterGroup(propertyMappings, filterSource, collector, localPropertiesById);
   const sorts = remappedViewSorts(propertyMappings, sortsSource, collector);
@@ -4367,7 +3922,9 @@ function dbViewFromNotion(
     collector,
     'property order',
   );
-  const fallbackPropertyOrder = fallbackNotionViewPropertyOrder(localProperties, type);
+  const fallbackPropertyOrder = unsupportedNotionViewType
+    ? undefined
+    : fallbackNotionViewPropertyOrder(localProperties, type);
   const propertyOrder = remappedPropertyOrder ?? propertySettings?.propertyOrder ?? fallbackPropertyOrder;
   if (!remappedPropertyOrder && !propertySettings?.propertyOrder && fallbackPropertyOrder) {
     reportUnavailableViewPropertyLayout(report, dataSourceId, view);
@@ -4400,8 +3957,23 @@ function dbViewFromNotion(
     collector,
     'wrapped columns',
   ) ?? propertySettings?.wrappedColumns;
-  const groupBy = remappedViewPropertyId(propertyMappings, groupBySource, collector, 'group');
-  const subGroupBy = remappedViewPropertyId(propertyMappings, subGroupBySource, collector, 'subgroup');
+  const remappedGroupBy = remappedViewPropertyId(propertyMappings, groupBySource, collector, 'group');
+  const remappedSubGroupBy = remappedViewPropertyId(
+    propertyMappings,
+    subGroupBySource,
+    collector,
+    'subgroup',
+  );
+  const groupBy = type === 'board'
+    ? remappedGroupBy && isHanjiBoardMainGroupPropertyType(localPropertiesById.get(remappedGroupBy)?.type)
+      ? remappedGroupBy
+      : undefined
+    : remappedGroupBy;
+  const subGroupBy = type === 'board'
+    ? remappedSubGroupBy && ['select', 'status'].includes(localPropertiesById.get(remappedSubGroupBy)?.type ?? '')
+      ? remappedSubGroupBy
+      : undefined
+    : remappedSubGroupBy;
   const calendarBy = remappedViewPropertyId(propertyMappings, calendarBySource, collector, 'calendar');
   const timelineBy = remappedViewPropertyId(propertyMappings, timelineBySource, collector, 'timeline');
   const timelineEndBy = remappedViewPropertyId(propertyMappings, timelineEndBySource, collector, 'timeline end');
@@ -4412,11 +3984,11 @@ function dbViewFromNotion(
     collector,
     'dependency',
   );
-  const rowHeight = normalizedViewRowHeight(firstDefinedViewValue(view, VIEW_ROW_HEIGHT_KEYS));
-  const cardSize = normalizedViewCardSize(firstDefinedViewValue(view, VIEW_CARD_SIZE_KEYS));
-  const openPageIn = normalizedViewOpenPageIn(firstDefinedViewValue(view, VIEW_OPEN_PAGE_IN_KEYS));
-  const timelineZoom = normalizedTimelineZoom(firstDefinedViewValue(view, VIEW_TIMELINE_ZOOM_KEYS));
-  const wrap = normalizedViewBoolean(firstDefinedViewValue(view, VIEW_WRAP_KEYS));
+  const rowHeight = normalizedViewRowHeight(firstDefinedViewValue(typedView, VIEW_ROW_HEIGHT_KEYS));
+  const cardSize = normalizedViewCardSize(firstDefinedViewValue(typedView, VIEW_CARD_SIZE_KEYS));
+  const openPageIn = normalizedViewOpenPageIn(firstDefinedViewValue(typedView, VIEW_OPEN_PAGE_IN_KEYS));
+  const timelineZoom = normalizedTimelineZoom(firstDefinedViewValue(typedView, VIEW_TIMELINE_ZOOM_KEYS));
+  const wrap = normalizedViewBoolean(firstDefinedViewValue(typedView, VIEW_WRAP_KEYS));
   const quickFilters = remappedViewFilterList(
     propertyMappings,
     quickFiltersSource,
@@ -4425,21 +3997,26 @@ function dbViewFromNotion(
   );
   const quickFilterGroup = quickFilters ? importedFilterGroupFromTerms(quickFilters) : undefined;
   const effectiveFilterGroup = mergeImportedFilterGroups(filterGroup, quickFilterGroup);
-  const inferredFilter = !effectiveFilterGroup
+  const inferredFilter = !unsupportedNotionViewType && !effectiveFilterGroup
     ? inferredViewNameSelectFilter(typeof view.name === 'string' ? view.name : '', localProperties)
     : undefined;
   if (inferredFilter && report) incrementReport(report, 'inferredViewNameFilters');
   reportUnresolvedViewPropertyReferences(report, dataSourceId, view, collector);
-  return {
+  return normalizeDatabaseViewStorageRecord({
     id: newId(),
     databaseId,
     name: typeof view.name === 'string' && view.name.trim() ? view.name.trim() : `View ${position + 1}`,
     type,
     config: {
+      ...(officialConfiguration ? structuredClone(officialConfiguration) : {}),
+      type: officialConfiguration?.type ?? type,
       notionViewId: typeof view.id === 'string' ? view.id : undefined,
       notionType,
       unsupportedNotionViewType,
-      notion: view,
+      notion: structuredClone(view),
+      ...('configuration' in view
+        ? { notionConfiguration: structuredClone(view.configuration) }
+        : {}),
       notionFilter: filterSource,
       notionSorts: sortsSource,
       notionVisibleProperties: visiblePropertiesSource,
@@ -4471,7 +4048,7 @@ function dbViewFromNotion(
       unresolvedPropertyReferences: collector.unresolved.length ? collector.unresolved : undefined,
     },
     position: position + 1,
-  };
+  });
 }
 
 function fallbackNotionViewPropertyOrder(properties: DbProperty[], viewType: string) {
@@ -4686,13 +4263,25 @@ function flattenImportablePageBlocksForPlan(blocks: Record<string, unknown>[]) {
   const out: Record<string, unknown>[] = [];
   const visit = (block: Record<string, unknown>) => {
     out.push(block);
-    if (block.type === 'template') return;
-    for (const child of notionBlockChildren(block)) {
+    // Child pages/databases own their descendants. Apply keeps the boundary
+    // block in the current page, then imports the child object's body from its
+    // own page snapshot instead of duplicating that body under the parent.
+    if (block.type === 'template' || block.type === 'child_page' || block.type === 'child_database') return;
+    const children = block.type === 'tab'
+      ? notionBlockChildren(block).map((child, index) => wrappedTabChildBlock(child, index))
+      : notionBlockChildren(block);
+    for (const child of children) {
       if (block.type === 'table' && child.type === 'table_row') continue;
       visit(child);
     }
   };
-  for (const block of blocks) visit(block);
+  const nestedBlockIds = nestedNotionBlockIds(blocks);
+  for (const block of blocks) {
+    const blockId = notionObjectId(block);
+    if (blockId && nestedBlockIds.has(blockId)) continue;
+    if (block.type === 'column' && notionBlockChildren(block).length === 0) continue;
+    visit(block);
+  }
   return out;
 }
 
@@ -5320,6 +4909,408 @@ function fileReferenceFromNotionBlock(block: Record<string, unknown>) {
   return notionFileReference(payload, fallbackName);
 }
 
+interface PendingNotionImportFileCopySlot {
+  reference: NotionFileReference;
+  target: NotionFileCopyTarget;
+}
+
+function notionImportFileSlotCoordinates(
+  revision: string,
+  target: NotionFileCopyTarget,
+) {
+  return [
+    'notion-file-slot-v1',
+    revision,
+    target.notionObject,
+    target.notionId ?? '',
+    target.notionPageId ?? '',
+    target.notionBlockId ?? '',
+    target.notionPropertyId ?? '',
+    target.notionPageFileKind ?? '',
+    target.notionFileRole ?? '',
+    target.notionFileStructuralPath ?? '',
+    String(target.notionFileOrdinal ?? 0),
+  ].join('\u001f');
+}
+
+async function notionImportFileSlotKey(
+  revision: string,
+  target: NotionFileCopyTarget,
+) {
+  const canonical = notionImportFileSlotCoordinates(revision, target);
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical));
+  const hex = Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+  return `notion-file-slot:v1:${hex}`;
+}
+
+function importedTemplateBlockFileSlotCandidates(
+  rawBlocks: Record<string, unknown>[],
+  base: Pick<NotionFileCopyTarget, 'notionId' | 'notionObject' | 'notionPageId'>,
+  path: string,
+  role: string,
+  out: PendingNotionImportFileCopySlot[],
+) {
+  for (let index = 0; index < rawBlocks.length; index += 1) {
+    const rawBlock = rawBlocks[index]!;
+    const blockPath = `${path}/${index}`;
+    const reference = fileReferenceFromNotionBlock(rawBlock);
+    if (reference) {
+      const notionBlockId = notionObjectId(rawBlock);
+      out.push({
+        reference,
+        target: {
+          ...base,
+          notionId: notionBlockId ?? base.notionId,
+          scope: fileCopyScopeForBlockType(localBlockTypeFromNotion(optionalString(rawBlock.type) ?? '', rawBlock)),
+          notionBlockId,
+          notionFileRole: role,
+          notionFileStructuralPath: blockPath,
+          notionFileOrdinal: 0,
+          label: role,
+        },
+      });
+    }
+    importedTemplateBlockFileSlotCandidates(
+      templateBlockChildren(rawBlock),
+      base,
+      `${blockPath}/children`,
+      role,
+      out,
+    );
+  }
+}
+
+function importedPageBlockFileSlotCandidates(
+  item: NotionImportItem,
+  blocks: Record<string, unknown>[],
+  out: PendingNotionImportFileCopySlot[],
+) {
+  const nestedIds = nestedNotionBlockIds(blocks);
+  const visit = (rawBlock: Record<string, unknown>, path: string) => {
+    const ownerSlotStart = out.length;
+    const reference = fileReferenceFromNotionBlock(rawBlock);
+    const notionBlockId = notionObjectId(rawBlock);
+    if (reference) {
+      out.push({
+        reference,
+        target: {
+          notionId: notionBlockId ?? item.notionId,
+          notionObject: 'block',
+          label: 'page block',
+          scope: fileCopyScopeForBlockType(localBlockTypeFromNotion(optionalString(rawBlock.type) ?? '', rawBlock)),
+          notionPageId: item.notionId,
+          notionBlockId,
+          notionFileRole: 'page_block_file',
+          notionFileStructuralPath: path,
+          notionFileOrdinal: 0,
+        },
+      });
+    }
+    if (rawBlock.type === 'template') {
+      importedTemplateBlockFileSlotCandidates(
+        templateBlockChildren(rawBlock),
+        {
+          notionId: notionBlockId ?? item.notionId,
+          notionObject: 'button_template_block',
+          notionPageId: item.notionId,
+        },
+        `${path}/button`,
+        'page_button_block_file',
+        out,
+      );
+      assertImportedFileOwnerTransactionCapacity(
+        out.length - ownerSlotStart,
+        'Imported template-button block',
+      );
+      return;
+    }
+    assertImportedFileOwnerTransactionCapacity(
+      out.length - ownerSlotStart,
+      'Imported page block',
+    );
+    let childIndex = 0;
+    for (const child of tabBlockChildrenForImport(rawBlock, undefined, item)) {
+      if (rawBlock.type === 'table' && child.type === 'table_row') continue;
+      if (rawBlock.type === 'child_page' || rawBlock.type === 'child_database') continue;
+      visit(child, `${path}/children/${childIndex}`);
+      childIndex += 1;
+    }
+  };
+  for (let index = 0; index < blocks.length; index += 1) {
+    const rawBlock = blocks[index]!;
+    const notionBlockId = notionObjectId(rawBlock);
+    if (notionBlockId && nestedIds.has(notionBlockId)) continue;
+    if (rawBlock.type === 'column' && notionBlockChildren(rawBlock).length === 0) continue;
+    visit(rawBlock, `page-blocks/${index}`);
+  }
+}
+
+/** Enumerate exactly the file owners represented by the immutable apply
+ * snapshot. Callers may pass only the unprocessed suffix for a legacy cursor. */
+async function collectNotionImportFileCopySlots(
+  allItems: NotionImportItem[],
+  revision: string,
+  includedItemIds?: Set<string>,
+) {
+  const pending: PendingNotionImportFileCopySlot[] = [];
+  const dataSourceItems = allItems.filter((item) => item.notionObject === 'data_source');
+  const dataSourceIds = new Set(
+    dataSourceItems.map((item) => item.notionId),
+  );
+  for (const item of allItems) {
+    if (includedItemIds && !includedItemIds.has(item.id)) continue;
+    const databaseHasNativeSource = item.notionObject === 'database' && (() => {
+      const metadata = itemMetadata(item);
+      const sources = Array.isArray(metadata.dataSources) ? metadata.dataSources : [];
+      const direct = sources.some((source) => {
+        const id = asRecord(source) ? notionObjectId(source as Record<string, unknown>) : undefined;
+        return !!id && dataSourceIds.has(id);
+      });
+      return direct || !!inferDataSourceForHiddenLinkedDatabase(item, allItems, dataSourceItems);
+    })();
+    if (
+      item.notionObject === 'page'
+      || item.notionObject === 'data_source'
+      || (item.notionObject === 'database' && !databaseHasNativeSource)
+    ) {
+      const chrome = importedPageChromeFromItem(item);
+      if (chrome.iconReference) {
+        pending.push({
+          reference: chrome.iconReference,
+          target: {
+            notionId: item.notionId,
+            notionObject: 'page',
+            label: 'page icon',
+            scope: 'icons',
+            notionPageId: item.notionId,
+            notionPageFileKind: 'icon',
+            notionFileRole: 'page_chrome_icon',
+            notionFileStructuralPath: `${item.notionObject}:${item.notionId}/chrome`,
+            notionFileOrdinal: 0,
+          },
+        });
+      }
+      if (chrome.coverReference) {
+        pending.push({
+          reference: chrome.coverReference,
+          target: {
+            notionId: item.notionId,
+            notionObject: 'page',
+            label: 'page cover',
+            scope: 'covers',
+            notionPageId: item.notionId,
+            notionPageFileKind: 'cover',
+            notionFileRole: 'page_chrome_cover',
+            notionFileStructuralPath: `${item.notionObject}:${item.notionId}/chrome`,
+            notionFileOrdinal: 0,
+          },
+        });
+      }
+    }
+
+    if (item.notionObject === 'page') {
+      const metadata = itemMetadata(item);
+      if (rowDataSourceId(item, dataSourceIds)) {
+        let rowFileCount = 0;
+        for (const [nameOrId, rawValue] of Object.entries(asRecord(metadata.properties) ?? {})) {
+          const prop = asRecord(rawValue) ?? {};
+          const notionPropertyId = optionalString(prop.id) ?? nameOrId;
+          const references = notionFilePropertyReferences(rawValue);
+          rowFileCount += references.length;
+          for (let index = 0; index < references.length; index += 1) {
+            pending.push({
+              reference: references[index]!,
+              target: {
+                notionId: notionPropertyId,
+                notionObject: 'property',
+                label: 'row file property',
+                scope: 'database/files',
+                notionPageId: item.notionId,
+                notionPropertyId,
+                notionPropertyName: nameOrId,
+                notionFileIndex: index,
+                notionFileName: references[index]!.name,
+                notionFileRole: 'row_property_file',
+                notionFileStructuralPath: `page:${item.notionId}/property:${notionPropertyId}`,
+                notionFileOrdinal: index,
+              },
+            });
+          }
+        }
+        assertImportedFileOwnerTransactionCapacity(rowFileCount, 'Imported database row');
+      }
+      const snapshot = pageSnapshot(item);
+      const childBlocks = Array.isArray(snapshot?.childBlocks)
+        ? snapshot.childBlocks.filter((block): block is Record<string, unknown> => !!block && typeof block === 'object')
+        : [];
+      importedPageBlockFileSlotCandidates(item, childBlocks, pending);
+    }
+
+    if (item.notionObject === 'data_source') {
+      const templates = rawTemplatesFromSnapshot(dataSourceSnapshot(item));
+      for (let templateIndex = 0; templateIndex < templates.length; templateIndex += 1) {
+        const templateSlotStart = pending.length;
+        const template = templates[templateIndex]!;
+        const templateId = notionObjectId(template) ?? item.notionId;
+        const templatePath = `data-source:${item.notionId}/templates/${templateIndex}`;
+        const icon = notionTemplateIconReference(template, 'template icon');
+        if (icon) {
+          pending.push({
+            reference: icon,
+            target: {
+              notionId: templateId,
+              notionObject: 'template',
+              label: 'template icon',
+              scope: 'icons',
+              notionPageId: notionObjectId(template),
+              notionPageFileKind: 'icon',
+              notionFileRole: 'template_icon',
+              notionFileStructuralPath: templatePath,
+              notionFileOrdinal: 0,
+            },
+          });
+        }
+        for (const [nameOrId, rawValue] of Object.entries(templatePropertiesFromNotion(template) ?? {})) {
+          const property = asRecord(rawValue) ?? {};
+          const notionPropertyId = optionalString(property.id) ?? nameOrId;
+          const references = notionFilePropertyReferences(rawValue);
+          for (let index = 0; index < references.length; index += 1) {
+            pending.push({
+              reference: references[index]!,
+              target: {
+                notionId: templateId,
+                notionObject: 'template',
+                label: 'template file property',
+                scope: 'database/files',
+                notionPageId: notionObjectId(template),
+                notionPropertyId,
+                notionPropertyName: nameOrId,
+                notionFileIndex: index,
+                notionFileName: references[index]!.name,
+                notionFileRole: 'template_property_file',
+                notionFileStructuralPath: `${templatePath}/property:${notionPropertyId}`,
+                notionFileOrdinal: index,
+              },
+            });
+          }
+        }
+        importedTemplateBlockFileSlotCandidates(
+          rawTemplateBlocks(template),
+          { notionId: templateId, notionObject: 'template_block', notionPageId: notionObjectId(template) },
+          `${templatePath}/blocks`,
+          'template_block_file',
+          pending,
+        );
+        assertImportedFileOwnerTransactionCapacity(
+          pending.length - templateSlotStart,
+          'Imported database template',
+          3,
+        );
+      }
+    }
+  }
+
+  const slots = await Promise.all(pending.map(async ({ reference, target }) => ({
+    slotKey: await notionImportFileSlotKey(revision, target),
+    reference,
+    target,
+  })));
+  slots.sort((left, right) => left.slotKey.localeCompare(right.slotKey));
+  for (let index = 1; index < slots.length; index += 1) {
+    if (slots[index - 1]!.slotKey === slots[index]!.slotKey) {
+      throw Object.assign(new Error('Notion import file slot coordinates were not unique.'), { code: 409 });
+    }
+  }
+  return slots;
+}
+
+async function loadNotionImportFileCheckpoints(
+  db: DbRef,
+  jobId: string,
+  revision: string,
+) {
+  const rows = await listAll(
+    db.table<FileUpload>('file_uploads').where('notionImportJobId', '==', jobId),
+    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  );
+  const bySlot = new Map<string, FileUpload>();
+  for (const row of rows) {
+    if (row.notionImportSnapshotRevision !== revision) continue;
+    const key = optionalString(row.notionImportSlotKey);
+    if (!key) continue;
+    if (bySlot.has(key)) {
+      throw Object.assign(new Error('Duplicate Notion import file checkpoint slot detected.'), { code: 409 });
+    }
+    bySlot.set(key, row);
+  }
+  return bySlot;
+}
+
+async function loadNotionImportFileCheckpointBySlotKey(
+  db: DbRef,
+  jobId: string,
+  revision: string,
+  slotKey: string,
+) {
+  const rows = await listAll(
+    db.table<FileUpload>('file_uploads').where('notionImportSlotKey', '==', slotKey),
+    2,
+  );
+  const matching = rows.filter((row) => (
+    row.notionImportJobId === jobId
+    && row.notionImportSnapshotRevision === revision
+    && row.notionImportSlotKey === slotKey
+  ));
+  if (matching.length > 1) {
+    throw Object.assign(new Error('Duplicate Notion import file checkpoint slot detected.'), { code: 409 });
+  }
+  return matching[0];
+}
+
+async function cleanupUnownedNotionImportFileCheckpoints(
+  context: NotionFileCopyContext,
+) {
+  const revision = optionalString(context.itemSnapshotRevision);
+  if (!revision) return;
+  const checkpoints = await loadNotionImportFileCheckpoints(context.db, context.job.id, revision);
+  for (const upload of checkpoints.values()) {
+    if (upload.status === 'deleted' || upload.status === 'expired') continue;
+    if (upload.pageId || upload.blockId || upload.databaseId || upload.propertyId || upload.templateId) continue;
+    await retireIncompleteNotionFileCheckpoint(context, upload);
+  }
+  const remaining = await loadNotionImportFileCheckpoints(context.db, context.job.id, revision);
+  const ownerless = Array.from(remaining.values()).filter((upload) => (
+    upload.status !== 'deleted'
+    && upload.status !== 'expired'
+    && !upload.pageId
+    && !upload.blockId
+    && !upload.databaseId
+    && !upload.propertyId
+    && !upload.templateId
+  ));
+  if (ownerless.length > 0) {
+    throw Object.assign(
+      new Error('Notion import cannot complete while durable file checkpoints are still ownerless.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+}
+
+async function copyNotionImportFileSlot(
+  context: NotionFileCopyContext,
+  slot: NotionImportFileCopySlot,
+) {
+  if (!context.itemSnapshotRevision) throw new Error('Notion import file slot requires an immutable revision.');
+  const coordinates = notionImportFileSlotCoordinates(context.itemSnapshotRevision, slot.target);
+  const expected = context.checkpointSlotKeysByCoordinates?.get(coordinates);
+  if (expected && expected !== slot.slotKey) {
+    throw Object.assign(new Error('Notion import file slot key changed before copy.'), { code: 409 });
+  }
+  return copyNotionFileReference(context, slot.target, slot.reference, slot.slotKey);
+}
+
 function reportBlockFileReference(
   report: ImportConversionReport | undefined,
   item: NotionImportItem,
@@ -5349,6 +5340,70 @@ function reportBlockRichTextUserReferences(
     `rich text block on "${item.title || item.notionId}"`,
     references,
   );
+}
+
+function reportImportedBlockLinkedViewResolutionFromRaw(
+  report: ImportConversionReport | undefined,
+  item: NotionImportItem,
+  rawBlock: Record<string, unknown>,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  itemsByNotionId?: Map<string, NotionImportItem>,
+) {
+  if (!report) return;
+  let localType = localBlockTypeFromNotion(
+    typeof rawBlock.type === 'string' ? rawBlock.type : 'paragraph',
+    rawBlock,
+  );
+  if (localType === 'inline_database' && rawBlock.type === 'child_database') {
+    const targetItem = linkedNotionTargetIdsFromBlock(rawBlock)
+      .map((targetId) => itemsByNotionId?.get(targetId))
+      .find((candidate) => candidate?.notionObject === 'database');
+    if (importedNotionDatabaseIsInline(targetItem) === false) localType = 'child_database';
+  }
+  if (localType !== 'inline_database') return;
+  const linkedViewIds = linkedNotionViewIdsFromBlock(rawBlock);
+  if (linkedViewIds.length === 0) return;
+  const linkedView = linkedViewIds
+    .map((viewId) => mappingsByNotionId.get(viewId))
+    .find((mapping) => mapping?.localType === 'db_view');
+  if (linkedView) return;
+  incrementReport(report, 'unresolvedLinkedViews');
+  pushReportIssue(report.unresolvedReferences, {
+    code: 'linked_view_unresolved',
+    notionId: linkedViewIds[0],
+    notionObject: 'view',
+    message: `Linked database view on "${item.title || item.notionId}" could not be mapped locally.`,
+  });
+}
+
+function reportImportedPageMarkdownFallback(
+  report: ImportConversionReport | undefined,
+  item: NotionImportItem,
+  markdownValue: unknown,
+) {
+  if (!report) return;
+  const markdown = asRecord(markdownValue);
+  const unknownBlockIds = Array.isArray(markdown?.unknownBlockIds)
+    ? markdown.unknownBlockIds
+    : [];
+  if (unknownBlockIds.length > 0) {
+    incrementReport(report, 'unknownMarkdownBlocks', unknownBlockIds.length);
+    pushReportIssue(report.unsupported, {
+      code: 'markdown_unknown_blocks',
+      notionId: item.notionId,
+      notionObject: 'page',
+      message: `${unknownBlockIds.length} Notion block(s) on "${item.title || item.notionId}" were unknown in the markdown fallback.`,
+    });
+  }
+  if (markdown?.truncated === true) {
+    incrementReport(report, 'truncatedMarkdownPages');
+    pushReportIssue(report.warnings, {
+      code: 'markdown_truncated',
+      notionId: item.notionId,
+      notionObject: 'page',
+      message: `Markdown fallback for "${item.title || item.notionId}" was truncated before import.`,
+    });
+  }
 }
 
 function reportTemplateBlockRichTextUserReferences(
@@ -5457,6 +5512,7 @@ function localBlockFromNotion(block: Record<string, unknown>, pageId: string, ac
       headerColumn: notionType === 'table' ? payload.has_row_header === true : undefined,
       width: columnWidth,
       notionSyncedBlockSourceId: syncedBlockSourceId,
+      notionBlockId: notionObjectId(block),
       buttonLabel: localType === 'button'
         ? isPartialNotionButtonBlock
           ? 'Notion button'
@@ -5641,16 +5697,6 @@ function inferDataSourceForApiLinkedDatabase(
     matchedViewIds: Array.from(new Set(ordered.map((match) => match.viewId).filter((id): id is string => !!id))),
     inferredFrom: 'view_parent_database_id' as const,
   };
-}
-
-interface HiddenLinkedDatabaseDataSourceInference {
-  dataSourceItem: NotionImportItem;
-  heading?: string;
-  matchedLabel: string;
-  matchedView?: Record<string, unknown>;
-  matchedViewId?: string;
-  matchedViewIds?: string[];
-  inferredFrom: 'view_parent_database_id' | 'sibling_heading_view_name';
 }
 
 function hasFallbackNotionViewName(view: Record<string, unknown>) {
@@ -5918,7 +5964,7 @@ async function enrichNotionViewDetails(
     .map((entry) => entry.view);
 }
 
-async function collectNestedBlockChildren(
+export async function collectNestedBlockChildren(
   token: string,
   blocks: Record<string, unknown>[],
   apiVersion: string,
@@ -5940,6 +5986,11 @@ async function collectNestedBlockChildren(
     const next = { ...block };
     out.push(next);
     if (next.has_children !== true) continue;
+    // A child page/database owns a separate Notion resource boundary. Keep the
+    // block so discovery can register that resource, but do not descend into
+    // its body while snapshotting the parent. The child item will fetch its own
+    // body once; descending here would read the same subtree twice.
+    if (next.type === 'child_page' || next.type === 'child_database') continue;
     const blockId = notionObjectId(next);
     if (!blockId) continue;
     if (depth > NOTION_BLOCK_CHILD_DEPTH_LIMIT || budget.remaining <= 0) {
@@ -6365,164 +6416,53 @@ async function collectDataSourceSnapshot(
   );
 
   return {
-    dataSource: dataSourceData,
-    propertyCount:
-      dataSourceData?.properties && typeof dataSourceData.properties === 'object'
-        ? Object.keys(dataSourceData.properties as Record<string, unknown>).length
-        : 0,
-    relationTargetIds: relationTargetIds(dataSourceData?.properties),
-    relationTargetReferences: relationTargetReferences(dataSourceData?.properties),
-    rowReferences: queryResults.map((record, queryIndex) => ({
-      id: notionObjectId(record),
-      object: record.object,
-      title: notionTitle(record),
-      parentId: notionParentId(record),
-      notionQueryOrder: queryIndex,
-      createdTime: typeof record.created_time === 'string' ? record.created_time : undefined,
-      lastEditedTime: typeof record.last_edited_time === 'string' ? record.last_edited_time : undefined,
-      properties: record.properties,
-      icon: record.icon,
-      cover: record.cover,
-    })),
-    rowsHasMore,
-    rowsNextCursor,
-    views: viewResults,
-    viewCount: viewResults.length,
-    viewsHasMore,
-    viewsNextCursor,
-    templates: templateSnapshot.templates,
-    templateCount: templateSnapshot.templates.length,
-    templatesHasMore: templateSnapshot.templatesHasMore,
-    templatesNextCursor: templateSnapshot.templatesNextCursor,
+    snapshot: {
+      dataSource: dataSourceData,
+      propertyCount:
+        dataSourceData?.properties && typeof dataSourceData.properties === 'object'
+          ? Object.keys(dataSourceData.properties as Record<string, unknown>).length
+          : 0,
+      relationTargetIds: relationTargetIds(dataSourceData?.properties),
+      relationTargetReferences: relationTargetReferences(dataSourceData?.properties),
+      rowReferences: queryResults.map((record, queryIndex) => ({
+        id: notionObjectId(record),
+        object: record.object,
+        title: notionTitle(record),
+        parentId: notionParentId(record),
+        notionQueryOrder: queryIndex,
+        createdTime: typeof record.created_time === 'string' ? record.created_time : undefined,
+        lastEditedTime: typeof record.last_edited_time === 'string' ? record.last_edited_time : undefined,
+        properties: record.properties,
+        icon: record.icon,
+        cover: record.cover,
+      })),
+      rowsHasMore,
+      rowsNextCursor,
+      views: viewResults,
+      viewCount: viewResults.length,
+      viewsHasMore,
+      viewsNextCursor,
+      templates: templateSnapshot.templates,
+      templateCount: templateSnapshot.templates.length,
+      templatesHasMore: templateSnapshot.templatesHasMore,
+      templatesNextCursor: templateSnapshot.templatesNextCursor,
+    },
+    // Data-source query results are full page objects. Keep them only as an
+    // in-memory side channel for this discovery call so row enrichment can
+    // reuse the authorized response without duplicating every page inside the
+    // persisted data-source snapshot. Partial/mock responses deliberately do
+    // not qualify and retain the normal /pages/{id} fallback.
+    reusableRowPagesById: new Map(
+      queryResults.flatMap((record) => {
+        const id = notionObjectId(record);
+        return id && record.object === 'page' && asRecord(record.parent) && asRecord(record.properties)
+          ? [[id, record] as const]
+          : [];
+      }),
+    ),
   };
 }
 
-export type DiscoveryProgressSnapshot = {
-  phase: 'search' | 'enrich';
-  discovered: number;
-  pendingEnrichment: number;
-  enrichedPages: number;
-  enrichedDataSources: number;
-  enrichableTotal: number;
-  searchPagesFetched: number;
-  byType: Record<string, number>;
-  recent: NotionImportActivityEntry[];
-};
-
-// One structured live-activity event. The client localizes `kind`; titles are
-// truncated so the ring stays small inside the persisted job progress JSON.
-export type NotionImportActivityEntry = {
-  at: string;
-  kind: string;
-  title?: string;
-  count?: number;
-  total?: number;
-};
-
-const NOTION_IMPORT_ACTIVITY_RING_LIMIT = 24;
-const NOTION_IMPORT_ACTIVITY_TITLE_LIMIT = 80;
-
-export function pushImportActivity(
-  ring: NotionImportActivityEntry[],
-  entry: { kind: string; title?: string; count?: number; total?: number },
-) {
-  ring.push({
-    at: nowIso(),
-    kind: entry.kind,
-    ...(entry.title ? { title: entry.title.slice(0, NOTION_IMPORT_ACTIVITY_TITLE_LIMIT) } : {}),
-    ...(entry.count !== undefined ? { count: entry.count } : {}),
-    ...(entry.total !== undefined ? { total: entry.total } : {}),
-  });
-  if (ring.length > NOTION_IMPORT_ACTIVITY_RING_LIMIT) {
-    ring.splice(0, ring.length - NOTION_IMPORT_ACTIVITY_RING_LIMIT);
-  }
-}
-
-function importActivityRingOf(progress: Record<string, unknown> | undefined): NotionImportActivityEntry[] {
-  const raw = progress && typeof progress === 'object' ? (progress as { recent?: unknown }).recent : undefined;
-  if (!Array.isArray(raw)) return [];
-  return raw.filter(
-    (item): item is NotionImportActivityEntry =>
-      !!item && typeof item === 'object' && typeof (item as { kind?: unknown }).kind === 'string',
-  );
-}
-
-// Live discovery occupies the 25→48% band of the overall bar (apply owns
-// 50→100). Search sits at 27; enrichment rises monotonically toward 48 with the
-// fraction of enrichable items processed. Pure so it can be unit-guarded.
-export function discoveryProgressPercent(
-  snapshot: Pick<DiscoveryProgressSnapshot, 'phase' | 'enrichedPages' | 'enrichedDataSources' | 'enrichableTotal'>,
-): number {
-  if (snapshot.phase === 'search') return 27;
-  const fraction = snapshot.enrichableTotal > 0
-    ? Math.min(1, (snapshot.enrichedPages + snapshot.enrichedDataSources) / snapshot.enrichableTotal)
-    : 0;
-  return Math.min(48, 30 + Math.round(fraction * 18));
-}
-
-// Whether an incremental discover call should stop starting new item
-// enrichment. Bounding a call by item count alone is not enough: one item can
-// fan out to dozens of throttled (350ms) Notion subrequests, so a 25-item
-// budget could still hold the Durable Object request open for minutes and
-// overload it (503). This adds a wall-clock bound — but the deadline may only
-// trip after at least one item has been enriched this call, so a single slow
-// item can never make the client loop spin forever with zero progress.
-// Extracted as a pure function so the exact stop rule stays regression-guarded
-// (the overload it prevents only reproduces at real-workspace scale).
-export function notionEnrichmentShouldStop(params: {
-  enrichBudget: number;
-  enrichedThisCall: number;
-  elapsedMs: number;
-  deadlineMs: number;
-}): boolean {
-  if (params.enrichBudget <= 0) return true;
-  if (params.enrichedThisCall > 0 && params.elapsedMs > params.deadlineMs) return true;
-  return false;
-}
-
-/**
- * Whether a discovered graph item still needs a source snapshot.
- *
- * Database reads can legitimately finish without a snapshot when Notion does
- * not expose the linked database to the integration. That terminal attempt is
- * persisted explicitly so a later incremental chunk does not retry the same
- * inaccessible reference forever.
- */
-export function notionDiscoveryItemNeedsEnrichment(item: DiscoveredNotionItem): boolean {
-  if (item.notionObject === 'page') {
-    return !item.metadata || item.metadata.pageSnapshot == null;
-  }
-  if (item.notionObject === 'data_source') {
-    return !item.metadata || item.metadata.dataSourceSnapshot == null;
-  }
-  if (item.notionObject === 'database') {
-    const metadata = item.metadata ?? {};
-    const fetchStatus = metadata.databaseFetchStatus;
-    return asRecord(metadata.database) == null && fetchStatus !== 'retrieved' && fetchStatus !== 'unavailable';
-  }
-  return false;
-}
-
-export function notionDiscoveryEnrichmentCandidates(
-  items: DiscoveredNotionItem[],
-  maxItems: number,
-): DiscoveredNotionItem[] {
-  const limit = Number.isFinite(maxItems) ? Math.max(0, Math.floor(maxItems)) : items.length;
-  return items.filter(notionDiscoveryItemNeedsEnrichment).slice(0, limit);
-}
-
-export function notionEnrichmentWaveSize(params: {
-  remaining: number;
-  enrichBudget: number;
-  concurrency: number;
-}): number {
-  const remaining = Math.max(0, Math.floor(params.remaining));
-  const concurrency = Math.max(1, Math.floor(params.concurrency));
-  const budget = Number.isFinite(params.enrichBudget)
-    ? Math.max(0, Math.floor(params.enrichBudget))
-    : remaining;
-  return Math.min(remaining, concurrency, budget);
-}
 function notionImportDiscoveryRuntime() {
   return {
     NOTION_PREFLIGHT_SAMPLE_LIMIT,
@@ -6547,17 +6487,11 @@ function notionImportDiscoveryRuntime() {
     collectPageSnapshot,
     collectDatabaseSnapshot,
     collectDataSourceSnapshot,
-    pushImportActivity,
-    notionEnrichmentShouldStop,
-    notionDiscoveryItemNeedsEnrichment,
-    notionDiscoveryEnrichmentCandidates,
-    notionEnrichmentWaveSize,
     uniqueStrings,
-  };
+  } satisfies NotionImportDiscoveryRuntime;
 }
-export type NotionImportDiscoveryRuntime = ReturnType<typeof notionImportDiscoveryRuntime>;
 
-async function discoverNotionGraph(
+export async function discoverNotionGraph(
   token: Parameters<typeof discoverNotionGraphWithRuntime>[0],
   options: Parameters<typeof discoverNotionGraphWithRuntime>[1],
 ) {
@@ -6576,6 +6510,37 @@ async function preflightNotionImportGraph(
 
 function importItemGeneration(job: NotionImportJob) {
   return job.activeItemGeneration ?? null;
+}
+
+function notionImportSnapshotEnrichmentComplete(item: Pick<
+  NotionImportItem,
+  'notionId' | 'notionObject' | 'phase' | 'metadata'
+>) {
+  return !notionDiscoveryItemNeedsEnrichment({
+    notionId: item.notionId,
+    notionObject: item.notionObject,
+    phase: item.phase,
+    metadata: item.metadata,
+  });
+}
+
+function notionImportItemEnrichmentComplete(item: Pick<
+  NotionImportItem,
+  'notionId' | 'notionObject' | 'phase' | 'metadata' | 'enrichmentComplete'
+>) {
+  if (typeof item.enrichmentComplete === 'boolean') return item.enrichmentComplete;
+  // Legacy rows predate the scalar. A projected row intentionally has no
+  // metadata, so recognize the unambiguous terminal snapshot phases without
+  // hydrating their potentially huge block/view trees. The ambiguous
+  // database_reference phase is left pending and gets one targeted getOne;
+  // its metadata distinguishes terminal "unavailable" from retryable work.
+  if (item.metadata === undefined) {
+    if (item.notionObject === 'page') return item.phase === 'page_snapshot';
+    if (item.notionObject === 'data_source') return item.phase === 'data_source_snapshot';
+    if (item.notionObject === 'database') return item.phase === 'database_snapshot';
+    return true;
+  }
+  return notionImportSnapshotEnrichmentComplete(item);
 }
 
 /**
@@ -6603,6 +6568,120 @@ export async function listActiveNotionImportItems(
   return rows.filter((item) => (item.itemGeneration ?? null) === generation);
 }
 
+const NOTION_IMPORT_DISCOVERY_SEED_FIELDS = [
+  'id',
+  'workspaceId',
+  'jobId',
+  'itemGeneration',
+  'notionId',
+  'notionObject',
+  'parentNotionId',
+  'title',
+  'status',
+  'phase',
+  'enrichmentComplete',
+  'error',
+] as const;
+
+/**
+ * Materialize the active graph without its heavy metadata JSON. This is the
+ * hot incremental-discovery path: completed page block trees, data-source
+ * rows/views/templates, and markdown stay in SQLite until plan/apply needs
+ * them. Older linked EdgeBase runtimes fall back to the full read rather than
+ * silently returning an incomplete graph.
+ */
+export async function listActiveNotionImportDiscoverySeeds(
+  db: DbRef,
+  job: NotionImportJob,
+) {
+  const generation = importItemGeneration(job);
+  const byJob = db.table<NotionImportItem>('notion_import_items').where('jobId', '==', job.id);
+  const narrowed = generation !== null && typeof byJob.where === 'function'
+    ? byJob.where('itemGeneration', '==', generation)
+    : byJob;
+  const projected = projectFields(narrowed, NOTION_IMPORT_DISCOVERY_SEED_FIELDS);
+  const rows = await listAll(projected, NOTION_IMPORT_ITEM_SAFETY_LIMIT);
+  return rows.filter((item) => (item.itemGeneration ?? null) === generation);
+}
+
+async function hydrateNotionImportDiscoverySeeds(
+  db: DbRef,
+  job: NotionImportJob,
+  seeds: NotionImportItem[],
+  limit: number,
+) {
+  const pending = seeds
+    .filter((item) => !notionImportItemEnrichmentComplete(item))
+    .slice(0, Math.max(0, limit));
+  const hydrated = new Map<string, NotionImportItem>();
+  const table = db.table<NotionImportItem>('notion_import_items');
+  await mapWithConcurrency(pending, Math.min(10, Math.max(1, pending.length)), async (seed) => {
+    const full = await getExisting(table, seed.id);
+    if (
+      !full
+      || full.jobId !== job.id
+      || (full.itemGeneration ?? null) !== importItemGeneration(job)
+      || full.notionId !== seed.notionId
+    ) {
+      throw new Error('Notion import discovery seed changed while it was being hydrated.');
+    }
+    hydrated.set(full.notionId, full);
+  });
+  return hydrated;
+}
+
+export async function backfillNotionImportDiscoveryEnrichmentState(
+  db: DbRef,
+  job: NotionImportJob,
+  rows: Array<Pick<NotionImportItem, 'id' | 'enrichmentComplete'>>,
+  options: {
+    expectedJobStatus?: NotionImportStatus;
+    extraExpectations?: TransactOperation[];
+    assertOwned?: () => Promise<void>;
+  } = {},
+) {
+  const updates = rows.filter(
+    (row): row is Pick<NotionImportItem, 'id'> & { enrichmentComplete: boolean } =>
+      typeof row.enrichmentComplete === 'boolean',
+  );
+  if (updates.length === 0) return;
+  const fenceOperations: TransactOperation[] = [
+    ...(options.expectedJobStatus
+      ? [{
+          table: 'notion_import_jobs',
+          op: 'expect' as const,
+          id: job.id,
+          where: [
+            ['status', '==', options.expectedJobStatus],
+            ['activeItemGeneration', '==', importItemGeneration(job)],
+          ] as Array<[string, '==', unknown]>,
+          exists: true,
+        }]
+      : []),
+    ...(options.extraExpectations ?? []),
+  ];
+  const batchSize = Math.max(1, MAX_RAW_TRANSACT_OPS - fenceOperations.length);
+  for (let index = 0; index < updates.length; index += batchSize) {
+    await options.assertOwned?.();
+    try {
+      await db.transact([
+        ...fenceOperations,
+        ...updates.slice(index, index + batchSize).map((row): TransactOperation => ({
+          table: 'notion_import_items',
+          op: 'update',
+          id: row.id,
+          data: { enrichmentComplete: row.enrichmentComplete },
+        })),
+      ]);
+    } catch (error) {
+      if ((options.extraExpectations?.length ?? 0) > 0 && isApplyLeaseConflict(error)) {
+        throw new NotionDiscoveryLeaseLostError(error);
+      }
+      throw error;
+    }
+  }
+}
+
 async function deleteImportItemRowsBestEffort(
   db: DbRef,
   rows: Array<Pick<NotionImportItem, 'id'>>,
@@ -6625,11 +6704,22 @@ async function deleteImportItemRowsBestEffort(
   return deletedAll;
 }
 
-export async function replaceDiscoveredItems(
+interface ReplacedDiscoveredItems {
+  items: NotionImportItem[];
+  activeItemGeneration: string;
+}
+
+interface ReplaceDiscoveredItemsOptions {
+  extraActivationExpectations?: TransactOperation[];
+  assertOwned?: () => Promise<void>;
+}
+
+async function replaceDiscoveredItemsWithGeneration(
   db: DbRef,
   job: NotionImportJob,
   items: DiscoveredNotionItem[],
-) {
+  options: ReplaceDiscoveredItemsOptions = {},
+): Promise<ReplacedDiscoveredItems> {
   // Snapshot/MCP/API staging is an untrusted import boundary. A source may
   // contain an app-local key, upload id, canonical storage route, or the exact
   // URL of another Hanji upload. Reject it before deleting the previous
@@ -6647,20 +6737,24 @@ export async function replaceDiscoveredItems(
   const previousGeneration = importItemGeneration(job);
   const previousRows = await listActiveNotionImportItems(db, job);
   const nextGeneration = newId();
-  const stagedRows: NotionImportItem[] = items.map((item) => ({
-    id: newId(),
-    workspaceId: job.workspaceId,
-    jobId: job.id,
-    itemGeneration: nextGeneration,
-    notionId: item.notionId,
-    notionObject: item.notionObject,
-    parentNotionId: item.parentNotionId,
-    title: item.title,
-    status: item.status ?? 'discovered',
-    phase: item.phase ?? 'discovery',
-    metadata: item.metadata,
-    error: item.error,
-  }));
+  const stagedRows: NotionImportItem[] = items.map((item) => {
+    const row: NotionImportItem = {
+      id: newId(),
+      workspaceId: job.workspaceId,
+      jobId: job.id,
+      itemGeneration: nextGeneration,
+      notionId: item.notionId,
+      notionObject: item.notionObject,
+      parentNotionId: item.parentNotionId,
+      title: item.title,
+      status: item.status ?? 'discovered',
+      phase: item.phase ?? 'discovery',
+      metadata: item.metadata,
+      error: item.error,
+    };
+    row.enrichmentComplete = notionImportSnapshotEnrichmentComplete(row);
+    return row;
+  });
 
   try {
     // EdgeBase accepts at most 500 operations per transaction. Each completed
@@ -6689,6 +6783,7 @@ export async function replaceDiscoveredItems(
 
   let activated = false;
   try {
+    await options.assertOwned?.();
     await db.transact([
       {
         table: 'notion_import_jobs',
@@ -6700,6 +6795,7 @@ export async function replaceDiscoveredItems(
         ],
         exists: true,
       },
+      ...(options.extraActivationExpectations ?? []),
       {
         table: 'notion_import_jobs',
         op: 'update',
@@ -6737,44 +6833,102 @@ export async function replaceDiscoveredItems(
     previousRows,
     'notion-import inactive generation cleanup',
   );
-  return stagedRows;
+  return {
+    items: stagedRows,
+    activeItemGeneration: nextGeneration,
+  };
 }
 
-async function mergeDiscoveredItems(
+export async function replaceDiscoveredItems(
   db: DbRef,
   job: NotionImportJob,
   items: DiscoveredNotionItem[],
+  options: ReplaceDiscoveredItemsOptions = {},
+) {
+  const replacement = await replaceDiscoveredItemsWithGeneration(db, job, items, options);
+  return replacement.items;
+}
+
+export async function mergeDiscoveredItems(
+  db: DbRef,
+  job: NotionImportJob,
+  items: DiscoveredNotionItem[],
+  options: {
+    existingItems?: NotionImportItem[];
+    projectedExistingItems?: boolean;
+    hydratedExistingNotionIds?: Set<string>;
+    includeItems?: boolean;
+    expectedJobStatus?: NotionImportStatus;
+    extraExpectations?: TransactOperation[];
+    assertOwned?: () => Promise<void>;
+  } = {},
 ) {
   await assertSafeNotionImportSourceReferences(
     db,
     items.map((item) => item.metadata),
   );
-  const table = db.table<NotionImportItem>('notion_import_items');
-  const existing = await listActiveNotionImportItems(db, job);
+  if (items.length > NOTION_IMPORT_ITEM_SAFETY_LIMIT) {
+    notionImportPayloadTooLarge(
+      `discovery merge exceeds ${NOTION_IMPORT_ITEM_SAFETY_LIMIT} items`,
+    );
+  }
+
+  // Incremental discovery already needs the active graph as its in-memory
+  // seed. Accept that exact snapshot here so the durable merge never performs
+  // a second full read of metadata/block trees after the Notion requests end.
+  const existing = options.existingItems ?? await listActiveNotionImportItems(db, job);
   const existingByNotionId = new Map(existing.map((item) => [item.notionId, item]));
+  const touchedNotionIds = new Set(items.map((item) => item.notionId));
+  if (options.projectedExistingItems) {
+    const hydratedIds = options.hydratedExistingNotionIds ?? new Set<string>();
+    const itemTable = db.table<NotionImportItem>('notion_import_items');
+    const toHydrate = Array.from(touchedNotionIds).filter((notionId) => (
+      existingByNotionId.has(notionId) && !hydratedIds.has(notionId)
+    ));
+    await mapWithConcurrency(toHydrate, Math.min(10, Math.max(1, toHydrate.length)), async (notionId) => {
+      const seed = existingByNotionId.get(notionId)!;
+      const full = await getExisting(itemTable, seed.id);
+      if (
+        !full
+        || full.jobId !== job.id
+        || (full.itemGeneration ?? null) !== importItemGeneration(job)
+        || full.notionId !== notionId
+      ) {
+        throw new Error('Notion import discovery item changed before its metadata merge.');
+      }
+      existingByNotionId.set(notionId, full);
+      hydratedIds.add(notionId);
+    });
+  }
+  const mergedByNotionId = new Map(existingByNotionId);
 
   for (const item of items) {
-    const current = existingByNotionId.get(item.notionId);
+    const current = mergedByNotionId.get(item.notionId);
     if (current) {
       const nextStatus = current.status === 'discovered' && item.status === 'referenced'
         ? current.status
         : item.status ?? current.status ?? 'discovered';
-      await table.update(current.id, {
+      const next: NotionImportItem = {
+        ...current,
         notionObject: item.notionObject,
         parentNotionId: item.parentNotionId ?? current.parentNotionId,
         title: item.title ?? current.title,
         status: nextStatus,
         phase: item.phase ?? current.phase ?? 'discovery',
-        metadata: {
-          ...(current.metadata ?? {}),
-          ...(item.metadata ?? {}),
-        },
+        metadata: item.metadata === undefined
+          ? current.metadata
+          : {
+              ...(current.metadata ?? {}),
+              ...item.metadata,
+            },
         error: item.error === undefined ? current.error ?? null : item.error,
-      });
+      };
+      next.enrichmentComplete = notionImportSnapshotEnrichmentComplete(next);
+      mergedByNotionId.set(item.notionId, next);
       continue;
     }
 
-    await table.insert({
+    const next: NotionImportItem = {
       id: newId(),
       workspaceId: job.workspaceId,
       jobId: job.id,
@@ -6787,14 +6941,133 @@ async function mergeDiscoveredItems(
       phase: item.phase ?? 'discovery',
       metadata: item.metadata,
       error: item.error,
-    });
+    };
+    next.enrichmentComplete = notionImportSnapshotEnrichmentComplete(next);
+    mergedByNotionId.set(item.notionId, next);
   }
 
-  return listActiveNotionImportItems(db, job);
+  // Build at most one durable operation per touched Notion object. The
+  // discovery graph contains every seed item on every incremental pass, but
+  // unchanged seeds must not generate writes or keep a constrained NAS runtime
+  // busy serializing identical metadata.
+  const operations: TransactOperation[] = [];
+  let inserted = 0;
+  let updated = 0;
+  for (const notionId of touchedNotionIds) {
+    const current = existingByNotionId.get(notionId);
+    const next = mergedByNotionId.get(notionId)!;
+    if (!current) {
+      operations.push({
+        table: 'notion_import_items',
+        op: 'insert',
+        data: next as unknown as Record<string, unknown>,
+      });
+      inserted += 1;
+      continue;
+    }
+    const patch = {
+      notionObject: next.notionObject,
+      parentNotionId: next.parentNotionId,
+      title: next.title,
+      status: next.status,
+      phase: next.phase,
+      enrichmentComplete: next.enrichmentComplete,
+      metadata: next.metadata,
+      error: next.error,
+    };
+    if (
+      current.notionObject === patch.notionObject
+      && current.parentNotionId === patch.parentNotionId
+      && current.title === patch.title
+      && current.status === patch.status
+      && current.phase === patch.phase
+      && current.enrichmentComplete === patch.enrichmentComplete
+      && jsonEquivalent(current.metadata, patch.metadata)
+      && (current.error ?? null) === (patch.error ?? null)
+    ) {
+      continue;
+    }
+    operations.push({
+      table: 'notion_import_items',
+      op: 'update',
+      id: current.id,
+      data: patch,
+    });
+    updated += 1;
+  }
+
+  // Keep each raw batch below both EdgeBase's 500-op hard ceiling and Hanji's
+  // lower change-log-aware ceiling. When a status fence is present it occupies
+  // one slot, and atomically prevents cancellation or a generation switch from
+  // being followed by stale item writes.
+  const fenceOperations: TransactOperation[] = [
+    ...(options.expectedJobStatus
+      ? [{
+          table: 'notion_import_jobs',
+          op: 'expect' as const,
+          id: job.id,
+          where: [
+            ['status', '==', options.expectedJobStatus],
+            ['activeItemGeneration', '==', importItemGeneration(job)],
+          ] as Array<[string, '==', unknown]>,
+          exists: true,
+        }]
+      : []),
+    ...(options.extraExpectations ?? []),
+  ];
+  const itemBatchSize = Math.max(1, MAX_RAW_TRANSACT_OPS - fenceOperations.length);
+  for (let index = 0; index < operations.length; index += itemBatchSize) {
+    await options.assertOwned?.();
+    const batch = operations.slice(index, index + itemBatchSize);
+    try {
+      await db.transact([
+        ...fenceOperations,
+        ...batch,
+      ]);
+    } catch (error) {
+      if ((options.extraExpectations?.length ?? 0) > 0 && isApplyLeaseConflict(error)) {
+        throw new NotionDiscoveryLeaseLostError(error);
+      }
+      throw error;
+    }
+  }
+
+  const counts = countImportItemsByObject(mergedByNotionId.values());
+  return {
+    totalKnown: mergedByNotionId.size,
+    counts,
+    inserted,
+    updated,
+    ...(options.includeItems ? { items: Array.from(mergedByNotionId.values()) } : {}),
+  };
 }
 
-async function scrubAppliedImportCredentialMetadata(db: DbRef, items: NotionImportItem[]) {
+type NotionImportCredentialScrubMutationCollector = (
+  operation: TransactOperation,
+) => Promise<void>;
+
+async function scrubAppliedImportCredentialMetadata(
+  db: DbRef,
+  items: NotionImportItem[],
+  collectMutation?: NotionImportCredentialScrubMutationCollector,
+) {
   const table = db.table<NotionImportItem>('notion_import_items');
+  if (collectMutation) {
+    for (const item of items) {
+      const sanitized = sanitizeNotionCredentialMetadata(item.metadata);
+      const next = sanitized && typeof sanitized === 'object' && !Array.isArray(sanitized)
+        ? sanitized as Record<string, unknown>
+        : {};
+      if (jsonEquivalent(next, item.metadata ?? {})) continue;
+      await collectMutation({
+        table: 'notion_import_items',
+        op: 'update',
+        id: item.id,
+        data: { metadata: next },
+      });
+    }
+    return;
+  }
   const concurrency = 20;
   for (let index = 0; index < items.length; index += concurrency) {
     await Promise.all(items.slice(index, index + concurrency).map(async (item) => {
@@ -6808,7 +7081,11 @@ async function scrubAppliedImportCredentialMetadata(db: DbRef, items: NotionImpo
   }
 }
 
-async function scrubMappedImportProductCredentials(db: DbRef, jobId: string) {
+async function scrubMappedImportProductCredentials(
+  db: DbRef,
+  jobId: string,
+  collectMutation?: NotionImportCredentialScrubMutationCollector,
+) {
   const mappings = await listAll(
     db.table<NotionImportMapping>('notion_import_mappings').where('jobId', '==', jobId),
     NOTION_IMPORT_ITEM_SAFETY_LIMIT,
@@ -6834,7 +7111,18 @@ async function scrubMappedImportProductCredentials(db: DbRef, jobId: string) {
     if (!jsonEquivalent(sanitizedProperties, page.properties)) {
       patch.properties = asRecord(sanitizedProperties) ?? {};
     }
-    if (Object.keys(patch).length > 0) await db.table<Page>('pages').update(page.id, patch);
+    if (Object.keys(patch).length > 0) {
+      if (collectMutation) {
+        await collectMutation({
+          table: 'pages',
+          op: 'update',
+          id: page.id,
+          data: patch as Record<string, unknown>,
+        });
+      } else {
+        await db.table<Page>('pages').update(page.id, patch);
+      }
+    }
 
     const blocks = await listAll(
       db.table<Block>('blocks').where('pageId', '==', page.id),
@@ -6843,7 +7131,17 @@ async function scrubMappedImportProductCredentials(db: DbRef, jobId: string) {
     for (const block of blocks) {
       const content = sanitizeNotionCredentialMetadata(block.content);
       if (!jsonEquivalent(content, block.content)) {
-        await db.table<Block>('blocks').update(block.id, { content: asRecord(content) ?? {} });
+        const patch = { content: asRecord(content) ?? {} };
+        if (collectMutation) {
+          await collectMutation({
+            table: 'blocks',
+            op: 'update',
+            id: block.id,
+            data: patch,
+          });
+        } else {
+          await db.table<Block>('blocks').update(block.id, patch);
+        }
       }
     }
   }
@@ -6862,150 +7160,18 @@ async function scrubMappedImportProductCredentials(db: DbRef, jobId: string) {
       patch.blocks = Array.isArray(blocks) ? blocks as TemplateBlock[] : [];
     }
     if (Object.keys(patch).length > 0) {
-      await db.table<DbTemplate>('db_templates').update(template.id, patch);
-    }
-  }
-}
-
-async function compensateFailedNotionImportFiles(
-  db: DbRef,
-  job: NotionImportJob,
-  actorId: string,
-  createdUploadIds: string[],
-) {
-  const trackedIds = new Set(createdUploadIds);
-  if (trackedIds.size === 0) return;
-  const uploadTable = db.table<FileUpload>('file_uploads');
-
-  await withFileWorkspaceLease(
-    db,
-    job.workspaceId,
-    actorId,
-    'notion-import-file-compensation',
-    async (lease) => {
-      // Never delete or rewrite a durable owner during failed-import cleanup.
-      // Imported pages become visible before a long apply has finished, so a
-      // user may already have edited/replaced a file block. The upload row can
-      // keep its historical blockId even after that reference was removed.
-      // Re-scan the current durable references while holding the same workspace
-      // file lease as normal attachment/detachment paths, and retire only rows
-      // that are genuinely orphaned now.
-      for (let attempt = 0; attempt < NOTION_APPLY_LEASE_CAS_ATTEMPTS; attempt += 1) {
-        await lease.assertOwned();
-        const uploads = (await listAll(
-          uploadTable.where('workspaceId', '==', job.workspaceId),
-          NOTION_IMPORT_ITEM_SAFETY_LIMIT,
-        )).filter((upload) => trackedIds.has(upload.id));
-        if (uploads.length === 0) return;
-
-        const references = await workspaceFileReferenceSnapshot(db, job.workspaceId);
-        const orphaned = uploads.filter((upload) => (
-          upload.status !== 'deleted'
-          && upload.status !== 'expired'
-          && upload.status !== 'deleting'
-          && fileUploadReferenceOwners(upload, references).length === 0
-        ));
-        if (orphaned.length === 0) return;
-
-        const operations: TransactOperation[] = [];
-        const cleanupAt = nowIso();
-        for (const upload of orphaned) {
-          operations.push(
-            {
-              table: 'file_uploads',
-              op: 'expect',
-              id: upload.id,
-              where: [
-                ['workspaceId', '==', job.workspaceId],
-                ['key', '==', upload.key],
-                ['status', '==', upload.status],
-                ['pageId', '==', upload.pageId ?? null],
-                ['blockId', '==', upload.blockId ?? null],
-                ['databaseId', '==', upload.databaseId ?? null],
-                ['propertyId', '==', upload.propertyId ?? null],
-                ['templateId', '==', upload.templateId ?? null],
-                ['updatedAt', '==', upload.updatedAt ?? null],
-              ],
-              exists: true,
-            },
-            {
-              table: 'file_uploads',
-              op: 'update',
-              id: upload.id,
-              data: {
-                status: 'deleting',
-                deletionPreviousStatus: upload.status,
-                expiresAt: cleanupAt,
-                deletedBy: actorId,
-                updatedAt: cleanupAt,
-              },
-            },
-          );
-        }
-
-        try {
-          for (let index = 0; index < operations.length; index += MAX_RAW_TRANSACT_OPS) {
-            await lease.assertOwned();
-            await db.transact(operations.slice(index, index + MAX_RAW_TRANSACT_OPS));
-          }
-          return;
-        } catch (error) {
-          if (!isApplyLeaseConflict(error) || attempt === NOTION_APPLY_LEASE_CAS_ATTEMPTS - 1) {
-            throw error;
-          }
-          // A raw/concurrent writer changed the upload despite the normal file
-          // lease boundary. Re-read both the row and every durable owner before
-          // deciding whether it is still safe to retire on the next attempt.
-        }
+      if (collectMutation) {
+        await collectMutation({
+          table: 'db_templates',
+          op: 'update',
+          id: template.id,
+          data: patch as Record<string, unknown>,
+        });
+      } else {
+        await db.table<DbTemplate>('db_templates').update(template.id, patch);
       }
-    },
-  );
-}
-
-function baseReport(extra: Record<string, unknown> = {}) {
-  return {
-    warnings: [
-      'This implementation performs Notion API graph discovery and a first-pass converter for local pages, databases, views, row pages, relation IDs, rollup/formula config metadata, file copies, templates, resumable search discovery, and ID mappings. High-fidelity linked view rendering, advanced formula translation, and real-workspace validation still need deeper work.',
-    ],
-    unsupported: [],
-    missingPermissions: [],
-    ...extra,
-  };
-}
-
-function mergeImportReportEntries(previous: unknown, current: unknown, limit = 500) {
-  const merged = [
-    ...(Array.isArray(previous) ? previous : []),
-    ...(Array.isArray(current) ? current : []),
-  ];
-  const seen = new Set<string>();
-  const result: unknown[] = [];
-  for (const entry of merged) {
-    let key: string;
-    try {
-      key = JSON.stringify(entry);
-    } catch {
-      key = String(entry);
     }
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push(entry);
-    if (result.length >= limit) break;
   }
-  return result;
-}
-
-function finalizeConversionReport(report: ImportConversionReport) {
-  return {
-    ...report,
-    summary: {
-      ...report.summary,
-      warnings: report.warnings.length,
-      unsupported: report.unsupported.length,
-      missingPermissions: report.missingPermissions.length,
-      unresolvedReferences: report.unresolvedReferences.length,
-    },
-  };
 }
 
 function basePage(input: {
@@ -7030,6 +7196,14 @@ function basePage(input: {
   const createdAt = notionIsoTimestamp(input.createdAt) ?? now;
   const updatedAt = notionIsoTimestamp(input.updatedAt) ?? createdAt;
   const properties = input.properties ? { ...input.properties } : {};
+  const notionImportJobId = optionalString(properties.notionImportJobId);
+  const notionImportSource = (
+    [
+      ['page', optionalString(properties.notionPageId)],
+      ['data_source', optionalString(properties.notionDataSourceId)],
+      ['database', optionalString(properties.notionDatabaseId)],
+    ] as const
+  ).find((entry) => !!entry[1]);
   if (input.createdAt) properties[NOTION_CREATED_TIME_KEY] = createdAt;
   if (input.updatedAt) properties[NOTION_LAST_EDITED_TIME_KEY] = updatedAt;
   return {
@@ -7051,8 +7225,12 @@ function basePage(input: {
     backlinksDisplay: 'default',
     pageCommentsDisplay: 'default',
     properties: Object.keys(properties).length > 0 ? properties : undefined,
+    notionImportJobId,
+    notionImportSourceKind: notionImportSource?.[0],
+    notionImportSourceId: notionImportSource?.[1],
+    notionImportStaging: !!notionImportJobId,
     isFavorite: input.isFavorite ?? false,
-    inTrash: false,
+    inTrash: !!notionImportJobId,
     position: input.position,
     createdBy: input.actorId,
     lastEditedBy: input.actorId,
@@ -7069,13 +7247,223 @@ function importedItemTimestamps(item: NotionImportItem) {
   };
 }
 
-async function preserveImportedPageTimestamps(db: DbRef, page: Page, item: NotionImportItem) {
+type ImportedPatchOwnerTable = 'pages' | 'blocks' | 'db_properties' | 'db_views' | 'db_templates';
+
+const IMPORTED_PATCH_OWNER_FIELDS: Record<ImportedPatchOwnerTable, readonly string[]> = {
+  pages: [
+    'workspaceId', 'parentId', 'parentType', 'kind', 'title', 'icon', 'iconType', 'cover',
+    'coverPosition', 'font', 'smallText', 'fullWidth', 'isLocked', 'isPublic',
+    'backlinksDisplay', 'pageCommentsDisplay', 'properties', 'notionImportJobId',
+    'notionImportSourceId', 'notionImportSourceKind', 'notionImportStaging',
+    'isFavorite', 'inTrash', 'trashedAt',
+    'position', 'createdBy', 'lastEditedBy', 'createdAt', 'updatedAt',
+  ],
+  blocks: [
+    'pageId', 'parentId', 'type', 'content', 'plainText', 'position', 'createdBy',
+    'lastEditedBy', 'lastMutationId', 'createdAt', 'updatedAt',
+  ],
+  db_properties: [
+    'databaseId', 'notionImportJobId', 'notionDataSourceId', 'notionPropertyId',
+    'name', 'description', 'type', 'config', 'position', 'createdAt', 'updatedAt',
+  ],
+  db_views: [
+    'databaseId', 'notionImportJobId', 'notionDataSourceId', 'notionViewId',
+    'notionViewStructuralIndex', 'notionImportSnapshotRevision', 'notionViewFingerprint',
+    'notionRowContextJobId', 'notionRowContextSnapshotRevision', 'notionRowContextBlockId',
+    'notionRowContextSourceViewId', 'notionRowContextFingerprint', 'name', 'type', 'config',
+    'position', 'createdAt', 'updatedAt',
+  ],
+  db_templates: [
+    'databaseId', 'notionImportJobId', 'notionTemplateId', 'notionDataSourceId', 'name',
+    'icon', 'title', 'properties', 'blocks', 'isDefault', 'position', 'createdAt', 'updatedAt',
+  ],
+};
+
+function importedPatchOwnerSnapshotWhere(
+  owner: { id: string },
+  table: ImportedPatchOwnerTable,
+): Array<[string, '==', unknown]> {
+  const record = owner as unknown as Record<string, unknown>;
+  return IMPORTED_PATCH_OWNER_FIELDS[table].map((field) => [field, '==', record[field] ?? null]);
+}
+
+function importedPatchOwnerTransactionWhere(
+  owner: { id: string },
+  table: ImportedPatchOwnerTable,
+): Array<[string, '==', unknown]> {
+  // EdgeBase deliberately keeps transact expectations portable across D1,
+  // Postgres, and Durable Objects by rejecting object/array equality. The
+  // complete snapshot is still compared in memory before this helper is
+  // called and again when classifying a conflict; the atomic fence must use
+  // only scalar columns (most importantly the EdgeBase-managed updatedAt).
+  return importedPatchOwnerSnapshotWhere(owner, table).filter(([, , value]) => (
+    value === null
+    || typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'boolean'
+  ));
+}
+
+function importedPatchOwnerSnapshotMatches(
+  expected: { id: string },
+  current: { id: string } | null | undefined,
+  table: ImportedPatchOwnerTable,
+) {
+  if (!current || current.id !== expected.id) return false;
+  const expectedRecord = expected as unknown as Record<string, unknown>;
+  const record = current as unknown as Record<string, unknown>;
+  return importedPatchOwnerSnapshotWhere(expected, table).every(([field, , value]) => (
+    // EdgeBase adds these fields after an insert. A raw owner retained by the
+    // same apply request legitimately lacks them; every product field still
+    // has to match, and the fresh durable timestamps fence the transaction.
+    ((field === 'createdAt' || field === 'updatedAt') && expectedRecord[field] == null)
+    ||
+    jsonEquivalent(record[field] ?? null, value)
+  ));
+}
+
+function notionImportMappingSnapshotMatches(
+  expected: NotionImportMapping,
+  current: NotionImportMapping | null | undefined,
+) {
+  return !!current
+    && current.id === expected.id
+    && current.workspaceId === expected.workspaceId
+    && current.jobId === expected.jobId
+    && (current.mappingKey ?? null) === (expected.mappingKey ?? null)
+    && current.notionId === expected.notionId
+    && current.notionType === expected.notionType
+    && current.localId === expected.localId
+    && current.localType === expected.localType
+    && current.relationKind === expected.relationKind
+    && jsonEquivalent(current.metadata ?? null, expected.metadata ?? null);
+}
+
+export async function transactImportedOwnerPatch<T extends { id: string }>(
+  context: NotionFileCopyContext,
+  input: {
+    table: ImportedPatchOwnerTable;
+    owner: T;
+    patch: Partial<T>;
+    requiredWhere: Array<[string, '==', unknown]>;
+    extraExpectations?: TransactOperation[];
+    label: string;
+  },
+): Promise<T> {
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error(`Notion import ${input.label} requires the active apply lease and immutable snapshot revision.`),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  const patch = input.patch as Record<string, unknown>;
+  const snapshotFields = new Set(IMPORTED_PATCH_OWNER_FIELDS[input.table]);
+  for (const field of Object.keys(patch)) {
+    if (!snapshotFields.has(field)) {
+      throw new Error(`Notion import ${input.label} patch field "${field}" is not covered by owner CAS.`);
+    }
+  }
+  // Revalidate the complete JSON-bearing snapshot immediately before the
+  // portable scalar transaction fence. This catches an edit that landed
+  // after the caller loaded the owner, while updatedAt below closes the race
+  // between this read and the atomic update without asking D1 to compare JSON.
+  const currentOwner = await getExisting(context.db.table<T>(input.table), input.owner.id);
+  if (!currentOwner || !importedPatchOwnerSnapshotMatches(input.owner, currentOwner, input.table)) {
+    throw Object.assign(
+      new Error(`Notion import ${input.label} owner changed concurrently; retry from the durable apply cursor.`),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  const operations: TransactOperation[] = [
+    {
+      table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+      where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+      exists: true,
+    },
+    {
+      table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+      where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+      exists: true,
+    },
+    ...(input.extraExpectations ?? []),
+    {
+      table: input.table,
+      op: 'expect',
+      id: input.owner.id,
+      where: [
+        ...input.requiredWhere,
+        ...importedPatchOwnerTransactionWhere(currentOwner, input.table),
+      ],
+      exists: true,
+    },
+    {
+      table: input.table,
+      op: 'update',
+      id: input.owner.id,
+      data: patch,
+    },
+  ];
+  try {
+    await context.db.transact(operations);
+  } catch (error) {
+    if (!isApplyLeaseConflict(error)) throw error;
+    const [currentJob, currentLease] = await Promise.all([
+      getExisting(context.db.table<NotionImportJob>('notion_import_jobs'), context.job.id).catch(() => null),
+      getExisting(
+        context.db.table<NotionImportApplyLock>('notion_import_apply_locks'),
+        context.applyLease.id,
+      ).catch(() => null),
+    ]);
+    if (
+      currentJob?.status === 'ready'
+      && currentJob.itemSnapshotRevision === context.itemSnapshotRevision
+      && currentLease?.leaseId === context.applyLease.leaseId
+      && currentLease.purpose === 'apply'
+    ) {
+      throw Object.assign(
+        new Error(`Notion import ${input.label} owner changed concurrently; retry from the durable apply cursor.`),
+        { code: 409, notionImportRecoveryPending: true, cause: error },
+      );
+    }
+    throw error;
+  }
+  return await getExisting(context.db.table<T>(input.table), input.owner.id)
+    ?? ({ ...input.owner, ...input.patch } as T);
+}
+
+async function preserveImportedPageTimestamps(
+  context: NotionFileCopyContext,
+  page: Page,
+  item: NotionImportItem,
+) {
+  const { db } = context;
   const timestamps = importedItemTimestamps(item);
   const patch: Partial<Page> = {};
-  if (timestamps.createdAt) patch.createdAt = timestamps.createdAt;
-  if (timestamps.updatedAt) patch.updatedAt = timestamps.updatedAt;
+  if (timestamps.createdAt && page.createdAt !== timestamps.createdAt) patch.createdAt = timestamps.createdAt;
+  if (timestamps.updatedAt && page.updatedAt !== timestamps.updatedAt) patch.updatedAt = timestamps.updatedAt;
   if (Object.keys(patch).length === 0) return page;
-  return await db.table<Page>('pages').update(page.id, patch);
+  if (context?.blockRecoveryPage?.id === page.id) {
+    await transactImportedPageBlockRecovery(db, [
+      ...importedPageBlockRecoveryFence(context),
+      importedPageBlockRecoveryPageExpectation(page),
+      { table: 'pages', op: 'update', id: page.id, data: patch as Record<string, unknown> },
+    ], page, context, 'timestamp preservation');
+    const updated = await getExisting(db.table<Page>('pages'), page.id) ?? { ...page, ...patch };
+    context.blockRecoveryPage = updated;
+    return updated;
+  }
+  return transactImportedOwnerPatch(context, {
+    table: 'pages',
+    owner: page,
+    patch,
+    requiredWhere: [
+      ['workspaceId', '==', context.job.workspaceId],
+      ['notionImportJobId', '==', context.job.id],
+      ['notionImportSourceId', '==', item.notionId],
+      ['notionImportSourceKind', '==', item.notionObject === 'data_source' ? 'data_source' : item.notionObject],
+    ],
+    label: 'page timestamp preservation',
+  });
 }
 
 async function loadMappings(db: DbRef, jobId: string) {
@@ -7227,10 +7615,11 @@ function resolveImportedPageParentFromNotionBlocks(
 }
 
 async function moveImportedPageToResolvedParent(
-  db: DbRef,
+  context: NotionFileCopyContext,
   page: Page,
   resolvedParent: { parentId?: string; position?: number },
 ) {
+  const { db } = context;
   if (!resolvedParent.parentId || resolvedParent.parentId === page.id) return page;
   const patch: Partial<Page> = {};
   if (page.parentId !== resolvedParent.parentId || page.parentType !== 'page') {
@@ -7241,26 +7630,51 @@ async function moveImportedPageToResolvedParent(
     patch.position = resolvedParent.position;
   }
   if (Object.keys(patch).length === 0) return page;
-  return await db.table<Page>('pages').update(page.id, patch);
+  if (context?.blockRecoveryPage?.id === page.id) {
+    await transactImportedPageBlockRecovery(db, [
+      ...importedPageBlockRecoveryFence(context),
+      importedPageBlockRecoveryPageExpectation(page),
+      { table: 'pages', op: 'update', id: page.id, data: patch as Record<string, unknown> },
+    ], page, context, 'parent repair');
+    const updated = await getExisting(db.table<Page>('pages'), page.id) ?? { ...page, ...patch };
+    context.blockRecoveryPage = updated;
+    return updated;
+  }
+  const notionSourceId = optionalString(page.notionImportSourceId);
+  if (!notionSourceId) {
+    throw Object.assign(
+      new Error('Notion import page parent remap owner has no durable source provenance.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  return transactImportedOwnerPatch(context, {
+    table: 'pages',
+    owner: page,
+    patch,
+    requiredWhere: [
+      ['workspaceId', '==', context.job.workspaceId],
+      ['notionImportJobId', '==', context.job.id],
+      ['notionImportSourceId', '==', notionSourceId],
+      ['notionImportSourceKind', '==', 'page'],
+    ],
+    label: 'page parent remap',
+  });
 }
 
-async function createMapping(
-  db: DbRef,
-  admin: AdminDbAccessor,
+interface NotionImportMappingInput {
+  notionId: string;
+  notionType: string;
+  localId: string;
+  localType: string;
+  relationKind?: string;
+  metadata?: Record<string, unknown>;
+}
+
+function notionImportMappingRow(
   job: NotionImportJob,
-  mappingsByNotionId: Map<string, NotionImportMapping>,
-  input: {
-    notionId: string;
-    notionType: string;
-    localId: string;
-    localType: string;
-    relationKind?: string;
-    metadata?: Record<string, unknown>;
-  },
-) {
-  const existing = mappingForNotionId(mappingsByNotionId, input.notionId);
-  if (existing) return existing;
-  const mapping = await db.table<NotionImportMapping>('notion_import_mappings').insert({
+  input: NotionImportMappingInput,
+): NotionImportMapping {
+  return {
     id: newId(),
     workspaceId: job.workspaceId,
     jobId: job.id,
@@ -7271,7 +7685,21 @@ async function createMapping(
     localType: input.localType,
     relationKind: input.relationKind ?? 'canonical',
     metadata: input.metadata,
-  });
+  };
+}
+
+async function createMapping(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  job: NotionImportJob,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  input: NotionImportMappingInput,
+) {
+  const existing = mappingForNotionId(mappingsByNotionId, input.notionId);
+  if (existing) return existing;
+  const mapping = await db.table<NotionImportMapping>('notion_import_mappings').insert(
+    notionImportMappingRow(job, input),
+  );
   mappingsByNotionId.set(mapping.notionId, mapping);
   // Route index must be written the moment a page/database is created, not only
   // in the end-of-apply batch — otherwise an interrupted apply leaves the page
@@ -7280,6 +7708,398 @@ async function createMapping(
     await ensurePageWorkspaceIndex(admin, input.localId, job.workspaceId);
   }
   return mapping;
+}
+
+async function publishRecoveredImportedOwnerMapping(
+  context: NotionFileCopyContext,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  input: NotionImportMappingInput,
+  ownerExpectation: {
+    table: 'pages' | 'db_templates' | 'db_properties' | 'db_views';
+    id: string;
+    where: Array<[string, '==', unknown]>;
+    patch?: Record<string, unknown>;
+    uniqueWhere?: Array<[string, '==', unknown]>;
+  },
+) {
+  const existing = mappingForNotionId(mappingsByNotionId, input.notionId);
+  if (existing) {
+    if (existing.localId !== input.localId || existing.localType !== input.localType) {
+      throw Object.assign(new Error('Notion import recovery mapping changed before publication.'), { code: 409 });
+    }
+    return existing;
+  }
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error('Notion import owner recovery requires the active apply lease and immutable snapshot revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  const mapping = notionImportMappingRow(context.job, input);
+  await context.db.transact([
+    {
+      table: 'notion_import_jobs',
+      op: 'expect',
+      id: context.job.id,
+      where: [
+        ['status', '==', 'ready'],
+        ['itemSnapshotRevision', '==', context.itemSnapshotRevision],
+      ],
+      exists: true,
+    },
+    {
+      table: 'notion_import_apply_locks',
+      op: 'expect',
+      id: context.applyLease.id,
+      where: [
+        ['leaseId', '==', context.applyLease.leaseId],
+        ['purpose', '==', 'apply'],
+      ],
+      exists: true,
+    },
+    {
+      table: ownerExpectation.table,
+      op: 'expect',
+      id: ownerExpectation.id,
+      where: ownerExpectation.where,
+      exists: true,
+    },
+    {
+      table: 'notion_import_mappings',
+      op: 'expect',
+      where: [['mappingKey', '==', mapping.mappingKey]],
+      exists: false,
+    },
+    ...(ownerExpectation.uniqueWhere?.length
+      ? [{
+          table: ownerExpectation.table,
+          op: 'expect' as const,
+          where: ownerExpectation.uniqueWhere,
+          exists: false,
+        }]
+      : []),
+    ...(ownerExpectation.patch
+      ? [{
+          table: ownerExpectation.table,
+          op: 'update' as const,
+          id: ownerExpectation.id,
+          data: ownerExpectation.patch,
+        }]
+      : []),
+    {
+      table: 'notion_import_mappings',
+      op: 'insert',
+      data: mapping as unknown as Record<string, unknown>,
+    },
+  ]);
+  mappingsByNotionId.set(mapping.notionId, mapping);
+  if (input.localType === 'page' || input.localType === 'database') {
+    await ensurePageWorkspaceIndex(context.admin, input.localId, context.job.workspaceId);
+  }
+  return mapping;
+}
+
+async function publishImportedDatabaseAliasMapping(
+  context: NotionFileCopyContext,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  input: NotionImportMappingInput,
+  owner: Page,
+  canonicalDataSourceId: string,
+  patchCanonicalProperties = false,
+) {
+  const mappingKey = mappingKeyForJob(context.job.id, input.notionId);
+  const existing = mappingForNotionId(mappingsByNotionId, input.notionId);
+  if (existing) {
+    if (
+      existing.workspaceId !== context.job.workspaceId
+      || existing.jobId !== context.job.id
+      || existing.mappingKey !== mappingKey
+      || normalizedNotionId(existing.notionId) !== normalizedNotionId(input.notionId)
+      || existing.notionType !== input.notionType
+      || existing.localId !== input.localId
+      || existing.localType !== input.localType
+      || (existing.relationKind ?? 'canonical') !== (input.relationKind ?? 'canonical')
+      || !jsonEquivalent(existing.metadata, input.metadata)
+    ) {
+      throw Object.assign(new Error('Notion database alias mapping contradicted its canonical owner.'), { code: 409 });
+    }
+  }
+
+  const properties = owner.properties ?? {};
+  const propertyJobId = optionalString(properties.notionImportJobId);
+  const propertyDataSourceId = optionalString(properties.notionDataSourceId);
+  if (
+    owner.id !== input.localId
+    || owner.workspaceId !== context.job.workspaceId
+    || owner.kind !== 'database'
+    || propertyJobId !== context.job.id
+    || propertyDataSourceId !== canonicalDataSourceId
+    || (owner.notionImportJobId != null && owner.notionImportJobId !== context.job.id)
+    || (owner.notionImportSourceId != null && owner.notionImportSourceId !== canonicalDataSourceId)
+    || (owner.notionImportSourceKind != null && owner.notionImportSourceKind !== 'data_source')
+  ) {
+    throw Object.assign(new Error('Notion database alias owner provenance changed before publication.'), { code: 409 });
+  }
+
+  const currentDatabaseId = optionalString(properties.notionDatabaseId);
+  const propertiesPatch = patchCanonicalProperties && !currentDatabaseId
+    ? {
+        properties: {
+          ...properties,
+          notionDatabaseId: input.notionId,
+          notionDataSourceId: canonicalDataSourceId,
+        },
+      }
+    : undefined;
+  if (existing) {
+    // The canonical page patch and alias mapping have been atomic since this
+    // helper was introduced. An existing mapping with a still-missing patch
+    // is therefore contradictory state, not a reason to perform a split
+    // repair behind the active worker's fence.
+    if (propertiesPatch) {
+      throw Object.assign(new Error('Notion database alias mapping exists without its canonical page patch.'), { code: 409 });
+    }
+    await ensurePageWorkspaceIndex(context.admin, owner.id, context.job.workspaceId);
+    return { mapping: existing, created: false };
+  }
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error('Notion database alias publication requires the active apply lease and immutable snapshot revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+
+  const mapping = notionImportMappingRow(context.job, input);
+  try {
+    await context.db.transact([
+      {
+        table: 'notion_import_jobs',
+        op: 'expect',
+        id: context.job.id,
+        where: [
+          ['status', '==', 'ready'],
+          ['itemSnapshotRevision', '==', context.itemSnapshotRevision],
+        ],
+        exists: true,
+      },
+      {
+        table: 'notion_import_apply_locks',
+        op: 'expect',
+        id: context.applyLease.id,
+        where: [
+          ['leaseId', '==', context.applyLease.leaseId],
+          ['purpose', '==', 'apply'],
+        ],
+        exists: true,
+      },
+      {
+        table: 'pages',
+        op: 'expect',
+        id: owner.id,
+        where: [
+          ['workspaceId', '==', owner.workspaceId],
+          ['parentId', '==', owner.parentId ?? null],
+          ['parentType', '==', owner.parentType ?? null],
+          ['kind', '==', owner.kind ?? null],
+          ['notionImportJobId', '==', owner.notionImportJobId ?? null],
+          ['notionImportSourceId', '==', owner.notionImportSourceId ?? null],
+          ['notionImportSourceKind', '==', owner.notionImportSourceKind ?? null],
+          ['inTrash', '==', owner.inTrash ?? null],
+          ['trashedAt', '==', owner.trashedAt ?? null],
+          ['position', '==', owner.position ?? null],
+          ['isLocked', '==', owner.isLocked ?? null],
+          ['updatedAt', '==', owner.updatedAt ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'notion_import_mappings',
+        op: 'expect',
+        where: [['mappingKey', '==', mapping.mappingKey]],
+        exists: false,
+      },
+      ...(propertiesPatch
+        ? [{ table: 'pages', op: 'update' as const, id: owner.id, data: propertiesPatch }]
+        : []),
+      {
+        table: 'notion_import_mappings',
+        op: 'insert',
+        data: mapping as unknown as Record<string, unknown>,
+      },
+    ]);
+  } catch (error) {
+    throw Object.assign(
+      new Error('Notion database alias owner changed concurrently before publication.'),
+      { code: 409, notionImportRecoveryPending: true, cause: error },
+    );
+  }
+  mappingsByNotionId.set(mapping.notionId, mapping);
+  await ensurePageWorkspaceIndex(context.admin, owner.id, context.job.workspaceId);
+  return { mapping, created: true };
+}
+
+async function insertImportedDatabaseChildWithMapping<T extends DbProperty | DbView>(
+  context: NotionFileCopyContext,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  table: 'db_properties' | 'db_views',
+  owner: T,
+  input?: Omit<NotionImportMappingInput, 'localId'>,
+  uniqueWhere?: Array<[string, '==', unknown]>,
+) {
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error('Notion import database child publication requires the active apply lease and immutable revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  const existing = input ? mappingForNotionId(mappingsByNotionId, input.notionId) : undefined;
+  if (existing) {
+    throw Object.assign(new Error('Notion import database child mapping changed before publication.'), { code: 409 });
+  }
+  const mapping = input
+    ? notionImportMappingRow(context.job, { ...input, localId: owner.id })
+    : undefined;
+  const operations: TransactOperation[] = [
+    {
+      table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+      where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+      exists: true,
+    },
+    {
+      table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+      where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+      exists: true,
+    },
+    { table, op: 'expect', id: owner.id, exists: false },
+  ];
+  if (uniqueWhere?.length) {
+    operations.push({ table, op: 'expect', where: uniqueWhere, exists: false });
+  }
+  if (mapping) {
+    operations.push({
+      table: 'notion_import_mappings', op: 'expect',
+      where: [['mappingKey', '==', mapping.mappingKey]], exists: false,
+    });
+  }
+  operations.push({ table, op: 'insert', data: owner as unknown as Record<string, unknown> });
+  if (mapping) {
+    operations.push({
+      table: 'notion_import_mappings', op: 'insert',
+      data: mapping as unknown as Record<string, unknown>,
+    });
+  }
+  try {
+    await context.db.transact(operations);
+  } catch (error) {
+    if (isRetryableNotionTemplateCleanupError(error)) throw error;
+    if (!isApplyLeaseConflict(error)) throw error;
+    throw Object.assign(
+      new Error('Notion import database child changed concurrently before publication.'),
+      { code: 409, notionImportRecoveryPending: true, cause: error },
+    );
+  }
+  if (mapping) mappingsByNotionId.set(mapping.notionId, mapping);
+  return { owner, mapping };
+}
+
+async function claimRecoveredImportedDatabaseChild(
+  context: NotionFileCopyContext,
+  table: 'db_properties' | 'db_views' | 'db_templates',
+  ownerId: string,
+  where: Array<[string, '==', unknown]>,
+  patch: Record<string, unknown>,
+  uniqueWhere?: Array<[string, '==', unknown]>,
+  extraExpectations: TransactOperation[] = [],
+) {
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error('Notion import database child recovery requires the active apply lease and immutable revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  await context.db.transact([
+    {
+      table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+      where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+      exists: true,
+    },
+    {
+      table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+      where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+      exists: true,
+    },
+    { table, op: 'expect', id: ownerId, where, exists: true },
+    ...extraExpectations,
+    ...(uniqueWhere?.length
+      ? [{ table, op: 'expect' as const, where: uniqueWhere, exists: false }]
+      : []),
+    { table, op: 'update', id: ownerId, data: patch },
+  ]);
+}
+
+async function insertImportedPageWithMapping(
+  context: NotionFileCopyContext,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  page: Page,
+  input: Omit<NotionImportMappingInput, 'localId'>,
+  stageBlockRecovery = false,
+) {
+  const existing = mappingForNotionId(mappingsByNotionId, input.notionId);
+  if (existing) {
+    const existingPage = await getExisting(context.db.table<Page>('pages'), existing.localId);
+    if (!existingPage) {
+      throw Object.assign(new Error('Notion import mapping owner page was missing.'), { code: 409 });
+    }
+    await ensurePageWorkspaceIndex(context.admin, existingPage.id, context.job.workspaceId);
+    return { page: existingPage, mapping: existing };
+  }
+  if (stageBlockRecovery && (!context.applyLease || !context.itemSnapshotRevision)) {
+    throw Object.assign(
+      new Error('Notion import block staging requires the active apply lease and immutable snapshot revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
+  const pageForInsert = stageBlockRecovery
+    ? {
+        ...page,
+        isLocked: true,
+        properties: {
+          ...(page.properties ?? {}),
+          [NOTION_IMPORT_BLOCK_RECOVERY_KEY]: {
+            jobId: context.job.id,
+            itemSnapshotRevision: context.itemSnapshotRevision,
+          },
+        },
+      }
+    : page;
+  const mapping = notionImportMappingRow(context.job, { ...input, localId: pageForInsert.id });
+  const operations: TransactOperation[] = [];
+  if (context.applyLease && context.itemSnapshotRevision) {
+    operations.push(
+      {
+        table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+        where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+        exists: true,
+      },
+      {
+        table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+        where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+        exists: true,
+      },
+    );
+  }
+  operations.push(
+    { table: 'pages', op: 'expect', id: pageForInsert.id, exists: false },
+    { table: 'pages', op: 'insert', data: pageForInsert as unknown as Record<string, unknown> },
+    { table: 'notion_import_mappings', op: 'insert', data: mapping as unknown as Record<string, unknown> },
+  );
+  await context.db.transact(operations);
+  mappingsByNotionId.set(mapping.notionId, mapping);
+  await ensurePageWorkspaceIndex(context.admin, pageForInsert.id, context.job.workspaceId);
+  return {
+    page: await getExisting(context.db.table<Page>('pages'), pageForInsert.id) ?? pageForInsert,
+    mapping,
+  };
 }
 
 function importRootNotionId(jobId: string) {
@@ -7292,13 +8112,21 @@ async function ensureImportRoot(
   job: NotionImportJob,
   mappingsByNotionId: Map<string, NotionImportMapping>,
   actorId: string,
+  applyLease?: { id: string; leaseId: string },
 ) {
   const generatedLabels = persistentGeneratedLabels(
     parsePersistentGeneratedLocale(asRecord(job.options)?.locale),
   );
   const rootNotionId = importRootNotionId(job.id);
   const existing = mappingForNotionId(mappingsByNotionId, rootNotionId);
-  if (existing) return existing.localId;
+  if (existing) {
+    const existingPage = await getExisting(db.table<Page>('pages'), existing.localId);
+    if (!existingPage) {
+      throw Object.assign(new Error('Notion import root mapping owner was missing.'), { code: 409 });
+    }
+    await ensurePageWorkspaceIndex(admin, existingPage.id, job.workspaceId);
+    return existing.localId;
+  }
   const title = job.notionWorkspaceName
     ? `${generatedLabels.importedFromNotion} - ${job.notionWorkspaceName}`
     : generatedLabels.importedFromNotion;
@@ -7338,6 +8166,26 @@ async function ensureImportRoot(
   // that the next apply duplicated.
   await db.transact([
     {
+      table: 'notion_import_jobs',
+      op: 'expect',
+      id: job.id,
+      where: [
+        ['status', '==', 'ready'],
+        ['itemSnapshotRevision', '==', job.itemSnapshotRevision ?? null],
+      ],
+      exists: true,
+    },
+    ...(applyLease ? [{
+      table: 'notion_import_apply_locks',
+      op: 'expect' as const,
+      id: applyLease.id,
+      where: [
+        ['leaseId', '==', applyLease.leaseId] as [string, '==', unknown],
+        ['purpose', '==', 'apply'] as [string, '==', unknown],
+      ],
+      exists: true,
+    }] : []),
+    {
       table: 'notion_import_mappings',
       op: 'expect',
       where: [['mappingKey', '==', mapping.mappingKey]],
@@ -7358,76 +8206,480 @@ async function ensureImportRoot(
  * selected page stay grouped beneath the first selected root instead of
  * leaking into the workspace root as unrelated sidebar entries.
  */
+function notionImportCompletionFence(
+  job: Pick<NotionImportJob, 'id' | 'itemSnapshotRevision'>,
+  applyLease?: { id: string; leaseId: string },
+  expectedJobStatus: NotionImportStatus = 'ready',
+): TransactOperation[] {
+  return [
+    {
+      table: 'notion_import_jobs',
+      op: 'expect',
+      id: job.id,
+      where: [
+        ['status', '==', expectedJobStatus],
+        ['itemSnapshotRevision', '==', job.itemSnapshotRevision ?? null],
+      ],
+      exists: true,
+    },
+    ...(applyLease
+      ? [{
+          table: 'notion_import_apply_locks',
+          op: 'expect' as const,
+          id: applyLease.id,
+          where: [
+            ['leaseId', '==', applyLease.leaseId] as [string, '==', unknown],
+            ['purpose', '==', 'apply'] as [string, '==', unknown],
+          ],
+          exists: true,
+        }]
+      : []),
+  ];
+}
+
+export function notionImportMappingExpectation(mapping: NotionImportMapping): TransactOperation {
+  const where: Array<[string, '==', unknown]> = [
+    ['workspaceId', '==', mapping.workspaceId],
+    ['jobId', '==', mapping.jobId],
+    ['mappingKey', '==', mapping.mappingKey ?? null],
+    ['notionId', '==', mapping.notionId],
+    ['notionType', '==', mapping.notionType],
+    ['localId', '==', mapping.localId],
+    ['localType', '==', mapping.localType],
+    ['relationKind', '==', mapping.relationKind],
+  ];
+  // Mapping rows are append-only. A mapping inserted transactionally in this
+  // request is cached before EdgeBase returns its auto timestamp, so only use
+  // updatedAt as an extra fence when the durable value is actually known.
+  if (typeof mapping.updatedAt === 'string' && mapping.updatedAt) {
+    where.push(['updatedAt', '==', mapping.updatedAt]);
+  }
+  return {
+    table: 'notion_import_mappings',
+    op: 'expect',
+    id: mapping.id,
+    where,
+    exists: true,
+  };
+}
+
+function notionImportUnwrapPageExpectation(page: Page): TransactOperation {
+  return {
+    table: 'pages',
+    op: 'expect',
+    id: page.id,
+    where: [
+      ['workspaceId', '==', page.workspaceId],
+      ['parentId', '==', page.parentId ?? null],
+      ['parentType', '==', page.parentType ?? null],
+      ['kind', '==', page.kind ?? null],
+      ['notionImportJobId', '==', page.notionImportJobId ?? null],
+      ['notionImportSourceId', '==', page.notionImportSourceId ?? null],
+      ['notionImportSourceKind', '==', page.notionImportSourceKind ?? null],
+      ['notionImportStaging', '==', page.notionImportStaging ?? null],
+      ['inTrash', '==', page.inTrash ?? null],
+      ['trashedAt', '==', page.trashedAt ?? null],
+      ['position', '==', page.position ?? null],
+      ['isFavorite', '==', page.isFavorite ?? null],
+      ['isLocked', '==', page.isLocked ?? null],
+      ['updatedAt', '==', page.updatedAt ?? null],
+    ],
+    exists: true,
+  };
+}
+
+async function stageIncompleteImportPages(
+  db: DbRef,
+  job: NotionImportJob,
+  mappingsByNotionId: Map<string, NotionImportMapping>,
+  applyLease?: { id: string; leaseId: string },
+) {
+  if (!applyLease || !job.itemSnapshotRevision) {
+    throw notionImportUnwrapRecoveryPendingError(
+      'Notion import staging requires an active apply lease and immutable revision.',
+    );
+  }
+  const mappingsByLocalId = new Map<string, NotionImportMapping[]>();
+  for (const mapping of mappingsByNotionId.values()) {
+    if (
+      (mapping.localType !== 'page' && mapping.localType !== 'database')
+      || !['import_root', 'page', 'data_source', 'database'].includes(mapping.notionType)
+    ) continue;
+    assertNotionImportUnwrapMapping(mapping, job);
+    const ownerMappings = mappingsByLocalId.get(mapping.localId) ?? [];
+    ownerMappings.push(mapping);
+    mappingsByLocalId.set(mapping.localId, ownerMappings);
+  }
+  const localIds = Array.from(mappingsByLocalId.keys())
+    .sort((left, right) => left < right ? -1 : left > right ? 1 : 0);
+  const pages = db.table<Page>('pages');
+  const fixedOperations = notionImportCompletionFence(job, applyLease);
+  const ownerChunkSize = Math.min(
+    100,
+    Math.max(1, Math.floor((MAX_RAW_TRANSACT_OPS - fixedOperations.length) / 2)),
+  );
+  const ownersById = new Map<string, Page>();
+  let staged = 0;
+
+  for (let offset = 0; offset < localIds.length; offset += ownerChunkSize) {
+    const ids = localIds.slice(offset, offset + ownerChunkSize);
+    const expectedIds = new Set(ids);
+    for (const owner of await listAll(pages.where('id', 'in', ids), ids.length)) {
+      if (!expectedIds.has(owner.id) || ownersById.has(owner.id)) {
+        throw notionImportUnwrapRecoveryPendingError(
+          'Notion import staging returned an unexpected page owner.',
+        );
+      }
+      ownersById.set(owner.id, owner);
+    }
+  }
+
+  // Finish the bounded read/validation pass before the first write. A broken
+  // legacy mapping must retain the established phase-specific error and must
+  // not partially hide unrelated owners before that error is produced.
+  for (const id of localIds) {
+    const owner = ownersById.get(id);
+    const ownerMappings = mappingsByLocalId.get(id) ?? [];
+    if (
+      !owner
+      || owner.workspaceId !== job.workspaceId
+      || !ownerMappings.some((mapping) => mapping.localType === owner.kind)
+      || !notionImportPageHasMappingProvenance(owner, ownerMappings, job)
+    ) {
+      return { complete: false, staged: 0 };
+    }
+  }
+
+  for (let offset = 0; offset < localIds.length; offset += ownerChunkSize) {
+    const ids = localIds.slice(offset, offset + ownerChunkSize);
+    const operations: TransactOperation[] = [];
+    for (const id of ids) {
+      const owner = ownersById.get(id)!;
+      if (owner.inTrash === true && owner.notionImportStaging === true) continue;
+      operations.push(
+        notionImportUnwrapPageExpectation(owner),
+        {
+          table: 'pages',
+          op: 'update',
+          id: owner.id,
+          data: { inTrash: true, notionImportStaging: true },
+        },
+      );
+      staged += 1;
+    }
+    if (operations.length > 0) await db.transact([...fixedOperations, ...operations]);
+  }
+  return { complete: true, staged };
+}
+
+function notionImportUnwrapRecoveryPendingError(message: string) {
+  return Object.assign(new Error(message), {
+    code: 409,
+    notionImportRecoveryPending: true,
+  });
+}
+
+function assertNotionImportUnwrapMapping(mapping: NotionImportMapping, job: NotionImportJob) {
+  if (
+    mapping.workspaceId !== job.workspaceId
+    || mapping.jobId !== job.id
+    || !normalizedNotionId(mapping.notionId)
+    || !mapping.localId
+  ) {
+    throw notionImportUnwrapRecoveryPendingError(
+      'Notion import unwrap mapping provenance changed.',
+    );
+  }
+}
+
+function notionImportPageHasMappingProvenance(
+  page: Page,
+  mappings: NotionImportMapping[],
+  job: NotionImportJob,
+) {
+  const properties = page.properties ?? {};
+  const jobMarkers = [
+    optionalString(page.notionImportJobId),
+    optionalString(properties.notionImportJobId),
+  ].filter((value): value is string => !!value);
+  if (jobMarkers.some((value) => value !== job.id)) return false;
+  const sourceMarkers = [
+    optionalString(page.notionImportSourceId),
+    optionalString(properties.notionPageId),
+    optionalString(properties.notionDataSourceId),
+    optionalString(properties.notionDatabaseId),
+  ]
+    .map(normalizedNotionId)
+    .filter(Boolean);
+  if (sourceMarkers.length === 0) return true;
+  return mappings.some((mapping) => sourceMarkers.includes(normalizedNotionId(mapping.notionId)));
+}
+
 async function unwrapImportRoot(
   db: DbRef,
   admin: AdminDbAccessor,
   job: NotionImportJob,
   mappingsByNotionId: Map<string, NotionImportMapping>,
+  applyLease?: { id: string; leaseId: string },
+  expectedJobStatus: NotionImportStatus = 'ready',
 ) {
   const rootNotionId = importRootNotionId(job.id);
   const rootMapping = mappingForNotionId(mappingsByNotionId, rootNotionId);
   if (!rootMapping || rootMapping.relationKind !== 'import_root') {
     return { unwrapped: 0, moved: 0 };
   }
+  assertNotionImportUnwrapMapping(rootMapping, job);
+  if (
+    normalizedNotionId(rootMapping.notionId) !== normalizedNotionId(rootNotionId)
+    || rootMapping.notionType !== 'import_root'
+    || rootMapping.localType !== 'page'
+  ) {
+    throw notionImportUnwrapRecoveryPendingError(
+      'Notion import root mapping changed before unwrap.',
+    );
+  }
   const pages = db.table<Page>('pages');
   const rootPage = await getExisting(pages, rootMapping.localId);
   if (!rootPage) {
-    await bestEffort(
-      'notion-import orphan root mapping.delete',
-      db.table<NotionImportMapping>('notion_import_mappings').delete(rootMapping.id),
-    );
+    await db.transact([
+      ...notionImportCompletionFence(job, applyLease, expectedJobStatus),
+      notionImportMappingExpectation(rootMapping),
+      { table: 'notion_import_mappings', op: 'delete', id: rootMapping.id },
+    ]);
     mappingsByNotionId.delete(rootMapping.notionId);
     return { unwrapped: 0, moved: 0 };
   }
 
-  const directChildren = await listAll(
-    pages.where('parentId', '==', rootPage.id),
-    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
-  );
-  const requestedRootIds = new Set(
+  const targetParentId = job.parentPageId || null;
+  const targetParentType = targetParentId ? 'page' : 'workspace';
+  const targetPage = targetParentId ? await getExisting(pages, targetParentId) : undefined;
+  if (
+    (targetParentId && !targetPage)
+    || (targetPage && (
+      targetPage.workspaceId !== job.workspaceId
+      || targetPage.inTrash === true
+      || targetPage.id === rootPage.id
+      || targetPage.parentId === rootPage.id
+    ))
+  ) {
+    throw notionImportUnwrapRecoveryPendingError(
+      'Notion import unwrap target changed or left the workspace.',
+    );
+  }
+  if (
+    rootPage.workspaceId !== job.workspaceId
+    || rootPage.kind !== 'page'
+    || (rootPage.parentId ?? null) !== targetParentId
+    || (rootPage.parentType ?? null) !== targetParentType
+    || !notionImportPageHasMappingProvenance(rootPage, [rootMapping], job)
+  ) {
+    throw notionImportUnwrapRecoveryPendingError(
+      'Notion import staging root provenance changed before unwrap.',
+    );
+  }
+
+  const jobPageMappings = Array.from(mappingsByNotionId.values())
+    .filter((mapping) => mapping.localType === 'page' || mapping.localType === 'database');
+  for (const mapping of jobPageMappings) assertNotionImportUnwrapMapping(mapping, job);
+  const mappingsByLocalId = new Map<string, NotionImportMapping[]>();
+  for (const mapping of jobPageMappings) {
+    const localMappings = mappingsByLocalId.get(mapping.localId) ?? [];
+    localMappings.push(mapping);
+    mappingsByLocalId.set(mapping.localId, localMappings);
+  }
+
+  const requestedRootIds = Array.from(new Set(
     [
       ...(job.rootNotionPageIds ?? []),
       ...(job.rootNotionDataSourceIds ?? []),
     ]
       .map(normalizedNotionId)
       .filter(Boolean),
-  );
-  const selectedLocalIds = new Set(
-    Array.from(mappingsByNotionId.values())
-      .filter((mapping) => requestedRootIds.has(normalizedNotionId(mapping.notionId)))
-      .filter((mapping) => mapping.localType === 'page' || mapping.localType === 'database')
-      .map((mapping) => mapping.localId),
-  );
-  const primarySelectedRoot = directChildren.find((page) => selectedLocalIds.has(page.id));
-  const targetParentId = job.parentPageId || null;
-  const targetParentType = targetParentId ? 'page' : 'workspace';
+  ));
+  const orderedSelectedMappings = requestedRootIds
+    .map((notionId) => mappingForNotionId(mappingsByNotionId, notionId))
+    .filter((mapping): mapping is NotionImportMapping => !!mapping)
+    .map((mapping) => {
+      if (mapping.localType !== 'page' && mapping.localType !== 'database') {
+        throw notionImportUnwrapRecoveryPendingError(
+          'Notion import selected root mapping has an incompatible owner.',
+        );
+      }
+      return mapping;
+    });
+  const selectedOwnerIds = Array.from(new Set(
+    orderedSelectedMappings.map((mapping) => mapping.localId),
+  )).sort((left, right) => left < right ? -1 : left > right ? 1 : 0);
+  const selectedOwnerRowsById = new Map<string, Page>();
+  const selectedOwnerReadChunkSize = 100;
+  for (let offset = 0; offset < selectedOwnerIds.length; offset += selectedOwnerReadChunkSize) {
+    const ids = selectedOwnerIds.slice(offset, offset + selectedOwnerReadChunkSize);
+    const expectedIds = new Set(ids);
+    for (const owner of await listAll(pages.where('id', 'in', ids), ids.length)) {
+      if (!expectedIds.has(owner.id) || selectedOwnerRowsById.has(owner.id)) {
+        throw notionImportUnwrapRecoveryPendingError(
+          'Notion import selected root lookup returned an unexpected owner.',
+        );
+      }
+      selectedOwnerRowsById.set(owner.id, owner);
+    }
+  }
+  const selectedOwnersById = new Map<string, Page>();
+  for (const mapping of orderedSelectedMappings) {
+    if (selectedOwnersById.has(mapping.localId)) continue;
+    const owner = selectedOwnerRowsById.get(mapping.localId);
+    const ownerMappings = mappingsByLocalId.get(mapping.localId) ?? [];
+    if (
+      !owner
+      || owner.workspaceId !== job.workspaceId
+      || owner.kind !== mapping.localType
+      || !notionImportPageHasMappingProvenance(owner, ownerMappings, job)
+    ) {
+      throw notionImportUnwrapRecoveryPendingError(
+        'Notion import selected root owner provenance changed.',
+      );
+    }
+    const isStillStaged = owner.parentId === rootPage.id && owner.parentType === 'page';
+    const isAlreadyAtTarget = (owner.parentId ?? null) === targetParentId
+      && (owner.parentType ?? null) === targetParentType;
+    if (!isStillStaged && !isAlreadyAtTarget) {
+      throw notionImportUnwrapRecoveryPendingError(
+        'Notion import selected root moved outside its expected unwrap target.',
+      );
+    }
+    if (targetPage && owner.id === targetPage.id) {
+      throw notionImportUnwrapRecoveryPendingError(
+        'Notion import selected root cannot be its own unwrap target.',
+      );
+    }
+    selectedOwnersById.set(owner.id, owner);
+  }
+  const primarySelectedRoot = orderedSelectedMappings
+    .map((mapping) => selectedOwnersById.get(mapping.localId))
+    .find((page): page is Page => !!page);
+  const selectedLocalIds = new Set(selectedOwnersById.keys());
 
-  const moveOps = directChildren.map((page): TransactOperation => {
-    const isSelectedRoot = selectedLocalIds.has(page.id);
-    const keepWithSelectedRoot = !isSelectedRoot && primarySelectedRoot;
-    return {
-      table: 'pages',
-      op: 'update',
-      id: page.id,
-      data: {
-        parentId: keepWithSelectedRoot ? primarySelectedRoot.id : targetParentId,
-        parentType: keepWithSelectedRoot ? 'page' : targetParentType,
-        // Legacy users often trashed the visibly-generated wrapper to get it
-        // out of Pages; that cascaded to the real imported children. During
-        // this one-time unwrap, restore those children as the product pages.
-        inTrash: false,
-        trashedAt: null,
-        ...(isSelectedRoot ? { isFavorite: false } : {}),
-      },
-    };
-  });
-  for (let offset = 0; offset < moveOps.length; offset += MAX_RAW_TRANSACT_OPS) {
-    await db.transact(moveOps.slice(offset, offset + MAX_RAW_TRANSACT_OPS));
+  const directChildren = await listAll(
+    pages.where('parentId', '==', rootPage.id),
+    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  );
+  for (const page of directChildren) {
+    const ownerMappings = mappingsByLocalId.get(page.id) ?? [];
+    if (
+      ownerMappings.length === 0
+      || page.workspaceId !== job.workspaceId
+      || !ownerMappings.some((mapping) => mapping.localType === page.kind)
+      || !notionImportPageHasMappingProvenance(page, ownerMappings, job)
+    ) {
+      throw notionImportUnwrapRecoveryPendingError(
+        'Notion import staging child provenance changed before unwrap.',
+      );
+    }
+  }
+
+  // Resolve every compatible page owner through bounded mixed-key reads. The
+  // mapping graph is already loaded by apply; publication must not add a
+  // whole-workspace scan or one independent read per owner.
+  const pageOwnersById = new Map<string, Page>([
+    [rootPage.id, rootPage],
+    ...Array.from(selectedOwnersById.entries()),
+    ...directChildren.map((page): [string, Page] => [page.id, page]),
+  ]);
+  const missingOwnerIds = Array.from(mappingsByLocalId.keys())
+    .filter((localId) => !pageOwnersById.has(localId))
+    .sort((left, right) => left < right ? -1 : left > right ? 1 : 0);
+  const ownerReadChunkSize = 100;
+  for (let offset = 0; offset < missingOwnerIds.length; offset += ownerReadChunkSize) {
+    const ids = missingOwnerIds.slice(offset, offset + ownerReadChunkSize);
+    const expectedIds = new Set(ids);
+    const rows = await listAll(pages.where('id', 'in', ids), ids.length);
+    for (const page of rows) {
+      if (!expectedIds.has(page.id) || pageOwnersById.has(page.id)) {
+        throw notionImportUnwrapRecoveryPendingError(
+          'Notion import publication returned an unexpected page owner.',
+        );
+      }
+      pageOwnersById.set(page.id, page);
+    }
+  }
+  for (const [localId, ownerMappings] of mappingsByLocalId) {
+    const owner = pageOwnersById.get(localId);
+    if (
+      !owner
+      || owner.workspaceId !== job.workspaceId
+      || !ownerMappings.some((mapping) => mapping.localType === owner.kind)
+      || !notionImportPageHasMappingProvenance(owner, ownerMappings, job)
+    ) {
+      throw notionImportUnwrapRecoveryPendingError(
+        'Notion import publication owner provenance changed.',
+      );
+    }
+  }
+
+  // A concrete target is workspace content and can share the unwrap CAS. The
+  // workspace row itself lives in the central block, so the root/job/page
+  // workspace IDs are the same-transaction fence for a workspace-root target.
+  const targetFenceOperations: TransactOperation[] = targetPage
+    ? [notionImportUnwrapPageExpectation(targetPage)]
+    : [];
+  const fixedMoveOperations = [
+    ...notionImportCompletionFence(job, applyLease, expectedJobStatus),
+    ...targetFenceOperations,
+    notionImportUnwrapPageExpectation(rootPage),
+  ];
+  const publishBatchSize = Math.floor((MAX_RAW_TRANSACT_OPS - fixedMoveOperations.length) / 2);
+  const directChildrenById = new Map(directChildren.map((page) => [page.id, page]));
+  const publicationPages = Array.from(pageOwnersById.values())
+    .filter((page) => page.id !== rootPage.id)
+    .sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
+  if (publishBatchSize < 1 && publicationPages.length > 0) {
+    throw Object.assign(new Error('Notion import unwrap transaction budget is too small.'), { code: 500 });
+  }
+  for (let offset = 0; offset < publicationPages.length; offset += publishBatchSize) {
+    const batch = publicationPages.slice(offset, offset + publishBatchSize);
+    const publishOperations = batch.flatMap((page): TransactOperation[] => {
+      const isDirectChild = directChildrenById.has(page.id);
+      const isSelectedRoot = isDirectChild && selectedLocalIds.has(page.id);
+      const keepWithSelectedRoot = isDirectChild && !isSelectedRoot && primarySelectedRoot;
+      return [
+        notionImportUnwrapPageExpectation(page),
+        {
+          table: 'pages',
+          op: 'update',
+          id: page.id,
+          data: {
+            ...(isDirectChild
+              ? {
+                  parentId: keepWithSelectedRoot ? primarySelectedRoot.id : targetParentId,
+                  parentType: keepWithSelectedRoot ? 'page' : targetParentType,
+                }
+              : {}),
+            // Legacy users often trashed the visibly-generated wrapper to get
+            // it out of Pages; restore only the exactly-fenced import owner.
+            inTrash: false,
+            trashedAt: null,
+            notionImportStaging: false,
+            ...(isSelectedRoot ? { isFavorite: false } : {}),
+          },
+        },
+      ];
+    });
+    await db.transact([...fixedMoveOperations, ...publishOperations]);
   }
 
   const routingPlan = await collectPermanentRoutingIndexPlan(admin, job.workspaceId, [rootPage.id]);
   await deletePermanentRoutingIndexes(routingPlan);
   await db.transact([
+    ...notionImportCompletionFence(job, applyLease, expectedJobStatus),
+    ...targetFenceOperations,
+    notionImportUnwrapPageExpectation(rootPage),
+    notionImportMappingExpectation(rootMapping),
+    {
+      table: 'pages',
+      op: 'expect',
+      where: [['parentId', '==', rootPage.id]],
+      exists: false,
+    },
     { table: 'notion_import_mappings', op: 'delete', id: rootMapping.id },
     { table: 'pages', op: 'delete', id: rootPage.id },
   ]);
@@ -7438,38 +8690,325 @@ async function unwrapImportRoot(
 // Failed/cancelled apply output is incomplete product state. Move every mapped
 // page to Trash (reversible) so neither a localized staging wrapper nor partial
 // children leak into Pages, Favorites, or search after a retry.
+function pageHasExactNotionImportRecoveryLock(page: Page, job: NotionImportJob) {
+  const marker = asRecord(asRecord(page.properties)?.[NOTION_IMPORT_BLOCK_RECOVERY_KEY]);
+  if (!marker || marker.jobId !== job.id) return false;
+  const revision = optionalString(job.itemSnapshotRevision);
+  return !revision || marker.itemSnapshotRevision === revision;
+}
+
+const NOTION_IMPORT_TERMINAL_PAGE_CLEANUP_ATTEMPTS = 3;
+
+interface NotionImportTerminalPageCandidate {
+  id: string;
+  mappings: NotionImportMapping[];
+  checkpointOwner: boolean;
+  locatorOwner: boolean;
+}
+
+interface NotionImportTerminalPageSnapshot {
+  signature: string;
+  importerRecoveryLock: boolean;
+}
+
+function notionImportTerminalPageCandidate(
+  candidates: Map<string, NotionImportTerminalPageCandidate>,
+  pageId: string | null | undefined,
+) {
+  if (!pageId) return undefined;
+  const existing = candidates.get(pageId);
+  if (existing) return existing;
+  const candidate: NotionImportTerminalPageCandidate = {
+    id: pageId,
+    mappings: [],
+    checkpointOwner: false,
+    locatorOwner: false,
+  };
+  candidates.set(pageId, candidate);
+  return candidate;
+}
+
+function notionImportTerminalPageIsOwned(
+  page: Page,
+  candidate: NotionImportTerminalPageCandidate,
+  job: NotionImportJob,
+) {
+  if (page.workspaceId !== job.workspaceId) return false;
+  const properties = asRecord(page.properties) ?? {};
+  const jobMarkers = [
+    optionalString(page.notionImportJobId),
+    optionalString(properties.notionImportJobId),
+  ].filter((value): value is string => !!value);
+  if (jobMarkers.some((value) => value !== job.id)) return false;
+
+  const matchingMappings = candidate.mappings.filter((mapping) => (
+    mapping.workspaceId === job.workspaceId
+    && mapping.jobId === job.id
+    && mapping.localId === page.id
+    && (mapping.localType === 'page' || mapping.localType === 'database')
+    && mapping.localType === page.kind
+  ));
+  if (
+    matchingMappings.length > 0
+    && notionImportPageHasMappingProvenance(page, matchingMappings, job)
+  ) {
+    return true;
+  }
+  if (candidate.locatorOwner && page.notionImportJobId === job.id) return true;
+  return candidate.checkpointOwner && jobMarkers.includes(job.id);
+}
+
+function notionImportTerminalPageSignature(page: Page) {
+  const properties = asRecord(page.properties) ?? {};
+  const marker = asRecord(properties[NOTION_IMPORT_BLOCK_RECOVERY_KEY]);
+  // This signature is only compared in worker memory after a failed CAS. The
+  // database expectation below deliberately contains scalars only because the
+  // cross-backend transaction contract does not compare JSON object values.
+  return JSON.stringify([
+    page.workspaceId,
+    page.parentId ?? null,
+    page.parentType ?? null,
+    page.kind ?? null,
+    page.notionImportJobId ?? null,
+    page.notionImportSourceId ?? null,
+    page.notionImportSourceKind ?? null,
+    page.notionImportStaging ?? null,
+    optionalString(properties.notionImportJobId) ?? null,
+    optionalString(properties.notionPageId) ?? null,
+    optionalString(properties.notionDataSourceId) ?? null,
+    optionalString(properties.notionDatabaseId) ?? null,
+    optionalString(marker?.jobId) ?? null,
+    optionalString(marker?.itemSnapshotRevision) ?? null,
+    page.inTrash ?? null,
+    page.trashedAt ?? null,
+    page.position ?? null,
+    page.isFavorite ?? null,
+    page.isLocked ?? null,
+    page.updatedAt ?? null,
+  ]);
+}
+
+function notionImportTerminalPageWasEditedAfterJob(page: Page, job: NotionImportJob) {
+  const terminalAt = Date.parse(job.finishedAt ?? job.cancelledAt ?? job.updatedAt ?? '');
+  const pageUpdatedAt = Date.parse(page.updatedAt ?? '');
+  // A terminal status is the last importer-owned write fence. A page revision
+  // at or after that instant may be a user adoption, so a later cleanup request
+  // must not reconstruct ownership from a stale mapping and trash it.
+  return Number.isFinite(terminalAt)
+    && Number.isFinite(pageUpdatedAt)
+    && pageUpdatedAt >= terminalAt;
+}
+
+function notionImportTerminalPageCleanupExpectation(page: Page): TransactOperation {
+  return {
+    table: 'pages',
+    op: 'expect',
+    id: page.id,
+    where: [
+      ['workspaceId', '==', page.workspaceId],
+      ['parentId', '==', page.parentId ?? null],
+      ['parentType', '==', page.parentType ?? null],
+      ['kind', '==', page.kind ?? null],
+      ['notionImportJobId', '==', page.notionImportJobId ?? null],
+      ['notionImportSourceId', '==', page.notionImportSourceId ?? null],
+      ['notionImportSourceKind', '==', page.notionImportSourceKind ?? null],
+      ['notionImportStaging', '==', page.notionImportStaging ?? null],
+      ['inTrash', '==', page.inTrash ?? null],
+      ['trashedAt', '==', page.trashedAt ?? null],
+      ['position', '==', page.position ?? null],
+      ['isFavorite', '==', page.isFavorite ?? null],
+      ['isLocked', '==', page.isLocked ?? null],
+      ['updatedAt', '==', page.updatedAt ?? null],
+    ],
+    exists: true,
+  };
+}
+
+function notionImportTerminalPageCleanupSatisfied(
+  page: Page,
+  snapshot: NotionImportTerminalPageSnapshot,
+  job: NotionImportJob,
+) {
+  return page.inTrash === true
+    && page.notionImportStaging !== true
+    && page.isFavorite !== true
+    && !pageHasExactNotionImportRecoveryLock(page, job)
+    && (!snapshot.importerRecoveryLock || page.isLocked !== true);
+}
+
+function isRetryableNotionImportTerminalPageCleanupError(error: unknown) {
+  if (isApplyLeaseConflict(error)) return true;
+  return isTransientInfrastructureError(error);
+}
+
+function notionImportTerminalPageCleanupPendingError() {
+  return Object.assign(
+    new Error('Notion import terminal page cleanup observed a newer page revision.'),
+    { code: 409, notionImportRecoveryPending: true },
+  );
+}
+
+async function trashIncompleteImportPageBatch(
+  db: DbRef,
+  job: NotionImportJob,
+  candidates: NotionImportTerminalPageCandidate[],
+  trashedAt: string,
+) {
+  const pages = db.table<Page>('pages');
+  const jobs = db.table<NotionImportJob>('notion_import_jobs');
+  const snapshots = new Map<string, NotionImportTerminalPageSnapshot>();
+  const lastAttemptedIds = new Set<string>();
+  const confirmedIds = new Set<string>();
+  const changedIds = new Set<string>();
+
+  for (let attempt = 0; attempt < NOTION_IMPORT_TERMINAL_PAGE_CLEANUP_ATTEMPTS; attempt += 1) {
+    const currentJob = await getExisting(jobs, job.id);
+    if (
+      !currentJob
+      || currentJob.workspaceId !== job.workspaceId
+      || currentJob.status !== job.status
+      || (currentJob.itemSnapshotRevision ?? null) !== (job.itemSnapshotRevision ?? null)
+      || (currentJob.status !== 'failed' && currentJob.status !== 'cancelled')
+    ) {
+      throw notionImportTerminalPageCleanupPendingError();
+    }
+
+    const rows = await Promise.all(
+      candidates.map((candidate) => getExisting(pages, candidate.id)),
+    );
+    const operations: TransactOperation[] = [];
+    const attemptedIds = new Set<string>();
+    rows.forEach((page, index) => {
+      if (!page) return;
+      const candidate = candidates[index];
+      if (!notionImportTerminalPageIsOwned(page, candidate, job)) return;
+      const signature = notionImportTerminalPageSignature(page);
+      const snapshot = snapshots.get(page.id);
+      if (!snapshot) {
+        if (notionImportTerminalPageWasEditedAfterJob(page, job)) return;
+        snapshots.set(page.id, {
+          signature,
+          importerRecoveryLock: pageHasExactNotionImportRecoveryLock(page, job),
+        });
+      } else if (signature !== snapshot.signature) {
+        if (lastAttemptedIds.has(page.id) && notionImportTerminalPageCleanupSatisfied(page, snapshot, job)) {
+          confirmedIds.add(page.id);
+        } else {
+          // A changed-but-active page is a possible user takeover. Exclude it
+          // from every retry rather than applying a newly-read snapshot.
+          changedIds.add(page.id);
+        }
+        return;
+      }
+
+      const stableSnapshot = snapshots.get(page.id)!;
+      if (notionImportTerminalPageCleanupSatisfied(page, stableSnapshot, job)) return;
+      const hasImporterRecoveryLock = stableSnapshot.importerRecoveryLock;
+      const data: Record<string, unknown> = {
+        isFavorite: false,
+        ...(!page.inTrash ? { inTrash: true } : {}),
+        ...(!page.trashedAt ? { trashedAt } : {}),
+        ...(page.notionImportStaging === true ? { notionImportStaging: false } : {}),
+      };
+      if (hasImporterRecoveryLock) {
+        const properties = { ...(page.properties ?? {}) };
+        delete properties[NOTION_IMPORT_BLOCK_RECOVERY_KEY];
+        data.properties = properties;
+        if (page.isLocked === true) data.isLocked = false;
+      }
+      attemptedIds.add(page.id);
+      operations.push(
+        notionImportTerminalPageCleanupExpectation(page),
+        { table: 'pages', op: 'update', id: page.id, data },
+      );
+    });
+
+    if (operations.length === 0) break;
+    lastAttemptedIds.clear();
+    attemptedIds.forEach((id) => lastAttemptedIds.add(id));
+    try {
+      await db.transact([
+        ...notionImportCompletionFence(job, undefined, job.status),
+        ...operations,
+      ]);
+      attemptedIds.forEach((id) => confirmedIds.add(id));
+      break;
+    } catch (error) {
+      if (
+        !isRetryableNotionImportTerminalPageCleanupError(error)
+        || attempt === NOTION_IMPORT_TERMINAL_PAGE_CLEANUP_ATTEMPTS - 1
+      ) {
+        throw error;
+      }
+    }
+  }
+
+  if (changedIds.size > 0) throw notionImportTerminalPageCleanupPendingError();
+  return confirmedIds.size;
+}
+
 async function trashIncompleteImportPages(
   db: DbRef,
   job: NotionImportJob,
   mappings?: NotionImportMapping[],
+  options: { includeCheckpointOwners?: boolean } = {},
 ) {
+  if (job.status !== 'failed' && job.status !== 'cancelled') return 0;
   const jobMappings = mappings ?? await listAll(
     db.table<NotionImportMapping>('notion_import_mappings').where('jobId', '==', job.id),
     NOTION_IMPORT_ITEM_SAFETY_LIMIT,
   );
-  const pageIds = Array.from(new Set(
-    jobMappings
-      .filter((mapping) => mapping.localType === 'page' || mapping.localType === 'database')
-      .map((mapping) => mapping.localId)
-      .filter(Boolean),
-  ));
-  const pages = db.table<Page>('pages');
+  // A legacy worker may have committed a page/file-owner transaction and died
+  // before its mapping insert. Durable repair may use checkpoint FKs as exact
+  // owner locators, but terminal request paths explicitly skip that backlog;
+  // their file/object work is owned by the bounded maintenance continuation.
+  const checkpointOwners = options.includeCheckpointOwners === false
+    ? []
+    : await listAll(
+        db.table<FileUpload>('file_uploads').where('notionImportJobId', '==', job.id),
+        NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+      );
+  const locatorOwners = await listAll(
+    db.table<Page>('pages').where('notionImportJobId', '==', job.id),
+    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  );
+  const candidates = new Map<string, NotionImportTerminalPageCandidate>();
+  for (const mapping of jobMappings) {
+    if (
+      mapping.workspaceId !== job.workspaceId
+      || mapping.jobId !== job.id
+      || (mapping.localType !== 'page' && mapping.localType !== 'database')
+    ) continue;
+    const candidate = notionImportTerminalPageCandidate(candidates, mapping.localId);
+    candidate?.mappings.push(mapping);
+  }
+  for (const upload of checkpointOwners) {
+    if (upload.workspaceId !== job.workspaceId) continue;
+    for (const pageId of [upload.pageId, upload.databaseId]) {
+      const candidate = notionImportTerminalPageCandidate(candidates, pageId);
+      if (candidate) candidate.checkpointOwner = true;
+    }
+  }
+  for (const page of locatorOwners) {
+    if (page.workspaceId !== job.workspaceId || page.notionImportJobId !== job.id) continue;
+    const candidate = notionImportTerminalPageCandidate(candidates, page.id);
+    if (candidate) candidate.locatorOwner = true;
+  }
   const trashedAt = nowIso();
   let trashed = 0;
-  for (let offset = 0; offset < pageIds.length; offset += MAX_RAW_TRANSACT_OPS) {
-    const rows = await Promise.all(
-      pageIds.slice(offset, offset + MAX_RAW_TRANSACT_OPS).map((pageId) => getExisting(pages, pageId)),
+  const completionFenceSize = notionImportCompletionFence(job, undefined, job.status).length;
+  const cleanupPageBatchSize = Math.max(
+    1,
+    Math.floor((MAX_RAW_TRANSACT_OPS - completionFenceSize) / 2),
+  );
+  const pageCandidates = Array.from(candidates.values());
+  for (let offset = 0; offset < pageCandidates.length; offset += cleanupPageBatchSize) {
+    trashed += await trashIncompleteImportPageBatch(
+      db,
+      job,
+      pageCandidates.slice(offset, offset + cleanupPageBatchSize),
+      trashedAt,
     );
-    const operations = rows
-      .filter((page): page is Page => !!page && !page.inTrash)
-      .map((page): TransactOperation => ({
-        table: 'pages',
-        op: 'update',
-        id: page.id,
-        data: { inTrash: true, trashedAt, isFavorite: false },
-      }));
-    if (operations.length) await db.transact(operations);
-    trashed += operations.length;
   }
   return trashed;
 }
@@ -7477,7 +9016,7 @@ async function trashIncompleteImportPages(
 function rowDataSourceId(item: NotionImportItem, dataSourceIds: Set<string>) {
   const metadata = itemMetadata(item);
   const value = metadata.dataSourceId;
-  if (typeof value === 'string' && value.trim()) return value.trim();
+  if (typeof value === 'string' && dataSourceIds.has(value.trim())) return value.trim();
   if (item.parentNotionId && dataSourceIds.has(item.parentNotionId)) return item.parentNotionId;
   return undefined;
 }
@@ -7680,6 +9219,18 @@ function convertNotionPropertyValue(value: unknown) {
   if (type === 'unique_id') return notionUniqueIdNumber(prop);
   if (type === 'formula') return notionFormulaComputedValue(prop);
   if (type === 'rollup') return notionRollupComputedValue(prop);
+  if (
+    type === 'button' ||
+    type === 'location' ||
+    type === 'verification' ||
+    type === 'last_visited_time' ||
+    type === 'place'
+  ) {
+    const normalized = normalizeDatabasePropertyImportValue(type, prop[type]);
+    return normalized === OMIT_DATABASE_PROPERTY_IMPORT_VALUE
+      ? normalized
+      : structuredClone(normalized);
+  }
   if (type === 'relation' && Array.isArray(prop.relation)) {
     return prop.relation
       .map((target) => target && typeof target === 'object' ? (target as Record<string, unknown>).id : null)
@@ -7705,12 +9256,15 @@ function rowPropertiesForDataSource(
   if (!rawProperties || typeof rawProperties !== 'object') return out;
   for (const [nameOrId, rawValue] of Object.entries(rawProperties as Record<string, unknown>)) {
     const prop = rawValue && typeof rawValue === 'object' ? rawValue as Record<string, unknown> : {};
-    const notionPropId = typeof prop.id === 'string' ? prop.id : nameOrId;
+    const notionPropId = optionalString(prop.id) ?? nameOrId;
     const localPropId = propertyMappings.get(notionPropId) ?? propertyMappings.get(nameOrId);
     if (!localPropId) continue;
-    out[localPropId] = options.omitFileValuesNeedingStorage && prop.type === 'files'
+    const converted = options.omitFileValuesNeedingStorage && prop.type === 'files'
       ? []
       : convertNotionPropertyValue(rawValue);
+    if (converted !== OMIT_DATABASE_PROPERTY_IMPORT_VALUE) {
+      out[localPropId] = converted;
+    }
     reportNotionUserReferences(
       reportContext?.report,
       reportContext?.notionId ?? notionPropId,
@@ -7736,17 +9290,18 @@ async function copyImportedRowFileProperties(
     ? { ...page.properties }
     : {};
   let changed = false;
+  const uploadIds = new Set<string>();
 
   for (const [nameOrId, rawValue] of Object.entries(rawProperties as Record<string, unknown>)) {
     const prop = rawValue && typeof rawValue === 'object' ? rawValue as Record<string, unknown> : {};
-    const notionPropId = typeof prop.id === 'string' ? prop.id : nameOrId;
+    const notionPropId = optionalString(prop.id) ?? nameOrId;
     const localPropId = propertyMappings.get(notionPropId) ?? propertyMappings.get(nameOrId);
     if (!localPropId) continue;
     const references = notionFilePropertyReferences(rawValue);
     if (references.length === 0) continue;
     const copied: unknown[] = [];
     for (const [index, reference] of references.entries()) {
-      copied.push(await copyNotionFileReference(context, {
+      const stored = await copyNotionFileReference(context, {
         notionId: notionPropId,
         notionObject: 'property',
         label: `file property "${nameOrId}" on "${item.title || item.notionId}"`,
@@ -7759,14 +9314,27 @@ async function copyImportedRowFileProperties(
         notionPropertyName: nameOrId,
         notionFileIndex: index,
         notionFileName: reference.name,
-      }, reference));
+        notionFileRole: 'row_property_file',
+        notionFileStructuralPath: `page:${item.notionId}/property:${notionPropId}`,
+        notionFileOrdinal: index,
+      }, reference);
+      copied.push(stored);
+      storedUploadIds(stored, uploadIds);
     }
     properties[localPropId] = copied;
     changed = true;
   }
 
   if (!changed) return page;
-  return context.db.table<Page>('pages').update(page.id, { properties });
+  await transactImportedFileOwner(
+    context,
+    { table: 'pages', op: 'update', id: page.id, data: { properties } },
+    Array.from(uploadIds),
+    { pageId: page.id },
+  );
+  const updated = await getExisting(context.db.table<Page>('pages'), page.id) ?? { ...page, properties };
+  if (context.blockRecoveryPage?.id === page.id) context.blockRecoveryPage = updated;
+  return updated;
 }
 
 function importedRowFilePropertiesNeedCopy(
@@ -7778,7 +9346,7 @@ function importedRowFilePropertiesNeedCopy(
   const properties = pageProperties && typeof pageProperties === 'object' ? pageProperties : {};
   for (const [nameOrId, rawValue] of Object.entries(rawProperties as Record<string, unknown>)) {
     const prop = rawValue && typeof rawValue === 'object' ? rawValue as Record<string, unknown> : {};
-    const notionPropId = typeof prop.id === 'string' ? prop.id : nameOrId;
+    const notionPropId = optionalString(prop.id) ?? nameOrId;
     const localPropId = propertyMappings.get(notionPropId) ?? propertyMappings.get(nameOrId);
     if (!localPropId) continue;
     const references = notionFilePropertyReferences(rawValue);
@@ -7802,6 +9370,7 @@ async function copyImportedPageChromeFiles(
   const properties = asRecord(page.properties) ? { ...(page.properties as Record<string, unknown>) } : {};
   const patch: Partial<Page> = {};
   let propertiesChanged = false;
+  const uploadIds = new Set<string>();
   const chrome = importedPageChromeFromItem(item);
 
   const iconReference = chrome.iconReference;
@@ -7814,8 +9383,12 @@ async function copyImportedPageChromeFiles(
       pageId: page.id,
       notionPageId: item.notionId,
       notionPageFileKind: 'icon',
+      notionFileRole: 'page_chrome_icon',
+      notionFileStructuralPath: `${item.notionObject}:${item.notionId}/chrome`,
+      notionFileOrdinal: 0,
     }, iconReference);
     if (copied !== iconReference) {
+      storedUploadIds(copied, uploadIds);
       patch.icon = copied.url;
       patch.iconType = 'image';
       properties[NOTION_PAGE_ICON_REFERENCE_KEY] = copied;
@@ -7833,8 +9406,12 @@ async function copyImportedPageChromeFiles(
       pageId: page.id,
       notionPageId: item.notionId,
       notionPageFileKind: 'cover',
+      notionFileRole: 'page_chrome_cover',
+      notionFileStructuralPath: `${item.notionObject}:${item.notionId}/chrome`,
+      notionFileOrdinal: 0,
     }, coverReference);
     if (copied !== coverReference) {
+      storedUploadIds(copied, uploadIds);
       patch.cover = copied.url;
       patch.coverPosition = chrome.coverPosition ?? 50;
       properties[NOTION_PAGE_COVER_REFERENCE_KEY] = copied;
@@ -7843,10 +9420,16 @@ async function copyImportedPageChromeFiles(
   }
 
   if (!propertiesChanged && Object.keys(patch).length === 0) return page;
-  return context.db.table<Page>('pages').update(page.id, {
-    ...patch,
-    ...(propertiesChanged ? { properties } : {}),
-  });
+  const data = { ...patch, ...(propertiesChanged ? { properties } : {}) };
+  await transactImportedFileOwner(
+    context,
+    { table: 'pages', op: 'update', id: page.id, data },
+    Array.from(uploadIds),
+    { pageId: page.id },
+  );
+  const updated = await getExisting(context.db.table<Page>('pages'), page.id) ?? { ...page, ...data };
+  if (context.blockRecoveryPage?.id === page.id) context.blockRecoveryPage = updated;
+  return updated;
 }
 
 function notionTemplateIconReference(template: Record<string, unknown>, fallbackName: string) {
@@ -8099,45 +9682,166 @@ async function cleanupUnownedImportedTemplateUploads(
   uploads: FileUpload[],
 ) {
   if (uploads.length === 0) return;
-  const proxy = storageBucket(context.storage, FILE_BUCKET);
-  if (!proxy) {
-    throw retryableNotionTemplateCleanupError(
-      'Notion template file cleanup is pending because EdgeBase storage is unavailable. Retry apply after storage is available.',
-    );
-  }
   const workspace = await getExisting(context.db.table<Workspace>('workspaces'), context.job.workspaceId);
   if (!workspace) throw new Error('workspace was not found');
   for (const upload of uploads) {
     if (upload.status === 'deleted' || upload.status === 'expired') continue;
-    const cleanupAt = nowIso();
-    const previousStatus = upload.status === 'deleting'
-      ? upload.deletionPreviousStatus ?? (upload.completedAt ? 'uploaded' : 'pending')
-      : upload.status;
-    await context.db.table<FileUpload>('file_uploads').update(upload.id, {
-      status: 'deleting',
-      deletionPreviousStatus: previousStatus,
-      expiresAt: cleanupAt,
-      deletedBy: context.actorId,
-      updatedAt: cleanupAt,
-    });
     try {
-      await proxy.delete(upload.key);
-      if (workspace.organizationId) {
-        await releaseOrganizationStorage(context.admin, {
-          id: upload.id,
-          organizationId: workspace.organizationId,
-          workspaceId: workspace.id,
-          bytes: upload.size,
-        });
+      let cleanupCompleted = false;
+      await withFileWorkspaceLease(
+        context.db,
+        context.job.workspaceId,
+        context.actorId,
+        'notion-template-unowned-upload-cleanup',
+        async (lease) => {
+          await lease.assertOwned();
+          const uploadTable = context.db.table<FileUpload>('file_uploads');
+          const current = await getExisting(uploadTable, upload.id);
+          if (!current || current.status === 'deleted' || current.status === 'expired') return;
+          if (!['uploaded', 'pending', 'preparing', 'deleting'].includes(current.status)) return;
+
+          const template = current.templateId
+            ? await getExisting(context.db.table<DbTemplate>('db_templates'), current.templateId)
+            : undefined;
+          if (template) {
+            const locators = collectImportedTemplateOwnerLocators({
+              icon: template.icon,
+              properties: template.properties,
+              blocks: template.blocks,
+            });
+            const stillOwned = Array.from(locators.values()).some((locator) => (
+              (!!locator.uploadId && locator.uploadId === current.id)
+              || (!!locator.key && locator.key === current.key)
+              || (!!locator.url && locator.url === current.url)
+            ));
+            // The template may have gained this file after the stale snapshot
+            // classified it as unowned. The file lease serializes normal owner
+            // commits; re-reading here prevents cleanup from deleting it.
+            if (stillOwned) return;
+          }
+
+          const claimedAt = nowIso();
+          const previousStatus = current.status === 'deleting'
+            ? current.deletionPreviousStatus ?? (current.completedAt ? 'uploaded' : 'pending')
+            : current.status;
+          const claimOperations: TransactOperation[] = [];
+          if (context.applyLease && context.itemSnapshotRevision) {
+            claimOperations.push(
+              {
+                table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+                where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+                exists: true,
+              },
+              {
+                table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+                where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+                exists: true,
+              },
+            );
+          }
+          claimOperations.push(
+            {
+              table: 'file_uploads', op: 'expect', id: current.id,
+              where: [
+                ['status', '==', current.status],
+                ['updatedAt', '==', current.updatedAt ?? null],
+                ['pageId', '==', current.pageId ?? null],
+                ['blockId', '==', current.blockId ?? null],
+                ['databaseId', '==', current.databaseId ?? null],
+                ['propertyId', '==', current.propertyId ?? null],
+                ['templateId', '==', current.templateId ?? null],
+                ['notionImportSlotKey', '==', current.notionImportSlotKey ?? null],
+              ],
+              exists: true,
+            },
+            {
+              table: 'file_uploads', op: 'update', id: current.id,
+              data: {
+                status: 'deleting',
+                deletionPreviousStatus: previousStatus,
+                expiresAt: claimedAt,
+                deletedBy: context.actorId,
+                updatedAt: claimedAt,
+              },
+            },
+          );
+          await context.db.transact(claimOperations);
+
+          const proxy = storageBucket(context.storage, current.bucket || FILE_BUCKET);
+          if (!proxy) {
+            throw new Error('EdgeBase storage is unavailable.');
+          }
+          await proxy.delete(current.key);
+          await lease.assertOwned();
+          if (workspace.organizationId) {
+            await releaseOrganizationStorage(context.admin, {
+              id: current.id,
+              organizationId: workspace.organizationId,
+              workspaceId: workspace.id,
+              bytes: current.size,
+            });
+          }
+          await lease.assertOwned();
+
+          const cleanupAt = nowIso();
+          const finishOperations: TransactOperation[] = [];
+          if (context.applyLease && context.itemSnapshotRevision) {
+            finishOperations.push(
+              {
+                table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+                where: [['status', '==', 'ready'], ['itemSnapshotRevision', '==', context.itemSnapshotRevision]],
+                exists: true,
+              },
+              {
+                table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+                where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+                exists: true,
+              },
+            );
+          }
+          finishOperations.push(
+            {
+              table: 'file_uploads', op: 'expect', id: current.id,
+              where: [
+                ['status', '==', 'deleting'],
+                ['updatedAt', '==', claimedAt],
+                ['pageId', '==', current.pageId ?? null],
+                ['blockId', '==', current.blockId ?? null],
+                ['databaseId', '==', current.databaseId ?? null],
+                ['propertyId', '==', current.propertyId ?? null],
+                ['templateId', '==', current.templateId ?? null],
+                ['notionImportSlotKey', '==', current.notionImportSlotKey ?? null],
+              ],
+              exists: true,
+            },
+            {
+              table: 'file_uploads', op: 'update', id: current.id,
+              data: {
+                status: 'expired',
+                ...(current.notionImportSlotKey
+                  ? { notionImportSlotKey: null as unknown as string }
+                  : {}),
+                expiresAt: cleanupAt,
+                expiredAt: cleanupAt,
+                deletedAt: cleanupAt,
+                deletedBy: context.actorId,
+                ...(current.notionImportSlotKey ? {
+                  notionImportTerminalSweepAfter: new Date(
+                    Date.now() + NOTION_FILE_TERMINAL_RESWEEP_DELAY_MS,
+                  ).toISOString(),
+                  notionImportTerminalSweepCompletedAt: null,
+                } : {}),
+                updatedAt: cleanupAt,
+              },
+            },
+          );
+          await context.db.transact(finishOperations);
+          cleanupCompleted = true;
+        },
+      );
+      if (cleanupCompleted && upload.notionImportSlotKey) {
+        context.checkpointUploadsBySlotKey?.delete(upload.notionImportSlotKey);
       }
-      await context.db.table<FileUpload>('file_uploads').update(upload.id, {
-        status: 'expired',
-        expiresAt: cleanupAt,
-        expiredAt: cleanupAt,
-        deletedAt: cleanupAt,
-        deletedBy: context.actorId,
-        updatedAt: cleanupAt,
-      });
     } catch (error) {
       throw retryableNotionTemplateCleanupError(
         `Notion template file cleanup is pending for upload ${upload.id}. Retry apply after maintenance completes: ${
@@ -8201,10 +9905,11 @@ async function existingImportedTemplateFileState(
     durableOwnerUploadIds.add(matching[0]!.id);
   }
 
-  const unownedActiveUploads = activeAssociatedUploads.filter((upload) => !matchedUploadIds.has(upload.id));
+  const unownedActiveUploads = activeAssociatedUploads.filter((upload) => (
+    !matchedUploadIds.has(upload.id) && !durableOwnerUploadIds.has(upload.id)
+  ));
   const ownerSetMatchesSlots = durableOwnerLocatorsValid
-    && durableOwnerUploadIds.size === matchedUploadIds.size
-    && Array.from(durableOwnerUploadIds).every((id) => matchedUploadIds.has(id));
+    && Array.from(matchedUploadIds).every((id) => durableOwnerUploadIds.has(id));
   if (allSlotsComplete && matchedUploadIds.size === slots.length && ownerSetMatchesSlots) {
     await cleanupUnownedImportedTemplateUploads(context, unownedActiveUploads);
     return 'complete' as const;
@@ -8216,6 +9921,18 @@ async function existingImportedTemplateFileState(
   // stored markers and missing/mismatched rows is corruption and must not be
   // papered over with another full copy that would orphan valid objects.
   if (ownerLocators.size === 0 && matchedUploadIds.size === 0) {
+    const durableCheckpoints = activeAssociatedUploads.filter((upload) => (
+      upload.notionImportJobId === context.job.id
+      && upload.notionImportSnapshotRevision === context.itemSnapshotRevision
+      && !!upload.notionImportSlotKey
+    ));
+    // The pre-copy phase intentionally leaves the source-only template owner
+    // unchanged until its single owner transaction. Let the slot recovery path
+    // HEAD/finalize or safely retire these rows; the legacy cleanup routine
+    // cannot distinguish a still-running put from an abandoned upload.
+    if (context.requireFileCopyCheckpoint && durableCheckpoints.length > 0) {
+      return 'source_only' as const;
+    }
     await cleanupUnownedImportedTemplateUploads(context, activeAssociatedUploads);
     return 'source_only' as const;
   }
@@ -8233,12 +9950,14 @@ async function copyImportedEmbeddedTemplateBlockFiles(
   context: NotionFileCopyContext,
   rawBlocks: Record<string, unknown>[],
   localBlocks: TemplateBlock[],
-  target: Pick<NotionFileCopyTarget, 'pageId' | 'blockId' | 'databaseId' | 'templateId'> & {
+  target: Pick<NotionFileCopyTarget, 'pageId' | 'blockId' | 'databaseId' | 'templateId' | 'notionPageId'> & {
     notionId: string;
     notionObject: string;
     label: string;
   },
   deferredBlockUploadIds?: string[],
+  structuralPath = 'blocks',
+  fileRole = 'template_block_file',
 ): Promise<TemplateBlock[]> {
   if (rawBlocks.length !== localBlocks.length) {
     throw new Error(`Notion import cannot safely align file blocks in ${target.label}.`);
@@ -8247,6 +9966,7 @@ async function copyImportedEmbeddedTemplateBlockFiles(
   for (let index = 0; index < rawBlocks.length; index += 1) {
     const rawBlock = rawBlocks[index]!;
     const localBlock = { ...localBlocks[index]! };
+    const blockPath = `${structuralPath}/${index}`;
     const reference = fileReferenceFromNotionBlock(rawBlock);
     if (reference) {
       const notionBlockId = notionObjectId(rawBlock);
@@ -8256,6 +9976,9 @@ async function copyImportedEmbeddedTemplateBlockFiles(
         label: `file block in ${target.label}`,
         scope: fileCopyScopeForBlockType(localBlock.type),
         notionBlockId,
+        notionFileRole: fileRole,
+        notionFileStructuralPath: blockPath,
+        notionFileOrdinal: 0,
       }, reference);
       localBlock.content = contentWithStoredNotionFile(localBlock.content, copied);
       if (deferredBlockUploadIds && copied.uploadId) {
@@ -8272,6 +9995,8 @@ async function copyImportedEmbeddedTemplateBlockFiles(
         localChildren,
         target,
         deferredBlockUploadIds,
+        `${blockPath}/children`,
+        fileRole,
       );
       localBlock.children = copiedChildren;
     }
@@ -8311,14 +10036,23 @@ function countImportedEmbeddedTemplateBlockFiles(
   return count;
 }
 
-function assertImportedBlockFileTransactionCapacity(fileCount: number) {
+function assertImportedFileOwnerTransactionCapacity(
+  fileCount: number,
+  ownerLabel: string,
+  companionOperationCount = 0,
+) {
   // Each copied upload needs one ownership expectation plus one association
-  // update, and the owner block itself needs one insert. Check the complete raw
+  // update, the owner block itself needs one insert, and pre-copied files add
+  // immutable job-revision plus apply-lease fences. Check the complete raw
   // graph before the first network fetch/object write/quota reservation so a
   // request that can never fit one atomic commit has zero storage side effects.
-  if (fileCount * 2 + 1 > MAX_RAW_TRANSACT_OPS) {
-    throw Object.assign(new Error('Imported block contains too many stored files.'), { code: 413 });
+  if (fileCount * 2 + 3 + companionOperationCount > MAX_RAW_TRANSACT_OPS) {
+    throw Object.assign(new Error(`${ownerLabel} contains too many stored files.`), { code: 413 });
   }
+}
+
+function assertImportedBlockFileTransactionCapacity(fileCount: number) {
+  assertImportedFileOwnerTransactionCapacity(fileCount, 'Imported block');
 }
 
 async function copyImportedTemplateFiles(
@@ -8327,6 +10061,7 @@ async function copyImportedTemplateFiles(
   rawTemplate: Record<string, unknown>,
   propertyMappings: Map<string, string>,
   item: NotionImportItem,
+  templateStructuralPath: string,
 ) {
   const notionTemplateId = notionObjectId(rawTemplate) ?? item.notionId;
   let icon = template.icon;
@@ -8339,6 +10074,11 @@ async function copyImportedTemplateFiles(
       scope: 'icons',
       databaseId: template.databaseId,
       templateId: template.id,
+      notionPageId: notionObjectId(rawTemplate),
+      notionPageFileKind: 'icon',
+      notionFileRole: 'template_icon',
+      notionFileStructuralPath: templateStructuralPath,
+      notionFileOrdinal: 0,
     }, iconReference);
     icon = copied.url;
   }
@@ -8370,6 +10110,10 @@ async function copyImportedTemplateFiles(
         notionPropertyName: nameOrId,
         notionFileIndex: index,
         notionFileName: reference.name,
+        notionPageId: notionObjectId(rawTemplate),
+        notionFileRole: 'template_property_file',
+        notionFileStructuralPath: `${templateStructuralPath}/property:${notionPropertyId}`,
+        notionFileOrdinal: index,
       }, reference));
     }
     properties[localPropertyId] = copied;
@@ -8385,7 +10129,11 @@ async function copyImportedTemplateFiles(
       label: `database template "${template.name}"`,
       databaseId: template.databaseId,
       templateId: template.id,
+      notionPageId: notionObjectId(rawTemplate),
     },
+    undefined,
+    `${templateStructuralPath}/blocks`,
+    'template_block_file',
   );
   return {
     ...template,
@@ -8395,28 +10143,96 @@ async function copyImportedTemplateFiles(
   };
 }
 
-export interface ImportedPropertyContext {
-  dataSourceId: string;
-  notionPropertyId: string;
-  notionPropertyName: string;
-  notionProperty: Record<string, unknown>;
-  property: DbProperty;
+async function insertImportedTemplateWithFiles(
+  context: NotionFileCopyContext,
+  template: DbTemplate,
+  mappingCommit?: {
+    mappingsByNotionId: Map<string, NotionImportMapping>;
+      input: Omit<NotionImportMappingInput, 'localId'>;
+    },
+  uniqueWhere?: Array<[string, '==', unknown]>,
+) {
+  const uploadIds = storedUploadIds({
+    icon: template.icon,
+    properties: template.properties,
+    blocks: template.blocks,
+  });
+  for (const [uploadId, target] of context.pendingCheckpointTargets ?? []) {
+    if (target.templateId === template.id && target.databaseId === template.databaseId) {
+      uploadIds.add(uploadId);
+    }
+  }
+  const mapping = mappingCommit
+    ? notionImportMappingRow(context.job, { ...mappingCommit.input, localId: template.id })
+    : undefined;
+  const preOwnerOperations: TransactOperation[] = [
+    ...(uniqueWhere?.length
+      ? [{ table: 'db_templates', op: 'expect' as const, where: uniqueWhere, exists: false }]
+      : []),
+    ...(mapping
+      ? [
+          {
+            table: 'notion_import_mappings',
+            op: 'expect' as const,
+            where: [['mappingKey', '==', mapping.mappingKey]] as Array<[string, '==', unknown]>,
+            exists: false,
+          },
+        ]
+      : []),
+  ];
+  const companionOperations: TransactOperation[] = mapping
+    ? [{
+        table: 'notion_import_mappings',
+        op: 'insert',
+        data: mapping as unknown as Record<string, unknown>,
+      }]
+    : [];
+  try {
+    await transactImportedFileOwner(
+      context,
+      { table: 'db_templates', op: 'insert', data: template as unknown as Record<string, unknown> },
+      Array.from(uploadIds),
+      { databaseId: template.databaseId, templateId: template.id },
+      companionOperations,
+      preOwnerOperations,
+    );
+  } catch (error) {
+    if (isRetryableNotionTemplateCleanupError(error)) throw error;
+    if (!isApplyLeaseConflict(error)) throw error;
+    throw Object.assign(
+      new Error('Notion import template owner changed concurrently before publication.'),
+      { code: 409, notionImportRecoveryPending: true, cause: error },
+    );
+  }
+  if (mapping && mappingCommit) {
+    mappingCommit.mappingsByNotionId.set(mapping.notionId, mapping);
+  }
+  return await getExisting(context.db.table<DbTemplate>('db_templates'), template.id) ?? template;
 }
 
-export interface ImportedRowContext {
-  page: Page;
-  dataSourceId: string;
-  notionId: string;
-}
-
-export interface ImportedPageBlockContext {
-  page: Page;
-  notionId: string;
-}
-
-export interface ImportedBlockMapping {
-  localId: string;
-  pageId: string;
+async function updateImportedTemplateWithFiles(
+  context: NotionFileCopyContext,
+  template: DbTemplate,
+  patch: Partial<DbTemplate>,
+) {
+  const next = { ...template, ...patch };
+  const uploadIds = storedUploadIds({
+    icon: next.icon,
+    properties: next.properties,
+    blocks: next.blocks,
+  });
+  for (const [uploadId, target] of context.pendingCheckpointTargets ?? []) {
+    if (target.templateId === template.id && target.databaseId === template.databaseId) {
+      uploadIds.add(uploadId);
+    }
+  }
+  await transactImportedFileOwner(
+    context,
+    { table: 'db_templates', op: 'update', id: template.id, data: patch as Record<string, unknown> },
+    Array.from(uploadIds),
+    { databaseId: template.databaseId, templateId: template.id },
+  );
+  return await getExisting(context.db.table<DbTemplate>('db_templates'), template.id) ?? next;
 }
 
 interface ImportedBlockOwnerContext {
@@ -8425,12 +10241,6 @@ interface ImportedBlockOwnerContext {
   blockType?: string;
   parentBlockNotionId?: string | null;
   position?: number;
-}
-
-export interface ImportedTemplateContext {
-  template: DbTemplate;
-  dataSourceId: string;
-  notionId?: string;
 }
 
 function contextKey(dataSourceId: string, propertyId: string) {
@@ -8752,7 +10562,7 @@ function relationTargetDataSourceFromPropertyContext(context: ImportedPropertyCo
 }
 
 async function remapImportedDatabaseProperties(
-  db: DbRef,
+  applyContext: NotionFileCopyContext,
   contexts: ImportedPropertyContext[],
   propertyMappingsByDataSource: Map<string, Map<string, string>>,
   mappingsByNotionId: Map<string, NotionImportMapping>,
@@ -8885,8 +10695,28 @@ async function remapImportedDatabaseProperties(
     }
 
     if (!changed) continue;
-    const updated = await db.table<DbProperty>('db_properties').update(context.property.id, {
-      config,
+    const updated = await transactImportedOwnerPatch(applyContext, {
+      table: 'db_properties',
+      owner: context.property,
+      patch: { config },
+      requiredWhere: [
+        ['databaseId', '==', context.property.databaseId],
+        ['notionImportJobId', '==', applyContext.job.id],
+        ['notionDataSourceId', '==', context.dataSourceId],
+        ['notionPropertyId', '==', context.notionPropertyId],
+      ],
+      extraExpectations: [{
+        table: 'pages', op: 'expect', id: context.property.databaseId,
+        where: [
+          ['workspaceId', '==', applyContext.job.workspaceId],
+          ['kind', '==', 'database'],
+          ['notionImportJobId', '==', applyContext.job.id],
+          ['notionImportSourceId', '==', context.dataSourceId],
+          ['notionImportSourceKind', '==', 'data_source'],
+        ],
+        exists: true,
+      }],
+      label: 'database property remap',
     });
     context.property = updated;
   }
@@ -8913,11 +10743,12 @@ export function remapImportedRichTextMentionSpans(
   mappingsByNotionId: Map<string, NotionImportMapping>,
 ) {
   if (!Array.isArray(value)) {
-    return { value, changed: false, remapped: 0, unresolved: [] as string[] };
+    return { value, changed: false, remapped: 0, observedRemapped: 0, unresolved: [] as string[] };
   }
 
   let changed = false;
   let remapped = 0;
+  let observedRemapped = 0;
   const unresolved: string[] = [];
   const spans = value.map((item) => {
     const span = asRecord(item);
@@ -8931,6 +10762,11 @@ export function remapImportedRichTextMentionSpans(
       unresolved.push(...targetIds);
       return item;
     }
+    // Keep immutable Notion target ids on the span and observe their durable
+    // local mapping even after the product patch already committed. This lets
+    // a retry rebuild conversion counts when only the commit response was
+    // lost, while `remapped` continues to describe actual content changes.
+    observedRemapped += 1;
     if (
       span.mention === 'page' &&
       span.pageId === mapping.localId &&
@@ -8953,6 +10789,7 @@ export function remapImportedRichTextMentionSpans(
     value: spans,
     changed,
     remapped,
+    observedRemapped,
     unresolved: Array.from(new Set(unresolved)),
   };
 }
@@ -8962,11 +10799,18 @@ function remapImportedRichTextMentionsInContent(
   mappingsByNotionId: Map<string, NotionImportMapping>,
 ) {
   if (!content) {
-    return { content, changed: false, remapped: 0, unresolved: [] as string[] };
+    return {
+      content,
+      changed: false,
+      remapped: 0,
+      observedRemapped: 0,
+      unresolved: [] as string[],
+    };
   }
   const next = { ...content };
   let changed = false;
   let remapped = 0;
+  let observedRemapped = 0;
   const unresolved: string[] = [];
   for (const key of ['rich', 'caption']) {
     const result = remapImportedRichTextMentionSpans(next[key], mappingsByNotionId);
@@ -8975,12 +10819,14 @@ function remapImportedRichTextMentionsInContent(
       changed = true;
     }
     remapped += result.remapped;
+    observedRemapped += result.observedRemapped;
     unresolved.push(...result.unresolved);
   }
   return {
     content: changed ? next : content,
     changed,
     remapped,
+    observedRemapped,
     unresolved: Array.from(new Set(unresolved)),
   };
 }
@@ -8992,18 +10838,27 @@ function remapImportedTemplateBlocksRichTextMentions(
   blocks: TemplateBlock[] | undefined;
   changed: boolean;
   remapped: number;
+  observedRemapped: number;
   unresolved: string[];
 } {
   if (!Array.isArray(blocks)) {
-    return { blocks, changed: false, remapped: 0, unresolved: [] as string[] };
+    return {
+      blocks,
+      changed: false,
+      remapped: 0,
+      observedRemapped: 0,
+      unresolved: [] as string[],
+    };
   }
   let changed = false;
   let remapped = 0;
+  let observedRemapped = 0;
   const unresolved: string[] = [];
   const nextBlocks = blocks.map((block) => {
     const contentResult = remapImportedRichTextMentionsInContent(block.content, mappingsByNotionId);
     const childResult = remapImportedTemplateBlocksRichTextMentions(block.children, mappingsByNotionId);
     remapped += contentResult.remapped + childResult.remapped;
+    observedRemapped += contentResult.observedRemapped + childResult.observedRemapped;
     unresolved.push(...contentResult.unresolved, ...childResult.unresolved);
     if (!contentResult.changed && !childResult.changed) return block;
     changed = true;
@@ -9017,6 +10872,7 @@ function remapImportedTemplateBlocksRichTextMentions(
     blocks: changed ? nextBlocks : blocks,
     changed,
     remapped,
+    observedRemapped,
     unresolved: Array.from(new Set(unresolved)),
   };
 }
@@ -9026,11 +10882,12 @@ function reportRichTextMentionRemap(
   notionId: string | undefined,
   notionObject: string,
   label: string,
-  result: { remapped: number; unresolved: string[] },
+  result: { remapped: number; observedRemapped?: number; unresolved: string[] },
   options: { reportUnresolved?: boolean } = {},
 ) {
   if (!report) return;
-  if (result.remapped > 0) incrementReport(report, 'remappedRichTextMentions', result.remapped);
+  const observedRemapped = result.observedRemapped ?? result.remapped;
+  if (observedRemapped > 0) incrementReport(report, 'remappedRichTextMentions', observedRemapped);
   if (options.reportUnresolved === false) return;
   if (result.unresolved.length === 0) return;
   incrementReport(report, 'unresolvedRichTextMentions', result.unresolved.length);
@@ -9045,15 +10902,19 @@ function reportRichTextMentionRemap(
 }
 
 async function remapImportedPageBlockRichTextMentions(
-  db: DbRef,
+  applyContext: NotionFileCopyContext,
   pages: ImportedPageBlockContext[],
   mappingsByNotionId: Map<string, NotionImportMapping>,
   conversionReport?: ImportConversionReport,
 ) {
+  const { db } = applyContext;
   let updatedBlocks = 0;
 
   for (const context of pages) {
-    const blocks = await listAll(db.table<Block>('blocks').where('pageId', '==', context.page.id), 1000);
+    const blocks = await listAll(
+      db.table<Block>('blocks').where('pageId', '==', context.page.id),
+      NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+    );
     for (const block of blocks) {
       const result = remapImportedRichTextMentionsInContent(block.content, mappingsByNotionId);
       const buttonTemplateRemap = remapImportedTemplateBlocksRichTextMentions(
@@ -9061,11 +10922,26 @@ async function remapImportedPageBlockRichTextMentions(
         mappingsByNotionId,
       );
       if (result.changed || buttonTemplateRemap.changed) {
-        await db.table<Block>('blocks').update(block.id, {
-          content: {
+        await transactImportedOwnerPatch(applyContext, {
+          table: 'blocks',
+          owner: block,
+          patch: { content: {
             ...((result.content ?? block.content) ?? {}),
             ...(buttonTemplateRemap.changed ? { buttonTemplate: buttonTemplateRemap.blocks } : {}),
-          },
+          } },
+          requiredWhere: [['pageId', '==', context.page.id]],
+          extraExpectations: [{
+            table: 'pages', op: 'expect', id: context.page.id,
+            where: [
+              ['workspaceId', '==', applyContext.job.workspaceId],
+              ['kind', '==', 'page'],
+              ['notionImportJobId', '==', applyContext.job.id],
+              ['notionImportSourceId', '==', context.notionId],
+              ['notionImportSourceKind', '==', 'page'],
+            ],
+            exists: true,
+          }],
+          label: 'block rich-text remap',
         });
         updatedBlocks += 1;
       }
@@ -9101,16 +10977,18 @@ function importLinkedTargetIdsFromBlockContent(block: Block) {
 }
 
 async function remapImportedPageLinkBlocks(
-  db: DbRef,
+  applyContext: NotionFileCopyContext,
   pages: ImportedPageBlockContext[],
   mappingsByNotionId: Map<string, NotionImportMapping>,
   conversionReport?: ImportConversionReport,
 ) {
+  const { db } = applyContext;
   const linkBlockTypes = new Set(['inline_database', 'child_database', 'child_page', 'link_to_page']);
   const pageTable = db.table<Page>('pages');
   const pageCache = new Map<string, Page | null>();
   let updatedBlocks = 0;
   let remappedTargets = 0;
+  let mappedBlocks = 0;
   let unresolvedTargets = 0;
 
   const linkedPageSnapshot = async (localPageId: string) => {
@@ -9121,7 +10999,10 @@ async function remapImportedPageLinkBlocks(
   };
 
   for (const context of pages) {
-    const blocks = await listAll(db.table<Block>('blocks').where('pageId', '==', context.page.id), 1000);
+    const blocks = await listAll(
+      db.table<Block>('blocks').where('pageId', '==', context.page.id),
+      NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+    );
     for (const block of blocks) {
       if (!linkBlockTypes.has(block.type)) continue;
       const targetIds = importLinkedTargetIdsFromBlockContent(block);
@@ -9163,10 +11044,28 @@ async function remapImportedPageLinkBlocks(
       if (linkedPage?.iconType) nextContent.childPageIconType = linkedPage.iconType;
       else delete nextContent.childPageIconType;
 
-      if (jsonEquivalent(nextContent, block.content)) continue;
-      await db.table<Block>('blocks').update(block.id, { content: nextContent });
-      updatedBlocks += 1;
+      mappedBlocks += 1;
       remappedTargets += 1;
+      if (jsonEquivalent(nextContent, block.content)) continue;
+      await transactImportedOwnerPatch(applyContext, {
+        table: 'blocks',
+        owner: block,
+        patch: { content: nextContent },
+        requiredWhere: [['pageId', '==', context.page.id]],
+        extraExpectations: [{
+          table: 'pages', op: 'expect', id: context.page.id,
+          where: [
+            ['workspaceId', '==', applyContext.job.workspaceId],
+            ['kind', '==', 'page'],
+            ['notionImportJobId', '==', applyContext.job.id],
+            ['notionImportSourceId', '==', context.notionId],
+            ['notionImportSourceKind', '==', 'page'],
+          ],
+          exists: true,
+        }],
+        label: 'linked block remap',
+      });
+      updatedBlocks += 1;
     }
   }
 
@@ -9175,7 +11074,7 @@ async function remapImportedPageLinkBlocks(
     if (unresolvedTargets > 0) incrementReport(conversionReport, 'unresolvedLinkedTargets', unresolvedTargets);
   }
 
-  return { updatedBlocks, remappedTargets, unresolvedTargets };
+  return { updatedBlocks, mappedBlocks, remappedTargets, unresolvedTargets };
 }
 
 function syncedBlockSourceNotionId(block: Block) {
@@ -9188,21 +11087,28 @@ function syncedBlockSourceNotionId(block: Block) {
 }
 
 async function remapImportedSyncedBlocks(
-  db: DbRef,
+  applyContext: NotionFileCopyContext,
   pages: ImportedPageBlockContext[],
   blockMappingsByNotionId: Map<string, ImportedBlockMapping>,
   conversionReport?: ImportConversionReport,
+  resolveMissingSource?: (notionBlockId: string) => Promise<ImportedBlockMapping | undefined>,
 ) {
+  const { db } = applyContext;
   let remapped = 0;
+  let observedRemapped = 0;
   let unresolved = 0;
 
   for (const context of pages) {
-    const blocks = await listAll(db.table<Block>('blocks').where('pageId', '==', context.page.id), 1000);
+    const blocks = await listAll(
+      db.table<Block>('blocks').where('pageId', '==', context.page.id),
+      NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+    );
     for (const block of blocks) {
       if (block.type !== 'synced_block') continue;
       const sourceNotionId = syncedBlockSourceNotionId(block);
       if (!sourceNotionId) continue;
-      const source = blockMappingsByNotionId.get(sourceNotionId);
+      const source = blockMappingsByNotionId.get(sourceNotionId) ??
+        await resolveMissingSource?.(sourceNotionId);
       if (!source) {
         unresolved += 1;
         if (conversionReport) {
@@ -9216,23 +11122,43 @@ async function remapImportedSyncedBlocks(
         continue;
       }
 
-      await db.table<Block>('blocks').update(block.id, {
-        content: {
-          ...(block.content ?? {}),
+      const content = asRecord(block.content) ?? {};
+      observedRemapped += 1;
+      if (content.syncedBlockId === source.localId && content.syncedPageId === source.pageId) continue;
+      await transactImportedOwnerPatch(applyContext, {
+        table: 'blocks',
+        owner: block,
+        patch: { content: {
+          ...content,
           syncedBlockId: source.localId,
           syncedPageId: source.pageId,
-        },
+        } },
+        requiredWhere: [['pageId', '==', context.page.id]],
+        extraExpectations: [{
+          table: 'pages', op: 'expect', id: context.page.id,
+          where: [
+            ['workspaceId', '==', applyContext.job.workspaceId],
+            ['kind', '==', 'page'],
+            ['notionImportJobId', '==', applyContext.job.id],
+            ['notionImportSourceId', '==', context.notionId],
+            ['notionImportSourceKind', '==', 'page'],
+          ],
+          exists: true,
+        }],
+        label: 'synced block remap',
       });
       remapped += 1;
     }
   }
 
   if (conversionReport) {
-    if (remapped > 0) incrementReport(conversionReport, 'remappedSyncedBlocks', remapped);
+    if (observedRemapped > 0) {
+      incrementReport(conversionReport, 'remappedSyncedBlocks', observedRemapped);
+    }
     if (unresolved > 0) incrementReport(conversionReport, 'unresolvedSyncedBlocks', unresolved);
   }
 
-  return { remapped, unresolved };
+  return { remapped, observedRemapped, unresolved };
 }
 
 export function remapImportedRowRelationProperties(
@@ -9245,6 +11171,11 @@ export function remapImportedRowRelationProperties(
     : {};
   let changed = false;
   const unresolved: Record<string, string[]> = {};
+  const localPageIds = new Set(
+    Array.from(mappingsByNotionId.values())
+      .filter((mapping) => mapping.localType === 'page')
+      .map((mapping) => mapping.localId),
+  );
 
   for (const prop of relationProps) {
     const value = properties[prop.id];
@@ -9258,9 +11189,13 @@ export function remapImportedRowRelationProperties(
     for (const notionId of notionIds) {
       const mapping = mappingsByNotionId.get(notionId);
       if (mapping?.localType === 'page') localIds.push(mapping.localId);
+      else if (localPageIds.has(notionId)) localIds.push(notionId);
       else unresolvedIds.push(notionId);
     }
-    if (localIds.length > 0 || unresolvedIds.length > 0) {
+    if (
+      localIds.length !== notionIds.length ||
+      localIds.some((localId, index) => localId !== notionIds[index])
+    ) {
       properties[prop.id] = localIds;
       changed = true;
     }
@@ -9275,7 +11210,7 @@ export function remapImportedRowRelationProperties(
   return changed ? properties : undefined;
 }
 
-function remapImportedTemplateRelationProperties(
+export function remapImportedTemplateRelationProperties(
   template: DbTemplate,
   relationProps: DbProperty[],
   mappingsByNotionId: Map<string, NotionImportMapping>,
@@ -9285,6 +11220,11 @@ function remapImportedTemplateRelationProperties(
     : {};
   let changed = false;
   const unresolved: Record<string, string[]> = {};
+  const localPageIds = new Set(
+    Array.from(mappingsByNotionId.values())
+      .filter((mapping) => mapping.localType === 'page')
+      .map((mapping) => mapping.localId),
+  );
 
   for (const prop of relationProps) {
     const value = properties[prop.id];
@@ -9298,9 +11238,13 @@ function remapImportedTemplateRelationProperties(
     for (const notionId of notionIds) {
       const mapping = mappingsByNotionId.get(notionId);
       if (mapping?.localType === 'page') localIds.push(mapping.localId);
+      else if (localPageIds.has(notionId)) localIds.push(notionId);
       else unresolvedIds.push(notionId);
     }
-    if (localIds.length > 0 || unresolvedIds.length > 0) {
+    if (
+      localIds.length !== notionIds.length ||
+      localIds.some((localId, index) => localId !== notionIds[index])
+    ) {
       properties[prop.id] = localIds;
       changed = true;
     }
@@ -9540,12 +11484,13 @@ export function remapImportedViewRelationFilterConfig(
 }
 
 async function remapImportedDatabaseViewRelationFilters(
-  db: DbRef,
+  context: NotionFileCopyContext,
   dataSourceItems: NotionImportItem[],
   propertyRecordsByDataSource: Map<string, DbProperty[]>,
   mappingsByNotionId: Map<string, NotionImportMapping>,
   conversionReport?: ImportConversionReport,
 ) {
+  const { db } = context;
   const localPageIds = new Set(
     Array.from(mappingsByNotionId.values())
       .filter((mapping) => mapping.localType === 'page')
@@ -9565,6 +11510,7 @@ async function remapImportedDatabaseViewRelationFilters(
     const views = await listAll(db.table<DbView>('db_views').where('databaseId', '==', databaseMapping.localId), 1000);
 
     for (const view of views) {
+      if (view.notionImportJobId !== context.job.id || view.notionDataSourceId !== item.notionId) continue;
       const result = remapImportedViewRelationFilterConfig(
         view.config,
         relationPropsById,
@@ -9575,7 +11521,28 @@ async function remapImportedDatabaseViewRelationFilters(
       unresolved += result.unresolved.length;
 
       if (result.changed) {
-        await db.table<DbView>('db_views').update(view.id, { config: result.config as Record<string, unknown> });
+        await transactImportedOwnerPatch(context, {
+          table: 'db_views',
+          owner: view,
+          patch: { config: result.config as Record<string, unknown> },
+          requiredWhere: [
+            ['databaseId', '==', databaseMapping.localId],
+            ['notionImportJobId', '==', context.job.id],
+            ['notionDataSourceId', '==', item.notionId],
+          ],
+          extraExpectations: [{
+            table: 'pages', op: 'expect', id: databaseMapping.localId,
+            where: [
+              ['workspaceId', '==', context.job.workspaceId],
+              ['kind', '==', 'database'],
+              ['notionImportJobId', '==', context.job.id],
+              ['notionImportSourceId', '==', item.notionId],
+              ['notionImportSourceKind', '==', 'data_source'],
+            ],
+            exists: true,
+          }],
+          label: 'database view relation-filter remap',
+        });
         updatedViews += 1;
       }
 
@@ -9774,25 +11741,15 @@ function importedViewConfigHasRelationValueFilter(config: unknown, sourcePropert
   );
 }
 
-function addImportedContextFilterToViewConfig(config: unknown, contextFilter: FilterGroupTerm) {
-  const record = asRecord(config) ?? {};
-  if (hasHanjiImportedRowContextFilterMarker(record)) return config;
-  const existing = existingImportedViewFilterGroupForContext(record);
-  const filterGroup = existing
-    ? {
-        conjunction: 'and',
-        filters: [],
-        groups: [contextFilter, existing],
-      }
-    : contextFilter;
-
-  return {
-    ...record,
-    filterGroup,
-    filters: undefined,
-    filterConjunction: undefined,
-    [HANJI_IMPORTED_ROW_CONTEXT_FILTER_MARKER]: true,
-  };
+function notionImportPageAvailableDuringApply(
+  page: Page,
+  job: Pick<NotionImportJob, 'id' | 'status'>,
+) {
+  return !page.inTrash || (
+    job.status === 'ready'
+    && page.notionImportStaging === true
+    && page.notionImportJobId === job.id
+  );
 }
 
 async function importedRowsRelatedToParentRow(
@@ -9800,13 +11757,14 @@ async function importedRowsRelatedToParentRow(
   intermediateDatabase: Page,
   parentRow: Page,
   intermediateRelationProps: DbProperty[],
+  job: Pick<NotionImportJob, 'id' | 'status'>,
 ) {
   if (intermediateRelationProps.length === 0) return [];
   const rows = await listAll(db.table<Page>('pages').where('parentId', '==', intermediateDatabase.id), 5000);
   return rows
     .filter((row) =>
       row.parentType === 'database' &&
-      !row.inTrash &&
+      notionImportPageAvailableDuringApply(row, job) &&
       intermediateRelationProps.some((prop) =>
         importedRelationValueIds(row.properties?.[prop.id]).includes(parentRow.id)
       )
@@ -9822,6 +11780,7 @@ async function importedLinkedDatabaseRowContextFilterForApply(
   sourceProperties: DbProperty[],
   propertyCache: Map<string, DbProperty[]>,
   pageCache: Map<string, Page | null>,
+  job: Pick<NotionImportJob, 'id' | 'status'>,
 ) {
   if (sourceDatabase.workspaceId !== parentRow.workspaceId || parentDatabase.workspaceId !== parentRow.workspaceId) {
     return undefined;
@@ -9829,7 +11788,7 @@ async function importedLinkedDatabaseRowContextFilterForApply(
 
   const directFilters = sourceProperties
     .filter((prop) => importedRelationTargetsDatabase(prop, parentDatabase))
-    .map((prop) => importedRelationContainsFilter(prop.id, parentRow.id));
+    .map((prop) => importedRelationContainsFilter(prop.id, { kind: HANJI_CURRENT_PAGE_FILTER_KIND }));
   const directGroup = importedRelationFilterGroup(directFilters);
   if (directGroup) return directGroup;
 
@@ -9843,7 +11802,7 @@ async function importedLinkedDatabaseRowContextFilterForApply(
     const intermediateDatabase = pageCache.get(intermediateDatabaseId);
     if (
       !intermediateDatabase ||
-      intermediateDatabase.inTrash ||
+      !notionImportPageAvailableDuringApply(intermediateDatabase, job) ||
       intermediateDatabase.kind !== 'database' ||
       intermediateDatabase.workspaceId !== parentRow.workspaceId
     ) {
@@ -9862,6 +11821,7 @@ async function importedLinkedDatabaseRowContextFilterForApply(
       intermediateDatabase,
       parentRow,
       intermediateRelationProps,
+      job,
     );
     if (targets.length > 0) {
       indirectFilters.push(importedRelationContainsFilter(sourceProp.id, targets.length === 1 ? targets[0] : targets));
@@ -9871,11 +11831,119 @@ async function importedLinkedDatabaseRowContextFilterForApply(
   return importedRelationFilterGroup(indirectFilters);
 }
 
+function canonicalRowContextFingerprintValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalRowContextFingerprintValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([, item]) => item !== undefined)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => [key, canonicalRowContextFingerprintValue(item)]),
+  );
+}
+
+function importedRowContextFingerprint(value: Record<string, unknown>) {
+  const canonical = JSON.stringify(canonicalRowContextFingerprintValue(value));
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < canonical.length; index += 1) {
+    hash ^= canonical.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `fnv1a32:${(hash >>> 0).toString(16).padStart(8, '0')}`;
+}
+
+function isKnownLegacyImportedRowContextGroup(
+  term: unknown,
+  relationPropsById: Map<string, DbProperty>,
+) {
+  const group = asRecord(term);
+  if (!group || (group.conjunction !== 'and' && group.conjunction !== 'or')) return false;
+  const filters = Array.isArray(group.filters) ? group.filters : [];
+  const groups = Array.isArray(group.groups) ? group.groups : [];
+  if (filters.length === 0 || groups.length !== 0) return false;
+  if (Object.keys(group).some((key) => !['conjunction', 'filters', 'groups'].includes(key))) return false;
+  return filters.every((filter) => {
+    const record = asRecord(filter);
+    if (!record || record.operator !== 'contains') return false;
+    if (Object.keys(record).some((key) => !['propertyId', 'operator', 'value'].includes(key))) return false;
+    const propertyId = optionalString(record.propertyId);
+    const prop = propertyId ? relationPropsById.get(propertyId) : undefined;
+    if (!prop || prop.type !== 'relation') return false;
+    return importedFilterValueHasCurrentPage(record.value)
+      || importedRelationValueIds(record.value).length > 0;
+  });
+}
+
+function repairLegacyCanonicalRowContextConfig(
+  config: Record<string, unknown>,
+  sourceProperties: DbProperty[],
+) {
+  if (!hasHanjiImportedRowContextFilterMarker(config)) {
+    return { config, changed: false };
+  }
+  const relationPropsById = new Map(
+    sourceProperties
+      .filter((prop) => prop.type === 'relation' || prop.type === 'rollup')
+      .map((prop) => [prop.id, prop]),
+  );
+  const injected = asRecord(config.filterGroup);
+  if (!injected || !importedViewFilterTermHasRelationValue(injected, relationPropsById)) {
+    throw Object.assign(new Error('Imported canonical view has a contradictory legacy row-context marker.'), { code: 409 });
+  }
+  let restored: Record<string, unknown> | undefined;
+  const groups = Array.isArray(injected.groups) ? injected.groups : [];
+  const filters = Array.isArray(injected.filters) ? injected.filters : [];
+  if (
+    injected.conjunction === 'and'
+    && filters.length === 0
+    && groups.length === 2
+    && isKnownLegacyImportedRowContextGroup(groups[0], relationPropsById)
+  ) {
+    restored = importedKnownFilterTerm(groups[1]);
+    if (!restored) {
+      throw Object.assign(new Error('Imported canonical view legacy row-context wrapper was malformed.'), { code: 409 });
+    }
+  } else if (!isKnownLegacyImportedRowContextGroup(injected, relationPropsById)) {
+    throw Object.assign(new Error('Imported canonical view legacy row-context filter was malformed.'), { code: 409 });
+  }
+  const repaired = withoutHanjiImportedRowContextFilterMarkers(config);
+  delete repaired.filters;
+  delete repaired.filterConjunction;
+  if (restored) repaired.filterGroup = restored;
+  else delete repaired.filterGroup;
+  return { config: repaired, changed: true };
+}
+
+function scopedImportedRowContextViewConfig(
+  canonicalConfig: Record<string, unknown>,
+  contextFilter: FilterGroupTerm,
+  blockId: string,
+  sourceViewId: string,
+) {
+  const next = withoutHanjiImportedRowContextFilterMarkers(canonicalConfig);
+  const existing = existingImportedViewFilterGroupForContext(next);
+  next.filterGroup = existing
+    ? { conjunction: 'and', filters: [], groups: [contextFilter, existing] }
+    : contextFilter;
+  delete next.filters;
+  delete next.filterConjunction;
+  next.inlineDatabaseBlockId = blockId;
+  next.inlineDatabaseSourceViewId = sourceViewId;
+  return next;
+}
+
 async function addImportedLinkedDatabaseRowContextFilters(
-  db: DbRef,
+  context: NotionFileCopyContext,
   pages: ImportedPageBlockContext[],
   conversionReport?: ImportConversionReport,
 ) {
+  const { db } = context;
+  if (!context.applyLease || !context.itemSnapshotRevision) {
+    throw Object.assign(
+      new Error('Imported linked-database row scoping requires an active apply lease and immutable revision.'),
+      { code: 409, notionImportRecoveryPending: true },
+    );
+  }
   const pagesTable = db.table<Page>('pages');
   const viewsTable = db.table<DbView>('db_views');
   const blocksTable = db.table<Block>('blocks');
@@ -9900,29 +11968,45 @@ async function addImportedLinkedDatabaseRowContextFilters(
     return pageCache.get(pageId) ?? null;
   };
 
-  for (const context of pages) {
-    const parentRow = await pageSnapshot(context.page.id);
-    if (!parentRow || parentRow.inTrash || parentRow.parentType !== 'database' || !parentRow.parentId) continue;
+  for (const pageContext of pages) {
+    const parentRow = await pageSnapshot(pageContext.page.id);
+    if (
+      !parentRow
+      || !notionImportPageAvailableDuringApply(parentRow, context.job)
+      || parentRow.parentType !== 'database'
+      || !parentRow.parentId
+    ) continue;
     const parentDatabase = await pageSnapshot(parentRow.parentId);
-    if (!parentDatabase || parentDatabase.inTrash || parentDatabase.kind !== 'database') continue;
+    if (
+      !parentDatabase
+      || !notionImportPageAvailableDuringApply(parentDatabase, context.job)
+      || parentDatabase.kind !== 'database'
+    ) continue;
 
-    const blocks = await listAll(blocksTable.where('pageId', '==', parentRow.id), 1000);
+    const blocks = await listAll(
+      blocksTable.where('pageId', '==', parentRow.id),
+      NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+    );
     for (const block of blocks) {
       if (block.type !== 'inline_database') continue;
       const content = asRecord(block.content);
       if (content?.linkedDatabaseSource !== true) continue;
       const sourceDatabaseId = optionalString(content.childPageId);
       if (!sourceDatabaseId) continue;
-      const viewIds = uniqueNonEmptyStrings([
+      const referencedViewIds = uniqueNonEmptyStrings([
         optionalString(content.databaseViewId),
         ...(Array.isArray(content.databaseViewIds)
           ? content.databaseViewIds.map((id) => optionalString(id))
           : []),
       ]);
-      if (viewIds.length === 0) continue;
+      if (referencedViewIds.length === 0) continue;
 
       const sourceDatabase = await pageSnapshot(sourceDatabaseId);
-      if (!sourceDatabase || sourceDatabase.inTrash || sourceDatabase.kind !== 'database') continue;
+      if (
+        !sourceDatabase
+        || !notionImportPageAvailableDuringApply(sourceDatabase, context.job)
+        || sourceDatabase.kind !== 'database'
+      ) continue;
       const sourceProperties = await propertiesForDatabase(sourceDatabase.id);
       if (sourceProperties.length === 0) continue;
 
@@ -9934,19 +12018,220 @@ async function addImportedLinkedDatabaseRowContextFilters(
         sourceProperties,
         propertyCache,
         pageCache,
+        context.job,
       );
       if (!contextFilter) continue;
 
-      for (const viewId of viewIds) {
-        const view = await getExisting(viewsTable, viewId);
-        if (!view || view.databaseId !== sourceDatabase.id) continue;
-        if (hasHanjiImportedRowContextFilterMarker(view.config)) continue;
-        if (importedViewConfigHasRelationValueFilter(view.config, sourceProperties)) continue;
-        const nextConfig = addImportedContextFilterToViewConfig(view.config, contextFilter);
-        if (jsonEquivalent(nextConfig, view.config)) continue;
-        await viewsTable.update(view.id, { config: nextConfig as Record<string, unknown> });
-        updatedViews += 1;
+      const sourceViews = new Map<string, DbView>();
+      for (const referencedViewId of referencedViewIds) {
+        const referencedView = await getExisting(viewsTable, referencedViewId);
+        if (!referencedView) continue;
+        const sourceViewId = optionalString(asRecord(referencedView.config)?.inlineDatabaseSourceViewId)
+          ?? referencedView.id;
+        const sourceView = sourceViewId === referencedView.id
+          ? referencedView
+          : await getExisting(viewsTable, sourceViewId);
+        if (!sourceView || sourceView.databaseId !== sourceDatabase.id) continue;
+        sourceViews.set(sourceView.id, sourceView);
       }
+      if (sourceViews.size === 0) continue;
+
+      const plans: Array<{
+        source: DbView;
+        canonicalConfig: Record<string, unknown>;
+        repairCanonical: boolean;
+        clone: DbView;
+        existingClone?: DbView;
+      }> = [];
+      const canonicalRepairOnlyPlans: Array<{
+        source: DbView;
+        canonicalConfig: Record<string, unknown>;
+      }> = [];
+      const targetViewIds = new Map<string, string>();
+      for (const sourceView of sourceViews.values()) {
+        const sourceConfig = asRecord(sourceView.config) ?? {};
+        const canonical = repairLegacyCanonicalRowContextConfig(sourceConfig, sourceProperties);
+        if (importedViewConfigHasRelationValueFilter(canonical.config, sourceProperties)) {
+          targetViewIds.set(sourceView.id, sourceView.id);
+          if (canonical.changed) {
+            canonicalRepairOnlyPlans.push({
+              source: sourceView,
+              canonicalConfig: canonical.config,
+            });
+          }
+          continue;
+        }
+        const fingerprint = importedRowContextFingerprint({
+          parentRowId: parentRow.id,
+          blockId: block.id,
+          sourceViewId: sourceView.id,
+          contextFilter,
+        });
+        let locator = viewsTable.where('notionRowContextJobId', '==', context.job.id);
+        for (const [field, value] of [
+          ['notionRowContextSnapshotRevision', context.itemSnapshotRevision],
+          ['notionRowContextBlockId', block.id],
+          ['notionRowContextSourceViewId', sourceView.id],
+        ] as const) {
+          if (typeof locator.where !== 'function') {
+            throw Object.assign(new Error('Imported row-context view locator requires compound equality queries.'), { code: 503 });
+          }
+          locator = locator.where(field, '==', value);
+        }
+        const matches = await listAll(locator, NOTION_IMPORT_ITEM_SAFETY_LIMIT);
+        if (matches.length > 1) {
+          throw Object.assign(new Error('Imported row-context view locator resolved to duplicate clones.'), { code: 409 });
+        }
+        const existingClone = matches[0];
+        if (
+          existingClone
+          && (
+            existingClone.databaseId !== sourceDatabase.id
+            || existingClone.notionRowContextFingerprint !== fingerprint
+            || optionalString(asRecord(existingClone.config)?.inlineDatabaseBlockId) !== block.id
+            || optionalString(asRecord(existingClone.config)?.inlineDatabaseSourceViewId) !== sourceView.id
+          )
+        ) {
+          throw Object.assign(new Error('Imported row-context view clone provenance was contradictory.'), { code: 409 });
+        }
+        const cloneConfig = scopedImportedRowContextViewConfig(
+          canonical.config,
+          contextFilter,
+          block.id,
+          sourceView.id,
+        );
+        const clone: DbView = existingClone ?? {
+          id: newId(),
+          databaseId: sourceView.databaseId,
+          name: sourceView.name,
+          type: sourceView.type,
+          config: cloneConfig,
+          position: sourceView.position,
+          notionRowContextJobId: context.job.id,
+          notionRowContextSnapshotRevision: context.itemSnapshotRevision,
+          notionRowContextBlockId: block.id,
+          notionRowContextSourceViewId: sourceView.id,
+          notionRowContextFingerprint: fingerprint,
+        };
+        plans.push({
+          source: sourceView,
+          canonicalConfig: canonical.config,
+          repairCanonical: canonical.changed,
+          clone,
+          existingClone,
+        });
+        targetViewIds.set(sourceView.id, clone.id);
+      }
+      if (plans.length === 0 && canonicalRepairOnlyPlans.length === 0) continue;
+
+      const cloneIds = Array.from(sourceViews.keys())
+        .map((sourceViewId) => targetViewIds.get(sourceViewId))
+        .filter((viewId): viewId is string => !!viewId);
+      const nextContent = {
+        ...content,
+        databaseViewId: cloneIds[0],
+        databaseViewIds: cloneIds,
+      };
+      const blockChanged = !jsonEquivalent(nextContent, content);
+      const operations: TransactOperation[] = [
+        {
+          table: 'notion_import_jobs', op: 'expect', id: context.job.id,
+          where: [
+            ['status', '==', context.job.status],
+            ['itemSnapshotRevision', '==', context.itemSnapshotRevision],
+          ],
+          exists: true,
+        },
+        {
+          table: 'notion_import_apply_locks', op: 'expect', id: context.applyLease.id,
+          where: [['leaseId', '==', context.applyLease.leaseId], ['purpose', '==', 'apply']],
+          exists: true,
+        },
+        {
+          table: 'pages', op: 'expect', id: parentRow.id,
+          where: [
+            ['workspaceId', '==', parentRow.workspaceId],
+            ['parentId', '==', parentRow.parentId],
+            ['parentType', '==', 'database'],
+          ],
+          exists: true,
+        },
+        {
+          table: 'blocks', op: 'expect', id: block.id,
+          where: [
+            ['pageId', '==', parentRow.id],
+            ['type', '==', 'inline_database'],
+            ['updatedAt', '==', block.updatedAt ?? null],
+          ],
+          exists: true,
+        },
+      ];
+      for (const plan of plans) {
+        operations.push({
+          table: 'db_views', op: 'expect', id: plan.source.id,
+          where: [
+            ['databaseId', '==', sourceDatabase.id],
+            ['updatedAt', '==', plan.source.updatedAt ?? null],
+          ],
+          exists: true,
+        });
+        if (plan.repairCanonical) {
+          operations.push({
+            table: 'db_views', op: 'update', id: plan.source.id,
+            data: { config: plan.canonicalConfig },
+          });
+        }
+        if (plan.existingClone) {
+          operations.push({
+            table: 'db_views', op: 'expect', id: plan.existingClone.id,
+            where: [
+              ['databaseId', '==', sourceDatabase.id],
+              ['notionRowContextJobId', '==', context.job.id],
+              ['notionRowContextSnapshotRevision', '==', context.itemSnapshotRevision],
+              ['notionRowContextBlockId', '==', block.id],
+              ['notionRowContextSourceViewId', '==', plan.source.id],
+              ['notionRowContextFingerprint', '==', plan.clone.notionRowContextFingerprint],
+              ['updatedAt', '==', plan.existingClone.updatedAt ?? null],
+            ],
+            exists: true,
+          });
+        } else {
+          operations.push(
+            { table: 'db_views', op: 'expect', id: plan.clone.id, exists: false },
+            { table: 'db_views', op: 'insert', data: plan.clone as unknown as Record<string, unknown> },
+          );
+        }
+      }
+      for (const plan of canonicalRepairOnlyPlans) {
+        operations.push(
+          {
+            table: 'db_views', op: 'expect', id: plan.source.id,
+            where: [
+              ['databaseId', '==', sourceDatabase.id],
+              ['updatedAt', '==', plan.source.updatedAt ?? null],
+            ],
+            exists: true,
+          },
+          {
+            table: 'db_views', op: 'update', id: plan.source.id,
+            data: { config: plan.canonicalConfig },
+          },
+        );
+      }
+      if (blockChanged) {
+        operations.push({ table: 'blocks', op: 'update', id: block.id, data: { content: nextContent } });
+      }
+      if (operations.length > MAX_RAW_TRANSACT_OPS) {
+        throw Object.assign(new Error('Imported inline database contains too many scoped views.'), { code: 413 });
+      }
+      if (
+        plans.some((plan) => !plan.existingClone || plan.repairCanonical)
+        || canonicalRepairOnlyPlans.length > 0
+        || blockChanged
+      ) {
+        await db.transact(operations);
+      }
+      updatedViews += plans.length;
     }
   }
 
@@ -10077,7 +12362,7 @@ function templateSelfFilterFromImportedViewConfig(
 }
 
 async function markImportedTemplateLinkedView(
-  db: DbRef,
+  context: NotionFileCopyContext,
   view: DbView,
   selfFilter: { sourceDatabaseId: string; relationPropertyId?: string },
 ) {
@@ -10092,14 +12377,36 @@ async function markImportedTemplateLinkedView(
     delete nextConfig.templateLinkedRelationPropertyId;
   }
   if (jsonEquivalent(nextConfig, view.config)) return;
-  await db.table<DbView>('db_views').update(view.id, { config: nextConfig });
+  await transactImportedOwnerPatch(context, {
+    table: 'db_views',
+    owner: view,
+    patch: { config: nextConfig },
+    requiredWhere: [
+      ['databaseId', '==', view.databaseId],
+      ['notionImportJobId', '==', context.job.id],
+      ['notionDataSourceId', '==', view.notionDataSourceId ?? null],
+    ],
+    extraExpectations: [{
+      table: 'pages', op: 'expect', id: view.databaseId,
+      where: [
+        ['workspaceId', '==', context.job.workspaceId],
+        ['kind', '==', 'database'],
+        ['notionImportJobId', '==', context.job.id],
+        ['notionImportSourceId', '==', view.notionDataSourceId ?? null],
+        ['notionImportSourceKind', '==', 'data_source'],
+      ],
+      exists: true,
+    }],
+    label: 'template-linked database view remap',
+  });
 }
 
 async function remapImportedTemplateLinkedDatabaseBlocks(
-  db: DbRef,
+  context: NotionFileCopyContext,
   templateContext: ImportedTemplateContext,
   mappingsByNotionId: Map<string, NotionImportMapping>,
 ) {
+  const { db } = context;
   const sourceDatabaseId = templateContext.template.databaseId;
   const blocks = templateContext.template.blocks;
   if (!Array.isArray(blocks) || blocks.length === 0) {
@@ -10182,7 +12489,7 @@ async function remapImportedTemplateLinkedDatabaseBlocks(
               ...(nextContent ?? {}),
               templateSelfFilter: selfFilter,
             };
-            await markImportedTemplateLinkedView(db, view, selfFilter);
+            await markImportedTemplateLinkedView(context, view, selfFilter);
             changed = true;
           }
         }
@@ -10222,632 +12529,79 @@ async function remapImportedTemplateLinkedDatabaseBlocks(
   return { blocks: changed ? remappedBlocks : blocks, changed };
 }
 
-/**
- * Imported file bytes are finalized before their block owner is made durable,
- * so a failed copy can never leave a block containing the temporary Notion
- * source URL. `file_uploads.blockId` is a real FK, however, and therefore
- * cannot point at the preallocated block id until that block exists. Register
- * those copies page-scoped, then publish the local-only block and claim every
- * upload in one ordered transaction (insert owner first, attach FKs second).
- */
-async function insertImportedBlockWithDeferredFileUploads(
-  context: NotionFileCopyContext,
-  block: Block,
-  rawUploadIds: string[],
-) {
-  const uploadIds = Array.from(new Set(rawUploadIds));
-  if (uploadIds.length === 0) return context.db.table<Block>('blocks').insert(block);
-
-  // One expectation and one association update per upload, plus the block
-  // insert. Fail before committing a graph the routed DB would have to split.
-  if (uploadIds.length * 2 + 1 > MAX_RAW_TRANSACT_OPS) {
-    throw Object.assign(new Error('Imported block contains too many stored files.'), { code: 413 });
-  }
-
-  return withFileWorkspaceLease(
-    context.db,
-    context.job.workspaceId,
-    context.actorId,
-    'notion-block-file-owner-create',
-    async (lease) => {
-      await lease.assertOwned();
-      await assertFileTargetsNotDeleting(
-        context.db,
-        context.job.workspaceId,
-        [block.pageId],
-      );
-
-      const uploads = context.db.table<FileUpload>('file_uploads');
-      for (const uploadId of uploadIds) {
-        const upload = await getExisting(uploads, uploadId);
-        if (
-          !upload
-          || upload.workspaceId !== context.job.workspaceId
-          || upload.pageId !== block.pageId
-          || upload.blockId
-          || upload.templateId
-          || upload.status !== 'uploaded'
-          || typeof upload.completedAt !== 'string'
-          || !Number.isFinite(Date.parse(upload.completedAt))
-        ) {
-          throw Object.assign(
-            new Error('Imported block file ownership changed before it could be committed.'),
-            { code: 409 },
-          );
-        }
-      }
-
-      const operations: TransactOperation[] = uploadIds.map((uploadId) => ({
-        table: 'file_uploads',
-        op: 'expect',
-        id: uploadId,
-        where: [
-          ['workspaceId', '==', context.job.workspaceId],
-          ['pageId', '==', block.pageId],
-          ['blockId', '==', null],
-          ['templateId', '==', null],
-          ['status', '==', 'uploaded'],
-        ],
-        exists: true,
-      }));
-      // SQLite foreign keys are immediate. Keep this order: the owner row must
-      // exist before the upload association is updated inside the transaction.
-      operations.push({
-        table: 'blocks',
-        op: 'insert',
-        data: block as unknown as Record<string, unknown>,
-      });
-      operations.push(...uploadIds.map((uploadId): TransactOperation => ({
-        table: 'file_uploads',
-        op: 'update',
-        id: uploadId,
-        data: { blockId: block.id, updatedAt: nowIso() },
-      })));
-      await context.db.transact(operations);
-      return block;
-    },
-  );
-}
-
-async function insertPageBlocksFromSnapshot(
-  db: DbRef,
-  pageId: string,
-  item: NotionImportItem,
-  actorId: string,
-  mappingsByNotionId: Map<string, NotionImportMapping>,
-  conversionReport?: ImportConversionReport,
-  fileCopyContext?: NotionFileCopyContext,
-  blockMappingsByNotionId?: Map<string, ImportedBlockMapping>,
-  itemsByNotionId?: Map<string, NotionImportItem>,
-) {
-  const snapshot = pageSnapshot(item);
-  const childBlocks = Array.isArray(snapshot?.childBlocks) ? snapshot.childBlocks : [];
-  const nestedBlockIds = nestedNotionBlockIds(childBlocks);
-  const blocks: Block[] = [];
-  const linkedPageSnapshotCache = new Map<string, Page | null>();
-
-  const linkedPageSnapshot = async (localPageId: string) => {
-    if (!linkedPageSnapshotCache.has(localPageId)) {
-      linkedPageSnapshotCache.set(localPageId, await getExisting(db.table<Page>('pages'), localPageId));
-    }
-    return linkedPageSnapshotCache.get(localPageId) ?? null;
-  };
-
-  const shouldImportChildrenInsideCurrentPage = (rawBlock: Record<string, unknown>) => {
-    const notionType = typeof rawBlock.type === 'string' ? rawBlock.type : '';
-    return notionType !== 'child_page' && notionType !== 'child_database';
-  };
-
-  const insertBlockTree = async (
-    rawBlock: Record<string, unknown>,
-    parentId: string | null,
-    position: number,
-    siblingHeadingBefore?: string,
-  ): Promise<Block[]> => {
-    const rawBlockRecord = rawBlock as Record<string, unknown>;
-    reportBlockConversion(conversionReport, rawBlockRecord, item);
-    reportBlockRichTextUserReferences(conversionReport, item, rawBlockRecord);
-    const block = localBlockFromNotion(rawBlockRecord, pageId, actorId, position);
-    block.parentId = parentId;
-    const richTextMentionRemap = remapImportedRichTextMentionsInContent(block.content, mappingsByNotionId);
-    if (richTextMentionRemap.changed) {
-      block.content = richTextMentionRemap.content;
-    }
-    reportRichTextMentionRemap(
-      conversionReport,
-      notionObjectId(rawBlockRecord) ?? item.notionId,
-      'block',
-      `block on "${item.title || item.notionId}"`,
-      richTextMentionRemap,
-      { reportUnresolved: false },
-    );
-    const buttonTemplateRemap = remapImportedTemplateBlocksRichTextMentions(
-      block.content?.buttonTemplate as TemplateBlock[] | undefined,
-      mappingsByNotionId,
-    );
-    if (buttonTemplateRemap.changed) {
-      block.content = {
-        ...(block.content ?? {}),
-        buttonTemplate: buttonTemplateRemap.blocks,
-      };
-    }
-    reportRichTextMentionRemap(
-      conversionReport,
-      notionObjectId(rawBlockRecord) ?? item.notionId,
-      'block',
-      `button template block on "${item.title || item.notionId}"`,
-      buttonTemplateRemap,
-      { reportUnresolved: false },
-    );
-    if (block.type === 'inline_database' && rawBlockRecord.type === 'child_database') {
-      const targetIds = linkedNotionTargetIdsFromBlock(rawBlockRecord);
-      const targetItem = targetIds
-        .map((targetId) => itemsByNotionId?.get(targetId))
-        .find((candidate) => candidate?.notionObject === 'database');
-      if (importedNotionDatabaseIsInline(targetItem) === false) {
-        const restContent = { ...(block.content ?? {}) };
-        delete restContent.notionLinkedDatabase;
-        delete restContent.notionLinkedViewIds;
-        block.type = 'child_database';
-        block.content = restContent;
-      }
-    }
-
-    if (block.type === 'inline_database' || block.type === 'child_database' || block.type === 'child_page' || block.type === 'link_to_page') {
-      const linkedTargetIds = linkedNotionTargetIdsFromBlock(rawBlockRecord);
-      const wantsDatabaseTarget = block.type === 'inline_database' || block.type === 'child_database';
-      const linked = linkedTargetIds
-        .map((targetId) => mappingsByNotionId.get(targetId))
-        .find((mapping) =>
-          wantsDatabaseTarget
-            ? mapping?.localType === 'database'
-            : mapping?.localType === 'page',
-      );
-      if (linked) {
-        const linkedPage = await linkedPageSnapshot(linked.localId);
-        const sourceUnavailableLinkedDatabase = importedDatabaseMappingSourceUnavailable(linked);
-        block.content = {
-          ...withNativeHanjiLinkedDatabaseFields(block.content, {
-            localTargetId: linked.localId,
-            localTargetType: linked.localType,
-            linkedDatabaseSource: block.type === 'inline_database' && linked.localType === 'database',
-          }),
-          childPageId: linked.localId,
-          ...(linkedPage?.title ? { childPageTitle: linkedPage.title } : {}),
-          ...(linkedPage?.icon ? { childPageIcon: linkedPage.icon } : {}),
-          ...(linkedPage?.iconType ? { childPageIconType: linkedPage.iconType } : {}),
-          ...(linkedPage?.kind ? { childPageKind: linkedPage.kind } : {}),
-        };
-        if (linked.localType === 'database' && rawBlockRecord.type === 'child_database' && !sourceUnavailableLinkedDatabase) {
-          await db.table<Page>('pages').update(linked.localId, {
-            parentId: pageId,
-            parentType: 'page',
-            position,
-          });
-        }
-        if (linked.localType === 'page' && rawBlockRecord.type === 'child_page') {
-          await db.table<Page>('pages').update(linked.localId, {
-            parentId: pageId,
-            parentType: 'page',
-            position,
-          });
-        }
-        if (block.type === 'inline_database' && linked.localType === 'database') {
-          const inferredLinkedView = inferredLinkedDatabaseViewMapping(linked, mappingsByNotionId);
-          if (inferredLinkedView) {
-            const localViewIds = mappedLocalDatabaseViewIds(
-              linkedNotionViewIdsFromBlock(rawBlockRecord),
-              mappingsByNotionId,
-            );
-            block.content = {
-              ...withNativeHanjiLinkedDatabaseFields(block.content, {
-                localViewId: inferredLinkedView.localId,
-                localViewIds,
-              }),
-              notionHiddenDatabaseTitleContext: {
-                inferredFrom: asRecord(linked.metadata)?.inferredFrom ?? 'view_parent_database_id',
-                heading: siblingHeadingBefore,
-                matchedViewId: inferredLinkedView.notionId,
-              },
-            };
-          }
-        }
-        if (block.type === 'inline_database' && linked.localType === 'database' && !block.content?.databaseViewId && siblingHeadingBefore) {
-          const linkedViews = await listAll(db.table<DbView>('db_views').where('databaseId', '==', linked.localId), 100);
-          const inferredView = databaseViewMatchingImportedSection(linkedViews, siblingHeadingBefore);
-          if (inferredView) {
-            const inferredFrom = linkedDatabaseHeadingMatchesLabel(siblingHeadingBefore, inferredView.name)
-              ? 'sibling_heading_view_name'
-              : 'sibling_heading_view_context';
-            block.content = {
-              ...withNativeHanjiLinkedDatabaseFields(block.content, {
-                localViewId: inferredView.id,
-              }),
-              ...(inferredFrom === 'sibling_heading_view_name' ? { hideDatabaseTitle: true } : {}),
-              notionHiddenDatabaseTitleContext: {
-                inferredFrom,
-                heading: siblingHeadingBefore,
-                matchedViewName: inferredView.name,
-              },
-            };
-          }
-        }
-      }
-      if (block.type === 'inline_database') {
-        const linkedViewIds = linkedNotionViewIdsFromBlock(rawBlockRecord);
-        const localViewIds = mappedLocalDatabaseViewIds(linkedViewIds, mappingsByNotionId);
-        const linkedView = linkedViewIds
-          .map((viewId) => mappingsByNotionId.get(viewId))
-          .find((mapping) => mapping?.localType === 'db_view');
-        if (linkedView) {
-          block.content = withNativeHanjiLinkedDatabaseFields(block.content, {
-            localViewId: linkedView.localId,
-            localViewIds,
-          });
-        } else if (linkedViewIds.length && conversionReport) {
-          incrementReport(conversionReport, 'unresolvedLinkedViews');
-          pushReportIssue(conversionReport.unresolvedReferences, {
-            code: 'linked_view_unresolved',
-            notionId: linkedViewIds[0],
-            notionObject: 'view',
-            message: `Linked database view on "${item.title || item.notionId}" could not be mapped locally.`,
-          });
-        }
-      }
-    }
-    const rawButtonTemplateBlocks = rawBlockRecord.type === 'template'
-      ? templateBlockChildren(rawBlockRecord)
-      : [];
-    const localButtonTemplateBlocks = Array.isArray(block.content?.buttonTemplate)
-      ? block.content.buttonTemplate as TemplateBlock[]
-      : [];
-    const fileReference = fileReferenceFromNotionBlock(rawBlockRecord);
-    if (fileCopyContext) {
-      const embeddedFileCount = countImportedEmbeddedTemplateBlockFiles(
-        rawButtonTemplateBlocks,
-        localButtonTemplateBlocks,
-        `template button on "${item.title || item.notionId}"`,
-      );
-      assertImportedBlockFileTransactionCapacity(embeddedFileCount + (fileReference ? 1 : 0));
-    }
-    const deferredBlockUploadIds: string[] = [];
-    if (
-      fileCopyContext
-      && (rawButtonTemplateBlocks.length > 0 || localButtonTemplateBlocks.length > 0)
-    ) {
-      block.content = {
-        ...(block.content ?? {}),
-        buttonTemplate: await copyImportedEmbeddedTemplateBlockFiles(
-          fileCopyContext,
-          rawButtonTemplateBlocks,
-          localButtonTemplateBlocks,
-          {
-            notionId: notionObjectId(rawBlockRecord) ?? item.notionId,
-            notionObject: 'button_template_block',
-            label: `template button on "${item.title || item.notionId}"`,
-            pageId,
-          },
-          deferredBlockUploadIds,
-        ),
-      };
-    }
-    if (fileReference && fileCopyContext) {
-      const notionBlockId = notionObjectId(rawBlockRecord);
-      const copied = await copyNotionFileReference(fileCopyContext, {
-        notionId: notionBlockId ?? item.notionId,
-        notionObject: 'block',
-        label: `block on "${item.title || item.notionId}"`,
-        scope: fileCopyScopeForBlockType(block.type),
-        pageId,
-        notionBlockId,
-      }, fileReference);
-      if (copied !== fileReference) {
-        block.content = contentWithStoredNotionFile(block.content, copied);
-      }
-      if (copied.uploadId) deferredBlockUploadIds.push(copied.uploadId);
-    } else if (fileReference) {
-      reportBlockFileReference(conversionReport, item, rawBlockRecord);
-    }
-    // A file-bearing block becomes a durable owner only after every byte was
-    // copied, HEAD-verified, and registered. If copy fails there is no block
-    // row containing the temporary signed/source URL to leak or revive later.
-    let inserted = fileCopyContext
-      ? await insertImportedBlockWithDeferredFileUploads(
-          fileCopyContext,
-          block,
-          deferredBlockUploadIds,
-        )
-      : await db.table<Block>('blocks').insert(block);
-    inserted = await preserveImportedBlockTimestamps(db, inserted, rawBlockRecord);
-    const notionBlockId = notionObjectId(rawBlockRecord);
-    if (notionBlockId && blockMappingsByNotionId) {
-      blockMappingsByNotionId.set(notionBlockId, {
-        localId: inserted.id,
-        pageId: inserted.pageId,
-      });
-    }
-    const insertedBlocks = [inserted];
-    const children = shouldImportChildrenInsideCurrentPage(rawBlockRecord)
-      ? tabBlockChildrenForImport(rawBlockRecord, conversionReport, item)
-      : [];
-    let childPosition = 1;
-    let childSiblingHeading = '';
-    for (const child of children) {
-      if (rawBlockRecord.type === 'table' && child.type === 'table_row') continue;
-      if (rawBlockRecord.type === 'template') continue;
-      insertedBlocks.push(...await insertBlockTree(child, inserted.id, childPosition, childSiblingHeading || undefined));
-      const heading = notionBlockHeadingText(child);
-      if (heading) childSiblingHeading = heading;
-      childPosition += 1;
-    }
-    return insertedBlocks;
-  };
-
-  let position = 1;
-  let siblingHeading = '';
-  for (const rawBlock of childBlocks) {
-    if (!rawBlock || typeof rawBlock !== 'object') continue;
-    const rawBlockRecord = rawBlock as Record<string, unknown>;
-    const rawBlockId = notionObjectId(rawBlockRecord);
-    if (rawBlockId && nestedBlockIds.has(rawBlockId)) continue;
-    if (rawBlockRecord.type === 'column' && notionBlockChildren(rawBlockRecord).length === 0) continue;
-    blocks.push(...await insertBlockTree(rawBlockRecord, null, position, siblingHeading || undefined));
-    const heading = notionBlockHeadingText(rawBlockRecord);
-    if (heading) siblingHeading = heading;
-    position += 1;
-  }
-  const markdown = snapshot?.markdown;
-  const markdownText = markdown && typeof markdown === 'object'
-    ? (markdown as Record<string, unknown>).text
-    : undefined;
-  const unknownBlockIds = markdown && typeof markdown === 'object' && Array.isArray((markdown as Record<string, unknown>).unknownBlockIds)
-    ? (markdown as Record<string, unknown>).unknownBlockIds as unknown[]
-    : [];
-  if (conversionReport && unknownBlockIds.length > 0) {
-    incrementReport(conversionReport, 'unknownMarkdownBlocks', unknownBlockIds.length);
-    pushReportIssue(conversionReport.unsupported, {
-      code: 'markdown_unknown_blocks',
-      notionId: item.notionId,
-      notionObject: 'page',
-      message: `${unknownBlockIds.length} Notion block(s) on "${item.title || item.notionId}" were unknown in the markdown fallback.`,
-    });
-  }
-  if (conversionReport && markdown && typeof markdown === 'object' && (markdown as Record<string, unknown>).truncated === true) {
-    incrementReport(conversionReport, 'truncatedMarkdownPages');
-    pushReportIssue(conversionReport.warnings, {
-      code: 'markdown_truncated',
-      notionId: item.notionId,
-      notionObject: 'page',
-      message: `Markdown fallback for "${item.title || item.notionId}" was truncated before import.`,
-    });
-  }
-  if (blocks.length === 0 && typeof markdownText === 'string' && markdownText.trim()) {
-    const block = await db.table<Block>('blocks').insert({
-      id: newId(),
-      pageId,
-      parentId: null,
-      type: 'paragraph',
-      content: {
-        rich: rich(markdownText.slice(0, 10_000)),
-        notionMarkdown: markdown,
-      },
-      plainText: markdownText.slice(0, 10_000),
-      position: 1,
-      createdBy: actorId,
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
-    });
-    blocks.push(block);
-  }
-  return blocks;
-}
-
-async function retryImportedPageFileCopies(
-  context: NotionFileCopyContext,
-  page: Page,
-) {
-  const blocks = await listAll(context.db.table<Block>('blocks').where('pageId', '==', page.id), 1000);
-  let scanned = 0;
-
-  for (const block of blocks) {
-    const content = asRecord(block.content) ?? {};
-    const reference = storedNotionFileReference(content.notionFileReference);
-    if (!reference) continue;
-    scanned += 1;
-    const copied = await copyNotionFileReference(context, {
-      notionId: optionalString(content.notionBlockId) ?? block.id,
-      notionObject: 'block',
-      label: `block on "${page.title || page.id}"`,
-      scope: fileCopyScopeForBlockType(block.type),
-      pageId: page.id,
-      blockId: block.id,
-    }, reference);
-    if (copied === reference) continue;
-    await context.db.table<Block>('blocks').update(block.id, {
-      content: contentWithStoredNotionFile(content, copied),
-    });
-  }
-
-  const properties = asRecord(page.properties);
-  if (!properties) return scanned;
-
-  let propertiesChanged = false;
-  const nextProperties = { ...properties };
-  const pagePatch: Partial<Page> = {};
-
-  const iconReference = storedNotionFileReference(nextProperties[NOTION_PAGE_ICON_REFERENCE_KEY]);
-  if (iconReference && page.iconType === 'image') {
-    scanned += 1;
-    const copied = await copyNotionFileReference(context, {
-      notionId: page.id,
-      notionObject: 'page',
-      label: `page icon on "${page.title || page.id}"`,
-      scope: 'icons',
-      pageId: page.id,
-    }, iconReference);
-    if (copied !== iconReference) {
-      nextProperties[NOTION_PAGE_ICON_REFERENCE_KEY] = copied;
-      pagePatch.icon = copied.url;
-      propertiesChanged = true;
-    }
-  }
-
-  const coverReference = storedNotionFileReference(nextProperties[NOTION_PAGE_COVER_REFERENCE_KEY]);
-  if (coverReference && page.cover) {
-    scanned += 1;
-    const copied = await copyNotionFileReference(context, {
-      notionId: page.id,
-      notionObject: 'page',
-      label: `page cover on "${page.title || page.id}"`,
-      scope: 'covers',
-      pageId: page.id,
-    }, coverReference);
-    if (copied !== coverReference) {
-      nextProperties[NOTION_PAGE_COVER_REFERENCE_KEY] = copied;
-      pagePatch.cover = copied.url;
-      propertiesChanged = true;
-    }
-  }
-
-  for (const [propertyId, value] of Object.entries(properties)) {
-    const values = Array.isArray(value) ? value : [];
-    if (values.length === 0) continue;
-    let changed = false;
-    const nextValues: unknown[] = [];
-    for (const item of values) {
-      const reference = storedNotionFileReference(item);
-      if (!reference) {
-        nextValues.push(item);
-        continue;
-      }
-      scanned += 1;
-      const copied = await copyNotionFileReference(context, {
-        notionId: propertyId,
-        notionObject: 'property',
-        label: `file property "${propertyId}" on "${page.title || page.id}"`,
-        scope: 'database/files',
-        pageId: page.id,
-        databaseId: page.parentType === 'database' ? page.parentId ?? undefined : undefined,
-        propertyId,
-      }, reference);
-      nextValues.push(copied);
-      if (copied !== reference) changed = true;
-    }
-    if (changed) {
-      nextProperties[propertyId] = nextValues;
-      propertiesChanged = true;
-    }
-  }
-
-  if (propertiesChanged || Object.keys(pagePatch).length > 0) {
-    await context.db.table<Page>('pages').update(page.id, {
-      ...pagePatch,
-      ...(propertiesChanged ? { properties: nextProperties } : {}),
-    });
-  }
-
-  return scanned;
-}
-
-async function retryFileCopies(
-  db: DbRef,
-  admin: AdminDbAccessor,
-  body: Record<string, unknown>,
-  actorId: string,
-  storage?: FunctionStorageProxy,
-  request?: Request,
-  env?: Record<string, unknown>,
-) {
-  assertNotionFileCopyNotDisabled(body);
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (job.status !== 'completed') {
-    throw new Error('Notion import job must be completed before retrying file copies.');
-  }
-
-  const mappings = await loadMappings(db, job.id);
-  const localPageIds = new Set(
-    Array.from(mappings.values())
-      .filter((mapping) => mapping.localType === 'page')
-      .map((mapping) => mapping.localId),
-  );
-  const report = emptyConversionReport();
-  const stats = {
-    fileCopies: 0,
-    fileCopySkipped: 0,
-  };
-  const tokenSource = await notionTokenForJob(db, body, job, actorId, env).catch(() => undefined);
-  const context: NotionFileCopyContext = {
-    db,
-    admin,
-    job,
-    actorId,
-    storage,
-    request,
-    conversionReport: report,
-    requireStoredFileCopies: true,
-    notionToken: tokenSource?.token,
-    apiVersion: job.apiVersion || NOTION_API_VERSION,
-    apiBase: notionApiBase(env),
-    stats,
-  };
-
-  let scanned = 0;
-  for (const pageId of localPageIds) {
-    const page = await getExisting(db.table<Page>('pages'), pageId);
-    if (!page || page.workspaceId !== job.workspaceId) continue;
-    scanned += await retryImportedPageFileCopies(context, page);
-  }
-
-  const finishedAt = nowIso();
-  const fileRetry = {
-    generatedAt: finishedAt,
-    scanned,
-    copied: stats.fileCopies,
-    skipped: stats.fileCopySkipped,
-    conversion: finalizeConversionReport(report),
-  };
-  const updated = await jobs.update(job.id, {
-    progress: {
-      ...withImportProgress(job.progress, {
-        key: 'file_copy_retry',
-        status: 'completed',
-        legacyStep: 'file_copy_retry_complete',
-        percent: 100,
-        at: finishedAt,
-        counts: {
-          scanned,
-          copied: stats.fileCopies,
-          skipped: stats.fileCopySkipped,
-        },
-      }),
-      step: 'file_copy_retry_complete',
-      fileRetry,
-    },
-    report: {
-      ...(job.report ?? {}),
-      fileRetry,
-    },
-  });
-
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: 'notion_import.retry_file_copies',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: fileRetry,
-    occurredAt: finishedAt,
-  });
-
-  return {
-    job: cleanJob(updated),
-    fileRetry,
-  };
-}
+const {
+  ensureImportedPageWorkspaceIndexes,
+  importedBlockBoundaryRepairComplete,
+  importedBlocksComplete,
+  importedPageBlockRecoveryFence,
+  importedPageBlockRecoveryPageExpectation,
+  insertPageBlocksFromSnapshot,
+  itemHasImportablePageBody,
+  markImportedBlocksComplete,
+  recoverIncompleteImportedPageBlocks,
+  replayImportedPageBlockMetrics,
+  replaceImportedBlocksForPage,
+  retryImportedPageFileCopies,
+  storedUploadIds,
+  transactImportedFileOwner,
+  transactImportedPageBlockRecovery,
+} = createNotionImportBlockApplyRuntime({
+  NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+  NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION,
+  NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION_KEY,
+  NOTION_IMPORT_BLOCK_RECOVERY_KEY,
+  NOTION_IMPORT_BLOCKS_COMPLETE_KEY,
+  NOTION_PAGE_COVER_REFERENCE_KEY,
+  NOTION_PAGE_ICON_REFERENCE_KEY,
+  asRecord,
+  assertImportedBlockFileTransactionCapacity,
+  contentWithStoredNotionFile,
+  copyImportedEmbeddedTemplateBlockFiles,
+  copyNotionFileReference,
+  countImportedEmbeddedTemplateBlockFiles,
+  databaseViewMatchingImportedSection,
+  fileCopyScopeForBlockType,
+  fileReferenceFromNotionBlock,
+  flattenImportablePageBlocksForPlan,
+  importedDatabaseMappingSourceUnavailable,
+  importedNotionDatabaseIsInline,
+  importedPatchOwnerSnapshotMatches,
+  importedPatchOwnerTransactionWhere,
+  importRootNotionId,
+  inferredLinkedDatabaseViewMapping,
+  isApplyLeaseConflict,
+  isRetryableNotionTemplateCleanupError,
+  jsonEquivalent,
+  linkedDatabaseHeadingMatchesLabel,
+  linkedNotionTargetIdsFromBlock,
+  linkedNotionViewIdsFromBlock,
+  listAll,
+  localBlockFromNotion,
+  mappedLocalDatabaseViewIds,
+  nestedNotionBlockIds,
+  normalizeFileName,
+  notionBlockChildren,
+  notionBlockHeadingText,
+  notionImportMappingExpectation,
+  notionImportMappingSnapshotMatches,
+  notionObjectId,
+  optionalString,
+  pageSnapshot,
+  preserveImportedBlockTimestamps,
+  remapImportedRichTextMentionsInContent,
+  remapImportedTemplateBlocksRichTextMentions,
+  renewNotionApplyLease,
+  reportBlockConversion,
+  reportBlockFileReference,
+  reportBlockRichTextUserReferences,
+  reportImportedBlockLinkedViewResolutionFromRaw,
+  reportImportedPageMarkdownFallback,
+  rich,
+  storedNotionFileReference,
+  tabBlockChildrenForImport,
+  templateBlockChildren,
+  withNativeHanjiLinkedDatabaseFields,
+});
 
 const notionImportPlanRuntime = {
   asRecord,
@@ -10898,8 +12652,7 @@ const notionImportPlanRuntime = {
   viewPropertyMappingsFromRawProperties,
   viewSnapshot,
   withGeneratedTitleProperty,
-};
-export type NotionImportPlanRuntime = typeof notionImportPlanRuntime;
+} satisfies NotionImportPlanRuntime;
 const {
   rawViewsForPlan,
   buildImportPlan,
@@ -10907,264 +12660,6 @@ const {
   notionPropertyFromRawProperties,
 } = createNotionImportPlanner(notionImportPlanRuntime);
 export { rawViewsForPlan, buildImportPlan };
-
-
-
-
-
-
-
-
-
-
-
-function itemHasImportablePageBody(item: NotionImportItem) {
-  const snapshot = pageSnapshot(item);
-  const childBlocks = Array.isArray(snapshot?.childBlocks) ? snapshot.childBlocks : [];
-  const markdown = snapshot?.markdown;
-  const markdownText = markdown && typeof markdown === 'object'
-    ? (markdown as Record<string, unknown>).text
-    : undefined;
-  return flattenImportablePageBlocksForPlan(childBlocks).length > 0 ||
-    (typeof markdownText === 'string' && markdownText.trim().length > 0);
-}
-
-function importedBlocksComplete(page: Page) {
-  const properties = asRecord(page.properties) ?? {};
-  return properties[NOTION_IMPORT_BLOCKS_COMPLETE_KEY] === true;
-}
-
-function importedBlockBoundaryRepairComplete(page: Page) {
-  const properties = asRecord(page.properties) ?? {};
-  return properties[NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION_KEY] === NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION;
-}
-
-async function markImportedBlocksComplete(db: DbRef, page: Page) {
-  const updated = await db.table<Page>('pages').update(page.id, {
-    properties: {
-      ...(page.properties ?? {}),
-      [NOTION_IMPORT_BLOCKS_COMPLETE_KEY]: true,
-      [NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION_KEY]: NOTION_IMPORT_BLOCK_BOUNDARY_REPAIR_VERSION,
-    },
-  });
-  return updated;
-}
-
-async function replaceImportedBlocksForPage(
-  db: DbRef,
-  page: Page,
-  item: NotionImportItem,
-  actorId: string,
-  mappingsByNotionId: Map<string, NotionImportMapping>,
-  conversionReport: ImportConversionReport,
-  fileCopyContext: NotionFileCopyContext,
-  importedBlockMappingsByNotionId: Map<string, ImportedBlockMapping>,
-  itemsByNotionId?: Map<string, NotionImportItem>,
-) {
-  const existingBlocks = await listAll(db.table<Block>('blocks').where('pageId', '==', page.id), NOTION_BLOCK_CHILD_TOTAL_LIMIT);
-  if (existingBlocks.length > 0) {
-    throw Object.assign(
-      new Error(
-        'Notion import will not replace existing page blocks until the replacement graph can be committed atomically. Existing content was preserved.',
-      ),
-      { code: 409 },
-    );
-  }
-  const insertedBlocks = await insertPageBlocksFromSnapshot(
-    db,
-    page.id,
-    item,
-    actorId,
-    mappingsByNotionId,
-    conversionReport,
-    fileCopyContext,
-    importedBlockMappingsByNotionId,
-    itemsByNotionId,
-  );
-  const updatedPage = await markImportedBlocksComplete(db, page);
-  return { page: updatedPage, insertedBlocks };
-}
-
-async function repairImportedPageBlocks(
-  db: DbRef,
-  admin: AdminDbAccessor,
-  body: Record<string, unknown>,
-  actorId: string,
-  storage?: FunctionStorageProxy,
-  request?: Request,
-  env?: Record<string, unknown>,
-) {
-  assertNotionFileCopyNotDisabled(body);
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-
-  const localPageId = optionalString(body.localPageId) ?? optionalString(body.pageId);
-  const notionPageId = optionalString(body.notionPageId);
-  const startAfterNotionPageId = optionalString(body.startAfterNotionPageId) ?? optionalString(body.afterNotionPageId);
-  const startAfterLocalPageId = optionalString(body.startAfterLocalPageId) ?? optionalString(body.afterLocalPageId);
-  const useStartCursor = !localPageId && !notionPageId && (!!startAfterNotionPageId || !!startAfterLocalPageId);
-  const maxPages = parsePositiveInt(body.maxPages, localPageId || notionPageId ? 1 : 25, 250);
-  const force = parseBoolean(body.force, !!(localPageId || notionPageId));
-  const items = await listActiveNotionImportItems(db, job);
-  if (items.length === 0) {
-    // A discovery that legitimately found nothing (nothing shared with the
-    // integration, or the Notion search was rate-limited into an empty result)
-    // is a user-actionable state, not a server fault — surface a clean 422.
-    throw new Error(
-      'Notion import found no items. Share pages with the integration, or wait a ' +
-      'few minutes if the Notion API rate-limited discovery, then run discovery again.',
-    );
-  }
-  await assertSafeNotionImportSourceReferences(
-    db,
-    items.map((item) => item.metadata),
-  );
-
-  const mappingsByNotionId = await loadMappings(db, job.id);
-  const itemsByNotionId = new Map(items.map((item) => [item.notionId, item]));
-  const conversionReport = emptyConversionReport();
-  const repaired = {
-    pages: 0,
-    blocks: 0,
-    fileCopies: 0,
-    fileCopySkipped: 0,
-    linkedDatabaseContextFilters: 0,
-    skippedAlreadyRepaired: 0,
-    scannedPages: 0,
-  };
-  const tokenSource = await notionTokenForJob(db, body, job, actorId, env).catch(() => undefined);
-  const fileCopyContext: NotionFileCopyContext = {
-    db,
-    admin,
-    job,
-    actorId,
-    storage,
-    request,
-    conversionReport,
-    requireStoredFileCopies: true,
-    notionToken: tokenSource?.token,
-    apiVersion: job.apiVersion || NOTION_API_VERSION,
-    apiBase: notionApiBase(env),
-    stats: repaired,
-  };
-  const importedBlockMappingsByNotionId = new Map<string, ImportedBlockMapping>();
-  const importedPageBlockContexts: ImportedPageBlockContext[] = [];
-  let startCursorSeen = !useStartCursor;
-  let hasMore = false;
-  let lastRepairedNotionPageId: string | undefined;
-  let lastRepairedLocalPageId: string | undefined;
-
-  for (const item of items) {
-    if (item.notionObject !== 'page') continue;
-    if (notionPageId && item.notionId !== notionPageId) continue;
-    if (!itemHasImportablePageBody(item)) continue;
-    const mapping = mappingsByNotionId.get(item.notionId);
-    if (!mapping || mapping.localType !== 'page') continue;
-    if (localPageId && mapping.localId !== localPageId) continue;
-    if (!startCursorSeen) {
-      if (
-        (startAfterNotionPageId && item.notionId === startAfterNotionPageId) ||
-        (startAfterLocalPageId && mapping.localId === startAfterLocalPageId)
-      ) {
-        startCursorSeen = true;
-      }
-      continue;
-    }
-    const page = await getExisting(db.table<Page>('pages'), mapping.localId);
-    if (!page) continue;
-    importedPageBlockContexts.push({ page, notionId: item.notionId });
-    repaired.scannedPages += 1;
-    const alreadyCurrent = importedBlocksComplete(page) && importedBlockBoundaryRepairComplete(page);
-    if (alreadyCurrent) {
-      if (!force) {
-        repaired.skippedAlreadyRepaired += 1;
-        continue;
-      }
-      // `force` is also used as a resumable verification pass. Rebuilding a
-      // graph already stamped with the current boundary version would duplicate
-      // every stored file before the replacement can be swapped atomically.
-      // Count the page/cursor as handled while leaving its proven graph intact.
-      if (repaired.pages >= maxPages) {
-        hasMore = true;
-        break;
-      }
-      repaired.pages += 1;
-      repaired.skippedAlreadyRepaired += 1;
-      lastRepairedNotionPageId = item.notionId;
-      lastRepairedLocalPageId = mapping.localId;
-      continue;
-    }
-    if (repaired.pages >= maxPages) {
-      hasMore = true;
-      break;
-    }
-
-    const replaced = await replaceImportedBlocksForPage(
-      db,
-      page,
-      item,
-      actorId,
-      mappingsByNotionId,
-      conversionReport,
-      fileCopyContext,
-      importedBlockMappingsByNotionId,
-      itemsByNotionId,
-    );
-    repaired.pages += 1;
-    repaired.blocks += replaced.insertedBlocks.length;
-    lastRepairedNotionPageId = item.notionId;
-    lastRepairedLocalPageId = mapping.localId;
-  }
-
-  const linkedDatabaseContextFilterRemap = await addImportedLinkedDatabaseRowContextFilters(
-    db,
-    importedPageBlockContexts,
-    conversionReport,
-  );
-  repaired.linkedDatabaseContextFilters = linkedDatabaseContextFilterRemap.updatedViews;
-
-  return {
-    job: cleanJob(job),
-    repaired,
-    partial: hasMore,
-    lastRepaired: lastRepairedNotionPageId || lastRepairedLocalPageId
-      ? {
-          notionPageId: lastRepairedNotionPageId,
-          localPageId: lastRepairedLocalPageId,
-        }
-      : null,
-    nextCursor: hasMore && (lastRepairedNotionPageId || lastRepairedLocalPageId)
-      ? {
-          startAfterNotionPageId: lastRepairedNotionPageId,
-          startAfterLocalPageId: lastRepairedLocalPageId,
-        }
-      : null,
-    report: conversionReport,
-  };
-}
-
-async function ensureImportedPageWorkspaceIndexes(
-  admin: AdminDbAccessor,
-  mappings: NotionImportMapping[],
-  workspaceId: string,
-) {
-  const localPageIds = new Set<string>();
-  for (const mapping of mappings) {
-    if (
-      (mapping.localType === 'page' || mapping.localType === 'database') &&
-      typeof mapping.localId === 'string' &&
-      mapping.localId.length > 0
-    ) {
-      localPageIds.add(mapping.localId);
-    }
-  }
-  for (const pageId of localPageIds) {
-    await ensurePageWorkspaceIndex(admin, pageId, workspaceId);
-  }
-}
 
 function applyLeaseExpiresAt(purpose: 'apply' | 'discover' = 'apply') {
   const ttl = purpose === 'discover' ? NOTION_DISCOVER_LEASE_TTL_MS : NOTION_APPLY_LEASE_TTL_MS;
@@ -11191,9 +12686,22 @@ export function notionApplyLeaseCanBeRecovered(params: {
   if (params.requestedPurpose !== 'apply') return false;
   if (params.existingPurpose === 'discover') return false;
   if (params.actorId !== params.existingActorId) return false;
-  const heartbeatMs = Date.parse(params.updatedAt ?? params.createdAt ?? '');
+  // Apply-lock tables have always retained EdgeBase's managed updatedAt field.
+  // A row without it is malformed, so createdAt must never become a mutable
+  // heartbeat substitute outside the transaction fence.
+  const heartbeatMs = Date.parse(params.updatedAt ?? '');
   if (!Number.isFinite(heartbeatMs)) return false;
   return (params.nowMs ?? Date.now()) - heartbeatMs >= NOTION_APPLY_LEASE_STALE_MS;
+}
+
+export function activeNotionImportOperation(
+  lock: Pick<NotionImportApplyLock, 'purpose' | 'expiresAt'> | null | undefined,
+  nowMs = Date.now(),
+): 'apply' | 'discover' | null {
+  if (!lock) return null;
+  const expiresAtMs = Date.parse(lock.expiresAt);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= nowMs) return null;
+  return lock.purpose === 'discover' ? 'discover' : 'apply';
 }
 
 async function acquireNotionApplyLease(
@@ -11233,7 +12741,12 @@ async function acquireNotionApplyLease(
             table: 'notion_import_apply_locks',
             op: 'expect',
             id: existing.id,
-            where: [['leaseId', '==', existing.leaseId]],
+            // An expired-lease takeover must lose its CAS if the incumbent
+            // heartbeat refreshed the same leaseId after this row was read.
+            where: [
+              ['leaseId', '==', existing.leaseId],
+              ['expiresAt', '==', existing.expiresAt],
+            ],
             exists: true,
           },
           {
@@ -11280,22 +12793,259 @@ async function acquireNotionApplyLease(
 async function renewNotionApplyLease(
   db: DbRef,
   lease: { id: string; leaseId: string },
+  purpose: 'apply' | 'discover' = 'apply',
 ) {
   await db.transact([
     {
       table: 'notion_import_apply_locks',
       op: 'expect',
       id: lease.id,
-      where: [['leaseId', '==', lease.leaseId]],
+      where: [
+        ['leaseId', '==', lease.leaseId],
+        ['purpose', '==', purpose],
+      ],
       exists: true,
     },
     {
       table: 'notion_import_apply_locks',
       op: 'update',
       id: lease.id,
-      data: { expiresAt: applyLeaseExpiresAt(), updatedAt: nowIso() },
+      data: { expiresAt: applyLeaseExpiresAt(purpose), updatedAt: nowIso() },
     },
   ]);
+}
+
+function notionApplyFailureLockProvesOwnership(
+  lock: NotionImportApplyLock | null,
+  job: NotionImportJob,
+  lease: { id: string; leaseId: string },
+  actorId: string,
+  nowMs = Date.now(),
+) {
+  if (
+    !lock
+    || lock.id !== lease.id
+    || lock.jobId !== job.id
+    || lock.workspaceId !== job.workspaceId
+    || lock.leaseId !== lease.leaseId
+    || lock.actorId !== actorId
+    || lock.purpose !== 'apply'
+  ) return false;
+  const expiresAtMs = Date.parse(lock.expiresAt);
+  // Cleanup transactions fence the exact managed heartbeat. Fail malformed
+  // updatedAt-less rows closed instead of proving ownership from createdAt,
+  // which is not part of the cleanup lock expectation.
+  const heartbeatMs = Date.parse(lock.updatedAt ?? '');
+  return Number.isFinite(expiresAtMs)
+    && expiresAtMs > nowMs
+    && Number.isFinite(heartbeatMs)
+    && nowMs - heartbeatMs < NOTION_APPLY_LEASE_STALE_MS;
+}
+
+async function recoverNotionApplyFailureCleanupAuthority(
+  db: DbRef,
+  job: NotionImportJob,
+  lease: { id: string; leaseId: string },
+  actorId: string,
+) {
+  for (let attempt = 0; attempt < NOTION_APPLY_FAILURE_RENEW_ATTEMPTS; attempt += 1) {
+    try {
+      await renewNotionApplyLease(db, lease);
+      break;
+    } catch (error) {
+      if (
+        !isTransientInfrastructureError(error)
+        || attempt === NOTION_APPLY_FAILURE_RENEW_ATTEMPTS - 1
+      ) break;
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, NOTION_APPLY_FAILURE_RENEW_BASE_DELAY_MS * (2 ** attempt));
+      });
+    }
+  }
+  const freshLock = await getExisting(
+    db.table<NotionImportApplyLock>('notion_import_apply_locks'),
+    lease.id,
+  ).catch(() => null);
+  return notionApplyFailureLockProvesOwnership(freshLock, job, lease, actorId);
+}
+
+class NotionApplyFailureCleanupAuthorityLostError extends Error {
+  constructor(cause?: unknown) {
+    super('Notion import apply failure cleanup authority was lost.');
+    this.name = 'NotionApplyFailureCleanupAuthorityLostError';
+    if (cause !== undefined) (this as Error & { cause?: unknown }).cause = cause;
+  }
+}
+
+async function transactNotionApplyFailureCleanupChunk(
+  db: DbRef,
+  job: NotionImportJob,
+  lease: { id: string; leaseId: string },
+  actorId: string,
+  mutations: TransactOperation[],
+) {
+  if (mutations.length === 0) return;
+  if (mutations.length > NOTION_APPLY_FAILURE_CLEANUP_MUTATION_CHUNK_SIZE) {
+    throw new Error(
+      `Notion import apply failure cleanup mutation chunks cannot exceed ${NOTION_APPLY_FAILURE_CLEANUP_MUTATION_CHUNK_SIZE} operations.`,
+    );
+  }
+
+  let freshLock: NotionImportApplyLock | null;
+  try {
+    freshLock = await getExisting(
+      db.table<NotionImportApplyLock>('notion_import_apply_locks'),
+      lease.id,
+    );
+  } catch (error) {
+    throw new NotionApplyFailureCleanupAuthorityLostError(error);
+  }
+  if (!freshLock || !notionApplyFailureLockProvesOwnership(freshLock, job, lease, actorId)) {
+    throw new NotionApplyFailureCleanupAuthorityLostError();
+  }
+
+  const renewedAt = nowIso();
+  try {
+    await db.transact([
+      {
+        table: 'notion_import_jobs',
+        op: 'expect',
+        id: job.id,
+        where: [
+          ['workspaceId', '==', job.workspaceId],
+          ['status', '==', 'ready'],
+          ['itemSnapshotRevision', '==', job.itemSnapshotRevision ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'notion_import_apply_locks',
+        op: 'expect',
+        id: lease.id,
+        where: [
+          ['workspaceId', '==', job.workspaceId],
+          ['jobId', '==', job.id],
+          ['leaseId', '==', lease.leaseId],
+          ['actorId', '==', actorId],
+          ['purpose', '==', 'apply'],
+          ['expiresAt', '==', freshLock.expiresAt],
+          ['updatedAt', '==', freshLock.updatedAt ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'notion_import_apply_locks',
+        op: 'update',
+        id: lease.id,
+        data: {
+          expiresAt: applyLeaseExpiresAt('apply'),
+          updatedAt: renewedAt,
+        },
+      },
+      ...mutations,
+    ]);
+  } catch (error) {
+    throw new NotionApplyFailureCleanupAuthorityLostError(error);
+  }
+}
+
+function createNotionApplyFailureCleanupMutationCollector(
+  db: DbRef,
+  job: NotionImportJob,
+  lease: { id: string; leaseId: string },
+  actorId: string,
+) {
+  const pending: TransactOperation[] = [];
+  const flush = async () => {
+    if (pending.length === 0) return;
+    const chunk = pending.splice(0, pending.length);
+    await transactNotionApplyFailureCleanupChunk(db, job, lease, actorId, chunk);
+  };
+  return {
+    async collect(operation: TransactOperation) {
+      pending.push(operation);
+      if (pending.length === NOTION_APPLY_FAILURE_CLEANUP_MUTATION_CHUNK_SIZE) {
+        await flush();
+      }
+    },
+    flush,
+  };
+}
+
+class NotionDiscoveryLeaseLostError extends Error {
+  constructor(cause?: unknown) {
+    super('Notion import discovery lease ownership was lost.');
+    this.name = 'NotionDiscoveryLeaseLostError';
+    if (cause !== undefined) (this as Error & { cause?: unknown }).cause = cause;
+  }
+}
+
+function notionDiscoveryLeaseExpectation(
+  lease: { id: string; leaseId: string },
+): TransactOperation {
+  return {
+    table: 'notion_import_apply_locks',
+    op: 'expect',
+    id: lease.id,
+    where: [
+      ['leaseId', '==', lease.leaseId],
+      ['purpose', '==', 'discover'],
+    ],
+    exists: true,
+  };
+}
+
+function startNotionDiscoveryLeaseHeartbeat(
+  db: DbRef,
+  lease: { id: string; leaseId: string },
+) {
+  let stopped = false;
+  let ownershipFailure: unknown;
+  let renewalInFlight: Promise<void> | null = null;
+
+  const renewSingleFlight = () => {
+    if (stopped) return Promise.resolve();
+    if (renewalInFlight) return renewalInFlight;
+    const renewal = renewNotionApplyLease(db, lease, 'discover')
+      .then(() => {
+        // A timer renewal can fail for transient infrastructure reasons while
+        // the durable lease remains ours. A later successful CAS is fresh
+        // ownership proof and must clear that stale observation.
+        ownershipFailure = undefined;
+      })
+      .catch((error) => {
+        ownershipFailure = error;
+        throw error;
+      })
+      .finally(() => {
+        if (renewalInFlight === renewal) renewalInFlight = null;
+      });
+    renewalInFlight = renewal;
+    return renewal;
+  };
+
+  const timer = setInterval(() => {
+    void renewSingleFlight().catch(() => {});
+  }, NOTION_DISCOVER_LEASE_HEARTBEAT_MS);
+
+  return {
+    expectOwnedOperation() {
+      return notionDiscoveryLeaseExpectation(lease);
+    },
+    async assertOwned() {
+      try {
+        await renewSingleFlight();
+      } catch (error) {
+        throw new NotionDiscoveryLeaseLostError(error);
+      }
+      if (ownershipFailure) throw new NotionDiscoveryLeaseLostError(ownershipFailure);
+    },
+    async stop() {
+      stopped = true;
+      clearInterval(timer);
+      if (renewalInFlight) await renewalInFlight.catch(() => {});
+    },
+  };
 }
 
 async function releaseNotionApplyLease(
@@ -11314,130 +13064,83 @@ async function releaseNotionApplyLease(
   ]);
 }
 
-async function markApplyJobFailed(
-  db: DbRef,
-  actorId: string,
-  body: Record<string, unknown>,
+function applyJobFailureMutation(
+  job: NotionImportJob,
   error: unknown,
 ) {
-  const jobId = typeof body.jobId === 'string' ? body.jobId : '';
-  if (!jobId) return;
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  // Only a job that was actually mid-apply should flip to `failed`: apply runs
-  // with the top-level status left at `ready` (updateApplyProgress never
-  // changes it), so a precondition throw ('not found', wrong status, already
-  // completed) must not clobber the job.
-  if (!job || job.status !== 'ready') return;
   const message = error instanceof Error ? error.message : String(error);
-  const failedAt = nowIso();
-  await jobs
-    .update(job.id, {
-      status: 'failed',
-      phase: 'apply_failed',
-      error: message,
-      progress: {
-        ...withImportProgress(job.progress, {
-          key: 'apply',
-          status: 'failed',
-          legacyStep: 'apply_failed',
-          message,
-          at: failedAt,
-        }),
+  // SQLite/JS timestamps have millisecond precision. A just-inserted importer
+  // page and the terminal job CAS can otherwise share the same timestamp and
+  // be mistaken for a user takeover (`page.updatedAt >= finishedAt`). Fence
+  // one millisecond past the request's last importer write; any real takeover
+  // after the candidate read is still protected by the page CAS below.
+  const failedAt = new Date(Date.now() + 1).toISOString();
+  const patch: Partial<NotionImportJob> = {
+    status: 'failed',
+    phase: 'apply_failed',
+    error: message,
+    progress: {
+      ...withImportProgress(job.progress, {
+        key: 'apply',
+        status: 'failed',
+        legacyStep: 'apply_failed',
+        message,
+        at: failedAt,
+      }),
+    },
+    report: {
+      ...(job.report ?? baseReport()),
+      lastError: message,
+      fileCleanupPending: {
+        requestedAt: failedAt,
+        reason: 'apply_failed',
       },
-      report: {
-        ...(job.report ?? baseReport()),
-        lastError: message,
-      },
-      finishedAt: failedAt,
-    })
-    .catch(() => {});
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: 'notion_import.apply_failed',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: { message },
-  }).catch(() => {});
+    },
+    finishedAt: failedAt,
+    fileCleanupStatus: 'pending',
+    fileCleanupRequestedAt: failedAt,
+    fileCleanupCompletedAt: null,
+  };
+  return {
+    message,
+    failedJob: { ...job, ...patch } as NotionImportJob,
+    operation: {
+      table: 'notion_import_jobs',
+      op: 'update',
+      id: job.id,
+      data: patch as Record<string, unknown>,
+    } as TransactOperation,
+  };
 }
 
-async function applyJob(
-  db: DbRef,
-  admin: AdminDbAccessor,
-  body: Record<string, unknown>,
-  actorId: string,
-  storage?: FunctionStorageProxy,
-  request?: Request,
-  env?: Record<string, unknown>,
-) {
-  // Authorize BEFORE arming the failure marker: markApplyJobFailed itself does
-  // no role check, so an unauthorized caller's 403 must not flip a ready job
-  // to `failed` (that would let any authenticated stranger who learns a job id
-  // sabotage another workspace's import).
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  const lease = await acquireNotionApplyLease(db, job, actorId);
-  const createdUploadIds: string[] = [];
-  try {
-    return await applyJobCore(db, admin, body, actorId, storage, request, env, lease, createdUploadIds);
-  } catch (error) {
-    const recoveryCanRetryInPlace = isRetryableNotionTemplateCleanupError(error)
-      && createdUploadIds.length === 0;
-    // No failed apply may leave temporary Notion/AWS bearer URLs in either
-    // staging or product owners. Detach every upload created for this job and
-    // hand its object/quota row to the durable maintenance recovery path.
-    let cleanupFailure: unknown;
-    await compensateFailedNotionImportFiles(db, job, actorId, createdUploadIds).catch((cleanupError) => {
-      cleanupFailure = cleanupError;
-      console.warn(
-        `[notion-import] failed to fully compensate file copies for job ${job.id}: ${
-          cleanupError instanceof Error ? cleanupError.message : String(cleanupError)
-        }`,
-      );
-    });
-    if (!recoveryCanRetryInPlace) {
-      await scrubMappedImportProductCredentials(db, job.id).catch(() => {});
-      const stagedItems = await listActiveNotionImportItems(db, job)
-        .catch(() => [] as NotionImportItem[]);
-      await scrubAppliedImportCredentialMetadata(db, stagedItems).catch(() => {});
-      // Record the failure on the job so apply progress can't stay stuck at
-      // `running` forever. discoverJob already does this for its own failures.
-      await markApplyJobFailed(db, actorId, body, error);
-      const failedJob = await getExisting(jobs, job.id).catch(() => null);
-      if (failedJob?.status === 'failed' || failedJob?.status === 'cancelled') {
-        await bestEffort(
-          'notion-import trash incomplete product pages',
-          trashIncompleteImportPages(db, failedJob),
-        );
-      }
-    }
-    if (cleanupFailure) {
-      const failedJob = await getExisting(jobs, job.id).catch(() => null);
-      if (failedJob) {
-        await jobs.update(job.id, {
-          report: {
-            ...(failedJob.report ?? {}),
-            fileCleanupPending: {
-              markedAt: nowIso(),
-              createdUploadIds,
-              message: cleanupFailure instanceof Error ? cleanupFailure.message : String(cleanupFailure),
-            },
-          },
-        }).catch(() => {});
-      }
-    }
-    throw error;
-  } finally {
-    await bestEffort('notion-import release apply lease', releaseNotionApplyLease(db, lease));
-  }
-}
+const { applyJob } = createNotionImportJobApplyHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DbRef,
+  FunctionStorageProxy,
+  Awaited<ReturnType<typeof applyJobCore>>
+>({
+  requireString,
+  assertWritableJob,
+  acquireNotionApplyLease,
+  applyJobCore,
+  clearNotionImportApplySnapshotCache,
+  isRetryableNotionTemplateCleanupError,
+  recoverNotionApplyFailureCleanupAuthority,
+  createNotionApplyFailureCleanupMutationCollector,
+  scrubMappedImportProductCredentials,
+  listActiveNotionImportItems,
+  scrubAppliedImportCredentialMetadata,
+  applyJobFailureMutation,
+  trashIncompleteImportPages,
+  releaseNotionApplyLease,
+});
+
 function notionImportApplyRuntime() {
   return {
     NOTION_API_VERSION,
+    NOTION_BLOCK_CHILD_TOTAL_LIMIT,
+    NOTION_IMPORT_PUBLICATION_BOUNDARY_VERSION,
     GENERATED_NOTION_TITLE_PROPERTY_ID,
     notionAppliedCountsFromMappings,
     withImportProgress,
@@ -11482,18 +13185,32 @@ function notionImportApplyRuntime() {
     hiddenLinkedDatabaseFallbackTitle,
     pushImportActivity,
     importActivityRingOf,
+    listActiveNotionImportDiscoverySeeds,
     listActiveNotionImportItems,
+    collectNotionImportFileCopySlots,
+    notionImportFileSlotCoordinates,
+    loadNotionImportFileCheckpoints,
+    loadNotionImportFileCheckpointBySlotKey,
+    cleanupUnownedNotionImportFileCheckpoints,
+    copyNotionImportFileSlot,
     scrubAppliedImportCredentialMetadata,
     finalizeConversionReport,
     basePage,
     importedItemTimestamps,
+    transactImportedOwnerPatch,
     preserveImportedPageTimestamps,
     loadMappings,
     buildImportedBlockOwnerContexts,
     resolveImportedPageParentFromNotionBlocks,
     moveImportedPageToResolvedParent,
     createMapping,
+    publishRecoveredImportedOwnerMapping,
+    publishImportedDatabaseAliasMapping,
+    insertImportedDatabaseChildWithMapping,
+    claimRecoveredImportedDatabaseChild,
+    insertImportedPageWithMapping,
     ensureImportRoot,
+    stageIncompleteImportPages,
     unwrapImportRoot,
     rowDataSourceId,
     rowPropertiesForDataSource,
@@ -11502,6 +13219,8 @@ function notionImportApplyRuntime() {
     copyImportedPageChromeFiles,
     existingImportedTemplateFileState,
     copyImportedTemplateFiles,
+    insertImportedTemplateWithFiles,
+    updateImportedTemplateWithFiles,
     remapImportedDatabaseProperties,
     remapImportedTemplateBlocksRichTextMentions,
     reportRichTextMentionRemap,
@@ -11516,15 +13235,15 @@ function notionImportApplyRuntime() {
     insertPageBlocksFromSnapshot,
     inspectDiscoveryCompletenessForReport,
     itemHasImportablePageBody,
+    replayImportedPageBlockMetrics,
     importedBlocksComplete,
     markImportedBlocksComplete,
     replaceImportedBlocksForPage,
     ensureImportedPageWorkspaceIndexes,
     renewNotionApplyLease,
     updateNotionJobIfStatus,
-  };
+  } satisfies NotionImportApplyRuntime;
 }
-export type NotionImportApplyRuntime = ReturnType<typeof notionImportApplyRuntime>;
 
 async function applyJobCore(
   db: DbRef,
@@ -11551,804 +13270,199 @@ async function applyJobCore(
   );
 }
 
-async function preflightJob(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  const parentPageId = optionalString(body.parentPageId);
-  await assertWritableImportTarget(db, workspaceId, parentPageId, actorId);
 
-  const connectionId = optionalString(body.connectionId);
-  const tokenSource = await notionTokenForJob(db, body, { connectionId, options: { connectionId } }, actorId, env);
-  if (tokenSource.connection?.workspaceId && tokenSource.connection.workspaceId !== workspaceId) {
-    throw new Error('Notion import connection belongs to another workspace.');
-  }
-  const rootNotionPageIds = parseStringArray(body.rootNotionPageIds);
-  const rootNotionDataSourceIds = parseStringArray(body.rootNotionDataSourceIds);
-  if (!rootNotionPageIds.length && !rootNotionDataSourceIds.length) {
-    throw new Error('rootNotionPageIds or rootNotionDataSourceIds is required for Notion import preflight.');
-  }
+const {
+  beginOAuthConnection,
+  completeOAuthConnection,
+  createConnection,
+  listConnections,
+  revokeConnection,
+  listAccessibleRoots,
+  parseConnectionKind,
+  notionTokenForJob,
+  notionWorkspaceInfo,
+  cachedNotionWorkspaceForDiscovery,
+  notionAccessibleRootCandidates,
+} = createNotionImportConnectionHandlers({
+  NOTION_API_VERSION,
+  NOTION_ROOT_SCAN_DEFAULT_PAGE_LIMIT,
+  NOTION_ROOT_SCAN_MAX_PAGE_LIMIT,
+  optionalString,
+  parsePositiveInt,
+  listAll,
+  assertWorkspaceRole,
+  assertWritableImportTarget,
+  asRecord,
+  notionObjectId,
+  notionParentResourceId,
+  notionParentType,
+  notionTitle,
+});
 
-  const preflight = await preflightNotionImportGraph(tokenSource.token, {
-    apiVersion: optionalString(body.apiVersion) ?? NOTION_API_VERSION,
-    rootNotionPageIds,
-    rootNotionDataSourceIds,
-    apiBase: notionApiBase(env),
-  });
-  await recordWorkspaceAudit(db, {
-    workspaceId,
-    actorId,
-    action: 'notion_import.preflight',
-    targetType: 'workspace',
-    targetId: workspaceId,
-    metadata: {
-      rootNotionPageIds,
-      rootNotionDataSourceIds,
-      connectionId: tokenSource.connectionId,
-      credentialSource: tokenSource.credentialSource,
-      summary: preflight.summary,
-    },
-    occurredAt: nowIso(),
-  });
-  return { preflight };
-}
+export { cachedNotionWorkspaceForDiscovery, notionAccessibleRootCandidates };
 
-async function scanAccessibleNotionRoots(
-  token: string,
-  options: {
-    apiVersion: string;
-    maxSearchPages: number;
-    apiBase?: string;
-    startCursor?: string;
-    includeWorkspace?: boolean;
-  },
-) {
-  const notionWorkspace = options.includeWorkspace === false
-    ? undefined
-    : notionWorkspaceInfo(await notionRequest(token, '/users/me', options.apiVersion, { apiBase: options.apiBase }));
-  const records: Record<string, unknown>[] = [];
-  let cursor: string | undefined = options.startCursor;
-  let hasMore = false;
-  let nextCursor: string | undefined;
-  let searchPagesFetched = 0;
-  let incompleteReason: string | undefined;
 
-  for (let page = 0; page < options.maxSearchPages; page += 1) {
-    const response = await notionRequest(token, '/search', options.apiVersion, {
-      method: 'POST',
-      body: {
-        page_size: 100,
-        sort: {
-          direction: 'descending',
-          timestamp: 'last_edited_time',
-        },
-        ...(cursor ? { start_cursor: cursor } : {}),
-      },
-      apiBase: options.apiBase,
-    });
-    searchPagesFetched += 1;
-    const results = Array.isArray(response.results)
-      ? response.results.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object')
-      : [];
-    records.push(...results);
-    const requestStatus = asRecord(response.request_status);
-    incompleteReason = optionalString(requestStatus?.incomplete_reason) ?? incompleteReason;
-    hasMore = response.has_more === true;
-    nextCursor = optionalString(response.next_cursor);
-    cursor = nextCursor;
-    if (!hasMore || !cursor) break;
-  }
+const {
+  isLiveImportJob,
+  importJobRetentionMs,
+  pruneStaleImportJobs,
+  listJobs,
+} = createNotionImportJobListingHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DbRef,
+  ShareRole,
+  ReturnType<typeof cleanJob>
+>({
+  envString,
+  listAll,
+  bestEffort,
+  requireString,
+  parsePositiveInt,
+  assertWorkspaceRole,
+  workspaceRole,
+  roleRanks,
+  cleanJob,
+  notionImportItemSafetyLimit: NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+});
+export {
+  isLiveImportJob,
+  importJobRetentionMs,
+  pruneStaleImportJobs,
+};
 
-  return {
-    roots: notionAccessibleRootCandidates(records),
-    items: records.map(compactNotionRootScanItem).filter((item): item is NotionImportRootScanItem => !!item),
-    scanned: records.length,
-    searchPagesFetched,
-    hasMore,
-    nextCursor: nextCursor ?? null,
-    incompleteReason: incompleteReason ?? null,
-    notionWorkspace,
-  };
-}
+const {
+  repairImportPageIndexes,
+  repairImportedPageBlocks,
+  retryFileCopies,
+} = createNotionImportJobRepairHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  NotionImportMapping,
+  Page,
+  ImportedBlockMapping,
+  DbRef,
+  FunctionStorageProxy,
+  NotionFileCopyContext,
+  ImportConversionReport,
+  ReturnType<typeof finalizeConversionReport>,
+  ReturnType<typeof cleanJob>
+>({
+  notionApiVersion: NOTION_API_VERSION,
+  notionImportItemSafetyLimit: NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+  assertNotionFileCopyNotDisabled,
+  requireString,
+  assertWritableJob,
+  loadMappings,
+  emptyConversionReport,
+  notionTokenForJob,
+  notionApiBase,
+  retryImportedPageFileCopies,
+  finalizeConversionReport,
+  withImportProgress,
+  cleanJob,
+  optionalString,
+  acquireNotionApplyLease,
+  parsePositiveInt,
+  parseBoolean,
+  listActiveNotionImportItems,
+  assertSafeNotionImportSourceReferences,
+  itemHasImportablePageBody,
+  importedBlocksComplete,
+  importedBlockBoundaryRepairComplete,
+  replaceImportedBlocksForPage,
+  addImportedLinkedDatabaseRowContextFilters,
+  releaseNotionApplyLease,
+  assertWorkspaceRole,
+  listAll,
+  unwrapImportRoot,
+  trashIncompleteImportPages,
+});
 
-async function listAccessibleRoots(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  const parentPageId = optionalString(body.parentPageId);
-  await assertWritableImportTarget(db, workspaceId, parentPageId, actorId);
+const { getJob } = createNotionImportJobReaderHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  NotionImportApplyLock,
+  DbRef,
+  ReturnType<typeof cleanJob>,
+  ReturnType<typeof cleanItem>,
+  ReturnType<typeof activeNotionImportOperation>
+>({
+  requireString,
+  assertReadableJob,
+  parseBoolean,
+  listActiveNotionImportItems,
+  cleanJob,
+  cleanItem,
+  activeNotionImportOperation,
+});
 
-  const connectionId = optionalString(body.connectionId);
-  const tokenSource = await notionTokenForJob(db, body, { connectionId, options: { connectionId } }, actorId, env);
-  if (tokenSource.connection?.workspaceId && tokenSource.connection.workspaceId !== workspaceId) {
-    throw new Error('Notion import connection belongs to another workspace.');
-  }
-
-  const scan = await scanAccessibleNotionRoots(tokenSource.token, {
-    apiVersion: optionalString(body.apiVersion) ?? NOTION_API_VERSION,
-    maxSearchPages: parsePositiveInt(
-      body.maxSearchPages,
-      NOTION_ROOT_SCAN_DEFAULT_PAGE_LIMIT,
-      NOTION_ROOT_SCAN_MAX_PAGE_LIMIT,
-    ),
-    apiBase: notionApiBase(env),
-    startCursor: optionalString(body.startCursor),
-    includeWorkspace: body.includeWorkspace !== false,
-  });
-
-  if (body.recordAudit !== false) {
-    await recordWorkspaceAudit(db, {
-      workspaceId,
-      actorId,
-      action: 'notion_import.root_scan',
-      targetType: 'workspace',
-      targetId: workspaceId,
-      metadata: {
-        connectionId: tokenSource.connectionId,
-        credentialSource: tokenSource.credentialSource,
-        tokenFingerprint: tokenSource.tokenFingerprint,
-        scanned: scan.scanned,
-        roots: scan.roots.length,
-        searchPagesFetched: scan.searchPagesFetched,
-        hasMore: scan.hasMore,
-        incompleteReason: scan.incompleteReason,
-        incremental: !!optionalString(body.startCursor),
-      },
-      occurredAt: nowIso(),
-    });
-  }
-
-  return scan;
-}
-
-async function createJobRecord(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-  retryOfJobId?: string,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  const parentPageId = optionalString(body.parentPageId);
-  await assertWritableImportTarget(db, workspaceId, parentPageId, actorId);
-
-  const connectionKind = parseConnectionKind(body.connectionKind);
-  const connectionId = optionalString(body.connectionId);
-  const rootNotionPageIds = parseStringArray(body.rootNotionPageIds);
-  const rootNotionDataSourceIds = parseStringArray(body.rootNotionDataSourceIds);
-  const providedSnapshotItems = parseSnapshotItems(body.snapshotItems);
-  const mcpFetchSnapshotItems = parseMcpFetchItems(body.mcpFetches);
-  const snapshotItems = expandSnapshotItems(
-    [...providedSnapshotItems, ...mcpFetchSnapshotItems],
-    NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
-  );
-  assertBoundedRequestDiscoveredItems(snapshotItems, 'snapshotItems');
-  await assertSafeNotionImportSourceReferences(
-    db,
-    snapshotItems.map((item) => item.metadata),
-  );
-  const token = optionalString(body.notionToken);
-  const tokenSource = token || connectionId
-    ? await notionTokenForJob(db, body, { connectionId, options: { connectionId } }, actorId, env)
-    : undefined;
-  if (tokenSource?.connection?.workspaceId && tokenSource.connection.workspaceId !== workspaceId) {
-    throw new Error('Notion import connection belongs to another workspace.');
-  }
-  const now = nowIso();
-  const maxDiscoveryPages = parsePositiveInt(
-    body.maxDiscoveryPages,
-    NOTION_SEARCH_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxEnrichedItems = parsePositiveInt(
-    body.maxEnrichedItems,
-    NOTION_ENRICHMENT_BATCH_SIZE,
-    NOTION_ENRICHMENT_BATCH_SIZE_MAX,
-  );
-  const maxChildrenPages = parsePositiveInt(
-    body.maxChildrenPages,
-    NOTION_CHILDREN_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxDataSourceQueryPages = parsePositiveInt(
-    body.maxDataSourceQueryPages,
-    NOTION_ROW_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxViewPages = parsePositiveInt(
-    body.maxViewPages,
-    NOTION_VIEW_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxTemplatePages = parsePositiveInt(
-    body.maxTemplatePages,
-    NOTION_TEMPLATE_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const discoveryConcurrency = parsePositiveInt(
-    body.discoveryConcurrency,
-    NOTION_DISCOVERY_CONCURRENCY_DEFAULT,
-    NOTION_DISCOVERY_CONCURRENCY_MAX,
-  );
-  const includeMarkdownFallback = parseBoolean(body.includeMarkdownFallback, true);
-  const importPagesFullWidth = parseOptionalBoolean(body.importPagesFullWidth);
-  const locale = parsePersistentGeneratedLocale(body.locale);
-  assertNotionFileCopyNotDisabled(body);
-  const deferDiscovery = parseBoolean(body.deferDiscovery, false);
-  const shouldRunDiscovery = !!tokenSource && !deferDiscovery && providedSnapshotItems.length === 0;
-  const readySnapshotItems = shouldRunDiscovery ? [] : snapshotItems;
-  const discoverySupplementalSnapshotItems = shouldRunDiscovery ? snapshotItems : [];
-  const shouldStageSnapshot = readySnapshotItems.length > 0;
-
-  const job = await db.table<NotionImportJob>('notion_import_jobs').insert({
-    id: newId(),
-    workspaceId,
-    source: 'notion_api',
-    connectionKind,
-    connectionId: tokenSource?.connectionId,
-    // Snapshot rows are persisted one at a time. Keep the durable job behind
-    // the ready gate until every row has landed so a failed staging pass can
-    // never expose a partial import graph to plan/apply.
-    status: shouldRunDiscovery || shouldStageSnapshot ? 'discovering' : 'queued',
-    phase: shouldRunDiscovery
-      ? 'api_search'
-      : shouldStageSnapshot
-        ? 'snapshot_staging'
-        : deferDiscovery && tokenSource
-          ? 'discovery_deferred'
-          : 'awaiting_connection',
-    actorId,
-    parentPageId,
-    rootNotionPageIds,
-    rootNotionDataSourceIds,
-    apiVersion: NOTION_API_VERSION,
-    options: {
-      importMode: 'workspace_graph',
-      preserveLinkedDatabases: true,
-      preserveViewUi: true,
-      preserveFiles: true,
-      maxDiscoveryPages,
-      maxEnrichedItems,
-      maxChildrenPages,
-      maxDataSourceQueryPages,
-      maxViewPages,
-      maxTemplatePages,
-      discoveryConcurrency,
-      includeMarkdownFallback,
-      locale,
-      ...(importPagesFullWidth !== undefined ? { importPagesFullWidth } : {}),
-      rootNotionDataSourceIds,
-      deferDiscovery,
-      connectionId: tokenSource?.connectionId,
-      credentialSource: tokenSource?.credentialSource,
-      tokenFingerprint: tokenSource?.tokenFingerprint,
-      tokenStored: false,
-      snapshotItems: providedSnapshotItems.length,
-      mcpFetchSnapshotItems: mcpFetchSnapshotItems.length,
-      discoverySupplementalSnapshotItems: discoverySupplementalSnapshotItems.length,
-    },
-    counts: {},
-    progress: {
-      ...withImportProgress(undefined, shouldRunDiscovery
-        ? {
-            key: 'discover',
-            status: 'running',
-            legacyStep: 'discovering_accessible_workspace_graph',
-            percent: 25,
-          }
-        : shouldStageSnapshot
-          ? {
-              key: 'discover',
-              status: 'running',
-              legacyStep: 'staging_snapshot_items',
-              percent: 35,
-              counts: { discovered: 0, totalKnown: readySnapshotItems.length },
-            }
-          : {
-              key: deferDiscovery && tokenSource ? 'discover' : 'connect',
-              status: 'pending',
-              legacyStep: deferDiscovery && tokenSource ? 'waiting_for_discovery' : 'waiting_for_notion_connection',
-              percent: deferDiscovery && tokenSource ? 15 : 5,
-            }),
-      discovered: 0,
-      totalKnown: readySnapshotItems.length,
-    },
-    report: baseReport({
-      rootNotionPageIds,
-      rootNotionDataSourceIds,
-      tokenStored: false,
-      connectionId: tokenSource?.connectionId,
-      credentialSource: tokenSource?.credentialSource,
-      snapshotProvided: snapshotItems.length > 0,
-      snapshotItems: providedSnapshotItems.length,
-      mcpFetchSnapshotItems: mcpFetchSnapshotItems.length,
-      discoverySupplementalSnapshotItems: discoverySupplementalSnapshotItems.length,
-      deferDiscovery,
-      ...(importPagesFullWidth !== undefined ? { importPagesFullWidth } : {}),
-      locale,
-    }),
-    retryOfJobId,
-    startedAt: shouldRunDiscovery || shouldStageSnapshot ? now : undefined,
-  });
-
-  await recordWorkspaceAudit(db, {
-    workspaceId,
-    actorId,
-    action: 'notion_import.create',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: {
-      connectionKind,
-      connectionId: tokenSource?.connectionId,
-      credentialSource: tokenSource?.credentialSource,
-      hasToken: !!token,
-      retryOfJobId,
-      rootNotionPageIds,
-      rootNotionDataSourceIds,
-      snapshotItems: snapshotItems.length,
-      mcpFetchSnapshotItems: mcpFetchSnapshotItems.length,
-      discoverySupplementalSnapshotItems: discoverySupplementalSnapshotItems.length,
-      deferDiscovery,
-      ...(importPagesFullWidth !== undefined ? { importPagesFullWidth } : {}),
-      locale,
-    },
-    occurredAt: now,
-  });
-
-  if (shouldStageSnapshot) {
-    try {
-      const inserted = await replaceDiscoveredItems(db, job, readySnapshotItems);
-      const counts = inserted.reduce<Record<string, number>>((acc, item) => {
-        acc[item.notionObject] = (acc[item.notionObject] ?? 0) + 1;
-        return acc;
-      }, {});
-      const finishedAt = nowIso();
-      const updated = await updateNotionJobIfStatus(db, job.id, 'discovering', {
-        status: 'ready',
-        phase: 'snapshot_ready',
-        counts,
-        progress: {
-          ...withImportProgress(job.progress, {
-            key: 'discover',
-            status: 'completed',
-            legacyStep: 'ready_for_graph_planning',
-            percent: 50,
-            counts: { discovered: inserted.length, totalKnown: inserted.length },
-            at: finishedAt,
-          }),
-          discovered: inserted.length,
-          totalKnown: inserted.length,
-        },
-        report: baseReport({
-          rootNotionPageIds,
-          rootNotionDataSourceIds,
-          tokenStored: false,
-          snapshotProvided: true,
-          snapshotItems: providedSnapshotItems.length,
-          mcpFetchSnapshotItems: mcpFetchSnapshotItems.length,
-          discoveredByObject: counts,
-          locale,
-        }),
-        finishedAt,
-      });
-      if (!updated) {
-        throw new Error('Notion import job state changed before snapshot staging completed.');
-      }
-      return {
-        job: cleanJob(updated),
-        items: inserted.map(cleanItem),
-      };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      const failedAt = nowIso();
-      // Best effort is deliberate: if the failure also prevents the status
-      // write, the job remains `discovering`, which still keeps plan/apply
-      // closed. Never promote a partially staged graph to `ready`.
-      await bestEffort(
-        'notion-import snapshot staging failure status',
-        updateNotionJobIfStatus(db, job.id, 'discovering', {
-          status: 'failed',
-          phase: 'snapshot_staging_failed',
-          error: message,
-          progress: {
-            ...withImportProgress(job.progress, {
-              key: 'discover',
-              status: 'failed',
-              legacyStep: 'snapshot_staging_failed',
-              message,
-              at: failedAt,
-            }),
-            discovered: 0,
-            totalKnown: readySnapshotItems.length,
-          },
-          report: {
-            ...(job.report ?? baseReport()),
-            lastError: message,
-          },
-          finishedAt: failedAt,
-        }),
-      );
-      throw error;
-    }
-  }
-
-  if (!tokenSource || deferDiscovery) return { job: cleanJob(job), items: [] };
-  return discoverJob(
-    db,
-    {
-      jobId: job.id,
-      notionToken: tokenSource.credentialSource === 'request' ? tokenSource.token : undefined,
-      connectionId: tokenSource.credentialSource === 'connection' ? tokenSource.connectionId : undefined,
-      maxDiscoveryPages,
-      maxEnrichedItems,
-      maxChildrenPages,
-      maxDataSourceQueryPages,
-      maxViewPages,
-      maxTemplatePages,
-      discoveryConcurrency,
-      includeMarkdownFallback,
-    },
-    actorId,
-    env,
-    tokenSource,
-    discoverySupplementalSnapshotItems,
-  );
-}
-
-// Mirrors the frontend's isLiveNotionJob: a job that is queued, discovering, or
-// mid-apply must never be pruned.
-export function isLiveImportJob(job: NotionImportJob) {
-  if (job.status === 'queued' || job.status === 'discovering') return true;
-  return (job.progress as { currentStatus?: unknown } | undefined)?.currentStatus === 'running';
-}
-
-export function importJobRetentionMs(env: Record<string, unknown> | undefined) {
-  const raw = envString(env, NOTION_IMPORT_JOB_RETENTION_DAYS_ENV);
-  if (!raw || !/^[1-9][0-9]*$/.test(raw)) return NOTION_IMPORT_JOB_RETENTION_MS_DEFAULT;
-  const days = Number(raw);
-  if (!Number.isSafeInteger(days) || days > NOTION_IMPORT_JOB_RETENTION_DAYS_MAX) {
-    return NOTION_IMPORT_JOB_RETENTION_MS_DEFAULT;
-  }
-  if (days > 0) return days * 24 * 60 * 60 * 1000;
-  return NOTION_IMPORT_JOB_RETENTION_MS_DEFAULT;
-}
-
-function importJobTimestampMs(job: NotionImportJob) {
-  const stamp = job.updatedAt ?? job.createdAt;
-  if (!stamp) return undefined;
-  const ms = new Date(stamp).getTime();
-  return Number.isFinite(ms) ? ms : undefined;
-}
-
-// Opportunistic housekeeping: delete finished/stale, non-live job records (and
-// their discovered items) that are older than the retention window OR beyond the
-// per-workspace keep cap. Returns the set of pruned job ids so the caller omits
-// them from the response. Best-effort — a delete failure never breaks listing.
-export async function pruneStaleImportJobs(
-  db: DbRef,
-  jobs: NotionImportJob[],
-  env: Record<string, unknown> | undefined,
-): Promise<Set<string>> {
-  const pruned = new Set<string>();
-  const retentionMs = importJobRetentionMs(env);
-  const nowMs = Date.now();
-  const nonLive = jobs
-    .filter((job) => !isLiveImportJob(job))
-    .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
-
-  const candidates: NotionImportJob[] = [];
-  nonLive.forEach((job, index) => {
-    const stampMs = importJobTimestampMs(job);
-    const tooOld = stampMs !== undefined && nowMs - stampMs > retentionMs;
-    const beyondCap = index >= NOTION_IMPORT_JOB_KEEP_MAX;
-    if (tooOld || beyondCap) candidates.push(job);
-  });
-  if (!candidates.length) return pruned;
-
-  // Delete the oldest candidates first, capped per call to bound request cost;
-  // repeated listings converge on a clean table.
-  const toPrune = candidates
-    .sort((a, b) => (a.createdAt ?? '').localeCompare(b.createdAt ?? ''))
-    .slice(0, NOTION_IMPORT_JOB_PRUNE_BATCH_MAX);
-  const jobTable = db.table<NotionImportJob>('notion_import_jobs');
-  const itemTable = db.table<NotionImportItem>('notion_import_items');
-  for (const job of toPrune) {
-    const items = await listAll(itemTable.where('jobId', '==', job.id), NOTION_IMPORT_ITEM_SAFETY_LIMIT);
-    await Promise.all(items.map((item) => bestEffort('notion-import prune item.delete', itemTable.delete(item.id))));
-    const deleted = await bestEffort('notion-import prune job.delete', jobTable.delete(job.id));
-    if (deleted) pruned.add(job.id);
-  }
-  return pruned;
-}
-
-async function listJobs(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  await assertWorkspaceRole(db, workspaceId, actorId, 'view');
-  const limit = parsePositiveInt(body.limit, 20, 100);
-  const jobs = await listAll(db.table<NotionImportJob>('notion_import_jobs').where('workspaceId', '==', workspaceId), 500);
-  // Pruning hard-deletes job/item rows, so a view-only member may list but
-  // must not trigger destructive housekeeping; editors' listings still
-  // converge on a clean table.
-  const role = await workspaceRole(db, workspaceId, actorId);
-  const canPrune = !!role && roleRanks[role] >= roleRanks.edit;
-  const pruned = canPrune ? await pruneStaleImportJobs(db, jobs, env) : new Set<string>();
-  return {
-    jobs: jobs
-      .filter((job) => !pruned.has(job.id))
-      .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))
-      .slice(0, limit)
-      .map(cleanJob),
-  };
-}
-
-// Recovery for imports created before per-page index writes (or interrupted
-// mid-apply): re-derives the central page_workspace_index from this workspace's
-// import mappings so orphaned imported pages become openable by /p/:id again.
-// Idempotent — ensurePageWorkspaceIndex no-ops when the row already matches.
-async function repairImportPageIndexes(
-  db: DbRef,
-  admin: AdminDbAccessor,
-  body: Record<string, unknown>,
-  actorId: string,
-) {
-  const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  await assertWorkspaceRole(db, workspaceId, actorId, 'edit');
-  const mappings = await listAll(
-    db.table<NotionImportMapping>('notion_import_mappings').where('workspaceId', '==', workspaceId),
-    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
-  );
-  const jobs = await listAll(
-    db.table<NotionImportJob>('notion_import_jobs').where('workspaceId', '==', workspaceId),
-    500,
-  );
-  const mappingsByJob = new Map<string, NotionImportMapping[]>();
-  for (const mapping of mappings) {
-    const group = mappingsByJob.get(mapping.jobId) ?? [];
-    group.push(mapping);
-    mappingsByJob.set(mapping.jobId, group);
-  }
-  let unwrapped = 0;
-  let moved = 0;
-  let trashed = 0;
-  for (const job of jobs) {
-    const jobMappings = mappingsByJob.get(job.id) ?? [];
-    if (!jobMappings.some((mapping) => mapping.relationKind === 'import_root')) continue;
-    if (job.status === 'completed') {
-      const byNotionId = new Map(jobMappings.map((mapping) => [mapping.notionId, mapping]));
-      const result = await unwrapImportRoot(db, admin, job, byNotionId);
-      unwrapped += result.unwrapped;
-      moved += result.moved;
-    } else if (job.status === 'failed' || job.status === 'cancelled') {
-      trashed += await trashIncompleteImportPages(db, job, jobMappings);
-    }
-  }
-  const seen = new Set<string>();
-  let repaired = 0;
-  for (const mapping of mappings) {
-    if (
-      mapping.relationKind !== 'import_root' &&
-      (mapping.localType === 'page' || mapping.localType === 'database') &&
-      typeof mapping.localId === 'string' &&
-      mapping.localId.length > 0 &&
-      !seen.has(mapping.localId)
-    ) {
-      seen.add(mapping.localId);
-      await ensurePageWorkspaceIndex(admin, mapping.localId, workspaceId);
-      repaired += 1;
-    }
-  }
-  return { repaired, unwrapped, moved, trashed };
-}
-
-async function getJob(db: DbRef, body: Record<string, unknown>, actorId: string) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const job = await getExisting(db.table<NotionImportJob>('notion_import_jobs'), jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertReadableJob(db, job, actorId);
-  const items = await listActiveNotionImportItems(db, job);
-  return {
-    job: cleanJob(job),
-    items: items.map(cleanItem),
-  };
-}
-
-async function appendSnapshotItemsJob(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (job.status === 'completed' || job.status === 'cancelled') {
-    throw new Error(`Cannot append discovery items to a ${job.status} Notion import job.`);
-  }
-
-  const snapshotItems = expandSnapshotItems(
-    parseSnapshotItems(body.snapshotItems),
-    NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
-  );
-  assertBoundedRequestDiscoveredItems(snapshotItems, 'snapshotItems');
-  const markReady = parseBoolean(body.markReady, false);
-  const importedBatchId = optionalString(body.batchId);
-  const clientDiscoveryState = asRecord(body.clientDiscoveryState);
-  if (clientDiscoveryState) {
-    assertBoundedSnapshotJsonValue(
-      clientDiscoveryState,
-      { bytes: 0, nodes: 0 },
-      'clientDiscoveryState',
-    );
-  }
-  const beforeItems = await listActiveNotionImportItems(db, job);
-  const merged = snapshotItems.length
-    ? await mergeDiscoveredItems(db, job, snapshotItems)
-    : beforeItems;
-  const counts = countImportItemsByObject(merged);
-  const finishedAt = markReady ? nowIso() : undefined;
-  const appendCounts = {
-    appended: snapshotItems.length,
-    totalKnown: merged.length,
-    ...(importedBatchId ? { batchId: importedBatchId } : {}),
-  };
-  const progress = {
-    ...withImportProgress(job.progress, {
-      key: 'discover',
-      status: markReady ? 'completed' : 'running',
-      legacyStep: markReady ? 'ready_for_graph_planning' : 'chunked_discovery',
-      percent: markReady ? 50 : 35,
-      counts: appendCounts,
-      at: finishedAt,
-    }),
-    discovered: merged.length,
-    totalKnown: merged.length,
-    chunkedDiscovery: true,
-    lastBatchSize: snapshotItems.length,
-    ...(importedBatchId ? { lastBatchId: importedBatchId } : {}),
-    ...(clientDiscoveryState ? { clientDiscoveryState } : {}),
-  };
-  const patch: Partial<NotionImportJob> = {
-    status: markReady ? 'ready' : 'discovering',
-    phase: markReady ? 'discovery_complete' : 'chunked_discovery',
-    counts,
-    progress,
-    report: baseReport({
-      ...(job.report ?? {}),
-      rootNotionPageIds: job.rootNotionPageIds ?? [],
-      rootNotionDataSourceIds: job.rootNotionDataSourceIds ??
-        parseStringArray((job.options as { rootNotionDataSourceIds?: unknown } | undefined)?.rootNotionDataSourceIds),
-      tokenStored: false,
-      chunkedDiscovery: true,
-      appendedSnapshotItems: ((job.report as { appendedSnapshotItems?: number } | undefined)?.appendedSnapshotItems ?? 0) +
-        snapshotItems.length,
-      discoveredByObject: counts,
-      totalKnownItems: merged.length,
-      ...(clientDiscoveryState ? { clientDiscoveryState } : {}),
-    }),
-    error: null,
-    finishedAt: finishedAt ?? null,
-  };
-  const updated = await jobs.update(job.id, patch);
-
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: markReady ? 'notion_import.discovery_finalize' : 'notion_import.discovery_append',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: {
-      ...(importedBatchId ? { batchId: importedBatchId } : {}),
-      appended: snapshotItems.length,
-      totalKnown: merged.length,
-      counts,
-      markReady,
-    },
-    occurredAt: nowIso(),
-  });
-
-  return {
-    job: cleanJob(updated),
-    appended: snapshotItems.length,
-    totalKnown: merged.length,
-    counts,
-  };
-}
-
-async function planJob(db: DbRef, body: Record<string, unknown>, actorId: string) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (job.status !== 'ready') {
-    const existingPlan = job.report && typeof job.report === 'object'
-      ? (job.report as Record<string, unknown>).plan
-      : undefined;
-    return {
-      job: cleanJob(job),
-      plan: existingPlan ?? {
-        status: 'blocked',
-        generatedAt: nowIso(),
-        counts: job.counts ?? {},
-        estimatedWrites: {},
-        conversion: finalizeConversionReport(emptyConversionReport()),
-        canApply: false,
-      },
-    };
-  }
-
-  const items = await listActiveNotionImportItems(db, job);
-  if (items.length === 0) {
-    // A discovery that legitimately found nothing (nothing shared with the
-    // integration, or the Notion search was rate-limited into an empty result)
-    // is a user-actionable state, not a server fault — surface a clean 422.
-    throw new Error(
-      'Notion import found no items. Share pages with the integration, or wait a ' +
-        'few minutes if the Notion API rate-limited discovery, then run discovery again.',
-    );
-  }
-  const plan = buildImportPlan(job, items);
-  const updated = await jobs.update(job.id, {
-    progress: {
-      ...withImportProgress(job.progress, {
-        key: 'review',
-        status: 'completed',
-        legacyStep: 'ready_for_import_review',
-        percent: 60,
-        counts: plan.estimatedWrites,
-      }),
-      plan: plan.estimatedWrites,
-    },
-    report: {
-      ...(job.report ?? {}),
-      plan,
-    },
-  });
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: 'notion_import.plan',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: {
-      estimatedWrites: plan.estimatedWrites,
-      conversionSummary: plan.conversion.summary,
-    },
-    occurredAt: plan.generatedAt,
-  });
-  return {
-    job: cleanJob(updated),
-    plan,
-  };
-}
+const {
+  appendSnapshotItemsJob,
+  planJob,
+} = createNotionImportJobReviewHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DiscoveredNotionItem,
+  DbRef,
+  ReturnType<typeof cleanJob>,
+  ReturnType<typeof emptyConversionReport>,
+  ReturnType<typeof finalizeConversionReport>,
+  ReturnType<typeof buildImportPlan>
+>({
+  requireString,
+  assertWritableJob,
+  expandSnapshotItems,
+  parseSnapshotItems,
+  snapshotItemsPerRequestMax: NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
+  assertBoundedRequestDiscoveredItems,
+  parseBoolean,
+  optionalString,
+  asRecord,
+  assertBoundedSnapshotJsonValue,
+  acquireNotionApplyLease,
+  startNotionDiscoveryLeaseHeartbeat,
+  importItemGeneration,
+  listActiveNotionImportItems,
+  mergeDiscoveredItems,
+  countImportItemsByObject,
+  withImportProgress,
+  baseReport,
+  parseStringArray,
+  updateNotionJobIfStatus,
+  cleanJob,
+  NotionDiscoveryLeaseLostError,
+  releaseNotionApplyLease,
+  isApplyLeaseConflict,
+  emptyConversionReport,
+  finalizeConversionReport,
+  buildImportPlan,
+});
 
 async function updateNotionJobIfStatus(
   db: DbRef,
   jobId: string,
   expectedStatus: NotionImportStatus,
   data: Partial<NotionImportJob>,
+  options: {
+    expectedItemGeneration?: string | null;
+    extraExpectations?: TransactOperation[];
+  } = {},
 ) {
   try {
+    const jobWhere: Array<[string, '==', unknown]> = [['status', '==', expectedStatus]];
+    if ('expectedItemGeneration' in options) {
+      jobWhere.push(['activeItemGeneration', '==', options.expectedItemGeneration ?? null]);
+    }
     await db.transact([
       {
         table: 'notion_import_jobs',
         op: 'expect',
         id: jobId,
-        where: [['status', '==', expectedStatus]],
+        where: jobWhere,
         exists: true,
       },
+      ...(options.extraExpectations ?? []),
       {
         table: 'notion_import_jobs',
         op: 'update',
@@ -12363,599 +13477,202 @@ async function updateNotionJobIfStatus(
   }
 }
 
-async function currentNotionDiscoveryResult(db: DbRef, job: NotionImportJob) {
+async function currentNotionDiscoveryResult(
+  db: DbRef,
+  job: NotionImportJob,
+  compact = false,
+) {
+  if (compact) return { job: cleanJob(job) };
   const items = await listActiveNotionImportItems(db, job);
   return { job: cleanJob(job), items: items.map(cleanItem) };
 }
 
-async function discoverJob(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-  preloadedTokenSource?: NotionTokenSource,
-  supplementalSnapshotItems: DiscoveredNotionItem[] = [],
-) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const job = await getExisting(db.table<NotionImportJob>('notion_import_jobs'), jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (job.status === 'cancelled') throw new Error('Notion import job is cancelled.');
-  const lease = await acquireNotionApplyLease(db, job, actorId, 'discover');
-  try {
-    return await discoverJobUnderLease(
+const {
+  preflightJob,
+  discoverJob,
+} = createNotionImportJobDiscoveryHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DiscoveredNotionItem,
+  NotionTokenSource,
+  DbRef,
+  ReturnType<typeof cleanJob>,
+  ReturnType<typeof cleanItem>,
+  Awaited<ReturnType<typeof preflightNotionImportGraph>>,
+  Awaited<ReturnType<typeof currentNotionDiscoveryResult>>
+>({
+  notionApiVersion: NOTION_API_VERSION,
+  notionSearchPagesDefault: NOTION_SEARCH_PAGES_DEFAULT,
+  notionPaginationSafetyPageLimit: NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
+  notionEnrichmentBatchSize: NOTION_ENRICHMENT_BATCH_SIZE,
+  notionEnrichmentBatchSizeMax: NOTION_ENRICHMENT_BATCH_SIZE_MAX,
+  notionChildrenPagesDefault: NOTION_CHILDREN_PAGES_DEFAULT,
+  notionRowPagesDefault: NOTION_ROW_PAGES_DEFAULT,
+  notionViewPagesDefault: NOTION_VIEW_PAGES_DEFAULT,
+  notionTemplatePagesDefault: NOTION_TEMPLATE_PAGES_DEFAULT,
+  notionDiscoveryConcurrencyDefault: NOTION_DISCOVERY_CONCURRENCY_DEFAULT,
+  notionDiscoveryConcurrencyMax: NOTION_DISCOVERY_CONCURRENCY_MAX,
+  notionEnrichBudgetDefault: NOTION_ENRICH_BUDGET_DEFAULT,
+  notionDiscoverCallDeadlineMs: NOTION_DISCOVER_CALL_DEADLINE_MS,
+  notionDiscoveryProgressIntervalMs: NOTION_DISCOVERY_PROGRESS_INTERVAL_MS,
+  requireString,
+  optionalString,
+  parseStringArray,
+  parseBoolean,
+  parsePositiveInt,
+  asRecord,
+  assertWritableImportTarget,
+  assertWritableJob,
+  notionTokenForJob,
+  preflightNotionImportGraph,
+  acquireNotionApplyLease,
+  startNotionDiscoveryLeaseHeartbeat,
+  releaseNotionApplyLease,
+  currentNotionDiscoveryResult,
+  importItemGeneration,
+  notionImportItemEnrichmentComplete,
+  listActiveNotionImportItems,
+  listActiveNotionImportDiscoverySeeds,
+  hydrateNotionImportDiscoverySeeds,
+  backfillNotionImportDiscoveryEnrichmentState,
+  withImportProgress,
+  updateNotionJobIfStatus: (db, jobId, expectedStatus, data, options) => (
+    updateNotionJobIfStatus(
       db,
-      body,
-      actorId,
-      env,
-      preloadedTokenSource,
-      supplementalSnapshotItems,
-    );
-  } finally {
-    await releaseNotionApplyLease(db, lease).catch((error) => {
-      console.error('[notion-import] failed to release discovery lease:', error);
-    });
-  }
-}
+      jobId,
+      expectedStatus,
+      data as Partial<NotionImportJob>,
+      options,
+    )
+  ),
+  discoveryProgressPercent,
+  cachedNotionWorkspaceForDiscovery,
+  discoverNotionGraph,
+  missingRequestedRootIds,
+  expandSnapshotItems,
+  mergeDiscoveredItems,
+  replaceDiscoveredItemsWithGeneration,
+  countImportItemsByObject,
+  deleteNotionImportJobItems: async (db, jobId): Promise<number> => (
+    await deleteNotionImportJobItems(db, jobId)
+  ),
+  cleanJob,
+  cleanItem,
+  baseReport,
+  mergeImportReportEntries,
+  NotionDiscoveryLeaseLostError,
+});
 
-async function discoverJobUnderLease(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-  preloadedTokenSource?: NotionTokenSource,
-  supplementalSnapshotItems: DiscoveredNotionItem[] = [],
-) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (job.status === 'cancelled') throw new Error('Notion import job is cancelled.');
-  const tokenSource = preloadedTokenSource ?? await notionTokenForJob(db, body, job, actorId, env);
-  const continueFromCursor = parseBoolean(body.continueFromCursor, false);
-  // Opt-in incremental discovery: each call does a bounded amount of enrichment
-  // work, persists progress, and reports whether more remains so a client can
-  // loop short discover calls until the graph is complete. Off by default so the
-  // existing one-shot full-convergence behavior is unchanged.
-  const incremental = parseBoolean(body.incremental, false);
-  const apiBase = notionApiBase(env);
-  const previousNextCursor = optionalString((job.progress as Record<string, unknown> | undefined)?.nextCursor)
-    ?? optionalString((job.report as Record<string, unknown> | undefined)?.nextCursor);
-  // Once search has been fully paged through, resumed incremental chunks skip
-  // re-scanning it from page 0 (otherwise every chunk re-fetches all search
-  // pages — O(graph) redundant work that grows chunk time back into 503s and
-  // stalls forward progress). Referenced items still surface via enrichment.
-  const searchAlreadyComplete = parseBoolean(
-    (job.progress as Record<string, unknown> | undefined)?.searchComplete,
-    false,
-  );
-  const skipSearch = incremental && continueFromCursor && searchAlreadyComplete;
-  // Incremental resume: seed the discovery run with every item already persisted
-  // for this job so completed enrichment is skipped and only pending work runs.
-  const seedItems: DiscoveredNotionItem[] = incremental
-    ? (
-        await listActiveNotionImportItems(db, job)
-      ).map((item) => ({
-        notionId: item.notionId,
-        notionObject: item.notionObject,
-        parentNotionId: item.parentNotionId,
-        title: item.title,
-        status: item.status,
-        phase: item.phase,
-        metadata: item.metadata,
-        error: item.error,
-      }))
-    : [];
-  // In incremental mode, continuing without a search cursor is valid (search may
-  // already be exhausted and we are only enriching seeded pending items); only
-  // reject when there is nothing to continue from at all. Non-incremental keeps
-  // seedItems empty, so this is identical to the original guard.
-  if (continueFromCursor && !previousNextCursor && seedItems.length === 0) {
-    throw new Error('No Notion search cursor is available to continue discovery.');
-  }
+const { createJobRecord } = createNotionImportJobCreateHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DiscoveredNotionItem,
+  NotionTokenSource,
+  DbRef,
+  NotionImportConnectionKind,
+  PersistentGeneratedLocale,
+  ReturnType<typeof cleanJob>,
+  ReturnType<typeof cleanItem>,
+  unknown
+>({
+  notionApiVersion: NOTION_API_VERSION,
+  notionSearchPagesDefault: NOTION_SEARCH_PAGES_DEFAULT,
+  notionPaginationSafetyPageLimit: NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
+  notionEnrichmentBatchSize: NOTION_ENRICHMENT_BATCH_SIZE,
+  notionEnrichmentBatchSizeMax: NOTION_ENRICHMENT_BATCH_SIZE_MAX,
+  notionChildrenPagesDefault: NOTION_CHILDREN_PAGES_DEFAULT,
+  notionRowPagesDefault: NOTION_ROW_PAGES_DEFAULT,
+  notionViewPagesDefault: NOTION_VIEW_PAGES_DEFAULT,
+  notionTemplatePagesDefault: NOTION_TEMPLATE_PAGES_DEFAULT,
+  notionDiscoveryConcurrencyDefault: NOTION_DISCOVERY_CONCURRENCY_DEFAULT,
+  notionDiscoveryConcurrencyMax: NOTION_DISCOVERY_CONCURRENCY_MAX,
+  notionImportSnapshotItemsPerRequestMax: NOTION_IMPORT_SNAPSHOT_ITEMS_PER_REQUEST_MAX,
+  requireString,
+  optionalString,
+  assertWritableImportTarget,
+  parseConnectionKind,
+  parseStringArray,
+  parseSnapshotItems,
+  parseMcpFetchItems,
+  expandSnapshotItems,
+  assertBoundedRequestDiscoveredItems,
+  assertSafeNotionImportSourceReferences,
+  notionTokenForJob,
+  parseBoolean,
+  parseServerRunRequestId,
+  parsePositiveInt,
+  parseOptionalBoolean,
+  parsePersistentGeneratedLocale,
+  assertNotionFileCopyNotDisabled,
+  serverOwnedNotionImportJobId,
+  enqueueNotionImportRun,
+  cleanJob,
+  withImportProgress,
+  baseReport,
+  isApplyLeaseConflict,
+  replaceDiscoveredItems,
+  updateNotionJobIfStatus,
+  cleanItem,
+  discoverJob,
+});
 
-  const maxDiscoveryPages = parsePositiveInt(
-    body.maxDiscoveryPages,
-    Number((job.options as { maxDiscoveryPages?: unknown } | undefined)?.maxDiscoveryPages) || NOTION_SEARCH_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const jobOptions = job.options as
-    | {
-        maxEnrichedItems?: unknown;
-        maxChildrenPages?: unknown;
-        maxDataSourceQueryPages?: unknown;
-        maxViewPages?: unknown;
-        maxTemplatePages?: unknown;
-        discoveryConcurrency?: unknown;
-        includeMarkdownFallback?: unknown;
-        rootNotionDataSourceIds?: unknown;
-      }
-    | undefined;
-  const rootNotionDataSourceIds = Array.isArray(job.rootNotionDataSourceIds) && job.rootNotionDataSourceIds.length
-    ? job.rootNotionDataSourceIds
-    : parseStringArray(jobOptions?.rootNotionDataSourceIds);
-  const maxEnrichedItems = parsePositiveInt(
-    body.maxEnrichedItems,
-    Number(jobOptions?.maxEnrichedItems) || NOTION_ENRICHMENT_BATCH_SIZE,
-    NOTION_ENRICHMENT_BATCH_SIZE_MAX,
-  );
-  const maxChildrenPages = parsePositiveInt(
-    body.maxChildrenPages,
-    Number(jobOptions?.maxChildrenPages) || NOTION_CHILDREN_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxDataSourceQueryPages = parsePositiveInt(
-    body.maxDataSourceQueryPages,
-    Number(jobOptions?.maxDataSourceQueryPages) || NOTION_ROW_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxViewPages = parsePositiveInt(
-    body.maxViewPages,
-    Number(jobOptions?.maxViewPages) || NOTION_VIEW_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const maxTemplatePages = parsePositiveInt(
-    body.maxTemplatePages,
-    Number(jobOptions?.maxTemplatePages) || NOTION_TEMPLATE_PAGES_DEFAULT,
-    NOTION_PAGINATION_SAFETY_PAGE_LIMIT,
-  );
-  const discoveryConcurrency = parsePositiveInt(
-    body.discoveryConcurrency,
-    Number(jobOptions?.discoveryConcurrency) || NOTION_DISCOVERY_CONCURRENCY_DEFAULT,
-    NOTION_DISCOVERY_CONCURRENCY_MAX,
-  );
-  const includeMarkdownFallback = parseBoolean(
-    body.includeMarkdownFallback,
-    typeof jobOptions?.includeMarkdownFallback === 'boolean' ? jobOptions.includeMarkdownFallback : true,
-  );
-  // Per-call enrichment budget for incremental mode (small so a single discover
-  // call stays fast). Non-incremental leaves this undefined -> infinite budget,
-  // preserving one-shot convergence exactly.
-  const enrichmentBudget = incremental
-    ? parsePositiveInt(body.maxEnrichedItems, NOTION_ENRICH_BUDGET_DEFAULT, NOTION_ENRICHMENT_BATCH_SIZE_MAX)
-    : undefined;
-  const startedAt = nowIso();
-  const discoveryProgress = withImportProgress(job.progress, {
-    key: 'discover',
-    status: 'running',
-    legacyStep: 'discovering_accessible_workspace_graph',
-    percent: 25,
-    message: continueFromCursor ? 'Continuing from the saved Notion search cursor.' : undefined,
-    at: startedAt,
-  });
-  const startedJob = await updateNotionJobIfStatus(db, job.id, job.status, {
-    status: 'discovering',
-    phase: 'api_search',
-    connectionId: tokenSource.connectionId ?? job.connectionId,
-    connectionKind: tokenSource.connection?.connectionKind ?? job.connectionKind,
-    error: null,
-    startedAt,
-    finishedAt: null,
-    progress: {
-      ...discoveryProgress,
-      continuedFromCursor: continueFromCursor,
-      searchStartCursor: continueFromCursor ? previousNextCursor : undefined,
-    },
-    options: {
-      ...(job.options ?? {}),
-      maxDiscoveryPages,
-      maxEnrichedItems,
-      maxChildrenPages,
-      maxDataSourceQueryPages,
-      maxViewPages,
-      maxTemplatePages,
-      discoveryConcurrency,
-      includeMarkdownFallback,
-      connectionId: tokenSource.connectionId,
-      credentialSource: tokenSource.credentialSource,
-      tokenFingerprint: tokenSource.tokenFingerprint,
-      tokenStored: false,
-    },
-  });
-  if (!startedJob) {
-    const current = await getExisting(jobs, job.id);
-    if (current?.status === 'cancelled') return await currentNotionDiscoveryResult(db, current);
-    throw new Error('Notion import job state changed before discovery started.');
-  }
+const {
+  deleteNotionImportJobItems,
+  cancelJob,
+  retryJob,
+} = createNotionImportJobLifecycleHandlers<
+  NotionImportJob,
+  NotionImportItem,
+  DbRef,
+  ReturnType<typeof cleanJob>,
+  unknown
+>({
+  requireString,
+  assertWritableJob,
+  clearNotionImportApplySnapshotCache,
+  isLiveImportJob,
+  cleanJob,
+  updateNotionJobIfStatus,
+  withImportProgress,
+  scrubMappedImportProductCredentials,
+  listActiveNotionImportItems,
+  scrubAppliedImportCredentialMetadata,
+  trashIncompleteImportPages,
+  createJobRecord,
+  parseStringArray,
+  optionalString,
+  parseOptionalBoolean,
+  listAll,
+  notionImportItemSafetyLimit: NOTION_IMPORT_ITEM_SAFETY_LIMIT,
+});
 
-  // Persist a live progress snapshot at most ~once/sec while discovery runs, so
-  // the polled step-3 panel shows the discovered count climbing and the bar
-  // moving (25→~48%) instead of freezing at the initial 25%. Best-effort +
-  // single-in-flight: a dropped write just skips one tick. The authoritative
-  // ready/failed write must always land last, so finalizeDiscoveryProgress
-  // stops new ticks and awaits the in-flight one before that final update —
-  // otherwise a straggling throttled write could overwrite terminal progress
-  // with a stale "running" snapshot.
-  let lastProgressWriteMs = 0;
-  let progressWriteInFlight: Promise<boolean> | null = null;
-  let progressFinalized = false;
-  const onDiscoveryProgress = (snapshot: DiscoveryProgressSnapshot) => {
-    if (progressFinalized || progressWriteInFlight) return;
-    const nowMs = Date.now();
-    if (nowMs - lastProgressWriteMs < NOTION_DISCOVERY_PROGRESS_INTERVAL_MS) return;
-    lastProgressWriteMs = nowMs;
-    const percent = discoveryProgressPercent(snapshot);
-    progressWriteInFlight = bestEffort(
-      'notion-import discovery progress',
-      updateNotionJobIfStatus(db, job.id, 'discovering', {
-        progress: {
-          ...withImportProgress(job.progress, {
-            key: 'discover',
-            status: 'running',
-            legacyStep: 'discovering_accessible_workspace_graph',
-            percent,
-            counts: { discovered: snapshot.discovered, totalKnown: snapshot.discovered },
-          }),
-          discovered: snapshot.discovered,
-          totalKnown: snapshot.discovered,
-          byType: snapshot.byType,
-          pendingEnrichment: snapshot.pendingEnrichment,
-          recent: snapshot.recent,
-        },
-      }),
-    );
-    void progressWriteInFlight.finally(() => {
-      progressWriteInFlight = null;
-    });
-  };
-  const finalizeDiscoveryProgress = async () => {
-    progressFinalized = true;
-    const inFlight = progressWriteInFlight;
-    if (inFlight) await inFlight.catch(() => {});
-  };
+const { runServerOwnedNotionImportChunk } = createNotionImportServerRunner<
+  NotionImportJob,
+  ReturnType<typeof cleanJob>,
+  DbRef,
+  FunctionStorageProxy,
+  Awaited<ReturnType<typeof discoverJob>>,
+  Awaited<ReturnType<typeof planJob>>,
+  Awaited<ReturnType<typeof applyJob>>
+>({
+  optionalString,
+  asRecord,
+  updateNotionJobIfStatus: (db, jobId, expectedStatus, data) => (
+    updateNotionJobIfStatus(
+      db,
+      jobId,
+      expectedStatus,
+      data as Partial<NotionImportJob>,
+    )
+  ),
+  withImportProgress,
+  notionTokenForJob,
+  discoverJob,
+  planJob,
+  applyJob,
+});
 
-  try {
-    const discovery = await discoverNotionGraph(tokenSource.token, {
-      apiVersion: job.apiVersion || NOTION_API_VERSION,
-      maxPages: maxDiscoveryPages,
-      maxEnrichedItems,
-      maxChildrenPages,
-      maxDataSourceQueryPages,
-      maxViewPages,
-      maxTemplatePages,
-      discoveryConcurrency,
-      includeMarkdownFallback,
-      rootNotionPageIds: job.rootNotionPageIds ?? [],
-      rootNotionDataSourceIds,
-      startCursor: continueFromCursor ? previousNextCursor : undefined,
-      seedItems: incremental ? seedItems : undefined,
-      enrichmentBudget,
-      perCallDeadlineMs: incremental ? NOTION_DISCOVER_CALL_DEADLINE_MS : undefined,
-      skipSearch,
-      apiBase,
-      onProgress: onDiscoveryProgress,
-    });
-    const missingRootPageIds = missingRequestedRootIds(job.rootNotionPageIds ?? [], discovery.items);
-    if (missingRootPageIds.length) {
-      throw new Error(
-        `Notion import could not read requested root page(s): ${missingRootPageIds.join(', ')}. ` +
-        'Share those page(s) and their linked databases with the configured Notion integration before importing.',
-      );
-    }
-    const missingRootDataSourceIds = missingRequestedRootIds(rootNotionDataSourceIds, discovery.items);
-    if (missingRootDataSourceIds.length) {
-      throw new Error(
-        `Notion import could not read requested root data source(s): ${missingRootDataSourceIds.join(', ')}. ` +
-        'Share those data source(s) with the configured Notion integration before importing.',
-      );
-    }
-    const currentDiscoveryItems = supplementalSnapshotItems.length
-      ? expandSnapshotItems([...discovery.items, ...supplementalSnapshotItems])
-      : discovery.items;
-    const beforeMerge = await getExisting(jobs, job.id);
-    if (beforeMerge?.status === 'cancelled') {
-      await deleteNotionImportJobItems(db, job.id);
-      return { job: cleanJob(beforeMerge), items: [] };
-    }
-    const discoveredItems = (incremental || continueFromCursor)
-      ? await mergeDiscoveredItems(db, startedJob, currentDiscoveryItems)
-      : await replaceDiscoveredItems(db, startedJob, currentDiscoveryItems);
-    const totalGraphCounts = discoveredItems.reduce<Record<string, number>>((acc, item) => {
-      acc[item.notionObject] = (acc[item.notionObject] ?? 0) + 1;
-      return acc;
-    }, {});
-    const finishedAt = nowIso();
-    // Composite completion signal for incremental mode: the job stays
-    // 'discovering' (and hasMore stays true) while either search has more pages
-    // or items remain pending enrichment; it becomes 'ready' only once both are
-    // done. Non-incremental keeps the original search-only hasMore and 'ready'.
-    const incrementalHasMore = discovery.hasMore || discovery.pendingEnrichment > 0;
-    const compositeHasMore = incremental ? incrementalHasMore : discovery.hasMore;
-    const discoveryWorkRemaining = incremental && incrementalHasMore;
-    // Search is exhausted once a pass finishes with no more search pages (or we
-    // already skipped it). Persist it so later resume chunks skip the re-scan.
-    const searchComplete = skipSearch || searchAlreadyComplete || discovery.hasMore === false;
-    await finalizeDiscoveryProgress();
-    const updated = await updateNotionJobIfStatus(db, job.id, 'discovering', {
-      status: 'ready',
-      // Incremental discovery keeps the job 'discovering' while work remains; the
-      // spread overrides the base 'ready' above only when there is more to do.
-      ...(discoveryWorkRemaining ? { status: 'discovering' } : {}),
-      phase: discoveryWorkRemaining ? 'discovery_enrichment' : 'discovery_complete',
-      notionWorkspaceId: discovery.notionWorkspace.id,
-      notionWorkspaceName: discovery.notionWorkspace.name,
-      counts: totalGraphCounts,
-      progress: {
-        ...withImportProgress(discoveryProgress, {
-          key: 'discover',
-          status: discoveryWorkRemaining ? 'running' : 'completed',
-          legacyStep: discoveryWorkRemaining
-            ? 'discovering_accessible_workspace_graph'
-            : 'ready_for_graph_planning',
-          percent: discoveryWorkRemaining ? 48 : 50,
-          at: finishedAt,
-          counts: {
-            discovered: currentDiscoveryItems.length,
-            totalKnown: discoveredItems.length,
-            searchPagesFetched: discovery.searchPagesFetched,
-          },
-        }),
-        discovered: currentDiscoveryItems.length,
-        totalKnown: discoveredItems.length,
-        byType: totalGraphCounts,
-        recent: discovery.recentActivity,
-        hasMore: compositeHasMore,
-        ...(incremental ? { pendingEnrichment: discovery.pendingEnrichment } : {}),
-        searchComplete,
-        nextCursor: discovery.nextCursor,
-        continuedFromCursor: continueFromCursor,
-        searchStartCursor: discovery.searchStartCursor,
-        searchPagesFetched: discovery.searchPagesFetched,
-        discoveryPasses: discovery.discoveryPasses,
-        searchCounts: discovery.counts,
-      },
-      report: baseReport({
-        rootNotionPageIds: job.rootNotionPageIds ?? [],
-        rootNotionDataSourceIds,
-        tokenStored: false,
-        connectionId: tokenSource.connectionId,
-        credentialSource: tokenSource.credentialSource,
-        apiVersion: job.apiVersion || NOTION_API_VERSION,
-        hasMoreFromSearch: discovery.hasMore,
-        nextCursor: discovery.nextCursor,
-        continuedFromCursor: continueFromCursor,
-        searchStartCursor: discovery.searchStartCursor,
-        searchPagesFetched: discovery.searchPagesFetched,
-        discoveryPasses: discovery.discoveryPasses,
-        discoveryConcurrency,
-        includeMarkdownFallback,
-        supplementalSnapshotItems: supplementalSnapshotItems.length,
-        totalKnownItems: discoveredItems.length,
-        discoveredByObject: totalGraphCounts,
-        currentDiscoveryByObject: discovery.graphCounts,
-        searchDiscoveredByObject: discovery.counts,
-        warnings: mergeImportReportEntries(job.report?.warnings, discovery.warnings),
-        missingPermissions: mergeImportReportEntries(
-          job.report?.missingPermissions,
-          discovery.missingPermissions,
-        ),
-        unsupported: mergeImportReportEntries(job.report?.unsupported, discovery.unsupported),
-      }),
-      error: null,
-      finishedAt: discoveryWorkRemaining ? null : finishedAt,
-    });
-    if (!updated) {
-      const current = await getExisting(jobs, job.id);
-      if (current?.status === 'cancelled') {
-        await deleteNotionImportJobItems(db, job.id);
-        return { job: cleanJob(current), items: [] };
-      }
-      throw new Error('Notion import job state changed before discovery completed.');
-    }
-
-    await recordWorkspaceAudit(db, {
-      workspaceId: job.workspaceId,
-      actorId,
-      action: 'notion_import.discover',
-      targetType: 'notion_import_job',
-      targetId: job.id,
-      metadata: {
-        itemCount: discoveredItems.length,
-        pageItemCount: currentDiscoveryItems.length,
-        counts: totalGraphCounts,
-        currentDiscoveryCounts: discovery.graphCounts,
-        searchCounts: discovery.counts,
-        hasMore: discovery.hasMore,
-        continuedFromCursor: continueFromCursor,
-        searchStartCursor: discovery.searchStartCursor,
-        searchPagesFetched: discovery.searchPagesFetched,
-        discoveryPasses: discovery.discoveryPasses,
-        discoveryConcurrency,
-        includeMarkdownFallback,
-        supplementalSnapshotItems: supplementalSnapshotItems.length,
-        warnings: discovery.warnings.length,
-        missingPermissions: discovery.missingPermissions.length,
-      },
-      occurredAt: finishedAt,
-    });
-
-    return {
-      job: cleanJob(updated),
-      items: discoveredItems.map(cleanItem),
-    };
-  } catch (error) {
-    await finalizeDiscoveryProgress();
-    const current = await getExisting(jobs, job.id);
-    if (current && current.status !== 'discovering') {
-      if (current.status === 'cancelled') {
-        await deleteNotionImportJobItems(db, job.id);
-        return { job: cleanJob(current), items: [] };
-      }
-      return await currentNotionDiscoveryResult(db, current);
-    }
-    const message = error instanceof Error ? error.message : String(error);
-    const failedAt = nowIso();
-    const failed = await updateNotionJobIfStatus(db, job.id, 'discovering', {
-      status: 'failed',
-      phase: 'discovery_failed',
-      error: message,
-      progress: {
-        ...withImportProgress(discoveryProgress, {
-          key: 'discover',
-          status: 'failed',
-          legacyStep: 'discovery_failed',
-          message,
-          at: failedAt,
-        }),
-      },
-      report: {
-        ...(job.report ?? baseReport()),
-        lastError: message,
-      },
-      finishedAt: failedAt,
-    });
-    if (!failed) {
-      const latest = await getExisting(jobs, job.id);
-      if (latest) return await currentNotionDiscoveryResult(db, latest);
-      throw error;
-    }
-    await recordWorkspaceAudit(db, {
-      workspaceId: job.workspaceId,
-      actorId,
-      action: 'notion_import.discover_failed',
-      targetType: 'notion_import_job',
-      targetId: job.id,
-      metadata: {
-        error: message,
-        continuedFromCursor: continueFromCursor,
-        searchStartCursor: continueFromCursor ? previousNextCursor : undefined,
-        connectionId: tokenSource.connectionId,
-        credentialSource: tokenSource.credentialSource,
-        maxDiscoveryPages,
-        maxEnrichedItems,
-        maxChildrenPages,
-        maxDataSourceQueryPages,
-        maxViewPages,
-        discoveryConcurrency,
-        includeMarkdownFallback,
-      },
-      occurredAt: failedAt,
-    });
-    throw new Error(failed.error ?? message);
-  }
-}
-
-async function deleteNotionImportJobItems(db: DbRef, jobId: string) {
-  const itemTable = db.table<NotionImportItem>('notion_import_items');
-  const items = await listAll(
-    itemTable.where('jobId', '==', jobId),
-    NOTION_IMPORT_ITEM_SAFETY_LIMIT,
-  );
-  for (const item of items) await itemTable.delete(item.id);
-  return items.length;
-}
-
-async function cancelJob(db: DbRef, body: Record<string, unknown>, actorId: string) {
-  const jobId = requireString(body.jobId, 'jobId');
-  const jobs = db.table<NotionImportJob>('notion_import_jobs');
-  const job = await getExisting(jobs, jobId);
-  if (!job) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, job, actorId);
-  if (!isLiveImportJob(job)) {
-    return { job: cleanJob(job) };
-  }
-  const now = nowIso();
-  const updated = await updateNotionJobIfStatus(db, job.id, job.status, {
-    status: 'cancelled',
-    phase: 'cancelled',
-    cancelledAt: now,
-    cancelledBy: actorId,
-    finishedAt: now,
-    progress: {
-      ...withImportProgress(job.progress, {
-        key: 'cancel',
-        status: 'cancelled',
-        legacyStep: 'cancelled',
-        at: now,
-      }),
-    },
-  });
-  if (!updated) {
-    const current = await getExisting(jobs, job.id);
-    if (!current) throw new Error('Notion import job was not found.');
-    return { job: cleanJob(current) };
-  }
-  // A worker restart can strand a discovery lease after its request has
-  // vanished. Cancellation is the user's explicit terminal fence, so remove
-  // that job-scoped lease immediately instead of making a restart/retry wait
-  // for its TTL. An old request cannot publish after the status CAS above.
-  await bestEffort(
-    'notion-import cancel stale lease',
-    db.table<NotionImportApplyLock>('notion_import_apply_locks').delete(job.id),
-  );
-  let cleanup: { removedItems: number; trashedPages: number; pending: boolean };
-  try {
-    const removedItems = await deleteNotionImportJobItems(db, job.id);
-    const trashedPages = await trashIncompleteImportPages(db, updated);
-    cleanup = { removedItems, trashedPages, pending: false };
-  } catch (error) {
-    cleanup = { removedItems: 0, trashedPages: 0, pending: true };
-    console.warn(
-      `[notion-import] cancelled job cleanup remains pending for ${job.id}: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-  const cleaned = await jobs.update(job.id, {
-    report: {
-      ...(updated.report ?? {}),
-      cancelCleanup: cleanup,
-    },
-  }).catch(() => updated);
-  await recordWorkspaceAudit(db, {
-    workspaceId: job.workspaceId,
-    actorId,
-    action: 'notion_import.cancel',
-    targetType: 'notion_import_job',
-    targetId: job.id,
-    metadata: cleanup,
-    occurredAt: now,
-  });
-  return { job: cleanJob(cleaned) };
-}
-
-async function retryJob(
-  db: DbRef,
-  body: Record<string, unknown>,
-  actorId: string,
-  env: Record<string, unknown> | undefined,
-) {
-  const retryOfJobId = requireString(body.jobId, 'jobId');
-  const previous = await getExisting(db.table<NotionImportJob>('notion_import_jobs'), retryOfJobId);
-  if (!previous) throw new Error('Notion import job was not found.');
-  await assertWritableJob(db, previous, actorId);
-  return createJobRecord(
-    db,
-    {
-      ...body,
-      workspaceId: previous.workspaceId,
-      parentPageId: previous.parentPageId,
-      rootNotionPageIds: previous.rootNotionPageIds,
-      rootNotionDataSourceIds: previous.rootNotionDataSourceIds ??
-        parseStringArray((previous.options as { rootNotionDataSourceIds?: unknown } | undefined)?.rootNotionDataSourceIds),
-      connectionKind: previous.connectionKind,
-      connectionId: optionalString(body.connectionId) ?? previous.connectionId ?? optionalString((previous.options as { connectionId?: unknown } | undefined)?.connectionId),
-      maxDiscoveryPages: (previous.options as { maxDiscoveryPages?: unknown } | undefined)?.maxDiscoveryPages,
-      maxEnrichedItems: (previous.options as { maxEnrichedItems?: unknown } | undefined)?.maxEnrichedItems,
-      maxChildrenPages: (previous.options as { maxChildrenPages?: unknown } | undefined)?.maxChildrenPages,
-      maxDataSourceQueryPages: (previous.options as { maxDataSourceQueryPages?: unknown } | undefined)?.maxDataSourceQueryPages,
-      maxViewPages: (previous.options as { maxViewPages?: unknown } | undefined)?.maxViewPages,
-      maxTemplatePages: (previous.options as { maxTemplatePages?: unknown } | undefined)?.maxTemplatePages,
-      discoveryConcurrency: (previous.options as { discoveryConcurrency?: unknown } | undefined)?.discoveryConcurrency,
-      includeMarkdownFallback: (previous.options as { includeMarkdownFallback?: unknown } | undefined)?.includeMarkdownFallback,
-      importPagesFullWidth: parseOptionalBoolean(body.importPagesFullWidth) ??
-        parseOptionalBoolean((previous.options as { importPagesFullWidth?: unknown } | undefined)?.importPagesFullWidth),
-      // A retry remains part of the same import and must keep the language of
-      // its already-reviewed generated names. Legacy jobs may adopt an
-      // explicit retry locale once; current jobs always win over the request.
-      locale: (previous.options as { locale?: unknown } | undefined)?.locale ?? body.locale,
-    },
-    actorId,
-    env,
-    retryOfJobId,
-  );
-}
+export { runServerOwnedNotionImportChunk };
 
 export const POST = defineFunction({
   trigger: { type: 'http' },
@@ -12983,7 +13700,7 @@ export const POST = defineFunction({
       case 'listAccessibleRoots':
         return await listAccessibleRoots(db, body, auth.id, env);
       case 'create':
-        return await createJobRecord(db, body, auth.id, env);
+        return await createJobRecord(db, admin, body, auth.id, env);
       case 'preflight':
         return await preflightJob(db, body, auth.id, env);
       case 'list':
@@ -13005,9 +13722,13 @@ export const POST = defineFunction({
       case 'retryFileCopies':
         return await retryFileCopies(db, admin, body, auth.id, storage, request, env);
       case 'cancel':
-        return await cancelJob(db, body, auth.id);
+        {
+          const result = await cancelJob(db, body, auth.id);
+          await deleteNotionImportRun(admin.db('app'), result.job.id);
+          return result;
+        }
       case 'retry':
-        return await retryJob(db, body, auth.id, env);
+        return await retryJob(db, admin, body, auth.id, env);
       default:
         return jsonError(400, 'Unknown Notion import action.');
     }

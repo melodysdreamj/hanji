@@ -7,7 +7,9 @@
   "dependencies": {
     "hint": "lisää viittausominaisuus",
     "label": "Riippuvuudet:",
-    "relationPropertyAriaLabel": "Riippuvuuden viittausominaisuus"
+    "relationPropertyAriaLabel": "Riippuvuuden viittausominaisuus",
+    "makeDependOn": "Tee {{title}} riippuvaiseksi kohteesta {{predecessor}}",
+    "startFrom": "Aloita riippuvuus kohteesta {{title}}"
   },
   "empty": {
     "description": "Aikajananäkymät tarvitsevat alkupäivämääräominaisuuden.",

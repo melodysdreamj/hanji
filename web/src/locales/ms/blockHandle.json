@@ -88,5 +88,38 @@
     "hoursAgo": "Dikemas kini {{hours}}j lalu",
     "daysAgo": "Dikemas kini {{days}}h lalu",
     "on": "Dikemas kini {{date}}"
+  },
+  "align": {
+    "center": "Pusat",
+    "choose": "Pilih penjajaran imej",
+    "left": "Kiri",
+    "right": "Kanan"
+  },
+  "altText": {
+    "help": "Teks alt membantu pengguna pembaca skrin memahami imej.",
+    "label": "Penerangan",
+    "placeholder": "Terangkan imej",
+    "remove": "Buang",
+    "save": "Simpan",
+    "title": "Teks alt"
+  },
+  "imageLink": {
+    "invalid": "Masukkan URL http:// atau https:// yang lengkap.",
+    "label": "Buka URL ini apabila imej diklik",
+    "remove": "Buang",
+    "save": "Simpan",
+    "title": "Pautan imej"
+  },
+  "media": {
+    "addImageLink": "Tambah pautan",
+    "align": "Jajarkan",
+    "altText": "Teks alt",
+    "copySourceLink": "Salin pautan sumber",
+    "download": "Muat turun",
+    "editImageLink": "Edit pautan",
+    "fullScreen": "Skrin penuh",
+    "openLink": "Buka pautan",
+    "replace": "Ganti",
+    "viewOriginal": "Lihat asal"
   }
 }

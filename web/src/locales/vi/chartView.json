@@ -4,7 +4,22 @@
     "sum": "Tổng",
     "average": "Trung bình",
     "min": "Tối thiểu",
-    "max": "Tối đa"
+    "max": "Tối đa",
+    "checked": "Đã chọn",
+    "count_values": "Đếm giá trị",
+    "date_range": "Khoảng ngày",
+    "earliest_date": "Ngày sớm nhất",
+    "empty": "Đếm trống",
+    "latest_date": "Ngày muộn nhất",
+    "median": "Trung vị",
+    "not_empty": "Đếm không trống",
+    "percent_checked": "Phần trăm đã chọn",
+    "percent_empty": "Phần trăm trống",
+    "percent_not_empty": "Phần trăm không trống",
+    "percent_unchecked": "Phần trăm chưa chọn",
+    "range": "Phạm vi",
+    "unchecked": "Chưa chọn",
+    "unique": "Đếm giá trị duy nhất"
   },
   "chartAria": "Biểu đồ {{name}}",
   "chartType": "Loại biểu đồ",
@@ -27,5 +42,9 @@
   "untitledProperty": "Chưa có tiêu đề",
   "valueProperty": "Thuộc tính giá trị",
   "xAxis": "Trục X",
-  "yAxis": "Trục Y"
+  "yAxis": "Trục Y",
+  "dateRangeDays": "{{count}} ngày",
+  "missingProperty": "thuộc tính đã lưu",
+  "unsupportedAggregateDesc": "Không thể tính {{aggregate}} từ {{property}}. Hãy chọn thuộc tính hoặc phép tính tương thích.",
+  "unsupportedAggregateTitle": "Phép tính biểu đồ này không khả dụng"
 }

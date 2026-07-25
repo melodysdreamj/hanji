@@ -6,6 +6,55 @@ import {
   formulaDateKeyFromDate,
   formatFormulaValue,
 } from "./formula-runtime.mjs";
+import { compareNaturalText, foldNfcText } from "../../shared/database/natural-order.mjs";
+
+/** @type {[string, ...string[]]} */
+export const NOTION_ROLLUP_FUNCTIONS = [
+  "count",
+  "count_values",
+  "empty",
+  "not_empty",
+  "unique",
+  "show_unique",
+  "percent_empty",
+  "percent_not_empty",
+  "sum",
+  "average",
+  "median",
+  "min",
+  "max",
+  "range",
+  "earliest_date",
+  "latest_date",
+  "date_range",
+  "checked",
+  "unchecked",
+  "percent_checked",
+  "percent_unchecked",
+  "count_per_group",
+  "percent_per_group",
+  "show_original",
+];
+
+export const LEGACY_ROLLUP_FUNCTION_ALIASES = Object.freeze({
+  count_all: "count",
+  count_empty: "empty",
+  count_unique: "unique",
+});
+
+/** @type {[string, ...string[]]} */
+export const ROLLUP_FUNCTIONS = [
+  ...NOTION_ROLLUP_FUNCTIONS,
+  ...Object.keys(LEGACY_ROLLUP_FUNCTION_ALIASES),
+];
+
+const NOTION_ROLLUP_FUNCTION_SET = new Set(NOTION_ROLLUP_FUNCTIONS);
+
+export function canonicalRollupFunction(value) {
+  if (typeof value !== "string") return undefined;
+  const normalized = LEGACY_ROLLUP_FUNCTION_ALIASES[value] ?? value;
+  return NOTION_ROLLUP_FUNCTION_SET.has(normalized) ? normalized : undefined;
+}
 
 const titleOf = (page) =>
   (page.iconType === "emoji" && page.icon ? page.icon + " " : "") +
@@ -38,7 +87,8 @@ function valueIsPresent(value) {
 
 function rollupPercent(count, total) {
   if (!total) return "0%";
-  return `${compactNumber((count / total) * 100)}%`;
+  const value = (count / total) * 100;
+  return `${Number.isInteger(value) ? value : Number(value.toFixed(2))}%`;
 }
 
 function rollupValuePieces(value) {
@@ -78,6 +128,23 @@ export function personIds(value) {
 
 function personLabel(id) {
   return id ? "You" : "";
+}
+
+function personReference(value) {
+  if (typeof value === "string") {
+    const id = value.trim();
+    return id ? { kind: "person", id, name: personLabel(id) || id } : null;
+  }
+  if (!value || typeof value !== "object") return null;
+  const notion = value.notion && typeof value.notion === "object" ? value.notion : undefined;
+  const rawId = value.id ?? value.userId;
+  const id = typeof rawId === "string" ? rawId.trim() : "";
+  if (!id) return null;
+  const rawName = value.name ?? value.displayName ?? notion?.name;
+  const name = typeof rawName === "string" && rawName.trim()
+    ? rawName.trim()
+    : personLabel(id) || id;
+  return { kind: "person", id, name };
 }
 
 
@@ -170,8 +237,8 @@ export function evaluateRollupValue(row, prop, pagesById = {}, props = [], props
   if (!relationProp) return "";
 
   const relatedPages = followRelation(row, relationProp, pagesById);
-  const fn = prop.config?.rollupFunction ?? "show_original";
-  if (fn === "count_all") return relatedPages.length;
+  const fn = canonicalRollupFunction(prop.config?.rollupFunction) ?? "show_original";
+  if (fn === "count") return relatedPages.length;
 
   const targetProps = relationTargetProps(relationProp, propsByDb);
   const firstHopTarget = targetProps.find((item) => item.id === prop.config?.rollupTargetPropertyId);
@@ -186,31 +253,37 @@ export function evaluateRollupValue(row, prop, pagesById = {}, props = [], props
   const presentValues = values.filter(valueIsPresent);
 
   if (fn === "count_values") return presentValues.length;
-  if (fn === "count_unique") return new Set(values.flatMap(rollupValuePieces)).size;
-  if (fn === "count_empty") return values.length - presentValues.length;
+  if (fn === "unique") return new Set(values.flatMap(rollupValuePieces)).size;
+  if (fn === "empty") return values.length - presentValues.length;
+  if (fn === "not_empty") return presentValues.length;
   if (fn === "percent_empty") return rollupPercent(values.length - presentValues.length, values.length);
   if (fn === "percent_not_empty") return rollupPercent(presentValues.length, values.length);
 
+  // The public API names these functions but does not expose the selected
+  // status-group identifier required to recompute them. Fail empty so callers
+  // can prefer a preserved imported computed value rather than an invented one.
+  if (fn === "count_per_group" || fn === "percent_per_group") return "";
+
   const checkedCount = values.filter(rollupCheckedValue).length;
-  if (fn === "checked") return String(checkedCount);
-  if (fn === "unchecked") return String(values.length - checkedCount);
+  if (fn === "checked") return checkedCount;
+  if (fn === "unchecked") return values.length - checkedCount;
   if (fn === "percent_checked") return rollupPercent(checkedCount, values.length);
   if (fn === "percent_unchecked") return rollupPercent(values.length - checkedCount, values.length);
 
   const numbers = presentValues.map((value) => Number(value)).filter((value) => Number.isFinite(value));
-  if (fn === "sum") return numbers.length ? compactNumber(numbers.reduce((sum, value) => sum + value, 0)) : "";
+  if (fn === "sum") return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) : "";
   if (fn === "average") {
-    return numbers.length ? compactNumber(numbers.reduce((sum, value) => sum + value, 0) / numbers.length) : "";
+    return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) / numbers.length : "";
   }
   if (fn === "median") {
     if (!numbers.length) return "";
     const sorted = numbers.slice().sort((a, b) => a - b);
     const middle = Math.floor(sorted.length / 2);
-    return compactNumber(sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2);
+    return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
   }
-  if (fn === "min") return numbers.length ? compactNumber(Math.min(...numbers)) : "";
-  if (fn === "max") return numbers.length ? compactNumber(Math.max(...numbers)) : "";
-  if (fn === "range") return numbers.length ? compactNumber(Math.max(...numbers) - Math.min(...numbers)) : "";
+  if (fn === "min") return numbers.length ? Math.min(...numbers) : "";
+  if (fn === "max") return numbers.length ? Math.max(...numbers) : "";
+  if (fn === "range") return numbers.length ? Math.max(...numbers) - Math.min(...numbers) : "";
 
   const dates = values.flatMap(rollupDateValues).sort((a, b) => a.getTime() - b.getTime());
   if (fn === "earliest_date") return dates.length ? formulaDateKeyFromDate(dates[0]) : "";
@@ -222,15 +295,19 @@ export function evaluateRollupValue(row, prop, pagesById = {}, props = [], props
     return start === end ? start : `${start} → ${end}`;
   }
 
-  if (!targetProp) return leafPages.map((page) => titleOf(page)).join(", ");
-  return leafPages
+  const displayedValues = !targetProp
+    ? leafPages.map((page) => titleOf(page))
+    : leafPages
     .map((page) =>
       targetProp.type === "rollup"
         ? ""
         : formatDbValue(page, targetProp, pagesById, propsByDb[targetProp.databaseId] ?? [], propsByDb)
     )
-    .filter(Boolean)
-    .join(", ");
+    .filter(Boolean);
+  // MCP's database query cells are scalar text/JSON values today, so the two
+  // array rollups are flattened display strings. Deduplication is exact for a
+  // scalar leaf and best-effort for an adapter-flattened multi-valued leaf.
+  return (fn === "show_unique" ? [...new Set(displayedValues)] : displayedValues).join(", ");
 }
 
 export function databasePropsContext(pages, databaseId, props) {
@@ -257,6 +334,29 @@ function evaluateFormulaValue(row, prop, props = [], pagesById = {}, propsByDb =
       if (typeof value === "number" || typeof value === "boolean") return value;
       if (value == null) return "";
       if (target.type === "number" || target.type === "checkbox") return value;
+      if (target.type === "select" || target.type === "status") return optionName(target, value);
+      if (target.type === "multi_select") {
+        return [...new Set(ids(value).map((id) => optionName(target, id)).filter(Boolean))];
+      }
+      if (target.type === "relation") {
+        return ids(value).flatMap((id) => {
+          const page = pagesById[id];
+          return page && !page.inTrash
+            ? [{ kind: "page", id, name: page.title || "Untitled" }]
+            : [];
+        });
+      }
+      if (target.type === "person" || target.type === "created_by" || target.type === "last_edited_by") {
+        const source = target.type === "created_by"
+          ? row.createdBy
+          : target.type === "last_edited_by"
+            ? row.lastEditedBy
+            : value;
+        const references = (Array.isArray(source) ? source : [source])
+          .map(personReference)
+          .filter(Boolean);
+        return [...new Map(references.map((reference) => [reference.id, reference])).values()];
+      }
       if (target.type === "date") {
         if (typeof value === "string") return value;
         if (value && typeof value === "object") {
@@ -346,8 +446,8 @@ function viewOptionTargets(prop, value) {
 
 function matchesViewFilter(row, prop, filter, pagesById, props = [], propsByDb = {}) {
   const value = propValue(row, prop);
-  const text = formatDbValue(row, prop, pagesById, props, propsByDb).toLowerCase();
-  const query = String(filter.value ?? "").toLowerCase().trim();
+  const text = foldNfcText(formatDbValue(row, prop, pagesById, props, propsByDb));
+  const query = foldNfcText(String(filter.value ?? "").trim());
 
   if (prop.type === "select" || prop.type === "multi_select" || prop.type === "status") {
     const ids = viewOptionIds(value);
@@ -437,7 +537,7 @@ function viewSortKey(row, prop, pagesById, props = [], propsByDb = {}) {
 
 export function compareViewSortKeys(a, b) {
   if (typeof a === "number" && typeof b === "number") return a - b;
-  return String(a).localeCompare(String(b), undefined, { numeric: true });
+  return compareNaturalText(a, b);
 }
 
 export function viewDisplayProperties(props, view) {
@@ -462,10 +562,10 @@ export function viewDisplayProperties(props, view) {
 export function applyDatabaseView(rows, props, pagesById, view, search, propsByDb = {}) {
   const propsById = new Map(props.map((prop) => [prop.id, prop]));
   let out = rows.slice();
-  const query = String(search ?? view?.config?.search ?? "").trim().toLowerCase();
+  const query = foldNfcText(String(search ?? view?.config?.search ?? "").trim());
   if (query) {
     out = out.filter((row) =>
-      props.some((prop) => formatDbValue(row, prop, pagesById, props, propsByDb).toLowerCase().includes(query))
+      props.some((prop) => foldNfcText(formatDbValue(row, prop, pagesById, props, propsByDb)).includes(query))
     );
   }
   if (view?.config?.filterGroup) {

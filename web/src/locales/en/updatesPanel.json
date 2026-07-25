@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} recent updates",
     "unreadOfTotal": "{{unread}} unread of {{total}} updates",
     "updateType": "Update type",
-    "updates": "Updates",
-    "modeUpdates": "Updates",
-    "modeChats": "Chats",
-    "inboxMode": "Inbox mode"
+    "updates": "Updates"
   },
   "time": {
     "justNow": "Just now",
@@ -30,6 +27,8 @@
     "blockCount_other": "{{count}} blocks",
     "currentVersion": "Current version",
     "currentVersionOnly": "Current version only",
+    "emptyBlock": "Empty block",
+    "emptyPreview": "This version has no page content.",
     "next": "Next",
     "nextVersion": "Next version",
     "noVersionPrevious": "No previous version",
@@ -39,6 +38,12 @@
     "previousSnapshots_one": "{{count}} previous snapshot",
     "previousSnapshots_other": "{{count}} previous snapshots",
     "previousVersion": "Previous version",
+    "previewAria": "Read-only page version preview",
+    "previewingCurrent": "Viewing current page",
+    "previewingSnapshot": "Viewing past version",
+    "previewOnlyHint": "Selecting a version only previews it. The current page changes only after Restore.",
+    "restoreThisVersion": "Restore",
+    "restoring": "Restoring...",
     "restoredPrevious": "Restored previous version",
     "restoredNext": "Restored next version",
     "restoredVersions": "Restored {{count}} versions",
@@ -46,7 +51,8 @@
     "versionCount_other": "{{count}} versions",
     "versionsAgo": "{{count}} versions ago",
     "versionsAhead": "{{count}} versions ahead",
-    "versionsAria": "Versions"
+    "versionsAria": "Versions",
+    "versionHistory": "Version history"
   },
   "badges": {
     "comment": "Comment",
@@ -61,6 +67,7 @@
   },
   "rows": {
     "byActor": "by {{name}}",
+    "bySelf": "by You",
     "emptyComment": "Empty comment",
     "forYou": "for you",
     "notification": "Notification",

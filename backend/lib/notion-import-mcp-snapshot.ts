@@ -1,5 +1,14 @@
 import { newId } from './table-utils';
 import {
+  DATABASE_PROPERTY_TYPES,
+  OMIT_DATABASE_PROPERTY_IMPORT_VALUE,
+  normalizeDatabasePropertyImportValue,
+} from './database-property-types';
+import {
+  NOTION_DATABASE_VIEW_TYPES,
+  normalizeDatabaseViewStorageRecord,
+} from './database-view-types';
+import {
   NOTION_IMPORT_MCP_EMBEDDED_JSON_AGGREGATE_MAX_BYTES,
   NOTION_IMPORT_MCP_EMBEDDED_JSON_MAX_BYTES,
   NOTION_IMPORT_MCP_FETCH_PAYLOADS_PER_REQUEST_MAX,
@@ -19,31 +28,55 @@ import {
 } from './notion-import-request-limits';
 
 const NOTION_IMPORT_ITEM_SAFETY_LIMIT = 100_000;
-const SUPPORTED_NOTION_PROPERTY_TYPES = new Set([
-  'title',
-  'rich_text',
-  'number',
-  'select',
-  'multi_select',
-  'status',
-  'date',
+const MCP_SNAPSHOT_WARNINGS_PER_ITEM_MAX = 100;
+const SUPPORTED_NOTION_PROPERTY_TYPES = new Set<string>([
+  ...DATABASE_PROPERTY_TYPES,
   'people',
-  'person',
-  'checkbox',
-  'url',
-  'email',
   'phone_number',
-  'phone',
-  'files',
-  'created_time',
-  'last_edited_time',
-  'created_by',
-  'last_edited_by',
-  'relation',
-  'rollup',
-  'formula',
-  'unique_id',
 ]);
+const SUPPORTED_MCP_SNAPSHOT_VIEW_TYPES = new Set<string>(
+  NOTION_DATABASE_VIEW_TYPES,
+);
+
+interface McpSnapshotWarning {
+  code: string;
+  message: string;
+  notionId?: string;
+  notionObject?: string;
+}
+
+interface McpSnapshotWarningBag {
+  warnings: McpSnapshotWarning[];
+  total: number;
+}
+
+function mcpSnapshotWarningBag(): McpSnapshotWarningBag {
+  return { warnings: [], total: 0 };
+}
+
+function pushMcpSnapshotWarning(
+  bag: McpSnapshotWarningBag,
+  warning: McpSnapshotWarning,
+) {
+  bag.total += 1;
+  if (bag.warnings.length < MCP_SNAPSHOT_WARNINGS_PER_ITEM_MAX) {
+    bag.warnings.push(warning);
+  }
+}
+
+function mcpSnapshotWarningMetadata(bag: McpSnapshotWarningBag) {
+  return {
+    mcpSnapshotWarnings: bag.warnings,
+    mcpSnapshotWarningsTruncated: Math.max(
+      0,
+      bag.total - bag.warnings.length,
+    ),
+  };
+}
+
+function mcpSnapshotValidationMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
 
 function optionalString(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
@@ -88,13 +121,29 @@ function mergeMetadata(
   current: Record<string, unknown> | undefined,
   next: Record<string, unknown> | undefined,
 ) {
-  return { ...(current ?? {}), ...(next ?? {}) };
+  const merged = { ...(current ?? {}), ...(next ?? {}) };
+  if (next && Object.hasOwn(next, 'mcpSnapshotWarnings')) {
+    if (!Array.isArray(next.mcpSnapshotWarnings) || next.mcpSnapshotWarnings.length === 0) {
+      delete merged.mcpSnapshotWarnings;
+    }
+  }
+  if (next && Object.hasOwn(next, 'mcpSnapshotWarningsTruncated')) {
+    if (
+      typeof next.mcpSnapshotWarningsTruncated !== 'number' ||
+      next.mcpSnapshotWarningsTruncated <= 0
+    ) {
+      delete merged.mcpSnapshotWarningsTruncated;
+    }
+  }
+  return merged;
 }
 
 function putDiscoveredItem(items: Map<string, DiscoveredNotionItem>, item: DiscoveredNotionItem) {
   const existing = items.get(item.notionId);
   if (!existing) {
-    items.set(item.notionId, item);
+    items.set(item.notionId, item.metadata
+      ? { ...item, metadata: mergeMetadata(undefined, item.metadata) }
+      : item);
     return;
   }
   const keepExistingSnapshotPhase =
@@ -558,17 +607,25 @@ function mcpStringList(value: unknown) {
   return items.length ? items : undefined;
 }
 
-function mcpViewRecord(rawView: Record<string, unknown>, viewId: string | undefined, dataSourceId: string) {
+function mcpViewRecord(
+  rawView: Record<string, unknown>,
+  viewId: string | undefined,
+  dataSourceId: string,
+  warningBag: McpSnapshotWarningBag,
+) {
+  const rawType = optionalString(rawView.type) ?? 'table';
+  const resolvedViewId = viewId ?? optionalString(rawView.id) ?? newId();
+  const name = optionalString(rawView.name) ?? 'Default view';
   const displayProperties =
     mcpStringList(rawView.displayProperties) ??
     mcpStringList(rawView.visibleProperties) ??
     mcpStringList(rawView.visible_properties);
   const rawSorts = Array.isArray(rawView.sorts) ? rawView.sorts : [];
-  return {
-    ...rawView,
-    id: viewId ?? optionalString(rawView.id) ?? newId(),
-    name: optionalString(rawView.name) ?? 'Default view',
-    type: optionalString(rawView.type) ?? 'table',
+  const projected: Record<string, unknown> = {
+    ...structuredClone(rawView),
+    id: resolvedViewId,
+    name,
+    type: rawType,
     data_source_id: dataSourceId,
     visible_properties: displayProperties,
     // Keep the two serialized view fields independent. The bounded snapshot
@@ -583,6 +640,51 @@ function mcpViewRecord(rawView: Record<string, unknown>, viewId: string | undefi
       }))
       .filter((sort) => sort.property),
   };
+
+  try {
+    const normalizedView = normalizeDatabaseViewStorageRecord({
+      type: rawType,
+      config: rawView.configuration,
+    });
+    projected.type = normalizedView.type;
+    if ('configuration' in rawView) {
+      projected.configuration = structuredClone(normalizedView.config);
+    }
+    return projected;
+  } catch (error) {
+    pushMcpSnapshotWarning(warningBag, {
+      code: 'mcp_snapshot_view_validation_fallback',
+      notionId: resolvedViewId,
+      notionObject: 'view',
+      message:
+        `View "${name}" could not use the canonical view validator: ` +
+        `${mcpSnapshotValidationMessage(error)} Raw MCP view metadata was preserved for fallback import.`,
+    });
+
+    if (!SUPPORTED_MCP_SNAPSHOT_VIEW_TYPES.has(rawType.toLowerCase())) {
+      // A future view type is already isolated by the downstream import
+      // fallback. Archive the complete raw object under one field and expose
+      // only safe identity projections, so no unknown top-level or nested key
+      // can be reinterpreted as typed fallback configuration or display state.
+      const futureView: Record<string, unknown> = {
+        id: resolvedViewId,
+        name,
+        type: rawType,
+        data_source_id: dataSourceId,
+        rawMcpView: structuredClone(rawView),
+      };
+      return futureView;
+    }
+
+    // Known view types still have to satisfy the canonical storage contract
+    // later in apply. Remove only the malformed discriminator-bearing field;
+    // preserve it separately on this raw import-boundary record.
+    if ('configuration' in rawView) {
+      projected.rawMcpConfiguration = structuredClone(rawView.configuration);
+      delete projected.configuration;
+    }
+    return projected;
+  }
 }
 
 interface McpParsedView {
@@ -621,6 +723,7 @@ function mcpViewsForDataSource(
 ) {
   const normalizedDataSourceId = normalizedNotionId(dataSourceId);
   const views: Record<string, unknown>[] = [];
+  const warningBag = mcpSnapshotWarningBag();
   for (const view of parsedViews) {
     workBudget.viewInspections += 1;
     if (workBudget.viewInspections > NOTION_IMPORT_MCP_VIEW_ASSIGNMENT_WORK_MAX) {
@@ -629,9 +732,9 @@ function mcpViewsForDataSource(
       );
     }
     if (view.sourceId && normalizedNotionId(view.sourceId) !== normalizedDataSourceId) continue;
-    views.push(mcpViewRecord(view.rawView, view.viewId, dataSourceId));
+    views.push(mcpViewRecord(view.rawView, view.viewId, dataSourceId, warningBag));
   }
-  return views;
+  return { views, warningBag };
 }
 
 function mcpTextSpans(value: unknown) {
@@ -668,6 +771,7 @@ function mcpRowPagePropertyValue(
   value: unknown,
   sourceProperty: Record<string, unknown> | undefined,
   rawProperties: Record<string, unknown>,
+  warningBag: McpSnapshotWarningBag,
 ) {
   const notionType = optionalString(sourceProperty?.type) ?? (typeof value === 'number' ? 'number' : 'rich_text');
   const id = optionalString(sourceProperty?.id) ?? name;
@@ -709,6 +813,31 @@ function mcpRowPagePropertyValue(
   }
   if (notionType === 'files') return { id, type: notionType, files: mcpRowPageFileValues(value) };
   if (notionType === 'checkbox') return { id, type: notionType, checkbox: value === true || value === '__YES__' };
+  if (
+    notionType === 'button' ||
+    notionType === 'location' ||
+    notionType === 'verification' ||
+    notionType === 'last_visited_time' ||
+    notionType === 'place'
+  ) {
+    try {
+      const normalized = normalizeDatabasePropertyImportValue(notionType, value);
+      if (normalized === OMIT_DATABASE_PROPERTY_IMPORT_VALUE) return undefined;
+      return { id, type: notionType, [notionType]: structuredClone(normalized) };
+    } catch (error) {
+      if (notionType !== 'place' && notionType !== 'verification') throw error;
+      pushMcpSnapshotWarning(warningBag, {
+        code: 'mcp_snapshot_property_value_invalid',
+        notionId: id,
+        notionObject: 'property',
+        message:
+          `Property "${name}" had an invalid ${notionType} MCP snapshot value: ` +
+          `${mcpSnapshotValidationMessage(error)} The typed value was degraded to null; ` +
+          'the raw value remains in rawMcpProperties.',
+      });
+      return { id, type: notionType, [notionType]: null };
+    }
+  }
   if (notionType === 'formula') {
     return {
       id,
@@ -731,6 +860,7 @@ function mcpRowPagePropertyValue(
 
 function mcpRowPageProperties(rawProperties: Record<string, unknown>, sourceProperties: Record<string, unknown>) {
   const out: Record<string, unknown> = {};
+  const warningBag = mcpSnapshotWarningBag();
   const sourceNames = new Set(Object.keys(sourceProperties));
   for (const name of sourceNames) {
     const sourceProperty = asRecord(sourceProperties[name]);
@@ -741,13 +871,27 @@ function mcpRowPageProperties(rawProperties: Record<string, unknown>, sourceProp
       optionalString(rawProperties[`date:${name}:end`]) ||
       rawProperties[`date:${name}:is_datetime`] !== undefined;
     if (!hasDirectValue && !hasDateValue) continue;
-    out[name] = mcpRowPagePropertyValue(name, rawProperties[name], sourceProperty, rawProperties);
+    const property = mcpRowPagePropertyValue(
+      name,
+      rawProperties[name],
+      sourceProperty,
+      rawProperties,
+      warningBag,
+    );
+    if (property) out[name] = property;
   }
   for (const [name, value] of Object.entries(rawProperties)) {
     if (name === 'url' || name.startsWith('date:') || sourceNames.has(name)) continue;
-    out[name] = mcpRowPagePropertyValue(name, value, undefined, rawProperties);
+    const property = mcpRowPagePropertyValue(
+      name,
+      value,
+      undefined,
+      rawProperties,
+      warningBag,
+    );
+    if (property) out[name] = property;
   }
-  return out;
+  return { properties: out, warningBag };
 }
 
 function putMcpDataSourceSnapshot(
@@ -775,7 +919,11 @@ function putMcpDataSourceSnapshot(
     payload.title ??
     'Untitled data source';
   const properties = mcpSchemaProperties(state);
-  const views = mcpViewsForDataSource(parsedViews, dataSourceId, workBudget);
+  const { views, warningBag } = mcpViewsForDataSource(
+    parsedViews,
+    dataSourceId,
+    workBudget,
+  );
   const dataSourceRef = {
     id: dataSourceId,
     object: 'data_source',
@@ -792,6 +940,7 @@ function putMcpDataSourceSnapshot(
     metadata: {
       discoveredFrom: 'mcp_fetch',
       ...(databaseId ? { databaseId } : {}),
+      ...mcpSnapshotWarningMetadata(warningBag),
       dataSourceSnapshot: {
         dataSource: {
           id: dataSourceId,
@@ -834,7 +983,9 @@ function putMcpPageSnapshot(
   const rawProperties = asRecord(
     firstTagJson(pageBlock.content, 'properties', embeddedJsonBudget),
   ) ?? {};
-  const properties = dataSourceId ? mcpRowPageProperties(rawProperties, sourceProperties) : rawProperties;
+  const rowSnapshot = dataSourceId
+    ? mcpRowPageProperties(rawProperties, sourceProperties)
+    : { properties: rawProperties, warningBag: mcpSnapshotWarningBag() };
   putDiscoveredItem(items, {
     notionId: pageId,
     notionObject: 'page',
@@ -845,7 +996,8 @@ function putMcpPageSnapshot(
     metadata: {
       discoveredFrom: 'mcp_fetch',
       ...(dataSourceId ? { dataSourceId } : {}),
-      properties,
+      ...mcpSnapshotWarningMetadata(rowSnapshot.warningBag),
+      properties: rowSnapshot.properties,
       rawMcpProperties: rawProperties,
       icon: tagAttribute(pageBlock.attributes, 'icon')
         ? { type: 'emoji', emoji: tagAttribute(pageBlock.attributes, 'icon') }

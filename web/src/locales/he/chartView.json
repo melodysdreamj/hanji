@@ -4,7 +4,22 @@
     "sum": "סכום",
     "average": "ממוצע",
     "min": "מינימום",
-    "max": "מקסימום"
+    "max": "מקסימום",
+    "checked": "מסומן",
+    "count_values": "ספור ערכים",
+    "date_range": "טווח תאריכים",
+    "earliest_date": "תאריך מוקדם ביותר",
+    "empty": "ספור ריקים",
+    "latest_date": "תאריך אחרון",
+    "median": "חציון",
+    "not_empty": "ספור לא ריקים",
+    "percent_checked": "אחוז מסומנים",
+    "percent_empty": "אחוז ריקים",
+    "percent_not_empty": "אחוז לא ריקים",
+    "percent_unchecked": "אחוז לא מסומנים",
+    "range": "טווח",
+    "unchecked": "לא מסומן",
+    "unique": "ספור ערכים ייחודיים"
   },
   "chartAria": "תרשים {{name}}",
   "chartType": "סוג תרשים",
@@ -27,5 +42,9 @@
   "untitledProperty": "ללא שם",
   "valueProperty": "מאפיין ערך",
   "xAxis": "ציר X",
-  "yAxis": "ציר Y"
+  "yAxis": "ציר Y",
+  "dateRangeDays": "{{count}} ימים",
+  "missingProperty": "המאפיין השמור",
+  "unsupportedAggregateDesc": "{{aggregate}} לא ניתן לחשב מ-{{property}}. בחר מאפיין או חישוב תואם.",
+  "unsupportedAggregateTitle": "חישוב תרשים זה אינו זמין"
 }

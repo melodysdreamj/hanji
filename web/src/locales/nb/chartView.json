@@ -4,7 +4,22 @@
     "count": "Antall",
     "max": "Maks",
     "min": "Min",
-    "sum": "Sum"
+    "sum": "Sum",
+    "checked": "Merket",
+    "count_values": "Antall verdier",
+    "date_range": "Datointervall",
+    "earliest_date": "Tidligste dato",
+    "empty": "Antall tomme",
+    "latest_date": "Siste dato",
+    "median": "Median",
+    "not_empty": "Antall ikke tomme",
+    "percent_checked": "Prosent merket",
+    "percent_empty": "Prosent tom",
+    "percent_not_empty": "Prosent ikke tom",
+    "percent_unchecked": "Prosent ikke merket",
+    "range": "Område",
+    "unchecked": "Ikke merket",
+    "unique": "Antall unike verdier"
   },
   "chartAria": "{{name}} diagram",
   "chartType": "Diagramtype",
@@ -27,5 +42,9 @@
   "untitledProperty": "Uten navn",
   "valueProperty": "Verdiegenskap",
   "xAxis": "X-akse",
-  "yAxis": "Y-akse"
+  "yAxis": "Y-akse",
+  "dateRangeDays": "{{count}} dager",
+  "missingProperty": "den lagrede egenskapen",
+  "unsupportedAggregateDesc": "{{aggregate}} kan ikke beregnes fra {{property}}. Velg en kompatibel egenskap eller beregning.",
+  "unsupportedAggregateTitle": "Denne diagramberegningen er ikke tilgjengelig"
 }

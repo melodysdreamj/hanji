@@ -51,7 +51,14 @@
     "range": "Tartomány",
     "earliest_date": "Legkorábbi dátum",
     "latest_date": "Legkésőbbi dátum",
-    "date_range": "Dátumtartomány"
+    "date_range": "Dátumtartomány",
+    "count": "Összes számolása",
+    "count_per_group": "Csoportonkénti darabszám",
+    "empty": "Üres darab",
+    "not_empty": "Nem üres darab",
+    "percent_per_group": "Csoportonkénti százalék",
+    "show_unique": "Egyedi értékek mutatása",
+    "unique": "Egyedi darabszám"
   },
   "undo": "Visszavonás",
   "untitled": "Névtelen",

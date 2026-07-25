@@ -6,5 +6,6 @@
   "unreachable": "Kan nie die bediener bereik nie",
   "unreachablePending_one": "Kan nie die bediener bereik nie · {{count}} verandering hangend",
   "unreachablePending_other": "Kan nie die bediener bereik nie · {{count}} veranderinge hangend",
-  "retryHint": "Klik om nou weer te probeer"
+  "retryHint": "Klik om nou weer te probeer",
+  "confirmed": "Gestoor op bediener"
 }

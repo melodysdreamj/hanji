@@ -35,7 +35,7 @@
     "rename": "Byt namn",
     "addPageInside": "Lägg till sida inuti",
     "exportAsMarkdown": "Exportera som Markdown",
-    "exportAsHanjiFile": "Exportera som Hanji-fil",
+    "exportAsHanjiFile": "Exportera Hanji JSON (filer exkluderade)",
     "importMarkdown": "Importera Markdown",
     "importing": "Importerar...",
     "unlockPage": "Lås upp sida",
@@ -44,7 +44,8 @@
     "removeVerification": "Ta bort verifiering",
     "verifyPage": "Verifiera sida",
     "customizePage": "Anpassa sida",
-    "undo": "Ångra"
+    "undo": "Ångra",
+    "exportAsHanjiArchive": "Exportera Hanji-arkiv (filer inkluderade)"
   },
   "customize": {
     "summaryDefault": "Standard",
@@ -101,6 +102,8 @@
     "movedToTrash": "Flyttad till papperskorgen",
     "restoredPage": "Sida återställd",
     "couldntRestorePage": "Kunde inte återställa sida",
-    "couldntMoveToTrash": "Kunde inte flytta till papperskorgen"
+    "couldntMoveToTrash": "Kunde inte flytta till papperskorgen",
+    "couldntExportHanjiArchive": "Kunde inte exportera Hanji-arkiv.",
+    "exportedHanjiArchive": "Exporterade ett Hanji-arkiv med filer."
   }
 }

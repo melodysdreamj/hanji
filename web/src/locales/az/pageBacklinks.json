@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} geri keçid",
-    "count_other": "{{count}} geri keçid"
+    "count_other": "{{count}} geri keçid",
+    "partial_one": "{{count}}+ geri bağlantı",
+    "partial_other": "{{count}}+ geri bağlantı"
   },
   "header": {
     "title": "Bağlı istinadlar"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} istinad",
     "mention_other": "{{count}} istinad",
     "link_one": "{{count}} keçid",
-    "link_other": "{{count}} keçid"
+    "link_other": "{{count}} keçid",
+    "loaded": "Yükləndi: {{summary}}"
   },
   "kind": {
     "mention": "İstinad",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "daha {{count}} geri keçid",
-    "count_other": "daha {{count}} geri keçid"
+    "count_other": "daha {{count}} geri keçid",
+    "load": "Daha çox geri bağlantı yüklə",
+    "loading": "Geri bağlantılar yüklənir…",
+    "search": "Geri bağlantıları axtar"
   }
 }

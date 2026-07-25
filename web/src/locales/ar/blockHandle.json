@@ -88,5 +88,38 @@
     "hoursAgo": "آخر تعديل قبل {{hours}} ساعة",
     "daysAgo": "آخر تعديل قبل {{days}} يوم",
     "on": "آخر تعديل {{date}}"
+  },
+  "align": {
+    "center": "توسيط",
+    "choose": "اختر محاذاة الصورة",
+    "left": "يسار",
+    "right": "يمين"
+  },
+  "altText": {
+    "help": "يساعد النص البديل مستخدمي قارئات الشاشة على فهم الصورة.",
+    "label": "الوصف",
+    "placeholder": "صف الصورة",
+    "remove": "إزالة",
+    "save": "حفظ",
+    "title": "النص البديل"
+  },
+  "imageLink": {
+    "invalid": "أدخل رابط http:// أو https:// كاملاً.",
+    "label": "افتح هذا الرابط عند النقر على الصورة",
+    "remove": "إزالة",
+    "save": "حفظ",
+    "title": "رابط الصورة"
+  },
+  "media": {
+    "addImageLink": "إضافة رابط",
+    "align": "محاذاة",
+    "altText": "نص بديل",
+    "copySourceLink": "نسخ رابط المصدر",
+    "download": "تنزيل",
+    "editImageLink": "تعديل الرابط",
+    "fullScreen": "ملء الشاشة",
+    "openLink": "فتح الرابط",
+    "replace": "استبدال",
+    "viewOriginal": "عرض الأصل"
   }
 }

@@ -233,7 +233,9 @@
     "video": "Video",
     "videoCaption": "Videotekst",
     "videoEmptyHint": "Last opp en videofil, lim inn en direkte lenke, eller bruk en YouTube-, Vimeo- eller Loom-lenke.",
-    "videoLink": "Videolenke"
+    "videoLink": "Videolenke",
+    "audioPlaybackFailed": "Denne lyden kunne ikke spilles av. Erstatt den eller åpne originalfilen.",
+    "videoPlaybackFailed": "Denne videoen kunne ikke spilles av. Erstatt den eller åpne originalfilen."
   },
   "mention": {
     "closeMenu": "Lukk omtalemeny",

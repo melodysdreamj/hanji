@@ -3,9 +3,17 @@
 // the format by design; the backend strips attachments to placeholders.
 
 import {
+  cancelNativeArchiveImportRemote,
+  exportPageNativeArchiveRemote,
   exportPageNativeRemote,
+  exportWorkspaceNativeArchiveRemote,
   exportWorkspaceNativeRemote,
+  importNativeArchiveRemote,
+  prepareNativeArchiveImportRemote,
   type HanjiExportDocument,
+  type ImportNativeResult,
+  type NativeArchiveImportInput,
+  type NativeArchiveUploadGrant,
 } from "@/lib/edgebase";
 import {
   isLegacyHanjiNativeFileName,
@@ -13,8 +21,17 @@ import {
 } from "@/lib/legacyNamespace";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import type { Page } from "@/lib/types";
+import {
+  NATIVE_ARCHIVE_LIMITS,
+  isNativeArchiveFile,
+  parseNativeArchive,
+  saveNativeArchiveResponse,
+  uploadNativeArchiveEntries,
+  type ParsedNativeArchive,
+} from "@/lib/nativeArchive";
 
 export const HANJI_FILE_EXT = ".hanji.json";
+export const HANJI_ARCHIVE_EXT = ".hanji.zip";
 export const NATIVE_FORMAT = "hanji.export";
 
 function safeFileStem(name: string) {
@@ -62,8 +79,28 @@ export async function exportWorkspaceAsNative(workspaceId: string, workspaceName
   return { counts: result.counts, warnings: result.warnings };
 }
 
+export async function exportPageAsNativeArchive(page: Page) {
+  const response = await exportPageNativeArchiveRemote(page.id);
+  await saveNativeArchiveResponse(
+    response,
+    `${safeFileStem(pageDisplayTitle(page))}-${todayStamp()}${HANJI_ARCHIVE_EXT}`
+  );
+}
+
+export async function exportWorkspaceAsNativeArchive(
+  workspaceId: string,
+  workspaceName?: string
+) {
+  const response = await exportWorkspaceNativeArchiveRemote(workspaceId);
+  await saveNativeArchiveResponse(
+    response,
+    `${safeFileStem(workspaceName || "workspace")}-${todayStamp()}${HANJI_ARCHIVE_EXT}`
+  );
+}
+
 export function isHanjiFile(file: File) {
   return (
+    isNativeArchiveFile(file) ||
     /\.hanji\.json$/i.test(file.name) ||
     /\.hanji$/i.test(file.name) ||
     isLegacyHanjiNativeFileName(file.name)
@@ -107,6 +144,134 @@ export function hanjiRemoteSourceFingerprint(
 export async function readHanjiFile(file: File): Promise<HanjiExportDocument> {
   const text = await file.text();
   return parseHanjiDocument(text);
+}
+
+export type HanjiImportFileSelection =
+  | { kind: "json"; document: HanjiExportDocument }
+  | { kind: "archive"; archive: ParsedNativeArchive };
+
+export async function readHanjiImportFile(file: File): Promise<HanjiImportFileSelection> {
+  if (isNativeArchiveFile(file)) {
+    return { kind: "archive", archive: await parseNativeArchive(file) };
+  }
+  return { kind: "json", document: await readHanjiFile(file) };
+}
+
+export function createNativeArchiveBatchId() {
+  return `web-${crypto.randomUUID()}`;
+}
+
+function archiveImportInput(input: {
+  workspaceId: string;
+  batchId: string;
+  archive: ParsedNativeArchive;
+}): NativeArchiveImportInput {
+  return {
+    workspaceId: input.workspaceId,
+    batchId: input.batchId,
+    document: input.archive.document,
+    manifest: input.archive.manifest,
+  };
+}
+
+function exactArchiveUploadEntries(
+  archive: ParsedNativeArchive,
+  grants: NativeArchiveUploadGrant[]
+) {
+  if (!Array.isArray(grants) || grants.length !== archive.manifest.files.length) {
+    throw new Error("Archive upload grants do not exactly match the manifest.");
+  }
+  const grantsByFileId = new Map<string, NativeArchiveUploadGrant>();
+  for (const grant of grants) {
+    if (
+      !grant
+      || typeof grant.fileId !== "string"
+      || grantsByFileId.has(grant.fileId)
+      || typeof grant.id !== "string"
+      || !grant.id
+      || typeof grant.key !== "string"
+      || !grant.key
+      || typeof grant.uploadUrl !== "string"
+      || !grant.uploadUrl
+      || typeof grant.uploadExpiresAt !== "string"
+      || !grant.uploadExpiresAt
+      || !Number.isSafeInteger(grant.uploadMaxBytes)
+    ) {
+      throw new Error("Archive upload grants are invalid or duplicated.");
+    }
+    let url: URL;
+    try {
+      url = new URL(grant.uploadUrl);
+    } catch {
+      throw new Error(`Archive upload grant ${grant.fileId} has an invalid URL.`);
+    }
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error(`Archive upload grant ${grant.fileId} has an invalid URL.`);
+    }
+    grantsByFileId.set(grant.fileId, grant);
+  }
+  const filesById = new Map(archive.files.map((file) => [file.id, file]));
+  if (filesById.size !== archive.manifest.files.length) {
+    throw new Error("Archive file slices do not exactly match the manifest.");
+  }
+  return archive.manifest.files.map((manifestFile) => {
+    const file = filesById.get(manifestFile.id);
+    const grant = grantsByFileId.get(manifestFile.id);
+    if (
+      !file
+      || !grant
+      || file.bytes !== manifestFile.bytes
+      || file.blob.size !== manifestFile.bytes
+      || file.contentType !== manifestFile.contentType
+      || grant.uploadMaxBytes !== Math.max(1, manifestFile.bytes)
+    ) {
+      throw new Error(`Archive upload grant for ${manifestFile.id} does not match the manifest.`);
+    }
+    return {
+      id: manifestFile.id,
+      blob: file.blob,
+      contentType: manifestFile.contentType,
+      key: grant.key,
+      name: manifestFile.name,
+      uploadUrl: grant.uploadUrl,
+    };
+  });
+}
+
+export async function importParsedNativeArchive(input: {
+  workspaceId: string;
+  batchId: string;
+  archive: ParsedNativeArchive;
+}): Promise<ImportNativeResult> {
+  const request = archiveImportInput(input);
+  const prepared = await prepareNativeArchiveImportRemote(request);
+  if (!prepared || prepared.batchId !== input.batchId || !Array.isArray(prepared.files)) {
+    throw new Error("Archive import preparation returned the wrong batch.");
+  }
+  if (prepared.completed) {
+    if (prepared.files.length !== 0) {
+      throw new Error("Completed archive import preparation returned unexpected upload grants.");
+    }
+    return prepared.completed;
+  }
+
+  try {
+    const entries = exactArchiveUploadEntries(input.archive, prepared.files);
+    const uploaded = await uploadNativeArchiveEntries(entries, {
+      concurrency: NATIVE_ARCHIVE_LIMITS.heavyConcurrency,
+    });
+    if (uploaded.failures.length > 0) {
+      const ids = uploaded.failures.map((failure) => failure.id).join(", ");
+      throw new Error(`Archive upload failed for ${ids}.`);
+    }
+  } catch (error) {
+    await cancelNativeArchiveImportRemote(request).catch(() => undefined);
+    throw error;
+  }
+
+  // Do not cancel after this point. A transport failure can hide a committed
+  // result; the caller must retry this exact batch so the server can replay it.
+  return importNativeArchiveRemote(request);
 }
 
 export function parseHanjiDocument(text: string): HanjiExportDocument {
@@ -207,7 +372,7 @@ export async function fetchRemoteHanjiExport(
 }
 
 // A short "n pages · m databases · k blocks" summary for the import preview.
-export function summarizeDocument(document_: HanjiExportDocument): string {
+export function summarizeDocument(document_: { counts?: Record<string, number> }): string {
   const counts = document_.counts ?? {};
   const parts: string[] = [];
   const push = (key: string, label: string) => {

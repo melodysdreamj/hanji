@@ -88,5 +88,38 @@
     "hoursAgo": "{{hours}} s avval",
     "daysAgo": "{{days}} k avval",
     "on": "{{date}} tahrirlandi"
+  },
+  "align": {
+    "center": "Markaz",
+    "choose": "Rasm tekislashni tanlang",
+    "left": "Chap",
+    "right": "O'ng"
+  },
+  "altText": {
+    "help": "Alt matni ekran o'quvchilari rasmni tushunishiga yordam beradi.",
+    "label": "Tavsif",
+    "placeholder": "Rasmni tavsiflang",
+    "remove": "Olib tashlash",
+    "save": "Saqlash",
+    "title": "Alt matni"
+  },
+  "imageLink": {
+    "invalid": "To'liq http:// yoki https:// URL manzilini kiriting.",
+    "label": "Rasm bosilganda shu URLni ochish",
+    "remove": "Olib tashlash",
+    "save": "Saqlash",
+    "title": "Rasm havolasi"
+  },
+  "media": {
+    "addImageLink": "Havola qo'shish",
+    "align": "Tekislash",
+    "altText": "Alt matni",
+    "copySourceLink": "Asl havolani nusxalash",
+    "download": "Yuklab olish",
+    "editImageLink": "Havolani tahrirlash",
+    "fullScreen": "To'liq ekran",
+    "openLink": "Havolani ochish",
+    "replace": "Almashtirish",
+    "viewOriginal": "Asl nusxani ko'rish"
   }
 }

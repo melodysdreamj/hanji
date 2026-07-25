@@ -3,11 +3,12 @@
 import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { routeInfoFromPath, usePathname, useRouter, useSearchParams } from "@/lib/router";
+import { rejectPublicSiteHost, usePublicSiteHost } from "@/lib/publicSiteHost";
 import { AppShell } from "./AppShell";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { HomeView } from "./HomeView";
 import { PageView } from "./PageView";
-import { SharedPageView } from "./SharedPageView";
+import { SharedPageLoading } from "./SharedPageLoading";
 import { TopBar } from "./TopBar";
 import pageStyles from "./PageView.module.css";
 
@@ -16,6 +17,15 @@ const WorkspaceSettingsDialog = lazy(() =>
   import("./WorkspaceSettingsDialog").then(({ WorkspaceSettingsDialog }) => ({
     default: WorkspaceSettingsDialog,
   }))
+);
+const SharedPageView = lazy(() =>
+  import("./SharedPageView").then(({ SharedPageView }) => ({ default: SharedPageView }))
+);
+const PublicFormView = lazy(() =>
+  import("./PublicFormView").then(({ PublicFormView }) => ({ default: PublicFormView }))
+);
+const PublicSiteView = lazy(() =>
+  import("./PublicSiteView").then(({ PublicSiteView }) => ({ default: PublicSiteView }))
 );
 
 function RouteFallback() {
@@ -42,12 +52,36 @@ function SettingsRouteView() {
 function RoutedView() {
   const pathname = usePathname();
   const route = routeInfoFromPath(pathname);
+  const siteHost = usePublicSiteHost();
 
   if (route.kind === "trash") return <TrashView />;
   if (route.kind === "settings" || route.kind === "account") return <SettingsRouteView />;
   if (route.kind === "page") return <PageView pageId={route.pageId} />;
   if (route.kind === "database") return <PageView pageId={route.databaseId} />;
-  if (route.kind === "share") return <SharedPageView token={route.shareId} />;
+  if (route.kind === "share") {
+    return (
+      <Suspense fallback={<SharedPageLoading />}>
+        <SharedPageView token={route.shareId} />
+      </Suspense>
+    );
+  }
+  if (route.kind === "form") {
+    return (
+      <Suspense fallback={<RouteFallback />}>
+        <PublicFormView token={route.formToken} />
+      </Suspense>
+    );
+  }
+  if (route.kind === "site" || (route.kind === "home" && siteHost.custom)) {
+    return (
+      <Suspense fallback={<SharedPageLoading />}>
+        <PublicSiteView
+          slug={route.kind === "site" ? route.siteSlug : undefined}
+          onRootSiteNotFound={route.kind === "home" ? rejectPublicSiteHost : undefined}
+        />
+      </Suspense>
+    );
+  }
   if (route.kind === "home" || route.kind === "workspace") return <HomeView />;
   return (
     <RouteProblem

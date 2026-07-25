@@ -6,5 +6,6 @@
   "unreachable": "לא ניתן להגיע לשרת",
   "unreachablePending_one": "לא ניתן להגיע לשרת · {{count}} שינוי בהמתנה",
   "unreachablePending_other": "לא ניתן להגיע לשרת · {{count}} שינויים בהמתנה",
-  "retryHint": "לחץ כדי לנסות שוב"
+  "retryHint": "לחץ כדי לנסות שוב",
+  "confirmed": "נשמר בשרת"
 }

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Otvoriť ponuku pracovného priestoru",
   "closeWorkspaceMenu": "Zatvoriť ponuku pracovného priestoru",
   "workspaceMenu": "Ponuka pracovného priestoru",
-  "exportWorkspace": "Exportovať pracovný priestor",
+  "exportWorkspace": "Exportovať JSON pracovného priestoru (bez súborov)",
   "exportedWorkspace": "Pracovný priestor exportovaný ako súbor Hanji.",
   "exportedWorkspaceWithPlaceholders": "Pracovný priestor exportovaný ako súbor Hanji — prílohy zostali ako zástupné symboly.",
   "couldntExportWorkspace": "Nepodarilo sa exportovať pracovný priestor.",
@@ -76,5 +76,12 @@
     "later": "Možno neskôr",
     "note": "Toto môžete kedykoľvek spustiť neskôr z Importu v bočnom paneli.",
     "title": "Preniesť váš Notion pracovný priestor do Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Pridať stránku do {{name}}",
+  "couldntExportWorkspaceArchive": "Nepodarilo sa exportovať archív pracovného priestoru.",
+  "exportedWorkspaceArchive": "Exportoval sa archív pracovného priestoru so súbormi.",
+  "exportWorkspaceArchive": "Exportovať archív pracovného priestoru (vrátane súborov)",
+  "joinTeamspaces": "Pripojiť sa k tímovým priestorom",
+  "keyboardShortcuts": "Klávesové skratky",
+  "teamspacePages": "Stránky {{name}}"
 }

@@ -92,5 +92,8 @@
     "V",
     "Z"
   ],
-  "you": "Jij"
+  "you": "Jij",
+  "buttonExecutionFailed": "Knop kon niet worden uitgevoerd.",
+  "loadingMoreRelations": "Meer relaties laden...",
+  "loadMoreRelations": "Meer relaties laden"
 }

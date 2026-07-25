@@ -51,7 +51,14 @@
     "range": "Intervalle",
     "earliest_date": "Date la plus ancienne",
     "latest_date": "Date la plus récente",
-    "date_range": "Plage de dates"
+    "date_range": "Plage de dates",
+    "count": "Compter tout",
+    "count_per_group": "Nombre par groupe",
+    "empty": "Compter les vides",
+    "not_empty": "Compter les non vides",
+    "percent_per_group": "Pourcentage par groupe",
+    "show_unique": "Afficher les valeurs uniques",
+    "unique": "Compter les valeurs uniques"
   },
   "undo": "Annuler",
   "untitled": "Sans titre",

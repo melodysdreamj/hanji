@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Tambah komen",
+    "addLink": "Tambah pautan",
+    "blockColor": "Guna warna terakhir",
+    "bold": "Tebal",
+    "copyPageLink": "Salin pautan halaman",
+    "findInPage": "Cari pada halaman ini",
+    "inlineCode": "Kod sebaris",
+    "italic": "Condong",
+    "moveBlock": "Pindah blok ke halaman lain",
+    "moveBlockDown": "Pindah blok ke bawah",
+    "moveBlockUp": "Pindah blok ke atas",
+    "movePage": "Pindah halaman semasa",
+    "navigateBack": "Kembali",
+    "navigateForward": "Ke hadapan",
+    "newPage": "Halaman baru",
+    "openBlockMenu": "Buka tindakan blok",
+    "openKeyboardShortcuts": "Buka pintasan papan kekunci",
+    "openParentPage": "Buka halaman induk",
+    "quickFind": "Cari Pantas",
+    "strikethrough": "Potong",
+    "toggleAllToggles": "Kembangkan atau lipat semua togol",
+    "toggleSidebar": "Togol bar sisi",
+    "toggleTheme": "Togol mod gelap",
+    "underline": "Garis bawah"
+  },
+  "categories": {
+    "createStyle": "Cipta & gaya",
+    "editMove": "Edit & pindah",
+    "popular": "Popular"
+  },
+  "categoriesLabel": "Kategori pintasan",
+  "close": "Tutup",
+  "closeBackdrop": "Tutup pintasan papan kekunci",
+  "empty": "Tiada pintasan ditemui",
+  "keysFor": "Kekunci untuk {{action}}",
+  "or": "atau",
+  "searchLabel": "Cari pintasan papan kekunci",
+  "searchPlaceholder": "Cari pintasan…",
+  "searchResults": "Hasil carian",
+  "searchTerms": {
+    "toggleTheme": "tema cerah gelap rupa"
+  },
+  "title": "Pintasan papan kekunci"
+}

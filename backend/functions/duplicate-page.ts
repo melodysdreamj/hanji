@@ -21,13 +21,22 @@ import {
   persistentGeneratedLabels,
 } from '../lib/persistent-generated-labels';
 import {
+  assertMinimumWorkspaceAccessRole as sharedAssertMinimumWorkspaceAccessRole,
   pageAccessRole as sharedPageAccessRole,
-  workspaceAccessRole as sharedWorkspaceAccessRole,
   pageAccessRoleRanks as roleRanks,
   type ShareRole,
 } from '../lib/page-access';
+import { hasPotentialStoredFileReference } from '../lib/file-reference-lifecycle';
 
-import { bestEffort, getExisting, listAll, nowIso, newId } from '../lib/table-utils';
+import {
+  bestEffort,
+  getExisting,
+  listAll,
+  nowIso,
+  newId,
+  type TableQuery,
+  type TransactOperation,
+} from '../lib/table-utils';
 import type {
   Block,
   DbProperty,
@@ -1011,10 +1020,16 @@ function parseParentInput(parentId: unknown, parentType: unknown) {
 function collectSubtree(pages: Page[], rootId: string) {
   const childrenByParent = new Map<string, Page[]>();
   for (const page of pages) {
-    if (!page.parentId) continue;
-    const list = childrenByParent.get(page.parentId) ?? [];
-    list.push(page);
-    childrenByParent.set(page.parentId, list);
+    if (page.parentId) {
+      const list = childrenByParent.get(page.parentId) ?? [];
+      list.push(page);
+      childrenByParent.set(page.parentId, list);
+    }
+    if (page.subitemParentId) {
+      const list = childrenByParent.get(page.subitemParentId) ?? [];
+      list.push(page);
+      childrenByParent.set(page.subitemParentId, list);
+    }
   }
 
   const out = new Set<string>();
@@ -1240,18 +1255,6 @@ function remapPropertyConfig(
   return next;
 }
 
-// Role resolution is canonical in lib/page-access; these wrappers only pin
-// this function's "missing workspace is an error" contract.
-async function workspaceRole(db: DbRef, workspaceId: string, actorId: string): Promise<ShareRole | undefined> {
-  return sharedWorkspaceAccessRole(db, workspaceId, actorId, { requireWorkspace: true });
-}
-
-async function assertWorkspaceEdit(db: DbRef, workspaceId: string, actorId: string) {
-  const role = await workspaceRole(db, workspaceId, actorId);
-  if (role && roleRanks[role] >= roleRanks.edit) return role;
-  throw new Error('Workspace access required.');
-}
-
 async function pageRole(
   db: DbRef,
   page: Page,
@@ -1272,6 +1275,2328 @@ async function rollbackPageWorkspaceIndex(admin: AdminDbAccessor, page: Page) {
   const current = await getExisting(index, page.id);
   if (!current || current.workspaceId !== page.workspaceId) return;
   await index.delete(page.id);
+}
+
+interface DuplicateHierarchyJob {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  rootRowId: string;
+  operation: 'duplicate';
+  trashStamp: string;
+  featureRevision: number;
+  requestedBy: string;
+  mutationId: string;
+  phase: string;
+  targetRootId: string;
+  sourceParentId: string;
+}
+
+interface DuplicateHierarchyItem {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  jobId: string;
+  rowId: string;
+  depth: number;
+  scanned: boolean;
+  scanLane: 'subitems' | 'pages';
+  scanPosition: number;
+  scanRowId: string;
+  targetRowId: string;
+  prepared: boolean;
+  applied: boolean;
+  sourceUpdatedAt?: string;
+  blockScanId: string;
+  blocksPrepared: boolean;
+  blocksApplied: boolean;
+  dependencyLane: 'outgoing' | 'incoming';
+  dependencyCursorId: string;
+  dependenciesPrepared: boolean;
+  dependenciesApplied: boolean;
+  fileCursorId: string;
+  filesApplied: boolean;
+  relationPropertyCursorId: string;
+  relationValueOffset: number;
+  relationsPrepared: boolean;
+}
+
+interface HierarchyRelationUpdate {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  jobId: string;
+  rowId: string;
+  sourceUpdatedAt: string;
+  properties: Record<string, unknown>;
+}
+
+interface DuplicateHierarchyDependencyEdge {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  predecessorRowId: string;
+  successorRowId: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+const DUPLICATE_HIERARCHY_CHILD_WINDOW = 32;
+const DUPLICATE_HIERARCHY_PARENT_STEPS = 32;
+const DUPLICATE_HIERARCHY_APPLY_WINDOW = 16;
+// A block window plus bounded reference resolution and the page/job fences
+// stays comfortably below the 128-row lifecycle request ceiling.
+const DUPLICATE_HIERARCHY_BLOCK_WINDOW = 8;
+const DUPLICATE_HIERARCHY_BLOCK_REFERENCE_LIMIT = 32;
+const DUPLICATE_HIERARCHY_DEPENDENCY_WINDOW = 8;
+const DUPLICATE_HIERARCHY_RELATION_VALUE_WINDOW = 16;
+
+function objectRecord(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : undefined;
+}
+
+function exactDuplicateSubitemChildCount(page: Page) {
+  const count = Number(page.subitemChildCount ?? 0);
+  if (!Number.isSafeInteger(count) || count < 0) {
+    throw Object.assign(new Error('Sub-item child count is invalid.'), { status: 409 });
+  }
+  return count;
+}
+
+function incrementedDuplicateSubitemChildCount(page: Page) {
+  const next = exactDuplicateSubitemChildCount(page) + 1;
+  if (!Number.isSafeInteger(next)) {
+    throw Object.assign(new Error('Sub-item child count is inconsistent.'), { status: 409 });
+  }
+  return next;
+}
+
+function duplicateHierarchyBinding(database: Page) {
+  const binding = objectRecord(objectRecord(database.databaseFeatures)?.subitems);
+  if (
+    binding?.enabled !== true
+    || typeof binding.parentPropertyId !== 'string'
+    || typeof binding.childrenPropertyId !== 'string'
+  ) return null;
+  return {
+    ...binding,
+    revision: Number(binding.revision ?? 0),
+  };
+}
+
+async function duplicateHierarchyHash(kind: string, ...parts: string[]) {
+  const bytes = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode([kind, ...parts].join('\u0000')),
+  );
+  return Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function duplicateHierarchyUuid(jobId: string, rowId: string) {
+  const hex = await duplicateHierarchyHash('duplicate-hierarchy-row', jobId, rowId);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+async function duplicateHierarchyBlockUuid(jobId: string, blockId: string) {
+  const hex = await duplicateHierarchyHash('duplicate-hierarchy-block', jobId, blockId);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+async function duplicateHierarchyFileUuid(jobId: string, uploadId: string) {
+  const hex = await duplicateHierarchyHash('duplicate-hierarchy-file', jobId, uploadId);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+function duplicateHierarchyDatabaseExpectation(database: Page): TransactOperation {
+  return {
+    table: 'pages',
+    op: 'expect',
+    id: database.id,
+    where: [
+      ['workspaceId', '==', database.workspaceId],
+      ['kind', '==', 'database'],
+      ['inTrash', '==', false],
+      ['databaseFeaturesRevision', '==', Number(database.databaseFeaturesRevision ?? 0)],
+    ],
+    exists: true,
+  };
+}
+
+function duplicateHierarchyJobExpectation(job: DuplicateHierarchyJob): TransactOperation {
+  return {
+    table: 'database_hierarchy_lifecycle_jobs',
+    op: 'expect',
+    id: job.id,
+    where: [
+      ['databaseId', '==', job.databaseId],
+      ['rootRowId', '==', job.rootRowId],
+      ['operation', '==', 'duplicate'],
+      ['featureRevision', '==', job.featureRevision],
+      ['requestedBy', '==', job.requestedBy],
+      ['mutationId', '==', job.mutationId],
+      ['sourceParentId', '==', job.sourceParentId],
+    ],
+    exists: true,
+  };
+}
+
+function duplicateHierarchyItemData(item: DuplicateHierarchyItem) {
+  return {
+    id: item.id,
+    workspaceId: item.workspaceId,
+    databaseId: item.databaseId,
+    jobId: item.jobId,
+    rowId: item.rowId,
+    depth: item.depth,
+    scanned: item.scanned,
+    scanLane: item.scanLane,
+    scanPosition: item.scanPosition,
+    scanRowId: item.scanRowId,
+    targetRowId: item.targetRowId,
+    prepared: item.prepared,
+    applied: item.applied,
+    published: false,
+    ...(item.sourceUpdatedAt !== undefined ? { sourceUpdatedAt: item.sourceUpdatedAt } : {}),
+    blockScanId: item.blockScanId,
+    blocksPrepared: item.blocksPrepared,
+    blocksApplied: item.blocksApplied,
+    dependencyLane: item.dependencyLane,
+    dependencyCursorId: item.dependencyCursorId,
+    dependenciesPrepared: item.dependenciesPrepared,
+    dependenciesApplied: item.dependenciesApplied,
+    fileCursorId: item.fileCursorId,
+    filesApplied: item.filesApplied,
+    relationPropertyCursorId: item.relationPropertyCursorId,
+    relationValueOffset: item.relationValueOffset,
+    relationsPrepared: item.relationsPrepared,
+  };
+}
+
+function duplicateHierarchyItemExpectation(item: DuplicateHierarchyItem): TransactOperation {
+  return {
+    table: 'database_hierarchy_lifecycle_items',
+    op: 'expect',
+    id: item.id,
+    where: [
+      ['jobId', '==', item.jobId],
+      ['rowId', '==', item.rowId],
+      ['scanned', '==', item.scanned],
+      ['scanLane', '==', item.scanLane],
+      ['scanPosition', '==', item.scanPosition],
+      ['scanRowId', '==', item.scanRowId],
+      ['prepared', '==', item.prepared],
+      ['applied', '==', item.applied],
+      ['blockScanId', '==', item.blockScanId],
+      ['blocksPrepared', '==', item.blocksPrepared],
+      ['blocksApplied', '==', item.blocksApplied],
+      ['dependencyLane', '==', item.dependencyLane],
+      ['dependencyCursorId', '==', item.dependencyCursorId],
+      ['dependenciesPrepared', '==', item.dependenciesPrepared],
+      ['dependenciesApplied', '==', item.dependenciesApplied],
+      ['fileCursorId', '==', item.fileCursorId],
+      ['filesApplied', '==', item.filesApplied],
+      ['relationPropertyCursorId', '==', item.relationPropertyCursorId],
+      ['relationValueOffset', '==', item.relationValueOffset],
+      ['relationsPrepared', '==', item.relationsPrepared],
+    ],
+    exists: true,
+  };
+}
+
+function duplicateHierarchySourcePageExpectation(
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+): TransactOperation {
+  if (item.sourceUpdatedAt === undefined) {
+    throw Object.assign(new Error('Hierarchy duplicate source fence is incomplete.'), { status: 409 });
+  }
+  return {
+    table: 'pages',
+    op: 'expect',
+    id: item.rowId,
+    where: [
+      ['workspaceId', '==', job.workspaceId],
+      ['inTrash', '==', false],
+      ['updatedAt', '==', item.sourceUpdatedAt || null],
+    ],
+    exists: true,
+  };
+}
+
+function duplicateHierarchyBlockExpectation(block: Block): TransactOperation {
+  return {
+    table: 'blocks',
+    op: 'expect',
+    id: block.id,
+    where: [
+      ['pageId', '==', block.pageId],
+      ['parentId', '==', block.parentId ?? null],
+      ['updatedAt', '==', block.updatedAt ?? null],
+    ],
+    exists: true,
+  };
+}
+
+async function firstDuplicateHierarchyItem(
+  db: DbRef,
+  jobId: string,
+  field: 'scanned' | 'prepared' | 'applied' | 'blocksPrepared' | 'blocksApplied'
+    | 'dependenciesPrepared' | 'dependenciesApplied' | 'filesApplied' | 'relationsPrepared',
+  value: boolean,
+  order: 'asc' | 'desc' = 'asc',
+) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy duplication requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!(field, '==', value).orderBy!('depth', order).orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(1).getList()).items?.[0] ?? null;
+}
+
+async function duplicateHierarchyItems(
+  db: DbRef,
+  jobId: string,
+  field: 'prepared' | 'applied',
+  value: boolean,
+  order: 'asc' | 'desc',
+) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy duplication requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!(field, '==', value).orderBy!('depth', order).orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW + 1).getList()).items ?? [];
+}
+
+async function duplicateHierarchyBlockStateItems(
+  db: DbRef,
+  jobId: string,
+  field: 'blocksPrepared' | 'blocksApplied',
+) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy block continuation requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!(field, '==', false).orderBy!('depth', 'asc').orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW + 1).getList()).items ?? [];
+}
+
+async function duplicateHierarchyDependencyStateItems(
+  db: DbRef,
+  jobId: string,
+  field: 'dependenciesPrepared' | 'dependenciesApplied',
+) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy dependency copy requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!(field, '==', false).orderBy!('depth', 'asc').orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW + 1).getList()).items ?? [];
+}
+
+async function duplicateHierarchyRelationStateItems(db: DbRef, jobId: string) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy relation copy requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!('relationsPrepared', '==', false).orderBy!('depth', 'asc').orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW + 1).getList()).items ?? [];
+}
+
+async function duplicateHierarchyFileStateItems(db: DbRef, jobId: string) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy file copy requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!('filesApplied', '==', false).orderBy!('depth', 'asc').orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW + 1).getList()).items ?? [];
+}
+
+async function duplicateHierarchyItemForRow(db: DbRef, jobId: string, rowId: string) {
+  let query: TableQuery<DuplicateHierarchyItem> = db
+    .table<DuplicateHierarchyItem>('database_hierarchy_lifecycle_items')
+    .where('jobId', '==', jobId);
+  if (typeof query.where !== 'function') {
+    throw Object.assign(new Error('Hierarchy duplication requires bounded item lookup.'), { status: 500 });
+  }
+  query = query.where!('rowId', '==', rowId);
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(1).getList()).items?.[0] ?? null;
+}
+
+async function duplicateHierarchyBlockWindow(db: DbRef, item: DuplicateHierarchyItem) {
+  let query: TableQuery<Block> = db.table<Block>('blocks').where('pageId', '==', item.rowId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy block continuation requires bounded ordered queries.'), { status: 500 });
+  }
+  if (item.blockScanId) query = query.where!('id', '>', item.blockScanId);
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  const candidates = (await query.limit(DUPLICATE_HIERARCHY_BLOCK_WINDOW + 1).getList()).items ?? [];
+  const rows = candidates
+    .filter((block) => block.pageId === item.rowId && (!item.blockScanId || block.id > item.blockScanId))
+    .sort((left, right) => left.id.localeCompare(right.id));
+  return {
+    rows: rows.slice(0, DUPLICATE_HIERARCHY_BLOCK_WINDOW),
+    hasMore: rows.length > DUPLICATE_HIERARCHY_BLOCK_WINDOW,
+  };
+}
+
+async function duplicateHierarchyDependencyEdgeForRows(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  lane: 'outgoing' | 'incoming',
+  rowIds: string[],
+) {
+  const field = lane === 'outgoing' ? 'predecessorRowId' : 'successorRowId';
+  let query: TableQuery<DuplicateHierarchyDependencyEdge> = db
+    .table<DuplicateHierarchyDependencyEdge>('database_dependency_edges')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof query.where !== 'function') {
+    throw Object.assign(new Error('Hierarchy dependency copy requires bounded edge lookup.'), { status: 500 });
+  }
+  query = query.where!(field, 'in', rowIds);
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(1).getList()).items?.[0] ?? null;
+}
+
+async function duplicateHierarchyDependencyEdgeWindow(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+) {
+  const field = item.dependencyLane === 'outgoing' ? 'predecessorRowId' : 'successorRowId';
+  let query: TableQuery<DuplicateHierarchyDependencyEdge> = db
+    .table<DuplicateHierarchyDependencyEdge>('database_dependency_edges')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy dependency copy requires bounded ordered queries.'), { status: 500 });
+  }
+  query = query.where!(field, '==', item.rowId);
+  if (item.dependencyCursorId) query = query.where!('id', '>', item.dependencyCursorId);
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  const candidates = (await query.limit(DUPLICATE_HIERARCHY_DEPENDENCY_WINDOW + 1).getList()).items ?? [];
+  const rows = candidates
+    .filter((edge) => (
+      edge.databaseId === job.databaseId
+      && edge[field] === item.rowId
+      && (!item.dependencyCursorId || edge.id > item.dependencyCursorId)
+    ))
+    .sort((left, right) => left.id.localeCompare(right.id));
+  return {
+    rows: rows.slice(0, DUPLICATE_HIERARCHY_DEPENDENCY_WINDOW),
+    hasMore: rows.length > DUPLICATE_HIERARCHY_DEPENDENCY_WINDOW,
+  };
+}
+
+function duplicateHierarchyDependencyEdgeExpectation(
+  edge: DuplicateHierarchyDependencyEdge,
+): TransactOperation {
+  return {
+    table: 'database_dependency_edges',
+    op: 'expect',
+    id: edge.id,
+    where: [
+      ['databaseId', '==', edge.databaseId],
+      ['predecessorRowId', '==', edge.predecessorRowId],
+      ['successorRowId', '==', edge.successorRowId],
+      ['updatedAt', '==', edge.updatedAt ?? null],
+    ],
+    exists: true,
+  };
+}
+
+async function assertDuplicateHierarchyDependencyEndpoint(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  rowId: string,
+) {
+  const page = await getExisting(db.table<Page>('pages'), rowId);
+  if (!page || page.workspaceId !== job.workspaceId || page.inTrash === true) {
+    throw Object.assign(new Error('Hierarchy dependency endpoint changed during preflight.'), { status: 409 });
+  }
+  const hierarchyItem = await duplicateHierarchyItemForRow(db, job.id, rowId);
+  const ordinaryDatabaseRow = page.parentType === 'database' && page.parentId === job.databaseId;
+  if (!hierarchyItem && !ordinaryDatabaseRow) {
+    throw Object.assign(new Error('Hierarchy dependency endpoint is outside the source database.'), { status: 409 });
+  }
+  return { page, hierarchyItem };
+}
+
+function compareDuplicateHierarchyBoundary(page: Page, boundary: { position: number; id: string }) {
+  return (page.position ?? 0) - boundary.position || page.id.localeCompare(boundary.id);
+}
+
+async function duplicateHierarchyChildWindow(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+) {
+  const read = async (additional: Array<[string, string, unknown]>) => {
+    let query: TableQuery<Page> = item.scanLane === 'subitems'
+      ? db.table<Page>('pages').where('parentId', '==', job.databaseId)
+      : db.table<Page>('pages').where('parentId', '==', item.rowId);
+    if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+      throw Object.assign(new Error('Hierarchy duplication requires bounded ordered queries.'), { status: 500 });
+    }
+    query = query.where!('parentType', '==', item.scanLane === 'subitems' ? 'database' : 'page');
+    if (item.scanLane === 'subitems') query = query.where!('subitemParentId', '==', item.rowId);
+    query = query.where!('inTrash', '==', false).orderBy!('position', 'asc').orderBy!('id', 'asc');
+    for (const [field, operator, value] of additional) query = query.where!(field, operator, value);
+    if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+    return (await query.limit(DUPLICATE_HIERARCHY_CHILD_WINDOW + 1).getList()).items ?? [];
+  };
+  const after = item.scanRowId ? { position: item.scanPosition, id: item.scanRowId } : undefined;
+  const candidates = after
+    ? (await Promise.all([
+        read([['position', '>', after.position]]),
+        read([['position', '==', after.position], ['id', '>', after.id]]),
+      ])).flat()
+    : await read([]);
+  const rows = Array.from(new Map(candidates
+    .filter((child) => (
+      child.workspaceId === job.workspaceId
+      && child.inTrash !== true
+      && (item.scanLane === 'subitems'
+        ? child.parentId === job.databaseId
+          && child.parentType === 'database'
+          && child.subitemParentId === item.rowId
+        : child.parentId === item.rowId && child.parentType === 'page')
+      && (!after || compareDuplicateHierarchyBoundary(child, after) > 0)
+    ))
+    .map((child) => [child.id, child])).values())
+    .sort((left, right) => compareDuplicateHierarchyBoundary(left, {
+      position: right.position ?? 0,
+      id: right.id,
+    }));
+  const accepted = rows.slice(0, DUPLICATE_HIERARCHY_CHILD_WINDOW);
+  const last = accepted.at(-1);
+  return {
+    rows: accepted,
+    hasMore: rows.length > DUPLICATE_HIERARCHY_CHILD_WINDOW,
+    boundary: last ? { position: last.position ?? 0, id: last.id } : undefined,
+  };
+}
+
+async function createDuplicateHierarchyJob(
+  db: DbRef,
+  database: Page,
+  source: Page,
+  mutationId: string,
+  actorId: string,
+) {
+  const id = await duplicateHierarchyHash(
+    'duplicate-hierarchy-job',
+    source.workspaceId,
+    database.id,
+    source.id,
+    mutationId,
+  );
+  const targetRootId = await duplicateHierarchyUuid(id, source.id);
+  const job: DuplicateHierarchyJob = {
+    id,
+    workspaceId: source.workspaceId,
+    databaseId: database.id,
+    rootRowId: source.id,
+    operation: 'duplicate',
+    trashStamp: nowIso(),
+    featureRevision: Number(database.databaseFeaturesRevision ?? 0),
+    requestedBy: actorId,
+    mutationId,
+    phase: 'discovering',
+    targetRootId,
+    sourceParentId: source.subitemParentId ?? '',
+  };
+  const item: DuplicateHierarchyItem = {
+    id: await duplicateHierarchyHash('duplicate-hierarchy-item', id, source.id),
+    workspaceId: source.workspaceId,
+    databaseId: database.id,
+    jobId: id,
+    rowId: source.id,
+    depth: 0,
+    scanned: false,
+    scanLane: 'subitems',
+    scanPosition: 0,
+    scanRowId: '',
+    targetRowId: targetRootId,
+    prepared: false,
+    applied: false,
+    blockScanId: '',
+    blocksPrepared: false,
+    blocksApplied: false,
+    dependencyLane: 'outgoing',
+    dependencyCursorId: '',
+    dependenciesPrepared: false,
+    dependenciesApplied: false,
+    fileCursorId: '',
+    filesApplied: false,
+    relationPropertyCursorId: '',
+    relationValueOffset: 0,
+    relationsPrepared: false,
+  };
+  await db.transact([
+    duplicateHierarchyDatabaseExpectation(database),
+    { table: 'database_hierarchy_lifecycle_jobs', op: 'expect', id, exists: false },
+    { table: 'database_hierarchy_lifecycle_jobs', op: 'insert', data: job as unknown as Record<string, unknown> },
+    { table: 'database_hierarchy_lifecycle_items', op: 'insert', data: duplicateHierarchyItemData(item) },
+  ]);
+  return job;
+}
+
+async function advanceDuplicateHierarchyDiscovery(
+  db: DbRef,
+  database: Page,
+  job: DuplicateHierarchyJob,
+) {
+  for (let step = 0; step < DUPLICATE_HIERARCHY_PARENT_STEPS; step += 1) {
+    const item = await firstDuplicateHierarchyItem(db, job.id, 'scanned', false);
+    if (!item) return false;
+    const window = await duplicateHierarchyChildWindow(db, job, item);
+    const children = await Promise.all(window.rows.map(async (child): Promise<DuplicateHierarchyItem> => ({
+      id: await duplicateHierarchyHash('duplicate-hierarchy-item', job.id, child.id),
+      workspaceId: job.workspaceId,
+      databaseId: job.databaseId,
+      jobId: job.id,
+      rowId: child.id,
+      depth: item.depth + 1,
+      scanned: false,
+      scanLane: 'subitems',
+      scanPosition: 0,
+      scanRowId: '',
+      targetRowId: await duplicateHierarchyUuid(job.id, child.id),
+      prepared: false,
+      applied: false,
+      blockScanId: '',
+      blocksPrepared: false,
+      blocksApplied: false,
+      dependencyLane: 'outgoing',
+      dependencyCursorId: '',
+      dependenciesPrepared: false,
+      dependenciesApplied: false,
+      fileCursorId: '',
+      filesApplied: false,
+      relationPropertyCursorId: '',
+      relationValueOffset: 0,
+      relationsPrepared: false,
+    })));
+    const operations: TransactOperation[] = [
+      duplicateHierarchyDatabaseExpectation(database),
+      duplicateHierarchyJobExpectation(job),
+      duplicateHierarchyItemExpectation(item),
+      ...children.map((child): TransactOperation => ({
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'insert',
+        data: duplicateHierarchyItemData(child),
+      })),
+    ];
+    if (window.hasMore && window.boundary) {
+      operations.push({
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { scanPosition: window.boundary.position, scanRowId: window.boundary.id },
+      });
+      await db.transact(operations);
+      return true;
+    }
+    operations.push({
+      table: 'database_hierarchy_lifecycle_items',
+      op: 'update',
+      id: item.id,
+      data: item.scanLane === 'subitems'
+        ? { scanLane: 'pages', scanPosition: 0, scanRowId: '' }
+        : { scanned: true },
+    });
+    await db.transact(operations);
+  }
+  return Boolean(await firstDuplicateHierarchyItem(db, job.id, 'scanned', false));
+}
+
+async function loadDuplicateHierarchyPages(db: DbRef, items: DuplicateHierarchyItem[]) {
+  const ids = items.map((item) => item.rowId);
+  const result = await db.table<Page>('pages').where('id', 'in', ids).limit(ids.length).getList();
+  const byId = new Map((result.items ?? []).map((page) => [page.id, page]));
+  if (byId.size !== ids.length) {
+    throw Object.assign(new Error('Hierarchy changed during duplication.'), { status: 409 });
+  }
+  return byId;
+}
+
+async function duplicateHierarchyFileProperties(
+  db: DbRef,
+  databaseId: string,
+  pages: Page[],
+) {
+  const propertyIds = Array.from(new Set(pages.flatMap((page) => (
+    Object.entries(page.properties ?? {})
+      .filter(([, value]) => hasPotentialStoredFileReference(value))
+      .map(([propertyId]) => propertyId)
+  ))));
+  if (propertyIds.length > MAX_DUPLICATED_FILES) {
+    throw Object.assign(
+      new Error(`Page duplication is limited to ${MAX_DUPLICATED_FILES} stored-file properties per row.`),
+      { status: 413 },
+    );
+  }
+  if (propertyIds.length === 0) return new Map<string, DbProperty>();
+  const result = await db.table<DbProperty>('db_properties')
+    .where('id', 'in', propertyIds)
+    .limit(propertyIds.length)
+    .getList();
+  return new Map((result.items ?? [])
+    .filter((property) => property.databaseId === databaseId && property.type === 'files')
+    .map((property) => [property.id, property]));
+}
+
+async function duplicateHierarchyPageFilePlans(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+  page: Page,
+  request?: Request,
+  knownFileProperties?: Map<string, DbProperty>,
+) {
+  const propsById = knownFileProperties
+    ?? await duplicateHierarchyFileProperties(db, job.databaseId, [page]);
+  const values: FileReferenceValue[] = [
+    { value: page.icon, directString: true },
+    { value: page.cover, directString: true },
+    { value: page.properties },
+    ...storedFilePropertyValues(page.properties, propsById),
+  ];
+  const uploads = await loadReferencedUploads(db, job.workspaceId, values);
+  const propertyMap = new Map(Array.from(propsById.keys(), (propertyId) => [propertyId, propertyId]));
+  return buildDuplicateFilePlans({
+    uploads,
+    pageMap: new Map([[job.databaseId, job.databaseId], [item.rowId, item.targetRowId]]),
+    blockMap: new Map(),
+    propertyMap,
+    templateMap: new Map(),
+    pageValues: [{ pageId: item.rowId, databaseId: job.databaseId, values }],
+    blockValues: [],
+    templateValues: [],
+    workspaceId: job.workspaceId,
+    actorId: job.requestedBy,
+    request,
+  });
+}
+
+async function prepareDuplicateHierarchyItems(db: DbRef, job: DuplicateHierarchyJob) {
+  const candidates = await duplicateHierarchyItems(db, job.id, 'prepared', false, 'asc');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  const pages = await loadDuplicateHierarchyPages(db, items);
+  // File-bearing pages are the heavy-payload class: validate one per request.
+  // File-free rows retain the existing aggregate preparation window.
+  const fileItem = items.find((item) => {
+    const page = pages.get(item.rowId)!;
+    return hasPotentialStoredFileReference([page.icon, page.cover, page.properties]);
+  });
+  const preparedItems = fileItem ? [fileItem] : items;
+  const fileProperties = fileItem
+    ? await duplicateHierarchyFileProperties(db, job.databaseId, [pages.get(fileItem.rowId)!])
+    : new Map<string, DbProperty>();
+  for (const item of preparedItems) {
+    const page = pages.get(item.rowId)!;
+    const canonicalParentItem = page.parentType === 'page' && page.parentId
+      ? await duplicateHierarchyItemForRow(db, job.id, page.parentId)
+      : null;
+    const isDatabaseRow = page.parentType === 'database' && page.parentId === job.databaseId;
+    const isCanonicalChild = page.parentType === 'page'
+      && Boolean(page.parentId)
+      && Boolean(canonicalParentItem)
+      && !page.subitemParentId;
+    if (
+      page.kind !== 'page'
+      || (!isDatabaseRow && !isCanonicalChild)
+    ) {
+      throw Object.assign(
+        new Error('Bounded hierarchy duplication requires plain database rows.'),
+        { status: 409 },
+      );
+    }
+    if (item === fileItem) {
+      await duplicateHierarchyPageFilePlans(db, job, item, page, undefined, fileProperties);
+    }
+  }
+  await db.transact([
+    duplicateHierarchyJobExpectation(job),
+    ...preparedItems.flatMap((item): TransactOperation[] => [
+      duplicateHierarchyItemExpectation(item),
+      {
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { prepared: true, sourceUpdatedAt: pages.get(item.rowId)!.updatedAt ?? '' },
+      },
+    ]),
+  ]);
+  return candidates.length > preparedItems.length
+    || Boolean(await firstDuplicateHierarchyItem(db, job.id, 'prepared', false));
+}
+
+async function duplicateHierarchyBlockFilePlans(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+  block: Block,
+  request?: Request,
+) {
+  if (!hasPotentialStoredFileReference(block.content)) return [];
+  const uploads = await loadReferencedUploads(db, job.workspaceId, [{ value: block.content }]);
+  return buildDuplicateFilePlans({
+    uploads,
+    pageMap: new Map([[job.databaseId, job.databaseId], [item.rowId, item.targetRowId]]),
+    blockMap: new Map([[block.id, await duplicateHierarchyBlockUuid(job.id, block.id)]]),
+    propertyMap: new Map(),
+    templateMap: new Map(),
+    pageValues: [],
+    blockValues: [{ blockId: block.id, pageId: item.rowId, values: [{ value: block.content }] }],
+    templateValues: [],
+    workspaceId: job.workspaceId,
+    actorId: job.requestedBy,
+    request,
+  });
+}
+
+async function prepareDuplicateHierarchyBlocks(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  request?: Request,
+) {
+  const candidates = await duplicateHierarchyBlockStateItems(db, job.id, 'blocksPrepared');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  if (items.some((item) => !item.prepared || item.sourceUpdatedAt === undefined)) {
+    throw Object.assign(new Error('Hierarchy block preflight started before row preflight.'), { status: 409 });
+  }
+  const rowIds = items.map((item) => item.rowId);
+  const firstBlock = (await db.table<Block>('blocks').where('pageId', 'in', rowIds).limit(1).getList()).items?.[0];
+  if (!firstBlock) {
+    const pages = await loadDuplicateHierarchyPages(db, items);
+    const [outgoingEdge, incomingEdge, fileUpload] = await Promise.all([
+      duplicateHierarchyDependencyEdgeForRows(db, job, 'outgoing', rowIds),
+      duplicateHierarchyDependencyEdgeForRows(db, job, 'incoming', rowIds),
+      db.table<FileUpload>('file_uploads').where('pageId', 'in', rowIds).limit(1).getList()
+        .then((result) => result.items?.[0]),
+    ]);
+    const dependenciesPrepared = !outgoingEdge && !incomingEdge;
+    const filesApplied = !fileUpload;
+    for (const item of items) {
+      const page = pages.get(item.rowId)!;
+      if ((page.updatedAt ?? '') !== item.sourceUpdatedAt || page.inTrash === true) {
+        throw Object.assign(new Error('Hierarchy duplicate source changed during block preflight.'), { status: 409 });
+      }
+    }
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: {
+            blockScanId: '',
+            blocksPrepared: true,
+            ...(dependenciesPrepared ? { dependenciesPrepared: true } : {}),
+            ...(filesApplied ? { filesApplied: true } : {}),
+          },
+        },
+      ]),
+    ]);
+    return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  }
+  const item = items.find((candidate) => candidate.rowId === firstBlock.pageId);
+  if (!item) throw Object.assign(new Error('Hierarchy block preflight ownership changed.'), { status: 409 });
+  const source = await getExisting(db.table<Page>('pages'), item.rowId);
+  if (!source || (source.updatedAt ?? '') !== item.sourceUpdatedAt || source.inTrash === true) {
+    throw Object.assign(new Error('Hierarchy duplicate source changed during block preflight.'), { status: 409 });
+  }
+  const window = await duplicateHierarchyBlockWindow(db, item);
+  for (const block of window.rows) {
+    await duplicateHierarchyBlockFilePlans(db, job, item, block, request);
+    if (block.parentId) {
+      const parent = await getExisting(db.table<Block>('blocks'), block.parentId);
+      if (!parent || parent.pageId !== item.rowId) {
+        throw Object.assign(new Error('Hierarchy block parent changed during preflight.'), { status: 409 });
+      }
+    }
+  }
+  const last = window.rows.at(-1);
+  await db.transact([
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+    ...window.rows.map(duplicateHierarchyBlockExpectation),
+    {
+      table: 'database_hierarchy_lifecycle_items',
+      op: 'update',
+      id: item.id,
+      data: window.hasMore && last
+        ? { blockScanId: last.id }
+        : { blockScanId: '', blocksPrepared: true },
+    },
+  ]);
+  return window.hasMore || candidates.length > 1;
+}
+
+async function prepareDuplicateHierarchyDependencies(db: DbRef, job: DuplicateHierarchyJob) {
+  const candidates = await duplicateHierarchyDependencyStateItems(db, job.id, 'dependenciesPrepared');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  if (items.some((item) => !item.blocksPrepared || item.sourceUpdatedAt === undefined)) {
+    throw Object.assign(new Error('Hierarchy dependency preflight started before block preflight.'), { status: 409 });
+  }
+  const rowIds = items.map((item) => item.rowId);
+  const [anyOutgoing, anyIncoming] = await Promise.all([
+    duplicateHierarchyDependencyEdgeForRows(db, job, 'outgoing', rowIds),
+    duplicateHierarchyDependencyEdgeForRows(db, job, 'incoming', rowIds),
+  ]);
+  if (!anyOutgoing && !anyIncoming) {
+    const pages = await loadDuplicateHierarchyPages(db, items);
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => {
+        const page = pages.get(item.rowId)!;
+        if ((page.updatedAt ?? '') !== item.sourceUpdatedAt || page.inTrash === true) {
+          throw Object.assign(new Error('Hierarchy source changed during dependency preflight.'), { status: 409 });
+        }
+        return [
+          duplicateHierarchyItemExpectation(item),
+          duplicateHierarchySourcePageExpectation(job, item),
+          {
+            table: 'database_hierarchy_lifecycle_items',
+            op: 'update',
+            id: item.id,
+            data: {
+              dependencyLane: 'outgoing',
+              dependencyCursorId: '',
+              dependenciesPrepared: true,
+            },
+          },
+        ];
+      }),
+    ]);
+    return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  }
+
+  const outgoingItems = items.filter((item) => item.dependencyLane === 'outgoing');
+  const lane: 'outgoing' | 'incoming' = outgoingItems.length > 0 ? 'outgoing' : 'incoming';
+  const laneItems = lane === 'outgoing' ? outgoingItems : items;
+  const firstEdge = await duplicateHierarchyDependencyEdgeForRows(
+    db,
+    job,
+    lane,
+    laneItems.map((item) => item.rowId),
+  );
+  if (!firstEdge) {
+    await loadDuplicateHierarchyPages(db, laneItems);
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...laneItems.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: lane === 'outgoing'
+            ? { dependencyLane: 'incoming', dependencyCursorId: '' }
+            : {
+                dependencyLane: 'outgoing',
+                dependencyCursorId: '',
+                dependenciesPrepared: true,
+              },
+        },
+      ]),
+    ]);
+    return true;
+  }
+  const ownerId = lane === 'outgoing' ? firstEdge.predecessorRowId : firstEdge.successorRowId;
+  const item = laneItems.find((candidate) => candidate.rowId === ownerId);
+  if (!item) throw Object.assign(new Error('Hierarchy dependency preflight ownership changed.'), { status: 409 });
+  const window = await duplicateHierarchyDependencyEdgeWindow(db, job, item);
+  for (const edge of window.rows) {
+    await Promise.all([
+      assertDuplicateHierarchyDependencyEndpoint(db, job, edge.predecessorRowId),
+      assertDuplicateHierarchyDependencyEndpoint(db, job, edge.successorRowId),
+    ]);
+  }
+  const last = window.rows.at(-1);
+  await db.transact([
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+    ...window.rows.map(duplicateHierarchyDependencyEdgeExpectation),
+    {
+      table: 'database_hierarchy_lifecycle_items',
+      op: 'update',
+      id: item.id,
+      data: window.hasMore && last
+        ? { dependencyCursorId: last.id }
+        : lane === 'outgoing'
+          ? { dependencyLane: 'incoming', dependencyCursorId: '' }
+          : {
+              dependencyLane: 'outgoing',
+              dependencyCursorId: '',
+              dependenciesPrepared: true,
+            },
+    },
+  ]);
+  return true;
+}
+
+function collectDuplicateHierarchyBlockReferences(
+  value: unknown,
+  pageIds: Set<string>,
+  blockIds: Set<string>,
+  depth = 0,
+): void {
+  if (depth > 64) {
+    throw Object.assign(new Error('Hierarchy block content nesting is too deep.'), { status: 409 });
+  }
+  if (!value || typeof value !== 'object') return;
+  if (Array.isArray(value)) {
+    for (const child of value) collectDuplicateHierarchyBlockReferences(child, pageIds, blockIds, depth + 1);
+    return;
+  }
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    if (
+      typeof child === 'string'
+      && (key === 'pageId' || key === 'childPageId' || key === 'syncedPageId')
+    ) pageIds.add(child);
+    if (typeof child === 'string' && key === 'syncedBlockId') blockIds.add(child);
+    if (pageIds.size + blockIds.size > DUPLICATE_HIERARCHY_BLOCK_REFERENCE_LIMIT) {
+      throw Object.assign(
+        new Error(`Hierarchy block continuation supports at most ${DUPLICATE_HIERARCHY_BLOCK_REFERENCE_LIMIT} internal references per block.`),
+        { status: 413 },
+      );
+    }
+    collectDuplicateHierarchyBlockReferences(child, pageIds, blockIds, depth + 1);
+  }
+}
+
+async function remapDuplicateHierarchyBlockContent(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+  block: Block,
+) {
+  const pageIds = new Set<string>([item.rowId]);
+  const blockIds = new Set<string>([block.id]);
+  collectDuplicateHierarchyBlockReferences(block.content, pageIds, blockIds);
+  const pageMap = new Map<string, string>([[item.rowId, item.targetRowId]]);
+  for (const pageId of pageIds) {
+    if (pageMap.has(pageId)) continue;
+    const referencedItem = await duplicateHierarchyItemForRow(db, job.id, pageId);
+    if (referencedItem) pageMap.set(pageId, referencedItem.targetRowId);
+  }
+  const blockMap = new Map<string, string>([[block.id, await duplicateHierarchyBlockUuid(job.id, block.id)]]);
+  for (const blockId of blockIds) {
+    if (blockMap.has(blockId)) continue;
+    const referencedBlock = await getExisting(db.table<Block>('blocks'), blockId);
+    if (!referencedBlock) continue;
+    const ownerItem = await duplicateHierarchyItemForRow(db, job.id, referencedBlock.pageId);
+    if (ownerItem) blockMap.set(blockId, await duplicateHierarchyBlockUuid(job.id, blockId));
+  }
+  return remapBlockContent(block.content, pageMap, blockMap);
+}
+
+async function applyDuplicateHierarchyBlocks(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  actorId: string,
+) {
+  const candidates = await duplicateHierarchyBlockStateItems(db, job.id, 'blocksApplied');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  if (items.some((item) => !item.blocksPrepared || !item.applied || item.sourceUpdatedAt === undefined)) {
+    throw Object.assign(new Error('Hierarchy block copy started before its fences were ready.'), { status: 409 });
+  }
+  const rowIds = items.map((item) => item.rowId);
+  const firstBlock = (await db.table<Block>('blocks').where('pageId', 'in', rowIds).limit(1).getList()).items?.[0];
+  if (!firstBlock) {
+    const sourcePages = await loadDuplicateHierarchyPages(db, items);
+    const targetIds = items.map((item) => item.targetRowId);
+    const loadedTargets = await db.table<Page>('pages').where('id', 'in', targetIds).limit(targetIds.length).getList();
+    const targetPages = new Map((loadedTargets.items ?? []).map((page) => [page.id, page]));
+    if (targetPages.size !== targetIds.length) {
+      throw Object.assign(new Error('Hierarchy block copy target pages changed.'), { status: 409 });
+    }
+    const [outgoingEdge, incomingEdge] = await Promise.all([
+      duplicateHierarchyDependencyEdgeForRows(db, job, 'outgoing', rowIds),
+      duplicateHierarchyDependencyEdgeForRows(db, job, 'incoming', rowIds),
+    ]);
+    const dependenciesApplied = !outgoingEdge && !incomingEdge;
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => {
+        const sourcePage = sourcePages.get(item.rowId)!;
+        const targetPage = targetPages.get(item.targetRowId)!;
+        if (
+          (sourcePage.updatedAt ?? '') !== item.sourceUpdatedAt
+          || targetPage.inTrash !== true
+          || targetPage.trashedAt !== job.trashStamp
+        ) throw Object.assign(new Error('Hierarchy block copy page fence changed.'), { status: 409 });
+        return [
+          duplicateHierarchyItemExpectation(item),
+          duplicateHierarchySourcePageExpectation(job, item),
+          {
+            table: 'pages',
+            op: 'expect',
+            id: item.targetRowId,
+            where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+            exists: true,
+          },
+          {
+            table: 'database_hierarchy_lifecycle_items',
+            op: 'update',
+            id: item.id,
+            data: {
+              blockScanId: '',
+              blocksApplied: true,
+              ...(dependenciesApplied ? { dependenciesApplied: true } : {}),
+            },
+          },
+        ];
+      }),
+    ]);
+    return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  }
+  const item = items.find((candidate) => candidate.rowId === firstBlock.pageId);
+  if (!item) throw Object.assign(new Error('Hierarchy block copy ownership changed.'), { status: 409 });
+  const targetPage = await getExisting(db.table<Page>('pages'), item.targetRowId);
+  if (!targetPage || targetPage.inTrash !== true || targetPage.trashedAt !== job.trashStamp) {
+    throw Object.assign(new Error('Hierarchy block copy target page changed.'), { status: 409 });
+  }
+  const window = await duplicateHierarchyBlockWindow(db, item);
+  const stamp = nowIso();
+  const operations: TransactOperation[] = [
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+    {
+      table: 'pages',
+      op: 'expect',
+      id: item.targetRowId,
+      where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+      exists: true,
+    },
+  ];
+  for (const block of window.rows) {
+    const targetId = await duplicateHierarchyBlockUuid(job.id, block.id);
+    const targetParentId = block.parentId
+      ? await duplicateHierarchyBlockUuid(job.id, block.parentId)
+      : null;
+    const content = await remapDuplicateHierarchyBlockContent(db, job, item, block);
+    const existing = await getExisting(db.table<Block>('blocks'), targetId);
+    operations.push(duplicateHierarchyBlockExpectation(block));
+    if (existing) {
+      if (
+        existing.pageId !== item.targetRowId
+        || (existing.parentId ?? null) !== targetParentId
+        || existing.type !== block.type
+        || existing.lastMutationId !== `hierarchy-duplicate:${job.id}`
+      ) throw Object.assign(new Error('Hierarchy duplicate block target changed during replay.'), { status: 409 });
+      operations.push(duplicateHierarchyBlockExpectation(existing));
+      continue;
+    }
+    const target: Block = {
+      ...cloneJson(block),
+      id: targetId,
+      pageId: item.targetRowId,
+      parentId: targetParentId,
+      content,
+      createdBy: actorId,
+      lastEditedBy: actorId,
+      lastMutationId: `hierarchy-duplicate:${job.id}`,
+      createdAt: stamp,
+      updatedAt: stamp,
+    };
+    operations.push(
+      { table: 'blocks', op: 'expect', id: targetId, exists: false },
+      { table: 'blocks', op: 'insert', data: target as unknown as Record<string, unknown> },
+    );
+  }
+  const last = window.rows.at(-1);
+  operations.push({
+    table: 'database_hierarchy_lifecycle_items',
+    op: 'update',
+    id: item.id,
+    data: window.hasMore && last
+      ? { blockScanId: last.id }
+      : { blockScanId: last?.id ?? '', blocksApplied: true },
+  });
+  await db.transact(operations);
+  return window.hasMore || candidates.length > 1;
+}
+
+async function nextDuplicateHierarchyFileUpload(
+  db: DbRef,
+  item: DuplicateHierarchyItem,
+) {
+  let query: TableQuery<FileUpload> = db.table<FileUpload>('file_uploads')
+    .where('pageId', '==', item.rowId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy file copy requires bounded upload keysets.'), { status: 500 });
+  }
+  if (item.fileCursorId) query = query.where!('id', '>', item.fileCursorId);
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(1).getList()).items?.[0] ?? null;
+}
+
+async function stableDuplicateHierarchyFilePlan(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+  sourceUpload: FileUpload,
+  sourceBlock: Block,
+  request?: Request,
+) {
+  const plans = await duplicateHierarchyBlockFilePlans(db, job, item, sourceBlock, request);
+  const plan = plans.find((candidate) => candidate.source.id === sourceUpload.id);
+  if (!plan) return null;
+  const id = await duplicateHierarchyFileUuid(job.id, sourceUpload.id);
+  const name = (optionalString(sourceUpload.name) ?? 'Untitled').slice(0, 180);
+  const bucket = uploadBucket(sourceUpload);
+  const key = `workspaces/${job.workspaceId}/duplicate-page/${id}-${cleanFileSegment(name)}${extensionFromName(name)}`;
+  plan.target = {
+    ...plan.target,
+    id,
+    key,
+    url: storageUrl(request, bucket, key),
+  };
+  return plan;
+}
+
+async function stableDuplicateHierarchyPageFilePlan(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  item: DuplicateHierarchyItem,
+  sourceUpload: FileUpload,
+  sourcePage: Page,
+  fileProperties: Map<string, DbProperty>,
+  request?: Request,
+) {
+  const plans = await duplicateHierarchyPageFilePlans(
+    db,
+    job,
+    item,
+    sourcePage,
+    request,
+    fileProperties,
+  );
+  const plan = plans.find((candidate) => candidate.source.id === sourceUpload.id);
+  if (!plan) return null;
+  const id = await duplicateHierarchyFileUuid(job.id, sourceUpload.id);
+  const name = (optionalString(sourceUpload.name) ?? 'Untitled').slice(0, 180);
+  const bucket = uploadBucket(sourceUpload);
+  const key = `workspaces/${job.workspaceId}/duplicate-page/${id}-${cleanFileSegment(name)}${extensionFromName(name)}`;
+  plan.target = {
+    ...plan.target,
+    id,
+    key,
+    url: storageUrl(request, bucket, key),
+  };
+  return plan;
+}
+
+async function ensureDuplicateHierarchyFileCopy(input: {
+  db: DbRef;
+  admin: AdminDbAccessor;
+  workspace: Workspace;
+  plan: DuplicateFilePlan;
+  storage: DuplicateStorageProxy | undefined;
+  lease: FileWorkspaceLeaseGuard;
+}) {
+  const { db, admin, workspace, plan, storage, lease } = input;
+  const existingTarget = await getExisting(db.table<FileUpload>('file_uploads'), plan.target.id);
+  if (existingTarget) {
+    const associations = ['pageId', 'blockId', 'databaseId', 'propertyId', 'templateId'] as const;
+    if (
+      existingTarget.workspaceId !== plan.target.workspaceId
+      || existingTarget.key !== plan.target.key
+      || uploadBucket(existingTarget) !== uploadBucket(plan.target)
+      || associations.some((field) => (
+        (existingTarget[field] ?? null) !== (plan.target[field] ?? null)
+      ))
+    ) {
+      throw Object.assign(new Error('Hierarchy file target ownership changed.'), { status: 409 });
+    }
+    if (existingTarget.status === 'uploaded') {
+      plan.target = existingTarget;
+    } else {
+      plan.target = existingTarget;
+      plan.rowCreated = true;
+      plan.objectWriteAttempted = true;
+      plan.reservation = workspace.organizationId ? {
+        id: existingTarget.id,
+        organizationId: workspace.organizationId,
+        workspaceId: workspace.id,
+        bytes: typeof existingTarget.size === 'number' ? existingTarget.size : 0,
+      } : null;
+      if (!(await rollbackDuplicatedFiles({ db, admin, plans: [plan], storage }))) {
+        throw new Error('Hierarchy file retry cleanup did not complete.');
+      }
+      plan.rowCreated = false;
+      plan.objectWriteAttempted = false;
+      plan.reservation = null;
+      plan.target.status = 'preparing';
+    }
+  }
+  if (plan.target.status !== 'uploaded') {
+    await copyDuplicatedFiles({ db, admin, workspace, plans: [plan], storage, lease });
+  }
+}
+
+async function applyDuplicateHierarchyFiles(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  job: DuplicateHierarchyJob,
+  storage: DuplicateStorageProxy | undefined,
+  request: Request | undefined,
+  lease: FileWorkspaceLeaseGuard,
+) {
+  const candidates = await duplicateHierarchyFileStateItems(db, job.id);
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  if (items.some((item) => !item.blocksApplied || !item.applied || item.sourceUpdatedAt === undefined)) {
+    throw Object.assign(new Error('Hierarchy file copy started before hidden content was ready.'), { status: 409 });
+  }
+  const nextUploads = await Promise.all(items.map((item) => nextDuplicateHierarchyFileUpload(db, item)));
+  const activeIndex = nextUploads.findIndex(Boolean);
+  if (activeIndex === -1) {
+    const targets = await db.table<Page>('pages')
+      .where('id', 'in', items.map((item) => item.targetRowId))
+      .limit(items.length)
+      .getList();
+    const targetsById = new Map((targets.items ?? []).map((page) => [page.id, page]));
+    if (targetsById.size !== items.length) {
+      throw Object.assign(new Error('Hierarchy file copy target pages changed.'), { status: 409 });
+    }
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'pages',
+          op: 'expect',
+          id: item.targetRowId,
+          where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+          exists: true,
+        },
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: { filesApplied: true },
+        },
+      ]),
+    ]);
+    return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  }
+  const item = items[activeIndex]!;
+  const sourceUpload = nextUploads[activeIndex]!;
+  const advanceWithoutCopy = async () => {
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      duplicateHierarchyItemExpectation(item),
+      duplicateHierarchySourcePageExpectation(job, item),
+      {
+        table: 'file_uploads',
+        op: 'expect',
+        id: sourceUpload.id,
+        where: [['pageId', '==', item.rowId]],
+        exists: true,
+      },
+      {
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { fileCursorId: sourceUpload.id },
+      },
+    ]);
+    return true;
+  };
+  let sourceBlock: Block | null = null;
+  let targetBlock: Block | null = null;
+  let sourcePage: Page | null = null;
+  let targetPage: Page | null = null;
+  let pageFileProperties = new Map<string, DbProperty>();
+  let plan: DuplicateFilePlan | null;
+  if (sourceUpload.blockId) {
+    sourceBlock = await getExisting(db.table<Block>('blocks'), sourceUpload.blockId);
+    if (!sourceBlock || sourceBlock.pageId !== item.rowId) {
+      throw Object.assign(new Error('Hierarchy file source block changed.'), { status: 409 });
+    }
+    plan = await stableDuplicateHierarchyFilePlan(
+      db,
+      job,
+      item,
+      sourceUpload,
+      sourceBlock,
+      request,
+    );
+    const targetBlockId = await duplicateHierarchyBlockUuid(job.id, sourceBlock.id);
+    targetBlock = await getExisting(db.table<Block>('blocks'), targetBlockId);
+    if (!targetBlock || targetBlock.pageId !== item.targetRowId) {
+      throw Object.assign(new Error('Hierarchy file target block changed.'), { status: 409 });
+    }
+  } else {
+    sourcePage = await getExisting(db.table<Page>('pages'), item.rowId);
+    if (
+      !sourcePage
+      || sourcePage.inTrash === true
+      || (sourcePage.updatedAt ?? '') !== item.sourceUpdatedAt
+    ) {
+      throw Object.assign(new Error('Hierarchy file source page changed.'), { status: 409 });
+    }
+    pageFileProperties = await duplicateHierarchyFileProperties(db, job.databaseId, [sourcePage]);
+    plan = await stableDuplicateHierarchyPageFilePlan(
+      db,
+      job,
+      item,
+      sourceUpload,
+      sourcePage,
+      pageFileProperties,
+      request,
+    );
+    targetPage = await getExisting(db.table<Page>('pages'), item.targetRowId);
+    if (!targetPage || targetPage.inTrash !== true || targetPage.trashedAt !== job.trashStamp) {
+      throw Object.assign(new Error('Hierarchy file target page changed.'), { status: 409 });
+    }
+  }
+  if (!plan) return advanceWithoutCopy();
+  const workspace = await getExisting(admin.db('app').table<Workspace>('workspaces'), job.workspaceId);
+  if (!workspace) throw new Error('Workspace was not found.');
+  await ensureDuplicateHierarchyFileCopy({ db, admin, workspace, plan, storage, lease });
+  const sourceUploadExpectation: TransactOperation = {
+    table: 'file_uploads',
+    op: 'expect',
+    id: sourceUpload.id,
+    where: [
+      ['pageId', '==', item.rowId],
+      ['blockId', '==', sourceBlock?.id ?? null],
+      ['databaseId', '==', sourceUpload.databaseId ?? null],
+      ['propertyId', '==', sourceUpload.propertyId ?? null],
+      ['status', '==', 'uploaded'],
+      ['etag', '==', sourceUpload.etag ?? null],
+    ],
+    exists: true,
+  };
+  const targetUploadExpectation: TransactOperation = {
+    table: 'file_uploads',
+    op: 'expect',
+    id: plan.target.id,
+    where: [
+      ['pageId', '==', item.targetRowId],
+      ['blockId', '==', targetBlock?.id ?? null],
+      ['databaseId', '==', plan.target.databaseId ?? null],
+      ['propertyId', '==', plan.target.propertyId ?? null],
+      ['status', '==', 'uploaded'],
+    ],
+    exists: true,
+  };
+  const operations: TransactOperation[] = [
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+    ...(sourceBlock ? [duplicateHierarchyBlockExpectation(sourceBlock)] : []),
+    ...(targetBlock ? [duplicateHierarchyBlockExpectation(targetBlock)] : []),
+    sourceUploadExpectation,
+    targetUploadExpectation,
+  ];
+  if (targetBlock) {
+    const content = remapStoredFileReferences(targetBlock.content, [plan]) as Record<string, unknown> | undefined;
+    operations.push({
+      table: 'blocks',
+      op: 'update',
+      id: targetBlock.id,
+      data: { content, updatedAt: nowIso(), lastEditedBy: job.requestedBy },
+    });
+  } else if (targetPage) {
+    const propertyMap = new Map(Array.from(pageFileProperties.keys(), (propertyId) => [propertyId, propertyId]));
+    const properties = remapProperties(
+      targetPage.properties,
+      propertyMap,
+      new Map(),
+      pageFileProperties,
+      [plan],
+    );
+    operations.push(
+      {
+        table: 'pages',
+        op: 'expect',
+        id: targetPage.id,
+        where: [
+          ['inTrash', '==', true],
+          ['trashedAt', '==', job.trashStamp],
+          ['updatedAt', '==', targetPage.updatedAt ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'pages',
+        op: 'update',
+        id: targetPage.id,
+        data: {
+          ...(targetPage.icon !== undefined ? {
+            icon: remapStoredFileReferences(targetPage.icon, [plan], true),
+          } : {}),
+          ...(targetPage.cover !== undefined ? {
+            cover: remapStoredFileReferences(targetPage.cover, [plan], true),
+          } : {}),
+          ...(targetPage.properties !== undefined ? { properties } : {}),
+          updatedAt: nowIso(),
+          lastEditedBy: job.requestedBy,
+        },
+      },
+    );
+  }
+  operations.push({
+      table: 'database_hierarchy_lifecycle_items',
+      op: 'update',
+      id: item.id,
+      data: { fileCursorId: sourceUpload.id },
+  });
+  await db.transact(operations);
+  return true;
+}
+
+async function duplicateHierarchyDependencyTarget(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  sourceRowId: string,
+) {
+  const item = await duplicateHierarchyItemForRow(db, job.id, sourceRowId);
+  const targetRowId = item?.targetRowId ?? sourceRowId;
+  const page = await getExisting(db.table<Page>('pages'), targetRowId);
+  if (item) {
+    if (!page || page.inTrash !== true || page.trashedAt !== job.trashStamp) {
+      throw Object.assign(new Error('Hierarchy dependency target page changed.'), { status: 409 });
+    }
+    return {
+      targetRowId,
+      expectation: {
+        table: 'pages',
+        op: 'expect',
+        id: targetRowId,
+        where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+        exists: true,
+      } as TransactOperation,
+      internal: true,
+    };
+  }
+  if (
+    !page
+    || page.workspaceId !== job.workspaceId
+    || page.parentType !== 'database'
+    || page.parentId !== job.databaseId
+    || page.inTrash === true
+  ) throw Object.assign(new Error('Hierarchy dependency external endpoint changed.'), { status: 409 });
+  return {
+    targetRowId,
+    expectation: {
+      table: 'pages',
+      op: 'expect',
+      id: targetRowId,
+      where: [
+        ['workspaceId', '==', job.workspaceId],
+        ['parentId', '==', job.databaseId],
+        ['parentType', '==', 'database'],
+        ['inTrash', '==', false],
+      ],
+      exists: true,
+    } as TransactOperation,
+    internal: false,
+  };
+}
+
+async function applyDuplicateHierarchyDependencies(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  actorId: string,
+) {
+  const candidates = await duplicateHierarchyDependencyStateItems(db, job.id, 'dependenciesApplied');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  if (items.some((item) => !item.dependenciesPrepared || !item.blocksApplied)) {
+    throw Object.assign(new Error('Hierarchy dependency copy started before block copy.'), { status: 409 });
+  }
+  const rowIds = items.map((item) => item.rowId);
+  const [anyOutgoing, anyIncoming] = await Promise.all([
+    duplicateHierarchyDependencyEdgeForRows(db, job, 'outgoing', rowIds),
+    duplicateHierarchyDependencyEdgeForRows(db, job, 'incoming', rowIds),
+  ]);
+  if (!anyOutgoing && !anyIncoming) {
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'pages',
+          op: 'expect',
+          id: item.targetRowId,
+          where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+          exists: true,
+        },
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: {
+            dependencyLane: 'outgoing',
+            dependencyCursorId: '',
+            dependenciesApplied: true,
+          },
+        },
+      ]),
+    ]);
+    return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  }
+
+  const outgoingItems = items.filter((item) => item.dependencyLane === 'outgoing');
+  const lane: 'outgoing' | 'incoming' = outgoingItems.length > 0 ? 'outgoing' : 'incoming';
+  const laneItems = lane === 'outgoing' ? outgoingItems : items;
+  const firstEdge = await duplicateHierarchyDependencyEdgeForRows(
+    db,
+    job,
+    lane,
+    laneItems.map((item) => item.rowId),
+  );
+  if (!firstEdge) {
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...laneItems.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'pages',
+          op: 'expect',
+          id: item.targetRowId,
+          where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]],
+          exists: true,
+        },
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: lane === 'outgoing'
+            ? { dependencyLane: 'incoming', dependencyCursorId: '' }
+            : { dependencyCursorId: '', dependenciesApplied: true },
+        },
+      ]),
+    ]);
+    return true;
+  }
+  const ownerId = lane === 'outgoing' ? firstEdge.predecessorRowId : firstEdge.successorRowId;
+  const item = laneItems.find((candidate) => candidate.rowId === ownerId);
+  if (!item) throw Object.assign(new Error('Hierarchy dependency copy ownership changed.'), { status: 409 });
+  const window = await duplicateHierarchyDependencyEdgeWindow(db, job, item);
+  const operations: TransactOperation[] = [
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+  ];
+  const stamp = nowIso();
+  for (const edge of window.rows) {
+    operations.push(duplicateHierarchyDependencyEdgeExpectation(edge));
+    const [predecessor, successor] = await Promise.all([
+      duplicateHierarchyDependencyTarget(db, job, edge.predecessorRowId),
+      duplicateHierarchyDependencyTarget(db, job, edge.successorRowId),
+    ]);
+    if (lane === 'incoming' && predecessor.internal) continue;
+    const targetId = await duplicateHierarchyHash('duplicate-hierarchy-dependency-edge', job.id, edge.id);
+    const existing = await getExisting(
+      db.table<DuplicateHierarchyDependencyEdge>('database_dependency_edges'),
+      targetId,
+    );
+    operations.push(predecessor.expectation, successor.expectation);
+    if (existing) {
+      if (
+        existing.workspaceId !== job.workspaceId
+        || existing.databaseId !== job.databaseId
+        || existing.predecessorRowId !== predecessor.targetRowId
+        || existing.successorRowId !== successor.targetRowId
+      ) throw Object.assign(new Error('Hierarchy dependency copy target changed during replay.'), { status: 409 });
+      operations.push(duplicateHierarchyDependencyEdgeExpectation(existing));
+      continue;
+    }
+    const target: DuplicateHierarchyDependencyEdge = {
+      id: targetId,
+      workspaceId: job.workspaceId,
+      databaseId: job.databaseId,
+      predecessorRowId: predecessor.targetRowId,
+      successorRowId: successor.targetRowId,
+      createdBy: actorId,
+      createdAt: stamp,
+      updatedAt: stamp,
+    };
+    operations.push(
+      { table: 'database_dependency_edges', op: 'expect', id: targetId, exists: false },
+      { table: 'database_dependency_edges', op: 'insert', data: target as unknown as Record<string, unknown> },
+    );
+  }
+  const last = window.rows.at(-1);
+  operations.push({
+    table: 'database_hierarchy_lifecycle_items',
+    op: 'update',
+    id: item.id,
+    data: window.hasMore && last
+      ? { dependencyCursorId: last.id }
+      : lane === 'outgoing'
+        ? { dependencyLane: 'incoming', dependencyCursorId: '' }
+        : { dependencyCursorId: last?.id ?? '', dependenciesApplied: true },
+  });
+  await db.transact(operations);
+  return true;
+}
+
+async function applyDuplicateHierarchyItems(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  database: Page,
+  source: Page,
+  body: Record<string, unknown>,
+  actorId: string,
+  job: DuplicateHierarchyJob,
+) {
+  const candidates = await duplicateHierarchyItems(db, job.id, 'applied', false, 'asc');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) return false;
+  let relationProbe: TableQuery<DbProperty> = db.table<DbProperty>('db_properties')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof relationProbe.where !== 'function') {
+    throw Object.assign(new Error('Hierarchy relation copy requires bounded schema lookup.'), { status: 500 });
+  }
+  relationProbe = relationProbe.where!('type', '==', 'relation');
+  if (typeof relationProbe.includeTotal === 'function') relationProbe = relationProbe.includeTotal(false);
+  const relationResult = await relationProbe.limit(3).getList();
+  const noOrdinaryRelations = relationResult.hasMore !== true
+    && (relationResult.items ?? []).every((property) => Boolean(duplicateRelationFeatureRole(property)));
+  const pages = await loadDuplicateHierarchyPages(db, items);
+  const labels = persistentGeneratedLabels(parsePersistentGeneratedLocale(body.locale));
+  const nextSiblingQuery = db.table<Page>('pages')
+    .where('parentId', '==', database.id);
+  let orderedSiblingQuery = nextSiblingQuery;
+  if (typeof orderedSiblingQuery.where === 'function' && typeof orderedSiblingQuery.orderBy === 'function') {
+    orderedSiblingQuery = orderedSiblingQuery
+      .where!('parentType', '==', 'database')
+      .where!('subitemParentId', '==', source.subitemParentId ?? '')
+      .where!('inTrash', '==', false)
+      .where!('position', '>', source.position ?? 0)
+      .orderBy!('position', 'asc')
+      .orderBy!('id', 'asc');
+  }
+  if (typeof orderedSiblingQuery.includeTotal === 'function') orderedSiblingQuery = orderedSiblingQuery.includeTotal(false);
+  const nextSibling = (await orderedSiblingQuery.limit(1).getList()).items?.[0];
+  for (const item of items) {
+    const current = pages.get(item.rowId)!;
+    const targetId = item.targetRowId;
+    const canonicalPageChild = current.parentType === 'page' && Boolean(current.parentId);
+    const targetContainerId = canonicalPageChild
+      ? await duplicateHierarchyUuid(job.id, current.parentId!)
+      : job.databaseId;
+    const targetContainerType: PageParentType = canonicalPageChild ? 'page' : 'database';
+    const targetSubitemParentId = canonicalPageChild
+      ? ''
+      : current.id === source.id
+        ? current.subitemParentId ?? ''
+        : await duplicateHierarchyUuid(job.id, current.subitemParentId ?? '');
+    const existing = await getExisting(db.table<Page>('pages'), targetId);
+    if (existing) {
+      if (
+        existing.workspaceId !== job.workspaceId
+        || existing.parentId !== targetContainerId
+        || existing.parentType !== targetContainerType
+        || existing.trashedAt !== job.trashStamp
+      ) throw Object.assign(new Error('Hierarchy duplicate target changed during replay.'), { status: 409 });
+      await ensurePageWorkspaceIndex(admin, existing.id, existing.workspaceId);
+      await db.transact([
+        duplicateHierarchyJobExpectation(job),
+        duplicateHierarchyItemExpectation(item),
+        duplicateHierarchySourcePageExpectation(job, item),
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: { applied: true, ...(noOrdinaryRelations ? { relationsPrepared: true } : {}) },
+        },
+      ]);
+      continue;
+    }
+    const stamp = nowIso();
+    const target: Page = {
+      ...cloneJson(current),
+      id: targetId,
+      parentId: targetContainerId,
+      parentType: targetContainerType,
+      subitemParentId: targetSubitemParentId,
+      subitemChildCount: exactDuplicateSubitemChildCount(current),
+      title: current.id === source.id
+        ? typeof body.title === 'string'
+          ? body.title
+          : labels.copyName(source.title || labels.untitled)
+        : current.title,
+      position: current.id === source.id
+        ? positionBetween(source.position, nextSibling?.position)
+        : current.position,
+      inTrash: true,
+      trashedAt: job.trashStamp,
+      isFavorite: false,
+      isPublic: false,
+      createdBy: actorId,
+      lastEditedBy: actorId,
+      createdAt: stamp,
+      updatedAt: stamp,
+    };
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      duplicateHierarchyItemExpectation(item),
+      duplicateHierarchySourcePageExpectation(job, item),
+      { table: 'pages', op: 'expect', id: target.id, exists: false },
+      { table: 'pages', op: 'insert', data: target as unknown as Record<string, unknown> },
+      {
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { applied: true, ...(noOrdinaryRelations ? { relationsPrepared: true } : {}) },
+      },
+    ]);
+    await ensurePageWorkspaceIndex(admin, target.id, target.workspaceId);
+  }
+  return candidates.length > DUPLICATE_HIERARCHY_APPLY_WINDOW
+    || Boolean(await firstDuplicateHierarchyItem(db, job.id, 'applied', false));
+}
+
+function duplicateRelationIds(value: unknown) {
+  return Array.isArray(value)
+    ? Array.from(new Set(value.filter((id): id is string => typeof id === 'string' && Boolean(id))))
+    : typeof value === 'string' && value
+      ? [value]
+      : [];
+}
+
+function duplicateRelationDatabaseId(property: DbProperty) {
+  const config = objectRecord(property.config);
+  return typeof config?.relationDatabaseId === 'string' && config.relationDatabaseId
+    ? config.relationDatabaseId
+    : property.databaseId;
+}
+
+function duplicateRelationFeatureRole(property: DbProperty) {
+  const role = objectRecord(property.config)?.databaseFeatureRole;
+  return typeof role === 'string' ? role : '';
+}
+
+async function nextDuplicateHierarchyRelationProperty(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+  cursorId: string,
+) {
+  let query: TableQuery<DbProperty> = db.table<DbProperty>('db_properties')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy relation copy requires bounded schema keysets.'), { status: 500 });
+  }
+  query = query.where!('type', '==', 'relation');
+  if (cursorId) query = query.where!('id', '>', cursorId);
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  return (await query.limit(1).getList()).items?.[0] ?? null;
+}
+
+function hierarchyRelationUpdateExpectation(update: HierarchyRelationUpdate): TransactOperation {
+  return {
+    table: 'database_hierarchy_relation_updates',
+    op: 'expect',
+    id: update.id,
+    where: [
+      ['jobId', '==', update.jobId],
+      ['rowId', '==', update.rowId],
+      ['sourceUpdatedAt', '==', update.sourceUpdatedAt],
+    ],
+    exists: true,
+  };
+}
+
+async function prepareDuplicateHierarchyRelations(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+) {
+  let schemaProbe: TableQuery<DbProperty> = db.table<DbProperty>('db_properties')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof schemaProbe.where !== 'function') {
+    throw Object.assign(new Error('Hierarchy relation copy requires bounded schema lookup.'), { status: 500 });
+  }
+  schemaProbe = schemaProbe.where!('type', '==', 'relation');
+  if (typeof schemaProbe.includeTotal === 'function') schemaProbe = schemaProbe.includeTotal(false);
+  const schemaResult = await schemaProbe.limit(3).getList();
+  if (
+    schemaResult.hasMore !== true
+    && (schemaResult.items ?? []).every((property) => Boolean(duplicateRelationFeatureRole(property)))
+  ) {
+    const candidates = await duplicateHierarchyRelationStateItems(db, job.id);
+    const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+    if (items.length === 0) return false;
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      ...items.flatMap((item): TransactOperation[] => [
+        duplicateHierarchyItemExpectation(item),
+        {
+          table: 'database_hierarchy_lifecycle_items',
+          op: 'update',
+          id: item.id,
+          data: { relationsPrepared: true },
+        },
+      ]),
+    ]);
+    return true;
+  }
+  const item = await firstDuplicateHierarchyItem(db, job.id, 'relationsPrepared', false);
+  if (!item) return false;
+  if (!item.applied || item.sourceUpdatedAt === undefined) {
+    throw Object.assign(new Error('Hierarchy relation copy started before hidden page staging.'), { status: 409 });
+  }
+  const [source, target] = await Promise.all([
+    getExisting(db.table<Page>('pages'), item.rowId),
+    getExisting(db.table<Page>('pages'), item.targetRowId),
+  ]);
+  if (
+    !source
+    || (source.updatedAt ?? '') !== item.sourceUpdatedAt
+    || !target
+    || target.inTrash !== true
+    || target.trashedAt !== job.trashStamp
+  ) throw Object.assign(new Error('Hierarchy relation copy page fence changed.'), { status: 409 });
+
+  const property = item.relationValueOffset > 0
+    ? await getExisting(db.table<DbProperty>('db_properties'), item.relationPropertyCursorId)
+    : await nextDuplicateHierarchyRelationProperty(db, job, item.relationPropertyCursorId);
+  if (!property) {
+    if (item.relationValueOffset > 0) {
+      throw Object.assign(new Error('Hierarchy relation copy schema changed during continuation.'), { status: 409 });
+    }
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      duplicateHierarchyItemExpectation(item),
+      duplicateHierarchySourcePageExpectation(job, item),
+      {
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { relationsPrepared: true },
+      },
+    ]);
+    return true;
+  }
+  if (property.databaseId !== job.databaseId || property.type !== 'relation') {
+    throw Object.assign(new Error('Hierarchy relation copy schema changed during continuation.'), { status: 409 });
+  }
+  if (duplicateRelationFeatureRole(property)) {
+    await db.transact([
+      duplicateHierarchyJobExpectation(job),
+      duplicateHierarchyItemExpectation(item),
+      duplicateHierarchySourcePageExpectation(job, item),
+      {
+        table: 'database_hierarchy_lifecycle_items',
+        op: 'update',
+        id: item.id,
+        data: { relationPropertyCursorId: property.id },
+      },
+    ]);
+    return true;
+  }
+
+  const plans = new Map<string, { update: HierarchyRelationUpdate; existing: boolean; page: Page }>();
+  const planFor = async (page: Page) => {
+    const cached = plans.get(page.id);
+    if (cached) return cached.update;
+    const id = await duplicateHierarchyHash('hierarchy-relation-update', job.id, page.id);
+    const existing = await getExisting(
+      db.table<HierarchyRelationUpdate>('database_hierarchy_relation_updates'),
+      id,
+    );
+    if (existing && existing.sourceUpdatedAt !== (page.updatedAt ?? '')) {
+      throw Object.assign(new Error('Hierarchy relation copy plan changed.'), { status: 409 });
+    }
+    const update = existing ?? {
+      id,
+      workspaceId: job.workspaceId,
+      databaseId: job.databaseId,
+      jobId: job.id,
+      rowId: page.id,
+      sourceUpdatedAt: page.updatedAt ?? '',
+      properties: cloneJson(page.properties ?? {}),
+    };
+    plans.set(page.id, { update, existing: Boolean(existing), page });
+    return update;
+  };
+
+  const targetPlan = await planFor(target);
+  const sourceIds = duplicateRelationIds(source.properties?.[property.id]);
+  const valueStart = item.relationValueOffset;
+  const valueEnd = Math.min(valueStart + DUPLICATE_HIERARCHY_RELATION_VALUE_WINDOW, sourceIds.length);
+  const valueWindow = sourceIds.slice(valueStart, valueEnd);
+  const mappedIds = valueStart > 0
+    ? duplicateRelationIds(targetPlan.properties[property.id])
+    : [];
+  const relationDatabaseId = duplicateRelationDatabaseId(property);
+  const reciprocalId = typeof objectRecord(property.config)?.relatedPropertyId === 'string'
+    ? String(objectRecord(property.config)?.relatedPropertyId)
+    : '';
+  const reciprocal = reciprocalId
+    ? await getExisting(db.table<DbProperty>('db_properties'), reciprocalId)
+    : null;
+  for (const relationId of valueWindow) {
+    const internal = await duplicateHierarchyItemForRow(db, job.id, relationId);
+    if (internal) {
+      mappedIds.push(internal.targetRowId);
+      continue;
+    }
+    const external = await getExisting(db.table<Page>('pages'), relationId);
+    if (
+      !external
+      || external.workspaceId !== job.workspaceId
+      || external.parentType !== 'database'
+      || external.parentId !== relationDatabaseId
+      || external.inTrash === true
+    ) throw Object.assign(new Error('Hierarchy relation copy target changed.'), { status: 409 });
+    mappedIds.push(external.id);
+    if (
+      reciprocal
+      && reciprocal.type === 'relation'
+      && reciprocal.databaseId === relationDatabaseId
+      && duplicateRelationDatabaseId(reciprocal) === job.databaseId
+    ) {
+      const externalPlan = await planFor(external);
+      externalPlan.properties[reciprocal.id] = Array.from(new Set([
+        ...duplicateRelationIds(externalPlan.properties[reciprocal.id]),
+        item.targetRowId,
+      ]));
+    }
+  }
+  targetPlan.properties[property.id] = mappedIds.length ? mappedIds : null;
+  const hasMoreValues = valueEnd < sourceIds.length;
+
+  const operations: TransactOperation[] = [
+    duplicateHierarchyJobExpectation(job),
+    duplicateHierarchyItemExpectation(item),
+    duplicateHierarchySourcePageExpectation(job, item),
+  ];
+  for (const plan of plans.values()) {
+    operations.push({
+      table: 'pages',
+      op: 'expect',
+      id: plan.page.id,
+      where: [['updatedAt', '==', plan.page.updatedAt ?? null]],
+      exists: true,
+    });
+    if (plan.existing) {
+      operations.push(
+        hierarchyRelationUpdateExpectation(plan.update),
+        {
+          table: 'database_hierarchy_relation_updates',
+          op: 'update',
+          id: plan.update.id,
+          data: { properties: plan.update.properties },
+        },
+      );
+    } else {
+      operations.push(
+        { table: 'database_hierarchy_relation_updates', op: 'expect', id: plan.update.id, exists: false },
+        {
+          table: 'database_hierarchy_relation_updates',
+          op: 'insert',
+          data: plan.update as unknown as Record<string, unknown>,
+        },
+      );
+    }
+  }
+  operations.push({
+    table: 'database_hierarchy_lifecycle_items',
+    op: 'update',
+    id: item.id,
+    data: hasMoreValues
+      ? { relationPropertyCursorId: property.id, relationValueOffset: valueEnd }
+      : { relationPropertyCursorId: property.id, relationValueOffset: 0 },
+  });
+  await db.transact(operations);
+  return true;
+}
+
+async function applyDuplicateHierarchyRelationUpdates(
+  db: DbRef,
+  job: DuplicateHierarchyJob,
+) {
+  let query: TableQuery<HierarchyRelationUpdate> = db
+    .table<HierarchyRelationUpdate>('database_hierarchy_relation_updates')
+    .where('jobId', '==', job.id);
+  if (typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Hierarchy relation copy requires bounded update keysets.'), { status: 500 });
+  }
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  const plans = (await query.limit(DUPLICATE_HIERARCHY_APPLY_WINDOW).getList()).items ?? [];
+  if (plans.length === 0) return false;
+  const rows = await db.table<Page>('pages')
+    .where('id', 'in', plans.map((plan) => plan.rowId))
+    .limit(plans.length)
+    .getList();
+  const byId = new Map((rows.items ?? []).map((page) => [page.id, page]));
+  if (byId.size !== plans.length) {
+    throw Object.assign(new Error('Hierarchy relation copy update target changed.'), { status: 409 });
+  }
+  const stamp = nowIso();
+  const operations: TransactOperation[] = [duplicateHierarchyJobExpectation(job)];
+  for (const plan of plans) {
+    const page = byId.get(plan.rowId)!;
+    if ((page.updatedAt ?? '') !== plan.sourceUpdatedAt) {
+      throw Object.assign(new Error('Hierarchy relation copy update target changed.'), { status: 409 });
+    }
+    operations.push(
+      hierarchyRelationUpdateExpectation(plan),
+      {
+        table: 'pages',
+        op: 'expect',
+        id: page.id,
+        where: [['updatedAt', '==', page.updatedAt ?? null]],
+        exists: true,
+      },
+      {
+        table: 'pages',
+        op: 'update',
+        id: page.id,
+        data: { properties: plan.properties, updatedAt: stamp, lastEditedBy: job.requestedBy },
+      },
+      { table: 'database_hierarchy_relation_updates', op: 'delete', id: plan.id },
+    );
+  }
+  await db.transact(operations);
+  return true;
+}
+
+async function publishDuplicateHierarchyItems(
+  db: DbRef,
+  database: Page,
+  job: DuplicateHierarchyJob,
+  actorId: string,
+) {
+  const candidates = await duplicateHierarchyItems(db, job.id, 'applied', true, 'desc');
+  const items = candidates.slice(0, DUPLICATE_HIERARCHY_APPLY_WINDOW);
+  if (items.length === 0) {
+    throw Object.assign(new Error('Hierarchy duplicate publication state is incomplete.'), { status: 409 });
+  }
+  const targetIds = items.map((item) => item.targetRowId);
+  const result = await db.table<Page>('pages').where('id', 'in', targetIds).limit(targetIds.length).getList();
+  const targets = new Map((result.items ?? []).map((page) => [page.id, page]));
+  const finishing = candidates.length <= DUPLICATE_HIERARCHY_APPLY_WINDOW;
+  const externalParent = finishing && job.sourceParentId
+    ? await getExisting(db.table<Page>('pages'), job.sourceParentId)
+    : null;
+  if (job.sourceParentId && finishing && (
+    !externalParent
+    || externalParent.workspaceId !== job.workspaceId
+    || externalParent.parentId !== job.databaseId
+    || externalParent.parentType !== 'database'
+    || externalParent.kind === 'database'
+  )) {
+    throw Object.assign(
+      new Error('External sub-item parent changed during duplicate publication.'),
+      { status: 409 },
+    );
+  }
+  const stamp = nowIso();
+  const operations: TransactOperation[] = [duplicateHierarchyJobExpectation(job)];
+  for (const item of items) {
+    if (
+      item.relationsPrepared !== true
+      || item.blocksApplied !== true
+      || item.dependenciesApplied !== true
+      || item.filesApplied !== true
+    ) {
+      throw Object.assign(new Error('Hierarchy duplicate related-content copy is incomplete.'), { status: 409 });
+    }
+    const target = targets.get(item.targetRowId);
+    if (!target || target.inTrash !== true || target.trashedAt !== job.trashStamp) {
+      throw Object.assign(new Error('Hierarchy duplicate staging state changed.'), { status: 409 });
+    }
+    operations.push(
+      duplicateHierarchySourcePageExpectation(job, item),
+      { table: 'pages', op: 'expect', id: target.id, where: [['inTrash', '==', true], ['trashedAt', '==', job.trashStamp]], exists: true },
+      { table: 'pages', op: 'update', id: target.id, data: { inTrash: false, trashedAt: null, updatedAt: stamp, lastEditedBy: actorId } },
+      { table: 'database_hierarchy_lifecycle_items', op: 'delete', id: item.id },
+    );
+  }
+  if (finishing) {
+    const binding = duplicateHierarchyBinding(database);
+    if (!binding) throw Object.assign(new Error('Sub-item feature binding changed.'), { status: 409 });
+    const features = cloneJson(objectRecord(database.databaseFeatures) ?? {});
+    if (externalParent) {
+      operations.push(
+        {
+          table: 'pages',
+          op: 'expect',
+          id: externalParent.id,
+          where: [
+            ['workspaceId', '==', externalParent.workspaceId],
+            ['parentId', '==', externalParent.parentId ?? null],
+            ['parentType', '==', externalParent.parentType],
+            ['inTrash', '==', externalParent.inTrash ?? null],
+            ['subitemParentId', '==', externalParent.subitemParentId ?? ''],
+            ['subitemChildCount', '==', exactDuplicateSubitemChildCount(externalParent)],
+            ['updatedAt', '==', externalParent.updatedAt ?? null],
+          ],
+          exists: true,
+        },
+        {
+          table: 'pages',
+          op: 'update',
+          id: externalParent.id,
+          data: {
+            subitemChildCount: incrementedDuplicateSubitemChildCount(externalParent),
+          },
+        },
+      );
+    }
+    operations.push(
+      duplicateHierarchyDatabaseExpectation(database),
+      {
+        table: 'pages',
+        op: 'update',
+        id: database.id,
+        data: {
+          databaseFeatures: { ...features, subitems: { ...binding, revision: binding.revision + 1 } },
+          databaseFeaturesRevision: job.featureRevision + 1,
+          updatedAt: stamp,
+          lastEditedBy: actorId,
+        },
+      },
+      { table: 'database_hierarchy_lifecycle_jobs', op: 'delete', id: job.id },
+    );
+  }
+  await db.transact(operations);
+  const root = targets.get(job.targetRootId)
+    ? { ...targets.get(job.targetRootId)!, inTrash: false, trashedAt: null, updatedAt: stamp }
+    : await getExisting(db.table<Page>('pages'), job.targetRootId);
+  return {
+    status: finishing ? 'completed' : 'pending',
+    replayed: false,
+    ...(finishing ? {} : { jobId: job.id }),
+    page: root,
+    pages: items.map((item) => ({
+      ...targets.get(item.targetRowId)!,
+      inTrash: false,
+      trashedAt: null,
+      updatedAt: stamp,
+    })),
+  };
+}
+
+async function duplicateDatabaseHierarchyWithContinuation(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  database: Page,
+  source: Page,
+  body: Record<string, unknown>,
+  actorId: string,
+  mutationId: string,
+  storage: DuplicateStorageProxy | undefined,
+  request: Request | undefined,
+  lease: FileWorkspaceLeaseGuard,
+) {
+  const jobId = await duplicateHierarchyHash(
+    'duplicate-hierarchy-job',
+    source.workspaceId,
+    database.id,
+    source.id,
+    mutationId,
+  );
+  const targetRootId = await duplicateHierarchyUuid(jobId, source.id);
+  const jobs = db.table<DuplicateHierarchyJob>('database_hierarchy_lifecycle_jobs');
+  let job = await getExisting(jobs, jobId);
+  if (!job) {
+    const completed = await getExisting(db.table<Page>('pages'), targetRootId);
+    if (completed?.inTrash === false && completed.createdBy === actorId) {
+      return { status: 'completed', replayed: true, page: completed, pages: [] as Page[] };
+    }
+    job = await createDuplicateHierarchyJob(db, database, source, mutationId, actorId);
+  }
+  if (
+    job.operation !== 'duplicate'
+    || job.databaseId !== database.id
+    || job.rootRowId !== source.id
+    || job.requestedBy !== actorId
+    || job.mutationId !== mutationId
+    || job.featureRevision !== Number(database.databaseFeaturesRevision ?? 0)
+  ) throw Object.assign(new Error('Hierarchy duplicate state changed; retry from current state.'), { status: 409 });
+
+  if (await advanceDuplicateHierarchyDiscovery(db, database, job)) {
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'prepared', false)) {
+    await prepareDuplicateHierarchyItems(db, job);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'blocksPrepared', false)) {
+    await prepareDuplicateHierarchyBlocks(db, job, request);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'dependenciesPrepared', false)) {
+    await prepareDuplicateHierarchyDependencies(db, job);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'applied', false)) {
+    await applyDuplicateHierarchyItems(db, admin, database, source, body, actorId, job);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'relationsPrepared', false)) {
+    await prepareDuplicateHierarchyRelations(db, job);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await applyDuplicateHierarchyRelationUpdates(db, job)) {
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'blocksApplied', false)) {
+    await applyDuplicateHierarchyBlocks(db, job, actorId);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'filesApplied', false)) {
+    await applyDuplicateHierarchyFiles(db, admin, job, storage, request, lease);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  if (await firstDuplicateHierarchyItem(db, job.id, 'dependenciesApplied', false)) {
+    await applyDuplicateHierarchyDependencies(db, job, actorId);
+    return { status: 'pending', replayed: false, jobId: job.id, page: source, pages: [] as Page[] };
+  }
+  return publishDuplicateHierarchyItems(db, database, job, actorId);
 }
 
 async function duplicatePage(
@@ -1336,6 +3661,36 @@ async function duplicatePageUnderLease(
   if (source.inTrash) throw new Error('Page is in trash.');
   await assertCanEditPage(db, source, actorId, actorEmail);
 
+  const hierarchyMutationId = optionalString(body.mutationId);
+  if (
+    hierarchyMutationId
+    && source.parentType === 'database'
+    && source.parentId
+    && !('parentId' in body)
+    && !('parentType' in body)
+  ) {
+    const database = await getExisting(pagesTable, source.parentId);
+    if (
+      database?.kind === 'database'
+      && database.workspaceId === source.workspaceId
+      && database.inTrash !== true
+      && duplicateHierarchyBinding(database)
+    ) {
+      return duplicateDatabaseHierarchyWithContinuation(
+        db,
+        admin,
+        database,
+        source,
+        body,
+        actorId,
+        hierarchyMutationId,
+        storage,
+        request,
+        lease,
+      );
+    }
+  }
+
   const workspacePages = await listAll(pagesTable.where('workspaceId', '==', source.workspaceId));
   const pagesById = Object.fromEntries(workspacePages.map((page) => [page.id, page]));
   assertParentAllowsDuplicate(pagesById, source.parentId);
@@ -1368,7 +3723,13 @@ async function duplicatePageUnderLease(
   // different container additionally requires edit access at that destination.
   if (!sameDestination) {
     if (destination.parentType === 'workspace') {
-      await assertWorkspaceEdit(db, source.workspaceId, actorId);
+      await sharedAssertMinimumWorkspaceAccessRole(
+        db,
+        source.workspaceId,
+        actorId,
+        'edit',
+        { requireWorkspace: true },
+      );
     } else {
       await assertCanEditPage(db, pagesById[destination.parentId as string], actorId, actorEmail);
     }
@@ -1488,6 +3849,11 @@ async function duplicatePageUnderLease(
     actorId,
     request,
   });
+  const rootSubitemParentId = source.parentType === 'database'
+    && destination.parentType === 'database'
+    && destination.parentId === source.parentId
+    ? source.subitemParentId ?? ''
+    : '';
   const workspace = filePlans.length > 0
     ? await getExisting(admin.db('app').table<Workspace>('workspaces'), source.workspaceId)
     : null;
@@ -1501,6 +3867,7 @@ async function duplicatePageUnderLease(
     rootPageId: pageMap.get(pageId)!,
     uploadIds: filePlans.map((plan) => plan.target.id),
     stagingTrashAt,
+    ...(rootSubitemParentId ? { subitemParentId: rootSubitemParentId } : {}),
   });
   await lease.setRecoveryData(recoveryMarker);
 
@@ -1527,6 +3894,7 @@ async function duplicatePageUnderLease(
     newParentType: PageParentType,
     position: number,
     titleOverride?: string,
+    subitemParentId = '',
   ): Promise<Page | null> {
     await keepLeaseAlive();
     const cur = pagesById[sourceId];
@@ -1541,6 +3909,8 @@ async function duplicatePageUnderLease(
       workspaceId: cur.workspaceId,
       parentId: newParentId,
       parentType: newParentType,
+      subitemParentId,
+      subitemChildCount: exactDuplicateSubitemChildCount(cur),
       kind: cur.kind,
       title: titleOverride ?? cur.title,
       icon: remapStoredFileReferences(cur.icon, filePlans, true) as string | undefined,
@@ -1647,9 +4017,31 @@ async function duplicatePageUnderLease(
     }
 
     const rows = sourceTreePages
-      .filter((item) => item.parentType === 'database' && item.parentId === cur.id)
+      .filter((item) => (
+        item.parentType === 'database'
+        && item.parentId === cur.id
+        && !item.subitemParentId
+      ))
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
     for (const row of rows) await duplicateNode(row.id, page.id, 'database', row.position);
+
+    const subitems = sourceTreePages
+      .filter((item) => (
+        item.parentType === 'database'
+        && item.parentId === cur.parentId
+        && item.subitemParentId === cur.id
+      ))
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+    for (const subitem of subitems) {
+      await duplicateNode(
+        subitem.id,
+        page.parentId ?? null,
+        'database',
+        subitem.position,
+        undefined,
+        page.id,
+      );
+    }
 
     const children = sourceTreePages
       .filter((item) => item.parentType === 'page' && item.parentId === cur.id)
@@ -1668,6 +4060,7 @@ async function duplicatePageUnderLease(
       typeof body.title === 'string'
         ? body.title
         : generatedLabels.copyName(source.title || generatedLabels.untitled),
+      rootSubitemParentId,
     );
     if (filePlans.length > 0) {
       if (!workspace) throw new Error('Workspace was not found.');
@@ -1691,10 +4084,66 @@ async function duplicatePageUnderLease(
       ...created.pages.filter((createdPage) => createdPage.id === recoveryMarker.rootPageId),
     ];
     for (const stagedPage of finalizeOrder) {
-      const finalized = await pagesTable.update(stagedPage.id, {
-        inTrash: false,
-        trashedAt: null,
-      });
+      let finalized: Page;
+      if (stagedPage.id === recoveryMarker.rootPageId && rootSubitemParentId) {
+        const externalParent = pagesById[rootSubitemParentId];
+        if (
+          !externalParent
+          || externalParent.workspaceId !== stagedPage.workspaceId
+          || externalParent.parentId !== stagedPage.parentId
+          || externalParent.parentType !== 'database'
+          || externalParent.kind === 'database'
+        ) {
+          throw Object.assign(
+            new Error('External sub-item parent changed during duplicate publication.'),
+            { status: 409 },
+          );
+        }
+        const externalParentCount = exactDuplicateSubitemChildCount(externalParent);
+        await db.transact([
+          {
+            table: 'pages',
+            op: 'expect',
+            id: stagedPage.id,
+            where: [
+              ['inTrash', '==', true],
+              ['trashedAt', '==', stagingTrashAt],
+              ['subitemParentId', '==', rootSubitemParentId],
+            ],
+            exists: true,
+          },
+          {
+            table: 'pages',
+            op: 'expect',
+            id: externalParent.id,
+            where: [
+              ['workspaceId', '==', externalParent.workspaceId],
+              ['parentId', '==', externalParent.parentId ?? null],
+              ['parentType', '==', externalParent.parentType],
+              ['subitemChildCount', '==', externalParentCount],
+            ],
+            exists: true,
+          },
+          {
+            table: 'pages',
+            op: 'update',
+            id: stagedPage.id,
+            data: { inTrash: false, trashedAt: null },
+          },
+          {
+            table: 'pages',
+            op: 'update',
+            id: externalParent.id,
+            data: { subitemChildCount: externalParentCount + 1 },
+          },
+        ]);
+        finalized = { ...stagedPage, inTrash: false, trashedAt: null };
+      } else {
+        finalized = await pagesTable.update(stagedPage.id, {
+          inTrash: false,
+          trashedAt: null,
+        });
+      }
       const index = created.pages.findIndex((createdPage) => createdPage.id === finalized.id);
       if (index !== -1) created.pages[index] = finalized;
       if (page?.id === finalized.id) page = finalized;

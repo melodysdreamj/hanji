@@ -25,6 +25,8 @@ interface Page {
   inTrash?: boolean;
   isLocked?: boolean;
   createdBy?: string;
+  updatedAt?: string;
+  lastEditedBy?: string;
 }
 
 interface Block {
@@ -36,6 +38,8 @@ interface Block {
   plainText?: string;
   position?: number;
   createdBy?: string;
+  lastEditedBy?: string;
+  lastMutationId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -664,6 +668,7 @@ async function upsertCrdtDocument(
       throw new Error('CRDT update payload could not be merged.');
     }
 
+    const checkpointedAt = nowIso();
     const patch: Partial<CollaborationDocument> = {
       workspaceId: page.workspaceId,
       pageId: operation.pageId,
@@ -677,9 +682,15 @@ async function upsertCrdtDocument(
       lastOperationId: operation.id,
       lastOperationRevision: operation.revision ?? 0,
       lastOperationOccurredAt: operation.occurredAt ?? null,
-      checkpointedAt: nowIso(),
-      updatedAt: nowIso(),
+      checkpointedAt,
+      updatedAt: checkpointedAt,
     };
+
+    // A checkpoint owns convergent collaboration recovery state only. The
+    // canonical block outbox / block-mutation lane is the sole authority that
+    // materializes ordinary block rows and touches their page. Keeping this
+    // guarded transaction document-only prevents the same edit from receiving
+    // a second row write, receipt, page touch, and change-log pair here.
 
     try {
       if (existing) {

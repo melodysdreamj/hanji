@@ -1,8 +1,26 @@
 import type { StoreApi } from "zustand";
 import type {
   DatabaseCreateEffect,
+  DatabaseDependencyCommitEffect,
+  DatabaseMetadataReconciliationEffect,
+  DatabaseRowsReconciliationEffect,
+  DatabaseTaskFeatureCommitEffect,
+  DatabaseTaskFeatureTurnOffEffect,
+  RemoteCallTerminalReconciliation,
   RowFileRemovalEffect,
 } from "./outbox";
+import type {
+  ConfigureDatabaseTaskFeatureInput,
+  DatabaseDependencyMutationOperation,
+  DatabaseStructuralRowMarker,
+  UpdateDatabaseDependencyRelationInput,
+} from "./edgebase";
+import {
+  buttonResultRequiresConfirmation,
+  isDatabaseStructuralRowMarker,
+  type ExecuteDatabaseButtonResult,
+} from "./edgebase";
+import { prepareButtonPageResultAdoption, type ButtonPageMutation } from "./buttonResultAdoption";
 import type {
   DbProperty,
   DbTemplate,
@@ -14,22 +32,37 @@ import type {
 import type {
   AppState,
   CachedRowsMeta,
+  DatabaseRowsQuery,
+  DatabaseSubitemRowWindow,
   DatabaseStoreRuntime,
   DeletedPropertyOptionSnapshot,
   DeletedPropertySnapshot,
 } from "./store";
+import {
+  applyDefinitiveReadDenial,
+  applyLatestRead,
+  beginReadApplication,
+  readApplicationKey,
+} from "./readApplicationGuard";
 
 type DatabaseStoreActions = Pick<
   AppState,
   | "loadDatabase"
   | "loadDatabaseRows"
   | "loadMoreDatabaseRows"
+  | "loadDatabaseSubitemRows"
+  | "loadMoreDatabaseSubitemRows"
+  | "loadDatabaseDependencyRelation"
+  | "databaseDependencyRelation"
   | "warmDatabaseRowDetail"
   | "dbProperties"
   | "dbViews"
   | "dbTemplates"
   | "dbRows"
   | "createDatabase"
+  | "configureDatabaseTaskFeature"
+  | "runDatabaseButton"
+  | "discardDatabaseButtonExecution"
   | "addProperty"
   | "updateProperty"
   | "setRelationDatabase"
@@ -40,6 +73,7 @@ type DatabaseStoreActions = Pick<
   | "restoreDeletedPropertyOption"
   | "addView"
   | "updateView"
+  | "applyConfiguredView"
   | "deleteView"
   | "restoreDeletedView"
   | "addTemplate"
@@ -49,10 +83,39 @@ type DatabaseStoreActions = Pick<
   | "restoreDeletedTemplate"
   | "addRow"
   | "moveDatabaseRow"
+  | "reparentDatabaseSubitem"
   | "setRowProperty"
   | "removeRowFilePropertyItem"
+  | "addDatabaseDependency"
   | "setRelation"
 >;
+
+function databaseRowsRequestWasAborted(signal?: AbortSignal) {
+  return signal?.aborted === true;
+}
+
+function materializeDatabaseRow(
+  row: Page | DatabaseStructuralRowMarker,
+  database: Page | undefined,
+): Page {
+  if (!isDatabaseStructuralRowMarker(row)) return row;
+  if (!database || database.kind !== "database") {
+    throw new Error("Database structural row marker requires loaded database context.");
+  }
+  return {
+    id: row.id,
+    workspaceId: database.workspaceId,
+    parentId: database.id,
+    parentType: "database",
+    kind: "page",
+    title: "",
+    iconType: "none",
+    inTrash: false,
+    position: 0,
+    subitemParentId: row.subitemParentId,
+    __structuralPlaceholder: true,
+  };
+}
 
 export function createDatabaseStoreActions(
   set: StoreApi<AppState>["setState"],
@@ -65,19 +128,25 @@ export function createDatabaseStoreActions(
     DATABASE_INITIAL_ROW_LIMIT,
     DATABASE_ROW_LOAD_MORE_LIMIT,
     appendUniqueIds,
-    asIdArray,
+    adoptPersistedPageCreateAuthority,
+    applyEmbeddedDatabaseSnapshots,
     assertDatabaseUnlocked,
     bySortPos,
+    cacheAppendRowPage,
+    cacheClearDatabase,
     cacheCurrentDatabaseMetadata,
     cacheReplaceTable,
     cacheSetMeta,
+    cacheRecentDatabaseRowsQuery,
     canCreatePageInState,
     canEditPageInState,
     cleanUniqueIds,
     cloneJson,
     configChanged,
     currentChangesSyncedAt,
+    currentDatabaseRowsAuthority,
     currentRelativeRouteHref,
+    databaseDependencyRelationKey,
     databaseCreateRowsQueryKey,
     databaseLoadPromises,
     databaseMetadataRevalidated,
@@ -89,10 +158,14 @@ export function createDatabaseStoreActions(
     databaseRowsLoadErrorMessage,
     databaseRowsQueryKey,
     databaseRowsQueryPromises,
+    clearRecentDatabaseRowsQueries,
     durableRemoteCall,
     ensureAuth,
+    executeDatabaseButtonRemote,
     feedSaysUnchanged,
     finishOptimisticDatabaseCreate,
+    flushPage,
+    getDatabaseDependencyRelationRemote,
     getDatabaseRowsRemote,
     getDatabaseSnapshotRemote,
     hasDatabaseTemplateStoredFileReference,
@@ -103,16 +176,19 @@ export function createDatabaseStoreActions(
     iconTypeForValue,
     isDatabaseLocked,
     isKoreanLocale,
-    isTemplateEditorPageId,
     lastHydratedRowsFeedStamp,
     linkedDatabaseResolvedTitle,
     mergeById,
+    mergeDatabaseDependencyRelationAuthority,
+    mergePersistedPageCreateAuthority,
     mirrorPendingPage,
     moveIdRelative,
     newId,
     normalizeDatabaseRowsQuery,
     nowIso,
     optimisticStarterDatabaseSchema,
+    projectOptimisticDatabaseSubitem,
+    projectOptimisticRowFileValue,
     outboxUserId,
     pageDisplayTitle,
     pendingDatabaseCreate,
@@ -123,6 +199,7 @@ export function createDatabaseStoreActions(
     pendingViewCreate,
     permanentDeleteIds,
     persistErrorStatus,
+    purgePagesFromBootstrapCache,
     persistOptimisticTemplateCreate,
     persistableRowProperties,
     positionBetween,
@@ -132,6 +209,7 @@ export function createDatabaseStoreActions(
     publishDatabaseViewsMutation,
     recordCacheMeta,
     recordValue,
+    readRecentDatabaseRowsQuery,
     registerRowsCacheKey,
     releaseOptimisticCreateDependents,
     reloadBlocksFromServer,
@@ -153,8 +231,568 @@ export function createDatabaseStoreActions(
     withoutLoadedDatabaseProperty,
   } = runtime;
 
+  type DatabaseRowsSnapshot = {
+    loaded: boolean;
+    loadedRowIds: string[] | undefined;
+    rows: Page[];
+  };
+  // Source generations are weak so replacing pagesById releases every old
+  // database projection together. The live generation is also capped: the
+  // cache is an optimization over already-loaded state, never new authority.
+  const databaseRowsByPageSource = new WeakMap<
+    AppState["pagesById"],
+    Map<string, DatabaseRowsSnapshot>
+  >();
+  const DATABASE_ROWS_SNAPSHOT_LIMIT = 256;
+  const DATABASE_SUBITEM_PARENT_WINDOW_LIMIT = 32;
+  const DATABASE_SUBITEM_ROW_PAGE_LIMIT = 50;
+  const databaseSubitemRowPagePromises = new Map<string, Promise<void>>();
+  const databaseButtonExecutionPromises = new Map<
+    string,
+    Promise<ExecuteDatabaseButtonResult | undefined>
+  >();
+  const databaseButtonRetryIds = new Map<string, string>();
+  const DATABASE_BUTTON_RETRY_LIMIT = 256;
+
+  function retainDatabaseSubitemWindow(
+    current: AppState["databaseSubitemRowWindowsByDb"],
+    dbId: string,
+    parentId: string,
+    window: DatabaseSubitemRowWindow
+  ) {
+    const byParent = { ...(current[dbId] ?? {}) };
+    delete byParent[parentId];
+    byParent[parentId] = window;
+    while (Object.keys(byParent).length > DATABASE_SUBITEM_PARENT_WINDOW_LIMIT) {
+      const oldestParentId = Object.keys(byParent)[0];
+      if (oldestParentId === undefined) break;
+      delete byParent[oldestParentId];
+    }
+    return { ...current, [dbId]: byParent };
+  }
+
+  function boundedSubitemRowLimit(limit: number | undefined) {
+    if (!Number.isFinite(limit)) return DATABASE_SUBITEM_ROW_PAGE_LIMIT;
+    return Math.max(1, Math.min(DATABASE_SUBITEM_ROW_PAGE_LIMIT, Math.trunc(limit!)));
+  }
+
+  function subitemPagePromiseKey(
+    dbId: string,
+    parentId: string,
+    queryKey: string,
+    cursor: string | undefined
+  ) {
+    return JSON.stringify([dbId, parentId, queryKey, cursor ?? null]);
+  }
+
+  function cacheDatabaseRows(
+    source: AppState["pagesById"],
+    dbId: string,
+    snapshot: DatabaseRowsSnapshot
+  ) {
+    let byDatabase = databaseRowsByPageSource.get(source);
+    if (!byDatabase) {
+      byDatabase = new Map();
+      databaseRowsByPageSource.set(source, byDatabase);
+    }
+    byDatabase.delete(dbId);
+    byDatabase.set(dbId, snapshot);
+    if (byDatabase.size > DATABASE_ROWS_SNAPSHOT_LIMIT) {
+      const oldestDbId = byDatabase.keys().next().value;
+      if (oldestDbId !== undefined) byDatabase.delete(oldestDbId);
+    }
+  }
+
+  function databasePageWithOptimisticOverlay(page: Page) {
+    return page.__structuralPlaceholder === true
+      ? page
+      : remotePageWithOptimisticOverlay(page);
+  }
+
+  function rememberCurrentDatabaseRowsQuery(
+    dbId: string,
+    queryKey: string,
+    authorityGeneration: number,
+    propsSource = get().propsByDb[dbId],
+    viewsSource = get().viewsByDb[dbId]
+  ) {
+    cacheRecentDatabaseRowsQuery(
+      dbId,
+      queryKey,
+      get(),
+      authorityGeneration,
+      propsSource,
+      viewsSource
+    );
+  }
+
+  const databaseTerminalReconciliation = (
+    databaseIds: Array<string | null | undefined>,
+    includeRows: boolean
+  ): RemoteCallTerminalReconciliation => {
+    const ids = Array.from(
+      new Set(databaseIds.filter((value): value is string => !!value?.trim()).map((value) => value.trim()))
+    ).slice(0, 100);
+    return {
+      databaseMetadataIds: ids,
+      ...(includeRows ? { databaseRowIds: ids } : {}),
+    };
+  };
+
+  const dependencyDirection = (property: DbProperty) => {
+    const role = property.config?.databaseFeatureRole;
+    if (role === "dependency_predecessor") return "predecessors" as const;
+    if (role === "dependency_successor") return "successors" as const;
+    return undefined;
+  };
+
+  const dependencyReadDirection = (property: DbProperty) => {
+    const role = property.config?.databaseFeatureRole;
+    if (role === "preserved_dependency_predecessor") return "predecessors" as const;
+    if (role === "preserved_dependency_successor") return "successors" as const;
+    return dependencyDirection(property);
+  };
+
+  const dependencyOperations = (
+    rowId: string,
+    direction: "predecessors" | "successors",
+    addRelatedRowIds: string[],
+    removeRelatedRowIds: string[],
+  ) => {
+    const operations: DatabaseDependencyMutationOperation[] = [];
+    if (direction === "predecessors") {
+      const windowCount = Math.max(
+        Math.ceil(addRelatedRowIds.length / 16),
+        Math.ceil(removeRelatedRowIds.length / 16),
+      );
+      for (let index = 0; index < windowCount; index += 1) {
+        operations.push({
+          addPredecessorIds: addRelatedRowIds.slice(index * 16, (index + 1) * 16),
+          mutationId: newId(),
+          removePredecessorIds: removeRelatedRowIds.slice(index * 16, (index + 1) * 16),
+          rowId,
+        });
+      }
+      return operations;
+    }
+    for (const successorRowId of addRelatedRowIds) {
+      operations.push({
+        addPredecessorIds: [rowId],
+        mutationId: newId(),
+        removePredecessorIds: [],
+        rowId: successorRowId,
+      });
+    }
+    for (const successorRowId of removeRelatedRowIds) {
+      operations.push({
+        addPredecessorIds: [],
+        mutationId: newId(),
+        removePredecessorIds: [rowId],
+        rowId: successorRowId,
+      });
+    }
+    return operations;
+  };
+
+  async function purgeDefinitivelyUnreadableDatabase(dbId: string) {
+    clearRecentDatabaseRowsQueries(dbId);
+    const stateBeforePurge = get();
+    const doomedPageIds = new Set<string>([
+      dbId,
+      ...(stateBeforePurge.databaseRowIdsByDb[dbId] ?? []),
+    ]);
+    const childPageIdsByParentId = new Map<string, string[]>();
+    for (const page of Object.values(stateBeforePurge.pagesById)) {
+      const parentId = page.parentId;
+      if (!parentId) continue;
+      const siblings = childPageIdsByParentId.get(parentId);
+      if (siblings) siblings.push(page.id);
+      else childPageIdsByParentId.set(parentId, [page.id]);
+    }
+    const pendingParentIds = [...doomedPageIds];
+    for (let index = 0; index < pendingParentIds.length; index += 1) {
+      for (const childPageId of childPageIdsByParentId.get(pendingParentIds[index]) ?? []) {
+        if (doomedPageIds.has(childPageId)) continue;
+        doomedPageIds.add(childPageId);
+        pendingParentIds.push(childPageId);
+      }
+    }
+    const cacheUserId = outboxUserId();
+    if (cacheUserId) {
+      await Promise.all([
+        cacheClearDatabase(cacheUserId, dbId, doomedPageIds),
+        purgePagesFromBootstrapCache(cacheUserId, doomedPageIds),
+      ]);
+    }
+    databaseMetadataRevalidated.delete(dbId);
+    set((state) => {
+      const pagesById = { ...state.pagesById };
+      const blocksByPage = { ...state.blocksByPage };
+      const commentsByPage = { ...state.commentsByPage };
+      const pageRolesById = { ...state.pageRolesById };
+      for (const pageId of doomedPageIds) {
+        delete pagesById[pageId];
+        delete blocksByPage[pageId];
+        delete commentsByPage[pageId];
+        delete pageRolesById[pageId];
+      }
+      const propsByDb = { ...state.propsByDb };
+      const viewsByDb = { ...state.viewsByDb };
+      const templatesByDb = { ...state.templatesByDb };
+      const databaseRowIdsByDb = { ...state.databaseRowIdsByDb };
+      const databaseRowPagesByDb = { ...state.databaseRowPagesByDb };
+      const databaseSubitemRowWindowsByDb = { ...state.databaseSubitemRowWindowsByDb };
+      delete propsByDb[dbId];
+      delete viewsByDb[dbId];
+      delete templatesByDb[dbId];
+      delete databaseRowIdsByDb[dbId];
+      delete databaseRowPagesByDb[dbId];
+      delete databaseSubitemRowWindowsByDb[dbId];
+      const loadedDbs = new Set(state.loadedDbs);
+      loadedDbs.delete(dbId);
+      const loadedBlockPages = new Set(state.loadedBlockPages);
+      const loadedCommentPages = new Set(state.loadedCommentPages);
+      const sharedPageIds = new Set(state.sharedPageIds);
+      for (const pageId of doomedPageIds) {
+        loadedBlockPages.delete(pageId);
+        loadedCommentPages.delete(pageId);
+        sharedPageIds.delete(pageId);
+      }
+      return {
+        pagesById,
+        blocksByPage,
+        commentsByPage,
+        pageRolesById,
+        propsByDb,
+        viewsByDb,
+        templatesByDb,
+        databaseRowIdsByDb,
+        databaseRowPagesByDb,
+        databaseSubitemRowWindowsByDb,
+        databaseDependencyRelations: Object.fromEntries(
+          Object.entries(state.databaseDependencyRelations).filter(([, relation]) => (
+            relation.databaseId !== dbId && !doomedPageIds.has(relation.rowId)
+          ))
+        ),
+        loadedDbs,
+        loadedBlockPages,
+        loadedCommentPages,
+        sharedPageIds,
+      };
+    });
+  }
+
+  async function loadDatabaseSubitemWindowPage(
+    dbId: string,
+    parentId: string,
+    query: DatabaseRowsQuery | undefined,
+    cursor: string | undefined,
+    append: boolean
+  ) {
+    if (pendingDatabaseCreate.has(dbId) || query?.signal?.aborted) return;
+    const loadUserId = outboxUserId();
+    if (loadUserId && permanentDeleteIds(loadUserId).has(dbId)) return;
+    const scopedQuery = { ...(query ?? {}), subitemParentId: parentId };
+    const queryKey = databaseRowsQueryKey(scopedQuery);
+    const limit = boundedSubitemRowLimit(query?.limit);
+    const promiseKey = subitemPagePromiseKey(dbId, parentId, queryKey, cursor);
+    const pending = databaseSubitemRowPagePromises.get(promiseKey);
+    if (pending) return pending;
+    const readToken = beginReadApplication(
+      readApplicationKey.databaseRows(dbId, queryKey),
+      readApplicationKey.databaseScope(dbId)
+    );
+    const before = get().databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+    const hadUsableWindow =
+      before?.queryKey === queryKey && before.rowIds.length > 0 && !before.error;
+
+    const loadPromise = (async () => {
+      set((state) => {
+        const current = state.databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+        const next: DatabaseSubitemRowWindow =
+          current?.queryKey === queryKey
+            ? {
+                ...current,
+                loading: append ? false : true,
+                loadingMore: append,
+                error: undefined,
+              }
+            : {
+                queryKey,
+                rowIds: [],
+                loadedCount: 0,
+                hasMore: false,
+                loading: true,
+                loadingMore: false,
+                error: undefined,
+              };
+        return {
+          databaseSubitemRowWindowsByDb: retainDatabaseSubitemWindow(
+            state.databaseSubitemRowWindowsByDb,
+            dbId,
+            parentId,
+            next
+          ),
+        };
+      });
+
+      const settleCanceledLoad = () => applyLatestRead(readToken, () => {
+        set((state) => {
+          const current = state.databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+          if (current?.queryKey !== queryKey) return {};
+          return {
+            databaseSubitemRowWindowsByDb: retainDatabaseSubitemWindow(
+              state.databaseSubitemRowWindowsByDb,
+              dbId,
+              parentId,
+              { ...current, loading: false, loadingMore: false, error: undefined }
+            ),
+          };
+        });
+      });
+
+      try {
+        const normalized = normalizeDatabaseRowsQuery(scopedQuery);
+        const props = get().dbProperties(dbId);
+        const remoteOptions = {
+          includeComputed: databaseNeedsComputedValues(props),
+          includeRelationTargets: true,
+          limit,
+          ...(cursor ? { cursor } : { offset: 0 }),
+          viewId: normalized.viewId || undefined,
+          search: normalized.search || undefined,
+          currentPageId: normalized.currentPageId || undefined,
+          subitemParentId: parentId,
+        };
+        const rowsResult = query?.signal
+          ? await getDatabaseRowsRemote(dbId, remoteOptions, query.signal)
+          : await getDatabaseRowsRemote(dbId, remoteOptions);
+        if (query?.signal?.aborted) {
+          await settleCanceledLoad();
+          return;
+        }
+        const databasePage = get().pagesById[dbId];
+        const returnedRows = (rowsResult.rows ?? []).map((row) => (
+          materializeDatabaseRow(row, databasePage)
+        ));
+        if (returnedRows.some((row) => (
+          row.parentId !== dbId
+          || row.parentType !== "database"
+          || (row.subitemParentId ?? "") !== parentId
+        ))) {
+          throw new Error("Database sub-item response did not match its requested parent window.");
+        }
+        const nextCursor = rowsResult.nextCursor?.trim();
+        if (
+          rowsResult.hasMore === true
+          && (!nextCursor || nextCursor === cursor)
+        ) {
+          throw new Error("Database sub-item continuation did not advance its cursor.");
+        }
+        await applyLatestRead(readToken, () => {
+          if (query?.signal?.aborted) return;
+          const deleted = loadUserId ? permanentDeleteIds(loadUserId) : new Set<string>();
+          const liveRows = returnedRows.filter((row) => !deleted.has(row.id));
+          const liveRelatedPages = (rowsResult.relatedPages ?? []).filter(
+            (page) => !deleted.has(page.id)
+          );
+          set((state) => {
+            const current = state.databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+            if (current?.queryKey !== queryKey) return {};
+            const incomingRowIds = liveRows.map((row) => row.id);
+            const rowIds = append
+              ? appendUniqueIds(current.rowIds, incomingRowIds)
+              : incomingRowIds;
+            const rowOrderStart = append ? current.rowIds.length : 0;
+            const rowsById = Object.fromEntries(
+              liveRows.map((row, index) => [
+                row.id,
+                databasePageWithOptimisticOverlay({
+                  ...row,
+                  __databaseRowOrder: rowOrderStart + index + 1,
+                }),
+              ])
+            );
+            const relatedPagesById = Object.fromEntries(
+              liveRelatedPages.map((page) => [page.id, remotePageWithOptimisticOverlay(page)])
+            );
+            const hydratedRelationTargetIds = new Set(state.hydratedRelationTargetIds);
+            for (const id of rowsResult.relationTargetIds ?? []) {
+              hydratedRelationTargetIds.add(id);
+            }
+            if (!rowsResult.relationTargetIds) {
+              for (const page of liveRelatedPages) hydratedRelationTargetIds.add(page.id);
+            }
+            return {
+              pagesById: { ...state.pagesById, ...relatedPagesById, ...rowsById },
+              hydratedRelationTargetIds,
+              databaseSubitemRowWindowsByDb: retainDatabaseSubitemWindow(
+                state.databaseSubitemRowWindowsByDb,
+                dbId,
+                parentId,
+                {
+                  queryKey,
+                  rowIds,
+                  loadedCount: rowIds.length,
+                  totalCount: rowsResult.totalCount,
+                  hasMore: rowsResult.hasMore === true,
+                  nextOffset: rowsResult.nextOffset,
+                  nextCursor,
+                  loading: false,
+                  loadingMore: false,
+                  error: undefined,
+                }
+              ),
+            };
+          });
+        });
+      } catch (error) {
+        if (databaseRowsRequestWasAborted(query?.signal)) {
+          await settleCanceledLoad();
+          return;
+        }
+        const status = persistErrorStatus(error);
+        if (status === 401 || status === 403 || status === 404) {
+          await applyDefinitiveReadDenial(readToken, () =>
+            purgeDefinitivelyUnreadableDatabase(dbId)
+          );
+          throw error;
+        }
+        await applyLatestRead(readToken, () => {
+          const message = databaseRowsLoadErrorMessage(error);
+          set((state) => {
+            const current = state.databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+            if (current?.queryKey !== queryKey) return {};
+            return {
+              databaseSubitemRowWindowsByDb: retainDatabaseSubitemWindow(
+                state.databaseSubitemRowWindowsByDb,
+                dbId,
+                parentId,
+                {
+                  ...current,
+                  loading: false,
+                  loadingMore: false,
+                  error: hadUsableWindow ? undefined : message,
+                }
+              ),
+            };
+          });
+          if (!hadUsableWindow) get().notify(message, "error");
+        });
+      }
+    })();
+
+    databaseSubitemRowPagePromises.set(promiseKey, loadPromise);
+    try {
+      await loadPromise;
+    } finally {
+      if (databaseSubitemRowPagePromises.get(promiseKey) === loadPromise) {
+        databaseSubitemRowPagePromises.delete(promiseKey);
+      }
+    }
+  }
+
   return {
     // ── databases ───────────────────────────────────────────────────────
+    databaseDependencyRelation(rowId, propertyId) {
+      return get().databaseDependencyRelations[
+        databaseDependencyRelationKey(rowId, propertyId)
+      ];
+    },
+
+    async loadDatabaseDependencyRelation(rowId, propertyId, options = {}) {
+      const row = get().pagesById[rowId];
+      const databaseId = row?.parentType === "database" ? row.parentId : undefined;
+      const property = databaseId
+        ? get().dbProperties(databaseId).find((candidate) => candidate.id === propertyId)
+        : undefined;
+      const direction = property ? dependencyReadDirection(property) : undefined;
+      if (!row || !databaseId || !property || !direction) return;
+      const key = databaseDependencyRelationKey(rowId, propertyId);
+      const current = get().databaseDependencyRelations[key];
+      const append = options.append === true && current?.hasMore === true;
+      const cursor = append ? current.nextCursor : undefined;
+      if (append && !cursor) return;
+      set((state) => {
+        const before = state.databaseDependencyRelations[key];
+        return {
+          databaseDependencyRelations: {
+            ...state.databaseDependencyRelations,
+            [key]: before
+              ? {
+                  ...before,
+                  error: undefined,
+                  loading: !append,
+                  loadingMore: append,
+                }
+              : {
+                  canonicalRelatedRowIds: [],
+                  databaseId,
+                  dependencyRevision: 0,
+                  direction,
+                  hasMore: false,
+                  loaded: false,
+                  loading: true,
+                  loadingMore: false,
+                  pendingMutations: [],
+                  propertyId,
+                  relatedRowIds: [],
+                  rowId,
+                },
+          },
+        };
+      });
+      try {
+        const result = await getDatabaseDependencyRelationRemote(
+          databaseId,
+          rowId,
+          direction,
+          {
+            ...(cursor ? { cursor } : {}),
+            ...(append && current?.dependencyRevision
+              ? { expectedDependencyRevision: current.dependencyRevision }
+              : {}),
+            ...(options.force ? { force: true } : {}),
+            propertyId,
+          },
+        );
+        if (result.propertyId !== propertyId) {
+          throw new Error("Dependency relation property authority changed.");
+        }
+        mergeDatabaseDependencyRelationAuthority(result, { append });
+      } catch (error) {
+        const status = persistErrorStatus(error);
+        if (append && status === 409) {
+          const restarted = await getDatabaseDependencyRelationRemote(
+            databaseId,
+            rowId,
+            direction,
+            { force: true, propertyId },
+          );
+          if (restarted.propertyId !== propertyId) {
+            throw new Error("Dependency relation property authority changed.");
+          }
+          mergeDatabaseDependencyRelationAuthority(restarted);
+          return;
+        }
+        set((state) => {
+          const before = state.databaseDependencyRelations[key];
+          if (!before) return {};
+          return {
+            databaseDependencyRelations: {
+              ...state.databaseDependencyRelations,
+              [key]: {
+                ...before,
+                error: error instanceof Error ? error.message : "Dependency relation load failed.",
+                loading: false,
+                loadingMore: false,
+              },
+            },
+          };
+        });
+      }
+    },
+
     async loadDatabase(dbId, options = {}) {
       if (pendingDatabaseCreate.has(dbId)) return;
       const loadUserId = outboxUserId();
@@ -176,6 +814,12 @@ export function createDatabaseStoreActions(
         !!get().viewsByDb[dbId] ||
         !!get().templatesByDb[dbId];
       const metadataRevalidated = databaseMetadataRevalidated.has(dbId);
+      const needsSnapshot =
+        force ||
+        needsLinkedDatabaseResolution ||
+        needsRequestedViews ||
+        !metadataRevalidated ||
+        !hasMetadata;
       const currentRowPage = get().databaseRowPagesByDb[dbId];
       const rowRefreshPending = currentRowPage?.loading === true || currentRowPage?.loadingMore === true;
       if (
@@ -198,6 +842,12 @@ export function createDatabaseStoreActions(
       const promiseKey = `${dbId}:${includeRows ? "rows" : "metadata"}:${requestedViewIds.join(",")}:${force ? "force" : "cached"}`;
       const pending = databaseLoadPromises.get(promiseKey);
       if (pending) return pending;
+      const metadataReadToken = needsSnapshot
+        ? beginReadApplication(
+            readApplicationKey.databaseMetadata(dbId),
+            readApplicationKey.databaseScope(dbId)
+          )
+        : undefined;
       const loadPromise = (async () => {
         // SWR: surface cached schema/views/templates immediately; the snapshot
         // fetch below still runs and reconciles.
@@ -208,20 +858,25 @@ export function createDatabaseStoreActions(
         // without a changedDatabaseIds entry that covers this cache generation.
         // Treating that absence as proof of freshness was the reload bug: rows
         // returned while recently-created properties/views stayed missing.
-        const needsSnapshot =
-          force ||
-          needsLinkedDatabaseResolution ||
-          needsRequestedViews ||
-          !metadataRevalidated ||
-          !hasMetadata;
         if (needsSnapshot) {
+          const readToken = metadataReadToken!;
           let snapshot: Awaited<ReturnType<typeof getDatabaseSnapshotRemote>>;
           try {
-            snapshot = await getDatabaseSnapshotRemote(dbId, { viewIds: requestedViewIds });
+            snapshot = await getDatabaseSnapshotRemote(dbId, {
+              force,
+              viewIds: requestedViewIds,
+            });
             if (
               loadUserId && permanentDeleteIds(loadUserId).has(dbId)
             ) return;
           } catch (error) {
+            const status = persistErrorStatus(error);
+            if (status === 401 || status === 403 || status === 404) {
+              await applyDefinitiveReadDenial(readToken, () =>
+                purgeDefinitivelyUnreadableDatabase(dbId)
+              );
+              throw error;
+            }
             // Offline with cached metadata: keep serving it; rows below get the
             // same treatment via their own cache.
             if (!hydratedMeta) throw error;
@@ -242,41 +897,46 @@ export function createDatabaseStoreActions(
             typeof snapshot.resolvedDatabaseTitle === "string" && snapshot.resolvedDatabaseTitle.trim()
               ? snapshot.resolvedDatabaseTitle.trim()
               : undefined;
-          set((s) => {
-            const pagesById = { ...s.pagesById };
-            if (resolvedDatabaseTitle && pagesById[dbId]) {
-              const page = pagesById[dbId];
-              pagesById[dbId] = {
-                ...page,
-                properties: {
-                  ...(page.properties ?? {}),
-                  notionLinkedDatabaseResolvedTitle: resolvedDatabaseTitle,
-                  notionLinkedDatabaseResolvedId: snapshot.resolvedDatabaseId,
-                  notionLinkedDatabaseResolvedFromNotionId: snapshot.resolvedFromNotionDatabaseId,
-                },
+          await applyLatestRead(readToken, async () => {
+            set((s) => {
+              const pagesById = { ...s.pagesById };
+              if (resolvedDatabaseTitle && pagesById[dbId]) {
+                const page = pagesById[dbId];
+                pagesById[dbId] = {
+                  ...page,
+                  properties: {
+                    ...(page.properties ?? {}),
+                    notionLinkedDatabaseResolvedTitle: resolvedDatabaseTitle,
+                    notionLinkedDatabaseResolvedId: snapshot.resolvedDatabaseId,
+                    notionLinkedDatabaseResolvedFromNotionId: snapshot.resolvedFromNotionDatabaseId,
+                  },
+                };
+              }
+              return {
+                pagesById,
+                propsByDb: { ...s.propsByDb, [dbId]: props },
+                viewsByDb: { ...s.viewsByDb, [dbId]: mergeById(s.viewsByDb[dbId], views) },
+                templatesByDb: { ...s.templatesByDb, [dbId]: mergeById(s.templatesByDb[dbId], templates) },
               };
-            }
-            return {
-              pagesById,
-              propsByDb: { ...s.propsByDb, [dbId]: props },
-              viewsByDb: { ...s.viewsByDb, [dbId]: mergeById(s.viewsByDb[dbId], views) },
-              templatesByDb: { ...s.templatesByDb, [dbId]: mergeById(s.templatesByDb[dbId], templates) },
-            };
+            });
+            const cacheUserId = outboxUserId();
+            // A snapshot can have started before a local-first view/property
+            // mutation committed. State reconciliation above preserves local
+            // records by id; cache that reconciled state too. Persisting the raw
+            // earlier snapshot here made a reload hydrate an old schema even
+            // though the server and the just-finished tab already had the change.
+            await Promise.all([
+              applyEmbeddedDatabaseSnapshots(snapshot.relatedDatabases ?? [], readToken),
+              cacheCurrentDatabaseMetadata(dbId),
+              cacheSetMeta(
+                cacheUserId,
+                recordCacheMeta.databaseMetadataStamp(dbId),
+                currentChangesSyncedAt || ""
+              ),
+              stampDatabaseCached(cacheUserId, dbId),
+            ]);
+            databaseMetadataRevalidated.add(dbId);
           });
-          const cacheUserId = outboxUserId();
-          // A snapshot can have started before a local-first view/property
-          // mutation committed. State reconciliation above preserves local
-          // records by id; cache that reconciled state too. Persisting the raw
-          // earlier snapshot here made a reload hydrate an old schema even
-          // though the server and the just-finished tab already had the change.
-          cacheCurrentDatabaseMetadata(dbId);
-          cacheSetMeta(
-            cacheUserId,
-            recordCacheMeta.databaseMetadataStamp(dbId),
-            currentChangesSyncedAt || ""
-          );
-          stampDatabaseCached(cacheUserId, dbId);
-          databaseMetadataRevalidated.add(dbId);
         }
 
         const rowPage = get().databaseRowPagesByDb[dbId];
@@ -308,6 +968,7 @@ export function createDatabaseStoreActions(
     },
 
     async loadDatabaseRows(dbId, query = {}) {
+      if (query.signal?.aborted) return;
       if (pendingDatabaseCreate.has(dbId)) {
         const queryKey = databaseRowsQueryKey(query);
         set((state) => {
@@ -330,12 +991,26 @@ export function createDatabaseStoreActions(
       const loadUserId = outboxUserId();
       if (loadUserId && permanentDeleteIds(loadUserId).has(dbId)) return;
       const force = query.force === true;
+      if (force) clearRecentDatabaseRowsQueries(dbId);
       const normalized = normalizeDatabaseRowsQuery(query);
       const queryKey = databaseRowsQueryKey(query);
       const offset = query.offset ?? 0;
+      const cursor = query.cursor;
       const limit = query.limit ?? DATABASE_INITIAL_ROW_LIMIT;
       const reset = query.reset !== false;
-      const promiseKey = `${dbId}:${queryKey}:${offset}:${limit}:${reset ? "reset" : "append"}:${force ? "force" : "cached"}`;
+      const databasePage = get().pagesById[dbId];
+      const linkedAliasRequiresRemoteRevalidation =
+        databasePage?.kind === "database" &&
+        databasePage.properties?.notionLinkedDatabaseSourceUnavailable === true;
+      const rowPageBeforeLoad = get().databaseRowPagesByDb[dbId];
+      const rowIdsBeforeLoad = get().databaseRowIdsByDb[dbId] ?? [];
+      const replaceVisibleRowsFromExactCache =
+        reset && offset === 0 && rowPageBeforeLoad?.queryKey !== queryKey;
+      const hadUsableSameQuerySnapshot =
+        rowPageBeforeLoad?.queryKey === queryKey &&
+        !rowPageBeforeLoad.error &&
+        (rowPageBeforeLoad.totalCount !== undefined || rowIdsBeforeLoad.length > 0);
+      const promiseKey = `${dbId}:${queryKey}:${cursor ?? `offset:${offset}`}:${limit}:${reset ? "reset" : "append"}:${force ? "force" : "cached"}`;
       const pending = databaseRowsQueryPromises.get(promiseKey);
       if (pending) {
         if (force) databaseRowsForcedAgain.add(promiseKey);
@@ -370,18 +1045,76 @@ export function createDatabaseStoreActions(
       }
       if (
         !force &&
+        !linkedAliasRequiresRemoteRevalidation &&
         reset &&
         offset === 0 &&
         databaseRowPageSatisfiesInitialLoad(get().databaseRowPagesByDb[dbId], queryKey, limit)
       ) {
+        rememberCurrentDatabaseRowsQuery(
+          dbId,
+          queryKey,
+          currentDatabaseRowsAuthority(dbId)
+        );
         return;
       }
 
+      if (!force && reset && offset === 0) {
+        const snapshot = readRecentDatabaseRowsQuery(dbId, queryKey, limit, get());
+        if (snapshot) {
+          beginReadApplication(
+            readApplicationKey.databaseRows(dbId, queryKey),
+            readApplicationKey.databaseScope(dbId)
+          );
+          set((state) => ({
+            databaseRowIdsByDb: {
+              ...state.databaseRowIdsByDb,
+              [dbId]: snapshot.rowIds,
+            },
+            databaseRowPagesByDb: {
+              ...state.databaseRowPagesByDb,
+              [dbId]: snapshot.page,
+            },
+            loadedDbs: new Set(state.loadedDbs).add(dbId),
+          }));
+          return;
+        }
+      }
+
+      const snapshotAuthorityGeneration = currentDatabaseRowsAuthority(dbId);
+      const snapshotPropsSource = get().propsByDb[dbId];
+      const snapshotViewsSource = get().viewsByDb[dbId];
+
+      const readToken = beginReadApplication(
+        readApplicationKey.databaseRows(dbId, queryKey),
+        readApplicationKey.databaseScope(dbId)
+      );
+
       const loadPromise = (async () => {
+        const clearCanceledLoad = () => {
+          set((s) => {
+            const current = s.databaseRowPagesByDb[dbId];
+            if (current?.queryKey !== queryKey) return {};
+            return {
+              databaseRowPagesByDb: {
+                ...s.databaseRowPagesByDb,
+                [dbId]: {
+                  ...current,
+                  loading: false,
+                  loadingMore: false,
+                  error: undefined,
+                },
+              },
+            };
+          });
+        };
+        const settleCanceledLoad = () => applyLatestRead(readToken, clearCanceledLoad);
         set((s) => {
           const current = s.databaseRowPagesByDb[dbId];
+          const preserveVisibleRows =
+            reset &&
+            (s.databaseRowIdsByDb[dbId]?.length ?? 0) > 0;
           return {
-            ...(reset
+            ...(reset && !preserveVisibleRows
               ? { databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [dbId]: [] } }
               : {}),
             databaseRowPagesByDb: {
@@ -400,138 +1133,25 @@ export function createDatabaseStoreActions(
         });
 
         // SWR: if this exact query's first page is cached, render it now (with
-        // queued outbox row edits overlaid); the fetch below reconciles.
+        // queued outbox row edits overlaid); the fetch below reconciles. When
+        // changing queries, replace the temporarily-preserved prior query rows
+        // only if this new query has an exact cache entry.
         const hydratedRows =
-          reset && offset === 0 && !force && !(get().databaseRowIdsByDb[dbId] ?? []).length
-            ? await hydrateDatabaseRowsFromCache(dbId, queryKey)
+          reset && offset === 0 && !force &&
+          (!(get().databaseRowIdsByDb[dbId] ?? []).length || replaceVisibleRowsFromExactCache)
+            ? await hydrateDatabaseRowsFromCache(dbId, queryKey, {
+                replaceVisibleRows: replaceVisibleRowsFromExactCache,
+                signal: query.signal,
+              })
             : false;
+        if (query.signal?.aborted) {
+          await settleCanceledLoad();
+          return;
+        }
         // §7 v2: this boot's change feed proves the db untouched since the
         // cache was written — the hydrated render IS current; skip the refetch.
         if (hydratedRows && feedSaysUnchanged(dbId, lastHydratedRowsFeedStamp.get(dbId))) {
-          set((s) => {
-            const current = s.databaseRowPagesByDb[dbId];
-            if (current?.queryKey !== queryKey) return {};
-            return {
-              databaseRowPagesByDb: {
-                ...s.databaseRowPagesByDb,
-                [dbId]: { ...current, loading: false, loadingMore: false, error: undefined },
-              },
-            };
-          });
-          return;
-        }
-        try {
-          const props = get().dbProperties(dbId);
-          const rowsResult = await getDatabaseRowsRemote(dbId, {
-            includeComputed: databaseNeedsComputedValues(props),
-            includeRelationTargets: true,
-            limit,
-            offset,
-            viewId: normalized.viewId || undefined,
-            search: normalized.search || undefined,
-            currentPageId: normalized.currentPageId || undefined,
-          });
-          if (
-            loadUserId && permanentDeleteIds(loadUserId).has(dbId)
-          ) return;
-          const deleted = loadUserId ? permanentDeleteIds(loadUserId) : new Set<string>();
-          const liveRows = (rowsResult.rows ?? []).filter((row) => !deleted.has(row.id));
-          const liveRelatedPages = (rowsResult.relatedPages ?? []).filter(
-            (page) => !deleted.has(page.id)
-          );
-          const rowOffset = rowsResult.offset ?? offset;
-          const incomingRowIds = liveRows.map((row) => row.id);
-          const rowsById = Object.fromEntries(
-            liveRows.map((row, index) => [
-              row.id,
-              { ...row, __databaseRowOrder: rowOffset + index + 1 },
-            ])
-          );
-          const relatedPagesById = Object.fromEntries(
-            liveRelatedPages.map((page) => [page.id, page])
-          );
-          set((s) => {
-            const current = s.databaseRowPagesByDb[dbId];
-            if (current?.queryKey !== queryKey) return {};
-            // Overlay queued, in-flight, or not-yet-observed optimistic edits on
-            // top of the server snapshot. High-latency mutation events can make
-            // an earlier forced query finish after a later local edit.
-            const withPendingEdits = (byId: Record<string, Page>) => {
-              let merged: Record<string, Page> | null = null;
-              for (const id of Object.keys(byId)) {
-                const projected = remotePageWithOptimisticOverlay(byId[id]);
-                if (projected !== byId[id]) {
-                  merged ??= { ...byId };
-                  merged[id] = projected;
-                }
-              }
-              return merged ?? byId;
-            };
-            const existingIds = reset || rowOffset === 0 ? [] : s.databaseRowIdsByDb[dbId] ?? [];
-            const rowIds = appendUniqueIds(existingIds, incomingRowIds);
-            const hydratedRelationTargetIds = new Set(s.hydratedRelationTargetIds);
-            for (const id of rowsResult.relationTargetIds ?? []) {
-              hydratedRelationTargetIds.add(id);
-            }
-            if (!rowsResult.relationTargetIds) {
-              for (const page of liveRelatedPages) {
-                hydratedRelationTargetIds.add(page.id);
-              }
-            }
-            return {
-              pagesById: { ...s.pagesById, ...withPendingEdits(relatedPagesById), ...withPendingEdits(rowsById) },
-              hydratedRelationTargetIds,
-              databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [dbId]: rowIds },
-              databaseRowPagesByDb: {
-                ...s.databaseRowPagesByDb,
-                [dbId]: {
-                  queryKey,
-                  loadedCount: rowOffset + incomingRowIds.length,
-                  totalCount: rowsResult.totalCount,
-                  hasMore: rowsResult.hasMore === true,
-                  nextOffset: rowsResult.nextOffset,
-                  loading: false,
-                  loadingMore: false,
-                  error: undefined,
-                },
-              },
-              loadedDbs: new Set(s.loadedDbs).add(dbId),
-            };
-          });
-          if (reset && rowOffset === 0) {
-            const cacheUserId = outboxUserId();
-            const keys = databaseRowCacheKeys(dbId, queryKey);
-            cacheReplaceTable(
-              cacheUserId,
-              keys.dataTable,
-              liveRows.map((row) => ({
-                id: row.id,
-                value: remotePageWithOptimisticOverlay(row),
-              }))
-            );
-            cacheReplaceTable(
-              cacheUserId,
-              keys.relatedPagesTable,
-              liveRelatedPages.map((page) => ({
-                id: page.id,
-                value: remotePageWithOptimisticOverlay(page),
-              }))
-            );
-            cacheSetMeta(cacheUserId, keys.meta, {
-              hasMore: rowsResult.hasMore === true,
-              nextOffset: rowsResult.nextOffset,
-              queryKey,
-              rowIds: incomingRowIds,
-              totalCount: rowsResult.totalCount,
-              feedStamp: currentChangesSyncedAt || undefined,
-            } satisfies CachedRowsMeta);
-            registerRowsCacheKey(cacheUserId, dbId, keys.suffix);
-            stampDatabaseCached(cacheUserId, dbId);
-          }
-        } catch (error) {
-          if (hydratedRows) {
-            // Offline refresh behind a cached render: keep the rows visible and
-            // skip the failure toast; queued edits keep retrying.
+          await applyLatestRead(readToken, () => {
             set((s) => {
               const current = s.databaseRowPagesByDb[dbId];
               if (current?.queryKey !== queryKey) return {};
@@ -542,29 +1162,229 @@ export function createDatabaseStoreActions(
                 },
               };
             });
-            return;
-          }
-          // No cache for this exact query: try computing the view locally from
-          // a complete cached base set before surfacing an error.
-          if (
-            reset &&
-            offset === 0 &&
-            (await hydrateRowsViaLocalEngine(dbId, queryKey, normalized).catch(() => false))
-          ) {
-            return;
-          }
-          const message = databaseRowsLoadErrorMessage(error);
-          set((s) => {
-            const current = s.databaseRowPagesByDb[dbId];
-            if (current?.queryKey !== queryKey) return {};
-            return {
-              databaseRowPagesByDb: {
-                ...s.databaseRowPagesByDb,
-                [dbId]: { ...current, loading: false, loadingMore: false, error: message },
-              },
-            };
           });
-          get().notify(message, "error");
+          rememberCurrentDatabaseRowsQuery(
+            dbId,
+            queryKey,
+            snapshotAuthorityGeneration,
+            snapshotPropsSource,
+            snapshotViewsSource
+          );
+          return;
+        }
+        try {
+          const props = get().dbProperties(dbId);
+          const remoteOptions = {
+            includeComputed: databaseNeedsComputedValues(props),
+            includeRelationTargets: true,
+            limit,
+            ...(cursor ? { cursor } : { offset }),
+            viewId: normalized.viewId || undefined,
+            search: normalized.search || undefined,
+            currentPageId: normalized.currentPageId || undefined,
+            ...(normalized.subitemParentId !== null
+              ? { subitemParentId: normalized.subitemParentId }
+              : {}),
+          };
+          const rowsResult = query.signal
+            ? await getDatabaseRowsRemote(dbId, remoteOptions, query.signal)
+            : await getDatabaseRowsRemote(dbId, remoteOptions);
+          if (query.signal?.aborted) {
+            await settleCanceledLoad();
+            return;
+          }
+          await applyLatestRead(readToken, async () => {
+            if (query.signal?.aborted) {
+              clearCanceledLoad();
+              return;
+            }
+            if (
+              loadUserId && permanentDeleteIds(loadUserId).has(dbId)
+            ) return;
+            const deleted = loadUserId ? permanentDeleteIds(loadUserId) : new Set<string>();
+            const databasePage = get().pagesById[dbId];
+            const liveRows = (rowsResult.rows ?? [])
+              .map((row) => materializeDatabaseRow(row, databasePage))
+              .filter((row) => !deleted.has(row.id));
+            const liveRelatedPages = (rowsResult.relatedPages ?? []).filter(
+              (page) => !deleted.has(page.id)
+            );
+            const rowOffset = rowsResult.offset ?? offset;
+            const incomingRowIds = liveRows.map((row) => row.id);
+            const rowsById = Object.fromEntries(
+              liveRows.map((row, index) => [
+                row.id,
+                { ...row, __databaseRowOrder: rowOffset + index + 1 },
+              ])
+            );
+            const relatedPagesById = Object.fromEntries(
+              liveRelatedPages.map((page) => [page.id, page])
+            );
+            set((s) => {
+              const current = s.databaseRowPagesByDb[dbId];
+              if (current?.queryKey !== queryKey) return {};
+              // Overlay queued, in-flight, or not-yet-observed optimistic edits on
+              // top of the server snapshot. High-latency mutation events can make
+              // an earlier forced query finish after a later local edit.
+              const withPendingEdits = (byId: Record<string, Page>) => {
+                let merged: Record<string, Page> | null = null;
+                for (const id of Object.keys(byId)) {
+                  if (byId[id].__structuralPlaceholder === true) continue;
+                  const projected = remotePageWithOptimisticOverlay(byId[id]);
+                  if (projected !== byId[id]) {
+                    merged ??= { ...byId };
+                    merged[id] = projected;
+                  }
+                }
+                return merged ?? byId;
+              };
+              const existingIds = reset || rowOffset === 0 ? [] : s.databaseRowIdsByDb[dbId] ?? [];
+              const rowIds = appendUniqueIds(existingIds, incomingRowIds);
+              const hydratedRelationTargetIds = new Set(s.hydratedRelationTargetIds);
+              for (const id of rowsResult.relationTargetIds ?? []) {
+                hydratedRelationTargetIds.add(id);
+              }
+              if (!rowsResult.relationTargetIds) {
+                for (const page of liveRelatedPages) {
+                  hydratedRelationTargetIds.add(page.id);
+                }
+              }
+              return {
+                pagesById: { ...s.pagesById, ...withPendingEdits(relatedPagesById), ...withPendingEdits(rowsById) },
+                hydratedRelationTargetIds,
+                databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [dbId]: rowIds },
+                databaseRowPagesByDb: {
+                  ...s.databaseRowPagesByDb,
+                  [dbId]: {
+                    queryKey,
+                    loadedCount: rowOffset + incomingRowIds.length,
+                    totalCount: rowsResult.totalCount,
+                    hasMore: rowsResult.hasMore === true,
+                    nextOffset: rowsResult.nextOffset,
+                    nextCursor: rowsResult.nextCursor,
+                    loading: false,
+                    loadingMore: false,
+                    error: undefined,
+                  },
+                },
+                loadedDbs: new Set(s.loadedDbs).add(dbId),
+              };
+            });
+            const appliedRowPage = get().databaseRowPagesByDb[dbId];
+            if (appliedRowPage?.queryKey === queryKey) {
+              rememberCurrentDatabaseRowsQuery(
+                dbId,
+                queryKey,
+                snapshotAuthorityGeneration,
+                snapshotPropsSource,
+                snapshotViewsSource
+              );
+              const cacheUserId = outboxUserId();
+              const keys = databaseRowCacheKeys(dbId, queryKey);
+              const cachedRows = liveRows.map((row) => ({
+                id: row.id,
+                value: databasePageWithOptimisticOverlay(row),
+              }));
+              const cachedRelatedPages = liveRelatedPages.map((page) => ({
+                id: page.id,
+                value: remotePageWithOptimisticOverlay(page),
+              }));
+              const cacheMeta = {
+                hasMore: rowsResult.hasMore === true,
+                nextOffset: rowsResult.nextOffset,
+                nextCursor: rowsResult.nextCursor,
+                queryKey,
+                rowIds: get().databaseRowIdsByDb[dbId] ?? [],
+                totalCount: rowsResult.totalCount,
+                feedStamp: currentChangesSyncedAt || undefined,
+              } satisfies CachedRowsMeta;
+              if (reset && rowOffset === 0) {
+                await Promise.all([
+                  cacheReplaceTable(cacheUserId, keys.dataTable, cachedRows),
+                  cacheReplaceTable(cacheUserId, keys.relatedPagesTable, cachedRelatedPages),
+                  cacheSetMeta(cacheUserId, keys.meta, cacheMeta),
+                  registerRowsCacheKey(cacheUserId, dbId, keys.suffix),
+                  stampDatabaseCached(cacheUserId, dbId),
+                ]);
+              } else if (!reset) {
+                await Promise.all([
+                  cacheAppendRowPage({
+                    dataTable: keys.dataTable,
+                    expectedOffset: rowOffset,
+                    meta: cacheMeta,
+                    metaKey: keys.meta,
+                    records: cachedRows,
+                    relatedRecords: cachedRelatedPages,
+                    relatedTable: keys.relatedPagesTable,
+                    userId: cacheUserId,
+                  }),
+                  registerRowsCacheKey(cacheUserId, dbId, keys.suffix),
+                  stampDatabaseCached(cacheUserId, dbId),
+                ]);
+              }
+            }
+          });
+        } catch (error) {
+          if (databaseRowsRequestWasAborted(query.signal)) {
+            await settleCanceledLoad();
+            return;
+          }
+          const status = persistErrorStatus(error);
+          if (status === 401 || status === 403 || status === 404) {
+            await applyDefinitiveReadDenial(readToken, () =>
+              purgeDefinitivelyUnreadableDatabase(dbId)
+            );
+            throw error;
+          }
+          await applyLatestRead(readToken, async () => {
+            if (hydratedRows || hadUsableSameQuerySnapshot) {
+              // A transient refresh failure does not make an already-renderable
+              // snapshot unusable. Keep its exact-query rows visible and skip the
+              // failure toast; queued edits and later refreshes keep reconciling.
+              set((s) => {
+                const current = s.databaseRowPagesByDb[dbId];
+                if (current?.queryKey !== queryKey) return {};
+                return {
+                  databaseRowPagesByDb: {
+                    ...s.databaseRowPagesByDb,
+                    [dbId]: { ...current, loading: false, loadingMore: false, error: undefined },
+                  },
+                };
+              });
+              return;
+            }
+            // No cache for this exact query: try computing the view locally from
+            // a complete cached base set before surfacing an error.
+            if (
+              reset &&
+              offset === 0 &&
+              (await hydrateRowsViaLocalEngine(dbId, queryKey, normalized).catch(() => false))
+            ) {
+              rememberCurrentDatabaseRowsQuery(
+                dbId,
+                queryKey,
+                snapshotAuthorityGeneration,
+                snapshotPropsSource,
+                snapshotViewsSource
+              );
+              return;
+            }
+            const message = databaseRowsLoadErrorMessage(error);
+            set((s) => {
+              const current = s.databaseRowPagesByDb[dbId];
+              if (current?.queryKey !== queryKey) return {};
+              return {
+                ...(replaceVisibleRowsFromExactCache
+                  ? { databaseRowIdsByDb: { ...s.databaseRowIdsByDb, [dbId]: [] } }
+                  : {}),
+                databaseRowPagesByDb: {
+                  ...s.databaseRowPagesByDb,
+                  [dbId]: { ...current, loading: false, loadingMore: false, error: message },
+                },
+              };
+            });
+            get().notify(message, "error");
+          });
         }
       })();
       databaseRowsQueryPromises.set(promiseKey, loadPromise);
@@ -588,6 +1408,7 @@ export function createDatabaseStoreActions(
         ...(query ?? {}),
         limit: query?.limit ?? DATABASE_ROW_LOAD_MORE_LIMIT,
         offset: current.nextOffset ?? current.loadedCount,
+        cursor: current.nextCursor,
         reset: false,
       });
       databaseRowLoadMorePromises.set(dbId, loadPromise);
@@ -598,6 +1419,82 @@ export function createDatabaseStoreActions(
           databaseRowLoadMorePromises.delete(dbId);
         }
       }
+    },
+
+    async loadDatabaseSubitemRows(dbId, parentIdInput, query = {}) {
+      const parentId = parentIdInput.trim();
+      if (!parentId || query.signal?.aborted) return;
+      const scopedQuery = { ...query, subitemParentId: parentId };
+      const queryKey = databaseRowsQueryKey(scopedQuery);
+      const limit = boundedSubitemRowLimit(query.limit);
+      const pending = databaseSubitemRowPagePromises.get(
+        subitemPagePromiseKey(dbId, parentId, queryKey, undefined)
+      );
+      if (pending) return pending;
+      const current = get().databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+      if (
+        query.force !== true
+        && databaseRowPageSatisfiesInitialLoad(current, queryKey, limit)
+      ) return;
+      return loadDatabaseSubitemWindowPage(dbId, parentId, query, undefined, false);
+    },
+
+    async loadMoreDatabaseSubitemRows(dbId, parentIdInput, query) {
+      const parentId = parentIdInput.trim();
+      if (!parentId || query?.signal?.aborted) return;
+      const current = get().databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+      if (!current) return;
+      let effectiveQuery = query;
+      if (!effectiveQuery) {
+        try {
+          const parsed = JSON.parse(current.queryKey ?? "") as Record<string, unknown>;
+          effectiveQuery = {
+            viewId: typeof parsed.viewId === "string" ? parsed.viewId : undefined,
+            search: typeof parsed.search === "string" ? parsed.search : undefined,
+            currentPageId:
+              typeof parsed.currentPageId === "string" ? parsed.currentPageId : undefined,
+          };
+        } catch {
+          return;
+        }
+      }
+      const queryKey = databaseRowsQueryKey({
+        ...effectiveQuery,
+        subitemParentId: parentId,
+      });
+      const cursor = current.nextCursor?.trim();
+      if (cursor) {
+        const pending = databaseSubitemRowPagePromises.get(
+          subitemPagePromiseKey(dbId, parentId, queryKey, cursor)
+        );
+        if (pending) return pending;
+      }
+      if (
+        current.queryKey !== queryKey
+        || !current.hasMore
+        || current.loading
+        || current.loadingMore
+      ) return;
+      if (!cursor) {
+        const message = databaseRowsLoadErrorMessage(
+          new Error("Database sub-item continuation is missing its cursor.")
+        );
+        set((state) => {
+          const live = state.databaseSubitemRowWindowsByDb[dbId]?.[parentId];
+          if (live?.queryKey !== queryKey) return {};
+          return {
+            databaseSubitemRowWindowsByDb: retainDatabaseSubitemWindow(
+              state.databaseSubitemRowWindowsByDb,
+              dbId,
+              parentId,
+              { ...live, loading: false, loadingMore: false, error: message }
+            ),
+          };
+        });
+        get().notify(message, "error");
+        return;
+      }
+      return loadDatabaseSubitemWindowPage(dbId, parentId, effectiveQuery, cursor, true);
     },
 
     warmDatabaseRowDetail(dbId, rowId) {
@@ -633,15 +1530,29 @@ export function createDatabaseStoreActions(
     dbRows(dbId) {
       const state = get();
       const loadedRowIds = state.databaseRowIdsByDb[dbId];
+      const loaded = state.loadedDbs.has(dbId);
+      const cached = databaseRowsByPageSource.get(state.pagesById)?.get(dbId);
+      if (
+        cached &&
+        cached.loaded === loaded &&
+        cached.loadedRowIds === loadedRowIds
+      ) {
+        return cached.rows;
+      }
+      let rows: Page[];
       if (loadedRowIds) {
-        return loadedRowIds
+        rows = loadedRowIds
           .map((id) => state.pagesById[id])
           .filter((page): page is Page => !!page && !page.inTrash);
+      } else if (!loaded && state.pagesById[dbId]?.kind === "database") {
+        rows = [];
+      } else {
+        rows = Object.values(state.pagesById)
+          .filter((p) => p.parentType === "database" && p.parentId === dbId && !p.inTrash)
+          .sort(bySortPos);
       }
-      if (!state.loadedDbs.has(dbId) && state.pagesById[dbId]?.kind === "database") return [];
-      return Object.values(state.pagesById)
-        .filter((p) => p.parentType === "database" && p.parentId === dbId && !p.inTrash)
-        .sort(bySortPos);
+      cacheDatabaseRows(state.pagesById, dbId, { loaded, loadedRowIds, rows });
+      return rows;
     },
 
     async createDatabase(opts) {
@@ -753,6 +1664,179 @@ export function createDatabaseStoreActions(
       return page;
     },
 
+    async configureDatabaseTaskFeature(input) {
+      assertDatabaseUnlocked(get().pagesById, input.databaseId);
+      const database = get().pagesById[input.databaseId];
+      if (!database || database.kind !== "database") {
+        throw new Error("Database task features require a database page.");
+      }
+      const properties = get().dbProperties(input.databaseId);
+      const propertyById = new Map(properties.map((property) => [property.id, property]));
+      if (input.enabled === false) {
+        const binding = input.feature === "subitems"
+          ? database.databaseFeatures?.subitems
+          : database.databaseFeatures?.dependencies;
+        if (!binding) throw new Error(`The ${input.feature} feature is not enabled.`);
+        const operationId = newId();
+        const [primaryPropertyId, secondaryPropertyId] = input.feature === "subitems"
+          ? [
+              database.databaseFeatures!.subitems!.parentPropertyId,
+              database.databaseFeatures!.subitems!.childrenPropertyId,
+            ]
+          : [
+              database.databaseFeatures!.dependencies!.predecessorPropertyId,
+              database.databaseFeatures!.dependencies!.successorPropertyId,
+            ];
+        const expectedDatabaseFeaturesRevision = Number(database.databaseFeaturesRevision ?? 0);
+        const expectedBindingRevision = Number(binding.revision ?? 0);
+        if (
+          !Number.isSafeInteger(expectedDatabaseFeaturesRevision)
+          || expectedDatabaseFeaturesRevision < 1
+          || !Number.isSafeInteger(expectedBindingRevision)
+          || expectedBindingRevision < 1
+        ) {
+          throw new Error("Database task-feature revision authority is missing.");
+        }
+        const request: ConfigureDatabaseTaskFeatureInput = {
+          databaseId: input.databaseId,
+          enabled: false,
+          expectedBindingRevision,
+          expectedDatabaseFeaturesRevision,
+          feature: input.feature,
+          operationId,
+          primaryPropertyId,
+          propertyDisposition: input.propertyDisposition,
+          secondaryPropertyId,
+        };
+        const effect: DatabaseTaskFeatureTurnOffEffect = {
+          databaseId: input.databaseId,
+          expectedBindingRevision,
+          expectedDatabaseFeaturesRevision,
+          feature: input.feature,
+          kind: "database_task_feature_turn_off",
+          operationId,
+          primaryPropertyId,
+          propertyDisposition: input.propertyDisposition,
+          secondaryPropertyId,
+        };
+        const result = await durableRemoteCall(
+          "configureDatabaseTaskFeatureRemote",
+          [request],
+          effect
+        );
+        return result.status;
+      }
+
+      const reservedNames = new Set(
+        properties.map((property) => property.name.trim()).filter(Boolean)
+      );
+      const uniquePropertyName = (base: string) => {
+        if (!reservedNames.has(base)) {
+          reservedNames.add(base);
+          return base;
+        }
+        let suffix = 1;
+        while (reservedNames.has(`${base} ${suffix}`)) suffix += 1;
+        const unique = `${base} ${suffix}`;
+        reservedNames.add(unique);
+        return unique;
+      };
+      const requestedName = (value: string, propertyId: string | undefined, fallback: string) =>
+        propertyId
+          ? value.trim() || propertyById.get(propertyId)?.name.trim() || fallback
+          : uniquePropertyName(value.trim() || fallback);
+
+      let request: ConfigureDatabaseTaskFeatureInput;
+      let effect: DatabaseTaskFeatureCommitEffect;
+      if (input.feature === "subitems") {
+        const binding = database.databaseFeatures?.subitems;
+        const parentPropertyId = binding?.parentPropertyId || newId();
+        const childrenPropertyId = binding?.childrenPropertyId || newId();
+        const nestedPropertyId = input.nestedPropertyId
+          ?? binding?.nestedPropertyId
+          ?? childrenPropertyId;
+        const showToggleOnTitle = input.showToggleOnTitle
+          ?? binding?.showToggleOnTitle
+          ?? true;
+        request = {
+          childrenProperty: {
+            id: childrenPropertyId,
+            name: requestedName(input.childrenPropertyName, binding?.childrenPropertyId, "Sub-item"),
+          },
+          databaseId: input.databaseId,
+          enabled: true,
+          feature: "subitems",
+          nestedPropertyId,
+          parentProperty: {
+            id: parentPropertyId,
+            name: requestedName(input.parentPropertyName, binding?.parentPropertyId, "Parent item"),
+          },
+          showToggleOnTitle,
+        };
+        effect = {
+          databaseId: input.databaseId,
+          feature: "subitems",
+          kind: "database_task_feature_commit",
+          nestedPropertyId,
+          primaryPropertyId: parentPropertyId,
+          secondaryPropertyId: childrenPropertyId,
+          showToggleOnTitle,
+        };
+      } else {
+        const binding = database.databaseFeatures?.dependencies;
+        const predecessorPropertyId = binding?.predecessorPropertyId || newId();
+        const successorPropertyId = binding?.successorPropertyId || newId();
+        const dateBinding = input.dateMode === "separate"
+          ? {
+              dateMode: "separate" as const,
+              endDatePropertyId: input.endDatePropertyId,
+              startDatePropertyId: input.startDatePropertyId,
+            }
+          : { datePropertyId: input.datePropertyId };
+        request = {
+          avoidWeekends: input.avoidWeekends,
+          databaseId: input.databaseId,
+          ...dateBinding,
+          enabled: true,
+          feature: "dependencies",
+          predecessorProperty: {
+            id: predecessorPropertyId,
+            name: requestedName(
+              input.predecessorPropertyName,
+              binding?.predecessorPropertyId,
+              "Blocked by"
+            ),
+          },
+          shiftMode: input.shiftMode,
+          successorProperty: {
+            id: successorPropertyId,
+            name: requestedName(
+              input.successorPropertyName,
+              binding?.successorPropertyId,
+              "Blocking"
+            ),
+          },
+        };
+        effect = {
+          avoidWeekends: input.avoidWeekends,
+          databaseId: input.databaseId,
+          ...dateBinding,
+          feature: "dependencies",
+          kind: "database_task_feature_commit",
+          primaryPropertyId: predecessorPropertyId,
+          secondaryPropertyId: successorPropertyId,
+          shiftMode: input.shiftMode,
+        };
+      }
+
+      const result = await durableRemoteCall(
+        "configureDatabaseTaskFeatureRemote",
+        [request],
+        effect
+      );
+      return result.status;
+    },
+
     async addProperty(dbId, type, name, config) {
       assertDatabaseUnlocked(get().pagesById, dbId);
       const existing = get().dbProperties(dbId);
@@ -825,16 +1909,17 @@ export function createDatabaseStoreActions(
               .dbViews(dbId)
               .find((view) => view.id === optimisticView.id);
             if (!currentView) continue;
-            void durableRemoteCall("updateViewRemote", [
-              currentView.id,
-              { config: currentView.config } as Partial<DbView>,
-              dbId,
-            ]).then((call) => {
-              if (call.status === "ok") {
-                publishDatabaseViewsMutation(dbId, "view_property_visibility_updated", [
-                  currentView.id,
-                ]);
-              } else if (call.status === "dropped") {
+            void durableRemoteCall(
+              "updateViewRemote",
+              [
+                currentView.id,
+                { config: currentView.config } as Partial<DbView>,
+                dbId,
+              ],
+              undefined,
+              undefined,
+              databaseTerminalReconciliation([dbId], false),
+              async () => {
                 set((state) => ({
                   viewsByDb: {
                     ...state.viewsByDb,
@@ -845,9 +1930,13 @@ export function createDatabaseStoreActions(
                     ),
                   },
                 }));
-                void get()
-                  .loadDatabase(dbId, { force: true, rows: false })
-                  .catch(() => {});
+                await cacheCurrentDatabaseMetadata(dbId);
+              }
+            ).then((call) => {
+              if (call.status === "ok") {
+                publishDatabaseViewsMutation(dbId, "view_property_visibility_updated", [
+                  currentView.id,
+                ]);
               }
             });
           }
@@ -912,14 +2001,17 @@ export function createDatabaseStoreActions(
       // edit already no-op'd locally — firing a hint-less remote mutation would
       // only 404. Persist only when we can route.
       if (dbId) {
-        void durableRemoteCall("updatePropertyRemote", [id, patch as Partial<DbProperty>, dbId]).then(
-          (call) => {
-            if (call.status === "ok") publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
-            // Terminal rejection: reconcile the optimistic schema edit from the
-            // server (refresh loops don't cover DB schema).
-            if (call.status === "dropped") void get().loadDatabase(dbId, { force: true, rows: false });
-          }
-        );
+        const reconcileEffect: DatabaseMetadataReconciliationEffect = {
+          databaseId: dbId,
+          kind: "database_metadata_reconcile",
+        };
+        void durableRemoteCall(
+          "updatePropertyRemote",
+          [id, patch as Partial<DbProperty>, dbId],
+          reconcileEffect
+        ).then((call) => {
+          if (call.status === "ok") publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
+        });
       }
 
       if (typeChanged && dbId) {
@@ -940,16 +2032,19 @@ export function createDatabaseStoreActions(
             },
           }));
           for (const view of updatedViews) {
-            void durableRemoteCall("updateViewRemote", [
-              view.id,
-              { config: view.config } as Partial<DbView>,
-              view.databaseId,
-            ]).then((call) => {
+            void durableRemoteCall(
+              "updateViewRemote",
+              [
+                view.id,
+                { config: view.config } as Partial<DbView>,
+                view.databaseId,
+              ],
+              undefined,
+              undefined,
+              databaseTerminalReconciliation([view.databaseId], false)
+            ).then((call) => {
               if (call.status === "ok") {
                 publishDatabaseViewsMutation(view.databaseId, "view_filter_type_guard_updated", [view.id]);
-              }
-              if (call.status === "dropped") {
-                void get().loadDatabase(view.databaseId, { force: true, rows: false });
               }
             });
           }
@@ -967,6 +2062,9 @@ export function createDatabaseStoreActions(
       const currentTarget = prop.config?.relationDatabaseId ?? prop.databaseId;
       if (currentTarget === targetDatabaseId) return;
       const previousRelatedPropertyId = prop.config?.relatedPropertyId;
+      const previousReciprocal = previousRelatedPropertyId
+        ? get().dbProperties(currentTarget).find((item) => item.id === previousRelatedPropertyId)
+        : undefined;
       const config: PropertyConfig = {
         ...(prop.config ?? {}),
         relationDatabaseId: targetDatabaseId,
@@ -990,23 +2088,54 @@ export function createDatabaseStoreActions(
       }
       cacheCurrentDatabaseMetadata(dbId);
       if (previousRelatedPropertyId) cacheCurrentDatabaseMetadata(currentTarget);
-      const call = await durableRemoteCall("updatePropertyRemote", [
-        id,
-        { config } as Partial<DbProperty>,
-        dbId,
-        previousRelatedPropertyId,
-      ]);
+      const reconciliation = databaseTerminalReconciliation(
+        [dbId, currentTarget, targetDatabaseId],
+        true
+      );
+      const call = await durableRemoteCall(
+        "updatePropertyRemote",
+        [
+          id,
+          { config } as Partial<DbProperty>,
+          dbId,
+          previousRelatedPropertyId,
+        ],
+        undefined,
+        undefined,
+        reconciliation,
+        async () => {
+          set((state) => ({
+            propsByDb: {
+              ...state.propsByDb,
+              [dbId]: (state.propsByDb[dbId] ?? []).map((item) =>
+                item.id === id && !configChanged(item.config, config)
+                  ? { ...item, config: cloneJson(prop.config) }
+                  : item
+              ),
+              ...(previousReciprocal &&
+              !(state.propsByDb[currentTarget] ?? []).some(
+                (item) => item.id === previousReciprocal.id
+              )
+                ? {
+                    [currentTarget]: [
+                      ...(state.propsByDb[currentTarget] ?? []),
+                      cloneJson(previousReciprocal),
+                    ].sort(bySortPos),
+                  }
+                : {}),
+            },
+          }));
+          await Promise.all(
+            reconciliation.databaseMetadataIds?.map(cacheCurrentDatabaseMetadata) ?? []
+          );
+        }
+      );
       if (call.status === "ok") {
         publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
         if (previousRelatedPropertyId) {
           publishDatabaseSchemaMutation(currentTarget, "property_deleted", [
             previousRelatedPropertyId,
           ]);
-        }
-      } else if (call.status === "dropped") {
-        void get().loadDatabase(dbId, { force: true, rows: false });
-        if (previousRelatedPropertyId) {
-          void get().loadDatabase(currentTarget, { force: true, rows: true });
         }
       }
     },
@@ -1024,8 +2153,17 @@ export function createDatabaseStoreActions(
       if (enabled) {
         if (prop.config?.relatedPropertyId) return; // already two-way
         // Load the target schema so the reciprocal lands with a correct position
-        // and is added to that database's existing views.
-        await get().loadDatabase(targetDbId, { rows: false }).catch(() => {});
+        // and is added to that database's existing views. When metadata is
+        // already present, keep the revalidation in the background: awaiting it
+        // here would make an optimistic two-way relation wait on network I/O
+        // (and can deadlock behind the still-pending primary property create).
+        const targetSchemaAvailable = Object.prototype.hasOwnProperty.call(
+          get().propsByDb,
+          targetDbId
+        );
+        const targetSchemaLoad = get().loadDatabase(targetDbId, { rows: false });
+        if (targetSchemaAvailable) void targetSchemaLoad.catch(() => {});
+        else await targetSchemaLoad.catch(() => {});
         const targetProps = get().dbProperties(targetDbId);
         const sourceDb = get().pagesById[dbId];
         const baseName =
@@ -1054,6 +2192,9 @@ export function createDatabaseStoreActions(
       // retained in the outbox payload so a retry can finish cleanup even when
       // the source unlink itself already committed.
       const reciprocalId = prop.config?.relatedPropertyId;
+      const previousReciprocal = reciprocalId
+        ? get().dbProperties(targetDbId).find((item) => item.id === reciprocalId)
+        : undefined;
       const config: PropertyConfig = { ...(prop.config ?? {}), relatedPropertyId: undefined };
       set((state) => ({
         propsByDb: {
@@ -1068,21 +2209,49 @@ export function createDatabaseStoreActions(
       }
       cacheCurrentDatabaseMetadata(dbId);
       if (reciprocalId) cacheCurrentDatabaseMetadata(targetDbId);
-      const call = await durableRemoteCall("updatePropertyRemote", [
-        id,
-        { config } as Partial<DbProperty>,
-        dbId,
-        reciprocalId,
-      ]);
+      const reconciliation = databaseTerminalReconciliation([dbId, targetDbId], true);
+      const call = await durableRemoteCall(
+        "updatePropertyRemote",
+        [
+          id,
+          { config } as Partial<DbProperty>,
+          dbId,
+          reciprocalId,
+        ],
+        undefined,
+        undefined,
+        reconciliation,
+        async () => {
+          set((state) => ({
+            propsByDb: {
+              ...state.propsByDb,
+              [dbId]: (state.propsByDb[dbId] ?? []).map((item) =>
+                item.id === id && !configChanged(item.config, config)
+                  ? { ...item, config: cloneJson(prop.config) }
+                  : item
+              ),
+              ...(previousReciprocal &&
+              !(state.propsByDb[targetDbId] ?? []).some(
+                (item) => item.id === previousReciprocal.id
+              )
+                ? {
+                    [targetDbId]: [
+                      ...(state.propsByDb[targetDbId] ?? []),
+                      cloneJson(previousReciprocal),
+                    ].sort(bySortPos),
+                  }
+                : {}),
+            },
+          }));
+          await Promise.all(
+            reconciliation.databaseMetadataIds?.map(cacheCurrentDatabaseMetadata) ?? []
+          );
+        }
+      );
       if (call.status === "ok") {
         publishDatabaseSchemaMutation(dbId, "property_updated", [id]);
         if (reciprocalId) {
           publishDatabaseSchemaMutation(targetDbId, "property_deleted", [reciprocalId]);
-        }
-      } else if (call.status === "dropped") {
-        void get().loadDatabase(dbId, { force: true, rows: false });
-        if (reciprocalId) {
-          void get().loadDatabase(targetDbId, { force: true, rows: true });
         }
       }
     },
@@ -1095,6 +2264,16 @@ export function createDatabaseStoreActions(
       assertDatabaseUnlocked(get().pagesById, dbId);
       const prop = get().dbProperties(dbId).find((item) => item.id === id);
       if (!prop || prop.type === "title") return null;
+      const reciprocalTargetDbId =
+        !opts?.skipReciprocal && prop.type === "relation" && prop.config?.relatedPropertyId
+          ? prop.config.relationDatabaseId ?? prop.databaseId
+          : undefined;
+      const reciprocalSnapshot =
+        reciprocalTargetDbId && prop.config?.relatedPropertyId
+          ? get()
+              .dbProperties(reciprocalTargetDbId)
+              .find((item) => item.id === prop.config?.relatedPropertyId)
+          : undefined;
 
       // Two-way relations: the backend owns the reciprocal lifecycle (database-
       // mutation cascades the paired property's deletion), so we only forward the
@@ -1104,7 +2283,7 @@ export function createDatabaseStoreActions(
       // (possibly loaded) target database so its column disappears at once; the
       // backend cascade makes it durable and a reload reconciles any drift.
       if (!opts?.skipReciprocal && prop.type === "relation" && prop.config?.relatedPropertyId) {
-        const targetDbId = prop.config.relationDatabaseId ?? prop.databaseId;
+        const targetDbId = reciprocalTargetDbId!;
         const reciprocalId = prop.config.relatedPropertyId;
         set((s) => {
           const targetProps = s.propsByDb[targetDbId];
@@ -1218,15 +2397,24 @@ export function createDatabaseStoreActions(
       // The backend owns the whole tombstone + row/view/template cleanup now.
       // Sending the same dependent writes concurrently can race the tombstone
       // and produce false terminal failures, so persist one durable delete.
-      const deleteCall = await durableRemoteCall("deletePropertyRemote", [
-        id,
-        dbId,
-        opts?.skipReciprocal,
-        prop.type === "relation" ? prop.config?.relatedPropertyId : undefined,
-      ]);
-      if (deleteCall.status === "dropped") {
-        const status = persistErrorStatus(deleteCall.error);
-        if (status !== 401 && status !== 403 && status !== 404) {
+      const reconciliation = databaseTerminalReconciliation(
+        [dbId, reciprocalTargetDbId],
+        true
+      );
+      const deleteCall = await durableRemoteCall(
+        "deletePropertyRemote",
+        [
+          id,
+          dbId,
+          opts?.skipReciprocal,
+          prop.type === "relation" ? prop.config?.relatedPropertyId : undefined,
+        ],
+        undefined,
+        undefined,
+        reconciliation,
+        async (error) => {
+          const status = persistErrorStatus(error);
+          if (status === 401 || status === 403 || status === 404) return;
           for (const row of snapshotRows) {
             const pending = pendingPage.get(row.id);
             if (pending) {
@@ -1245,6 +2433,18 @@ export function createDatabaseStoreActions(
               ...s.propsByDb,
               [dbId]: [...(s.propsByDb[dbId] ?? []), cloneJson(prop)].sort(bySortPos),
             };
+            if (
+              reciprocalTargetDbId &&
+              reciprocalSnapshot &&
+              !(propsByDb[reciprocalTargetDbId] ?? []).some(
+                (item) => item.id === reciprocalSnapshot.id
+              )
+            ) {
+              propsByDb[reciprocalTargetDbId] = [
+                ...(propsByDb[reciprocalTargetDbId] ?? []),
+                cloneJson(reciprocalSnapshot),
+              ].sort(bySortPos);
+            }
             for (const related of snapshotRelatedProperties) {
               propsByDb[dbId] = propsByDb[dbId].map((candidate) =>
                 candidate.id === related.id
@@ -1299,8 +2499,12 @@ export function createDatabaseStoreActions(
               },
             };
           });
+          await Promise.all(
+            reconciliation.databaseMetadataIds?.map(cacheCurrentDatabaseMetadata) ?? []
+          );
         }
-        await get().loadDatabase(dbId, { force: true, rows: true }).catch(() => {});
+      );
+      if (deleteCall.status === "dropped") {
         return null;
       }
       if (deleteCall.status === "ok") {
@@ -1387,97 +2591,128 @@ export function createDatabaseStoreActions(
       // restored; starting every request concurrently can strand that marker.
       const propertyRestoreCall = await durableRemoteCall(
         "createPropertyRemote",
-        [snapshot.property as Partial<DbProperty>]
+        [snapshot.property as Partial<DbProperty>],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], true),
+        async () => {
+          for (const row of existingRows) {
+            const pending = pendingPage.get(row.id);
+            if (pending?.properties && snapshot.property.id in pending.properties) {
+              const properties = { ...pending.properties };
+              delete properties[snapshot.property.id];
+              pendingPage.set(row.id, { ...pending, properties });
+              mirrorPendingPage(row.id);
+            }
+          }
+          set((state) => {
+            const propsByDb = {
+              ...state.propsByDb,
+              [dbId]: (state.propsByDb[dbId] ?? [])
+                .filter((prop) => prop.id !== snapshot.property.id)
+                .map((prop) => {
+                  const config = { ...(prop.config ?? {}) };
+                  if (config.rollupRelationPropertyId === snapshot.property.id) {
+                    config.rollupRelationPropertyId = undefined;
+                    config.rollupTargetPropertyId = undefined;
+                  }
+                  if (config.rollupTargetPropertyId === snapshot.property.id) {
+                    config.rollupTargetPropertyId = undefined;
+                  }
+                  return { ...prop, config };
+                }),
+            };
+            const pagesById = { ...state.pagesById };
+            for (const row of existingRows) {
+              const current = pagesById[row.id];
+              if (!current?.properties || !(snapshot.property.id in current.properties)) {
+                continue;
+              }
+              const properties = { ...current.properties };
+              delete properties[snapshot.property.id];
+              pagesById[row.id] = { ...current, properties };
+            }
+            return {
+              propsByDb,
+              pagesById,
+              viewsByDb: {
+                ...state.viewsByDb,
+                [dbId]: (state.viewsByDb[dbId] ?? []).map((view) => ({
+                  ...view,
+                  config: viewConfigWithoutProperty(view.config, snapshot.property.id),
+                })),
+              },
+              templatesByDb: {
+                ...state.templatesByDb,
+                [dbId]: (state.templatesByDb[dbId] ?? []).map((template) => {
+                  const properties = { ...(template.properties ?? {}) };
+                  delete properties[snapshot.property.id];
+                  return { ...template, properties };
+                }),
+              },
+            };
+          });
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
       );
       if (propertyRestoreCall.status === "dropped") {
-        for (const row of existingRows) {
-          const pending = pendingPage.get(row.id);
-          if (pending?.properties && snapshot.property.id in pending.properties) {
-            const properties = { ...pending.properties };
-            delete properties[snapshot.property.id];
-            pendingPage.set(row.id, { ...pending, properties });
-            mirrorPendingPage(row.id);
-          }
-        }
-        set((s) => {
-          const propsByDb = {
-            ...s.propsByDb,
-            [dbId]: (s.propsByDb[dbId] ?? [])
-              .filter((prop) => prop.id !== snapshot.property.id)
-              .map((prop) => {
-                const config = { ...(prop.config ?? {}) };
-                if (config.rollupRelationPropertyId === snapshot.property.id) {
-                  config.rollupRelationPropertyId = undefined;
-                  config.rollupTargetPropertyId = undefined;
-                }
-                if (config.rollupTargetPropertyId === snapshot.property.id) {
-                  config.rollupTargetPropertyId = undefined;
-                }
-                return { ...prop, config };
-              }),
-          };
-          const pagesById = { ...s.pagesById };
-          for (const row of existingRows) {
-            const current = pagesById[row.id];
-            if (!current?.properties || !(snapshot.property.id in current.properties)) continue;
-            const properties = { ...current.properties };
-            delete properties[snapshot.property.id];
-            pagesById[row.id] = { ...current, properties };
-          }
-          return {
-            propsByDb,
-            pagesById,
-            viewsByDb: {
-              ...s.viewsByDb,
-              [dbId]: (s.viewsByDb[dbId] ?? []).map((view) => ({
-                ...view,
-                config: viewConfigWithoutProperty(view.config, snapshot.property.id),
-              })),
-            },
-            templatesByDb: {
-              ...s.templatesByDb,
-              [dbId]: (s.templatesByDb[dbId] ?? []).map((template) => {
-                const properties = { ...(template.properties ?? {}) };
-                delete properties[snapshot.property.id];
-                return { ...template, properties };
-              }),
-            },
-          };
-        });
         return false;
       }
       const dependentRestoreCalls = await Promise.all([
         ...existingRows.map((row) =>
-          durableRemoteCall("updatePageRemote", [
-            row.id,
-            { properties: persistableRowProperties(row) } as Partial<Page>,
-          ])
+          durableRemoteCall(
+            "updatePageRemote",
+            [
+              row.id,
+              { properties: persistableRowProperties(row) } as Partial<Page>,
+            ],
+            undefined,
+            undefined,
+            { databaseRowIds: [dbId] }
+          )
         ),
         ...restoredViews.map((view) =>
-          durableRemoteCall("updateViewRemote", [
-            view.id,
-            { config: view.config } as Partial<DbView>,
-            dbId,
-          ])
+          durableRemoteCall(
+            "updateViewRemote",
+            [
+              view.id,
+              { config: view.config } as Partial<DbView>,
+              dbId,
+            ],
+            undefined,
+            undefined,
+            databaseTerminalReconciliation([dbId], false)
+          )
         ),
         ...restoredTemplates.map((template) =>
-          durableRemoteCall("updateTemplateRemote", [
-            template.id,
-            { properties: template.properties } as Partial<DbTemplate>,
-            dbId,
-          ])
+          durableRemoteCall(
+            "updateTemplateRemote",
+            [
+              template.id,
+              { properties: template.properties } as Partial<DbTemplate>,
+              dbId,
+            ],
+            undefined,
+            undefined,
+            databaseTerminalReconciliation([dbId], false)
+          )
         ),
         ...restoredRelatedProperties.map((prop) =>
-          durableRemoteCall("updatePropertyRemote", [
-            prop.id,
-            { config: prop.config } as Partial<DbProperty>,
-            dbId,
-          ])
+          durableRemoteCall(
+            "updatePropertyRemote",
+            [
+              prop.id,
+              { config: prop.config } as Partial<DbProperty>,
+              dbId,
+            ],
+            undefined,
+            undefined,
+            databaseTerminalReconciliation([dbId], false)
+          )
         ),
       ]);
       const restoreCalls = [propertyRestoreCall, ...dependentRestoreCalls];
       if (dependentRestoreCalls.some((call) => call.status === "dropped")) {
-        await get().loadDatabase(dbId, { force: true, rows: true }).catch(() => {});
         return false;
       }
       if (restoreCalls.every((call) => call.status === "ok")) {
@@ -1547,76 +2782,69 @@ export function createDatabaseStoreActions(
         return { propsByDb, pagesById };
       });
 
-      const propertyCall = await durableRemoteCall("updatePropertyRemote", [
-        propertyId,
-        { config } as Partial<DbProperty>,
-        dbId,
-      ]);
-      if (propertyCall.status === "dropped") {
-        set((s) => ({
-          propsByDb: {
-            ...s.propsByDb,
-            [dbId]: (s.propsByDb[dbId] ?? []).map((current) => {
-              if (current.id !== propertyId) return current;
-              const currentOptions = current.config?.options ?? [];
-              if (currentOptions.some((item) => item.id === optionId)) return current;
-              const insertAt = Math.max(0, Math.min(optionIndex, currentOptions.length));
-              return {
-                ...current,
-                config: {
-                  ...(current.config ?? {}),
-                  options: [
-                    ...currentOptions.slice(0, insertAt),
-                    cloneJson(option),
-                    ...currentOptions.slice(insertAt),
-                  ],
-                },
-              };
-            }),
-          },
-        }));
-        for (const row of updatedRows) {
-          const previous = snapshotRows.find((item) => item.id === row.id);
-          if (!previous) continue;
-          rollbackOptimisticRowProperty(
-            row.id,
-            propertyId,
-            row.properties?.[propertyId],
-            { [propertyId]: previous.value }
-          );
+      const propertyReconciliation = databaseTerminalReconciliation([dbId], true);
+      const propertyCall = await durableRemoteCall(
+        "updatePropertyRemote",
+        [propertyId, { config } as Partial<DbProperty>, dbId],
+        undefined,
+        undefined,
+        propertyReconciliation,
+        async () => {
+          set((s) => ({
+            propsByDb: {
+              ...s.propsByDb,
+              [dbId]: (s.propsByDb[dbId] ?? []).map((current) => {
+                if (current.id !== propertyId || configChanged(current.config, config)) {
+                  return current;
+                }
+                return { ...current, config: cloneJson(prop.config) };
+              }),
+            },
+          }));
+          for (const row of updatedRows) {
+            const previous = snapshotRows.find((item) => item.id === row.id);
+            if (!previous) continue;
+            rollbackOptimisticRowProperty(
+              row.id,
+              propertyId,
+              row.properties?.[propertyId],
+              { [propertyId]: previous.value }
+            );
+          }
+          await cacheCurrentDatabaseMetadata(dbId);
         }
+      );
+      if (propertyCall.status === "dropped") {
         return null;
       }
 
       const rowCalls = await Promise.all(
-        updatedRows.map((row) =>
-          durableRemoteCall("updatePageRemote", [
-            row.id,
-            { properties: persistableRowProperties(row) } as Partial<Page>,
-          ])
-        )
+        updatedRows.map((row) => {
+          const previous = snapshotRows.find((item) => item.id === row.id);
+          return durableRemoteCall(
+            "updatePageRemote",
+            [
+              row.id,
+              { properties: persistableRowProperties(row) } as Partial<Page>,
+            ],
+            undefined,
+            undefined,
+            { databaseRowIds: [dbId] },
+            async () => {
+              if (!previous) return;
+              rollbackOptimisticRowProperty(
+                row.id,
+                propertyId,
+                row.properties?.[propertyId],
+                { [propertyId]: previous.value }
+              );
+            }
+          );
+        })
       );
       const droppedRowIndexes = rowCalls.flatMap((call, index) =>
         call.status === "dropped" ? [index] : []
       );
-      for (const index of droppedRowIndexes) {
-        const row = updatedRows[index]!;
-        const previous = snapshotRows.find((item) => item.id === row.id);
-        if (!previous) continue;
-        rollbackOptimisticRowProperty(
-          row.id,
-          propertyId,
-          row.properties?.[propertyId],
-          { [propertyId]: previous.value }
-        );
-      }
-      if (
-        droppedRowIndexes.length > 0 &&
-        propertyCall.status === "ok" &&
-        rowCalls.every((call) => call.status !== "queued")
-      ) {
-        await get().loadDatabase(dbId, { force: true, rows: true }).catch(() => {});
-      }
       if (propertyCall.status === "ok" && rowCalls.every((call) => call.status === "ok")) {
         publishDatabaseSchemaMutation(dbId, "property_option_deleted", [propertyId]);
         if (updatedRows.length > 0) publishDatabaseRowsMutation(dbId, "property_option_deleted_rows_updated", updatedRows.map((row) => row.id));
@@ -1680,69 +2908,65 @@ export function createDatabaseStoreActions(
         return { propsByDb, pagesById };
       });
 
-      const propertyCall = await durableRemoteCall("updatePropertyRemote", [
-        propertyId,
-        { config } as Partial<DbProperty>,
-        dbId,
-      ]);
-      if (propertyCall.status === "dropped") {
-        set((s) => ({
-          propsByDb: {
-            ...s.propsByDb,
-            [dbId]: (s.propsByDb[dbId] ?? []).map((current) =>
-              current.id === propertyId
-                ? {
-                    ...current,
-                    config: {
-                      ...(current.config ?? {}),
-                      options: (current.config?.options ?? []).filter(
-                        (item) => item.id !== restoredOption.id
-                      ),
-                    },
-                  }
-                : current
-            ),
-          },
-        }));
-        for (const row of existingRows) {
-          rollbackOptimisticRowProperty(
-            row.id,
-            propertyId,
-            row.value,
-            previousRowProperties.get(row.id) ?? {}
-          );
+      const propertyReconciliation = databaseTerminalReconciliation([dbId], true);
+      const propertyCall = await durableRemoteCall(
+        "updatePropertyRemote",
+        [propertyId, { config } as Partial<DbProperty>, dbId],
+        undefined,
+        undefined,
+        propertyReconciliation,
+        async () => {
+          set((s) => ({
+            propsByDb: {
+              ...s.propsByDb,
+              [dbId]: (s.propsByDb[dbId] ?? []).map((current) =>
+                current.id === propertyId && !configChanged(current.config, config)
+                  ? { ...current, config: cloneJson(prop.config) }
+                  : current
+              ),
+            },
+          }));
+          for (const row of existingRows) {
+            rollbackOptimisticRowProperty(
+              row.id,
+              propertyId,
+              row.value,
+              previousRowProperties.get(row.id) ?? {}
+            );
+          }
+          await cacheCurrentDatabaseMetadata(dbId);
         }
+      );
+      if (propertyCall.status === "dropped") {
         return false;
       }
 
       const rowCalls = await Promise.all(
         existingRows.map((row) => {
           const page = get().pagesById[row.id];
-          return durableRemoteCall("updatePageRemote", [
-            row.id,
-            { properties: page ? persistableRowProperties(page) : {} } as Partial<Page>,
-          ]);
+          return durableRemoteCall(
+            "updatePageRemote",
+            [
+              row.id,
+              { properties: page ? persistableRowProperties(page) : {} } as Partial<Page>,
+            ],
+            undefined,
+            undefined,
+            { databaseRowIds: [dbId] },
+            async () => {
+              rollbackOptimisticRowProperty(
+                row.id,
+                propertyId,
+                row.value,
+                previousRowProperties.get(row.id) ?? {}
+              );
+            }
+          );
         })
       );
       const droppedRowIndexes = rowCalls.flatMap((call, index) =>
         call.status === "dropped" ? [index] : []
       );
-      for (const index of droppedRowIndexes) {
-        const row = existingRows[index]!;
-        rollbackOptimisticRowProperty(
-          row.id,
-          propertyId,
-          row.value,
-          previousRowProperties.get(row.id) ?? {}
-        );
-      }
-      if (
-        droppedRowIndexes.length > 0 &&
-        propertyCall.status === "ok" &&
-        rowCalls.every((call) => call.status !== "queued")
-      ) {
-        await get().loadDatabase(dbId, { force: true, rows: true }).catch(() => {});
-      }
       if (propertyCall.status === "ok" && rowCalls.every((call) => call.status === "ok")) {
         publishDatabaseSchemaMutation(dbId, "property_option_restored", [propertyId]);
         if (existingRows.length > 0) publishDatabaseRowsMutation(dbId, "property_option_restored_rows_updated", existingRows.map((row) => row.id));
@@ -1824,7 +3048,13 @@ export function createDatabaseStoreActions(
       // Routing hint derived from viewsByDb (see updateProperty): only persist
       // when the view resolves to a database, else the mutation can't be routed.
       if (dbId) {
-        const callPromise = durableRemoteCall("updateViewRemote", [id, patch as Partial<DbView>, dbId]);
+        const callPromise = durableRemoteCall(
+          "updateViewRemote",
+          [id, patch as Partial<DbView>, dbId],
+          undefined,
+          undefined,
+          databaseTerminalReconciliation([dbId], false)
+        );
         // The durable call is already in the outbox. Mirror the optimistic view
         // set into the record cache as well so a reload cannot hydrate the
         // pre-edit config while that call lands or waits for retry.
@@ -1832,12 +3062,27 @@ export function createDatabaseStoreActions(
         void callPromise.then(
           (call) => {
             if (call.status === "ok") publishDatabaseViewsMutation(dbId, "view_updated", [id]);
-            // Terminal rejection: reconcile the optimistic view edit from the
-            // server (refresh loops don't cover DB schema).
-            if (call.status === "dropped") void get().loadDatabase(dbId, { force: true, rows: false });
           }
         );
       }
+    },
+
+    applyConfiguredView(view) {
+      const dbId = view.databaseId;
+      set((state) => {
+        const current = state.viewsByDb[dbId] ?? [];
+        const found = current.some((item) => item.id === view.id);
+        return {
+          viewsByDb: {
+            ...state.viewsByDb,
+            [dbId]: found
+              ? current.map((item) => item.id === view.id ? view : item)
+              : [...current, view].sort(bySortPos),
+          },
+        };
+      });
+      cacheCurrentDatabaseMetadata(dbId);
+      publishDatabaseViewsMutation(dbId, "form_view_configured", [view.id]);
     },
 
     async deleteView(id) {
@@ -1852,18 +3097,27 @@ export function createDatabaseStoreActions(
         return { viewsByDb: next };
       });
       cacheCurrentDatabaseMetadata(dbId);
-      const call = await durableRemoteCall("deleteViewRemote", [id, dbId]);
+      const call = await durableRemoteCall(
+        "deleteViewRemote",
+        [id, dbId],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], false),
+        async () => {
+          set((state) => ({
+            viewsByDb: {
+              ...state.viewsByDb,
+              [dbId]: (state.viewsByDb[dbId] ?? []).some(
+                (view) => view.id === snapshot.id
+              )
+                ? state.viewsByDb[dbId] ?? []
+                : [...(state.viewsByDb[dbId] ?? []), cloneJson(snapshot)].sort(bySortPos),
+            },
+          }));
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
+      );
       if (call.status === "dropped") {
-        set((s) => ({
-          viewsByDb: {
-            ...s.viewsByDb,
-            [dbId]: (s.viewsByDb[dbId] ?? []).some((view) => view.id === snapshot.id)
-              ? s.viewsByDb[dbId] ?? []
-              : [...(s.viewsByDb[dbId] ?? []), cloneJson(snapshot)].sort(bySortPos),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
         return null;
       }
       if (call.status === "ok") publishDatabaseViewsMutation(dbId, "view_deleted", [id]);
@@ -1882,16 +3136,25 @@ export function createDatabaseStoreActions(
         },
       }));
       cacheCurrentDatabaseMetadata(dbId);
-      const call = await durableRemoteCall("createViewRemote", [restored as Partial<DbView>]);
+      const call = await durableRemoteCall(
+        "createViewRemote",
+        [restored as Partial<DbView>],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], false),
+        async () => {
+          set((state) => ({
+            viewsByDb: {
+              ...state.viewsByDb,
+              [dbId]: (state.viewsByDb[dbId] ?? []).filter(
+                (item) => item.id !== restored.id
+              ),
+            },
+          }));
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
+      );
       if (call.status === "dropped") {
-        set((s) => ({
-          viewsByDb: {
-            ...s.viewsByDb,
-            [dbId]: (s.viewsByDb[dbId] ?? []).filter((item) => item.id !== restored.id),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
         return false;
       }
       if (call.status === "ok") publishDatabaseViewsMutation(dbId, "view_restored", [restored.id]);
@@ -2000,40 +3263,77 @@ export function createDatabaseStoreActions(
 
       // Persist the selected template before clearing the prior default(s). A
       // primary terminal rejection must not strand the database with no default.
-      const primaryCall = await durableRemoteCall("updateTemplateRemote", [
-        id,
-        patch as Partial<DbTemplate>,
-        dbId,
-      ]);
+      const primaryCall = await durableRemoteCall(
+        "updateTemplateRemote",
+        [
+          id,
+          patch as Partial<DbTemplate>,
+          dbId,
+        ],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], false),
+        async () => {
+          const patchFields = new Set<keyof DbTemplate>(
+            Object.keys(patch) as Array<keyof DbTemplate>
+          );
+          patchFields.add("isDefault");
+          set((state) => ({
+            templatesByDb: {
+              ...state.templatesByDb,
+              [dbId]: (state.templatesByDb[dbId] ?? []).map((current) => {
+                const before = beforeTemplates.find(
+                  (template) => template.id === current.id
+                );
+                const optimistic = optimisticTemplates.find(
+                  (template) => template.id === current.id
+                );
+                return before && optimistic
+                  ? rollbackMatchingFields(current, optimistic, before, patchFields)
+                  : current;
+              }),
+            },
+          }));
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
+      );
       if (primaryCall.status === "dropped") {
-        const patchFields = new Set<keyof DbTemplate>(Object.keys(patch) as Array<keyof DbTemplate>);
-        patchFields.add("isDefault");
-        set((s) => ({
-          templatesByDb: {
-            ...s.templatesByDb,
-            [dbId]: (s.templatesByDb[dbId] ?? []).map((current) => {
-              const before = beforeTemplates.find((template) => template.id === current.id);
-              const optimistic = optimisticTemplates.find((template) => template.id === current.id);
-              return before && optimistic
-                ? rollbackMatchingFields(current, optimistic, before, patchFields)
-                : current;
-            }),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
         return false;
       }
 
       const secondaryCalls = patch.isDefault
         ? await Promise.all(
-            previousDefaults.map((previousId) =>
-              durableRemoteCall("updateTemplateRemote", [
-                previousId,
-                { isDefault: false },
-                dbId,
-              ])
-            )
+            previousDefaults.map((previousId) => {
+              const before = beforeTemplates.find(
+                (template) => template.id === previousId
+              );
+              const optimistic = optimisticTemplates.find(
+                (template) => template.id === previousId
+              );
+              return durableRemoteCall(
+                "updateTemplateRemote",
+                [previousId, { isDefault: false }, dbId],
+                undefined,
+                undefined,
+                databaseTerminalReconciliation([dbId], false),
+                async () => {
+                  set((state) => ({
+                    templatesByDb: {
+                      ...state.templatesByDb,
+                      [dbId]: (state.templatesByDb[dbId] ?? []).map((current) =>
+                        current.id === previousId &&
+                        before &&
+                        optimistic &&
+                        current.isDefault === optimistic.isDefault
+                          ? { ...current, isDefault: before.isDefault }
+                          : current
+                      ),
+                    },
+                  }));
+                  await cacheCurrentDatabaseMetadata(dbId);
+                }
+              );
+            })
           )
         : [];
       const droppedPreviousDefaults = new Set(
@@ -2042,28 +3342,6 @@ export function createDatabaseStoreActions(
         )
       );
       if (droppedPreviousDefaults.size > 0) {
-        set((s) => ({
-          templatesByDb: {
-            ...s.templatesByDb,
-            [dbId]: (s.templatesByDb[dbId] ?? []).map((current) => {
-              if (!droppedPreviousDefaults.has(current.id)) return current;
-              const before = beforeTemplates.find((template) => template.id === current.id);
-              const optimistic = optimisticTemplates.find((template) => template.id === current.id);
-              return before &&
-                optimistic &&
-                current.isDefault === optimistic.isDefault
-                ? { ...current, isDefault: before.isDefault }
-                : current;
-            }),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        if (
-          primaryCall.status === "ok" &&
-          secondaryCalls.every((call) => call.status !== "queued")
-        ) {
-          await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
-        }
         return false;
       }
 
@@ -2089,20 +3367,29 @@ export function createDatabaseStoreActions(
         return { templatesByDb };
       });
       cacheCurrentDatabaseMetadata(dbId);
-      const call = await durableRemoteCall("deleteTemplateRemote", [id, dbId]);
+      const call = await durableRemoteCall(
+        "deleteTemplateRemote",
+        [id, dbId],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], false),
+        async () => {
+          set((state) => ({
+            templatesByDb: {
+              ...state.templatesByDb,
+              [dbId]: (state.templatesByDb[dbId] ?? []).some(
+                (template) => template.id === snapshot.id
+              )
+                ? state.templatesByDb[dbId] ?? []
+                : [...(state.templatesByDb[dbId] ?? []), cloneJson(snapshot)].sort(
+                    bySortPos
+                  ),
+            },
+          }));
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
+      );
       if (call.status === "dropped") {
-        set((s) => ({
-          templatesByDb: {
-            ...s.templatesByDb,
-            [dbId]: (s.templatesByDb[dbId] ?? []).some(
-              (template) => template.id === snapshot.id
-            )
-              ? s.templatesByDb[dbId] ?? []
-              : [...(s.templatesByDb[dbId] ?? []), cloneJson(snapshot)].sort(bySortPos),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
         return null;
       }
       if (call.status === "ok") publishDatabaseTemplatesMutation(dbId, "template_deleted");
@@ -2132,32 +3419,59 @@ export function createDatabaseStoreActions(
         };
       });
       cacheCurrentDatabaseMetadata(dbId);
-      const createCall = await durableRemoteCall("createTemplateRemote", [
-        restored as Partial<DbTemplate>,
-      ]);
+      const createCall = await durableRemoteCall(
+        "createTemplateRemote",
+        [restored as Partial<DbTemplate>],
+        undefined,
+        undefined,
+        databaseTerminalReconciliation([dbId], false),
+        async () => {
+          set((state) => ({
+            templatesByDb: {
+              ...state.templatesByDb,
+              [dbId]: (state.templatesByDb[dbId] ?? [])
+                .filter((item) => item.id !== restored.id)
+                .map((current) => {
+                  const before = beforeTemplates.find(
+                    (item) => item.id === current.id
+                  );
+                  return before && current.isDefault === false && before.isDefault
+                    ? { ...current, isDefault: true }
+                    : current;
+                }),
+            },
+          }));
+          await cacheCurrentDatabaseMetadata(dbId);
+        }
+      );
       if (createCall.status === "dropped") {
-        set((s) => ({
-          templatesByDb: {
-            ...s.templatesByDb,
-            [dbId]: (s.templatesByDb[dbId] ?? [])
-              .filter((item) => item.id !== restored.id)
-              .map((current) => {
-                const before = beforeTemplates.find((item) => item.id === current.id);
-                return before && current.isDefault === false && before.isDefault
-                  ? { ...current, isDefault: true }
-                  : current;
-              }),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
         return false;
       }
 
       const secondaryCalls = await Promise.all(
-        previousDefaults.map((id) =>
-          durableRemoteCall("updateTemplateRemote", [id, { isDefault: false }, dbId])
-        )
+        previousDefaults.map((previousId) => {
+          const before = beforeTemplates.find((item) => item.id === previousId);
+          return durableRemoteCall(
+            "updateTemplateRemote",
+            [previousId, { isDefault: false }, dbId],
+            undefined,
+            undefined,
+            databaseTerminalReconciliation([dbId], false),
+            async () => {
+              set((state) => ({
+                templatesByDb: {
+                  ...state.templatesByDb,
+                  [dbId]: (state.templatesByDb[dbId] ?? []).map((current) =>
+                    current.id === previousId && current.isDefault === false && before
+                      ? { ...current, isDefault: before.isDefault }
+                      : current
+                  ),
+                },
+              }));
+              await cacheCurrentDatabaseMetadata(dbId);
+            }
+          );
+        })
       );
       const droppedPreviousDefaults = new Set(
         secondaryCalls.flatMap((call, index) =>
@@ -2165,25 +3479,6 @@ export function createDatabaseStoreActions(
         )
       );
       if (droppedPreviousDefaults.size > 0) {
-        set((s) => ({
-          templatesByDb: {
-            ...s.templatesByDb,
-            [dbId]: (s.templatesByDb[dbId] ?? []).map((current) => {
-              if (!droppedPreviousDefaults.has(current.id)) return current;
-              const before = beforeTemplates.find((item) => item.id === current.id);
-              return before && current.isDefault === false
-                ? { ...current, isDefault: before.isDefault }
-                : current;
-            }),
-          },
-        }));
-        cacheCurrentDatabaseMetadata(dbId);
-        if (
-          createCall.status === "ok" &&
-          secondaryCalls.every((call) => call.status !== "queued")
-        ) {
-          await get().loadDatabase(dbId, { force: true, rows: false }).catch(() => {});
-        }
         return false;
       }
       if (createCall.status === "ok" && secondaryCalls.every((call) => call.status === "ok")) {
@@ -2201,8 +3496,14 @@ export function createDatabaseStoreActions(
       if (!canCreatePageInState(get(), dbId, userId)) {
         throw new Error("Page access required.");
       }
+      clearRecentDatabaseRowsQueries(dbId);
       const originHref = currentRelativeRouteHref();
       const rows = get().dbRows(dbId);
+      const precedingRow = atEnd ? rows[rows.length - 1] : undefined;
+      const precedingPendingRowId =
+        precedingRow && pendingDatabaseRowCreate.get(precedingRow.id) === dbId
+          ? precedingRow.id
+          : undefined;
       const templates = get().dbTemplates(dbId);
       const template =
         templateId === ""
@@ -2282,13 +3583,14 @@ export function createDatabaseStoreActions(
             title: row.title,
             templateId,
             empty: templateId === "",
-            position: row.position,
           },
         ],
         fnKey: "createDatabaseRowRemote",
         opKey: `create-row:${id}`,
         userId: userId || "",
-        waitsFor: () => pendingDatabaseCreate.has(dbId),
+        waitsFor: () =>
+          pendingDatabaseCreate.has(dbId) ||
+          Boolean(precedingPendingRowId && pendingDatabaseRowCreate.has(precedingPendingRowId)),
         onSuccess: (result) => {
           pendingDatabaseRowCreate.delete(id);
           const created = result as
@@ -2299,7 +3601,16 @@ export function createDatabaseStoreActions(
               const current = state.pagesById[id];
               return {
                 pagesById: current
-                  ? { ...state.pagesById, [id]: { ...created.row, ...current } }
+                  ? {
+                      ...state.pagesById,
+                      [id]: {
+                        ...mergePersistedPageCreateAuthority(created.row, current),
+                        position:
+                          current.position === row.position
+                            ? created.row.position
+                            : current.position,
+                      },
+                    }
                   : state.pagesById,
                 blocksByPage: {
                   ...state.blocksByPage,
@@ -2308,6 +3619,7 @@ export function createDatabaseStoreActions(
                 loadedBlockPages: new Set(state.loadedBlockPages).add(id),
               };
             });
+            adoptPersistedPageCreateAuthority(id, created.row);
           } else {
             void get().loadDatabase(dbId, { force: true, rows: true });
             void reloadBlocksFromServer(id);
@@ -2358,6 +3670,7 @@ export function createDatabaseStoreActions(
             const route = routeInfoFromPath(window.location.pathname);
             if (route.kind === "page" && route.pageId === id) replaceRoute(originHref);
           }
+          releaseOptimisticCreateDependents(id);
         },
       });
       return row;
@@ -2373,6 +3686,8 @@ export function createDatabaseStoreActions(
       if (!row.parentId || row.parentId !== target.parentId) return undefined;
       if (isDatabaseLocked(pagesById, row.parentId)) return undefined;
       if (row.id === target.id) return undefined;
+      const databaseId = row.parentId;
+      clearRecentDatabaseRowsQueries(databaseId);
 
       const siblings = Object.values(pagesById)
         .filter((page) =>
@@ -2399,42 +3714,64 @@ export function createDatabaseStoreActions(
       // Capture the pre-move row order so a terminal rejection can restore it;
       // dbRows() orders strictly by databaseRowIdsByDb, so rolling back only the
       // row's position would leave the visible order wrong.
-      const beforeOrder = row.parentId ? get().databaseRowIdsByDb[row.parentId] : undefined;
+      const beforeOrder = get().databaseRowIdsByDb[databaseId];
+      const optimisticOrder = moveIdRelative(beforeOrder ?? [], rowId, targetId, side);
       set((s) => ({
         pagesById: {
           ...s.pagesById,
           [rowId]: { ...row, ...optimistic },
         },
-        databaseRowIdsByDb: row.parentId
-          ? {
-              ...s.databaseRowIdsByDb,
-              [row.parentId]: moveIdRelative(s.databaseRowIdsByDb[row.parentId] ?? [], rowId, targetId, side),
-            }
-          : s.databaseRowIdsByDb,
+        databaseRowIdsByDb: {
+          ...s.databaseRowIdsByDb,
+          [databaseId]: optimisticOrder,
+        },
       }));
 
-      const moveCall = await durableRemoteCall("moveDatabaseRowRemote", [rowId, targetId, side]);
+      const moveCall = await durableRemoteCall(
+        "moveDatabaseRowRemote",
+        [rowId, targetId, side],
+        undefined,
+        undefined,
+        { databaseRowIds: [databaseId] },
+        () => {
+          set((state) => {
+            const current = state.pagesById[rowId];
+            const sameOptimisticRow =
+              !!current &&
+              current.position === optimistic.position &&
+              current.updatedAt === optimistic.updatedAt;
+            const currentOrder = state.databaseRowIdsByDb[databaseId] ?? [];
+            const sameOptimisticOrder =
+              !!optimisticOrder &&
+              currentOrder.length === optimisticOrder.length &&
+              currentOrder.every((id, index) => id === optimisticOrder[index]);
+            return {
+              ...(sameOptimisticRow
+                ? {
+                    pagesById: {
+                      ...state.pagesById,
+                      [rowId]: {
+                        ...current,
+                        position: before.position,
+                        updatedAt: before.updatedAt,
+                        lastEditedBy: before.lastEditedBy,
+                      },
+                    },
+                  }
+                : {}),
+              ...(beforeOrder && sameOptimisticOrder
+                ? {
+                    databaseRowIdsByDb: {
+                      ...state.databaseRowIdsByDb,
+                      [databaseId]: beforeOrder,
+                    },
+                  }
+                : {}),
+            };
+          });
+        }
+      );
       if (moveCall.status === "dropped") {
-        // Terminal rejection: undo the optimistic reorder (the durable layer
-        // already toasted unless the row was simply gone).
-        set((s) => {
-          const current = s.pagesById[rowId];
-          if (!current) return {};
-          return {
-            pagesById: {
-              ...s.pagesById,
-              [rowId]: { ...current, position: before.position, updatedAt: before.updatedAt },
-            },
-            ...(row.parentId && beforeOrder
-              ? {
-                  databaseRowIdsByDb: {
-                    ...s.databaseRowIdsByDb,
-                    [row.parentId]: beforeOrder,
-                  },
-                }
-              : {}),
-          };
-        });
         return undefined;
       }
       if (moveCall.status === "queued") {
@@ -2456,6 +3793,159 @@ export function createDatabaseStoreActions(
       });
       publishDatabaseRowsMutation(row.parentId, "row_moved", [rowId]);
       return persisted;
+    },
+
+    async reparentDatabaseSubitem(rowId, targetParentId) {
+      const row = get().pagesById[rowId];
+      if (!row || row.parentType !== "database" || !row.parentId) return undefined;
+      if (!canEditPageInState(get(), row)) {
+        get().notify(storeMessages().editAccessDeniedSave, "default");
+        return undefined;
+      }
+      const databaseId = row.parentId;
+      if ((row.subitemParentId ?? "") === targetParentId) return row;
+      const mutationId = newId();
+      const optimistic: Page = {
+        ...row,
+        lastMutationId: mutationId,
+        subitemParentId: targetParentId,
+        updatedAt: nowIso(),
+        ...(get().userId ? { lastEditedBy: get().userId } : {}),
+      };
+      clearRecentDatabaseRowsQueries(databaseId);
+      set((state) => ({
+        pagesById: { ...state.pagesById, [rowId]: optimistic },
+      }));
+      projectOptimisticDatabaseSubitem(rowId, targetParentId, mutationId);
+
+      const effect: DatabaseRowsReconciliationEffect = {
+        databaseId,
+        kind: "database_rows_reconcile",
+        mutationId,
+        rowId,
+        targetParentId,
+      };
+      const call = await durableRemoteCall(
+        "reparentDatabaseSubitemRemote",
+        [rowId, targetParentId, mutationId],
+        effect,
+        undefined,
+        { databaseRowIds: [databaseId] },
+      );
+      if (call.status === "dropped") return undefined;
+      if (call.status === "queued") return optimistic;
+      const persistedResult = call.result as Awaited<
+        ReturnType<DatabaseStoreRuntime["reparentDatabaseSubitemRemote"]>
+      >;
+      const persisted = persistedResult.row;
+      return persisted;
+    },
+
+    async runDatabaseButton(rowId, propertyId, confirmationToken) {
+      const key = `${rowId}\u001f${propertyId}`;
+      const active = databaseButtonExecutionPromises.get(key);
+      if (active) return active;
+
+      const run = (async () => {
+        await ensureAuth();
+        const beforeFlush = get().pagesById[rowId];
+        if (!beforeFlush || beforeFlush.parentType !== "database" || !beforeFlush.parentId) return undefined;
+        if (!canEditPageInState(get(), beforeFlush)) {
+          get().notify(storeMessages().editAccessDeniedSave, "default");
+          return undefined;
+        }
+        if (beforeFlush.isLocked) {
+          get().notify(storeMessages().pageLockedSave, "default");
+          return undefined;
+        }
+        if (isDatabaseLocked(get().pagesById, beforeFlush.parentId)) {
+          get().notify(storeMessages().databaseLockedSave, "default");
+          return undefined;
+        }
+        await flushPage(rowId);
+        const row = get().pagesById[rowId];
+        if (!row || row.parentType !== "database" || !row.parentId) return undefined;
+        let executionId = databaseButtonRetryIds.get(key);
+        if (!executionId) {
+          executionId = newId();
+          databaseButtonRetryIds.set(key, executionId);
+          while (databaseButtonRetryIds.size > DATABASE_BUTTON_RETRY_LIMIT) {
+            const oldest = databaseButtonRetryIds.keys().next().value as string | undefined;
+            if (!oldest) break;
+            databaseButtonRetryIds.delete(oldest);
+          }
+        }
+        try {
+          const result = await executeDatabaseButtonRemote({
+            workspaceId: row.workspaceId,
+            databaseId: row.parentId,
+            rowId,
+            propertyId,
+            executionId,
+            ...(confirmationToken ? { confirmationToken } : {}),
+          });
+          if (buttonResultRequiresConfirmation(result)) return result;
+          databaseButtonRetryIds.delete(key);
+          const adopted = remotePageWithOptimisticOverlay(result.row);
+          const pageAdoption = prepareButtonPageResultAdoption(
+            result,
+            remotePageWithOptimisticOverlay,
+            { surface: "database-button" },
+          );
+          const targetMutations = new Map(
+            pageAdoption.mutations.map((mutation) => [mutation.databaseId, mutation]),
+          );
+          const sourceMutation = targetMutations.get(row.parentId);
+          const source: ButtonPageMutation = sourceMutation
+            ? {
+                ...sourceMutation,
+                reason: "database-button-page-results",
+                rowIds: Array.from(new Set([rowId, ...sourceMutation.rowIds])),
+              }
+            : {
+                databaseId: row.parentId,
+                reason: "database-button-execute",
+                rowIds: [rowId],
+              };
+          targetMutations.delete(row.parentId);
+          const mutations = [source, ...targetMutations.values()];
+          for (const mutation of mutations) clearRecentDatabaseRowsQueries(mutation.databaseId);
+          set((state) => {
+            const adoptedPages = pageAdoption.apply(state);
+            return {
+              ...adoptedPages,
+              pagesById: { ...adoptedPages.pagesById, [rowId]: adopted },
+            };
+          });
+          for (const mutation of mutations) {
+            publishDatabaseRowsMutation(mutation.databaseId, mutation.reason, mutation.rowIds);
+          }
+          return {
+            ...result,
+            row: adopted,
+            createdPages: pageAdoption.createdPages,
+            updatedPages: pageAdoption.updatedPages,
+          };
+        } catch (error) {
+          const status = persistErrorStatus(error);
+          if (status !== undefined && status >= 400 && status < 500 && status !== 429) {
+            databaseButtonRetryIds.delete(key);
+          }
+          throw error;
+        }
+      })();
+      databaseButtonExecutionPromises.set(key, run);
+      try {
+        return await run;
+      } finally {
+        if (databaseButtonExecutionPromises.get(key) === run) {
+          databaseButtonExecutionPromises.delete(key);
+        }
+      }
+    },
+
+    discardDatabaseButtonExecution(rowId, propertyId) {
+      databaseButtonRetryIds.delete(`${rowId}\u001f${propertyId}`);
     },
 
     setRowProperty(rowId, propId, value, opts) {
@@ -2502,6 +3992,7 @@ export function createDatabaseStoreActions(
       const remaining = previousValue.filter((_value, index) => index !== removedIndex);
       const nextValue = remaining.length ? remaining : null;
       const now = nowIso();
+      clearRecentDatabaseRowsQueries(cur.parentId);
       set((state) => {
         const current = state.pagesById[rowId];
         if (!current) return {};
@@ -2517,6 +4008,7 @@ export function createDatabaseStoreActions(
           },
         };
       });
+      projectOptimisticRowFileValue(rowId, propertyId, nextValue);
 
       const effect: RowFileRemovalEffect = {
         cacheKey: expectedStorageKey || undefined,
@@ -2537,59 +4029,182 @@ export function createDatabaseStoreActions(
       return call.status;
     },
 
-    setRelation(rowId, prop, nextIds) {
+    async addDatabaseDependency(rowId, predecessorRowId) {
+      const cur = get().pagesById[rowId];
+      const predecessor = get().pagesById[predecessorRowId];
+      if (
+        !cur
+        || !predecessor
+        || rowId === predecessorRowId
+        || cur.parentType !== "database"
+        || predecessor.parentType !== "database"
+        || !cur.parentId
+        || predecessor.parentId !== cur.parentId
+      ) return "dropped";
+      if (!canEditPageInState(get(), cur)) {
+        get().notify(storeMessages().editAccessDeniedSave, "default");
+        return "dropped";
+      }
+      if (cur.isLocked) {
+        get().notify(storeMessages().pageLockedSave, "default");
+        return "dropped";
+      }
+      if (isDatabaseLocked(get().pagesById, cur.parentId)) {
+        get().notify(storeMessages().databaseLockedSave, "default");
+        return "dropped";
+      }
+      const database = get().pagesById[cur.parentId];
+      const features = recordValue(database?.databaseFeatures);
+      const binding = recordValue(features?.dependencies);
+      const propertyId = typeof binding?.predecessorPropertyId === "string"
+        ? binding.predecessorPropertyId.trim()
+        : "";
+      if (binding?.enabled !== true || !propertyId) return "dropped";
+
+      const relation = get().databaseDependencyRelation(rowId, propertyId);
+      if (relation?.relatedRowIds.includes(predecessorRowId)) return undefined;
+      const mutationId = newId();
+      const addRelatedRowIds = [predecessorRowId];
+      const operations = dependencyOperations(rowId, "predecessors", addRelatedRowIds, []);
+      const input: UpdateDatabaseDependencyRelationInput = {
+        databaseId: cur.parentId,
+        direction: "predecessors",
+        mutationId,
+        operations,
+        propertyId,
+        rowId,
+      };
+      const effect: DatabaseDependencyCommitEffect = {
+        addRelatedRowIds,
+        databaseId: cur.parentId,
+        direction: "predecessors",
+        kind: "database_dependency_commit",
+        mutationId,
+        propertyId,
+        removeRelatedRowIds: [],
+        rowId,
+      };
+      if (relation) {
+        const key = databaseDependencyRelationKey(rowId, propertyId);
+        set((state) => {
+          const current = state.databaseDependencyRelations[key];
+          if (!current) return {};
+          return {
+            databaseDependencyRelations: {
+              ...state.databaseDependencyRelations,
+              [key]: {
+                ...current,
+                pendingMutations: [
+                  ...current.pendingMutations,
+                  { addRelatedRowIds, mutationId, removeRelatedRowIds: [] },
+                ],
+                relatedRowIds: cleanUniqueIds([
+                  ...current.relatedRowIds,
+                  predecessorRowId,
+                ]),
+              },
+            },
+          };
+        });
+      }
+      const call = await durableRemoteCall(
+        "updateDatabaseDependencyRelationRemote",
+        [input],
+        effect,
+      );
+      return call.status;
+    },
+
+    async setRelation(rowId, prop, nextIds) {
       const cur = get().pagesById[rowId];
       if (!cur) return;
-      const prevIds = asIdArray(cur.properties?.[prop.id]);
-      get().setRowProperty(rowId, prop.id, nextIds.length ? nextIds : null, { debounce: false });
-      if (isTemplateEditorPageId(rowId)) return;
+      const direction = dependencyDirection(prop);
+      if (direction) {
+        if (cur.parentType !== "database" || !cur.parentId) return;
+        if (!canEditPageInState(get(), cur)) {
+          get().notify(storeMessages().editAccessDeniedSave, "default");
+          return "dropped";
+        }
+        if (cur.isLocked) {
+          get().notify(storeMessages().pageLockedSave, "default");
+          return "dropped";
+        }
+        if (isDatabaseLocked(get().pagesById, cur.parentId)) {
+          get().notify(storeMessages().databaseLockedSave, "default");
+          return "dropped";
+        }
+        let relation = get().databaseDependencyRelation(rowId, prop.id);
+        if (!relation?.loaded) {
+          await get().loadDatabaseDependencyRelation(rowId, prop.id, { force: true });
+          relation = get().databaseDependencyRelation(rowId, prop.id);
+        }
+        if (!relation?.loaded || relation.error) return "dropped";
+        const normalizedNextIds = cleanUniqueIds(nextIds);
+        const currentIds = relation.relatedRowIds;
+        const currentSet = new Set(currentIds);
+        const nextSet = new Set(normalizedNextIds);
+        const addRelatedRowIds = normalizedNextIds.filter((id) => !currentSet.has(id));
+        const removeRelatedRowIds = currentIds.filter((id) => !nextSet.has(id));
+        if (addRelatedRowIds.length === 0 && removeRelatedRowIds.length === 0) return;
+        if (addRelatedRowIds.length + removeRelatedRowIds.length > 50) return "dropped";
 
-      // Keep a reciprocal relation in sync: if the target database has a relation
-      // property pointing back at this row's database, mirror the link there.
-      const sourceDbId = prop.databaseId;
-      const targetDbId = prop.config?.relationDatabaseId ?? prop.databaseId;
-      if (!targetDbId) return;
-      const targetProps = get().propsByDb[targetDbId] ?? [];
-      // Prefer the explicit two-way pair link; fall back to the "any relation
-      // pointing back" heuristic for legacy/imported pairs (see backend
-      // reciprocalRelationProperty).
-      const linkedId = prop.config?.relatedPropertyId;
-      const reciprocal =
-        (linkedId
-          ? targetProps.find(
-              (p) =>
-                p.id === linkedId &&
-                p.type === "relation" &&
-                (p.config?.relationDatabaseId ?? p.databaseId) === sourceDbId
-            )
-          : undefined) ??
-        targetProps.find(
-          (p) =>
-            p.type === "relation" &&
-            p.id !== prop.id &&
-            (p.config?.relationDatabaseId ?? p.databaseId) === sourceDbId
+        const mutationId = newId();
+        const operations = dependencyOperations(
+          rowId,
+          direction,
+          addRelatedRowIds,
+          removeRelatedRowIds,
         );
-      if (!reciprocal) return;
-
-      const added = nextIds.filter((id) => !prevIds.includes(id));
-      const removed = prevIds.filter((id) => !nextIds.includes(id));
-      for (const targetId of added) {
-        const target = get().pagesById[targetId];
-        if (!target) continue;
-        const ids = asIdArray(target.properties?.[reciprocal.id]);
-        if (!ids.includes(rowId)) {
-          get().setRowProperty(targetId, reciprocal.id, [...ids, rowId], { debounce: false });
-        }
+        const input: UpdateDatabaseDependencyRelationInput = {
+          databaseId: cur.parentId,
+          direction,
+          mutationId,
+          operations,
+          propertyId: prop.id,
+          rowId,
+        };
+        const effect: DatabaseDependencyCommitEffect = {
+          addRelatedRowIds,
+          databaseId: cur.parentId,
+          direction,
+          kind: "database_dependency_commit",
+          mutationId,
+          propertyId: prop.id,
+          removeRelatedRowIds,
+          rowId,
+        };
+        const key = databaseDependencyRelationKey(rowId, prop.id);
+        set((state) => {
+          const current = state.databaseDependencyRelations[key];
+          if (!current) return {};
+          return {
+            databaseDependencyRelations: {
+              ...state.databaseDependencyRelations,
+              [key]: {
+                ...current,
+                pendingMutations: [
+                  ...current.pendingMutations,
+                  { addRelatedRowIds, mutationId, removeRelatedRowIds },
+                ],
+                relatedRowIds: normalizedNextIds,
+              },
+            },
+          };
+        });
+        const call = await durableRemoteCall(
+          "updateDatabaseDependencyRelationRemote",
+          [input],
+          effect,
+        );
+        return call.status;
       }
-      for (const targetId of removed) {
-        const target = get().pagesById[targetId];
-        if (!target) continue;
-        const ids = asIdArray(target.properties?.[reciprocal.id]);
-        if (ids.includes(rowId)) {
-          const next = ids.filter((id) => id !== rowId);
-          get().setRowProperty(targetId, reciprocal.id, next.length ? next : null, { debounce: false });
-        }
-      }
+      get().setRowProperty(rowId, prop.id, nextIds.length ? nextIds : null, { debounce: false });
+      // The row mutation endpoint owns reciprocal-relation synchronization and
+      // returns every changed target in affectedRows. Sending a second client
+      // mutation for each target doubled the critical path on a low-power NAS
+      // and raced the server's authoritative reciprocal update. The normal
+      // page flush reconciles affectedRows into live state and warm caches.
+      return undefined;
     },
   };
 }

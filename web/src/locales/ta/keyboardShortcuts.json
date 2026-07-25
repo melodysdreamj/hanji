@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "கருத்து சேர்",
+    "addLink": "இணைப்பு சேர்",
+    "blockColor": "கடைசி வண்ணத்தைப் பயன்படுத்து",
+    "bold": "தடிமனாக்கு",
+    "copyPageLink": "பக்க இணைப்பை நகலெடு",
+    "findInPage": "இந்தப் பக்கத்தில் தேடு",
+    "inlineCode": "இன்லைன் குறியீடு",
+    "italic": "சாய்வாக்கு",
+    "moveBlock": "தொகுதியை மற்றொரு பக்கத்திற்கு நகர்த்து",
+    "moveBlockDown": "தொகுதியை கீழே நகர்த்து",
+    "moveBlockUp": "தொகுதியை மேலே நகர்த்து",
+    "movePage": "தற்போதைய பக்கத்தை நகர்த்து",
+    "navigateBack": "பின்செல்",
+    "navigateForward": "முன்செல்",
+    "newPage": "புதிய பக்கம்",
+    "openBlockMenu": "தொகுதி செயல்களைத் திற",
+    "openKeyboardShortcuts": "விசைப்பலகை குறுக்குவழிகளைத் திற",
+    "openParentPage": "மூலப் பக்கத்தைத் திற",
+    "quickFind": "விரைவுத் தேடல்",
+    "strikethrough": "குறுக்குக்கோடு",
+    "toggleAllToggles": "அனைத்து மாற்றிகளையும் விரி/சுருக்கு",
+    "toggleSidebar": "பக்கப்பட்டியை மாற்று",
+    "toggleTheme": "இருண்ட பயன்முறையை மாற்று",
+    "underline": "கீழ்க்கோடு"
+  },
+  "categories": {
+    "createStyle": "உருவாக்கு மற்றும் பாணி",
+    "editMove": "திருத்து மற்றும் நகர்த்து",
+    "popular": "பிரபலமான"
+  },
+  "categoriesLabel": "குறுக்குவழி வகைகள்",
+  "close": "மூடு",
+  "closeBackdrop": "விசைப்பலகை குறுக்குவழிகளை மூடு",
+  "empty": "குறுக்குவழிகள் எதுவும் காணப்படவில்லை",
+  "keysFor": "{{action}} க்கான விசைகள்",
+  "or": "அல்லது",
+  "searchLabel": "விசைப்பலகை குறுக்குவழி தேடல்",
+  "searchPlaceholder": "குறுக்குவழி தேடு...",
+  "searchResults": "தேடல் முடிவுகள்",
+  "searchTerms": {
+    "toggleTheme": "தீம் ஒளி இருள் தோற்றம்"
+  },
+  "title": "விசைப்பலகை குறுக்குவழிகள்"
+}

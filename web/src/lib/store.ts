@@ -2,12 +2,17 @@
 
 import { create } from "zustand";
 import {
+  affectedDatabaseRowsFromMutation,
+  applyBlockSnapshotRemote,
   bootstrapWorkspace,
   createBlockRemote,
   createBlocksRemote,
   createWorkspaceRemote,
   createCommentRemote,
   createDatabaseRemote,
+  configureDatabaseTaskFeatureRemote,
+  executeDatabaseButtonRemote,
+  executePageButtonRemote,
   createDatabaseRowRemote,
   createPageRemote,
   createPropertyRemote,
@@ -24,24 +29,28 @@ import {
   deleteWorkspaceRemote,
   duplicatePageRemote,
   ensureAuth,
+  getDatabaseDependencyRelationRemote,
   getDatabaseRowsRemote,
   getDatabaseSnapshotRemote,
   getPageBlocksRemote,
   getPageCommentsRemote,
   getPageRemote,
   moveDatabaseRowRemote,
-  recordCollaborationOperationRemote,
+  reparentDatabaseSubitemRemote,
+  probeWorkspaceChanges,
   rememberWorkspaceCache,
   restorePageRemote,
   restoreDatabaseRowRemote,
   trashPageRemote,
   trashDatabaseRowRemote,
+  touchBlockPageRecencyRemote,
   updateBlockRemote,
   updateBlocksRemote,
   updateCommentRemote,
   deleteCommentsRemote,
   updateCommentsRemote,
   updateDatabaseRowRemote,
+  updateDatabaseDependencyRelationRemote,
   updatePageRemote,
   updatePropertyRemote,
   updateTemplateRemote,
@@ -49,7 +58,13 @@ import {
   updateWorkspaceRemote,
 } from "./edgebase";
 import type {
+  BlockBatchUpdateRemoteResult,
+  BlockPageRecencyProof,
+  BlockUpdateRemoteResult,
   CreateWorkspaceInput,
+  DatabaseSnapshotResult,
+  DatabaseDependencyDirection,
+  DatabaseDependencyRelationResult,
   DeleteWorkspaceInput,
   OrganizationDirectoryResult,
   SharedPageResult,
@@ -67,7 +82,10 @@ import { i18next } from "@/i18n";
 import { isKoreanLocale } from "./i18n";
 import { activePersistentGeneratedLabels } from "./persistentGeneratedLabels";
 import { newId, positionBetween } from "./ids";
-import { hasDatabaseTemplateStoredFileReference } from "./storedFileReferences";
+import {
+  hasDatabaseTemplateStoredFileReference,
+  hasStoredFileReference,
+} from "./storedFileReferences";
 import {
   localBoxIfSettled,
   lockBoxName,
@@ -87,17 +105,25 @@ import {
   outboxRekey,
   outboxSet,
   resetOutboxForTests,
+  type BlockStructureInvalidation,
   type DatabaseCreateEffect,
+  type MutationOutboxOp,
   type OutboxEntry,
   type OutboxOp,
+  type PageRecencyOutboxOp,
   type RemoteCallEffect,
+  type RemoteCallTerminalReconciliation,
   type RowFileRemovalEffect,
+  type TerminalReconciliationOutboxOp,
 } from "./outbox";
 import {
+  cacheAppendRowPage,
+  cacheClearDatabase,
   cacheGetMeta,
   cacheListTable,
   cacheReplaceTable,
   cacheSetMeta,
+  cacheUpdateMeta,
   getOfflinePins,
   recordCacheClear,
   registerRowsCacheKey,
@@ -111,12 +137,27 @@ import {
   recordCacheMeta,
   recordCacheTables,
 } from "./recordCacheKeys";
+import {
+  applyDefinitiveReadDenial,
+  applyLatestRead,
+  beginReadApplication,
+  deriveReadApplication,
+  invalidateReadApplication,
+  readApplicationKey,
+  resetReadApplicationGuards,
+  type ReadApplicationToken,
+} from "./readApplicationGuard";
 import { runAcknowledgedMutation } from "./mutationLifecycle";
-import { overlayOutboxOnBlocks, overlayOutboxOnPages } from "./outboxProjection";
+import {
+  overlayOutboxOnBlocks,
+  overlayOutboxOnComments,
+  overlayOutboxOnPages,
+} from "./outboxProjection";
 import {
   commitPersistedBlockDeletionToCache,
   commitPersistedBlockToCache,
-  commitPersistedPageToCache,
+  commitPersistedPagesToCache,
+  commitPersistedRelatedPagesToCache,
 } from "./persistedMutationCache";
 import {
   remapViewConfigPropertyIds,
@@ -142,7 +183,11 @@ import {
 } from "./storeEntityPolicy";
 import { optimisticStarterDatabaseSchema } from "./starterDatabaseModel";
 import { createDatabaseStoreActions } from "./databaseStoreSlice";
-import { createBlockStoreActions } from "./blockStoreSlice";
+import {
+  clearDeferredBlockCreatesForPage,
+  createBlockStoreActions,
+  resetDeferredBlockCreates,
+} from "./blockStoreSlice";
 import { createPageStoreActions } from "./pageStoreSlice";
 import { remapPageHref } from "./pageLinks";
 import { replaceRoute, routeInfoFromPath } from "./router";
@@ -159,7 +204,11 @@ import {
   evictCachedWorkspaceFiles,
   hasCachedWorkspaceFiles,
 } from "./offlineFiles";
-import { storageKeyFromUrl } from "./fileUrls";
+import {
+  evictSignedWorkspaceFileUrl,
+  settleSignedWorkspaceFileUrlRequests,
+  storageKeyFromUrl,
+} from "./fileUrls";
 import {
   pageMetaMutationPatch,
   publishLocalDatabaseMutation,
@@ -180,8 +229,6 @@ import type {
   BlockType,
   ButtonTemplateBlock,
   CollaborationBlockStructureAction,
-  CollaborationBlockStructureBlock,
-  CollaborationBlockStructureOperation,
   Comment,
   DbProperty,
   DbTemplate,
@@ -191,6 +238,7 @@ import type {
   OrganizationAuditExport,
   OrganizationBillingRecord,
   OrganizationDomain,
+  OrganizationDiscoveryExport,
   OrganizationEnterpriseControls,
   OrganizationGroup,
   OrganizationLegalHold,
@@ -204,6 +252,8 @@ import type {
   PropertyType,
   SelectOption,
   ShareRole,
+  Teamspace,
+  TeamspaceSettings,
   TextSpan,
   ViewConfig,
   ViewType,
@@ -243,6 +293,8 @@ export interface BlockStructureHistoryOperation {
   occurredAt: string;
 }
 export interface BlockHistoryEntry {
+  /** Authenticated local actor that created this undo/version snapshot. */
+  actorId?: string;
   blocks: Block[];
   operations?: BlockStructureHistoryOperation[];
   at: number;
@@ -419,21 +471,6 @@ function structureBlockSnapshot(block: Block): Block {
   };
 }
 
-function structurePayloadBlock(block: Block): CollaborationBlockStructureBlock {
-  return {
-    id: block.id,
-    pageId: block.pageId,
-    parentId: block.parentId ?? null,
-    type: block.type,
-    content: cloneValue(block.content) as Record<string, unknown> | undefined,
-    plainText: block.plainText,
-    position: block.position,
-    createdBy: block.createdBy,
-    createdAt: block.createdAt,
-    updatedAt: block.updatedAt,
-  };
-}
-
 function blockStructurePatch(block: Block): Partial<Block> {
   return {
     pageId: block.pageId,
@@ -449,6 +486,42 @@ function isStructureOnlyPatch(patch: Partial<Block>) {
   return keys.every((key) => key === "pageId" || key === "parentId" || key === "position");
 }
 
+function blockPatchChangesStructure(patch: Partial<Block>) {
+  return "pageId" in patch || "parentId" in patch || "position" in patch;
+}
+
+const MAX_BLOCK_STRUCTURE_INVALIDATION_PAGES = 100;
+const MAX_BLOCK_STRUCTURE_INVALIDATION_IDS = 100;
+
+function blockStructureInvalidation(
+  pageIds: Iterable<unknown>,
+  blockIds?: Iterable<unknown>
+): BlockStructureInvalidation | undefined {
+  const normalizedPageIds = Array.from(
+    new Set(
+      Array.from(pageIds)
+        .filter((pageId): pageId is string => typeof pageId === "string")
+        .map((pageId) => pageId.trim())
+        .filter(Boolean)
+    )
+  ).slice(0, MAX_BLOCK_STRUCTURE_INVALIDATION_PAGES);
+  if (normalizedPageIds.length === 0) return undefined;
+  const normalizedBlockIds = blockIds
+    ? Array.from(
+        new Set(
+          Array.from(blockIds)
+            .filter((blockId): blockId is string => typeof blockId === "string")
+            .map((blockId) => blockId.trim())
+            .filter(Boolean)
+        )
+      ).slice(0, MAX_BLOCK_STRUCTURE_INVALIDATION_IDS)
+    : [];
+  return {
+    pageIds: normalizedPageIds,
+    ...(normalizedBlockIds.length > 0 ? { blockIds: normalizedBlockIds } : {}),
+  };
+}
+
 function inferStructureAction(before: Block[], after: Block[]): CollaborationBlockStructureAction {
   if (before.length === 0 && after.length > 0) return "create";
   if (before.length > 0 && after.length === 0) return "delete";
@@ -459,50 +532,6 @@ function inferStructureAction(before: Block[], after: Block[]): CollaborationBlo
     if (firstBefore.parentId && !firstAfter.parentId) return "outdent";
   }
   return "move";
-}
-
-function blockStructureOperationPayload(
-  operation: BlockStructureHistoryOperation,
-  direction: "forward" | "inverse" = "forward"
-): CollaborationBlockStructureOperation {
-  const before = direction === "forward" ? operation.before : operation.after;
-  const after = direction === "forward" ? operation.after : operation.before;
-  const action: CollaborationBlockStructureAction =
-    direction === "forward"
-      ? operation.action
-      : operation.action === "create"
-        ? "delete"
-        : operation.action === "delete"
-          ? "restore"
-          : operation.action === "restore"
-            ? "delete"
-            : inferStructureAction(before, after);
-  return {
-    engine: "block_structure",
-    schemaVersion: 1,
-    action,
-    blockIds: operation.blockIds,
-    before: before.map(structurePayloadBlock),
-    after: after.map(structurePayloadBlock),
-  };
-}
-
-function recordBlockStructureOperation(
-  operation: BlockStructureHistoryOperation,
-  direction: "forward" | "inverse" = "forward"
-) {
-  const payload = blockStructureOperationPayload(operation, direction);
-  void recordCollaborationOperationRemote({
-    pageId: operation.pageId,
-    blockId:
-      payload.action === "create" || payload.action === "delete" || payload.action === "restore"
-        ? null
-        : operation.blockIds[0] ?? null,
-    kind: "block_structure",
-    operation: payload,
-    revision: Date.parse(operation.occurredAt) || Date.now(),
-    occurredAt: operation.occurredAt,
-  }).catch(() => {});
 }
 
 function removeBlocksFromPages(
@@ -591,9 +620,44 @@ function consumeLinkedTwin(
   };
 }
 
+function blockHistoryOwnsOperation(
+  entry: BlockHistoryEntry | undefined,
+  operation: BlockStructureHistoryOperation
+) {
+  return entry?.operations?.some(
+    (candidate) =>
+      candidate === operation ||
+      (candidate.action === operation.action &&
+        candidate.pageId === operation.pageId &&
+        candidate.occurredAt === operation.occurredAt &&
+        JSON.stringify(candidate.blockIds) === JSON.stringify(operation.blockIds))
+  ) ?? false;
+}
+
+function blockStructureDropReconciliation(
+  operation: BlockStructureHistoryOperation,
+  direction: "undo" | "redo",
+  pageIds: string[]
+): NonNullable<BlockStructureInvalidation["dropReconciliation"]> | undefined {
+  const historyByPage = useStore.getState().blockHistoryByPage;
+  const histories = pageIds.flatMap((pageId) => {
+    const history = historyByPage[pageId];
+    const entry = (direction === "undo" ? history?.past : history?.future)?.at(-1);
+    if (!blockHistoryOwnsOperation(entry, operation)) return [];
+    return [{
+      at: entry!.at,
+      ...(entry!.link?.id ? { linkId: entry!.link.id } : {}),
+      operationOccurredAt: operation.occurredAt,
+      pageId,
+    }];
+  });
+  return histories.length > 0 ? { direction, histories } : undefined;
+}
+
 async function persistBlockStructureOperation(
   operation: BlockStructureHistoryOperation,
-  direction: "undo" | "redo"
+  direction: "undo" | "redo",
+  beforeTerminalReconciliation?: BeforeTerminalReconciliation
 ) {
   const target = historyOperationTarget(operation, direction);
   const removals = target.remove.map((block) => block.id);
@@ -605,13 +669,39 @@ async function persistBlockStructureOperation(
   const updates = shouldCreate ? [] : target.upsert;
   const hintPageId =
     target.upsert[0]?.pageId ?? target.remove[0]?.pageId ?? undefined;
+  const baseInvalidation = blockStructureInvalidation(
+    [
+      operation.pageId,
+      ...operation.before.map((block) => block.pageId),
+      ...operation.after.map((block) => block.pageId),
+    ],
+    operation.blockIds
+  );
+  const dropReconciliation = baseInvalidation
+    ? blockStructureDropReconciliation(operation, direction, baseInvalidation.pageIds)
+    : undefined;
+  const invalidation = baseInvalidation
+    ? {
+        ...baseInvalidation,
+        ...(dropReconciliation ? { dropReconciliation } : {}),
+      }
+    : undefined;
   // Durable one-shots: transient failures queue + retry instead of silently
   // dropping the structural undo/redo. Return each first-attempt outcome so
   // the history action can distinguish a durable queued operation from a
   // terminal drop and avoid announcing a version restore that never landed.
   const calls: Array<Promise<DurableCallResult>> = [];
   if (removals.length) {
-    calls.push(durableRemoteCall("deleteBlocksRemote", [removals, hintPageId]));
+    calls.push(
+      durableRemoteCall(
+        "deleteBlocksRemote",
+        [removals, hintPageId],
+        undefined,
+        invalidation,
+        undefined,
+        beforeTerminalReconciliation
+      )
+    );
   }
   if (updates.length) {
     if (operation.action === "move") {
@@ -626,7 +716,7 @@ async function persistBlockStructureOperation(
             root.id,
             blockStructurePatch(root),
             hintPageId,
-          ])
+          ], undefined, invalidation, undefined, beforeTerminalReconciliation)
         );
       }
     } else {
@@ -637,37 +727,185 @@ async function persistBlockStructureOperation(
             patch: blockStructurePatch(block),
           })),
           hintPageId,
-        ])
+        ], undefined, invalidation, undefined, beforeTerminalReconciliation)
       );
     }
   }
-  if (creates.length) calls.push(durableRemoteCall("createBlocksRemote", [creates]));
+  if (creates.length) {
+    calls.push(
+      durableRemoteCall(
+        "createBlocksRemote",
+        [creates],
+        undefined,
+        invalidation,
+        undefined,
+        beforeTerminalReconciliation
+      )
+    );
+  }
   return Promise.all(calls);
 }
 
-async function persistBlockSnapshot(pageId: string, before: Block[], after: Block[]) {
+async function persistBlockSnapshot(
+  pageId: string,
+  before: Block[],
+  after: Block[],
+  beforeTerminalReconciliation?: BeforeTerminalReconciliation
+) {
   const beforeById = new Map(before.map((block) => [block.id, block]));
   const afterById = new Map(after.map((block) => [block.id, block]));
   for (const block of before) cancelPendingBlock(block.id);
   for (const block of after) cancelPendingBlock(block.id);
 
-  const calls: Array<Promise<DurableCallResult>> = [
-    ...after.flatMap((block) => {
-      const previous = beforeById.get(block.id);
-      if (!previous) return [durableRemoteCall("createBlockRemote", [block])];
-      if (JSON.stringify(previous) === JSON.stringify(block)) return [];
-      return [
-        durableRemoteCall("updateBlockRemote", [
-          block.id,
-          persistableBlockPatch(block),
+  const creates = after.filter((block) => !beforeById.has(block.id));
+  const updates = after.flatMap((block) => {
+    const previous = beforeById.get(block.id);
+    if (!previous || snapshotsEqual([previous], [block])) return [];
+    const previousPatch = persistableBlockPatch(previous);
+    const nextPatch = persistableBlockPatch(block);
+    const patch = Object.fromEntries(
+      Object.entries(nextPatch).filter(
+        ([key, value]) => !jsonValuesEqual(previousPatch[key as keyof Block], value)
+      )
+    ) as Partial<Block>;
+    return [{ block, patch, previous }];
+  });
+  const removals = before.filter((block) => !afterById.has(block.id));
+  const classCount = Number(creates.length > 0)
+    + Number(updates.length > 0)
+    + Number(removals.length > 0);
+  const calls: Array<Promise<DurableCallResult>> = [];
+  const createChunkById = new Map(
+    creates.map((block, index) => [block.id, Math.floor(index / BLOCK_BATCH_CHUNK_SIZE)])
+  );
+  const createsCanBatch = creates.every((block, index) => {
+    if (hasStoredFileReference(block.content)) return false;
+    const parentChunk = block.parentId ? createChunkById.get(block.parentId) : undefined;
+    return parentChunk === undefined || parentChunk === Math.floor(index / BLOCK_BATCH_CHUNK_SIZE);
+  });
+  const updatesCanBatch = updates.every(({ patch, previous, block }) =>
+    !("pageId" in patch)
+    && !("parentId" in patch)
+    && !(
+      "content" in patch
+      && (hasStoredFileReference(previous.content) || hasStoredFileReference(block.content))
+    )
+  );
+  const compatibleMixedSnapshot = classCount > 1
+    && creates.length + updates.length + removals.length <= BLOCK_BATCH_CHUNK_SIZE
+    && createsCanBatch
+    && creates.every((block) => !block.parentId)
+    && updatesCanBatch
+    && updates.every(({ patch }) => !("position" in patch))
+    && removals.every((block) => !block.parentId && !hasStoredFileReference(block.content));
+
+  if (compatibleMixedSnapshot) {
+    calls.push(
+      durableBlockSnapshotCall(
+        {
+          creates,
+          deleteIds: removals.map(({ id }) => id),
           pageId,
-        ]),
-      ];
-    }),
-    ...before
-      .filter((block) => !afterById.has(block.id))
-      .map((block) => durableRemoteCall("deleteBlockRemote", [block.id, pageId])),
-  ];
+          updates: updates.map(({ block, patch }) => ({ id: block.id, patch })),
+        },
+        beforeTerminalReconciliation
+      )
+    );
+  } else if (
+    classCount === 1
+    && creates.length > 1
+    && createsCanBatch
+  ) {
+    for (let index = 0; index < creates.length; index += BLOCK_BATCH_CHUNK_SIZE) {
+      calls.push(
+        durableRemoteCall(
+          "createBlocksRemote",
+          [creates.slice(index, index + BLOCK_BATCH_CHUNK_SIZE)],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+  } else if (
+    classCount === 1
+    && updates.length > 1
+    && updatesCanBatch
+  ) {
+    for (let index = 0; index < updates.length; index += BLOCK_BATCH_CHUNK_SIZE) {
+      calls.push(
+        durableRemoteCall(
+          "updateBlocksRemote",
+          [
+            updates
+              .slice(index, index + BLOCK_BATCH_CHUNK_SIZE)
+              .map(({ block, patch }) => ({ id: block.id, patch })),
+            pageId,
+          ],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+  } else if (classCount === 1 && removals.length > 1) {
+    for (let index = 0; index < removals.length; index += BLOCK_BATCH_CHUNK_SIZE) {
+      calls.push(
+        durableRemoteCall(
+          "deleteBlocksRemote",
+          [
+            removals
+              .slice(index, index + BLOCK_BATCH_CHUNK_SIZE)
+              .map((block) => block.id),
+            pageId,
+          ],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+  } else {
+    for (const block of creates) {
+      calls.push(
+        durableRemoteCall(
+          "createBlockRemote",
+          [block],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+    for (const { block } of updates) {
+      calls.push(
+        durableRemoteCall(
+          "updateBlockRemote",
+          [block.id, persistableBlockPatch(block), pageId],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+    for (const block of removals) {
+      calls.push(
+        durableRemoteCall(
+          "deleteBlockRemote",
+          [block.id, pageId],
+          undefined,
+          undefined,
+          undefined,
+          beforeTerminalReconciliation
+        )
+      );
+    }
+  }
   return Promise.all(calls);
 }
 
@@ -679,6 +917,26 @@ const blockTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const pageTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const pageFlushes = new Map<string, Promise<void>>();
 const blockFlushes = new Map<string, Promise<void>>();
+const blockBatchTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const blockBatchFlushes = new Map<string, Promise<void>>();
+const BLOCK_BATCH_CHUNK_SIZE = 100;
+const BLOCK_BATCH_DEBOUNCE_MS = 1000;
+const PAGE_RECENCY_WINDOW_MS = 5000;
+const PAGE_RECENCY_DRAIN_CHUNK_SIZE = 100;
+const PAGE_RECENCY_MAX_IN_FLIGHT = 4;
+type LivePageRecencyGeneration = {
+  epoch: number;
+  operation: PageRecencyOutboxOp;
+  userId: string;
+};
+const pendingPageRecency = new Map<string, LivePageRecencyGeneration>();
+const pageRecencyInFlight = new Map<string, Promise<"retry" | "settled">>();
+const pageRecencyInFlightGeneration = new Map<string, LivePageRecencyGeneration>();
+const pageRecencyRetryAttempts = new Map<string, number>();
+let pageRecencyTimer: ReturnType<typeof setTimeout> | undefined;
+let pageRecencyTimerDueAt = Number.POSITIVE_INFINITY;
+let pageRecencyDrain: Promise<void> | undefined;
+let pageRecencyEpoch = 0;
 const blockLoadPromises = new Map<string, Promise<void>>();
 // Undo/redo serialization: a re-entrant Cmd+Z during the awaited persist would
 // read the same stacks and collapse two undos into one. Later calls QUEUE
@@ -691,12 +949,16 @@ function serializeBlockHistory<T>(pageId: string, run: () => Promise<T>): Promis
   blockHistoryGates.set(pageId, next.catch(() => {}));
   return next;
 }
-// Derived block lists memoized on the source array's identity — see
-// topLevelBlocks/childBlocks. Bounded by page/parent count; entries for
-// deleted pages are tiny and harmless.
+// Derived block lists memoized on structural source identity — see
+// topLevelBlocks/childBlocks. Content-only immutable replacements retain the
+// prior structural source through this weak lineage; actual membership/order
+// changes use their new array identity and invalidate every projection.
+// Entries are bounded by page/parent count, while obsolete array generations
+// remain weakly held and are reclaimed with the canonical state they describe.
 const EMPTY_BLOCK_LIST: Block[] = [];
 const topLevelBlocksCache = new Map<string, { source: Block[]; result: Block[] }>();
 const childBlocksCache = new Map<string, { source: Block[]; result: Block[] }>();
+const blockStructureSources = new WeakMap<Block[], Block[]>();
 
 // Comments load SWR-style: a repeat loadComments call refreshes in the
 // background (deduped + rate-limited) instead of early-returning forever, so
@@ -704,6 +966,44 @@ const childBlocksCache = new Map<string, { source: Block[]; result: Block[] }>()
 const commentLoadPromises = new Map<string, Promise<void>>();
 const commentFetchedAt = new Map<string, number>();
 const COMMENT_REFRESH_MIN_GAP_MS = 1500;
+type CommentSignalRefreshState = {
+  cancelled: boolean;
+  drain?: Promise<void>;
+  lastStartedAt?: number;
+  pending: boolean;
+  timer?: ReturnType<typeof setTimeout>;
+  wakeTimer?: () => void;
+};
+const commentSignalRefreshes = new Map<string, CommentSignalRefreshState>();
+
+function waitForCommentSignalRefreshWindow(
+  state: CommentSignalRefreshState,
+  delayMs: number,
+) {
+  if (delayMs <= 0) return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const wake = () => {
+      if (settled) return;
+      settled = true;
+      if (state.timer) clearTimeout(state.timer);
+      state.timer = undefined;
+      state.wakeTimer = undefined;
+      resolve();
+    };
+    state.wakeTimer = wake;
+    state.timer = setTimeout(wake, delayMs);
+  });
+}
+
+function resetCommentSignalRefreshes() {
+  for (const state of commentSignalRefreshes.values()) {
+    state.cancelled = true;
+    state.pending = false;
+    state.wakeTimer?.();
+  }
+  commentSignalRefreshes.clear();
+}
 const pendingBlock = new Map<string, Partial<Block>>();
 // Owning page per pending block — routing hint for the workspace-DO split.
 const pendingBlockPage = new Map<string, string>();
@@ -712,7 +1012,30 @@ const pendingBlockPage = new Map<string, string>();
 // optimistic-concurrency guard (expectedUpdatedAt) — a replayed full-field
 // patch must not silently clobber what another device wrote meanwhile.
 const pendingBlockBase = new Map<string, string>();
+// Stable receipt for one coalesced block generation. If a response is lost,
+// replaying the same id is an idempotent acknowledgement, not a self-conflict.
+const pendingBlockMutationId = new Map<string, string>();
+// While generation N is in flight, generation N+1 can be based on either the
+// old server stamp (N did not land) or N's receipt (N landed but the browser
+// refreshed before its authoritative timestamp was mirrored).
+const pendingBlockExpectedMutationId = new Map<string, string>();
+const inFlightBlockMutationId = new Map<string, string>();
 const pendingPage = new Map<string, Partial<Page>>();
+// Ordinary pages and database rows share one durable generation contract.
+// The timestamp protects the first generation; the predecessor receipt keeps
+// a newer generation safe whether its in-flight predecessor landed or not.
+const pendingPageBase = new Map<string, string>();
+const pendingPageMutationId = new Map<string, string>();
+const pendingPageExpectedMutationId = new Map<string, string>();
+const inFlightPageMutationId = new Map<string, string>();
+// A replacement outbox generation must include every still-unacknowledged
+// field from its predecessor so a tab close cannot lose a different page key.
+const inFlightPagePatch = new Map<string, Partial<Page>>();
+// Each page/row generation carries both the state it started from and the
+// promise for its local durable mirror. The remote write may start only after
+// that exact generation can survive a reload.
+const pendingPageBefore = new Map<string, Page>();
+const pendingPageDurability = new Map<string, Promise<void>>();
 // A row/page patch stays projected over delayed server snapshots until a
 // response actually contains it. `pendingPage` deliberately removes a patch
 // while its request is in flight, which used to let an older forced database
@@ -734,12 +1057,14 @@ const pendingViewCreate = new Map<string, string>();
 const pendingTemplateCreate = new Map<string, string>();
 const pendingCommentCreate = new Map<string, string>();
 const PERSIST_RETRY_MS = 2000;
+const PERSIST_RETRY_MAX_MS = 30_000;
 // Invalidates any network/cache load that began before a permanent-delete
 // tombstone or a cross-tab deletion signal landed.
 let workspaceDataEpoch = 0;
 
 function advanceWorkspaceDataEpoch() {
   workspaceDataEpoch += 1;
+  clearRecentDatabaseRowsQueries();
 }
 
 // ── sync health (SyncStatusBadge) ───────────────────────────────────────────
@@ -765,6 +1090,7 @@ function noteSyncSuccess() {
 // resolved with i18next.t at call time (locale cannot change mid-session).
 function storeMessages() {
   return {
+    conflictSave: i18next.t("store:conflictSave"),
     databaseLockedSave: i18next.t("store:databaseLockedSave"),
     databaseRowsLoadFailed: i18next.t("store:databaseRowsLoadFailed"),
     editAccessDeniedSave: i18next.t("store:editAccessDeniedSave"),
@@ -807,7 +1133,8 @@ function persistDropMessage(error: unknown) {
   const status = persistErrorStatus(error);
   if (status === 401) return storeMessages().sessionExpired;
   if (status === 403) return storeMessages().editAccessDeniedSave;
-  if (status === 409 || status === 423) return storeMessages().lockedSave;
+  if (status === 409) return storeMessages().conflictSave;
+  if (status === 423) return storeMessages().lockedSave;
   if (status === 404) return storeMessages().pageMissingSave;
   if (status === 400 || status === 413 || status === 422) return storeMessages().saveFailed;
   return undefined;
@@ -832,16 +1159,21 @@ function outboxUserId() {
   return useStore.getState().userId || "";
 }
 
-function mirrorPendingPage(id: string) {
+function mirrorPendingPage(id: string): Promise<void> {
   const patch = pendingPage.get(id);
-  if (!patch || !Object.keys(patch).length) return;
+  if (!patch || !Object.keys(patch).length) return Promise.resolve();
   const page = useStore.getState().pagesById[id];
-  outboxSet(outboxUserId(), `page:${id}`, {
+  const durability = outboxSet(outboxUserId(), `page:${id}`, {
+    expectedMutationId: pendingPageExpectedMutationId.get(id),
+    expectedUpdatedAt: pendingPageBase.get(id),
     id,
     kind: "page_update",
+    mutationId: pendingPageMutationId.get(id),
     patch: persistablePagePatch(patch, page),
     target: page?.parentType === "database" ? "database_row" : "page",
   });
+  pendingPageDurability.set(id, durability);
+  return durability;
 }
 
 function remotePageWithOptimisticOverlay(page: Page): Page {
@@ -882,33 +1214,100 @@ function remoteBlockWithOptimisticOverlay(block: Block): Block {
  * renders the pre-save IndexedDB value and waits several seconds for network
  * revalidation even though the server already returned the authoritative row.
  */
-async function reconcilePersistedPageMutation(id: string, persisted: Page | undefined) {
-  const authoritative = persisted ?? useStore.getState().pagesById[id];
-  if (!authoritative) return;
-  const projected = remotePageWithOptimisticOverlay(authoritative);
-  useStore.setState((state) => {
-    if (!state.pagesById[authoritative.id]) return {};
-    return {
-      pagesById: {
-        ...state.pagesById,
-        [authoritative.id]: projected,
-      },
-    };
-  });
-
-  const userId = outboxUserId();
-  if (!userId) return;
-  const queryKeys = new Set<string>([databaseRowsQueryKey({})]);
-  if (authoritative.parentType === "database" && authoritative.parentId) {
-    const activeQuery = useStore.getState().databaseRowPagesByDb[authoritative.parentId]?.queryKey;
-    if (activeQuery) queryKeys.add(activeQuery);
+async function reconcilePersistedPageMutations(
+  id: string,
+  persisted: Page | undefined,
+  affectedRows: Iterable<Page> = []
+) {
+  const source = persisted ?? useStore.getState().pagesById[id];
+  if (!source) return;
+  const sourceDatabaseId =
+    source.parentType === "database" && source.parentId ? source.parentId : undefined;
+  const sourceQueryKeys = new Set<string>([databaseRowsQueryKey({})]);
+  if (sourceDatabaseId) {
+    const activeQuery =
+      useStore.getState().databaseRowPagesByDb[sourceDatabaseId]?.queryKey;
+    if (activeQuery) sourceQueryKeys.add(activeQuery);
   }
-  await commitPersistedPageToCache({
-    activeQueryKeys: queryKeys,
+  const relationPropertyIds = sourceDatabaseId
+    ? new Set(
+        (useStore.getState().propsByDb[sourceDatabaseId] ?? [])
+          .filter((property) => property.type === "relation")
+          .map((property) => property.id),
+      )
+    : new Set<string>();
+  const selectedRelationTargetIds = new Set<string>();
+  for (const propertyId of relationPropertyIds) {
+    const value = source.properties?.[propertyId];
+    if (!Array.isArray(value)) continue;
+    for (const targetId of value) {
+      if (typeof targetId === "string" && targetId && targetId !== source.id) {
+        selectedRelationTargetIds.add(targetId);
+      }
+    }
+  }
+  const selectedRelationTargetPages: Page[] = [];
+
+  function* authoritativePages() {
+    yield source;
+    for (const affectedRow of affectedRows) {
+      if (selectedRelationTargetIds.has(affectedRow.id)) {
+        selectedRelationTargetPages.push(affectedRow);
+      }
+      if (affectedRow.id !== id) yield affectedRow;
+    }
+  }
+
+  // Projection and cache-input collection advance lazily with the bounded
+  // cache chunks. A resolver runs inside the first queued surface task so a
+  // newer optimistic generation created while the cache tail is held wins.
+  function* cacheEntries() {
+    for (const authoritative of authoritativePages()) {
+      const projected = remotePageWithOptimisticOverlay(authoritative);
+      useStore.setState((state) => {
+        if (!state.pagesById[authoritative.id]) return {};
+        return {
+          pagesById: {
+            ...state.pagesById,
+            [authoritative.id]: projected,
+          },
+        };
+      });
+
+      const queryKeys = new Set<string>([databaseRowsQueryKey({})]);
+      if (authoritative.parentType === "database" && authoritative.parentId) {
+        const activeQuery =
+          useStore.getState().databaseRowPagesByDb[authoritative.parentId]?.queryKey;
+        if (activeQuery) queryKeys.add(activeQuery);
+      }
+      yield {
+        activeQueryKeys: queryKeys,
+        page: projected,
+        resolvePage: () => remotePageWithOptimisticOverlay(authoritative),
+      };
+    }
+  }
+
+  const entries = cacheEntries();
+  const userId = outboxUserId();
+  if (!userId) {
+    for (const entry of entries) void entry;
+    return;
+  }
+  await commitPersistedPagesToCache({
     bootstrapKey: bootKey || undefined,
-    page: projected,
+    pages: entries,
     userId,
   });
+  if (sourceDatabaseId && selectedRelationTargetPages.length > 0) {
+    await commitPersistedRelatedPagesToCache({
+      databaseId: sourceDatabaseId,
+      pages: selectedRelationTargetPages,
+      queryKeys: sourceQueryKeys,
+      sourceId: source.id,
+      userId,
+    });
+  }
 }
 
 async function reconcilePersistedBlockMutation(
@@ -922,6 +1321,13 @@ async function reconcilePersistedBlockMutation(
   const live = state.blocksByPage[pageId]?.find((block) => block.id === id);
   const authoritative = persisted ?? live;
   if (!authoritative) return;
+  // The acknowledgement is a second write boundary. Reads that began while
+  // this generation was on the wire may still contain the pre-write block and
+  // must not apply after the optimistic overlay is retired below.
+  invalidateReadApplication(
+    readApplicationKey.blocks(pageId),
+    `block_mutation_ack:${id}`,
+  );
   const projected = remoteBlockWithOptimisticOverlay(authoritative);
   useStore.setState((current) => {
     const blocks = current.blocksByPage[pageId];
@@ -944,12 +1350,253 @@ function mirrorPendingBlock(id: string) {
   const patch = pendingBlock.get(id);
   if (!patch || !Object.keys(patch).length) return;
   outboxSet(outboxUserId(), `block:${id}`, {
+    expectedMutationId: pendingBlockExpectedMutationId.get(id),
     expectedUpdatedAt: pendingBlockBase.get(id),
     hintPageId: pendingBlockPage.get(id),
     id,
     kind: "block_update",
+    mutationId: pendingBlockMutationId.get(id),
     patch: persistableBlockPatch(patch),
   });
+}
+
+function validBlockPageRecencyProof(value: unknown): BlockPageRecencyProof | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const proof = value as Record<string, unknown>;
+  if (
+    typeof proof.blockId !== "string" || !proof.blockId
+    || typeof proof.blockUpdatedAt !== "string" || !proof.blockUpdatedAt
+    || typeof proof.mutationId !== "string" || !proof.mutationId
+    || typeof proof.pageId !== "string" || !proof.pageId
+  ) return undefined;
+  return {
+    blockId: proof.blockId,
+    blockUpdatedAt: proof.blockUpdatedAt,
+    mutationId: proof.mutationId,
+    pageId: proof.pageId,
+  };
+}
+
+function normalizedBlockUpdateResult(value: unknown): BlockUpdateRemoteResult {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Block mutation response is malformed.");
+  }
+  const result = value as Record<string, unknown>;
+  const block = result.block;
+  if (!block || typeof block !== "object" || Array.isArray(block)) {
+    throw new Error("Block mutation response is missing its committed block.");
+  }
+  const proof = result.pageRecency === undefined
+    ? undefined
+    : validBlockPageRecencyProof(result.pageRecency);
+  if (result.pageRecency !== undefined && !proof) {
+    throw new Error("Block mutation response has a malformed page-recency proof.");
+  }
+  return { block: block as Block, ...(proof ? { pageRecency: proof } : {}) };
+}
+
+function normalizedBlockBatchUpdateResult(value: unknown): BlockBatchUpdateRemoteResult {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Block batch response is malformed.");
+  }
+  const result = value as Record<string, unknown>;
+  if (!Array.isArray(result.blocks) || !Array.isArray(result.pageRecencies)) {
+    throw new Error("Block batch response is missing committed rows or page-recency proofs.");
+  }
+  const pageRecencies = result.pageRecencies.map((value) => validBlockPageRecencyProof(value));
+  if (pageRecencies.some((proof) => !proof)) {
+    throw new Error("Block batch response has a malformed page-recency proof.");
+  }
+  return {
+    blocks: result.blocks as Block[],
+    pageRecencies: pageRecencies as BlockPageRecencyProof[],
+  };
+}
+
+function pageRecencyKey(pageId: string) {
+  return `page-recency:${pageId}`;
+}
+
+function clearPageRecencyTimer() {
+  if (pageRecencyTimer) clearTimeout(pageRecencyTimer);
+  pageRecencyTimer = undefined;
+  pageRecencyTimerDueAt = Number.POSITIVE_INFINITY;
+}
+
+function resetPageRecencyMemory() {
+  pageRecencyEpoch += 1;
+  clearPageRecencyTimer();
+  pendingPageRecency.clear();
+  pageRecencyInFlight.clear();
+  pageRecencyInFlightGeneration.clear();
+  pageRecencyRetryAttempts.clear();
+  pageRecencyDrain = undefined;
+}
+
+function schedulePageRecencyDrain() {
+  const dueAt = Math.min(
+    ...Array.from(pendingPageRecency.values())
+      .filter(({ operation }) => !pageRecencyInFlight.has(operation.pageId))
+      .map(({ operation }) => operation.dueAt),
+  );
+  if (!Number.isFinite(dueAt)) {
+    clearPageRecencyTimer();
+    return;
+  }
+  if (pageRecencyTimer && pageRecencyTimerDueAt <= dueAt) return;
+  clearPageRecencyTimer();
+  pageRecencyTimerDueAt = dueAt;
+  pageRecencyTimer = setTimeout(() => {
+    pageRecencyTimer = undefined;
+    pageRecencyTimerDueAt = Number.POSITIVE_INFINITY;
+    void flushPageRecencies(false);
+  }, Math.max(0, dueAt - Date.now()));
+}
+
+async function admitBlockPageRecency(proof: BlockPageRecencyProof) {
+  const userId = outboxUserId();
+  if (!userId) throw new Error("Page recency requires an authenticated durable owner.");
+  const existing = pendingPageRecency.get(proof.pageId);
+  if (
+    existing
+    && (
+      existing.operation.blockUpdatedAt > proof.blockUpdatedAt
+      || (
+        existing.operation.blockUpdatedAt === proof.blockUpdatedAt
+        && existing.operation.blockId === proof.blockId
+        && existing.operation.mutationId === proof.mutationId
+      )
+    )
+  ) return;
+  const inFlight = pageRecencyInFlightGeneration.get(proof.pageId);
+  const hasNextWindow = !!inFlight && !!existing && existing !== inFlight;
+  const dueAt = hasNextWindow
+    ? existing.operation.dueAt
+    : inFlight
+      ? Date.now() + PAGE_RECENCY_WINDOW_MS
+      : existing?.operation.dueAt ?? Date.now() + PAGE_RECENCY_WINDOW_MS;
+  const generation: LivePageRecencyGeneration = {
+    epoch: pageRecencyEpoch,
+    operation: { ...proof, dueAt, kind: "page_recency" },
+    userId,
+  };
+  pendingPageRecency.set(proof.pageId, generation);
+  pageRecencyRetryAttempts.delete(proof.pageId);
+  // This await is the block-ack barrier: a successful block request remains
+  // durably replayable until its companion page generation is also durable.
+  await outboxSet(userId, pageRecencyKey(proof.pageId), generation.operation);
+  schedulePageRecencyDrain();
+}
+
+async function settlePageRecencyGeneration(generation: LivePageRecencyGeneration) {
+  const { operation, userId } = generation;
+  // A newer same-key generation may already be durable (or still be behind
+  // its block-ack barrier). Never delete that key on behalf of an older wire
+  // response: deleting then re-mirroring would create a crash-sized loss gap.
+  if (pendingPageRecency.get(operation.pageId) !== generation) return;
+  pendingPageRecency.delete(operation.pageId);
+  pageRecencyRetryAttempts.delete(operation.pageId);
+  await outboxAck(userId, pageRecencyKey(operation.pageId));
+}
+
+function deliverPageRecency(
+  generation: LivePageRecencyGeneration,
+): Promise<"retry" | "settled"> {
+  const pageId = generation.operation.pageId;
+  const active = pageRecencyInFlight.get(pageId);
+  if (active) return active;
+  const run = (async (): Promise<"retry" | "settled"> => {
+    if (generation.epoch !== pageRecencyEpoch) return "settled";
+    try {
+      const { dueAt: _dueAt, kind: _kind, ...proof } = generation.operation;
+      await touchBlockPageRecencyRemote(proof);
+      if (generation.epoch !== pageRecencyEpoch) return "settled";
+      await settlePageRecencyGeneration(generation);
+      noteSyncSuccess();
+      return "settled";
+    } catch (error) {
+      if (generation.epoch !== pageRecencyEpoch) return "settled";
+      if (persistErrorStatus(error) === 404) {
+        await settlePageRecencyGeneration(generation);
+        noteSyncSuccess();
+        return "settled";
+      }
+      noteSyncFailure();
+      const current = pendingPageRecency.get(pageId) ?? generation;
+      const attempt = (pageRecencyRetryAttempts.get(pageId) ?? 0) + 1;
+      pageRecencyRetryAttempts.set(pageId, attempt);
+      const retry: LivePageRecencyGeneration = {
+        ...current,
+        operation: {
+          ...current.operation,
+          dueAt: Date.now() + persistRetryDelayMs(attempt),
+        },
+      };
+      pendingPageRecency.set(pageId, retry);
+      await outboxSet(retry.userId, pageRecencyKey(pageId), retry.operation);
+      return "retry";
+    }
+  })();
+  pageRecencyInFlight.set(pageId, run);
+  pageRecencyInFlightGeneration.set(pageId, generation);
+  void run.finally(() => {
+    if (pageRecencyInFlight.get(pageId) === run) pageRecencyInFlight.delete(pageId);
+    if (pageRecencyInFlightGeneration.get(pageId) === generation) {
+      pageRecencyInFlightGeneration.delete(pageId);
+    }
+    schedulePageRecencyDrain();
+  });
+  return run;
+}
+
+async function flushPageRecencies(force: boolean) {
+  if (force) clearPageRecencyTimer();
+  if (pageRecencyDrain) {
+    await pageRecencyDrain;
+    if (force) await flushPageRecencies(true);
+    return;
+  }
+  const run = (async () => {
+    const retryBlockedPages = new Set<string>();
+    for (;;) {
+      const now = Date.now();
+      const eligible = Array.from(pendingPageRecency.values())
+        .filter(({ operation }) => (
+          !pageRecencyInFlight.has(operation.pageId)
+          && !retryBlockedPages.has(operation.pageId)
+          && (force || operation.dueAt <= now)
+        ))
+        .sort((left, right) => (
+          left.operation.dueAt - right.operation.dueAt
+          || left.operation.pageId.localeCompare(right.operation.pageId)
+        ));
+      if (eligible.length === 0) break;
+      const chunk = eligible.slice(0, PAGE_RECENCY_DRAIN_CHUNK_SIZE);
+      let cursor = 0;
+      const workers = Array.from(
+        { length: Math.min(PAGE_RECENCY_MAX_IN_FLIGHT, chunk.length) },
+        async () => {
+          for (;;) {
+            const generation = chunk[cursor];
+            cursor += 1;
+            if (!generation) return;
+            const outcome = await deliverPageRecency(generation);
+            if (outcome === "retry") {
+              retryBlockedPages.add(generation.operation.pageId);
+            }
+          }
+        },
+      );
+      await Promise.all(workers);
+    }
+  })();
+  pageRecencyDrain = run;
+  try {
+    await run;
+  } finally {
+    if (pageRecencyDrain === run) pageRecencyDrain = undefined;
+    schedulePageRecencyDrain();
+  }
 }
 
 function retryPage(id: string) {
@@ -960,6 +1607,29 @@ function retryPage(id: string) {
 function retryBlock(id: string) {
   if (blockTimers.has(id)) return;
   blockTimers.set(id, setTimeout(() => void flushBlock(id), PERSIST_RETRY_MS));
+}
+
+function pendingBlockIdsForPage(pageId: string) {
+  return Array.from(pendingBlockPage.entries())
+    .filter(([id, ownerPageId]) => ownerPageId === pageId && pendingBlock.has(id))
+    .map(([id]) => id);
+}
+
+function scheduleBlockBatch(pageId: string, delay = BLOCK_BATCH_DEBOUNCE_MS) {
+  // A fixed collection window (rather than a trailing per-keystroke debounce)
+  // guarantees continuous typing still reaches the server every ~1 second.
+  // Later blocks on the same page join the already-scheduled batch.
+  if (blockBatchTimers.has(pageId)) return;
+  blockBatchTimers.set(
+    pageId,
+    setTimeout(() => void flushBlockBatch(pageId), Math.max(0, delay))
+  );
+}
+
+function blockPatchCanBatch(patch: Partial<Block>) {
+  // Cross-page/reparenting writes carry subtree and file-association semantics
+  // that the backend intentionally keeps on the single-update path.
+  return !("pageId" in patch) && !("parentId" in patch);
 }
 
 function pendingPageLikeCreateHas(id: string | null | undefined) {
@@ -1049,42 +1719,144 @@ async function flushPageOnce(id: string) {
     return;
   }
   const patch = pendingPage.get(id);
+  const before = pendingPageBefore.get(id);
+  const durability = pendingPageDurability.get(id) ?? Promise.resolve();
+  const expectedUpdatedAt = pendingPageBase.get(id);
+  const expectedMutationId = pendingPageExpectedMutationId.get(id);
+  const mutationId = pendingPageMutationId.get(id) ?? newId();
   pendingPage.delete(id);
+  pendingPageMutationId.delete(id);
+  pendingPageBefore.delete(id);
+  if (pendingPageDurability.get(id) === durability) pendingPageDurability.delete(id);
+  if (patch) {
+    inFlightPageMutationId.set(id, mutationId);
+    inFlightPagePatch.set(id, patch);
+  }
   if (patch && Object.keys(patch).length) {
     try {
       const page = useStore.getState().pagesById[id];
       const persistablePatch = persistablePagePatch(patch, page);
-      await runAcknowledgedMutation({
-        send: () => {
-          if (page?.parentType === "database") {
-            const filePropertyIds = databaseRowFilePropertyIds(page, persistablePatch);
-            return runSerializedRowFilePropertyPatch(id, filePropertyIds, () =>
-              updateDatabaseRowRemote(id, persistablePatch)
+      const filePropertyIds =
+        page?.parentType === "database"
+          ? databaseRowFilePropertyIds(page, persistablePatch)
+          : [];
+      // Closing/reloading after the remote request starts must never lose the
+      // accepted edit. Wait for the exact captured outbox generation first;
+      // a later edit gets its own pending generation and drains afterwards.
+      const persist = async () => {
+        await durability;
+        await runAcknowledgedMutation({
+          send: () =>
+            page?.parentType === "database"
+              ? updateDatabaseRowRemote(
+                  id,
+                  persistablePatch,
+                  expectedUpdatedAt,
+                  mutationId,
+                  expectedMutationId,
+                )
+              : updatePageRemote(
+                  id,
+                  persistablePatch,
+                  expectedUpdatedAt,
+                  mutationId,
+                  expectedMutationId,
+                ),
+          commit: async (persisted) => {
+            if (pendingPage.has(id)) {
+              if (persisted?.updatedAt) pendingPageBase.set(id, persisted.updatedAt);
+              pendingPageExpectedMutationId.set(id, mutationId);
+            } else {
+              pendingPageBase.delete(id);
+              pendingPageExpectedMutationId.delete(id);
+              pendingPageMutationId.delete(id);
+            }
+            await reconcilePersistedPageMutations(
+              id,
+              persisted,
+              affectedDatabaseRowsFromMutation(persisted)
             );
-          }
-          return updatePageRemote(id, persistablePatch);
-        },
-        commit: async (persisted) => {
-          await reconcilePersistedPageMutation(id, persisted);
-          publishPersistedPageMutation(id, patch, page);
-        },
-        acknowledge: () => {
-          outboxAck(outboxUserId(), `page:${id}`);
-          if (pendingPage.has(id)) mirrorPendingPage(id);
-        },
-      });
+            publishPersistedPageMutation(id, patch, page);
+          },
+          acknowledge: () => {
+            outboxAck(outboxUserId(), `page:${id}`);
+            if (pendingPage.has(id)) mirrorPendingPage(id);
+          },
+        });
+      };
+      // Whole-value file patches share a per-row/property causal lane with
+      // detach effects. Claim the lane before waiting on IndexedDB so a later
+      // removal cannot overtake this already-accepted generation.
+      if (filePropertyIds.length > 0) {
+        await runSerializedRowFilePropertyPatch(id, filePropertyIds, persist);
+      } else {
+        await persist();
+      }
       noteSyncSuccess();
     } catch (error) {
       if (shouldDropPersistError(error)) {
-        notifyPersistDrop(error);
-        outboxAck(outboxUserId(), `page:${id}`);
-        if (pendingPage.has(id)) mirrorPendingPage(id);
+        const userId = outboxUserId();
+        const hasNewerGeneration = pendingPage.has(id);
+        const originalKey = `page:${id}`;
+        const markerKey = hasNewerGeneration
+          ? `terminal:${originalKey}:${newId()}`
+          : originalKey;
+        const target = currentPage?.parentType === "database" ? "database_row" : "page";
+        const operation: MutationOutboxOp = {
+          expectedMutationId,
+          expectedUpdatedAt,
+          id,
+          kind: "page_update",
+          mutationId,
+          patch: persistablePagePatch(patch, currentPage),
+          target,
+        };
+        const entry = target === "database_row"
+          ? DURABLE_REMOTE_CALLS.updateDatabaseRowRemote
+          : DURABLE_REMOTE_CALLS.updatePageRemote;
+        const disposition = durableTerminalDisposition(entry, persistErrorStatus(error));
+        if (disposition === "drop") notifyPersistDrop(error);
+        if (!hasNewerGeneration) {
+          pendingPageBase.delete(id);
+          pendingPageExpectedMutationId.delete(id);
+          pendingPageMutationId.delete(id);
+        }
+        await transitionToTerminalReconciliation(
+          userId,
+          markerKey,
+          operation,
+          disposition === "confirmed" ? "drop" : disposition,
+          error,
+          () => {
+            if (hasNewerGeneration) {
+              // The newer generation still contains the desired combined state.
+              // Keep the oldest baseline so a later terminal rejection can roll
+              // the whole uncommitted chain back without erasing concurrent work.
+              if (before) pendingPageBefore.set(id, before);
+            } else {
+              rollbackTerminalPageMutation(id, patch, before);
+            }
+          }
+        );
         return;
       }
       noteSyncFailure();
+      if (!pendingPage.has(id)) {
+        pendingPageMutationId.set(id, mutationId);
+        if (expectedUpdatedAt) pendingPageBase.set(id, expectedUpdatedAt);
+        else pendingPageBase.delete(id);
+        if (expectedMutationId) pendingPageExpectedMutationId.set(id, expectedMutationId);
+        else pendingPageExpectedMutationId.delete(id);
+      }
       pendingPage.set(id, { ...patch, ...(pendingPage.get(id) ?? {}) });
+      if (before) pendingPageBefore.set(id, before);
       mirrorPendingPage(id);
       retryPage(id);
+    } finally {
+      if (inFlightPageMutationId.get(id) === mutationId) {
+        inFlightPageMutationId.delete(id);
+        inFlightPagePatch.delete(id);
+      }
     }
   }
 }
@@ -1136,6 +1908,30 @@ function publishCommentsMutation(pageId: string) {
     kind: "comments_changed",
     pageId,
     reason: "comments_changed",
+    revision: Date.now(),
+    updatedAt: nowIso(),
+  });
+}
+
+/**
+ * Announce only that canonical block structure changed. The signal is emitted
+ * after the server mutation commits; peers always reload canonical blocks and
+ * never treat this payload as a durable operation or state snapshot.
+ */
+function publishBlockStructureMutation(
+  pageId: string,
+  reason: string,
+  blockIds?: Iterable<string>
+) {
+  if (!pageId || isTemplateEditorPageId(pageId)) return;
+  const ids = blockIds
+    ? Array.from(new Set(Array.from(blockIds).filter(Boolean))).slice(0, 100)
+    : undefined;
+  publishPageRoomMutation({
+    blockIds: ids?.length ? ids : undefined,
+    kind: "block_structure_changed",
+    pageId,
+    reason,
     revision: Date.now(),
     updatedAt: nowIso(),
   });
@@ -1203,6 +1999,208 @@ async function flushBlock(id: string) {
   }
 }
 
+type PendingBlockBatchItem = {
+  expectedMutationId?: string;
+  expectedUpdatedAt?: string;
+  id: string;
+  mutationId: string;
+  pageId: string;
+  patch: Partial<Block>;
+};
+
+function restorePendingBlockBatchItems(items: readonly PendingBlockBatchItem[]) {
+  for (const { expectedMutationId, expectedUpdatedAt, id, mutationId, patch } of items) {
+    if (!pendingBlock.has(id)) {
+      pendingBlockMutationId.set(id, mutationId);
+      if (expectedMutationId) pendingBlockExpectedMutationId.set(id, expectedMutationId);
+      else pendingBlockExpectedMutationId.delete(id);
+      if (expectedUpdatedAt) pendingBlockBase.set(id, expectedUpdatedAt);
+      else pendingBlockBase.delete(id);
+    }
+    pendingBlock.set(id, { ...patch, ...(pendingBlock.get(id) ?? {}) });
+    mirrorPendingBlock(id);
+  }
+}
+
+async function flushBlockBatch(pageId: string) {
+  const timer = blockBatchTimers.get(pageId);
+  if (timer) clearTimeout(timer);
+  blockBatchTimers.delete(pageId);
+
+  const active = blockBatchFlushes.get(pageId);
+  if (active) {
+    await active.catch(() => {});
+    // An explicit caller (notably flushAllPending) that joins an in-flight
+    // batch must also join work accepted while that batch was on the wire.
+    // Starting a fresh collection timer here lets the caller resolve while
+    // those durable generations remain unsent. Re-enter after the active run
+    // releases its lane; the normal timer-driven path still keeps its fixed
+    // collection window when nobody is explicitly awaiting a full drain.
+    if (pendingBlockIdsForPage(pageId).length > 0) await flushBlockBatch(pageId);
+    return;
+  }
+
+  const candidates = pendingBlockIdsForPage(pageId)
+    .filter((id) => !blockFlushes.has(id) && !pendingBlockCreate.has(id));
+  const batchIds = candidates.filter((id) => {
+    const patch = pendingBlock.get(id);
+    return !!patch && blockPatchCanBatch(patch) && !valueReferencesPendingCreate(patch);
+  });
+  const individualIds = candidates.filter((id) => !batchIds.includes(id));
+
+  // A singleton still uses the mature single-write path. updateMany becomes a
+  // real network win only when at least two blocks share the collection window.
+  if (batchIds.length < 2) {
+    individualIds.push(...batchIds);
+    await Promise.all(individualIds.map((id) => flushBlock(id)));
+    if (pendingBlockIdsForPage(pageId).length > 0) scheduleBlockBatch(pageId);
+    return;
+  }
+
+  const items: PendingBlockBatchItem[] = [];
+  for (const id of batchIds) {
+    const patch = pendingBlock.get(id);
+    const ownerPageId = pendingBlockPage.get(id);
+    if (!patch || ownerPageId !== pageId) continue;
+    const itemTimer = blockTimers.get(id);
+    if (itemTimer) clearTimeout(itemTimer);
+    blockTimers.delete(id);
+    const mutationId = pendingBlockMutationId.get(id) ?? newId();
+    const expectedMutationId = pendingBlockExpectedMutationId.get(id);
+    const expectedUpdatedAt = pendingBlockBase.get(id);
+    pendingBlock.delete(id);
+    pendingBlockMutationId.delete(id);
+    inFlightBlockMutationId.set(id, mutationId);
+    items.push({ expectedMutationId, expectedUpdatedAt, id, mutationId, pageId, patch });
+  }
+
+  const run = (async () => {
+    let remaining = items.slice();
+    try {
+      while (remaining.length > 0) {
+        const chunk = remaining.slice(0, BLOCK_BATCH_CHUNK_SIZE);
+        const response = await updateBlocksRemote(
+          chunk.map(({ expectedMutationId, expectedUpdatedAt, id, mutationId, patch }) => ({
+            expectedMutationId,
+            expectedUpdatedAt,
+            id,
+            mutationId,
+            patch: persistableBlockPatch(patch),
+          })),
+          pageId
+        );
+        const { blocks: persisted, pageRecencies } = normalizedBlockBatchUpdateResult(response);
+        const persistedById = new Map(persisted.map((block) => [block.id, block]));
+        await Promise.all(
+          chunk.map(async ({ id, mutationId, patch: sentPatch }) => {
+            const persistedBlock = persistedById.get(id);
+            await reconcilePersistedBlockMutation(id, persistedBlock, pageId);
+            if (pendingBlock.has(id)) {
+              const authoritativeStamp = persistedBlock?.updatedAt ?? sentPatch.updatedAt;
+              if (typeof authoritativeStamp === "string") {
+                pendingBlockBase.set(id, authoritativeStamp);
+              }
+              pendingBlockExpectedMutationId.set(id, mutationId);
+            } else {
+              pendingBlockBase.delete(id);
+              pendingBlockExpectedMutationId.delete(id);
+              pendingBlockMutationId.delete(id);
+              pendingBlockPage.delete(id);
+            }
+          })
+        );
+        await Promise.all(pageRecencies.map(admitBlockPageRecency));
+        for (const { id } of chunk) {
+          outboxAck(outboxUserId(), `block:${id}`);
+          if (pendingBlock.has(id)) mirrorPendingBlock(id);
+        }
+        const structureIds = chunk
+          .filter(({ patch }) => blockPatchChangesStructure(patch))
+          .map(({ id }) => id);
+        if (structureIds.length > 0) {
+          publishBlockStructureMutation(pageId, "block_structure_batch_committed", structureIds);
+        }
+        // The local queue may contain thousands of touched blocks. Drain every
+        // safe transaction chunk in this SAME flush cycle; never impose a new
+        // one-second collection delay between chunks.
+        remaining = remaining.slice(chunk.length);
+        noteSyncSuccess();
+      }
+    } catch (error) {
+      const status = persistErrorStatus(error);
+      if (status === 400 || status === 404 || status === 409 || status === 413) {
+        // A batch-wide validation/CAS failure does not identify which member
+        // lost. A 404 can likewise name just one remotely-deleted block. Restore
+        // every generation and fall back to the established per-block path so
+        // one unusual block cannot discard its neighbours.
+        restorePendingBlockBatchItems(remaining);
+        setTimeout(() => {
+          for (const { id } of remaining) void flushBlock(id);
+        }, 0);
+        return;
+      }
+      if (shouldDropPersistError(error)) {
+        notifyPersistDrop(error);
+        const userId = outboxUserId();
+        const markerKey = `terminal:block-batch:${newId()}`;
+        const invalidation = blockStructureInvalidation(
+          [pageId],
+          remaining.map(({ id }) => id)
+        );
+        const operation: MutationOutboxOp = {
+          args: [[], pageId],
+          ...(invalidation ? { blockStructureInvalidation: invalidation } : {}),
+          fn: "updateBlocksRemote",
+          kind: "remote_call",
+        };
+        await transitionToTerminalReconciliation(
+          userId,
+          markerKey,
+          operation,
+          "drop",
+          error,
+          () => {
+            for (const { id } of remaining) {
+              if (pendingBlock.has(id)) continue;
+              pendingBlockBase.delete(id);
+              pendingBlockExpectedMutationId.delete(id);
+              pendingBlockMutationId.delete(id);
+            }
+          },
+          async () => {
+            await Promise.all(
+              remaining
+                .filter(({ id }) => !pendingBlock.has(id))
+                .map(({ id }) => outboxAck(userId, `block:${id}`))
+            );
+          }
+        );
+        return;
+      }
+      noteSyncFailure();
+      restorePendingBlockBatchItems(remaining);
+      scheduleBlockBatch(pageId);
+    }
+  })();
+
+  blockBatchFlushes.set(pageId, run);
+  for (const { id } of items) blockFlushes.set(id, run);
+  try {
+    await Promise.all([run, ...individualIds.map((id) => flushBlock(id))]);
+  } finally {
+    if (blockBatchFlushes.get(pageId) === run) blockBatchFlushes.delete(pageId);
+    for (const { id, mutationId } of items) {
+      if (blockFlushes.get(id) === run) blockFlushes.delete(id);
+      if (inFlightBlockMutationId.get(id) === mutationId) {
+        inFlightBlockMutationId.delete(id);
+      }
+    }
+    if (pendingBlockIdsForPage(pageId).length > 0 && !blockBatchTimers.has(pageId)) {
+      scheduleBlockBatch(pageId);
+    }
+  }
+}
+
 async function flushBlockOnce(id: string) {
   const t = blockTimers.get(id);
   if (t) {
@@ -1226,21 +2224,41 @@ async function flushBlockOnce(id: string) {
   }
   const patch = pendingBlock.get(id);
   const hintPageId = pendingBlockPage.get(id);
+  const mutationId = pendingBlockMutationId.get(id) ?? newId();
+  const expectedMutationId = pendingBlockExpectedMutationId.get(id);
+  const expectedUpdatedAt = pendingBlockBase.get(id);
   pendingBlock.delete(id);
+  pendingBlockMutationId.delete(id);
+  inFlightBlockMutationId.set(id, mutationId);
   if (patch && Object.keys(patch).length) {
     try {
       await runAcknowledgedMutation({
-        send: () => updateBlockRemote(id, persistableBlockPatch(patch), hintPageId),
-        commit: async (persisted) => {
+        send: () => updateBlockRemote(
+          id,
+          persistableBlockPatch(patch),
+          hintPageId,
+          expectedUpdatedAt,
+          mutationId,
+          expectedMutationId,
+        ),
+        commit: async (response) => {
+          const { block: persisted, pageRecency } = normalizedBlockUpdateResult(response);
           await reconcilePersistedBlockMutation(id, persisted, hintPageId);
           // The server stored this patch's stamp; edits enqueued after this
           // flush conflict-check against it, not the pre-flush base.
           if (pendingBlock.has(id)) {
-            if (typeof patch.updatedAt === "string") pendingBlockBase.set(id, patch.updatedAt);
+            const authoritativeStamp = persisted?.updatedAt ?? patch.updatedAt;
+            if (typeof authoritativeStamp === "string") {
+              pendingBlockBase.set(id, authoritativeStamp);
+            }
+            pendingBlockExpectedMutationId.set(id, mutationId);
           } else {
             pendingBlockBase.delete(id);
+            pendingBlockExpectedMutationId.delete(id);
+            pendingBlockMutationId.delete(id);
             pendingBlockPage.delete(id);
           }
+          if (pageRecency) await admitBlockPageRecency(pageRecency);
         },
         acknowledge: () => {
           // A newer patch may already occupy the same durable outbox key. Ack
@@ -1249,23 +2267,81 @@ async function flushBlockOnce(id: string) {
           if (pendingBlock.has(id)) mirrorPendingBlock(id);
         },
       });
+      if (blockPatchChangesStructure(patch)) {
+        const committedPageId =
+          typeof patch.pageId === "string" && patch.pageId ? patch.pageId : hintPageId;
+        if (committedPageId) {
+          publishBlockStructureMutation(
+            committedPageId,
+            "block_structure_update_committed",
+            [id]
+          );
+        }
+      }
       noteSyncSuccess();
     } catch (error) {
       if (shouldDropPersistError(error)) {
+        const userId = outboxUserId();
+        const hasNewerGeneration = pendingBlock.has(id);
+        const originalKey = `block:${id}`;
+        const markerKey = hasNewerGeneration
+          ? `terminal:${originalKey}:${newId()}`
+          : originalKey;
+        const operation: MutationOutboxOp = {
+          expectedMutationId,
+          expectedUpdatedAt,
+          hintPageId,
+          id,
+          kind: "block_update",
+          mutationId,
+          patch: persistableBlockPatch(patch),
+        };
         notifyPersistDrop(error);
-        pendingBlockBase.delete(id);
-        outboxAck(outboxUserId(), `block:${id}`);
-        if (pendingBlock.has(id)) mirrorPendingBlock(id);
+        await transitionToTerminalReconciliation(
+          userId,
+          markerKey,
+          operation,
+          "drop",
+          error,
+          () => {
+            // This generation is terminal. A forced canonical reload must not
+            // reapply its optimistic fields, but an edit accepted while the
+            // request was in flight still owns its own partial overlay.
+            const newerPatch = pendingBlock.get(id);
+            if (newerPatch && Object.keys(newerPatch).length > 0) {
+              optimisticBlockOverlays.set(id, { ...newerPatch });
+            } else {
+              optimisticBlockOverlays.delete(id);
+            }
+            if (!hasNewerGeneration) {
+              pendingBlockBase.delete(id);
+              pendingBlockExpectedMutationId.delete(id);
+              pendingBlockMutationId.delete(id);
+            }
+          }
+        );
         return;
       }
       noteSyncFailure();
+      if (!pendingBlock.has(id)) {
+        pendingBlockMutationId.set(id, mutationId);
+        if (expectedMutationId) pendingBlockExpectedMutationId.set(id, expectedMutationId);
+        else pendingBlockExpectedMutationId.delete(id);
+      }
       pendingBlock.set(id, { ...patch, ...(pendingBlock.get(id) ?? {}) });
       mirrorPendingBlock(id);
       retryBlock(id);
+    } finally {
+      if (inFlightBlockMutationId.get(id) === mutationId) {
+        inFlightBlockMutationId.delete(id);
+      }
     }
   } else {
     pendingBlockPage.delete(id);
     pendingBlockBase.delete(id);
+    pendingBlockExpectedMutationId.delete(id);
+    pendingBlockMutationId.delete(id);
+    if (inFlightBlockMutationId.get(id) === mutationId) inFlightBlockMutationId.delete(id);
   }
 }
 
@@ -1277,6 +2353,13 @@ function cancelPendingPage(id: string) {
     pageTimers.delete(id);
   }
   pendingPage.delete(id);
+  pendingPageBase.delete(id);
+  pendingPageExpectedMutationId.delete(id);
+  pendingPageMutationId.delete(id);
+  pendingPageBefore.delete(id);
+  pendingPageDurability.delete(id);
+  inFlightPageMutationId.delete(id);
+  inFlightPagePatch.delete(id);
   optimisticPageOverlays.delete(id);
   outboxAck(outboxUserId(), `page:${id}`);
 }
@@ -1289,6 +2372,9 @@ function cancelPendingBlock(id: string) {
   }
   pendingBlock.delete(id);
   pendingBlockBase.delete(id);
+  pendingBlockExpectedMutationId.delete(id);
+  pendingBlockMutationId.delete(id);
+  inFlightBlockMutationId.delete(id);
   optimisticBlockOverlays.delete(id);
   outboxAck(outboxUserId(), `block:${id}`);
 }
@@ -1463,6 +2549,14 @@ function rollbackPendingPageCreate(rootId: string, originHref: string) {
       templatesByDb,
       databaseRowIdsByDb,
       databaseRowPagesByDb,
+      databaseSubitemRowWindowsByDb: pruneDatabaseSubitemRowWindows(
+        current.databaseSubitemRowWindowsByDb,
+        ids
+      ),
+      databaseDependencyRelations: pruneDatabaseDependencyRelations(
+        current.databaseDependencyRelations,
+        ids
+      ),
       loadedBlockPages,
       loadedCommentPages,
       loadedDbs,
@@ -1509,6 +2603,34 @@ function releaseOptimisticCreateDependents(id: string) {
   wakeDeferredDurableCalls();
 }
 
+function mergePersistedPageCreateAuthority(persisted: Page, current: Page): Page {
+  const merged = { ...persisted, ...current };
+  // User content may have advanced while create was in flight, but these
+  // fields are the server's committed concurrency identity. Letting the
+  // provisional local timestamps win makes the first queued edit compare
+  // against a revision that never existed on the server.
+  if (persisted.createdAt !== undefined) merged.createdAt = persisted.createdAt;
+  if (persisted.updatedAt !== undefined) merged.updatedAt = persisted.updatedAt;
+  if (persisted.lastMutationId !== undefined) {
+    merged.lastMutationId = persisted.lastMutationId;
+  }
+  return merged;
+}
+
+function adoptPersistedPageCreateAuthority(id: string, persisted: Page) {
+  if (!pendingPage.has(id)) return;
+  if (persisted.updatedAt) pendingPageBase.set(id, persisted.updatedAt);
+  else pendingPageBase.delete(id);
+  if (persisted.lastMutationId) {
+    pendingPageExpectedMutationId.set(id, persisted.lastMutationId);
+  } else {
+    pendingPageExpectedMutationId.delete(id);
+  }
+  // Replace the same durable generation before releasing it, so a crash after
+  // create acknowledgement cannot replay the provisional timestamp either.
+  void mirrorPendingPage(id);
+}
+
 function finishPendingPageCreate(id: string, persisted?: Page) {
   const entry = pendingPageCreate.get(id);
   if (!entry) return;
@@ -1523,8 +2645,14 @@ function finishPendingPageCreate(id: string, persisted?: Page) {
     useStore.setState((state) => {
       const current = state.pagesById[id];
       if (!current) return {};
-      return { pagesById: { ...state.pagesById, [id]: { ...persisted, ...current } } };
+      return {
+        pagesById: {
+          ...state.pagesById,
+          [id]: mergePersistedPageCreateAuthority(persisted, current),
+        },
+      };
     });
+    adoptPersistedPageCreateAuthority(id, persisted);
   }
   noteSyncSuccess();
   releaseOptimisticCreateDependents(id);
@@ -1549,12 +2677,11 @@ async function flushPageCreate(id: string) {
       finishPendingPageCreate(id, persisted);
     } catch (error) {
       if (shouldDropPersistError(error)) {
-        // A retried client-id create that already landed is idempotent success.
-        if (persistErrorStatus(error) === 409) finishPendingPageCreate(id);
-        else {
-          notifyPersistDrop(error);
-          rollbackPendingPageCreate(id, entry.originHref);
-        }
+        // Exact stable-id replays return 2xx. A raw 409 can also be a foreign
+        // id/route/parent conflict, so it is a silent terminal drop rather than
+        // commit proof.
+        if (persistErrorStatus(error) !== 409) notifyPersistDrop(error);
+        rollbackPendingPageCreate(id, entry.originHref);
         return;
       }
       noteSyncFailure();
@@ -1588,8 +2715,15 @@ function persistPageCreate(page: Page, originHref: string, userId: string) {
 // silently lost a just-created block (or an unpersisted delete) with no retry
 // and no toast — the block reappeared/vanished on the next reload.
 const pendingBlockCreate = new Map<string, Block>();
+const pendingBlockCreateTouchPage = new Set<string>();
 const blockCreateTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const blockCreateInFlight = new Map<string, Promise<void>>();
+
+function semanticPageMutationPending(id: string) {
+  return [inFlightPagePatch.get(id), pendingPage.get(id)].some((patch) =>
+    patch && Object.keys(patch).some((key) => key !== "updatedAt" && key !== "lastEditedBy")
+  );
+}
 
 function retryBlockCreate(id: string) {
   if (blockCreateTimers.has(id)) return;
@@ -1611,6 +2745,18 @@ async function flushBlockCreate(id: string) {
   }
   const run = (async () => {
     if (pendingPageLikeCreateHas(block.pageId) || valueReferencesPendingCreate(block)) return;
+    // A page patch and a new block both advance the page's remote revision.
+    // Drain an already-admitted title/metadata generation before the block
+    // create so an immediate title -> Enter -> body sequence cannot let the
+    // block invalidate the page patch's compare-and-swap baseline. Local block
+    // insertion and focus stay synchronous; only the remote deliveries queue.
+    if (semanticPageMutationPending(block.pageId)) {
+      await flushPage(block.pageId);
+      if (semanticPageMutationPending(block.pageId)) {
+        retryBlockCreate(id);
+        return;
+      }
+    }
     // A child's create must not reach the backend before its parent's create:
     // block-mutation validates parentId and 404s ("Parent block was not
     // found"), which the drop policy treats as terminal — the child would be
@@ -1630,49 +2776,62 @@ async function flushBlockCreate(id: string) {
     }
     try {
       await runAcknowledgedMutation({
-        send: () => createBlockRemote(block),
+        send: () => pendingBlockCreateTouchPage.has(id)
+          ? createBlockRemote(block, { touchPage: true })
+          : createBlockRemote(block),
         commit: async (persisted) => {
           await reconcilePersistedBlockMutation(id, persisted, block.pageId);
+          if (pendingBlock.has(id) && persisted) {
+            if (persisted.updatedAt) pendingBlockBase.set(id, persisted.updatedAt);
+            else pendingBlockBase.delete(id);
+            if (persisted.lastMutationId) {
+              pendingBlockExpectedMutationId.set(id, persisted.lastMutationId);
+            } else {
+              pendingBlockExpectedMutationId.delete(id);
+            }
+            // The queued edit was accepted while the create was in flight.
+            // Replace its provisional local base in the same durable outbox
+            // generation before the create acknowledgement releases it.
+            mirrorPendingBlock(id);
+          }
           pendingBlockCreate.delete(id);
+          pendingBlockCreateTouchPage.delete(id);
         },
         acknowledge: () => outboxAck(outboxUserId(), `create:${id}`),
       });
+      publishBlockStructureMutation(block.pageId, "block_create_committed", [id]);
       noteSyncSuccess();
       if (pendingBlock.has(id)) void flushBlock(id);
     } catch (error) {
       if (shouldDropPersistError(error)) {
-        // 409 on create means the id already exists server-side — a retried or
-        // replayed create whose earlier attempt landed. That is idempotent
-        // success (client UUIDs), not a user-facing drop.
-        if (persistErrorStatus(error) === 409) {
-          try {
-            await reconcilePersistedBlockMutation(id, block, block.pageId);
+        const disposition = persistErrorStatus(error) === 409 ? "silent_drop" : "drop";
+        if (disposition === "drop") notifyPersistDrop(error);
+        await transitionToTerminalReconciliation(
+          outboxUserId(),
+          `create:${id}`,
+          {
+            block,
+            kind: "block_create",
+            ...(pendingBlockCreateTouchPage.has(id) ? { touchPage: true } : {}),
+          },
+          disposition,
+          error,
+          () => {
+            cancelPendingBlock(id);
+            useStore.setState((state) => ({
+              blocksByPage: {
+                ...state.blocksByPage,
+                [block.pageId]: (state.blocksByPage[block.pageId] ?? []).filter(
+                  (current) => current.id !== id
+                ),
+              },
+            }));
+          },
+          () => {
             pendingBlockCreate.delete(id);
-            outboxAck(outboxUserId(), `create:${id}`);
-            noteSyncSuccess();
-            if (pendingBlock.has(id)) void flushBlock(id);
-          } catch {
-            // The server already owns the block, but the authoritative local
-            // commit did not finish. Retain the durable create so the next
-            // attempt takes this same idempotent 409 path and completes cache
-            // reconciliation before acknowledging it.
-            noteSyncFailure();
-            retryBlockCreate(id);
+            pendingBlockCreateTouchPage.delete(id);
           }
-        } else {
-          pendingBlockCreate.delete(id);
-          outboxAck(outboxUserId(), `create:${id}`);
-          cancelPendingBlock(id);
-          useStore.setState((state) => ({
-            blocksByPage: {
-              ...state.blocksByPage,
-              [block.pageId]: (state.blocksByPage[block.pageId] ?? []).filter(
-                (current) => current.id !== id
-              ),
-            },
-          }));
-          notifyPersistDrop(error);
-        }
+        );
         return;
       }
       noteSyncFailure();
@@ -1687,9 +2846,15 @@ async function flushBlockCreate(id: string) {
   }
 }
 
-function persistBlockCreate(block: Block) {
+function persistBlockCreate(block: Block, options: { touchPage?: boolean } = {}) {
   pendingBlockCreate.set(block.id, block);
-  outboxSet(outboxUserId(), `create:${block.id}`, { block, kind: "block_create" });
+  if (options.touchPage === true) pendingBlockCreateTouchPage.add(block.id);
+  else pendingBlockCreateTouchPage.delete(block.id);
+  outboxSet(outboxUserId(), `create:${block.id}`, {
+    block,
+    kind: "block_create",
+    ...(options.touchPage === true ? { touchPage: true } : {}),
+  });
   void flushBlockCreate(block.id);
 }
 
@@ -1700,6 +2865,7 @@ function cancelPendingBlockCreate(id: string) {
     blockCreateTimers.delete(id);
   }
   pendingBlockCreate.delete(id);
+  pendingBlockCreateTouchPage.delete(id);
   outboxAck(outboxUserId(), `create:${id}`);
 }
 
@@ -1718,13 +2884,27 @@ async function runBlockDelete(ids: string[], hintPageId?: string, opKey?: string
         if (opKey) outboxAck(userId, opKey);
       },
     });
+    if (hintPageId) {
+      publishBlockStructureMutation(hintPageId, "block_delete_committed", ids);
+    }
     noteSyncSuccess();
   } catch (error) {
     if (shouldDropPersistError(error)) {
-      if (opKey) outboxAck(outboxUserId(), opKey);
-      // 404 is expected when the blocks were never persisted or already gone;
-      // only surface genuine permission/lock drops to the user.
-      if (persistErrorStatus(error) !== 404) notifyPersistDrop(error);
+      // A raw 404 can be a routing/authority miss, so reload canonical blocks
+      // instead of publishing a false deletion confirmation.
+      const disposition = persistErrorStatus(error) === 404 ? "silent_drop" : "drop";
+      if (disposition === "drop") notifyPersistDrop(error);
+      if (opKey) {
+        await transitionToTerminalReconciliation(
+          outboxUserId(),
+          opKey,
+          { hintPageId, ids, kind: "block_delete" },
+          disposition,
+          error
+        );
+      } else if (hintPageId) {
+        await reloadBlocksFromServer(hintPageId).catch(() => {});
+      }
       return;
     }
     noteSyncFailure();
@@ -1751,9 +2931,12 @@ async function persistBlockDelete(ids: string[], hintPageId?: string) {
 function touchPageForBlockChange(
   updatePage: AppState["updatePage"],
   pageId: string,
-  opts?: { debounce?: boolean }
+  opts?: { debounce?: boolean; debounceMs?: number }
 ) {
-  updatePage(pageId, {}, { debounce: opts?.debounce ?? true });
+  updatePage(pageId, {}, {
+    debounce: opts?.debounce ?? true,
+    debounceMs: opts?.debounce ? opts.debounceMs : undefined,
+  });
 }
 
 /** Flush every pending debounced write immediately (e.g. before unload). */
@@ -1771,18 +2954,36 @@ export async function flushAllPending() {
       runBackgroundDurableCall(opKey)
     ),
   ]);
-  await Promise.allSettled(
-    Array.from(deferredDurableCalls.entries()).map(([opKey, call]) =>
-      retryDurableRemoteCall(opKey, call.fnKey, call.args, call.effect)
-    )
-  );
+  await Promise.allSettled([
+    ...Array.from(deferredDurableInFlight.values()),
+    ...Array.from(deferredDurableCalls.keys()).map(runDeferredDurableCall),
+  ]);
   await Promise.allSettled([
     ...Array.from(pageFlushes.values()),
+    ...Array.from(blockBatchFlushes.values()),
     ...Array.from(blockCreateInFlight.values()),
     ...Array.from(pendingPage.keys()).map((id) => flushPage(id)),
-    ...Array.from(pendingBlock.keys()).map((id) => flushBlock(id)),
+    ...Array.from(new Set(pendingBlockPage.values())).map((pageId) =>
+      flushBlockBatch(pageId)
+    ),
     ...Array.from(pendingBlockCreate.keys()).map((id) => flushBlockCreate(id)),
   ]);
+  // Block acknowledgements can admit page-recency generations while the
+  // block lanes above are settling. Force the complete bounded page drain only
+  // after those admissions exist; transient failures remain durable for their
+  // scheduled backoff instead of making lifecycle flush spin forever.
+  await flushPageRecencies(true);
+  // A newer same-key page generation can start while the captured generation
+  // is settling. Join those already-running continuations without spinning on
+  // retryable work that was deliberately re-queued for the bounded backoff.
+  // Four stabilization passes cover the create/update/ack/remirror chain while
+  // keeping this explicit flush bounded if edits continue concurrently.
+  for (let pass = 0; pass < 4; pass += 1) {
+    await Promise.resolve();
+    const activePageRuns = Array.from(pageFlushes.values());
+    if (activePageRuns.length === 0) break;
+    await Promise.allSettled(activePageRuns);
+  }
 }
 
 // ── durable outbox replay (local-first Phase 0) ─────────────────────────────
@@ -1799,6 +3000,12 @@ export async function flushAllPending() {
  */
 export async function clearDurableOutboxOnSignOut() {
   const userId = outboxUserId();
+  clearRecentDatabaseRowsQueries();
+  resetPageRecencyMemory();
+  resetCommentSignalRefreshes();
+  cancelScheduledWarmOfflineScope();
+  resetReadApplicationGuards();
+  resetDeferredBlockCreates();
   await Promise.allSettled([
     outboxClear(userId),
     recordCacheClear(userId),
@@ -1815,15 +3022,23 @@ export async function clearDurableOutboxOnSignOut() {
 
 /** Test hook: allow a fresh bootstrap after resetStore (bootPromise is module state). */
 export function resetBootstrapForTests() {
+  cancelScheduledWarmOfflineScope();
+  resetWorkspaceRefreshLoop();
   bootPromise = null;
   bootKey = "";
   databaseMetadataRevalidated.clear();
+  resetReadApplicationGuards();
 }
 
 /** Test-only isolation for module-level persistence lanes. */
 export function resetPendingPersistenceForTests() {
+  cancelScheduledWarmOfflineScope();
+  resetReadApplicationGuards();
+  resetPageRecencyMemory();
+  resetCommentSignalRefreshes();
   for (const timer of pageTimers.values()) clearTimeout(timer);
   for (const timer of blockTimers.values()) clearTimeout(timer);
+  for (const timer of blockBatchTimers.values()) clearTimeout(timer);
   for (const timer of blockCreateTimers.values()) clearTimeout(timer);
   for (const timer of pageCreateTimers.values()) clearTimeout(timer);
   for (const timer of backgroundDurableTimers.values()) clearTimeout(timer);
@@ -1831,6 +3046,7 @@ export function resetPendingPersistenceForTests() {
   for (const timer of replayQueueTimers.values()) clearTimeout(timer);
   pageTimers.clear();
   blockTimers.clear();
+  blockBatchTimers.clear();
   blockCreateTimers.clear();
   pageCreateTimers.clear();
   backgroundDurableTimers.clear();
@@ -1839,12 +3055,24 @@ export function resetPendingPersistenceForTests() {
   replayQueues.clear();
   replayQueueRuns.clear();
   pendingPage.clear();
+  pendingPageBase.clear();
+  pendingPageExpectedMutationId.clear();
+  pendingPageMutationId.clear();
+  pendingPageBefore.clear();
+  pendingPageDurability.clear();
+  inFlightPageMutationId.clear();
+  inFlightPagePatch.clear();
   optimisticPageOverlays.clear();
   optimisticBlockOverlays.clear();
   pendingBlock.clear();
   pendingBlockPage.clear();
   pendingBlockBase.clear();
+  pendingBlockExpectedMutationId.clear();
+  pendingBlockMutationId.clear();
+  inFlightBlockMutationId.clear();
   pendingBlockCreate.clear();
+  pendingBlockCreateTouchPage.clear();
+  resetDeferredBlockCreates();
   pendingPageCreate.clear();
   pendingDatabaseCreate.clear();
   pendingDatabaseRowCreate.clear();
@@ -1856,21 +3084,63 @@ export function resetPendingPersistenceForTests() {
   deferredDurableCalls.clear();
   pageFlushes.clear();
   blockFlushes.clear();
+  blockBatchFlushes.clear();
   blockCreateInFlight.clear();
   pageCreateInFlight.clear();
   backgroundDurableInFlight.clear();
+  deferredDurableInFlight.clear();
+  blockSnapshotRuns.clear();
+  pageTerminalReconciliationPromises.clear();
   databaseMetadataRevalidated.clear();
   databaseRowsForcedAgain.clear();
+  resetRecentDatabaseRowsQueries();
 }
 
 // ── offline scope warmer (local-first Phase 3 v2) ───────────────────────────
-// After an online boot, eagerly cache the pages the user is most likely to
-// need offline: pinned pages, favorites, and recents — plus the databases
-// they embed. Sequential and capped; delta-sync-lite makes repeat warms
-// nearly free (unchanged pages skip their refetch).
+// After an online boot, finish only incomplete explicit offline pins. Ordinary
+// visits already write every accepted page/block/schema/exact-row response to
+// IndexedDB, so favorites and recents need no second server walk. Pin recovery
+// is delayed until the current surface has been quiet for ten seconds and the
+// browser is idle, keeping it out of the first page-read window.
 
 const WARM_MAX_PAGES = 30;
 const WARM_MAX_DATABASES = 10;
+const OFFLINE_SCOPE_WARM_QUIET_MS = 10_000;
+let offlineScopeWarmTimer: ReturnType<typeof setTimeout> | undefined;
+let offlineScopeWarmIdleId: number | undefined;
+
+function cancelScheduledWarmOfflineScope() {
+  if (offlineScopeWarmTimer !== undefined) {
+    clearTimeout(offlineScopeWarmTimer);
+    offlineScopeWarmTimer = undefined;
+  }
+  if (offlineScopeWarmIdleId !== undefined && typeof window !== "undefined") {
+    const idleWindow = window as Window & { cancelIdleCallback?: (handle: number) => void };
+    idleWindow.cancelIdleCallback?.(offlineScopeWarmIdleId);
+    offlineScopeWarmIdleId = undefined;
+  }
+}
+
+export function scheduleWarmOfflineScope(userId: string) {
+  if (!userId || typeof window === "undefined") return;
+  cancelScheduledWarmOfflineScope();
+  const run = () => {
+    offlineScopeWarmIdleId = undefined;
+    if (outboxUserId() !== userId || !useStore.getState().ready) return;
+    void warmOfflineScope(userId);
+  };
+  offlineScopeWarmTimer = setTimeout(() => {
+    offlineScopeWarmTimer = undefined;
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+    };
+    if (idleWindow.requestIdleCallback) {
+      offlineScopeWarmIdleId = idleWindow.requestIdleCallback(run, { timeout: 10_000 });
+    } else {
+      run();
+    }
+  }, OFFLINE_SCOPE_WARM_QUIET_MS);
+}
 
 const NON_FILE_TEXT_FIELDS = new Set([
   "caption",
@@ -1960,7 +3230,7 @@ export async function warmPageOfflineScope(pageId: string): Promise<string[]> {
     try {
       await state.loadBlocks(pageId);
     } catch {
-      // Warmers are best-effort; the outbox/caches cover the rest.
+      // Explicit pin warming is best-effort; readiness remains truthful.
     }
     for (const block of useStore.getState().blocksByPage[pageId] ?? []) {
       const childId = block.content?.childPageId;
@@ -2016,39 +3286,27 @@ export async function warmOfflineScope(userId: string) {
   try {
     const pins = await getOfflinePins(userId);
     const state = useStore.getState();
-    const favorites = Object.values(state.pagesById)
-      .filter((page) => page.isFavorite && !page.inTrash)
-      .map((page) => page.id);
-    const targets = [
-      ...new Set([...Object.keys(pins), ...favorites, ...state.recentPageIds.slice(0, 10)]),
-    ]
+    const targets = Object.keys(pins)
       .filter((id) => {
         const page = state.pagesById[id];
         return !!page && !page.inTrash;
       })
       .slice(0, WARM_MAX_PAGES);
-    const dbIds = new Set<string>();
-    const pageDatabaseIds = new Map<string, string[]>();
     for (const pageId of targets) {
-      const ids = await warmPageOfflineScope(pageId);
-      pageDatabaseIds.set(pageId, ids);
-      for (const dbId of ids) dbIds.add(dbId);
-    }
-    const loadedDbIds = new Set<string>();
-    for (const dbId of [...dbIds].slice(0, WARM_MAX_DATABASES)) {
-      try {
-        await useStore.getState().loadDatabase(dbId, {});
-        loadedDbIds.add(dbId);
-      } catch {
-        // Best-effort.
+      if (await isPageOfflineReady(pageId)) continue;
+      const databaseIds = (await warmPageOfflineScope(pageId)).slice(0, WARM_MAX_DATABASES);
+      const loadedDatabaseIds: string[] = [];
+      for (const databaseId of databaseIds) {
+        try {
+          await useStore.getState().loadDatabase(databaseId, {});
+          loadedDatabaseIds.push(databaseId);
+        } catch {
+          // Best-effort; the next idle online visit can retry the incomplete pin.
+        }
       }
-    }
-    // Database rows did not exist in memory during the page-first warm above.
-    // Re-collect after row hydration so row attachment bytes join the same
-    // offline scope; failed/unloaded databases are deliberately excluded.
-    for (const [pageId, ids] of pageDatabaseIds) {
-      const loadedIds = ids.filter((id) => loadedDbIds.has(id));
-      if (loadedIds.length) await warmPageOfflineFiles(pageId, loadedIds);
+      if (loadedDatabaseIds.length) {
+        await warmPageOfflineFiles(pageId, loadedDatabaseIds);
+      }
     }
   } catch {
     // Warming must never break boot.
@@ -2129,16 +3387,58 @@ async function replayOutboxOp(
   op: OutboxOp
 ): Promise<ReplayOutcome> {
   switch (op.kind) {
+    case "terminal_reconciliation": {
+      const error = terminalReconciliationError(op);
+      const settled = await finishTerminalReconciliation(
+        userId,
+        entryKey,
+        op,
+        error
+      );
+      return settled ? "complete" : "retry";
+    }
     case "page_update": {
       if (pendingPage.has(op.id) || useStore.getState().pagesById[op.id]) {
+        if (!pendingPage.has(op.id)) {
+          if (op.expectedUpdatedAt) pendingPageBase.set(op.id, op.expectedUpdatedAt);
+          else pendingPageBase.delete(op.id);
+          if (op.expectedMutationId) {
+            pendingPageExpectedMutationId.set(op.id, op.expectedMutationId);
+          } else {
+            pendingPageExpectedMutationId.delete(op.id);
+          }
+          if (op.mutationId) pendingPageMutationId.set(op.id, op.mutationId);
+          else pendingPageMutationId.delete(op.id);
+        }
         pendingPage.set(op.id, { ...op.patch, ...(pendingPage.get(op.id) ?? {}) });
         mirrorPendingPage(op.id);
         await flushPage(op.id);
         return "complete";
       }
       return replayRemote(userId, entryKey, op, async () => {
-        if (op.target === "database_row") await updateDatabaseRowRemote(op.id, op.patch);
-        else await updatePageRemote(op.id, op.patch);
+        if (op.expectedUpdatedAt || op.mutationId || op.expectedMutationId) {
+          if (op.target === "database_row") {
+            await updateDatabaseRowRemote(
+              op.id,
+              op.patch,
+              op.expectedUpdatedAt,
+              op.mutationId,
+              op.expectedMutationId,
+            );
+          } else {
+            await updatePageRemote(
+              op.id,
+              op.patch,
+              op.expectedUpdatedAt,
+              op.mutationId,
+              op.expectedMutationId,
+            );
+          }
+        } else if (op.target === "database_row") {
+          await updateDatabaseRowRemote(op.id, op.patch);
+        } else {
+          await updatePageRemote(op.id, op.patch);
+        }
       });
     }
     case "block_update": {
@@ -2155,17 +3455,28 @@ async function replayOutboxOp(
         // Replayed offline edits carry the optimistic-concurrency guard: if the
         // block changed on another device meanwhile, the server 409s and the
         // conflict path below keeps the server version + offers "apply mine".
-        return updateBlockRemote(op.id, op.patch, op.hintPageId, op.expectedUpdatedAt);
+        return updateBlockRemote(
+          op.id,
+          op.patch,
+          op.hintPageId,
+          op.expectedUpdatedAt,
+          op.mutationId,
+          op.expectedMutationId,
+        );
       });
     }
     case "block_create":
       return replayRemote(userId, entryKey, op, async () => {
-        await createBlockRemote(op.block);
+        await (op.touchPage
+          ? createBlockRemote(op.block, { touchPage: true })
+          : createBlockRemote(op.block));
       });
     case "block_delete":
       return replayRemote(userId, entryKey, op, async () => {
         await deleteBlocksRemote(op.ids, op.hintPageId);
       });
+    case "page_recency":
+      return replayPageRecency(userId, entryKey, op);
     case "remote_call": {
       const entry = DURABLE_REMOTE_CALLS[op.fn];
       if (!entry) {
@@ -2188,18 +3499,227 @@ async function replayOutboxOp(
   }
 }
 
-function replayDropIsBenign(op: OutboxOp, status: number | undefined) {
-  // A replayed create that 409s already landed before the crash; a replayed
-  // delete that 404s is already gone. Neither is a user-facing failure.
-  if (op.kind === "block_create" && status === 409) return true;
-  if (op.kind === "block_delete" && status === 404) return true;
-  if (op.kind === "remote_call" && status !== undefined) {
-    return DURABLE_REMOTE_CALLS[op.fn]?.benign.includes(status) ?? false;
+async function replayPageRecency(
+  userId: string,
+  entryKey: string,
+  op: PageRecencyOutboxOp,
+): Promise<ReplayOutcome> {
+  try {
+    const { dueAt: _dueAt, kind: _kind, ...proof } = op;
+    await touchBlockPageRecencyRemote(proof);
+    await outboxAck(userId, entryKey);
+    noteSyncSuccess();
+    return "complete";
+  } catch (error) {
+    if (persistErrorStatus(error) === 404) {
+      await outboxAck(userId, entryKey);
+      noteSyncSuccess();
+      return "complete";
+    }
+    noteSyncFailure();
+    return "retry";
   }
-  return false;
 }
 
-function shouldDropRemoteCallEffectError(op: OutboxOp, error: unknown) {
+function replayTerminalDisposition(
+  op: MutationOutboxOp,
+  status: number | undefined
+): DurableTerminalDisposition {
+  // Legacy block ops predate the shared registry, but raw status has the same
+  // semantics: exact idempotent replay is 2xx; ambiguous 404/409 drops silently.
+  if (op.kind === "block_create" && status === 409) return "silent_drop";
+  if (op.kind === "block_delete" && status === 404) return "silent_drop";
+  if (op.kind === "remote_call") {
+    return durableTerminalDisposition(DURABLE_REMOTE_CALLS[op.fn], status);
+  }
+  return "drop";
+}
+
+async function reconcileDroppedLegacyOutboxOp(op: MutationOutboxOp) {
+  if (op.kind === "page_update") {
+    const databaseId = op.target === "database_row" ? databaseIdForPageLike(op.id) : undefined;
+    if (databaseId) {
+      await useStore
+        .getState()
+        .loadDatabaseRows(databaseId, { force: true, reset: true });
+    } else {
+      await reconcilePageAfterTerminalDrop(op.id);
+    }
+    return;
+  }
+  if (op.kind === "block_update" && op.hintPageId) {
+    await reconcileDroppedBlockStructure({
+      blockIds: [op.id],
+      pageIds: [op.hintPageId],
+    });
+    return;
+  }
+  if (op.kind === "block_create") {
+    await reconcileDroppedBlockStructure({
+      blockIds: [op.block.id],
+      pageIds: [op.block.pageId],
+    });
+    return;
+  }
+  if (op.kind === "block_delete" && op.hintPageId) {
+    await reconcileDroppedBlockStructure({ blockIds: op.ids, pageIds: [op.hintPageId] });
+  }
+}
+
+function legacyReplayRemoteCallDropEffect(
+  op: Extract<OutboxOp, { kind: "remote_call" }>
+): RemoteCallEffect | undefined {
+  if (op.effect) return op.effect;
+  // Compatibility with durable entries written before property reconciliation
+  // effects existed. The whitelisted call captured its database routing hint
+  // at args[2], so no schema/content inference or additional authority read is
+  // needed to recover the metadata-only refresh after an upgrade.
+  const databaseId = op.fn === "updatePropertyRemote" ? op.args[2] : undefined;
+  if (typeof databaseId !== "string" || !databaseId.trim()) return undefined;
+  return { databaseId: databaseId.trim(), kind: "database_metadata_reconcile" };
+}
+
+function blockHistoryMatchesDropMarker(
+  entry: BlockHistoryEntry,
+  marker: NonNullable<
+    BlockStructureInvalidation["dropReconciliation"]
+  >["histories"][number]
+) {
+  if (entry.at !== marker.at) return false;
+  if (marker.linkId && entry.link?.id !== marker.linkId) return false;
+  return entry.operations?.some(
+    (operation) => operation.occurredAt === marker.operationOccurredAt
+  ) ?? false;
+}
+
+function restoreDroppedBlockStructureHistory(invalidation: BlockStructureInvalidation) {
+  const reconciliation = invalidation.dropReconciliation;
+  if (!reconciliation) return;
+  useStore.setState((state) => {
+    let blockHistoryByPage = state.blockHistoryByPage;
+    let changed = false;
+    for (const marker of reconciliation.histories.slice(
+      0,
+      MAX_BLOCK_STRUCTURE_INVALIDATION_PAGES
+    )) {
+      const history = blockHistoryByPage[marker.pageId];
+      if (!history) continue;
+      const destination = reconciliation.direction === "undo" ? history.past : history.future;
+      if (destination.some((entry) => blockHistoryMatchesDropMarker(entry, marker))) continue;
+      const source = reconciliation.direction === "undo" ? history.future : history.past;
+      const index = source.findLastIndex((entry) => blockHistoryMatchesDropMarker(entry, marker));
+      if (index < 0) continue;
+      const entry = source[index];
+      const remaining = source.slice(0, index).concat(source.slice(index + 1));
+      blockHistoryByPage = {
+        ...blockHistoryByPage,
+        [marker.pageId]: reconciliation.direction === "undo"
+          ? {
+              past: destination.concat(entry).slice(-HISTORY_LIMIT),
+              future: remaining,
+            }
+          : {
+              past: remaining,
+              future: destination.concat(entry).slice(-HISTORY_LIMIT),
+            },
+      };
+      changed = true;
+    }
+    return changed ? { blockHistoryByPage } : {};
+  });
+}
+
+async function reconcileDroppedBlockStructure(invalidation: BlockStructureInvalidation) {
+  restoreDroppedBlockStructureHistory(invalidation);
+  const bounded = blockStructureInvalidation(invalidation.pageIds);
+  if (!bounded) return;
+  await Promise.all(bounded.pageIds.map((pageId) => reloadBlocksFromServer(pageId)));
+}
+
+function publishCommittedRemoteCallBlockStructure(
+  fnKey: string,
+  args: unknown[],
+  invalidation?: BlockStructureInvalidation
+) {
+  const byPage = new Map<string, Set<string>>();
+  const add = (pageId: unknown, blockId: unknown) => {
+    if (typeof pageId !== "string" || !pageId) return;
+    const ids = byPage.get(pageId) ?? new Set<string>();
+    if (typeof blockId === "string" && blockId) ids.add(blockId);
+    byPage.set(pageId, ids);
+  };
+  const asRecord = (value: unknown) =>
+    value && typeof value === "object" ? value as Record<string, unknown> : undefined;
+
+  if (fnKey === "createBlockRemote") {
+    const block = asRecord(args[0]);
+    add(block?.pageId, block?.id);
+  } else if (fnKey === "createBlocksRemote") {
+    for (const value of Array.isArray(args[0]) ? args[0] : []) {
+      const block = asRecord(value);
+      add(block?.pageId, block?.id);
+    }
+  } else if (fnKey === "deleteBlockRemote") {
+    add(args[1], args[0]);
+  } else if (fnKey === "deleteBlocksRemote") {
+    for (const id of Array.isArray(args[0]) ? args[0] : []) add(args[1], id);
+  } else if (fnKey === "updateBlockRemote") {
+    const patch = asRecord(args[1]);
+    if (patch && blockPatchChangesStructure(patch as Partial<Block>)) {
+      add(typeof patch.pageId === "string" ? patch.pageId : args[2], args[0]);
+    }
+  } else if (fnKey === "updateBlocksRemote") {
+    for (const value of Array.isArray(args[0]) ? args[0] : []) {
+      const update = asRecord(value);
+      const patch = asRecord(update?.patch);
+      if (!patch || !blockPatchChangesStructure(patch as Partial<Block>)) continue;
+      add(typeof patch.pageId === "string" ? patch.pageId : args[1], update?.id);
+    }
+  }
+
+  const explicit = invalidation
+    ? blockStructureInvalidation(invalidation.pageIds, invalidation.blockIds)
+    : undefined;
+  for (const pageId of explicit?.pageIds ?? []) {
+    if (explicit?.blockIds?.length) {
+      for (const blockId of explicit.blockIds) add(pageId, blockId);
+    } else {
+      add(pageId, undefined);
+    }
+  }
+
+  for (const [pageId, blockIds] of byPage) {
+    publishBlockStructureMutation(pageId, `committed_${fnKey}`, blockIds);
+  }
+}
+
+function publishReplayedBlockStructureMutation(op: MutationOutboxOp) {
+  if (op.kind === "block_create") {
+    publishBlockStructureMutation(op.block.pageId, "replayed_block_create", [op.block.id]);
+    return;
+  }
+  if (op.kind === "block_delete") {
+    if (op.hintPageId) {
+      publishBlockStructureMutation(op.hintPageId, "replayed_block_delete", op.ids);
+    }
+    return;
+  }
+  if (op.kind === "block_update") {
+    if (op.hintPageId && blockPatchChangesStructure(op.patch)) {
+      publishBlockStructureMutation(op.hintPageId, "replayed_block_structure_update", [op.id]);
+    }
+    return;
+  }
+  if (op.kind === "remote_call") {
+    publishCommittedRemoteCallBlockStructure(
+      op.fn,
+      op.args,
+      op.blockStructureInvalidation
+    );
+  }
+}
+
+function shouldDropRemoteCallEffectError(op: MutationOutboxOp, error: unknown) {
   // The SDK already attempted its session refresh before surfacing a 401.
   // A file detach must not remain optimistically hidden forever after that
   // definitive denial, while unrelated mutation queues keep their existing
@@ -2217,38 +3737,60 @@ function shouldDropRemoteCallEffectError(op: OutboxOp, error: unknown) {
 async function replayRemote(
   userId: string,
   entryKey: string,
-  op: OutboxOp,
+  op: MutationOutboxOp,
   run: () => Promise<unknown>
 ): Promise<ReplayOutcome> {
   try {
     const result = await run();
     if (op.kind === "block_update") {
-      await reconcileReplayedBlockUpdate(userId, op, result);
+      const normalized = normalizedBlockUpdateResult(result);
+      await reconcileReplayedBlockUpdate(userId, op, normalized);
+      if (normalized.pageRecency) {
+        await admitBlockPageRecency(normalized.pageRecency);
+      }
     }
     if (op.kind === "remote_call" && op.effect) {
       await applyRemoteCallEffectSuccess(op.effect, result);
     }
-    outboxAck(userId, entryKey);
+    publishReplayedBlockStructureMutation(op);
+    await outboxAck(userId, entryKey);
     noteSyncSuccess();
     return "complete";
   } catch (error) {
     if (shouldDropRemoteCallEffectError(op, error)) {
-      outboxAck(userId, entryKey);
       if (
         op.kind === "block_update" &&
         op.expectedUpdatedAt &&
         persistErrorStatus(error) === 409
       ) {
-        handleBlockReplayConflict(op);
+        await transitionToTerminalReconciliation(
+          userId,
+          entryKey,
+          op,
+          "drop",
+          error,
+          () => handleBlockReplayConflict(op)
+        );
         return "complete";
       }
-      const benign = replayDropIsBenign(op, persistErrorStatus(error));
-      if (op.kind === "remote_call" && op.effect) {
-        if (benign) await applyRemoteCallEffectSuccess(op.effect, undefined);
-        else await applyRemoteCallEffectDrop(op.effect, error);
+      const disposition = replayTerminalDisposition(op, persistErrorStatus(error));
+      if (disposition === "confirmed") {
+        if (op.kind === "remote_call" && op.effect) {
+          await applyRemoteCallEffectSuccess(op.effect, undefined);
+        }
+        publishReplayedBlockStructureMutation(op);
+        await outboxAck(userId, entryKey);
+        noteSyncSuccess();
+        return "complete";
       }
-      if (!benign) notifyPersistDrop(error);
-      else noteSyncSuccess();
+      if (disposition === "drop") notifyPersistDrop(error);
+      await transitionToTerminalReconciliation(
+        userId,
+        entryKey,
+        op,
+        disposition,
+        error
+      );
       return "complete";
     }
     noteSyncFailure();
@@ -2312,13 +3854,15 @@ async function reconcileReplayedBlockUpdate(
  */
 function handleBlockReplayConflict(op: Extract<OutboxOp, { kind: "block_update" }>) {
   const pageId = op.hintPageId;
-  if (pageId) void reloadBlocksFromServer(pageId);
   const messages = storeMessages();
   useStore.getState().notify(messages.blockConflictSave, "error", {
     label: messages.blockConflictKeepMine,
     onClick: async () => {
       try {
-        await updateBlockRemote(op.id, op.patch, pageId);
+        const result = normalizedBlockUpdateResult(
+          await updateBlockRemote(op.id, op.patch, pageId, undefined, op.mutationId)
+        );
+        if (result.pageRecency) await admitBlockPageRecency(result.pageRecency);
         if (pageId) await reloadBlocksFromServer(pageId);
       } catch (error) {
         notifyPersistDrop(error);
@@ -2335,7 +3879,7 @@ async function reloadBlocksFromServer(pageId: string) {
     loadedBlockPages.delete(pageId);
     return { loadedBlockPages };
   });
-  await useStore.getState().loadBlocks(pageId, { force: true }).catch(() => {});
+  await useStore.getState().loadBlocks(pageId, { force: true });
 }
 
 // ── durable one-shot remote calls (local-first Phase 0 completion) ──────────
@@ -2348,22 +3892,48 @@ async function reloadBlocksFromServer(pageId: string) {
 // import, workspace create) stay plain awaits on purpose: they fail loudly and
 // lose nothing.
 //
-// `benign` lists terminal statuses that mean "already applied" when an op is
-// retried or replayed: 409 for creates (duplicate client UUID), 404 for
-// deletes/trash/restore (target already gone).
+// `benign` preserves the historical user-notification policy for statuses that
+// should not produce a second failure toast. `confirmed` is narrower: only it
+// may turn a terminal response into idempotent success. Raw legacy 404/409
+// responses prove no commit in this registry; exact idempotent replays return
+// an ordinary 2xx response from the handler.
 
 type DurableRemoteFn = (...args: never[]) => Promise<unknown>;
-type DurableRemoteEntry = { benign: number[]; fn: (...args: unknown[]) => Promise<unknown> };
+type DurableRemoteEntry = {
+  benign: number[];
+  confirmed: number[];
+  fn: (...args: unknown[]) => Promise<unknown>;
+};
+type DurableTerminalDisposition = "confirmed" | "silent_drop" | "drop";
 
-function durableEntry(fn: DurableRemoteFn, benign: number[]): DurableRemoteEntry {
-  return { benign, fn: fn as unknown as (...args: unknown[]) => Promise<unknown> };
+function durableEntry(
+  fn: DurableRemoteFn,
+  benign: number[],
+  confirmed: number[] = []
+): DurableRemoteEntry {
+  return {
+    benign,
+    confirmed,
+    fn: fn as unknown as (...args: unknown[]) => Promise<unknown>,
+  };
+}
+
+function durableTerminalDisposition(
+  entry: DurableRemoteEntry | undefined,
+  status: number | undefined
+): DurableTerminalDisposition {
+  if (status !== undefined && entry?.confirmed.includes(status)) return "confirmed";
+  if (status !== undefined && entry?.benign.includes(status)) return "silent_drop";
+  return "drop";
 }
 
 const DURABLE_REMOTE_CALLS: Record<string, DurableRemoteEntry> = {
+  applyBlockSnapshotRemote: durableEntry(applyBlockSnapshotRemote, []),
   createBlockRemote: durableEntry(createBlockRemote, [409]),
   createBlocksRemote: durableEntry(createBlocksRemote, [404, 409]),
   createCommentRemote: durableEntry(createCommentRemote, [409]),
   createDatabaseRemote: durableEntry(createDatabaseRemote, [409]),
+  configureDatabaseTaskFeatureRemote: durableEntry(configureDatabaseTaskFeatureRemote, []),
   createDatabaseRowRemote: durableEntry(createDatabaseRowRemote, [404, 409]),
   createPageRemote: durableEntry(createPageRemote, [409]),
   createPropertyRemote: durableEntry(createPropertyRemote, [409]),
@@ -2377,6 +3947,7 @@ const DURABLE_REMOTE_CALLS: Record<string, DurableRemoteEntry> = {
   deleteTemplateRemote: durableEntry(deleteTemplateRemote, [404]),
   deleteViewRemote: durableEntry(deleteViewRemote, [404]),
   moveDatabaseRowRemote: durableEntry(moveDatabaseRowRemote, [404]),
+  reparentDatabaseSubitemRemote: durableEntry(reparentDatabaseSubitemRemote, [404]),
   restoreDatabaseRowRemote: durableEntry(restoreDatabaseRowRemote, [404]),
   restorePageRemote: durableEntry(restorePageRemote, [404]),
   trashDatabaseRowRemote: durableEntry(trashDatabaseRowRemote, [404]),
@@ -2387,16 +3958,414 @@ const DURABLE_REMOTE_CALLS: Record<string, DurableRemoteEntry> = {
   updateCommentRemote: durableEntry(updateCommentRemote, [404]),
   updateCommentsRemote: durableEntry(updateCommentsRemote, [404]),
   updateDatabaseRowRemote: durableEntry(updateDatabaseRowRemote, []),
+  updateDatabaseDependencyRelationRemote: durableEntry(updateDatabaseDependencyRelationRemote, [404]),
   updatePageRemote: durableEntry(updatePageRemote, [404]),
   updatePropertyRemote: durableEntry(updatePropertyRemote, [404]),
   updateTemplateRemote: durableEntry(updateTemplateRemote, [404]),
   updateViewRemote: durableEntry(updateViewRemote, [404]),
 };
 
+export function durableRemotePolicyForTests() {
+  return Object.entries(DURABLE_REMOTE_CALLS).map(([fn, entry]) => ({
+    benign: entry.benign.slice(),
+    confirmed: entry.confirmed.slice(),
+    fn,
+  }));
+}
+
+export function durableRemoteStatusOutcomeForTests(
+  fnKey: string,
+  status: number | undefined,
+  hasError = true
+): DurableTerminalDisposition | "success" {
+  if (!hasError && status !== undefined && status >= 200 && status < 300) return "success";
+  return durableTerminalDisposition(DURABLE_REMOTE_CALLS[fnKey], status);
+}
+
+const MAX_REMOTE_CALL_RECONCILIATION_KEYS = 100;
+const pageTerminalReconciliationPromises = new Map<string, Promise<void>>();
+
+function boundedReconciliationKeys(values: Iterable<unknown>) {
+  return Array.from(
+    new Set(
+      Array.from(values)
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim())
+        .filter(Boolean)
+    )
+  ).slice(0, MAX_REMOTE_CALL_RECONCILIATION_KEYS);
+}
+
+function mergeRemoteCallTerminalReconciliation(
+  ...values: Array<RemoteCallTerminalReconciliation | undefined>
+): RemoteCallTerminalReconciliation | undefined {
+  const merged: RemoteCallTerminalReconciliation = {};
+  for (const key of [
+    "commentPageIds",
+    "databaseMetadataIds",
+    "databaseRowIds",
+    "pageIds",
+  ] as const) {
+    const ids = boundedReconciliationKeys(values.flatMap((value) => value?.[key] ?? []));
+    if (ids.length) merged[key] = ids;
+  }
+  return Object.keys(merged).length ? merged : undefined;
+}
+
+function remoteCallBlockInvalidation(
+  fnKey: string,
+  args: unknown[]
+): BlockStructureInvalidation | undefined {
+  const records = (value: unknown) =>
+    (Array.isArray(value) ? value : []).filter(
+      (item): item is Record<string, unknown> => !!item && typeof item === "object"
+    );
+  if (fnKey === "createBlockRemote") {
+    const block = recordValue(args[0]);
+    return blockStructureInvalidation([block?.pageId], [block?.id]);
+  }
+  if (fnKey === "createBlocksRemote") {
+    const blocks = records(args[0]);
+    return blockStructureInvalidation(
+      blocks.map((block) => block.pageId),
+      blocks.map((block) => block.id)
+    );
+  }
+  if (fnKey === "deleteBlockRemote") {
+    return blockStructureInvalidation([args[1]], [args[0]]);
+  }
+  if (fnKey === "deleteBlocksRemote") {
+    return blockStructureInvalidation([args[1]], Array.isArray(args[0]) ? args[0] : []);
+  }
+  if (fnKey === "updateBlockRemote") {
+    const patch = recordValue(args[1]);
+    return blockStructureInvalidation([patch?.pageId, args[2]], [args[0]]);
+  }
+  if (fnKey === "updateBlocksRemote") {
+    const updates = records(args[0]);
+    return blockStructureInvalidation(
+      [args[1], ...updates.map((update) => recordValue(update.patch)?.pageId)],
+      updates.map((update) => update.id)
+    );
+  }
+  if (fnKey === "applyBlockSnapshotRemote") {
+    const input = recordValue(args[0]);
+    const creates = records(input?.creates);
+    const updates = records(input?.updates);
+    return blockStructureInvalidation(
+      [input?.pageId, ...creates.map((block) => block.pageId)],
+      [
+        ...creates.map((block) => block.id),
+        ...updates.map((update) => update.id),
+        ...(Array.isArray(input?.deleteIds) ? input.deleteIds : []),
+      ]
+    );
+  }
+  return undefined;
+}
+
+function databaseIdForPageLike(value: unknown) {
+  if (typeof value !== "string") return undefined;
+  const page = useStore.getState().pagesById[value];
+  return page?.parentType === "database" ? page.parentId : undefined;
+}
+
+function inferRemoteCallTerminalReconciliation(
+  fnKey: string,
+  args: unknown[],
+  effect?: RemoteCallEffect
+): RemoteCallTerminalReconciliation | undefined {
+  const first = recordValue(args[0]);
+  const metadataId =
+    fnKey === "createPropertyRemote" || fnKey === "createTemplateRemote" || fnKey === "createViewRemote"
+      ? first?.databaseId
+      : fnKey === "updatePropertyRemote" || fnKey === "updateTemplateRemote" || fnKey === "updateViewRemote"
+        ? args[2]
+        : fnKey === "deletePropertyRemote" || fnKey === "deleteTemplateRemote" || fnKey === "deleteViewRemote"
+          ? args[1]
+          : undefined;
+
+  const rowDatabaseIds: unknown[] = [];
+  if (fnKey === "createDatabaseRowRemote") rowDatabaseIds.push(first?.databaseId);
+  if (
+    fnKey === "deleteDatabaseRowRemote" ||
+    fnKey === "restoreDatabaseRowRemote" ||
+    fnKey === "trashDatabaseRowRemote" ||
+    fnKey === "moveDatabaseRowRemote"
+  ) {
+    rowDatabaseIds.push(databaseIdForPageLike(args[0]), databaseIdForPageLike(args[1]));
+  }
+  if (fnKey === "updatePageRemote") rowDatabaseIds.push(databaseIdForPageLike(args[0]));
+
+  const commentPageIds: unknown[] = [];
+  if (fnKey === "createCommentRemote") commentPageIds.push(first?.pageId);
+  if (fnKey === "updateCommentRemote") commentPageIds.push(args[2]);
+  if (fnKey === "deleteCommentsRemote" || fnKey === "updateCommentsRemote") {
+    commentPageIds.push(args[1]);
+    for (const value of Array.isArray(args[0]) ? args[0] : []) {
+      const update = recordValue(value);
+      commentPageIds.push(recordValue(update?.patch)?.pageId);
+    }
+  }
+
+  const pageIds: unknown[] = [];
+  if (fnKey === "createPageRemote") pageIds.push(first?.id);
+  if (
+    fnKey === "deletePageRemote" ||
+    fnKey === "restorePageRemote" ||
+    fnKey === "trashPageRemote"
+  ) {
+    pageIds.push(args[0]);
+  }
+  if (fnKey === "updatePageRemote" && rowDatabaseIds.every((value) => !value)) {
+    pageIds.push(args[0]);
+  }
+
+  return mergeRemoteCallTerminalReconciliation({
+    ...(commentPageIds.length ? { commentPageIds: boundedReconciliationKeys(commentPageIds) } : {}),
+    ...(metadataId && effect?.kind !== "database_metadata_reconcile"
+      ? { databaseMetadataIds: boundedReconciliationKeys([metadataId]) }
+      : {}),
+    ...(rowDatabaseIds.length
+      ? { databaseRowIds: boundedReconciliationKeys(rowDatabaseIds) }
+      : {}),
+    ...(pageIds.length ? { pageIds: boundedReconciliationKeys(pageIds) } : {}),
+  });
+}
+
+function pruneRemoteCallOptimism(fnKey: string, args: unknown[]) {
+  const first = recordValue(args[0]);
+  if (fnKey === "createBlockRemote" || fnKey === "createBlocksRemote") {
+    const blocks = fnKey === "createBlockRemote"
+      ? [first]
+      : (Array.isArray(args[0]) ? args[0] : []).map(recordValue);
+    const ids = new Set(
+      blocks.flatMap((block) => typeof block?.id === "string" ? [block.id] : [])
+    );
+    for (const id of ids) rollbackDependentWritesForFailedCreate(id);
+    useStore.setState((state) => ({
+      blocksByPage: Object.fromEntries(
+        Object.entries(state.blocksByPage).map(([pageId, values]) => [
+          pageId,
+          values.filter((value) => !ids.has(value.id)),
+        ])
+      ),
+    }));
+    return;
+  }
+  const targetId =
+    typeof first?.id === "string"
+      ? first.id
+      : typeof args[0] === "string"
+        ? args[0]
+        : undefined;
+  if (!targetId) return;
+  if (fnKey === "createPageRemote") {
+    rollbackPendingPageCreate(targetId, "/");
+    return;
+  }
+  if (fnKey === "createDatabaseRowRemote") {
+    rollbackDependentWritesForFailedCreate(targetId);
+    useStore.setState((state) => {
+      const pagesById = { ...state.pagesById };
+      const blocksByPage = { ...state.blocksByPage };
+      delete pagesById[targetId];
+      delete blocksByPage[targetId];
+      return {
+        pagesById,
+        blocksByPage,
+        databaseRowIdsByDb: Object.fromEntries(
+          Object.entries(state.databaseRowIdsByDb).map(([databaseId, ids]) => [
+            databaseId,
+            ids.filter((id) => id !== targetId),
+          ])
+        ),
+        ...(state.focusPageId === targetId
+          ? { focusPageId: undefined, focusPageTarget: undefined }
+          : {}),
+      };
+    });
+    return;
+  }
+  const collection =
+    fnKey === "createPropertyRemote"
+      ? "propsByDb"
+      : fnKey === "createViewRemote"
+        ? "viewsByDb"
+        : fnKey === "createTemplateRemote"
+          ? "templatesByDb"
+          : undefined;
+  if (!collection) return;
+  useStore.setState((state) => ({
+    [collection]: Object.fromEntries(
+      Object.entries(
+        state[collection] as Record<string, Array<{ id: string }>>
+      ).map(([databaseId, values]) => [
+        databaseId,
+        values.filter((value) => value.id !== targetId),
+      ])
+    ),
+  }));
+}
+
+function reconcilePageAfterTerminalDrop(pageId: string) {
+  const existing = pageTerminalReconciliationPromises.get(pageId);
+  if (existing) return existing;
+  const run = useStore
+    .getState()
+    .refreshPageAccess(pageId)
+    .finally(() => {
+      if (pageTerminalReconciliationPromises.get(pageId) === run) {
+        pageTerminalReconciliationPromises.delete(pageId);
+      }
+    });
+  pageTerminalReconciliationPromises.set(pageId, run);
+  return run;
+}
+
+async function reconcileRemoteCallTerminalDrop(
+  fnKey: string,
+  args: unknown[],
+  effect?: RemoteCallEffect,
+  explicit?: RemoteCallTerminalReconciliation
+) {
+  const mergedReconciliation = mergeRemoteCallTerminalReconciliation(
+    explicit,
+    inferRemoteCallTerminalReconciliation(fnKey, args, effect)
+  );
+  const reconciliation = effect?.kind === "database_metadata_reconcile"
+    ? mergeRemoteCallTerminalReconciliation({
+        ...mergedReconciliation,
+        databaseMetadataIds: mergedReconciliation?.databaseMetadataIds?.filter(
+          (databaseId) => databaseId !== effect.databaseId
+        ),
+      })
+    : effect?.kind === "database_rows_reconcile"
+      ? mergeRemoteCallTerminalReconciliation({
+          ...mergedReconciliation,
+          databaseRowIds: mergedReconciliation?.databaseRowIds?.filter(
+            (databaseId) => databaseId !== effect.databaseId
+          ),
+        })
+      : mergedReconciliation;
+  pruneRemoteCallOptimism(fnKey, args);
+  if (!reconciliation) return;
+  await Promise.all([
+    ...(reconciliation.pageIds ?? []).map(reconcilePageAfterTerminalDrop),
+    ...(reconciliation.databaseMetadataIds ?? []).map((databaseId) =>
+      useStore.getState().loadDatabase(databaseId, { force: true, rows: false })
+    ),
+    ...(reconciliation.databaseRowIds ?? []).map((databaseId) =>
+      useStore
+        .getState()
+        .loadDatabaseRows(databaseId, { force: true, reset: true })
+    ),
+    ...(reconciliation.commentPageIds ?? []).map((pageId) =>
+      useStore.getState().loadComments(pageId, { force: true })
+    ),
+  ]);
+}
+
+function terminalReconciliationMarker(
+  operation: MutationOutboxOp,
+  disposition: Exclude<DurableTerminalDisposition, "confirmed">,
+  status: number | undefined
+): TerminalReconciliationOutboxOp {
+  return {
+    disposition,
+    kind: "terminal_reconciliation",
+    operation,
+    ...(status === undefined ? {} : { status }),
+  };
+}
+
+function terminalReconciliationError(marker: TerminalReconciliationOutboxOp) {
+  return Object.assign(
+    new Error(
+      marker.status === undefined
+        ? "Terminal mutation requires reconciliation."
+        : `HTTP ${marker.status}`
+    ),
+    marker.status === undefined ? {} : { status: marker.status }
+  );
+}
+
+async function reconcileTerminalOperation(
+  operation: MutationOutboxOp,
+  error: unknown
+) {
+  if (operation.kind !== "remote_call") {
+    await reconcileDroppedLegacyOutboxOp(operation);
+    return;
+  }
+  const effect = legacyReplayRemoteCallDropEffect(operation);
+  if (effect) await applyRemoteCallEffectDrop(effect, error);
+  await reconcileRemoteCallTerminalDrop(
+    operation.fn,
+    operation.args,
+    effect,
+    operation.terminalReconciliation
+  );
+  if (operation.blockStructureInvalidation) {
+    await reconcileDroppedBlockStructure(operation.blockStructureInvalidation);
+  }
+}
+
+async function finishTerminalReconciliation(
+  userId: string,
+  entryKey: string,
+  marker: TerminalReconciliationOutboxOp,
+  error: unknown,
+  beforeReconciliation?: BeforeTerminalReconciliation
+) {
+  try {
+    await beforeReconciliation?.(error);
+    await reconcileTerminalOperation(marker.operation, error);
+    await outboxAck(userId, entryKey);
+    return true;
+  } catch {
+    // The mutation outcome is already terminal. Keep the reconciliation-only
+    // marker and pending hint intact so a later eligible session can resume
+    // canonical settlement without ever resending the mutation.
+    noteSyncFailure();
+    return false;
+  }
+}
+
+async function transitionToTerminalReconciliation(
+  userId: string,
+  entryKey: string,
+  operation: MutationOutboxOp,
+  disposition: Exclude<DurableTerminalDisposition, "confirmed">,
+  error: unknown,
+  beforeReconciliation?: BeforeTerminalReconciliation,
+  afterDurableTransition?: () => void | Promise<void>
+) {
+  const marker = terminalReconciliationMarker(
+    operation,
+    disposition,
+    persistErrorStatus(error)
+  );
+  await outboxSet(userId, entryKey, marker);
+  // Only now may the live mutation lane discard its retry/timer state.
+  await afterDurableTransition?.();
+  return finishTerminalReconciliation(
+    userId,
+    entryKey,
+    marker,
+    error,
+    beforeReconciliation
+  );
+}
+
 type DurableCallResult =
   | { result: unknown; status: "ok" }
   | { status: "queued" }
   | { error: unknown; status: "dropped" };
+
+type BeforeTerminalReconciliation = (
+  error: unknown
+) => void | Promise<void>;
 
 function remoteCallWaitsForOptimisticCreate(args: unknown[]) {
   return valueReferencesPendingCreate(args);
@@ -2404,28 +4373,51 @@ function remoteCallWaitsForOptimisticCreate(args: unknown[]) {
 
 type DeferredDurableCall = {
   args: unknown[];
+  beforeTerminalReconciliation?: BeforeTerminalReconciliation;
+  blockStructureInvalidation?: BlockStructureInvalidation;
   effect?: RemoteCallEffect;
   fnKey: string;
+  terminalReconciliation?: RemoteCallTerminalReconciliation;
   userId: string;
 };
 
 const deferredDurableCalls = new Map<string, DeferredDurableCall>();
 const deferredDurableTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const deferredDurableInFlight = new Map<string, Promise<void>>();
+const deferredDurableRetryAttempts = new Map<string, number>();
+
+function persistRetryDelayMs(attempt: number) {
+  return Math.min(PERSIST_RETRY_MAX_MS, PERSIST_RETRY_MS * 2 ** Math.max(0, attempt - 1));
+}
 
 function scheduleDeferredDurableCall(
   opKey: string,
   fnKey: string,
   args: unknown[],
   effect: RemoteCallEffect | undefined,
+  invalidation: BlockStructureInvalidation | undefined,
+  terminalReconciliation: RemoteCallTerminalReconciliation | undefined,
+  beforeTerminalReconciliation: BeforeTerminalReconciliation | undefined,
   userId: string,
   delay = PERSIST_RETRY_MS
 ) {
-  deferredDurableCalls.set(opKey, { args, effect, fnKey, userId });
+  deferredDurableCalls.set(opKey, {
+    args,
+    beforeTerminalReconciliation,
+    blockStructureInvalidation: invalidation,
+    effect,
+    fnKey,
+    terminalReconciliation,
+    userId,
+  });
   if (deferredDurableTimers.has(opKey)) return;
-  deferredDurableTimers.set(
-    opKey,
-    setTimeout(() => void retryDurableRemoteCall(opKey, fnKey, args, effect), delay)
-  );
+  const timer = setTimeout(() => {
+    if (deferredDurableTimers.get(opKey) === timer) {
+      deferredDurableTimers.delete(opKey);
+    }
+    void runDeferredDurableCall(opKey).catch(() => {});
+  }, delay);
+  deferredDurableTimers.set(opKey, timer);
 }
 
 function finishDeferredDurableCall(opKey: string) {
@@ -2433,6 +4425,32 @@ function finishDeferredDurableCall(opKey: string) {
   if (timer) clearTimeout(timer);
   deferredDurableTimers.delete(opKey);
   deferredDurableCalls.delete(opKey);
+  deferredDurableRetryAttempts.delete(opKey);
+}
+
+function scheduleDeferredDurableRetry(
+  opKey: string,
+  fnKey: string,
+  args: unknown[],
+  effect: RemoteCallEffect | undefined,
+  invalidation: BlockStructureInvalidation | undefined,
+  terminalReconciliation: RemoteCallTerminalReconciliation | undefined,
+  beforeTerminalReconciliation: BeforeTerminalReconciliation | undefined,
+  userId: string
+) {
+  const attempt = (deferredDurableRetryAttempts.get(opKey) ?? 0) + 1;
+  deferredDurableRetryAttempts.set(opKey, attempt);
+  scheduleDeferredDurableCall(
+    opKey,
+    fnKey,
+    args,
+    effect,
+    invalidation,
+    terminalReconciliation,
+    beforeTerminalReconciliation,
+    userId,
+    persistRetryDelayMs(attempt)
+  );
 }
 
 function wakeDeferredDurableCalls() {
@@ -2441,11 +4459,15 @@ function wakeDeferredDurableCalls() {
     const timer = deferredDurableTimers.get(opKey);
     if (timer) clearTimeout(timer);
     deferredDurableTimers.delete(opKey);
+    deferredDurableRetryAttempts.delete(opKey);
     scheduleDeferredDurableCall(
       opKey,
       call.fnKey,
       call.args,
       call.effect,
+      call.blockStructureInvalidation,
+      call.terminalReconciliation,
+      call.beforeTerminalReconciliation,
       call.userId,
       0
     );
@@ -2527,7 +4549,8 @@ function startSerializedRowFileRemovalCall(
   userId: string,
   opKey: string,
   fnKey: string,
-  effect: RowFileRemovalEffect
+  effect: RowFileRemovalEffect,
+  durability: Promise<void> = Promise.resolve()
 ): Promise<DurableCallResult> {
   const entry = DURABLE_REMOTE_CALLS[fnKey];
   if (!entry) {
@@ -2559,7 +4582,7 @@ function startSerializedRowFileRemovalCall(
     // A predecessor may have committed or rolled back after this operation
     // was first persisted. Rewrite the durable snapshot before attempting it
     // so a crash/reload preserves the rebased causal payload too.
-    outboxSet(userId, opKey, {
+    const rebasedDurability = outboxSet(userId, opKey, {
       args: effectiveArgs,
       effect: effectiveEffect,
       fn: fnKey,
@@ -2570,6 +4593,13 @@ function startSerializedRowFileRemovalCall(
     // when its causal lane reaches the front; remove only its own item so
     // earlier rollbacks and later additions remain intact.
     applyRowFileRemovalIntent(effectiveEffect);
+    await Promise.all([durability, rebasedDurability]);
+    if (effectiveEffect.cacheKey) {
+      // The mounted file chip may already be resolving this exact file. Keep
+      // the optimistic/outbox detach immediate, but let that bounded read
+      // settle before the server write can retire its upload underneath it.
+      await settleSignedWorkspaceFileUrlRequests(effectiveEffect.cacheKey);
+    }
     for (;;) {
       let result: unknown;
       try {
@@ -2581,8 +4611,28 @@ function startSerializedRowFileRemovalCall(
             error
           )
         ) {
-          outboxAck(userId, opKey);
-          const drop = await applyRemoteCallEffectDrop(effectiveEffect, error).catch(() => null);
+          const disposition = durableTerminalDisposition(entry, persistErrorStatus(error));
+          const operation: MutationOutboxOp = {
+            args: effectiveArgs,
+            effect: effectiveEffect,
+            fn: fnKey,
+            kind: "remote_call",
+          };
+          const marker = terminalReconciliationMarker(
+            operation,
+            disposition === "confirmed" ? "drop" : disposition,
+            persistErrorStatus(error)
+          );
+          await outboxSet(userId, opKey, marker);
+          let drop: RemoteCallEffectDropResult | undefined;
+          let reconciled = false;
+          try {
+            drop = await applyRemoteCallEffectDrop(effectiveEffect, error);
+            await outboxAck(userId, opKey);
+            reconciled = true;
+          } catch {
+            noteSyncFailure();
+          }
           if (drop?.unavailable) rowFileRemovalCommittedValues.delete(key);
           else {
             rowFileRemovalCommittedValues.set(
@@ -2590,10 +4640,11 @@ function startSerializedRowFileRemovalCall(
               drop ? drop.authoritativeValue : effectiveEffect.previousValue
             );
           }
-          if (!entry.benign.includes(persistErrorStatus(error) ?? -1)) {
+          if (disposition === "drop") {
             notifyPersistDrop(error);
           }
           report({ error, status: "dropped" });
+          if (!reconciled) return;
           return;
         }
         noteSyncFailure();
@@ -2613,7 +4664,7 @@ function startSerializedRowFileRemovalCall(
           ? (remote.properties?.[effectiveEffect.propertyId] ?? null)
           : effectiveEffect.nextValue
       );
-      outboxAck(userId, opKey);
+      await outboxAck(userId, opKey);
       noteSyncSuccess();
       report({ result, status: "ok" });
       return;
@@ -2649,46 +4700,222 @@ function startSerializedRowFileRemovalCall(
 async function durableRemoteCall(
   fnKey: keyof typeof DURABLE_REMOTE_CALLS & string,
   args: unknown[],
-  effect?: RemoteCallEffect
+  effect?: RemoteCallEffect,
+  invalidation?: BlockStructureInvalidation,
+  explicitReconciliation?: RemoteCallTerminalReconciliation,
+  beforeTerminalReconciliation?: BeforeTerminalReconciliation
 ): Promise<DurableCallResult> {
   const entry = DURABLE_REMOTE_CALLS[fnKey];
   const opKey = `call:${newId()}`;
   const userId = outboxUserId();
-  outboxSet(userId, opKey, { args, effect, fn: fnKey, kind: "remote_call" });
+  const effectiveInvalidation = invalidation ?? remoteCallBlockInvalidation(fnKey, args);
+  const terminalReconciliation = mergeRemoteCallTerminalReconciliation(
+    explicitReconciliation,
+    inferRemoteCallTerminalReconciliation(fnKey, args, effect)
+  );
+  const operation: MutationOutboxOp = {
+    args,
+    ...(effectiveInvalidation ? { blockStructureInvalidation: effectiveInvalidation } : {}),
+    effect,
+    fn: fnKey,
+    kind: "remote_call",
+    ...(terminalReconciliation ? { terminalReconciliation } : {}),
+  };
+  const durability = outboxSet(userId, opKey, operation);
   if (remoteCallWaitsForOptimisticCreate(args)) {
-    scheduleDeferredDurableCall(opKey, fnKey, args, effect, userId);
+    scheduleDeferredDurableCall(
+      opKey,
+      fnKey,
+      args,
+      effect,
+      effectiveInvalidation,
+      terminalReconciliation,
+      beforeTerminalReconciliation,
+      userId
+    );
     return { status: "queued" };
   }
   if (effect?.kind === "row_file_remove") {
-    return startSerializedRowFileRemovalCall(userId, opKey, fnKey, effect);
+    return startSerializedRowFileRemovalCall(userId, opKey, fnKey, effect, durability);
   }
   try {
+    await durability;
     const result = await entry.fn(...args);
     if (effect) await applyRemoteCallEffectSuccess(effect, result);
+    publishCommittedRemoteCallBlockStructure(fnKey, args, effectiveInvalidation);
     finishDeferredDurableCall(opKey);
-    outboxAck(outboxUserId(), opKey);
+    await outboxAck(userId, opKey);
     noteSyncSuccess();
     return { result, status: "ok" };
   } catch (error) {
     if (shouldDropRemoteCallEffectError({ args, effect, fn: fnKey, kind: "remote_call" }, error)) {
-      outboxAck(outboxUserId(), opKey);
-      finishDeferredDurableCall(opKey);
-      if (effect) await applyRemoteCallEffectDrop(effect, error);
-      if (!entry.benign.includes(persistErrorStatus(error) ?? -1)) notifyPersistDrop(error);
+      const disposition = durableTerminalDisposition(entry, persistErrorStatus(error));
+      if (disposition === "confirmed") {
+        if (effect) await applyRemoteCallEffectSuccess(effect, undefined);
+        publishCommittedRemoteCallBlockStructure(fnKey, args, effectiveInvalidation);
+        finishDeferredDurableCall(opKey);
+        await outboxAck(userId, opKey);
+        noteSyncSuccess();
+        return { result: undefined, status: "ok" };
+      }
+      if (disposition === "drop") notifyPersistDrop(error);
+      await transitionToTerminalReconciliation(
+        userId,
+        opKey,
+        operation,
+        disposition,
+        error,
+        beforeTerminalReconciliation,
+        () => finishDeferredDurableCall(opKey)
+      );
       return { error, status: "dropped" };
     }
     noteSyncFailure();
-    scheduleDeferredDurableCall(opKey, fnKey, args, effect, userId);
+    scheduleDeferredDurableRetry(
+      opKey,
+      fnKey,
+      args,
+      effect,
+      effectiveInvalidation,
+      terminalReconciliation,
+      beforeTerminalReconciliation,
+      userId
+    );
     return { status: "queued" };
   }
 }
 
-async function retryDurableRemoteCall(
+const blockSnapshotRuns = new Map<string, Promise<void>>();
+
+function durableBlockSnapshotCall(
+  input: Parameters<typeof applyBlockSnapshotRemote>[0],
+  beforeTerminalReconciliation?: BeforeTerminalReconciliation,
+): Promise<DurableCallResult> {
+  const fnKey = "applyBlockSnapshotRemote";
+  const args = [input];
+  const opKey = `call:${newId()}`;
+  const userId = outboxUserId();
+  const invalidation = remoteCallBlockInvalidation(fnKey, args);
+  const operation: MutationOutboxOp = {
+    args,
+    ...(invalidation ? { blockStructureInvalidation: invalidation } : {}),
+    fn: fnKey,
+    kind: "remote_call",
+  };
+  const durability = outboxSet(userId, opKey, operation);
+  const predecessor = blockSnapshotRuns.get(input.pageId);
+  let reported = false;
+  let resolveFirst!: (result: DurableCallResult) => void;
+  const firstResult = new Promise<DurableCallResult>((resolve) => {
+    resolveFirst = resolve;
+  });
+  const report = (result: DurableCallResult) => {
+    if (reported) return;
+    reported = true;
+    resolveFirst(result);
+  };
+
+  const run = async () => {
+    await predecessor;
+    await durability;
+    for (;;) {
+      try {
+        const result = await applyBlockSnapshotRemote(input);
+        publishCommittedRemoteCallBlockStructure(fnKey, args, invalidation);
+        await outboxAck(userId, opKey);
+        noteSyncSuccess();
+        report({ result, status: "ok" });
+        return;
+      } catch (error) {
+        if (shouldDropRemoteCallEffectError(operation, error)) {
+          const disposition = durableTerminalDisposition(
+            DURABLE_REMOTE_CALLS[fnKey],
+            persistErrorStatus(error),
+          );
+          if (disposition === "confirmed") {
+            publishCommittedRemoteCallBlockStructure(fnKey, args, invalidation);
+            await outboxAck(userId, opKey);
+            noteSyncSuccess();
+            report({ result: undefined, status: "ok" });
+            return;
+          }
+          if (disposition === "drop") notifyPersistDrop(error);
+          await transitionToTerminalReconciliation(
+            userId,
+            opKey,
+            operation,
+            disposition,
+            error,
+            beforeTerminalReconciliation,
+          );
+          report({ error, status: "dropped" });
+          return;
+        }
+        noteSyncFailure();
+        report({ status: "queued" });
+        await persistRetryDelay();
+      }
+    }
+  };
+  const completion = run().catch(() => {
+    noteSyncFailure();
+    report({ status: "queued" });
+  });
+  blockSnapshotRuns.set(input.pageId, completion);
+  void completion.finally(() => {
+    if (blockSnapshotRuns.get(input.pageId) === completion) {
+      blockSnapshotRuns.delete(input.pageId);
+    }
+  });
+  if (predecessor) report({ status: "queued" });
+  return firstResult;
+}
+
+function runDeferredDurableCall(opKey: string): Promise<void> {
+  const active = deferredDurableInFlight.get(opKey);
+  if (active) return active;
+  const call = deferredDurableCalls.get(opKey);
+  if (!call) return Promise.resolve();
+
+  let resolveOwner!: () => void;
+  let rejectOwner!: (error: unknown) => void;
+  const owner = new Promise<void>((resolve, reject) => {
+    resolveOwner = resolve;
+    rejectOwner = reject;
+  });
+  // Publish ownership before invoking the attempt body. A synchronous flush
+  // from a caller callback must join this exact promise rather than starting a
+  // second request in the small pre-await window.
+  deferredDurableInFlight.set(opKey, owner);
+  void retryDurableRemoteCallOnce(opKey, call).then(resolveOwner, rejectOwner);
+  void owner.then(
+    () => {
+      if (deferredDurableInFlight.get(opKey) === owner) {
+        deferredDurableInFlight.delete(opKey);
+      }
+    },
+    () => {
+      if (deferredDurableInFlight.get(opKey) === owner) {
+        deferredDurableInFlight.delete(opKey);
+      }
+    }
+  );
+  return owner;
+}
+
+async function retryDurableRemoteCallOnce(
   opKey: string,
-  fnKey: string,
-  args: unknown[],
-  effect?: RemoteCallEffect
+  call: DeferredDurableCall
 ) {
+  const {
+    args,
+    beforeTerminalReconciliation,
+    blockStructureInvalidation: invalidation,
+    effect,
+    fnKey,
+    terminalReconciliation,
+    userId,
+  } = call;
   const timer = deferredDurableTimers.get(opKey);
   if (timer) clearTimeout(timer);
   deferredDurableTimers.delete(opKey);
@@ -2703,36 +4930,82 @@ async function retryDurableRemoteCall(
       fnKey,
       args,
       effect,
-      deferredDurableCalls.get(opKey)?.userId ?? outboxUserId()
+      invalidation,
+      terminalReconciliation,
+      beforeTerminalReconciliation,
+      userId
     );
     return;
   }
   if (effect?.kind === "row_file_remove") {
-    await startSerializedRowFileRemovalCall(outboxUserId(), opKey, fnKey, effect);
+    const firstResult = startSerializedRowFileRemovalCall(
+      outboxUserId(),
+      opKey,
+      fnKey,
+      effect
+    );
+    // startSerializedRowFileRemovalCall installs the row/property completion
+    // synchronously before returning. Transfer this exact durable op to that
+    // owner now: keeping it in the deferred map until the serializer's first
+    // `queued` result would let a later forced flush enqueue the same op again
+    // behind its still-running retry loop.
+    finishDeferredDurableCall(opKey);
+    await firstResult;
     return;
   }
   try {
     const result = await entry.fn(...args);
     if (effect) await applyRemoteCallEffectSuccess(effect, result);
+    publishCommittedRemoteCallBlockStructure(fnKey, args, invalidation);
     finishDeferredDurableCall(opKey);
-    outboxAck(outboxUserId(), opKey);
+    await outboxAck(userId, opKey);
     noteSyncSuccess();
   } catch (error) {
     if (shouldDropRemoteCallEffectError({ args, effect, fn: fnKey, kind: "remote_call" }, error)) {
-      finishDeferredDurableCall(opKey);
-      outboxAck(outboxUserId(), opKey);
-      if (effect) await applyRemoteCallEffectDrop(effect, error);
-      if (!entry.benign.includes(persistErrorStatus(error) ?? -1)) notifyPersistDrop(error);
+      const disposition = durableTerminalDisposition(entry, persistErrorStatus(error));
+      if (disposition === "confirmed") {
+        if (effect) await applyRemoteCallEffectSuccess(effect, undefined);
+        publishCommittedRemoteCallBlockStructure(fnKey, args, invalidation);
+        finishDeferredDurableCall(opKey);
+        await outboxAck(userId, opKey);
+        noteSyncSuccess();
+        return;
+      }
+      if (disposition === "drop") notifyPersistDrop(error);
+      const operation: MutationOutboxOp = {
+        args,
+        ...(invalidation ? { blockStructureInvalidation: invalidation } : {}),
+        effect,
+        fn: fnKey,
+        kind: "remote_call",
+        ...(terminalReconciliation ? { terminalReconciliation } : {}),
+      };
+      await transitionToTerminalReconciliation(
+        userId,
+        opKey,
+        operation,
+        disposition,
+        error,
+        beforeTerminalReconciliation,
+        () => finishDeferredDurableCall(opKey)
+      );
       return;
     }
     noteSyncFailure();
-    scheduleDeferredDurableCall(
-      opKey,
-      fnKey,
-      args,
-      effect,
-      deferredDurableCalls.get(opKey)?.userId ?? outboxUserId()
-    );
+    // Reset/sign-out/cancellation may have removed this exact pending call
+    // while its unabortable request was in flight. Do not resurrect stale work.
+    if (deferredDurableCalls.get(opKey) === call) {
+      scheduleDeferredDurableRetry(
+        opKey,
+        fnKey,
+        args,
+        effect,
+        invalidation,
+        terminalReconciliation,
+        beforeTerminalReconciliation,
+        userId
+      );
+    }
   }
 }
 
@@ -2743,6 +5016,7 @@ type BackgroundDurableCallSpec = {
   onDrop: (error: unknown) => void | Promise<void>;
   onSuccess: (result: unknown | undefined) => void | Promise<void>;
   opKey: string;
+  terminalReconciliation?: RemoteCallTerminalReconciliation;
   userId: string;
   waitsFor?: () => boolean;
 };
@@ -2750,6 +5024,7 @@ type BackgroundDurableCallSpec = {
 const backgroundDurableCalls = new Map<string, BackgroundDurableCallSpec>();
 const backgroundDurableTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const backgroundDurableInFlight = new Map<string, Promise<void>>();
+const backgroundDurableRetryAttempts = new Map<string, number>();
 
 function scheduleBackgroundDurableCall(opKey: string, delay = PERSIST_RETRY_MS) {
   if (backgroundDurableTimers.has(opKey)) return;
@@ -2759,12 +5034,19 @@ function scheduleBackgroundDurableCall(opKey: string, delay = PERSIST_RETRY_MS) 
   );
 }
 
+function scheduleBackgroundDurableRetry(opKey: string) {
+  const attempt = (backgroundDurableRetryAttempts.get(opKey) ?? 0) + 1;
+  backgroundDurableRetryAttempts.set(opKey, attempt);
+  scheduleBackgroundDurableCall(opKey, persistRetryDelayMs(attempt));
+}
+
 function wakeBackgroundDurableCalls() {
   for (const [opKey, spec] of backgroundDurableCalls) {
     if (spec.waitsFor?.()) continue;
     const timer = backgroundDurableTimers.get(opKey);
     if (timer) clearTimeout(timer);
     backgroundDurableTimers.delete(opKey);
+    backgroundDurableRetryAttempts.delete(opKey);
     scheduleBackgroundDurableCall(opKey, 0);
   }
 }
@@ -2789,25 +5071,47 @@ async function runBackgroundDurableCall(opKey: string) {
     try {
       const result = await entry.fn(...spec.args);
       backgroundDurableCalls.delete(opKey);
-      outboxAck(spec.userId, opKey);
+      backgroundDurableRetryAttempts.delete(opKey);
+      await outboxAck(spec.userId, opKey);
       noteSyncSuccess();
       await spec.onSuccess(result);
     } catch (error) {
       if (shouldDropPersistError(error)) {
-        backgroundDurableCalls.delete(opKey);
-        outboxAck(spec.userId, opKey);
-        const benign = entry.benign.includes(persistErrorStatus(error) ?? -1);
-        if (benign) {
-          noteSyncSuccess();
+        const disposition = durableTerminalDisposition(entry, persistErrorStatus(error));
+        if (disposition === "confirmed") {
           await spec.onSuccess(undefined);
+          backgroundDurableCalls.delete(opKey);
+          backgroundDurableRetryAttempts.delete(opKey);
+          await outboxAck(spec.userId, opKey);
+          noteSyncSuccess();
         } else {
-          await spec.onDrop(error);
-          notifyPersistDrop(error);
+          if (disposition === "drop") notifyPersistDrop(error);
+          const operation: MutationOutboxOp = {
+            args: spec.args,
+            effect: spec.effect,
+            fn: spec.fnKey,
+            kind: "remote_call",
+            ...(spec.terminalReconciliation
+              ? { terminalReconciliation: spec.terminalReconciliation }
+              : {}),
+          };
+          await transitionToTerminalReconciliation(
+            spec.userId,
+            opKey,
+            operation,
+            disposition,
+            error,
+            spec.onDrop,
+            () => {
+              backgroundDurableCalls.delete(opKey);
+              backgroundDurableRetryAttempts.delete(opKey);
+            }
+          );
         }
         return;
       }
       noteSyncFailure();
-      scheduleBackgroundDurableCall(opKey);
+      scheduleBackgroundDurableRetry(opKey);
     }
   })().catch(() => {
     // The server outcome is already classified above. A reconciliation
@@ -2825,12 +5129,19 @@ async function runBackgroundDurableCall(opKey: string) {
 }
 
 function startBackgroundDurableCall(spec: BackgroundDurableCallSpec) {
-  backgroundDurableCalls.set(spec.opKey, spec);
+  const terminalReconciliation = mergeRemoteCallTerminalReconciliation(
+    spec.terminalReconciliation,
+    inferRemoteCallTerminalReconciliation(spec.fnKey, spec.args, spec.effect)
+  );
+  const persistedSpec = { ...spec, terminalReconciliation };
+  backgroundDurableRetryAttempts.delete(spec.opKey);
+  backgroundDurableCalls.set(spec.opKey, persistedSpec);
   outboxSet(spec.userId, spec.opKey, {
     args: spec.args,
     effect: spec.effect,
     fn: spec.fnKey,
     kind: "remote_call",
+    ...(terminalReconciliation ? { terminalReconciliation } : {}),
   });
   scheduleBackgroundDurableCall(spec.opKey, 0);
 }
@@ -2840,6 +5151,7 @@ function cancelBackgroundDurableCall(opKey: string, userId = outboxUserId()) {
   if (timer) clearTimeout(timer);
   backgroundDurableTimers.delete(opKey);
   backgroundDurableCalls.delete(opKey);
+  backgroundDurableRetryAttempts.delete(opKey);
   outboxAck(userId, opKey);
 }
 
@@ -2943,6 +5255,74 @@ function rollbackMatchingFields<T extends object>(
     }
   }
   return next;
+}
+
+function rollbackTerminalPageMutation(
+  id: string,
+  patch: Partial<Page>,
+  before: Page | undefined
+) {
+  optimisticPageOverlays.delete(id);
+  if (!before) return;
+  useStore.setState((state) => {
+    const current = state.pagesById[id];
+    if (!current) return {};
+    const patchFields = Object.keys(patch).filter(
+      (field) => field !== "properties"
+    ) as Array<keyof Page>;
+    if (Object.prototype.hasOwnProperty.call(patch, "properties")) {
+      patchFields.push("__computed");
+    }
+    const optimistic = {
+      ...before,
+      ...patch,
+      ...(Object.prototype.hasOwnProperty.call(patch, "properties")
+        ? { __computed: undefined }
+        : {}),
+    };
+    const next = rollbackMatchingFields(current, optimistic, before, patchFields);
+
+    if (patch.properties && typeof patch.properties === "object") {
+      const currentProperties = current.properties ?? {};
+      const beforeProperties = before.properties ?? {};
+      const optimisticProperties = patch.properties;
+      const nextProperties = { ...currentProperties };
+      const propertyIds = new Set([
+        ...Object.keys(beforeProperties),
+        ...Object.keys(optimisticProperties),
+      ]);
+      for (const propertyId of propertyIds) {
+        const currentHas = Object.prototype.hasOwnProperty.call(
+          currentProperties,
+          propertyId
+        );
+        const optimisticHas = Object.prototype.hasOwnProperty.call(
+          optimisticProperties,
+          propertyId
+        );
+        if (currentHas !== optimisticHas) continue;
+        if (
+          currentHas &&
+          !jsonValuesEqual(currentProperties[propertyId], optimisticProperties[propertyId])
+        ) {
+          continue;
+        }
+        if (Object.prototype.hasOwnProperty.call(beforeProperties, propertyId)) {
+          nextProperties[propertyId] = cloneJsonValue(beforeProperties[propertyId]);
+        } else {
+          delete nextProperties[propertyId];
+        }
+      }
+      next.properties = nextProperties;
+    }
+
+    return {
+      pagesById: {
+        ...state.pagesById,
+        [id]: next,
+      },
+    };
+  });
 }
 
 /**
@@ -3079,6 +5459,59 @@ function applyRowFileRemovalIntent(effect: RowFileRemovalEffect) {
       },
     };
   });
+  projectOptimisticRowFileValue(
+    effect.rowId,
+    effect.propertyId,
+    effect.nextValue
+  );
+}
+
+function projectOptimisticRowFileValue(
+  rowId: string,
+  propertyId: string,
+  value: unknown
+) {
+  const page = useStore.getState().pagesById[rowId];
+  if (!page) return;
+  optimisticPageOverlays.set(rowId, {
+    ...(optimisticPageOverlays.get(rowId) ?? {}),
+    properties: {
+      ...(page.properties ?? {}),
+      [propertyId]: value,
+    },
+  });
+}
+
+function projectOptimisticDatabaseSubitem(
+  rowId: string,
+  targetParentId: string,
+  mutationId: string
+) {
+  optimisticPageOverlays.set(rowId, {
+    ...(optimisticPageOverlays.get(rowId) ?? {}),
+    lastMutationId: mutationId,
+    subitemParentId: targetParentId,
+  });
+}
+
+function clearOptimisticDatabaseSubitem(
+  rowId: string,
+  targetParentId: string,
+  mutationId: string
+) {
+  const current = optimisticPageOverlays.get(rowId);
+  if (
+    !current
+    || current.subitemParentId !== targetParentId
+    || current.lastMutationId !== mutationId
+  ) return;
+  const {
+    lastMutationId: _lastMutationId,
+    subitemParentId: _subitemParentId,
+    ...remaining
+  } = current;
+  if (Object.keys(remaining).length > 0) optimisticPageOverlays.set(rowId, remaining);
+  else optimisticPageOverlays.delete(rowId);
 }
 
 function rollbackRowFileValue(effect: RowFileRemovalEffect, currentValue: unknown) {
@@ -3240,7 +5673,9 @@ function finishOptimisticDatabaseCreate(
       return {
         pagesById: {
           ...state.pagesById,
-          [id]: currentPage ? { ...result.page, ...currentPage } : result.page,
+          [id]: currentPage
+            ? mergePersistedPageCreateAuthority(result.page, currentPage)
+            : result.page,
           ...Object.fromEntries(rows.map((row) => [row.id, row])),
         },
         propsByDb: {
@@ -3273,6 +5708,7 @@ function finishOptimisticDatabaseCreate(
         loadedDbs: new Set(state.loadedDbs).add(id),
       };
     });
+    adoptPersistedPageCreateAuthority(id, result.page);
   } else {
     void useStore.getState().loadDatabase(id, { force: true, rows: true });
   }
@@ -3341,6 +5777,14 @@ function rollbackOptimisticDatabaseCreate(effect: DatabaseCreateEffect) {
       templatesByDb,
       databaseRowIdsByDb,
       databaseRowPagesByDb,
+      databaseSubitemRowWindowsByDb: pruneDatabaseSubitemRowWindows(
+        state.databaseSubitemRowWindowsByDb,
+        failedPageIds
+      ),
+      databaseDependencyRelations: pruneDatabaseDependencyRelations(
+        state.databaseDependencyRelations,
+        failedPageIds
+      ),
       loadedBlockPages,
       loadedCommentPages,
       loadedDbs,
@@ -3360,9 +5804,361 @@ function rollbackOptimisticDatabaseCreate(effect: DatabaseCreateEffect) {
   }
 }
 
+function taskFeatureCommitAuthority(
+  effect: Extract<RemoteCallEffect, { kind: "database_task_feature_commit" }>,
+  result: unknown
+) {
+  const response = recordValue(result);
+  const database = recordValue(response?.database) as Page | null;
+  const properties = Array.isArray(response?.properties)
+    ? response.properties.filter((value): value is DbProperty => !!recordValue(value))
+    : [];
+  const binding = database?.databaseFeatures?.[effect.feature];
+  const remoteRevision = Number(database?.databaseFeaturesRevision ?? 0);
+  const bindingRevision = Number(binding?.revision ?? 0);
+  const expectedIds = [effect.primaryPropertyId, effect.secondaryPropertyId];
+  const propertiesById = new Map(properties.map((property) => [property.id, property]));
+  const primary = propertiesById.get(effect.primaryPropertyId);
+  const secondary = propertiesById.get(effect.secondaryPropertyId);
+  const primaryConfig = recordValue(primary?.config);
+  const secondaryConfig = recordValue(secondary?.config);
+  const expectedRoles = effect.feature === "subitems"
+    ? ["subitem_parent", "subitem_children"]
+    : ["dependency_predecessor", "dependency_successor"];
+  const dependencyBinding = database?.databaseFeatures?.dependencies;
+  const subitemsBinding = database?.databaseFeatures?.subitems;
+  const dependencyDateBindingMatches = effect.dateMode === "separate"
+    ? dependencyBinding?.dateMode === "separate"
+      && dependencyBinding.startDatePropertyId === effect.startDatePropertyId
+      && dependencyBinding.endDatePropertyId === effect.endDatePropertyId
+    : dependencyBinding?.dateMode !== "separate"
+      && dependencyBinding?.datePropertyId === effect.datePropertyId;
+  const bindingMatches = effect.feature === "subitems"
+    ? subitemsBinding?.parentPropertyId === effect.primaryPropertyId
+      && subitemsBinding.childrenPropertyId === effect.secondaryPropertyId
+      && subitemsBinding.nestedPropertyId === (effect.nestedPropertyId ?? effect.secondaryPropertyId)
+      && subitemsBinding.showToggleOnTitle === (effect.showToggleOnTitle ?? true)
+    : dependencyBinding?.predecessorPropertyId === effect.primaryPropertyId
+      && dependencyBinding.successorPropertyId === effect.secondaryPropertyId
+      && dependencyDateBindingMatches
+      && dependencyBinding.shiftMode === effect.shiftMode
+      && dependencyBinding.avoidWeekends === effect.avoidWeekends;
+  const exactProperty = (
+    property: DbProperty | undefined,
+    config: Record<string, unknown> | null,
+    id: string,
+    relatedId: string,
+    role: string
+  ) => property?.id === id
+    && property.databaseId === effect.databaseId
+    && property.type === "relation"
+    && config?.relationDatabaseId === effect.databaseId
+    && config?.relatedPropertyId === relatedId
+    && config?.databaseFeatureRole === role;
+
+  if (
+    database?.id !== effect.databaseId
+    || database.kind !== "database"
+    || properties.length !== 2
+    || new Set(properties.map((property) => property.id)).size !== 2
+    || !expectedIds.every((id) => propertiesById.has(id))
+    || binding?.enabled !== true
+    || !bindingMatches
+    || !Number.isSafeInteger(remoteRevision)
+    || remoteRevision < 1
+    || !Number.isSafeInteger(bindingRevision)
+    || bindingRevision < 1
+    || !exactProperty(
+      primary,
+      primaryConfig,
+      effect.primaryPropertyId,
+      effect.secondaryPropertyId,
+      expectedRoles[0]!
+    )
+    || !exactProperty(
+      secondary,
+      secondaryConfig,
+      effect.secondaryPropertyId,
+      effect.primaryPropertyId,
+      expectedRoles[1]!
+    )
+  ) {
+    throw new Error("Database task-feature response authority is malformed.");
+  }
+  return { database, properties: [primary!, secondary!], remoteRevision };
+}
+
+function taskFeatureTurnOffAuthority(
+  effect: Extract<RemoteCallEffect, { kind: "database_task_feature_turn_off" }>,
+  result: unknown
+) {
+  const response = recordValue(result);
+  const database = recordValue(response?.database) as Page | null;
+  const properties = Array.isArray(response?.properties)
+    ? response.properties.filter((value): value is DbProperty => !!recordValue(value))
+    : [];
+  const removedPropertyIds = Array.isArray(response?.removedPropertyIds)
+    ? response.removedPropertyIds.filter((value): value is string => typeof value === "string")
+    : [];
+  const remoteRevision = Number(database?.databaseFeaturesRevision ?? 0);
+  const expectedIds = [effect.primaryPropertyId, effect.secondaryPropertyId];
+  const expectedRemovedIds = effect.propertyDisposition === "remove" ? expectedIds : [];
+  const propertiesById = new Map(properties.map((property) => [property.id, property]));
+  const primary = propertiesById.get(effect.primaryPropertyId);
+  const secondary = propertiesById.get(effect.secondaryPropertyId);
+  const primaryConfig = recordValue(primary?.config);
+  const secondaryConfig = recordValue(secondary?.config);
+  const expectedRoles = effect.feature === "subitems"
+    ? ["preserved_subitem_parent", "preserved_subitem_children"]
+    : ["preserved_dependency_predecessor", "preserved_dependency_successor"];
+  const preservedBindings = database?.databaseFeatures?.preservedTaskFeatures?.[effect.feature] ?? [];
+  const preservedBindingMatches = preservedBindings.some((binding) => {
+    if (binding.enabled !== false || binding.revision !== effect.expectedBindingRevision) return false;
+    return effect.feature === "subitems"
+      ? "parentPropertyId" in binding
+        && binding.parentPropertyId === effect.primaryPropertyId
+        && binding.childrenPropertyId === effect.secondaryPropertyId
+      : "predecessorPropertyId" in binding
+        && binding.predecessorPropertyId === effect.primaryPropertyId
+        && binding.successorPropertyId === effect.secondaryPropertyId;
+  });
+  const exactProperty = (
+    property: DbProperty | undefined,
+    config: Record<string, unknown> | null,
+    id: string,
+    relatedId: string,
+    role: string
+  ) => property?.id === id
+    && property.databaseId === effect.databaseId
+    && property.type === "relation"
+    && config?.relationDatabaseId === effect.databaseId
+    && config?.relatedPropertyId === relatedId
+    && config?.databaseFeatureRole === role;
+  const exactRemovedIds = removedPropertyIds.length === expectedRemovedIds.length
+    && removedPropertyIds.every((id, index) => id === expectedRemovedIds[index]);
+  const propertyAuthorityMatches = effect.propertyDisposition === "keep"
+    ? properties.length === 2
+      && propertiesById.size === 2
+      && preservedBindingMatches
+      && exactProperty(
+        primary,
+        primaryConfig,
+        effect.primaryPropertyId,
+        effect.secondaryPropertyId,
+        expectedRoles[0]!
+      )
+      && exactProperty(
+        secondary,
+        secondaryConfig,
+        effect.secondaryPropertyId,
+        effect.primaryPropertyId,
+        expectedRoles[1]!
+      )
+    : properties.length === 0;
+
+  if (
+    response?.operationId !== effect.operationId
+    || response?.status !== "completed"
+    || typeof response?.replayed !== "boolean"
+    || database?.id !== effect.databaseId
+    || database.kind !== "database"
+    || database.databaseFeatures?.[effect.feature] !== undefined
+    || remoteRevision !== effect.expectedDatabaseFeaturesRevision + 1
+    || !exactRemovedIds
+    || !propertyAuthorityMatches
+  ) {
+    throw new Error("Database task-feature turn-off response authority is malformed.");
+  }
+  return { database, properties, remoteRevision };
+}
+
 async function applyRemoteCallEffectSuccess(effect: RemoteCallEffect, result: unknown) {
   if (effect.kind === "database_create") {
     finishOptimisticDatabaseCreate(effect, result);
+    return;
+  }
+  if (effect.kind === "database_metadata_reconcile") return;
+  if (effect.kind === "database_dependency_commit") {
+    const response = recordValue(result);
+    const relation = recordValue(response?.relation);
+    const relatedRowIds = Array.isArray(relation?.relatedRowIds)
+      ? relation.relatedRowIds.filter((value): value is string => typeof value === "string")
+      : [];
+    const dependencyRevision = Number(relation?.dependencyRevision ?? 0);
+    const nextCursor = typeof relation?.nextCursor === "string"
+      ? relation.nextCursor.trim()
+      : undefined;
+    if (
+      response?.mutationId !== effect.mutationId
+      || relation?.databaseId !== effect.databaseId
+      || relation.rowId !== effect.rowId
+      || relation.propertyId !== effect.propertyId
+      || relation.direction !== effect.direction
+      || !Array.isArray(relation.relatedRowIds)
+      || relatedRowIds.length !== relation.relatedRowIds.length
+      || new Set(relatedRowIds).size !== relatedRowIds.length
+      || relatedRowIds.length > 50
+      || relatedRowIds.some((id) => !id || id.trim() !== id || id.length > 256)
+      || typeof relation.hasMore !== "boolean"
+      || !Number.isSafeInteger(dependencyRevision)
+      || dependencyRevision < 1
+      || (relation.hasMore === true && !nextCursor)
+      || (relation.hasMore === false && relation.nextCursor !== undefined)
+    ) {
+      throw new Error("Database dependency relation response authority is malformed.");
+    }
+    mergeDatabaseDependencyRelationAuthority({
+      databaseId: effect.databaseId,
+      dependencyRevision,
+      direction: effect.direction,
+      hasMore: relation.hasMore,
+      ...(nextCursor ? { nextCursor } : {}),
+      propertyId: effect.propertyId,
+      relatedRowIds,
+      rowId: effect.rowId,
+    }, { settledMutationId: effect.mutationId });
+    publishDatabaseRowsMutation(
+      effect.databaseId,
+      "dependency_relation_changed",
+      [effect.rowId, ...effect.addRelatedRowIds, ...effect.removeRelatedRowIds],
+    );
+    return;
+  }
+  if (effect.kind === "database_task_feature_commit") {
+    const authority = taskFeatureCommitAuthority(effect, result);
+    useStore.setState((state) => {
+      const currentDatabase = state.pagesById[effect.databaseId];
+      const currentRevision = Number(currentDatabase?.databaseFeaturesRevision ?? 0);
+      const incomingById = new Map(authority.properties.map((property) => [property.id, property]));
+      const currentProperties = state.propsByDb[effect.databaseId] ?? [];
+      const mergedProperties = currentProperties.map((property) => {
+        const incoming = incomingById.get(property.id);
+        if (!incoming) return property;
+        incomingById.delete(property.id);
+        return (property.updatedAt ?? "") > (incoming.updatedAt ?? "") ? property : incoming;
+      });
+      mergedProperties.push(...incomingById.values());
+      return {
+        pagesById: {
+          ...state.pagesById,
+          [effect.databaseId]: currentDatabase && currentRevision > authority.remoteRevision
+            ? currentDatabase
+            : { ...(currentDatabase ?? {}), ...authority.database },
+        },
+        propsByDb: {
+          ...state.propsByDb,
+          [effect.databaseId]: mergedProperties.sort(bySortPos),
+        },
+      };
+    });
+    await reconcilePersistedPageMutations(
+      effect.databaseId,
+      useStore.getState().pagesById[effect.databaseId]
+    );
+    publishDatabaseSchemaMutation(
+      effect.databaseId,
+      "task_feature_configured",
+      [effect.primaryPropertyId, effect.secondaryPropertyId]
+    );
+    return;
+  }
+  if (effect.kind === "database_task_feature_turn_off") {
+    const authority = taskFeatureTurnOffAuthority(effect, result);
+    useStore.setState((state) => {
+      const removedIds = effect.propertyDisposition === "remove"
+        ? new Set([effect.primaryPropertyId, effect.secondaryPropertyId])
+        : new Set<string>();
+      let metadataState = state;
+      for (const propertyId of removedIds) {
+        metadataState = {
+          ...metadataState,
+          ...withoutLoadedDatabaseProperty(metadataState, effect.databaseId, propertyId),
+        };
+      }
+      const currentDatabase = metadataState.pagesById[effect.databaseId];
+      const currentRevision = Number(currentDatabase?.databaseFeaturesRevision ?? 0);
+      const incomingById = new Map(authority.properties.map((property) => [property.id, property]));
+      const currentProperties = metadataState.propsByDb[effect.databaseId] ?? [];
+      const mergedProperties = currentProperties.map((property) => {
+        const incoming = incomingById.get(property.id);
+        if (!incoming) return property;
+        incomingById.delete(property.id);
+        return incoming;
+      });
+      mergedProperties.push(...incomingById.values());
+      return {
+        databaseDependencyRelations: removedIds.size > 0
+          ? pruneDatabaseDependencyRelations(metadataState.databaseDependencyRelations, removedIds)
+          : metadataState.databaseDependencyRelations,
+        pagesById: {
+          ...metadataState.pagesById,
+          [effect.databaseId]: currentDatabase && currentRevision > authority.remoteRevision
+            ? currentDatabase
+            : { ...(currentDatabase ?? {}), ...authority.database },
+        },
+        propsByDb: {
+          ...metadataState.propsByDb,
+          [effect.databaseId]: mergedProperties.sort(bySortPos),
+        },
+        templatesByDb: metadataState.templatesByDb,
+        viewsByDb: metadataState.viewsByDb,
+      };
+    });
+    await reconcilePersistedPageMutations(
+      effect.databaseId,
+      useStore.getState().pagesById[effect.databaseId]
+    );
+    publishDatabaseSchemaMutation(
+      effect.databaseId,
+      "task_feature_configured",
+      [effect.primaryPropertyId, effect.secondaryPropertyId]
+    );
+    return;
+  }
+  if (effect.kind === "database_rows_reconcile") {
+    const response = recordValue(result);
+    const remoteDatabase = response?.database as Page | undefined;
+    const remoteRow = response?.row as Page | undefined;
+    const completedMutationId = response?.completedMutationId;
+    const completedTargetParentId = response?.completedTargetParentId;
+    const completedRevision = Number(response?.databaseFeaturesRevision ?? 0);
+    const remoteDatabaseRevision = Number(remoteDatabase?.databaseFeaturesRevision ?? 0);
+    if (
+      remoteDatabase?.id !== effect.databaseId
+      || remoteRow?.id !== effect.rowId
+      || remoteRow.parentId !== effect.databaseId
+      || remoteRow.parentType !== "database"
+      || completedMutationId !== effect.mutationId
+      || completedTargetParentId !== effect.targetParentId
+      || !Number.isSafeInteger(completedRevision)
+      || completedRevision < 1
+      || !Number.isSafeInteger(remoteDatabaseRevision)
+      || remoteDatabaseRevision < completedRevision
+    ) {
+      throw new Error("Sub-item reparent response authority is malformed.");
+    }
+    const state = useStore.getState();
+    const currentDatabaseRevision = Number(
+      state.pagesById[effect.databaseId]?.databaseFeaturesRevision ?? 0
+    );
+    const currentRowMutationId = state.pagesById[effect.rowId]?.lastMutationId;
+    const staleSameRowResponse =
+      !!currentRowMutationId
+      && currentRowMutationId !== effect.mutationId
+      && completedRevision < currentDatabaseRevision;
+    clearOptimisticDatabaseSubitem(
+      effect.rowId,
+      effect.targetParentId,
+      effect.mutationId
+    );
+    clearRecentDatabaseRowsQueries(effect.databaseId);
+    if (staleSameRowResponse) return;
+    await reconcilePersistedPageMutations(
+      effect.rowId,
+      remoteRow,
+      remoteDatabaseRevision >= currentDatabaseRevision ? [remoteDatabase] : []
+    );
+    publishDatabaseRowsMutation(effect.databaseId, "subitem_reparented", [effect.rowId]);
     return;
   }
   const remote = remotePageResult(result);
@@ -3396,6 +6192,11 @@ async function applyRemoteCallEffectSuccess(effect: RemoteCallEffect, result: un
   const committedValue = remote
     ? (remote.properties?.[effect.propertyId] ?? null)
     : effect.nextValue;
+  // This direct durable effect bypasses the ordinary pending-page flush, so it
+  // must explicitly advance every already-warm row cache before its outbox
+  // entry is acknowledged. Otherwise a reload can briefly hydrate the removed
+  // file and start a doomed signed-URL request before the server row arrives.
+  await reconcilePersistedPageMutations(effect.rowId, remote ?? undefined);
   publishPersistedPageMutation(
     effect.rowId,
     {
@@ -3409,6 +6210,7 @@ async function applyRemoteCallEffectSuccess(effect: RemoteCallEffect, result: un
     !rowFileValueContainsKey(committedValue, effect.cacheKey) &&
     !rowFileValueContainsKey(page?.properties?.[effect.propertyId], effect.cacheKey)
   ) {
+    evictSignedWorkspaceFileUrl(effect.cacheKey);
     await evictCachedWorkspaceFiles([effect.cacheKey]).catch(() => {});
   }
 }
@@ -3444,6 +6246,14 @@ function hideUnavailableDatabaseRow(effect: RowFileRemovalEffect, status: number
         ...state.databaseRowIdsByDb,
         [effect.databaseId]: nextRowIds,
       },
+      databaseSubitemRowWindowsByDb: pruneDatabaseSubitemRowWindows(
+        state.databaseSubitemRowWindowsByDb,
+        new Set([effect.rowId])
+      ),
+      databaseDependencyRelations: pruneDatabaseDependencyRelations(
+        state.databaseDependencyRelations,
+        new Set([effect.rowId])
+      ),
       ...(pageState
         ? {
             databaseRowPagesByDb: {
@@ -3497,6 +6307,57 @@ async function applyRemoteCallEffectDrop(
     rollbackOptimisticDatabaseCreate(effect);
     return { unavailable: false };
   }
+  if (effect.kind === "database_metadata_reconcile") {
+    await useStore
+      .getState()
+      .loadDatabase(effect.databaseId, { force: true, rows: false });
+    return { unavailable: false };
+  }
+  if (
+    effect.kind === "database_task_feature_commit"
+    || effect.kind === "database_task_feature_turn_off"
+  ) {
+    await useStore
+      .getState()
+      .loadDatabase(effect.databaseId, { force: true, rows: false });
+    return { unavailable: false };
+  }
+  if (effect.kind === "database_dependency_commit") {
+    try {
+      const relation = await getDatabaseDependencyRelationRemote(
+        effect.databaseId,
+        effect.rowId,
+        effect.direction,
+        { force: true, propertyId: effect.propertyId },
+      );
+      if (relation.propertyId !== effect.propertyId) {
+        throw new Error("Dependency relation property authority changed.");
+      }
+      mergeDatabaseDependencyRelationAuthority(
+        relation,
+        { settledMutationId: effect.mutationId },
+      );
+    } catch {
+      dropDatabaseDependencyPendingMutation(
+        effect.rowId,
+        effect.propertyId,
+        effect.mutationId,
+      );
+    }
+    return { unavailable: false };
+  }
+  if (effect.kind === "database_rows_reconcile") {
+    clearOptimisticDatabaseSubitem(
+      effect.rowId,
+      effect.targetParentId,
+      effect.mutationId
+    );
+    clearRecentDatabaseRowsQueries(effect.databaseId);
+    await useStore
+      .getState()
+      .loadDatabaseRows(effect.databaseId, { force: true, reset: true });
+    return { unavailable: false };
+  }
   let authoritative: Page | null = null;
   let authoritativeError: unknown;
   try {
@@ -3542,6 +6403,7 @@ async function applyRemoteCallEffectDrop(
       },
     };
   });
+  projectOptimisticRowFileValue(effect.rowId, effect.propertyId, reconciledValue);
   if (hadNewerValue) preserveNewerPendingRowFileValue(effect, reconciledValue);
   return {
     authoritativeValue: authoritative
@@ -3655,7 +6517,7 @@ export async function handleLocalUnlock(input: WorkspaceBootstrapInput) {
   }
   if (userId) {
     void replayDurableOutbox(userId).catch(() => {});
-    void warmOfflineScope(userId);
+    scheduleWarmOfflineScope(userId);
   }
 }
 
@@ -3682,8 +6544,10 @@ function applyBootstrapResult(
   result: WorkspaceBootstrapResult,
   mode: "initial" | "reconcile",
   previousServerPageIds?: Set<string>,
-  exposeReady = true
+  exposeReady = true,
+  membershipAuthority: "cached" | "fresh" = "fresh"
 ) {
+  clearRecentDatabaseRowsQueries();
   const {
     userId,
     isInstanceAdmin = false,
@@ -3699,6 +6563,9 @@ function applyBootstrapResult(
     workspaces = [],
     currentMember,
     members = [],
+    teamspaces = [],
+    discoverableTeamspaces = [],
+    teamspaceSettings,
     pages: unfilteredPages = [],
     pageRoles: unfilteredPageRoles = {},
     sharedPageIds: unfilteredSharedPageIds = [],
@@ -3721,22 +6588,97 @@ function applyBootstrapResult(
     // local-only pages (queued offline creates) and still-pending debounced
     // patches survive the refresh. Pages the server KNEW before but no longer
     // returns were deleted or un-shared remotely — drop them.
+    const currentState = useStore.getState();
+    const removedPageIds = new Set<string>();
+    if (previousServerPageIds) {
+      for (const id of previousServerPageIds) {
+        if (!pagesById[id] && currentState.pagesById[id] && !pendingPage.has(id)) {
+          removedPageIds.add(id);
+        }
+      }
+      for (const page of Object.values(currentState.pagesById)) {
+        if (
+          page.parentType !== "workspace"
+          || !page.teamspaceId
+          || pagesById[page.id]
+          || !previousServerPageIds.has(page.id)
+        ) {
+          continue;
+        }
+        for (const pageId of collectPageSubtree(currentState.pagesById, page.id)) {
+          removedPageIds.add(pageId);
+        }
+      }
+    }
+    if (removedPageIds.size) {
+      const pendingBlockIds = new Set<string>();
+      for (const pageId of removedPageIds) {
+        cancelPendingPage(pageId);
+        for (const block of currentState.blocksByPage[pageId] ?? []) pendingBlockIds.add(block.id);
+      }
+      for (const [blockId, pageId] of pendingBlockPage) {
+        if (removedPageIds.has(pageId)) pendingBlockIds.add(blockId);
+      }
+      for (const block of pendingBlockCreate.values()) {
+        if (removedPageIds.has(block.pageId)) pendingBlockIds.add(block.id);
+      }
+      for (const blockId of pendingBlockIds) {
+        cancelPendingBlock(blockId);
+        cancelPendingBlockCreate(blockId);
+      }
+    }
     useStore.setState((s) => {
       const merged = { ...s.pagesById };
-      if (previousServerPageIds) {
-        for (const id of Object.keys(merged)) {
-          if (!pagesById[id] && previousServerPageIds.has(id) && !pendingPage.has(id)) {
-            delete merged[id];
-          }
-        }
+      const pageRolesById = { ...s.pageRolesById };
+      const blocksByPage = { ...s.blocksByPage };
+      const blockHistoryByPage = { ...s.blockHistoryByPage };
+      const commentsByPage = { ...s.commentsByPage };
+      const propsByDb = { ...s.propsByDb };
+      const viewsByDb = { ...s.viewsByDb };
+      const templatesByDb = { ...s.templatesByDb };
+      const databaseRowIdsByDb = { ...s.databaseRowIdsByDb };
+      const databaseRowPagesByDb = { ...s.databaseRowPagesByDb };
+      const loadedBlockPages = new Set(s.loadedBlockPages);
+      const loadedCommentPages = new Set(s.loadedCommentPages);
+      const loadedDbs = new Set(s.loadedDbs);
+      const treeExpandedPageIds = new Set(s.treeExpandedPageIds);
+      const hydratedRelationTargetIds = new Set(s.hydratedRelationTargetIds);
+      for (const id of removedPageIds) {
+        delete merged[id];
+        delete pageRolesById[id];
+        delete blocksByPage[id];
+        delete blockHistoryByPage[id];
+        delete commentsByPage[id];
+        delete propsByDb[id];
+        delete viewsByDb[id];
+        delete templatesByDb[id];
+        delete databaseRowIdsByDb[id];
+        delete databaseRowPagesByDb[id];
+        loadedBlockPages.delete(id);
+        loadedCommentPages.delete(id);
+        loadedDbs.delete(id);
+        treeExpandedPageIds.delete(id);
+        hydratedRelationTargetIds.delete(id);
+      }
+      for (const [databaseId, rowIds] of Object.entries(databaseRowIdsByDb)) {
+        databaseRowIdsByDb[databaseId] = rowIds.filter((id) => !removedPageIds.has(id));
       }
       for (const [id, page] of Object.entries(pagesById)) {
         merged[id] = remotePageWithOptimisticOverlay(page);
       }
+      Object.assign(pageRolesById, pageRoles);
+      const recentPageIds = s.recentPageIds.filter((id) => !removedPageIds.has(id));
+      writeRecentPageIds(ws.id, recentPageIds);
+      writeTreeExpandedPageIds(ws.id, Array.from(treeExpandedPageIds));
       return {
         ready: true,
+        bootstrapFailure: undefined,
         workspace: ws,
-        activeDataScope: { kind: "workspace" as const, workspaceId: ws.id },
+        activeDataScope: {
+          kind: "workspace" as const,
+          membershipAuthority,
+          workspaceId: ws.id,
+        },
         isInstanceAdmin,
         organization,
         organizations,
@@ -3750,12 +6692,43 @@ function applyBootstrapResult(
         userId,
         currentMember,
         workspaceMembers: members,
+        teamspaces,
+        discoverableTeamspaces,
+        teamspaceSettings,
         pagesById: merged,
-        pageRolesById: { ...s.pageRolesById, ...pageRoles },
+        pageRolesById,
+        blocksByPage,
+        blockHistoryByPage,
+        commentsByPage,
+        propsByDb,
+        viewsByDb,
+        templatesByDb,
+        databaseRowIdsByDb,
+        databaseRowPagesByDb,
+        databaseSubitemRowWindowsByDb: pruneDatabaseSubitemRowWindows(
+          s.databaseSubitemRowWindowsByDb,
+          removedPageIds,
+        ),
+        databaseDependencyRelations: pruneDatabaseDependencyRelations(
+          s.databaseDependencyRelations,
+          removedPageIds,
+        ),
+        loadedBlockPages,
+        loadedCommentPages,
+        loadedDbs,
+        treeExpandedPageIds,
+        hydratedRelationTargetIds,
+        recentPageIds,
         sharedPageIds: new Set(sharedPageIds),
+        ...(s.commentPanel && removedPageIds.has(s.commentPanel.pageId)
+          ? { commentPanel: undefined }
+          : {}),
+        ...(s.focusPageId && removedPageIds.has(s.focusPageId)
+          ? { focusPageId: undefined, focusPageTarget: undefined }
+          : {}),
       };
     });
-    return;
+    return removedPageIds;
   }
 
   const recentPageIds = readRecentPageIds(ws.id).filter((id) => {
@@ -3768,10 +6741,12 @@ function applyBootstrapResult(
       return page && !page.inTrash;
     })
   );
+  resetDeferredBlockCreates();
   useStore.setState({
     ready: exposeReady,
+    bootstrapFailure: undefined,
     workspace: ws,
-    activeDataScope: { kind: "workspace", workspaceId: ws.id },
+    activeDataScope: { kind: "workspace", membershipAuthority, workspaceId: ws.id },
     isInstanceAdmin,
     organization,
     organizations,
@@ -3785,6 +6760,9 @@ function applyBootstrapResult(
     userId,
     currentMember,
     workspaceMembers: members,
+    teamspaces,
+    discoverableTeamspaces,
+    teamspaceSettings,
     pagesById,
     pageRolesById: pageRoles,
     sharedPageIds: new Set(sharedPageIds),
@@ -3801,9 +6779,12 @@ function applyBootstrapResult(
     loadedDbs: new Set(),
     databaseRowIdsByDb: {},
     databaseRowPagesByDb: {},
+    databaseSubitemRowWindowsByDb: {},
+    databaseDependencyRelations: {},
     hydratedRelationTargetIds: new Set(),
     commentPanel: undefined,
   });
+  return new Set<string>();
 }
 
 function cachedBootTargetPageId(input: WorkspaceBootstrapInput): string | undefined {
@@ -3929,15 +6910,25 @@ function applyBootstrapResultWithOutbox(
   entries: OutboxEntry[],
   mode: "initial" | "reconcile",
   previousServerPageIds?: Set<string>,
-  exposeReady = true
+  exposeReady = true,
+  membershipAuthority: "cached" | "fresh" = "fresh"
 ) {
-  applyBootstrapResult(
+  const removedPageIds = applyBootstrapResult(
     { ...result, pages: overlayOutboxOnPages(entries, result.pages ?? []) },
     mode,
     previousServerPageIds,
-    exposeReady
+    exposeReady,
+    membershipAuthority
   );
   materializeOutboxEffects(entries);
+  if (removedPageIds.size) {
+    // A server visibility decision is authoritative. Reset every persistent
+    // page/container cache generation before the caller stores the new
+    // bootstrap blob, so a warm reload cannot revive revoked Teamspace data.
+    void recordCacheClear(result.userId);
+    void clearOfflineWorkspaceFileCache();
+  }
+  return removedPageIds;
 }
 
 /**
@@ -3991,6 +6982,9 @@ async function readBootstrapBlob(key: string): Promise<WorkspaceBootstrapResult 
  * possibly a previous account's on a shared browser.
  */
 function discardHydratedBoot() {
+  clearRecentDatabaseRowsQueries();
+  resetReadApplicationGuards();
+  resetDeferredBlockCreates();
   setWorkspacePeople([], []);
   useStore.setState({
     ready: false,
@@ -4009,6 +7003,9 @@ function discardHydratedBoot() {
     organizationAuditEvents: [],
     currentMember: undefined,
     workspaceMembers: [],
+    teamspaces: [],
+    discoverableTeamspaces: [],
+    teamspaceSettings: undefined,
     pagesById: {},
     pageRolesById: {},
     sharedPageIds: new Set(),
@@ -4025,6 +7022,8 @@ function discardHydratedBoot() {
     loadedDbs: new Set(),
     databaseRowIdsByDb: {},
     databaseRowPagesByDb: {},
+    databaseSubitemRowWindowsByDb: {},
+    databaseDependencyRelations: {},
     hydratedRelationTargetIds: new Set(),
     commentPanel: undefined,
   });
@@ -4039,12 +7038,18 @@ async function hydrateBootstrapFromCache(
   const userId = useStore.getState().userId || readLastUserId();
   if (!userId) return false;
   const entries = await outboxAllEntries(userId);
+  // A warm reload already has enough identity + durable mutation data to
+  // recover immediately. Do not wait for the network bootstrap and route
+  // revalidation before starting the claimed outbox lane; those reads can run
+  // in parallel while the canonical write is acknowledged.
+  void replayDurableOutbox(userId).catch(() => {});
   applyBootstrapResultWithOutbox(
     blob,
     entries,
     "initial",
     undefined,
-    false
+    false,
+    "cached"
   );
   // Keep the boot surface hidden until the current page's cached blocks and
   // database state have joined the workspace snapshot. This prevents a warm
@@ -4152,95 +7157,273 @@ function applyBootFeedHints(result: WorkspaceBootstrapResult, previousChangesSyn
 // visibility regains, reconciling through the same SWR machinery as boot.
 const WORKSPACE_REFRESH_MS = 60_000;
 const WORKSPACE_REFRESH_MIN_GAP_MS = 15_000;
+const WORKSPACE_REFRESH_ACTIVITY_WINDOW_MS = 5 * 60_000;
+const WORKSPACE_REFRESH_ACTIVITY_EVENTS = ["pointerdown", "keydown", "input", "wheel"] as const;
 let workspaceRefreshTimer: ReturnType<typeof setTimeout> | null = null;
-let workspaceRefreshInFlight = false;
+let workspaceRefreshInFlight: Promise<void> | null = null;
+let workspaceRefreshInFlightGeneration = -1;
+let workspaceRefreshInFlightKey = "";
+let workspaceRefreshGeneration = 0;
 let workspaceRefreshedAt = 0;
+let workspaceRefreshLastActivityAt = 0;
+let workspaceRefreshListenersInstalled = false;
 let bootInputForRefresh: WorkspaceBootstrapInput = {};
+let bootInputKeyForRefresh = "";
 
-async function refreshWorkspaceDelta() {
-  if (workspaceRefreshInFlight) return;
-  const activeState = useStore.getState();
-  if (
-    !activeState.ready ||
-    activeState.activeDataScope?.kind === "public_share" ||
-    !bootKey
-  ) return;
-  if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-  if (typeof navigator !== "undefined" && navigator.onLine === false) return;
-  workspaceRefreshInFlight = true;
+function workspaceRefreshIsCurrent(generation: number, key: string, dataEpoch: number) {
+  return (
+    generation === workspaceRefreshGeneration &&
+    bootKey === key &&
+    bootInputKeyForRefresh === key &&
+    useStore.getState().ready &&
+    dataEpoch === workspaceDataEpoch
+  );
+}
+
+async function runWorkspaceRefreshDelta(generation: number) {
   const dataEpoch = workspaceDataEpoch;
   try {
     const key = bootKey;
+    const refreshInput = { ...bootInputForRefresh };
     const blob = await readBootstrapBlob(key);
     const watermark = blob?.pagesSyncedAt;
     // No cached baseline to delta against — leave full fetches to the boot path.
     if (!blob || !watermark) return;
+    // A reset or workspace switch while the cache read was pending must not
+    // issue a stale authenticated request for the former owner.
+    if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
     const changesCursor = blob.changesSyncedAt ?? "";
+    if (blob.workspaceRefreshToken) {
+      try {
+        const probe = await probeWorkspaceChanges({
+          workspaceId: blob.workspace.id,
+          workspaceRefreshToken: blob.workspaceRefreshToken,
+        });
+        // A reset or workspace switch while the lean request was in flight
+        // must neither mark the former workspace fresh nor start its fallback.
+        if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
+        if (probe.decision === "unchanged") {
+          // The opaque token already represents the authoritative cursor and
+          // authority snapshot. A quiet probe deliberately mutates no cache,
+          // feed cursor, store identity, or outbox state.
+          workspaceRefreshedAt = Date.now();
+          return;
+        }
+      } catch (error) {
+        if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
+        const status = persistErrorStatus(error);
+        // A definitive endpoint denial/miss may reflect a scoped actor or an
+        // older deployment. Let the existing visibility-filtered bootstrap
+        // make the authoritative decision exactly once. Network/5xx failures
+        // abort this tick and retry on the next scheduled boundary.
+        if (status !== 401 && status !== 403 && status !== 404) throw error;
+      }
+      // Explicit fence between the probe and the authoritative fallback.
+      if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
+    }
     let result = await bootstrapWorkspace({
-      ...bootInputForRefresh,
+      ...refreshInput,
       pagesSince: watermark,
       ...(changesCursor ? { changesSince: changesCursor } : {}),
     });
     // Workspace switched while the fetch was in flight: discard.
-    if (
-      bootKey !== key ||
-      !useStore.getState().ready ||
-      dataEpoch !== workspaceDataEpoch
-    ) return;
+    if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
     // Nothing changed since the cursor: advance the cursor cache but do NOT
     // touch store state — replacing workspaceMembers/pagesById with fresh
     // identities every poll would re-render subscribers and (worse) bounce
     // the presence room, which re-joins when the member array changes.
     const state = useStore.getState();
-    const quietDelta =
+    const resultWorkspaces = result.workspaces?.length
+      ? result.workspaces
+      : [result.workspace];
+    const sameJson = (left: unknown, right: unknown) =>
+      JSON.stringify(left) === JSON.stringify(right);
+    let quietDelta =
       result.pagesDelta &&
       (result.changedPages?.length ?? 0) === 0 &&
       (result.deletedPageIds?.length ?? 0) === 0 &&
-      JSON.stringify(result.members ?? []) === JSON.stringify(state.workspaceMembers) &&
-      JSON.stringify(result.pageRoles ?? {}) === JSON.stringify(state.pageRolesById) &&
+      result.userId === state.userId &&
+      (result.isInstanceAdmin ?? false) === state.isInstanceAdmin &&
+      sameJson(result.workspace, state.workspace) &&
+      sameJson(result.organization, state.organization) &&
+      sameJson(result.organizations ?? [], state.organizations) &&
+      sameJson(result.currentOrganizationMember, state.currentOrganizationMember) &&
+      sameJson(result.organizationMembers ?? [], state.organizationMembers) &&
+      sameJson(result.organizationGroups ?? [], state.organizationGroups) &&
+      sameJson(result.organizationProfiles ?? [], state.organizationProfiles) &&
+      sameJson(result.organizationDomains ?? [], state.organizationDomains) &&
+      sameJson(result.organizationAuditEvents ?? [], state.organizationAuditEvents) &&
+      sameJson(resultWorkspaces, state.workspaces) &&
+      sameJson(result.currentMember, state.currentMember) &&
+      sameJson(result.members ?? [], state.workspaceMembers) &&
+      sameJson(result.teamspaces ?? [], state.teamspaces) &&
+      sameJson(result.discoverableTeamspaces ?? [], state.discoverableTeamspaces) &&
+      sameJson(result.teamspaceSettings, state.teamspaceSettings) &&
+      sameJson(result.pageRoles ?? {}, state.pageRolesById) &&
       JSON.stringify((result.sharedPageIds ?? []).slice().sort()) ===
         JSON.stringify(Array.from(state.sharedPageIds).sort());
     if (result.pagesDelta) {
       const resolved = resolveBootstrapDelta(blob, result);
-      if (!resolved) return; // unresolvable (new visible page) → next boot refetches fully
-      result = resolved;
+      if (resolved) {
+        result = resolved;
+      } else {
+        // A delta can be impossible to materialize when a newly visible page
+        // is absent from the local blob. Finish this one refresh chain with a
+        // single authoritative full response instead of repeating the same
+        // probe+delta on every tick.
+        result = await bootstrapWorkspace(refreshInput);
+        if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
+        quietDelta = false;
+      }
     }
-    applyBootFeedHints(result, changesCursor);
     if (!quietDelta) {
       const entries = await outboxAllEntries(result.userId);
+      // Reading the durable overlay is asynchronous. Re-check every owner
+      // fence before applying either it or the server result.
+      if (!workspaceRefreshIsCurrent(generation, key, dataEpoch)) return;
+      applyBootFeedHints(result, changesCursor);
       applyBootstrapResultWithOutbox(
         result,
         entries,
         "reconcile",
         new Set((blob.pages ?? []).map((page) => page.id))
       );
+    } else {
+      applyBootFeedHints(result, changesCursor);
     }
     cacheSetMeta(result.userId, recordCacheMeta.bootstrap(key), bootstrapBlobForCache(result));
     workspaceRefreshedAt = Date.now();
   } catch {
     // Transient (offline, auth refresh): the next tick retries.
-  } finally {
-    workspaceRefreshInFlight = false;
   }
 }
 
-function startWorkspaceRefreshLoop() {
-  if (workspaceRefreshTimer !== null || typeof window === "undefined") return;
-  const tick = () => {
-    workspaceRefreshTimer = setTimeout(() => {
-      void refreshWorkspaceDelta().finally(tick);
-    }, WORKSPACE_REFRESH_MS);
-  };
-  tick();
-  const refreshIfStale = () => {
-    if (Date.now() - workspaceRefreshedAt < WORKSPACE_REFRESH_MIN_GAP_MS) return;
-    void refreshWorkspaceDelta();
-  };
-  window.addEventListener("focus", refreshIfStale);
-  window.addEventListener("online", refreshIfStale);
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") refreshIfStale();
+function refreshWorkspaceDelta() {
+  const activeState = useStore.getState();
+  if (
+    !activeState.ready ||
+    activeState.activeDataScope?.kind === "public_share" ||
+    !bootKey ||
+    (typeof document !== "undefined" && document.visibilityState === "hidden") ||
+    (typeof navigator !== "undefined" && navigator.onLine === false)
+  ) return Promise.resolve();
+  const generation = workspaceRefreshGeneration;
+  const key = bootKey;
+  if (
+    workspaceRefreshInFlight &&
+    workspaceRefreshInFlightGeneration === generation &&
+    workspaceRefreshInFlightKey === key
+  ) return workspaceRefreshInFlight;
+  const refresh = runWorkspaceRefreshDelta(generation).finally(() => {
+    if (workspaceRefreshInFlight === refresh) {
+      workspaceRefreshInFlight = null;
+      workspaceRefreshInFlightGeneration = -1;
+      workspaceRefreshInFlightKey = "";
+    }
   });
+  workspaceRefreshInFlight = refresh;
+  workspaceRefreshInFlightGeneration = generation;
+  workspaceRefreshInFlightKey = key;
+  return refresh;
+}
+
+function workspaceRefreshActivityRecent(now = Date.now()) {
+  return (
+    workspaceRefreshLastActivityAt > 0 &&
+    now - workspaceRefreshLastActivityAt < WORKSPACE_REFRESH_ACTIVITY_WINDOW_MS
+  );
+}
+
+function scheduleWorkspaceRefreshTick() {
+  if (
+    workspaceRefreshTimer !== null ||
+    typeof window === "undefined" ||
+    !workspaceRefreshActivityRecent()
+  ) return;
+  const activityRemaining =
+    workspaceRefreshLastActivityAt + WORKSPACE_REFRESH_ACTIVITY_WINDOW_MS - Date.now();
+  workspaceRefreshTimer = setTimeout(() => {
+    workspaceRefreshTimer = null;
+    if (!workspaceRefreshActivityRecent()) return;
+    void refreshWorkspaceDelta().finally(scheduleWorkspaceRefreshTick);
+  }, Math.min(WORKSPACE_REFRESH_MS, activityRemaining));
+}
+
+function markWorkspaceRefreshActivity(forceStaleRefresh: boolean) {
+  const now = Date.now();
+  const resumedFromIdle = !workspaceRefreshActivityRecent(now);
+  workspaceRefreshLastActivityAt = now;
+  scheduleWorkspaceRefreshTick();
+  if (
+    (forceStaleRefresh || resumedFromIdle) &&
+    now - workspaceRefreshedAt >= WORKSPACE_REFRESH_MIN_GAP_MS
+  ) {
+    void refreshWorkspaceDelta();
+  }
+}
+
+function handleWorkspaceRefreshInputActivity() {
+  markWorkspaceRefreshActivity(false);
+}
+
+function handleWorkspaceRefreshBoundary() {
+  markWorkspaceRefreshActivity(true);
+}
+
+function handleWorkspaceRefreshVisibility() {
+  if (document.visibilityState === "visible") handleWorkspaceRefreshBoundary();
+}
+
+function installWorkspaceRefreshListeners() {
+  if (workspaceRefreshListenersInstalled || typeof window === "undefined") return;
+  workspaceRefreshListenersInstalled = true;
+  for (const eventName of WORKSPACE_REFRESH_ACTIVITY_EVENTS) {
+    window.addEventListener(eventName, handleWorkspaceRefreshInputActivity, {
+      capture: true,
+      passive: true,
+    });
+  }
+  window.addEventListener("focus", handleWorkspaceRefreshBoundary);
+  window.addEventListener("online", handleWorkspaceRefreshBoundary);
+  document.addEventListener("visibilitychange", handleWorkspaceRefreshVisibility);
+}
+
+function resetWorkspaceRefreshLoop() {
+  if (workspaceRefreshTimer !== null) clearTimeout(workspaceRefreshTimer);
+  workspaceRefreshTimer = null;
+  workspaceRefreshGeneration += 1;
+  workspaceRefreshLastActivityAt = 0;
+  workspaceRefreshedAt = 0;
+  bootInputForRefresh = {};
+  bootInputKeyForRefresh = "";
+  if (!workspaceRefreshListenersInstalled || typeof window === "undefined") return;
+  for (const eventName of WORKSPACE_REFRESH_ACTIVITY_EVENTS) {
+    window.removeEventListener(eventName, handleWorkspaceRefreshInputActivity, true);
+  }
+  window.removeEventListener("focus", handleWorkspaceRefreshBoundary);
+  window.removeEventListener("online", handleWorkspaceRefreshBoundary);
+  document.removeEventListener("visibilitychange", handleWorkspaceRefreshVisibility);
+  workspaceRefreshListenersInstalled = false;
+}
+
+export function workspaceRefreshScheduleForTests() {
+  return {
+    activityWindowMs: WORKSPACE_REFRESH_ACTIVITY_WINDOW_MS,
+    inFlight: workspaceRefreshInFlight !== null,
+    lastActivityAt: workspaceRefreshLastActivityAt,
+    timerArmed: workspaceRefreshTimer !== null,
+  };
+}
+
+export async function workspaceRefreshIdleForTests() {
+  while (workspaceRefreshInFlight) await workspaceRefreshInFlight;
+}
+
+function startWorkspaceRefreshLoop() {
+  if (typeof window === "undefined") return;
+  installWorkspaceRefreshListeners();
+  workspaceRefreshLastActivityAt = Date.now();
+  scheduleWorkspaceRefreshTick();
 }
 
 
@@ -4282,6 +7465,50 @@ async function hydrateBlocksFromCache(pageId: string): Promise<boolean> {
   return true;
 }
 
+async function cacheCurrentComments(pageId: string) {
+  const userId = outboxUserId();
+  if (!userId) return;
+  const comments = useStore.getState().commentsByPage[pageId] ?? [];
+  await Promise.all([
+    cacheReplaceTable(
+      userId,
+      recordCacheTables.comments(pageId),
+      comments.map((comment) => ({ id: comment.id, value: comment }))
+    ),
+    cacheSetMeta(userId, recordCacheMeta.commentsCachedAt(pageId), Date.now()),
+    // Comments can be loaded from UpdatesPanel without loading page blocks.
+    // Share the page-surface LRU so those comment-only tables stay bounded.
+    stampBlocksCached(userId, pageId),
+  ]);
+}
+
+async function hydrateCommentsFromCache(pageId: string): Promise<boolean> {
+  const userId = outboxUserId();
+  if (!userId || permanentDeleteIds(userId).has(pageId)) return false;
+  const cachedAt = await cacheGetMeta<number>(
+    userId,
+    recordCacheMeta.commentsCachedAt(pageId)
+  );
+  if (!cachedAt) return false;
+  const [records, entries] = await Promise.all([
+    cacheListTable<Comment>(userId, recordCacheTables.comments(pageId)),
+    outboxAllEntries(userId),
+  ]);
+  const comments = overlayOutboxOnComments(
+    entries,
+    pageId,
+    records.map((record) => record.value)
+  );
+  useStore.setState((state) => {
+    if (state.loadedCommentPages.has(pageId)) return {};
+    return {
+      commentsByPage: { ...state.commentsByPage, [pageId]: comments },
+      loadedCommentPages: new Set(state.loadedCommentPages).add(pageId),
+    };
+  });
+  return true;
+}
+
 async function hydrateDatabaseMetaFromCache(dbId: string): Promise<boolean> {
   const userId = outboxUserId();
   if (!userId || permanentDeleteIds(userId).has(dbId)) return false;
@@ -4307,30 +7534,127 @@ async function hydrateDatabaseMetaFromCache(dbId: string): Promise<boolean> {
 
 function cacheCurrentDatabaseMetadata(dbId: string) {
   const userId = outboxUserId();
-  if (!userId) return;
+  if (!userId) return Promise.resolve();
   const properties = useStore.getState().propsByDb[dbId] ?? [];
   const views = useStore.getState().viewsByDb[dbId] ?? [];
   const templates = useStore.getState().templatesByDb[dbId] ?? [];
-  cacheReplaceTable(
-    userId,
-    recordCacheTables.databaseProperties(dbId),
-    properties.map((property) => ({ id: property.id, value: property }))
+  return Promise.all([
+    cacheReplaceTable(
+      userId,
+      recordCacheTables.databaseProperties(dbId),
+      properties.map((property) => ({ id: property.id, value: property }))
+    ),
+    cacheReplaceTable(
+      userId,
+      recordCacheTables.databaseViews(dbId),
+      views.map((view) => ({ id: view.id, value: view }))
+    ),
+    cacheReplaceTable(
+      userId,
+      recordCacheTables.databaseTemplates(dbId),
+      templates.map((template) => ({ id: template.id, value: template }))
+    ),
+  ]).then(() => undefined);
+}
+
+async function applyEmbeddedDatabaseSnapshots(
+  snapshots: DatabaseSnapshotResult[],
+  sourceToken: ReadApplicationToken
+) {
+  if (snapshots.length === 0) return;
+  const deleted = permanentDeleteIds(outboxUserId());
+  const accepted = snapshots.filter(
+    (snapshot, index, all) =>
+      !deleted.has(snapshot.databaseId) &&
+      all.findIndex((candidate) => candidate.databaseId === snapshot.databaseId) === index
   );
-  cacheReplaceTable(
-    userId,
-    recordCacheTables.databaseViews(dbId),
-    views.map((view) => ({ id: view.id, value: view }))
+  if (accepted.length === 0) return;
+
+  await Promise.all(
+    accepted.map((snapshot) => {
+      const dbId = snapshot.databaseId;
+      const metadataToken = deriveReadApplication(
+        sourceToken,
+        readApplicationKey.databaseMetadata(dbId),
+        readApplicationKey.databaseScope(dbId)
+      );
+      return applyLatestRead(metadataToken, async () => {
+        // Publish each schema received with the blocks response immediately.
+        // A direct metadata request that started later owns a newer token and
+        // prevents this embedded snapshot from replacing it.
+        useStore.setState((state) => {
+          const pagesById = { ...state.pagesById };
+          const resolvedTitle = snapshot.resolvedDatabaseTitle?.trim();
+          if (resolvedTitle && pagesById[dbId]) {
+            const page = pagesById[dbId];
+            pagesById[dbId] = {
+              ...page,
+              properties: {
+                ...(page.properties ?? {}),
+                notionLinkedDatabaseResolvedTitle: resolvedTitle,
+                notionLinkedDatabaseResolvedId: snapshot.resolvedDatabaseId,
+                notionLinkedDatabaseResolvedFromNotionId: snapshot.resolvedFromNotionDatabaseId,
+              },
+            };
+          }
+          databaseMetadataRevalidated.add(dbId);
+          return {
+            pagesById,
+            propsByDb: {
+              ...state.propsByDb,
+              [dbId]: snapshot.properties.slice().sort(bySortPos),
+            },
+            viewsByDb: {
+              ...state.viewsByDb,
+              [dbId]: mergeById(state.viewsByDb[dbId], snapshot.views),
+            },
+            templatesByDb: {
+              ...state.templatesByDb,
+              [dbId]: mergeById(state.templatesByDb[dbId], snapshot.templates),
+            },
+          };
+        });
+
+        const cacheUserId = outboxUserId();
+        if (!cacheUserId) return;
+        await Promise.all([
+          cacheCurrentDatabaseMetadata(dbId),
+          cacheSetMeta(
+            cacheUserId,
+            recordCacheMeta.databaseMetadataStamp(dbId),
+            currentChangesSyncedAt || ""
+          ),
+          stampDatabaseCached(cacheUserId, dbId),
+        ]);
+      });
+    })
   );
-  cacheReplaceTable(
+}
+
+function purgePagesFromBootstrapCache(userId: string, pageIds: Iterable<string>) {
+  if (!userId || !bootKey) return Promise.resolve();
+  const doomed = new Set(pageIds);
+  return cacheUpdateMeta<WorkspaceBootstrapResult>(
     userId,
-    recordCacheTables.databaseTemplates(dbId),
-    templates.map((template) => ({ id: template.id, value: template }))
+    recordCacheMeta.bootstrap(bootKey),
+    (current) => {
+      if (!current) return undefined;
+      const pageRoles = { ...(current.pageRoles ?? {}) };
+      for (const pageId of doomed) delete pageRoles[pageId];
+      return {
+        ...current,
+        pages: (current.pages ?? []).filter((page) => !doomed.has(page.id)),
+        pageRoles,
+        sharedPageIds: (current.sharedPageIds ?? []).filter((pageId) => !doomed.has(pageId)),
+      };
+    }
   );
 }
 
 export interface CachedRowsMeta {
   hasMore: boolean;
   nextOffset?: number;
+  nextCursor?: string;
   queryKey: string;
   rowIds: string[];
   totalCount?: number;
@@ -4367,7 +7691,12 @@ function feedSaysUnchanged(dbId: string, cacheStamp: string | undefined): boolea
 async function hydrateRowsViaLocalEngine(
   dbId: string,
   queryKey: string,
-  normalized: { currentPageId: string; search: string; viewId: string }
+  normalized: {
+    currentPageId: string;
+    search: string;
+    subitemParentId: string | null;
+    viewId: string;
+  }
 ): Promise<boolean> {
   const userId = outboxUserId();
   if (!userId) return false;
@@ -4402,7 +7731,11 @@ async function hydrateRowsViaLocalEngine(
   );
   const baseRows = effectiveRowIds
     .map((id) => rowsById.get(id))
-    .filter((row): row is Page => !!row);
+    .filter((row): row is Page => !!row)
+    .filter((row) => (
+      normalized.subitemParentId === null
+      || (row.subitemParentId ?? "") === normalized.subitemParentId
+    ));
   const pagesForContext: Record<string, Page> = { ...state.pagesById };
   for (const page of related) pagesForContext[page.id] = pagesForContext[page.id] ?? page;
   for (const row of baseRows) pagesForContext[row.id] = row;
@@ -4441,6 +7774,7 @@ async function hydrateRowsViaLocalEngine(
           totalCount: filtered.length,
           hasMore: false,
           nextOffset: undefined,
+          nextCursor: undefined,
           loading: false,
           loadingMore: false,
           error: undefined,
@@ -4452,7 +7786,12 @@ async function hydrateRowsViaLocalEngine(
   return true;
 }
 
-async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Promise<boolean> {
+async function hydrateDatabaseRowsFromCache(
+  dbId: string,
+  queryKey: string,
+  options: { replaceVisibleRows?: boolean; signal?: AbortSignal } = {}
+): Promise<boolean> {
+  if (options.signal?.aborted) return false;
   const userId = outboxUserId();
   if (!userId || permanentDeleteIds(userId).has(dbId)) return false;
   // Per-view caches (Phase 3 v2): each first-page query caches under its own
@@ -4460,13 +7799,15 @@ async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Pro
   const keys = databaseRowCacheKeys(dbId, queryKey);
   const meta = await cacheGetMeta<CachedRowsMeta>(userId, keys.meta);
   if (!meta || meta.queryKey !== queryKey) return false;
-  lastHydratedRowsFeedStamp.set(dbId, meta.feedStamp ?? "");
+  if (options.signal?.aborted) return false;
   const [rowRecords, relatedRecords, entries] = await Promise.all([
     cacheListTable<Page>(userId, keys.dataTable),
     cacheListTable<Page>(userId, keys.relatedPagesTable),
     outboxAllEntries(userId),
   ]);
   const deleted = permanentDeleteIds(userId);
+  if (options.signal?.aborted) return false;
+  lastHydratedRowsFeedStamp.set(dbId, meta.feedStamp ?? "");
   const rows = overlayOutboxOnPages(entries, rowRecords.map((record) => record.value)).filter(
     (page) => !deleted.has(page.id)
   );
@@ -4480,9 +7821,10 @@ async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Pro
   const rowIds = meta.rowIds.filter((id) => !deleted.has(id));
   if (rowIds.some((id) => !rowsById.has(id))) return false;
   useStore.setState((s) => {
+    if (options.signal?.aborted) return {};
     const current = s.databaseRowPagesByDb[dbId];
     if (current?.queryKey !== queryKey) return {};
-    if ((s.databaseRowIdsByDb[dbId] ?? []).length) return {};
+    if (!options.replaceVisibleRows && (s.databaseRowIdsByDb[dbId] ?? []).length) return {};
     const pagesById = { ...s.pagesById };
     for (const page of related) {
       pagesById[page.id] = pagesById[page.id] ?? page;
@@ -4506,6 +7848,7 @@ async function hydrateDatabaseRowsFromCache(dbId: string, queryKey: string): Pro
           totalCount: meta.totalCount,
           hasMore: meta.hasMore,
           nextOffset: meta.nextOffset,
+          nextCursor: meta.nextCursor,
           // The background refresh is still running; keep the loading flag so
           // consumers can show a refresh affordance without hiding rows.
           loading: true,
@@ -4538,11 +7881,53 @@ export type DatabaseRowsQuery = {
   viewId?: string;
   search?: string;
   currentPageId?: string;
+  /** Exact hierarchy window: "" selects roots, an id selects that parent's children. */
+  subitemParentId?: string;
   force?: boolean;
   limit?: number;
   offset?: number;
+  /** Opaque backend continuation; excluded from the durable query key. */
+  cursor?: string;
   reset?: boolean;
+  /** Ephemeral caller cancellation; excluded from the durable query key. */
+  signal?: AbortSignal;
 };
+
+export type ConfigureDatabaseTaskFeatureOptions =
+  | {
+      databaseId: string;
+      enabled: false;
+      feature: "dependencies" | "subitems";
+      propertyDisposition: "keep" | "remove";
+    }
+  | {
+      childrenPropertyName: string;
+      databaseId: string;
+      enabled?: true;
+      feature: "subitems";
+      nestedPropertyId?: string;
+      parentPropertyName: string;
+      showToggleOnTitle?: boolean;
+    }
+  | ({
+      avoidWeekends: boolean;
+      databaseId: string;
+      enabled?: true;
+      feature: "dependencies";
+      predecessorPropertyName: string;
+      shiftMode: "overlap" | "maintain_spacing" | "none";
+      successorPropertyName: string;
+    } & (
+      | {
+          dateMode?: "range";
+          datePropertyId: string;
+        }
+      | {
+          dateMode: "separate";
+          endDatePropertyId: string;
+          startDatePropertyId: string;
+        }
+    ));
 
 export type LoadDatabaseOptions = {
   force?: boolean;
@@ -4556,10 +7941,183 @@ export type DatabaseRowPageState = {
   totalCount?: number;
   hasMore: boolean;
   nextOffset?: number;
+  nextCursor?: string;
   loading?: boolean;
   loadingMore?: boolean;
   error?: string;
 };
+
+export type DatabaseSubitemRowWindow = DatabaseRowPageState & {
+  rowIds: string[];
+};
+
+export type DatabaseDependencyPendingMutation = {
+  addRelatedRowIds: string[];
+  mutationId: string;
+  removeRelatedRowIds: string[];
+};
+
+export type DatabaseDependencyRelationState = {
+  canonicalRelatedRowIds: string[];
+  databaseId: string;
+  dependencyRevision: number;
+  direction: DatabaseDependencyDirection;
+  error?: string;
+  hasMore: boolean;
+  loaded: boolean;
+  loading: boolean;
+  loadingMore: boolean;
+  nextCursor?: string;
+  pendingMutations: DatabaseDependencyPendingMutation[];
+  propertyId: string;
+  relatedRowIds: string[];
+  rowId: string;
+};
+
+function databaseDependencyRelationKey(rowId: string, propertyId: string) {
+  return `${rowId}\u001f${propertyId}`;
+}
+
+function applyDependencyRelationPending(
+  canonicalIds: string[],
+  pendingMutations: DatabaseDependencyPendingMutation[],
+) {
+  const ids = canonicalIds.slice();
+  const present = new Set(ids);
+  for (const pending of pendingMutations) {
+    for (const id of pending.removeRelatedRowIds) {
+      present.delete(id);
+    }
+    for (const id of pending.addRelatedRowIds) {
+      if (!present.has(id)) ids.push(id);
+      present.add(id);
+    }
+  }
+  return ids.filter((id) => present.has(id));
+}
+
+function mergeDatabaseDependencyRelationAuthority(
+  result: DatabaseDependencyRelationResult,
+  options: { append?: boolean; settledMutationId?: string } = {},
+) {
+  useStore.setState((state) => {
+    const key = databaseDependencyRelationKey(result.rowId, result.propertyId);
+    const current = state.databaseDependencyRelations[key];
+    const pendingMutations = (current?.pendingMutations ?? []).filter(
+      (pending) => pending.mutationId !== options.settledMutationId
+    );
+    const canAppend = options.append === true
+      && current?.dependencyRevision === result.dependencyRevision;
+    const incomingCanonical = canAppend
+      ? Array.from(new Set([
+          ...(current?.canonicalRelatedRowIds ?? []),
+          ...result.relatedRowIds,
+        ]))
+      : result.relatedRowIds;
+    const keepNewer = !!current
+      && current.dependencyRevision > result.dependencyRevision;
+    const canonicalRelatedRowIds = keepNewer
+      ? current.canonicalRelatedRowIds
+      : incomingCanonical;
+    const hydratedRelationTargetIds = new Set(state.hydratedRelationTargetIds);
+    for (const id of result.relatedRowIds) hydratedRelationTargetIds.add(id);
+    return {
+      databaseDependencyRelations: {
+        ...state.databaseDependencyRelations,
+        [key]: {
+          canonicalRelatedRowIds,
+          databaseId: result.databaseId,
+          dependencyRevision: keepNewer
+            ? current.dependencyRevision
+            : result.dependencyRevision,
+          direction: result.direction,
+          hasMore: keepNewer ? current.hasMore : result.hasMore,
+          loaded: true,
+          loading: false,
+          loadingMore: false,
+          ...(keepNewer
+            ? (current.nextCursor ? { nextCursor: current.nextCursor } : {})
+            : (result.nextCursor ? { nextCursor: result.nextCursor } : {})),
+          pendingMutations,
+          propertyId: result.propertyId,
+          relatedRowIds: applyDependencyRelationPending(
+            canonicalRelatedRowIds,
+            pendingMutations,
+          ),
+          rowId: result.rowId,
+        },
+      },
+      hydratedRelationTargetIds,
+    };
+  });
+}
+
+function dropDatabaseDependencyPendingMutation(
+  rowId: string,
+  propertyId: string,
+  mutationId: string,
+) {
+  useStore.setState((state) => {
+    const key = databaseDependencyRelationKey(rowId, propertyId);
+    const current = state.databaseDependencyRelations[key];
+    if (!current) return {};
+    const pendingMutations = current.pendingMutations.filter(
+      (pending) => pending.mutationId !== mutationId
+    );
+    return {
+      databaseDependencyRelations: {
+        ...state.databaseDependencyRelations,
+        [key]: {
+          ...current,
+          loading: false,
+          loadingMore: false,
+          pendingMutations,
+          relatedRowIds: applyDependencyRelationPending(
+            current.canonicalRelatedRowIds,
+            pendingMutations,
+          ),
+        },
+      },
+    };
+  });
+}
+
+function pruneDatabaseDependencyRelations(
+  current: Record<string, DatabaseDependencyRelationState>,
+  deletedIds: Set<string>,
+) {
+  return Object.fromEntries(Object.entries(current).filter(([, relation]) => (
+    !deletedIds.has(relation.databaseId)
+    && !deletedIds.has(relation.rowId)
+    && !deletedIds.has(relation.propertyId)
+  )));
+}
+
+function pruneDatabaseSubitemRowWindows(
+  current: Record<string, Record<string, DatabaseSubitemRowWindow>>,
+  deletedIds: Set<string>
+) {
+  const next: Record<string, Record<string, DatabaseSubitemRowWindow>> = {};
+  for (const [databaseId, byParent] of Object.entries(current)) {
+    if (deletedIds.has(databaseId)) continue;
+    const retained: Record<string, DatabaseSubitemRowWindow> = {};
+    for (const [parentId, window] of Object.entries(byParent)) {
+      if (deletedIds.has(parentId)) continue;
+      const rowIds = window.rowIds.filter((rowId) => !deletedIds.has(rowId));
+      const removedCount = window.rowIds.length - rowIds.length;
+      retained[parentId] = {
+        ...window,
+        rowIds,
+        loadedCount: Math.max(0, window.loadedCount - removedCount),
+        ...(typeof window.totalCount === "number"
+          ? { totalCount: Math.max(0, window.totalCount - removedCount) }
+          : {}),
+      };
+    }
+    if (Object.keys(retained).length > 0) next[databaseId] = retained;
+  }
+  return next;
+}
 
 function databaseRowPageSatisfiesInitialLoad(
   current: DatabaseRowPageState | undefined,
@@ -4576,7 +8134,9 @@ function databaseRowPageSatisfiesInitialLoad(
   if (current.totalCount !== undefined) {
     return current.loadedCount >= Math.min(limit, current.totalCount);
   }
-  if (current.loadedCount === 0 && current.hasMore === false) return true;
+  if (current.loadedCount === 0) {
+    return current.hasMore === false || typeof current.nextCursor === "string";
+  }
   return current.loadedCount > 0 && (current.loadedCount >= limit || current.hasMore === false);
 }
 
@@ -4585,11 +8145,195 @@ function normalizeDatabaseRowsQuery(query: DatabaseRowsQuery = {}) {
     viewId: query.viewId?.trim() || "",
     search: query.search?.trim() || "",
     currentPageId: query.currentPageId?.trim() || "",
+    subitemParentId:
+      typeof query.subitemParentId === "string"
+        ? query.subitemParentId.trim()
+        : null,
   };
 }
 
 export function databaseRowsQueryKey(query: DatabaseRowsQuery = {}) {
   return JSON.stringify(normalizeDatabaseRowsQuery(query));
+}
+
+type RecentDatabaseRowsQuery = {
+  authorityGeneration: number;
+  databaseId: string;
+  dataEpoch: number;
+  page: DatabaseRowPageState;
+  propsSource: DbProperty[] | undefined;
+  queryKey: string;
+  rowIds: string[];
+  scopeKey: string;
+  viewsSource: DbView[] | undefined;
+};
+
+const MAX_RECENT_DATABASE_ROW_QUERIES_PER_DB = 3;
+const MAX_RECENT_DATABASE_ROW_QUERY_COUNT = 256;
+const MAX_RECENT_DATABASE_ROW_IDS = 50_000;
+const recentDatabaseRowsQueries = new Map<string, RecentDatabaseRowsQuery>();
+const recentDatabaseRowsAuthority = new Map<string, number>();
+let recentDatabaseRowsQueryIdCount = 0;
+let recentDatabaseRowsAuthorityClock = 0;
+let recentDatabaseRowsAuthorityBase = 0;
+
+function recentDatabaseRowsQueryMapKey(databaseId: string, queryKey: string) {
+  return JSON.stringify([databaseId, queryKey]);
+}
+
+function recentDatabaseRowsScopeKey(
+  state: Pick<AppState, "activeDataScope" | "userId" | "workspace">
+) {
+  const scope = state.activeDataScope;
+  const mountedScope = scope
+    ? scope.kind === "public_share"
+      ? `public:${scope.workspaceId}:${scope.shareKey}`
+      : `workspace:${scope.workspaceId}`
+    : `workspace:${state.workspace?.id ?? ""}`;
+  return `${state.userId ?? ""}:${mountedScope}`;
+}
+
+function deleteRecentDatabaseRowsQuery(mapKey: string) {
+  const snapshot = recentDatabaseRowsQueries.get(mapKey);
+  if (!snapshot) return;
+  recentDatabaseRowsQueryIdCount -= snapshot.rowIds.length;
+  recentDatabaseRowsQueries.delete(mapKey);
+}
+
+function resetRecentDatabaseRowsQueries() {
+  recentDatabaseRowsQueries.clear();
+  recentDatabaseRowsAuthority.clear();
+  recentDatabaseRowsQueryIdCount = 0;
+  recentDatabaseRowsAuthorityClock = 0;
+  recentDatabaseRowsAuthorityBase = 0;
+}
+
+function clearRecentDatabaseRowsQueries(databaseId?: string) {
+  if (databaseId === undefined) {
+    recentDatabaseRowsQueries.clear();
+    recentDatabaseRowsQueryIdCount = 0;
+    recentDatabaseRowsAuthorityClock += 1;
+    recentDatabaseRowsAuthorityBase = recentDatabaseRowsAuthorityClock;
+    recentDatabaseRowsAuthority.clear();
+    return;
+  }
+  recentDatabaseRowsAuthorityClock += 1;
+  recentDatabaseRowsAuthority.set(databaseId, recentDatabaseRowsAuthorityClock);
+  for (const [mapKey, snapshot] of recentDatabaseRowsQueries) {
+    if (snapshot.databaseId === databaseId) deleteRecentDatabaseRowsQuery(mapKey);
+  }
+}
+
+function currentDatabaseRowsAuthority(databaseId: string) {
+  return recentDatabaseRowsAuthority.get(databaseId) ?? recentDatabaseRowsAuthorityBase;
+}
+
+function cacheRecentDatabaseRowsQuery(
+  databaseId: string,
+  queryKey: string,
+  state: Pick<
+    AppState,
+    | "activeDataScope"
+    | "databaseRowIdsByDb"
+    | "databaseRowPagesByDb"
+    | "pagesById"
+    | "propsByDb"
+    | "userId"
+    | "viewsByDb"
+    | "workspace"
+  >,
+  expectedAuthorityGeneration: number,
+  expectedPropsSource: DbProperty[] | undefined,
+  expectedViewsSource: DbView[] | undefined
+) {
+  const page = state.databaseRowPagesByDb[databaseId];
+  const rowIds = state.databaseRowIdsByDb[databaseId] ?? [];
+  if (
+    !page ||
+    page.queryKey !== queryKey ||
+    page.loading ||
+    page.loadingMore ||
+    page.error ||
+    currentDatabaseRowsAuthority(databaseId) !== expectedAuthorityGeneration ||
+    state.propsByDb[databaseId] !== expectedPropsSource ||
+    state.viewsByDb[databaseId] !== expectedViewsSource ||
+    rowIds.length > MAX_RECENT_DATABASE_ROW_IDS ||
+    rowIds.some((rowId) => {
+      const row = state.pagesById[rowId];
+      return !row || row.parentType !== "database" || row.parentId !== databaseId;
+    })
+  ) {
+    return;
+  }
+
+  const mapKey = recentDatabaseRowsQueryMapKey(databaseId, queryKey);
+  deleteRecentDatabaseRowsQuery(mapKey);
+  const snapshot: RecentDatabaseRowsQuery = {
+    authorityGeneration: expectedAuthorityGeneration,
+    databaseId,
+    dataEpoch: workspaceDataEpoch,
+    page: { ...page, loading: false, loadingMore: false, error: undefined },
+    propsSource: expectedPropsSource,
+    queryKey,
+    rowIds: rowIds.slice(),
+    scopeKey: recentDatabaseRowsScopeKey(state),
+    viewsSource: expectedViewsSource,
+  };
+  recentDatabaseRowsQueries.set(mapKey, snapshot);
+  recentDatabaseRowsQueryIdCount += snapshot.rowIds.length;
+
+  const databaseSnapshotKeys = Array.from(recentDatabaseRowsQueries)
+    .filter(([, candidate]) => candidate.databaseId === databaseId)
+    .map(([candidateKey]) => candidateKey);
+  while (databaseSnapshotKeys.length > MAX_RECENT_DATABASE_ROW_QUERIES_PER_DB) {
+    const oldestDatabaseKey = databaseSnapshotKeys.shift();
+    if (oldestDatabaseKey !== undefined) deleteRecentDatabaseRowsQuery(oldestDatabaseKey);
+  }
+  while (
+    recentDatabaseRowsQueries.size > MAX_RECENT_DATABASE_ROW_QUERY_COUNT ||
+    recentDatabaseRowsQueryIdCount > MAX_RECENT_DATABASE_ROW_IDS
+  ) {
+    const oldestKey = recentDatabaseRowsQueries.keys().next().value;
+    if (oldestKey === undefined) break;
+    deleteRecentDatabaseRowsQuery(oldestKey);
+  }
+}
+
+function readRecentDatabaseRowsQuery(
+  databaseId: string,
+  queryKey: string,
+  limit: number,
+  state: Pick<
+    AppState,
+    | "activeDataScope"
+    | "pagesById"
+    | "propsByDb"
+    | "userId"
+    | "viewsByDb"
+    | "workspace"
+  >
+) {
+  const mapKey = recentDatabaseRowsQueryMapKey(databaseId, queryKey);
+  const snapshot = recentDatabaseRowsQueries.get(mapKey);
+  if (!snapshot) return undefined;
+  if (
+    snapshot.dataEpoch !== workspaceDataEpoch ||
+    snapshot.scopeKey !== recentDatabaseRowsScopeKey(state) ||
+    snapshot.authorityGeneration !== currentDatabaseRowsAuthority(databaseId) ||
+    snapshot.propsSource !== state.propsByDb[databaseId] ||
+    snapshot.viewsSource !== state.viewsByDb[databaseId] ||
+    !databaseRowPageSatisfiesInitialLoad(snapshot.page, queryKey, limit) ||
+    snapshot.rowIds.some((rowId) => {
+      const row = state.pagesById[rowId];
+      return !row || row.parentType !== "database" || row.parentId !== databaseId;
+    })
+  ) {
+    deleteRecentDatabaseRowsQuery(mapKey);
+    return undefined;
+  }
+  recentDatabaseRowsQueries.delete(mapKey);
+  recentDatabaseRowsQueries.set(mapKey, snapshot);
+  return { page: { ...snapshot.page }, rowIds: snapshot.rowIds.slice() };
 }
 
 function appendUniqueIds(current: string[], additions: string[]) {
@@ -4660,6 +8404,15 @@ export type RowFileRemovalStatus = "dropped" | "ignored" | "ok" | "queued";
 
 export interface AppState {
   ready: boolean;
+  /** Definitive server denial for the route whose bootstrap was rejected.
+   *  Kept in the store so a cache discard/remount cannot fall back to an
+   *  indefinite loading screen before AppShell receives the rejected promise. */
+  bootstrapFailure?: {
+    message: string;
+    status?: number;
+    pageId?: string;
+    workspaceSlug?: string;
+  };
   /** True when mutations keep failing while the browser reports online —
    *  i.e. the server is unreachable (dead wifi, server down). */
   syncDegraded: boolean;
@@ -4686,7 +8439,11 @@ export interface AppState {
   workspace?: Workspace;
   /** Which authority produced the records currently mounted in the shared maps. */
   activeDataScope?:
-    | { kind: "workspace"; workspaceId: string }
+    | {
+        kind: "workspace";
+        membershipAuthority: "cached" | "fresh";
+        workspaceId: string;
+      }
     | { kind: "public_share"; shareKey: string; workspaceId: string };
   workspaces: Workspace[];
   /** Whether the signed-in account is an instance administrator (server console). */
@@ -4703,6 +8460,7 @@ export interface AppState {
   organizationScimTokens: OrganizationScimToken[];
   organizationLegalHolds: OrganizationLegalHold[];
   organizationAuditExports: OrganizationAuditExport[];
+  organizationDiscoveryExports: OrganizationDiscoveryExport[];
   organizationBillingRecords: OrganizationBillingRecord[];
   applyOrganizationDirectory: (directory: OrganizationStateResult) => void;
   updateWorkspace: (patch: Partial<Workspace>) => Promise<Workspace | undefined>;
@@ -4713,6 +8471,9 @@ export interface AppState {
   currentMember?: WorkspaceMember;
   workspaceMembers: WorkspaceMember[];
   applyWorkspaceMembers: (members: WorkspaceMember[], currentMember?: WorkspaceMember) => void;
+  teamspaces: Teamspace[];
+  discoverableTeamspaces: Teamspace[];
+  teamspaceSettings?: TeamspaceSettings;
   pagesById: Record<string, Page>;
   pageRolesById: Record<string, ShareRole>;
   sharedPageIds: Set<string>;
@@ -4750,6 +8511,7 @@ export interface AppState {
   createPage: (opts: {
     parentId: string | null;
     parentType: PageParentType;
+    teamspaceId?: string | null;
     title?: string;
     kind?: PageKind;
     afterPosition?: number;
@@ -4757,12 +8519,16 @@ export interface AppState {
     focusTarget?: FocusPageTarget;
     focusTitle?: boolean;
   }) => Promise<Page>;
-  applyRemotePage: (page: Page) => void;
+  applyRemotePage: (page: Page) => Promise<void>;
   applyRemotePagePatch: (id: string, patch: Partial<Page>) => void;
   refreshWorkspacePages: () => Promise<void>;
   refreshPageAccess: (pageId: string) => Promise<void>;
   applySharedPageSnapshot: (snapshot: SharedPageResult, shareKey: string) => void;
-  updatePage: (id: string, patch: Partial<Page>, opts?: { debounce?: boolean }) => void;
+  updatePage: (
+    id: string,
+    patch: Partial<Page>,
+    opts?: { debounce?: boolean; debounceMs?: number }
+  ) => void;
   trashPage: (id: string) => Promise<void>;
   restorePage: (id: string) => Promise<void>;
   canPermanentlyDeletePage: (id: string) => boolean;
@@ -4800,6 +8566,7 @@ export interface AppState {
     plainText?: string;
     position: number;
     history?: BlockHistoryMode | false;
+    deferPersistUntilMutation?: boolean;
     persist?: boolean;
   }) => Block;
   /**
@@ -4813,15 +8580,16 @@ export interface AppState {
   updateBlock: (
     id: string,
     patch: Partial<Block>,
-    opts?: { debounce?: boolean; history?: BlockHistoryMode | false }
+    opts?: {
+      debounce?: boolean;
+      debounceMs?: number;
+      history?: BlockHistoryMode | false;
+      pageId?: string;
+    }
   ) => void;
   applyRemoteBlockText: (
     id: string,
     patch: Pick<Partial<Block>, "content" | "plainText" | "updatedAt">
-  ) => void;
-  applyRemoteBlockStructure: (
-    pageId: string,
-    operation: CollaborationBlockStructureOperation
   ) => void;
   deleteBlock: (id: string, opts?: { history?: BlockHistoryMode | false }) => Promise<void>;
   moveBlockToPage: (id: string, targetPageId: string) => Promise<void>;
@@ -4837,9 +8605,16 @@ export interface AppState {
   ) => void;
   undoBlockChange: (pageId: string) => Promise<boolean>;
   redoBlockChange: (pageId: string) => Promise<boolean>;
+  runPageButton: (
+    pageId: string,
+    blockId: string,
+    confirmationToken?: string,
+  ) => Promise<import("./edgebase").ExecutePageButtonResult | undefined>;
+  discardPageButtonExecution: (pageId: string, blockId: string) => void;
 
   // comments ------------------------------------------------------------
   loadComments: (pageId: string, opts?: { force?: boolean }) => Promise<void>;
+  refreshCommentsFromSignal: (pageId: string) => Promise<void>;
   pageComments: (pageId: string) => Comment[];
   addComment: (
     pageId: string,
@@ -4859,10 +8634,34 @@ export interface AppState {
   loadedDbs: Set<string>;
   databaseRowIdsByDb: Record<string, string[]>;
   databaseRowPagesByDb: Record<string, DatabaseRowPageState>;
+  databaseSubitemRowWindowsByDb: Record<
+    string,
+    Record<string, DatabaseSubitemRowWindow>
+  >;
+  databaseDependencyRelations: Record<string, DatabaseDependencyRelationState>;
   hydratedRelationTargetIds: Set<string>;
+  databaseDependencyRelation: (
+    rowId: string,
+    propertyId: string
+  ) => DatabaseDependencyRelationState | undefined;
+  loadDatabaseDependencyRelation: (
+    rowId: string,
+    propertyId: string,
+    options?: { append?: boolean; force?: boolean }
+  ) => Promise<void>;
   loadDatabase: (dbId: string, options?: LoadDatabaseOptions) => Promise<void>;
   loadDatabaseRows: (dbId: string, query?: DatabaseRowsQuery) => Promise<void>;
   loadMoreDatabaseRows: (dbId: string, query?: DatabaseRowsQuery) => Promise<void>;
+  loadDatabaseSubitemRows: (
+    dbId: string,
+    parentId: string,
+    query?: DatabaseRowsQuery
+  ) => Promise<void>;
+  loadMoreDatabaseSubitemRows: (
+    dbId: string,
+    parentId: string,
+    query?: DatabaseRowsQuery
+  ) => Promise<void>;
   warmDatabaseRowDetail: (dbId: string, rowId: string) => void;
   dbProperties: (dbId: string) => DbProperty[];
   dbViews: (dbId: string) => DbView[];
@@ -4874,9 +8673,19 @@ export interface AppState {
     title?: string;
     afterPosition?: number;
     viewType?: Extract<ViewType, "table" | "board" | "list" | "gallery" | "calendar" | "timeline">;
+    /** Explicitly opt in to three durable starter rows. Omission creates none. */
     seedRows?: boolean;
     properties?: Parameters<typeof createDatabaseRemote>[0]["properties"];
   }) => Promise<Page>;
+  configureDatabaseTaskFeature: (
+    input: ConfigureDatabaseTaskFeatureOptions
+  ) => Promise<"dropped" | "ok" | "queued">;
+  runDatabaseButton: (
+    rowId: string,
+    propertyId: string,
+    confirmationToken?: string,
+  ) => Promise<import("./edgebase").ExecuteDatabaseButtonResult | undefined>;
+  discardDatabaseButtonExecution: (rowId: string, propertyId: string) => void;
   addProperty: (
     dbId: string,
     type: PropertyType,
@@ -4904,6 +8713,8 @@ export interface AppState {
     opts?: { config?: ViewConfig; position?: number }
   ) => Promise<DbView | null>;
   updateView: (id: string, patch: Partial<DbView>) => void;
+  /** Apply a server-owned compound mutation result without issuing a second write. */
+  applyConfiguredView: (view: DbView) => void;
   deleteView: (id: string) => Promise<DbView | null>;
   restoreDeletedView: (view: DbView) => Promise<boolean>;
   addTemplate: (dbId: string, name?: string) => Promise<DbTemplate | null>;
@@ -4918,6 +8729,7 @@ export interface AppState {
     opts?: { focusTitle?: boolean }
   ) => Promise<Page>;
   moveDatabaseRow: (rowId: string, targetId: string, side: "before" | "after") => Promise<Page | undefined>;
+  reparentDatabaseSubitem: (rowId: string, targetParentId: string) => Promise<Page | undefined>;
   setRowProperty: (
     rowId: string,
     propId: string,
@@ -4930,7 +8742,15 @@ export interface AppState {
     propertyId: string;
     rowId: string;
   }) => Promise<RowFileRemovalStatus>;
-  setRelation: (rowId: string, prop: DbProperty, nextIds: string[]) => void;
+  addDatabaseDependency: (
+    rowId: string,
+    predecessorRowId: string
+  ) => Promise<"dropped" | "ok" | "queued" | undefined>;
+  setRelation: (
+    rowId: string,
+    prop: DbProperty,
+    nextIds: string[]
+  ) => Promise<"dropped" | "ok" | "queued" | undefined>;
 }
 
 function canEditPageInState(state: AppState, page: Page | undefined, userId = state.userId) {
@@ -5023,11 +8843,20 @@ function canPermanentlyDeletePageInState(
 function canCreatePageInState(
   state: AppState,
   parentId: string | null | undefined,
-  userId = state.userId
+  userId = state.userId,
+  teamspaceId?: string | null
 ) {
   if (state.activeDataScope?.kind === "public_share") return false;
   if (parentId) {
     return canEditPageInState(state, state.pagesById[parentId], userId);
+  }
+  if (teamspaceId) {
+    const teamspace = [...state.teamspaces, ...state.discoverableTeamspaces]
+      .find((candidate) => candidate.id === teamspaceId);
+    if (teamspace?.role === "owner") return true;
+    if (teamspace?.role !== "member" || teamspace.membersCanEditSidebar === false) return false;
+    const role = teamspace.memberPageRole;
+    return role === "edit" || role === "full_access";
   }
   return canCreateWorkspacePage({
     workspace: state.workspace,
@@ -5081,8 +8910,16 @@ const pageStoreRuntime = {
   pendingBlockCreate,
   pendingBlockPage,
   pendingPage,
+  pendingPageBase,
+  pendingPageBefore,
+  pendingPageExpectedMutationId,
+  pendingPageMutationId,
+  inFlightPageMutationId,
+  inFlightPagePatch,
   persistPageCreate,
+  persistablePagePatch,
   positionBetween,
+  reconcilePersistedPageMutation: reconcilePersistedPageMutations,
   recordCacheClear,
   remapBlockContent,
   remapViewConfigPropertyIds,
@@ -5092,6 +8929,7 @@ const pageStoreRuntime = {
   storeMessages,
   stripComputedFromPages,
   advanceWorkspaceDataEpoch,
+  clearRecentDatabaseRowsQueries,
   writeRecentPageIds,
   writeTreeExpandedPageIds,
 };
@@ -5101,18 +8939,24 @@ const blockStoreRuntime = {
   EMPTY_BLOCK_LIST,
   HISTORY_LIMIT,
   MERGE_WINDOW_MS,
+  blockStructureInvalidation,
   blockLoadPromises,
-  blockTimers,
+  blockStructureSources,
   blocksCacheFresh,
   byCreated,
   bySortPos,
+  applyEmbeddedDatabaseSnapshots,
+  cacheCurrentComments,
   cacheReplaceTable,
   cacheSetMeta,
   cancelPendingBlock,
   childBlocksCache,
   cloneBlocks,
   consumeLinkedTwin,
+  canEditPageInState,
   durableRemoteCall,
+  ensureAuth,
+  executePageButtonRemote,
   firstDroppedDurableCall,
   flushBlock,
   getPageBlocksRemote,
@@ -5131,23 +8975,31 @@ const blockStoreRuntime = {
   overlayOutboxOnBlocks,
   pendingBlock,
   pendingBlockBase,
+  pendingBlockCreate,
+  pendingBlockExpectedMutationId,
+  pendingBlockMutationId,
   pendingBlockPage,
+  inFlightBlockMutationId,
   pendingPageLikeCreateHas,
   permanentDeleteIds,
+  persistErrorStatus,
   persistBlockCreate,
   persistBlockDelete,
   persistBlockSnapshot,
   persistBlockStructureOperation,
   positionBetween,
+  publishBlockStructureMutation,
+  publishDatabaseRowsMutation,
   publishCommentsMutation,
   reconcilePersistedBlockMutation,
-  recordBlockStructureOperation,
   recordCacheMeta,
   recordCacheTables,
   reloadBlocksFromServer,
   remapBlockContent,
   remoteBlockWithOptimisticOverlay,
+  remotePageWithOptimisticOverlay,
   removeBlocksFromPages,
+  scheduleBlockBatch,
   serializeBlockHistory,
   snapshotsEqual,
   spansToPlainText,
@@ -5165,20 +9017,28 @@ const databaseStoreRuntime = {
   DATABASE_INITIAL_ROW_LIMIT,
   DATABASE_ROW_LOAD_MORE_LIMIT,
   appendUniqueIds,
-  asIdArray,
+  applyEmbeddedDatabaseSnapshots,
   assertDatabaseUnlocked,
   bySortPos,
+  cacheAppendRowPage,
+  cacheClearDatabase,
   cacheCurrentDatabaseMetadata,
   cacheReplaceTable,
   cacheSetMeta,
+  cacheRecentDatabaseRowsQuery,
   canCreatePageInState,
   canEditPageInState,
   cleanUniqueIds,
   cloneJson,
   configChanged,
   createDatabaseRowRemote,
+  configureDatabaseTaskFeatureRemote,
+  executeDatabaseButtonRemote,
+  flushPage,
   currentChangesSyncedAt,
+  currentDatabaseRowsAuthority,
   currentRelativeRouteHref,
+  databaseDependencyRelationKey,
   databaseCreateRowsQueryKey,
   databaseLoadPromises,
   databaseMetadataRevalidated,
@@ -5190,10 +9050,12 @@ const databaseStoreRuntime = {
   databaseRowsLoadErrorMessage,
   databaseRowsQueryKey,
   databaseRowsQueryPromises,
+  clearRecentDatabaseRowsQueries,
   durableRemoteCall,
   ensureAuth,
   feedSaysUnchanged,
   finishOptimisticDatabaseCreate,
+  getDatabaseDependencyRelationRemote,
   getDatabaseRowsRemote,
   getDatabaseSnapshotRemote,
   hasDatabaseTemplateStoredFileReference,
@@ -5204,17 +9066,21 @@ const databaseStoreRuntime = {
   iconTypeForValue,
   isDatabaseLocked,
   isKoreanLocale,
-  isTemplateEditorPageId,
   lastHydratedRowsFeedStamp,
   linkedDatabaseResolvedTitle,
   mergeById,
+  mergePersistedPageCreateAuthority,
+  mergeDatabaseDependencyRelationAuthority,
   mirrorPendingPage,
   moveDatabaseRowRemote,
+  reparentDatabaseSubitemRemote,
   moveIdRelative,
   newId,
   normalizeDatabaseRowsQuery,
   nowIso,
   optimisticStarterDatabaseSchema,
+  projectOptimisticDatabaseSubitem,
+  projectOptimisticRowFileValue,
   outboxUserId,
   pageDisplayTitle,
   pendingDatabaseCreate,
@@ -5225,6 +9091,7 @@ const databaseStoreRuntime = {
   pendingViewCreate,
   permanentDeleteIds,
   persistErrorStatus,
+  purgePagesFromBootstrapCache,
   persistOptimisticTemplateCreate,
   persistableRowProperties,
   positionBetween,
@@ -5234,8 +9101,10 @@ const databaseStoreRuntime = {
   publishDatabaseViewsMutation,
   recordCacheMeta,
   recordValue,
+  readRecentDatabaseRowsQuery,
   registerRowsCacheKey,
   releaseOptimisticCreateDependents,
+  adoptPersistedPageCreateAuthority,
   reloadBlocksFromServer,
   remotePageWithOptimisticOverlay,
   replaceRoute,
@@ -5249,6 +9118,7 @@ const databaseStoreRuntime = {
   startBackgroundDurableCall,
   storeMessages,
   templateTitleValue,
+  updateDatabaseDependencyRelationRemote,
   valueReferencesPendingCreate,
   viewConfigWithoutFilterProperty,
   viewConfigWithoutProperty,
@@ -5258,6 +9128,7 @@ export type DatabaseStoreRuntime = typeof databaseStoreRuntime;
 
 export const useStore = create<AppState>((set, get) => ({
   ready: false,
+  bootstrapFailure: undefined,
   syncDegraded: false,
   sidebarOpen: false,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
@@ -5309,6 +9180,7 @@ export const useStore = create<AppState>((set, get) => ({
   organizationScimTokens: [],
   organizationLegalHolds: [],
   organizationAuditExports: [],
+  organizationDiscoveryExports: [],
   organizationBillingRecords: [],
   applyOrganizationDirectory: (directory) => {
     const organizationProfiles = directory.organizationProfiles ?? get().organizationProfiles;
@@ -5329,6 +9201,7 @@ export const useStore = create<AppState>((set, get) => ({
       organizationScimTokens: directory.organizationScimTokens ?? s.organizationScimTokens,
       organizationLegalHolds: directory.organizationLegalHolds ?? s.organizationLegalHolds,
       organizationAuditExports: directory.organizationAuditExports ?? s.organizationAuditExports,
+      organizationDiscoveryExports: directory.organizationDiscoveryExports ?? s.organizationDiscoveryExports,
       organizationBillingRecords: directory.organizationBillingRecords ?? s.organizationBillingRecords,
       workspaces: directory.workspaces ?? s.workspaces,
     }));
@@ -5389,11 +9262,15 @@ export const useStore = create<AppState>((set, get) => ({
         await get().bootstrap({ workspaceId: next.id });
         return get().workspace ?? next;
       } catch {
+        resetDeferredBlockCreates();
         set({
           ready: false,
           workspace: next,
           currentMember: undefined,
           workspaceMembers: [],
+          teamspaces: [],
+          discoverableTeamspaces: [],
+          teamspaceSettings: undefined,
           pagesById: {},
           pageRolesById: {},
           sharedPageIds: new Set(),
@@ -5410,6 +9287,8 @@ export const useStore = create<AppState>((set, get) => ({
           loadedDbs: new Set(),
           databaseRowIdsByDb: {},
           databaseRowPagesByDb: {},
+          databaseSubitemRowWindowsByDb: {},
+          databaseDependencyRelations: {},
           hydratedRelationTargetIds: new Set(),
           commentPanel: undefined,
         });
@@ -5417,11 +9296,15 @@ export const useStore = create<AppState>((set, get) => ({
       }
     }
     rememberWorkspaceCache(undefined);
+    resetDeferredBlockCreates();
     set({
       ready: false,
       workspace: undefined,
       currentMember: undefined,
       workspaceMembers: [],
+      teamspaces: [],
+      discoverableTeamspaces: [],
+      teamspaceSettings: undefined,
       pagesById: {},
       pageRolesById: {},
       sharedPageIds: new Set(),
@@ -5438,6 +9321,8 @@ export const useStore = create<AppState>((set, get) => ({
       loadedDbs: new Set(),
       databaseRowIdsByDb: {},
       databaseRowPagesByDb: {},
+      databaseSubitemRowWindowsByDb: {},
+      databaseDependencyRelations: {},
       hydratedRelationTargetIds: new Set(),
       commentPanel: undefined,
     });
@@ -5453,6 +9338,9 @@ export const useStore = create<AppState>((set, get) => ({
     return get().workspace;
   },
   workspaceMembers: [],
+  teamspaces: [],
+  discoverableTeamspaces: [],
+  teamspaceSettings: undefined,
   applyWorkspaceMembers: (members, currentMember) => {
     setWorkspacePeople(members, get().organizationProfiles);
     set((s) => ({
@@ -5491,6 +9379,8 @@ export const useStore = create<AppState>((set, get) => ({
   loadedDbs: new Set(),
   databaseRowIdsByDb: {},
   databaseRowPagesByDb: {},
+  databaseSubitemRowWindowsByDb: {},
+  databaseDependencyRelations: {},
   hydratedRelationTargetIds: new Set(),
 
   async bootstrap(input = {}) {
@@ -5509,6 +9399,19 @@ export const useStore = create<AppState>((set, get) => ({
       return;
     }
     if (bootPromise && bootKey === key) return bootPromise;
+    set({ bootstrapFailure: undefined });
+    const previousRefreshLane = bootKey !== key
+      && current.ready
+      && !!current.workspace
+      && bootInputKeyForRefresh === bootKey
+      ? {
+          key: bootKey,
+          input: { ...bootInputForRefresh },
+          workspaceId: current.workspace.id,
+          refreshedAt: workspaceRefreshedAt,
+        }
+      : null;
+    if (bootKey !== key) resetWorkspaceRefreshLoop();
     bootKey = key;
     bootPromise = (async () => {
       // Stale-while-revalidate boot (local-first Phase 1): read the cached
@@ -5551,22 +9454,44 @@ export const useStore = create<AppState>((set, get) => ({
         // and leave stale blocks visible until a later refresh. Revalidate in
         // the already-visible background boot and keep queued outbox edits
         // projected by the forced network load.
-        if (hydrated) await revalidateHydratedCurrentRouteBlocks(input);
+        if (hydrated) {
+          // The warm-cache path started durable replay as soon as local state
+          // was available. Let that authoritative write finish before route
+          // revalidation starts page/block reads; on a small NAS those reads
+          // otherwise contend with recovery and can both slow the save and
+          // exhaust the worker into transient 503s.
+          await replayDurableOutbox(result.userId).catch(() => {});
+          await revalidateHydratedCurrentRouteBlocks(input);
+        }
         rememberLastUserId(result.userId);
         cacheSetMeta(
           result.userId,
           recordCacheMeta.bootstrap(key),
           bootstrapBlobForCache(result)
         );
-        bootInputForRefresh = input;
+        bootInputForRefresh = { ...input };
+        bootInputKeyForRefresh = key;
         workspaceRefreshedAt = Date.now();
         startWorkspaceRefreshLoop();
         // Local-first Phase 0: replay mutations left durably queued by tabs
         // that died before flushing. Fire-and-forget: never blocks boot.
-        void replayDurableOutbox(result.userId).catch(() => {});
+        if (!hydrated) void replayDurableOutbox(result.userId).catch(() => {});
         // Phase 3 v2: eagerly cache pins/favorites/recents for offline use.
-        void warmOfflineScope(result.userId);
+        scheduleWarmOfflineScope(result.userId);
       } catch (error) {
+        const status = persistErrorStatus(error);
+        if (status === 401 || status === 403 || status === 404) {
+          useStore.setState({
+            bootstrapFailure: {
+              message: error instanceof Error ? error.message : String(error),
+              status,
+              ...(input.pageId?.trim() ? { pageId: input.pageId.trim() } : {}),
+              ...(normalizeWorkspaceSlug(input.workspaceSlug)
+                ? { workspaceSlug: normalizeWorkspaceSlug(input.workspaceSlug) }
+                : {}),
+            },
+          });
+        }
         if (!hydrated) throw error;
         // Hydrated render + failed fetch: only a transient/offline failure
         // lets the cache stand (Phase 2 offline boot). A definitive server
@@ -5574,7 +9499,6 @@ export const useStore = create<AppState>((set, get) => ({
         // un-render the cached data (a revoked share, or a previous account
         // on this browser), drop the refuted blob so the next boot fails
         // fast, and surface the denial to the caller.
-        const status = persistErrorStatus(error);
         if (status === 401 || status === 403 || status === 404) {
           const cacheOwnerId = blob?.userId || useStore.getState().userId || "";
           if (cacheOwnerId) cacheSetMeta(cacheOwnerId, recordCacheMeta.bootstrap(key), null);
@@ -5585,8 +9509,27 @@ export const useStore = create<AppState>((set, get) => ({
         if (cachedUserId) void replayDurableOutbox(cachedUserId).catch(() => {});
       }
     })().catch((e) => {
-      bootPromise = null; // allow retry after a failed bootstrap
-      bootKey = "";
+      // A different-key bootstrap may already own the global lane. Never let
+      // this older rejection clear it. When a cold switch failed before
+      // changing live state, restore the successful workspace's poll lane;
+      // otherwise the still-visible workspace would stop refreshing forever.
+      if (bootKey === key) {
+        bootPromise = null; // allow retry after a failed bootstrap
+        const live = useStore.getState();
+        if (
+          previousRefreshLane
+          && live.ready
+          && live.workspace?.id === previousRefreshLane.workspaceId
+        ) {
+          bootKey = previousRefreshLane.key;
+          bootInputForRefresh = { ...previousRefreshLane.input };
+          bootInputKeyForRefresh = previousRefreshLane.key;
+          workspaceRefreshedAt = previousRefreshLane.refreshedAt;
+          startWorkspaceRefreshLoop();
+        } else {
+          bootKey = "";
+        }
+      }
       throw e;
     });
     return bootPromise;
@@ -5649,27 +9592,129 @@ export const useStore = create<AppState>((set, get) => ({
     ) {
       return;
     }
+    const readToken = beginReadApplication(readApplicationKey.comments(pageId));
     const promise = (async () => {
+      const hydrated = !force && !alreadyLoaded
+        ? await hydrateCommentsFromCache(pageId)
+        : false;
+      const hasRenderableComments = alreadyLoaded || hydrated;
       try {
-        const comments = (await getPageCommentsRemote(pageId)).comments.sort(byCreated);
-        if (
-          loadUserId && permanentDeleteIds(loadUserId).has(pageId)
-        ) return;
-        commentFetchedAt.set(pageId, Date.now());
-        set((s) => ({
-          commentsByPage: { ...s.commentsByPage, [pageId]: comments },
-          loadedCommentPages: new Set(s.loadedCommentPages).add(pageId),
-        }));
+        const remoteComments = (await getPageCommentsRemote(pageId)).comments.sort(byCreated);
+        await applyLatestRead(readToken, async () => {
+          if (
+            loadUserId && permanentDeleteIds(loadUserId).has(pageId)
+          ) return;
+          const entries = loadUserId ? await outboxAllEntries(loadUserId) : [];
+          if (
+            loadUserId && permanentDeleteIds(loadUserId).has(pageId)
+          ) return;
+          const comments = overlayOutboxOnComments(entries, pageId, remoteComments);
+          commentFetchedAt.set(pageId, Date.now());
+          set((s) => ({
+            commentsByPage: { ...s.commentsByPage, [pageId]: comments },
+            loadedCommentPages: new Set(s.loadedCommentPages).add(pageId),
+          }));
+          // Paint first, but do not resolve the load until IndexedDB owns the
+          // response. A reload immediately after the server reply must still be
+          // able to render these comments locally.
+          await cacheCurrentComments(pageId);
+        });
       } catch (error) {
+        const status = persistErrorStatus(error);
+        if (status === 401 || status === 403 || status === 404) {
+          await applyDefinitiveReadDenial(readToken, async () => {
+            commentFetchedAt.delete(pageId);
+            if (loadUserId) {
+              await Promise.all([
+                cacheReplaceTable(loadUserId, recordCacheTables.comments(pageId), []),
+                cacheSetMeta(loadUserId, recordCacheMeta.commentsCachedAt(pageId), null),
+              ]);
+            }
+            set((state) => {
+              const commentsByPage = { ...state.commentsByPage };
+              delete commentsByPage[pageId];
+              const loadedCommentPages = new Set(state.loadedCommentPages);
+              loadedCommentPages.delete(pageId);
+              return { commentsByPage, loadedCommentPages };
+            });
+          });
+          throw error;
+        }
         // Background refresh of an already-rendered list may fail offline —
         // the rendered comments stand. A first load still surfaces the error.
-        if (!alreadyLoaded) throw error;
+        if (!hasRenderableComments) throw error;
       }
     })().finally(() => {
       commentLoadPromises.delete(promiseKey);
     });
     commentLoadPromises.set(promiseKey, promise);
     return promise;
+  },
+
+  refreshCommentsFromSignal(pageId) {
+    let state = commentSignalRefreshes.get(pageId);
+    if (!state) {
+      state = {
+        cancelled: false,
+        pending: false,
+      };
+      commentSignalRefreshes.set(pageId, state);
+    }
+    state.pending = true;
+    if (state.drain) return state.drain;
+    state.cancelled = false;
+
+    const drain = (async () => {
+      while (!state.cancelled && state.pending) {
+        // A force read that was already active can predate this invalidation.
+        // Let its own authority settle, then keep the pending signal so the
+        // next read is guaranteed to start after the signal.
+        const preexistingForce = commentLoadPromises.get(`${pageId}:force`);
+        if (preexistingForce) {
+          await preexistingForce.catch(() => {});
+          continue;
+        }
+
+        const remainingMs = state.lastStartedAt === undefined
+          ? 0
+          : Math.max(
+              0,
+              state.lastStartedAt + COMMENT_REFRESH_MIN_GAP_MS - Date.now(),
+            );
+        if (remainingMs > 0) {
+          await waitForCommentSignalRefreshWindow(state, remainingMs);
+        }
+        if (state.cancelled) break;
+
+        // No await separates this check from loadComments, so an older force
+        // lane cannot race in and consume the pending generation.
+        const forceAfterWindow = commentLoadPromises.get(`${pageId}:force`);
+        if (forceAfterWindow) {
+          await forceAfterWindow.catch(() => {});
+          continue;
+        }
+
+        // Every signal received before this exact request start is covered by
+        // the upcoming canonical read. A signal received while it is in flight
+        // flips pending back to true and therefore owns one trailing read.
+        state.pending = false;
+        state.lastStartedAt = Date.now();
+        try {
+          await get().loadComments(pageId, { force: true });
+        } catch (error) {
+          // A newer signal received during the failed read still owns one
+          // bounded post-signal attempt. Without one, the older failure would
+          // consume that later invalidation. Stop once an attempt fails with
+          // no newer pending signal; the caller retains rejection ownership.
+          if (!state.pending) throw error;
+        }
+      }
+    })().finally(() => {
+      state.drain = undefined;
+      state.wakeTimer?.();
+    });
+    state.drain = drain;
+    return drain;
   },
 
   pageComments(pageId) {
@@ -5726,7 +9771,7 @@ export const useStore = create<AppState>((set, get) => ({
       waitsFor: () =>
         pendingPageLikeCreateHas(pageId) ||
         Boolean(parentId && pendingCommentCreate.has(parentId)),
-      onSuccess: (result) => {
+      onSuccess: async (result) => {
         pendingCommentCreate.delete(comment.id);
         const persisted = result as Comment | undefined;
         if (persisted) {
@@ -5739,10 +9784,11 @@ export const useStore = create<AppState>((set, get) => ({
             },
           }));
         }
+        await cacheCurrentComments(pageId);
         publishCommentsMutation(pageId);
         releaseOptimisticCreateDependents(comment.id);
       },
-      onDrop: () => {
+      onDrop: async () => {
         const failed = new Set([comment.id]);
         let changed = true;
         while (changed) {
@@ -5755,7 +9801,12 @@ export const useStore = create<AppState>((set, get) => ({
         }
         for (const id of failed) {
           pendingCommentCreate.delete(id);
-          cancelBackgroundDurableCall(`create-comment:${id}`, authorId);
+          // The current root was already acknowledged by the background
+          // settlement branch before onDrop ran. Only queued descendants need
+          // their own cancellation/ack so each durable key settles once.
+          if (id !== comment.id) {
+            cancelBackgroundDurableCall(`create-comment:${id}`, authorId);
+          }
           rollbackDependentWritesForFailedCreate(id);
         }
         useStore.setState((state) => ({
@@ -5766,8 +9817,10 @@ export const useStore = create<AppState>((set, get) => ({
             ),
           },
         }));
+        await cacheCurrentComments(pageId);
       },
     });
+    void cacheCurrentComments(pageId);
     return comment;
   },
 
@@ -5782,6 +9835,7 @@ export const useStore = create<AppState>((set, get) => ({
       }
     }
     let foundPageId = "";
+    let previousComment: Comment | undefined;
     const localPatch: Partial<Comment> = {
       ...patch,
       updatedAt: patch.updatedAt ?? nowIso(),
@@ -5792,6 +9846,7 @@ export const useStore = create<AppState>((set, get) => ({
         const idx = comments.findIndex((comment) => comment.id === id);
         if (idx < 0) continue;
         foundPageId = pageId;
+        previousComment = comments[idx];
         const next = comments.slice();
         next[idx] = { ...next[idx], ...localPatch };
         commentsByPage[pageId] = next.sort(byCreated);
@@ -5801,13 +9856,37 @@ export const useStore = create<AppState>((set, get) => ({
     });
     if (foundPageId) {
       const pageId = foundPageId;
-      void durableRemoteCall("updateCommentRemote", [id, patch as Partial<Comment>, pageId]).then(
+      const before = previousComment;
+      void cacheCurrentComments(pageId);
+      void durableRemoteCall(
+        "updateCommentRemote",
+        [id, patch as Partial<Comment>, pageId],
+        undefined,
+        undefined,
+        { commentPageIds: [pageId] },
+        async () => {
+          if (before) {
+            useStore.setState((current) => ({
+              commentsByPage: {
+                ...current.commentsByPage,
+                [pageId]: (current.commentsByPage[pageId] ?? []).map((comment) =>
+                  comment.id === id
+                    ? rollbackMatchingFields(
+                        comment,
+                        { ...before, ...localPatch },
+                        before,
+                        Object.keys(localPatch) as Array<keyof Comment>
+                      )
+                    : comment
+                ),
+              },
+            }));
+          }
+          await cacheCurrentComments(pageId);
+        }
+      ).then(
         (call) => {
           if (call.status === "ok") publishCommentsMutation(pageId);
-          // Terminal rejection (e.g. resolving someone else's thread without
-          // edit access): un-apply the optimistic flip so the UI matches the
-          // server instead of silently reverting on the next reload.
-          if (call.status === "dropped") void get().loadComments(pageId, { force: true });
         }
       );
     }
@@ -5837,33 +9916,57 @@ export const useStore = create<AppState>((set, get) => ({
         .map((comment) => comment.id),
     ];
     const doomed = new Set(doomedIds);
+    const removedComments = (state.commentsByPage[pageId] ?? []).filter((comment) =>
+      doomed.has(comment.id)
+    );
     set((s) => ({
       commentsByPage: {
         ...s.commentsByPage,
         [pageId]: (s.commentsByPage[pageId] ?? []).filter((comment) => !doomed.has(comment.id)),
       },
     }));
-    void durableRemoteCall("deleteCommentsRemote", [doomedIds, pageId]).then((call) => {
+    void cacheCurrentComments(pageId);
+    void durableRemoteCall(
+      "deleteCommentsRemote",
+      [doomedIds, pageId],
+      undefined,
+      undefined,
+      { commentPageIds: [pageId] },
+      async () => {
+        useStore.setState((current) => {
+          const byId = new Map(
+            (current.commentsByPage[pageId] ?? []).map((comment) => [comment.id, comment])
+          );
+          for (const comment of removedComments) {
+            if (!byId.has(comment.id)) byId.set(comment.id, comment);
+          }
+          return {
+            commentsByPage: {
+              ...current.commentsByPage,
+              [pageId]: Array.from(byId.values()).sort(byCreated),
+            },
+          };
+        });
+        await cacheCurrentComments(pageId);
+      }
+    ).then((call) => {
       if (call.status === "ok") publishCommentsMutation(pageId);
-      if (call.status === "dropped") void get().loadComments(pageId, { force: true });
     });
   },
 
   ...createDatabaseStoreActions(set, get, databaseStoreRuntime),
 }));
 
-function asIdArray(value: unknown): string[] {
-  if (Array.isArray(value)) return value.map(String).filter(Boolean);
-  return value ? [String(value)] : [];
-}
-
 function applyCrossTabPermanentDeleteFence(userId: string) {
   const state = useStore.getState();
   if (!userId || state.userId !== userId) return;
   const deleted = permanentDeleteIds(userId);
   if (deleted.size === 0) return;
-  workspaceDataEpoch += 1;
+  advanceWorkspaceDataEpoch();
   for (const pageId of deleted) cancelPendingPage(pageId);
+  for (const pageId of deleted) {
+    clearDeferredBlockCreatesForPage(pageId, state.blocksByPage[pageId] ?? []);
+  }
   for (const [blockId, pageId] of pendingBlockPage) {
     if (deleted.has(pageId)) cancelPendingBlock(blockId);
   }
@@ -5906,6 +10009,14 @@ function applyCrossTabPermanentDeleteFence(userId: string) {
         Object.entries(current.databaseRowPagesByDb).filter(
           ([databaseId]) => !deletedDatabaseIds.has(databaseId)
         )
+      ),
+      databaseSubitemRowWindowsByDb: pruneDatabaseSubitemRowWindows(
+        current.databaseSubitemRowWindowsByDb,
+        deleted
+      ),
+      databaseDependencyRelations: pruneDatabaseDependencyRelations(
+        current.databaseDependencyRelations,
+        deleted
       ),
       loadedBlockPages: new Set(
         [...current.loadedBlockPages].filter((pageId) => !deleted.has(pageId))

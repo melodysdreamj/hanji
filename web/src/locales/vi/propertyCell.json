@@ -92,5 +92,8 @@
     "T6",
     "T7"
   ],
-  "you": "Bạn"
+  "you": "Bạn",
+  "buttonExecutionFailed": "Không thể chạy nút.",
+  "loadingMoreRelations": "Đang tải thêm quan hệ...",
+  "loadMoreRelations": "Tải thêm quan hệ"
 }

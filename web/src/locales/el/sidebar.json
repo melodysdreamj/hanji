@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Άνοιγμα μενού χώρου εργασίας",
   "closeWorkspaceMenu": "Κλείσιμο μενού χώρου εργασίας",
   "workspaceMenu": "Μενού χώρου εργασίας",
-  "exportWorkspace": "Εξαγωγή χώρου εργασίας",
+  "exportWorkspace": "Εξαγωγή JSON χώρου εργασίας (χωρίς αρχεία)",
   "exportedWorkspace": "Ο χώρος εργασίας εξήχθη ως αρχείο Hanji.",
   "exportedWorkspaceWithPlaceholders": "Ο χώρος εργασίας εξήχθη ως αρχείο Hanji — τα συνημμένα παρέμειναν ως σύμβολα κράτησης θέσης.",
   "couldntExportWorkspace": "Αδυναμία εξαγωγής χώρου εργασίας",
@@ -76,5 +76,12 @@
     "later": "Ίσως αργότερα",
     "note": "Μπορείτε πάντα να το ξεκινήσετε αργότερα από την Εισαγωγή στην πλαϊνή γραμμή.",
     "title": "Να εισαγάγετε τον χώρο εργασίας του Notion στο Hanji;"
-  }
+  },
+  "addPageToTeamspace": "Προσθήκη σελίδας στο {{name}}",
+  "couldntExportWorkspaceArchive": "Δεν ήταν δυνατή η εξαγωγή του αρχείου χώρου εργασίας.",
+  "exportedWorkspaceArchive": "Εξήχθη ένα αρχείο χώρου εργασίας με αρχεία.",
+  "exportWorkspaceArchive": "Εξαγωγή αρχείου χώρου εργασίας (με αρχεία)",
+  "joinTeamspaces": "Συμμετοχή σε ομαδικούς χώρους",
+  "keyboardShortcuts": "Συντομεύσεις πληκτρολογίου",
+  "teamspacePages": "Σελίδες {{name}}"
 }

@@ -92,5 +92,8 @@
     "金",
     "土"
   ],
-  "you": "あなた"
+  "you": "あなた",
+  "buttonExecutionFailed": "ボタンを実行できませんでした。",
+  "loadingMoreRelations": "さらにリレーションを読み込み中...",
+  "loadMoreRelations": "さらにリレーションを読み込む"
 }

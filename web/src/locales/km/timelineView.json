@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "ភាពអាស្រ័យ៖",
     "hint": "បន្ថែមទ្រព្យសម្បត្តិទំនាក់ទំនង",
-    "relationPropertyAriaLabel": "ទ្រព្យសម្បត្តិទំនាក់ទំនងអាស្រ័យ"
+    "relationPropertyAriaLabel": "ទ្រព្យសម្បត្តិទំនាក់ទំនងអាស្រ័យ",
+    "makeDependOn": "ធ្វើឱ្យ {{title}} ពឹងផ្អែកលើ {{predecessor}}",
+    "startFrom": "ចាប់ផ្តើមការពឹងផ្អែកពី {{title}}"
   },
   "toolbar": {
     "today": "ថ្ងៃនេះ",

@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Rufe",
+    "open": "Buɗe",
+    "private": "Keɓaɓɓe"
+  },
+  "add": "Ƙara",
+  "approve": "Amince",
+  "archive": "Ajiye teamspace",
+  "available": "Akwai don shiga",
+  "choosePrincipal": "Zaɓi mutum ko rukuni",
+  "create": "Ƙirƙiri teamspace",
+  "deny": "Ƙi",
+  "error": {
+    "action": "Ba a iya kammala wannan aikin teamspace ba.",
+    "load": "Ba a iya loda bayanan teamspace ba."
+  },
+  "fields": {
+    "access": "Samun dama",
+    "description": "Bayani",
+    "icon": "Ikon",
+    "memberRole": "Izinin shafin memba",
+    "membersCanEditSidebar": "Membobi na iya ƙara da sake tsara shafofi",
+    "membersCanInvite": "Membobi na iya gayyatar mutane",
+    "name": "Suna",
+    "openRole": "Izinin shafin baƙo na buɗe"
+  },
+  "governance": "Saitunan Tawaga",
+  "join": "Shiga",
+  "joined": "Tawagarku",
+  "loadMore": "Ƙara",
+  "manage": "Sarrafa",
+  "member": "Memba",
+  "members": "Membobi",
+  "noneArchived": "Babu wasu Tawaga da aka ajiye.",
+  "noneAvailable": "Babu wasu Tawaga da suke samuwa.",
+  "noneJoined": "Ba ka shiga kowane Tawaga har yanzu.",
+  "noRequests": "Babu wasu buƙatu masu jira.",
+  "notice": {
+    "approved": "An amince da buƙatar.",
+    "archived": "An ajiye Tawaga.",
+    "created": "An ƙirƙiri Tawaga.",
+    "defaultSet": "An sabunta Tawaga na tsoho.",
+    "denied": "An ƙi buƙatar.",
+    "joined": "An shiga Tawaga.",
+    "memberAdded": "An ƙara memba.",
+    "memberRemoved": "An cire memba.",
+    "memberUpdated": "An sabunta matsayin memba.",
+    "policySaved": "An sabunta manufar ƙirƙirar Tawaga.",
+    "requested": "An nemi izini.",
+    "restored": "An mayar da Tawaga.",
+    "saved": "An sabunta Tawaga."
+  },
+  "notOwner": "Mai wannan wurin tawagar ko mai gudanar da wurin aiki ne kawai zai iya gudanar da shi.",
+  "open": "Buɗe",
+  "owner": "Mai",
+  "ownersOnlyCreate": "Masu wurin aiki ne kawai zasu iya ƙirƙirar wuraren tawagar.",
+  "remove": "Cire",
+  "replacement": "Zaɓi tsohon wurin tawagar maye",
+  "request": "Nemi damar shiga",
+  "requestPending": "Nema yana jira",
+  "requests": "Bukatun shiga",
+  "restore": "Maida",
+  "roles": {
+    "comment": "Iya sharhi",
+    "edit": "Iya gyara",
+    "full_access": "Cikakkiyar dama",
+    "view": "Iya kallo"
+  },
+  "save": "Ajiye canje-canje",
+  "selectTeamspace": "Wurin tawagar",
+  "setDefault": "Saita tsohon wurin tawagar",
+  "subtitle": "Shirya aikin gama kai da sarrafa wanda zai iya gano ko shiga.",
+  "tabs": {
+    "archived": "An adana",
+    "browse": "Bincike",
+    "create": "Sabon wurin tawagar",
+    "label": "Duban wurin tawagar",
+    "manage": "Gudanar"
+  },
+  "title": "Wuraren tawagar"
+}

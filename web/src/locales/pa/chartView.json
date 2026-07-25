@@ -4,7 +4,22 @@
     "sum": "ਜੋੜ",
     "average": "ਔਸਤ",
     "min": "ਘੱਟ",
-    "max": "ਵੱਧ"
+    "max": "ਵੱਧ",
+    "checked": "ਚੈਕ ਕੀਤਾ",
+    "count_values": "ਮੁੱਲ ਗਿਣਤੀ",
+    "date_range": "ਮਿਤੀ ਸੀਮਾ",
+    "earliest_date": "ਸਭ ਤੋਂ ਪੁਰਾਣੀ ਮਿਤੀ",
+    "empty": "ਖਾਲੀ ਗਿਣਤੀ",
+    "latest_date": "ਸਭ ਤੋਂ ਨਵੀਂ ਮਿਤੀ",
+    "median": "ਮੱਧਮਾਨ",
+    "not_empty": "ਗੈਰ-ਖਾਲੀ ਗਿਣਤੀ",
+    "percent_checked": "ਚੈਕ ਪ੍ਰਤੀਸ਼ਤ",
+    "percent_empty": "ਖਾਲੀ ਪ੍ਰਤੀਸ਼ਤ",
+    "percent_not_empty": "ਗੈਰ-ਖਾਲੀ ਪ੍ਰਤੀਸ਼ਤ",
+    "percent_unchecked": "ਅਣ-ਚੈਕ ਪ੍ਰਤੀਸ਼ਤ",
+    "range": "ਸੀਮਾ",
+    "unchecked": "ਅਣ-ਚੈਕ",
+    "unique": "ਅਨੋਖੇ ਮੁੱਲਾਂ ਦੀ ਗਿਣਤੀ"
   },
   "chartAria": "{{name}} ਚਾਰਟ",
   "chartType": "ਚਾਰਟ ਕਿਸਮ",
@@ -27,5 +42,9 @@
   "untitledProperty": "ਬੇ-ਨਾਮ",
   "valueProperty": "ਮੁੱਲ ਵਿਸ਼ੇਸ਼ਤਾ",
   "xAxis": "X-ਧੁਰਾ",
-  "yAxis": "Y-ਧੁਰਾ"
+  "yAxis": "Y-ਧੁਰਾ",
+  "dateRangeDays": "{{count}} ਦਿਨ",
+  "missingProperty": "ਸੇਵ ਕੀਤੀ ਪ੍ਰਾਪਰਟੀ",
+  "unsupportedAggregateDesc": "{{aggregate}} ਨੂੰ {{property}} ਤੋਂ ਗਿਣਿਆ ਨਹੀਂ ਜਾ ਸਕਦਾ। ਕੋਈ ਅਨੁਕੂਲ ਪ੍ਰਾਪਰਟੀ ਜਾਂ ਗਣਨਾ ਚੁਣੋ।",
+  "unsupportedAggregateTitle": "ਇਹ ਚਾਰਟ ਗਣਨਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
 }

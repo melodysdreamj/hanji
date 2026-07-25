@@ -162,6 +162,7 @@
     "audioCaption": "Audio caption",
     "audioEmptyHint": "Upload an audio file or paste an audio link to play it here.",
     "audioLink": "Audio link",
+    "audioPlaybackFailed": "This audio could not be played. Replace it or open the original file.",
     "chooseAudioFile": "Choose an audio file.",
     "chooseVideoFile": "Choose a video file.",
     "embedAudio": "Embed audio",
@@ -176,7 +177,8 @@
     "video": "Video",
     "videoCaption": "Video caption",
     "videoEmptyHint": "Upload a video file, paste a direct link, or use a YouTube, Vimeo, or Loom link.",
-    "videoLink": "Video link"
+    "videoLink": "Video link",
+    "videoPlaybackFailed": "This video could not be played. Replace it or open the original file."
   },
   "bookmark": {
     "copy": "Copy bookmark link",

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "បន្ថែមមតិយោបល់",
+    "addLink": "បន្ថែមតំណ",
+    "blockColor": "អនុវត្តពណ៌ចុងក្រោយ",
+    "bold": "ដិត",
+    "copyPageLink": "ចម្លងតំណទំព័រ",
+    "findInPage": "ស្វែងរកលើទំព័រនេះ",
+    "inlineCode": "កូដក្នុងជួរ",
+    "italic": "ទ្រេត",
+    "moveBlock": "ផ្លាស់ទីប្លុកទៅទំព័រផ្សេង",
+    "moveBlockDown": "ផ្លាស់ទីប្លុកចុះក្រោម",
+    "moveBlockUp": "ផ្លាស់ទីប្លុកឡើងលើ",
+    "movePage": "ផ្លាស់ទីទំព័របច្ចុប្បន្ន",
+    "navigateBack": "ត្រលប់ក្រោយ",
+    "navigateForward": "ទៅមុខ",
+    "newPage": "ទំព័រថ្មី",
+    "openBlockMenu": "បើកសកម្មភាពប្លុក",
+    "openKeyboardShortcuts": "បើកផ្លូវកាត់ក្តារចុច",
+    "openParentPage": "បើកទំព័រមេ",
+    "quickFind": "ស្វែងរករហ័ស",
+    "strikethrough": "ឆូតកាត់",
+    "toggleAllToggles": "ពង្រីក ឬ បង្រួម toggle ទាំងអស់",
+    "toggleSidebar": "បិទ/បើករបារចំហៀង",
+    "toggleTheme": "បិទ/បើករបៀបងងឹត",
+    "underline": "គូសបន្ទាត់ក្រោម"
+  },
+  "categories": {
+    "createStyle": "បង្កើត & ស្ទីល",
+    "editMove": "កែសម្រួល & ផ្លាស់ទី",
+    "popular": "ពេញនិយម"
+  },
+  "categoriesLabel": "ប្រភេទផ្លូវកាត់",
+  "close": "បិទ",
+  "closeBackdrop": "បិទផ្លូវកាត់ក្តារចុច",
+  "empty": "រកមិនឃើញផ្លូវកាត់ទេ",
+  "keysFor": "គ្រាប់ចុចសម្រាប់ {{action}}",
+  "or": "ឬ",
+  "searchLabel": "ស្វែងរកផ្លូវកាត់ក្ដារចុច",
+  "searchPlaceholder": "ស្វែងរកផ្លូវកាត់…",
+  "searchResults": "លទ្ធផលស្វែងរក",
+  "searchTerms": {
+    "toggleTheme": "ប្រធានបទ ភ្លឺ ងងឹត រូបរាង"
+  },
+  "title": "ផ្លូវកាត់ក្ដារចុច"
+}

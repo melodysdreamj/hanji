@@ -6,5 +6,6 @@
   "unreachable": "A szerver nem elérhető",
   "unreachablePending_one": "A szerver nem elérhető · {{count}} változtatás függőben",
   "unreachablePending_other": "A szerver nem elérhető · {{count}} változtatás függőben",
-  "retryHint": "Kattints az újrapróbálkozáshoz"
+  "retryHint": "Kattints az újrapróbálkozáshoz",
+  "confirmed": "Szerverre mentve"
 }

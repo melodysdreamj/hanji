@@ -59,18 +59,18 @@
   "hanji": {
     "cantImport": "Hanji-tiedostoa ei voitu tuoda.",
     "cantRead": "Hanji-tiedostoa ei voitu lukea.",
-    "choose": "Valitse .hanji.json-tiedosto",
+    "choose": "Valitse .hanji.json- tai .hanji.zip-tiedosto",
     "chooseButton": "Valitse tiedosto",
     "fetch": "Nouda vienti",
     "fetching": "Noudetaan...",
-    "fileHint": "Vie sivu, tietokanta tai työtila toisesta Hanjista ja tuo se tänne. Suhteet, koonti, kaavat, näkymät ja mallipohjat säilyvät. Liitteitä ei sisälly.",
+    "fileHint": "Käytä .hanji.json tiedostoa vain rakenteelle (tiedostot jätetään pois) tai .hanji.zip tiedostoa häviöttömään siirtoon (tiedostot mukana). Suhteet, koosteet, kaavat, näkymät ja mallipohjat säilyvät.",
     "fromFile": "Tiedostosta",
     "fromLive": "Toimivasta esiintymästä",
     "importButton": "Tuo",
     "importedItems_one": "Tuotiin {{count}} kohde Hanji-tiedostosta.",
     "importedItems_other": "Tuotiin {{count}} kohdetta Hanji-tiedostosta.",
     "importing": "Tuodaan...",
-    "liveHint": "Hae työtila suoraan toisesta käynnissä olevasta Hanjista (esim. Docker-kehitysympäristö). Etäpalvelimen on sallittava pyynnöt tästä osoitteesta.",
+    "liveHint": "Tuo työtila suoraan toisesta käynnissä olevasta Hanji-instanssista (esim. Docker-kehitysympäristö). Tiedostot jätetään pois. Etäpalvelimen on sallittava pyynnöt tästä osoitteesta.",
     "needFile": "Valitse ensin Hanji-tiedosto.",
     "needRemote": "Anna etä-Hanjin URL ja työtilan tunnus.",
     "placeholderNote": "Osa liitteistä jätettiin paikkamerkkeinä.",
@@ -82,7 +82,9 @@
     "review": "Valmis tuotavaksi: {{summary}}",
     "selected": "Valittu: {{name}}",
     "tab": "Hanji",
-    "title": "Tuo Hanjista"
+    "title": "Tuo Hanjista",
+    "filesExcluded": "Tiedostot jätetty pois.",
+    "filesIncluded": "Tiedostot mukana."
   },
   "importApplied": "Notion-tuonti sovellettu.",
   "importCancelled": "Notion-tuonti peruutettu.",
@@ -305,6 +307,12 @@
       "Etsi",
       "Käytä"
     ],
-    "stepsAria": "Notion-tuontivaiheet"
+    "stepsAria": "Notion-tuontivaiheet",
+    "serverRunnerStatus": "Hanji käsittelee tätä tuontia palvelimella. Välilehden sulkeminen tai päivittäminen ei keskeytä sitä.",
+    "serverRunningHint": "Tuonti jatkuu taustalla. Voit sulkea tämän välilehden."
+  },
+  "terminal": {
+    "cancelled": "Tuonti peruutettiin. Voit käynnistää sen uudelleen, kun olet valmis.",
+    "failed": "Tuonti pysähtyi turvallisesti ennen valmistumista. Tarkista yhteys ja yritä uudelleen. Tekniset tiedot ja tunnisteet on piilotettu."
   }
 }

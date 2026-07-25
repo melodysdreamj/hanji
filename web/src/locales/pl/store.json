@@ -1,6 +1,6 @@
 {
   "blockConflictKeepMine": "Zastosuj moją wersję",
-  "blockConflictSave": "Ten blok został edytowany na innym urządzeniu, więc Twoja zmiana offline nie została zastosowana.",
+  "blockConflictSave": "Oczekująca edycja pokrywa się z najnowszą wersją serwera, więc nie mogła zostać automatycznie scalona.",
   "blockMoveCommentsSkipped": "Blok został przeniesiony, ale jego komentarze nie mogły zostać przeniesione razem z nim.",
   "databaseLockedSave": "Ta baza danych jest zablokowana, więc Twoje zmiany nie mogły zostać zapisane.",
   "databaseRowsLoadFailed": "Nie udało się załadować wierszy bazy danych. Spróbuj ponownie za chwilę.",
@@ -9,5 +9,6 @@
   "pageLockedSave": "Ta strona jest zablokowana, więc Twoje zmiany nie mogły zostać zapisane.",
   "pageMissingSave": "Nie znaleziono strony, więc Twoje zmiany nie mogły zostać zapisane.",
   "saveFailed": "Nie udało się zapisać zmian.",
-  "sessionExpired": "Twoja sesja wygasła lub żądanie nie mogło zostać uwierzytelnione. Spróbuj ponownie."
+  "sessionExpired": "Twoja sesja wygasła lub żądanie nie mogło zostać uwierzytelnione. Spróbuj ponownie.",
+  "conflictSave": "Zawartość zmieniła się przed zakończeniem zapisywania, więc nie udało się zapisać twojej zmiany."
 }

@@ -13,7 +13,7 @@
   "groupName": "그룹 이름",
   "groupOptions": "{{groupName}} 그룹 옵션",
   "groupThisBoard": "보드 그룹화",
-  "groupThisBoardDesc": "선택 또는 상태 속성을 추가해 열을 만드세요.",
+  "groupThisBoardDesc": "선택, 상태, 사람 또는 다중 선택 속성을 추가하거나 선택해 열을 만드세요.",
   "newGroup": "신규 그룹",
   "newGroupIn": "{{dbTitle}}에서 새 {{groupName}} 그룹 추가",
   "newPage": "새 페이지",

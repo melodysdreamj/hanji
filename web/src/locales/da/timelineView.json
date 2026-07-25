@@ -7,7 +7,9 @@
   "dependencies": {
     "hint": "tilføj en relationsegenskab",
     "label": "Afhængigheder:",
-    "relationPropertyAriaLabel": "Afhængighedsrelationsegenskab"
+    "relationPropertyAriaLabel": "Afhængighedsrelationsegenskab",
+    "makeDependOn": "Gør {{title}} afhængig af {{predecessor}}",
+    "startFrom": "Start afhængighed fra {{title}}"
   },
   "empty": {
     "description": "Tidslinjevisninger har brug for en startdato-egenskab for at vise sider over tid.",

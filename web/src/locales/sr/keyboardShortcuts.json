@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Dodaj komentar",
+    "addLink": "Dodaj link",
+    "blockColor": "Primeni poslednju korišćenu boju",
+    "bold": "Podebljano",
+    "copyPageLink": "Kopiraj link stranice",
+    "findInPage": "Traži na stranici",
+    "inlineCode": "Inline kod",
+    "italic": "Italik",
+    "moveBlock": "Premesti blok na drugu stranicu",
+    "moveBlockDown": "Premesti blok nadole",
+    "moveBlockUp": "Premesti blok nagore",
+    "movePage": "Premesti trenutnu stranicu",
+    "navigateBack": "Nazad",
+    "navigateForward": "Napred",
+    "newPage": "Nova stranica",
+    "openBlockMenu": "Otvori akcije bloka",
+    "openKeyboardShortcuts": "Otvori prečice na tastaturi",
+    "openParentPage": "Otvori roditeljsku stranicu",
+    "quickFind": "Brza pretraga",
+    "strikethrough": "Precrtano",
+    "toggleAllToggles": "Proširi ili sažmi sve toglove",
+    "toggleSidebar": "Prebaci bočnu traku",
+    "toggleTheme": "Prebaci tamni režim",
+    "underline": "Podvučeno"
+  },
+  "categories": {
+    "createStyle": "Kreiranje i stil",
+    "editMove": "Uređivanje i premeštanje",
+    "popular": "Popularno"
+  },
+  "categoriesLabel": "Kategorije prečica",
+  "close": "Zatvori",
+  "closeBackdrop": "Zatvori prečice na tastaturi",
+  "empty": "Nema pronađenih prečica",
+  "keysFor": "Tasteri za {{action}}",
+  "or": "ili",
+  "searchLabel": "Pretraga prečica na tastaturi",
+  "searchPlaceholder": "Pretraga prečica…",
+  "searchResults": "Rezultati pretrage",
+  "searchTerms": {
+    "toggleTheme": "tema svetlo tamno izgled"
+  },
+  "title": "Prečice na tastaturi"
+}

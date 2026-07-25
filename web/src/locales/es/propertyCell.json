@@ -92,5 +92,8 @@
     "V",
     "S"
   ],
-  "you": "Tú"
+  "you": "Tú",
+  "buttonExecutionFailed": "No se pudo ejecutar el botón.",
+  "loadingMoreRelations": "Cargando más relaciones...",
+  "loadMoreRelations": "Cargar más relaciones"
 }

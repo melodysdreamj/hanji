@@ -13,7 +13,7 @@
   "groupName": "समूह नाम",
   "groupOptions": "{{groupName}} समूह विकल्प",
   "groupThisBoard": "यो बोर्ड समूहबद्ध गर्नुहोस्",
-  "groupThisBoardDesc": "स्तम्भ बनाउन चयन वा स्थिति गुण थप्नुहोस्।",
+  "groupThisBoardDesc": "स्तम्भहरू बनाउन चयन, स्थिति, व्यक्ति, वा बहु-चयन गुण थप्नुहोस् वा छान्नुहोस्।",
   "newGroup": "नयाँ समूह",
   "newGroupIn": "{{dbTitle}} मा नयाँ {{groupName}} समूह",
   "newPage": "नयाँ",

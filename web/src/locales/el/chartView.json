@@ -4,7 +4,22 @@
     "sum": "Άθροισμα",
     "average": "Μέσος όρος",
     "min": "Ελάχιστο",
-    "max": "Μέγιστο"
+    "max": "Μέγιστο",
+    "checked": "Επιλεγμένο",
+    "count_values": "Μέτρηση τιμών",
+    "date_range": "Εύρος ημερομηνιών",
+    "earliest_date": "Παλαιότερη ημερομηνία",
+    "empty": "Μέτρηση κενών",
+    "latest_date": "Νεότερη ημερομηνία",
+    "median": "Διάμεσος",
+    "not_empty": "Μέτρηση μη κενών",
+    "percent_checked": "Ποσοστό επιλεγμένων",
+    "percent_empty": "Ποσοστό κενών",
+    "percent_not_empty": "Ποσοστό μη κενών",
+    "percent_unchecked": "Ποσοστό μη επιλεγμένων",
+    "range": "Εύρος",
+    "unchecked": "Μη επιλεγμένο",
+    "unique": "Μέτρηση μοναδικών τιμών"
   },
   "chartAria": "Διάγραμμα {{name}}",
   "chartType": "Τύπος διαγράμματος",
@@ -27,5 +42,9 @@
   "untitledProperty": "Χωρίς τίτλο",
   "valueProperty": "Ιδιότητα τιμής",
   "xAxis": "Άξονας X",
-  "yAxis": "Άξονας Y"
+  "yAxis": "Άξονας Y",
+  "dateRangeDays": "{{count}} ημέρες",
+  "missingProperty": "την αποθηκευμένη ιδιότητα",
+  "unsupportedAggregateDesc": "Το {{aggregate}} δεν μπορεί να υπολογιστεί από την {{property}}. Επιλέξτε μια συμβατή ιδιότητα ή υπολογισμό.",
+  "unsupportedAggregateTitle": "Αυτός ο υπολογισμός γραφήματος δεν είναι διαθέσιμος"
 }

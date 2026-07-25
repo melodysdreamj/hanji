@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "إضافة تعليق",
+    "addLink": "إضافة رابط",
+    "blockColor": "تطبيق آخر لون مستخدم",
+    "bold": "عريض",
+    "copyPageLink": "نسخ رابط الصفحة",
+    "findInPage": "بحث في هذه الصفحة",
+    "inlineCode": "رمز مضمن",
+    "italic": "مائل",
+    "moveBlock": "نقل الكتلة إلى صفحة أخرى",
+    "moveBlockDown": "نقل الكتلة لأسفل",
+    "moveBlockUp": "نقل الكتلة لأعلى",
+    "movePage": "نقل الصفحة الحالية",
+    "navigateBack": "الرجوع",
+    "navigateForward": "التقدم",
+    "newPage": "صفحة جديدة",
+    "openBlockMenu": "فتح إجراءات الكتلة",
+    "openKeyboardShortcuts": "فتح اختصارات لوحة المفاتيح",
+    "openParentPage": "فتح الصفحة الرئيسية",
+    "quickFind": "بحث سريع",
+    "strikethrough": "يتوسطه خط",
+    "toggleAllToggles": "توسيع أو طي جميع المفاتيح",
+    "toggleSidebar": "تبديل الشريط الجانبي",
+    "toggleTheme": "تبديل الوضع الداكن",
+    "underline": "تسطير"
+  },
+  "categories": {
+    "createStyle": "إنشاء وتنسيق",
+    "editMove": "تحرير ونقل",
+    "popular": "شائع"
+  },
+  "categoriesLabel": "فئات الاختصارات",
+  "close": "إغلاق",
+  "closeBackdrop": "إغلاق اختصارات لوحة المفاتيح",
+  "empty": "لم يتم العثور على اختصارات",
+  "keysFor": "مفاتيح {{action}}",
+  "or": "أو",
+  "searchLabel": "البحث عن اختصارات لوحة المفاتيح",
+  "searchPlaceholder": "ابحث عن اختصارات…",
+  "searchResults": "نتائج البحث",
+  "searchTerms": {
+    "toggleTheme": "السمة فاتح داكن المظهر"
+  },
+  "title": "اختصارات لوحة المفاتيح"
+}

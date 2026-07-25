@@ -247,7 +247,9 @@
     "runningHint": "Giữ tab trình duyệt này mở trong khi quá trình nhập đang chạy.",
     "noJobHint": "Bắt đầu khám phá từ bước Phạm vi trước.",
     "applyLocksHint": "Áp dụng ghi các mục đã được khám phá vào không gian làm việc này.",
-    "browserRunnerWarning": "Việc nhập này đang chạy trong tab trình duyệt này. Giữ tab mở cho đến khi hoàn tất. Đóng hoặc tải lại tab sẽ tạm dừng xử lý; mở lại Hanji sẽ tiếp tục từ tiến trình đã lưu."
+    "browserRunnerWarning": "Việc nhập này đang chạy trong tab trình duyệt này. Giữ tab mở cho đến khi hoàn tất. Đóng hoặc tải lại tab sẽ tạm dừng xử lý; mở lại Hanji sẽ tiếp tục từ tiến trình đã lưu.",
+    "serverRunnerStatus": "Hanji đang xử lý việc nhập này trên máy chủ. Đóng hoặc tải lại tab này sẽ không làm tạm dừng.",
+    "serverRunningHint": "Quá trình nhập tiếp tục trong nền. Bạn có thể đóng tab này."
   },
   "installer": {
     "elapsed": "Đã qua",
@@ -281,9 +283,9 @@
     "title": "Nhập từ Hanji",
     "fromFile": "Từ tệp",
     "fromLive": "Từ một phiên bản trực tiếp",
-    "choose": "Chọn tệp .hanji.json",
+    "choose": "Chọn tệp .hanji.json hoặc .hanji.zip",
     "chooseButton": "Chọn tệp",
-    "fileHint": "Xuất một trang, cơ sở dữ liệu hoặc không gian làm việc từ một Hanji khác, sau đó nhập vào đây. Các quan hệ, rollup, công thức, chế độ xem và mẫu được giữ nguyên. Tệp đính kèm không được bao gồm.",
+    "fileHint": "Sử dụng .hanji.json để chỉ nhập cấu trúc (không gồm tệp), hoặc .hanji.zip để chuyển giao không mất dữ liệu (gồm tệp). Quan hệ, rollup, công thức, chế độ xem và mẫu được bảo toàn.",
     "selected": "Đã chọn: {{name}}",
     "importButton": "Nhập",
     "importing": "Đang nhập...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "tùy chọn",
     "fetch": "Lấy xuất",
     "fetching": "Đang tải...",
-    "liveHint": "Lấy một không gian làm việc trực tiếp từ một Hanji khác đang chạy (ví dụ: phiên bản dev Docker). Máy chủ từ xa phải cho phép yêu cầu từ địa chỉ này.",
+    "liveHint": "Kéo một không gian làm việc trực tiếp từ một Hanji đang chạy khác (ví dụ: phiên bản dev Docker). Tệp không được bao gồm. Máy chủ từ xa phải cho phép các yêu cầu từ địa chỉ này.",
     "review": "Sẵn sàng nhập: {{summary}}",
     "placeholderNote": "Một số tệp đính kèm được để làm chỗ giữ chỗ.",
     "importedItems_one": "Đã nhập {{count}} mục từ tệp Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "Không thể đọc tệp Hanji.",
     "cantImport": "Không thể nhập tệp Hanji.",
     "needFile": "Chọn tệp Hanji trước.",
-    "needRemote": "Nhập URL Hanji từ xa và ID không gian làm việc."
+    "needRemote": "Nhập URL Hanji từ xa và ID không gian làm việc.",
+    "filesExcluded": "Không bao gồm tệp.",
+    "filesIncluded": "Bao gồm tệp."
   },
   "connectWithNotion": "Kết nối với Notion",
   "oauthConfiguredHint": "Máy chủ này đã cấu hình tích hợp Notion OAuth. Thiết lập token vẫn khả dụng cho các kết nối tự lưu trữ.",
-  "cantStartOAuth": "Không thể bắt đầu kết nối Notion."
+  "cantStartOAuth": "Không thể bắt đầu kết nối Notion.",
+  "terminal": {
+    "cancelled": "Quá trình nhập đã bị hủy. Bạn có thể bắt đầu lại khi sẵn sàng.",
+    "failed": "Quá trình nhập đã dừng an toàn trước khi hoàn tất. Kiểm tra kết nối và thử lại. Chi tiết kỹ thuật và mã định danh được ẩn ở đây."
+  }
 }

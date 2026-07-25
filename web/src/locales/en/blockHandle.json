@@ -35,6 +35,39 @@
   "turnMenu": {
     "chooseType": "Choose a block type"
   },
+  "media": {
+    "download": "Download",
+    "viewOriginal": "View original",
+    "openLink": "Open link",
+    "copySourceLink": "Copy source link",
+    "fullScreen": "Full screen",
+    "align": "Align",
+    "addImageLink": "Add link",
+    "editImageLink": "Edit link",
+    "altText": "Alt text",
+    "replace": "Replace"
+  },
+  "align": {
+    "choose": "Choose image alignment",
+    "left": "Left",
+    "center": "Center",
+    "right": "Right"
+  },
+  "imageLink": {
+    "title": "Image link",
+    "label": "Open this URL when the image is clicked",
+    "invalid": "Enter a full http:// or https:// URL.",
+    "remove": "Remove",
+    "save": "Save"
+  },
+  "altText": {
+    "title": "Alt text",
+    "label": "Description",
+    "placeholder": "Describe the image",
+    "help": "Alt text helps people using screen readers understand the image.",
+    "remove": "Remove",
+    "save": "Save"
+  },
   "colorMenu": {
     "textColor": "Text color",
     "backgroundColor": "Background color"

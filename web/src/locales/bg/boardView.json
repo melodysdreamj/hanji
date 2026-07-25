@@ -13,7 +13,7 @@
   "groupName": "Име на групата",
   "groupOptions": "Опции на група {{groupName}}",
   "groupThisBoard": "Групирай тази дъска",
-  "groupThisBoardDesc": "Добавете свойство Избор или Статус, за да създадете колони.",
+  "groupThisBoardDesc": "Добавете или изберете свойство Избор, Статус, Човек или Множествен избор, за да създадете колони.",
   "newGroup": "Нова група",
   "newGroupIn": "Нова група {{groupName}} в {{dbTitle}}",
   "newPage": "Нова",

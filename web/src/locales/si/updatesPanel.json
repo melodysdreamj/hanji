@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} මෑත යාවත්කාලීන",
     "unreadOfTotal": "යාවත්කාලීන {{total}} න් {{unread}} නොකියවූ",
     "updateType": "යාවත්කාලීන වර්ගය",
-    "updates": "යාවත්කාලීන",
-    "modeUpdates": "යාවත්කාලීන",
-    "modeChats": "කතාබස්",
-    "inboxMode": "ඉන්බොක්ස් ප්රකාරය"
+    "updates": "යාවත්කාලීන"
   },
   "time": {
     "justNow": "මේ දැන්",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} අනුවාද",
     "versionsAgo": "අනුවාද {{count}}කට පෙර",
     "versionsAhead": "අනුවාද {{count}}ක් ඉදිරියෙන්",
-    "versionsAria": "අනුවාද ලැයිස්තුව"
+    "versionsAria": "අනුවාද ලැයිස්තුව",
+    "emptyBlock": "හිස් බ්ලොක්",
+    "emptyPreview": "මෙම අනුවාදයට පිටු අන්තර්ගතයක් නැත.",
+    "previewAria": "කියවීම්-පමණක් පිටු අනුවාද පෙරදසුන",
+    "previewingCurrent": "වත්මන් පිටුව නරඹමින්",
+    "previewingSnapshot": "අතීත අනුවාදය පෙරදසුන",
+    "previewOnlyHint": "අනුවාදයක් තේරීමෙන් එය පෙරදසුන් කරයි. වත්මන් පිටුව වෙනස් වන්නේ ප්‍රතිසාධනයෙන් පසුව පමණි.",
+    "restoreThisVersion": "ප්‍රතිසාධනය",
+    "restoring": "ප්‍රතිසාධනය කරමින්...",
+    "versionHistory": "අනුවාද ඉතිහාසය"
   },
   "badges": {
     "comment": "අදහස",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} සඳහන් කර ඇත · {{preview}}",
     "referenceLink": "{{title}} ට සම්බන්ධිත · {{preview}}",
     "unreadDot": "නොකියවූ",
-    "workspaceUpdate": "වැඩබිම් යාවත්කාලීනය"
+    "workspaceUpdate": "වැඩබිම් යාවත්කාලීනය",
+    "bySelf": "ඔබ විසින්"
   },
   "empty": {
     "allCaughtUp": "සියල්ල යාවත්කාලීනයි.",

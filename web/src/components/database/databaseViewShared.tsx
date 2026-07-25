@@ -38,6 +38,7 @@ export const NOTION_2023_VIEW_TYPES: { type: ViewType }[] = [
   { type: "gallery" },
   { type: "calendar" },
   { type: "timeline" },
+  { type: "form" },
   { type: "chart" },
 ];
 
@@ -63,6 +64,7 @@ export function ViewTypeIcon({ type, size = 14 }: { type: ViewType; size?: numbe
   if (type === "gallery") return <GalleryIcon size={size} aria-hidden="true" />;
   if (type === "calendar") return <CalendarIcon size={size} aria-hidden="true" />;
   if (type === "timeline") return <TimelineIcon size={size} aria-hidden="true" />;
+  if (type === "form") return <FileText size={size} aria-hidden="true" />;
   if (type === "chart") return <ChartIcon size={size} aria-hidden="true" />;
   return <TableIcon size={size} aria-hidden="true" />;
 }

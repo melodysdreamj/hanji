@@ -7,7 +7,8 @@
   "pageMissingSave": "找不到頁面，因此無法儲存您的變更。",
   "saveFailed": "無法儲存您的變更。",
   "sessionExpired": "您的會話已過期或請求無法通過驗證。請再試一次。",
-  "blockConflictSave": "此區塊已在其他裝置上編輯，因此您的離線變更未套用。",
+  "blockConflictSave": "排定的編輯與伺服器最新版本重疊，無法自動合併。",
   "blockConflictKeepMine": "套用我的版本",
-  "blockMoveCommentsSkipped": "區塊已移動，但無法同時移動其留言。"
+  "blockMoveCommentsSkipped": "區塊已移動，但無法同時移動其留言。",
+  "conflictSave": "儲存完成前內容已變更，因此無法儲存您的編輯。"
 }

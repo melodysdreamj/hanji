@@ -88,5 +88,38 @@
   },
   "turnMenu": {
     "chooseType": "Vyberte typ bloku"
+  },
+  "align": {
+    "center": "Střed",
+    "choose": "Vybrat zarovnání obrázku",
+    "left": "Vlevo",
+    "right": "Vpravo"
+  },
+  "altText": {
+    "help": "Alternativní text pomáhá lidem používajícím čtečky obrazovky porozumět obrázku.",
+    "label": "Popis",
+    "placeholder": "Popište obrázek",
+    "remove": "Odebrat",
+    "save": "Uložit",
+    "title": "Alternativní text"
+  },
+  "imageLink": {
+    "invalid": "Zadejte úplnou http:// nebo https:// URL.",
+    "label": "Otevřít tuto URL po kliknutí na obrázek",
+    "remove": "Odebrat",
+    "save": "Uložit",
+    "title": "Odkaz na obrázek"
+  },
+  "media": {
+    "addImageLink": "Přidat odkaz",
+    "align": "Zarovnat",
+    "altText": "Alternativní text",
+    "copySourceLink": "Kopírovat zdrojový odkaz",
+    "download": "Stáhnout",
+    "editImageLink": "Upravit odkaz",
+    "fullScreen": "Celá obrazovka",
+    "openLink": "Otevřít odkaz",
+    "replace": "Nahradit",
+    "viewOriginal": "Zobrazit originál"
   }
 }

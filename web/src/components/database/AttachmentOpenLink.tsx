@@ -68,6 +68,10 @@ export function AttachmentOpenLink({
           alt={file.name}
           label={t("image.preview")}
           closeLabel={t("image.closePreview")}
+          openLabel={t("file.openNamed", { fileName: file.name })}
+          openText={t("common.open")}
+          downloadLabel={t("file.downloadNamed", { fileName: file.name })}
+          downloadText={t("common.download")}
           onClose={closePreview}
         />
       )}

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}}",
-    "count_other": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}}"
+    "count_other": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}}",
+    "partial_one": "{{count}}+ តំណថយក្រោយ",
+    "partial_other": "{{count}}+ តំណថយក្រោយ"
   },
   "header": {
     "title": "មេនសិនដែលបានភ្ជាប់"
@@ -10,7 +12,8 @@
     "mention_one": "មេនសិនចំនួន {{count}}",
     "mention_other": "មេនសិនចំនួន {{count}}",
     "link_one": "តំណភ្ជាប់ចំនួន {{count}}",
-    "link_other": "តំណភ្ជាប់ចំនួន {{count}}"
+    "link_other": "តំណភ្ជាប់ចំនួន {{count}}",
+    "loaded": "បានផ្ទុក: {{summary}}"
   },
   "kind": {
     "mention": "មេនសិន",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}} ទៀត",
-    "count_other": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}} ទៀត"
+    "count_other": "តំណភ្ជាប់ថយក្រោយចំនួន {{count}} ទៀត",
+    "load": "ផ្ទុកតំណថយក្រោយបន្ថែម",
+    "loading": "កំពុងផ្ទុកតំណថយក្រោយ…",
+    "search": "ស្វែងរកតំណថយក្រោយ"
   }
 }

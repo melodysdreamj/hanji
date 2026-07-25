@@ -92,5 +92,8 @@
     "P",
     "Szo"
   ],
-  "you": "Te"
+  "you": "Te",
+  "buttonExecutionFailed": "A gombot nem sikerült futtatni.",
+  "loadingMoreRelations": "További kapcsolatok betöltése…",
+  "loadMoreRelations": "További kapcsolatok betöltése"
 }

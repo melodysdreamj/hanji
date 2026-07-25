@@ -92,5 +92,8 @@
     "P",
     "S"
   ],
-  "you": "Jaz"
+  "you": "Jaz",
+  "buttonExecutionFailed": "Gumba ni bilo mogoče zagnati.",
+  "loadingMoreRelations": "Nalaganje več relacij...",
+  "loadMoreRelations": "Naloži več relacij"
 }

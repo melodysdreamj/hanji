@@ -88,5 +88,38 @@
   },
   "turnMenu": {
     "chooseType": "Valitse lohkon tyyppi"
+  },
+  "align": {
+    "center": "Keskitä",
+    "choose": "Valitse kuvan tasaus",
+    "left": "Vasen",
+    "right": "Oikea"
+  },
+  "altText": {
+    "help": "Alt-teksti auttaa ruudunlukijoiden käyttäjiä ymmärtämään kuvaa.",
+    "label": "Kuvaus",
+    "placeholder": "Kuvaile kuvaa",
+    "remove": "Poista",
+    "save": "Tallenna",
+    "title": "Alt-teksti"
+  },
+  "imageLink": {
+    "invalid": "Syötä täydellinen http:// tai https:// URL-osoite.",
+    "label": "Avaa tämä URL-osoite, kun kuvaa napsautetaan.",
+    "remove": "Poista",
+    "save": "Tallenna",
+    "title": "Kuvan linkki"
+  },
+  "media": {
+    "addImageLink": "Lisää linkki",
+    "align": "Tasaus",
+    "altText": "Alt-teksti",
+    "copySourceLink": "Kopioi lähdelinkki",
+    "download": "Lataa",
+    "editImageLink": "Muokkaa linkkiä",
+    "fullScreen": "Koko näyttö",
+    "openLink": "Avaa linkki",
+    "replace": "Korvaa",
+    "viewOriginal": "Näytä alkuperäinen"
   }
 }

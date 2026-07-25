@@ -7,7 +7,8 @@
   "pageMissingSave": "Sidan kunde inte hittas, så dina ändringar kunde inte sparas.",
   "saveFailed": "Dina ändringar kunde inte sparas.",
   "sessionExpired": "Din session löpte ut eller begäran kunde inte autentiseras. Försök igen.",
-  "blockConflictSave": "Det här blocket redigerades på en annan enhet, så din offlineändring tillämpades inte.",
+  "blockConflictSave": "En köad redigering överlappar den senaste serverversionen och kunde inte sammanfogas automatiskt.",
   "blockConflictKeepMine": "Använd min version",
-  "blockMoveCommentsSkipped": "Blocket flyttades, men kommentarerna kunde inte flyttas med det."
+  "blockMoveCommentsSkipped": "Blocket flyttades, men kommentarerna kunde inte flyttas med det.",
+  "conflictSave": "Innehållet ändrades innan sparandet slutfördes, så din redigering kunde inte sparas."
 }

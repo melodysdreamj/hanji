@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Пікір қосу",
+    "addLink": "Сілтеме қосу",
+    "blockColor": "Соңғы қолданылған түсті қолдану",
+    "bold": "Қалың",
+    "copyPageLink": "Парақ сілтемесін көшіру",
+    "findInPage": "Осы парақтан іздеу",
+    "inlineCode": "Инлайн код",
+    "italic": "Көлбеу",
+    "moveBlock": "Блокты басқа параққа жылжыту",
+    "moveBlockDown": "Блокты төмен жылжыту",
+    "moveBlockUp": "Блокты жоғары жылжыту",
+    "movePage": "Ағымдағы парақты жылжыту",
+    "navigateBack": "Артқа өту",
+    "navigateForward": "Алға өту",
+    "newPage": "Жаңа парақ",
+    "openBlockMenu": "Блок əрекеттерін ашу",
+    "openKeyboardShortcuts": "Пернетақта пернелерін ашу",
+    "openParentPage": "Ата-ана парағын ашу",
+    "quickFind": "Жылдам іздеу",
+    "strikethrough": "Сызылған",
+    "toggleAllToggles": "Барлық тогглдарды кеңейту немесе жию",
+    "toggleSidebar": "Бүйір панелін ауыстыру",
+    "toggleTheme": "Қараңғы режимді ауыстыру",
+    "underline": "Астын сызу"
+  },
+  "categories": {
+    "createStyle": "Жасау және стиль",
+    "editMove": "Өңдеу және жылжыту",
+    "popular": "Танымал"
+  },
+  "categoriesLabel": "Пернелер тіркестері санаттары",
+  "close": "Жабу",
+  "closeBackdrop": "Пернетақта пернелерін жабу",
+  "empty": "Пернелер тіркестері табылмады",
+  "keysFor": "{{action}} пернелері",
+  "or": "немесе",
+  "searchLabel": "Пернетақта пернелерін іздеу",
+  "searchPlaceholder": "Пернелерді іздеу…",
+  "searchResults": "Іздеу нәтижелері",
+  "searchTerms": {
+    "toggleTheme": "тақырып ашық қараңғы көрініс"
+  },
+  "title": "Пернетақта пернелері"
+}

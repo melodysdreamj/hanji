@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "의존 관계:",
     "hint": "관계형 속성을 추가하세요",
-    "relationPropertyAriaLabel": "의존 관계 속성"
+    "relationPropertyAriaLabel": "의존 관계 속성",
+    "startFrom": "{{title}}에서 의존 관계 시작",
+    "makeDependOn": "{{title}}이(가) {{predecessor}}에 의존하도록 설정"
   },
   "toolbar": {
     "today": "오늘",

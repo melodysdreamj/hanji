@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Buka menu ruang kerja",
   "closeWorkspaceMenu": "Tutup menu ruang kerja",
   "workspaceMenu": "Menu ruang kerja",
-  "exportWorkspace": "Eksport ruang kerja",
+  "exportWorkspace": "Eksport JSON ruang kerja (fail dikecualikan)",
   "exportedWorkspace": "Ruang kerja telah dieksport sebagai fail Hanji.",
   "exportedWorkspaceWithPlaceholders": "Ruang kerja telah dieksport sebagai fail Hanji — lampiran ditinggalkan sebagai pemegang tempat.",
   "couldntExportWorkspace": "Tidak dapat mengeksport ruang kerja.",
@@ -76,5 +76,12 @@
     "later": "Mungkin nanti",
     "note": "Anda boleh mulakan ini kemudian dari Import di sidebar.",
     "title": "Bawa ruang kerja Notion anda ke Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Tambah halaman ke {{name}}",
+  "couldntExportWorkspaceArchive": "Tidak dapat mengeksport arkib ruang kerja.",
+  "exportedWorkspaceArchive": "Mengeksport arkib ruang kerja dengan fail.",
+  "exportWorkspaceArchive": "Eksport arkib ruang kerja (fail disertakan)",
+  "joinTeamspaces": "Sertai ruang pasukan",
+  "keyboardShortcuts": "Pintasan papan kekunci",
+  "teamspacePages": "Halaman {{name}}"
 }

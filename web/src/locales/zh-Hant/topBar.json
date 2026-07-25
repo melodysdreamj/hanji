@@ -38,7 +38,7 @@
   "moveTo": "移動至",
   "exporting": "匯出中…",
   "exportAsMarkdown": "匯出為 Markdown",
-  "exportAsHanji": "匯出為 Hanji 檔案",
+  "exportAsHanji": "匯出 Hanji JSON（不含檔案）",
   "importing": "匯入中…",
   "importMarkdown": "匯入 Markdown",
   "unlockPage": "解鎖頁面",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "無法更新存取權限",
     "removedFromAccessList": "已從存取清單移除",
     "couldntRemoveAccess": "無法移除存取權限",
-    "couldntLoadAccessList": "無法載入存取清單"
+    "couldntLoadAccessList": "無法載入存取清單",
+    "couldntExportHanjiArchive": "無法匯出 Hanji 封存檔。",
+    "exportedHanjiArchive": "已匯出含檔案的 Hanji 封存檔。"
   },
   "user": "使用者",
   "whoHasAccess": "誰有存取權",
   "workspace": "工作區",
   "workspaceCount_one": "{{count}} 個工作區",
   "workspaceCount_other": "{{count}} 個工作區",
-  "you": "你"
+  "you": "你",
+  "exportAsHanjiArchive": "匯出 Hanji 封存檔（含檔案）",
+  "turnIntoWiki": "轉換成維基",
+  "undoWiki": "復原維基",
+  "wikiCreated": "已將頁面轉換成維基",
+  "wikiPageSettings": "維基頁面設定",
+  "wikiUndone": "已移除維基；頁面內容已保留",
+  "wikiUpdateFailed": "無法更新維基"
 }

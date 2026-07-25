@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Tambah komentar",
+    "addLink": "Tambah tautan",
+    "blockColor": "Terapkan warna terakhir",
+    "bold": "Tebal",
+    "copyPageLink": "Salin tautan halaman",
+    "findInPage": "Cari di halaman ini",
+    "inlineCode": "Kode inline",
+    "italic": "Miring",
+    "moveBlock": "Pindahkan blok ke halaman lain",
+    "moveBlockDown": "Pindahkan blok ke bawah",
+    "moveBlockUp": "Pindahkan blok ke atas",
+    "movePage": "Pindahkan halaman saat ini",
+    "navigateBack": "Kembali",
+    "navigateForward": "Maju",
+    "newPage": "Halaman baru",
+    "openBlockMenu": "Buka aksi blok",
+    "openKeyboardShortcuts": "Buka pintasan keyboard",
+    "openParentPage": "Buka halaman induk",
+    "quickFind": "Cari Cepat",
+    "strikethrough": "Coret",
+    "toggleAllToggles": "Perluas atau ciutkan semua toggle",
+    "toggleSidebar": "Alihkan bilah sisi",
+    "toggleTheme": "Alihkan mode gelap",
+    "underline": "Garis bawah"
+  },
+  "categories": {
+    "createStyle": "Buat & gaya",
+    "editMove": "Edit & pindah",
+    "popular": "Populer"
+  },
+  "categoriesLabel": "Kategori pintasan",
+  "close": "Tutup",
+  "closeBackdrop": "Tutup pintasan keyboard",
+  "empty": "Pintasan tidak ditemukan",
+  "keysFor": "Pintasan untuk {{action}}",
+  "or": "atau",
+  "searchLabel": "Cari pintasan keyboard",
+  "searchPlaceholder": "Cari pintasan…",
+  "searchResults": "Hasil pencarian",
+  "searchTerms": {
+    "toggleTheme": "tema terang gelap tampilan"
+  },
+  "title": "Pintasan keyboard"
+}

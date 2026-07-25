@@ -6,5 +6,6 @@
   "unreachable": "Server nedostupan",
   "unreachablePending_one": "Server nedostupan · {{count}} promjena na čekanju",
   "unreachablePending_other": "Server nedostupan · {{count}} promjena na čekanju",
-  "retryHint": "Kliknite za ponovni pokušaj"
+  "retryHint": "Kliknite za ponovni pokušaj",
+  "confirmed": "Spremljeno na server"
 }

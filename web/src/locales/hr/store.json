@@ -7,7 +7,8 @@
   "pageMissingSave": "Stranica nije pronađena, pa vaše promjene nisu mogle biti spremljene.",
   "saveFailed": "Vaše promjene nisu mogle biti spremljene.",
   "sessionExpired": "Vaša sesija je istekla ili zahtjev nije mogao biti autentificiran. Pokušajte ponovno.",
-  "blockConflictSave": "Ovaj blok je uređivan na drugom uređaju, pa vaša izmjena izvan mreže nije primijenjena.",
+  "blockConflictSave": "Čekajuća izmjena preklapa se s najnovijom verzijom na serveru pa se nije mogla automatski spojiti.",
   "blockConflictKeepMine": "Primijeni moju verziju",
-  "blockMoveCommentsSkipped": "Blok je premješten, ali njegovi komentari nisu mogli biti premješteni s njim."
+  "blockMoveCommentsSkipped": "Blok je premješten, ali njegovi komentari nisu mogli biti premješteni s njim.",
+  "conflictSave": "Sadržaj se promijenio prije dovršetka spremanja, pa vaša izmjena nije spremljena."
 }

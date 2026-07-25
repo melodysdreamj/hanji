@@ -1,6 +1,6 @@
 {
   "name": "hanji-mcp",
-  "version": "0.1.0-alpha.4",
+  "version": "0.2.0-alpha",
   "private": true,
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -10,12 +10,14 @@
   },
   "scripts": {
     "start": "node src/index.mjs",
-    "check": "node --check src/index.mjs && node --check src/edgebase.mjs && node --check src/legacy-product-compat.mjs && node --check src/formula-runtime.mjs && node --check src/database-query-runtime.mjs && node --check src/notion-tool-dsl.mjs && node --check src/tool-registry-foundation.mjs && node --check src/tool-registry-database.mjs && node --check src/tool-registry-notion.mjs && node --check scripts/smoke.mjs && node --check scripts/tool-invocation-smoke.mjs",
+    "check": "node --check ../shared/notion-chart-aggregates.mjs && node --check ../shared/notion-mcp-sql-runtime.mjs && node --check src/index.mjs && node --check src/edgebase.mjs && node --check src/legacy-product-compat.mjs && node --check src/formula-runtime.mjs && node --check src/database-query-runtime.mjs && node --check src/notion-tool-dsl.mjs && node --check src/notion-search-pagination.mjs && node --check src/notion-sql-pagination.mjs && node --check src/notion-official-tools.mjs && node --check src/notion-move-pages-contract.mjs && node --check src/notion-move-pages-handler.mjs && node --check src/notion-update-page-handler.mjs && node --check src/database-view-types.mjs && node --check src/tool-registry-foundation.mjs && node --check src/tool-registry-database.mjs && node --check src/tool-registry-notion.mjs && node --check scripts/smoke.mjs && node --check scripts/tool-invocation-smoke.mjs && node --check ../scripts/notion-parity-guard.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "node --test tests/*.test.mjs",
-    "smoke": "node scripts/smoke.mjs && node scripts/tool-invocation-smoke.mjs",
-    "smoke:live": "node scripts/live-smoke.mjs"
+    "smoke": "node scripts/smoke.mjs && node scripts/tool-invocation-smoke.mjs && npm run parity:notion",
+    "parity:notion": "node ../scripts/notion-parity-guard.mjs",
+    "smoke:live": "node scripts/live-smoke.mjs",
+    "smoke:workspace-scope-live": "node scripts/live-smoke.mjs --workspace-scope-only"
   },
   "engines": {
     "node": ">=22.12.0"

@@ -9,7 +9,7 @@
     "duplicate": "Dupliker",
     "editIcon": "Redigér ikon",
     "editProperties": "Redigér egenskaber",
-    "exportAsHanjiFile": "Eksportér som Hanji-fil",
+    "exportAsHanjiFile": "Eksportér Hanji JSON (filer ekskluderet)",
     "exportAsMarkdown": "Eksportér som Markdown",
     "fullPage": "Fuld side",
     "importing": "Importerer...",
@@ -26,7 +26,8 @@
     "sidePeek": "Sidevisning",
     "undo": "Fortryd",
     "unlockPage": "Lås side op",
-    "verifyPage": "Bekræft side"
+    "verifyPage": "Bekræft side",
+    "exportAsHanjiArchive": "Eksportér Hanji-arkiv (filer inkluderet)"
   },
   "aria": {
     "backlinksDisplay": "Tilbagelinksvisning",
@@ -100,7 +101,9 @@
     "pageVerified": "Side verificeret",
     "removedFromFavorites": "Fjernet fra favoritter",
     "restoredPage": "Side gendannet",
-    "verificationRemoved": "Verifikation fjernet"
+    "verificationRemoved": "Verifikation fjernet",
+    "couldntExportHanjiArchive": "Kunne ikke eksportere Hanji-arkiv.",
+    "exportedHanjiArchive": "Eksporterede et Hanji-arkiv med filer."
   },
   "untitledDatabaseRow": "unavngivet databaserække"
 }

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} بکلینک",
-    "count_other": "{{count}} بکلینک"
+    "count_other": "{{count}} بکلینک",
+    "partial_one": "{{count}}+ بکلینک",
+    "partial_other": "{{count}}+ بکلینک"
   },
   "header": {
     "title": "منشن‌های پیوندی"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} منشن",
     "mention_other": "{{count}} منشن",
     "link_one": "{{count}} پیوند",
-    "link_other": "{{count}} پیوند"
+    "link_other": "{{count}} پیوند",
+    "loaded": "بارگذاری شد: {{summary}}"
   },
   "kind": {
     "mention": "منشن",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} بکلینک بیشتر",
-    "count_other": "{{count}} بکلینک بیشتر"
+    "count_other": "{{count}} بکلینک بیشتر",
+    "load": "بارگذاری بکلینک‌های بیشتر",
+    "loading": "در حال بارگذاری بکلینک‌ها…",
+    "search": "جستجوی بکلینک‌ها"
   }
 }

@@ -16,7 +16,7 @@
   "groupName": "Název skupiny",
   "groupOptions": "Možnosti skupiny {{groupName}}",
   "groupThisBoard": "Seskupit tento board",
-  "groupThisBoardDesc": "Přidejte vlastnost Select nebo Status a vytvořte sloupce.",
+  "groupThisBoardDesc": "Přidejte nebo zvolte vlastnost typu Výběr, Stav, Osoba nebo Vícenásobný výběr pro vytvoření sloupců.",
   "newGroup": "Nová skupina",
   "newGroupIn": "Nová skupina {{groupName}} v {{dbTitle}}",
   "newPage": "Nová",

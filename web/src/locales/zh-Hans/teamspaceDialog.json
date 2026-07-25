@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "关闭",
+    "open": "开放",
+    "private": "私密"
+  },
+  "add": "添加",
+  "approve": "批准",
+  "archive": "归档团队空间",
+  "available": "可加入",
+  "choosePrincipal": "选择用户或群组",
+  "create": "创建团队空间",
+  "deny": "拒绝",
+  "error": {
+    "action": "无法完成该团队空间操作。",
+    "load": "无法加载团队空间详情。"
+  },
+  "fields": {
+    "access": "访问",
+    "description": "描述",
+    "icon": "图标",
+    "memberRole": "成员页面访问",
+    "membersCanEditSidebar": "成员可添加和重排页面",
+    "membersCanInvite": "成员可邀请他人",
+    "name": "名称",
+    "openRole": "公开访客页面访问"
+  },
+  "governance": "团队空间设置",
+  "join": "加入",
+  "joined": "我的团队空间",
+  "loadMore": "加载更多",
+  "manage": "管理",
+  "member": "成员",
+  "members": "成员",
+  "noneArchived": "没有已归档的团队空间。",
+  "noneAvailable": "没有其他可用的团队空间。",
+  "noneJoined": "你还没有加入任何团队空间。",
+  "noRequests": "没有待处理的请求。",
+  "notice": {
+    "approved": "请求已批准。",
+    "archived": "团队空间已归档。",
+    "created": "团队空间已创建。",
+    "defaultSet": "默认团队空间已更新。",
+    "denied": "请求已拒绝。",
+    "joined": "已加入团队空间。",
+    "memberAdded": "成员已添加。",
+    "memberRemoved": "成员已移除。",
+    "memberUpdated": "成员角色已更新。",
+    "policySaved": "团队空间创建政策已更新。",
+    "requested": "已请求访问。",
+    "restored": "团队空间已恢复。",
+    "saved": "团队空间已更新。"
+  },
+  "notOwner": "只有团队空间所有者或工作区管理员才能管理此团队空间。",
+  "open": "打开",
+  "owner": "所有者",
+  "ownersOnlyCreate": "只有工作区所有者才能创建团队空间",
+  "remove": "移除",
+  "replacement": "选择替换默认团队空间",
+  "request": "请求访问",
+  "requestPending": "请求待处理",
+  "requests": "访问请求",
+  "restore": "恢复",
+  "roles": {
+    "comment": "可评论",
+    "edit": "可编辑",
+    "full_access": "完全权限",
+    "view": "可查看"
+  },
+  "save": "保存更改",
+  "selectTeamspace": "团队空间",
+  "setDefault": "设为默认团队空间",
+  "subtitle": "组织共享工作，控制谁能发现或加入。",
+  "tabs": {
+    "archived": "已归档",
+    "browse": "浏览",
+    "create": "新建团队空间",
+    "label": "团队空间视图",
+    "manage": "管理"
+  },
+  "title": "团队空间"
+}

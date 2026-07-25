@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Fechado",
+    "open": "Aberto",
+    "private": "Privado"
+  },
+  "add": "Adicionar",
+  "approve": "Aprovar",
+  "archive": "Arquivar teamspace",
+  "available": "Disponível para aderir",
+  "choosePrincipal": "Escolher uma pessoa ou grupo",
+  "create": "Criar teamspace",
+  "deny": "Negar",
+  "error": {
+    "action": "Não foi possível concluir essa ação do teamspace.",
+    "load": "Não foi possível carregar os detalhes do teamspace."
+  },
+  "fields": {
+    "access": "Acesso",
+    "description": "Descrição",
+    "icon": "Ícone",
+    "memberRole": "Acesso dos membros a páginas",
+    "membersCanEditSidebar": "Membros podem adicionar e reordenar páginas",
+    "membersCanInvite": "Membros podem convidar pessoas",
+    "name": "Nome",
+    "openRole": "Acesso de visitantes abertos a páginas"
+  },
+  "governance": "Definições do Teamspace",
+  "join": "Participar",
+  "joined": "Os teus teamspaces",
+  "loadMore": "Carregar mais",
+  "manage": "Gerir",
+  "member": "Membro",
+  "members": "Membros",
+  "noneArchived": "Não há teamspaces arquivados.",
+  "noneAvailable": "Não há outros teamspaces disponíveis.",
+  "noneJoined": "Ainda não participas em nenhum teamspace.",
+  "noRequests": "Não há pedidos pendentes.",
+  "notice": {
+    "approved": "Pedido aprovado.",
+    "archived": "Teamspace arquivado.",
+    "created": "Teamspace criado.",
+    "defaultSet": "Teamspace predefinido atualizado.",
+    "denied": "Pedido recusado.",
+    "joined": "Participou no teamspace.",
+    "memberAdded": "Membro adicionado.",
+    "memberRemoved": "Membro removido.",
+    "memberUpdated": "Função do membro atualizada.",
+    "policySaved": "Política de criação de teamspace atualizada.",
+    "requested": "Acesso solicitado.",
+    "restored": "Teamspace restaurado.",
+    "saved": "Teamspace atualizado."
+  },
+  "notOwner": "Apenas o proprietário do teamspace ou o administrador do workspace pode gerir este teamspace.",
+  "open": "Abrir",
+  "owner": "Proprietário",
+  "ownersOnlyCreate": "Apenas os proprietários do workspace podem criar teamspaces",
+  "remove": "Remover",
+  "replacement": "Escolher um padrão de substituição",
+  "request": "Solicitar acesso",
+  "requestPending": "Pedido pendente",
+  "requests": "Pedidos de acesso",
+  "restore": "Restaurar",
+  "roles": {
+    "comment": "Pode comentar",
+    "edit": "Pode editar",
+    "full_access": "Acesso total",
+    "view": "Pode ver"
+  },
+  "save": "Guardar alterações",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Definir como teamspace padrão",
+  "subtitle": "Organize o trabalho partilhado e controle quem pode descobri-lo ou aderir.",
+  "tabs": {
+    "archived": "Arquivados",
+    "browse": "Explorar",
+    "create": "Novo teamspace",
+    "label": "Vistas do teamspace",
+    "manage": "Gerir"
+  },
+  "title": "Teamspaces"
+}

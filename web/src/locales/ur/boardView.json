@@ -13,7 +13,7 @@
   "groupName": "گروپ کا نام",
   "groupOptions": "{{groupName}} گروپ کے اختیارات",
   "groupThisBoard": "اس بورڈ کو گروپ کریں",
-  "groupThisBoardDesc": "کالم بنانے کے لیے سلیکٹ یا اسٹیٹس پراپرٹی شامل کریں۔",
+  "groupThisBoardDesc": "کالم بنانے کے لیے سلیکٹ، سٹیٹس، شخص، یا ملٹی سلیکٹ پراپرٹی شامل کریں یا منتخب کریں۔",
   "newGroup": "نیا گروپ",
   "newGroupIn": "{{dbTitle}} میں نیا {{groupName}} گروپ",
   "newPage": "نیا",

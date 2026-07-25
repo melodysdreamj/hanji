@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Geschlossen",
+    "open": "Offen",
+    "private": "Privat"
+  },
+  "add": "Hinzufügen",
+  "approve": "Genehmigen",
+  "archive": "Teamspace archivieren",
+  "available": "Zum Beitritt verfügbar",
+  "choosePrincipal": "Person oder Gruppe auswählen",
+  "create": "Teamspace erstellen",
+  "deny": "Ablehnen",
+  "error": {
+    "action": "Die Teamspace-Aktion konnte nicht abgeschlossen werden.",
+    "load": "Teamspace-Details konnten nicht geladen werden."
+  },
+  "fields": {
+    "access": "Zugriff",
+    "description": "Beschreibung",
+    "icon": "Icon",
+    "memberRole": "Mitglieder-Seitenzugriff",
+    "membersCanEditSidebar": "Mitglieder können Seiten hinzufügen und umordnen",
+    "membersCanInvite": "Mitglieder können Personen einladen",
+    "name": "Name",
+    "openRole": "Besucher-Seitenzugriff"
+  },
+  "governance": "Teamspace-Einstellungen",
+  "join": "Beitreten",
+  "joined": "Deine Teamspaces",
+  "loadMore": "Mehr laden",
+  "manage": "Verwalten",
+  "member": "Mitglied",
+  "members": "Mitglieder",
+  "noneArchived": "Keine archivierten Teamspaces.",
+  "noneAvailable": "Keine weiteren Teamspaces verfügbar.",
+  "noneJoined": "Noch keinem Teamspace beigetreten.",
+  "noRequests": "Keine ausstehenden Anfragen.",
+  "notice": {
+    "approved": "Anfrage genehmigt.",
+    "archived": "Teamspace archiviert.",
+    "created": "Teamspace erstellt.",
+    "defaultSet": "Standard-Teamspace aktualisiert.",
+    "denied": "Anfrage abgelehnt.",
+    "joined": "Teamspace beigetreten.",
+    "memberAdded": "Mitglied hinzugefügt.",
+    "memberRemoved": "Mitglied entfernt.",
+    "memberUpdated": "Mitgliedsrolle aktualisiert.",
+    "policySaved": "Teamspace-Erstellungsrichtlinie aktualisiert.",
+    "requested": "Zugriff angefordert.",
+    "restored": "Teamspace wiederhergestellt.",
+    "saved": "Teamspace aktualisiert."
+  },
+  "notOwner": "Nur ein Teamspace-Besitzer oder ein Workspace-Administrator kann diesen Teamspace verwalten.",
+  "open": "Öffnen",
+  "owner": "Besitzer",
+  "ownersOnlyCreate": "Nur Workspace-Besitzer können Teamspaces erstellen",
+  "remove": "Entfernen",
+  "replacement": "Ersatz-Standard wählen",
+  "request": "Zugriff anfordern",
+  "requestPending": "Anfrage ausstehend",
+  "requests": "Zugriffsanfragen",
+  "restore": "Wiederherstellen",
+  "roles": {
+    "comment": "Kann kommentieren",
+    "edit": "Kann bearbeiten",
+    "full_access": "Voller Zugriff",
+    "view": "Kann anzeigen"
+  },
+  "save": "Änderungen speichern",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Als Standard-Teamspace festlegen",
+  "subtitle": "Gemeinsame Arbeit organisieren und steuern, wer sie entdecken oder beitreten kann.",
+  "tabs": {
+    "archived": "Archiviert",
+    "browse": "Durchsuchen",
+    "create": "Neuer Teamspace",
+    "label": "Teamspace-Ansichten",
+    "manage": "Verwalten"
+  },
+  "title": "Teamspaces"
+}

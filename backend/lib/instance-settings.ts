@@ -1,11 +1,15 @@
 import { isNotFoundError } from './table-utils';
 
 export type SignupPolicy = 'public' | 'closed';
+export type MemberAddPolicy = 'enabled' | 'disabled';
 
 export interface InstanceSettings {
   id: string;
   signupPolicy?: SignupPolicy | string;
+  memberAddPolicy?: MemberAddPolicy | string;
   instanceAdminUserIds?: string[] | unknown;
+  /** Random scalar replaced by every settings write for bounded exact invalidation. */
+  authorityVersion?: string | null;
   /** Auth user id of the env-provisioned master account, once ensured. */
   masterUserId?: string | null;
   /** Email the master account was last ensured with; a changed env email re-runs the ensure. */
@@ -43,6 +47,16 @@ export function parseSignupPolicy(value: unknown, fallback: SignupPolicy = 'publ
   throw new Error('Signup policy is invalid.');
 }
 
+export function parseMemberAddPolicy(
+  value: unknown,
+  fallback: MemberAddPolicy = 'enabled',
+): MemberAddPolicy {
+  if (typeof value !== 'string') return fallback;
+  const policy = value.trim().toLowerCase();
+  if (policy === 'enabled' || policy === 'disabled') return policy;
+  throw new Error('Member add policy is invalid.');
+}
+
 function normalizeInstanceSettings(row: InstanceSettings | null | undefined): InstanceSettings {
   let signupPolicy: SignupPolicy;
   try {
@@ -50,6 +64,16 @@ function normalizeInstanceSettings(row: InstanceSettings | null | undefined): In
   } catch {
     // An invalid stored policy falls back alone; the rest of the row survives.
     signupPolicy = 'public';
+  }
+  let memberAddPolicy: MemberAddPolicy;
+  try {
+    // Existing installations predate this field, so a stored row without it
+    // keeps the previous enabled behavior. New instance setup also persists
+    // `enabled` explicitly through upsertInstanceSettings below.
+    memberAddPolicy = parseMemberAddPolicy(row?.memberAddPolicy, 'enabled');
+  } catch {
+    // An invalid stored security value fails closed.
+    memberAddPolicy = 'disabled';
   }
   const instanceAdminUserIds = Array.isArray(row?.instanceAdminUserIds)
     ? Array.from(
@@ -63,7 +87,12 @@ function normalizeInstanceSettings(row: InstanceSettings | null | undefined): In
   return {
     id: row?.id ?? INSTANCE_SETTINGS_ID,
     signupPolicy,
+    memberAddPolicy,
     instanceAdminUserIds,
+    authorityVersion:
+      typeof row?.authorityVersion === 'string' && row.authorityVersion.trim()
+        ? row.authorityVersion.trim()
+        : null,
     masterUserId:
       typeof row?.masterUserId === 'string' && row.masterUserId.trim() ? row.masterUserId.trim() : null,
     masterEmail:
@@ -100,6 +129,11 @@ export async function upsertInstanceSettings(
     // A patch that omits signupPolicy must not reset the stored policy.
     delete normalizedPatch.signupPolicy;
   }
+  if (patch.memberAddPolicy !== undefined) {
+    normalizedPatch.memberAddPolicy = parseMemberAddPolicy(patch.memberAddPolicy);
+  } else {
+    delete normalizedPatch.memberAddPolicy;
+  }
   if (patch.instanceAdminUserIds !== undefined) {
     normalizedPatch.instanceAdminUserIds = Array.isArray(patch.instanceAdminUserIds)
       ? Array.from(
@@ -119,6 +153,10 @@ export async function upsertInstanceSettings(
   } else if (typeof patch.masterEmail === 'string') {
     normalizedPatch.masterEmail = patch.masterEmail.trim().toLowerCase();
   }
+  // `updatedAt` has millisecond resolution and can collide across two
+  // serialized settings commits. A random scalar lets lean readers project a
+  // constant-size exact change token without loading instanceAdminUserIds.
+  normalizedPatch.authorityVersion = crypto.randomUUID();
   try {
     return normalizeInstanceSettings(await table.update(INSTANCE_SETTINGS_ID, normalizedPatch));
   } catch (error) {
@@ -134,6 +172,9 @@ export async function upsertInstanceSettings(
       await table.insert({
         id: INSTANCE_SETTINGS_ID,
         signupPolicy: 'public',
+        // Fresh servers preserve the collaboration-first default. An instance
+        // administrator can explicitly block new workspace memberships later.
+        memberAddPolicy: 'enabled',
         ...normalizedPatch,
       }),
     );

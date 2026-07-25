@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlink"
+    "count_other": "{{count}} backlink",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlink"
   },
   "header": {
     "title": "Mention được liên kết"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} mention",
     "mention_other": "{{count}} mention",
     "link_one": "{{count}} liên kết",
-    "link_other": "{{count}} liên kết"
+    "link_other": "{{count}} liên kết",
+    "loaded": "Đã tải: {{summary}}"
   },
   "kind": {
     "mention": "Mention",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} backlink nữa",
-    "count_other": "{{count}} backlink nữa"
+    "count_other": "{{count}} backlink nữa",
+    "load": "Tải thêm backlink",
+    "loading": "Đang tải backlink…",
+    "search": "Tìm backlink"
   }
 }

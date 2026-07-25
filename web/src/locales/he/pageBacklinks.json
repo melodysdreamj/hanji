@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} קישור חוזר",
-    "count_other": "{{count}} קישורים חוזרים"
+    "count_other": "{{count}} קישורים חוזרים",
+    "partial_one": "{{count}}+ קישור נכנס",
+    "partial_other": "{{count}}+ קישורים נכנסים"
   },
   "header": {
     "title": "אזכורים מקושרים"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} אזכור",
     "mention_other": "{{count}} אזכורים",
     "link_one": "{{count}} קישור",
-    "link_other": "{{count}} קישורים"
+    "link_other": "{{count}} קישורים",
+    "loaded": "נטען: {{summary}}"
   },
   "kind": {
     "mention": "אזכור",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} קישור חוזר נוסף",
-    "count_other": "{{count}} קישורים חוזרים נוספים"
+    "count_other": "{{count}} קישורים חוזרים נוספים",
+    "load": "טען עוד קישורים נכנסים",
+    "loading": "טוען קישורים נכנסים…",
+    "search": "חפש קישורים נכנסים"
   }
 }

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "ওয়ার্কস্পেস মেনু খুলুন",
   "closeWorkspaceMenu": "ওয়ার্কস্পেস মেনু বন্ধ করুন",
   "workspaceMenu": "ওয়ার্কস্পেস মেনু",
-  "exportWorkspace": "ওয়ার্কস্পেস রপ্তানি করুন",
+  "exportWorkspace": "ওয়ার্কস্পেস JSON এক্সপোর্ট (ফাইল বাদে)",
   "exportedWorkspace": "ওয়ার্কস্পেস Hanji ফাইল হিসেবে রপ্তানি করা হয়েছে।",
   "exportedWorkspaceWithPlaceholders": "ওয়ার্কস্পেস Hanji ফাইল হিসেবে রপ্তানি করা হয়েছে — সংযুক্তিগুলি স্থানধারক হিসেবে রেখে দেওয়া হয়েছে।",
   "couldntExportWorkspace": "ওয়ার্কস্পেস এক্সপোর্ট করা যায়নি।",
@@ -76,5 +76,12 @@
     "later": "পরে",
     "note": "আপনি পরে সবসময় সাইডবারের ইম্পোর্ট থেকে এটি শুরু করতে পারেন।",
     "title": "আপনার Notion ওয়ার্কস্পেস Hanji-তে নিয়ে আসবেন?"
-  }
+  },
+  "addPageToTeamspace": "{{name}}-এ পৃষ্ঠা যোগ করুন",
+  "couldntExportWorkspaceArchive": "ওয়ার্কস্পেস আর্কাইভ এক্সপোর্ট করা যায়নি।",
+  "exportedWorkspaceArchive": "ফাইলসহ ওয়ার্কস্পেস আর্কাইভ এক্সপোর্ট করা হয়েছে।",
+  "exportWorkspaceArchive": "ওয়ার্কস্পেস আর্কাইভ এক্সপোর্ট (ফাইলসহ)",
+  "joinTeamspaces": "টিমস্পেসে যোগ দিন",
+  "keyboardShortcuts": "কীবোর্ড শর্টকাট",
+  "teamspacePages": "{{name}} পৃষ্ঠাসমূহ"
 }

@@ -14,13 +14,13 @@ import { useTranslation } from "react-i18next";
 import {
   outboxAllEntries,
   outboxPendingHintCount,
+  subscribeOutboxChanges,
   subscribeOutboxPending,
 } from "@/lib/outbox";
 import { flushAllPending, useStore } from "@/lib/store";
 
 import styles from "./SyncStatusBadge.module.css";
 
-const POLL_MS = 2500;
 const CONFIRMED_VISIBLE_MS = 2500;
 
 export default function SyncStatusBadge() {
@@ -52,26 +52,66 @@ export default function SyncStatusBadge() {
   useEffect(() => {
     if (!userId) return;
     let mounted = true;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const poll = async () => {
-      if (timer) clearTimeout(timer);
-      const entries = await outboxAllEntries(userId).catch(() => []);
+    let dirty = true;
+    let trailing = false;
+    let inFlight: Promise<void> | null = null;
+    const isVisible = () => document.visibilityState === "visible";
+    const reconcile = () => {
       if (!mounted) return;
-      setPending(Math.max(entries.length, outboxPendingHintCount(userId)));
-      timer = setTimeout(() => void poll(), POLL_MS);
+      if (!isVisible()) {
+        dirty = true;
+        return;
+      }
+      if (inFlight) {
+        trailing = true;
+        return;
+      }
+      dirty = false;
+      const current = outboxAllEntries(userId)
+        .catch(() => [])
+        .then((entries) => {
+          if (!mounted) return;
+          setPending(Math.max(entries.length, outboxPendingHintCount(userId)));
+        });
+      inFlight = current;
+      void current.finally(() => {
+        if (inFlight !== current) return;
+        inFlight = null;
+        if (!mounted || (!trailing && !dirty)) return;
+        trailing = false;
+        reconcile();
+      });
     };
-    const unsubscribe = subscribeOutboxPending((changedUserId, pendingHint) => {
+    const requestReconcile = () => {
+      if (!isVisible()) {
+        dirty = true;
+        return;
+      }
+      reconcile();
+    };
+    const unsubscribePending = subscribeOutboxPending((changedUserId, pendingHint) => {
       if (!mounted || changedUserId !== userId) return;
       // Paint the local->server pending transition immediately; the async read
       // below then reconciles this tab's hint with every tab's durable queue.
+      if (!isVisible()) {
+        dirty = true;
+        return;
+      }
       setPending(pendingHint);
-      void poll();
+      requestReconcile();
     });
-    void poll();
+    const unsubscribeChanges = subscribeOutboxChanges(requestReconcile);
+    const handleVisibilityChange = () => {
+      if (isVisible()) requestReconcile();
+      else dirty = true;
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    requestReconcile();
     return () => {
       mounted = false;
-      unsubscribe();
-      if (timer) clearTimeout(timer);
+      unsubscribePending();
+      unsubscribeChanges();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [userId]);
 

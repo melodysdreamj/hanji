@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Přidat komentář",
+    "addLink": "Přidat odkaz",
+    "blockColor": "Použít poslední barvu",
+    "bold": "Tučné",
+    "copyPageLink": "Kopírovat odkaz na stránku",
+    "findInPage": "Hledat na stránce",
+    "inlineCode": "Vložený kód",
+    "italic": "Kurzíva",
+    "moveBlock": "Přesunout blok na jinou stránku",
+    "moveBlockDown": "Přesunout blok dolů",
+    "moveBlockUp": "Přesunout blok nahoru",
+    "movePage": "Přesunout aktuální stránku",
+    "navigateBack": "Zpět",
+    "navigateForward": "Vpřed",
+    "newPage": "Nová stránka",
+    "openBlockMenu": "Otevřít akce bloku",
+    "openKeyboardShortcuts": "Otevřít klávesové zkratky",
+    "openParentPage": "Otevřít nadřazenou stránku",
+    "quickFind": "Rychlé hledání",
+    "strikethrough": "Přeškrtnutí",
+    "toggleAllToggles": "Rozbalit nebo sbalit všechny přepínače",
+    "toggleSidebar": "Přepnout postranní panel",
+    "toggleTheme": "Přepnout tmavý režim",
+    "underline": "Podtržení"
+  },
+  "categories": {
+    "createStyle": "Vytváření a stylování",
+    "editMove": "Úpravy a přesun",
+    "popular": "Oblíbené"
+  },
+  "categoriesLabel": "Kategorie zkratek",
+  "close": "Zavřít",
+  "closeBackdrop": "Zavřít klávesové zkratky",
+  "empty": "Nenalezeny žádné zkratky",
+  "keysFor": "Klávesy pro {{action}}",
+  "or": "nebo",
+  "searchLabel": "Prohledat klávesové zkratky",
+  "searchPlaceholder": "Hledat zkratky…",
+  "searchResults": "Výsledky hledání",
+  "searchTerms": {
+    "toggleTheme": "téma světlý tmavý zobrazení"
+  },
+  "title": "Klávesové zkratky"
+}

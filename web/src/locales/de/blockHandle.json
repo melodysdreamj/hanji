@@ -88,5 +88,38 @@
     "hoursAgo": "Zuletzt bearbeitet vor {{hours}} Std",
     "daysAgo": "Zuletzt bearbeitet vor {{days}} T",
     "on": "Zuletzt bearbeitet {{date}}"
+  },
+  "align": {
+    "center": "Zentriert",
+    "choose": "Bildausrichtung wählen",
+    "left": "Links",
+    "right": "Rechts"
+  },
+  "altText": {
+    "help": "Alt-Text hilft Nutzern von Screenreadern, das Bild zu verstehen.",
+    "label": "Beschreibung",
+    "placeholder": "Bild beschreiben",
+    "remove": "Entfernen",
+    "save": "Speichern",
+    "title": "Alt-Text"
+  },
+  "imageLink": {
+    "invalid": "Geben Sie eine vollständige http:// oder https:// URL ein.",
+    "label": "URL bei Bildklick öffnen",
+    "remove": "Entfernen",
+    "save": "Speichern",
+    "title": "Bildlink"
+  },
+  "media": {
+    "addImageLink": "Link hinzufügen",
+    "align": "Ausrichten",
+    "altText": "Alt-Text",
+    "copySourceLink": "Quelllink kopieren",
+    "download": "Herunterladen",
+    "editImageLink": "Link bearbeiten",
+    "fullScreen": "Vollbild",
+    "openLink": "Link öffnen",
+    "replace": "Ersetzen",
+    "viewOriginal": "Original anzeigen"
   }
 }

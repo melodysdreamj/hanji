@@ -88,5 +88,38 @@
     "hoursAgo": "Editado há {{hours}}h",
     "daysAgo": "Editado há {{days}}d",
     "on": "Editado em {{date}}"
+  },
+  "align": {
+    "center": "Centro",
+    "choose": "Escolher alinhamento da imagem",
+    "left": "Esquerda",
+    "right": "Direita"
+  },
+  "altText": {
+    "help": "O texto alternativo ajuda pessoas que usam leitores de tela a entender a imagem.",
+    "label": "Descrição",
+    "placeholder": "Descreva a imagem",
+    "remove": "Remover",
+    "save": "Salvar",
+    "title": "Texto alternativo"
+  },
+  "imageLink": {
+    "invalid": "Insira uma URL completa http:// ou https://",
+    "label": "Abrir URL ao clicar na imagem",
+    "remove": "Remover",
+    "save": "Salvar",
+    "title": "Link da imagem"
+  },
+  "media": {
+    "addImageLink": "Adicionar link",
+    "align": "Alinhar",
+    "altText": "Texto alternativo",
+    "copySourceLink": "Copiar link de origem",
+    "download": "Baixar",
+    "editImageLink": "Editar link",
+    "fullScreen": "Tela cheia",
+    "openLink": "Abrir link",
+    "replace": "Substituir",
+    "viewOriginal": "Ver original"
   }
 }

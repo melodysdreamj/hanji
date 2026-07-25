@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Drobečková navigace",
+  "clearSearch": "Vymazat hledání",
+  "errors": {
+    "not-found": "Tato stránka mohla být zrušena nebo se změnila její adresa.",
+    "offline": "Zkontrolujte připojení a zkuste stránku znovu otevřít.",
+    "rate-limited": "Tento web přijímá příliš mnoho požadavků. Počkejte chvíli a zkuste to znovu.",
+    "unavailable": "Hanji nyní nemůže tuto stránku otevřít. Zkuste to za chvíli."
+  },
+  "madeWithHanji": "Vytvořeno pomocí Hanji",
+  "navigation": "Navigace webu",
+  "noResults": "Nenalezeny žádné stránky",
+  "outsideSite": "Tato stránka není součástí tohoto publikovaného webu.",
+  "search": "Hledat na tomto webu",
+  "tryAgain": "Zkusit znovu",
+  "unavailable": "Tento web není k dispozici."
+}

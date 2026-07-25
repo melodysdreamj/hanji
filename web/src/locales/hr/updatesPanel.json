@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} nedavnih ažuriranja",
     "unreadOfTotal": "{{unread}} nepročitanih od {{total}} ažuriranja",
     "updateType": "Vrsta ažuriranja",
-    "updates": "Ažuriranja",
-    "modeUpdates": "Ažuriranja",
-    "modeChats": "Razgovori",
-    "inboxMode": "Način sandučića"
+    "updates": "Ažuriranja"
   },
   "time": {
     "justNow": "Upravo",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} verzija",
     "versionsAgo": "Prije {{count}} verzija",
     "versionsAhead": "Unaprijed {{count}} verzija",
-    "versionsAria": "Verzije"
+    "versionsAria": "Verzije",
+    "emptyBlock": "Prazan blok",
+    "emptyPreview": "Ova verzija nema sadržaj stranice.",
+    "previewAria": "Pregled verzije stranice samo za čitanje",
+    "previewingCurrent": "Prikaz trenutne stranice",
+    "previewingSnapshot": "Prikaz prošle verzije",
+    "previewOnlyHint": "Odabir verzije samo je pregledava. Trenutna stranica mijenja se tek nakon vraćanja.",
+    "restoreThisVersion": "Vrati",
+    "restoring": "Vraćanje...",
+    "versionHistory": "Povijest verzija"
   },
   "badges": {
     "comment": "Komentar",
@@ -67,7 +73,8 @@
     "referenceMention": "Spomenuto {{title}} · {{preview}}",
     "referenceLink": "Povezano s {{title}} · {{preview}}",
     "unreadDot": "Nepročitano",
-    "workspaceUpdate": "Ažuriranje radnog prostora"
+    "workspaceUpdate": "Ažuriranje radnog prostora",
+    "bySelf": "od Vas"
   },
   "empty": {
     "allCaughtUp": "Sve ste provjerili.",

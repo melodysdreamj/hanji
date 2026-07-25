@@ -88,5 +88,38 @@
     "hoursAgo": "{{hours}} saat əvvəl redaktə edilib",
     "daysAgo": "{{days}} gün əvvəl redaktə edilib",
     "on": "{{date}} redaktə edilib"
+  },
+  "align": {
+    "center": "Mərkəz",
+    "choose": "Hizalanma seçin",
+    "left": "Sol",
+    "right": "Sağ"
+  },
+  "altText": {
+    "help": "Alt mətn ekran oxuyucu istifadəçilərinin şəkli anlamasına kömək edir.",
+    "label": "Təsvir",
+    "placeholder": "Şəkli təsvir edin",
+    "remove": "Sil",
+    "save": "Yadda saxla",
+    "title": "Alt mətn"
+  },
+  "imageLink": {
+    "invalid": "Tam http:// və ya https:// URL daxil edin.",
+    "label": "Şəkil klikləndikdə bu URL-i aç",
+    "remove": "Sil",
+    "save": "Yadda saxla",
+    "title": "Şəkil linki"
+  },
+  "media": {
+    "addImageLink": "Link əlavə et",
+    "align": "Hizala",
+    "altText": "Alt mətn",
+    "copySourceLink": "Mənbə linkini kopyala",
+    "download": "Yüklə",
+    "editImageLink": "Linki redaktə et",
+    "fullScreen": "Tam ekran",
+    "openLink": "Linki aç",
+    "replace": "Əvəz et",
+    "viewOriginal": "Orijinala bax"
   }
 }

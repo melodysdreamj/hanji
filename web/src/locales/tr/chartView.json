@@ -4,7 +4,22 @@
     "sum": "Toplam",
     "average": "Ortalama",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "İşaretli",
+    "count_values": "Değer sayısı",
+    "date_range": "Tarih aralığı",
+    "earliest_date": "En erken tarih",
+    "empty": "Boş sayısı",
+    "latest_date": "En geç tarih",
+    "median": "Ortanca",
+    "not_empty": "Dolu sayısı",
+    "percent_checked": "İşaretli yüzdesi",
+    "percent_empty": "Boş yüzdesi",
+    "percent_not_empty": "Dolu yüzdesi",
+    "percent_unchecked": "İşaretsiz yüzdesi",
+    "range": "Aralık",
+    "unchecked": "İşaretsiz",
+    "unique": "Benzersiz değer sayısı"
   },
   "chartAria": "{{name}} grafiği",
   "chartType": "Grafik türü",
@@ -27,5 +42,9 @@
   "untitledProperty": "İsimsiz",
   "valueProperty": "Değer özelliği",
   "xAxis": "X ekseni",
-  "yAxis": "Y ekseni"
+  "yAxis": "Y ekseni",
+  "dateRangeDays": "{{count}} gün",
+  "missingProperty": "kaydedilen özellik",
+  "unsupportedAggregateDesc": "{{aggregate}}, {{property}} üzerinden hesaplanamaz. Uyumlu bir özellik veya hesaplama seçin.",
+  "unsupportedAggregateTitle": "Bu grafik hesaplaması kullanılamıyor"
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "@/lib/router";
 import { useShallow } from "zustand/react/shallow";
 import {
-  listAllBlocks,
   mergedBlocks,
   pageReferenceHits,
   type PageReferenceHit,
@@ -19,7 +19,6 @@ import {
 } from "@/lib/edgebase";
 import { activeDateLocale } from "@/lib/i18n";
 import { i18next } from "@/i18n";
-import { InboxChats } from "./InboxChats";
 import { pageHref } from "@/lib/navigation";
 import { pagePathOrWorkspaceRoot } from "@/lib/pagePath";
 import { pageDisplayTitle } from "@/lib/pageTitle";
@@ -32,7 +31,7 @@ import {
   writeUpdateActivityKeys,
 } from "@/lib/updateReadState";
 import { actorLabel } from "./database/people";
-import { ArrowLeft, ArrowRight, Bell, CheckIcon, ClockIcon, X } from "./icons";
+import { Bell, CheckIcon, ClockIcon, X } from "./icons";
 import { PageIconGlyph } from "./PageIcon";
 import styles from "./UpdatesPanel.module.css";
 
@@ -66,6 +65,17 @@ type Activity =
     };
 type ActivityFilter = "all" | "unread" | "comments" | "mentions" | "edits";
 
+type PageHistorySelection = {
+  pageId?: string;
+  key: string;
+};
+
+type PageHistoryPreviewRow = {
+  block: Block;
+  depth: number;
+  number?: number;
+};
+
 const ACTIVITY_FILTER_VALUES: ActivityFilter[] = [
   "all",
   "unread",
@@ -73,6 +83,7 @@ const ACTIVITY_FILTER_VALUES: ActivityFilter[] = [
   "mentions",
   "edits",
 ];
+const EMPTY_BLOCKS: Block[] = [];
 
 function richText(body: unknown) {
   if (typeof body === "string") return body;
@@ -180,12 +191,72 @@ function notificationReadKeys(notifications: NotificationRecord[]) {
   );
 }
 
+function isSelfAuthored(actorId: string | null | undefined, userId: string | undefined) {
+  return Boolean(userId && actorId === userId);
+}
+
 function sameStringSet(a: Set<string>, b: Set<string>) {
   if (a.size !== b.size) return false;
   for (const value of a) {
     if (!b.has(value)) return false;
   }
   return true;
+}
+
+function blockPreviewText(block: Block) {
+  const richTextValue = block.content?.rich?.map((span) => span.text).join("").trim();
+  if (richTextValue) return richTextValue;
+  if (block.plainText?.trim()) return block.plainText.trim();
+  if (block.content?.expression?.trim()) return block.content.expression.trim();
+  if (block.content?.buttonLabel?.trim()) return block.content.buttonLabel.trim();
+  if (block.content?.childPageTitle?.trim()) return block.content.childPageTitle.trim();
+  if (block.content?.fileName?.trim()) return block.content.fileName.trim();
+  if (block.content?.table?.length) {
+    return block.content.table
+      .flat()
+      .map((cell) => cell.trim())
+      .filter(Boolean)
+      .slice(0, 8)
+      .join(" · ");
+  }
+  if (block.content?.url?.trim()) return block.content.url.trim();
+  return "";
+}
+
+function pageHistoryPreviewRows(blocks: Block[]) {
+  const byParent = new Map<string | null, Block[]>();
+  for (const block of blocks) {
+    const parentId = block.parentId ?? null;
+    byParent.set(parentId, [...(byParent.get(parentId) ?? []), block]);
+  }
+  for (const children of byParent.values()) {
+    children.sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
+  }
+
+  const rows: PageHistoryPreviewRow[] = [];
+  const visited = new Set<string>();
+  const walk = (parentId: string | null, depth: number) => {
+    let numbered = 0;
+    for (const block of byParent.get(parentId) ?? []) {
+      if (visited.has(block.id)) continue;
+      visited.add(block.id);
+      if (block.type === "numbered_list_item") numbered += 1;
+      else numbered = 0;
+      if (block.type !== "column_list" && block.type !== "column") {
+        rows.push({
+          block,
+          depth,
+          number: block.type === "numbered_list_item" ? numbered : undefined,
+        });
+      }
+      walk(block.id, block.type === "column_list" || block.type === "column" ? depth : depth + 1);
+    }
+  };
+  walk(null, 0);
+  for (const block of blocks) {
+    if (!visited.has(block.id)) rows.push({ block, depth: 0 });
+  }
+  return rows;
 }
 
 export function UpdatesPanel({
@@ -205,7 +276,7 @@ export function UpdatesPanel({
   exiting?: boolean;
 }) {
   const router = useRouter();
-  const { t } = useTranslation(["updatesPanel", "common"]);
+  const { t, i18n } = useTranslation(["updatesPanel", "common"]);
   // "sidebar-inline" renders the feed inside the sidebar column (Notion-style
   // inbox that swaps the page tree) instead of as a floating overlay: no
   // backdrop, no modal focus trap, and no aggressive auto-focus on open.
@@ -228,8 +299,6 @@ export function UpdatesPanel({
   );
   const pagesById = useStore((s) => s.pagesById);
   const commentsByPage = useStore((s) => s.commentsByPage);
-  const loadedCommentPages = useStore((s) => s.loadedCommentPages);
-  const loadComments = useStore((s) => s.loadComments);
   const blocksByPage = useStore((s) => s.blocksByPage);
   const loadedBlockPages = useStore((s) => s.loadedBlockPages);
   const blockHistory = useStore((s) => (pageId ? s.blockHistoryByPage[pageId] : undefined));
@@ -238,15 +307,13 @@ export function UpdatesPanel({
   const notify = useStore((s) => s.notify);
   const workspaceId = useStore((s) => s.workspace?.id);
   const userId = useStore((s) => s.userId);
-  const [fetchedBlocks, setFetchedBlocks] = useState<Block[]>([]);
-  const [referencesLoaded, setReferencesLoaded] = useState(false);
   const [filter, setFilter] = useState<ActivityFilter>(initialFilter);
-  // Inbox mode: the notification feed stays intact; "chats" swaps the list
-  // for the messenger-style per-page room view (2026-07-10 contract revision).
-  const [inboxMode, setInboxMode] = useState<"updates" | "chats">("updates");
   const [readActivityKeys, setReadActivityKeys] = useState<Set<string>>(() => readUpdateActivityKeys());
   const [serverReadActivityKeys, setServerReadActivityKeys] = useState<Set<string>>(new Set());
   const [serverNotifications, setServerNotifications] = useState<NotificationRecord[]>([]);
+  const [notificationsLoaded, setNotificationsLoaded] = useState(false);
+  const [historySelection, setHistorySelection] = useState<PageHistorySelection>({ key: "current" });
+  const [restoringVersion, setRestoringVersion] = useState(false);
   const panelTitle =
     title ?? (pageId ? t("updatesPanel:header.pageHistory") : t("updatesPanel:header.updates"));
   const page = pageId ? pagesById[pageId] : undefined;
@@ -263,17 +330,28 @@ export function UpdatesPanel({
   const historyPastCount = blockHistory?.past.length ?? 0;
   const historyFutureCount = blockHistory?.future.length ?? 0;
   const localVersionCount = historyPastCount + historyFutureCount + 1;
-  const currentBlocks = pageId ? (blocksByPage[pageId] ?? []) : [];
-  const currentVersionAt =
-    Math.max(timeValue(page?.updatedAt ?? page?.createdAt), ...currentBlocks.map(blockUpdatedAt)) || 0;
+  const currentBlocks = pageId ? (blocksByPage[pageId] ?? EMPTY_BLOCKS) : EMPTY_BLOCKS;
+  const pageVersionAt = timeValue(page?.updatedAt ?? page?.createdAt);
+  const latestEditedBlock = currentBlocks.reduce<Block | undefined>(
+    (latest, block) => (!latest || blockUpdatedAt(block) > blockUpdatedAt(latest) ? block : latest),
+    undefined,
+  );
+  const latestBlockVersionAt = latestEditedBlock ? blockUpdatedAt(latestEditedBlock) : 0;
+  const currentVersionAt = Math.max(pageVersionAt, latestBlockVersionAt) || 0;
+  const pageVersionActorId = page?.lastEditedBy ?? page?.createdBy;
+  const currentVersionActorId =
+    latestEditedBlock && latestBlockVersionAt >= pageVersionAt
+      ? latestEditedBlock.lastEditedBy ?? pageVersionActorId
+      : pageVersionActorId ?? latestEditedBlock?.lastEditedBy;
   const previousVersions = useMemo(
     () =>
       [...(blockHistory?.past ?? [])]
         .reverse()
-        .slice(0, 8)
         .map((entry, index) => ({
           entry,
           steps: index + 1,
+          key: `past:${index + 1}:${entry.at}`,
+          direction: "previous" as const,
           title:
             index === 0
               ? t("updatesPanel:versions.previousVersion")
@@ -285,10 +363,11 @@ export function UpdatesPanel({
     () =>
       [...(blockHistory?.future ?? [])]
         .reverse()
-        .slice(0, 4)
         .map((entry, index) => ({
           entry,
           steps: index + 1,
+          key: `future:${index + 1}:${entry.at}`,
+          direction: "next" as const,
           title:
             index === 0
               ? t("updatesPanel:versions.nextVersion")
@@ -296,14 +375,52 @@ export function UpdatesPanel({
         })),
     [blockHistory, t],
   );
+  const historyVersions = useMemo(
+    () => [
+      {
+        key: "current",
+        direction: null,
+        steps: 0,
+        title: t("updatesPanel:versions.currentVersion"),
+        at: currentVersionAt,
+        actorId: currentVersionActorId,
+        blocks: currentBlocks,
+      },
+      ...previousVersions.map((version) => ({
+        ...version,
+        at: version.entry.at,
+        actorId: version.entry.actorId,
+        blocks: version.entry.blocks,
+      })),
+      ...nextVersions.map((version) => ({
+        ...version,
+        at: version.entry.at,
+        actorId: version.entry.actorId,
+        blocks: version.entry.blocks,
+      })),
+    ],
+    [currentBlocks, currentVersionActorId, currentVersionAt, nextVersions, previousVersions, t],
+  );
+  const selectedHistoryKey = historySelection.pageId === pageId ? historySelection.key : "current";
+  const selectedHistoryVersion =
+    historyVersions.find((version) => version.key === selectedHistoryKey) ?? historyVersions[0];
+  const previewRows = useMemo(
+    () => pageHistoryPreviewRows(selectedHistoryVersion.blocks),
+    [selectedHistoryVersion.blocks],
+  );
 
   const pageIds = useMemo(() => pages.map((page) => page.id), [pages]);
-  const pageIdsKey = pageIds.join("|");
 
   const applyServerNotifications = useCallback(
     (notifications: NotificationRecord[]) => {
-      setServerNotifications(notifications);
-      const serverKeys = notificationReadKeys(notifications);
+      // The backend enforces the same recipient boundary. Keep this local
+      // filter as a stale-response/older-runtime defense so a self row can
+      // never repaint the unread UI during a rolling upgrade.
+      const recipientNotifications = notifications.filter(
+        (notification) => !isSelfAuthored(notification.actorId, userId),
+      );
+      setServerNotifications(recipientNotifications);
+      const serverKeys = notificationReadKeys(recipientNotifications);
       setServerReadActivityKeys((current) => (sameStringSet(current, serverKeys) ? current : serverKeys));
       if (serverKeys.size === 0) return;
       setReadActivityKeys((current) => {
@@ -313,7 +430,7 @@ export function UpdatesPanel({
         return new Set(next);
       });
     },
-    [workspaceId],
+    [userId, workspaceId],
   );
 
   const close = useCallback(() => {
@@ -333,10 +450,6 @@ export function UpdatesPanel({
   }, [inline]);
 
   useEffect(() => {
-    void Promise.all(pageIds.map((pageId) => loadComments(pageId)));
-  }, [loadComments, pageIds, pageIdsKey]);
-
-  useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       setReadActivityKeys(readUpdateActivityKeys(workspaceId));
     });
@@ -344,13 +457,15 @@ export function UpdatesPanel({
   }, [workspaceId]);
 
   useEffect(() => {
-    if (!workspaceId) {
+    setNotificationsLoaded(false);
+    if (!workspaceId || pageId) {
       setServerNotifications([]);
       setServerReadActivityKeys(new Set());
+      setNotificationsLoaded(true);
       return;
     }
     let cancelled = false;
-    void listNotificationsRemote({ workspaceId, includeRead: true, limit: 100 })
+    void listNotificationsRemote({ workspaceId, includeRead: true, limit: 200 })
       .then((result) => {
         if (!cancelled) applyServerNotifications(result.notifications ?? []);
       })
@@ -359,30 +474,16 @@ export function UpdatesPanel({
           setServerNotifications([]);
           setServerReadActivityKeys(new Set());
         }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [applyServerNotifications, workspaceId]);
-
-  useEffect(() => {
-    let cancelled = false;
-    listAllBlocks()
-      .then((blocks) => {
-        if (!cancelled) setFetchedBlocks(blocks);
-      })
-      .catch(() => {
-        if (!cancelled) setFetchedBlocks([]);
       })
       .finally(() => {
-        if (!cancelled) setReferencesLoaded(true);
+        if (!cancelled) setNotificationsLoaded(true);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [applyServerNotifications, pageId, workspaceId]);
 
-  const loading = pageIds.some((pageId) => !loadedCommentPages.has(pageId)) || !referencesLoaded;
+  const loading = Boolean(workspaceId && !pageId && !notificationsLoaded);
 
   const activities = useMemo<Activity[]>(() => {
     const scopedPageIds = pageId ? new Set(pageIds) : null;
@@ -391,24 +492,12 @@ export function UpdatesPanel({
       if (scopedPageIds && (!notification.pageId || !scopedPageIds.has(notification.pageId))) return false;
       return true;
     });
-    const serverCommentIds = new Set(
-      scopedNotifications
-        .map((notification) => notification.commentId)
-        .filter((commentId): commentId is string => typeof commentId === "string" && commentId.length > 0),
-    );
-    const serverReferenceBlockIds = new Set(
-      scopedNotifications
-        .filter((notification) => !notification.commentId && ["mention", "link"].includes(notification.kind))
-        .map((notification) => notification.blockId)
-        .filter((blockId): blockId is string => typeof blockId === "string" && blockId.length > 0),
-    );
     const commentItems: Activity[] = [];
     for (const [commentPageId, comments] of Object.entries(commentsByPage)) {
       if (scopedPageIds && !scopedPageIds.has(commentPageId)) continue;
       const page = pagesById[commentPageId];
       if (!page || page.inTrash) continue;
       for (const comment of comments) {
-        if (serverCommentIds.has(comment.id)) continue;
         commentItems.push({
           kind: "comment",
           id: `comment:${comment.id}`,
@@ -426,10 +515,12 @@ export function UpdatesPanel({
       at: timeValue(page.updatedAt ?? page.createdAt),
     }));
 
-    const referenceBlocks = mergedBlocks(fetchedBlocks, blocksByPage, loadedBlockPages);
+    // Inbox opening never fetches the workspace block corpus. Blocks already
+    // loaded for normal page editing can enrich the durable notification feed
+    // without adding another read lane.
+    const referenceBlocks = mergedBlocks(EMPTY_BLOCKS, blocksByPage, loadedBlockPages);
     const referenceItems: Activity[] = pageReferenceHits(referenceBlocks, pagesById)
       .filter((reference) => !scopedPageIds || scopedPageIds.has(reference.page.id))
-      .filter((reference) => !serverReferenceBlockIds.has(reference.block.id))
       .map((reference) => ({
         kind: "reference",
         id: `reference:${reference.block.id}:${reference.targetPage.id}:${reference.kind}`,
@@ -438,7 +529,8 @@ export function UpdatesPanel({
         at: timeValue(reference.block.updatedAt ?? reference.block.createdAt ?? reference.page.updatedAt),
       }));
 
-    const localItems = [...commentItems, ...referenceItems, ...pageItems];
+    const localItems = [...commentItems, ...referenceItems, ...pageItems]
+      .filter((activity) => !isSelfAuthored(activityActorId(activity), userId));
     const localKeys = new Set(localItems.map((activity) => updateActivityReadKey(activity)));
     const notificationItems: Activity[] = scopedNotifications
       .filter((notification) => !localKeys.has(notification.activityKey))
@@ -457,13 +549,13 @@ export function UpdatesPanel({
   }, [
     blocksByPage,
     commentsByPage,
-    fetchedBlocks,
     loadedBlockPages,
     pageId,
     pageIds,
     pages,
     pagesById,
     serverNotifications,
+    userId,
   ]);
 
   function activityHash(activity: Activity) {
@@ -483,7 +575,7 @@ export function UpdatesPanel({
     if (activity.kind === "comment") return activity.comment.authorId;
     if (activity.kind === "notification") return activity.notification.actorId;
     if (activity.kind === "reference") {
-      return activity.reference.block.createdBy ?? activity.reference.page.lastEditedBy ?? activity.reference.page.createdBy;
+      return activity.reference.block.lastEditedBy ?? activity.reference.block.createdBy ?? activity.reference.page.lastEditedBy ?? activity.reference.page.createdBy;
     }
     return activity.page.lastEditedBy ?? activity.page.createdBy;
   }
@@ -537,38 +629,42 @@ export function UpdatesPanel({
     };
   }
 
-  // The notification-sync effect re-runs on `activitySyncKey` (a content hash of
-  // the activities), not on the identity of this per-render transform function.
-  // Read it through a ref so the effect isn't forced to list an unstable closure
-  // in its deps (which would re-run it on every render).
-  const activityNotificationInputRef = useRef(activityNotificationInput);
-  useEffect(() => {
-    activityNotificationInputRef.current = activityNotificationInput;
-  });
-
   const effectiveReadActivityKeys = useMemo(
     () => new Set([...readActivityKeys, ...serverReadActivityKeys]),
     [readActivityKeys, serverReadActivityKeys],
   );
 
-  const activitySyncKey = useMemo(
-    () =>
-      workspaceId && !pageId && !loading
-        ? activities.map((activity) => activityReadKey(activity)).join("|")
-        : "",
-    [activities, loading, pageId, workspaceId],
-  );
+  // Only locally observed activity is an input to sync. Server notifications
+  // are the response/durable view and must never be echoed back as a new sync.
+  // The serialized snapshot includes the full payload (not just activityKey),
+  // so equivalent renders stay quiet while a real title/preview/target/read
+  // change still produces a new request.
+  const activitySyncSnapshot = workspaceId && !pageId && !loading
+    ? {
+        activities: activities
+          .filter((activity) => activity.kind !== "notification")
+          .map((activity) => activityNotificationInput(activity)),
+        localReadKeys: activities
+          .filter((activity) => activity.kind !== "notification")
+          .map((activity) => activityReadKey(activity))
+          .filter((key) => readActivityKeys.has(key))
+          .sort(),
+      }
+    : null;
+  const activitySyncKey = activitySyncSnapshot
+    ? JSON.stringify(activitySyncSnapshot)
+    : "";
+  const activitySyncSnapshotRef = useRef(activitySyncSnapshot);
+  activitySyncSnapshotRef.current = activitySyncSnapshot;
 
   useEffect(() => {
-    if (!workspaceId || pageId || loading || activities.length === 0) return;
+    const snapshot = activitySyncSnapshotRef.current;
+    if (!workspaceId || !snapshot || snapshot.activities.length === 0) return;
     let cancelled = false;
-    const localReadKeys = activities
-      .map((activity) => activityReadKey(activity))
-      .filter((key) => readActivityKeys.has(key));
-    void syncNotificationsRemote(workspaceId, activities.map((activity) => activityNotificationInputRef.current(activity)))
+    void syncNotificationsRemote(workspaceId, snapshot.activities)
       .then(async (result) => {
-        if (localReadKeys.length === 0) return result;
-        return markNotificationsReadRemote(workspaceId, localReadKeys);
+        if (snapshot.localReadKeys.length === 0) return result;
+        return markNotificationsReadRemote(workspaceId, snapshot.localReadKeys);
       })
       .then((result) => {
         if (!cancelled) applyServerNotifications(result.notifications ?? []);
@@ -577,7 +673,7 @@ export function UpdatesPanel({
     return () => {
       cancelled = true;
     };
-  }, [activities, activitySyncKey, applyServerNotifications, loading, pageId, readActivityKeys, workspaceId]);
+  }, [activitySyncKey, applyServerNotifications, workspaceId]);
 
   const filterCounts = useMemo(() => {
     return {
@@ -662,22 +758,8 @@ export function UpdatesPanel({
     }
   }
 
-  async function restoreAdjacentVersion(direction: "previous" | "next") {
-    if (!pageId) return;
-    const ok =
-      direction === "previous"
-        ? await undoBlockChange(pageId)
-        : await redoBlockChange(pageId);
-    notify(
-      ok
-        ? t(direction === "previous" ? "updatesPanel:versions.restoredPrevious" : "updatesPanel:versions.restoredNext")
-        : t(direction === "previous" ? "updatesPanel:versions.noVersionPrevious" : "updatesPanel:versions.noVersionNext"),
-      ok ? "success" : "default",
-    );
-  }
-
   async function restoreVersionSteps(direction: "previous" | "next", steps: number) {
-    if (!pageId) return;
+    if (!pageId) return 0;
     let restored = 0;
     for (let step = 0; step < steps; step += 1) {
       const ok =
@@ -695,10 +777,40 @@ export function UpdatesPanel({
         : t(direction === "previous" ? "updatesPanel:versions.noVersionPrevious" : "updatesPanel:versions.noVersionNext"),
       restored > 0 ? "success" : "default",
     );
+    return restored;
+  }
+
+  async function restoreSelectedVersion() {
+    if (!pageId || !selectedHistoryVersion.direction || restoringVersion || pageLocked) return;
+    setRestoringVersion(true);
+    try {
+      const restored = await restoreVersionSteps(
+        selectedHistoryVersion.direction,
+        selectedHistoryVersion.steps,
+      );
+      if (restored > 0) setHistorySelection({ pageId, key: "current" });
+    } finally {
+      setRestoringVersion(false);
+    }
   }
 
   function versionBlockLabel(blockCount: number) {
     return t("updatesPanel:versions.blockCount", { count: blockCount });
+  }
+
+  function actorByline(actorId?: string | null) {
+    if (actorId && actorId === userId) {
+      const language = i18n.resolvedLanguage ?? i18n.language;
+      const selfByline = i18n.getResource(language, "updatesPanel", "rows.bySelf");
+      if (typeof selfByline === "string" && selfByline.trim()) {
+        return t("updatesPanel:rows.bySelf");
+      }
+    }
+    return t("updatesPanel:rows.byActor", { name: actorLabel(actorId, userId) });
+  }
+
+  function versionActorLabel(actorId?: string) {
+    return actorId ? actorByline(actorId) : "";
   }
 
   function activityBadge(activity: Activity) {
@@ -752,23 +864,21 @@ export function UpdatesPanel({
 
   function activityActor(activity: Activity) {
     if (activity.kind === "comment")
-      return t("updatesPanel:rows.byActor", { name: actorLabel(activity.comment.authorId, userId) });
+      return actorByline(activity.comment.authorId);
     if (activity.kind === "notification") {
       return activity.notification.actorId
-        ? t("updatesPanel:rows.byActor", { name: actorLabel(activity.notification.actorId, userId) })
+        ? actorByline(activity.notification.actorId)
         : t("updatesPanel:rows.forYou");
     }
     if (activity.kind === "reference") {
-      return t("updatesPanel:rows.byActor", {
-        name: actorLabel(
-          activity.reference.block.createdBy ?? activity.reference.page.lastEditedBy ?? activity.reference.page.createdBy,
-          userId,
-        ),
-      });
+      return actorByline(
+        activity.reference.block.lastEditedBy ??
+          activity.reference.block.createdBy ??
+          activity.reference.page.lastEditedBy ??
+          activity.reference.page.createdBy,
+      );
     }
-    return t("updatesPanel:rows.byActor", {
-      name: actorLabel(activity.page.lastEditedBy ?? activity.page.createdBy, userId),
-    });
+    return actorByline(activity.page.lastEditedBy ?? activity.page.createdBy);
   }
 
   function activityPreview(activity: Activity) {
@@ -855,6 +965,164 @@ export function UpdatesPanel({
     }
   }
 
+  if (pageId) {
+    if (typeof document === "undefined") return null;
+    const appShell = document.querySelector<HTMLElement>("[data-app-main]")?.parentElement ?? document.body;
+    return createPortal(
+      <>
+        <button
+          type="button"
+          className={`${styles.backdrop} ${styles.historyBackdrop}`}
+          onClick={close}
+          tabIndex={-1}
+          aria-label={t("updatesPanel:header.closeUpdates")}
+        />
+        <aside
+          ref={panelRef}
+          className={styles.panel}
+          data-placement={placement}
+          data-page-history="true"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          onKeyDown={onPanelKeyDown}
+        >
+          <div className={styles.historyDialog}>
+            <section className={styles.historyPreviewPane} aria-label={t("updatesPanel:versions.previewAria")}>
+              <div className={styles.historyPreviewHeader}>
+                <span className={styles.historyPreviewPageTitle}>{page ? pageTitle(page) : panelTitle}</span>
+                <span
+                  className={styles.historyPreviewState}
+                  data-history-preview-kind={selectedHistoryVersion.direction ? "snapshot" : "current"}
+                >
+                  {selectedHistoryVersion.direction
+                    ? t("updatesPanel:versions.previewingSnapshot")
+                    : t("updatesPanel:versions.previewingCurrent")}
+                </span>
+              </div>
+              <div className={`${styles.historyPreviewCanvas} nscroll`} data-page-history-preview>
+                <article className={styles.historyPreviewDocument}>
+                  {page?.icon && <div className={styles.historyPreviewIcon}>{page.icon}</div>}
+                  <h1>{page ? pageTitle(page) : panelTitle}</h1>
+                  <div className={styles.historyPreviewMeta}>
+                    <ClockIcon size={14} aria-hidden="true" />
+                    <span>{timeLabelFromMs(selectedHistoryVersion.at)}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{versionBlockLabel(selectedHistoryVersion.blocks.length)}</span>
+                    {selectedHistoryVersion.actorId && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span>{versionActorLabel(selectedHistoryVersion.actorId)}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className={styles.historyPreviewBlocks}>
+                    {previewRows.length === 0 && (
+                      <div className={styles.historyPreviewEmpty}>{t("updatesPanel:versions.emptyPreview")}</div>
+                    )}
+                    {previewRows.map(({ block, depth, number }) => {
+                      const text = blockPreviewText(block);
+                      if (block.type === "divider") {
+                        return <hr key={block.id} className={styles.historyPreviewDivider} />;
+                      }
+                      return (
+                        <div
+                          key={block.id}
+                          className={styles.historyPreviewBlock}
+                          data-type={block.type}
+                          style={{ "--history-depth": Math.min(depth, 5) } as React.CSSProperties}
+                        >
+                          {block.type === "bulleted_list_item" && <span className={styles.historyPreviewMarker}>•</span>}
+                          {block.type === "numbered_list_item" && (
+                            <span className={styles.historyPreviewMarker}>{number ?? 1}.</span>
+                          )}
+                          {block.type === "to_do" && (
+                            <span className={styles.historyPreviewCheckbox} data-checked={block.content?.checked ? "true" : undefined}>
+                              {block.content?.checked ? "✓" : ""}
+                            </span>
+                          )}
+                          {block.type === "toggle" && <span className={styles.historyPreviewMarker}>▸</span>}
+                          {block.type === "quote" && <span className={styles.historyPreviewQuote} aria-hidden="true" />}
+                          <span className={styles.historyPreviewBlockText}>
+                            {text || t("updatesPanel:versions.emptyBlock")}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section className={styles.historyVersionPane} aria-label={t("updatesPanel:versions.versionHistory")}>
+              <div className={styles.historyVersionHeader}>
+                <div>
+                  <div id={titleId} className={styles.historyVersionTitle}>
+                    {t("updatesPanel:versions.versionHistory")}
+                  </div>
+                  <div className={styles.historyVersionCount}>
+                    {t("updatesPanel:versions.versionCount", { count: localVersionCount })}
+                  </div>
+                </div>
+                <button
+                  ref={closeRef}
+                  type="button"
+                  className={styles.close}
+                  onClick={close}
+                  aria-label={t("updatesPanel:header.closeUpdates")}
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <div
+                className={`${styles.versionList} nscroll`}
+                role="listbox"
+                aria-label={t("updatesPanel:versions.versionsAria")}
+              >
+                {historyVersions.map((version) => (
+                  <button
+                    key={version.key}
+                    type="button"
+                    role="option"
+                    aria-selected={selectedHistoryVersion.key === version.key}
+                    className={styles.versionRow}
+                    data-current={version.direction ? undefined : "true"}
+                    data-selected={selectedHistoryVersion.key === version.key ? "true" : undefined}
+                    onClick={() => setHistorySelection({ pageId, key: version.key })}
+                  >
+                    <span className={styles.versionText}>
+                      <span className={styles.versionTitle}>{version.title}</span>
+                      <span className={styles.versionMeta}>
+                        {timeLabelFromMs(version.at)}
+                        {version.actorId ? ` · ${versionActorLabel(version.actorId)}` : ""}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className={styles.historyRestoreFooter}>
+                <p>{t("updatesPanel:versions.previewOnlyHint")}</p>
+                <button
+                  type="button"
+                  className={styles.historyRestoreButton}
+                  disabled={!selectedHistoryVersion.direction || pageLocked || restoringVersion}
+                  onClick={() => void restoreSelectedVersion()}
+                >
+                  {restoringVersion
+                    ? t("updatesPanel:versions.restoring")
+                    : t("updatesPanel:versions.restoreThisVersion")}
+                </button>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </>,
+      appShell,
+    );
+  }
+
   return (
     <>
       {!inline && (
@@ -889,26 +1157,6 @@ export function UpdatesPanel({
           </div>
           <div className={styles.headerActions}>
             {!pageId && (
-              <div className={styles.modeToggle} role="tablist" aria-label={t("updatesPanel:header.inboxMode")}>
-                {([
-                  ["updates", t("updatesPanel:header.modeUpdates")],
-                  ["chats", t("updatesPanel:header.modeChats")],
-                ] as const).map(([mode, label]) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    role="tab"
-                    aria-selected={inboxMode === mode}
-                    data-inbox-mode={mode}
-                    className={styles.modeButton}
-                    onClick={() => setInboxMode(mode)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-            {!pageId && inboxMode === "updates" && (
               <button
                 type="button"
                 className={styles.markRead}
@@ -932,7 +1180,6 @@ export function UpdatesPanel({
           </div>
         </div>
 
-        {(pageId || inboxMode === "updates") && (
         <div className={styles.tabs} role="tablist" aria-label={t("updatesPanel:header.updateType")}>
           {availableFilters.map((item) => (
             <button
@@ -952,101 +1199,7 @@ export function UpdatesPanel({
             </button>
           ))}
         </div>
-        )}
 
-        {!pageId && inboxMode === "chats" && workspaceId && (
-          <InboxChats workspaceId={workspaceId} />
-        )}
-
-        {pageId && (
-          <div className={styles.historyArea}>
-            <div className={styles.historyStrip} role="group" aria-label={t("updatesPanel:header.pageHistory")}>
-              <div className={styles.historyText}>
-                <span>{t("updatesPanel:versions.versionCount", { count: localVersionCount })}</span>
-                <span>
-                  {pageLocked
-                    ? t("updatesPanel:versions.pageLocked")
-                    : historyPastCount > 0
-                      ? t("updatesPanel:versions.previousSnapshots", { count: historyPastCount })
-                      : t("updatesPanel:versions.currentVersionOnly")}
-                </span>
-              </div>
-              <div className={styles.historyActions}>
-                <button
-                  type="button"
-                  className={styles.historyButton}
-                  onClick={() => void restoreAdjacentVersion("previous")}
-                  disabled={pageLocked || historyPastCount === 0}
-                >
-                  <ArrowLeft size={13} aria-hidden="true" />
-                  <span>{t("updatesPanel:versions.previous")}</span>
-                </button>
-                <button
-                  type="button"
-                  className={styles.historyButton}
-                  onClick={() => void restoreAdjacentVersion("next")}
-                  disabled={pageLocked || historyFutureCount === 0}
-                >
-                  <span>{t("updatesPanel:versions.next")}</span>
-                  <ArrowRight size={13} aria-hidden="true" />
-                </button>
-              </div>
-            </div>
-            <div className={styles.versionList} aria-label={t("updatesPanel:versions.versionsAria")}>
-              <div className={styles.versionRow} data-current="true">
-                <span className={styles.versionIcon} aria-hidden="true">
-                  <ClockIcon size={13} />
-                </span>
-                <span className={styles.versionText}>
-                  <span className={styles.versionTitle}>{t("updatesPanel:versions.currentVersion")}</span>
-                  <span className={styles.versionMeta}>
-                    {timeLabelFromMs(currentVersionAt)} · {versionBlockLabel(currentBlocks.length)}
-                  </span>
-                </span>
-              </div>
-              {previousVersions.map((version) => (
-                <button
-                  key={`past:${version.entry.at}:${version.steps}`}
-                  type="button"
-                  className={styles.versionRow}
-                  disabled={pageLocked}
-                  onClick={() => void restoreVersionSteps("previous", version.steps)}
-                >
-                  <span className={styles.versionIcon} aria-hidden="true">
-                    <ClockIcon size={13} />
-                  </span>
-                  <span className={styles.versionText}>
-                    <span className={styles.versionTitle}>{version.title}</span>
-                    <span className={styles.versionMeta}>
-                      {timeLabelFromMs(version.entry.at)} · {versionBlockLabel(version.entry.blocks.length)}
-                    </span>
-                  </span>
-                </button>
-              ))}
-              {nextVersions.map((version) => (
-                <button
-                  key={`future:${version.entry.at}:${version.steps}`}
-                  type="button"
-                  className={styles.versionRow}
-                  disabled={pageLocked}
-                  onClick={() => void restoreVersionSteps("next", version.steps)}
-                >
-                  <span className={styles.versionIcon} aria-hidden="true">
-                    <ClockIcon size={13} />
-                  </span>
-                  <span className={styles.versionText}>
-                    <span className={styles.versionTitle}>{version.title}</span>
-                    <span className={styles.versionMeta}>
-                      {timeLabelFromMs(version.entry.at)} · {versionBlockLabel(version.entry.blocks.length)}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {(pageId || inboxMode === "updates") && (
         <div id={listId} className={`${styles.list} nscroll`}>
           {initialLoading && <div className={styles.empty} role="status">{t("updatesPanel:empty.loadingUpdates")}</div>}
           {!initialLoading && activities.length === 0 && (
@@ -1118,7 +1271,6 @@ export function UpdatesPanel({
               </section>
             ))}
         </div>
-        )}
       </aside>
     </>
   );

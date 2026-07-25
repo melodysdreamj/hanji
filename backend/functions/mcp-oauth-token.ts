@@ -16,6 +16,7 @@ import {
   prepareRefreshToken,
   refreshTokenExpired,
   requestBody,
+  revokeLegacyBroadMcpGrant,
   revokeMcpGrantFamily,
   sha256Base64Url,
   stringValue,
@@ -82,6 +83,9 @@ async function authorizationCodeGrant(context: FunctionContext, body: Record<str
   const grant = await db.table<McpOAuthGrant>('mcp_oauth_grants').getOne(codeRow.grantId);
   if (!grantIsActive(grant)) {
     return jsonError(400, 'invalid_grant', 'MCP grant is no longer active.', corsHeaders(context.request));
+  }
+  if (await revokeLegacyBroadMcpGrant(db, grant!)) {
+    return jsonError(400, 'invalid_grant', 'MCP grant requires workspace reauthorization.', corsHeaders(context.request));
   }
   if ((await grantAccessibleWorkspaces(db, grant!)).length === 0) {
     await revokeMcpGrantFamily(db, grant!.id, 'system:workspace-access-lost').catch((error) => {
@@ -185,6 +189,7 @@ async function refreshTokenGrant(context: FunctionContext, body: Record<string, 
   if (!grantIsActive(grant)) {
     return jsonError(400, 'invalid_grant', 'MCP grant is no longer active.', corsHeaders(context.request));
   }
+  if (await revokeLegacyBroadMcpGrant(db, grant!)) return invalidGrant();
   if ((await grantAccessibleWorkspaces(db, grant!)).length === 0) {
     await revokeMcpGrantFamily(db, grant!.id, 'system:workspace-access-lost', now).catch((error) => {
       console.error('[mcp-oauth-token] failed to revoke inaccessible grant:', error);

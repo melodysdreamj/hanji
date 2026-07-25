@@ -111,7 +111,10 @@ function loadLanguageCatalogs(language: string) {
 }
 
 export function shouldUseAccountLanguagePreference(pathname: string): boolean {
-  return pathname !== "/share" && !pathname.startsWith("/share/");
+  return pathname !== "/share"
+    && !pathname.startsWith("/share/")
+    && pathname !== "/form"
+    && !pathname.startsWith("/form/");
 }
 
 function normalizeLanguagePreference(pref: string): string | undefined {

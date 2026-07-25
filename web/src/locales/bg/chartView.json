@@ -4,7 +4,22 @@
     "sum": "Сума",
     "average": "Средно",
     "min": "Мин",
-    "max": "Макс"
+    "max": "Макс",
+    "checked": "Отметнато",
+    "count_values": "Брой стойности",
+    "date_range": "Диапазон от дати",
+    "earliest_date": "Най-ранна дата",
+    "empty": "Брой празни",
+    "latest_date": "Най-късна дата",
+    "median": "Медиана",
+    "not_empty": "Брой непразни",
+    "percent_checked": "Процент отметнати",
+    "percent_empty": "Процент празни",
+    "percent_not_empty": "Процент непразни",
+    "percent_unchecked": "Процент неотметнати",
+    "range": "Диапазон",
+    "unchecked": "Неотметнато",
+    "unique": "Брой уникални стойности"
   },
   "chartAria": "{{name}} диаграма",
   "chartType": "Тип диаграма",
@@ -27,5 +42,9 @@
   "untitledProperty": "Без име",
   "valueProperty": "Свойство стойност",
   "xAxis": "X ос",
-  "yAxis": "Y ос"
+  "yAxis": "Y ос",
+  "dateRangeDays": "{{count}} дни",
+  "missingProperty": "запазеното свойство",
+  "unsupportedAggregateDesc": "{{aggregate}} не може да се изчисли от {{property}}. Изберете съвместимо свойство или изчисление.",
+  "unsupportedAggregateTitle": "Това изчисление не е налично"
 }

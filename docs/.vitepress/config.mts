@@ -17,6 +17,7 @@ export default defineConfig({
   // build never picks them up; the CI build runs from a public checkout where
   // these files do not exist at all.
   srcExclude: [
+    'issues/**',
     'project-operating-loop.md',
     'confirmed-contracts.md',
     'contract-candidates.md',

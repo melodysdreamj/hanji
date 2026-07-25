@@ -90,8 +90,16 @@ export function createPageStoreActions(
     pendingBlockCreate,
     pendingBlockPage,
     pendingPage,
+    pendingPageBase,
+    pendingPageBefore,
+    pendingPageExpectedMutationId,
+    pendingPageMutationId,
+    inFlightPageMutationId,
+    inFlightPagePatch,
     persistPageCreate,
+    persistablePagePatch,
     positionBetween,
+    reconcilePersistedPageMutation,
     recordCacheClear,
     remapBlockContent,
     remapViewConfigPropertyIds,
@@ -101,23 +109,61 @@ export function createPageStoreActions(
     storeMessages,
     stripComputedFromPages,
     advanceWorkspaceDataEpoch,
+    clearRecentDatabaseRowsQueries,
     writeRecentPageIds,
     writeTreeExpandedPageIds,
   } = runtime;
 
+  const emptyChildPages: Page[] = [];
+  let pageTreeSnapshot: {
+    source: AppState["pagesById"];
+    childPagesByParent: Map<string | null, Page[]>;
+    favoritePages: Page[];
+  } | undefined;
+
+  function currentPageTreeSnapshot() {
+    const pagesById = get().pagesById;
+    if (pageTreeSnapshot?.source === pagesById) return pageTreeSnapshot;
+
+    const childPagesByParent = new Map<string | null, Page[]>();
+    const favoritePages: Page[] = [];
+    for (const page of Object.values(pagesById)) {
+      if (page.inTrash) continue;
+      if (page.isFavorite) favoritePages.push(page);
+
+      let treeParentId: string | null | undefined;
+      if (page.parentType === "workspace" || page.parentId == null) {
+        treeParentId = null;
+      } else if (page.parentType === "page") {
+        treeParentId = page.parentId;
+      }
+      if (treeParentId === undefined) continue;
+
+      const children = childPagesByParent.get(treeParentId);
+      if (children) children.push(page);
+      else childPagesByParent.set(treeParentId, [page]);
+    }
+    for (const children of childPagesByParent.values()) children.sort(bySortPos);
+    favoritePages.sort(bySortPos);
+
+    pageTreeSnapshot = { source: pagesById, childPagesByParent, favoritePages };
+    return pageTreeSnapshot;
+  }
+
+  function invalidateDatabaseRowsForPages(pages: Array<Page | undefined>) {
+    const databaseIds = new Set<string>();
+    for (const page of pages) {
+      if (page?.parentType === "database" && page.parentId) {
+        databaseIds.add(page.parentId);
+      }
+    }
+    for (const databaseId of databaseIds) clearRecentDatabaseRowsQueries(databaseId);
+  }
+
   return {
 // ── pages ───────────────────────────────────────────────────────────
   childPages(parentId) {
-    const all = Object.values(get().pagesById);
-    return all
-      .filter(
-        (p) =>
-          !p.inTrash &&
-          (parentId === null
-            ? p.parentType === "workspace" || p.parentId == null
-            : p.parentId === parentId && p.parentType === "page")
-      )
-      .sort(bySortPos);
+    return currentPageTreeSnapshot().childPagesByParent.get(parentId) ?? emptyChildPages;
   },
 
   recentPages() {
@@ -138,9 +184,7 @@ export function createPageStoreActions(
   },
 
   favoritePages() {
-    return Object.values(get().pagesById)
-      .filter((p) => p.isFavorite && !p.inTrash)
-      .sort(bySortPos);
+    return currentPageTreeSnapshot().favoritePages;
   },
 
   trashedPages() {
@@ -160,7 +204,7 @@ export function createPageStoreActions(
     if (!ws) throw new Error("no workspace");
     const userId = get().userId || (await ensureAuth());
     if (userId && userId !== get().userId) set({ userId });
-    if (!canCreatePageInState(get(), opts.parentId, userId)) {
+    if (!canCreatePageInState(get(), opts.parentId, userId, opts.teamspaceId)) {
       throw new Error("Page access required.");
     }
     if (opts.parentId && get().pagesById[opts.parentId]?.isLocked) {
@@ -177,6 +221,9 @@ export function createPageStoreActions(
       workspaceId: ws.id,
       parentId: opts.parentId,
       parentType: opts.parentType,
+      ...(opts.parentType === "workspace" && opts.teamspaceId
+        ? { teamspaceId: opts.teamspaceId, teamspacePermissionMode: "inherit" as const }
+        : {}),
       kind: opts.kind ?? "page",
       title: opts.title ?? "",
       iconType: "none",
@@ -194,6 +241,7 @@ export function createPageStoreActions(
       lastEditedBy: userId || undefined,
     };
     const focusTarget = opts.focusTarget ?? (opts.focusTitle === false ? undefined : "title");
+    invalidateDatabaseRowsForPages([page]);
     set((s) => ({
       pagesById: { ...s.pagesById, [id]: page },
       pageRolesById: { ...s.pageRolesById, [id]: "edit" },
@@ -213,13 +261,20 @@ export function createPageStoreActions(
     return page;
   },
 
-  applyRemotePage(page) {
+  async applyRemotePage(page) {
+    invalidateDatabaseRowsForPages([get().pagesById[page.id], page]);
     set((s) => ({
       pagesById: { ...s.pagesById, [page.id]: remotePageWithOptimisticOverlay(page) },
     }));
+    await reconcilePersistedPageMutation(page.id, page);
   },
 
   applyRemotePagePatch(id, patch) {
+    const current = get().pagesById[id];
+    invalidateDatabaseRowsForPages([
+      current,
+      current ? { ...current, ...patch } : undefined,
+    ]);
     set((s) => {
       const current = s.pagesById[id];
       if (!current) return {};
@@ -233,19 +288,135 @@ export function createPageStoreActions(
     if (get().activeDataScope?.kind === "public_share") return;
     const ws = get().workspace;
     if (!ws) return;
-    const { pages = [], pageRoles = {}, sharedPageIds = [] } = await bootstrapWorkspace({ workspaceId: ws.id });
+    const {
+      pages = [],
+      pageRoles = {},
+      sharedPageIds = [],
+      teamspaces = [],
+      discoverableTeamspaces = [],
+      teamspaceSettings,
+    } = await bootstrapWorkspace({ workspaceId: ws.id });
     const entries = await outboxAllEntries(get().userId ?? "");
     const projectedPages = overlayOutboxOnPages(entries, pages);
+    const before = get();
+    const returnedPageIds = new Set(projectedPages.map((page) => page.id));
+    const revokedTeamspacePageIds = new Set<string>();
+    for (const page of Object.values(before.pagesById)) {
+      if (
+        page.parentType !== "workspace"
+        || !page.teamspaceId
+        || returnedPageIds.has(page.id)
+      ) {
+        continue;
+      }
+      for (const pageId of collectPageSubtree(before.pagesById, page.id)) {
+        revokedTeamspacePageIds.add(pageId);
+      }
+    }
+    if (revokedTeamspacePageIds.size) {
+      const pendingBlockIds = new Set<string>();
+      for (const pageId of revokedTeamspacePageIds) {
+        cancelPendingPage(pageId);
+        for (const block of before.blocksByPage[pageId] ?? []) pendingBlockIds.add(block.id);
+      }
+      for (const [blockId, pageId] of pendingBlockPage) {
+        if (revokedTeamspacePageIds.has(pageId)) pendingBlockIds.add(blockId);
+      }
+      for (const block of pendingBlockCreate.values()) {
+        if (revokedTeamspacePageIds.has(block.pageId)) pendingBlockIds.add(block.id);
+      }
+      for (const blockId of pendingBlockIds) {
+        cancelPendingBlock(blockId);
+        cancelPendingBlockCreate(blockId);
+      }
+    }
+    clearRecentDatabaseRowsQueries();
     set((s) => {
       const pagesById = { ...s.pagesById };
+      const pageRolesById = { ...s.pageRolesById };
+      const blocksByPage = { ...s.blocksByPage };
+      const blockHistoryByPage = { ...s.blockHistoryByPage };
+      const commentsByPage = { ...s.commentsByPage };
+      const propsByDb = { ...s.propsByDb };
+      const viewsByDb = { ...s.viewsByDb };
+      const templatesByDb = { ...s.templatesByDb };
+      const databaseRowIdsByDb = { ...s.databaseRowIdsByDb };
+      const databaseRowPagesByDb = { ...s.databaseRowPagesByDb };
+      const loadedBlockPages = new Set(s.loadedBlockPages);
+      const loadedCommentPages = new Set(s.loadedCommentPages);
+      const loadedDbs = new Set(s.loadedDbs);
+      const treeExpandedPageIds = new Set(s.treeExpandedPageIds);
+      const hydratedRelationTargetIds = new Set(s.hydratedRelationTargetIds);
+      for (const pageId of revokedTeamspacePageIds) {
+        delete pagesById[pageId];
+        delete pageRolesById[pageId];
+        delete blocksByPage[pageId];
+        delete blockHistoryByPage[pageId];
+        delete commentsByPage[pageId];
+        delete propsByDb[pageId];
+        delete viewsByDb[pageId];
+        delete templatesByDb[pageId];
+        delete databaseRowIdsByDb[pageId];
+        delete databaseRowPagesByDb[pageId];
+        loadedBlockPages.delete(pageId);
+        loadedCommentPages.delete(pageId);
+        loadedDbs.delete(pageId);
+        treeExpandedPageIds.delete(pageId);
+        hydratedRelationTargetIds.delete(pageId);
+      }
+      for (const [databaseId, rowIds] of Object.entries(databaseRowIdsByDb)) {
+        databaseRowIdsByDb[databaseId] = rowIds.filter(
+          (pageId) => !revokedTeamspacePageIds.has(pageId),
+        );
+      }
       for (const page of projectedPages) pagesById[page.id] = page;
+      Object.assign(pageRolesById, pageRoles);
       return {
-        activeDataScope: { kind: "workspace" as const, workspaceId: ws.id },
+        activeDataScope:
+          s.activeDataScope?.kind === "workspace" &&
+          s.activeDataScope.workspaceId === ws.id
+            ? s.activeDataScope
+            : {
+                kind: "workspace" as const,
+                membershipAuthority: "cached" as const,
+                workspaceId: ws.id,
+              },
         pagesById,
-        pageRolesById: { ...s.pageRolesById, ...pageRoles },
+        teamspaces,
+        discoverableTeamspaces,
+        teamspaceSettings,
+        pageRolesById,
+        blocksByPage,
+        blockHistoryByPage,
+        commentsByPage,
+        propsByDb,
+        viewsByDb,
+        templatesByDb,
+        databaseRowIdsByDb,
+        databaseRowPagesByDb,
+        loadedBlockPages,
+        loadedCommentPages,
+        loadedDbs,
+        treeExpandedPageIds,
+        hydratedRelationTargetIds,
+        recentPageIds: s.recentPageIds.filter(
+          (pageId) => !revokedTeamspacePageIds.has(pageId),
+        ),
         sharedPageIds: new Set(sharedPageIds),
+        ...(s.commentPanel && revokedTeamspacePageIds.has(s.commentPanel.pageId)
+          ? { commentPanel: undefined }
+          : {}),
+        ...(s.focusPageId && revokedTeamspacePageIds.has(s.focusPageId)
+          ? { focusPageId: undefined, focusPageTarget: undefined }
+          : {}),
       };
     });
+    if (revokedTeamspacePageIds.size) {
+      await Promise.all([
+        recordCacheClear(before.userId ?? ""),
+        clearOfflineWorkspaceFileCache(),
+      ]);
+    }
     materializeOutboxEffects(entries);
   },
 
@@ -262,18 +433,29 @@ export function createPageStoreActions(
       sharedPageIds = [],
       workspaces = [],
       organizationProfiles = [],
+      teamspaces = [],
+      discoverableTeamspaces = [],
+      teamspaceSettings,
     } = await bootstrapWorkspace({ pageId: targetPageId });
     const entries = await outboxAllEntries(get().userId ?? "");
     const projectedPages = overlayOutboxOnPages(entries, pages);
+    clearRecentDatabaseRowsQueries();
     setWorkspacePeople(members, organizationProfiles);
     set((s) => {
       const pagesById = { ...s.pagesById };
       for (const page of projectedPages) pagesById[page.id] = page;
       return {
         workspace: ws,
-        activeDataScope: { kind: "workspace" as const, workspaceId: ws.id },
+        activeDataScope: {
+          kind: "workspace" as const,
+          membershipAuthority: "fresh" as const,
+          workspaceId: ws.id,
+        },
         currentMember,
         workspaceMembers: members,
+        teamspaces,
+        discoverableTeamspaces,
+        teamspaceSettings,
         workspaces: workspaces.length ? workspaces : s.workspaces,
         pagesById,
         pageRolesById: { ...s.pageRolesById, ...pageRoles },
@@ -284,6 +466,7 @@ export function createPageStoreActions(
   },
 
   applySharedPageSnapshot(snapshot, shareKey) {
+    clearRecentDatabaseRowsQueries();
     const blocksByPage = new Map<string, Block[]>();
     for (const block of snapshot.blocks ?? []) {
       const list = blocksByPage.get(block.pageId) ?? [];
@@ -401,21 +584,40 @@ export function createPageStoreActions(
     if (userId && !("lastEditedBy" in nextPatch)) nextPatch.lastEditedBy = userId;
     const invalidatesComputed = "properties" in nextPatch;
     const localPatch = invalidatesComputed ? { ...nextPatch, __computed: undefined } : nextPatch;
+    invalidateDatabaseRowsForPages([cur, { ...cur, ...localPatch }]);
     set((s) => {
       const pagesById = invalidatesComputed ? stripComputedFromPages(s.pagesById) : s.pagesById;
       return { pagesById: { ...pagesById, [id]: { ...cur, ...localPatch } } };
     });
     if (isTemplateEditorPageId(id)) return;
-    pendingPage.set(id, { ...(pendingPage.get(id) ?? {}), ...nextPatch });
+    if (!pendingPage.has(id)) {
+      pendingPageBefore.set(id, cur);
+      const predecessorMutationId = inFlightPageMutationId.get(id);
+      const predecessorPatch = inFlightPagePatch.get(id);
+      if (predecessorMutationId) {
+        pendingPageExpectedMutationId.set(id, predecessorMutationId);
+      } else {
+        pendingPageExpectedMutationId.delete(id);
+        if (cur.updatedAt) pendingPageBase.set(id, cur.updatedAt);
+        else pendingPageBase.delete(id);
+      }
+      pendingPageMutationId.set(id, newId());
+      pendingPage.set(id, { ...(predecessorPatch ?? {}), ...nextPatch });
+    } else {
+      pendingPage.set(id, { ...(pendingPage.get(id) ?? {}), ...nextPatch });
+    }
     optimisticPageOverlays.set(id, {
       ...(optimisticPageOverlays.get(id) ?? {}),
-      ...nextPatch,
+      ...persistablePagePatch(nextPatch, cur),
     });
     mirrorPendingPage(id);
     if (opts?.debounce) {
       const t = pageTimers.get(id);
       if (t) clearTimeout(t);
-      pageTimers.set(id, setTimeout(() => void flushPage(id), 500));
+      const debounceMs = typeof opts.debounceMs === "number" && Number.isFinite(opts.debounceMs)
+        ? Math.max(0, opts.debounceMs)
+        : 500;
+      pageTimers.set(id, setTimeout(() => void flushPage(id), debounceMs));
     } else {
       void flushPage(id);
     }
@@ -444,6 +646,7 @@ export function createPageStoreActions(
     }
 
     if (patches.length === 0) return;
+    invalidateDatabaseRowsForPages(patches.map((item) => item.before));
     set((s) => {
       const next = { ...s.pagesById };
       for (const item of patches) {
@@ -454,40 +657,45 @@ export function createPageStoreActions(
     });
     const trashCall = await durableRemoteCall(
       root.parentType === "database" ? "trashDatabaseRowRemote" : "trashPageRemote",
-      [id]
+      [id],
+      undefined,
+      undefined,
+      root.parentType === "database" && root.parentId
+        ? { databaseRowIds: [root.parentId] }
+        : { pageIds: [id] },
+      () => {
+        // Revert only lifecycle fields that still carry this optimistic
+        // generation. The durable core then applies the exact canonical page
+        // or database-row authority before its final acknowledgement.
+        set((state) => {
+          const next = { ...state.pagesById };
+          for (const item of patches) {
+            const current = next[item.id];
+            if (
+              !current ||
+              current.inTrash !== item.patch.inTrash ||
+              current.trashedAt !== item.patch.trashedAt
+            ) {
+              continue;
+            }
+            const sameMutationStamp = current.updatedAt === item.patch.updatedAt;
+            next[item.id] = {
+              ...current,
+              inTrash: item.before.inTrash,
+              trashedAt: item.before.trashedAt,
+              ...(sameMutationStamp
+                ? {
+                    updatedAt: item.before.updatedAt,
+                    lastEditedBy: item.before.lastEditedBy,
+                  }
+                : {}),
+            };
+          }
+          return { pagesById: next };
+        });
+      }
     );
     if (trashCall.status === "dropped") {
-      // A terminal denial is not an offline success. Revert only the lifecycle
-      // fields that still carry this optimistic mutation, preserving any
-      // unrelated edit that happened while the request was in flight, then
-      // ask the authoritative bootstrap path to remove/refresh stale access.
-      set((s) => {
-        const next = { ...s.pagesById };
-        for (const item of patches) {
-          const current = next[item.id];
-          if (
-            !current ||
-            current.inTrash !== item.patch.inTrash ||
-            current.trashedAt !== item.patch.trashedAt
-          ) {
-            continue;
-          }
-          const sameMutationStamp = current.updatedAt === item.patch.updatedAt;
-          next[item.id] = {
-            ...current,
-            inTrash: item.before.inTrash,
-            trashedAt: item.before.trashedAt,
-            ...(sameMutationStamp
-              ? {
-                  updatedAt: item.before.updatedAt,
-                  lastEditedBy: item.before.lastEditedBy,
-                }
-              : {}),
-          };
-        }
-        return { pagesById: next };
-      });
-      await get().refreshPageAccess(id).catch(() => {});
       throw trashCall.error;
     }
     const persisted = trashCall.status === "ok" ? (trashCall.result as Page[]) : [];
@@ -524,6 +732,7 @@ export function createPageStoreActions(
     }
 
     if (patches.length === 0) return;
+    invalidateDatabaseRowsForPages(patches.map((item) => item.before));
     set((s) => {
       const next = { ...s.pagesById };
       for (const item of patches) {
@@ -534,36 +743,42 @@ export function createPageStoreActions(
     });
     const restoreCall = await durableRemoteCall(
       root.parentType === "database" ? "restoreDatabaseRowRemote" : "restorePageRemote",
-      [id]
+      [id],
+      undefined,
+      undefined,
+      root.parentType === "database" && root.parentId
+        ? { databaseRowIds: [root.parentId] }
+        : { pageIds: [id] },
+      () => {
+        set((state) => {
+          const next = { ...state.pagesById };
+          for (const item of patches) {
+            const current = next[item.id];
+            if (
+              !current ||
+              current.inTrash !== item.patch.inTrash ||
+              current.trashedAt !== item.patch.trashedAt
+            ) {
+              continue;
+            }
+            const sameMutationStamp = current.updatedAt === item.patch.updatedAt;
+            next[item.id] = {
+              ...current,
+              inTrash: item.before.inTrash,
+              trashedAt: item.before.trashedAt,
+              ...(sameMutationStamp
+                ? {
+                    updatedAt: item.before.updatedAt,
+                    lastEditedBy: item.before.lastEditedBy,
+                  }
+                : {}),
+            };
+          }
+          return { pagesById: next };
+        });
+      }
     );
     if (restoreCall.status === "dropped") {
-      set((s) => {
-        const next = { ...s.pagesById };
-        for (const item of patches) {
-          const current = next[item.id];
-          if (
-            !current ||
-            current.inTrash !== item.patch.inTrash ||
-            current.trashedAt !== item.patch.trashedAt
-          ) {
-            continue;
-          }
-          const sameMutationStamp = current.updatedAt === item.patch.updatedAt;
-          next[item.id] = {
-            ...current,
-            inTrash: item.before.inTrash,
-            trashedAt: item.before.trashedAt,
-            ...(sameMutationStamp
-              ? {
-                  updatedAt: item.before.updatedAt,
-                  lastEditedBy: item.before.lastEditedBy,
-                }
-              : {}),
-          };
-        }
-        return { pagesById: next };
-      });
-      await get().refreshPageAccess(id).catch(() => {});
       throw restoreCall.error;
     }
     const persisted = restoreCall.status === "ok" ? (restoreCall.result as Page[]) : [];
@@ -728,6 +943,7 @@ export function createPageStoreActions(
     if (!source) return null;
     if (!canEditPageInState(get(), source)) return null;
     if (isPageParentLocked(get().pagesById, source.parentId)) return null;
+    invalidateDatabaseRowsForPages([source]);
     const useRemoteDuplicate = true;
     if (useRemoteDuplicate) {
       const result = await duplicatePageRemote(id, {

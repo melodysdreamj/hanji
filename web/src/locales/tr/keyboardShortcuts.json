@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Yorum ekle",
+    "addLink": "Bağlantı ekle",
+    "blockColor": "Son kullanılan rengi uygula",
+    "bold": "Kalın",
+    "copyPageLink": "Sayfa bağlantısını kopyala",
+    "findInPage": "Bu sayfada bul",
+    "inlineCode": "Satır içi kod",
+    "italic": "İtalik",
+    "moveBlock": "Bloğu başka sayfaya taşı",
+    "moveBlockDown": "Bloğu aşağı taşı",
+    "moveBlockUp": "Bloğu yukarı taşı",
+    "movePage": "Geçerli sayfayı taşı",
+    "navigateBack": "Geri git",
+    "navigateForward": "İleri git",
+    "newPage": "Yeni sayfa",
+    "openBlockMenu": "Blok işlemlerini aç",
+    "openKeyboardShortcuts": "Klavye kısayollarını aç",
+    "openParentPage": "Üst sayfayı aç",
+    "quickFind": "Hızlı Bul",
+    "strikethrough": "Üstü çizili",
+    "toggleAllToggles": "Tüm açılırları genişlet veya daralt",
+    "toggleSidebar": "Kenar çubuğunu aç/kapa",
+    "toggleTheme": "Karanlık modu aç/kapa",
+    "underline": "Altı çizili"
+  },
+  "categories": {
+    "createStyle": "Oluştur & Stil",
+    "editMove": "Düzenle & Taşı",
+    "popular": "Popüler"
+  },
+  "categoriesLabel": "Kısayol kategorileri",
+  "close": "Kapat",
+  "closeBackdrop": "Klavye kısayollarını kapat",
+  "empty": "Kısayol bulunamadı",
+  "keysFor": "{{action}} kısayolları",
+  "or": "veya",
+  "searchLabel": "Klavye kısayollarını ara",
+  "searchPlaceholder": "Kısayolları ara…",
+  "searchResults": "Arama sonuçları",
+  "searchTerms": {
+    "toggleTheme": "tema açık koyu görünüm"
+  },
+  "title": "Klavye kısayolları"
+}

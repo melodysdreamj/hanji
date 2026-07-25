@@ -36,11 +36,25 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "@/lib/router";
 import { pageHref } from "@/lib/navigation";
 import {
+  advanceNotionApplyStallState,
   advanceNotionDiscoveryStallState,
+  isNotionDiscoveryConflict,
+  NOTION_APPLY_STALL_LIMIT,
   NOTION_DISCOVERY_STALL_LIMIT,
+  notionApplyFileRecoveryRetryLimitReached,
+  notionApplyRequestBudget,
+  notionImportOperationIsActive,
   notionDiscoveryShouldContinue,
+  waitForNotionApplyRetryAfter,
 } from "@/lib/notionImportResume";
 import { estimateImportRunMetrics } from "@/lib/importRunMetrics";
+import {
+  isNotionImportLive,
+  isNotionImportProblemTerminal,
+  isNotionImportTerminal,
+  reconcileNotionImportJob,
+  selectNotionImportJobForRemount,
+} from "@/lib/notionImportReconciliation";
 import {
   activePersistentGeneratedLabels,
   persistentGeneratedLabels,
@@ -55,6 +69,7 @@ import type {
 import { Database, FileText, GlobeIcon, TableIcon, Upload, X } from "./icons";
 import NotionTokenGuide from "./NotionTokenGuide";
 import { useStore } from "@/lib/store";
+import type { ParsedNativeArchive } from "@/lib/nativeArchive";
 import styles from "./ImportDialog.module.css";
 
 const ACCEPTED_IMPORTS = ".md,.markdown,.txt,.csv,text/markdown,text/plain,text/csv,application/csv";
@@ -76,23 +91,61 @@ const NOTION_MAX_DISCOVER_CHUNKS = 2000;
 // a brief 503/timeout should not tear down a long import (chunks retry with
 // backoff and unchanged cursor/seed state).
 const NOTION_DISCOVER_MAX_RETRIES = 5;
+const NOTION_DISCOVERY_CONFLICT_POLL_INTERVAL_MS = 1_000;
+const NOTION_DISCOVERY_CONFLICT_POLL_DEADLINE_MS = 10 * 60 * 1_000;
 // Apply is also a persisted, resumable operation. Keep each product-write
 // request small enough for the DO and loop the server's `partial` responses
 // until it reports the job completed.
-const NOTION_MAX_APPLY_CHUNKS = 2_000;
 const NOTION_APPLY_MAX_RETRIES = 5;
+const NOTION_APPLY_DATA_SOURCE_BATCH_SIZE = 5;
 const NOTION_APPLY_DATABASE_BATCH_SIZE = 25;
+const NOTION_APPLY_FILE_BATCH_SIZE = 10;
 const NOTION_APPLY_PAGE_BATCH_SIZE = 20;
+const NOTION_APPLY_REMAP_BATCH_SIZE = 20;
 const NOTION_STATUS_POLL_INTERVAL_MS = 3_000;
 // Discovery deliberately survives dialog unmounts. Keep one runner per job at
 // module scope so reopening the dialog joins the in-flight runner instead of
 // starting a second cursor/progress writer for the same durable job.
-const notionDiscoveryRunnerCompletions = new Map<string, Promise<void>>();
+type NotionDiscoveryRunner = {
+  completion: Promise<void>;
+  controller: AbortController;
+  generation: number;
+};
+
+const notionDiscoveryRunners = new Map<string, NotionDiscoveryRunner>();
+let notionDiscoveryRunnerGeneration = 0;
+
+function notionRunnerAbortError() {
+  return new DOMException("Notion import runner aborted.", "AbortError");
+}
+
+function checkNotionRunnerAborted(signal: AbortSignal) {
+  if (signal.aborted) throw notionRunnerAbortError();
+}
+
+function isNotionRunnerAbort(error: unknown, signal: AbortSignal) {
+  return signal.aborted || (error instanceof Error && error.name === "AbortError");
+}
+
+function waitForNotionRunnerDelay(ms: number, signal: AbortSignal) {
+  checkNotionRunnerAborted(signal);
+  return new Promise<void>((resolve, reject) => {
+    const finish = (error?: Error) => {
+      window.clearTimeout(timer);
+      signal.removeEventListener("abort", onAbort);
+      if (error) reject(error);
+      else resolve();
+    };
+    const onAbort = () => finish(notionRunnerAbortError());
+    const timer = window.setTimeout(() => finish(), ms);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
 
 export type NotionImportActivitySummary = {
   jobId: string;
   mode: "discover" | "apply";
-  percent: number;
+  percent?: number;
 };
 
 type ImportReportIssue = {
@@ -353,6 +406,10 @@ function buildImportLabels(t: Translate) {
     cantExpand: t("importDialog:cantExpand"),
     importApplied: t("importDialog:importApplied"),
     cantApply: t("importDialog:cantApply"),
+    terminal: {
+      failed: t("importDialog:terminal.failed"),
+      cancelled: t("importDialog:terminal.cancelled"),
+    },
     fileRetryFinished: (copied: number, skipped: number) =>
       t("importDialog:fileRetryFinished", { copied, skipped }),
     cantRetryFiles: t("importDialog:cantRetryFiles"),
@@ -371,6 +428,8 @@ function buildImportLabels(t: Translate) {
       readyHint: (count: number) => t("importDialog:wizard.readyHint", { count }),
       runningHint: t("importDialog:wizard.runningHint"),
       browserRunnerWarning: t("importDialog:wizard.browserRunnerWarning"),
+      serverRunningHint: t("importDialog:wizard.serverRunningHint"),
+      serverRunnerStatus: t("importDialog:wizard.serverRunnerStatus"),
       noJobHint: t("importDialog:wizard.noJobHint"),
       applyLocksHint: t("importDialog:wizard.applyLocksHint"),
       done: t("common:actions.done"),
@@ -436,6 +495,8 @@ function buildImportLabels(t: Translate) {
       liveHint: t("importDialog:hanji.liveHint"),
       review: (summary: string) => t("importDialog:hanji.review", { summary }),
       placeholderNote: t("importDialog:hanji.placeholderNote"),
+      filesIncluded: t("importDialog:hanji.filesIncluded"),
+      filesExcluded: t("importDialog:hanji.filesExcluded"),
       importedItems: (count: number) => t("importDialog:hanji.importedItems", { count }),
       cantRead: t("importDialog:hanji.cantRead"),
       cantImport: t("importDialog:hanji.cantImport"),
@@ -886,8 +947,19 @@ function itemCountFromJob(job: NotionImportJob, fallback = 0) {
 }
 
 function isLiveNotionJob(job: NotionImportJob) {
-  if (job.status === "queued" || job.status === "discovering") return true;
-  return job.progress?.currentStatus === "running";
+  return isNotionImportLive(job);
+}
+
+function isServerOwnedNotionJob(job: NotionImportJob) {
+  return job.options?.runnerMode === "server";
+}
+
+function isMonitorableNotionJob(job: NotionImportJob) {
+  return isLiveNotionJob(job) || (isServerOwnedNotionJob(job) && !isNotionImportTerminal(job));
+}
+
+function newServerRunRequestId() {
+  return crypto.randomUUID().replace(/-/g, "_");
 }
 
 export function ImportDialog({
@@ -906,14 +978,15 @@ export function ImportDialog({
   const productLocale = productLocaleFromLanguage(i18n.resolvedLanguage ?? i18n.language);
   const router = useRouter();
   const titleId = useId();
-  const scopeGroupId = useId();
   const dialogRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
   const oauthCallbackHandledRef = useRef(false);
   const rootScanRunRef = useRef(0);
+  const rootScanCredentialKeyRef = useRef("");
   const notify = useStore((s) => s.notify);
+  const userId = useStore((s) => s.userId);
   const workspace = useStore((s) => s.workspace);
   const refreshWorkspacePages = useStore((s) => s.refreshWorkspacePages);
   const L = buildImportLabels(t as unknown as Translate);
@@ -934,12 +1007,12 @@ export function ImportDialog({
   const [source, setSource] = useState<"file" | "notion" | "hanji">(initialTab ?? "notion");
   const [notionToken, setNotionToken] = useState("");
   const [notionConnectionName, setNotionConnectionName] = useState("");
-  const [notionScope, setNotionScope] = useState<"workspace" | "pages">("workspace");
   const [notionImportPagesFullWidth, setNotionImportPagesFullWidth] = useState(true);
   const [notionRootIds, setNotionRootIds] = useState("");
   const [notionRootCandidates, setNotionRootCandidates] = useState<NotionImportRootCandidate[]>([]);
   const [selectedNotionRootKeys, setSelectedNotionRootKeys] = useState<string[]>([]);
   const [notionRootScanBusy, setNotionRootScanBusy] = useState(false);
+  const [notionRootScanError, setNotionRootScanError] = useState("");
   const [notionRootScanSummary, setNotionRootScanSummary] = useState<{
     scanned: number;
     hasMore: boolean;
@@ -960,6 +1033,12 @@ export function ImportDialog({
     job: NotionImportJob;
     itemCount: number;
   } | null>(null);
+  const notionResultRef = useRef<{
+    job: NotionImportJob;
+    itemCount: number;
+  } | null>(null);
+  const notionObservedJobsRef = useRef<Map<string, NotionImportJob>>(new Map());
+  const notionBusyGenerationRef = useRef(0);
   const [importedRootPage, setImportedRootPage] = useState<{ jobId: string; pageId: string } | null>(null);
   const [cancellingJobId, setCancellingJobId] = useState<string | null>(null);
   // Wizard position for the Notion tab: 1 connect, 2 scope, 3 discover,
@@ -969,6 +1048,15 @@ export function ImportDialog({
   const autoResumeJobIdRef = useRef("");
   const autoApplyJobIdRef = useRef("");
   const credentialPromptJobIdRef = useRef("");
+  // Retain the same opaque id after an ambiguous create response. Replaying
+  // it returns the already-committed server job instead of starting a second
+  // import; clear it only after the server response is observed.
+  const notionServerRunRequestIdRef = useRef("");
+  const notionApplyRunRef = useRef<{
+    jobId: string;
+    workspaceId?: string;
+    controller: AbortController;
+  } | null>(null);
   // 1s clock for the installer-style run panel (elapsed time keeps counting
   // between polls).
   const [runNowMs, setRunNowMs] = useState(() => Date.now());
@@ -988,11 +1076,13 @@ export function ImportDialog({
     promise: Promise<void>;
   } | null>(null);
 
-  // ─── Native Hanji import (.hanji.json) ───
+  // ─── Native Hanji import (.hanji.json or .hanji.zip) ───
   const hanjiInputRef = useRef<HTMLInputElement>(null);
   const [hanjiMode, setHanjiMode] = useState<"file" | "live">("file");
-  const [hanjiSelection, setHanjiSelection] = useState<{
-    document: HanjiExportDocument;
+  const [hanjiSelection, setHanjiSelection] = useState<(
+    | { kind: "json"; document: HanjiExportDocument }
+    | { kind: "archive"; archive: ParsedNativeArchive; batchId: string }
+  ) & {
     fingerprint: string;
     label: string;
     summary: string;
@@ -1007,6 +1097,133 @@ export function ImportDialog({
   const remoteExportAbortRef = useRef<AbortController | null>(null);
   const hanjiTargetWorkspaceRef = useRef(workspace?.id);
   const notionTargetWorkspaceRef = useRef(workspace?.id);
+
+  const beginNotionBusy = useCallback(() => {
+    const generation = notionBusyGenerationRef.current + 1;
+    notionBusyGenerationRef.current = generation;
+    setNotionBusy(true);
+    return generation;
+  }, []);
+
+  const finishNotionBusy = useCallback((generation: number) => {
+    if (notionBusyGenerationRef.current === generation) setNotionBusy(false);
+  }, []);
+
+  const invalidateNotionBusy = useCallback(() => {
+    notionBusyGenerationRef.current += 1;
+    setNotionBusy(false);
+  }, []);
+
+  const abortNotionWorkForTerminalJob = useCallback((job: NotionImportJob) => {
+    if (!isNotionImportTerminal(job)) return;
+    const ownsCurrentWork = notionResultRef.current?.job.id === job.id;
+    const workspaceId = job.workspaceId || notionTargetWorkspaceRef.current;
+    const runnerKey = workspaceId ? `${workspaceId}:${job.id}` : "";
+    const runner = runnerKey ? notionDiscoveryRunners.get(runnerKey) : undefined;
+    if (runner) {
+      runner.controller.abort();
+    }
+    if (notionApplyRunRef.current?.jobId === job.id) {
+      notionApplyRunRef.current.controller.abort();
+    }
+    if (ownsCurrentWork) invalidateNotionBusy();
+  }, [invalidateNotionBusy]);
+
+  const reconcileNotionJobForPublication = useCallback((
+    incoming: NotionImportJob,
+    currentResult: { job: NotionImportJob; itemCount: number } | null,
+  ) => {
+    const known = reconcileNotionImportJob(
+      notionObservedJobsRef.current.get(incoming.id),
+      incoming,
+    );
+    const job = currentResult?.job.id === incoming.id
+      ? reconcileNotionImportJob(currentResult.job, known)
+      : known;
+    if (
+      isServerOwnedNotionJob(job)
+      && job.options?.serverRunRequestId === notionServerRunRequestIdRef.current
+    ) {
+      notionServerRunRequestIdRef.current = "";
+    }
+    notionObservedJobsRef.current.set(job.id, job);
+    return job;
+  }, []);
+
+  const commitNotionResult = useCallback((job: NotionImportJob, itemCount: number) => {
+    const nextResult = { job, itemCount };
+    notionResultRef.current = nextResult;
+    setNotionResult(nextResult);
+  }, []);
+
+  const clearTerminalNotionResult = useCallback(() => {
+    const current = notionResultRef.current?.job;
+    if (current && !isNotionImportTerminal(current)) return;
+    rootScanRunRef.current += 1;
+    rootScanCredentialKeyRef.current = "";
+    notionResultRef.current = null;
+    setNotionResult(null);
+    setImportedRootPage(null);
+    setSelectedConnectionId("");
+    notionStepJobKeyRef.current = "";
+    setNotionStep(1);
+  }, []);
+
+  const abortNotionWorkForTerminalJobs = useCallback((jobs: NotionImportJob[]) => {
+    for (const job of jobs) abortNotionWorkForTerminalJob(job);
+  }, [abortNotionWorkForTerminalJob]);
+
+  const publishNotionJob = useCallback((
+    incoming: NotionImportJob,
+    options: { itemCount?: number; surface?: boolean } = {},
+  ) => {
+    const currentResult = notionResultRef.current;
+    const job = reconcileNotionJobForPublication(incoming, currentResult);
+
+    setNotionJobs((current) => {
+      const index = current.findIndex((entry) => entry.id === job.id);
+      if (index < 0) return [job, ...current].slice(0, 5);
+      return current.map((entry) => entry.id === job.id
+        ? reconcileNotionImportJob(entry, job)
+        : entry);
+    });
+
+    if (options.surface || currentResult?.job.id === job.id) {
+      const retainedCurrent = currentResult?.job.id === job.id && job === currentResult.job;
+      const itemCount = retainedCurrent
+        ? currentResult.itemCount
+        : options.itemCount ?? itemCountFromJob(job, currentResult?.itemCount ?? 0);
+      commitNotionResult(job, itemCount);
+    }
+    abortNotionWorkForTerminalJobs([job]);
+    return job;
+  }, [abortNotionWorkForTerminalJobs, commitNotionResult, reconcileNotionJobForPublication]);
+
+  const publishNotionJobList = useCallback((incomingJobs: NotionImportJob[]) => {
+    const currentResult = notionResultRef.current;
+    const jobs = incomingJobs.map((incoming) =>
+      reconcileNotionJobForPublication(incoming, currentResult)
+    );
+    setNotionJobs(jobs);
+
+    const refreshedCurrent = currentResult
+      ? jobs.find((job) => job.id === currentResult.job.id)
+      : undefined;
+    const selected = refreshedCurrent ?? (!currentResult
+      ? selectNotionImportJobForRemount(jobs)
+      : null);
+    if (selected) {
+      commitNotionResult(
+        selected,
+        itemCountFromJob(
+          selected,
+          currentResult?.job.id === selected.id ? currentResult.itemCount : 0,
+        ),
+      );
+    }
+    abortNotionWorkForTerminalJobs(jobs);
+    return jobs;
+  }, [abortNotionWorkForTerminalJobs, commitNotionResult, reconcileNotionJobForPublication]);
 
   const refreshNotionImportState = useCallback((): Promise<void> => {
     const workspaceId = workspace?.id;
@@ -1034,18 +1251,9 @@ export function ImportDialog({
       const connections = (connectionsResult.connections ?? []).filter(
         (connection) => connection.status === "active"
       );
-      setNotionJobs(jobs);
+      publishNotionJobList(jobs);
       setNotionConnections(connections);
       setNotionConnectionStorageAvailable(connectionsResult.connectionStorageAvailable !== false);
-      setNotionResult((currentResult) => {
-        if (!currentResult) return currentResult;
-        const refreshed = jobs.find((job) => job.id === currentResult.job.id);
-        if (!refreshed) return currentResult;
-        return {
-          job: refreshed,
-          itemCount: itemCountFromJob(refreshed, currentResult.itemCount),
-        };
-      });
       setSelectedConnectionId((currentId) => {
         if (currentId && !connections.some((connection) => connection.id === currentId)) return "";
         if (!currentId && connections.length) return connections[0].id;
@@ -1058,7 +1266,7 @@ export function ImportDialog({
     });
     notionRefreshInFlightRef.current = { workspaceId, promise };
     return promise;
-  }, [workspace?.id]);
+  }, [publishNotionJobList, workspace?.id]);
 
   const refreshNotionImportStateFresh = useCallback(async () => {
     // A mutation may finish while a poll that started before it is still in
@@ -1070,11 +1278,13 @@ export function ImportDialog({
   }, [refreshNotionImportState]);
 
   const notionPollingJobId =
-    (notionResult && isLiveNotionJob(notionResult.job) ? notionResult.job.id : undefined) ??
-    notionJobs.find(isLiveNotionJob)?.id;
+    (notionResult && isMonitorableNotionJob(notionResult.job) ? notionResult.job.id : undefined) ??
+    notionJobs.find(isMonitorableNotionJob)?.id;
 
   const close = useCallback((restoreFocus = true) => {
     closedRef.current = true;
+    rootScanRunRef.current += 1;
+    rootScanCredentialKeyRef.current = "";
     hanjiReadRunRef.current += 1;
     remoteExportRunRef.current += 1;
     remoteExportAbortRef.current?.abort();
@@ -1090,6 +1300,7 @@ export function ImportDialog({
   useEffect(
     () => () => {
       remoteExportAbortRef.current?.abort();
+      notionApplyRunRef.current?.controller.abort();
     },
     []
   );
@@ -1151,18 +1362,51 @@ export function ImportDialog({
 
   useEffect(() => {
     if (notionTargetWorkspaceRef.current === workspace?.id) return;
+    notionApplyRunRef.current?.controller.abort();
+    invalidateNotionBusy();
     notionTargetWorkspaceRef.current = workspace?.id;
     notionRefreshRunRef.current += 1;
     notionRefreshInFlightRef.current = null;
+    notionObservedJobsRef.current.clear();
+    notionResultRef.current = null;
     setNotionJobs([]);
     setNotionResult(null);
     setImportedRootPage(null);
     setSelectedConnectionId("");
-  }, [workspace?.id]);
+  }, [invalidateNotionBusy, workspace?.id]);
 
   useEffect(() => {
-    if (!open || source !== "notion" || !workspace?.id) return;
+    // The sidebar keeps this controller mounted with `onActivityChange` even
+    // while the modal is closed. That controller must read a durable live job
+    // after a fresh browser load so it can restore the sidebar progress action
+    // (and resume stored-connection work). Keep that cold check jobs-only and
+    // wait for authenticated store state; connection metadata and repair work
+    // remain tied to an explicitly opened Notion dialog.
+    const workspaceId = workspace?.id;
+    if (source !== "notion" || !workspaceId) return;
     let mounted = true;
+    if (!open) {
+      if (!onActivityChange || !userId) return;
+      void listNotionImportJobsRemote({ workspaceId, limit: 5 })
+        .then((jobsResult) => {
+          if (
+            !mounted ||
+            sourceRef.current !== "notion" ||
+            useStore.getState().workspace?.id !== workspaceId
+          ) {
+            return;
+          }
+          const jobs = jobsResult.jobs ?? [];
+          publishNotionJobList(jobs);
+        })
+        .catch(() => {
+          // A cold/offline shell may not be able to read protected state yet.
+          // Opening the dialog performs the full authenticated refresh.
+        });
+      return () => {
+        mounted = false;
+      };
+    }
     refreshNotionImportState()
       .catch(() => {
         if (!mounted) return;
@@ -1172,7 +1416,7 @@ export function ImportDialog({
     return () => {
       mounted = false;
     };
-  }, [open, source, workspace?.id, refreshNotionImportState]);
+  }, [onActivityChange, open, publishNotionJobList, source, userId, workspace?.id, refreshNotionImportState]);
 
   // One-shot self-heal for legacy/interrupted imports: rebuild page routing,
   // unwrap completed staging roots, and hide failed partial output.
@@ -1205,7 +1449,7 @@ export function ImportDialog({
     // status reads can never overlap.
     const tick = async () => {
       try {
-        const snapshot = await getNotionImportJobRemote(jobId, workspaceId);
+        const snapshot = await getNotionImportJobRemote(jobId, workspaceId, { compact: true });
         if (
           cancelled ||
           sourceRef.current !== "notion" ||
@@ -1213,19 +1457,7 @@ export function ImportDialog({
         ) {
           return;
         }
-        setNotionJobs((current) => {
-          const index = current.findIndex((job) => job.id === jobId);
-          if (index < 0) return [snapshot.job, ...current].slice(0, 5);
-          return current.map((job) => (job.id === jobId ? snapshot.job : job));
-        });
-        setNotionResult((current) =>
-          current?.job.id === jobId
-            ? {
-                job: snapshot.job,
-                itemCount: itemCountFromJob(snapshot.job, current.itemCount),
-              }
-            : current
-        );
+        publishNotionJob(snapshot.job);
       } catch {
         // A dropped status read is harmless; the next tick reads the durable job.
       }
@@ -1236,15 +1468,20 @@ export function ImportDialog({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [source, workspace?.id, notionPollingJobId]);
+  }, [publishNotionJob, source, workspace?.id, notionPollingJobId]);
 
   useEffect(() => {
     rootScanRunRef.current += 1;
+    rootScanCredentialKeyRef.current = "";
     setNotionRootCandidates([]);
     setSelectedNotionRootKeys([]);
     setNotionRootScanSummary(null);
-    setNotionRootScanBusy(false);
-  }, [notionToken, selectedConnectionId]);
+    setNotionRootScanWorkspace(null);
+    setNotionRootScanError("");
+    // Keep an older request marked busy until it settles. The latest
+    // credential is queued by the auto-scan effect below, so credential edits
+    // can never create overlapping Notion search reads.
+  }, [notionToken, selectedConnectionId, workspace?.id]);
 
   useEffect(() => {
     if (!workspace?.id || oauthCallbackHandledRef.current || typeof window === "undefined") return;
@@ -1265,7 +1502,7 @@ export function ImportDialog({
       notify(labelsRef.current.oauthMissingCode, "error");
       return;
     }
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     completeNotionOAuthConnectionRemote({
       workspaceId: workspace.id,
       code,
@@ -1284,9 +1521,16 @@ export function ImportDialog({
       })
       .finally(() => {
         clearNotionOAuthCallbackParams();
-        setNotionBusy(false);
+        finishNotionBusy(busyGeneration);
       });
-  }, [workspace?.id, notify, notionConnectionName, refreshNotionImportStateFresh]);
+  }, [
+    beginNotionBusy,
+    finishNotionBusy,
+    workspace?.id,
+    notify,
+    notionConnectionName,
+    refreshNotionImportStateFresh,
+  ]);
 
   function dialogFocusables() {
     return Array.from(
@@ -1386,16 +1630,25 @@ export function ImportDialog({
     remoteExportAbortRef.current = null;
     setHanjiSelection(null);
     try {
-      const { hanjiFileSourceFingerprint, readHanjiFile, summarizeDocument } = await import("./nativeExport");
+      const {
+        createNativeArchiveBatchId,
+        hanjiFileSourceFingerprint,
+        readHanjiImportFile,
+        summarizeDocument,
+      } = await import("./nativeExport");
       const fingerprint = hanjiFileSourceFingerprint(file);
-      const doc = await readHanjiFile(file);
+      const selected = await readHanjiImportFile(file);
       if (closedRef.current || hanjiReadRunRef.current !== runId) return;
-      setHanjiSelection({
-        document: doc,
+      const common = {
         fingerprint,
         label: L.hanji.selected(file.name),
-        summary: summarizeDocument(doc),
-      });
+        summary: summarizeDocument(
+          selected.kind === "archive" ? selected.archive.document : selected.document
+        ),
+      };
+      setHanjiSelection(selected.kind === "archive"
+        ? { ...common, kind: "archive", archive: selected.archive, batchId: createNativeArchiveBatchId() }
+        : { ...common, kind: "json", document: selected.document });
     } catch (error) {
       if (hanjiReadRunRef.current !== runId) return;
       notify(error instanceof Error ? error.message : L.hanji.cantRead, "error");
@@ -1461,6 +1714,7 @@ export function ImportDialog({
       });
       if (closedRef.current || remoteExportRunRef.current !== runId) return;
       setHanjiSelection({
+        kind: "json",
         document: doc,
         fingerprint,
         label: L.hanji.selected(`${base} · ${remoteWs}`),
@@ -1485,17 +1739,30 @@ export function ImportDialog({
     }
     setHanjiImporting(true);
     try {
-      const result = await importNativeRemote({
-        workspaceId: workspace.id,
-        document: hanjiSelection.document,
-      });
+      const result = hanjiSelection.kind === "archive"
+        ? await (async () => {
+            const { importParsedNativeArchive } = await import("./nativeExport");
+            return importParsedNativeArchive({
+              workspaceId: workspace.id,
+              batchId: hanjiSelection.batchId,
+              archive: hanjiSelection.archive,
+            });
+          })()
+        : await importNativeRemote({
+            workspaceId: workspace.id,
+            document: hanjiSelection.document,
+          });
       await refreshWorkspacePages();
       const imported = result.counts.pages ?? 0;
       const hasPlaceholders = (result.warnings ?? []).some(
         (warning: NativeExportWarning) => warning.code === "stripped_file"
       );
       notify(
-        `${L.hanji.importedItems(imported)}${hasPlaceholders ? ` ${L.hanji.placeholderNote}` : ""}`,
+        `${L.hanji.importedItems(imported)}${
+          hanjiSelection.kind === "archive"
+            ? ` ${L.hanji.filesIncluded}`
+            : hasPlaceholders ? ` ${L.hanji.placeholderNote}` : ""
+        }`,
         "success"
       );
       const rootId = result.rootPageIds?.[0];
@@ -1511,7 +1778,6 @@ export function ImportDialog({
   }
 
   function rootIds() {
-    if (notionScope !== "pages") return [];
     return uniqueRootIds([
       ...selectedRootCandidates(notionRootCandidates, selectedNotionRootKeys)
         .filter((candidate) => candidate.notionObject === "page")
@@ -1521,7 +1787,6 @@ export function ImportDialog({
   }
 
   function rootDataSourceIds() {
-    if (notionScope !== "pages") return [];
     return uniqueRootIds(
       selectedRootCandidates(notionRootCandidates, selectedNotionRootKeys)
         .filter((candidate) => candidate.notionObject === "data_source")
@@ -1577,25 +1842,6 @@ export function ImportDialog({
     };
   }
 
-  async function advanceNotionConnectionStep() {
-    if (!workspace?.id || notionBusy) return;
-    const token = notionToken.trim();
-    if (!validateEnteredNotionToken(token)) return;
-    if (!token || !notionConnectionStorageAvailable) {
-      setNotionStep(2);
-      return;
-    }
-    setNotionBusy(true);
-    try {
-      await persistEnteredNotionToken(token);
-      setNotionStep(2);
-    } catch (error) {
-      notify(error instanceof Error ? error.message : L.cantSaveConnection, "error");
-    } finally {
-      setNotionBusy(false);
-    }
-  }
-
   async function startNotionImport(retryJobId?: string) {
     if (!workspace?.id || notionBusy) return;
     const enteredToken = notionToken.trim();
@@ -1607,33 +1853,35 @@ export function ImportDialog({
     }
     const pageRootIds = rootIds();
     const dataSourceRootIds = rootDataSourceIds();
-    if (!retryJobId && notionScope === "pages" && pageRootIds.length === 0 && dataSourceRootIds.length === 0) {
+    if (!retryJobId && pageRootIds.length === 0 && dataSourceRootIds.length === 0) {
       notify(L.rootPagesRequired, "error");
       return;
     }
-    // Every fresh API discovery uses bounded incremental calls. A selected root
-    // can still fan out to hundreds of pages in a large imported homepage,
-    // so treating page-scoped imports as a short inline request makes a dev
-    // worker restart lose the whole in-memory graph.
-    const useStreamingDiscovery = !retryJobId;
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
+    let attemptedServerOwned = false;
     try {
       const credential = await resolveNotionCredential(enteredToken, selectedConnectionId);
       const { token, connectionId } = credential;
-      if (useStreamingDiscovery) {
+      const serverOwned = Boolean(connectionId);
+      attemptedServerOwned = serverOwned;
+      // No-secret local mode deliberately keeps the token request-only, so it
+      // retains the bounded browser runner. A saved encrypted connection uses
+      // only create/monitor/cancel/retry from this point; discovery, planning,
+      // and apply are owned by the durable server queue.
+      if (!retryJobId && !serverOwned) {
         await runStreamingNotionDiscovery({
           workspaceId: workspace.id,
-          connectionKind: connectionId
-            ? credential.connectionKind ?? "internal_integration"
-            : "manual_token",
-          connectionId,
+          connectionKind: "manual_token",
           token,
           rootNotionPageIds: pageRootIds,
           rootNotionDataSourceIds: dataSourceRootIds,
         });
-        if (connectionId) setNotionToken("");
         return;
       }
+      const serverRunRequestId = serverOwned
+        ? notionServerRunRequestIdRef.current || newServerRunRequestId()
+        : undefined;
+      if (serverRunRequestId) notionServerRunRequestIdRef.current = serverRunRequestId;
       const result = retryJobId
         ? await retryNotionImportJobRemote({
             workspaceId: workspace.id,
@@ -1641,7 +1889,9 @@ export function ImportDialog({
             notionToken: token || undefined,
             connectionId,
             importPagesFullWidth: notionImportPagesFullWidth,
-            deferDiscovery: true,
+            deferDiscovery: !serverOwned,
+            serverOwned,
+            serverRunRequestId,
           })
         : await createNotionImportJobRemote({
             workspaceId: workspace.id,
@@ -1654,9 +1904,11 @@ export function ImportDialog({
             rootNotionDataSourceIds: dataSourceRootIds,
             importPagesFullWidth: notionImportPagesFullWidth,
             locale: productLocale,
+            serverOwned,
+            serverRunRequestId,
           });
       const itemCount = result.items?.length ?? itemCountFromJob(result.job);
-      if (retryJobId && result.job.status === "queued") {
+      if (!serverOwned && retryJobId && result.job.status === "queued") {
         await runStreamingNotionDiscovery({
           workspaceId: workspace.id,
           connectionKind: result.job.connectionKind,
@@ -1664,20 +1916,28 @@ export function ImportDialog({
           token,
           resumeJob: result.job,
         });
-        if (connectionId) setNotionToken("");
         return;
       }
-      await refreshNotionImportStateFresh();
-      setNotionResult({ job: result.job, itemCount });
+      const publishedJob = publishNotionJob(result.job, { itemCount, surface: true });
+      if (serverOwned) notionServerRunRequestIdRef.current = "";
+      await refreshNotionImportStateFresh().catch(() => {});
       notify(
-        result.job.status === "ready" ? L.foundItems(itemCount) : L.jobCreated,
-        result.job.status === "ready" ? "success" : "default"
+        publishedJob.status === "ready" ? L.foundItems(itemCount) : L.jobCreated,
+        publishedJob.status === "ready" ? "success" : "default"
       );
       if (connectionId) setNotionToken("");
     } catch (error) {
+      if (attemptedServerOwned) {
+        const ambiguousRequestId = notionServerRunRequestIdRef.current;
+        await refreshNotionImportStateFresh().catch(() => {});
+        if (ambiguousRequestId && notionServerRunRequestIdRef.current !== ambiguousRequestId) {
+          notify(L.jobCreated, "default");
+          return;
+        }
+      }
       notify(error instanceof Error ? error.message : L.cantStartImport, "error");
     } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
@@ -1693,147 +1953,159 @@ export function ImportDialog({
     rootNotionPageIds?: string[];
     rootNotionDataSourceIds?: string[];
   }) {
-    try {
-      const created = args.resumeJob
-        ? { job: args.resumeJob }
-        : await createNotionImportJobRemote({
-            workspaceId: args.workspaceId,
-            connectionKind: args.connectionKind,
-            connectionId: args.connectionId,
-            notionToken: args.token || undefined,
-            rootNotionPageIds: args.rootNotionPageIds ?? [],
-            rootNotionDataSourceIds: args.rootNotionDataSourceIds ?? [],
-            importPagesFullWidth: notionImportPagesFullWidth,
-            locale: productLocale,
-            deferDiscovery: true,
-          });
-      const jobId = created.job.id;
-      // A deferred job is "live" (queued), so this advances the wizard to the run
-      // panel immediately instead of stalling on the scope step.
-      setNotionResult({ job: created.job, itemCount: 0 });
+    const created = args.resumeJob
+      ? { job: args.resumeJob }
+      : await createNotionImportJobRemote({
+          workspaceId: args.workspaceId,
+          connectionKind: args.connectionKind,
+          connectionId: args.connectionId,
+          notionToken: args.token || undefined,
+          rootNotionPageIds: args.rootNotionPageIds ?? [],
+          rootNotionDataSourceIds: args.rootNotionDataSourceIds ?? [],
+          importPagesFullWidth: notionImportPagesFullWidth,
+          locale: productLocale,
+          deferDiscovery: true,
+        });
+    const jobId = created.job.id;
+    // Every inbound snapshot takes the same reconciliation path. If a poll has
+    // already observed this job terminal, a stale resume snapshot cannot revive
+    // it or start another discovery mutation.
+    let job = publishNotionJob(created.job, { itemCount: 0, surface: true });
+    if (isNotionImportTerminal(job)) return;
 
-      const runnerKey = `${args.workspaceId}:${jobId}`;
-      const existingRunner = notionDiscoveryRunnerCompletions.get(runnerKey);
-      if (existingRunner) {
-        await existingRunner;
-        const snapshot = await getNotionImportJobRemote(jobId, args.workspaceId).catch(() => null);
-        if (snapshot?.job) {
-          setNotionResult({
-            job: snapshot.job,
-            itemCount: itemCountFromJob(snapshot.job),
-          });
-        }
-        await refreshNotionImportStateFresh().catch(() => {});
-        return;
-      }
-      let finishRunner!: () => void;
-      const runnerCompletion = new Promise<void>((resolve) => {
+    const runnerKey = `${args.workspaceId}:${jobId}`;
+    const existingRunner = notionDiscoveryRunners.get(runnerKey);
+    if (existingRunner) {
+      await existingRunner.completion;
+      const snapshot = await getNotionImportJobRemote(jobId, args.workspaceId, { compact: true }).catch(() => null);
+      if (snapshot?.job) publishNotionJob(snapshot.job, { surface: true });
+      await refreshNotionImportStateFresh().catch(() => {});
+      return;
+    }
+
+    let finishRunner!: () => void;
+    const controller = new AbortController();
+    const runner: NotionDiscoveryRunner = {
+      completion: new Promise<void>((resolve) => {
         finishRunner = resolve;
-      });
-      notionDiscoveryRunnerCompletions.set(runnerKey, runnerCompletion);
-      try {
-
-      // Incremental discovery: each discover() call does a BOUNDED amount of work
-      // (searches a page and/or enriches a small batch of items), persists, and
-      // reports whether more remains — so no single request can grind for
-      // minutes on a large workspace. Loop short calls until the job reports it
-      // is done. The shared active-job poll above streams persisted progress
-      // without separately re-reading job and connection lists.
-      let job = created.job;
+      }),
+      controller,
+      generation: ++notionDiscoveryRunnerGeneration,
+    };
+    notionDiscoveryRunners.set(runnerKey, runner);
+    const { signal } = controller;
+    try {
+      // Incremental discovery: each discover() call does a bounded amount of
+      // work. The controller also owns retry/conflict waits so terminal polling
+      // can stop the loop before one more mutation is issued.
       let discoveryStallState = advanceNotionDiscoveryStallState(undefined, job);
-
-      let discoverError: unknown = null;
-      try {
-        let continueFromCursor = args.resumeJob
-          ? notionDiscoveryShouldContinue(args.resumeJob)
-          : false;
-        // A single discover chunk can transiently fail (e.g. a 503 if the
-        // Durable Object is briefly saturated). Retry the same chunk a few
-        // times with backoff instead of tearing down the whole multi-minute
-        // import — only give up after several consecutive failures.
-        let consecutiveErrors = 0;
-        for (let chunk = 0; chunk < NOTION_MAX_DISCOVER_CHUNKS; chunk += 1) {
-          let res: Awaited<ReturnType<typeof discoverNotionImportJobRemote>>;
-          try {
-            res = await discoverNotionImportJobRemote({
-              jobId,
-              workspaceId: args.workspaceId,
-              notionToken: args.token || undefined,
-              connectionId: args.connectionId,
-              continueFromCursor,
-              incremental: true,
-            });
+      let continueFromCursor = args.resumeJob
+        ? notionDiscoveryShouldContinue(args.resumeJob)
+        : false;
+      let consecutiveErrors = 0;
+      let conflictPollDeadlineAt = 0;
+      for (let chunk = 0; chunk < NOTION_MAX_DISCOVER_CHUNKS; chunk += 1) {
+        checkNotionRunnerAborted(signal);
+        let res: Awaited<ReturnType<typeof discoverNotionImportJobRemote>>;
+        try {
+          res = await discoverNotionImportJobRemote({
+            jobId,
+            workspaceId: args.workspaceId,
+            notionToken: args.token || undefined,
+            connectionId: args.connectionId,
+            continueFromCursor,
+            incremental: true,
+            compact: true,
+          });
+          checkNotionRunnerAborted(signal);
+          consecutiveErrors = 0;
+          conflictPollDeadlineAt = 0;
+        } catch (chunkError) {
+          checkNotionRunnerAborted(signal);
+          if (isNotionDiscoveryConflict(chunkError)) {
+            conflictPollDeadlineAt ||= Date.now() + NOTION_DISCOVERY_CONFLICT_POLL_DEADLINE_MS;
+            let snapshot: Awaited<ReturnType<typeof getNotionImportJobRemote>> | null = null;
+            while (Date.now() < conflictPollDeadlineAt) {
+              await waitForNotionRunnerDelay(
+                Math.min(
+                  NOTION_DISCOVERY_CONFLICT_POLL_INTERVAL_MS,
+                  Math.max(1, conflictPollDeadlineAt - Date.now()),
+                ),
+                signal,
+              );
+              snapshot = await withTimeout(
+                getNotionImportJobRemote(jobId, args.workspaceId, { compact: true }),
+                Math.max(1, conflictPollDeadlineAt - Date.now()),
+                () => new Error("Notion discovery conflict status polling timed out."),
+              );
+              checkNotionRunnerAborted(signal);
+              job = publishNotionJob(snapshot.job, { surface: true });
+              if (isNotionImportTerminal(job) || !notionImportOperationIsActive(snapshot)) break;
+            }
+            checkNotionRunnerAborted(signal);
+            if (!snapshot || notionImportOperationIsActive(snapshot)) {
+              throw new Error("Notion discovery conflict did not settle before the bounded polling deadline.");
+            }
+            if (job.status === "ready" || isNotionImportTerminal(job)) break;
+            continueFromCursor = notionDiscoveryShouldContinue(job);
             consecutiveErrors = 0;
-          } catch (chunkError) {
-            consecutiveErrors += 1;
-            const record = chunkError && typeof chunkError === "object"
-              ? chunkError as { code?: unknown; status?: unknown }
-              : null;
-            const status = Number(record?.status ?? record?.code);
-            if (status === 409) throw chunkError;
-            if (consecutiveErrors >= NOTION_DISCOVER_MAX_RETRIES) throw chunkError;
-            await new Promise((resolve) =>
-              setTimeout(resolve, Math.min(8000, 1000 * consecutiveErrors))
-            );
-            continue; // retry the same chunk; cursor/seed state is unchanged
+            continue;
           }
-          // Every successful chunk persists either a cursor, a completed-search
-          // marker, or both. Later calls continue from that durable boundary.
-          continueFromCursor = true;
-          job = res.job;
-          setNotionResult({ job, itemCount: itemCountFromJob(job) });
-          discoveryStallState = advanceNotionDiscoveryStallState(discoveryStallState, job);
-          if (
-            job.progress?.hasMore === true &&
-            discoveryStallState.unchangedChunks >= NOTION_DISCOVERY_STALL_LIMIT
-          ) {
-            // A successful response that repeats the same durable boundary is
-            // not forward progress. Pause instead of issuing up to 2,000
-            // identical chunks; the user can retry after reviewing access.
-            break;
-          }
-          // Done when the job flips to ready (no search remaining AND nothing
-          // left to enrich).
-          if (
-            job.status === "ready" ||
-            job.status === "failed" ||
-            job.status === "cancelled" ||
-            job.status === "completed" ||
-            job.progress?.hasMore !== true
-          ) break;
+          consecutiveErrors += 1;
+          if (consecutiveErrors >= NOTION_DISCOVER_MAX_RETRIES) throw chunkError;
+          await waitForNotionRunnerDelay(
+            Math.min(8_000, 1_000 * consecutiveErrors),
+            signal,
+          );
+          continue;
         }
-      } catch (error) {
-        discoverError = error;
+        continueFromCursor = true;
+        job = publishNotionJob(res.job, {
+          itemCount: itemCountFromJob(res.job),
+          surface: true,
+        });
+        if (isNotionImportTerminal(job)) break;
+        checkNotionRunnerAborted(signal);
+        discoveryStallState = advanceNotionDiscoveryStallState(discoveryStallState, job);
+        if (
+          job.progress?.hasMore === true &&
+          discoveryStallState.unchangedChunks >= NOTION_DISCOVERY_STALL_LIMIT
+        ) break;
+        if (job.status === "ready" || job.progress?.hasMore !== true) break;
       }
-
-      if (discoverError) {
-        notify(discoverError instanceof Error ? discoverError.message : L.cantStartImport, "error");
-      } else {
-        const final = await getNotionImportJobRemote(jobId, args.workspaceId).catch(() => null);
-        if (final?.job) {
-          job = final.job;
-          setNotionResult({ job, itemCount: itemCountFromJob(job) });
-        }
-        if (job.status === "ready" || (job.status !== "cancelled" && job.progress?.hasMore !== true)) {
-          notify(L.foundItems(itemCountFromJob(job)), "success");
-        } else if (job.status !== "cancelled") {
-          notify(L.discoveryPaused, "default");
-        }
+      checkNotionRunnerAborted(signal);
+      const final = await getNotionImportJobRemote(
+        jobId,
+        args.workspaceId,
+        { compact: true },
+      ).catch(() => null);
+      checkNotionRunnerAborted(signal);
+      if (final?.job) {
+        job = publishNotionJob(final.job, { surface: true });
+        checkNotionRunnerAborted(signal);
+      }
+      if (job.status === "ready") {
+        notify(L.foundItems(itemCountFromJob(job)), "success");
+      } else if (!isNotionImportTerminal(job)) {
+        notify(L.discoveryPaused, "default");
       }
       await refreshNotionImportStateFresh().catch(() => {});
-      } finally {
-        finishRunner();
-        if (notionDiscoveryRunnerCompletions.get(runnerKey) === runnerCompletion) {
-          notionDiscoveryRunnerCompletions.delete(runnerKey);
-        }
-      }
+      checkNotionRunnerAborted(signal);
+    } catch (error) {
+      if (isNotionRunnerAbort(error, signal)) return;
+      notify(error instanceof Error ? error.message : L.cantStartImport, "error");
+      await refreshNotionImportStateFresh().catch(() => {});
     } finally {
-      setNotionBusy(false);
+      finishRunner();
+      if (notionDiscoveryRunners.get(runnerKey)?.generation === runner.generation) {
+        notionDiscoveryRunners.delete(runnerKey);
+      }
     }
   }
 
   async function resumeNotionDiscovery(job: NotionImportJob, automatic = false) {
     if (!workspace?.id || notionBusy) return;
+    if (isServerOwnedNotionJob(job)) return;
     const enteredToken = automatic ? "" : notionToken.trim();
     if (!validateEnteredNotionToken(enteredToken)) return;
     const fallbackConnectionId = job.connectionId || selectedConnectionId || undefined;
@@ -1848,7 +2120,7 @@ export function ImportDialog({
     // explicitly instead of leaving the user on Connect with a static
     // "Discovering..." button for the whole resumed chunk sequence.
     setNotionStep(3);
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const credential = await resolveNotionCredential(enteredToken, fallbackConnectionId);
       await runStreamingNotionDiscovery({
@@ -1861,13 +2133,14 @@ export function ImportDialog({
       if (credential.connectionId) setNotionToken("");
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantStartImport, "error");
-      setNotionBusy(false);
+    } finally {
+      finishNotionBusy(busyGeneration);
     }
   }
 
   async function startNotionOAuthConnection() {
     if (!workspace?.id || notionBusy || !notionOAuthConfigured) return;
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const result = await beginNotionOAuthConnectionRemote({
         workspaceId: workspace.id,
@@ -1877,30 +2150,12 @@ export function ImportDialog({
       window.location.assign(result.authorizationUrl);
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantStartOAuth, "error");
-      setNotionBusy(false);
-    }
-  }
-
-  async function saveNotionConnection() {
-    if (!workspace?.id || notionBusy) return;
-    const token = notionToken.trim();
-    if (!token) {
-      notify(L.tokenRequired, "error");
-      return;
-    }
-    if (!validateEnteredNotionToken(token)) return;
-    setNotionBusy(true);
-    try {
-      await persistEnteredNotionToken(token);
-    } catch (error) {
-      notify(error instanceof Error ? error.message : L.cantSaveConnection, "error");
-    } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
   async function scanNotionRootCandidates() {
-    if (!workspace?.id || notionRootScanBusy) return;
+    if (closedRef.current || !workspace?.id || notionRootScanBusy) return;
     const token = notionToken.trim();
     if (!validateEnteredNotionToken(token)) return;
     const connectionId = token ? undefined : selectedConnectionId || undefined;
@@ -1909,9 +2164,13 @@ export function ImportDialog({
       return;
     }
 
+    rootScanCredentialKeyRef.current = token
+      ? `${workspace.id}:token:${token}`
+      : `${workspace.id}:connection:${connectionId}`;
     const runId = rootScanRunRef.current + 1;
     rootScanRunRef.current = runId;
     setNotionRootScanBusy(true);
+    setNotionRootScanError("");
     setNotionRootCandidates([]);
     setSelectedNotionRootKeys([]);
     setNotionRootScanWorkspace(null);
@@ -1983,18 +2242,69 @@ export function ImportDialog({
       );
     } catch (error) {
       if (rootScanRunRef.current !== runId) return;
-      // Clear the "running" flag so a failed/timed-out scan stops showing
-      // "스캔 중… 요청 0회" forever; the button already resets via busy below.
+      const message = error instanceof Error ? error.message : L.cantScanRoots;
       setNotionRootScanSummary((prev) => (prev ? { ...prev, running: false } : prev));
-      notify(error instanceof Error ? error.message : L.cantScanRoots, "error");
+      setNotionRootScanError(message);
+      notify(message, "error");
     } finally {
-      if (rootScanRunRef.current === runId) setNotionRootScanBusy(false);
+      // Only one root scan can enter this function while busy. Even if its
+      // credential became stale, settling it releases the queued latest
+      // credential through the effect below; no overlap is possible.
+      setNotionRootScanBusy(false);
     }
   }
 
+  useEffect(() => {
+    const workspaceId = workspace?.id;
+    const token = notionToken.trim();
+    const connectionId = token ? "" : selectedConnectionId;
+    const credentialReady = token
+      ? isAllowedNotionToken(token) && token.length >= 8
+      : Boolean(connectionId);
+    const hasActiveJob = Boolean(
+      notionResult?.job || notionJobs.some((job) => isMonitorableNotionJob(job)),
+    );
+    if (
+      !open ||
+      closedRef.current ||
+      source !== "notion" ||
+      !workspaceId ||
+      !credentialReady ||
+      hasActiveJob ||
+      notionRootScanBusy
+    ) {
+      return;
+    }
+    const credentialKey = token
+      ? `${workspaceId}:token:${token}`
+      : `${workspaceId}:connection:${connectionId}`;
+    if (rootScanCredentialKeyRef.current === credentialKey) return;
+
+    // Token typing gets a short debounce. Stored-connection selection can
+    // begin immediately; both paths still enter the same serialized scanner.
+    const timer = window.setTimeout(
+      () => void scanNotionRootCandidates(),
+      token ? 350 : 0,
+    );
+    return () => window.clearTimeout(timer);
+    // scanNotionRootCandidates intentionally reads the render snapshot named
+    // by credentialKey; adding its changing function identity would rearm the
+    // debounce on unrelated renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    open,
+    source,
+    workspace?.id,
+    notionToken,
+    selectedConnectionId,
+    notionRootScanBusy,
+    notionResult?.job,
+    notionJobs,
+  ]);
+
   async function revokeNotionConnection(connectionId: string) {
     if (!connectionId || notionBusy) return;
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       await revokeNotionImportConnectionRemote(connectionId, workspace?.id);
       if (selectedConnectionId === connectionId) setSelectedConnectionId("");
@@ -2003,13 +2313,13 @@ export function ImportDialog({
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantRemoveConnection, "error");
     } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
   async function reviewNotionImport(jobId: string) {
     if (notionBusy) return;
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const result = await planNotionImportJobRemote(jobId, workspace?.id);
       await refreshNotionImportStateFresh();
@@ -2018,15 +2328,12 @@ export function ImportDialog({
         safeCount(estimated.pages) +
         safeCount(estimated.databases) +
         safeCount(estimated.rows);
-      setNotionResult({
-        job: result.job,
-        itemCount,
-      });
+      publishNotionJob(result.job, { itemCount, surface: true });
       notify(L.reviewReady, "success");
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantReview, "error");
     } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
@@ -2039,41 +2346,68 @@ export function ImportDialog({
       notify(L.expandNeedsCredential, "error");
       return;
     }
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const credential = await resolveNotionCredential(enteredToken, fallbackConnectionId);
-      const result = await discoverNotionImportJobRemote({
-        workspaceId: workspace?.id,
-        jobId: job.id,
-        notionToken: credential.token || undefined,
+      if (!workspace?.id) throw new Error(L.cantExpand);
+      await runStreamingNotionDiscovery({
+        workspaceId: workspace.id,
+        connectionKind: credential.connectionId
+          ? credential.connectionKind ?? "internal_integration"
+          : "manual_token",
         connectionId: credential.connectionId,
-        continueFromCursor: typeof job.progress?.nextCursor === "string" && job.progress.nextCursor.length > 0,
+        token: credential.token,
+        resumeJob: job,
       });
-      await refreshNotionImportStateFresh();
-      const itemCount = result.items?.length ?? itemCountFromJob(result.job);
-      setNotionResult({ job: result.job, itemCount });
-      notify(L.discoveryExpanded(itemCount), "success");
       if (credential.connectionId) setNotionToken("");
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantExpand, "error");
     } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
   async function applyNotionImport(jobId: string) {
-    if (notionBusy) return;
+    if (notionBusy || notionApplyRunRef.current) return;
     const enteredToken = notionToken.trim();
     if (!validateEnteredNotionToken(enteredToken)) return;
-    const job = notionJobs.find((item) => item.id === jobId) ?? notionResult?.job;
+    // The just-finished runner response is newer than the periodically
+    // refreshed list. A manual Retry must read that durable cursor (especially
+    // retryAfterAt) rather than racing from the older list snapshot.
+    const job = notionResultRef.current?.job.id === jobId
+      ? notionResultRef.current.job
+      : notionJobs.find((item) => item.id === jobId);
+    if (job && isServerOwnedNotionJob(job)) return;
     const fallbackConnectionId = job?.connectionId || selectedConnectionId || undefined;
+    const applyRun = {
+      jobId,
+      workspaceId: workspace?.id,
+      controller: new AbortController(),
+    };
+    notionApplyRunRef.current = applyRun;
     setNotionStep(4);
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const credential = await resolveNotionCredential(enteredToken, fallbackConnectionId);
+      checkNotionRunnerAborted(applyRun.controller.signal);
+      // Re-entering a cursor that already hit the automatic recovery ceiling
+      // is the user's one explicit retry allowance. Honor the checkpoint's
+      // existing deadline before that first request; a ceiling reached by a
+      // response later in this same run still returns immediately below.
+      if (job) {
+        const mayStart = await waitForNotionApplyRetryAfter(
+          job,
+          applyRun.controller.signal,
+        );
+        checkNotionRunnerAborted(applyRun.controller.signal);
+        if (!mayStart) return;
+      }
       let result: Awaited<ReturnType<typeof applyNotionImportJobRemote>> | null = null;
       let consecutiveErrors = 0;
-      for (let chunk = 0; chunk < NOTION_MAX_APPLY_CHUNKS; chunk += 1) {
+      let applyChunkBudget = notionApplyRequestBudget(job);
+      let applyStallState: ReturnType<typeof advanceNotionApplyStallState> | undefined;
+      for (let chunk = 0; chunk < applyChunkBudget; chunk += 1) {
+        checkNotionRunnerAborted(applyRun.controller.signal);
         let chunkResult: Awaited<ReturnType<typeof applyNotionImportJobRemote>>;
         try {
           chunkResult = await applyNotionImportJobRemote({
@@ -2082,11 +2416,17 @@ export function ImportDialog({
             notionToken: credential.token || undefined,
             connectionId: credential.connectionId,
             importPagesFullWidth: notionImportPagesFullWidth,
+            compact: true,
+            applyDataSourceBatchSize: NOTION_APPLY_DATA_SOURCE_BATCH_SIZE,
             applyDatabaseBatchSize: NOTION_APPLY_DATABASE_BATCH_SIZE,
+            applyFileBatchSize: NOTION_APPLY_FILE_BATCH_SIZE,
             applyPageBatchSize: NOTION_APPLY_PAGE_BATCH_SIZE,
+            applyRemapBatchSize: NOTION_APPLY_REMAP_BATCH_SIZE,
           });
+          checkNotionRunnerAborted(applyRun.controller.signal);
           consecutiveErrors = 0;
         } catch (chunkError) {
+          checkNotionRunnerAborted(applyRun.controller.signal);
           const record = chunkError && typeof chunkError === "object"
             ? chunkError as { code?: unknown; status?: unknown }
             : null;
@@ -2094,31 +2434,59 @@ export function ImportDialog({
           const retryable = status === 429 || status === 502 || status === 503 || status === 504;
           consecutiveErrors += 1;
           if (!retryable || consecutiveErrors >= NOTION_APPLY_MAX_RETRIES) throw chunkError;
-          await new Promise((resolve) =>
-            setTimeout(resolve, Math.min(8_000, 1_000 * consecutiveErrors))
+          await waitForNotionRunnerDelay(
+            Math.min(8_000, 1_000 * consecutiveErrors),
+            applyRun.controller.signal,
           );
           chunk -= 1;
           continue;
         }
         result = chunkResult;
-        setNotionResult({
-          job: chunkResult.job,
+        const publishedJob = publishNotionJob(chunkResult.job, {
           itemCount: itemCountFromJob(chunkResult.job),
+          surface: true,
         });
+        if (
+          isNotionImportTerminal(publishedJob) &&
+          (publishedJob !== chunkResult.job || publishedJob.status !== "completed")
+        ) return;
         if (chunkResult.partial !== true || chunkResult.job.status === "completed") break;
+        applyChunkBudget = Math.max(
+          applyChunkBudget,
+          notionApplyRequestBudget(chunkResult.job, chunk + 1),
+        );
+        applyStallState = advanceNotionApplyStallState(applyStallState, chunkResult.job);
+        if (applyStallState.unchangedChunks >= NOTION_APPLY_STALL_LIMIT) {
+          throw new Error("Notion apply stopped because its durable cursor did not advance.");
+        }
+        // The server keeps this cursor durable. Once automatic file recovery
+        // has outlived its recovery TTL, end only the browser runner so the
+        // existing interrupted-apply UI offers an explicit retry; do not mark
+        // the job failed or discard its staged/product progress.
+        if (notionApplyFileRecoveryRetryLimitReached(chunkResult.job)) return;
+        const shouldContinue = await waitForNotionApplyRetryAfter(
+          chunkResult.job,
+          applyRun.controller.signal,
+        );
+        checkNotionRunnerAborted(applyRun.controller.signal);
+        if (!shouldContinue) return;
       }
       if (!result || result.partial === true || result.job.status !== "completed") {
         throw new Error(L.cantApply);
       }
+      // Publishing this run's own completed response intentionally trips the
+      // shared terminal abort controller. The remaining work is read-only
+      // reconciliation and local UI finalization, so it must not reinterpret
+      // that self-owned terminal signal as an external cancellation.
       const jobs = workspace?.id
         ? await listNotionImportJobsRemote({ workspaceId: workspace.id, limit: 5 })
         : { jobs: [] };
-      setNotionJobs(jobs.jobs ?? []);
-      setNotionResult({
-        job: result.job,
+      publishNotionJobList(jobs.jobs ?? []);
+      publishNotionJob(result.job, {
         itemCount: typeof result.applied?.pages === "number"
           ? result.applied.pages + (result.applied.databases ?? 0) + (result.applied.rows ?? 0)
           : 0,
+        surface: true,
       });
       const rootIds = (result.job.rootNotionPageIds ?? job?.rootNotionPageIds ?? []).map((id) =>
         id.replace(/-/g, "").toLowerCase()
@@ -2130,45 +2498,45 @@ export function ImportDialog({
           mapping.localId &&
           rootIds.includes(String(mapping.notionId ?? "").replace(/-/g, "").toLowerCase())
       );
-      if (rootMapping?.localId) setImportedRootPage({ jobId, pageId: rootMapping.localId });
+      const importedRootPageId = result.importedRootPageId || rootMapping?.localId;
+      if (importedRootPageId) setImportedRootPage({ jobId, pageId: importedRootPageId });
       // Imported pages were written server-side; pull them into the sidebar tree.
       void refreshWorkspacePages().catch(() => {});
       notify(L.importApplied, "success");
       if (credential.connectionId) setNotionToken("");
     } catch (error) {
+      if (isNotionRunnerAbort(error, applyRun.controller.signal)) return;
       // A failed apply moves its partial product pages to Trash server-side;
       // refresh immediately so stale staging entries disappear from the tree.
       void refreshWorkspacePages().catch(() => {});
       const snapshot = workspace?.id
-        ? await getNotionImportJobRemote(jobId, workspace.id).catch(() => null)
+        ? await getNotionImportJobRemote(jobId, workspace.id, { compact: true }).catch(() => null)
         : null;
       if (snapshot?.job) {
-        setNotionResult({
-          job: snapshot.job,
-          itemCount: itemCountFromJob(snapshot.job),
-        });
+        publishNotionJob(snapshot.job, { surface: true });
       }
-      if (snapshot?.job.status !== "cancelled") {
+      if (snapshot?.job.status !== "cancelled" && snapshot?.job.status !== "failed") {
         notify(error instanceof Error ? error.message : L.cantApply, "error");
       }
     } finally {
-      setNotionBusy(false);
+      if (notionApplyRunRef.current === applyRun) notionApplyRunRef.current = null;
+      finishNotionBusy(busyGeneration);
     }
   }
 
   async function retryNotionFileCopies(jobId: string) {
     if (notionBusy) return;
-    setNotionBusy(true);
+    const busyGeneration = beginNotionBusy();
     try {
       const result = await retryNotionImportFileCopiesRemote(jobId, workspace?.id);
       const jobs = workspace?.id
         ? await listNotionImportJobsRemote({ workspaceId: workspace.id, limit: 5 })
         : { jobs: [] };
-      setNotionJobs(jobs.jobs ?? []);
+      publishNotionJobList(jobs.jobs ?? []);
       const fileRetry = result.fileRetry ?? {};
-      setNotionResult({
-        job: result.job,
+      publishNotionJob(result.job, {
         itemCount: safeCount(fileRetry.copied) + safeCount(fileRetry.skipped),
+        surface: true,
       });
       notify(
         L.fileRetryFinished(safeCount(fileRetry.copied), safeCount(fileRetry.skipped)),
@@ -2177,7 +2545,7 @@ export function ImportDialog({
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantRetryFiles, "error");
     } finally {
-      setNotionBusy(false);
+      finishNotionBusy(busyGeneration);
     }
   }
 
@@ -2186,19 +2554,12 @@ export function ImportDialog({
     setCancellingJobId(jobId);
     try {
       const result = await cancelNotionImportJobRemote(jobId, workspace?.id);
-      setNotionResult((current) =>
-        current && current.job.id === jobId
-          ? { job: result.job, itemCount: itemCountFromJob(result.job, current.itemCount) }
-          : current
-      );
-      setNotionJobs((current) =>
-        current.map((job) => (job.id === jobId ? result.job : job))
-      );
+      publishNotionJob(result.job, { surface: true });
       await refreshNotionImportStateFresh().catch(() => {});
       // The server-side cancellation fence already owns the old job. Do not
       // keep the fresh-start controls disabled while an obsolete Notion
       // request is still returning in the background.
-      setNotionBusy(false);
+      invalidateNotionBusy();
       notify(L.importCancelled, "success");
     } catch (error) {
       notify(error instanceof Error ? error.message : L.cantCancelImport, "error");
@@ -2227,34 +2588,17 @@ export function ImportDialog({
   }
 
   function jobActions(job: NotionImportJob) {
-    if (isLiveNotionJob(job)) {
-      // A running import must stay cancellable even while other Notion calls
-      // are busy, so this button only locks while its own cancel is in flight.
-      return (
-        <span className={styles.jobActions}>
-          {!notionBusy ? (
-            <button
-              type="button"
-              className={styles.secondary}
-              onClick={() => void resumeNotionDiscovery(job)}
-            >
-              {L.resumeImport}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className={styles.secondary}
-            onClick={() => void cancelNotionImport(job.id)}
-            disabled={cancellingJobId !== null}
-          >
-            {cancellingJobId === job.id ? L.cancellingImport : L.cancelImport}
-          </button>
-        </span>
-      );
+    // Live ownership and cancellation stay in the single-flow action footer,
+    // not inside the scrolling activity panel.
+    if (
+      (isServerOwnedNotionJob(job) && !isNotionImportTerminal(job)) ||
+      isLiveNotionJob(job)
+    ) {
+      return null;
     }
-    // Failed/cancelled retry is the wizard footer's primary action.
+    // Failed/cancelled retry is the single-flow footer's primary action.
     if (job.status === "ready") {
-      // Apply itself lives in the wizard footer; the panel offers the
+      // Apply itself lives in the single-flow footer; the panel offers the
       // secondary inspection actions.
       return (
         <span className={styles.jobActions}>
@@ -2303,16 +2647,36 @@ export function ImportDialog({
         </section>
       );
     }
+    if (isNotionImportProblemTerminal(job)) {
+      return (
+        <section
+          className={styles.stepCard}
+          data-run-panel={mode}
+          data-terminal-status={job.status}
+        >
+          <header className={styles.stepHeader}>
+            <strong>{mode === "apply" ? L.progressSteps.apply : L.progressSteps.discover}</strong>
+            <span className={styles.statusPill} data-status={job.status}>
+              {statusLabel(job)}
+            </span>
+          </header>
+          <div className={styles.runCurrent} role="status">
+            <strong>{statusLabel(job)}</strong>
+          </div>
+          <p className={styles.terminalNotice} role="alert">
+            {job.status === "failed" ? L.terminal.failed : L.terminal.cancelled}
+          </p>
+        </section>
+      );
+    }
     const runRecent = activeRecent;
     const startedAt =
       progressStepStartedAt(job, mode === "apply" ? "apply" : "discover") ??
       (typeof job.createdAt === "string" ? job.createdAt : undefined);
     const elapsed = elapsedText(startedAt, runNowMs);
-    // Throughput straight off the persisted activity ring — pure derivation,
-    // refreshed by the ~1s poll.
     // Speed = overall average throughput (items done ÷ total elapsed), not a
-    // recent-window rate. The windowed rate swung wildly (0.6 → 0.3 …) as heavy
-    // items passed; the running average is stable and honest.
+    // recent-window rate. The persisted activity feed is bounded and does not
+    // contain one entry for every processed object, so it is narration only.
     const elapsedSecs = startedAt
       ? Math.max(0, ((runNowMs ?? Date.now()) - new Date(startedAt).getTime()) / 1000)
       : 0;
@@ -2323,20 +2687,11 @@ export function ImportDialog({
           ? lastEntry.count
           : undefined
         : processedItemCount(job);
-    const completionKinds = mode === "apply"
-      ? new Set(["create_page", "create_row", "create_database"])
-      : new Set(["read_page", "read_data_source"]);
-    const completionTimesMs = logEntries
-      .filter((entry) => completionKinds.has(entry.kind) && typeof entry.at === "string")
-      .map((entry) => new Date(entry.at as string).getTime())
-      .filter(Number.isFinite);
     let rateText = "";
     const runMetrics = activeLive
       ? estimateImportRunMetrics({
           doneCount,
           elapsedSeconds: elapsedSecs,
-          nowMs: runNowMs,
-          completionTimesMs,
         })
       : undefined;
     if (runMetrics) {
@@ -2356,6 +2711,16 @@ export function ImportDialog({
         : activeLive
           ? progressSummaryText(job, L) || L.installer.searching
           : statusLabel(job);
+    const rawProgressPercent = Number(job.progress?.percent);
+    const determinatePercent = Number.isFinite(rawProgressPercent)
+      ? Math.max(0, Math.min(100, Math.round(rawProgressPercent)))
+      : null;
+    const discoveryFrontierClosed =
+      mode === "apply" ||
+      job.progress?.hasMore === false ||
+      job.progress?.searchComplete === true ||
+      job.status === "ready" ||
+      job.status === "completed";
     const discoveredText = [
       activeDiscovered.length ? activeDiscovered.join(" · ") : L.noDiscovered,
       discoveryDetailText(job),
@@ -2376,16 +2741,29 @@ export function ImportDialog({
           <strong>{currentLine}</strong>
         </div>
 
-        {activeLive ? (
-          <div className={styles.progressTrack} role="progressbar" aria-label={currentLine}>
-            <span data-indeterminate="true" />
+        {activeLive && discoveryFrontierClosed && determinatePercent !== null ? (
+          <div
+            className={styles.progressTrack}
+            role="progressbar"
+            aria-label={currentLine}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={determinatePercent}
+          >
+            <span style={{ width: `${determinatePercent}%` }} />
           </div>
         ) : null}
 
         {activeLive ? (
-          <p className={styles.browserRunnerWarning} role="note" data-browser-runner-warning>
-            {L.wizard.browserRunnerWarning}
-          </p>
+          isServerOwnedNotionJob(job) ? (
+            <p className={styles.browserRunnerWarning} role="note" data-server-runner-status>
+              {L.wizard.serverRunnerStatus}
+            </p>
+          ) : (
+            <p className={styles.browserRunnerWarning} role="note" data-browser-runner-warning>
+              {L.wizard.browserRunnerWarning}
+            </p>
+          )
         ) : null}
 
         <div className={styles.statGrid}>
@@ -2505,21 +2883,7 @@ export function ImportDialog({
           </div>
         ) : null}
 
-        <div className={styles.notionActions}>
-          {jobActions(job)}
-          {mode === "apply" && job.status === "completed" && importedRootPage?.jobId === job.id ? (
-            <button
-              type="button"
-              className={styles.primary}
-              onClick={() => {
-                close(false);
-                router.push(pageHref(importedRootPage.pageId));
-              }}
-            >
-              {L.openImportedPage}
-            </button>
-          ) : null}
-        </div>
+        <div className={styles.notionActions}>{jobActions(job)}</div>
       </section>
     );
   }
@@ -2539,9 +2903,8 @@ export function ImportDialog({
   // resurfacing stale discovery over a fresh scope selection.
   const activeJob =
     notionResult?.job ??
-    notionJobs.find((job) => isLiveNotionJob(job)) ??
+    notionJobs.find((job) => isMonitorableNotionJob(job)) ??
     null;
-  const activeItemCount = notionResult ? notionResult.itemCount : activeJob ? itemCountFromJob(activeJob) : 0;
   const activeSteps = activeJob ? progressStepsOf(activeJob) : [];
   const activeApplied = activeJob ? appliedStats(activeJob) : undefined;
   const activeDiscovered = activeJob ? discoveredEntries(activeJob, L) : [];
@@ -2560,6 +2923,7 @@ export function ImportDialog({
   // same operation rather than a second decision point.
   const automaticApplyPending = Boolean(
     activeJob &&
+      !isServerOwnedNotionJob(activeJob) &&
       notionResult?.job.id === activeJob.id &&
       activeJob.status === "ready" &&
       activeJob.progress?.hasMore !== true &&
@@ -2568,12 +2932,15 @@ export function ImportDialog({
   // Keep the lifecycle guard and shell activity continuous across the brief
   // durable ready boundary before the first apply request starts.
   const activeLive = activeJob
-    ? isLiveNotionJob(activeJob) ||
-      automaticApplyPending ||
-      (notionBusy && notionStep === 4 && activeJob.status !== "completed")
+    ? !isNotionImportTerminal(activeJob) &&
+      (isLiveNotionJob(activeJob) ||
+        (isServerOwnedNotionJob(activeJob) && !isNotionImportTerminal(activeJob)) ||
+        automaticApplyPending ||
+        (notionBusy && notionStep === 4))
     : false;
   const interruptedApply = Boolean(
     activeJob &&
+      !isServerOwnedNotionJob(activeJob) &&
       activeJob.status === "ready" &&
       applyStarted &&
       activeJob.progress?.currentStatus === "running" &&
@@ -2584,7 +2951,12 @@ export function ImportDialog({
     ? `${activeRecent[activeRecent.length - 1].at ?? ""}:${activeRecent.length}`
     : "";
   const manualResumeRequired = Boolean(
-    activeJob && isLiveNotionJob(activeJob) && !activeJob.connectionId && notionStep === 1,
+    activeJob &&
+      !activeJob.connectionId &&
+      (
+        (isLiveNotionJob(activeJob) && notionStep === 1) ||
+        (interruptedApply && !notionToken.trim())
+      ),
   );
 
   useEffect(() => {
@@ -2594,39 +2966,38 @@ export function ImportDialog({
       return;
     }
     const rawPercent = Number(activeJob.progress?.percent);
-    const percent = Number.isFinite(rawPercent)
-      ? Math.max(0, Math.min(100, rawPercent))
-      : 0;
+    const mode = applyStarted || automaticApplyPending ? "apply" : "discover";
+    const determinate =
+      mode === "apply" ||
+      activeJob.progress?.hasMore === false ||
+      activeJob.progress?.searchComplete === true ||
+      activeJob.status === "ready" ||
+      activeJob.status === "completed";
+    const percent = determinate && Number.isFinite(rawPercent)
+      ? Math.round(Math.max(0, Math.min(100, rawPercent)))
+      : undefined;
     onActivityChange({
       jobId: activeJob.id,
-      mode: applyStarted || automaticApplyPending ? "apply" : "discover",
-      percent: Math.round(percent),
+      mode,
+      percent,
     });
   }, [activeJob, activeLive, applyStarted, automaticApplyPending, onActivityChange]);
 
   useEffect(() => () => onActivityChange?.(null), [onActivityChange]);
 
-  // Notion discovery/apply is currently driven by bounded requests from this
-  // mounted browser controller. Closing only the modal is safe because the
-  // controller stays mounted in Sidebar; closing or reloading the tab pauses
-  // the runner until Hanji is opened again. Ask the browser to confirm that
-  // destructive navigation while the durable job is live, even if the user
-  // switches to another import source before dismissing the modal.
+  // Request-only local imports are still driven by bounded requests from this
+  // mounted browser controller, so destructive navigation needs a warning.
+  // Saved-connection imports are owned by the durable server queue and skip
+  // this browser lifecycle guard entirely.
   useEffect(() => {
-    if (!activeLive) return;
+    if (!activeLive || (activeJob && isServerOwnedNotionJob(activeJob))) return;
     const warnBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = true;
     };
     window.addEventListener("beforeunload", warnBeforeUnload);
     return () => window.removeEventListener("beforeunload", warnBeforeUnload);
-  }, [activeLive]);
-
-  const wizardStepUnlocked = (step: number) => {
-    if (step <= 2) return true;
-    if (step === 3) return Boolean(activeJob);
-    return applyStarted || automaticApplyPending;
-  };
+  }, [activeJob, activeLive]);
 
   // Follow job transitions (including dialog reopen onto a live job): jump to
   // the discover step when a job appears, and to apply once applying starts.
@@ -2673,16 +3044,19 @@ export function ImportDialog({
     ) {
       return;
     }
+    if (isServerOwnedNotionJob(activeJob)) return;
     const runnerKey = workspace?.id ? `${workspace.id}:${activeJob.id}` : "";
     if (!activeJob.connectionId) {
       if (
         runnerKey &&
-        !notionDiscoveryRunnerCompletions.has(runnerKey) &&
+        !notionDiscoveryRunners.has(runnerKey) &&
         credentialPromptJobIdRef.current !== activeJob.id
       ) {
-        credentialPromptJobIdRef.current = activeJob.id;
         setNotionStep(1);
-        if (open) notify(L.resumeNeedsCredential, "default");
+        if (open) {
+          credentialPromptJobIdRef.current = activeJob.id;
+          notify(L.resumeNeedsCredential, "default");
+        }
       }
       return;
     }
@@ -2718,6 +3092,12 @@ export function ImportDialog({
       }
       return;
     }
+    if (isNotionImportProblemTerminal(job)) {
+      logJobIdRef.current = job.id;
+      logSeenRef.current = new Set();
+      setLogEntries([]);
+      return;
+    }
     const jobChanged = logJobIdRef.current !== job.id;
     if (jobChanged) {
       logJobIdRef.current = job.id;
@@ -2743,7 +3123,7 @@ export function ImportDialog({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeJob?.id, activeRecentStamp]);
+  }, [activeJob?.id, activeJob?.status, activeRecentStamp]);
 
   // Keep the live activity feed pinned to the newest line, installer-style.
   useEffect(() => {
@@ -2981,6 +3361,7 @@ export function ImportDialog({
                   <span className={styles.actionBarHint}>
                     {hanjiSelection.label}
                     {hanjiSelection.summary ? ` · ${hanjiSelection.summary}` : ""}
+                    {` · ${hanjiSelection.kind === "archive" ? L.hanji.filesIncluded : L.hanji.filesExcluded}`}
                   </span>
                   <button
                     type="button"
@@ -2996,530 +3377,523 @@ export function ImportDialog({
               <input
                 ref={hanjiInputRef}
                 type="file"
-                accept=".hanji.json,.json,application/json"
+                accept=".hanji.zip,.hanji.json,.json,application/vnd.hanji.archive+zip,application/zip,application/json"
                 className={styles.hiddenInput}
                 onChange={onHanjiInputChange}
               />
             </div>
           ) : (
-            <div className={styles.panel}>
-              <div className={styles.destBanner}>
-                <span className={styles.destRoute}>
-                  <GlobeIcon size={14} aria-hidden="true" />
-                  <strong>{sourceWorkspaceName || L.notion}</strong>
-                  <span aria-hidden="true">→</span>
-                  <strong>{workspace?.name || ""}</strong>
-                </span>
-                <span className={styles.destNote}>{L.destinationNote}</span>
-              </div>
-
-              <div className={styles.wizardSteps} role="tablist" aria-label={L.wizard.stepsAria}>
-                {[1, 2, 3, 4].map((step) => (
-                  <button
-                    key={step}
-                    type="button"
-                    role="tab"
-                    aria-selected={notionStep === step}
-                    className={styles.wizardStep}
-                    data-active={notionStep === step ? "true" : undefined}
-                    data-done={step < notionStep ? "true" : undefined}
-                    disabled={!wizardStepUnlocked(step)}
-                    onClick={() => setNotionStep(step)}
+            <div className={styles.panel} data-notion-single-flow="">
+              {!activeJob || manualResumeRequired ? (
+                <>
+                  <section
+                    className={styles.stepCard}
+                    data-done={selectedConnection ? "true" : undefined}
+                    data-notion-connection=""
                   >
-                    <span className={styles.wizardStepBadge} aria-hidden="true">
-                      {step}
-                    </span>
-                    <span>{L.wizard.stepLabels[step - 1]}</span>
-                  </button>
-                ))}
-              </div>
+                    <header className={styles.stepHeader}>
+                      <strong>{L.stepConnect}</strong>
+                      {selectedConnection ? (
+                        <span className={styles.stepDone}>
+                          {L.connectedTo(
+                            selectedConnection.notionWorkspaceName ||
+                              selectedConnection.name ||
+                              L.notionWorkspace,
+                          )}
+                        </span>
+                      ) : null}
+                    </header>
 
-              {notionStep === 1 ? (
-              <section className={styles.stepCard} data-done={selectedConnection ? "true" : undefined}>
-                <header className={styles.stepHeader}>
-                  <strong>{L.stepConnect}</strong>
-                  {selectedConnection ? (
-                    <span className={styles.stepDone}>
-                      {L.connectedTo(
-                        selectedConnection.notionWorkspaceName || selectedConnection.name || L.notionWorkspace,
-                      )}
-                    </span>
-                  ) : null}
-                </header>
-                <NotionTokenGuide />
-                {notionConnections.length ? (
-                  <div className={styles.connectionPicker}>
-                    <label className={styles.field}>
-                      <span>{L.savedConnection}</span>
-                      <select
-                        value={selectedConnectionId}
-                        onChange={(event) => setSelectedConnectionId(event.currentTarget.value)}
-                      >
-                        <option value="">
-                          {notionConnectionStorageAvailable ? L.tokenSummary : L.oneTimeToken}
-                        </option>
-                        {notionConnections.map((connection) => (
-                          <option key={connection.id} value={connection.id}>
-                            {connection.name || connection.notionWorkspaceName || L.notionConnectionFallback}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    {selectedConnectionId ? (
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        onClick={() => void revokeNotionConnection(selectedConnectionId)}
-                        disabled={notionBusy}
-                      >
-                        {L.remove}
-                      </button>
-                    ) : null}
-                  </div>
-                ) : null}
-                <div className={styles.tokenGuide} data-token-guide="">
-                  <div className={styles.tokenGuideCopy}>
-                    <strong>{L.tokenIntroTitle}</strong>
-                    <p>{L.tokenIntroDesc}</p>
-                  </div>
-                  <div className={styles.tokenGuideActions}>
-                    <a className={styles.externalButton} href={NOTION_TOKEN_URL} target="_blank" rel="noreferrer">
-                      {L.openTokenPage}
-                    </a>
-                  </div>
-                </div>
-                <div className={styles.tokenFields}>
-                  <label className={styles.field}>
-                    <span>{L.tokenLabel}</span>
-                    <input
-                      type="password"
-                      value={notionToken}
-                      onChange={(event) => setNotionToken(event.currentTarget.value)}
-                      placeholder={L.tokenPlaceholder}
-                      autoComplete="off"
-                      aria-invalid={
-                        notionToken.trim() && !isAllowedNotionToken(notionToken.trim()) ? "true" : undefined
-                      }
-                    />
-                  </label>
-                  {notionConnectionStorageAvailable ? (
-                    <>
+                    <div className={styles.tokenFields}>
                       <label className={styles.field}>
-                        <span>{L.connectionNameLabel}</span>
+                        <span>{L.tokenLabel}</span>
                         <input
-                          type="text"
-                          value={notionConnectionName}
-                          onChange={(event) => setNotionConnectionName(event.currentTarget.value)}
-                          placeholder={L.optional}
+                          type="password"
+                          value={notionToken}
+                          onChange={(event) => setNotionToken(event.currentTarget.value)}
+                          placeholder={L.tokenPlaceholder}
                           autoComplete="off"
+                          aria-invalid={
+                            notionToken.trim() && !isAllowedNotionToken(notionToken.trim())
+                              ? "true"
+                              : undefined
+                          }
                         />
                       </label>
-                      {notionToken.trim() ? (
-                        <div>
+                      {notionConnectionStorageAvailable && notionToken.trim() ? (
+                        <label className={styles.field}>
+                          <span>{L.connectionNameLabel}</span>
+                          <input
+                            type="text"
+                            value={notionConnectionName}
+                            onChange={(event) => setNotionConnectionName(event.currentTarget.value)}
+                            placeholder={L.optional}
+                            autoComplete="off"
+                          />
+                        </label>
+                      ) : null}
+                    </div>
+
+                    {!notionConnectionStorageAvailable ? (
+                      <p className={styles.stepHint}>
+                        {L.connectionStorageUnavailable}
+                      </p>
+                    ) : null}
+
+                    {notionConnections.length ? (
+                      <div className={styles.connectionPicker}>
+                        <label className={styles.field}>
+                          <span>{L.savedConnection}</span>
+                          <select
+                            value={selectedConnectionId}
+                            onChange={(event) => setSelectedConnectionId(event.currentTarget.value)}
+                          >
+                            <option value="">
+                              {notionConnectionStorageAvailable ? L.tokenSummary : L.oneTimeToken}
+                            </option>
+                            {notionConnections.map((connection) => (
+                              <option key={connection.id} value={connection.id}>
+                                {connection.name ||
+                                  connection.notionWorkspaceName ||
+                                  L.notionConnectionFallback}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        {selectedConnectionId ? (
                           <button
                             type="button"
                             className={styles.secondary}
-                            onClick={() => void saveNotionConnection()}
+                            onClick={() => void revokeNotionConnection(selectedConnectionId)}
+                            disabled={
+                              notionBusy ||
+                              notionRootScanBusy ||
+                              !notionRootScanSummary ||
+                              notionRootScanSummary.running
+                            }
+                          >
+                            {L.remove}
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    <NotionTokenGuide />
+
+                    <div className={styles.tokenGuide} data-token-guide="">
+                      <div className={styles.tokenGuideCopy}>
+                        <strong>{L.tokenIntroTitle}</strong>
+                        <p>{L.tokenIntroDesc}</p>
+                      </div>
+                      <div className={styles.tokenGuideActions}>
+                        <a
+                          className={styles.externalButton}
+                          href={NOTION_TOKEN_URL}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {L.openTokenPage}
+                        </a>
+                      </div>
+                    </div>
+
+                    {notionOAuthConfigured ? (
+                      <div className={styles.tokenGuide} data-notion-oauth-option="">
+                        <div className={styles.tokenGuideCopy}>
+                          <strong>{L.connectWithNotion}</strong>
+                          <p>{L.oauthConfiguredHint}</p>
+                        </div>
+                        <div className={styles.tokenGuideActions}>
+                          <button
+                            type="button"
+                            className={styles.secondary}
+                            onClick={() => void startNotionOAuthConnection()}
                             disabled={notionBusy || !workspace?.id}
                           >
-                            {L.saveConnection}
+                            {L.connectWithNotion}
                           </button>
                         </div>
-                      ) : null}
-                    </>
-                  ) : (
-                    <p className={styles.stepHint}>{L.connectionStorageUnavailable}</p>
-                  )}
-                </div>
-                {notionOAuthConfigured ? (
-                  <div className={styles.tokenGuide} data-notion-oauth-option="">
-                    <div className={styles.tokenGuideCopy}>
-                      <strong>{L.connectWithNotion}</strong>
-                      <p>{L.oauthConfiguredHint}</p>
-                    </div>
-                    <div className={styles.tokenGuideActions}>
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        onClick={() => void startNotionOAuthConnection()}
-                        disabled={notionBusy || !workspace?.id}
-                      >
-                        {L.connectWithNotion}
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-                <details className={styles.tokenInstructions}>
-                  <summary>{L.tokenInstructionsTitle}</summary>
-                  <ol>
-                    {L.tokenInstructionItems.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ol>
-                  <a className={styles.textLink} href={NOTION_TOKEN_HELP_URL} target="_blank" rel="noreferrer">
-                    {L.tokenHelpLink}
-                  </a>
-                </details>
-              </section>
-              ) : null}
+                      </div>
+                    ) : null}
 
-              {notionStep === 2 ? (
-              <section className={styles.stepCard}>
-                <header className={styles.stepHeader}>
-                  <strong>{L.stepScope}</strong>
-                </header>
-                <div className={styles.scopeGroup} role="radiogroup" aria-label={L.stepScope}>
-                  {/* Localized label text plus explicit htmlFor/id; the rule cannot resolve L.*. */}
-                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                  <label
-                    className={styles.scopeOption}
-                    data-selected={notionScope === "workspace" ? "true" : undefined}
-                    htmlFor={`${scopeGroupId}-workspace`}
-                  >
-                    <input
-                      id={`${scopeGroupId}-workspace`}
-                      type="radio"
-                      name={scopeGroupId}
-                      checked={notionScope === "workspace"}
-                      onChange={() => setNotionScope("workspace")}
-                    />
-                    <span className={styles.scopeText}>
-                      <span className={styles.scopeTitle}>
-                        {L.scopeWorkspace}
-                        <em>{L.recommended}</em>
-                      </span>
-                      <span className={styles.scopeDesc}>{L.scopeWorkspaceDesc}</span>
-                    </span>
-                  </label>
-                  {/* Localized label text plus explicit htmlFor/id; the rule cannot resolve L.*. */}
-                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                  <label
-                    className={styles.scopeOption}
-                    data-selected={notionScope === "pages" ? "true" : undefined}
-                    htmlFor={`${scopeGroupId}-pages`}
-                  >
-                    <input
-                      id={`${scopeGroupId}-pages`}
-                      type="radio"
-                      name={scopeGroupId}
-                      checked={notionScope === "pages"}
-                      onChange={() => setNotionScope("pages")}
-                    />
-                    <span className={styles.scopeText}>
-                      <span className={styles.scopeTitle}>{L.scopePages}</span>
-                      <span className={styles.scopeDesc}>{L.scopePagesDesc}</span>
-                    </span>
-                  </label>
-                </div>
-                {notionScope === "pages" ? (
-                  <div className={styles.rootPicker}>
-                    <div className={styles.rootScanRow}>
-                      <button
-                        type="button"
-                        className={styles.secondary}
-                        onClick={() => void scanNotionRootCandidates()}
-                        disabled={notionBusy || notionRootScanBusy || !hasCredential || !workspace?.id}
+                    <details className={styles.tokenInstructions}>
+                      <summary>{L.tokenInstructionsTitle}</summary>
+                      <ol>
+                        {L.tokenInstructionItems.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ol>
+                      <a
+                        className={styles.textLink}
+                        href={NOTION_TOKEN_HELP_URL}
+                        target="_blank"
+                        rel="noreferrer"
                       >
-                        {notionRootScanBusy ? L.scanningRoots : L.scanRoots}
-                      </button>
-                      <span className={styles.rootScanSummary}>
-                        {notionRootScanSummary
-                          ? notionRootScanSummary.running
-                            ? L.rootScanProgress(
-                                notionRootCandidates.length,
-                                notionRootScanSummary.scanned,
-                                notionRootScanSummary.searchPagesFetched,
-                              )
-                            : [
-                                L.rootScanFound(notionRootCandidates.length, notionRootScanSummary.scanned),
-                                notionRootScanWorkspace?.name
-                                  ? L.rootScanWorkspaceLabel(notionRootScanWorkspace.name)
-                                  : null,
-                              ]
-                                .filter(Boolean)
-                                .join(" · ")
-                          : L.rootScanHint}
-                      </span>
-                    </div>
-                    {notionRootScanBusy ? (
-                      <div className={styles.rootScanProgressBar} aria-hidden="true">
-                        <span />
-                      </div>
-                    ) : null}
-                    {notionRootScanSummary?.hasMore ? (
-                      <p className={styles.stepHint}>{L.rootScanHasMore}</p>
-                    ) : null}
-                    {notionRootCandidates.length ? (
-                      <div className={styles.rootList} role="group" aria-label={L.rootPickerTitle}>
-                        <div className={styles.rootListHeader}>
-                          <strong>{L.rootPickerTitle}</strong>
-                          <span>{L.rootSelectionCount(selectedRoots.length, notionRootCandidates.length)}</span>
-                          <button
-                            type="button"
-                            className={styles.inlineButton}
-                            disabled={notionRootScanBusy}
-                            onClick={() => setSelectedNotionRootKeys(notionRootCandidates.map(notionRootCandidateKey))}
-                          >
-                            {L.selectAllRoots}
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.inlineButton}
-                            disabled={notionRootScanBusy}
-                            onClick={() => setSelectedNotionRootKeys([])}
-                          >
-                            {L.clearRootSelection}
-                          </button>
-                        </div>
-                        <div className={styles.rootCandidateList}>
-                          {notionRootCandidates.map((candidate) => {
-                            const key = notionRootCandidateKey(candidate);
-                            const checked = selectedNotionRootKeys.includes(key);
-                            return (
-                              <label key={key} className={styles.rootCandidate} data-selected={checked ? "true" : undefined}>
-                                <input
-                                  type="checkbox"
-                                  checked={checked}
-                                  disabled={notionRootScanBusy}
-                                  onChange={(event) => {
-                                    // Read the checkbox value synchronously: React nulls
-                                    // `event.currentTarget` once the handler returns, and the
-                                    // state updater below runs later during render — reading
-                                    // it there throws and unmounts the (unbounded) dialog.
-                                    const isChecked = event.currentTarget.checked;
-                                    setSelectedNotionRootKeys((current) => {
-                                      if (isChecked) {
-                                        return current.includes(key) ? current : [...current, key];
-                                      }
-                                      return current.filter((item) => item !== key);
-                                    });
-                                  }}
-                                />
-                                <span className={styles.rootCandidateIcon} aria-hidden="true">
-                                  {candidate.notionObject === "data_source" ? (
-                                    <Database size={15} />
-                                  ) : (
-                                    <FileText size={15} />
-                                  )}
-                                </span>
-                                <span className={styles.rootCandidateText}>
-                                  <strong>{candidate.title || generatedLabels.untitled}</strong>
-                                  <span>{rootCandidateKindLabel(candidate, L)}</span>
-                                </span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ) : notionRootScanSummary && !notionRootScanSummary.running ? (
-                      <div className={styles.rootScanEmptyNotice} role="note">
-                        <p className={styles.rootScanEmptyTitle}>
-                          {L.rootScanEmptyTitle(notionRootScanWorkspace?.name)}
-                        </p>
-                        <p>{L.rootScanEmptyWhy}</p>
-                        <ol>
-                          <li>{L.rootScanEmptyStep1}</li>
-                          <li>{L.rootScanEmptyStep2}</li>
-                          <li>{L.rootScanEmptyStep3}</li>
-                        </ol>
-                        <p>{L.rootScanEmptyOtherWorkspace(notionRootScanWorkspace?.name)}</p>
-                      </div>
-                    ) : null}
-                    <details className={styles.manualRootFallback}>
-                      <summary>{L.manualRootFallback}</summary>
-                      <label className={styles.field}>
-                        <span>{L.rootIdsLabel}</span>
-                        <textarea
-                          value={notionRootIds}
-                          onChange={(event) => setNotionRootIds(event.currentTarget.value)}
-                          placeholder={L.rootIdsPlaceholder}
-                          rows={3}
-                        />
-                      </label>
+                        {L.tokenHelpLink}
+                      </a>
                     </details>
-                    <p className={styles.stepHint} data-tone={rootIdCount ? "ok" : undefined}>
-                      {rootIdCount ? `${L.pagesRecognized(rootIdCount)} · ` : ""}
-                      {L.scopeWarning}
-                    </p>
+                  </section>
+
+                  <div className={styles.destBanner}>
+                    <span className={styles.destRoute}>
+                      <GlobeIcon size={14} aria-hidden="true" />
+                      <strong>{sourceWorkspaceName || L.notion}</strong>
+                      <span aria-hidden="true">→</span>
+                      <strong>{workspace?.name || ""}</strong>
+                    </span>
+                    <span className={styles.destNote}>{L.destinationNote}</span>
                   </div>
-                ) : null}
-                {/* Secondary option below the scope choice so the mobile step
-                    keeps the scan controls above the fold. */}
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label
-                  className={styles.optionRow}
-                  htmlFor={`${scopeGroupId}-full-width`}
-                >
-                  <input
-                    id={`${scopeGroupId}-full-width`}
-                    type="checkbox"
-                    checked={notionImportPagesFullWidth}
-                    onChange={(event) => setNotionImportPagesFullWidth(event.currentTarget.checked)}
-                  />
-                  <span className={styles.optionText}>
-                    <strong>{L.fullWidthPages}</strong>
-                    <span>{L.fullWidthPagesDesc}</span>
-                  </span>
-                </label>
-              </section>
-              ) : null}
 
-              {notionStep === 3 ? renderRunPanel("discover") : null}
-              {notionStep === 4 ? renderRunPanel("apply") : null}
+                  {!manualResumeRequired ? (
+                    <section className={styles.stepCard} data-notion-root-selection="">
+                      <header className={styles.stepHeader}>
+                        <strong>{L.rootPickerTitle}</strong>
+                      </header>
+                      <div className={styles.rootPicker}>
+                        <div className={styles.rootScanRow}>
+                          <span
+                            className={styles.rootScanSummary}
+                            role="status"
+                            aria-live="polite"
+                          >
+                            {notionRootScanSummary
+                              ? notionRootScanSummary.running
+                                ? L.rootScanProgress(
+                                    notionRootCandidates.length,
+                                    notionRootScanSummary.scanned,
+                                    notionRootScanSummary.searchPagesFetched,
+                                  )
+                                : [
+                                    L.rootScanFound(
+                                      notionRootCandidates.length,
+                                      notionRootScanSummary.scanned,
+                                    ),
+                                    notionRootScanWorkspace?.name
+                                      ? L.rootScanWorkspaceLabel(notionRootScanWorkspace.name)
+                                      : null,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" · ")
+                              : hasCredential
+                                ? L.scanningRoots
+                                : L.rootScanHint}
+                          </span>
+                        </div>
 
-              <div className={styles.wizardFooter}>
-                {notionStep > 1 ? (
-                  <button
-                    type="button"
-                    className={styles.secondary}
-                    onClick={() => setNotionStep(notionStep - 1)}
-                  >
-                    {L.wizard.back}
-                  </button>
-                ) : null}
-                <span className={styles.wizardHint}>
-                  {notionStep === 1
-                    ? hasCredential
-                      ? ""
-                      : L.wizard.needCredentialHint
-                    : notionStep === 2
-                      ? notionScope === "pages" && rootIdCount === 0
-                        ? L.wizard.needRootsHint
-                        : `${notionScope === "workspace" ? L.scopeWorkspace : L.scopePages} · ${workspace?.name || ""}`
-                      : notionStep === 3
-                        ? activeJob?.status === "ready"
-                          ? `${L.wizard.readyHint(activeItemCount)} ${L.wizard.applyLocksHint}`
-                          : activeJob && activeLive
-                            ? L.wizard.runningHint
-                            : activeJob
-                              ? ""
-                              : L.wizard.noJobHint
-                        : activeJob && activeLive
-                          ? L.wizard.runningHint
-                          : ""}
-                </span>
-                {notionStep === 1 && manualResumeRequired && activeJob ? (
-                  <button
-                    type="button"
-                    className={styles.secondary}
-                    onClick={() => void cancelNotionImport(activeJob.id)}
-                    disabled={cancellingJobId !== null}
-                  >
-                    {cancellingJobId === activeJob.id ? L.cancellingImport : L.cancelImport}
-                  </button>
-                ) : null}
-                {notionStep === 1 ? (
-                  <button
-                    type="button"
-                    className={styles.primary}
-                    disabled={notionBusy || (manualResumeRequired ? !notionToken.trim() : !hasCredential)}
-                    onClick={() => {
-                      if (manualResumeRequired && activeJob) {
-                        if (applyStarted) {
-                          void applyNotionImport(activeJob.id);
-                        } else {
-                          void resumeNotionDiscovery(activeJob);
+                        {notionRootScanSummary?.hasMore ? (
+                          <p className={styles.stepHint}>{L.rootScanHasMore}</p>
+                        ) : null}
+
+                        {notionRootScanError ? (
+                          <div className={styles.rootScanError} role="alert">
+                            <span>{notionRootScanError}</span>
+                            <button
+                              type="button"
+                              className={styles.secondary}
+                              onClick={() => {
+                                rootScanCredentialKeyRef.current = "";
+                                void scanNotionRootCandidates();
+                              }}
+                              disabled={notionRootScanBusy}
+                            >
+                              {L.retry}
+                            </button>
+                          </div>
+                        ) : null}
+
+                        {notionRootCandidates.length ? (
+                          <div
+                            className={styles.rootList}
+                            role="group"
+                            aria-label={L.rootPickerTitle}
+                          >
+                            <div className={styles.rootListHeader}>
+                              <strong>{L.rootPickerTitle}</strong>
+                              <span>
+                                {L.rootSelectionCount(
+                                  selectedRoots.length,
+                                  notionRootCandidates.length,
+                                )}
+                              </span>
+                              <button
+                                type="button"
+                                className={styles.inlineButton}
+                                disabled={notionRootScanBusy}
+                                onClick={() =>
+                                  setSelectedNotionRootKeys(
+                                    notionRootCandidates.map(notionRootCandidateKey),
+                                  )
+                                }
+                              >
+                                {L.selectAllRoots}
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.inlineButton}
+                                disabled={notionRootScanBusy}
+                                onClick={() => setSelectedNotionRootKeys([])}
+                              >
+                                {L.clearRootSelection}
+                              </button>
+                            </div>
+                            <div className={styles.rootCandidateList}>
+                              {notionRootCandidates.map((candidate) => {
+                                const key = notionRootCandidateKey(candidate);
+                                const checked = selectedNotionRootKeys.includes(key);
+                                return (
+                                  <label
+                                    key={key}
+                                    className={styles.rootCandidate}
+                                    data-selected={checked ? "true" : undefined}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      disabled={notionRootScanBusy}
+                                      onChange={(event) => {
+                                        const isChecked = event.currentTarget.checked;
+                                        setSelectedNotionRootKeys((current) => {
+                                          if (isChecked) {
+                                            return current.includes(key)
+                                              ? current
+                                              : [...current, key];
+                                          }
+                                          return current.filter((item) => item !== key);
+                                        });
+                                      }}
+                                    />
+                                    <span className={styles.rootCandidateIcon} aria-hidden="true">
+                                      {candidate.notionObject === "data_source" ? (
+                                        <Database size={15} />
+                                      ) : (
+                                        <FileText size={15} />
+                                      )}
+                                    </span>
+                                    <span className={styles.rootCandidateText}>
+                                      <strong>
+                                        {candidate.title || generatedLabels.untitled}
+                                      </strong>
+                                      <span>{rootCandidateKindLabel(candidate, L)}</span>
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ) : notionRootScanSummary &&
+                          !notionRootScanSummary.running &&
+                          !notionRootScanError ? (
+                          <div className={styles.rootScanEmptyNotice} role="note">
+                            <p className={styles.rootScanEmptyTitle}>
+                              {L.rootScanEmptyTitle(notionRootScanWorkspace?.name)}
+                            </p>
+                            <p>{L.rootScanEmptyWhy}</p>
+                            <ol>
+                              <li>{L.rootScanEmptyStep1}</li>
+                              <li>{L.rootScanEmptyStep2}</li>
+                              <li>{L.rootScanEmptyStep3}</li>
+                            </ol>
+                            <p>
+                              {L.rootScanEmptyOtherWorkspace(notionRootScanWorkspace?.name)}
+                            </p>
+                          </div>
+                        ) : null}
+
+                        <details className={styles.manualRootFallback}>
+                          <summary>{L.manualRootFallback}</summary>
+                          <label className={styles.field}>
+                            <span>{L.rootIdsLabel}</span>
+                            <textarea
+                              value={notionRootIds}
+                              onChange={(event) => setNotionRootIds(event.currentTarget.value)}
+                              placeholder={L.rootIdsPlaceholder}
+                              rows={3}
+                            />
+                          </label>
+                        </details>
+
+                        <p className={styles.stepHint} data-tone={rootIdCount ? "ok" : undefined}>
+                          {rootIdCount ? L.pagesRecognized(rootIdCount) : L.scopeWarning}
+                        </p>
+
+                        {/* Localized text is nested below the native checkbox. */}
+                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                        <label className={styles.optionRow}>
+                          <input
+                            type="checkbox"
+                            checked={notionImportPagesFullWidth}
+                            onChange={(event) =>
+                              setNotionImportPagesFullWidth(event.currentTarget.checked)
+                            }
+                          />
+                          <span className={styles.optionText}>
+                            <strong>{L.fullWidthPages}</strong>
+                            <span>{L.fullWidthPagesDesc}</span>
+                          </span>
+                        </label>
+                      </div>
+                    </section>
+                  ) : null}
+
+                  <div className={styles.actionBar} data-notion-import-consent="">
+                    <span className={styles.actionBarHint}>
+                      {manualResumeRequired
+                        ? L.resumeNeedsCredential
+                        : notionRootScanBusy
+                          ? L.scanningRoots
+                          : rootIdCount
+                            ? L.rootSelectionCount(
+                                selectedRoots.length,
+                                notionRootCandidates.length,
+                              )
+                            : L.wizard.needRootsHint}
+                    </span>
+                    {manualResumeRequired && activeJob ? (
+                      <>
+                        <button
+                          type="button"
+                          className={styles.secondary}
+                          onClick={() => void cancelNotionImport(activeJob.id)}
+                          disabled={cancellingJobId !== null}
+                        >
+                          {cancellingJobId === activeJob.id
+                            ? L.cancellingImport
+                            : L.cancelImport}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.primary}
+                          disabled={notionBusy || !notionToken.trim()}
+                          onClick={() => {
+                            if (applyStarted) {
+                              void applyNotionImport(activeJob.id);
+                            } else {
+                              void resumeNotionDiscovery(activeJob);
+                            }
+                          }}
+                        >
+                          {notionBusy
+                            ? L.resumingImport
+                            : applyStarted
+                              ? L.retry
+                              : L.resumeImport}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.primary}
+                        onClick={() => void startNotionImport()}
+                        disabled={
+                          notionBusy ||
+                          notionRootScanBusy ||
+                          !workspace?.id ||
+                          !hasCredential ||
+                          rootIdCount === 0
                         }
-                        return;
-                      }
-                      void advanceNotionConnectionStep();
-                    }}
-                  >
-                    {notionBusy
-                      ? applyStarted
-                        ? L.resumingImport
-                        : L.discovering
-                      : manualResumeRequired
-                        ? applyStarted
-                          ? L.retry
-                          : L.resumeImport
-                        : L.wizard.next}
-                  </button>
-                ) : null}
-                {notionStep === 2 ? (
-                  <button
-                    type="button"
-                    className={styles.primary}
-                    onClick={() => void startNotionImport()}
-                    disabled={
-                      notionBusy ||
-                      notionRootScanBusy ||
-                      !workspace?.id ||
-                      !hasCredential ||
-                      (notionScope === "pages" && rootIdCount === 0)
-                    }
-                  >
-                    {notionBusy ? L.discovering : L.startDiscovery}
-                  </button>
-                ) : null}
-                {notionStep === 3 ? (
-                  activeJob?.status === "ready" ? (
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      disabled={notionBusy}
-                      onClick={() => {
-                        setNotionStep(4);
-                        void applyNotionImport(activeJob.id);
-                      }}
-                    >
-                      {L.wizard.applyNow}
-                    </button>
-                  ) : activeJob && (activeJob.status === "failed" || activeJob.status === "cancelled") ? (
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      disabled={notionBusy}
-                      onClick={() => void startNotionImport(activeJob.id)}
-                    >
-                      {L.retry}
-                    </button>
-                  ) : (
-                    <button type="button" className={styles.primary} disabled>
-                      {activeJob && activeLive ? L.discovering : L.wizard.applyNow}
-                    </button>
-                  )
-                ) : null}
-                {notionStep === 4 ? (
-                  activeJob && (activeJob.status === "failed" || activeJob.status === "cancelled") ? (
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      disabled={notionBusy}
-                      onClick={() => void startNotionImport(activeJob.id)}
-                    >
-                      {L.retry}
-                    </button>
-                  ) : activeJob && interruptedApply ? (
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      onClick={() => void applyNotionImport(activeJob.id)}
-                    >
-                      {L.retry}
-                    </button>
-                  ) : activeJob?.status === "completed" && importedRootPage?.jobId === activeJob.id ? (
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      onClick={() => {
-                        close(false);
-                        router.push(pageHref(importedRootPage.pageId));
-                      }}
-                    >
-                      {L.openImportedPage}
-                    </button>
-                  ) : activeJob?.status === "completed" ? (
-                    <button type="button" className={styles.primary} onClick={() => close()}>
-                      {L.wizard.done}
-                    </button>
-                  ) : (
-                    <button type="button" className={styles.primary} disabled>
-                      {activeJob && activeLive ? L.wizard.applying : L.wizard.applyNow}
-                    </button>
-                  )
-                ) : null}
-              </div>
+                      >
+                        {notionBusy ? L.discovering : L.hanji.importButton}
+                      </button>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={styles.destBanner}>
+                    <span className={styles.destRoute}>
+                      <GlobeIcon size={14} aria-hidden="true" />
+                      <strong>{sourceWorkspaceName || L.notion}</strong>
+                      <span aria-hidden="true">→</span>
+                      <strong>{workspace?.name || ""}</strong>
+                    </span>
+                    <span className={styles.destNote}>{L.destinationNote}</span>
+                  </div>
+
+                  {renderRunPanel(
+                    applyStarted || automaticApplyPending ? "apply" : "discover",
+                  )}
+
+                  <div className={styles.actionBar} data-notion-action-footer="">
+                    <span className={styles.actionBarHint}>
+                      {statusLabel(activeJob)}
+                    </span>
+                    {isNotionImportProblemTerminal(activeJob) ? (
+                        <button
+                          type="button"
+                          className={styles.primary}
+                          disabled={notionBusy}
+                          onClick={() => void startNotionImport(activeJob.id)}
+                        >
+                          {L.retry}
+                        </button>
+                    ) : interruptedApply ? (
+                        <button
+                          type="button"
+                          className={styles.primary}
+                          onClick={() => void applyNotionImport(activeJob.id)}
+                        >
+                          {L.retry}
+                        </button>
+                    ) : activeJob.status === "completed" ? (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.secondary}
+                            onClick={() => {
+                              clearTerminalNotionResult();
+                              close();
+                            }}
+                          >
+                            {L.wizard.done}
+                          </button>
+                          {importedRootPage?.jobId === activeJob.id ? (
+                            <button
+                              type="button"
+                              className={styles.primary}
+                              onClick={() => {
+                                clearTerminalNotionResult();
+                                close(false);
+                                router.push(pageHref(importedRootPage.pageId));
+                              }}
+                            >
+                              {L.openImportedPage}
+                            </button>
+                          ) : null}
+                        </>
+                    ) : (
+                        <>
+                          {!isServerOwnedNotionJob(activeJob) &&
+                          isLiveNotionJob(activeJob) &&
+                          !notionBusy ? (
+                            <button
+                              type="button"
+                              className={styles.secondary}
+                              onClick={() => {
+                                if (applyStarted) {
+                                  void applyNotionImport(activeJob.id);
+                                } else {
+                                  void resumeNotionDiscovery(activeJob);
+                                }
+                              }}
+                            >
+                              {applyStarted ? L.retry : L.resumeImport}
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className={styles.secondary}
+                            onClick={() => void cancelNotionImport(activeJob.id)}
+                            disabled={cancellingJobId !== null}
+                          >
+                            {cancellingJobId === activeJob.id
+                              ? L.cancellingImport
+                              : L.cancelImport}
+                          </button>
+                        </>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

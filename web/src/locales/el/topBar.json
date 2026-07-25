@@ -38,7 +38,7 @@
   "moveTo": "Μετακίνηση σε",
   "exporting": "Εξαγωγή…",
   "exportAsMarkdown": "Εξαγωγή ως Markdown",
-  "exportAsHanji": "Εξαγωγή ως αρχείο Hanji",
+  "exportAsHanji": "Εξαγωγή Hanji JSON (εξαιρούνται αρχεία)",
   "importing": "Εισαγωγή…",
   "importMarkdown": "Εισαγωγή Markdown",
   "unlockPage": "Ξεκλείδωμα σελίδας",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Αδυναμία ενημέρωσης πρόσβασης",
     "removedFromAccessList": "Αφαιρέθηκε από τη λίστα πρόσβασης",
     "couldntRemoveAccess": "Αδυναμία αφαίρεσης πρόσβασης",
-    "couldntLoadAccessList": "Αδυναμία φόρτωσης λίστας πρόσβασης"
+    "couldntLoadAccessList": "Αδυναμία φόρτωσης λίστας πρόσβασης",
+    "couldntExportHanjiArchive": "Αδυναμία εξαγωγής αρχείου Hanji.",
+    "exportedHanjiArchive": "Εξήχθη αρχείο Hanji με αρχεία."
   },
   "user": "Χρήστης",
   "whoHasAccess": "Ποιος έχει πρόσβαση",
   "workspace": "Χώρος εργασίας",
   "workspaceCount_one": "{{count}} χώρος εργασίας",
   "workspaceCount_other": "{{count}} χώροι εργασίας",
-  "you": "Εσύ"
+  "you": "Εσύ",
+  "exportAsHanjiArchive": "Εξαγωγή αρχείου Hanji (με αρχεία)",
+  "turnIntoWiki": "Μετατροπή σε wiki",
+  "undoWiki": "Αναίρεση wiki",
+  "wikiCreated": "Η σελίδα μετατράπηκε σε wiki",
+  "wikiPageSettings": "Ρυθμίσεις σελίδας wiki",
+  "wikiUndone": "Το wiki αφαιρέθηκε· το περιεχόμενο της σελίδας διατηρήθηκε",
+  "wikiUpdateFailed": "Αδυναμία ενημέρωσης του wiki"
 }

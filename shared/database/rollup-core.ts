@@ -36,7 +36,64 @@ export interface RollupContext {
   displayValue: (page: RollupPage, prop: RollupProperty) => string;
 }
 
+export const NOTION_ROLLUP_FUNCTIONS = [
+  "count",
+  "count_values",
+  "empty",
+  "not_empty",
+  "unique",
+  "show_unique",
+  "percent_empty",
+  "percent_not_empty",
+  "sum",
+  "average",
+  "median",
+  "min",
+  "max",
+  "range",
+  "earliest_date",
+  "latest_date",
+  "date_range",
+  "checked",
+  "unchecked",
+  "percent_checked",
+  "percent_unchecked",
+  "count_per_group",
+  "percent_per_group",
+  "show_original",
+] as const;
+
+/**
+ * Hanji stored these names before Notion standardized the current public API
+ * spellings. They remain accepted so existing databases do not change meaning.
+ */
+export const LEGACY_ROLLUP_FUNCTION_ALIASES = {
+  count_all: "count",
+  count_empty: "empty",
+  count_unique: "unique",
+} as const;
+
+export const ROLLUP_FUNCTIONS = [
+  ...NOTION_ROLLUP_FUNCTIONS,
+  ...Object.keys(LEGACY_ROLLUP_FUNCTION_ALIASES),
+] as const;
+
+export type NotionRollupFunction = (typeof NOTION_ROLLUP_FUNCTIONS)[number];
+export type LegacyRollupFunction = keyof typeof LEGACY_ROLLUP_FUNCTION_ALIASES;
+export type RollupFunction = NotionRollupFunction | LegacyRollupFunction;
 export type RollupResult = string | number;
+
+const NOTION_ROLLUP_FUNCTION_SET = new Set<string>(NOTION_ROLLUP_FUNCTIONS);
+
+/** Return a current Notion function name, preserving unknown-value detection. */
+export function canonicalRollupFunction(value: unknown): NotionRollupFunction | undefined {
+  if (typeof value !== "string") return undefined;
+  const alias = LEGACY_ROLLUP_FUNCTION_ALIASES[value as LegacyRollupFunction];
+  const normalized = alias ?? value;
+  return NOTION_ROLLUP_FUNCTION_SET.has(normalized)
+    ? normalized as NotionRollupFunction
+    : undefined;
+}
 
 const MAX_HOPS = 3;
 
@@ -51,7 +108,13 @@ function valueIsPresent(value: unknown) {
   return value !== null && value !== undefined && value !== "";
 }
 
-/** 2-decimal percent (unified: web used toFixed(2), backend used toFixed(6)). */
+/**
+ * 2-decimal display percent (unified: web used toFixed(2), backend used
+ * toFixed(6)). This engine's computed-value contract cannot yet carry Notion's
+ * typed number/date/array rollup envelopes, so percentages remain display
+ * strings and date/array rollups are flattened below. REST projection must not
+ * mistake those flattened values for native typed rollup payloads.
+ */
 function rollupPercent(count: number, total: number): string {
   if (!total) return "0%";
   const value = (count / total) * 100;
@@ -199,8 +262,8 @@ export function evaluateRollup(
   const relatedPages = valueAsIds(row.properties?.[relationProp.id])
     .map((id) => ctx.pagesById(id))
     .filter((page): page is RollupPage => !!page && !page.inTrash);
-  const fn = typeof prop.config?.rollupFunction === "string" ? prop.config.rollupFunction : "show_original";
-  if (fn === "count_all") return relatedPages.length;
+  const fn = canonicalRollupFunction(prop.config?.rollupFunction) ?? "show_original";
+  if (fn === "count") return relatedPages.length;
 
   const firstHopTarget = targetProps.find((item) => item.id === prop.config?.rollupTargetPropertyId);
 
@@ -215,10 +278,17 @@ export function evaluateRollup(
   const presentValues = values.filter(valueIsPresent);
 
   if (fn === "count_values") return presentValues.length;
-  if (fn === "count_unique") return new Set(values.flatMap(rollupValuePieces)).size;
-  if (fn === "count_empty") return values.length - presentValues.length;
+  if (fn === "unique") return new Set(values.flatMap(rollupValuePieces)).size;
+  if (fn === "empty") return values.length - presentValues.length;
+  if (fn === "not_empty") return presentValues.length;
   if (fn === "percent_empty") return rollupPercent(values.length - presentValues.length, values.length);
   if (fn === "percent_not_empty") return rollupPercent(presentValues.length, values.length);
+
+  // Notion's public rollup config exposes these function names but not the
+  // selected status-group id needed to evaluate them. Returning empty is
+  // deliberate: backend adapters can then use a preserved imported computed
+  // value instead of manufacturing a plausible-but-wrong group count.
+  if (fn === "count_per_group" || fn === "percent_per_group") return "";
 
   const checkedCount = values.filter(rollupCheckedValue).length;
   if (fn === "checked") return checkedCount;
@@ -252,10 +322,13 @@ export function evaluateRollup(
     return start === end ? start : `${start} → ${end}`;
   }
 
-  return leafPages
+  const displayedValues = leafPages
     .map((page) => (targetProp ? ctx.displayValue(page, targetProp) : ctx.displayValue(page, TITLE_PROP)))
-    .filter(Boolean)
-    .join(", ");
+    .filter(Boolean);
+  // The shared computed-value type is scalar, so show_original/show_unique are
+  // display strings rather than Notion property-item arrays. Scalar values are
+  // deduplicated faithfully; multi-valued cells stay flattened by the adapter.
+  return (fn === "show_unique" ? [...new Set(displayedValues)] : displayedValues).join(", ");
 }
 
 // Synthetic title property so the show_original / title fallbacks route the leaf

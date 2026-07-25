@@ -88,5 +88,38 @@
     "hoursAgo": "ከ{{hours}} ሰዓት በፊት አርትዕ ተደርጓል",
     "daysAgo": "ከ{{days}} ቀን በፊት አርትዕ ተደርጓል",
     "on": "በ{{date}} አርትዕ ተደርጓል"
+  },
+  "align": {
+    "center": "መሃል",
+    "choose": "የምስል አሰላለፍ ምረጥ",
+    "left": "ግራ",
+    "right": "ቀኝ"
+  },
+  "altText": {
+    "help": "የአልት ጽሑፍ የስክሪን አንባቢ ተጠቃሚዎች ምስሉን እንዲረዱ ይረዳል።",
+    "label": "መግለጫ",
+    "placeholder": "ምስሉን ግለጽ",
+    "remove": "አስወግድ",
+    "save": "አስቀምጥ",
+    "title": "የአልት ጽሑፍ"
+  },
+  "imageLink": {
+    "invalid": "ሙሉ http:// ወይም https:// URL ያስገቡ።",
+    "label": "ምስሉ ሲጫን ይህን URL ክፈት",
+    "remove": "አስወግድ",
+    "save": "አስቀምጥ",
+    "title": "የምስል አገናኝ"
+  },
+  "media": {
+    "addImageLink": "አገናኝ ጨምር",
+    "align": "አሰላለፍ",
+    "altText": "የአልት ጽሑፍ",
+    "copySourceLink": "የምንጭ አገናኝ ቅዳ",
+    "download": "አውርድ",
+    "editImageLink": "አገናኝ አስተካክል",
+    "fullScreen": "ሙሉ ማያ",
+    "openLink": "አገናኝ ክፈት",
+    "replace": "ተካ",
+    "viewOriginal": "ዋናውን አሳይ"
   }
 }

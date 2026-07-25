@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Video başlığı",
     "videoEmptyHint": "Video faylı yükləyin, birbaşa link yapışdırın və ya YouTube, Vimeo və ya Loom linki istifadə edin.",
-    "videoLink": "Video linki"
+    "videoLink": "Video linki",
+    "audioPlaybackFailed": "Bu audio çalına bilmədi. Onu dəyişdirin və ya orijinal faylı açın.",
+    "videoPlaybackFailed": "Bu video çalına bilmədi. Onu dəyişdirin və ya orijinal faylı açın."
   },
   "bookmark": {
     "copy": "Yer imi linkini kopyala",

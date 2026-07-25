@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "कार्यक्षेत्र मेनू उघडा",
   "closeWorkspaceMenu": "कार्यक्षेत्र मेनू बंद करा",
   "workspaceMenu": "कार्यक्षेत्र मेनू",
-  "exportWorkspace": "कार्यक्षेत्र निर्यात करा",
+  "exportWorkspace": "कार्यक्षेत्र JSON निर्यात करा (फायलींशिवाय)",
   "exportedWorkspace": "कार्यक्षेत्र Hanji फाइल म्हणून निर्यात केले",
   "exportedWorkspaceWithPlaceholders": "कार्यक्षेत्र Hanji फाइल म्हणून निर्यात केले — संलग्नक जागाधारक म्हणून सोडले",
   "couldntExportWorkspace": "कार्यक्षेत्र निर्यात करू शकलो नाही.",
@@ -76,5 +76,12 @@
     "later": "कदाचित नंतर",
     "note": "आपण हे नेहमी नंतर साइडबारमधील आयात मधून सुरू करू शकता.",
     "title": "आपले Notion वर्कस्पेस Hanji मध्ये आणायचे का?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} मध्ये पृष्ठ जोडा",
+  "couldntExportWorkspaceArchive": "कार्यक्षेत्र संग्रह निर्यात करू शकलो नाही.",
+  "exportedWorkspaceArchive": "फायलींसह कार्यक्षेत्र संग्रह निर्यात केला.",
+  "exportWorkspaceArchive": "कार्यक्षेत्र संग्रह निर्यात करा (फायलींसह)",
+  "joinTeamspaces": "टीमस्पेसमध्ये सामील व्हा",
+  "keyboardShortcuts": "कीबोर्ड शॉर्टकट",
+  "teamspacePages": "{{name}} पृष्ठे"
 }

@@ -35,7 +35,7 @@
     "rename": "ਨਾਮ ਬਦਲੋ",
     "addPageInside": "ਅੰਦਰ ਪੰਨਾ ਜੋੜੋ",
     "exportAsMarkdown": "Markdown ਵਜੋਂ ਐਕਸਪੋਰਟ ਕਰੋ",
-    "exportAsHanjiFile": "Hanji ਫਾਈਲ ਵਜੋਂ ਐਕਸਪੋਰਟ ਕਰੋ",
+    "exportAsHanjiFile": "Hanji JSON ਨਿਰਯਾਤ (ਫਾਈਲਾਂ ਬਿਨਾਂ)",
     "importMarkdown": "ਮਾਰਕਡਾਊਨ ਆਯਾਤ",
     "importing": "ਆਯਾਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
     "unlockPage": "ਪੰਨਾ ਅਨਲਾਕ ਕਰੋ",
@@ -44,7 +44,8 @@
     "removeVerification": "ਪ੍ਰਮਾਣੀਕਰਨ ਹਟਾਓ",
     "verifyPage": "ਪੰਨਾ ਪ੍ਰਮਾਣਿਤ ਕਰੋ",
     "customizePage": "ਪੰਨਾ ਕਸਟਮਾਈਜ਼ ਕਰੋ",
-    "undo": "ਵਾਪਸ ਕਰੋ"
+    "undo": "ਵਾਪਸ ਕਰੋ",
+    "exportAsHanjiArchive": "Hanji ਪੁਰਾਲੇਖ ਨਿਰਯਾਤ ਕਰੋ (ਫਾਈਲਾਂ ਸ਼ਾਮਲ)"
   },
   "customize": {
     "summaryDefault": "ਡਿਫਾਲਟ",
@@ -101,6 +102,8 @@
     "movedToTrash": "ਰੱਦੀ ਵਿੱਚ ਭੇਜਿਆ",
     "restoredPage": "ਪੰਨਾ ਬਹਾਲ ਕੀਤਾ",
     "couldntRestorePage": "ਪੰਨਾ ਬਹਾਲ ਨਹੀਂ ਕਰ ਸਕਿਆ",
-    "couldntMoveToTrash": "ਰੱਦੀ ਵਿੱਚ ਨਹੀਂ ਭੇਜ ਸਕਿਆ"
+    "couldntMoveToTrash": "ਰੱਦੀ ਵਿੱਚ ਨਹੀਂ ਭੇਜ ਸਕਿਆ",
+    "couldntExportHanjiArchive": "Hanji ਅਰਕਾਈਵ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਿਆ।",
+    "exportedHanjiArchive": "Hanji ਅਰਕਾਈਵ ਫ਼ਾਈਲਾਂ ਸਮੇਤ ਨਿਰਯਾਤ ਕੀਤਾ।"
   }
 }

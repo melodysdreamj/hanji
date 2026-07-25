@@ -13,7 +13,7 @@
   "groupName": "ਗਰੁੱਪ ਨਾਮ",
   "groupOptions": "{{groupName}} ਗਰੁੱਪ ਵਿਕਲਪ",
   "groupThisBoard": "ਇਸ ਬੋਰਡ ਨੂੰ ਗਰੁੱਪ ਕਰੋ",
-  "groupThisBoardDesc": "ਕਾਲਮ ਬਣਾਉਣ ਲਈ ਇੱਕ ਚੁਣੋ ਜਾਂ ਸਥਿਤੀ ਵਿਸ਼ੇਸ਼ਤਾ ਸ਼ਾਮਲ ਕਰੋ।",
+  "groupThisBoardDesc": "ਕਾਲਮ ਬਣਾਉਣ ਲਈ ਇੱਕ Select, Status, Person, ਜਾਂ Multi-select ਪ੍ਰਾਪਰਟੀ ਜੋੜੋ ਜਾਂ ਚੁਣੋ।",
   "newGroup": "ਨਵਾਂ ਗਰੁੱਪ",
   "newGroupIn": "{{dbTitle}} 'ਚ ਨਵਾਂ {{groupName}} ਗਰੁੱਪ",
   "newPage": "ਨਵਾਂ",

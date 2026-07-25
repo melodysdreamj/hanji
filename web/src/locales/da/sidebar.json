@@ -24,7 +24,7 @@
   "dismissInviteCard": "Afvis medlemskort",
   "exportedWorkspace": "Arbejdsområde eksporteret som Hanji-fil",
   "exportedWorkspaceWithPlaceholders": "Arbejdsområde eksporteret som Hanji-fil — vedhæftninger blev efterladt som pladsholdere",
-  "exportWorkspace": "Eksporter arbejdsområde",
+  "exportWorkspace": "Eksporter arbejdsområde JSON (filer ekskluderet)",
   "favoritePages": "Favoritsider",
   "favorites": "Favoritter",
   "home": "Hjem",
@@ -76,5 +76,12 @@
     "later": "Måske senere",
     "note": "Du kan altid starte dette senere via Importer i sidepanelet.",
     "title": "Vil du importere dit Notion-arbejdsområde til Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Tilføj side til {{name}}",
+  "couldntExportWorkspaceArchive": "Kunne ikke eksportere arbejdsområdearkiv.",
+  "exportedWorkspaceArchive": "Eksporterede et arbejdsområdearkiv med filer.",
+  "exportWorkspaceArchive": "Eksporter arbejdsområdearkiv (filer inkluderet)",
+  "joinTeamspaces": "Tilmeld teamspaces",
+  "keyboardShortcuts": "Tastaturgenveje",
+  "teamspacePages": "{{name}} sider"
 }

@@ -4,7 +4,22 @@
     "sum": "Jami",
     "average": "O'rtacha",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Belgilangan",
+    "count_values": "Qiymatlar soni",
+    "date_range": "Sana oralig‘i",
+    "earliest_date": "Eng erta sana",
+    "empty": "Bo‘sh qiymatlar soni",
+    "latest_date": "Eng so‘nggi sana",
+    "median": "Mediana",
+    "not_empty": "Bo‘sh bo‘lmagan qiymatlar soni",
+    "percent_checked": "Belgilanganlar foizi",
+    "percent_empty": "Bo‘sh qiymatlar foizi",
+    "percent_not_empty": "Bo‘sh bo‘lmagan qiymatlar foizi",
+    "percent_unchecked": "Belgilanmaganlar foizi",
+    "range": "Oraliq",
+    "unchecked": "Belgilanmagan",
+    "unique": "Noyob qiymatlar soni"
   },
   "chartAria": "{{name}} charti",
   "chartType": "Chart turi",
@@ -27,5 +42,9 @@
   "untitledProperty": "Nomsiz",
   "valueProperty": "Qiymat xususiyati",
   "xAxis": "X o'qi",
-  "yAxis": "Y o'qi"
+  "yAxis": "Y o'qi",
+  "dateRangeDays": "{{count}} kun",
+  "missingProperty": "saqlangan xususiyat",
+  "unsupportedAggregateDesc": "{{aggregate}} ni {{property}} dan hisoblab bo‘lmaydi. Mos xususiyat yoki hisoblashni tanlang.",
+  "unsupportedAggregateTitle": "Bu diagramma hisobi mavjud emas"
 }

@@ -51,7 +51,14 @@
     "range": "Masafa",
     "earliest_date": "Tarehe ya mapema zaidi",
     "latest_date": "Tarehe ya hivi karibuni",
-    "date_range": "Masafa ya tarehe"
+    "date_range": "Masafa ya tarehe",
+    "count": "Hesabu zote",
+    "count_per_group": "Idadi kwa kila kikundi",
+    "empty": "Idadi tupu",
+    "not_empty": "Idadi isiyo tupu",
+    "percent_per_group": "Asilimia kwa kila kikundi",
+    "show_unique": "Onyesha thamani za kipekee",
+    "unique": "Idadi ya thamani za kipekee"
   },
   "undo": "Tengua",
   "untitled": "Bila jina",

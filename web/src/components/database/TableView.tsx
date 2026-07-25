@@ -34,6 +34,7 @@ import type {
   PagePresenceAwareness,
 } from "@/lib/pagePresence";
 import type {
+  DatabaseButtonActionDocument,
   DbProperty,
   DbView,
   Page,
@@ -42,7 +43,12 @@ import type {
   PropertyType,
   TableCalculation,
 } from "@/lib/types";
-import { useStore, type DatabaseRowsQuery } from "@/lib/store";
+import {
+  databaseRowsQueryKey,
+  useStore,
+  type DatabaseRowsQuery,
+  type DatabaseSubitemRowWindow,
+} from "@/lib/store";
 import { newId, positionBetween } from "@/lib/ids";
 import {
   applyView,
@@ -53,11 +59,9 @@ import {
   viewFilterSeedValues,
   visibleViewProperties,
 } from "./query";
-import { evaluateFormula, formatFormulaValue } from "./formula";
 import { backendComputedValue } from "./computed";
-import { normalizeFileAttachments } from "./files";
 import { formatNumberValue, numberFormatForProperty } from "./numberFormat";
-import { normalizePersonIds, personLabel } from "./people";
+import { personLabel } from "./people";
 import { nextColor } from "./colors";
 import {
   dateKey,
@@ -68,6 +72,11 @@ import {
   parseDate,
 } from "./dateUtils";
 import { usePropertyTypeChangeConfirm } from "./PropertyTypeChangeConfirm";
+import {
+  AutomationActionEditor,
+  automationEditorActionsValid,
+  newAutomationEditorAction,
+} from "../automation/AutomationActionEditor";
 import { PropertyTypeConfig } from "./PropertyTypeConfig";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
 import {
@@ -76,7 +85,13 @@ import {
   PROPERTY_TYPES,
   localizedPropertyTypeLabel,
 } from "./propertyTypes";
-import { evaluateRollup, valueAsIds } from "./rollup";
+import { evaluateRollup } from "./rollup";
+import {
+  displaySummaryValue,
+  effectiveSummaryValue,
+  summaryValuePieces as valuePieces,
+  summaryValuePresent as valuePresent,
+} from "./summaryValue";
 import { chipStyle } from "./colors";
 import {
   ArrowDown,
@@ -104,6 +119,7 @@ import styles from "./database.module.css";
 
 const TABLE_PROP_DRAG = "application/x-hanji-db-property";
 const TABLE_ROW_DRAG = "application/x-hanji-db-row";
+const EMPTY_SUBITEM_ROW_WINDOWS: Record<string, DatabaseSubitemRowWindow> = {};
 const DEFAULT_TITLE_WIDTH = 260;
 const DEFAULT_PROP_WIDTH = 180;
 const MIN_PROP_WIDTH = 96;
@@ -116,6 +132,22 @@ const TABLE_ADD_PROPERTY_WIDTH = 132;
 // the whole grid past the inline container's right edge.
 const TABLE_INLINE_ADD_PROPERTY_MIN_WIDTH = 64;
 const PROPERTY_HEADER_MENU_WIDTH = 360;
+const DATABASE_BUTTON_EDITABLE_TYPES = new Set<PropertyType>([
+  "title",
+  "rich_text",
+  "number",
+  "select",
+  "multi_select",
+  "status",
+  "date",
+  "person",
+  "checkbox",
+  "url",
+  "email",
+  "phone",
+  "place",
+  "verification",
+]);
 const CELL_FOCUS_SELECTOR = [
   'input:not([type="hidden"]):not(:disabled)',
   "textarea:not(:disabled)",
@@ -150,9 +182,6 @@ function textRangeFromFocusTarget(target: EventTarget | null): PageAwarenessText
   if (typeof start !== "number" || typeof end !== "number") return undefined;
   return { start: Math.min(start, end), end: Math.max(start, end) };
 }
-
-// Reserved property key storing a row's sub-item parent (Notion-style nested rows).
-const SUBITEM_KEY = "__subitemParent";
 
 type TreeRow = { row: Page; depth: number; hasChildren: boolean };
 type TableGroup = {
@@ -549,6 +578,7 @@ export function TableView({
   db,
   view,
   rows: rowsProp,
+  rowsViewApplied = false,
   rowQuery,
   readOnly = false,
   search,
@@ -566,6 +596,7 @@ export function TableView({
   db: Page;
   view: DbView;
   rows?: Page[];
+  rowsViewApplied?: boolean;
   rowQuery?: DatabaseRowsQuery;
   readOnly?: boolean;
   search?: string;
@@ -592,8 +623,12 @@ export function TableView({
   const storeRows = useStore(useShallow((s) => s.dbRows(db.id)));
   const rows = rowsProp ?? storeRows;
   const rowPage = useStore(useShallow((s) => s.databaseRowPagesByDb[db.id]));
+  const subitemWindows = useStore((s) => s.databaseSubitemRowWindowsByDb[db.id])
+    ?? EMPTY_SUBITEM_ROW_WINDOWS;
   const loadDatabaseRows = useStore((s) => s.loadDatabaseRows);
   const loadMoreDatabaseRows = useStore((s) => s.loadMoreDatabaseRows);
+  const loadDatabaseSubitemRows = useStore((s) => s.loadDatabaseSubitemRows);
+  const loadMoreDatabaseSubitemRows = useStore((s) => s.loadMoreDatabaseSubitemRows);
   const addProperty = useStore((s) => s.addProperty);
   const addRow = useStore((s) => s.addRow);
   const setRowProperty = useStore((s) => s.setRowProperty);
@@ -613,6 +648,8 @@ export function TableView({
   const [titleFocusRowId, setTitleFocusRowId] = useState<string | null>(null);
   const [copiedRows, setCopiedRows] = useState(false);
   const [duplicatingSelected, setDuplicatingSelected] = useState(false);
+  const [reparentingSelected, setReparentingSelected] = useState(false);
+  const hierarchySelectionBusyRef = useRef(false);
   const [selectionMenuOpen, setSelectionMenuOpen] = useState(false);
   const [selectionChromeSlot, setSelectionChromeSlot] = useState<HTMLElement | null>(null);
   const initialRowLimit = tableInitialLoadLimit(view);
@@ -627,6 +664,7 @@ export function TableView({
   const restorePage = useStore((s) => s.restorePage);
   const duplicatePage = useStore((s) => s.duplicatePage);
   const notify = useStore((s) => s.notify);
+  const reparentDatabaseSubitem = useStore((s) => s.reparentDatabaseSubitem);
   const { openRowContextMenuAt, rowContextMenu } = useRowContextMenu({
     onEditProperties: onEditRowProperties,
     onOpenRowIn,
@@ -654,10 +692,80 @@ export function TableView({
   // changes (drag-over, hover, selection) was a re-render hotspot. Inputs are
   // stable across those renders (useShallow props/pagesById, prop-provided
   // view/search/contextPageId), so it recomputes only when the data changes.
-  const shown = useMemo(
-    () => applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
-    [rows, props, view, pagesById, search, contextPageId]
+  const baseShown = useMemo(
+    () =>
+      rowsViewApplied
+        ? rows
+        : applyView(rows, props, view, pagesById, { search, currentPageId: contextPageId }),
+    [rows, rowsViewApplied, props, view, pagesById, search, contextPageId]
   );
+  const subitemQuery = useMemo<DatabaseRowsQuery>(
+    () => rowQuery ?? {
+      viewId: view.id,
+      search,
+      currentPageId: contextPageId,
+    },
+    [contextPageId, rowQuery, search, view.id]
+  );
+  const subitemQueryKey = databaseRowsQueryKey(subitemQuery);
+  useEffect(() => {
+    setExpandedRows(new Set());
+  }, [subitemQueryKey]);
+  const matchingSubitemWindow = useCallback((parentId: string) => {
+    const window = subitemWindows[parentId];
+    if (!window) return undefined;
+    const expectedQueryKey = databaseRowsQueryKey({
+      ...subitemQuery,
+      subitemParentId: parentId,
+    });
+    return window.queryKey === expectedQueryKey ? window : undefined;
+  }, [subitemQuery, subitemWindows]);
+  const shown = useMemo(() => {
+    if (expandedRows.size === 0) return baseShown;
+    const merged = [...baseShown];
+    const seen = new Set(merged.map((row) => row.id));
+    for (const parentId of expandedRows) {
+      const window = matchingSubitemWindow(parentId);
+      if (!window) continue;
+      for (const rowId of window.rowIds) {
+        const row = pagesById[rowId];
+        if (!row || row.subitemParentId !== parentId || seen.has(row.id)) continue;
+        merged.push(row);
+        seen.add(row.id);
+      }
+    }
+    return merged;
+  }, [baseShown, expandedRows, matchingSubitemWindow, pagesById]);
+  const subtaskConfig = view.config?.subtasks;
+  const subitemsBinding = db.databaseFeatures?.subitems;
+  const subtaskDisplayMode = subtaskConfig?.displayMode ?? "show";
+  const subtaskFilterScope = subtaskConfig?.filterScope ?? "parents_and_subitems";
+  const subtaskRenderingEnabled = subitemsBinding?.enabled === true
+    && subtaskDisplayMode !== "disabled";
+  const hierarchicalSubtasks = subtaskRenderingEnabled && subtaskDisplayMode === "show";
+  const expandableSubtasks = hierarchicalSubtasks
+    && subtaskFilterScope === "parents_and_subitems";
+  const flattenedSubtasks = subtaskRenderingEnabled && subtaskDisplayMode === "flattened";
+  const hiddenSubtasks = subtaskRenderingEnabled && subtaskDisplayMode === "hidden";
+  const hierarchyRows = useMemo(() => {
+    const eligible = shown.filter((row) => (
+      row.__structuralPlaceholder !== true || expandableSubtasks
+    ));
+    if (!subtaskRenderingEnabled) return eligible;
+    if (subtaskDisplayMode === "hidden" || subtaskFilterScope === "parents") {
+      return eligible.filter((row) => !row.subitemParentId);
+    }
+    if (subtaskFilterScope === "subitems") {
+      return eligible.filter((row) => !!row.subitemParentId);
+    }
+    return eligible;
+  }, [
+    expandableSubtasks,
+    shown,
+    subtaskDisplayMode,
+    subtaskFilterScope,
+    subtaskRenderingEnabled,
+  ]);
   const hasSearchQuery = !!(search ?? "").trim();
   const hasViewFilters = !!effectiveFilterGroup(view.config);
   const rowLoadError = !loadingRows && rows.length === 0 && rowPage?.error ? rowPage.error : "";
@@ -668,9 +776,10 @@ export function TableView({
     rows.length === 0 &&
     !hasSearchQuery &&
     !hasViewFilters &&
-    shown.length === 0;
+    hierarchyRows.length === 0;
   const updateView = useStore((s) => s.updateView);
-  const canReorderRows = (view.config?.sorts ?? []).length === 0;
+  const selectionBusy = duplicatingSelected || reparentingSelected;
+  const canReorderRows = (view.config?.sorts ?? []).length === 0 && !selectionBusy;
   const dbTitle = pageDisplayTitle(db);
   // The dictionary EN strings equal the old hardcoded fallback ("New" /
   // `New page in …`), so full-page native tables localize too with EN output
@@ -686,14 +795,33 @@ export function TableView({
   const wrappedColumns = new Set(view.config?.wrappedColumns ?? []);
 
   // Build the sub-item tree from the (filtered/sorted) rows: a row references its
-  // parent via the reserved SUBITEM_KEY property. Rows whose parent isn't in the
+  // parent via the server-owned scalar. Rows whose parent isn't in the
   // current result become roots (so children of a filtered-out parent still show).
-  const shownIds = new Set(shown.map((r) => r.id));
+  const childCountByParent = new Map<string, number>();
+  for (const row of shown) {
+    if (!row.subitemParentId) continue;
+    childCountByParent.set(
+      row.subitemParentId,
+      (childCountByParent.get(row.subitemParentId) ?? 0) + 1
+    );
+  }
+  for (const row of shown) {
+    if (
+      typeof row.subitemChildCount === "number"
+      && Number.isSafeInteger(row.subitemChildCount)
+      && row.subitemChildCount >= 0
+    ) {
+      childCountByParent.set(row.id, row.subitemChildCount);
+    }
+  }
+  const shownIds = new Set(hierarchyRows.map((r) => r.id));
   const childrenByParent = new Map<string, Page[]>();
   const rootRows: Page[] = [];
-  for (const row of shown) {
-    const parent = row.properties?.[SUBITEM_KEY];
-    const parentId = typeof parent === "string" && shownIds.has(parent) ? parent : null;
+  for (const row of hierarchyRows) {
+    const parent = row.subitemParentId;
+    const parentId = expandableSubtasks && typeof parent === "string" && shownIds.has(parent)
+      ? parent
+      : null;
     if (parentId) {
       const list = childrenByParent.get(parentId) ?? [];
       list.push(row);
@@ -705,30 +833,38 @@ export function TableView({
   const allTreeRows: TreeRow[] = [];
   const pushTree = (row: Page, depth: number) => {
     const kids = childrenByParent.get(row.id) ?? [];
-    allTreeRows.push({ row, depth, hasChildren: kids.length > 0 });
+    const hasChildren = expandableSubtasks && (
+      row.__structuralPlaceholder === true
+      || (childCountByParent.get(row.id) ?? 0) > 0
+    );
+    allTreeRows.push({ row, depth, hasChildren });
     if (kids.length && expandedRows.has(row.id)) {
       for (const kid of kids) pushTree(kid, depth + 1);
     }
   };
   for (const row of rootRows) pushTree(row, 0);
-  const hasHiddenLocalRows = allTreeRows.length > visibleRowLimit;
+  const rootScopedHierarchy = expandableSubtasks && rowQuery?.subitemParentId === "";
+  const hasHiddenLocalRows = !rootScopedHierarchy && allTreeRows.length > visibleRowLimit;
   const hasRemoteMoreRows = rowPage?.hasMore === true;
   const hasMoreRows = hasHiddenLocalRows || hasRemoteMoreRows;
-  const treeRows = allTreeRows.slice(0, visibleRowLimit);
+  const treeRows = rootScopedHierarchy ? allTreeRows : allTreeRows.slice(0, visibleRowLimit);
   const displayTreeRows = useMemo(
     () => (inlineEmptyTablePreview ? [] : treeRows),
     [inlineEmptyTablePreview, treeRows],
   );
   const renderedRows = displayTreeRows.map((item) => item.row);
+  const actionableRenderedRows = renderedRows.filter(
+    (row) => row.__structuralPlaceholder !== true,
+  );
   const remainingRowCount = hasHiddenLocalRows
     ? allTreeRows.length - treeRows.length
     : typeof rowPage?.totalCount === "number"
       ? Math.max(0, rowPage.totalCount - (rowPage.loadedCount ?? rows.length))
       : undefined;
-  const selectedShown = renderedRows.filter((row) => selectedRows.has(row.id));
-  const allSelected = renderedRows.length > 0 && selectedShown.length === renderedRows.length;
+  const selectedShown = actionableRenderedRows.filter((row) => selectedRows.has(row.id));
+  const allSelected = actionableRenderedRows.length > 0
+    && selectedShown.length === actionableRenderedRows.length;
   const rowIndexById = new Map(displayTreeRows.map((item, index) => [item.row.id, index]));
-  const tableHasSubitems = displayTreeRows.some((item) => item.depth > 0 || item.hasChildren);
   const tableGroups = groupedTableRows(displayTreeRows, groupProp);
   const renderItems: TableRenderItem[] = groupProp
     ? tableGroups.flatMap((group) => [
@@ -738,16 +874,18 @@ export function TableView({
     : displayTreeRows.map((item) => ({ kind: "row", item }));
 
   function toggleExpanded(id: string) {
+    const expanding = !expandedRows.has(id);
     setExpandedRows((cur) => {
       const next = new Set(cur);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+    if (expanding) void loadDatabaseSubitemRows(db.id, id, subitemQuery);
   }
 
   function toggleRowSelected(id: string, selected: boolean, range = false) {
-    if (duplicatingSelected) return;
+    if (selectionBusy || hierarchySelectionBusyRef.current) return;
     const orderedIds = treeRows.map((item) => item.row.id);
     const lastIndex = lastSelectedRowId ? orderedIds.indexOf(lastSelectedRowId) : -1;
     const currentIndex = orderedIds.indexOf(id);
@@ -770,8 +908,10 @@ export function TableView({
     setLastSelectedRowId(id);
   }
   function toggleSelectAll() {
-    if (duplicatingSelected) return;
-    setSelectedRows(allSelected ? new Set() : new Set(renderedRows.map((row) => row.id)));
+    if (selectionBusy || hierarchySelectionBusyRef.current) return;
+    setSelectedRows(
+      allSelected ? new Set() : new Set(actionableRenderedRows.map((row) => row.id)),
+    );
     setLastSelectedRowId(null);
   }
   function clearSelection() {
@@ -815,10 +955,10 @@ export function TableView({
   }
 
   function hasSelectedRowAncestor(row: Page) {
-    let parentId = row.properties?.[SUBITEM_KEY];
+    let parentId = row.subitemParentId;
     while (typeof parentId === "string") {
       if (selectedRows.has(parentId)) return true;
-      parentId = pagesById[parentId]?.properties?.[SUBITEM_KEY];
+      parentId = pagesById[parentId]?.subitemParentId;
     }
     return false;
   }
@@ -844,39 +984,57 @@ export function TableView({
   }
 
   function canOutdentSelectedRows() {
-    return !readOnly && selectedRootTreeRows().some((item) => typeof item.row.properties?.[SUBITEM_KEY] === "string");
+    return !readOnly && selectedRootTreeRows().some((item) => !!item.row.subitemParentId);
   }
 
-  function indentSelectedRows() {
-    if (readOnly) return;
+  async function indentSelectedRows() {
+    if (readOnly || selectionBusy || hierarchySelectionBusyRef.current) return;
     const parent = indentTargetForSelectedRows();
     if (!parent) return;
-    for (const item of selectedRootTreeRows()) {
-      if (item.row.id === parent.id) continue;
-      setRowProperty(item.row.id, SUBITEM_KEY, parent.id, { debounce: false });
-    }
+    const moves = selectedRootTreeRows()
+      .filter((item) => item.row.id !== parent.id)
+      .map((item) => ({ rowId: item.row.id, targetParentId: parent.id }));
+    if (moves.length === 0) return;
+    hierarchySelectionBusyRef.current = true;
+    setReparentingSelected(true);
     setExpandedRows((cur) => new Set(cur).add(parent.id));
+    try {
+      await Promise.allSettled(
+        moves.map((move) => reparentDatabaseSubitem(move.rowId, move.targetParentId))
+      );
+    } finally {
+      hierarchySelectionBusyRef.current = false;
+      setReparentingSelected(false);
+    }
   }
 
-  function outdentSelectedRows() {
-    if (readOnly) return;
+  async function outdentSelectedRows() {
+    if (readOnly || selectionBusy || hierarchySelectionBusyRef.current) return;
     const expandedParentIds = new Set<string>();
+    const moves: Array<{ rowId: string; targetParentId: string }> = [];
     for (const item of selectedRootTreeRows()) {
-      const parentId = item.row.properties?.[SUBITEM_KEY];
-      if (typeof parentId !== "string") continue;
+      const parentId = item.row.subitemParentId;
+      if (!parentId) continue;
       const parent = pagesById[parentId];
-      const grandparentId = parent?.properties?.[SUBITEM_KEY];
-      const properties = { ...(item.row.properties ?? {}) };
-      if (typeof grandparentId === "string") {
-        properties[SUBITEM_KEY] = grandparentId;
+      const grandparentId = parent?.subitemParentId ?? "";
+      if (grandparentId) {
         expandedParentIds.add(grandparentId);
-      } else {
-        delete properties[SUBITEM_KEY];
       }
-      updatePage(item.row.id, { properties });
+      moves.push({ rowId: item.row.id, targetParentId: grandparentId });
     }
+    if (moves.length === 0) return;
+    hierarchySelectionBusyRef.current = true;
+    setReparentingSelected(true);
     if (expandedParentIds.size > 0) {
       setExpandedRows((cur) => new Set([...cur, ...expandedParentIds]));
+    }
+    try {
+      await Promise.allSettled(
+        moves.map((move) => reparentDatabaseSubitem(move.rowId, move.targetParentId))
+      );
+    } finally {
+      hierarchySelectionBusyRef.current = false;
+      setReparentingSelected(false);
     }
   }
 
@@ -914,7 +1072,7 @@ export function TableView({
     }
   }
   async function duplicateSelected() {
-    if (readOnly || duplicatingSelected) return;
+    if (readOnly || selectionBusy || hierarchySelectionBusyRef.current) return;
     const ids = selectedShown.map((row) => row.id);
     if (ids.length === 0) return;
     setDuplicatingSelected(true);
@@ -964,15 +1122,15 @@ export function TableView({
 
   useLayoutEffect(() => {
     tableShortcutRef.current = {
-      shown: renderedRows,
+      shown: actionableRenderedRows,
       selectedCount: selectedShown.length,
-      busy: duplicatingSelected,
+      busy: selectionBusy,
       clearSelection,
       copySelected: () => void copySelected(),
       duplicateSelected: () => void duplicateSelected(),
       deleteSelected: () => void deleteSelected(),
-      indentSelectedRows,
-      outdentSelectedRows,
+      indentSelectedRows: () => void indentSelectedRows(),
+      outdentSelectedRows: () => void outdentSelectedRows(),
     };
   });
 
@@ -1063,6 +1221,15 @@ export function TableView({
   }, []);
 
   const titlePropertyId = props.find((prop) => prop.type === "title")?.id ?? null;
+  const configuredNestedPropertyId = subitemsBinding?.nestedPropertyId;
+  const nestedPropertyId = configuredNestedPropertyId
+    && (configuredNestedPropertyId === subitemsBinding?.parentPropertyId
+      || configuredNestedPropertyId === subitemsBinding?.childrenPropertyId)
+    ? configuredNestedPropertyId
+    : subitemsBinding?.childrenPropertyId;
+  const subtaskToggleColumnId = subitemsBinding?.enabled
+    ? (subitemsBinding.showToggleOnTitle === false ? nestedPropertyId : titlePropertyId)
+    : subtaskConfig?.toggleColumnId ?? titlePropertyId;
   const displayColumnWidth = (prop: DbProperty) =>
     resizePreview && resizePreview.propId === prop.id
       ? resizePreview.width
@@ -1547,21 +1714,19 @@ export function TableView({
       const source = useStore.getState().pagesById[sourceId];
       const pastedRow = useStore.getState().pagesById[pastedId];
       if (!source || !pastedRow) continue;
-      const properties = { ...(pastedRow.properties ?? {}) };
-      const originalParent = properties[SUBITEM_KEY];
-      if (typeof originalParent === "string") {
+      const originalParent = pastedRow.subitemParentId;
+      if (originalParent) {
         const mappedParent = rowMap.get(originalParent);
         if (mappedParent) {
-          properties[SUBITEM_KEY] = mappedParent;
           pastedParentIds.add(mappedParent);
+          void reparentDatabaseSubitem(pastedId, mappedParent);
         } else {
-          delete properties[SUBITEM_KEY];
+          void reparentDatabaseSubitem(pastedId, "");
         }
       }
       updatePage(pastedId, {
         title: source.title,
         position: positionMap.get(pastedId) ?? pastedRow.position,
-        properties,
       });
     }
 
@@ -1680,14 +1845,14 @@ export function TableView({
         data-table-selection-bar
         role="toolbar"
         aria-label={t("tableView:selectedRowActions")}
-        aria-busy={duplicatingSelected || undefined}
+        aria-busy={selectionBusy || undefined}
         onPaste={onTablePaste}
       >
         <label className={styles.selectionCount}>
           <input
             type="checkbox"
             checked={allSelected}
-            disabled={duplicatingSelected}
+            disabled={selectionBusy}
             ref={(el) => {
               if (el) el.indeterminate = !allSelected && selectedShown.length > 0;
             }}
@@ -1710,7 +1875,7 @@ export function TableView({
         <button
           type="button"
           className={styles.selectionIconAction}
-          disabled={readOnly || duplicatingSelected}
+          disabled={readOnly || selectionBusy}
           title={t("tableView:deleteSelectedRows")}
           aria-label={t("tableView:deleteSelectedRows")}
           onClick={() => void deleteSelected()}
@@ -1723,7 +1888,7 @@ export function TableView({
             className={styles.selectionMore}
             aria-label={t("tableView:moreSelectedRowActions")}
             aria-expanded={selectionMenuOpen}
-            disabled={duplicatingSelected}
+            disabled={selectionBusy}
             onClick={() => setSelectionMenuOpen((open) => !open)}
           >
             ...
@@ -1734,7 +1899,7 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={duplicatingSelected}
+                disabled={selectionBusy}
                 onClick={() => void copySelected()}
               >
                 <Copy size={14} aria-hidden="true" />
@@ -1744,7 +1909,7 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={readOnly || duplicatingSelected}
+                disabled={readOnly || selectionBusy}
                 aria-busy={duplicatingSelected || undefined}
                 onClick={() => void duplicateSelected()}
               >
@@ -1755,8 +1920,8 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={duplicatingSelected || !canOutdentSelectedRows()}
-                onClick={outdentSelectedRows}
+                disabled={selectionBusy || !canOutdentSelectedRows()}
+                onClick={() => void outdentSelectedRows()}
               >
                 <ArrowLeft size={14} aria-hidden="true" />
                 {t("tableView:outdent")}
@@ -1765,8 +1930,8 @@ export function TableView({
                 type="button"
                 className={styles.selectionMenuItem}
                 role="menuitem"
-                disabled={duplicatingSelected || !canIndentSelectedRows()}
-                onClick={indentSelectedRows}
+                disabled={selectionBusy || !canIndentSelectedRows()}
+                onClick={() => void indentSelectedRows()}
               >
                 <ArrowRight size={14} aria-hidden="true" />
                 {t("tableView:indent")}
@@ -1778,7 +1943,7 @@ export function TableView({
           type="button"
           className={styles.selectionClose}
           aria-label={t("tableView:clearSelection")}
-          disabled={duplicatingSelected}
+          disabled={selectionBusy}
           onClick={clearSelection}
         >
           <X size={14} aria-hidden="true" />
@@ -1941,12 +2106,120 @@ export function TableView({
           }
           const { row, depth, hasChildren } = entry.item;
           const rowIndex = rowIndexById.get(row.id) ?? 0;
-          const rowTitle = pageDisplayTitle(row);
-          const showOpenRowButton = !!row.title.trim();
+          const isStructuralPlaceholder = row.__structuralPlaceholder === true;
+          const rowTitle = isStructuralPlaceholder
+            ? t("tableView:restrictedParent")
+            : pageDisplayTitle(row);
+          const showOpenRowButton = !isStructuralPlaceholder && !!row.title.trim();
           const subitemsExpanded = expandedRows.has(row.id);
           const subitemsLabel = subitemsExpanded
             ? t("tableView:collapseSubitems", { title: rowTitle })
             : t("tableView:expandSubitems", { title: rowTitle });
+          const subitemParent = row.subitemParentId
+            ? pagesById[row.subitemParentId]
+            : undefined;
+          const subitemParentTitle = subitemParent?.__structuralPlaceholder === true
+            ? t("tableView:restrictedParent")
+            : subitemParent
+              ? pageDisplayTitle(subitemParent)
+              : "";
+          const childCount = childCountByParent.get(row.id) ?? 0;
+          const subitemWindow = subitemsExpanded ? matchingSubitemWindow(row.id) : undefined;
+
+          if (isStructuralPlaceholder) {
+            return (
+              <div
+                key={row.id}
+                className={styles.tableRow}
+                role="row"
+                aria-label={t("tableView:rowAriaLabel", { title: rowTitle })}
+                data-table-row-id={row.id}
+                data-structural-placeholder="true"
+                style={{ gridTemplateColumns: bodyGridTemplate }}
+              >
+                {showRowGutter && (
+                  <div
+                    className={styles.rowGutterCell}
+                    role="gridcell"
+                    aria-hidden="true"
+                  />
+                )}
+                {visible.map((property, index) => {
+                  const isFirstCell = index === 0;
+                  const isTitleCell = property.id === titlePropertyId;
+                  return (
+                    <div
+                      key={property.id}
+                      className={styles.cell}
+                      role="gridcell"
+                      aria-colindex={index + 1 + (showRowGutter ? 1 : 0)}
+                      data-first={isFirstCell ? "true" : undefined}
+                      data-title={isTitleCell ? "true" : undefined}
+                      data-table-cell
+                      data-row-index={rowIndex}
+                      data-col-index={index}
+                    >
+                      {property.id === subtaskToggleColumnId && depth > 0 && (
+                        <span
+                          className={styles.subitemIndent}
+                          style={{ width: depth * 20 }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      {property.id === subtaskToggleColumnId && hasChildren && (
+                        <button
+                          type="button"
+                          className={styles.subitemToggle}
+                          data-visible="true"
+                          aria-expanded={subitemsExpanded}
+                          aria-label={subitemsLabel}
+                          title={subitemsLabel}
+                          onClick={() => toggleExpanded(row.id)}
+                        >
+                          {subitemsExpanded
+                            ? <ChevronDown size={13} aria-hidden="true" />
+                            : <ChevronRight size={13} aria-hidden="true" />}
+                        </button>
+                      )}
+                      {property.id === subtaskToggleColumnId
+                        && subitemsExpanded
+                        && subitemWindow?.hasMore && (
+                          <button
+                            type="button"
+                            className={styles.subitemToggle}
+                            data-subitem-load-more
+                            data-visible="true"
+                            aria-label={`${t("tableView:loadMore")}: ${rowTitle}`}
+                            title={`${t("tableView:loadMore")}: ${rowTitle}`}
+                            disabled={subitemWindow.loadingMore === true}
+                            onClick={() => void loadMoreDatabaseSubitemRows(
+                              db.id,
+                              row.id,
+                              subitemQuery,
+                            )}
+                          >
+                            <Plus size={13} aria-hidden="true" />
+                          </button>
+                        )}
+                      {isTitleCell && (
+                        <div className={styles.cellEditor} data-cell-editor>
+                          <span>{rowTitle}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+                {shouldRenderTrailingGridCell && (
+                  <div
+                    className={styles.trailingGridCell}
+                    data-table-trailing-grid-cell
+                    role="gridcell"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+            );
+          }
 
           return (
             <div
@@ -2043,7 +2316,7 @@ export function TableView({
 	                    data-table-row-select
 	                    aria-label={t("tableView:selectRow", { title: pageDisplayTitle(row) })}
 	                    checked={selectedRows.has(row.id)}
-                    disabled={duplicatingSelected}
+                    disabled={selectionBusy}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleRowSelected(row.id, !selectedRows.has(row.id), e.shiftKey);
@@ -2121,11 +2394,10 @@ export function TableView({
                         </button>
                       </>
                     )}
-                    {isTitleCell && depth > 0 && (
+                    {p.id === subtaskToggleColumnId && depth > 0 && (
                       <span className={styles.subitemIndent} style={{ width: depth * 20 }} aria-hidden="true" />
                     )}
-                    {isTitleCell && tableHasSubitems && (
-                      hasChildren ? (
+                    {p.id === subtaskToggleColumnId && hasChildren && (
                         <button
                           type="button"
                           className={styles.subitemToggle}
@@ -2144,9 +2416,46 @@ export function TableView({
                             <ChevronRight size={13} aria-hidden="true" />
                           )}
                         </button>
-                      ) : (
-                        <span className={styles.subitemToggle} aria-hidden="true" />
-                      )
+                    )}
+                    {p.id === subtaskToggleColumnId
+                      && subitemsExpanded
+                      && subitemWindow?.hasMore && (
+                        <button
+                          type="button"
+                          className={styles.subitemToggle}
+                          data-subitem-load-more
+                          data-visible="true"
+                          aria-label={`${t("tableView:loadMore")}: ${rowTitle}`}
+                          title={`${t("tableView:loadMore")}: ${rowTitle}`}
+                          disabled={subitemWindow.loadingMore === true}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void loadMoreDatabaseSubitemRows(db.id, row.id, subitemQuery);
+                          }}
+                        >
+                          <Plus size={13} aria-hidden="true" />
+                        </button>
+                    )}
+                    {p.id === subtaskToggleColumnId
+                      && flattenedSubtasks
+                      && row.subitemParentId && (
+                        <span
+                          className={styles.subitemParentIndicator}
+                          data-subitem-parent-id={row.subitemParentId}
+                          title={t("tableView:subitemOf", { title: subitemParentTitle })}
+                        >
+                          {t("tableView:subitemOf", { title: subitemParentTitle })}
+                        </span>
+                    )}
+                    {p.id === subtaskToggleColumnId
+                      && hiddenSubtasks
+                      && childCount > 0 && (
+                        <span
+                          className={styles.subitemCount}
+                          data-subitem-count={childCount}
+                        >
+                          {t("tableView:subitemCount", { count: childCount })}
+                        </span>
                     )}
                     <div className={styles.cellEditor} data-cell-editor>
                       {readOnly || row.isLocked ? (
@@ -2525,16 +2834,6 @@ function rawPropertyValue(
   pagesById: Record<string, Page>,
   propsByDb: Record<string, DbProperty[]>
 ): unknown {
-  if (prop.type === "title") return row.title;
-  if (prop.type === "created_time") return row.createdAt;
-  if (prop.type === "last_edited_time") return row.updatedAt;
-  if (prop.type === "created_by") return row.createdBy;
-  if (prop.type === "last_edited_by") return row.lastEditedBy;
-  if (prop.type === "formula") {
-    const computed = backendComputedValue(row, prop);
-    if (computed !== undefined) return computed;
-    return evaluateFormula({ row, prop, props, pagesById });
-  }
   if (prop.type === "rollup") {
     const computed = backendComputedValue(row, prop);
     if (computed !== undefined) return computed;
@@ -2550,39 +2849,7 @@ function rawPropertyValue(
       pagesById,
     });
   }
-  return row.properties?.[prop.id];
-}
-
-function displaySummaryValue(
-  value: unknown,
-  prop: DbProperty,
-  pagesById: Record<string, Page>
-): string | string[] {
-  if (prop.type === "select" || prop.type === "status") {
-    const id = value ? String(value) : "";
-    return prop.config?.options?.find((option) => option.id === id)?.name ?? id;
-  }
-  if (prop.type === "multi_select") {
-    return valueAsIds(value).map(
-      (id) => prop.config?.options?.find((option) => option.id === id)?.name ?? id
-    );
-  }
-  if (prop.type === "relation") {
-    return valueAsIds(value).map((id) => pageDisplayTitle(pagesById[id]));
-  }
-  if (prop.type === "files") {
-    return normalizeFileAttachments(value).map((file) => file.name);
-  }
-  if (prop.type === "person" || prop.type === "created_by" || prop.type === "last_edited_by") {
-    return normalizePersonIds(value).map((id) => personLabel(id));
-  }
-  if (prop.type === "created_time" || prop.type === "last_edited_time") {
-    return formatNotionTimestamp(value);
-  }
-  if (prop.type === "formula") return formatFormulaValue(value as ReturnType<typeof evaluateFormula>);
-  if (Array.isArray(value)) return value.map(String);
-  if (value == null) return "";
-  return String(value);
+  return effectiveSummaryValue(row, prop, props, pagesById);
 }
 
 function tsvCell(text: string) {
@@ -2627,16 +2894,6 @@ function rowsToTsv(
       .join("\t")
   );
   return [header, ...body].join("\n");
-}
-
-function valuePieces(value: unknown, prop: DbProperty, pagesById: Record<string, Page>) {
-  const display = displaySummaryValue(value, prop, pagesById);
-  const parts = Array.isArray(display) ? display : [display];
-  return parts.map((part) => String(part).trim()).filter(Boolean);
-}
-
-function valuePresent(value: unknown, prop: DbProperty, pagesById: Record<string, Page>) {
-  return valuePieces(value, prop, pagesById).length > 0;
 }
 
 function numericValue(value: unknown) {
@@ -2764,6 +3021,156 @@ function summarizeColumn(
   }
 }
 
+function validDatabaseButtonAction(
+  action: Extract<DatabaseButtonActionDocument["actions"][number], { type: "edit_property" }>,
+  properties: readonly DbProperty[]
+) {
+  const property = properties.find((candidate) => candidate.id === action.propertyId);
+  if (!property) return false;
+  if (action.value.kind === "execution_time") return property.type === "date";
+  if (action.value.kind !== "literal") return true;
+  const value = action.value.value;
+  const options = new Set((property.config?.options ?? []).map((option) => option.id));
+  if (property.type === "select" || property.type === "status") {
+    return value === null || (typeof value === "string" && options.has(value));
+  }
+  if (property.type === "multi_select") {
+    return value === null || (Array.isArray(value) && value.every((item) => typeof item === "string" && options.has(item)));
+  }
+  if (property.type === "checkbox") return typeof value === "boolean";
+  if (property.type === "number") return value === null || (typeof value === "number" && Number.isFinite(value));
+  if (property.type === "person") return Array.isArray(value) && value.every((item) => typeof item === "string");
+  if (property.type === "place") {
+    if (value === null) return true;
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const place = value as { lat?: unknown; lon?: unknown };
+    return typeof place.lat === "number" && Number.isFinite(place.lat) && typeof place.lon === "number" && Number.isFinite(place.lon);
+  }
+  if (property.type === "verification") {
+    return Boolean(value && typeof value === "object" && !Array.isArray(value) && (
+      (value as { state?: unknown }).state === "verified" ||
+      (value as { state?: unknown }).state === "unverified"
+    ));
+  }
+  if (property.type === "date") return value === null || typeof value === "string";
+  return typeof value === "string";
+}
+
+function DatabaseButtonEditor({
+  property,
+  properties,
+  onClose,
+  onSave,
+}: {
+  property: DbProperty;
+  properties: DbProperty[];
+  onClose: () => void;
+  onSave: (document: DatabaseButtonActionDocument) => void;
+}) {
+  const { t } = useTranslation(["tableView", "common"]);
+  const editableProperties = useMemo(
+    () => properties.filter((candidate) => DATABASE_BUTTON_EDITABLE_TYPES.has(candidate.type)),
+    [properties]
+  );
+  const editorSources = useStore(useShallow((state) => ({
+    pagesById: state.pagesById,
+    views: state.viewsByDb[property.databaseId] ?? [],
+  })));
+  const editorPages = useMemo(() => Object.values(editorSources.pagesById), [editorSources.pagesById]);
+  const [document, setDocument] = useState<DatabaseButtonActionDocument>(() => {
+    const existing = property.config?.button;
+    if (existing) {
+      return {
+        version: 1,
+        label: existing.label,
+        actions: structuredClone(existing.actions),
+      };
+    }
+    return {
+      version: 1,
+      label: property.name,
+      actions: editableProperties[0]
+        ? [newAutomationEditorAction("edit_property", {
+            properties: editableProperties,
+            pages: editorPages,
+            views: editorSources.views,
+          })]
+        : [],
+    };
+  });
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [onClose]);
+
+  const canSave =
+    document.label.trim().length > 0 &&
+    document.label.trim().length <= 100 &&
+    automationEditorActionsValid(document.actions, "database_button") &&
+    document.actions
+      .filter((action) => action.type === "edit_property")
+      .every((action) => validDatabaseButtonAction(action, editableProperties));
+
+  return createPortal(
+    <div className={styles.databaseButtonEditorOverlay}>
+      <button
+        type="button"
+        className={styles.databaseButtonEditorBackdrop}
+        aria-label={t("tableView:closeAutomationEditor")}
+        onClick={onClose}
+      />
+      <div
+        className={styles.databaseButtonEditor}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("tableView:editButtonAutomation", { name: property.name })}
+      >
+        <div className={styles.databaseButtonEditorHeader}>
+          <strong>{t("tableView:editAutomation")}</strong>
+          <button type="button" aria-label={t("tableView:closeAutomationEditor")} onClick={onClose}>
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+        <label className={styles.databaseButtonEditorField}>
+          <span>{t("tableView:buttonLabel")}</span>
+          <input
+            autoFocus
+            aria-label={t("tableView:buttonLabel")}
+            maxLength={100}
+            value={document.label}
+            onChange={(event) => setDocument((current) => ({ ...current, label: event.target.value }))}
+          />
+        </label>
+        <section className={styles.databaseButtonTrigger} aria-label={t("tableView:whenUsed")}>
+          <span>{t("tableView:whenUsed")}</span>
+          <strong>{t("tableView:buttonClicked")}</strong>
+        </section>
+        <AutomationActionEditor
+          surface="database_button"
+          actions={document.actions}
+          properties={editableProperties}
+          pages={editorPages}
+          views={editorSources.views}
+          onChange={(actions) => setDocument((current) => ({ ...current, actions }))}
+        />
+        <button
+          type="button"
+          className={styles.databaseButtonSave}
+          disabled={!canSave}
+          onClick={() => onSave({ ...document, label: document.label.trim() })}
+        >
+          {t("common:actions.save")}
+        </button>
+      </div>
+    </div>,
+    globalThis.document.body
+  );
+}
+
 function PropertyHeader({
   prop,
   props,
@@ -2783,6 +3190,7 @@ function PropertyHeader({
 }) {
   const { t } = useTranslation(["tableView", "common"]);
   const [open, setOpen] = useState(false);
+  const [buttonEditorOpen, setButtonEditorOpen] = useState(false);
   const [menuPanel, setMenuPanel] = useState<"main" | "edit" | "type">("main");
   const [typeSearch, setTypeSearch] = useState("");
   const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
@@ -3237,15 +3645,30 @@ function PropertyHeader({
                   </span>
                   {prop.description && <span className={styles.propertyHeaderInfo}>i</span>}
                 </div>
-                <button
-                  className={styles.propertyHeaderItem}
-                  data-menu-item
-                  onClick={() => setMenuPanel("edit")}
-                >
-                  <PropertiesIcon size={15} aria-hidden="true" />
-                  <span className={styles.propertyHeaderItemText}>{t("tableView:editProperty")}</span>
-                  <ChevronRight size={14} aria-hidden="true" />
-                </button>
+                {prop.type === "button" ? (
+                  <button
+                    className={styles.propertyHeaderItem}
+                    data-menu-item
+                    onClick={() => {
+                      closeMenu(false);
+                      setButtonEditorOpen(true);
+                    }}
+                  >
+                    <PropertiesIcon size={15} aria-hidden="true" />
+                    <span className={styles.propertyHeaderItemText}>{t("tableView:editAutomation")}</span>
+                    <ChevronRight size={14} aria-hidden="true" />
+                  </button>
+                ) : (
+                  <button
+                    className={styles.propertyHeaderItem}
+                    data-menu-item
+                    onClick={() => setMenuPanel("edit")}
+                  >
+                    <PropertiesIcon size={15} aria-hidden="true" />
+                    <span className={styles.propertyHeaderItemText}>{t("tableView:editProperty")}</span>
+                    <ChevronRight size={14} aria-hidden="true" />
+                  </button>
+                )}
                 <button
                   className={styles.propertyHeaderItem}
                   data-menu-item
@@ -3492,6 +3915,17 @@ function PropertyHeader({
           </div>
         </>,
         document.body
+      )}
+      {buttonEditorOpen && prop.type === "button" && (
+        <DatabaseButtonEditor
+          property={prop}
+          properties={props}
+          onClose={() => setButtonEditorOpen(false)}
+          onSave={(button) => {
+            updateProperty(prop.id, { config: { ...prop.config, button } });
+            setButtonEditorOpen(false);
+          }}
+        />
       )}
       {typeChangeConfirmDialog}
     </div>

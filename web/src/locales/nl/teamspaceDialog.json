@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Gesloten",
+    "open": "Open",
+    "private": "Privé"
+  },
+  "add": "Toevoegen",
+  "approve": "Goedkeuren",
+  "archive": "Teamspace archiveren",
+  "available": "Beschikbaar om lid te worden",
+  "choosePrincipal": "Kies een persoon of groep",
+  "create": "Teamspace aanmaken",
+  "deny": "Weigeren",
+  "error": {
+    "action": "Kan die teamspace-actie niet voltooien.",
+    "load": "Kan teamspace-details niet laden."
+  },
+  "fields": {
+    "access": "Toegang",
+    "description": "Beschrijving",
+    "icon": "Icoon",
+    "memberRole": "Toegang ledenpagina's",
+    "membersCanEditSidebar": "Leden kunnen pagina's toevoegen en herschikken",
+    "membersCanInvite": "Leden kunnen personen uitnodigen",
+    "name": "Naam",
+    "openRole": "Toegang open bezoekerspagina's"
+  },
+  "governance": "Teamspace instellingen",
+  "join": "Deelnemen",
+  "joined": "Je teamspaces",
+  "loadMore": "Meer laden",
+  "manage": "Beheren",
+  "member": "Lid",
+  "members": "Leden",
+  "noneArchived": "Er zijn geen gearchiveerde teamspaces.",
+  "noneAvailable": "Er zijn geen andere teamspaces beschikbaar.",
+  "noneJoined": "Je bent nog bij geen teamspace aangesloten.",
+  "noRequests": "Er zijn geen openstaande verzoeken.",
+  "notice": {
+    "approved": "Verzoek goedgekeurd.",
+    "archived": "Teamspace gearchiveerd.",
+    "created": "Teamspace aangemaakt.",
+    "defaultSet": "Standaard teamspace bijgewerkt.",
+    "denied": "Verzoek geweigerd.",
+    "joined": "Teamspace aangesloten.",
+    "memberAdded": "Lid toegevoegd.",
+    "memberRemoved": "Lid verwijderd.",
+    "memberUpdated": "Lidrol bijgewerkt.",
+    "policySaved": "Teamspace aanmaakbeleid bijgewerkt.",
+    "requested": "Toegang aangevraagd.",
+    "restored": "Teamspace hersteld.",
+    "saved": "Teamspace bijgewerkt."
+  },
+  "notOwner": "Alleen een teamspace-eigenaar of workspace-beheerder kan deze teamspace beheren.",
+  "open": "Openen",
+  "owner": "Eigenaar",
+  "ownersOnlyCreate": "Alleen workspace-eigenaren kunnen teamspaces aanmaken",
+  "remove": "Verwijderen",
+  "replacement": "Kies een vervangende standaardteamspace",
+  "request": "Toegang aanvragen",
+  "requestPending": "Aanvraag in afwachting",
+  "requests": "Toegangsaanvragen",
+  "restore": "Herstellen",
+  "roles": {
+    "comment": "Kan reageren",
+    "edit": "Kan bewerken",
+    "full_access": "Volledige toegang",
+    "view": "Kan bekijken"
+  },
+  "save": "Wijzigingen opslaan",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Instellen als standaardteamspace",
+  "subtitle": "Organiseer gedeeld werk en beheer wie het kan ontdekken of eraan deelnemen.",
+  "tabs": {
+    "archived": "Gearchiveerd",
+    "browse": "Bladeren",
+    "create": "Nieuwe teamspace",
+    "label": "Teamspace-weergaven",
+    "manage": "Beheren"
+  },
+  "title": "Teamspaces"
+}

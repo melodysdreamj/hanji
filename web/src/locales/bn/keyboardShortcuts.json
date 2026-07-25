@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "মন্তব্য যোগ করুন",
+    "addLink": "লিঙ্ক যোগ করুন",
+    "blockColor": "শেষ ব্যবহৃত রঙ প্রয়োগ করুন",
+    "bold": "বোল্ড",
+    "copyPageLink": "পৃষ্ঠা লিঙ্ক কপি",
+    "findInPage": "এই পৃষ্ঠায় খুঁজুন",
+    "inlineCode": "ইনলাইন কোড",
+    "italic": "ইটালিক",
+    "moveBlock": "ব্লক অন্য পৃষ্ঠায় সরান",
+    "moveBlockDown": "ব্লক নিচে সরান",
+    "moveBlockUp": "ব্লক উপরে সরান",
+    "movePage": "বর্তমান পৃষ্ঠা সরান",
+    "navigateBack": "পেছনে যান",
+    "navigateForward": "সামনে যান",
+    "newPage": "নতুন পৃষ্ঠা",
+    "openBlockMenu": "ব্লক অ্যাকশন খুলুন",
+    "openKeyboardShortcuts": "কীবোর্ড শর্টকাট খুলুন",
+    "openParentPage": "মূল পৃষ্ঠা খুলুন",
+    "quickFind": "দ্রুত অনুসন্ধান",
+    "strikethrough": "স্ট্রাইকথ্রু",
+    "toggleAllToggles": "সমস্ত টগল সম্প্রসারণ বা সংকোচন",
+    "toggleSidebar": "সাইডবার টগল করুন",
+    "toggleTheme": "ডার্ক মোড টগল করুন",
+    "underline": "আন্ডারলাইন"
+  },
+  "categories": {
+    "createStyle": "তৈরি ও স্টাইল",
+    "editMove": "সম্পাদনা ও সরান",
+    "popular": "জনপ্রিয়"
+  },
+  "categoriesLabel": "শর্টকাট বিভাগ",
+  "close": "বন্ধ",
+  "closeBackdrop": "কীবোর্ড শর্টকাট বন্ধ করুন",
+  "empty": "কোন শর্টকাট পাওয়া যায়নি",
+  "keysFor": "{{action}} এর কী",
+  "or": "অথবা",
+  "searchLabel": "কীবোর্ড শর্টকাট খুঁজুন",
+  "searchPlaceholder": "শর্টকাট খুঁজুন…",
+  "searchResults": "অনুসন্ধানের ফলাফল",
+  "searchTerms": {
+    "toggleTheme": "থিম লাইট ডার্ক চেহারা"
+  },
+  "title": "কীবোর্ড শর্টকাট"
+}

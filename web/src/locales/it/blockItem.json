@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Didascalia video",
     "videoEmptyHint": "Carica un file video, incolla un link diretto o usa un link di YouTube, Vimeo o Loom.",
-    "videoLink": "Link video"
+    "videoLink": "Link video",
+    "audioPlaybackFailed": "Impossibile riprodurre questo audio. Sostituiscilo o apri il file originale.",
+    "videoPlaybackFailed": "Impossibile riprodurre questo video. Sostituiscilo o apri il file originale."
   },
   "bookmark": {
     "copy": "Copia link segnalibro",

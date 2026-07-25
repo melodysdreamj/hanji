@@ -59,18 +59,18 @@
   "hanji": {
     "cantImport": "Kunne ikke importere Hanji-filen.",
     "cantRead": "Kunne ikke lese Hanji-filen.",
-    "choose": "Velg en .hanji.json-fil",
+    "choose": "Velg en .hanji.json- eller .hanji.zip-fil",
     "chooseButton": "Velg fil",
     "fetch": "Hent eksport",
     "fetching": "Henter...",
-    "fileHint": "Eksporter en side, database eller et arbeidsområde fra en annen Hanji, og importer den her. Relasjoner, rollups, formler, visninger og maler blir bevart. Vedlegg er ikke inkludert.",
+    "fileHint": "Bruk .hanji.json for kun struktur (filer ekskludert), eller .hanji.zip for en tapsfri overføring (filer inkludert). Relasjoner, rollups, formler, visninger og maler blir bevart.",
     "fromFile": "Fra en fil",
     "fromLive": "Fra en live-instans",
     "importButton": "Importer",
     "importedItems_one": "Importerte {{count}} element fra Hanji-filen.",
     "importedItems_other": "Importerte {{count}} elementer fra Hanji-filen.",
     "importing": "Importerer...",
-    "liveHint": "Hent et arbeidsområde direkte fra en annen kjørende Hanji (for eksempel en Docker-utviklingsinstans). Den eksterne må tillate forespørsler fra denne adressen.",
+    "liveHint": "Hent et arbeidsområde direkte fra en annen kjørende Hanji (for eksempel en Docker-utviklingsinstans). Filer er ekskludert. Den eksterne må tillate forespørsler fra denne adressen.",
     "needFile": "Velg en Hanji-fil først.",
     "needRemote": "Skriv inn den eksterne Hanji-URL-en og arbeidsområde-ID-en.",
     "placeholderNote": "Noen vedlegg ble igjen som plassholdere.",
@@ -82,7 +82,9 @@
     "review": "Klar til å importere: {{summary}}",
     "selected": "Valgt: {{name}}",
     "tab": "Hanji",
-    "title": "Importer fra Hanji"
+    "title": "Importer fra Hanji",
+    "filesExcluded": "Filer ekskludert.",
+    "filesIncluded": "Filer inkludert."
   },
   "importApplied": "Notion-import anvendt.",
   "importCancelled": "Notion-import avbrutt.",
@@ -305,6 +307,12 @@
       "Oppdag",
       "Bruk"
     ],
-    "stepsAria": "Notion-importsteg"
+    "stepsAria": "Notion-importsteg",
+    "serverRunnerStatus": "Hanji behandler denne importen på serveren. Å lukke eller laste inn fanen på nytt vil ikke sette den på pause.",
+    "serverRunningHint": "Importen fortsetter i bakgrunnen. Du kan lukke denne fanen."
+  },
+  "terminal": {
+    "cancelled": "Importen ble avbrutt. Du kan trygt starte den på nytt når du er klar.",
+    "failed": "Importen stoppet trygt før den ble fullført. Sjekk forbindelsen og prøv igjen. Tekniske detaljer og identifikatorer er skjult her."
   }
 }

@@ -51,7 +51,14 @@
     "range": "ክልል",
     "earliest_date": "ቀደምት ቀን",
     "latest_date": "ኋለኛ ቀን",
-    "date_range": "የቀን ክልል"
+    "date_range": "የቀን ክልል",
+    "count": "ሁሉም ቁጥር",
+    "count_per_group": "በቡድን ቆጠራ",
+    "empty": "ባዶ ቆጠራ",
+    "not_empty": "ያልባዶ ቆጠራ",
+    "percent_per_group": "በቡድን መቶኛ",
+    "show_unique": "ልዩ እሴቶችን አሳይ",
+    "unique": "ልዩ እሴቶች ቆጠራ"
   },
   "undo": "ቀልብስ",
   "untitled": "ርዕስ የሌለው",

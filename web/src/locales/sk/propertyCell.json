@@ -92,5 +92,8 @@
     "Pi",
     "So"
   ],
-  "you": "Ty"
+  "you": "Ty",
+  "buttonExecutionFailed": "Tlačidlo sa nepodarilo spustiť.",
+  "loadingMoreRelations": "Načítavajú sa ďalšie vzťahy...",
+  "loadMoreRelations": "Načítať ďalšie vzťahy"
 }

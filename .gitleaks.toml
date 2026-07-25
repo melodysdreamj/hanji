@@ -14,6 +14,17 @@ tags = ["privacy", "personal-data"]
 [[rules.allowlists]]
 paths = ['''^\.gitleaks\.toml$''']
 
+[[allowlists]]
+targetRules = ["etsy-access-token"]
+description = "Reviewed Swedish translation keys that cross an Etsy keyword boundary"
+condition = "AND"
+regexes = [
+  '''^(?:ariaServerAccountSummary|enterpriseMcpPolicySaved|errUpdateMemberAddPolicy)$''',
+]
+paths = [
+  '''(?:^|/)web/src/locales/sv/workspaceSettingsDialog\.json$''',
+]
+
 [[rules]]
 id = "forbidden-private-operational-path"
 description = "Known private operational/customer path in public source"

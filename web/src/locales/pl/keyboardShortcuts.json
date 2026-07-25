@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Dodaj komentarz",
+    "addLink": "Dodaj link",
+    "blockColor": "Zastosuj ostatnio używany kolor",
+    "bold": "Pogrubienie",
+    "copyPageLink": "Kopiuj link do strony",
+    "findInPage": "Znajdź na stronie",
+    "inlineCode": "Kod wbudowany",
+    "italic": "Kursywa",
+    "moveBlock": "Przenieś blok do innej strony",
+    "moveBlockDown": "Przenieś blok w dół",
+    "moveBlockUp": "Przenieś blok w górę",
+    "movePage": "Przenieś bieżącą stronę",
+    "navigateBack": "Wstecz",
+    "navigateForward": "Dalej",
+    "newPage": "Nowa strona",
+    "openBlockMenu": "Otwórz akcje bloku",
+    "openKeyboardShortcuts": "Otwórz skróty klawiaturowe",
+    "openParentPage": "Otwórz stronę nadrzędną",
+    "quickFind": "Szybkie wyszukiwanie",
+    "strikethrough": "Przekreślenie",
+    "toggleAllToggles": "Rozwiń lub zwiń wszystkie przełączniki",
+    "toggleSidebar": "Przełącz pasek boczny",
+    "toggleTheme": "Przełącz tryb ciemny",
+    "underline": "Podkreślenie"
+  },
+  "categories": {
+    "createStyle": "Tworzenie i styl",
+    "editMove": "Edycja i przenoszenie",
+    "popular": "Popularne"
+  },
+  "categoriesLabel": "Kategorie skrótów",
+  "close": "Zamknij",
+  "closeBackdrop": "Zamknij skróty klawiaturowe",
+  "empty": "Nie znaleziono skrótów",
+  "keysFor": "Klawisze dla {{action}}",
+  "or": "lub",
+  "searchLabel": "Szukaj skrótów klawiszowych",
+  "searchPlaceholder": "Szukaj skrótów…",
+  "searchResults": "Wyniki wyszukiwania",
+  "searchTerms": {
+    "toggleTheme": "motyw jasny ciemny wygląd"
+  },
+  "title": "Skróty klawiszowe"
+}

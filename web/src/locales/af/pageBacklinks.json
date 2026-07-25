@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} terugskakel",
-    "count_other": "{{count}} terugskakels"
+    "count_other": "{{count}} terugskakels",
+    "partial_one": "{{count}}+ terugskakel",
+    "partial_other": "{{count}}+ terugskakels"
   },
   "header": {
     "title": "Geskakelde meldings"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} melding",
     "mention_other": "{{count}} meldings",
     "link_one": "{{count}} skakel",
-    "link_other": "{{count}} skakels"
+    "link_other": "{{count}} skakels",
+    "loaded": "Gelaai: {{summary}}"
   },
   "kind": {
     "mention": "Melding",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Nog {{count}} terugskakel",
-    "count_other": "Nog {{count}} terugskakels"
+    "count_other": "Nog {{count}} terugskakels",
+    "load": "Laai meer terugskakels",
+    "loading": "Laai terugskakels…",
+    "search": "Soek terugskakels"
   }
 }

@@ -1,9 +1,62 @@
 import { defineFunction } from '@edge-base/shared';
 import { boundedDb, boundedDbForPage } from '../lib/workspace-db';
-import { bestEffort } from '../lib/table-utils';
+import { bestEffort, isNotFoundError } from '../lib/table-utils';
+import { decodeSearchSourceCursor, encodeSearchSourceCursor } from '../lib/search-source-cursor';
+import {
+  invokeProductFunction,
+  type ProductFunctionDefinition as InternalFunctionHandler,
+} from '../lib/product-function-bridge';
+import { assertMinimumPageAccessRole } from '../lib/page-access';
+import {
+  assertMcpClientApprovedForWorkspaces,
+  filterMcpClientApprovedWorkspaces,
+} from '../lib/enterprise-controls';
+import {
+  NOTION_DATABASE_VIEW_TYPES,
+  parseDatabaseViewType,
+  type NotionDatabaseViewType,
+} from '../lib/database-view-types';
+import {
+  assertRequiredNotionViewConfigure,
+  notionViewConfigurePlan,
+  parseNotionViewConfigDsl,
+  type NotionViewDslProperty,
+} from '../lib/notion-view-config-dsl';
+import {
+  normalizeNotionMoveDestination,
+  normalizeNotionMovePageIds,
+  notionMoveBatchPositions,
+  NOTION_MOVE_PAGES_MAX_IDS,
+  type NotionMovePagesDestination,
+} from '../lib/notion-move-pages-contract';
+import {
+  notionMcpDdlPatch,
+  notionMcpPropertySchema,
+  notionMcpPropertySchemaMap,
+  notionMcpTypedDatabaseProperties,
+  parseNotionMcpCreateTable,
+  parseNotionMcpDdl,
+  type NotionMcpDatabaseType,
+} from '../lib/notion-mcp-database';
+import {
+  executeStreamableNotionMcpSqlChunk,
+  notionMcpSqlStreamPlan,
+  NOTION_MCP_SQL_CROSS_WINDOW_ERROR,
+  parseNotionMcpSqlUnion,
+} from '../lib/notion-mcp-query';
+import { POST as blockMutationHandler } from './block-mutation';
+import { POST as databaseMutationHandler } from './database-mutation';
+import { POST as databaseRowMutationHandler } from './database-row-mutation';
 import { POST as duplicatePageHandler } from './duplicate-page';
+import {
+  createNotionFileUpload,
+  deleteNotionFileUpload,
+  sendNotionFileUpload,
+  POST as fileMutationHandler,
+} from './file-mutation';
 import { notionCompatHandler } from './notion/v1/[...slug]';
 import { POST as pageMutationHandler } from './page-mutation';
+import { POST as pageQueryHandler } from './page-query';
 import {
   type DbRef,
   type McpOAuthGrant,
@@ -17,6 +70,7 @@ import {
   listAll,
   optionsResponse,
   publicGrant,
+  revokeLegacyBroadMcpGrant,
   revokeMcpGrantFamily,
   verifyAccessToken,
 } from '../lib/mcp-oauth';
@@ -24,6 +78,8 @@ import {
 interface FunctionContext {
   request: Request;
   env?: Record<string, unknown>;
+  storage?: unknown;
+  waitUntil?: (promise: Promise<unknown>) => void;
   admin: {
     db(namespace: string): DbRef;
   };
@@ -42,11 +98,48 @@ interface PageRecord {
   title?: string | null;
   position?: number | null;
   inTrash?: boolean | null;
+  createdBy?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  properties?: Record<string, unknown> | null;
 }
 
 interface BlockRecord {
   id: string;
   pageId: string;
+  parentId?: string | null;
+  type?: string | null;
+  plainText?: string | null;
+  content?: Record<string, unknown> | null;
+  position?: number | null;
+}
+
+interface CommentRecord {
+  id: string;
+  pageId: string;
+  blockId?: string | null;
+  parentId?: string | null;
+  authorId?: string | null;
+  body?: Record<string, unknown> | null;
+  resolved?: boolean | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+interface AttachmentUploadRecord {
+  id: string;
+  workspaceId: string;
+  name?: string | null;
+  contentType?: string | null;
+  size?: number | null;
+  status?: string | null;
+  pageId?: string | null;
+  blockId?: string | null;
+  databaseId?: string | null;
+  propertyId?: string | null;
+  templateId?: string | null;
+  expiresAt?: string | null;
+  fileImportResult?: unknown;
 }
 
 interface DbPropertyRecord {
@@ -87,10 +180,6 @@ interface McpAsyncTask {
   updatedAt?: string;
 }
 
-type InternalFunctionHandler =
-  | ((context: unknown) => Promise<unknown> | unknown)
-  | { handler?: (context: unknown) => Promise<unknown> | unknown };
-
 interface JsonRpcRequest {
   jsonrpc?: string;
   id?: string | number | null;
@@ -99,7 +188,7 @@ interface JsonRpcRequest {
 }
 
 export const MAX_MCP_JSON_RPC_BATCH_ITEMS = 50;
-export const MAX_MCP_MOVE_PAGE_IDS = 50;
+export const MAX_MCP_MOVE_PAGE_IDS = NOTION_MOVE_PAGES_MAX_IDS;
 export const MAX_MCP_CREATE_PAGES = 25;
 export const MAX_MCP_REQUEST_JSON_DEPTH = 32;
 export const MAX_MCP_REQUEST_JSON_NODES = 100_000;
@@ -108,6 +197,23 @@ export const MAX_MCP_MARKDOWN_BLOCKS = 1_000;
 export const MAX_MCP_COMMENT_RICH_TEXT_ITEMS = 100;
 export const MAX_MCP_COMMENT_TEXT_BYTES = 256 * 1024;
 export const MAX_MCP_COMMENT_RICH_TEXT_JSON_BYTES = 768 * 1024;
+export const MAX_MCP_INLINE_ATTACHMENT_BYTES = 200 * 1024;
+export const MAX_MCP_URL_ATTACHMENT_BYTES = 5 * 1024 * 1024;
+const MAX_MCP_MEETING_NOTE_RESULTS = 50;
+const MAX_MCP_MEETING_NOTE_AUTHORITY_PAGES = 2_500;
+export const MCP_ATTACHMENT_TTL_MS = 60 * 60 * 1000;
+
+const MCP_TEXT_ATTACHMENT_TYPES = new Map([
+  ['md', 'text/markdown'],
+  ['markdown', 'text/markdown'],
+  ['txt', 'text/plain'],
+  ['csv', 'text/csv'],
+  ['json', 'application/json'],
+  ['yaml', 'application/yaml'],
+  ['yml', 'application/yaml'],
+  ['tsv', 'text/tab-separated-values'],
+  ['ics', 'text/calendar'],
+]);
 
 const COMPATIBILITY_REPORT_URI = 'notion://docs/mcp-compatibility-report';
 const ENHANCED_MARKDOWN_URI = 'notion://docs/enhanced-markdown-spec';
@@ -234,15 +340,38 @@ function stripHanjiId(value: unknown) {
   try {
     const url = new URL(raw);
     const pageMatch = url.pathname.match(/\/(?:p|database)\/([0-9a-f-]{32,36})/i);
-    if (pageMatch) return pageMatch[1];
+    if (pageMatch) return notionUuid(pageMatch[1]);
+    const trailingId = decodeURIComponent(url.pathname)
+      .match(/(?:^|[-/])([0-9a-f]{32}|[0-9a-f-]{36})\/?$/i)?.[1];
+    if (trailingId) return notionUuid(trailingId);
     const blockMatch = url.hash.match(/block-([0-9a-f-]{32,36})/i);
-    if (blockMatch) return blockMatch[1];
+    if (blockMatch) return notionUuid(blockMatch[1]);
     const view = url.searchParams.get('v');
-    if (view) return view;
+    if (view) return notionUuid(view);
   } catch {
     // fall through
   }
   return raw;
+}
+
+function notionUuid(value: string) {
+  const compact = value.replaceAll('-', '');
+  if (!/^[0-9a-f]{32}$/i.test(compact)) return value;
+  return `${compact.slice(0, 8)}-${compact.slice(8, 12)}-${compact.slice(12, 16)}-${compact.slice(16, 20)}-${compact.slice(20)}`;
+}
+
+function notionViewId(value: unknown) {
+  const raw = textValue(value);
+  if (!raw) return '';
+  const viewUri = raw.match(/^view:\/\/(.+)$/i)?.[1];
+  if (viewUri) return notionUuid(viewUri.trim());
+  try {
+    const queryView = new URL(raw).searchParams.get('v');
+    if (queryView) return notionUuid(queryView);
+  } catch {
+    // Fall back to a bare id or another supported Hanji id form.
+  }
+  return stripHanjiId(raw);
 }
 
 function selectedWorkspaceId(input: Record<string, unknown>) {
@@ -253,13 +382,6 @@ function pageSize(value: unknown, fallback = 25, max = 100) {
   const number = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(number)) return fallback;
   return Math.max(1, Math.min(max, Math.floor(number)));
-}
-
-function positionBetween(a?: number | null, b?: number | null) {
-  if (a == null && b == null) return 1;
-  if (a == null) return (b ?? 1) / 2;
-  if (b == null) return a + 1;
-  return (a + b) / 2;
 }
 
 function titleOf(page: PageRecord | null | undefined) {
@@ -273,16 +395,6 @@ function normalizeParentType(value: unknown, parentId: string | null): PageParen
   return 'page';
 }
 
-function siblingPages(pages: PageRecord[], parentId: string | null, parentType: PageParentType, excludeId: string) {
-  return pages
-    .filter((page) => {
-      if (page.inTrash || page.id === excludeId) return false;
-      if (parentType === 'workspace') return !page.parentId || page.parentType === 'workspace';
-      return page.parentId === parentId && page.parentType === parentType;
-    })
-    .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
-}
-
 function toolJson(payload: unknown, isError = false) {
   return {
     isError,
@@ -293,6 +405,14 @@ function toolJson(payload: unknown, isError = false) {
       },
     ],
     structuredContent: typeof payload === 'string' ? { text: payload } : payload,
+  };
+}
+
+function toolTextWithStructured(text: string, structuredContent: Record<string, unknown>) {
+  return {
+    isError: false,
+    content: [{ type: 'text', text }],
+    structuredContent,
   };
 }
 
@@ -425,31 +545,94 @@ function unauthorized(context: FunctionContext) {
   );
 }
 
+class McpAuthenticationError extends Error {
+  override name = 'McpAuthenticationError';
+}
+
+function asyncTaskHttpError(
+  context: FunctionContext,
+  status: number,
+  code: string,
+  message: string,
+) {
+  const headers = mcpHeaders(context.request);
+  headers.set('Cache-Control', 'no-store');
+  return json({ object: 'error', code, message }, { status, headers });
+}
+
+function asyncTaskInternalError(context: FunctionContext, error: unknown) {
+  const candidate = error && typeof error === 'object'
+    ? Number((error as { status?: unknown; code?: unknown }).status
+      ?? (error as { status?: unknown; code?: unknown }).code)
+    : NaN;
+  const status = Number.isInteger(candidate) && candidate >= 500 && candidate <= 599
+    ? candidate
+    : 500;
+  return asyncTaskHttpError(
+    context,
+    status,
+    'internal_server_error',
+    'Async task status is temporarily unavailable.',
+  );
+}
+
+function isMcpClientGovernanceDenial(error: unknown): error is Error {
+  return error instanceof Error
+    && error.message === 'This MCP client is not approved for the selected workspace.';
+}
+
 async function authenticatedGrant(context: FunctionContext) {
   const raw = bearerToken(context.request);
   if (!raw) return null;
-  const token = await verifyAccessToken(raw, context.env, context.request);
-  const grant = await context.admin.db('app').table<McpOAuthGrant>('mcp_oauth_grants').getOne(token.grant_id);
-  if (!grantIsActive(grant)) throw new Error('MCP grant is revoked or expired.');
-  if (grant!.userId !== token.sub || grant!.clientId !== token.client_id) {
-    throw new Error('MCP grant does not match the access token.');
+  const db = context.admin.db('app');
+  let token: Awaited<ReturnType<typeof verifyAccessToken>>;
+  try {
+    token = await verifyAccessToken(raw, context.env, context.request);
+  } catch (error) {
+    if (
+      error instanceof Error
+      && error.message === 'HANJI_MCP_OAUTH_SECRET is required for hosted MCP OAuth.'
+    ) {
+      throw error;
+    }
+    throw new McpAuthenticationError('MCP access token is invalid.');
   }
-  if ((await grantAccessibleWorkspaces(context.admin.db('app'), grant!)).length === 0) {
+  let grant: McpOAuthGrant | null;
+  try {
+    grant = await db.table<McpOAuthGrant>('mcp_oauth_grants').getOne(token.grant_id);
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      throw new McpAuthenticationError('MCP grant is revoked or expired.');
+    }
+    throw error;
+  }
+  if (!grant || !grantIsActive(grant)) {
+    throw new McpAuthenticationError('MCP grant is revoked or expired.');
+  }
+  if (grant.userId !== token.sub || grant.clientId !== token.client_id) {
+    throw new McpAuthenticationError('MCP grant does not match the access token.');
+  }
+  if (await revokeLegacyBroadMcpGrant(db, grant)) {
+    throw new McpAuthenticationError(
+      'MCP grant requires reauthorization with an explicit workspace selection.',
+    );
+  }
+  const accessible = await grantAccessibleWorkspaces(db, grant);
+  if (accessible.length === 0) {
     await revokeMcpGrantFamily(
-      context.admin.db('app'),
-      grant!.id,
+      db,
+      grant.id,
       'system:workspace-access-lost',
     ).catch((error) => {
       console.error('[mcp] failed to revoke inaccessible grant:', error);
     });
-    throw new Error('MCP grant no longer has workspace access.');
+    throw new McpAuthenticationError('MCP grant no longer has workspace access.');
   }
   await bestEffort(
     'mcp grant lastUsedAt update',
-    context.admin.db('app').table<McpOAuthGrant>('mcp_oauth_grants')
-      .update(grant!.id, { lastUsedAt: new Date().toISOString() }),
+    db.table<McpOAuthGrant>('mcp_oauth_grants').update(grant.id, { lastUsedAt: new Date().toISOString() }),
   );
-  return { token, grant: grant! };
+  return { token, grant };
 }
 
 const notionSearchSchema = objectSchema({
@@ -460,7 +643,8 @@ const notionSearchSchema = objectSchema({
   page_url: stringSchema('Optional page URL/id for clients that provide it.'),
   workspace_id: stringSchema('Required Hanji workspace id. Call list_workspaces or _notion_get_teams first.'),
   teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
-  page_size: numberSchema('1-100 results.'),
+  page_size: { type: 'integer', minimum: 1, maximum: 25, description: '1-25 results.' },
+  max_highlight_length: { type: 'integer', minimum: 0, maximum: 1000, description: 'Maximum highlight characters; 0 omits highlights.' },
   start_cursor: stringSchema('Pagination cursor.'),
   filters: jsonObjectSchema,
 });
@@ -470,22 +654,80 @@ const notionFetchSchema = objectSchema({
   workspace_id: stringSchema('Required Hanji workspace id.'),
   teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
   include_discussions: booleanSchema('Include page comments summary where supported.'),
+  include_transcript: booleanSchema('Include attendee-authorized AI meeting-note transcript content for the fetched page.'),
 });
 
-const notionQueryDataSourcesSchema = objectSchema({
-  data: {
-    type: 'object',
-    description: 'Use {workspace_id, data_source_id|data_source_url|data_source_urls, query, filter, sorts, page_size, start_cursor}.',
-    additionalProperties: true,
+const notionCreateAttachmentSchema = objectSchema({
+  workspace_id: stringSchema('Required Hanji workspace id.'),
+  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+  filename: stringSchema('Filename with a supported extension.'),
+  content_type: stringSchema('Optional MIME type matching filename.'),
+  content: stringSchema('Small UTF-8 text content, at most 200 KiB. Exactly one of content or source_url is required.'),
+  source_url: stringSchema('Direct public HTTPS URL with no redirects or private-network target. Exactly one source is required.'),
+}, ['filename']);
+
+const notionDownloadAttachmentSchema = objectSchema({
+  file_upload_id: stringSchema('FileUpload id returned by notion-create-attachment.'),
+}, ['file_upload_id']);
+
+const notionQueryDataSourcesSchema = {
+  type: 'object',
+  properties: {
+    data: {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            workspace_id: stringSchema('Required Hanji workspace id.'),
+            teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+            mode: { type: 'string', enum: ['sql'] },
+            data_source_urls: { ...arrayOf(stringSchema('collection:// data source URL.')), minItems: 1 },
+            query: stringSchema('Read-only SELECT SQL.'),
+            start_cursor: stringSchema('Opaque continuation cursor for bounded SQL source scanning.'),
+            params: {
+              type: 'array',
+              maxItems: 256,
+              items: {
+                oneOf: [
+                  { type: 'string' },
+                  { type: 'number' },
+                  { type: 'boolean' },
+                  { type: 'null' },
+                ],
+              },
+              description: 'Bind values. Strings, finite numbers, booleans, and null are accepted without interpolation.',
+            },
+          },
+          required: ['data_source_urls', 'query'],
+          additionalProperties: false,
+        },
+        {
+          type: 'object',
+          properties: {
+            workspace_id: stringSchema('Required Hanji workspace id.'),
+            teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+            mode: { type: 'string', enum: ['view'] },
+            view_url: stringSchema('Database view URL or view:// id.'),
+            is_archived: booleanSchema('Query archived rows instead of active rows.'),
+            page_size: numberSchema('1-100 rows.'),
+            start_cursor: stringSchema('Pagination cursor.'),
+          },
+          required: ['mode', 'view_url'],
+          additionalProperties: false,
+        },
+      ],
+    },
   },
-}, ['data']);
+  required: ['data'],
+  additionalProperties: false,
+};
 
 const notionQueryDatabaseViewSchema = objectSchema({
   workspace_id: stringSchema('Required Hanji workspace id.'),
   teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
   view_id: stringSchema('View id, view:// URI, or Notion URL with ?v=.'),
   view_url: stringSchema('View URL, view:// URI, or Notion URL with ?v=.'),
-  query: stringSchema('Optional search text applied on top of the saved view.'),
+  is_archived: booleanSchema('Query archived rows instead of active rows.'),
   page_size: numberSchema('1-100 results.'),
   start_cursor: stringSchema('Pagination cursor.'),
 });
@@ -517,26 +759,54 @@ const notionCreatePagesSchema = objectSchema({
   allow_async: booleanSchema('Return a Notion-style async task handle.'),
 }, ['pages']);
 
-const notionUpdatePageSchema = objectSchema({
-  workspace_id: stringSchema('Required Hanji workspace id.'),
-  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
-  page_id: stringSchema('Page id or URL.'),
-  pageId: stringSchema('Page id or URL.'),
-  command: {
-    type: 'string',
-    enum: ['update_properties', 'insert_content', 'replace_content', 'update_content', 'apply_template', 'update_verification'],
-  },
-  template_id: stringSchema('Database template id used by apply_template.'),
-  title: stringSchema(),
-  properties: jsonObjectSchema,
-  content: stringSchema('Markdown-ish content.'),
-  new_str: stringSchema('Replacement or inserted Markdown-ish content.'),
-  position: jsonObjectSchema,
-  icon: stringSchema(),
-  cover: stringSchema(),
-  locked: booleanSchema(),
-  allow_async: booleanSchema('Return a Notion-style async task handle.'),
-});
+const notionUpdatePageSchema = {
+  ...objectSchema({
+    workspace_id: stringSchema('Required Hanji workspace id.'),
+    teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+    page_id: stringSchema('Page id or URL.'),
+    pageId: stringSchema('Page id or URL.'),
+    command: {
+      type: 'string',
+      enum: ['update_properties', 'insert_content', 'replace_content', 'update_content', 'apply_template', 'update_verification'],
+    },
+    template_id: stringSchema('Database template id used by apply_template.'),
+    title: stringSchema(),
+    properties: jsonObjectSchema,
+    content: stringSchema('Markdown-ish content. For replace_content, content or new_str is required.'),
+    new_str: stringSchema('Replacement or inserted Markdown-ish content. May be empty only when explicitly supplied.'),
+    content_updates: {
+      ...arrayOf(objectSchema({
+        old_str: stringSchema('Existing content to replace.'),
+        new_str: stringSchema('Replacement content.'),
+        replace_all_matches: booleanSchema('Replace every match instead of requiring one unambiguous match.'),
+      }, ['old_str', 'new_str'])),
+      minItems: 1,
+      maxItems: 100,
+    },
+    position: objectSchema({
+      type: { type: 'string', enum: ['start', 'end'] },
+    }, ['type']),
+    after: stringSchema('Ellipsis selection after which insert_content adds content.'),
+    allow_deleting_content: booleanSchema(
+      'For replace_content and update_content, permit deletion of child pages or databases.',
+    ),
+    icon: stringSchema(),
+    cover: stringSchema(),
+    locked: booleanSchema(),
+    verification_status: { type: 'string', enum: ['verified', 'unverified'] },
+    verification_expiry_days: numberSchema('Optional positive number of days before verification expires.'),
+    allow_async: booleanSchema('Return a Notion-style async task handle.'),
+  }),
+  allOf: [{
+    if: {
+      properties: { command: { const: 'replace_content' } },
+      required: ['command'],
+    },
+    then: {
+      anyOf: [{ required: ['new_str'] }, { required: ['content'] }],
+    },
+  }],
+};
 
 const notionDuplicatePageSchema = objectSchema({
   workspace_id: stringSchema('Required Hanji workspace id.'),
@@ -555,8 +825,16 @@ const notionDuplicatePageSchema = objectSchema({
 const notionMovePagesSchema = objectSchema({
   workspace_id: stringSchema('Required Hanji workspace id.'),
   teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
-  page_or_database_ids: arrayOf(stringSchema('Page or database id/URL to move.')),
-  page_ids: arrayOf(stringSchema('Alternative page id list.')),
+  page_or_database_ids: {
+    ...arrayOf(stringSchema('Page or database id/URL to move.')),
+    minItems: 1,
+    maxItems: NOTION_MOVE_PAGES_MAX_IDS,
+  },
+  page_ids: {
+    ...arrayOf(stringSchema('Alternative page id list.')),
+    minItems: 1,
+    maxItems: NOTION_MOVE_PAGES_MAX_IDS,
+  },
   page_id: stringSchema('Single page id.'),
   new_parent: {
     type: 'object',
@@ -584,17 +862,78 @@ const notionMovePagesSchema = objectSchema({
   before_page_id: stringSchema('Destination sibling to place before.'),
 });
 
-const notionCommentSchema = objectSchema({
+const notionGetCommentsSchema = objectSchema({
   workspace_id: stringSchema('Required Hanji workspace id.'),
   teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
-  page_id: stringSchema(),
-  block_id: stringSchema(),
-  comment_id: stringSchema(),
-  discussion_id: stringSchema(),
+  page_id: stringSchema('Page id.'),
+  include_all_blocks: booleanSchema('Include discussions anchored to child blocks.'),
+  include_resolved: booleanSchema('Include resolved discussions.'),
+  discussion_id: stringSchema('Specific discussion id or discussion:// URL.'),
+}, ['page_id']);
+
+const notionCreateCommentSchema = objectSchema({
+  workspace_id: stringSchema('Required Hanji workspace id.'),
+  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+  page_id: stringSchema('Page id.'),
+  selection_with_ellipsis: stringSchema('A unique page-content selection, using ... between its beginning and end.'),
+  discussion_id: stringSchema('Existing discussion id or discussion:// URL to reply to.'),
+  markdown: stringSchema('Notion-flavored inline Markdown comment body.'),
   rich_text: arrayOf(jsonObjectSchema),
-  text: stringSchema('Plain text comment body.'),
-  resolved: booleanSchema(),
+}, ['page_id']);
+
+const notionCreateDatabaseSchema = objectSchema({
+  workspace_id: stringSchema('Required Hanji workspace id.'),
+  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+  title: stringSchema('Database title.'),
+  description: stringSchema('Database description.'),
+  parent: {
+    type: 'object',
+    properties: { type: { type: 'string', enum: ['page_id'] }, page_id: stringSchema('Parent page id.') },
+    required: ['page_id'],
+    additionalProperties: false,
+  },
+  schema: stringSchema('CREATE TABLE statement defining the data-source schema.'),
+  database_type: { type: 'string', enum: ['tasks', 'projects', 'skills'] },
 });
+
+const notionUpdateDataSourceSchema = objectSchema({
+  workspace_id: stringSchema('Required Hanji workspace id.'),
+  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+  data_source_id: stringSchema('collection:// URI, data source id, or single-source database id.'),
+  title: stringSchema('New data-source title.'),
+  description: stringSchema('New data-source description.'),
+  is_inline: booleanSchema('Display a single-source database inline or as a full page.'),
+  in_trash: booleanSchema('Move the data source to or from trash.'),
+  statements: stringSchema('Semicolon-separated ADD/DROP/RENAME/ALTER COLUMN statements.'),
+}, ['data_source_id']);
+
+const notionCreateViewSchema = {
+  ...objectSchema({
+    workspace_id: stringSchema('Required Hanji workspace id.'),
+    teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+    database_id: stringSchema('Database that receives a view tab. Exactly one of database_id or parent_page_id is required.'),
+    parent_page_id: stringSchema('Page that receives an inline linked database view. Exactly one of parent_page_id or database_id is required.'),
+    data_source_id: stringSchema('Data source referenced by the new view. Accepts a collection:// URI or bare id.'),
+    name: stringSchema('Name of the view.'),
+    type: {
+      type: 'string',
+      enum: [...NOTION_DATABASE_VIEW_TYPES],
+    },
+    configure: stringSchema('View DSL. Supports FILTER, SORT BY, GROUP BY, CALENDAR BY, TIMELINE BY, MAP BY, CHART, FORM, SHOW, HIDE, COVER, WRAP CELLS, and FREEZE COLUMNS.'),
+  }, ['data_source_id', 'name', 'type']),
+  oneOf: [
+    { required: ['database_id'], not: { required: ['parent_page_id'] } },
+    { required: ['parent_page_id'], not: { required: ['database_id'] } },
+  ],
+};
+
+const notionUpdateViewSchema = objectSchema({
+  workspace_id: stringSchema('Required Hanji workspace id.'),
+  teamspace_id: stringSchema('Notion-compatible alias for workspace_id.'),
+  view_id: stringSchema('View id, view:// URI, or Notion URL with ?v=.'),
+  name: stringSchema('New name for the view.'),
+  configure: stringSchema('View DSL. Supports FILTER, SORT BY, GROUP BY, CALENDAR BY, TIMELINE BY, MAP BY, CHART, FORM, SHOW, HIDE, COVER, WRAP CELLS, FREEZE COLUMNS, and CLEAR directives.'),
+}, ['view_id']);
 
 const notionAsyncTaskSchema = objectSchema({
   task_id: stringSchema('Async task id returned by a previous hosted MCP operation.'),
@@ -672,7 +1011,7 @@ const hostedTools: ToolDefinition[] = [
   {
     name: 'fetch',
     title: 'Fetch',
-    description: 'Fetch a Hanji page, block, database, or collection:// data source using its semantic read scope. Database pages and rows use databases:read; normal pages use pages:read; self uses workspace:read.',
+    description: 'Fetch a Hanji page, block, database, or collection:// data source using its semantic read scope. Set include_transcript for real attendee-authorized meeting-note transcripts. Database pages and rows use databases:read; normal pages use pages:read; self uses workspace:read.',
     inputSchema: notionFetchSchema,
   },
   {
@@ -684,19 +1023,31 @@ const hostedTools: ToolDefinition[] = [
   {
     name: 'notion-fetch',
     title: 'Fetch',
-    description: 'Official Notion MCP-compatible fetch. Supports self (workspace:read), normal pages (pages:read), and database pages/rows or collection:// ids (databases:read).',
+    description: 'Official Notion MCP-compatible fetch. Supports attendee-authorized meeting-note transcripts with include_transcript, self (workspace:read), normal pages (pages:read), and database pages/rows or collection:// ids (databases:read).',
     inputSchema: notionFetchSchema,
+  },
+  {
+    name: 'notion-create-attachment',
+    title: 'Create attachment',
+    description: 'Create a real temporary Hanji file upload from small UTF-8 content or a direct public HTTPS source. Requires files:write and an explicit workspace_id. Inline content supports safe Markdown, text, CSV, JSON, YAML, TSV, and calendar files up to 200 KiB; URL imports are capped at 5 MiB.',
+    inputSchema: notionCreateAttachmentSchema,
+  },
+  {
+    name: 'notion-download-attachment',
+    title: 'Download attachment',
+    description: 'Download a small UTF-8 text attachment created by this MCP grant. Requires files:read and returns complete content up to 200 KiB.',
+    inputSchema: notionDownloadAttachmentSchema,
   },
   {
     name: '_notion_query_data_sources',
     title: 'Query data sources',
-    description: 'Notion-compatible data source query for Hanji databases. Requires databases:read.',
+    description: 'Notion-compatible data source query for Hanji databases. Requires databases:read. SQL mode streams one collection:// source with bind-safe filters, projections, direct-property multi-key ordering, LIMIT/OFFSET, and opaque continuation; cross-window joins, CTEs/subqueries, DISTINCT, grouping/aggregates, unions, and computed ordering fail before row reads. View mode queries saved database views.',
     inputSchema: notionQueryDataSourcesSchema,
   },
   {
     name: 'notion-query-data-sources',
     title: 'Query data sources',
-    description: 'Official Notion MCP-compatible data source query for Hanji databases.',
+    description: 'Official Notion MCP-compatible data source query for Hanji databases. SQL mode streams one collection:// source with bind-safe filters, projections, direct-property multi-key ordering, LIMIT/OFFSET, and opaque continuation; cross-window SQL shapes fail before row reads.',
     inputSchema: notionQueryDataSourcesSchema,
   },
   {
@@ -708,25 +1059,25 @@ const hostedTools: ToolDefinition[] = [
   {
     name: '_notion_create_pages',
     title: 'Create pages',
-    description: 'Notion-compatible page/row creation name and schema. Hanji validates output/destination write scopes (and template databases:read), then returns an explicit unsupported error because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
+    description: 'Notion-compatible page/row creation through Hanji\'s canonical mutation facade, with output/destination write scopes, template reads, and partial-failure retry metadata.',
     inputSchema: notionCreatePagesSchema,
   },
   {
     name: 'notion-create-pages',
     title: 'Create pages',
-    description: 'Official Notion MCP-compatible page/row creation name and schema. Hanji validates semantic scopes before allow_async, then records/returns an explicit unsupported result because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
+    description: 'Official Notion MCP-compatible page/row creation through Hanji\'s canonical mutation facade. Semantic scopes are validated before synchronous execution or a persisted async result.',
     inputSchema: notionCreatePagesSchema,
   },
   {
     name: '_notion_update_page',
     title: 'Update page',
-    description: 'Notion-compatible page update name and schema. Hanji validates pages:write or databases:write (plus template databases:read), then returns an explicit unsupported error because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
+    description: 'Notion-compatible page update through Hanji\'s canonical page, row, block, template, and verification mutation paths.',
     inputSchema: notionUpdatePageSchema,
   },
   {
     name: 'notion-update-page',
     title: 'Update page',
-    description: 'Official Notion MCP-compatible page update name and schema. Hanji validates target/template scopes before allow_async, then records/returns an explicit unsupported result because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
+    description: 'Official Notion MCP-compatible page update. Target and template scopes are validated before canonical synchronous execution or a persisted async result.',
     inputSchema: notionUpdatePageSchema,
   },
   {
@@ -756,91 +1107,97 @@ const hostedTools: ToolDefinition[] = [
   {
     name: '_notion_create_database',
     title: 'Create database',
-    description: 'Notion-compatible database creation name and schema. Hanji validates databases:write and the destination page scope, then returns an explicit unsupported error because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
-    inputSchema: jsonObjectSchema,
+    description: 'Notion-compatible database creation through Hanji\'s canonical database mutation facade with destination and database write-scope enforcement.',
+    inputSchema: notionCreateDatabaseSchema,
   },
   {
     name: 'notion-create-database',
     title: 'Create database',
-    description: 'Official Notion MCP-compatible database creation name and schema. Hanji validates databases:write plus any destination page scope, then returns an explicit unsupported result because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
-    inputSchema: jsonObjectSchema,
+    description: 'Official Notion MCP-compatible database creation through Hanji\'s canonical mutation facade, including schema and destination validation.',
+    inputSchema: notionCreateDatabaseSchema,
   },
   {
     name: '_notion_update_data_source',
     title: 'Update data source',
-    description: 'Notion-compatible data-source update name and schema. Hanji validates databases:write, then returns an explicit unsupported error because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
-    inputSchema: jsonObjectSchema,
+    description: 'Notion-compatible data-source update through Hanji\'s canonical database schema mutation facade.',
+    inputSchema: notionUpdateDataSourceSchema,
   },
   {
     name: 'notion-update-data-source',
     title: 'Update data source',
-    description: 'Official Notion MCP-compatible data-source update name and schema. Hanji validates databases:write, then returns an explicit unsupported result because primary compatibility writes remain fail-closed until they use the canonical file lifecycle.',
-    inputSchema: jsonObjectSchema,
+    description: 'Official Notion MCP-compatible data-source update through Hanji\'s canonical schema mutation facade with database write-scope enforcement.',
+    inputSchema: notionUpdateDataSourceSchema,
   },
   {
     name: '_notion_get_comments',
     title: 'Get comments',
     description: 'List comments on a page or block.',
-    inputSchema: notionCommentSchema,
+    inputSchema: notionGetCommentsSchema,
   },
   {
     name: 'notion-get-comments',
     title: 'Get comments',
     description: 'Official Notion MCP-compatible comment listing.',
-    inputSchema: notionCommentSchema,
+    inputSchema: notionGetCommentsSchema,
   },
   {
     name: '_notion_create_comment',
     title: 'Create comment',
     description: 'Create a page or block comment. Requires comments write scope.',
-    inputSchema: notionCommentSchema,
+    inputSchema: notionCreateCommentSchema,
   },
   {
     name: 'notion-create-comment',
     title: 'Create comment',
     description: 'Official Notion MCP-compatible comment creation.',
-    inputSchema: notionCommentSchema,
+    inputSchema: notionCreateCommentSchema,
   },
   {
     name: '_notion_create_view',
     title: 'Create view',
-    description: 'Create a database view through the Notion-compatible REST facade.',
-    inputSchema: jsonObjectSchema,
+    description: 'Create a database view tab or inline linked view through the Notion-compatible REST facade. Database view creation requires databases:write; parent_page_id additionally requires pages:write. Supports all ten official view types and the official configure DSL.',
+    inputSchema: notionCreateViewSchema,
   },
   {
     name: 'notion-create-view',
     title: 'Create view',
-    description: 'Official Notion MCP-compatible view creation. Hanji supports table, board, list, gallery, calendar, and timeline.',
-    inputSchema: jsonObjectSchema,
+    description: 'Official Notion MCP-compatible view creation. Exactly one of database_id or parent_page_id is required. Database view creation requires databases:write; parent_page_id additionally requires pages:write. All ten official view types and configure directives are supported.',
+    inputSchema: notionCreateViewSchema,
   },
   {
     name: '_notion_update_view',
     title: 'Update view',
-    description: 'Update a database view through the Notion-compatible REST facade.',
-    inputSchema: jsonObjectSchema,
+    description: 'Update a database view name or configuration through the Notion-compatible REST facade.',
+    inputSchema: notionUpdateViewSchema,
   },
   {
     name: 'notion-update-view',
     title: 'Update view',
-    description: 'Official Notion MCP-compatible view update.',
-    inputSchema: jsonObjectSchema,
+    description: 'Official Notion MCP-compatible view update. Only name and the configure DSL are mutable after creation.',
+    inputSchema: notionUpdateViewSchema,
   },
   {
     name: '_notion_query_meeting_notes',
     title: 'Query meeting notes',
-    description: 'Compatibility response for Notion AI meeting notes; Hanji has no separate meeting-notes source.',
+    description: 'Query native or preserved imported meeting-note blocks with attendee and page-access enforcement.',
     inputSchema: objectSchema({
       workspace_id: stringSchema('Required Hanji workspace id.'),
       teamspace_id: stringSchema('Alias for workspace_id.'),
+      filter: jsonObjectSchema,
+      sort: arrayOf(jsonObjectSchema),
+      limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Maximum meeting notes to return.' },
     }),
   },
   {
     name: 'notion-query-meeting-notes',
     title: 'Query meeting notes',
-    description: 'Official Notion MCP-compatible unsupported response for Notion AI meeting notes.',
+    description: 'Official Notion MCP-compatible meeting-notes query over native and preserved imported artifacts.',
     inputSchema: objectSchema({
       workspace_id: stringSchema('Required Hanji workspace id.'),
       teamspace_id: stringSchema('Alias for workspace_id.'),
+      filter: jsonObjectSchema,
+      sort: arrayOf(jsonObjectSchema),
+      limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Maximum meeting notes to return.' },
     }),
   },
   {
@@ -858,7 +1215,9 @@ async function toolList() {
 }
 
 async function grantedAccessibleWorkspaces(context: FunctionContext, grant: McpOAuthGrant) {
-  return grantAccessibleWorkspaces(context.admin.db('app'), grant);
+  const db = context.admin.db('app');
+  const accessible = await grantAccessibleWorkspaces(db, grant);
+  return filterMcpClientApprovedWorkspaces(db, accessible, grant.clientId);
 }
 
 async function workspaceSelectionError(context: FunctionContext, grant: McpOAuthGrant, tool: string) {
@@ -883,8 +1242,20 @@ async function workspaceSelectionError(context: FunctionContext, grant: McpOAuth
 async function requireWorkspaceArgument(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>, tool: string) {
   const workspaceId = selectedWorkspaceId(args);
   if (workspaceId) {
-    const allowed = await grantedAccessibleWorkspaces(context, grant);
-    if (allowed.some((workspace) => workspace.id === workspaceId)) return { workspaceId };
+    const db = context.admin.db('app');
+    const accessible = await grantAccessibleWorkspaces(db, grant);
+    const selected = accessible.find((workspace) => workspace.id === workspaceId);
+    if (selected) {
+      await assertMcpClientApprovedForWorkspaces(db, [selected], {
+        actorId: grant.userId,
+        clientId: grant.clientId,
+        clientName: grant.clientName,
+        grantId: grant.id,
+        stage: 'hosted_call',
+      });
+      return { workspaceId };
+    }
+    const allowed = await filterMcpClientApprovedWorkspaces(db, accessible, grant.clientId);
     return {
       error: toolError('workspace_not_allowed', {
         tool,
@@ -896,6 +1267,17 @@ async function requireWorkspaceArgument(context: FunctionContext, grant: McpOAut
     };
   }
   return { error: await workspaceSelectionError(context, grant, tool) };
+}
+
+class NotionCompatHttpError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string | null,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'NotionCompatHttpError';
+  }
 }
 
 async function callNotionCompat(
@@ -927,6 +1309,7 @@ async function callNotionCompat(
     auth: { id: grant.userId, email: null },
     params: { slug: slug.replace(/^\/+/, '') },
     admin: context.admin,
+    storage: context.storage,
   });
   const text = await response.text();
   let payload: unknown = text;
@@ -939,58 +1322,64 @@ async function callNotionCompat(
     const message = isRecord(payload)
       ? textValue(payload.message ?? payload.error_description ?? payload.code, `HTTP ${response.status}`)
       : `HTTP ${response.status}: ${String(text).slice(0, 200)}`;
-    throw new Error(message);
+    const code = isRecord(payload) ? textValue(payload.code) || null : null;
+    throw new NotionCompatHttpError(response.status, code, message);
   }
   return payload;
 }
 
-async function callProductFunction(
+export async function callProductFunction(
   context: FunctionContext,
   grant: McpOAuthGrant,
   slug: string,
   body: Record<string, unknown>,
   handler: InternalFunctionHandler,
 ) {
-  const invoke = typeof handler === 'function' ? handler : handler.handler;
-  if (typeof invoke !== 'function') throw new Error('Internal product function handler is unavailable.');
   const urls = endpointUrls(context);
-  const request = new Request(`${urls.origin}/api/functions/${slug.replace(/^\/+/, '')}`, {
-    method: 'POST',
+  return invokeProductFunction(handler, context, body, {
+    url: `${urls.origin}/api/functions/${slug.replace(/^\/+/, '')}`,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body),
-  });
-  const result = await invoke({
-    request,
-    env: context.env,
     auth: { id: grant.userId, email: null },
-    admin: context.admin,
   });
-  if (!(result instanceof Response)) return result;
-  const text = await result.text();
-  let payload: unknown = text;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    // Keep the raw text body for diagnostics.
-  }
-  if (!result.ok) {
-    const message = isRecord(payload)
-      ? textValue(payload.message ?? payload.error_description ?? payload.code, `HTTP ${result.status}`)
-      : `HTTP ${result.status}: ${String(text).slice(0, 200)}`;
-    throw new Error(message);
-  }
-  return payload;
 }
 
 async function pageRecord(context: FunctionContext, id: string) {
   if (!id) return null;
   const db = await boundedDbForPage(context.admin, id);
   if (!db) return null;
-  return await db.table<PageRecord>('pages').getOne(id).catch(() => null);
+  try {
+    const page = await db.table<PageRecord>('pages').getOne(id);
+    if (!isRecord(page)) throw new Error('Page record response was malformed.');
+    const parentId = page.parentId;
+    const parentType = page.parentType;
+    const hasParent = typeof parentId === 'string' && !!textValue(parentId);
+    const parentIdValid = parentId === undefined || parentId === null || hasParent;
+    const parentTypeValid = parentType === undefined
+      || parentType === null
+      || parentType === 'workspace'
+      || parentType === 'page'
+      || parentType === 'database';
+    const parentPairValid = parentType === undefined
+      || parentType === null
+      || (hasParent ? parentType !== 'workspace' : parentType === 'workspace');
+    if (textValue(page.id) !== id
+      || !textValue(page.workspaceId)
+      || !parentIdValid
+      || !parentTypeValid
+      || !parentPairValid) {
+      throw new Error('Page record response was malformed.');
+    }
+    return page as unknown as PageRecord;
+  } catch (error) {
+    if (isNotFoundError(error)) return null;
+    throw error;
+  }
 }
+
+type PageRecordLookup = (id: string) => Promise<PageRecord | null>;
 
 // Dormant-until-set consent narrowing: when the grant's pageIds/databaseIds
 // allowlists are non-empty, every resource-targeted operation must stay inside
@@ -1004,7 +1393,12 @@ function grantResourceAllowlist(grant: McpOAuthGrant): Set<string> | null {
   return ids.length ? new Set(ids) : null;
 }
 
-async function pageWithinGrantAllowlist(context: FunctionContext, grant: McpOAuthGrant, page: PageRecord) {
+async function pageWithinGrantAllowlist(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  page: PageRecord,
+  lookup: PageRecordLookup = (id) => pageRecord(context, id),
+) {
   const allowlist = grantResourceAllowlist(grant);
   if (!allowlist) return true;
   const workspaceId = page.workspaceId;
@@ -1016,7 +1410,7 @@ async function pageWithinGrantAllowlist(context: FunctionContext, grant: McpOAut
     visited.add(current.id);
     const parentId = textValue(current.parentId);
     if (!parentId) break;
-    current = await pageRecord(context, parentId);
+    current = await lookup(parentId);
   }
   return false;
 }
@@ -1201,7 +1595,13 @@ async function asyncTaskForGrant(
   grant: McpOAuthGrant,
   taskId: string,
 ) {
-  const task = await context.admin.db('app').table<McpAsyncTask>('mcp_async_tasks').getOne(taskId).catch(() => null);
+  let task: McpAsyncTask | null;
+  try {
+    task = await context.admin.db('app').table<McpAsyncTask>('mcp_async_tasks').getOne(taskId);
+  } catch (error) {
+    if (isNotFoundError(error)) return null;
+    throw error;
+  }
   if (!task || task.grantId !== grant.id || task.userId !== grant.userId || task.clientId !== grant.clientId) {
     return null;
   }
@@ -1212,42 +1612,79 @@ async function recordAsyncTask(
   context: FunctionContext,
   grant: McpOAuthGrant,
   operationName: string,
-  status: 'succeeded' | 'failed',
-  payload: unknown,
+  workspaceId: string,
 ) {
   const now = new Date().toISOString();
   const task = await context.admin.db('app').table<McpAsyncTask>('mcp_async_tasks').insert({
     grantId: grant.id,
     userId: grant.userId,
     clientId: grant.clientId,
-    status,
-    operation: { surface: 'mcp', name: operationName },
-    result: status === 'succeeded' ? payload : undefined,
-    error: status === 'failed' ? payload : undefined,
+    status: 'queued',
+    operation: { surface: 'mcp', name: operationName, workspace_id: workspaceId },
     pollAfterSeconds: 1,
-    completedAt: now,
+    createdAt: now,
+    updatedAt: now,
   });
-  return publicAsyncTask(context, task);
+  return task;
+}
+
+type AsyncTaskTerminal =
+  | { status: 'succeeded'; payload: unknown }
+  | { status: 'failed'; payload: unknown };
+
+function asyncTaskFailure(error: unknown) {
+  return {
+    object: 'error',
+    message: error instanceof Error ? error.message : String(error),
+  };
+}
+
+async function queueAsyncTask(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  operationName: string,
+  workspaceId: string,
+  run: () => Promise<AsyncTaskTerminal>,
+) {
+  const table = context.admin.db('app').table<McpAsyncTask>('mcp_async_tasks');
+  const task = await recordAsyncTask(context, grant, operationName, workspaceId);
+  const work = (async () => {
+    const startedAt = new Date().toISOString();
+    await table.update(task.id, { status: 'running', updatedAt: startedAt });
+    let terminal: AsyncTaskTerminal;
+    try {
+      terminal = await run();
+    } catch (error) {
+      terminal = { status: 'failed', payload: asyncTaskFailure(error) };
+    }
+    const completedAt = new Date().toISOString();
+    await table.update(task.id, {
+      status: terminal.status,
+      // EdgeBase's D1 adapter cannot bind `undefined`. Clear the inactive
+      // terminal field explicitly so queued/running tasks always reach a
+      // durable terminal state in the real runtime, not only in fake DB tests.
+      result: terminal.status === 'succeeded' ? terminal.payload : null,
+      error: terminal.status === 'failed' ? terminal.payload : null,
+      completedAt,
+      updatedAt: completedAt,
+    });
+  })();
+  if (context.waitUntil) context.waitUntil(work);
+  else void work.catch((error) => console.error('[mcp] async task runner failed:', error));
+  return toolJson({ async_task: publicAsyncTask(context, task) });
 }
 
 async function runAsyncTask(
   context: FunctionContext,
   grant: McpOAuthGrant,
   operationName: string,
+  workspaceId: string,
   run: () => Promise<unknown>,
 ) {
-  try {
-    const result = await run();
-    return toolJson({ async_task: await recordAsyncTask(context, grant, operationName, 'succeeded', result) });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return toolJson({
-      async_task: await recordAsyncTask(context, grant, operationName, 'failed', {
-        object: 'error',
-        message,
-      }),
-    });
-  }
+  return queueAsyncTask(context, grant, operationName, workspaceId, async () => ({
+    status: 'succeeded',
+    payload: await run(),
+  }));
 }
 
 async function getAsyncTask(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
@@ -1256,6 +1693,16 @@ async function getAsyncTask(context: FunctionContext, grant: McpOAuthGrant, args
   const task = await asyncTaskForGrant(context, grant, taskId);
   if (!task) {
     return toolError('async_task_not_found', { task_id: taskId });
+  }
+  const workspaceId = textValue(task.operation?.workspace_id);
+  if (workspaceId) {
+    const selected = await requireWorkspaceArgument(
+      context,
+      grant,
+      { workspace_id: workspaceId },
+      '_notion_get_async_task',
+    );
+    if ('error' in selected) return selected.error;
   }
   return toolJson({ async_task: publicAsyncTask(context, task) });
 }
@@ -1310,6 +1757,15 @@ export function assertMcpMarkdownBounds(markdown: unknown) {
       throw new Error(`MCP Markdown content must contain at most ${MAX_MCP_MARKDOWN_BLOCKS} blocks.`);
     }
   }
+}
+
+function requireMcpReplaceContent(args: Record<string, unknown>) {
+  const markdown = args.new_str ?? args.content;
+  if (typeof markdown !== 'string') {
+    throw new Error('replace_content requires new_str or content to be a string.');
+  }
+  assertMcpMarkdownBounds(markdown);
+  return markdown;
 }
 
 export function markdownishBlocks(markdown: unknown) {
@@ -1395,35 +1851,534 @@ async function getTeams(context: FunctionContext, grant: McpOAuthGrant, args: Re
   });
 }
 
+function directNotionUserMatchesQuery(user: unknown, query: unknown) {
+  const needle = textValue(query).toLowerCase();
+  if (!needle || !isRecord(user)) return true;
+  const person = isRecord(user.person) ? user.person : null;
+  return `${textValue(user.name)}\n${textValue(user.id)}\n${textValue(person?.email)}`
+    .toLowerCase()
+    .includes(needle);
+}
+
 async function getUsers(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   requireGrantScope(grant, ['workspace:read']);
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_get_users');
   if ('error' in selected) return selected.error;
+  const userId = textValue(args.user_id);
+  if (userId === 'self') {
+    const user = await callNotionCompat(context, grant, 'GET', 'users/me', undefined, {
+      workspace_id: selected.workspaceId,
+    });
+    return toolJson({
+      object: 'list',
+      type: 'user',
+      user: {},
+      results: directNotionUserMatchesQuery(user, args.query) ? [user] : [],
+      has_more: false,
+      next_cursor: null,
+    });
+  }
+  if (userId) {
+    const user = await callNotionCompat(
+      context,
+      grant,
+      'GET',
+      `users/${encodeURIComponent(userId)}`,
+      undefined,
+      { workspace_id: selected.workspaceId },
+    );
+    return toolJson({
+      object: 'list',
+      type: 'user',
+      user: {},
+      results: directNotionUserMatchesQuery(user, args.query) ? [user] : [],
+      has_more: false,
+      next_cursor: null,
+    });
+  }
   const payload = await callNotionCompat(context, grant, 'GET', 'users', undefined, {
     workspace_id: selected.workspaceId,
+    query: args.query,
     start_cursor: args.start_cursor,
     page_size: args.page_size,
   });
-  let results = isRecord(payload) && Array.isArray(payload.results) ? payload.results : [];
-  const query = textValue(args.query).toLowerCase();
-  if (query) {
-    results = results.filter((user) => JSON.stringify(user).toLowerCase().includes(query));
+  if (!isRecord(payload) || !Array.isArray(payload.results)) {
+    throw new Error('User list response was malformed.');
   }
-  const userId = textValue(args.user_id);
-  if (userId && userId !== 'self') results = results.filter((user) => isRecord(user) && user.id === userId);
-  if (userId === 'self' && results.length) results = [results[0]];
-  return toolJson({ ...(isRecord(payload) ? payload : {}), results });
+  return toolJson(payload);
+}
+
+function notionSearchDateKey(value: unknown) {
+  const raw = textValue(value);
+  if (!raw) return '';
+  const parsed = Date.parse(raw);
+  return Number.isFinite(parsed) ? new Date(parsed).toISOString().slice(0, 10) : raw.slice(0, 10);
+}
+
+function notionSearchCreatorId(entity: Record<string, unknown>) {
+  const createdBy = isRecord(entity.created_by) ? entity.created_by : null;
+  return textValue(createdBy?.id ?? entity.createdBy ?? entity.createdById ?? entity.authorId);
+}
+
+function matchesNotionSearchFilters(entity: Record<string, unknown>, filters: unknown) {
+  if (filters === undefined) return true;
+  if (!isRecord(filters)) throw new Error('filters must be an object.');
+  if (filters.created_date_range !== undefined) {
+    if (!isRecord(filters.created_date_range)) throw new Error('filters.created_date_range must be an object.');
+    const start = textValue(filters.created_date_range.start_date);
+    const end = textValue(filters.created_date_range.end_date);
+    const created = notionSearchDateKey(entity.created_time ?? entity.createdAt ?? entity.createdTime);
+    if (!created || (start && created < start.slice(0, 10)) || (end && created > end.slice(0, 10))) return false;
+  }
+  if (filters.created_by_user_ids !== undefined) {
+    if (!Array.isArray(filters.created_by_user_ids)) {
+      throw new Error('filters.created_by_user_ids must be an array.');
+    }
+    const ids = filters.created_by_user_ids.map((value) => textValue(value)).filter(Boolean);
+    if (ids.length && !ids.includes(notionSearchCreatorId(entity))) return false;
+  }
+  const objectType = textValue(filters.value).toLowerCase();
+  const type = entity.kind === 'database' || entity.object === 'database' || entity.object === 'data_source'
+    ? 'database'
+    : 'page';
+  return !objectType || objectType === type;
+}
+
+function notionSearchPropertyTexts(entity: Record<string, unknown>) {
+  if (!isRecord(entity.properties)) return [];
+  return Object.values(entity.properties).flatMap((property) => {
+    if (!isRecord(property)) return [];
+    const value = notionSqlPropertyValue(property);
+    if (Array.isArray(value)) return [value.join(', ')];
+    if (value == null || typeof value === 'object') return [];
+    return [String(value)];
+  }).filter(Boolean);
+}
+
+function compactNotionSearchResult(
+  context: FunctionContext,
+  entity: Record<string, unknown>,
+  query: string,
+  maxHighlightLength: number,
+  workspaceId: string,
+) {
+  const titleProperty = isRecord(entity.properties)
+    ? Object.values(entity.properties).find((property) => isRecord(property) && property.type === 'title')
+    : null;
+  const title = textValue(entity.title)
+    || notionRichTextPlain(entity.title)
+    || (isRecord(titleProperty) ? notionRichTextPlain(titleProperty.title) : '')
+    || 'Untitled';
+  const values = [title, ...notionSearchPropertyTexts(entity)];
+  const needle = query.toLowerCase();
+  const matchedSource = needle
+    ? values.find((value) => value.toLowerCase().includes(needle))
+    : title;
+  if (matchedSource === undefined) return null;
+  const source = matchedSource;
+  const id = textValue(entity.id);
+  const type = entity.kind === 'database' || entity.object === 'database' || entity.object === 'data_source'
+    ? 'database'
+    : 'page';
+  return {
+    id,
+    title,
+    url: textValue(entity.url) || new URL(`/p/${encodeURIComponent(id)}`, endpointUrls(context).origin).toString(),
+    type,
+    workspace_id: workspaceId,
+    highlight: maxHighlightLength === 0 ? '' : source.slice(0, maxHighlightLength),
+    timestamp: entity.last_edited_time ?? entity.updatedAt ?? entity.created_time ?? entity.createdAt ?? null,
+  };
+}
+
+const HOSTED_DATA_SOURCE_SEARCH_MAX_PAGES = 50;
+const HOSTED_WORKSPACE_SEARCH_MAX_WINDOWS = 10;
+const HOSTED_WORKSPACE_SEARCH_CURSOR_MAX_BYTES = 16 * 1024;
+
+type HostedWorkspaceSearchPhase = 'metadata' | 'body';
+
+type HostedWorkspaceSearchCursor = {
+  v: 1;
+  kind: 'mcpWorkspaceSearch';
+  fingerprint: string;
+  phase: HostedWorkspaceSearchPhase;
+  sourceCursor?: string;
+  revision?: string;
+};
+
+function nativeSearchValueTexts(value: unknown) {
+  const texts: string[] = [];
+  const seen = new Set<object>();
+  let remainingValues = 512;
+  let remainingCharacters = 64 * 1024;
+  const visit = (candidate: unknown, depth: number) => {
+    if (depth > 8 || remainingValues <= 0 || remainingCharacters <= 0 || candidate == null) return;
+    if (
+      typeof candidate === 'string'
+      || typeof candidate === 'number'
+      || typeof candidate === 'boolean'
+    ) {
+      const text = String(candidate).trim().slice(0, remainingCharacters);
+      if (!text) return;
+      texts.push(text);
+      remainingValues -= 1;
+      remainingCharacters -= text.length;
+      return;
+    }
+    if (typeof candidate !== 'object' || seen.has(candidate)) return;
+    seen.add(candidate);
+    const values = Array.isArray(candidate)
+      ? candidate
+      : Object.values(candidate as Record<string, unknown>);
+    for (const item of values) visit(item, depth + 1);
+  };
+  visit(value, 0);
+  return texts;
+}
+
+function nativePageSearchTexts(page: PageRecord) {
+  return [textValue(page.title, 'Untitled'), ...nativeSearchValueTexts(page.properties)];
+}
+
+function nativeBlockSearchText(block: BlockRecord) {
+  const content = isRecord(block.content) ? block.content : {};
+  return [
+    textValue(block.plainText),
+    notionRichTextPlain(content.rich),
+    notionRichTextPlain(content.caption),
+    textValue(content.expression),
+    textValue(content.fileName),
+  ].filter(Boolean).join(' ');
+}
+
+function compactNativeSearchResult(
+  context: FunctionContext,
+  page: PageRecord,
+  query: string,
+  maxHighlightLength: number,
+  workspaceId: string,
+  bodyText?: string,
+) {
+  const title = textValue(page.title, 'Untitled');
+  const needle = query.toLowerCase();
+  const source = bodyText
+    ?? nativePageSearchTexts(page).find((value) => value.toLowerCase().includes(needle))
+    ?? title;
+  return {
+    id: page.id,
+    title,
+    url: new URL(`/p/${encodeURIComponent(page.id)}`, endpointUrls(context).origin).toString(),
+    type: page.kind === 'database' ? 'database' : 'page',
+    workspace_id: workspaceId,
+    highlight: maxHighlightLength === 0 ? '' : source.slice(0, maxHighlightLength),
+    timestamp: page.updatedAt ?? page.createdAt ?? null,
+  };
+}
+
+function parseHostedWorkspaceSearchCursor(
+  value: unknown,
+  fingerprint: string,
+): HostedWorkspaceSearchCursor {
+  if (
+    !isRecord(value)
+    || value.v !== 1
+    || value.kind !== 'mcpWorkspaceSearch'
+    || value.fingerprint !== fingerprint
+    || (value.phase !== 'metadata' && value.phase !== 'body')
+  ) {
+    throw Object.assign(
+      new Error('Workspace search cursor does not match this request.'),
+      { status: 400 },
+    );
+  }
+  const sourceCursor = value.sourceCursor === undefined
+    ? undefined
+    : textValue(value.sourceCursor);
+  const revision = value.revision === undefined ? undefined : textValue(value.revision);
+  if (
+    (value.sourceCursor !== undefined
+      && (!sourceCursor || new TextEncoder().encode(sourceCursor).byteLength > HOSTED_WORKSPACE_SEARCH_CURSOR_MAX_BYTES))
+    || (value.revision !== undefined && !revision)
+  ) {
+    throw Object.assign(new Error('Workspace search cursor is malformed.'), { status: 400 });
+  }
+  return {
+    v: 1,
+    kind: 'mcpWorkspaceSearch',
+    fingerprint,
+    phase: value.phase,
+    ...(sourceCursor ? { sourceCursor } : {}),
+    ...(revision ? { revision } : {}),
+  };
+}
+
+async function hostedWorkspaceSearchFingerprint(
+  grant: McpOAuthGrant,
+  args: Record<string, unknown>,
+  workspaceId: string,
+  query: string,
+  size: number,
+  maxHighlightLength: number,
+  requiredAncestorIds: string[],
+) {
+  return await mcpSqlStreamFingerprint({
+    v: 1,
+    kind: 'mcpWorkspaceSearch',
+    grantId: grant.id,
+    grantUserId: grant.userId,
+    grantScopes: [...(grant.scopes ?? [])].sort(),
+    workspaceId,
+    query,
+    size,
+    maxHighlightLength,
+    filters: args.filters ?? null,
+    pageUrl: textValue(args.page_url) || null,
+    contentSearchMode: textValue(args.content_search_mode) || 'workspace_search',
+    requiredAncestorIds,
+  });
+}
+
+async function hostedWorkspaceSearch(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  args: Record<string, unknown>,
+  workspaceId: string,
+  query: string,
+  size: number,
+  maxHighlightLength: number,
+  requiredAncestorIds: string[],
+) {
+  const fingerprint = await hostedWorkspaceSearchFingerprint(
+    grant,
+    args,
+    workspaceId,
+    query,
+    size,
+    maxHighlightLength,
+    requiredAncestorIds,
+  );
+  const cursor = args.start_cursor === undefined
+    ? undefined
+    : parseHostedWorkspaceSearchCursor(
+        await decodeSearchSourceCursor(args.start_cursor, context.env),
+        fingerprint,
+      );
+  let phase: HostedWorkspaceSearchPhase = cursor?.phase ?? 'metadata';
+  let sourceCursor = cursor?.sourceCursor;
+  let expectedRevision = cursor?.revision;
+  const results: Record<string, unknown>[] = [];
+  const seenCursors = new Set(sourceCursor ? [`${phase}:${sourceCursor}`] : []);
+  let nextState: HostedWorkspaceSearchCursor | undefined;
+
+  for (let window = 0; window < HOSTED_WORKSPACE_SEARCH_MAX_WINDOWS; window += 1) {
+    const remaining = Math.max(0, size - results.length);
+    const sourceLimit = Math.max(1, remaining);
+    const requestedCursor = sourceCursor;
+    const payload = await callProductFunction(
+      context,
+      grant,
+      'page-query',
+      phase === 'metadata'
+        ? {
+            action: 'searchPages',
+            workspaceId,
+            query,
+            limit: sourceLimit,
+            includePaginationMeta: true,
+            ...(requiredAncestorIds.length ? { requiredAncestorIds } : {}),
+            ...(requestedCursor ? { sourceCursor: requestedCursor } : {}),
+          }
+        : {
+            action: 'searchBlocks',
+            workspaceId,
+            query,
+            limit: sourceLimit,
+            includePaginationMeta: true,
+            dedupePages: true,
+            excludeMetadataMatches: true,
+            includePages: true,
+            ...(requiredAncestorIds.length ? { requiredAncestorIds } : {}),
+            ...(requestedCursor ? { sourceCursor: requestedCursor } : {}),
+          },
+      pageQueryHandler,
+    );
+    if (!isRecord(payload)) throw new Error('Workspace search source response was malformed.');
+    const revision = textValue(payload.revision);
+    if (!revision || (expectedRevision && revision !== expectedRevision)) {
+      throw Object.assign(
+        new Error('Workspace search source changed while the cursor was in use. Restart the search.'),
+        { status: 409 },
+      );
+    }
+    expectedRevision = undefined;
+    const items = phase === 'metadata' ? payload.pages : payload.blocks;
+    if (!Array.isArray(items) || items.length > sourceLimit || typeof payload.hasMore !== 'boolean') {
+      throw new Error('Workspace search source response was malformed.');
+    }
+    const pagesById = phase === 'body'
+      ? new Map(
+          (Array.isArray(payload.pages) ? payload.pages : [])
+            .filter((page): page is PageRecord => isRecord(page) && !!textValue(page.id))
+            .map((page) => [page.id, page]),
+        )
+      : null;
+
+    for (const item of items) {
+      const page = phase === 'metadata'
+        ? (isRecord(item) ? item as unknown as PageRecord : null)
+        : (
+            isRecord(item)
+              ? pagesById?.get(textValue(item.pageId)) ?? null
+              : null
+          );
+      if (!page || !textValue(page.id)) {
+        throw new Error('Workspace search source response was malformed.');
+      }
+      if (!matchesNotionSearchFilters(page as unknown as Record<string, unknown>, args.filters)) continue;
+      if (results.length >= size) {
+        nextState = {
+          v: 1,
+          kind: 'mcpWorkspaceSearch',
+          fingerprint,
+          phase,
+          ...(requestedCursor ? { sourceCursor: requestedCursor } : {}),
+          revision,
+        };
+        break;
+      }
+      const bodyText = phase === 'body' && isRecord(item)
+        ? nativeBlockSearchText(item as unknown as BlockRecord)
+        : undefined;
+      results.push(compactNativeSearchResult(
+        context,
+        page,
+        query,
+        maxHighlightLength,
+        workspaceId,
+        bodyText,
+      ));
+    }
+    if (nextState) break;
+
+    if (payload.hasMore === true) {
+      const nextCursor = textValue(payload.nextCursor);
+      const cursorKey = `${phase}:${nextCursor}`;
+      if (
+        !nextCursor
+        || new TextEncoder().encode(nextCursor).byteLength > HOSTED_WORKSPACE_SEARCH_CURSOR_MAX_BYTES
+        || seenCursors.has(cursorKey)
+      ) {
+        throw new Error('Workspace search source pagination did not advance.');
+      }
+      seenCursors.add(cursorKey);
+      sourceCursor = nextCursor;
+      if (results.length >= size || window + 1 >= HOSTED_WORKSPACE_SEARCH_MAX_WINDOWS) {
+        nextState = {
+          v: 1,
+          kind: 'mcpWorkspaceSearch',
+          fingerprint,
+          phase,
+          sourceCursor,
+        };
+      }
+      if (nextState) break;
+      continue;
+    }
+    if (payload.nextCursor !== undefined) {
+      throw new Error('Workspace search source pagination was malformed.');
+    }
+    if (phase === 'metadata') {
+      phase = 'body';
+      sourceCursor = undefined;
+      if (window + 1 >= HOSTED_WORKSPACE_SEARCH_MAX_WINDOWS) {
+        nextState = {
+          v: 1,
+          kind: 'mcpWorkspaceSearch',
+          fingerprint,
+          phase,
+        };
+      }
+      if (nextState) break;
+      continue;
+    }
+    break;
+  }
+
+  return {
+    results,
+    hasMore: nextState !== undefined,
+    nextCursor: nextState
+      ? await encodeSearchSourceCursor(nextState, context.env)
+      : null,
+  };
 }
 
 async function searchNotion(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   const selected = await requireWorkspaceArgument(context, grant, args, '_search');
   if ('error' in selected) return selected.error;
+  const query = textValue(args.query);
+  const size = pageSize(args.page_size, 10, 25);
+  const requestedHighlight = typeof args.max_highlight_length === 'number'
+    ? Math.floor(args.max_highlight_length)
+    : 200;
+  const maxHighlightLength = Math.max(0, Math.min(1000, requestedHighlight));
   // User search is directory metadata, not content search. Conversely,
   // workspace:read must never satisfy any page/database search branch.
   if (args.query_type === 'user') {
     requireGrantScope(grant, ['workspace:read']);
-    return getUsers(context, grant, { ...args, workspace_id: selected.workspaceId });
+    const payload = await callNotionCompat(context, grant, 'GET', 'users', undefined, {
+      workspace_id: selected.workspaceId,
+      query,
+      start_cursor: args.start_cursor,
+      page_size: size,
+    });
+    if (!isRecord(payload)
+      || payload.object !== 'list'
+      || payload.type !== 'user'
+      || !isRecord(payload.user)
+      || !Array.isArray(payload.results)
+      || payload.results.length > size
+      || payload.results.some((user) => {
+        if (!isRecord(user)
+          || user.object !== 'user'
+          || user.type !== 'person'
+          || !textValue(user.id)
+          || !textValue(user.name)
+          || !isRecord(user.person)) {
+          return true;
+        }
+        return user.person.email !== undefined && !textValue(user.person.email);
+      })) {
+      throw new Error('User search response was malformed.');
+    }
+    const userResults = payload.results as Record<string, unknown>[];
+    const hasMore = payload.has_more;
+    const nextCursor = payload.next_cursor;
+    if (typeof hasMore !== 'boolean'
+      || (hasMore
+        ? userResults.length === 0
+          || textValue(nextCursor) !== textValue(userResults[userResults.length - 1].id)
+        : nextCursor !== null)) {
+      throw new Error('User search pagination response was malformed.');
+    }
+    const users = userResults.map((user) => {
+      const person = isRecord(user.person) ? user.person : {};
+      return {
+        id: textValue(user.id),
+        title: textValue(user.name, textValue(user.id, 'Hanji user')),
+        type: 'user',
+        email: textValue(person.email) || undefined,
+        workspace_id: selected.workspaceId,
+      };
+    });
+    return toolJson({
+      type: 'user',
+      results: users,
+      has_more: hasMore,
+      next_cursor: hasMore ? textValue(nextCursor) : null,
+    });
   }
+  const start = cursorOffset(args.start_cursor);
   const dataSourceId = collectionIdFromInput(args.data_source_url);
   if (dataSourceId) {
     // Same narrowing as queryDataSources: the caller-supplied data source must
@@ -1436,16 +2391,61 @@ async function searchNotion(context: FunctionContext, grant: McpOAuthGrant, args
       'Data source',
     );
     requireContentScope(grant, dataSource, 'read');
-    const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${dataSourceId}/query`, {
-      query: args.query,
-      filter: args.filters,
-      page_size: pageSize(args.page_size, 10),
-      start_cursor: args.start_cursor,
-    });
+    const matches: Record<string, unknown>[] = [];
+    let cursor: unknown;
+    let requestStatus: Record<string, unknown> | null = null;
+    const seenUpstreamCursors = new Set<string>();
+    for (
+      let page = 0;
+      page < HOSTED_DATA_SOURCE_SEARCH_MAX_PAGES && matches.length <= start + size;
+      page += 1
+    ) {
+      const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${dataSourceId}/query`, {
+        page_size: 100,
+        ...(cursor ? { start_cursor: cursor } : {}),
+      });
+      if (!isRecord(payload)
+        || !Array.isArray(payload.results)
+        || payload.results.some((row) => !isRecord(row)
+          || row.object !== 'page'
+          || !textValue(row.id))) {
+        throw new Error('Data source search response was malformed.');
+      }
+      const rows = payload.results as Record<string, unknown>[];
+      if (isRecord(payload.request_status) && payload.request_status.type === 'incomplete') {
+        requestStatus = payload.request_status;
+      }
+      for (const row of rows) {
+        if (!matchesNotionSearchFilters(row, args.filters)) continue;
+        const compact = compactNotionSearchResult(context, row, query, maxHighlightLength, selected.workspaceId);
+        if (!compact) continue;
+        matches.push(compact);
+      }
+      if (payload.has_more !== true) break;
+      const nextCursor = textValue(payload.next_cursor);
+      if (!nextCursor || seenUpstreamCursors.has(nextCursor)) {
+        throw new Error('Data source search pagination was malformed.');
+      }
+      if (matches.length > start + size) break;
+      if (page + 1 >= HOSTED_DATA_SOURCE_SEARCH_MAX_PAGES) {
+        requestStatus = {
+          type: 'incomplete',
+          incomplete_reason: 'search_scan_limit_reached',
+        };
+        break;
+      }
+      seenUpstreamCursors.add(nextCursor);
+      cursor = nextCursor;
+    }
+    const windowed = matches.slice(start, start + size);
+    const hasMore = start + size < matches.length;
     return toolJson({
       type: 'workspace_search',
-      results: isRecord(payload) && Array.isArray(payload.results) ? payload.results : [],
+      results: windowed,
+      has_more: hasMore,
+      next_cursor: hasMore ? String(start + size) : null,
       data_source_id: dataSourceId,
+      ...(requestStatus ? { request_status: requestStatus } : {}),
       scope: { provider: 'hanji', workspace_id: selected.workspaceId },
     });
   }
@@ -1456,66 +2456,410 @@ async function searchNotion(context: FunctionContext, grant: McpOAuthGrant, args
   // allowlist projection so the compatibility search cannot leak sibling
   // resources or pagination metadata outside the grant.
   requireAllGrantScopes(grant, ['pages:read', 'databases:read']);
-  if (grantResourceAllowlist(grant)) {
-    const query = textValue(args.query).toLowerCase();
-    const filter = isRecord(args.filters) ? args.filters : {};
-    const objectFilter = textValue(filter.value).toLowerCase();
-    const start = cursorOffset(args.start_cursor);
-    const size = pageSize(args.page_size, 10);
-    const candidates = (await workspacePages(context, selected.workspaceId))
-      .filter((page) => !page.inTrash)
-      .sort((left, right) => (left.position ?? 0) - (right.position ?? 0) || left.id.localeCompare(right.id));
-    const results: unknown[] = [];
-    for (const page of candidates) {
-      if (!(await pageWithinGrantAllowlist(context, grant, page))) continue;
-      if (query && !String(page.title ?? '').toLowerCase().includes(query)) continue;
-      if (objectFilter === 'page' && page.kind === 'database') continue;
-      if (objectFilter === 'database' && page.kind !== 'database') continue;
-      try {
-        const payload = page.kind === 'database'
-          ? await callNotionCompat(context, grant, 'GET', `databases/${page.id}`)
-          : await callNotionCompat(context, grant, 'GET', `pages/${page.id}`);
-        results.push(payload);
-      } catch {
-        // Keep the compatibility endpoint's user-level access check
-        // authoritative; inaccessible candidates are omitted indistinguishably.
-      }
-    }
-    const windowed = results.slice(start, start + size);
-    const hasMore = start + size < results.length;
-    return toolJson({
-      object: 'list',
-      type: 'workspace_search',
-      results: windowed,
-      has_more: hasMore,
-      next_cursor: hasMore ? String(start + size) : null,
-      scope: {
-        provider: 'hanji',
-        access_model: 'resource_allowlist',
-        workspace_id: selected.workspaceId,
-      },
-    });
+  const pageScopeId = stripHanjiId(args.page_url);
+  if (pageScopeId) {
+    await requirePageInWorkspace(context, grant, selected.workspaceId, pageScopeId, 'Page');
   }
-  const payload = await callNotionCompat(context, grant, 'POST', 'search', {
-    query: args.query,
-    workspace_id: selected.workspaceId,
-    page_size: pageSize(args.page_size, 10),
-    start_cursor: args.start_cursor,
-    filter: isRecord(args.filters) ? args.filters : undefined,
-  });
+  if (args.filters !== undefined) matchesNotionSearchFilters({}, args.filters);
+  const grantAllowlist = grantResourceAllowlist(grant);
+  const requiredAncestorIds = pageScopeId
+    ? [pageScopeId]
+    : grantAllowlist
+      ? Array.from(grantAllowlist).sort()
+      : [];
+  const window = await hostedWorkspaceSearch(
+    context,
+    grant,
+    args,
+    selected.workspaceId,
+    query,
+    size,
+    maxHighlightLength,
+    requiredAncestorIds,
+  );
   return toolJson({
+    object: 'list',
     type: 'workspace_search',
-    ...(isRecord(payload) ? payload : { results: payload }),
+    results: window.results,
+    has_more: window.hasMore,
+    next_cursor: window.nextCursor,
     scope: {
       provider: 'hanji',
-      access_model: 'account_accessible_workspaces',
+      access_model: grantResourceAllowlist(grant) ? 'resource_allowlist' : 'account_accessible_workspaces',
       workspace_id: selected.workspaceId,
+      page_url: pageScopeId ? args.page_url : undefined,
       requested_content_search_mode: args.content_search_mode ?? 'workspace_search',
       effective_content_search_mode: 'workspace_search',
       note: args.content_search_mode === 'ai_search'
         ? 'Hanji does not provide a separate Notion AI or connected-source search layer; searched Hanji workspace data.'
         : undefined,
     },
+  });
+}
+
+async function fetchMeetingTranscriptsForPage(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  workspaceId: string,
+  pageId: string,
+) {
+  const payload = await callNotionCompat(context, grant, 'POST', 'blocks/meeting_notes/query', {
+    workspace_id: workspaceId,
+    page_id: pageId,
+    include_transcript: true,
+    limit: 50,
+  });
+  if (!isRecord(payload) || !Array.isArray(payload.results)) return [];
+  const results: Record<string, unknown>[] = [];
+  for (const candidate of payload.results) {
+    if (!isRecord(candidate)) continue;
+    const blockId = textValue(candidate.id);
+    if (!blockId) continue;
+    const note = await requireBlockInWorkspace(
+      context,
+      grant,
+      workspaceId,
+      blockId,
+      'Meeting note',
+    );
+    if (note.page.id !== pageId) throw new Error('Meeting note was not found.');
+    requireContentScope(grant, note.page, 'read');
+    const transcript = isRecord(candidate.transcript) ? candidate.transcript : null;
+    const transcriptBlockId = textValue(transcript?.block_id);
+    if (transcriptBlockId) {
+      const transcriptBlock = await requireBlockInWorkspace(
+        context,
+        grant,
+        workspaceId,
+        transcriptBlockId,
+        'Meeting transcript',
+      );
+      if (transcriptBlock.page.id !== pageId) throw new Error('Meeting transcript was not found.');
+      requireContentScope(grant, transcriptBlock.page, 'read');
+    }
+    results.push(candidate);
+  }
+  return results;
+}
+
+function hostedMeetingNoteLimit(value: unknown) {
+  if (value === undefined) return MAX_MCP_MEETING_NOTE_RESULTS;
+  if (
+    typeof value !== 'number'
+    || !Number.isInteger(value)
+    || value < 1
+    || value > MAX_MCP_MEETING_NOTE_RESULTS
+  ) {
+    throw new Error(`limit must be an integer between 1 and ${MAX_MCP_MEETING_NOTE_RESULTS}.`);
+  }
+  return value;
+}
+
+async function meetingNoteAuthorityGraph(
+  context: FunctionContext,
+  workspaceId: string,
+  blockIds: string[],
+) {
+  const db = boundedDb(context.admin, workspaceId);
+  const blocks = blockIds.length === 0
+    ? []
+    : await listAll(
+      db.table<BlockRecord>('blocks').where('id', 'in', blockIds),
+      { label: 'Hosted MCP meeting-note authority blocks' },
+    );
+  const blocksById = new Map(blocks.map((block) => [block.id, block]));
+  const pagesById = new Map<string, PageRecord | null>();
+  const pendingPageIds = new Set(
+    blocks.map((block) => textValue(block.pageId)).filter(Boolean),
+  );
+
+  while (pendingPageIds.size > 0) {
+    if (pagesById.size + pendingPageIds.size > MAX_MCP_MEETING_NOTE_AUTHORITY_PAGES) {
+      throw new Error(
+        `Meeting-note authority graph exceeds ${MAX_MCP_MEETING_NOTE_AUTHORITY_PAGES} pages.`,
+      );
+    }
+    const batch = Array.from(pendingPageIds).slice(0, MAX_MCP_MEETING_NOTE_RESULTS);
+    for (const id of batch) pendingPageIds.delete(id);
+    const pages = await listAll(
+      db.table<PageRecord>('pages').where('id', 'in', batch),
+      { label: 'Hosted MCP meeting-note authority pages' },
+    );
+    const batchById = new Map(pages.map((page) => [page.id, page]));
+    for (const id of batch) pagesById.set(id, batchById.get(id) ?? null);
+    for (const page of pages) {
+      const parentId = textValue(page.parentId);
+      if (parentId && !pagesById.has(parentId)) pendingPageIds.add(parentId);
+    }
+  }
+  return { blocksById, pagesById };
+}
+
+function meetingNotePageWithinLoadedAllowlist(
+  grant: McpOAuthGrant,
+  workspaceId: string,
+  page: PageRecord,
+  pagesById: Map<string, PageRecord | null>,
+) {
+  const allowlist = grantResourceAllowlist(grant);
+  if (!allowlist) return true;
+  const visited = new Set<string>();
+  let current: PageRecord | null = page;
+  while (current && !visited.has(current.id)) {
+    if (current.workspaceId !== workspaceId) return false;
+    if (allowlist.has(current.id)) return true;
+    visited.add(current.id);
+    const parentId = textValue(current.parentId);
+    if (!parentId) break;
+    current = pagesById.get(parentId) ?? null;
+  }
+  return false;
+}
+
+async function filterHostedMeetingNotes(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  workspaceId: string,
+  payload: unknown,
+  limit: number,
+) {
+  if (!isRecord(payload) || !Array.isArray(payload.results)) return payload;
+  if (payload.results.length > MAX_MCP_MEETING_NOTE_RESULTS) {
+    throw new Error(
+      `Meeting-note query returned more than ${MAX_MCP_MEETING_NOTE_RESULTS} results.`,
+    );
+  }
+  const candidates = payload.results.filter(isRecord);
+  const blockIds = Array.from(new Set(
+    candidates.map((candidate) => textValue(candidate.id)).filter(Boolean),
+  ));
+  const { blocksById, pagesById } = await meetingNoteAuthorityGraph(
+    context,
+    workspaceId,
+    blockIds,
+  );
+  const authorized = candidates.filter((candidate) => {
+    const block = blocksById.get(textValue(candidate.id));
+    const page = block ? pagesById.get(block.pageId) : null;
+    if (!block || !page || page.workspaceId !== workspaceId) return false;
+    const scope = contentScopeName(contentScopeFamily(page), 'read');
+    if (!hasScope(grant, [scope])) return false;
+    return meetingNotePageWithinLoadedAllowlist(grant, workspaceId, page, pagesById);
+  });
+  const unrestricted = !grantResourceAllowlist(grant)
+    && hasAllScopes(grant, ['pages:read', 'databases:read']);
+  return {
+    results: authorized.slice(0, limit),
+    has_more: authorized.length > limit || (unrestricted && payload.has_more === true),
+  };
+}
+
+function attachmentExtension(filename: string) {
+  const match = filename.trim().toLowerCase().match(/\.([a-z0-9]+)$/);
+  return match?.[1] ?? '';
+}
+
+function inlineAttachmentContentType(filename: string, requested: unknown) {
+  const inferred = MCP_TEXT_ATTACHMENT_TYPES.get(attachmentExtension(filename));
+  if (!inferred) {
+    throw new Error('Inline attachments support .md, .markdown, .txt, .csv, .json, .yaml, .yml, .tsv, and .ics files. Use source_url for other safe file types.');
+  }
+  const explicit = textValue(requested).split(';', 1)[0]?.trim().toLowerCase();
+  if (explicit && explicit !== inferred) {
+    throw new Error(`content_type must match ${filename} (${inferred}).`);
+  }
+  return inferred;
+}
+
+function attachmentToolPayload(upload: AttachmentUploadRecord, originalName: string) {
+  const marker = attachmentGrantMarker(upload);
+  return {
+    object: 'file_upload',
+    id: upload.id,
+    file_upload_id: upload.id,
+    filename: originalName,
+    content_type: upload.contentType ?? null,
+    content_length: upload.size ?? null,
+    status: upload.status ?? null,
+    expiry_time: marker?.expires_at ?? upload.expiresAt ?? null,
+    markdown_source: `<file src="file-upload://${upload.id}">`,
+  };
+}
+
+async function markAttachmentGrant(
+  context: FunctionContext,
+  workspaceId: string,
+  uploadId: string,
+  grant: McpOAuthGrant,
+  originalName: string,
+) {
+  const table = boundedDb(context.admin, workspaceId).table<AttachmentUploadRecord>('file_uploads');
+  const current = await table.getOne(uploadId);
+  if (!current) throw new Error('Attachment upload was not found after creation.');
+  const priorResult = isRecord(current.fileImportResult) ? current.fileImportResult : {};
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + MCP_ATTACHMENT_TTL_MS).toISOString();
+  return await table.update(uploadId, {
+    expiresAt,
+    fileImportResult: {
+      ...priorResult,
+      mcp_attachment: {
+        grant_id: grant.id,
+        original_name: originalName,
+        created_at: createdAt,
+        expires_at: expiresAt,
+      },
+    },
+  });
+}
+
+function attachmentGrantMarker(upload: AttachmentUploadRecord | null | undefined) {
+  const result = isRecord(upload?.fileImportResult) ? upload.fileImportResult : null;
+  return isRecord(result?.mcp_attachment) ? result.mcp_attachment : null;
+}
+
+async function createAttachment(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  args: Record<string, unknown>,
+) {
+  requireGrantWrite(grant, ['files:write']);
+  const selected = await requireWorkspaceArgument(context, grant, args, 'notion-create-attachment');
+  if ('error' in selected) return selected.error;
+  const filename = textValue(args.filename);
+  if (!filename) return toolError('filename is required.');
+  const hasContent = typeof args.content === 'string';
+  const sourceUrl = textValue(args.source_url);
+  if (hasContent === !!sourceUrl) {
+    return toolError('Provide exactly one of content or source_url.');
+  }
+  const internalContext = {
+    ...context,
+    auth: { id: grant.userId, email: null },
+  };
+  let upload: AttachmentUploadRecord | null = null;
+  try {
+    if (hasContent) {
+      const bytes = mcpUtf8Encoder.encode(args.content as string);
+      if (bytes.byteLength === 0) throw new Error('content must not be empty.');
+      if (bytes.byteLength > MAX_MCP_INLINE_ATTACHMENT_BYTES) {
+        throw new Error('Inline attachment content must be at most 200 KiB after UTF-8 encoding.');
+      }
+      const contentType = inlineAttachmentContentType(filename, args.content_type);
+      const created = await createNotionFileUpload(internalContext, {
+        workspaceId: selected.workspaceId,
+        filename,
+        contentType,
+        mode: 'single_part',
+        scope: 'uploads',
+      }) as { upload: AttachmentUploadRecord };
+      upload = created.upload;
+      const sent = await sendNotionFileUpload(internalContext, upload.id, {
+        workspaceId: selected.workspaceId,
+        bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+        filename,
+        contentType,
+      }) as { upload: AttachmentUploadRecord };
+      upload = await markAttachmentGrant(context, selected.workspaceId, sent.upload.id, grant, filename);
+    } else {
+      if (!/^https:\/\//i.test(sourceUrl)) throw new Error('source_url must be a public HTTPS URL.');
+      const created = await createNotionFileUpload(internalContext, {
+        workspaceId: selected.workspaceId,
+        filename,
+        contentType: textValue(args.content_type) || 'application/octet-stream',
+        mode: 'external_url',
+        externalUrl: sourceUrl,
+        scope: 'uploads',
+      }) as { upload: AttachmentUploadRecord };
+      upload = created.upload;
+      if (typeof upload.size !== 'number' || upload.size <= 0 || upload.size > MAX_MCP_URL_ATTACHMENT_BYTES) {
+        throw new Error('URL attachment downloads must be non-empty and at most 5 MiB.');
+      }
+      upload = await markAttachmentGrant(context, selected.workspaceId, upload.id, grant, filename);
+    }
+    return toolJson(attachmentToolPayload(upload, filename));
+  } catch (error) {
+    if (upload?.id) {
+      await deleteNotionFileUpload(internalContext, upload.id, selected.workspaceId).catch(() => {});
+    }
+    throw error;
+  }
+}
+
+async function attachmentForGrant(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  uploadId: string,
+) {
+  const db = context.admin.db('app');
+  for (const workspace of await grantAccessibleWorkspaces(db, grant)) {
+    const upload = await boundedDb(context.admin, workspace.id)
+      .table<AttachmentUploadRecord>('file_uploads')
+      .getOne(uploadId)
+      .catch(() => null);
+    const marker = attachmentGrantMarker(upload);
+    if (textValue(marker?.grant_id) !== grant.id) continue;
+    await assertMcpClientApprovedForWorkspaces(db, [workspace], {
+      actorId: grant.userId,
+      clientId: grant.clientId,
+      clientName: grant.clientName,
+      grantId: grant.id,
+      stage: 'hosted_call',
+    });
+    const attached = !!(upload?.pageId || upload?.blockId || upload?.databaseId || upload?.propertyId || upload?.templateId);
+    const expiry = Date.parse(textValue(marker?.expires_at, textValue(upload?.expiresAt)));
+    if (!attached && Number.isFinite(expiry) && Date.now() >= expiry) continue;
+    return upload;
+  }
+  return null;
+}
+
+async function downloadAttachment(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  args: Record<string, unknown>,
+) {
+  requireGrantScope(grant, ['files:read']);
+  const uploadId = textValue(args.file_upload_id);
+  if (!uploadId) return toolError('file_upload_id is required.');
+  const upload = await attachmentForGrant(context, grant, uploadId);
+  if (!upload || upload.status !== 'uploaded') return toolError('Attachment was not found.');
+  const marker = attachmentGrantMarker(upload);
+  const filename = textValue(marker?.original_name) || upload.name || 'attachment.txt';
+  if (!MCP_TEXT_ATTACHMENT_TYPES.has(attachmentExtension(filename))) {
+    return toolError('Only supported UTF-8 text attachments can be downloaded through this tool.');
+  }
+  if (typeof upload.size !== 'number' || upload.size < 0 || upload.size > MAX_MCP_INLINE_ATTACHMENT_BYTES) {
+    return toolError('Attachment is larger than the 200 KiB text download limit.');
+  }
+  const signed = await callProductFunction(context, grant, 'file-mutation', {
+    action: 'signedUrl',
+    workspaceId: upload.workspaceId,
+    uploadId: upload.id,
+    expiresIn: '5m',
+  }, fileMutationHandler) as { url?: unknown };
+  const url = textValue(signed.url);
+  if (!url) throw new Error('Attachment download URL was not available.');
+  const response = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(30_000) });
+  if (response.status >= 300 && response.status < 400) {
+    throw new Error('Attachment download URL unexpectedly redirected.');
+  }
+  if (!response.ok) throw new Error(`Attachment download returned HTTP ${response.status}.`);
+  const bytes = await response.arrayBuffer();
+  if (bytes.byteLength > MAX_MCP_INLINE_ATTACHMENT_BYTES || bytes.byteLength !== upload.size) {
+    throw new Error('Attachment download failed its size verification.');
+  }
+  let content: string;
+  try {
+    content = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new Error('Attachment is not valid UTF-8 text.');
+  }
+  return toolJson({
+    file_upload_id: upload.id,
+    filename,
+    content_type: upload.contentType ?? null,
+    content,
   });
 }
 
@@ -1584,49 +2928,316 @@ async function fetchNotion(context: FunctionContext, grant: McpOAuthGrant, args:
     requireContentScope(grant, pageRecordInWorkspace, 'read');
     const page = await callNotionCompat(context, grant, 'GET', `pages/${id}`);
     const blocks = await callNotionCompat(context, grant, 'GET', `blocks/${id}/children`, undefined, { page_size: 100 }).catch(() => null);
-    return toolJson({ metadata: { type: isRecord(page) ? page.object : 'page', workspace_id: selected.workspaceId }, page, blocks });
+    const transcripts = args.include_transcript === true
+      ? await fetchMeetingTranscriptsForPage(context, grant, selected.workspaceId, id)
+      : undefined;
+    return toolJson({
+      metadata: { type: isRecord(page) ? page.object : 'page', workspace_id: selected.workspaceId },
+      page,
+      blocks,
+      ...(transcripts ? { transcripts } : {}),
+    });
   }
   const ownedBlock = await requireBlockInWorkspace(context, grant, selected.workspaceId, id, 'Page');
   requireContentScope(grant, ownedBlock.page, 'read');
   const block = await callNotionCompat(context, grant, 'GET', `blocks/${id}`);
   const children = await callNotionCompat(context, grant, 'GET', `blocks/${id}/children`, undefined, { page_size: 100 }).catch(() => null);
-  return toolJson({ metadata: { type: 'block', workspace_id: selected.workspaceId }, block, children });
+  const transcripts = args.include_transcript === true
+    ? await fetchMeetingTranscriptsForPage(context, grant, selected.workspaceId, ownedBlock.page.id)
+    : undefined;
+  return toolJson({
+    metadata: { type: 'block', workspace_id: selected.workspaceId },
+    block,
+    children,
+    ...(transcripts ? { transcripts } : {}),
+  });
+}
+
+function notionRichTextPlain(value: unknown) {
+  if (!Array.isArray(value)) return '';
+  return value.map((item) => {
+    if (!isRecord(item)) return '';
+    if (typeof item.plain_text === 'string') return item.plain_text;
+    if (isRecord(item.text) && typeof item.text.content === 'string') return item.text.content;
+    if (isRecord(item.equation) && typeof item.equation.expression === 'string') return item.equation.expression;
+    return '';
+  }).join('');
+}
+
+function notionSqlPropertyValue(property: Record<string, unknown>) {
+  const type = textValue(property.type);
+  const value = property[type];
+  if (type === 'title' || type === 'rich_text') return notionRichTextPlain(value);
+  if (type === 'number') return value ?? null;
+  if (type === 'checkbox') return value === true ? '__YES__' : '__NO__';
+  if (type === 'select' || type === 'status') return isRecord(value) ? value.name ?? null : null;
+  if (type === 'multi_select') return Array.isArray(value)
+    ? value.map((option) => isRecord(option) ? option.name : null).filter(Boolean).join(', ')
+    : null;
+  if (type === 'date') return isRecord(value) ? value.start ?? null : null;
+  if (type === 'people') return Array.isArray(value)
+    ? value.map((person) => isRecord(person) ? person.id : null).filter(Boolean)
+    : [];
+  if (type === 'relation') return Array.isArray(value)
+    ? value.map((relation) => isRecord(relation) ? relation.id : null).filter(Boolean)
+    : [];
+  if (type === 'files') return Array.isArray(value)
+    ? value.map((file) => {
+        if (!isRecord(file)) return null;
+        if (isRecord(file.external)) return file.external.url;
+        if (isRecord(file.file)) return file.file.url;
+        if (isRecord(file.file_upload)) return file.file_upload.id;
+        return null;
+      }).filter(Boolean)
+    : [];
+  if (type === 'formula' && isRecord(value)) return value[value.type as string] ?? null;
+  if (type === 'rollup' && isRecord(value)) return value[value.type as string] ?? null;
+  if (type === 'unique_id' && isRecord(value)) {
+    return `${textValue(value.prefix)}${value.number ?? ''}`;
+  }
+  return value ?? null;
+}
+
+function notionSqlRow(page: Record<string, unknown>) {
+  const row: Record<string, unknown> = {
+    url: textValue(page.url),
+    id: textValue(page.id),
+    createdTime: page.created_time ?? null,
+  };
+  if (isRecord(page.properties)) {
+    for (const [name, property] of Object.entries(page.properties)) {
+      if (isRecord(property)) row[name] = notionSqlPropertyValue(property);
+    }
+  }
+  return row;
+}
+
+type McpSqlStreamCursor = {
+  v: 1;
+  kind: 'mcpSqlStream';
+  fingerprint: string;
+  sourceCursor?: string;
+  projectedOffset: number;
+  remainingOffset: number;
+};
+
+const MCP_SQL_STREAM_SOURCE_WINDOWS = 10;
+
+type McpSqlSourceSort = {
+  direction: 'ascending' | 'descending';
+} & ({ property: string } | { timestamp: 'created_time' });
+
+function notionMcpSqlSourceSorts(
+  orderBy: Array<{ property: string; direction: 'asc' | 'desc' }>,
+  properties: DbPropertyRecord[],
+): McpSqlSourceSort[] {
+  return orderBy.map((order) => {
+    const property = properties.find((candidate) =>
+      candidate.name.toLowerCase() === order.property.toLowerCase()
+    );
+    const direction: McpSqlSourceSort['direction'] = order.direction === 'desc' ? 'descending' : 'ascending';
+    if (property) return { property: property.name, direction };
+    if (order.property === 'createdTime') return { timestamp: 'created_time', direction };
+    throw new Error(`SQL ORDER BY requires a data-source property: ${order.property}.`);
+  });
+}
+
+function canonicalMcpSqlFingerprintValue(value: unknown): unknown {
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(canonicalMcpSqlFingerprintValue);
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, item]) => [key, canonicalMcpSqlFingerprintValue(item)]));
+}
+
+async function mcpSqlStreamFingerprint(value: unknown) {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(JSON.stringify(canonicalMcpSqlFingerprintValue(value))),
+  );
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function parseMcpSqlStreamCursor(value: unknown, fingerprint: string): McpSqlStreamCursor {
+  if (!isRecord(value) || value.v !== 1 || value.kind !== 'mcpSqlStream' || value.fingerprint !== fingerprint) {
+    throw Object.assign(new Error('SQL continuation cursor does not match this query.'), { status: 400 });
+  }
+  const sourceCursor = value.sourceCursor === undefined ? undefined : textValue(value.sourceCursor);
+  const projectedOffset = Number(value.projectedOffset);
+  const remainingOffset = Number(value.remainingOffset);
+  if (
+    (value.sourceCursor !== undefined && !sourceCursor)
+    || !Number.isSafeInteger(projectedOffset)
+    || projectedOffset < 0
+    || projectedOffset > 100
+    || !Number.isSafeInteger(remainingOffset)
+    || remainingOffset < 0
+  ) {
+    throw Object.assign(new Error('SQL continuation cursor is malformed.'), { status: 400 });
+  }
+  return {
+    v: 1,
+    kind: 'mcpSqlStream',
+    fingerprint,
+    ...(sourceCursor ? { sourceCursor } : {}),
+    projectedOffset,
+    remainingOffset,
+  };
+}
+
+async function streamNotionDataSourceSql(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  dataSourceId: string,
+  sourceUrl: string,
+  parsed: ReturnType<typeof parseNotionMcpSqlUnion>,
+  params: unknown[],
+  sourceSorts: McpSqlSourceSort[],
+  fingerprint: string,
+  startCursor: string | undefined,
+) {
+  const limit = Math.max(0, Math.min(500, parsed.cursor.limit ?? 100));
+  if (limit === 0) return { results: [], hasMore: false, nextCursor: undefined };
+  const resumed = startCursor
+    ? parseMcpSqlStreamCursor(
+        await decodeSearchSourceCursor(startCursor, context.env),
+        fingerprint,
+      )
+    : undefined;
+  let remainingOffset = resumed?.remainingOffset ?? Math.max(0, parsed.cursor.offset ?? 0);
+  const results: Array<Record<string, unknown>> = [];
+  let sourceCursor = resumed?.sourceCursor;
+  let projectedOffset = resumed?.projectedOffset ?? 0;
+
+  const continuation = async (next: {
+    sourceCursor?: string;
+    projectedOffset: number;
+    remainingOffset: number;
+  }) => ({
+    results,
+    hasMore: true,
+    nextCursor: await encodeSearchSourceCursor({
+      v: 1,
+      kind: 'mcpSqlStream',
+      fingerprint,
+      ...next,
+    } satisfies McpSqlStreamCursor, context.env),
+  });
+
+  for (let window = 0; window < MCP_SQL_STREAM_SOURCE_WINDOWS; window += 1) {
+    const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${dataSourceId}/query`, {
+      page_size: 100,
+      ...(sourceSorts.length ? { sorts: sourceSorts } : {}),
+      ...(sourceCursor ? { start_cursor: sourceCursor } : {}),
+    });
+    if (!isRecord(payload) || !Array.isArray(payload.results)) {
+      throw new Error('Data source query response was malformed.');
+    }
+    const sourceRows = payload.results.filter(isRecord).map(notionSqlRow);
+    const projected = executeStreamableNotionMcpSqlChunk(parsed, params, sourceUrl, sourceRows);
+    if (projectedOffset > projected.length) {
+      throw Object.assign(new Error('SQL continuation source changed before resume.'), { status: 409 });
+    }
+    for (let index = projectedOffset; index < projected.length; index += 1) {
+      const row = projected[index]!;
+      if (remainingOffset > 0) {
+        remainingOffset -= 1;
+        continue;
+      }
+      if (results.length >= limit) {
+        return await continuation({ sourceCursor, projectedOffset: index, remainingOffset });
+      }
+      results.push(row);
+    }
+    projectedOffset = 0;
+    if (payload.has_more !== true) return { results, hasMore: false, nextCursor: undefined };
+    const nextCursor = textValue(payload.next_cursor);
+    if (!nextCursor || nextCursor === sourceCursor) {
+      throw new Error('Data source query response returned a non-advancing cursor.');
+    }
+    sourceCursor = nextCursor;
+  }
+  return await continuation({ sourceCursor, projectedOffset: 0, remainingOffset });
 }
 
 async function queryDataSources(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   const data = isRecord(args.data) ? args.data : {};
   const selected = await requireWorkspaceArgument(context, grant, data, '_notion_query_data_sources');
   if ('error' in selected) return selected.error;
-  const dataSourceId = collectionIdFromInput(
-    data.data_source_id ??
-    data.database_id ??
-    data.data_source_url ??
-    (Array.isArray(data.data_source_urls) ? data.data_source_urls[0] : undefined),
-  );
-  if (!dataSourceId && textValue(data.view_url)) {
-    return toolError('data_source_id is required for hosted view queries. Pass the collection/data source id along with view_url.');
+  if (data.mode === 'view') {
+    return queryDatabaseView(context, grant, { ...data, workspace_id: selected.workspaceId });
   }
-  if (!dataSourceId) return toolError('data_source_id or data_source_url is required.');
-  const dataSource = await requireDatabaseInWorkspace(
+  const urls = Array.isArray(data.data_source_urls) ? data.data_source_urls.map((url) => textValue(url)).filter(Boolean) : [];
+  if (!urls.length) return toolError('data.data_source_urls must contain at least one collection:// URL.');
+  if (urls.length > 10) return toolError('data.data_source_urls may contain at most 10 data sources.');
+  if (!Array.isArray(data.params) && data.params !== undefined) return toolError('data.params must be an array.');
+  if (data.start_cursor !== undefined && (
+    typeof data.start_cursor !== 'string'
+    || !data.start_cursor.trim()
+  )) return toolError('data.start_cursor must be a non-empty opaque string.');
+  const parsed = parseNotionMcpSqlUnion(data.query);
+  const declaredIds = new Set(urls.map(collectionIdFromInput).filter(Boolean));
+  const references = parsed.dataSourceUrls;
+  const sourcesByReference = new Map<string, string>();
+  for (const reference of references) {
+    const id = collectionIdFromInput(reference);
+    if (!id || !declaredIds.has(id)) return toolError(`SQL references an undeclared data source: ${reference}.`);
+  }
+  const authorityReads = await Promise.allSettled(references.map(async (reference) => {
+    const id = collectionIdFromInput(reference)!;
+    const source = await requireDatabaseInWorkspace(context, grant, selected.workspaceId, id, 'Data source');
+    requireContentScope(grant, source, 'read');
+    return { reference, id };
+  }));
+  for (const authority of authorityReads) {
+    if (authority.status === 'rejected') throw authority.reason;
+    sourcesByReference.set(authority.value.reference, authority.value.id);
+  }
+  const params = Array.isArray(data.params) ? data.params : [];
+  const streamPlan = notionMcpSqlStreamPlan(parsed);
+  if (!streamPlan || references.length !== 1) return toolError(NOTION_MCP_SQL_CROSS_WINDOW_ERROR);
+  const reference = references[0]!;
+  executeStreamableNotionMcpSqlChunk(parsed, params, reference, []);
+  const dataSourceId = sourcesByReference.get(reference)!;
+  const sourceSorts = streamPlan.orderBy.length
+    ? notionMcpSqlSourceSorts(
+        streamPlan.orderBy,
+        await databaseProperties(context, dataSourceId),
+      )
+    : [];
+  const fingerprint = await mcpSqlStreamFingerprint({
+    v: 1,
+    grantId: grant.id,
+    userId: grant.userId,
+    workspaceId: selected.workspaceId,
+    references,
+    query: data.query,
+    params,
+  });
+  const execution = await streamNotionDataSourceSql(
     context,
     grant,
-    selected.workspaceId,
     dataSourceId,
-    'Data source',
+    reference,
+    parsed,
+    params,
+    sourceSorts,
+    fingerprint,
+    textValue(data.start_cursor) || undefined,
   );
-  requireContentScope(grant, dataSource, 'read');
-  const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${dataSourceId}/query`, {
-    query: data.query,
-    filter: data.filter,
-    sorts: data.sorts,
-    start_cursor: data.start_cursor,
-    page_size: pageSize(data.page_size, 100),
-  });
+  if (execution.hasMore && !execution.nextCursor) {
+    throw new Error('SQL source stream returned has_more without a continuation cursor.');
+  }
+  const nextCursor = execution.nextCursor ?? null;
   return toolJson({
-    mode: data.mode ?? 'query',
-    data_source_id: dataSourceId,
-    data_source_url: `collection://${dataSourceId}`,
-    ...(isRecord(payload) ? payload : { results: payload }),
+    mode: 'sql',
+    data_source_urls: references,
+    ...(references.length === 1 ? { data_source_url: references[0] } : {}),
+    results: execution.results,
+    rows: execution.results,
+    returned: execution.results.length,
+    has_more: execution.hasMore,
+    next_cursor: nextCursor,
   });
 }
 
@@ -1637,10 +3248,41 @@ function localFilterToNotionFilter(props: DbPropertyRecord[], filter: unknown): 
   if (!prop) return null;
   const operator = textValue(filter.operator, 'equals');
   const condition: Record<string, unknown> = {};
-  condition[operator] = filter.value ?? true;
+  let value = filter.value ?? true;
+  if (prop.type === 'number' || prop.type === 'unique_id') {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return null;
+    value = number;
+  } else if (prop.type === 'checkbox') {
+    if (typeof value !== 'boolean') {
+      const normalized = String(value).trim().toLowerCase();
+      if (['true', '1', 'yes', 'checked'].includes(normalized)) value = true;
+      else if (['false', '0', 'no', 'unchecked'].includes(normalized)) value = false;
+      else return null;
+    }
+  } else if (prop.type === 'select' || prop.type === 'status' || prop.type === 'multi_select') {
+    const options = Array.isArray(prop.config?.options) ? prop.config.options : [];
+    const option = options.find((candidate) => isRecord(candidate)
+      && (candidate.id === value || textValue(candidate.name).toLowerCase() === String(value).trim().toLowerCase()));
+    if (isRecord(option) && typeof option.name === 'string') value = option.name;
+  }
+  condition[operator] = operator === 'is_empty' || operator === 'is_not_empty' ? true : value;
+  if (prop.type === 'created_time' || prop.type === 'last_edited_time') {
+    return { timestamp: prop.type, [prop.type]: condition };
+  }
+  const filterType = prop.type === 'person'
+    ? 'people'
+    : prop.type === 'phone'
+      ? 'phone_number'
+      : prop.type;
+  if (![
+    'title', 'rich_text', 'url', 'email', 'phone_number', 'number', 'checkbox',
+    'select', 'status', 'multi_select', 'date', 'people', 'created_by',
+    'last_edited_by', 'relation', 'files', 'unique_id',
+  ].includes(filterType)) return null;
   return {
     property: prop.name,
-    rich_text: condition,
+    [filterType]: condition,
   };
 }
 
@@ -1688,7 +3330,7 @@ async function queryDatabaseView(context: FunctionContext, grant: McpOAuthGrant,
   const data = isRecord(args.data) ? args.data : args;
   const selected = await requireWorkspaceArgument(context, grant, data, 'notion-query-database-view');
   if ('error' in selected) return selected.error;
-  const viewId = stripHanjiId(data.view_id ?? data.view_url ?? data.database_view_url);
+  const viewId = notionViewId(data.view_id ?? data.view_url ?? data.database_view_url);
   if (!viewId) return toolError('view_id or view_url is required.');
   const view = await viewRecord(context, viewId, selected.workspaceId);
   if (!view) return toolError('view_not_found', { view_id: viewId });
@@ -1702,15 +3344,25 @@ async function queryDatabaseView(context: FunctionContext, grant: McpOAuthGrant,
   requireContentScope(grant, database, 'read');
   const props = await databaseProperties(context, database.id);
   const config = isRecord(view.config) ? view.config : {};
+  const notionMetadata = isRecord(config.__notionCompat) ? config.__notionCompat : {};
+  const savedFilter = isRecord(notionMetadata.filter)
+    ? notionMetadata.filter
+    : isRecord(config.filter)
+      ? config.filter
+      : localViewFiltersToNotion(props, config);
+  const savedSorts = Array.isArray(notionMetadata.sorts)
+    ? notionMetadata.sorts
+    : localViewSortsToNotion(props, config);
   const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${database.id}/query`, {
-    query: data.query ?? config.search,
-    filter: data.filter ?? localViewFiltersToNotion(props, config),
-    sorts: data.sorts ?? localViewSortsToNotion(props, config),
+    filter: savedFilter,
+    sorts: savedSorts,
+    is_archived: data.is_archived === true,
     start_cursor: data.start_cursor,
     page_size: pageSize(data.page_size, 100),
   });
   return toolJson({
     mode: 'view',
+    is_archived: data.is_archived === true,
     view_id: view.id,
     view_url: `view://${view.id}`,
     data_source_id: database.id,
@@ -1809,7 +3461,9 @@ async function createPages(context: FunctionContext, grant: McpOAuthGrant, args:
           properties: simpleProperties(pageInput.properties, title),
           icon: textValue(pageInput.icon) ? { type: 'emoji', emoji: textValue(pageInput.icon) } : undefined,
           cover: textValue(pageInput.cover) ? { external: { url: textValue(pageInput.cover) } } : undefined,
-          children: markdownishBlocks(pageInput.content),
+          ...(pageInput.content !== undefined
+            ? { children: markdownishBlocks(pageInput.content) }
+            : {}),
           template: pageInput.template_id ? { type: 'template_id', template_id: pageInput.template_id } : undefined,
         });
         created.push(payload);
@@ -1838,18 +3492,13 @@ async function createPages(context: FunctionContext, grant: McpOAuthGrant, args:
     }
     return { ok: true as const, payload: { pages: created } };
   };
-  const outcome = await run();
   if (args.allow_async === true) {
-    return toolJson({
-      async_task: await recordAsyncTask(
-        context,
-        grant,
-        'create_pages',
-        outcome.ok ? 'succeeded' : 'failed',
-        outcome.payload,
-      ),
+    return queueAsyncTask(context, grant, 'create_pages', selected.workspaceId, async () => {
+      const outcome = await run();
+      return { status: outcome.ok ? 'succeeded' : 'failed', payload: outcome.payload };
     });
   }
+  const outcome = await run();
   return outcome.ok
     ? toolJson(outcome.payload)
     : toolError('create_pages_failed', outcome.payload);
@@ -1857,11 +3506,48 @@ async function createPages(context: FunctionContext, grant: McpOAuthGrant, args:
 
 async function updatePage(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   const command = textValue(args.command, args.content || args.new_str ? 'insert_content' : 'update_properties');
-  if (command === 'insert_content' || command === 'replace_content') {
-    const markdown = command === 'replace_content'
-      ? args.new_str ?? args.content
-      : args.content ?? args.new_str;
-    assertMcpMarkdownBounds(markdown);
+  if (args.allow_deleting_content !== undefined && typeof args.allow_deleting_content !== 'boolean') {
+    throw new Error('allow_deleting_content must be a boolean.');
+  }
+  const replacementMarkdown = command === 'replace_content'
+    ? requireMcpReplaceContent(args)
+    : undefined;
+  let insertAfter: string | undefined;
+  let insertPosition: { type: 'start' | 'end' } | undefined;
+  if (command === 'insert_content') {
+    assertMcpMarkdownBounds(args.content ?? args.new_str);
+    if (args.after !== undefined && args.position !== undefined) {
+      throw new Error('insert_content.after and insert_content.position cannot both be provided.');
+    }
+    if (args.after !== undefined) {
+      if (typeof args.after !== 'string' || args.after.length === 0) {
+        throw new Error('insert_content.after must be a non-empty string.');
+      }
+      insertAfter = args.after;
+    }
+    if (args.position !== undefined) {
+      if (!isRecord(args.position)) throw new Error('insert_content.position must be an object.');
+      if (args.position.type !== 'start' && args.position.type !== 'end') {
+        throw new Error('insert_content.position.type must be start or end.');
+      }
+      insertPosition = { type: args.position.type };
+    }
+  }
+  if (command === 'update_content') {
+    const updates = Array.isArray(args.content_updates) ? args.content_updates : [];
+    if (!updates.length) throw new Error('update_content requires content_updates.');
+    if (updates.length > 100) throw new Error('content_updates must contain at most 100 entries.');
+    for (const update of updates) {
+      if (!isRecord(update) || typeof update.old_str !== 'string' || typeof update.new_str !== 'string') {
+        throw new Error('Each content update requires old_str and new_str strings.');
+      }
+      if (!update.old_str) throw new Error('content_updates.old_str must not be empty.');
+      if (update.replace_all_matches !== undefined && typeof update.replace_all_matches !== 'boolean') {
+        throw new Error('content_updates.replace_all_matches must be a boolean.');
+      }
+      boundedMcpUtf8Bytes(update.old_str, MAX_MCP_MARKDOWN_BYTES, 'content_updates.old_str');
+      assertMcpMarkdownBounds(update.new_str);
+    }
   }
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_update_page');
   if ('error' in selected) return selected.error;
@@ -1876,32 +3562,92 @@ async function updatePage(context: FunctionContext, grant: McpOAuthGrant, args: 
     if (!templateId) throw new Error('template_id is required for apply_template.');
     await requireTemplateSource(context, grant, selected.workspaceId, templateId);
   }
-  if (command === 'replace_content') {
-    return toolError('replace_content_not_available', {
-      message:
-        'replace_content is disabled until Hanji has an atomic canonical replacement path. ' +
-        'Use insert_content only when append-only behavior is acceptable.',
-      supported_alternative: 'insert_content',
-    });
-  }
   const run = async () => {
-    if (command === 'insert_content') {
-      const content = args.content ?? args.new_str;
-      return await callNotionCompat(context, grant, 'PATCH', `blocks/${pageId}/children`, {
-        children: markdownishBlocks(content),
-      });
+    if (command === 'insert_content' || command === 'replace_content' || command === 'update_content') {
+      const payload = command === 'insert_content'
+        ? {
+            type: 'insert_content',
+            insert_content: {
+              content: args.content ?? args.new_str ?? '',
+              ...(insertAfter === undefined ? {} : { after: insertAfter }),
+              ...(insertPosition === undefined ? {} : { position: insertPosition }),
+            },
+          }
+        : command === 'replace_content'
+          ? {
+              type: 'replace_content',
+              replace_content: {
+                new_str: replacementMarkdown,
+                ...(args.allow_deleting_content === undefined
+                  ? {}
+                  : { allow_deleting_content: args.allow_deleting_content }),
+              },
+            }
+          : {
+              type: 'update_content',
+              update_content: {
+                content_updates: args.content_updates,
+                ...(args.allow_deleting_content === undefined
+                  ? {}
+                  : { allow_deleting_content: args.allow_deleting_content }),
+              },
+            };
+      return await callNotionCompat(context, grant, 'PATCH', `pages/${pageId}/markdown`, payload);
+    }
+    if (command === 'update_verification') {
+      const verified = args.verification_status === 'verified';
+      const expiryDays = Number(args.verification_expiry_days);
+      if (args.verification_status !== 'verified' && args.verification_status !== 'unverified') {
+        throw new Error('update_verification requires verification_status.');
+      }
+      if (args.verification_expiry_days !== undefined && (!Number.isFinite(expiryDays) || expiryDays <= 0)) {
+        throw new Error('verification_expiry_days must be a positive number.');
+      }
+      const verifiedAt = verified ? new Date().toISOString() : null;
+      const verificationExpiresAt = verified && Number.isFinite(expiryDays) && expiryDays > 0
+        ? new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000).toISOString()
+        : null;
+      const result = await callProductFunction(
+        context,
+        grant,
+        'page-mutation',
+        {
+          action: 'update',
+          id: pageId,
+          workspaceId: selected.workspaceId,
+          patch: {
+            verifiedAt,
+            verifiedBy: verified ? grant.userId : null,
+            verificationExpiresAt,
+          },
+        },
+        pageMutationHandler as InternalFunctionHandler,
+      );
+      return {
+        ...(isRecord(result) ? result : { result }),
+        verification_status: verified ? 'verified' : 'unverified',
+      };
     }
     const patch: Record<string, unknown> = {};
-    if (args.properties !== undefined || args.title !== undefined) {
-      patch.properties = args.properties !== undefined ? simpleProperties(args.properties, textValue(args.title, 'Untitled')) : simpleProperties({ title: args.title }, textValue(args.title, 'Untitled'));
+    if (command === 'apply_template') {
+      patch.template = { type: 'template_id', template_id: args.template_id };
+    } else if (command === 'update_properties') {
+      if (args.properties !== undefined || args.title !== undefined) {
+        patch.properties = args.properties !== undefined
+          ? simpleProperties(args.properties, textValue(args.title, 'Untitled'))
+          : simpleProperties({ title: args.title }, textValue(args.title, 'Untitled'));
+      }
+      if (args.icon !== undefined) patch.icon = textValue(args.icon) ? { type: 'emoji', emoji: textValue(args.icon) } : null;
+      if (args.cover !== undefined) patch.cover = textValue(args.cover) ? { external: { url: textValue(args.cover) } } : null;
+      if (args.locked !== undefined) patch.is_locked = args.locked === true;
+    } else {
+      throw new Error(`Unsupported update-page command: ${command}.`);
     }
-    if (args.icon !== undefined) patch.icon = textValue(args.icon) ? { type: 'emoji', emoji: textValue(args.icon) } : null;
-    if (args.cover !== undefined) patch.cover = textValue(args.cover) ? { external: { url: textValue(args.cover) } } : null;
-    if (args.locked !== undefined) patch.is_locked = args.locked === true;
-    if (command === 'apply_template' && args.template_id) patch.template = { type: 'template_id', template_id: args.template_id };
     return await callNotionCompat(context, grant, 'PATCH', `pages/${pageId}`, patch);
   };
-  if (args.allow_async === true) return await runAsyncTask(context, grant, 'update_page', run);
+  if (args.allow_async === true) {
+    return await runAsyncTask(context, grant, 'update_page', selected.workspaceId, run);
+  }
   return toolJson(await run());
 }
 
@@ -1970,35 +3716,90 @@ async function duplicatePage(context: FunctionContext, grant: McpOAuthGrant, arg
       workspace_id: selected.workspaceId,
     };
   };
-  if (forceAsync || args.allow_async === true) return await runAsyncTask(context, grant, 'duplicate_page', run);
+  if (forceAsync || args.allow_async === true) {
+    return await runAsyncTask(context, grant, 'duplicate_page', selected.workspaceId, run);
+  }
   return toolJson(await run());
 }
 
 export function moveIds(args: Record<string, unknown>) {
-  const raw = Array.isArray(args.page_or_database_ids)
-    ? args.page_or_database_ids
-    : Array.isArray(args.page_ids)
-      ? args.page_ids
-      : args.page_id
-        ? [args.page_id]
-        : [];
-  if (raw.length > MAX_MCP_MOVE_PAGE_IDS) {
-    throw new Error(`Move requests may contain at most ${MAX_MCP_MOVE_PAGE_IDS} page or database ids.`);
-  }
-  return Array.from(new Set(raw.map(stripHanjiId).filter(Boolean)));
+  return normalizeNotionMovePageIds(args, stripHanjiId);
 }
 
 function moveDestination(args: Record<string, unknown>) {
-  const destination = isRecord(args.new_parent)
-    ? args.new_parent
-    : isRecord(args.parent)
-      ? args.parent
-      : {};
-  const databaseId = stripHanjiId(destination.data_source_id ?? destination.database_id);
-  const parentPageId = stripHanjiId(destination.page_id ?? destination.parent_page_id);
-  const parentId = databaseId || parentPageId || null;
-  const parentType = normalizeParentType(destination.type ?? (databaseId ? 'database' : undefined), parentId);
-  return { parentId, parentType };
+  return normalizeNotionMoveDestination(args, stripHanjiId);
+}
+
+async function callCanonicalMove(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  workspaceId: string,
+  page: PageRecord,
+  destination: Pick<NotionMovePagesDestination, 'parentId' | 'parentType'>,
+  position: number,
+  dryRun: boolean,
+) {
+  const common = { id: page.id, workspaceId, position, dryRun };
+  const isDatabaseRow = page.parentType === 'database' && Boolean(page.parentId);
+  let payload: unknown;
+
+  if (isDatabaseRow) {
+    if (destination.parentType === 'database') {
+      payload = await callProductFunction(
+        context,
+        grant,
+        'database-row-mutation',
+        page.parentId === destination.parentId
+          ? { ...common, action: 'update', patch: { position } }
+          : { ...common, action: 'moveToDatabase', targetDatabaseId: destination.parentId },
+        databaseRowMutationHandler as InternalFunctionHandler,
+      );
+    } else {
+      payload = await callProductFunction(
+        context,
+        grant,
+        'database-row-mutation',
+        destination.parentType === 'workspace'
+          ? { ...common, action: 'moveToWorkspace', targetParentType: 'workspace' }
+          : {
+              ...common,
+              action: 'moveToPage',
+              targetParentType: 'page',
+              targetPageId: destination.parentId,
+            },
+        databaseRowMutationHandler as InternalFunctionHandler,
+      );
+    }
+  } else if (destination.parentType === 'database') {
+    if (page.kind === 'database') throw new Error('Only regular pages can be moved into a data source.');
+    payload = await callProductFunction(
+      context,
+      grant,
+      'database-row-mutation',
+      { ...common, action: 'movePageToDatabase', targetDatabaseId: destination.parentId },
+      databaseRowMutationHandler as InternalFunctionHandler,
+    );
+  } else {
+    payload = await callProductFunction(
+      context,
+      grant,
+      'page-mutation',
+      {
+        ...common,
+        action: 'move',
+        patch: {
+          parentId: destination.parentId,
+          parentType: destination.parentType,
+          position,
+        },
+      },
+      pageMutationHandler as InternalFunctionHandler,
+    );
+  }
+
+  if (isRecord(payload) && isRecord(payload.page)) return payload.page as unknown as PageRecord;
+  if (isRecord(payload) && isRecord(payload.row)) return payload.row as unknown as PageRecord;
+  return page;
 }
 
 async function movePages(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
@@ -2006,11 +3807,30 @@ async function movePages(context: FunctionContext, grant: McpOAuthGrant, args: R
   // any database lookup. The HTTP/JSON-RPC body caps do not otherwise stop one
   // tools/call from amplifying into thousands of permission checks and moves.
   const ids = moveIds(args);
-  if (!ids.length) return toolError('Provide page_or_database_ids, page_ids, or page_id.');
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_move_pages');
   if ('error' in selected) return selected.error;
 
-  const { parentId, parentType } = moveDestination(args);
+  let destination = moveDestination(args);
+  // The official REST compatibility exception is intentionally narrower than
+  // a generic `type: page`: only an explicit page_id discriminator may carry
+  // the id of a single-data-source database.
+  if (destination.parentId && destination.requestedType === 'page_id') {
+    const actual = await requirePageInWorkspace(
+      context,
+      grant,
+      selected.workspaceId,
+      destination.parentId,
+      'Destination parent',
+    );
+    if (actual.kind === 'database') {
+      destination = {
+        ...destination,
+        parentType: 'database',
+        notionParent: { type: 'data_source_id', data_source_id: destination.parentId },
+      };
+    }
+  }
+  const { parentId, parentType } = destination;
   const destinationParent = await resolveDestinationParent(
     context,
     grant,
@@ -2052,43 +3872,40 @@ async function movePages(context: FunctionContext, grant: McpOAuthGrant, args: R
     candidates.push(page);
   }
 
-  // Validate the complete mixed batch before the first mutation so a missing
-  // database/page scope cannot leave a partially moved result.
+  const positions = notionMoveBatchPositions(
+    pages,
+    candidates.map((page) => page.id),
+    destination,
+    afterPageId || undefined,
+    beforePageId || undefined,
+  );
+
+  // Run the exact canonical planners for every candidate before the first
+  // write. ACL, lock, cycle, schema, relation, file-owner, and transaction
+  // budget failures therefore cannot leave an earlier item moved.
   for (const page of candidates) {
-    const id = page.id;
-    const siblings = siblingPages(pages, parentId, parentType, id);
-    const after = afterPageId ? siblings.find((item) => item.id === afterPageId) : undefined;
-    const before = beforePageId ? siblings.find((item) => item.id === beforePageId) : undefined;
-    if (afterPageId && !after) throw new Error(`after_page_id ${afterPageId} is not a destination sibling.`);
-    if (beforePageId && !before) throw new Error(`before_page_id ${beforePageId} is not a destination sibling.`);
-    if (after && before && (after.position ?? 0) >= (before.position ?? 0)) {
-      throw new Error('after_page_id must come before before_page_id.');
-    }
-    const position =
-      after || before
-        ? positionBetween(after?.position, before?.position)
-        : positionBetween(siblings[siblings.length - 1]?.position, undefined);
-    const payload = await callProductFunction(
+    await callCanonicalMove(
       context,
       grant,
-      'page-mutation',
-      {
-        action: 'move',
-        id,
-        patch: {
-          parentId,
-          parentType,
-          position,
-        },
-      },
-      pageMutationHandler as InternalFunctionHandler,
+      selected.workspaceId,
+      page,
+      destination,
+      positions[page.id]!,
+      true,
     );
-    const updated = isRecord(payload) && isRecord(payload.page)
-      ? payload.page as unknown as PageRecord
-      : page;
-    pagesById.set(id, updated);
-    const index = pages.findIndex((item) => item.id === id);
-    if (index >= 0) pages[index] = updated;
+  }
+
+  for (const page of candidates) {
+    const position = positions[page.id]!;
+    const updated = await callCanonicalMove(
+      context,
+      grant,
+      selected.workspaceId,
+      page,
+      destination,
+      position,
+      false,
+    );
     const result: Record<string, unknown> = {
       id: updated.id,
       parent: parentType === 'workspace' ? { type: 'workspace' } : { type: parentType, id: parentId },
@@ -2112,8 +3929,17 @@ async function movePages(context: FunctionContext, grant: McpOAuthGrant, args: R
 async function createDatabase(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_create_database');
   if ('error' in selected) return selected.error;
-  const title = textValue(args.title ?? args.name);
+  const hasSchema = typeof args.schema === 'string' && args.schema.trim().length > 0;
+  const databaseType = textValue(args.database_type) as NotionMcpDatabaseType;
+  const hasDatabaseType = ['tasks', 'projects', 'skills'].includes(databaseType);
+  if (Number(hasSchema) + Number(hasDatabaseType) !== 1) {
+    return toolError('Provide exactly one of schema or database_type.');
+  }
+  const title = textValue(args.title);
   const createParent = isRecord(args.parent) ? args.parent : undefined;
+  if (createParent && textValue(createParent.type) && textValue(createParent.type) !== 'page_id') {
+    return toolError('parent.type must be page_id.');
+  }
   const parentTarget = createParentTarget(createParent ?? {});
   // Hanji databases can be rooted in a workspace or nested under a page; a
   // data-source parent would be a different operation and fails closed here.
@@ -2130,14 +3956,65 @@ async function createDatabase(context: FunctionContext, grant: McpOAuthGrant, ar
   const writeFamilies = new Set<ContentScopeFamily>(['databases']);
   if (destinationParent) writeFamilies.add(contentScopeFamily(destinationParent));
   requireContentFamilies(grant, writeFamilies, 'write');
+  const parsedProperties = hasSchema
+    ? parseNotionMcpCreateTable(args.schema)
+    : notionMcpTypedDatabaseProperties(databaseType);
+  const dualRelations = parsedProperties.filter((property) => property.type === 'relation' && property.relationDual);
+  for (const relation of dualRelations) {
+    const targetId = collectionIdFromInput(relation.relationDataSourceId);
+    if (!targetId) return toolError(`Relation "${relation.name}" requires a data source id.`);
+    const target = await requireDatabaseInWorkspace(
+      context,
+      grant,
+      selected.workspaceId,
+      targetId,
+      `Relation target for ${relation.name}`,
+    );
+    requireContentScope(grant, target, 'write');
+  }
+  // Canonical creation commits the new source atomically. DUAL reciprocity is
+  // then reconciled through the ordinary schema mutation path so the target
+  // property is created and cross-linked by the same backend invariant used by
+  // the product UI and REST API.
+  const properties = notionMcpPropertySchemaMap(parsedProperties.map((property) => (
+    property.relationDual ? { ...property, relationDual: undefined } : property
+  )));
   const payload = await callNotionCompat(context, grant, 'POST', 'databases', {
     workspace_id: selected.workspaceId,
     parent: isRecord(args.parent) ? { workspace_id: selected.workspaceId, ...args.parent } : { workspace_id: selected.workspaceId },
     title: richText(title),
-    properties: isRecord(args.properties) ? args.properties : undefined,
-    initial_data_source: isRecord(args.initial_data_source) ? args.initial_data_source : undefined,
+    description: typeof args.description === 'string' ? richText(args.description) : undefined,
+    database_type: hasDatabaseType ? databaseType : undefined,
+    initial_data_source: { properties },
   });
-  return toolJson(payload);
+  const dataSourceId = isRecord(payload) ? stripHanjiId(payload.id) : '';
+  if (!dataSourceId) throw new Error('Created database response did not include a data source id.');
+  const dataSource = dualRelations.length
+    ? await callNotionCompat(context, grant, 'PATCH', `data_sources/${dataSourceId}`, {
+        properties: Object.fromEntries(dualRelations.map((property) => [
+          property.name,
+          notionMcpPropertySchema(property),
+        ])),
+      })
+    : await callNotionCompat(context, grant, 'GET', `data_sources/${dataSourceId}`);
+  const schemaSummary = isRecord(dataSource) && isRecord(dataSource.properties)
+    ? Object.keys(dataSource.properties).join(', ')
+    : Object.keys(properties).join(', ');
+  const text = [
+    `<data-source url="collection://${dataSourceId}">`,
+    `Title: ${title || (hasDatabaseType ? databaseType : 'Untitled')}`,
+    `Properties: ${schemaSummary || 'Name'}`,
+    hasDatabaseType ? `Database type: ${databaseType}` : '',
+    `Data source ID: ${dataSourceId}`,
+    '</data-source>',
+  ].filter(Boolean).join('\n');
+  return toolTextWithStructured(text, {
+    database: payload,
+    data_source: dataSource,
+    data_source_id: dataSourceId,
+    data_source_url: `collection://${dataSourceId}`,
+    ...(hasDatabaseType ? { database_type: databaseType } : {}),
+  });
 }
 
 async function updateDataSource(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
@@ -2153,35 +4030,301 @@ async function updateDataSource(context: FunctionContext, grant: McpOAuthGrant, 
     'Data source',
   );
   requireContentScope(grant, dataSource, 'write');
+  const mutationFields = ['title', 'description', 'is_inline', 'in_trash', 'statements'];
+  if (!mutationFields.some((field) => Object.prototype.hasOwnProperty.call(args, field))) {
+    return toolError('Provide at least one of statements, title, description, is_inline, or in_trash.');
+  }
+  if ('is_inline' in args && typeof args.is_inline !== 'boolean') return toolError('is_inline must be a boolean.');
+  if ('in_trash' in args && typeof args.in_trash !== 'boolean') return toolError('in_trash must be a boolean.');
+  if ('title' in args && typeof args.title !== 'string') return toolError('title must be a string.');
+  if ('description' in args && typeof args.description !== 'string') return toolError('description must be a string.');
+  const current = await callNotionCompat(context, grant, 'GET', `data_sources/${dataSourceId}`);
+  if (!isRecord(current)) throw new Error('Data source response was malformed.');
+  const currentParent = isRecord(current.parent) ? current.parent : {};
+  if (args.is_inline !== undefined && stripHanjiId(currentParent.database_id) !== dataSourceId) {
+    return toolError('is_inline is only supported for single-source databases.');
+  }
+  const operations = typeof args.statements === 'string' && args.statements.trim()
+    ? parseNotionMcpDdl(args.statements)
+    : [];
+  const properties = operations.length
+    ? notionMcpDdlPatch(isRecord(current.properties) ? current.properties : {}, operations)
+    : undefined;
   const payload = await callNotionCompat(context, grant, 'PATCH', `data_sources/${dataSourceId}`, {
-    name: args.name,
-    title: args.title ? richText(args.title) : undefined,
-    properties: args.properties,
-    archived: args.archived,
-    in_trash: args.in_trash,
+    ...('title' in args ? { title: args.title } : {}),
+    ...('description' in args ? { description: args.description } : {}),
+    ...('is_inline' in args ? { is_inline: args.is_inline } : {}),
+    ...('in_trash' in args ? { in_trash: args.in_trash } : {}),
+    ...(properties ? { properties } : {}),
   });
-  return toolJson(payload);
+  const schemaSummary = isRecord(payload) && isRecord(payload.properties)
+    ? Object.keys(payload.properties).join(', ')
+    : '';
+  const text = [
+    `<data-source url="collection://${dataSourceId}">`,
+    `Updated data source: ${dataSourceId}`,
+    schemaSummary ? `Properties: ${schemaSummary}` : '',
+    operations.length ? `Applied ${operations.length} DDL statement(s).` : '',
+    '</data-source>',
+  ].filter(Boolean).join('\n');
+  return toolTextWithStructured(text, {
+    data_source: payload,
+    data_source_id: dataSourceId,
+    data_source_url: `collection://${dataSourceId}`,
+    applied_statements: operations.map((operation) => operation.raw),
+  });
+}
+
+function xmlEscape(value: unknown) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function markdownCommentRichText(markdown: string) {
+  boundedMcpUtf8Bytes(markdown, MAX_MCP_COMMENT_TEXT_BYTES, 'MCP comment markdown');
+  const result: Array<Record<string, unknown>> = [];
+  const token = /(\*\*([^*\n]+)\*\*|~~([^~\n]+)~~|`([^`\n]+)`|\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)|\$([^$\n]+)\$|<mention-date\s+start="([^"]+)"(?:\s+end="([^"]+)")?(?:\s+time_zone="([^"]+)")?\s*\/?>)/g;
+  let cursor = 0;
+  const pushText = (content: string, annotations: Record<string, unknown> = {}, link?: string) => {
+    if (!content) return;
+    result.push({
+      type: 'text',
+      text: { content, ...(link ? { link: { url: link } } : {}) },
+      annotations: {
+        bold: false,
+        italic: false,
+        strikethrough: false,
+        underline: false,
+        code: false,
+        color: 'default',
+        ...annotations,
+      },
+    });
+  };
+  for (const match of markdown.matchAll(token)) {
+    const index = match.index ?? 0;
+    pushText(markdown.slice(cursor, index));
+    if (match[2] !== undefined) pushText(match[2], { bold: true });
+    else if (match[3] !== undefined) pushText(match[3], { strikethrough: true });
+    else if (match[4] !== undefined) pushText(match[4], { code: true });
+    else if (match[5] !== undefined) pushText(match[5], {}, match[6]);
+    else if (match[7] !== undefined) result.push({ type: 'equation', equation: { expression: match[7] } });
+    else if (match[8] !== undefined) {
+      result.push({
+        type: 'mention',
+        mention: {
+          type: 'date',
+          date: {
+            start: match[8],
+            ...(match[9] ? { end: match[9] } : {}),
+            ...(match[10] ? { time_zone: match[10] } : {}),
+          },
+        },
+      });
+    }
+    cursor = index + match[0].length;
+  }
+  pushText(markdown.slice(cursor));
+  if (result.length > MAX_MCP_COMMENT_RICH_TEXT_ITEMS) {
+    throw new Error(`MCP comment rich_text must contain at most ${MAX_MCP_COMMENT_RICH_TEXT_ITEMS} items.`);
+  }
+  return result;
+}
+
+function notionMcpCommentContent(args: Record<string, unknown>) {
+  const hasMarkdown = typeof args.markdown === 'string';
+  const hasRichText = Array.isArray(args.rich_text);
+  if (Number(hasMarkdown) + Number(hasRichText) !== 1) {
+    throw new Error('Provide exactly one of markdown or rich_text.');
+  }
+  const rich = hasMarkdown
+    ? markdownCommentRichText(String(args.markdown))
+    : args.rich_text as unknown[];
+  const bounded = boundedMcpCommentRichText({ rich_text: rich });
+  if (!bounded.some((item) => commentRichTextItemText(item).trim())) {
+    throw new Error('Comment content cannot be empty.');
+  }
+  return bounded;
+}
+
+function blockCommentText(block: BlockRecord) {
+  if (typeof block.plainText === 'string' && block.plainText) return block.plainText;
+  const rich = isRecord(block.content) && Array.isArray(block.content.rich) ? block.content.rich : [];
+  return rich.map((span) => isRecord(span) && typeof span.text === 'string' ? span.text : '').join('');
+}
+
+function selectionMatchesBlock(selection: string, block: BlockRecord) {
+  const text = blockCommentText(block).replace(/\s+/g, ' ').trim();
+  const normalized = selection.replace(/\s+/g, ' ').trim();
+  if (!text || !normalized) return false;
+  const ellipsis = normalized.match(/^(.*?)(?:\.\.\.|…)(.*?)$/s);
+  if (!ellipsis) return text.includes(normalized);
+  const start = ellipsis[1].trim();
+  const end = ellipsis[2].trim();
+  const startIndex = start ? text.indexOf(start) : 0;
+  if (startIndex < 0) return false;
+  const endIndex = end ? text.indexOf(end, startIndex + start.length) : text.length;
+  return endIndex >= startIndex + start.length;
+}
+
+function discussionCommentId(value: unknown) {
+  const raw = textValue(value);
+  if (!raw) return '';
+  return raw.split('/').filter(Boolean).at(-1) ?? raw;
+}
+
+function storedCommentText(comment: CommentRecord) {
+  const body = isRecord(comment.body) ? comment.body : {};
+  const rich = Array.isArray(body.rich) ? body.rich : [];
+  return rich.map((span) => {
+    if (!isRecord(span)) return '';
+    if (typeof span.text === 'string') return span.text;
+    if (typeof span.expression === 'string') return span.expression;
+    return '';
+  }).join('');
+}
+
+function storedCommentRichText(comment: CommentRecord) {
+  const body = isRecord(comment.body) ? comment.body : {};
+  const rich = Array.isArray(body.rich) ? body.rich : [];
+  return rich.filter(isRecord).map((span) => {
+    const annotations = {
+      bold: span.bold === true,
+      italic: span.italic === true,
+      strikethrough: span.strikethrough === true,
+      underline: span.underline === true,
+      code: span.code === true,
+      color: typeof span.color === 'string' ? span.color : 'default',
+    };
+    const text = typeof span.text === 'string' ? span.text : '';
+    if (span.mention === 'page' && typeof span.pageId === 'string') {
+      return {
+        type: 'mention', mention: { type: 'page', page: { id: span.pageId } },
+        annotations, plain_text: text || span.pageId, href: null,
+      };
+    }
+    if (span.mention === 'person' && typeof span.userId === 'string') {
+      return {
+        type: 'mention', mention: { type: 'user', user: { object: 'user', id: span.userId } },
+        annotations, plain_text: text || span.userId, href: null,
+      };
+    }
+    if (span.mention === 'date' && typeof span.date === 'string') {
+      return {
+        type: 'mention',
+        mention: {
+          type: 'date',
+          date: {
+            start: span.date,
+            end: typeof span.dateEnd === 'string' ? span.dateEnd : null,
+            time_zone: typeof span.dateTimeZone === 'string' ? span.dateTimeZone : null,
+          },
+        },
+        annotations, plain_text: text || span.date, href: null,
+      };
+    }
+    if (typeof span.equation === 'string') {
+      return {
+        type: 'equation', equation: { expression: span.equation },
+        annotations, plain_text: span.equation, href: null,
+      };
+    }
+    const link = typeof span.link === 'string' ? span.link : null;
+    return {
+      type: 'text', text: { content: text, link: link ? { url: link } : null },
+      annotations, plain_text: text, href: link,
+    };
+  });
 }
 
 async function commentsTool(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>, mode: 'list' | 'create') {
   requireGrantScope(grant, mode === 'create' ? ['comments:write'] : ['comments:read']);
   if (mode === 'create') requireGrantWrite(grant, ['comments:write']);
-  const rich = mode === 'create' ? boundedMcpCommentRichText(args) : undefined;
+  const createRich = mode === 'create' ? notionMcpCommentContent(args) : [];
   const selected = await requireWorkspaceArgument(context, grant, args, mode === 'create' ? '_notion_create_comment' : '_notion_get_comments');
   if ('error' in selected) return selected.error;
   const pageId = stripHanjiId(args.page_id);
-  const blockId = stripHanjiId(args.block_id);
-  if (pageId) await requirePageInWorkspace(context, grant, selected.workspaceId, pageId, 'Page');
-  if (blockId) await requireBlockInWorkspace(context, grant, selected.workspaceId, blockId, 'Block');
+  if (!pageId) return toolError('page_id is required.');
+  const page = await requirePageInWorkspace(context, grant, selected.workspaceId, pageId, 'Page');
+  const db = boundedDb(context.admin, selected.workspaceId);
+  await assertMinimumPageAccessRole(
+    db,
+    { ...page, parentType: page.parentType ?? undefined },
+    grant.userId,
+    mode === 'create' ? 'comment' : 'view',
+  );
+  const comments = await listAll(db.table<CommentRecord>('comments').where('pageId', '==', pageId));
   if (mode === 'list') {
-    const payload = await callNotionCompat(context, grant, 'GET', 'comments', undefined, {
-      workspace_id: selected.workspaceId,
-      page_id: pageId,
-      block_id: blockId,
-      start_cursor: args.start_cursor,
-      page_size: args.page_size,
-    });
-    return toolJson(payload);
+    const wantedId = discussionCommentId(args.discussion_id);
+    const includeAllBlocks = args.include_all_blocks === true;
+    const includeResolved = args.include_resolved === true;
+    const roots = comments
+      .filter((comment) => !comment.parentId)
+      .filter((comment) => includeResolved || comment.resolved !== true)
+      .filter((comment) => !wantedId || comment.id === wantedId)
+      .filter((comment) => wantedId || includeAllBlocks || !comment.blockId)
+      .sort((left, right) => String(left.createdAt ?? '').localeCompare(String(right.createdAt ?? '')));
+    if (!roots.length) return toolJson({});
+    const replies = new Map<string, CommentRecord[]>();
+    for (const comment of comments) {
+      if (!comment.parentId) continue;
+      const list = replies.get(comment.parentId) ?? [];
+      list.push(comment);
+      replies.set(comment.parentId, list);
+    }
+    const lines = ['<discussions>'];
+    const structured: Array<Record<string, unknown>> = [];
+    for (const root of roots) {
+      const discussionId = `discussion://${pageId}/${root.blockId || 'page'}/${root.id}`;
+      lines.push(`  <discussion id="${xmlEscape(discussionId)}" ${root.blockId ? `block="${xmlEscape(root.blockId)}"` : 'target="page"'} resolved="${root.resolved ? 'true' : 'false'}">`);
+      const thread = [root, ...(replies.get(root.id) ?? []).sort((left, right) => String(left.createdAt ?? '').localeCompare(String(right.createdAt ?? '')))];
+      const items = thread.map((comment) => {
+        const text = storedCommentText(comment);
+        const richText = storedCommentRichText(comment);
+        lines.push(`    <comment id="${xmlEscape(comment.id)}" author="${xmlEscape(comment.authorId || 'unknown')}" created="${xmlEscape(comment.createdAt || '')}">${xmlEscape(text)}</comment>`);
+        return {
+          id: comment.id,
+          author_id: comment.authorId ?? null,
+          created_time: comment.createdAt ?? null,
+          updated_time: comment.updatedAt ?? comment.createdAt ?? null,
+          rich_text: richText,
+          text,
+        };
+      });
+      const quote = isRecord(root.body) && typeof root.body.quote === 'string' ? root.body.quote : '';
+      if (quote) lines.push(`    <quote>${xmlEscape(quote)}</quote>`);
+      lines.push('  </discussion>');
+      structured.push({ discussion_id: discussionId, block_id: root.blockId ?? null, resolved: root.resolved === true, comments: items });
+    }
+    lines.push('</discussions>');
+    return toolTextWithStructured(lines.join('\n'), { text: lines.join('\n'), discussions: structured });
+  }
+  const rich = createRich;
+  const selection = typeof args.selection_with_ellipsis === 'string' ? args.selection_with_ellipsis.trim() : '';
+  const requestedDiscussionId = discussionCommentId(args.discussion_id);
+  if (selection && requestedDiscussionId) return toolError('selection_with_ellipsis cannot be combined with discussion_id.');
+  let blockId = '';
+  let parentDiscussionId = '';
+  if (requestedDiscussionId) {
+    const requested = comments.find((comment) => comment.id === requestedDiscussionId);
+    if (!requested) return toolError('Discussion was not found.');
+    const root = requested.parentId
+      ? comments.find((comment) => comment.id === requested.parentId)
+      : requested;
+    if (!root) return toolError('Discussion was not found.');
+    blockId = textValue(root.blockId);
+    parentDiscussionId = root.id;
+  } else if (selection) {
+    const blocks = (await listAll(db.table<BlockRecord>('blocks').where('pageId', '==', pageId)))
+      .filter((block) => selectionMatchesBlock(selection, block));
+    if (blocks.length !== 1) {
+      return toolError(blocks.length ? 'selection_with_ellipsis matched more than one block.' : 'selection_with_ellipsis did not match page content.');
+    }
+    blockId = blocks[0].id;
   }
   const parent = blockId
     ? { block_id: blockId, workspace_id: selected.workspaceId }
@@ -2189,38 +4332,166 @@ async function commentsTool(context: FunctionContext, grant: McpOAuthGrant, args
   const payload = await callNotionCompat(context, grant, 'POST', 'comments', {
     workspace_id: selected.workspaceId,
     parent,
-    rich_text: rich!,
+    rich_text: rich,
+    ...(parentDiscussionId ? { discussion_id: parentDiscussionId } : {}),
+    ...(selection ? { selection_with_ellipsis: selection } : {}),
   });
-  return toolJson(payload);
+  const commentId = isRecord(payload) ? textValue(payload.id) : '';
+  const discussionId = `discussion://${pageId}/${blockId || 'page'}/${parentDiscussionId || commentId}`;
+  return toolTextWithStructured(
+    `Created comment ${commentId || ''} in ${discussionId}.`,
+    { comment: payload, discussion_id: discussionId, page_id: pageId, block_id: blockId || null },
+  );
 }
 
 async function createView(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
+  const dataSourceId = collectionIdFromInput(args.data_source_id);
+  if (!dataSourceId) return toolError('data_source_id is required.');
+  const databaseId = stripHanjiId(args.database_id);
+  const parentPageId = stripHanjiId(args.parent_page_id);
+  if (Number(!!databaseId) + Number(!!parentPageId) !== 1) {
+    return toolError('Exactly one of database_id or parent_page_id is required.');
+  }
+  const name = textValue(args.name);
+  if (!name) return toolError('name is required.');
+  const type = parseDatabaseViewType(args.type);
+  const parsed = parseNotionViewConfigDsl(args.configure);
+  assertRequiredNotionViewConfigure(type, parsed);
+  requireContentFamilies(
+    grant,
+    new Set<ContentScopeFamily>(parentPageId ? ['databases', 'pages'] : ['databases']),
+    'write',
+  );
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_create_view');
   if ('error' in selected) return selected.error;
-  const dataSourceId = collectionIdFromInput(args.data_source_id ?? args.database_id ?? args.data_source_url);
-  if (!dataSourceId) return toolError('data_source_id is required.');
-  const dataSource = await requireDatabaseInWorkspace(
-    context,
-    grant,
-    selected.workspaceId,
-    dataSourceId,
-    'Data source',
-  );
-  requireContentScope(grant, dataSource, 'write');
-  const type = textValue(args.type, 'table');
-  const payload = await callNotionCompat(context, grant, 'POST', `data_sources/${dataSourceId}/views`, {
-    name: textValue(args.name, `${type[0]?.toUpperCase() ?? 'T'}${type.slice(1)}`),
+  let dataSource: PageRecord;
+  if (databaseId) {
+    let database: PageRecord;
+    if (databaseId === dataSourceId) {
+      dataSource = await requireDatabaseInWorkspace(
+        context, grant, selected.workspaceId, dataSourceId, 'Data source',
+      );
+      database = dataSource;
+    } else {
+      [dataSource, database] = await Promise.all([
+        requireDatabaseInWorkspace(
+          context, grant, selected.workspaceId, dataSourceId, 'Data source',
+        ),
+        requireDatabaseInWorkspace(
+          context, grant, selected.workspaceId, databaseId, 'Database',
+        ),
+      ]);
+    }
+    requireContentScope(grant, database, 'write');
+    requireContentScope(grant, dataSource, 'write');
+  } else {
+    let parent: PageRecord;
+    [dataSource, parent] = await Promise.all([
+      requireDatabaseInWorkspace(
+        context, grant, selected.workspaceId, dataSourceId, 'Data source',
+      ),
+      requirePageInWorkspace(
+        context, grant, selected.workspaceId, parentPageId, 'Parent page',
+      ),
+    ]);
+    if (parent.kind === 'database') return toolError('Parent page was not found.');
+    requireContentScope(grant, dataSource, 'write');
+    requireContentScope(grant, parent, 'write');
+  }
+  const properties = await databaseProperties(context, dataSource.id);
+  const initialPlan = notionViewConfigurePlan(type, parsed, properties);
+  const payload = await callNotionCompat(context, grant, 'POST', 'views', {
+    workspace_id: selected.workspaceId,
+    database_id: databaseId || undefined,
+    create_database: parentPageId
+      ? { parent: { type: 'page_id', page_id: parentPageId } }
+      : undefined,
+    data_source_id: dataSource.id,
+    name,
     type,
-    config: isRecord(args.config) ? args.config : undefined,
-    [type]: isRecord(args[type]) ? args[type] : undefined,
+    ...initialPlan.body,
   });
+  const viewId = isRecord(payload) ? stripHanjiId(payload.id) : '';
+  if (!viewId) throw new Error('Created view response did not include an id.');
+  if (initialPlan.changed) {
+    try {
+      await persistHostedViewConfigure(
+        context,
+        grant,
+        selected.workspaceId,
+        viewId,
+        dataSource.id,
+        type,
+        parsed,
+        properties,
+      );
+    } catch (error) {
+      const created = await viewRecord(context, viewId, selected.workspaceId);
+      const metadata = isRecord(created?.config?.__notionCompat)
+        ? created.config.__notionCompat
+        : {};
+      const linkedBlockId = textValue(metadata.linked_block_id);
+      if (linkedBlockId && parentPageId) {
+        await callProductFunction(context, grant, 'block-mutation', {
+          action: 'delete',
+          id: linkedBlockId,
+          pageId: parentPageId,
+        }, blockMutationHandler).catch(() => undefined);
+      }
+      await callNotionCompat(context, grant, 'DELETE', `views/${viewId}`).catch(() => undefined);
+      throw error;
+    }
+  }
   return toolJson(payload);
+}
+
+async function persistHostedViewConfigure(
+  context: FunctionContext,
+  grant: McpOAuthGrant,
+  workspaceId: string,
+  viewId: string,
+  dataSourceId: string,
+  type: NotionDatabaseViewType,
+  configure: Record<string, unknown>,
+  properties: NotionViewDslProperty[],
+) {
+  const current = await viewRecord(context, viewId, workspaceId);
+  if (!current || current.databaseId !== dataSourceId) throw new Error('View was not found after mutation.');
+  const plan = notionViewConfigurePlan(type, configure, properties, current.config ?? {});
+  if (!plan.changed) return current;
+  const result = await callProductFunction(context, grant, 'database-mutation', {
+    action: 'update',
+    table: 'db_views',
+    id: current.id,
+    databaseId: dataSourceId,
+    workspaceId,
+    patch: { config: plan.config },
+  }, databaseMutationHandler);
+  return isRecord(result) && isRecord(result.record) ? result.record : current;
+}
+
+function hostedViewConfigWithCompatMetadata(
+  currentConfig: Record<string, unknown>,
+  body: Record<string, unknown>,
+) {
+  const config = { ...currentConfig };
+  const metadata = isRecord(currentConfig.__notionCompat)
+    ? { ...currentConfig.__notionCompat }
+    : {};
+  if ('filter' in body) metadata.filter = body.filter ?? null;
+  if ('sorts' in body) metadata.sorts = body.sorts ?? null;
+  if ('configuration' in body && isRecord(body.configuration)) {
+    const prior = isRecord(metadata.configuration) ? metadata.configuration : {};
+    metadata.configuration = { ...prior, ...body.configuration };
+  }
+  config.__notionCompat = metadata;
+  return config;
 }
 
 async function updateView(context: FunctionContext, grant: McpOAuthGrant, args: Record<string, unknown>) {
   const selected = await requireWorkspaceArgument(context, grant, args, '_notion_update_view');
   if ('error' in selected) return selected.error;
-  const viewId = stripHanjiId(args.view_id);
+  const viewId = notionViewId(args.view_id);
   if (!viewId) return toolError('view_id is required.');
   // Resolve the view within the selected workspace (the lookup is workspace-
   // scoped) and confirm its data source belongs there before mutating it.
@@ -2234,13 +4505,48 @@ async function updateView(context: FunctionContext, grant: McpOAuthGrant, args: 
     'Data source',
   );
   requireContentScope(grant, dataSource, 'write');
-  const type = textValue(args.type);
+  const type = parseDatabaseViewType(view.type ?? 'table');
+  const hasConfigure = args.configure !== undefined;
+  const parsed = hasConfigure ? parseNotionViewConfigDsl(args.configure) : {};
+  const properties = hasConfigure ? await databaseProperties(context, dataSource.id) : [];
+  const initialPlan = hasConfigure
+    ? notionViewConfigurePlan(type, parsed, properties, view.config ?? {})
+    : { body: {}, config: view.config ?? {}, changed: false };
+  if (initialPlan.changed) {
+    const finalPlan = notionViewConfigurePlan(
+      type,
+      parsed,
+      properties,
+      hostedViewConfigWithCompatMetadata(view.config ?? {}, initialPlan.body),
+    );
+    await callProductFunction(context, grant, 'database-mutation', {
+      action: 'update',
+      table: 'db_views',
+      id: view.id,
+      databaseId: dataSource.id,
+      workspaceId: selected.workspaceId,
+      patch: {
+        name: textValue(args.name) || view.name,
+        config: finalPlan.config,
+      },
+    }, databaseMutationHandler);
+    // The mutation above is the only write. A later response-projection read
+    // can fail, but the durable state is already the exact requested state;
+    // there is no intermediate compat/local config split to roll back.
+    const payload = await callNotionCompat(
+      context,
+      grant,
+      'GET',
+      `views/${viewId}`,
+      undefined,
+      { workspace_id: selected.workspaceId },
+    );
+    return toolJson(payload);
+  }
   const payload = await callNotionCompat(context, grant, 'PATCH', `views/${viewId}`, {
     workspace_id: selected.workspaceId,
     name: args.name,
-    type: type || undefined,
-    config: isRecord(args.config) ? args.config : undefined,
-    ...(type && isRecord(args[type]) ? { [type]: args[type] } : {}),
+    ...initialPlan.body,
   });
   return toolJson(payload);
 }
@@ -2250,6 +4556,8 @@ function normalizedToolName(name: string | undefined) {
   const aliases: Record<string, string> = {
     'notion-search': '_search',
     'notion-fetch': '_fetch',
+    'notion-create-attachment': '_notion_create_attachment',
+    'notion-download-attachment': '_notion_download_attachment',
     'notion-query-data-sources': '_notion_query_data_sources',
     'notion-query-database-view': '_notion_query_database_view',
     'notion-create-pages': '_notion_create_pages',
@@ -2320,6 +4628,8 @@ async function callTool(context: FunctionContext, grant: McpOAuthGrant, name: st
     if (toolName === '_notion_get_users' || toolName === 'get_users') return await getUsers(context, grant, args);
     if (toolName === 'search' || toolName === '_search') return await searchNotion(context, grant, args);
     if (toolName === 'fetch' || toolName === '_fetch') return await fetchNotion(context, grant, args);
+    if (toolName === '_notion_create_attachment') return await createAttachment(context, grant, args);
+    if (toolName === '_notion_download_attachment') return await downloadAttachment(context, grant, args);
     if (toolName === '_notion_query_data_sources') return await queryDataSources(context, grant, args);
     if (toolName === '_notion_query_database_view') return await queryDatabaseView(context, grant, args);
     if (toolName === '_notion_create_pages' || toolName === 'create_pages') return await createPages(context, grant, args);
@@ -2335,18 +4645,27 @@ async function callTool(context: FunctionContext, grant: McpOAuthGrant, name: st
     if (toolName === '_notion_update_view') return await updateView(context, grant, args);
     if (toolName === '_notion_get_async_task') return await getAsyncTask(context, grant, args);
     if (toolName === '_notion_query_meeting_notes') {
-      requireGrantScope(grant, ['databases:read']);
+      requireGrantScope(grant, ['pages:read', 'databases:read']);
       const selected = await requireWorkspaceArgument(context, grant, args, '_notion_query_meeting_notes');
       if ('error' in selected) return selected.error;
-      return toolJson({
-        results: [],
-        has_more: false,
-        next_cursor: null,
-        is_unsupported: true,
-        unsupported_feature: 'notion_ai_meeting_notes',
+      const limit = hostedMeetingNoteLimit(args.limit);
+      const payload = await callNotionCompat(context, grant, 'POST', 'blocks/meeting_notes/query', {
         workspace_id: selected.workspaceId,
-        message: 'Hanji does not provide a separate Notion AI meeting-notes data source. Use normal page/database search or a Hanji database dedicated to meetings.',
+        filter: args.filter,
+        sort: args.sort,
+        // Collect one bounded compatibility window, then apply the grant's
+        // current semantic/resource authority before honoring the caller's
+        // requested result limit. This avoids per-result round trips and lets
+        // an allowed result survive a forbidden sibling in the same window.
+        limit: MAX_MCP_MEETING_NOTE_RESULTS,
       });
+      return toolJson(await filterHostedMeetingNotes(
+        context,
+        grant,
+        selected.workspaceId,
+        payload,
+        limit,
+      ));
     }
   } catch (error) {
     return toolError(error instanceof Error ? error.message : String(error));
@@ -2371,13 +4690,13 @@ function compatibilityReport(context: FunctionContext, grant: McpOAuthGrant) {
     `Resource: ${endpointUrls(context).resource}`,
     `Grant: ${grant.id}`,
     '',
-    'Hosted tool coverage now includes the current official Notion MCP-style surface for shared Hanji concepts: notion-search/fetch/create-pages/update-page/move-pages/duplicate-page/create-database/update-data-source/create-view/update-view/query-data-sources/query-database-view/query-meeting-notes/create-comment/get-comments/get-teams/get-users/get-async-task, plus OpenAI-compatible search/fetch aliases and legacy underscore aliases.',
+    'Hosted tool coverage includes all 20 current Notion connector names: notion-search/fetch/create-attachment/download-attachment/create-pages/update-page/move-pages/duplicate-page/create-database/update-data-source/create-view/update-view/query-data-sources/query-database-view/query-meeting-notes/create-comment/get-comments/get-teams/get-users/get-async-task, plus OpenAI-compatible search/fetch aliases and legacy underscore aliases.',
     '',
-    'Hanji differs from Notion in one important way: this OAuth connection can be account-scoped, so workspace-bound tools require an explicit `workspace_id`. Notion-compatible `teamspace_id` is accepted as an alias for the Hanji workspace id. Notion AI-only connected-source and meeting-notes behavior returns explicit fallback/unsupported metadata instead of being simulated.',
+    'Hanji differs from Notion in one important way: this OAuth connection can be account-scoped, so workspace-bound tools require an explicit `workspace_id`. Notion-compatible `teamspace_id` is accepted as an alias for the Hanji workspace id. Native and preserved imported meeting notes and transcripts enforce attendee, page ACL, content-scope, and grant-resource checks; connected-source and AI-search layers remain explicit fallbacks.',
     '',
     'Scope separation: `workspace:read` covers workspace/team/user/self metadata only and never content. Normal pages use `pages:*`; database pages and database rows use `databases:*`. Mixed search requires both read scopes, data-source search/query/view requires `databases:read`, and write scopes never substitute for read scopes. Duplicate and move authorize source/result/destination semantic families independently.',
     '',
-    'Current write boundary: create-pages, update-page, create-database, and update-data-source preserve the official names/schemas and validate scopes, but return an explicit unsupported result until the Notion-compatible primary write facade delegates to Hanji\'s canonical stored-file ownership, quota, and permanent-delete lifecycle. Async calls expose the same boundary as a completed failed task rather than claiming success.',
+    'Primary writes: create-pages, update-page, create-database, update-data-source, and create-attachment execute through canonical product mutation/file-lifecycle handlers after scope validation. Async-enabled calls persist a pollable result instead of reporting completion before the mutation outcome is known. Inline attachments intentionally accept only safe UTF-8 formats; active HTML/XML/SVG/CSS files are rejected by this surface under Hanji stored-file security policy.',
   ].join('\n');
 }
 
@@ -2385,7 +4704,7 @@ function enhancedMarkdownSpec() {
   return [
     '# Hanji Notion-Compatible Markdown',
     '',
-    'Hosted MCP exposes the page-body tool names and a practical Markdown-ish input schema, but primary create/update content writes fail closed in this release until they use Hanji\'s canonical stored-file lifecycle. A future enabled path will convert headings, paragraphs, bullet lines, and to-do lines to Notion-compatible block payloads before reaching the product API.',
+    'Hosted MCP page-body writes use the same Notion-compatible Markdown facade as the REST surface. Headings, paragraphs, bullet lines, and to-do lines are converted to canonical block mutations, while replace/update content commands use the page Markdown endpoint.',
     '',
     'Supported reference styles in fetch results include page/database/data-source JSON objects and collection URLs such as `collection://<database-id>`.',
     '',
@@ -2397,9 +4716,19 @@ function viewDslSpec() {
   return [
     '# Hanji Notion-Compatible View DSL',
     '',
-    'Hosted MCP view tools route through the Notion-compatible REST facade. Supported product view types are table, board, list, gallery, calendar, and timeline.',
+    'Hosted MCP view tools route through the Notion-compatible REST facade. All ten official view types and their exact configuration fields are retained.',
     '',
-    'For exact view configuration, pass the same JSON config fields accepted by Hanji database views through `_notion_create_view` or `_notion_update_view`.',
+    'Separate directives with semicolons or newlines:',
+    '- `FILTER "Property" = "value"`, `!=`, `CONTAINS`, `IS EMPTY`, or `IS NOT EMPTY`',
+    '- `SORT BY "Property" ASC|DESC`',
+    '- `GROUP BY "Property"` (required for board)',
+    '- `CALENDAR BY "Property"` (required for calendar)',
+    '- `TIMELINE BY "Start" TO "End"` (required for timeline)',
+    '- `MAP BY "Property"` (required for map)',
+    '- `CHART column|bar|line|donut|number` with optional `AGGREGATE`, `COLOR`, `HEIGHT`, `SORT`, `STACK BY`, and `CAPTION`',
+    '- `FORM CLOSE|OPEN`, `FORM ANONYMOUS true|false`, and `FORM PERMISSIONS none|comment_only|reader|read_and_write|editor`',
+    '- `SHOW`, `HIDE`, `COVER`, `WRAP CELLS`, `NO WRAP`, and `FREEZE COLUMNS [count|THROUGH "Property"]`',
+    '- On update, `CLEAR FILTER`, `CLEAR SORT`, and `CLEAR GROUP BY` remove those settings.',
   ].join('\n');
 }
 
@@ -2489,9 +4818,15 @@ export const GET = defineFunction({
   customBearerAuth: true,
   handler: async (rawContext: unknown) => {
     const context = rawContext as FunctionContext;
+    let auth: Awaited<ReturnType<typeof authenticatedGrant>> = null;
     try {
-      const auth = await authenticatedGrant(context);
-      if (!auth) return unauthorized(context);
+      auth = await authenticatedGrant(context);
+    } catch (error) {
+      if (error instanceof McpAuthenticationError) return unauthorized(context);
+      return asyncTaskInternalError(context, error);
+    }
+    if (!auth) return unauthorized(context);
+    try {
       const taskId = new URL(context.request.url).searchParams.get('async_task_id')?.trim();
       if (taskId) {
         const task = await asyncTaskForGrant(context, auth.grant, taskId);
@@ -2507,6 +4842,41 @@ export const GET = defineFunction({
             { status: 404, headers },
           );
         }
+        const workspaceId = textValue(task.operation?.workspace_id);
+        if (workspaceId) {
+          const db = context.admin.db('app');
+          const workspace = (await grantAccessibleWorkspaces(db, auth.grant))
+            .find((candidate) => candidate.id === workspaceId);
+          if (!workspace) {
+            return json(
+              {
+                object: 'error',
+                code: 'async_task_not_found',
+                message: 'Async task was not found.',
+              },
+              { status: 404, headers },
+            );
+          }
+          try {
+            await assertMcpClientApprovedForWorkspaces(db, [workspace], {
+              actorId: auth.grant.userId,
+              clientId: auth.grant.clientId,
+              clientName: auth.grant.clientName,
+              grantId: auth.grant.id,
+              stage: 'hosted_call',
+            });
+          } catch (error) {
+            if (isMcpClientGovernanceDenial(error)) {
+              return asyncTaskHttpError(
+                context,
+                403,
+                'restricted_resource',
+                error.message,
+              );
+            }
+            throw error;
+          }
+        }
         return json({ async_task: publicAsyncTask(context, task) }, { headers });
       }
       return json(
@@ -2517,8 +4887,8 @@ export const GET = defineFunction({
         },
         { headers: mcpHeaders(context.request) },
       );
-    } catch {
-      return unauthorized(context);
+    } catch (error) {
+      return asyncTaskInternalError(context, error);
     }
   },
 });

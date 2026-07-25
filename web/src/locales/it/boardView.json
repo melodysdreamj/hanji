@@ -13,7 +13,7 @@
   "groupName": "Nome gruppo",
   "groupOptions": "Opzioni del gruppo {{groupName}}",
   "groupThisBoard": "Raggruppa questa bacheca",
-  "groupThisBoardDesc": "Aggiungi una proprietà Selezione o Stato per creare colonne.",
+  "groupThisBoardDesc": "Aggiungi o scegli una proprietà Selezione, Stato, Persona o Selezione multipla per creare colonne.",
   "newGroup": "Nuovo gruppo",
   "newGroupIn": "Nuovo gruppo {{groupName}} in {{dbTitle}}",
   "newPage": "Nuovo",

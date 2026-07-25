@@ -11,6 +11,127 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#efe9dc" />
     <script src="/theme-init.js"></script>
+    <script src="/boot-init.js"></script>
+    <style>
+      :root {
+        --hanji-boot-bg: #ffffff;
+        --hanji-boot-text: rgb(44, 44, 43);
+        --hanji-boot-muted: rgb(125, 122, 117);
+        --hanji-boot-line: rgb(235, 234, 232);
+        --hanji-boot-border: rgb(230, 229, 227);
+        --hanji-boot-font: ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Helvetica, Arial, sans-serif;
+      }
+      html[data-theme="dark"] {
+        --hanji-boot-bg: rgb(25, 25, 25);
+        --hanji-boot-text: rgb(240, 239, 237);
+        --hanji-boot-muted: rgb(184, 181, 175);
+        --hanji-boot-line: rgb(48, 48, 46);
+        --hanji-boot-border: rgb(62, 62, 60);
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--hanji-boot-bg);
+        color: var(--hanji-boot-text);
+        font-family: var(--hanji-boot-font);
+      }
+      .pre-i18n-loading {
+        position: fixed;
+        inset: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+        background: var(--hanji-boot-bg);
+      }
+      .pre-i18n-private {
+        box-sizing: border-box;
+        display: grid;
+        width: 100%;
+        height: 100%;
+        place-items: center;
+        padding: 24px;
+      }
+      .pre-i18n-private-content {
+        display: flex;
+        min-width: 0;
+        max-width: min(92vw, 420px);
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        text-align: center;
+      }
+      .pre-i18n-mark {
+        display: block;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+      .pre-i18n-credit {
+        max-width: 100%;
+        margin: 0;
+        overflow: hidden;
+        color: var(--hanji-boot-muted);
+        font-size: 13px;
+        line-height: 1.5;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .pre-i18n-credit a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .pre-i18n-public {
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+      }
+      .pre-i18n-public-bar {
+        height: 44px;
+        border-bottom: 1px solid var(--hanji-boot-border);
+      }
+      .pre-i18n-public-page {
+        box-sizing: border-box;
+        width: min(100%, 900px);
+        margin: 0 auto;
+        padding: 76px 96px 48px;
+      }
+      .pre-i18n-skeleton-line {
+        display: block;
+        height: 14px;
+        margin-top: 18px;
+        border-radius: 4px;
+        background: var(--hanji-boot-line);
+      }
+      .pre-i18n-skeleton-line:first-child {
+        width: min(68%, 430px);
+        height: 38px;
+        margin-top: 0;
+        border-radius: 6px;
+      }
+      .pre-i18n-skeleton-line:nth-child(2) {
+        width: min(92%, 650px);
+        margin-top: 42px;
+      }
+      .pre-i18n-skeleton-line:nth-child(3) {
+        width: min(74%, 520px);
+      }
+      html:not([data-hanji-boot-route="public-share"]) .pre-i18n-public,
+      html[data-hanji-boot-route="public-share"] .pre-i18n-private {
+        display: none;
+      }
+      html[data-hanji-boot-warm="true"]:not([data-hanji-boot-route="public-share"])
+        .pre-i18n-loading {
+        display: none;
+      }
+      @media (max-width: 700px) {
+        .pre-i18n-public-page {
+          padding: 52px 28px 32px;
+        }
+      }
+    </style>
     <meta property="og:title" content="Hanji" />
     <meta property="og:description" content="Your connected workspace for notes and databases." />
     <meta property="og:type" content="website" />
@@ -19,7 +140,46 @@
     <title>Hanji</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main
+        class="pre-i18n-loading"
+        data-testid="pre-i18n-loading"
+        data-kind="private"
+        aria-busy="true"
+      >
+        <section class="pre-i18n-private">
+          <div class="pre-i18n-private-content">
+            <img
+              class="pre-i18n-mark"
+              src="/icon-192.png"
+              alt=""
+              aria-hidden="true"
+              width="48"
+              height="48"
+              fetchpriority="high"
+              data-testid="pre-i18n-mark"
+            />
+            <p class="pre-i18n-credit" data-testid="pre-i18n-credit">
+              Hanji is built with the help of
+              <a
+                data-hanji-boot-credit-link
+                href="https://www.cloudflare.com"
+                target="_blank"
+                rel="noreferrer noopener"
+              >Cloudflare</a>
+            </p>
+          </div>
+        </section>
+        <section class="pre-i18n-public" aria-hidden="true">
+          <div class="pre-i18n-public-bar"></div>
+          <div class="pre-i18n-public-page">
+            <span class="pre-i18n-skeleton-line" data-pre-i18n-skeleton-line></span>
+            <span class="pre-i18n-skeleton-line" data-pre-i18n-skeleton-line></span>
+            <span class="pre-i18n-skeleton-line" data-pre-i18n-skeleton-line></span>
+          </div>
+        </section>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "टिप्पणी जोड़ें",
+    "addLink": "लिंक जोड़ें",
+    "blockColor": "अंतिम रंग लागू करें",
+    "bold": "बोल्ड",
+    "copyPageLink": "पेज लिंक कॉपी करें",
+    "findInPage": "इस पेज पर खोजें",
+    "inlineCode": "इनलाइन कोड",
+    "italic": "इटैलिक",
+    "moveBlock": "ब्लॉक को दूसरे पेज पर ले जाएँ",
+    "moveBlockDown": "ब्लॉक को नीचे ले जाएँ",
+    "moveBlockUp": "ब्लॉक को ऊपर ले जाएँ",
+    "movePage": "वर्तमान पेज ले जाएँ",
+    "navigateBack": "पीछे जाएँ",
+    "navigateForward": "आगे जाएँ",
+    "newPage": "नया पेज",
+    "openBlockMenu": "ब्लॉक कार्रवाइयाँ खोलें",
+    "openKeyboardShortcuts": "कीबोर्ड शॉर्टकट खोलें",
+    "openParentPage": "मूल पेज खोलें",
+    "quickFind": "त्वरित खोज",
+    "strikethrough": "स्ट्राइकथ्रू",
+    "toggleAllToggles": "सभी टॉगल फैलाएँ या समेटें",
+    "toggleSidebar": "साइडबार टॉगल करें",
+    "toggleTheme": "डार्क मोड टॉगल करें",
+    "underline": "अंडरलाइन"
+  },
+  "categories": {
+    "createStyle": "बनाएँ और स्टाइल करें",
+    "editMove": "संपादित करें और स्थानांतरित करें",
+    "popular": "लोकप्रिय"
+  },
+  "categoriesLabel": "शॉर्टकट श्रेणियाँ",
+  "close": "बंद करें",
+  "closeBackdrop": "कीबोर्ड शॉर्टकट बंद करें",
+  "empty": "कोई शॉर्टकट नहीं मिला",
+  "keysFor": "{{action}} के लिए कुंजियाँ",
+  "or": "या",
+  "searchLabel": "कीबोर्ड शॉर्टकट खोजें",
+  "searchPlaceholder": "शॉर्टकट खोजें…",
+  "searchResults": "खोज परिणाम",
+  "searchTerms": {
+    "toggleTheme": "थीम लाइट डार्क दृश्य"
+  },
+  "title": "कीबोर्ड शॉर्टकट"
+}

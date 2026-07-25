@@ -1,6 +1,6 @@
 {
   "blockConflictKeepMine": "Anvend min version",
-  "blockConflictSave": "Denne blok blev redigeret på en anden enhed, så din offline-ændring blev ikke anvendt.",
+  "blockConflictSave": "En ventende redigering overlapper den seneste serverversion, så den kunne ikke flettes automatisk.",
   "blockMoveCommentsSkipped": "Blokken blev flyttet, men dens kommentarer kunne ikke flyttes med.",
   "databaseLockedSave": "Denne database er låst, så dine ændringer kunne ikke gemmes.",
   "databaseRowsLoadFailed": "Kunne ikke indlæse database-rækker. Prøv igen om et øjeblik.",
@@ -9,5 +9,6 @@
   "pageLockedSave": "Siden er låst, så dine ændringer kunne ikke gemmes.",
   "pageMissingSave": "Siden kunne ikke findes, så dine ændringer kunne ikke gemmes.",
   "saveFailed": "Dine ændringer kunne ikke gemmes.",
-  "sessionExpired": "Din session udløb, eller anmodningen kunne ikke autentificeres. Prøv venligst igen."
+  "sessionExpired": "Din session udløb, eller anmodningen kunne ikke autentificeres. Prøv venligst igen.",
+  "conflictSave": "Dette indhold blev ændret, før gemningen var fuldført, så din redigering kunne ikke gemmes."
 }

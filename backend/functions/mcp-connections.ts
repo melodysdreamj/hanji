@@ -1,4 +1,5 @@
 import { defineFunction } from '@edge-base/shared';
+import { assertMcpClientApprovedForWorkspaces } from '../lib/enterprise-controls';
 import {
   MCP_DEFAULT_SCOPES,
   type DbRef,
@@ -15,7 +16,9 @@ import {
   publicGrant,
   readOnlyFromScopes,
   requestBody,
+  revokeLegacyBroadMcpGrant,
   revokeMcpGrantFamily,
+  stringList,
   stringValue,
   validateMcpScopes,
 } from '../lib/mcp-oauth';
@@ -48,11 +51,16 @@ async function listConnections(context: FunctionContext) {
     const selectedWorkspaceIds = (grant.workspaceIds ?? [])
       .map(String)
       .filter((workspaceId) => accessibleWorkspaceIds.has(workspaceId));
-    const hasWorkspaceAccess = (grant.workspaceAccess ?? 'all_accessible') === 'selected'
-      ? selectedWorkspaceIds.length > 0
-      : workspaces.length > 0;
     let visibleGrant = grant;
-    if (grantIsActive(grant) && !hasWorkspaceAccess) {
+    if (await revokeLegacyBroadMcpGrant(db, grant)) {
+      const now = nowIso();
+      visibleGrant = {
+        ...grant,
+        status: 'revoked',
+        revokedAt: now,
+        revokedBy: 'system:legacy-broad-workspace-grant',
+      };
+    } else if (grantIsActive(grant) && selectedWorkspaceIds.length === 0) {
       const now = nowIso();
       await revokeMcpGrantFamily(db, grant.id, 'system:workspace-access-lost', now).catch((error) => {
         console.error('[mcp-connections] failed to revoke inaccessible grant:', error);
@@ -99,9 +107,27 @@ async function createManualToken(context: FunctionContext, body: Record<string, 
   const actorId = requireAuth(context);
   const db = context.admin.db('app');
   const urls = endpointUrls(context);
-  if ((await accessibleWorkspaces(db, actorId)).length === 0) {
+  const workspaces = await accessibleWorkspaces(db, actorId);
+  if (workspaces.length === 0) {
     throw new Error('No active workspace is available for MCP access.');
   }
+  const requestedWorkspaceIds = Array.from(new Set(stringList(
+    body.workspaceIds ?? body.workspace_ids ?? body.workspaceId ?? body.workspace_id,
+  )));
+  if (requestedWorkspaceIds.length === 0) {
+    throw new Error('Manual MCP tokens require at least one selected workspace.');
+  }
+  const workspaceById = new Map(workspaces.map((workspace) => [workspace.id, workspace]));
+  if (requestedWorkspaceIds.some((workspaceId) => !workspaceById.has(workspaceId))) {
+    throw new Error('A selected workspace is not accessible to this account.');
+  }
+  const selectedWorkspaces = requestedWorkspaceIds.map((workspaceId) => workspaceById.get(workspaceId)!);
+  await assertMcpClientApprovedForWorkspaces(db, selectedWorkspaces, {
+      actorId,
+      clientId: 'manual-token',
+      clientName: stringValue(body.clientName, 'Manual MCP token'),
+      stage: 'manual_token_authorization',
+  });
   const scopes = validateMcpScopes(body.scopes, MCP_DEFAULT_SCOPES);
   const grant = await db.table<McpOAuthGrant>('mcp_oauth_grants').insert({
     userId: actorId,
@@ -109,8 +135,8 @@ async function createManualToken(context: FunctionContext, body: Record<string, 
     clientName: stringValue(body.clientName, 'Manual MCP token'),
     resource: urls.resource,
     scopes,
-    workspaceAccess: 'all_accessible',
-    workspaceIds: [],
+    workspaceAccess: 'selected',
+    workspaceIds: requestedWorkspaceIds,
     pageIds: [],
     databaseIds: [],
     readOnly: readOnlyFromScopes(scopes),

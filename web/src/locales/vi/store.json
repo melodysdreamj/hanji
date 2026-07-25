@@ -7,7 +7,8 @@
   "pageMissingSave": "Không tìm thấy trang, vì vậy các thay đổi của bạn không thể được lưu.",
   "saveFailed": "Các thay đổi của bạn không thể được lưu.",
   "sessionExpired": "Phiên của bạn đã hết hạn hoặc yêu cầu không thể xác thực. Vui lòng thử lại.",
-  "blockConflictSave": "Khối này đã được chỉnh sửa trên thiết bị khác, vì vậy thay đổi ngoại tuyến của bạn không được áp dụng.",
+  "blockConflictSave": "Chỉnh sửa đang chờ trùng với phiên bản máy chủ mới nhất, không thể tự động hợp nhất.",
   "blockConflictKeepMine": "Áp dụng phiên bản của tôi",
-  "blockMoveCommentsSkipped": "Khối đã được di chuyển, nhưng các bình luận không thể di chuyển theo."
+  "blockMoveCommentsSkipped": "Khối đã được di chuyển, nhưng các bình luận không thể di chuyển theo.",
+  "conflictSave": "Nội dung đã thay đổi trước khi lưu hoàn tất, nên không thể lưu chỉnh sửa của bạn."
 }

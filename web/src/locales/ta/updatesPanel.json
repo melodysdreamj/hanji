@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} சமீபத்திய புதுப்பிப்புகள்",
     "unreadOfTotal": "{{total}} புதுப்பிப்புகளில் {{unread}} படிக்காதவை",
     "updateType": "புதுப்பிப்பு வகை",
-    "updates": "புதுப்பிப்புகள்",
-    "modeUpdates": "புதுப்பிப்புகள்",
-    "modeChats": "அரட்டைகள்",
-    "inboxMode": "உள்வரும் முறை"
+    "updates": "புதுப்பிப்புகள்"
   },
   "time": {
     "justNow": "இப்போதுதான்",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} பதிப்புகள்",
     "versionsAgo": "{{count}} பதிப்புகளுக்கு முன்",
     "versionsAhead": "{{count}} பதிப்புகள் முன்னால்",
-    "versionsAria": "பதிப்புகள்"
+    "versionsAria": "பதிப்புகள்",
+    "emptyBlock": "வெற்று தொகுதி",
+    "emptyPreview": "இந்தப் பதிப்பில் பக்க உள்ளடக்கம் இல்லை.",
+    "previewAria": "படிக்க மட்டும் பக்க பதிப்பு முன்னோட்டம்",
+    "previewingCurrent": "தற்போதைய பக்கம்",
+    "previewingSnapshot": "கடந்த பதிப்பு",
+    "previewOnlyHint": "ஒரு பதிப்பைத் தேர்ந்தெடுப்பது அதை முன்னோட்டமாக மட்டுமே காட்டும். மீட்டமைத்த பின்னரே தற்போதைய பக்கம் மாறும்.",
+    "restoreThisVersion": "மீட்டமை",
+    "restoring": "மீட்டமைக்கிறது...",
+    "versionHistory": "பதிப்பு வரலாறு"
   },
   "badges": {
     "comment": "கருத்து",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} குறிப்பிடப்பட்டது · {{preview}}",
     "referenceLink": "{{title}} உடன் இணைக்கப்பட்டது · {{preview}}",
     "unreadDot": "படிக்காதது",
-    "workspaceUpdate": "பணியிட புதுப்பிப்பு"
+    "workspaceUpdate": "பணியிட புதுப்பிப்பு",
+    "bySelf": "உங்களால்"
   },
   "empty": {
     "allCaughtUp": "நீங்கள் அனைத்தையும் பார்த்துவிட்டீர்கள்.",

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Çalışma alanı menüsünü aç",
   "closeWorkspaceMenu": "Çalışma alanı menüsünü kapat",
   "workspaceMenu": "Çalışma alanı menüsü",
-  "exportWorkspace": "Çalışma alanını dışa aktar",
+  "exportWorkspace": "Çalışma alanı JSON'ını dışa aktar (dosyalar hariç)",
   "exportedWorkspace": "Çalışma alanı Hanji dosyası olarak dışa aktarıldı.",
   "exportedWorkspaceWithPlaceholders": "Çalışma alanı Hanji dosyası olarak dışa aktarıldı — ekler yer tutucu olarak bırakıldı.",
   "couldntExportWorkspace": "Çalışma alanı dışa aktarılamadı.",
@@ -76,5 +76,12 @@
     "later": "Belki sonra",
     "note": "Bunu her zaman daha sonra kenar çubuğundaki İçe Aktar'dan başlatabilirsiniz.",
     "title": "Notion çalışma alanınızı Hanji'ye taşımak ister misiniz?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} takım alanına sayfa ekle",
+  "couldntExportWorkspaceArchive": "Çalışma alanı arşivi dışa aktarılamadı.",
+  "exportedWorkspaceArchive": "Dosyaları içeren bir çalışma alanı arşivi dışa aktarıldı.",
+  "exportWorkspaceArchive": "Çalışma alanı arşivini dışa aktar (dosyalar dahil)",
+  "joinTeamspaces": "Takım alanlarına katıl",
+  "keyboardShortcuts": "Klavye kısayolları",
+  "teamspacePages": "{{name}} sayfaları"
 }

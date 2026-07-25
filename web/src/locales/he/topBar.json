@@ -38,7 +38,7 @@
   "moveTo": "העבר אל",
   "exporting": "מייצא…",
   "exportAsMarkdown": "ייצא כ-Markdown",
-  "exportAsHanji": "ייצא כקובץ Hanji",
+  "exportAsHanji": "ייצא Hanji JSON (ללא קבצים)",
   "importing": "מייבא…",
   "importMarkdown": "ייבוא Markdown",
   "unlockPage": "פתח דף",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "לא ניתן היה לעדכן גישה",
     "removedFromAccessList": "הוסר מרשימת הגישה",
     "couldntRemoveAccess": "לא ניתן היה להסיר גישה",
-    "couldntLoadAccessList": "לא ניתן היה לטעון רשימת גישה"
+    "couldntLoadAccessList": "לא ניתן היה לטעון רשימת גישה",
+    "couldntExportHanjiArchive": "לא ניתן היה לייצא ארכיון Hanji.",
+    "exportedHanjiArchive": "ייצא ארכיון Hanji עם קבצים."
   },
   "user": "משתמש",
   "whoHasAccess": "למי יש גישה",
   "workspace": "סביבת עבודה",
   "workspaceCount_one": "{{count}} סביבת עבודה",
   "workspaceCount_other": "{{count}} סביבות עבודה",
-  "you": "את/ה"
+  "you": "את/ה",
+  "exportAsHanjiArchive": "ייצא ארכיון Hanji (כולל קבצים)",
+  "turnIntoWiki": "הפוך לויקי",
+  "undoWiki": "בטל ויקי",
+  "wikiCreated": "הדף הפך לויקי",
+  "wikiPageSettings": "הגדרות דף ויקי",
+  "wikiUndone": "ויקי הוסר; תוכן הדף נשמר",
+  "wikiUpdateFailed": "לא ניתן לעדכן את הויקי"
 }

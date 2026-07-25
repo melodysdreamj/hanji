@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Maelezo ya video",
     "videoEmptyHint": "Pakia faili la video, bandika kiungo cha moja kwa moja, au tumia kiungo cha YouTube, Vimeo, au Loom.",
-    "videoLink": "Kiungo cha video"
+    "videoLink": "Kiungo cha video",
+    "audioPlaybackFailed": "Sauti hii haikuweza kuchezwa. Badilisha au fungua faili asili.",
+    "videoPlaybackFailed": "Video hii haikuweza kuchezwa. Badilisha au fungua faili asili."
   },
   "bookmark": {
     "copy": "Nakili kiungo cha alamisho",

@@ -176,7 +176,9 @@
     "video": "Vidéo",
     "videoCaption": "Légende vidéo",
     "videoEmptyHint": "Téléchargez un fichier vidéo, collez un lien direct ou utilisez un lien YouTube, Vimeo ou Loom.",
-    "videoLink": "Lien vidéo"
+    "videoLink": "Lien vidéo",
+    "audioPlaybackFailed": "Cet audio n'a pas pu être lu. Remplacez-le ou ouvrez le fichier d'origine.",
+    "videoPlaybackFailed": "Cette vidéo n'a pas pu être lue. Remplacez-la ou ouvrez le fichier d'origine."
   },
   "bookmark": {
     "copy": "Copier le lien du signet",

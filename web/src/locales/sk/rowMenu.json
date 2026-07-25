@@ -35,7 +35,7 @@
     "rename": "Premenovať",
     "addPageInside": "Pridať stránku dovnútra",
     "exportAsMarkdown": "Exportovať ako Markdown",
-    "exportAsHanjiFile": "Exportovať ako súbor Hanji",
+    "exportAsHanjiFile": "Exportovať Hanji JSON (bez súborov)",
     "importMarkdown": "Importovať Markdown",
     "importing": "Importovanie...",
     "unlockPage": "Odomknúť stránku",
@@ -44,7 +44,8 @@
     "removeVerification": "Odstrániť overenie",
     "verifyPage": "Overiť stránku",
     "customizePage": "Prispôsobiť stránku",
-    "undo": "Vrátiť späť"
+    "undo": "Vrátiť späť",
+    "exportAsHanjiArchive": "Exportovať archív Hanji (vrátane súborov)"
   },
   "customize": {
     "summaryDefault": "Predvolené",
@@ -101,6 +102,8 @@
     "movedToTrash": "Presunuté do Koša",
     "restoredPage": "Obnovená stránka",
     "couldntRestorePage": "Stránku sa nepodarilo obnoviť",
-    "couldntMoveToTrash": "Nepodarilo sa presunúť do Koša"
+    "couldntMoveToTrash": "Nepodarilo sa presunúť do Koša",
+    "couldntExportHanjiArchive": "Nepodarilo sa exportovať archív Hanji.",
+    "exportedHanjiArchive": "Exportoval sa archív Hanji so súbormi."
   }
 }

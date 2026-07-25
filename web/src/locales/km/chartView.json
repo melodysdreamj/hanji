@@ -4,7 +4,22 @@
     "sum": "សរុប",
     "average": "មធ្យម",
     "min": "អប្បបរមា",
-    "max": "អតិបរមា"
+    "max": "អតិបរមា",
+    "checked": "បានធីក",
+    "count_values": "រាប់តម្លៃ",
+    "date_range": "ជួរកាលបរិច្ឆេទ",
+    "earliest_date": "កាលបរិច្ឆេទដំបូងបំផុត",
+    "empty": "រាប់ទទេ",
+    "latest_date": "កាលបរិច្ឆេទចុងក្រោយ",
+    "median": "មធ្យម",
+    "not_empty": "រាប់មិនទទេ",
+    "percent_checked": "ភាគរយបានធីក",
+    "percent_empty": "ភាគរយទទេ",
+    "percent_not_empty": "ភាគរយមិនទទេ",
+    "percent_unchecked": "ភាគរយមិនបានធីក",
+    "range": "ជួរ",
+    "unchecked": "មិនបានធីក",
+    "unique": "រាប់តម្លៃតែមួយគត់"
   },
   "chartAria": "តារាង {{name}}",
   "chartType": "ប្រភេទតារាង",
@@ -27,5 +42,9 @@
   "untitledProperty": "គ្មានចំណងជើង",
   "valueProperty": "លក្ខណសម្បត្តិតម្លៃ",
   "xAxis": "អ័ក្ស X",
-  "yAxis": "អ័ក្ស Y"
+  "yAxis": "អ័ក្ស Y",
+  "dateRangeDays": "{{count}} ថ្ងៃ",
+  "missingProperty": "លក្ខណៈសម្បត្តិដែលបានរក្សាទុក",
+  "unsupportedAggregateDesc": "{{aggregate}} មិនអាចគណនាពី {{property}} បានទេ។ ជ្រើសរើសលក្ខណៈសម្បត្តិ ឬការគណនាដែលត្រូវគ្នា។",
+  "unsupportedAggregateTitle": "ការគណនាតារាងនេះមិនអាចប្រើបានទេ"
 }

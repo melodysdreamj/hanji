@@ -38,7 +38,7 @@
   "moveTo": "ရွှေ့ရန်",
   "exporting": "တင်ပို့နေသည်…",
   "exportAsMarkdown": "Markdown အဖြစ် ထုတ်ယူရန်",
-  "exportAsHanji": "Hanji ဖိုင်အဖြစ် ထုတ်ယူရန်",
+  "exportAsHanji": "Hanji JSON ထုတ်ယူရန် (ဖိုင်များမပါဝင်)",
   "importing": "တင်သွင်းနေသည်…",
   "importMarkdown": "Markdown တင်သွင်းပါ",
   "unlockPage": "စာမျက်နှာ သော့ဖွင့်ရန်",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ဝင်ရောက်ခွင့်ကို အပ်ဒိတ်လုပ်၍မရပါ",
     "removedFromAccessList": "ဝင်ရောက်ခွင့်စာရင်းမှ ဖယ်ရှားပြီး",
     "couldntRemoveAccess": "ဝင်ရောက်ခွင့်ကို ဖယ်ရှား၍မရပါ",
-    "couldntLoadAccessList": "ဝင်ရောက်ခွင့်စာရင်းကို ဖွင့်၍မရပါ"
+    "couldntLoadAccessList": "ဝင်ရောက်ခွင့်စာရင်းကို ဖွင့်၍မရပါ",
+    "couldntExportHanjiArchive": "Hanji မော်ကွန်း ထုတ်ယူနိုင်မှုမရှိပါ။",
+    "exportedHanjiArchive": "ဖိုင်များပါဝင်သော Hanji မော်ကွန်းကို ထုတ်ယူပြီးပါပြီ။"
   },
   "user": "အသုံးပြုသူ",
   "whoHasAccess": "ဝင်ရောက်ခွင့်ရှိသူများ",
   "workspace": "လုပ်ငန်းခွင်",
   "workspaceCount_one": "လုပ်ငန်းခွင် {{count}} ခု",
   "workspaceCount_other": "လုပ်ငန်းခွင် {{count}} ခု",
-  "you": "ကျွန်ုပ်"
+  "you": "ကျွန်ုပ်",
+  "exportAsHanjiArchive": "Hanji မော်ကွန်းထုတ်ယူရန် (ဖိုင်များပါဝင်)",
+  "turnIntoWiki": "ဝီကီအဖြစ် ပြောင်းရန်",
+  "undoWiki": "ဝီကီ ပြန်ဖျက်ရန်",
+  "wikiCreated": "စာမျက်နှာကို ဝီကီသို့ ပြောင်းပြီးပါပြီ။",
+  "wikiPageSettings": "ဝီကီစာမျက်နှာ ဆက်တင်များ",
+  "wikiUndone": "ဝီကီ ဖျက်လိုက်ပြီ; စာမျက်နှာအကြောင်းအရာ ထိန်းသိမ်းထားသည်။",
+  "wikiUpdateFailed": "ဝီကီကို အပ်ဒိတ်လုပ်၍မရပါ။"
 }

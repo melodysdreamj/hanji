@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Reactie toevoegen",
+    "addLink": "Link toevoegen",
+    "blockColor": "Laatst gebruikte kleur toepassen",
+    "bold": "Vet",
+    "copyPageLink": "Paginalink kopiëren",
+    "findInPage": "Op deze pagina zoeken",
+    "inlineCode": "Inline-code",
+    "italic": "Cursief",
+    "moveBlock": "Blok naar andere pagina verplaatsen",
+    "moveBlockDown": "Blok omlaag verplaatsen",
+    "moveBlockUp": "Blok omhoog verplaatsen",
+    "movePage": "Huidige pagina verplaatsen",
+    "navigateBack": "Terug",
+    "navigateForward": "Vooruit",
+    "newPage": "Nieuwe pagina",
+    "openBlockMenu": "Blokacties openen",
+    "openKeyboardShortcuts": "Toetsenbord sneltoetsen openen",
+    "openParentPage": "Bovenliggende pagina openen",
+    "quickFind": "Snel zoeken",
+    "strikethrough": "Doorhalen",
+    "toggleAllToggles": "Alle toggles uit- of invouwen",
+    "toggleSidebar": "Zijbalk in-/uitschakelen",
+    "toggleTheme": "Donkere modus in-/uitschakelen",
+    "underline": "Onderstrepen"
+  },
+  "categories": {
+    "createStyle": "Maken en opmaken",
+    "editMove": "Bewerken en verplaatsen",
+    "popular": "Populair"
+  },
+  "categoriesLabel": "Sneltoetscategorieën",
+  "close": "Sluiten",
+  "closeBackdrop": "Toetsenbord sneltoetsen sluiten",
+  "empty": "Geen sneltoetsen gevonden",
+  "keysFor": "Toetsen voor {{action}}",
+  "or": "of",
+  "searchLabel": "Sneltoetsen doorzoeken",
+  "searchPlaceholder": "Sneltoetsen zoeken…",
+  "searchResults": "Zoekresultaten",
+  "searchTerms": {
+    "toggleTheme": "thema licht donker uiterlijk"
+  },
+  "title": "Sneltoetsen"
+}

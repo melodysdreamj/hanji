@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Şərh əlavə et",
+    "addLink": "Link əlavə et",
+    "blockColor": "Son istifadə edilən rəngi tətbiq et",
+    "bold": "Qalın",
+    "copyPageLink": "Səhifə linkini kopyala",
+    "findInPage": "Bu səhifədə axtar",
+    "inlineCode": "Inline kod",
+    "italic": "Kursiv",
+    "moveBlock": "Bloku başqa səhifəyə keçir",
+    "moveBlockDown": "Bloku aşağı hərəkət etdir",
+    "moveBlockUp": "Bloku yuxarı hərəkət etdir",
+    "movePage": "Cari səhifəni keçir",
+    "navigateBack": "Geri",
+    "navigateForward": "İrəli",
+    "newPage": "Yeni səhifə",
+    "openBlockMenu": "Blok əməliyyatlarını aç",
+    "openKeyboardShortcuts": "Klaviatura qısayollarını aç",
+    "openParentPage": "Ana səhifəni aç",
+    "quickFind": "Tez axtarış",
+    "strikethrough": "Üstündən xətt çəkmə",
+    "toggleAllToggles": "Bütün toggle-ları genişləndir və ya yığ",
+    "toggleSidebar": "Yan paneli dəyiş",
+    "toggleTheme": "Tünd rejimi dəyiş",
+    "underline": "Alt xətt"
+  },
+  "categories": {
+    "createStyle": "Yarat və üslubla",
+    "editMove": "Redaktə & hərəkət",
+    "popular": "Populyar"
+  },
+  "categoriesLabel": "Qısayol kateqoriyaları",
+  "close": "Bağla",
+  "closeBackdrop": "Klaviatura qısayollarını bağla",
+  "empty": "Qısayol tapılmadı",
+  "keysFor": "{{action}} üçün düymələr",
+  "or": "və ya",
+  "searchLabel": "Klaviatura qısa yollarını axtar",
+  "searchPlaceholder": "Qısa yolları axtar…",
+  "searchResults": "Axtarış nəticələri",
+  "searchTerms": {
+    "toggleTheme": "tema açıq qaranlıq görünüş"
+  },
+  "title": "Klaviatura qısa yolları"
+}

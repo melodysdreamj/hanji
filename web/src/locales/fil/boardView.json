@@ -13,7 +13,7 @@
   "groupName": "Pangalan ng grupo",
   "groupOptions": "Mga opsyon ng grupong {{groupName}}",
   "groupThisBoard": "I-grupo ang board na ito",
-  "groupThisBoardDesc": "Magdagdag ng Select o Status property para makagawa ng mga column.",
+  "groupThisBoardDesc": "Magdagdag o pumili ng Select, Status, Person, o Multi-select na property para gumawa ng mga column.",
   "newGroup": "Bagong grupo",
   "newGroupIn": "Bagong grupong {{groupName}} sa {{dbTitle}}",
   "newPage": "Bago",

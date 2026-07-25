@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} ta orqaga havola",
-    "count_other": "{{count}} ta orqaga havola"
+    "count_other": "{{count}} ta orqaga havola",
+    "partial_one": "{{count}}+ orqa havola",
+    "partial_other": "{{count}}+ orqa havola"
   },
   "header": {
     "title": "Bog'langan eslatmalar"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ta eslatma",
     "mention_other": "{{count}} ta eslatma",
     "link_one": "{{count}} ta havola",
-    "link_other": "{{count}} ta havola"
+    "link_other": "{{count}} ta havola",
+    "loaded": "Yuklandi: {{summary}}"
   },
   "kind": {
     "mention": "Eslatma",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Yana {{count}} ta orqaga havola",
-    "count_other": "Yana {{count}} ta orqaga havola"
+    "count_other": "Yana {{count}} ta orqaga havola",
+    "load": "Ko‘proq orqa havola yuklash",
+    "loading": "Orqa havolalar yuklanmoqda…",
+    "search": "Orqa havolalarni qidirish"
   }
 }

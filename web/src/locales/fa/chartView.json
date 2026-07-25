@@ -4,7 +4,22 @@
     "sum": "مجموع",
     "average": "میانگین",
     "min": "حداقل",
-    "max": "حداکثر"
+    "max": "حداکثر",
+    "checked": "علامت‌خورده",
+    "count_values": "تعداد مقادیر",
+    "date_range": "محدوده تاریخ",
+    "earliest_date": "قدیمی‌ترین تاریخ",
+    "empty": "تعداد خالی",
+    "latest_date": "جدیدترین تاریخ",
+    "median": "میانه",
+    "not_empty": "تعداد غیرخالی",
+    "percent_checked": "درصد علامت‌خورده",
+    "percent_empty": "درصد خالی",
+    "percent_not_empty": "درصد غیرخالی",
+    "percent_unchecked": "درصد علامت‌نخورده",
+    "range": "محدوده",
+    "unchecked": "علامت‌نخورده",
+    "unique": "تعداد مقادیر یکتا"
   },
   "chartAria": "نمودار {{name}}",
   "chartType": "نوع نمودار",
@@ -27,5 +42,9 @@
   "untitledProperty": "بدون عنوان",
   "valueProperty": "ویژگی مقدار",
   "xAxis": "محور X",
-  "yAxis": "محور Y"
+  "yAxis": "محور Y",
+  "dateRangeDays": "{{count}} روز",
+  "missingProperty": "ویژگی ذخیره‌شده",
+  "unsupportedAggregateDesc": "{{aggregate}} از {{property}} قابل محاسبه نیست. یک ویژگی یا محاسبه سازگار انتخاب کنید.",
+  "unsupportedAggregateTitle": "این محاسبه نمودار در دسترس نیست"
 }

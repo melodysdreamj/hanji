@@ -1,5 +1,7 @@
 import { listAll, type TransactDb } from './table-utils';
 import { hanjiEnvFlag, hanjiEnvValue } from './hanji-compat';
+import { escapeHtml } from './html-escape';
+export { escapeHtml } from './html-escape';
 export { listAll, nowIso } from './table-utils';
 
 export const MCP_SUPPORTED_SCOPES = [
@@ -21,6 +23,8 @@ export const MCP_DEFAULT_SCOPES = [
   'databases:write',
   'comments:read',
   'comments:write',
+  'files:read',
+  'files:write',
   'workspace:read',
 ];
 
@@ -286,15 +290,6 @@ export function htmlPage(title: string, body: string, status = 200) {
   });
 }
 
-export function escapeHtml(value: unknown) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
 export async function requestBody(request?: Request) {
   if (!request) return {};
   const contentType = request.headers.get('content-type') ?? '';
@@ -304,7 +299,12 @@ export async function requestBody(request?: Request) {
   }
   const text = await request.text();
   const params = new URLSearchParams(text);
-  return Object.fromEntries(params.entries());
+  const body: Record<string, unknown> = {};
+  for (const key of new Set(params.keys())) {
+    const values = params.getAll(key);
+    body[key] = values.length > 1 ? values : values[0] ?? '';
+  }
+  return body;
 }
 
 export function stringValue(value: unknown, fallback = '') {
@@ -450,10 +450,32 @@ export async function accessibleWorkspaces(db: DbRef, userId: string) {
   );
 }
 
+export const MCP_LEGACY_BROAD_GRANT_REVOKED_BY = 'system:legacy-broad-workspace-grant';
+
+function fixedGrantWorkspaceIds(grant: McpOAuthGrant) {
+  if (grant.workspaceAccess !== 'selected' || !Array.isArray(grant.workspaceIds)) return null;
+  const ids = grant.workspaceIds.map((value) =>
+    typeof value === 'string' ? value.trim() : '',
+  );
+  if (ids.length === 0 || ids.some((id) => !id)) return null;
+  return Array.from(new Set(ids));
+}
+
+export function grantHasFixedWorkspaceScope(grant: McpOAuthGrant | null | undefined) {
+  return !!grant && fixedGrantWorkspaceIds(grant) !== null;
+}
+
+export async function revokeLegacyBroadMcpGrant(db: DbRef, grant: McpOAuthGrant) {
+  if (!grantIsActive(grant) || grantHasFixedWorkspaceScope(grant)) return false;
+  await revokeMcpGrantFamily(db, grant.id, MCP_LEGACY_BROAD_GRANT_REVOKED_BY);
+  return true;
+}
+
 export async function grantAccessibleWorkspaces(db: DbRef, grant: McpOAuthGrant) {
+  const selectedIds = fixedGrantWorkspaceIds(grant);
+  if (!selectedIds) return [];
   const rows = await accessibleWorkspaces(db, grant.userId);
-  if ((grant.workspaceAccess ?? 'all_accessible') !== 'selected') return rows;
-  const allowed = new Set((grant.workspaceIds ?? []).map(String));
+  const allowed = new Set(selectedIds);
   return rows.filter((workspace) => allowed.has(workspace.id));
 }
 
@@ -677,7 +699,11 @@ export async function verifyAccessToken(
   return payload;
 }
 
-async function verifySignedJwt(
+// Shared signature primitive for protocol adapters that intentionally reuse
+// the hosted OAuth signing key while enforcing their own `typ`, audience, and
+// scope claims. Callers must validate those claims after signature checking;
+// this helper deliberately does not make an MCP-audience decision.
+export async function verifySignedJwt(
   token: string,
   env: Record<string, unknown> | undefined,
   request?: Request,

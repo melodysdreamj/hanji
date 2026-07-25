@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Keterangan video",
     "videoEmptyHint": "Unggah file video, tempel tautan langsung, atau gunakan tautan YouTube, Vimeo, atau Loom.",
-    "videoLink": "Tautan video"
+    "videoLink": "Tautan video",
+    "audioPlaybackFailed": "Audio ini tidak dapat diputar. Ganti atau buka file aslinya.",
+    "videoPlaybackFailed": "Video ini tidak dapat diputar. Ganti atau buka file aslinya."
   },
   "bookmark": {
     "copy": "Salin tautan bookmark",

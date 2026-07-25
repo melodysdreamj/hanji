@@ -247,7 +247,9 @@
     "runningHint": "Păstrați această filă de browser deschisă în timp ce importul rulează.",
     "noJobHint": "Începeți descoperirea de la pasul Domeniu.",
     "applyLocksHint": "Aplicarea scrie elementele descoperite în acest workspace.",
-    "browserRunnerWarning": "Importul rulează în această filă de browser. Păstrați fila deschisă până la terminare. Închiderea sau reîncărcarea filei întrerupe procesarea; redeschiderea Hanji reia de la progresul salvat."
+    "browserRunnerWarning": "Importul rulează în această filă de browser. Păstrați fila deschisă până la terminare. Închiderea sau reîncărcarea filei întrerupe procesarea; redeschiderea Hanji reia de la progresul salvat.",
+    "serverRunnerStatus": "Hanji procesează acest import pe server. Închiderea sau reîncărcarea acestei file nu-l va întrerupe.",
+    "serverRunningHint": "Importul continuă în fundal. Poți închide această filă."
   },
   "installer": {
     "elapsed": "Timp scurs",
@@ -281,9 +283,9 @@
     "title": "Import din Hanji",
     "fromFile": "Din fișier",
     "fromLive": "Dintr-o instanță activă",
-    "choose": "Alegeți un fișier .hanji.json",
+    "choose": "Alegeți un fișier .hanji.json sau .hanji.zip",
     "chooseButton": "Alege fișier",
-    "fileHint": "Exportați o pagină, o bază de date sau un spațiu de lucru dintr-un alt Hanji, apoi importați-l aici. Relațiile, rollup-urile, formulele, vizualizările și șabloanele sunt păstrate. Atașamentele nu sunt incluse.",
+    "fileHint": "Folosiți .hanji.json doar pentru structură (fișiere excluse) sau .hanji.zip pentru o transferare fără pierderi (fișiere incluse). Relațiile, rollup-urile, formulele, vizualizările și șabloanele sunt păstrate.",
     "selected": "Selectat: {{name}}",
     "importButton": "Importați",
     "importing": "Se importă...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "opțional",
     "fetch": "Preia exportul",
     "fetching": "Se încarcă...",
-    "liveHint": "Extrageți un spațiu de lucru direct de la un alt Hanji în funcțiune (de exemplu, o instanță de dezvoltare Docker). La distanță trebuie să permită cererile de la această adresă.",
+    "liveHint": "Preluați un spațiu de lucru direct de la un Hanji care rulează (de exemplu, o instanță Docker dev). Fișierele sunt excluse. Sursa la distanță trebuie să permită solicitări de la această adresă.",
     "review": "Gata de import: {{summary}}",
     "placeholderNote": "Unele atașamente au rămas ca înlocuitori.",
     "importedItems_one": "Am importat {{count}} element din fișierul Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "Nu s-a putut citi fișierul Hanji.",
     "cantImport": "Nu s-a putut importa fișierul Hanji.",
     "needFile": "Selectați mai întâi un fișier Hanji.",
-    "needRemote": "Introduceți URL-ul Hanji la distanță și ID-ul spațiului de lucru."
+    "needRemote": "Introduceți URL-ul Hanji la distanță și ID-ul spațiului de lucru.",
+    "filesExcluded": "Fișiere excluse.",
+    "filesIncluded": "Fișiere incluse."
   },
   "connectWithNotion": "Conectează-te cu Notion",
   "cantStartOAuth": "Conexiunea Notion nu a putut fi inițiată.",
-  "oauthConfiguredHint": "Acest server are o integrare Notion OAuth configurată. Configurarea token-ului rămâne disponibilă pentru conexiuni auto-găzduite."
+  "oauthConfiguredHint": "Acest server are o integrare Notion OAuth configurată. Configurarea token-ului rămâne disponibilă pentru conexiuni auto-găzduite.",
+  "terminal": {
+    "cancelled": "Importul a fost anulat. Poți să-l reîncepi în siguranță când ești gata.",
+    "failed": "Importul s-a oprit în siguranță înainte de a se finaliza. Verifică conexiunea și încearcă din nou. Detaliile tehnice și identificatorii sunt ascunse aici."
+  }
 }

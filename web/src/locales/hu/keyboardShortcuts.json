@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Megjegyzés hozzáadása",
+    "addLink": "Link hozzáadása",
+    "blockColor": "Utolsó használt szín alkalmazása",
+    "bold": "Félkövér",
+    "copyPageLink": "Oldallink másolása",
+    "findInPage": "Keresés az oldalon",
+    "inlineCode": "Beágyazott kód",
+    "italic": "Dőlt",
+    "moveBlock": "Blokk áthelyezése másik oldalra",
+    "moveBlockDown": "Blokk lefelé mozgatása",
+    "moveBlockUp": "Blokk felfelé mozgatása",
+    "movePage": "Aktuális oldal áthelyezése",
+    "navigateBack": "Vissza",
+    "navigateForward": "Előre",
+    "newPage": "Új oldal",
+    "openBlockMenu": "Blokk műveletek megnyitása",
+    "openKeyboardShortcuts": "Billentyűparancsok megnyitása",
+    "openParentPage": "Szülőoldal megnyitása",
+    "quickFind": "Gyorskeresés",
+    "strikethrough": "Áthúzás",
+    "toggleAllToggles": "Összes lenyíló kibontása vagy összecsukása",
+    "toggleSidebar": "Oldalsáv váltása",
+    "toggleTheme": "Sötét mód váltása",
+    "underline": "Aláhúzás"
+  },
+  "categories": {
+    "createStyle": "Létrehozás és stílus",
+    "editMove": "Szerkesztés és mozgatás",
+    "popular": "Népszerű"
+  },
+  "categoriesLabel": "Billentyűparancs kategóriák",
+  "close": "Bezárás",
+  "closeBackdrop": "Billentyűparancsok bezárása",
+  "empty": "Nincs találat",
+  "keysFor": "{{action}} billentyűi",
+  "or": "vagy",
+  "searchLabel": "Billentyűparancsok keresése",
+  "searchPlaceholder": "Parancsok keresése…",
+  "searchResults": "Keresési eredmények",
+  "searchTerms": {
+    "toggleTheme": "téma világos sötét megjelenés"
+  },
+  "title": "Billentyűparancsok"
+}

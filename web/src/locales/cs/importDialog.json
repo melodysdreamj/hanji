@@ -59,18 +59,18 @@
   "hanji": {
     "cantImport": "Soubor Hanji nelze importovat.",
     "cantRead": "Soubor Hanji nelze přečíst.",
-    "choose": "Vyberte soubor .hanji.json",
+    "choose": "Vybrat soubor .hanji.json nebo .hanji.zip",
     "chooseButton": "Vyberte soubor",
     "fetch": "Načíst export",
     "fetching": "Načítání...",
-    "fileHint": "Exportujte stránku, databázi nebo pracovní prostor z jiného Hanji a poté jej sem importujte. Relace, souhrny, vzorce, zobrazení a šablony jsou zachovány. Přílohy nejsou zahrnuty.",
+    "fileHint": "Použijte .hanji.json pro strukturu (bez souborů) nebo .hanji.zip pro bezztrátový přenos (včetně souborů). Vztahy, rollupy, vzorce, zobrazení a šablony jsou zachovány.",
     "fromFile": "Ze souboru",
     "fromLive": "Z živé instance",
     "importButton": "Importovat",
     "importedItems_one": "Importováno {{count}} položka ze souboru Hanji.",
     "importedItems_other": "Importováno {{count}} položek ze souboru Hanji.",
     "importing": "Importování...",
-    "liveHint": "Importujte pracovní prostor přímo z jiného běžícího Hanji (např. Docker dev instance). Vzdálený server musí povolovat požadavky z této adresy.",
+    "liveHint": "Importujte pracovní prostor přímo z jiného běžícího Hanji (např. Docker dev instance). Soubory jsou vyloučeny. Vzdálený server musí povolit požadavky z této adresy.",
     "needFile": "Nejprve vyberte soubor Hanji.",
     "needRemote": "Zadejte adresu URL vzdáleného Hanji a ID pracovního prostoru.",
     "placeholderNote": "Některé přílohy zůstaly jako zástupné symboly.",
@@ -82,7 +82,9 @@
     "review": "Připraveno k importu: {{summary}}",
     "selected": "Vybráno: {{name}}",
     "tab": "Hanji",
-    "title": "Import z Hanji"
+    "title": "Import z Hanji",
+    "filesExcluded": "Soubory vyloučeny.",
+    "filesIncluded": "Soubory zahrnuty."
   },
   "importApplied": "Import z Notion aplikován.",
   "importCancelled": "Import z Notion zrušen.",
@@ -305,6 +307,12 @@
       "Najít",
       "Použít"
     ],
-    "stepsAria": "Kroky importu z Notion"
+    "stepsAria": "Kroky importu z Notion",
+    "serverRunnerStatus": "Hanji zpracovává tento import na serveru. Zavření nebo obnovení této karty jej nepozastaví.",
+    "serverRunningHint": "Import pokračuje na pozadí. Tuto kartu můžete zavřít."
+  },
+  "terminal": {
+    "cancelled": "Import byl zrušen. Až budete připraveni, můžete jej bezpečně spustit znovu.",
+    "failed": "Import se před dokončením bezpečně zastavil. Zkontrolujte připojení a zkuste to znovu. Technické podrobnosti a identifikátory jsou zde skryty."
   }
 }

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} อัปเดตล่าสุด",
     "unreadOfTotal": "ยังไม่ได้อ่าน {{unread}} รายการจาก {{total}} อัปเดต",
     "updateType": "ประเภทอัปเดต",
-    "updates": "อัปเดต",
-    "modeUpdates": "อัปเดต",
-    "modeChats": "แชท",
-    "inboxMode": "โหมดกล่องข้อความ"
+    "updates": "อัปเดต"
   },
   "time": {
     "justNow": "เมื่อสักครู่",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} เวอร์ชัน",
     "versionsAgo": "{{count}} เวอร์ชันที่แล้ว",
     "versionsAhead": "อีก {{count}} เวอร์ชันถัดไป",
-    "versionsAria": "เวอร์ชัน"
+    "versionsAria": "เวอร์ชัน",
+    "emptyBlock": "บล็อกว่าง",
+    "emptyPreview": "เวอร์ชันนี้ไม่มีเนื้อหาหน้า",
+    "previewAria": "ดูตัวอย่างเวอร์ชันหน้าแบบอ่านอย่างเดียว",
+    "previewingCurrent": "กำลังดูหน้าปัจจุบัน",
+    "previewingSnapshot": "กำลังดูเวอร์ชันก่อนหน้า",
+    "previewOnlyHint": "การเลือกเวอร์ชันจะแสดงตัวอย่างเท่านั้น หน้าปัจจุบันจะเปลี่ยนหลังจากคืนค่า",
+    "restoreThisVersion": "คืนค่า",
+    "restoring": "กำลังคืนค่า...",
+    "versionHistory": "ประวัติเวอร์ชัน"
   },
   "badges": {
     "comment": "ความคิดเห็น",
@@ -67,7 +73,8 @@
     "referenceMention": "กล่าวถึง {{title}} · {{preview}}",
     "referenceLink": "ลิงก์ไปยัง {{title}} · {{preview}}",
     "unreadDot": "ไม่ได้อ่าน",
-    "workspaceUpdate": "อัปเดตเวิร์กสเปซ"
+    "workspaceUpdate": "อัปเดตเวิร์กสเปซ",
+    "bySelf": "โดยคุณ"
   },
   "empty": {
     "allCaughtUp": "คุณอัปเดตครบแล้ว",

@@ -176,7 +176,9 @@
     "video": "វីដេអូ",
     "videoCaption": "ចំណងជើងវីដេអូ",
     "videoEmptyHint": "ផ្ទុកឡើងឯកសារវីដេអូ បិទភ្ជាប់តំណផ្ទាល់ ឬប្រើតំណ YouTube, Vimeo, ឬ Loom ។",
-    "videoLink": "តំណវីដេអូ"
+    "videoLink": "តំណវីដេអូ",
+    "audioPlaybackFailed": "សំឡេងនេះមិនអាចចាក់បានទេ។ ជំនួសវា ឬបើកឯកសារដើម។",
+    "videoPlaybackFailed": "វីដេអូនេះមិនអាចចាក់បានទេ។ ជំនួសវា ឬបើកឯកសារដើម។"
   },
   "bookmark": {
     "copy": "ចម្លងតំណភ្ជាប់ចំណាំ",

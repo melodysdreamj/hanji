@@ -35,7 +35,7 @@
     "rename": "Tukar nama",
     "addPageInside": "Tambah halaman dalam",
     "exportAsMarkdown": "Eksport sebagai Markdown",
-    "exportAsHanjiFile": "Eksport sebagai fail Hanji",
+    "exportAsHanjiFile": "Eksport JSON Hanji (fail tidak disertakan)",
     "importMarkdown": "Import Markdown",
     "importing": "Mengimport...",
     "unlockPage": "Buka kunci halaman",
@@ -44,7 +44,8 @@
     "removeVerification": "Buang pengesahan",
     "verifyPage": "Sahkan halaman",
     "customizePage": "Sesuaikan halaman",
-    "undo": "Buat asal"
+    "undo": "Buat asal",
+    "exportAsHanjiArchive": "Eksport arkib Hanji (fail disertakan)"
   },
   "customize": {
     "summaryDefault": "Lalai",
@@ -101,6 +102,8 @@
     "movedToTrash": "Dipindahkan ke Tong Sampah",
     "restoredPage": "Halaman dipulihkan",
     "couldntRestorePage": "Tidak dapat pulihkan halaman",
-    "couldntMoveToTrash": "Tidak dapat alih ke Tong Sampah"
+    "couldntMoveToTrash": "Tidak dapat alih ke Tong Sampah",
+    "couldntExportHanjiArchive": "Tidak dapat mengeksport arkib Hanji.",
+    "exportedHanjiArchive": "Mengeksport arkib Hanji dengan fail."
   }
 }

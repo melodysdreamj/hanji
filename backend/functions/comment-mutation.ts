@@ -1,7 +1,12 @@
 import { defineFunction } from '@edge-base/shared';
 import { errorStatus } from '../lib/error-status';
+import { assertOrganizationDlpContent } from '../lib/enterprise-controls';
 import { MAX_RAW_TRANSACT_OPS, boundedDbFromPageHint } from '../lib/workspace-db';
 import { upsertNotification } from '../lib/notifications';
+import {
+  organizationGroupMembersForGroupIds,
+  workspaceMembershipForUser,
+} from '../lib/notification-recipient-access';
 import {
   pageAccessRole as sharedPageAccessRole,
   pageHasDirectAccess as sharedPageHasDirectAccess,
@@ -21,12 +26,10 @@ import type {
   Comment,
   DbRef,
   FunctionContext,
-  OrganizationGroupMember,
   Page,
   PagePermission,
   TableRef,
   Workspace,
-  WorkspaceMember,
 } from '../lib/app-types';
 import { pageAccessRoleRanks as roleRanks } from '../lib/page-access';
 
@@ -131,21 +134,17 @@ async function pageNotificationRecipientSet(
   const permissions = await listAll(
     db.table<PagePermission>('page_permissions').where('pageId', '==', page.id),
   );
+  const groupIds = new Set<string>();
   for (const permission of permissions) {
     if (permission.principalType === 'user' && permission.principalId) {
       recipients.add(permission.principalId);
     }
     if (permission.principalType === 'group' && permission.principalId) {
-      const groupMembers = await listAll(
-        db.table<OrganizationGroupMember>('organization_group_members').where(
-          'groupId',
-          '==',
-          permission.principalId,
-        ),
-      );
-      for (const member of groupMembers) recipients.add(member.userId);
+      groupIds.add(permission.principalId);
     }
   }
+  const groupMembers = await organizationGroupMembersForGroupIds(db, groupIds);
+  for (const member of groupMembers) recipients.add(member.userId);
 
   recipients.delete(actorId);
   return recipients;
@@ -159,10 +158,7 @@ async function canUserSeePage(db: DbRef, page: Page, userId: string) {
   // direct share below, matching lib/page-access's active-member gating.
   const workspace = await getExisting(db.table<Workspace>('workspaces'), page.workspaceId);
   if (workspace?.ownerId === userId) return true;
-  const members = await listAll(
-    db.table<WorkspaceMember>('workspace_members').where('workspaceId', '==', page.workspaceId),
-  );
-  if (members.some((member) => member.userId === userId)) return true;
+  if (await workspaceMembershipForUser(db, page.workspaceId, userId)) return true;
   return sharedPageHasDirectAccess(db, page, userId);
 }
 
@@ -446,6 +442,9 @@ export const POST = defineFunction({
   try {
     // Inside the try so routing misses map to 400/404 via the catch below.
     const db = await boundedDbFromPageHint(admin, body.pageId);
+    if (['create', 'update', 'updateMany'].includes(action)) {
+      await assertOrganizationDlpContent(db, body);
+    }
     switch (action) {
       case 'create':
         return { comment: await createComment(db, body, auth.id, actorEmail) };

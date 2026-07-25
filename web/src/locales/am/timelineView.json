@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "ጥገኞች:",
     "hint": "የግንኙነት ንብረት ያክሉ",
-    "relationPropertyAriaLabel": "የጥገኝነት ግንኙነት ንብረት"
+    "relationPropertyAriaLabel": "የጥገኝነት ግንኙነት ንብረት",
+    "makeDependOn": "{{title}}ን በ{{predecessor}} ላይ ጥገኛ አድርግ",
+    "startFrom": "ከ{{title}} ጥገኝነት ጀምር"
   },
   "toolbar": {
     "today": "ዛሬ",

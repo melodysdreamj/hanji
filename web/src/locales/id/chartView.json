@@ -4,7 +4,22 @@
     "sum": "Total",
     "average": "Rata-rata",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Tercentang",
+    "count_values": "Jumlah nilai",
+    "date_range": "Rentang tanggal",
+    "earliest_date": "Tanggal terawal",
+    "empty": "Jumlah kosong",
+    "latest_date": "Tanggal terakhir",
+    "median": "Median",
+    "not_empty": "Jumlah tidak kosong",
+    "percent_checked": "Persen tercentang",
+    "percent_empty": "Persen kosong",
+    "percent_not_empty": "Persen tidak kosong",
+    "percent_unchecked": "Persen tidak tercentang",
+    "range": "Rentang",
+    "unchecked": "Tidak tercentang",
+    "unique": "Jumlah nilai unik"
   },
   "chartAria": "Bagan {{name}}",
   "chartType": "Jenis bagan",
@@ -27,5 +42,9 @@
   "untitledProperty": "Tanpa judul",
   "valueProperty": "Properti nilai",
   "xAxis": "Sumbu X",
-  "yAxis": "Sumbu Y"
+  "yAxis": "Sumbu Y",
+  "dateRangeDays": "{{count}} hari",
+  "missingProperty": "properti yang disimpan",
+  "unsupportedAggregateDesc": "{{aggregate}} tidak dapat dihitung dari {{property}}. Pilih properti atau perhitungan yang kompatibel.",
+  "unsupportedAggregateTitle": "Perhitungan bagan ini tidak tersedia"
 }

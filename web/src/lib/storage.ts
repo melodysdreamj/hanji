@@ -16,6 +16,10 @@ const FILE_BUCKET = "files";
 const WS_KEY = "hanji.workspaceId";
 const MULTIPART_UPLOAD_THRESHOLD_BYTES = 5 * 1024 * 1024;
 const MULTIPART_PART_SIZE_BYTES = 5 * 1024 * 1024;
+const FILE_DOWNLOAD_SIGN_TIMEOUT_MS = 15_000;
+const FILE_COMPLETION_RETRY_DELAYS_MS = [100, 400] as const;
+const LOCAL_WORKER_CONNECTION_LOST =
+  "The local worker connection was lost. This request was not retried.";
 
 export function workspaceFileApiOrigin() {
   const base = typeof window === "undefined" ? "http://localhost" : window.location.origin;
@@ -63,6 +67,31 @@ function reportProgress(
     ...progress,
     percent: Math.max(0, Math.min(100, Math.round(progress.percent))),
   });
+}
+
+function isRetryableFileCompletionFailure(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: unknown; status?: unknown; message?: unknown };
+  const status = candidate.status ?? candidate.code;
+  return status === 503 && candidate.message === LOCAL_WORKER_CONNECTION_LOST;
+}
+
+async function completeFileUploadWithRetry(input: {
+  id: string;
+  key: string;
+  url: string;
+}) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await completeFileUploadRemote(input);
+    } catch (error) {
+      const delayMs = FILE_COMPLETION_RETRY_DELAYS_MS[attempt];
+      if (delayMs === undefined || !isRetryableFileCompletionFailure(error)) throw error;
+      // Only finalization is retried: the object body is already stored, and
+      // completeUpload returns the existing result after an ambiguous commit.
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
 }
 
 async function uploadWithSignedUrl(
@@ -283,7 +312,7 @@ export async function uploadWorkspaceFile(
 
   reportProgress(options, { phase: "finalizing", percent: 96, loaded: file.size, total: file.size });
   const url = bucket.getUrl(upload.key);
-  const completed = await completeFileUploadRemote({
+  const completed = await completeFileUploadWithRetry({
     id: upload.id,
     key: upload.key,
     url,
@@ -312,5 +341,7 @@ export async function createWorkspaceFileDownloadUrl(
   input: { key?: string; uploadId?: string; expiresIn?: string }
 ) {
   await ensureAuth();
-  return createFileDownloadUrlRemote(input);
+  return createFileDownloadUrlRemote(input, {
+    timeoutMs: FILE_DOWNLOAD_SIGN_TIMEOUT_MS,
+  });
 }

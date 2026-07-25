@@ -13,6 +13,8 @@ import {
   HANJI_CURRENT_PAGE_FILTER_KIND,
   isHanjiCurrentPageFilterKind,
 } from "../legacy-product-compat";
+import { compareNaturalText, foldNfcText } from "./natural-order.mjs";
+import { canonicalRollupFunction } from "./rollup-core";
 
 /** Loose property shape — both web's strict `DbProperty` and backend's loose one satisfy it. */
 export interface QueryProperty {
@@ -133,15 +135,16 @@ function isDateLike(prop: QueryProperty): boolean {
   return prop.type === "date" || prop.type === "created_time" || prop.type === "last_edited_time";
 }
 
-// A rollup either SURFACES its related leaf values (show_original — the default)
+// A rollup either SURFACES its related leaf values (show_original/show_unique)
 // or AGGREGATES them into a scalar (sum/average/min/max/range/count_*/percent_*/
 // checked/unchecked/earliest_date/latest_date/date_range/…). Only surfacing
 // rollups filter by relation membership over the individual leaf ids; aggregate
 // rollups fall through to the numeric/date/text comparison paths that operate on
 // the scalar cell value, so equals/does_not_equal agree with greater_than/less_than.
 function isRelationSurfacingRollup(prop: QueryProperty): boolean {
-  const fn = prop.config?.rollupFunction;
-  return typeof fn !== "string" || fn === "show_original";
+  const raw = prop.config?.rollupFunction;
+  const fn = canonicalRollupFunction(raw);
+  return typeof raw !== "string" || fn === "show_original" || fn === "show_unique";
 }
 
 // A datetime string is an *absolute instant* when it carries an explicit UTC
@@ -267,8 +270,8 @@ export function filterMatches(
     const resolvedFilterValue = resolveFilterValue(f.value, a.currentPageId);
     const targetIds = optionIds(resolvedFilterValue);
     const hasTarget = targetIds.length > 0 && ids.some((id) => targetIds.includes(id));
-    const t = a.displayText(row, prop).toLowerCase();
-    const q = a.asText(resolvedFilterValue).toLowerCase().trim();
+    const t = foldNfcText(a.displayText(row, prop));
+    const q = foldNfcText(a.asText(resolvedFilterValue).trim());
     switch (f.operator) {
       case "is_empty":
         return ids.length === 0;
@@ -358,8 +361,8 @@ export function filterMatches(
   }
 
   // Text-like (title, rich_text, url, email, phone, files, formula).
-  const t = a.displayText(row, prop).toLowerCase();
-  const q = a.asText(f.value).toLowerCase();
+  const t = foldNfcText(a.displayText(row, prop));
+  const q = foldNfcText(a.asText(f.value));
   // An empty-value negation filter is an inert no-op (mirrors the relation/person
   // branch): a blank "does not contain"/"does not equal" must not hide every row.
   if (q === "" && (f.operator === "does_not_contain" || f.operator === "does_not_equal")) return true;
@@ -441,7 +444,7 @@ export function sortKey(row: QueryPage, prop: QueryProperty, a: QueryAdapters): 
 
 export function compareKeys(a: number | string, b: number | string): number {
   if (typeof a === "number" && typeof b === "number") return a - b;
-  return String(a).localeCompare(String(b), undefined, { numeric: true });
+  return compareNaturalText(a, b);
 }
 
 function knownFilterTerm(term: QueryFilter | QueryFilterGroup, byId: Map<string, QueryProperty>): boolean {

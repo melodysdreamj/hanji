@@ -6,5 +6,6 @@
   "unreachable": "Kan inte nå servern",
   "unreachablePending_one": "Kan inte nå servern · {{count}} ändring väntar",
   "unreachablePending_other": "Kan inte nå servern · {{count}} ändringar väntar",
-  "retryHint": "Klicka för att försöka igen"
+  "retryHint": "Klicka för att försöka igen",
+  "confirmed": "Sparad på servern"
 }

@@ -8,7 +8,8 @@
     "delete": "Șterge",
     "clearAll": "Șterge tot",
     "done": "Gata",
-    "add": "Adaugă"
+    "add": "Adaugă",
+    "reportIssue": "Raportează o problemă"
   },
   "labels": {
     "untitled": "Fără titlu"

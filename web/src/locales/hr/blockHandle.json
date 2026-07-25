@@ -88,5 +88,38 @@
     "hoursAgo": "Uređeno prije {{hours}} h",
     "daysAgo": "Uređeno prije {{days}} d",
     "on": "Uređeno {{date}}"
+  },
+  "align": {
+    "center": "Centar",
+    "choose": "Odaberite poravnanje slike",
+    "left": "Lijevo",
+    "right": "Desno"
+  },
+  "altText": {
+    "help": "Alternativni tekst pomaže osobama koje koriste čitače zaslona razumjeti sliku.",
+    "label": "Opis",
+    "placeholder": "Opišite sliku",
+    "remove": "Ukloni",
+    "save": "Spremi",
+    "title": "Alternativni tekst"
+  },
+  "imageLink": {
+    "invalid": "Unesite cijeli http:// ili https:// URL.",
+    "label": "Otvori URL klikom na sliku",
+    "remove": "Ukloni",
+    "save": "Spremi",
+    "title": "Link slike"
+  },
+  "media": {
+    "addImageLink": "Dodaj link",
+    "align": "Poravnanje",
+    "altText": "Alternativni tekst",
+    "copySourceLink": "Kopiraj izvorni link",
+    "download": "Preuzmi",
+    "editImageLink": "Uredi link",
+    "fullScreen": "Cijeli zaslon",
+    "openLink": "Otvori link",
+    "replace": "Zamijeni",
+    "viewOriginal": "Prikaži original"
   }
 }

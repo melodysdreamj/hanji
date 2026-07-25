@@ -38,7 +38,7 @@
   "moveTo": "Mută în",
   "exporting": "Se exportă…",
   "exportAsMarkdown": "Exportă ca Markdown",
-  "exportAsHanji": "Exportă ca fișier Hanji",
+  "exportAsHanji": "Exportă Hanji JSON (fișiere excluse)",
   "importing": "Se importă…",
   "importMarkdown": "Importă Markdown",
   "unlockPage": "Deblochează pagina",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Nu s-a putut actualiza accesul",
     "removedFromAccessList": "Eliminat din lista de acces",
     "couldntRemoveAccess": "Nu s-a putut elimina accesul",
-    "couldntLoadAccessList": "Nu s-a putut încărca lista de acces"
+    "couldntLoadAccessList": "Nu s-a putut încărca lista de acces",
+    "couldntExportHanjiArchive": "Nu s-a putut exporta arhiva Hanji.",
+    "exportedHanjiArchive": "S-a exportat o arhivă Hanji cu fișiere."
   },
   "user": "Utilizator",
   "whoHasAccess": "Cine are acces",
   "workspace": "Spațiu de lucru",
   "workspaceCount_one": "{{count}} spațiu de lucru",
   "workspaceCount_other": "{{count}} spații de lucru",
-  "you": "Tu"
+  "you": "Tu",
+  "exportAsHanjiArchive": "Exportă arhivă Hanji (fișiere incluse)",
+  "turnIntoWiki": "Transformă în wiki",
+  "undoWiki": "Anulează wiki",
+  "wikiCreated": "Pagină transformată în wiki",
+  "wikiPageSettings": "Setări pagină wiki",
+  "wikiUndone": "Wiki eliminat, conținut păstrat",
+  "wikiUpdateFailed": "Nu s-a putut actualiza wiki"
 }

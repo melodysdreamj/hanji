@@ -4,7 +4,22 @@
     "sum": "Som",
     "average": "Gemiddelde",
     "min": "Min",
-    "max": "Max"
+    "max": "Max",
+    "checked": "Aangevinkt",
+    "count_values": "Aantal waarden",
+    "date_range": "Datumbereik",
+    "earliest_date": "Vroegste datum",
+    "empty": "Aantal lege waarden",
+    "latest_date": "Laatste datum",
+    "median": "Mediaan",
+    "not_empty": "Aantal niet-lege waarden",
+    "percent_checked": "Percentage aangevinkt",
+    "percent_empty": "Percentage lege waarden",
+    "percent_not_empty": "Percentage niet-lege waarden",
+    "percent_unchecked": "Percentage niet aangevinkt",
+    "range": "Bereik",
+    "unchecked": "Niet aangevinkt",
+    "unique": "Aantal unieke waarden"
   },
   "chartAria": "{{name}} grafiek",
   "chartType": "Grafiektype",
@@ -27,5 +42,9 @@
   "untitledProperty": "Naamloos",
   "valueProperty": "Waardeeigenschap",
   "xAxis": "X-as",
-  "yAxis": "Y-as"
+  "yAxis": "Y-as",
+  "dateRangeDays": "{{count}} dagen",
+  "missingProperty": "de opgeslagen eigenschap",
+  "unsupportedAggregateDesc": "{{aggregate}} kan niet worden berekend uit {{property}}. Kies een compatibele eigenschap of berekening.",
+  "unsupportedAggregateTitle": "Deze grafiekberekening is niet beschikbaar"
 }

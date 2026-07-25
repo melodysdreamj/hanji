@@ -35,7 +35,7 @@
     "rename": "Palitan ang pangalan",
     "addPageInside": "Magdagdag ng page sa loob",
     "exportAsMarkdown": "I-export bilang Markdown",
-    "exportAsHanjiFile": "I-export bilang Hanji file",
+    "exportAsHanjiFile": "I-export ang Hanji JSON (walang mga file)",
     "importMarkdown": "I-import ang Markdown",
     "importing": "Nag-iimport...",
     "unlockPage": "I-unlock ang pahina",
@@ -44,7 +44,8 @@
     "removeVerification": "Alisin ang pagpapatotoo",
     "verifyPage": "I-verify ang pahina",
     "customizePage": "I-customize ang page",
-    "undo": "I-undo"
+    "undo": "I-undo",
+    "exportAsHanjiArchive": "I-export ang Hanji archive (kasama ang mga file)"
   },
   "customize": {
     "summaryDefault": "Pamantayan",
@@ -101,6 +102,8 @@
     "movedToTrash": "Inilip sa Basura",
     "restoredPage": "Na-restore ang pahina",
     "couldntRestorePage": "Hindi na-restore ang pahina",
-    "couldntMoveToTrash": "Hindi nailipat sa Basurahan"
+    "couldntMoveToTrash": "Hindi nailipat sa Basurahan",
+    "couldntExportHanjiArchive": "Hindi na-export ang Hanji archive.",
+    "exportedHanjiArchive": "Na-export ang Hanji archive kasama ang mga file."
   }
 }

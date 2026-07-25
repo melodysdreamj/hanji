@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "Backlink {{count}}",
-    "count_other": "Backlink {{count}}"
+    "count_other": "Backlink {{count}}",
+    "partial_one": "{{count}}+ kiungo cha nyuma",
+    "partial_other": "{{count}}+ viungo vya nyuma"
   },
   "header": {
     "title": "Mention Zilizounganishwa"
@@ -10,7 +12,8 @@
     "mention_one": "Mention {{count}}",
     "mention_other": "Mention {{count}}",
     "link_one": "Kiungo {{count}}",
-    "link_other": "Viungo {{count}}"
+    "link_other": "Viungo {{count}}",
+    "loaded": "Imepakiwa: {{summary}}"
   },
   "kind": {
     "mention": "Mention",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} backlink zaidi",
-    "count_other": "{{count}} backlink zaidi"
+    "count_other": "{{count}} backlink zaidi",
+    "load": "Pakia viungo zaidi vya nyuma",
+    "loading": "Inapakia viungo vya nyuma…",
+    "search": "Tafuta viungo vya nyuma"
   }
 }

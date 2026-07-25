@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} बॅकलिंक",
-    "count_other": "{{count}} बॅकलिंक्स"
+    "count_other": "{{count}} बॅकलिंक्स",
+    "partial_one": "{{count}}+ बॅकलिंक",
+    "partial_other": "{{count}}+ बॅकलिंक"
   },
   "header": {
     "title": "लिंक केलेले उल्लेख"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} उल्लेख",
     "mention_other": "{{count}} उल्लेख",
     "link_one": "{{count}} दुवा",
-    "link_other": "{{count}} दुवे"
+    "link_other": "{{count}} दुवे",
+    "loaded": "लोड केले: {{summary}}"
   },
   "kind": {
     "mention": "उल्लेख",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} अधिक बॅकलिंक",
-    "count_other": "{{count}} अधिक बॅकलिंक्स"
+    "count_other": "{{count}} अधिक बॅकलिंक्स",
+    "load": "अधिक बॅकलिंक लोड करा",
+    "loading": "बॅकलिंक लोड होत आहेत…",
+    "search": "बॅकलिंक शोधा"
   }
 }

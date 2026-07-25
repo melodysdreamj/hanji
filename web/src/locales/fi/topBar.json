@@ -36,7 +36,7 @@
   "enableWebSharing": "Ota web-jakaminen käyttöön sivulle {{pageTitle}}",
   "expired": "Vanhentunut",
   "expiresAt": "Vanhenee {{formatted}}",
-  "exportAsHanji": "Vie Hanji-tiedostona",
+  "exportAsHanji": "Vie Hanji JSON (tiedostot pois lukien)",
   "exportAsMarkdown": "Vie Markdownina",
   "exporting": "Viedään…",
   "fontDefault": "Oletus",
@@ -138,7 +138,9 @@
     "updatedWebLinkExpiration": "Verkkolinkin vanhentuminen päivitetty",
     "verificationRemoved": "Vahvistus poistettu",
     "webSharingDisabled": "Verkkojakaminen poistettu käytöstä",
-    "webSharingEnabled": "Verkkojakaminen otettu käyttöön"
+    "webSharingEnabled": "Verkkojakaminen otettu käyttöön",
+    "couldntExportHanjiArchive": "Hanji-arkiston vienti epäonnistui.",
+    "exportedHanjiArchive": "Viety Hanji-arkisto tiedostoineen."
   },
   "todayAt": "Tänään klo {{time}}",
   "undo": "Kumoa",
@@ -153,5 +155,12 @@
   "workspaceCount_one": "{{count}} työtila",
   "workspaceCount_other": "{{count}} työtilaa",
   "yesterdayAt": "Eilen klo {{time}}",
-  "you": "Minä"
+  "you": "Minä",
+  "exportAsHanjiArchive": "Vie Hanji-arkisto (tiedostot mukaan lukien)",
+  "turnIntoWiki": "Muunna wikiksi",
+  "undoWiki": "Kumoa wiki",
+  "wikiCreated": "Sivu muutettu wikiksi",
+  "wikiPageSettings": "Wikisivun asetukset",
+  "wikiUndone": "Wiki poistettu; sivun sisältö säilyi",
+  "wikiUpdateFailed": "Wikin päivitys epäonnistui"
 }

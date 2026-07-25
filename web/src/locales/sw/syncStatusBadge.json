@@ -6,5 +6,6 @@
   "unreachable": "Haifikiki seva",
   "unreachablePending_one": "Haifikiki seva · badiliko {{count}} linalosubiri",
   "unreachablePending_other": "Haifikiki seva · mabadiliko {{count}} yanayosubiri",
-  "retryHint": "Bofya kujaribu tena sasa"
+  "retryHint": "Bofya kujaribu tena sasa",
+  "confirmed": "Imehifadhiwa kwenye seva"
 }

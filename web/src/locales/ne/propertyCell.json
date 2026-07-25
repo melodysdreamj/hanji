@@ -92,5 +92,8 @@
     "शु",
     "श"
   ],
-  "you": "तपाईं"
+  "you": "तपाईं",
+  "buttonExecutionFailed": "बटन चलाउन सकिएन।",
+  "loadingMoreRelations": "थप सम्बन्ध लोड गर्दै...",
+  "loadMoreRelations": "थप सम्बन्ध लोड गर्नुहोस्"
 }

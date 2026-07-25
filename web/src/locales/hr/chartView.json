@@ -4,7 +4,22 @@
     "sum": "Zbroj",
     "average": "Prosjek",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Označeno",
+    "count_values": "Broj vrijednosti",
+    "date_range": "Raspon datuma",
+    "earliest_date": "Najraniji datum",
+    "empty": "Broj praznih",
+    "latest_date": "Najkasniji datum",
+    "median": "Medijan",
+    "not_empty": "Broj ispunjenih",
+    "percent_checked": "Postotak označenih",
+    "percent_empty": "Postotak praznih",
+    "percent_not_empty": "Postotak ispunjenih",
+    "percent_unchecked": "Postotak neoznačenih",
+    "range": "Raspon",
+    "unchecked": "Neoznačeno",
+    "unique": "Broj jedinstvenih vrijednosti"
   },
   "chartAria": "Grafikon {{name}}",
   "chartType": "Vrsta grafikona",
@@ -27,5 +42,9 @@
   "untitledProperty": "Bez naslova",
   "valueProperty": "Svojstvo vrijednosti",
   "xAxis": "X-os",
-  "yAxis": "Y-os"
+  "yAxis": "Y-os",
+  "dateRangeDays": "{{count}} dana",
+  "missingProperty": "spremljeno svojstvo",
+  "unsupportedAggregateDesc": "{{aggregate}} se ne može izračunati iz svojstva {{property}}. Odaberite kompatibilno svojstvo ili izračun.",
+  "unsupportedAggregateTitle": "Ovaj izračun grafikona nije dostupan."
 }

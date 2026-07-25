@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Zárt",
+    "open": "Nyitott",
+    "private": "Privát"
+  },
+  "add": "Hozzáadás",
+  "approve": "Jóváhagyás",
+  "archive": "Teamspace archiválása",
+  "available": "Csatlakozásra elérhető",
+  "choosePrincipal": "Személy vagy csoport kiválasztása",
+  "create": "Teamspace létrehozása",
+  "deny": "Elutasítás",
+  "error": {
+    "action": "Nem sikerült végrehajtani a teamspace műveletet.",
+    "load": "Nem sikerült betölteni a teamspace adatait."
+  },
+  "fields": {
+    "access": "Hozzáférés",
+    "description": "Leírás",
+    "icon": "Ikon",
+    "memberRole": "Tagok oldalhozzáférése",
+    "membersCanEditSidebar": "A tagok hozzáadhatnak és átrendezhetnek oldalakat",
+    "membersCanInvite": "A tagok meghívhatnak embereket",
+    "name": "Név",
+    "openRole": "Nyílt látogatói oldalhozzáférés"
+  },
+  "governance": "Teamspace beállítások",
+  "join": "Csatlakozás",
+  "joined": "Saját teamspace-ek",
+  "loadMore": "Több betöltése",
+  "manage": "Kezelés",
+  "member": "Tag",
+  "members": "Tagok",
+  "noneArchived": "Nincsenek archivált teamspace-ek.",
+  "noneAvailable": "Nincsenek más elérhető teamspace-ek.",
+  "noneJoined": "Még nem csatlakoztál egy teamspace-hez sem.",
+  "noRequests": "Nincsenek függőben lévő kérések.",
+  "notice": {
+    "approved": "Kérés jóváhagyva.",
+    "archived": "Teamspace archiválva.",
+    "created": "Teamspace létrehozva.",
+    "defaultSet": "Alapértelmezett teamspace frissítve.",
+    "denied": "Kérés elutasítva.",
+    "joined": "Teamspace-hez csatlakoztál.",
+    "memberAdded": "Tag hozzáadva.",
+    "memberRemoved": "Tag eltávolítva.",
+    "memberUpdated": "Tag szerepkör frissítve.",
+    "policySaved": "Teamspace létrehozási szabályzat frissítve.",
+    "requested": "Hozzáférés kérve.",
+    "restored": "Teamspace visszaállítva.",
+    "saved": "Teamspace frissítve."
+  },
+  "notOwner": "Csak egy teamspace tulajdonosa vagy munkaterület adminisztrátora kezelheti ezt a teamspace-t.",
+  "open": "Megnyitás",
+  "owner": "Tulajdonos",
+  "ownersOnlyCreate": "Csak munkaterület tulajdonosok hozhatnak létre teamspace-t",
+  "remove": "Eltávolítás",
+  "replacement": "Válassz helyettesítő alapértelmezett teamspace-t",
+  "request": "Hozzáférések kérése",
+  "requestPending": "Kérelem függőben",
+  "requests": "Hozzáférési kérelmek",
+  "restore": "Visszaállítás",
+  "roles": {
+    "comment": "Hozzászólhat",
+    "edit": "Szerkeszthet",
+    "full_access": "Teljes hozzáférés",
+    "view": "Megtekinthet"
+  },
+  "save": "Változtatások mentése",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Beállítás alapértelmezett teamspace-ként",
+  "subtitle": "Szervezd a megosztott munkát, és szabályozd, ki találhatja meg vagy csatlakozhat hozzá.",
+  "tabs": {
+    "archived": "Archivált",
+    "browse": "Böngészés",
+    "create": "Új teamspace",
+    "label": "Teamspace nézetek",
+    "manage": "Kezelés"
+  },
+  "title": "Teamspace-ek"
+}

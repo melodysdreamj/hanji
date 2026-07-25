@@ -92,5 +92,8 @@
     "வெ",
     "ச"
   ],
-  "you": "நீங்கள்"
+  "you": "நீங்கள்",
+  "buttonExecutionFailed": "பொத்தானை இயக்க முடியவில்லை.",
+  "loadingMoreRelations": "மேலும் உறவுகளை ஏற்றுகிறது...",
+  "loadMoreRelations": "மேலும் உறவுகளை ஏற்று"
 }

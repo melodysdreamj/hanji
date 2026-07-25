@@ -4,7 +4,22 @@
     "sum": "Jimla",
     "average": "Matsakaici",
     "min": "Mafi ƙanƙanta",
-    "max": "Mafi girma"
+    "max": "Mafi girma",
+    "checked": "An duba",
+    "count_values": "Ƙididdiga darajoji",
+    "date_range": "Zangon kwanaki",
+    "earliest_date": "Kwanaki mafi tsufa",
+    "empty": "Adadin fanko",
+    "latest_date": "Kwanaki mafi sabo",
+    "median": "Tsakiyar darajoji",
+    "not_empty": "Adadin masu kome",
+    "percent_checked": "Kashi na an duba",
+    "percent_empty": "Kashi na fanko",
+    "percent_not_empty": "Kashi na masu kome",
+    "percent_unchecked": "Kashi na ba a duba ba",
+    "range": "Zango",
+    "unchecked": "Ba a duba ba",
+    "unique": "Ƙididdigar darajoji na musamman"
   },
   "chartAria": "Ginshiƙin {{name}}",
   "chartType": "Nau'in ginshiƙi",
@@ -27,5 +42,9 @@
   "untitledProperty": "Babun suna",
   "valueProperty": "Siffar ƙima",
   "xAxis": "Gatura X",
-  "yAxis": "Gatura Y"
+  "yAxis": "Gatura Y",
+  "dateRangeDays": "{{count}} kwanaki",
+  "missingProperty": "kadarar da aka ajiye",
+  "unsupportedAggregateDesc": "{{aggregate}} ba za a iya lissafta shi daga {{property}} ba. Zaɓi kadarar da ta dace ko lissafin.",
+  "unsupportedAggregateTitle": "Wannan lissafin ginshiƙi baya samuwa"
 }

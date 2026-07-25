@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "વર્કસ્પેસ મેનુ ખોલો",
   "closeWorkspaceMenu": "વર્કસ્પેસ મેનૂ બંધ કરો",
   "workspaceMenu": "વર્કસ્પેસ મેનૂ",
-  "exportWorkspace": "વર્કસ્પેસ નિકાસ કરો",
+  "exportWorkspace": "વર્કસ્પેસ JSON નિકાસ કરો (ફાઇલો સિવાય)",
   "exportedWorkspace": "Hanji ફાઇલ તરીકે વર્કસ્પેસ નિકાસ કર્યું.",
   "exportedWorkspaceWithPlaceholders": "Hanji ફાઇલ તરીકે વર્કસ્પેસ નિકાસ કર્યું — જોડાણો પ્લેસહોલ્ડર તરીકે રાખવામાં આવ્યા.",
   "couldntExportWorkspace": "વર્કસ્પેસ નિકાસ કરી શકાયો નહીં.",
@@ -76,5 +76,12 @@
     "later": "પછીથી",
     "note": "તમે પછીથી પણ સાઇડબારમાં ઇમ્પોર્ટ થી આ શરૂ કરી શકો છો.",
     "title": "તમારા Notion વર્કસ્પેસને Hanji માં લાવો?"
-  }
+  },
+  "addPageToTeamspace": "{{name}}માં પેજ ઉમેરો",
+  "couldntExportWorkspaceArchive": "વર્કસ્પેસ આર્કાઇવ નિકાસ કરી શકાયું નહીં.",
+  "exportedWorkspaceArchive": "ફાઇલો સાથે વર્કસ્પેસ આર્કાઇવ નિકાસ કર્યું.",
+  "exportWorkspaceArchive": "વર્કસ્પેસ આર્કાઇવ નિકાસ કરો (ફાઇલો સાથે)",
+  "joinTeamspaces": "ટીમસ્પેસમાં જોડાઓ",
+  "keyboardShortcuts": "કીબોર્ડ શોર્ટકટ",
+  "teamspacePages": "{{name}}ના પેજ"
 }

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Magdagdag ng komento",
+    "addLink": "Magdagdag ng link",
+    "blockColor": "Ilapat ang huling ginamit na kulay",
+    "bold": "Makapal",
+    "copyPageLink": "Kopyahin ang link ng pahina",
+    "findInPage": "Hanapin sa pahinang ito",
+    "inlineCode": "Inline code",
+    "italic": "Italiko",
+    "moveBlock": "Ilipat ang block sa ibang pahina",
+    "moveBlockDown": "Ilipat pababa ang block",
+    "moveBlockUp": "Ilipat pataas ang block",
+    "movePage": "Ilipat ang kasalukuyang pahina",
+    "navigateBack": "Bumalik",
+    "navigateForward": "Pasulong",
+    "newPage": "Bagong pahina",
+    "openBlockMenu": "Buksan ang mga aksyon ng block",
+    "openKeyboardShortcuts": "Buksan ang mga keyboard shortcut",
+    "openParentPage": "Buksan ang magulang na pahina",
+    "quickFind": "Mabilis na Hanap",
+    "strikethrough": "Strikethrough",
+    "toggleAllToggles": "Palawakin o itupi ang lahat ng toggle",
+    "toggleSidebar": "I-toggle ang sidebar",
+    "toggleTheme": "I-toggle ang dark mode",
+    "underline": "Salungguhit"
+  },
+  "categories": {
+    "createStyle": "Gumawa at istilo",
+    "editMove": "I-edit at ilipat",
+    "popular": "Sikat"
+  },
+  "categoriesLabel": "Mga kategorya ng shortcut",
+  "close": "Isara",
+  "closeBackdrop": "Isara ang keyboard shortcuts",
+  "empty": "Walang nakitang shortcut",
+  "keysFor": "Mga key para sa {{action}}",
+  "or": "o",
+  "searchLabel": "Maghanap ng mga keyboard shortcut",
+  "searchPlaceholder": "Maghanap ng shortcut…",
+  "searchResults": "Mga resulta ng paghahanap",
+  "searchTerms": {
+    "toggleTheme": "tema maliwanag madilim anyo"
+  },
+  "title": "Mga shortcut sa keyboard"
+}

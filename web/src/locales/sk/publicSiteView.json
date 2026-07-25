@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Navigačná cesta",
+  "clearSearch": "Vymazať vyhľadávanie",
+  "errors": {
+    "not-found": "Táto stránka mohla byť nezverejnená alebo sa jej adresa mohla zmeniť.",
+    "offline": "Skontrolujte svoje pripojenie a potom skúste stránku znova otvoriť.",
+    "rate-limited": "Táto stránka prijíma príliš veľa požiadaviek. Počkajte chvíľu a skúste to znova.",
+    "unavailable": "Hanji momentálne nemôže otvoriť túto stránku. Skúste to znova o chvíľu."
+  },
+  "madeWithHanji": "Vytvorené pomocou Hanji",
+  "navigation": "Navigácia stránky",
+  "noResults": "Nenašli sa žiadne stránky",
+  "outsideSite": "Táto stránka nie je súčasťou tohto publikovaného webu.",
+  "search": "Hľadať na tejto stránke",
+  "tryAgain": "Skúsiť znova",
+  "unavailable": "Táto stránka nie je dostupná."
+}

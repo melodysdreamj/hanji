@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} кері сілтеме",
-    "count_other": "{{count}} кері сілтеме"
+    "count_other": "{{count}} кері сілтеме",
+    "partial_one": "{{count}}+ кері сілтеме",
+    "partial_other": "{{count}}+ кері сілтемелер"
   },
   "header": {
     "title": "Байланысқан атаулар"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} атау",
     "mention_other": "{{count}} атау",
     "link_one": "{{count}} сілтеме",
-    "link_other": "{{count}} сілтеме"
+    "link_other": "{{count}} сілтеме",
+    "loaded": "Жүктелді: {{summary}}"
   },
   "kind": {
     "mention": "Атау",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Тағы {{count}} кері сілтеме",
-    "count_other": "Тағы {{count}} кері сілтеме"
+    "count_other": "Тағы {{count}} кері сілтеме",
+    "load": "Тағы кері сілтемелерді жүктеу",
+    "loading": "Кері сілтемелер жүктелуде…",
+    "search": "Кері сілтемелерді іздеу"
   }
 }

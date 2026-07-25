@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Odpri meni delovnega prostora",
   "closeWorkspaceMenu": "Zapri meni delovnega prostora",
   "workspaceMenu": "Meni delovnega prostora",
-  "exportWorkspace": "Izvozi delovni prostor",
+  "exportWorkspace": "Izvozi JSON delovnega prostora (brez datotek)",
   "exportedWorkspace": "Delovni prostor izvožen kot datoteko Hanji.",
   "exportedWorkspaceWithPlaceholders": "Delovni prostor izvožen kot datoteko Hanji — priloge so ostale kot ograde.",
   "couldntExportWorkspace": "Delovnega prostora ni bilo mogoče izvoziti.",
@@ -76,5 +76,12 @@
     "later": "Mogoče kasneje",
     "note": "To lahko kasneje vedno začnete iz Uvoza v stranski vrstici.",
     "title": "Uvozite svoj Notion delovni prostor v Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Dodaj stran v {{name}}",
+  "couldntExportWorkspaceArchive": "Ni bilo mogoče izvoziti arhiva delovnega prostora.",
+  "exportedWorkspaceArchive": "Izvozili ste arhiv delovnega prostora z datotekami.",
+  "exportWorkspaceArchive": "Izvozi arhiv delovnega prostora (z datotekami)",
+  "joinTeamspaces": "Pridruži se teamspaces",
+  "keyboardShortcuts": "Tipkovne bližnjice",
+  "teamspacePages": "Strani {{name}}"
 }

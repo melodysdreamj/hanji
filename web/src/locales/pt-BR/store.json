@@ -7,7 +7,8 @@
   "pageMissingSave": "A página não pôde ser encontrada, portanto suas alterações não puderam ser salvas.",
   "saveFailed": "Suas alterações não puderam ser salvas.",
   "sessionExpired": "Sua sessão expirou ou a solicitação não pôde ser autenticada. Tente novamente.",
-  "blockConflictSave": "Este bloco foi editado em outro dispositivo, portanto sua alteração offline não foi aplicada.",
+  "blockConflictSave": "Uma edição enfileirada conflita com a versão mais recente do servidor e não pôde ser mesclada automaticamente.",
   "blockConflictKeepMine": "Aplicar minha versão",
-  "blockMoveCommentsSkipped": "O bloco foi movido, mas seus comentários não puderam ser movidos com ele."
+  "blockMoveCommentsSkipped": "O bloco foi movido, mas seus comentários não puderam ser movidos com ele.",
+  "conflictSave": "Este conteúdo foi alterado antes do salvamento, então sua edição não pôde ser salva."
 }

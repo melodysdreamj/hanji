@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} нещодавні оновлення",
     "unreadOfTotal": "{{unread}} непрочитаних з {{total}} оновлень",
     "updateType": "Тип оновлення",
-    "updates": "Оновлення",
-    "modeUpdates": "Оновлення",
-    "modeChats": "Чати",
-    "inboxMode": "Режим вхідних"
+    "updates": "Оновлення"
   },
   "time": {
     "justNow": "Щойно",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} версій",
     "versionsAgo": "{{count}} версій тому",
     "versionsAhead": "{{count}} версій попереду",
-    "versionsAria": "Версії"
+    "versionsAria": "Версії",
+    "emptyBlock": "Порожній блок",
+    "emptyPreview": "Ця версія не має вмісту сторінки.",
+    "previewAria": "Перегляд версії сторінки (лише читання)",
+    "previewingCurrent": "Перегляд поточної сторінки",
+    "previewingSnapshot": "Перегляд минулої версії",
+    "previewOnlyHint": "Вибір версії лише показує попередній перегляд. Поточна сторінка зміниться лише після відновлення.",
+    "restoreThisVersion": "Відновити",
+    "restoring": "Відновлення…",
+    "versionHistory": "Історія версій"
   },
   "badges": {
     "comment": "Коментар",
@@ -67,7 +73,8 @@
     "referenceMention": "Згадка {{title}} · {{preview}}",
     "referenceLink": "Посилання на {{title}} · {{preview}}",
     "unreadDot": "Непрочитане",
-    "workspaceUpdate": "Оновлення робочого простору"
+    "workspaceUpdate": "Оновлення робочого простору",
+    "bySelf": "вами"
   },
   "empty": {
     "allCaughtUp": "Усе переглянуто.",

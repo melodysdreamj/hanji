@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Drobtine",
+  "clearSearch": "Počisti iskanje",
+  "errors": {
+    "not-found": "To spletišče je bilo morda odstranjeno iz objave ali pa se je njegov naslov spremenil.",
+    "offline": "Preverite povezavo in nato poskusite znova odpreti spletišče.",
+    "rate-limited": "To spletišče prejema preveč zahtev. Počakajte trenutek in poskusite znova.",
+    "unavailable": "Hanji trenutno ne more odpreti tega spletišča. Poskusite znova čez trenutek."
+  },
+  "madeWithHanji": "Narejeno s Hanji",
+  "navigation": "Navigacija po spletišču",
+  "noResults": "Ni najdenih strani",
+  "outsideSite": "Ta stran ni del tega objavljenega spletišča.",
+  "search": "Iskanje po tem spletišču",
+  "tryAgain": "Poskusi znova",
+  "unavailable": "To spletišče ni na voljo."
+}

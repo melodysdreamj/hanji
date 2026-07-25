@@ -4,7 +4,22 @@
     "sum": "మొత్తం",
     "average": "సగటు",
     "min": "కనిష్టం",
-    "max": "గరిష్టం"
+    "max": "గరిష్టం",
+    "checked": "తనిఖీ చేయబడింది",
+    "count_values": "విలువల సంఖ్య",
+    "date_range": "తేదీ పరిధి",
+    "earliest_date": "మొదటి తేదీ",
+    "empty": "ఖాళీ విలువల సంఖ్య",
+    "latest_date": "చివరి తేదీ",
+    "median": "మధ్యమం",
+    "not_empty": "ఖాళీ కాని విలువల సంఖ్య",
+    "percent_checked": "తనిఖీ చేసిన శాతం",
+    "percent_empty": "ఖాళీ విలువల శాతం",
+    "percent_not_empty": "ఖాళీ కాని విలువల శాతం",
+    "percent_unchecked": "తనిఖీ చేయని శాతం",
+    "range": "పరిధి",
+    "unchecked": "తనిఖీ చేయబడలేదు",
+    "unique": "ప్రత్యేక విలువల సంఖ్య"
   },
   "chartAria": "{{name}} చార్ట్",
   "chartType": "చార్ట్ రకం",
@@ -27,5 +42,9 @@
   "untitledProperty": "శీర్షిక లేని",
   "valueProperty": "విలువ ప్రాపర్టీ",
   "xAxis": "X-అక్షం",
-  "yAxis": "Y-అక్షం"
+  "yAxis": "Y-అక్షం",
+  "dateRangeDays": "{{count}} రోజులు",
+  "missingProperty": "సేవ్ చేసిన ప్రాపర్టీ",
+  "unsupportedAggregateDesc": "{{aggregate}}ను {{property}} నుండి లెక్కించడం సాధ్యం కాదు. అనుకూలమైన ప్రాపర్టీ లేదా గణనను ఎంచుకోండి.",
+  "unsupportedAggregateTitle": "ఈ చార్ట్ గణన అందుబాటులో లేదు"
 }

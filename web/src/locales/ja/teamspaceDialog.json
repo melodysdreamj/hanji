@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "クローズド",
+    "open": "オープン",
+    "private": "プライベート"
+  },
+  "add": "追加",
+  "approve": "承認",
+  "archive": "チームスペースをアーカイブ",
+  "available": "参加可能なチームスペース",
+  "choosePrincipal": "人またはグループを選択",
+  "create": "チームスペースを作成",
+  "deny": "拒否",
+  "error": {
+    "action": "チームスペース操作を完了できませんでした。",
+    "load": "チームスペースの詳細を読み込めませんでした。"
+  },
+  "fields": {
+    "access": "アクセス",
+    "description": "説明",
+    "icon": "アイコン",
+    "memberRole": "メンバーページアクセス",
+    "membersCanEditSidebar": "メンバーはページの追加と並べ替えが可能",
+    "membersCanInvite": "メンバーはユーザーを招待可能",
+    "name": "名前",
+    "openRole": "公開ビジターのページアクセス"
+  },
+  "governance": "チームスペース設定",
+  "join": "参加",
+  "joined": "自分のチームスペース",
+  "loadMore": "さらに表示",
+  "manage": "管理",
+  "member": "メンバー",
+  "members": "メンバー",
+  "noneArchived": "アーカイブされたチームスペースはありません。",
+  "noneAvailable": "他に参加可能なチームスペースはありません。",
+  "noneJoined": "まだチームスペースに参加していません。",
+  "noRequests": "保留中のリクエストはありません。",
+  "notice": {
+    "approved": "リクエストが承認されました。",
+    "archived": "チームスペースをアーカイブしました。",
+    "created": "チームスペースを作成しました。",
+    "defaultSet": "デフォルトのチームスペースを更新しました。",
+    "denied": "リクエストが拒否されました。",
+    "joined": "チームスペースに参加しました。",
+    "memberAdded": "メンバーを追加しました。",
+    "memberRemoved": "メンバーを削除しました。",
+    "memberUpdated": "メンバーのロールを更新しました。",
+    "policySaved": "チームスペース作成ポリシーを更新しました。",
+    "requested": "アクセスをリクエストしました。",
+    "restored": "チームスペースを復元しました。",
+    "saved": "チームスペースを更新しました。"
+  },
+  "notOwner": "チームスペースのオーナーまたはワークスペース管理者のみ、このチームスペースを管理できます。",
+  "open": "開く",
+  "owner": "オーナー",
+  "ownersOnlyCreate": "ワークスペースオーナーのみチームスペースを作成できます",
+  "remove": "削除",
+  "replacement": "代替のデフォルトを選択",
+  "request": "アクセスをリクエスト",
+  "requestPending": "リクエスト保留中",
+  "requests": "アクセスリクエスト",
+  "restore": "復元",
+  "roles": {
+    "comment": "コメント可能",
+    "edit": "編集可能",
+    "full_access": "フルアクセス",
+    "view": "表示可能"
+  },
+  "save": "変更を保存",
+  "selectTeamspace": "チームスペース",
+  "setDefault": "デフォルトチームスペースに設定",
+  "subtitle": "共有作業を整理し、誰が発見または参加できるかを管理します。",
+  "tabs": {
+    "archived": "アーカイブ済み",
+    "browse": "参照",
+    "create": "新規チームスペース",
+    "label": "チームスペースビュー",
+    "manage": "管理"
+  },
+  "title": "チームスペース"
+}

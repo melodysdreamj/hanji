@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Asılılıqlar:",
     "hint": "əlaqəli xassə əlavə edin",
-    "relationPropertyAriaLabel": "Asılılıq əlaqəli xassəsi"
+    "relationPropertyAriaLabel": "Asılılıq əlaqəli xassəsi",
+    "makeDependOn": "{{title}}-i {{predecessor}}-dan asılı et",
+    "startFrom": "Asılılığı {{title}}-dan başlat"
   },
   "toolbar": {
     "today": "Bugün",

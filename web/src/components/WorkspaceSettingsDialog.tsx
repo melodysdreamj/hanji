@@ -52,6 +52,7 @@ import {
   currentUserEmail,
   currentUserId,
   saveAccountLanguagePreferenceRemote,
+  updateInstanceMemberAddPolicyRemote,
   updateInstanceSignupPolicyRemote,
   updateMyWorkspaceProfileRemote,
   updateOrganizationGroupRemote,
@@ -87,6 +88,7 @@ import type {
   FileUsageReport,
   DomainSignupPolicy,
   InstanceAdminUser,
+  MemberAddPolicy,
   ServerAuditSummaryEvent,
   ServerBackupSummary,
   ServerImportJobSummary,
@@ -108,10 +110,12 @@ import type {
   WorkspaceMember,
 } from "@/lib/types";
 import { EmojiPicker } from "./EmojiPicker";
+import { EnterpriseSettingsPanel } from "./EnterpriseSettingsPanel";
 import { ImportedPeopleMapping } from "./ImportedPeopleMapping";
 import { GlobeIcon, LockIcon, PaletteIcon, Search, SharePeopleIcon, Upload, UserIcon } from "./icons";
 import { WorkspaceIconGlyph } from "./PageIcon";
 import { SupportSection } from "./SupportSection";
+import { TeamspaceDialog } from "./TeamspaceDialog";
 import styles from "./WorkspaceSettingsDialog.module.css";
 
 // User-facing copy for this surface lives in the i18next catalogs at
@@ -140,6 +144,8 @@ const LABELS = {
   get remove() { return wt("remove"); },
   get revoke() { return wt("revoke"); },
   get verify() { return wt("verify"); },
+  get checkVerification() { return wt("checkVerification"); },
+  get dnsTxtInstructions() { return wt("dnsTxtInstructions"); },
   get adminOnlyNotice() { return wt("adminOnlyNotice"); },
   get adminRequired() { return wt("adminRequired"); },
   get clipboardCopyFailed() { return wt("clipboardCopyFailed"); },
@@ -173,6 +179,7 @@ const LABELS = {
   get sharingGuests() { return wt("sharingGuests"); },
   get sharingPublicWeb() { return wt("sharingPublicWeb"); },
   get auditAllEvents() { return wt("auditAllEvents"); },
+  get navEnterprise() { return wt("navEnterprise"); },
   get auditLoginAttempt() { return wt("auditLoginAttempt"); },
   get auditSettingsUpdate() { return wt("auditSettingsUpdate"); },
   get auditMemberDeactivate() { return wt("auditMemberDeactivate"); },
@@ -256,6 +263,7 @@ const LABELS = {
   get navUsageFiles() { return wt("navUsageFiles"); },
   get navWorkspaceGroup() { return wt("navWorkspaceGroup"); },
   get navWorkspaceMembers() { return wt("navWorkspaceMembers"); },
+  get navTeamspaces() { return wt("navTeamspaces"); },
   get accountConsole() { return wt("accountConsole"); },
   get accountConsoleSubtitle() { return wt("accountConsoleSubtitle"); },
   get hanjiServer() { return wt("hanjiServer"); },
@@ -300,6 +308,12 @@ const LABELS = {
   get signupHelpClosed() { return wt("signupHelpClosed"); },
   get signupHelpPublic() { return wt("signupHelpPublic"); },
   get signupHelpVerified() { return wt("signupHelpVerified"); },
+  get memberAddPolicyTitle() { return wt("memberAddPolicyTitle"); },
+  get memberAddPolicyEnabled() { return wt("memberAddPolicyEnabled"); },
+  get memberAddPolicyDisabled() { return wt("memberAddPolicyDisabled"); },
+  get memberAddPolicyHelpEnabled() { return wt("memberAddPolicyHelpEnabled"); },
+  get memberAddPolicyHelpDisabled() { return wt("memberAddPolicyHelpDisabled"); },
+  get memberAddDisabledNotice() { return wt("memberAddDisabledNotice"); },
   get temporaryPasswordCopied() { return wt("temporaryPasswordCopied"); },
   get temporaryPasswordPrefix() { return wt("temporaryPasswordPrefix"); },
   get verifiedAccountsTile() { return wt("verifiedAccountsTile"); },
@@ -617,6 +631,11 @@ const SIGNUP_POLICY_OPTIONS: Array<{ value: SignupPolicy; label: string }> = [
   { value: "closed", label: LABELS.signupClosed },
 ];
 
+const MEMBER_ADD_POLICY_OPTIONS: Array<{ value: MemberAddPolicy; label: string }> = [
+  { value: "disabled", label: LABELS.memberAddPolicyDisabled },
+  { value: "enabled", label: LABELS.memberAddPolicyEnabled },
+];
+
 const DOMAIN_SIGNUP_POLICY_OPTIONS: Array<{ value: DomainSignupPolicy; label: string }> = [
   { value: "invite_only", label: LABELS.signupInviteOnly },
   { value: "verified_domains", label: LABELS.domainSignupVerified },
@@ -873,6 +892,16 @@ function signupPolicyLabel(value: string | undefined) {
   return SIGNUP_POLICY_OPTIONS.find((option) => option.value === policy)?.label ?? LABELS.signupPublic;
 }
 
+function memberAddPolicyValue(value: string | undefined): MemberAddPolicy {
+  return value === "disabled" ? "disabled" : "enabled";
+}
+
+function memberAddPolicyLabel(value: string | undefined) {
+  const policy = memberAddPolicyValue(value);
+  return MEMBER_ADD_POLICY_OPTIONS.find((option) => option.value === policy)?.label
+    ?? LABELS.memberAddPolicyEnabled;
+}
+
 function domainSignupPolicyValue(value: string | undefined): DomainSignupPolicy {
   return value === "verified_domains" ? "verified_domains" : "invite_only";
 }
@@ -1019,8 +1048,10 @@ type SettingsNavSection =
   | "server-system"
   | "workspace"
   | "people"
+  | "teamspaces"
   | "workspace-security"
   | "organization"
+  | "enterprise"
   | "usage";
 
 const ACCOUNT_CONSOLE_NAV_GROUPS = [
@@ -1040,6 +1071,7 @@ const WORKSPACE_ADMIN_NAV_GROUPS = [
     items: [
       { section: "workspace", label: LABELS.navOverview, icon: GlobeIcon },
       { section: "people", label: LABELS.navWorkspaceMembers, icon: SharePeopleIcon },
+      { section: "teamspaces", label: LABELS.navTeamspaces, icon: SharePeopleIcon },
       { section: "organization", label: LABELS.navPoliciesDomains, icon: UserIcon },
       { section: "usage", label: LABELS.navUsage, icon: Upload },
     ],
@@ -1048,6 +1080,7 @@ const WORKSPACE_ADMIN_NAV_GROUPS = [
     label: LABELS.navSecurityGroup,
     items: [
       { section: "workspace-security", label: LABELS.navSharingSecurity, icon: LockIcon },
+      { section: "enterprise", label: LABELS.navEnterprise, icon: LockIcon },
     ],
   },
 ] as const;
@@ -1068,6 +1101,26 @@ const SERVER_ADMIN_NAV_GROUPS = [
     ],
   },
 ] as const;
+
+type InstanceAdminSnapshot = Awaited<ReturnType<typeof getInstanceAdminRemote>>;
+
+// A server snapshot already contains every console section. Share only an
+// active request for the same signed-in account (including React Strict Mode
+// remounts); once it settles, manual refresh and successful mutations start a
+// fresh authoritative request.
+const instanceAdminLoads = new Map<string, Promise<InstanceAdminSnapshot>>();
+
+function getInstanceAdminSingleFlight(userId: string) {
+  const key = userId || "signed-in";
+  const existing = instanceAdminLoads.get(key);
+  if (existing) return existing;
+  const request = getInstanceAdminRemote();
+  const tracked = request.finally(() => {
+    if (instanceAdminLoads.get(key) === tracked) instanceAdminLoads.delete(key);
+  });
+  instanceAdminLoads.set(key, tracked);
+  return tracked;
+}
 
 type WorkspaceSettingsSurface = "account-console" | "settings" | "workspace-admin" | "server-admin";
 
@@ -1152,6 +1205,7 @@ export function WorkspaceSettingsDialog({
   const [instanceBusy, setInstanceBusy] = useState("");
   const [instanceQuery, setInstanceQuery] = useState("");
   const [instanceSignupPolicy, setInstanceSignupPolicy] = useState<SignupPolicy>("public");
+  const [instanceMemberAddPolicy, setInstanceMemberAddPolicy] = useState<MemberAddPolicy>("enabled");
   const [serverWorkspaceQuery, setServerWorkspaceQuery] = useState("");
   const [serverAuditAction, setServerAuditAction] = useState("");
   const [serverJobStatus, setServerJobStatus] = useState("");
@@ -1282,9 +1336,10 @@ export function WorkspaceSettingsDialog({
         "server-system",
       );
     } else if (workspaceAdminSurface) {
-      if (canManageWorkspace) sections.push("workspace", "people");
+      if (canManageWorkspace) sections.push("workspace", "people", "teamspaces");
       if (canManageOrganizationSecurity) sections.push("workspace-security");
       if (canManageOrganization) sections.push("organization");
+      if (canManageOrganization) sections.push("enterprise");
       if (canViewStorage) sections.push("usage");
     }
     return new Set(sections);
@@ -1302,7 +1357,9 @@ export function WorkspaceSettingsDialog({
     if (workspaceAdminSurface) {
       if (allowedSettingsSections.has("workspace")) return "workspace";
       if (allowedSettingsSections.has("people")) return "people";
+      if (allowedSettingsSections.has("teamspaces")) return "teamspaces";
       if (allowedSettingsSections.has("organization")) return "organization";
+      if (allowedSettingsSections.has("enterprise")) return "enterprise";
       if (allowedSettingsSections.has("workspace-security")) return "workspace-security";
       if (allowedSettingsSections.has("usage")) return "usage";
       return "workspace";
@@ -1329,12 +1386,17 @@ export function WorkspaceSettingsDialog({
   );
   const workspaceCreationPolicy = workspaceCreationPolicyValue(organization?.workspaceCreationPolicy);
   const signupPolicy = instanceSignupPolicy;
+  const memberAddPolicy = instanceMemberAddPolicy;
+  const memberAddsEnabled = memberAddPolicy === "enabled";
   const domainSignupPolicy = domainSignupPolicyValue(organization?.domainSignupPolicy);
   const verifiedOrganizationDomainCount = organizationDomains.filter(
     (domainItem) => organizationDomainStatus(domainItem) === LABELS.statusVerified,
   ).length;
   const signupPolicyHelp =
     signupPolicy === "public" ? LABELS.signupHelpPublic : LABELS.signupHelpClosed;
+  const memberAddPolicyHelp = memberAddsEnabled
+    ? LABELS.memberAddPolicyHelpEnabled
+    : LABELS.memberAddPolicyHelpDisabled;
   const organizationDomainPolicyLabel = verifiedOrganizationDomainCount
     ? domainSignupPolicy === "verified_domains"
       ? LABELS.domainPolicyVerifiedRequired
@@ -1368,6 +1430,8 @@ export function WorkspaceSettingsDialog({
           ? "server-system"
         : section === "members" || section === "people"
         ? "people"
+        : section === "teamspaces"
+          ? "teamspaces"
         : section === "security"
           ? (adminSurface ? "workspace-security" : "account-security")
           : section === "sharing" || section === "workspace-security"
@@ -1376,6 +1440,8 @@ export function WorkspaceSettingsDialog({
             ? "mcp"
             : section === "storage" || section === "usage"
               ? "usage"
+              : section === "enterprise" || section === "sso" || section === "scim"
+                ? "enterprise"
               : section === "organization" || section === "domains" || section === "groups"
                 ? "organization"
                 : section === "workspace"
@@ -1519,7 +1585,11 @@ export function WorkspaceSettingsDialog({
   }, [organization?.id, organization?.storageLimitBytes]);
 
   const applyInstanceAdminResult = useCallback((result: {
-    instanceSettings?: { signupPolicy?: SignupPolicy | string; instanceAdminUserIds?: unknown };
+    instanceSettings?: {
+      signupPolicy?: SignupPolicy | string;
+      memberAddPolicy?: MemberAddPolicy | string;
+      instanceAdminUserIds?: unknown;
+    };
     instanceAdmins?: string[];
     users?: InstanceAdminUser[];
     overview?: ServerOverviewSummary;
@@ -1548,6 +1618,9 @@ export function WorkspaceSettingsDialog({
     if (result.instanceSettings?.signupPolicy) {
       setInstanceSignupPolicy(signupPolicyValue(result.instanceSettings.signupPolicy));
     }
+    if (result.instanceSettings?.memberAddPolicy) {
+      setInstanceMemberAddPolicy(memberAddPolicyValue(result.instanceSettings.memberAddPolicy));
+    }
   }, []);
 
   const refreshInstanceAdmin = useCallback(async () => {
@@ -1555,24 +1628,24 @@ export function WorkspaceSettingsDialog({
     setInstanceLoading(true);
     setInstanceError("");
     try {
-      applyInstanceAdminResult(await getInstanceAdminRemote());
+      applyInstanceAdminResult(await getInstanceAdminSingleFlight(signedInUserId));
     } catch (err) {
       setInstanceError(settingsErrorMessage(err, t("workspaceSettingsDialog:errLoadInstanceUsers")));
     } finally {
       setInstanceLoading(false);
     }
-  }, [applyInstanceAdminResult, serverAdminSurface, t]);
+  }, [applyInstanceAdminResult, serverAdminSurface, signedInUserId, t]);
 
   useEffect(() => {
     if (!serverAdminSurface) return;
     void refreshInstanceAdmin();
-  }, [refreshInstanceAdmin, serverAdminSurface, visibleSettingsSection]);
+  }, [refreshInstanceAdmin, serverAdminSurface]);
 
   // Server-account search for the member-add picker. Instance admins get live
   // results (name/email); a 403 means the caller is not an instance admin, so
   // the picker falls back to blind exact-email entry.
   useEffect(() => {
-    if (!invitePanelOpen || !canManageWorkspace) return;
+    if (!invitePanelOpen || !canManageWorkspace || !memberAddsEnabled) return;
     let active = true;
     const query = memberAddQuery.trim();
     const handle = window.setTimeout(() => {
@@ -1592,7 +1665,14 @@ export function WorkspaceSettingsDialog({
       active = false;
       window.clearTimeout(handle);
     };
-  }, [invitePanelOpen, canManageWorkspace, memberAddQuery]);
+  }, [invitePanelOpen, canManageWorkspace, memberAddQuery, memberAddsEnabled]);
+
+  useEffect(() => {
+    if (memberAddsEnabled) return;
+    setInvitePanelOpen(false);
+    setServerUserResults([]);
+    setSelectedServerUser(null);
+  }, [memberAddsEnabled]);
 
   const refreshMembers = useCallback(async () => {
     if (!workspace?.id || !canManageWorkspace) {
@@ -1614,6 +1694,9 @@ export function WorkspaceSettingsDialog({
       setOrganizationAuditEvents(result.organizationAuditEvents ?? []);
       if (result.instanceSettings?.signupPolicy) {
         setInstanceSignupPolicy(signupPolicyValue(result.instanceSettings.signupPolicy));
+      }
+      if (result.instanceSettings?.memberAddPolicy) {
+        setInstanceMemberAddPolicy(memberAddPolicyValue(result.instanceSettings.memberAddPolicy));
       }
     } catch (err) {
       if (shouldSuppressBackgroundSettingsError(
@@ -1676,6 +1759,9 @@ export function WorkspaceSettingsDialog({
       if (result.instanceSettings?.signupPolicy) {
         setInstanceSignupPolicy(signupPolicyValue(result.instanceSettings.signupPolicy));
       }
+      if (result.instanceSettings?.memberAddPolicy) {
+        setInstanceMemberAddPolicy(memberAddPolicyValue(result.instanceSettings.memberAddPolicy));
+      }
       applyOrganizationDirectory(result);
     } catch (err) {
       setOrganizationError(settingsErrorMessage(err, t("workspaceSettingsDialog:errLoadOrganization")));
@@ -1685,7 +1771,11 @@ export function WorkspaceSettingsDialog({
   }, [applyOrganizationDirectory, canManageOrganization, organization?.id, t]);
 
   useEffect(() => {
-    if (visibleSettingsSection !== "organization" && visibleSettingsSection !== "workspace-security") return;
+    if (
+      visibleSettingsSection !== "organization" &&
+      visibleSettingsSection !== "workspace-security" &&
+      visibleSettingsSection !== "enterprise"
+    ) return;
     void refreshOrganizationDirectory();
   }, [refreshOrganizationDirectory, visibleSettingsSection]);
 
@@ -2164,6 +2254,19 @@ export function WorkspaceSettingsDialog({
       applyInstanceAdminResult(await updateInstanceSignupPolicyRemote(nextPolicy));
     } catch (err) {
       setInstanceError(settingsErrorMessage(err, t("workspaceSettingsDialog:errUpdateSignupPolicy")));
+    } finally {
+      setInstanceBusy("");
+    }
+  }
+
+  async function updateMemberAddPolicy(nextPolicy: MemberAddPolicy) {
+    if (nextPolicy === memberAddPolicy) return;
+    setInstanceBusy("policy:memberAdd");
+    setInstanceError("");
+    try {
+      applyInstanceAdminResult(await updateInstanceMemberAddPolicyRemote(nextPolicy));
+    } catch (err) {
+      setInstanceError(settingsErrorMessage(err, t("workspaceSettingsDialog:errUpdateMemberAddPolicy")));
     } finally {
       setInstanceBusy("");
     }
@@ -2708,7 +2811,8 @@ export function WorkspaceSettingsDialog({
     setMcpNotice("");
     setMcpCreatedToken(null);
     try {
-      const result = await createManualMcpTokenRemote();
+      if (!workspace?.id) throw new Error(t("workspaceSettingsDialog:errCreateMcpToken"));
+      const result = await createManualMcpTokenRemote([workspace.id]);
       setMcpConnections(result);
       setMcpCreatedToken(result.createdToken ?? null);
       setMcpNotice(LABELS.manualTokenCreated);
@@ -3056,6 +3160,34 @@ export function WorkspaceSettingsDialog({
                 ))}
               </div>
               <div className={styles.fieldMessage}>{signupPolicyHelp}</div>
+            </div>
+
+            <div className={styles.organizationPolicyBlock}>
+              <div className={styles.organizationSubhead}>
+                <span>{LABELS.memberAddPolicyTitle}</span>
+                <strong>{memberAddPolicyLabel(memberAddPolicy)}</strong>
+              </div>
+              <div
+                className={styles.policyOptions}
+                role="radiogroup"
+                aria-label={t("workspaceSettingsDialog:ariaInstanceMemberAddPolicy")}
+              >
+                {MEMBER_ADD_POLICY_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={styles.policyOption}
+                    role="radio"
+                    aria-checked={memberAddPolicy === option.value}
+                    data-active={memberAddPolicy === option.value ? "true" : undefined}
+                    disabled={instanceBusy === "policy:memberAdd"}
+                    onClick={() => void updateMemberAddPolicy(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.fieldMessage}>{memberAddPolicyHelp}</div>
             </div>
 
             <form className={styles.memberInvite} onSubmit={createInstanceUser}>
@@ -3812,6 +3944,12 @@ export function WorkspaceSettingsDialog({
           </section>
           ) : null}
 
+          {renderCurrentSection && visibleSettingsSection === "teamspaces" ? (
+            <section id="teamspaces" className={styles.section}>
+              <TeamspaceDialog embedded />
+            </section>
+          ) : null}
+
           {renderCurrentSection && visibleSettingsSection === "preferences" ? (
           <>
           <section id="preferences" className={styles.section} aria-labelledby={appearanceSectionId}>
@@ -4454,7 +4592,7 @@ export function WorkspaceSettingsDialog({
                   type="button"
                   className={styles.secondaryButton}
                   onClick={() => void createManualMcpToken()}
-                  disabled={mcpBusy === "manual-token"}
+                  disabled={mcpBusy === "manual-token" || !workspace?.id}
                 >
                   {LABELS.createToken}
                 </button>
@@ -4507,7 +4645,8 @@ export function WorkspaceSettingsDialog({
                   <button
                     type="button"
                     className={styles.primaryButton}
-                    aria-expanded={invitePanelOpen}
+                    aria-expanded={memberAddsEnabled && invitePanelOpen}
+                    disabled={!memberAddsEnabled}
                     onClick={() => setInvitePanelOpen((current) => !current)}
                   >
                     {LABELS.addMembers}
@@ -4517,6 +4656,12 @@ export function WorkspaceSettingsDialog({
             </div>
 
             {memberError ? <div className={styles.notice}>{memberError}</div> : null}
+
+            {!memberAddsEnabled ? (
+              <div className={styles.notice} data-tone="neutral">
+                {LABELS.memberAddDisabledNotice}
+              </div>
+            ) : null}
 
             <div className={styles.memberDirectoryTools}>
               <label className={styles.memberSearch}>
@@ -4614,7 +4759,7 @@ export function WorkspaceSettingsDialog({
               </div>
             ) : null}
 
-            {canManageWorkspace && invitePanelOpen ? (
+            {canManageWorkspace && memberAddsEnabled && invitePanelOpen ? (
               <form className={styles.memberInvite} onSubmit={addMember}>
                 <div className={styles.memberAddField}>
                   <input
@@ -5006,6 +5151,14 @@ export function WorkspaceSettingsDialog({
                         <span className={styles.domainText}>
                           <strong>{domain.domain}</strong>
                           <span>{verified && domain.verifiedAt ? LABELS.verifiedAt(formatStorageDate(domain.verifiedAt)) : statusLabel}</span>
+                          {!verified && domain.recordName && domain.recordValue ? (
+                            <span className={styles.domainVerification}>
+                              {LABELS.dnsTxtInstructions}
+                              <code>{domain.recordName}</code>
+                              <code>{domain.recordValue}</code>
+                              {domain.verificationError ? <em>{domain.verificationError}</em> : null}
+                            </span>
+                          ) : null}
                         </span>
                         <span className={styles.domainControls}>
                           <span
@@ -5021,7 +5174,7 @@ export function WorkspaceSettingsDialog({
                               disabled={organizationBusy === `domain:verify:${domain.id}`}
                               onClick={() => void verifyOrganizationDomain(domain)}
                             >
-                              {LABELS.verify}
+                              {LABELS.checkVerification}
                             </button>
                           ) : null}
                           {canManageOrganizationSecurity ? (
@@ -5262,6 +5415,13 @@ export function WorkspaceSettingsDialog({
               </div>
             ) : null}
           </section>
+          ) : null}
+
+          {renderCurrentSection && visibleSettingsSection === "enterprise" ? (
+            <EnterpriseSettingsPanel
+              canManageSecurity={canManageOrganizationSecurity}
+              canManageBilling={canManageOrganizationBilling}
+            />
           ) : null}
 
           {renderCurrentSection && visibleSettingsSection === "usage" ? (

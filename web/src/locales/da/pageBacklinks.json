@@ -8,16 +8,22 @@
   },
   "more": {
     "count_one": "{{count}} flere tilbagelink",
-    "count_other": "{{count}} flere tilbagelinks"
+    "count_other": "{{count}} flere tilbagelinks",
+    "load": "Indlæs flere backlinks",
+    "loading": "Indlæser backlinks…",
+    "search": "Søg efter backlinks"
   },
   "summary": {
     "link_one": "{{count}} link",
     "link_other": "{{count}} links",
     "mention_one": "{{count}} omtale",
-    "mention_other": "{{count}} omtaler"
+    "mention_other": "{{count}} omtaler",
+    "loaded": "Indlæst: {{summary}}"
   },
   "toggle": {
     "count_one": "{{count}} tilbagelink",
-    "count_other": "{{count}} tilbagelinks"
+    "count_other": "{{count}} tilbagelinks",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlinks"
   }
 }

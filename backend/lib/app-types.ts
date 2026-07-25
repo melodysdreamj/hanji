@@ -8,6 +8,7 @@
 // stay optional because fixtures and partial reads may omit them.
 import type { ShareRole } from './page-access';
 import type { ListResult, TableQuery, TransactDb } from './table-utils';
+import type { DatabasePropertyType } from './database-property-types';
 
 export type { ShareRole };
 
@@ -22,7 +23,8 @@ export type FileUploadStatus =
   | 'uploaded'
   | 'deleting'
   | 'deleted'
-  | 'expired';
+  | 'expired'
+  | 'failed';
 
 export interface Workspace {
   id: string;
@@ -58,6 +60,8 @@ export interface OrganizationMember {
   avatar?: string | null;
   role: string;
   status?: string;
+  externalId?: string | null;
+  provisionedBy?: string | null;
   joinedAt?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -68,6 +72,8 @@ export interface OrganizationGroup {
   organizationId: string;
   name: string;
   description?: string;
+  externalId?: string | null;
+  provisionedBy?: string | null;
   createdBy?: string;
 }
 
@@ -81,16 +87,67 @@ export interface OrganizationGroupMember {
   createdBy?: string;
 }
 
+export interface OrganizationPolicyVersion {
+  id: string;
+  organizationId: string;
+  version: number;
+}
+
+export interface SearchGroupAuthority {
+  id: string;
+  workspaceId: string;
+  organizationId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SearchGroupMembership {
+  id: string;
+  workspaceId: string;
+  organizationId: string;
+  userId: string;
+  organizationMemberId: string;
+  groupId: string;
+  sourceMembershipId: string;
+  policyVersion: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SearchGroupMembershipSnapshot {
+  id: string;
+  workspaceId: string;
+  organizationId: string;
+  userId: string;
+  organizationMemberId: string;
+  policyVersion: number;
+  syncAfter?: string | null;
+  syncComplete?: boolean;
+  completedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Page {
   id: string;
   workspaceId: string;
   parentId?: string | null;
   parentType: PageParentType;
+  teamspaceId?: string | null;
+  teamspacePermissionMode?: 'inherit' | 'restricted' | string;
   kind: PageKind;
   title?: string;
   icon?: string;
   iconType?: 'none' | 'emoji' | 'image';
   cover?: string;
+  notionIcon?: Record<string, unknown> | null;
+  notionCover?: Record<string, unknown> | null;
+  databaseFeatures?: Record<string, unknown> | null;
+  databaseFeaturesRevision?: number;
+  subitemParentId?: string;
+  subitemChildCount?: number;
+  /** Transient restricted-ancestor projection; never persisted as page content. */
+  __structuralPlaceholder?: true;
   coverPosition?: number;
   font?: 'default' | 'serif' | 'mono';
   smallText?: boolean;
@@ -99,10 +156,16 @@ export interface Page {
   isPublic?: boolean;
   backlinksDisplay?: 'default' | 'expanded' | 'off';
   pageCommentsDisplay?: 'default' | 'expanded' | 'off';
+  isWiki?: boolean;
+  wikiRootId?: string | null;
   verifiedAt?: string | null;
   verifiedBy?: string | null;
   verificationExpiresAt?: string | null;
   properties?: Record<string, unknown>;
+  notionImportJobId?: string | null;
+  notionImportSourceId?: string | null;
+  notionImportSourceKind?: string | null;
+  notionImportStaging?: boolean;
   isFavorite?: boolean;
   inTrash?: boolean;
   trashedAt?: string | null;
@@ -110,6 +173,46 @@ export interface Page {
   position: number;
   createdBy?: string;
   lastEditedBy?: string;
+  lastMutationId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PageOwner {
+  id: string;
+  workspaceId: string;
+  pageId: string;
+  wikiRootId: string;
+  userId: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WikiVerificationQueue {
+  id: string;
+  workspaceId: string;
+  pageId: string;
+  expiresAt: string;
+  state: 'pending' | 'retrying';
+  attempts: number;
+  nextAttemptAt?: string | null;
+  lastError?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WikiVerificationEmailDelivery {
+  id: string;
+  workspaceId: string;
+  pageId: string;
+  userId: string;
+  expiresAt: string;
+  email?: string | null;
+  status: 'pending' | 'sent' | 'failed' | 'not_configured' | 'no_email';
+  attempts: number;
+  lastError?: string | null;
+  sentAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -123,6 +226,8 @@ export interface Block {
   plainText?: string;
   position: number;
   createdBy?: string;
+  lastEditedBy?: string;
+  lastMutationId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -130,9 +235,12 @@ export interface Block {
 export interface DbProperty {
   id: string;
   databaseId: string;
+  notionImportJobId?: string;
+  notionDataSourceId?: string;
+  notionPropertyId?: string;
   name: string;
   description?: string;
-  type: string;
+  type: DatabasePropertyType;
   config?: Record<string, unknown>;
   position: number;
   createdAt?: string;
@@ -142,6 +250,17 @@ export interface DbProperty {
 export interface DbView {
   id: string;
   databaseId: string;
+  notionImportJobId?: string;
+  notionDataSourceId?: string;
+  notionViewId?: string;
+  notionViewStructuralIndex?: number;
+  notionImportSnapshotRevision?: string;
+  notionViewFingerprint?: string;
+  notionRowContextJobId?: string;
+  notionRowContextSnapshotRevision?: string;
+  notionRowContextBlockId?: string;
+  notionRowContextSourceViewId?: string;
+  notionRowContextFingerprint?: string;
   name: string;
   type: string;
   config?: Record<string, unknown>;
@@ -153,6 +272,12 @@ export interface DbView {
 export interface DbTemplate {
   id: string;
   databaseId: string;
+  notionImportJobId?: string;
+  notionTemplateId?: string;
+  notionDataSourceId?: string;
+  notionTemplateStructuralIndex?: number;
+  notionImportSnapshotRevision?: string;
+  notionTemplateFingerprint?: string;
   name: string;
   icon?: string;
   title?: string;
@@ -160,6 +285,43 @@ export interface DbTemplate {
   blocks?: unknown[];
   isDefault?: boolean;
   position: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AutomationExecutionReceipt {
+  id: string;
+  workspaceId: string;
+  databaseId?: string;
+  sourceType: 'database_button' | 'page_button' | 'database_automation';
+  sourceId: string;
+  triggerPageId: string;
+  requestedBy: string;
+  requestHash: string;
+  status: 'succeeded' | 'failed';
+  result?: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DatabaseAutomationDefinition {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  name: string;
+  enabled: boolean;
+  scopeType: 'database' | 'view';
+  viewId?: string | null;
+  triggerType: 'events' | 'schedule';
+  trigger: Record<string, unknown>;
+  actionDocument: Record<string, unknown>;
+  nextRunAt?: string | null;
+  status: 'active' | 'disabled' | 'paused';
+  revision: number;
+  createdBy: string;
+  updatedBy: string;
+  pausedAt?: string | null;
+  pausedReason?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -204,6 +366,62 @@ export interface ShareLink {
   updatedAt?: string;
 }
 
+export type SiteTheme = 'system' | 'light' | 'dark';
+export type SiteDomainStatus = 'none' | 'pending_validation' | 'validated';
+
+export interface SiteConfig {
+  id: string;
+  pageId: string;
+  workspaceId: string;
+  slug: string;
+  published: boolean;
+  title: string;
+  description?: string;
+  theme: SiteTheme;
+  showBreadcrumbs: boolean;
+  showSearch: boolean;
+  showBranding: boolean;
+  navigationPageIds: string[];
+  customHostname?: string | null;
+  domainStatus: SiteDomainStatus;
+  domainVerificationToken?: string | null;
+  revision: number;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type SiteRouteStatus = 'provisioning' | 'pending_validation' | 'active' | 'inactive';
+
+export interface SiteRouteIndex {
+  id: string;
+  routeKey: string;
+  routeKind: 'slug' | 'host';
+  routeValue: string;
+  workspaceId: string;
+  siteId: string;
+  pageId: string;
+  status: SiteRouteStatus;
+  revision: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type FormAudience = 'none' | 'workspace' | 'web';
+
+export interface FormLink {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  viewId: string;
+  token: string;
+  audience: FormAudience;
+  enabled: boolean;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface NotificationRecord {
   id: string;
   workspaceId: string;
@@ -230,6 +448,7 @@ export interface FileUpload {
   scope?: string;
   pageId?: string | null;
   blockId?: string | null;
+  commentId?: string | null;
   databaseId?: string | null;
   propertyId?: string | null;
   templateId?: string | null;
@@ -242,10 +461,23 @@ export interface FileUpload {
   createdBy?: string;
   expiresAt?: string | null;
   completedAt?: string | null;
+  orphanReferenceCheckedAt?: string | null;
   expiredAt?: string | null;
   deletedAt?: string | null;
   deletedBy?: string | null;
   deletionPreviousStatus?: 'preparing' | 'pending' | 'uploaded' | null;
+  mode?: 'single_part' | 'multi_part' | 'external_url';
+  numberOfPartsTotal?: number;
+  numberOfPartsSent?: number;
+  multipartUploadId?: string | null;
+  multipartParts?: Array<{ partNumber: number; etag: string; size: number }>;
+  externalUrl?: string | null;
+  fileImportResult?: unknown;
+  notionImportJobId?: string | null;
+  notionImportSnapshotRevision?: string | null;
+  notionImportSlotKey?: string | null;
+  notionImportTerminalSweepAfter?: string | null;
+  notionImportTerminalSweepCompletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -284,12 +516,64 @@ export interface CollaborationDocument {
 
 // ─── Function runtime plumbing shared by functions/*.ts ─────────────────────
 
+export type SearchRelatedWhere =
+  | [field: string, op: '==' | 'in', value: unknown]
+  | [field: string, op: 'is-not-true'];
+
+export type SearchRelatedGroupMembership = {
+  table: string;
+  grantPrincipalField: string;
+  membershipGroupField: string;
+  whereAll: SearchRelatedWhere[];
+};
+
+export type SearchRelatedPrincipalBranch = {
+  whereAll: SearchRelatedWhere[];
+  groupMembership?: SearchRelatedGroupMembership;
+};
+
+export type SearchRelatedGrantSource = {
+  table: string;
+  ancestorField: string;
+  whereAll: SearchRelatedWhere[];
+  principalAny: SearchRelatedPrincipalBranch[];
+};
+
+export type SearchRelatedAncestry = {
+  parentField: string;
+  parentTypeField: string;
+  stopParentType: string;
+  maxDepth: number;
+  whereAll: SearchRelatedWhere[];
+  requiredAncestorIds?: string[];
+  grantSource?: SearchRelatedGrantSource;
+};
+
+export type SearchRelatedRelation = {
+  localField: string;
+  table: string;
+  whereAll: SearchRelatedWhere[];
+  ancestry?: SearchRelatedAncestry;
+};
+
+export type SearchRelatedInput = {
+  query: string;
+  queryVariants?: string[];
+  order: Array<{ field: string; direction: 'asc' }>;
+  after?: { values: string[] };
+  limit: number;
+  includeTotal: boolean;
+  relation: SearchRelatedRelation;
+};
+
 export interface TableRef<T> extends TableQuery<T> {
   getOne(id: string): Promise<T | null>;
   getList(): Promise<ListResult<T>>;
   insert(data: Partial<T>): Promise<T>;
   update(id: string, data: Partial<T>): Promise<T>;
   delete(id: string): Promise<void>;
+  search?(query: string): TableQuery<T>;
+  searchRelated?(input: SearchRelatedInput): Promise<ListResult<T>>;
   where(field: string, op: string, value: unknown): TableQuery<T>;
 }
 
@@ -318,6 +602,16 @@ export interface FunctionStorageProxy {
 export interface FunctionContext {
   auth: FunctionAuth | null;
   request?: Request;
+  env?: Record<string, unknown>;
+  email?: {
+    readonly supportsIdempotency: boolean;
+    send(options: {
+      to: string;
+      subject: string;
+      text: string;
+      idempotencyKey: string;
+    }): Promise<{ success: boolean; messageId?: string }>;
+  };
   admin: {
     db(namespace: string, instanceId?: string): DbRef;
     auth?: {

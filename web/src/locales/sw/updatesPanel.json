@@ -15,10 +15,7 @@
     "recentUpdates_other": "Taarifa {{count}} za hivi karibuni",
     "unreadOfTotal": "{{unread}} hazijasomwa kati ya taarifa {{total}}",
     "updateType": "Aina ya taarifa",
-    "updates": "Taarifa",
-    "modeUpdates": "Taarifa",
-    "modeChats": "Mazungumzo",
-    "inboxMode": "Hali ya kikasha"
+    "updates": "Taarifa"
   },
   "time": {
     "justNow": "Sasa hivi",
@@ -46,7 +43,16 @@
     "versionCount_other": "Matoleo {{count}}",
     "versionsAgo": "Matoleo {{count}} yaliyopita",
     "versionsAhead": "Matoleo {{count}} yajayo",
-    "versionsAria": "Matoleo"
+    "versionsAria": "Matoleo",
+    "emptyBlock": "Kizuizi tupu",
+    "emptyPreview": "Toleo hili halina maudhui ya ukurasa.",
+    "previewAria": "Onyesho la toleo la ukurasa la kusoma pekee",
+    "previewingCurrent": "Unaangalia ukurasa wa sasa",
+    "previewingSnapshot": "Unaangalia toleo la zamani",
+    "previewOnlyHint": "Kuchagua toleo kunatoa onyesho tu. Ukurasa wa sasa unabadilika baada ya kurejesha.",
+    "restoreThisVersion": "Rejesha",
+    "restoring": "Inarejesha...",
+    "versionHistory": "Historia ya matoleo"
   },
   "badges": {
     "comment": "Maoni",
@@ -67,7 +73,8 @@
     "referenceMention": "Imetajwa katika {{title}} · {{preview}}",
     "referenceLink": "Imeunganishwa kwa {{title}} · {{preview}}",
     "unreadDot": "Haijasomwa",
-    "workspaceUpdate": "Sasisho la workspace"
+    "workspaceUpdate": "Sasisho la workspace",
+    "bySelf": "na wewe"
   },
   "empty": {
     "allCaughtUp": "Umesasishwa vyote.",

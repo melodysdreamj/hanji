@@ -35,7 +35,7 @@
     "rename": "Sake suna",
     "addPageInside": "Ƙara shafi a ciki",
     "exportAsMarkdown": "Fitarwa azaman Markdown",
-    "exportAsHanjiFile": "Fitarwa azaman fayil ɗin Hanji",
+    "exportAsHanjiFile": "Fitar da Hanji JSON (fayiloli ba a haɗa su ba)",
     "importMarkdown": "Shigo da Markdown",
     "importing": "Ana shigowa...",
     "unlockPage": "Buɗe shafi",
@@ -44,7 +44,8 @@
     "removeVerification": "Cire tabbaci",
     "verifyPage": "Tabbata shafi",
     "customizePage": "Keɓance shafi",
-    "undo": "Soke"
+    "undo": "Soke",
+    "exportAsHanjiArchive": "Fitar da Hanji archive (fayiloli sun haɗa)"
   },
   "customize": {
     "summaryDefault": "Tsoho",
@@ -101,6 +102,8 @@
     "movedToTrash": "An tura zuwa Sharar",
     "restoredPage": "An maido da shafi",
     "couldntRestorePage": "An kasa maido da shafi",
-    "couldntMoveToTrash": "An kasa matsawa zuwa Sharar"
+    "couldntMoveToTrash": "An kasa matsawa zuwa Sharar",
+    "couldntExportHanjiArchive": "An kasa fitar da ajiyar Hanji.",
+    "exportedHanjiArchive": "An fitar da ajiyar Hanji tare da fayiloli."
   }
 }

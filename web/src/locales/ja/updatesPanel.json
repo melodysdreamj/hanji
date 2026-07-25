@@ -15,10 +15,7 @@
     "recentUpdates_other": "最新の更新 {{count}}件",
     "unreadOfTotal": "更新{{total}}件中{{unread}}件未読",
     "updateType": "更新タイプ",
-    "updates": "更新",
-    "modeUpdates": "更新",
-    "modeChats": "チャット",
-    "inboxMode": "受信トレイモード"
+    "updates": "更新"
   },
   "time": {
     "justNow": "たった今",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}}バージョン",
     "versionsAgo": "{{count}}バージョン前",
     "versionsAhead": "{{count}}バージョン先",
-    "versionsAria": "バージョン"
+    "versionsAria": "バージョン",
+    "emptyBlock": "空のブロック",
+    "emptyPreview": "このバージョンにはページコンテンツがありません。",
+    "previewAria": "読み取り専用のページバージョンプレビュー",
+    "previewingCurrent": "現在のページを表示中",
+    "previewingSnapshot": "過去のバージョンを表示中",
+    "previewOnlyHint": "バージョンを選択してもプレビューのみです。復元すると現在のページが変更されます。",
+    "restoreThisVersion": "復元",
+    "restoring": "復元中...",
+    "versionHistory": "バージョン履歴"
   },
   "badges": {
     "comment": "コメント",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}}をメンション · {{preview}}",
     "referenceLink": "{{title}}にリンク · {{preview}}",
     "unreadDot": "未読",
-    "workspaceUpdate": "ワークスペースアップデート"
+    "workspaceUpdate": "ワークスペースアップデート",
+    "bySelf": "自分"
   },
   "empty": {
     "allCaughtUp": "すべて確認済み",

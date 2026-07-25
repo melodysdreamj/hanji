@@ -20,6 +20,36 @@
   cursor: default;
 }
 
+.actions {
+  position: fixed;
+  top: 18px;
+  right: 64px;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.action:hover,
+.action:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  outline: none;
+}
+
 .close {
   position: fixed;
   top: 18px;

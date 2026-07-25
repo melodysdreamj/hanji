@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} atualizações recentes",
     "unreadOfTotal": "{{unread}} não lidas de {{total}} atualizações",
     "updateType": "Tipo de atualização",
-    "updates": "Atualizações",
-    "modeUpdates": "Atualizações",
-    "modeChats": "Conversas",
-    "inboxMode": "Modo caixa de entrada"
+    "updates": "Atualizações"
   },
   "time": {
     "justNow": "Agora mesmo",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versões",
     "versionsAgo": "Há {{count}} versões",
     "versionsAhead": "{{count}} versões à frente",
-    "versionsAria": "Versões"
+    "versionsAria": "Versões",
+    "emptyBlock": "Bloco vazio",
+    "emptyPreview": "Esta versão não tem conteúdo de página.",
+    "previewAria": "Visualização somente leitura da versão da página",
+    "previewingCurrent": "Visualizando página atual",
+    "previewingSnapshot": "Visualizando versão anterior",
+    "previewOnlyHint": "Selecionar uma versão apenas a pré-visualiza. A página atual só é alterada após Restaurar.",
+    "restoreThisVersion": "Restaurar",
+    "restoring": "Restaurando...",
+    "versionHistory": "Histórico de versões"
   },
   "badges": {
     "comment": "Comentário",
@@ -67,7 +73,8 @@
     "referenceMention": "Mencionou {{title}} · {{preview}}",
     "referenceLink": "Vinculado a {{title}} · {{preview}}",
     "unreadDot": "Não lido",
-    "workspaceUpdate": "Atualização do workspace"
+    "workspaceUpdate": "Atualização do workspace",
+    "bySelf": "Por você"
   },
   "empty": {
     "allCaughtUp": "Tudo em dia.",

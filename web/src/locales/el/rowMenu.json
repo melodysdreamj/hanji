@@ -35,7 +35,7 @@
     "rename": "Μετονομασία",
     "addPageInside": "Προσθήκη σελίδας μέσα",
     "exportAsMarkdown": "Εξαγωγή ως Markdown",
-    "exportAsHanjiFile": "Εξαγωγή ως αρχείο Hanji",
+    "exportAsHanjiFile": "Εξαγωγή Hanji JSON (χωρίς αρχεία)",
     "importMarkdown": "Εισαγωγή Markdown",
     "importing": "Εισαγωγή...",
     "unlockPage": "Ξεκλείδωμα σελίδας",
@@ -44,7 +44,8 @@
     "removeVerification": "Αφαίρεση επαλήθευσης",
     "verifyPage": "Επαλήθευση σελίδας",
     "customizePage": "Προσαρμογή σελίδας",
-    "undo": "Αναίρεση"
+    "undo": "Αναίρεση",
+    "exportAsHanjiArchive": "Εξαγωγή αρχείου Hanji (περιλαμβάνονται αρχεία)"
   },
   "customize": {
     "summaryDefault": "Προεπιλογή",
@@ -101,6 +102,8 @@
     "movedToTrash": "Μετακινήθηκε στον Κάδο",
     "restoredPage": "Η σελίδα επαναφέρθηκε",
     "couldntRestorePage": "Αδυναμία επαναφοράς σελίδας",
-    "couldntMoveToTrash": "Αδυναμία μετακίνησης στον Κάδο"
+    "couldntMoveToTrash": "Αδυναμία μετακίνησης στον Κάδο",
+    "couldntExportHanjiArchive": "Δεν ήταν δυνατή η εξαγωγή του αρχείου Hanji.",
+    "exportedHanjiArchive": "Εξήχθη ένα αρχείο Hanji με αρχεία."
   }
 }

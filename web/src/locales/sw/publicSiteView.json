@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Njia",
+  "clearSearch": "Futa utaftaji",
+  "errors": {
+    "not-found": "Tovuti hii inaweza kuwa imeacha kuchapishwa au anwani yake imebadilika.",
+    "offline": "Angalia muunganisho wako, kisha jaribu kufungua tovuti tena.",
+    "rate-limited": "Tovuti hii inapokea maombi mengi sana. Subiri kidogo kisha ujaribu tena.",
+    "unavailable": "Hanji haikuweza kufungua tovuti hii sasa hivi. Jaribu tena baada ya muda."
+  },
+  "madeWithHanji": "Imetengenezwa kwa Hanji",
+  "navigation": "Urambazaji wa tovuti",
+  "noResults": "Hakuna kurasa zilizopatikana",
+  "outsideSite": "Ukurasa huu si sehemu ya tovuti hii iliyochapishwa.",
+  "search": "Tafuta tovuti hii",
+  "tryAgain": "Jaribu tena",
+  "unavailable": "Tovuti hii haipatikani."
+}

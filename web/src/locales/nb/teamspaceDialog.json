@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Lukket",
+    "open": "Åpen",
+    "private": "Privat"
+  },
+  "add": "Legg til",
+  "approve": "Godkjenn",
+  "archive": "Arkiver teamspace",
+  "available": "Tilgjengelig for å bli med",
+  "choosePrincipal": "Velg en person eller gruppe",
+  "create": "Opprett teamspace",
+  "deny": "Avslå",
+  "error": {
+    "action": "Kunne ikke fullføre den teamspace-handlingen.",
+    "load": "Kunne ikke laste teamspace-detaljer."
+  },
+  "fields": {
+    "access": "Tilgang",
+    "description": "Beskrivelse",
+    "icon": "Ikon",
+    "memberRole": "Medlemstilgang til sider",
+    "membersCanEditSidebar": "Medlemmer kan legge til og omorganisere sider",
+    "membersCanInvite": "Medlemmer kan invitere",
+    "name": "Navn",
+    "openRole": "Åpen besøkstilgang til sider"
+  },
+  "governance": "Teamspace-innstillinger",
+  "join": "Bli med",
+  "joined": "Dine teamspaces",
+  "loadMore": "Last inn mer",
+  "manage": "Administrer",
+  "member": "Medlem",
+  "members": "Medlemmer",
+  "noneArchived": "Det finnes ingen arkiverte teamspace.",
+  "noneAvailable": "Det finnes ingen andre tilgjengelige teamspace.",
+  "noneJoined": "Du har ikke blitt med i noen teamspace ennå.",
+  "noRequests": "Det er ingen ventende forespørsler.",
+  "notice": {
+    "approved": "Forespørsel godkjent.",
+    "archived": "Teamspace arkivert.",
+    "created": "Teamspace opprettet.",
+    "defaultSet": "Standard teamspace oppdatert.",
+    "denied": "Forespørsel avvist.",
+    "joined": "Ble med i Teamspace.",
+    "memberAdded": "Medlem lagt til.",
+    "memberRemoved": "Medlem fjernet.",
+    "memberUpdated": "Medlemsrolle oppdatert.",
+    "policySaved": "Teamspace-opprettelsespolicy oppdatert.",
+    "requested": "Tilgang forespurt.",
+    "restored": "Teamspace gjenopprettet.",
+    "saved": "Teamspace oppdatert."
+  },
+  "notOwner": "Kun en teamspace-eier eller workspace-administrator kan administrere dette teamspaceet.",
+  "open": "Åpne",
+  "owner": "Eier",
+  "ownersOnlyCreate": "Kun workspace-eiere kan opprette teamspaces",
+  "remove": "Fjern",
+  "replacement": "Velg en erstatningsstandard",
+  "request": "Be om tilgang",
+  "requestPending": "Forespørsel venter",
+  "requests": "Tilgangsforespørsler",
+  "restore": "Gjenopprett",
+  "roles": {
+    "comment": "Kan kommentere",
+    "edit": "Kan redigere",
+    "full_access": "Full tilgang",
+    "view": "Kan se"
+  },
+  "save": "Lagre endringer",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Gjør til standard teamspace",
+  "subtitle": "Organiser delt arbeid og styr hvem som kan oppdage eller bli med.",
+  "tabs": {
+    "archived": "Arkivert",
+    "browse": "Utforsk",
+    "create": "Nytt teamspace",
+    "label": "Teamspace-visninger",
+    "manage": "Administrer"
+  },
+  "title": "Teamspaces"
+}

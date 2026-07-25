@@ -38,7 +38,7 @@
   "moveTo": "ወደ አንቀሳቅስ",
   "exporting": "በማስተላለፍ ላይ…",
   "exportAsMarkdown": "እንደ Markdown ላክ",
-  "exportAsHanji": "እንደ Hanji ፋይል ላክ",
+  "exportAsHanji": "Hanji JSON አስላክ (ፋይሎች አይካተቱም)",
   "importing": "በማስመጣት ላይ…",
   "importMarkdown": "ማርክዳውን አስመጣ",
   "unlockPage": "ገጽ ክፈት",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "መዳረሻን ማዘመን አልተቻለም",
     "removedFromAccessList": "ከመዳረሻ ዝርዝር ተወግዷል",
     "couldntRemoveAccess": "መዳረሻን ማስወገድ አልተቻለም",
-    "couldntLoadAccessList": "የመዳረሻ ዝርዝር መጫን አልተቻለም"
+    "couldntLoadAccessList": "የመዳረሻ ዝርዝር መጫን አልተቻለም",
+    "couldntExportHanjiArchive": "Hanji አርካይቭን ማስላክ አልተቻለም።",
+    "exportedHanjiArchive": "ከፋይሎች ጋር የ Hanji አርካይቭን አስልኳል።"
   },
   "user": "ተጠቃሚ",
   "whoHasAccess": "መዳረሻ ያላቸው",
   "workspace": "የሥራ ቦታ",
   "workspaceCount_one": "{{count}} የሥራ ቦታ",
   "workspaceCount_other": "{{count}} የሥራ ቦታ",
-  "you": "እርስዎ"
+  "you": "እርስዎ",
+  "exportAsHanjiArchive": "Hanji አርካይቭ አስላክ (ፋይሎች ተካተዋል)",
+  "turnIntoWiki": "ወደ ዊኪ ቀይር",
+  "undoWiki": "ዊኪ ተመልስ",
+  "wikiCreated": "ገጹን ወደ ዊኪ ቀይረዋል",
+  "wikiPageSettings": "የዊኪ ገጽ ቅንብሮች",
+  "wikiUndone": "ዊኪ ተወግዷል፤ የገጹ ይዘት ተጠብቋል",
+  "wikiUpdateFailed": "ዊኪውን ማዘመን አልተቻለም"
 }

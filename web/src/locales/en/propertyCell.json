@@ -1,5 +1,6 @@
 {
   "addFileOrImage": "Add file or image",
+  "buttonExecutionFailed": "Couldn't run the button.",
   "clear": "Clear",
   "closeMenu": "Close menu",
   "closeOptionEditor": "Close option editor",
@@ -54,6 +55,8 @@
   "prevMonth": "Previous month",
   "relationDatabaseUnavailable": "Relation database is unavailable",
   "relationLoading": "Loading relation items",
+  "loadMoreRelations": "Load more relations",
+  "loadingMoreRelations": "Loading more relations...",
   "relationUnavailable": "Relation items unavailable",
   "relatedPages": "Related pages",
   "remove": "Remove {{name}}",

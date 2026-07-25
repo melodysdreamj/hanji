@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} povratna povezava",
-    "count_other": "{{count}} povratnih povezav"
+    "count_other": "{{count}} povratnih povezav",
+    "partial_one": "{{count}}+ povratna povezava",
+    "partial_other": "{{count}}+ povratnih povezav"
   },
   "header": {
     "title": "Povezane omembe"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} omemba",
     "mention_other": "{{count}} omemb",
     "link_one": "{{count}} povezava",
-    "link_other": "{{count}} povezav"
+    "link_other": "{{count}} povezav",
+    "loaded": "Naloženo: {{summary}}"
   },
   "kind": {
     "mention": "Omemba",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} dodatna povratna povezava",
-    "count_other": "{{count}} dodatnih povratnih povezav"
+    "count_other": "{{count}} dodatnih povratnih povezav",
+    "load": "Naloži več povratnih povezav",
+    "loading": "Nalaganje povratnih povezav…",
+    "search": "Iskanje povratnih povezav"
   }
 }

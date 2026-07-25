@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "التبعيات:",
     "hint": "أضف خاصية علاقة",
-    "relationPropertyAriaLabel": "خاصية علاقة التبعية"
+    "relationPropertyAriaLabel": "خاصية علاقة التبعية",
+    "makeDependOn": "جعل {{title}} يعتمد على {{predecessor}}",
+    "startFrom": "بدء التبعية من {{title}}"
   },
   "toolbar": {
     "today": "اليوم",

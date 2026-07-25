@@ -8,7 +8,8 @@
     "delete": "Delete",
     "clearAll": "Clear all",
     "done": "Done",
-    "add": "Add"
+    "add": "Add",
+    "reportIssue": "Report issue"
   },
   "labels": {
     "untitled": "Untitled"

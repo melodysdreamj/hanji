@@ -4,7 +4,22 @@
     "sum": "Cəm",
     "average": "Orta",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "İşarələnmiş",
+    "count_values": "Dəyər sayı",
+    "date_range": "Tarix aralığı",
+    "earliest_date": "Ən erkən tarix",
+    "empty": "Boş dəyər sayı",
+    "latest_date": "Ən son tarix",
+    "median": "Median",
+    "not_empty": "Boş olmayan sayı",
+    "percent_checked": "İşarələnmiş faizi",
+    "percent_empty": "Boş faizi",
+    "percent_not_empty": "Boş olmayan faizi",
+    "percent_unchecked": "İşarələnməmiş faizi",
+    "range": "Aralıq",
+    "unchecked": "İşarələnməmiş",
+    "unique": "Unikal dəyər sayı"
   },
   "chartAria": "{{name}} qrafiki",
   "chartType": "Qrafik növü",
@@ -27,5 +42,9 @@
   "untitledProperty": "Adsız",
   "valueProperty": "Dəyər xassəsi",
   "xAxis": "X oxu",
-  "yAxis": "Y oxu"
+  "yAxis": "Y oxu",
+  "dateRangeDays": "{{count}} gün",
+  "missingProperty": "saxlanılan xassə",
+  "unsupportedAggregateDesc": "{{aggregate}}, {{property}} xassəsindən hesablana bilməz. Uyğun xassə və ya hesablama seçin.",
+  "unsupportedAggregateTitle": "Bu diaqram hesablaması mövcud deyil"
 }

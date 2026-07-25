@@ -92,5 +92,8 @@
     "P",
     "S"
   ],
-  "you": "Ty"
+  "you": "Ty",
+  "buttonExecutionFailed": "Tlačítko se nepodařilo spustit.",
+  "loadingMoreRelations": "Načítání dalších vztahů…",
+  "loadMoreRelations": "Načíst další vztahy"
 }

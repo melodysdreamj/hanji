@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} nedávne aktualizácie",
     "unreadOfTotal": "{{unread}} neprečítaných z {{total}} aktualizácií",
     "updateType": "Typ aktualizácie",
-    "updates": "Aktualizácie",
-    "modeUpdates": "Aktualizácie",
-    "modeChats": "Rozhovory",
-    "inboxMode": "Režim schránky"
+    "updates": "Aktualizácie"
   },
   "time": {
     "justNow": "Práve teraz",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} verzií",
     "versionsAgo": "pred {{count}} verziami",
     "versionsAhead": "o {{count}} verzií vpred",
-    "versionsAria": "Verzie"
+    "versionsAria": "Verzie",
+    "emptyBlock": "Prázdny blok",
+    "emptyPreview": "Táto verzia neobsahuje žiadny obsah stránky.",
+    "previewAria": "Náhľad verzie stránky len na čítanie",
+    "previewingCurrent": "Zobrazenie aktuálnej stránky",
+    "previewingSnapshot": "Zobrazenie minulej verzie",
+    "previewOnlyHint": "Výber verzie ju iba zobrazí v náhľade. Aktuálna stránka sa zmení až po obnovení.",
+    "restoreThisVersion": "Obnoviť",
+    "restoring": "Obnovuje sa...",
+    "versionHistory": "História verzií"
   },
   "badges": {
     "comment": "Komentár",
@@ -67,7 +73,8 @@
     "referenceMention": "Spomenuté {{title}} · {{preview}}",
     "referenceLink": "Odkaz na {{title}} · {{preview}}",
     "unreadDot": "Neprečítané",
-    "workspaceUpdate": "Aktualizácia pracovného priestoru"
+    "workspaceUpdate": "Aktualizácia pracovného priestoru",
+    "bySelf": "Vami"
   },
   "empty": {
     "allCaughtUp": "Máte všetko prečítané.",

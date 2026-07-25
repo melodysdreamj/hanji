@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Открыть меню рабочего пространства",
   "closeWorkspaceMenu": "Закрыть меню рабочего пространства",
   "workspaceMenu": "Меню рабочего пространства",
-  "exportWorkspace": "Экспорт рабочего пространства",
+  "exportWorkspace": "Экспорт JSON рабочего пространства (без файлов)",
   "exportedWorkspace": "Рабочее пространство экспортировано как файл Hanji.",
   "exportedWorkspaceWithPlaceholders": "Рабочее пространство экспортировано как файл Hanji — вложения оставлены как заполнители.",
   "couldntExportWorkspace": "Не удалось экспортировать рабочее пространство.",
@@ -76,5 +76,12 @@
     "later": "Позже",
     "note": "Вы всегда можете начать это позже из раздела Импорт на боковой панели.",
     "title": "Перенести рабочее пространство Notion в Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Добавить страницу в {{name}}",
+  "couldntExportWorkspaceArchive": "Не удалось экспортировать архив рабочего пространства.",
+  "exportedWorkspaceArchive": "Экспортирован архив рабочего пространства с файлами.",
+  "exportWorkspaceArchive": "Экспорт архива рабочего пространства (с файлами)",
+  "joinTeamspaces": "Присоединиться к командным пространствам",
+  "keyboardShortcuts": "Горячие клавиши",
+  "teamspacePages": "Страницы {{name}}"
 }

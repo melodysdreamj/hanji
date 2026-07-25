@@ -43,6 +43,75 @@ export interface DatabaseCreateEffect {
   views: DbView[];
 }
 
+/**
+ * Persisted terminal-drop reconciliation for optimistic database metadata.
+ * The database id is sufficient: replay uses the canonical metadata-only
+ * loader, whose existing per-database in-flight key coalesces concurrent
+ * drops without pulling row data into this freshness lane.
+ */
+export interface DatabaseMetadataReconciliationEffect {
+  databaseId: string;
+  kind: "database_metadata_reconcile";
+}
+
+export interface DatabaseRowsReconciliationEffect {
+  databaseId: string;
+  kind: "database_rows_reconcile";
+  mutationId: string;
+  rowId: string;
+  targetParentId: string;
+}
+
+export interface DatabaseDependencyCommitEffect {
+  addRelatedRowIds: string[];
+  databaseId: string;
+  direction: "predecessors" | "successors";
+  kind: "database_dependency_commit";
+  mutationId: string;
+  propertyId: string;
+  removeRelatedRowIds: string[];
+  rowId: string;
+}
+
+/**
+ * Complete response authority for one database task-feature command. The
+ * generated relation ids and dependency settings are persisted with the
+ * durable call so replay can validate the server response without a second
+ * metadata read.
+ */
+export interface DatabaseTaskFeatureCommitEffect {
+  avoidWeekends?: boolean;
+  databaseId: string;
+  dateMode?: "range" | "separate";
+  datePropertyId?: string;
+  endDatePropertyId?: string;
+  feature: "dependencies" | "subitems";
+  kind: "database_task_feature_commit";
+  nestedPropertyId?: string;
+  primaryPropertyId: string;
+  secondaryPropertyId: string;
+  showToggleOnTitle?: boolean;
+  shiftMode?: "overlap" | "maintain_spacing" | "none";
+  startDatePropertyId?: string;
+}
+
+/**
+ * Complete request identity for disabling one active task-feature binding.
+ * The revision and property pair travel with the durable operation so every
+ * retry can be validated against the same backend receipt.
+ */
+export interface DatabaseTaskFeatureTurnOffEffect {
+  databaseId: string;
+  expectedBindingRevision: number;
+  expectedDatabaseFeaturesRevision: number;
+  feature: "dependencies" | "subitems";
+  kind: "database_task_feature_turn_off";
+  operationId: string;
+  primaryPropertyId: string;
+  propertyDisposition: "keep" | "remove";
+  secondaryPropertyId: string;
+}
+
 export interface RowFileRemovalEffect {
   cacheKey?: string;
   databaseId: string;
@@ -55,26 +124,118 @@ export interface RowFileRemovalEffect {
   rowId: string;
 }
 
-export type RemoteCallEffect = DatabaseCreateEffect | RowFileRemovalEffect;
+/**
+ * Small advisory effect retained with a durable structural mutation.
+ * Canonical blocks remain the only durable state; these ids only tell the
+ * exact affected page rooms to reload after commit/replay confirmation.
+ */
+export interface BlockStructureInvalidation {
+  blockIds?: string[];
+  /**
+   * Opaque, bounded markers for restoring an undo/redo entry when an initially
+   * queued structure write later drops. One marker is retained per affected
+   * page; block content and user-authored payloads are deliberately excluded.
+   */
+  dropReconciliation?: {
+    direction: "undo" | "redo";
+    histories: Array<{
+      at: number;
+      linkId?: string;
+      operationOccurredAt: string;
+      pageId: string;
+    }>;
+  };
+  pageIds: string[];
+}
 
-export type OutboxOp =
+/**
+ * Bounded authority identities retained for a terminal remote-call drop.
+ * The mutation payload remains the source of optimistic intent; these ids
+ * only select the existing canonical loaders after the outbox entry is acked.
+ */
+export interface RemoteCallTerminalReconciliation {
+  commentPageIds?: string[];
+  databaseMetadataIds?: string[];
+  databaseRowIds?: string[];
+  pageIds?: string[];
+}
+
+export type RemoteCallEffect =
+  | DatabaseCreateEffect
+  | DatabaseDependencyCommitEffect
+  | DatabaseMetadataReconciliationEffect
+  | DatabaseRowsReconciliationEffect
+  | DatabaseTaskFeatureCommitEffect
+  | DatabaseTaskFeatureTurnOffEffect
+  | RowFileRemovalEffect;
+
+export interface PageRecencyOutboxOp {
+  blockId: string;
+  blockUpdatedAt: string;
+  /** Fixed first-generation deadline in epoch milliseconds. */
+  dueAt: number;
+  kind: "page_recency";
+  mutationId: string;
+  pageId: string;
+}
+
+export type MutationOutboxOp =
   | {
-      /** Server stamp when the patch was first queued — replay's 409 conflict guard. */
+      /** Server stamp when the patch generation began — replay's 409 conflict guard. */
       expectedUpdatedAt?: string;
+      /** Mutation that this generation was based on while its response was still in flight. */
+      expectedMutationId?: string;
       hintPageId?: string;
       id: string;
       kind: "block_update";
+      /** Stable id for this coalesced generation; lets the server dedupe a lost response. */
+      mutationId?: string;
       patch: Partial<Block>;
     }
-  | { block: Block; kind: "block_create" }
+  | { block: Block; kind: "block_create"; touchPage?: boolean }
   | { hintPageId?: string; ids: string[]; kind: "block_delete" }
-  | { id: string; kind: "page_update"; patch: Partial<Page>; target: "database_row" | "page" }
+  | {
+      /** Server stamp read before this durable generation was admitted. */
+      expectedUpdatedAt?: string;
+      /** Same-actor predecessor receipt accepted as the alternate causal base. */
+      expectedMutationId?: string;
+      id: string;
+      kind: "page_update";
+      /** Stable receipt for exact lost-response replay. */
+      mutationId?: string;
+      patch: Partial<Page>;
+      target: "database_row" | "page";
+    }
+  | PageRecencyOutboxOp
   // Generic one-shot mutation captured as (whitelisted fn name, args). Used for
   // every optimistic-before-network flow that is not a debounced queue:
   // page/row/property/view/template/comment creates+deletes, trash/restore,
   // moves, and the undo/redo block batch paths. Replay resolves `fn` against
   // the store's DURABLE_REMOTE_CALLS registry.
-  | { args: unknown[]; effect?: RemoteCallEffect; fn: string; kind: "remote_call" };
+  | {
+      args: unknown[];
+      blockStructureInvalidation?: BlockStructureInvalidation;
+      effect?: RemoteCallEffect;
+      fn: string;
+      kind: "remote_call";
+      terminalReconciliation?: RemoteCallTerminalReconciliation;
+    };
+
+/**
+ * A terminal response ends mutation delivery, but it does not prove that the
+ * optimistic browser/cache state is settled. Replace the mutation in-place
+ * with this reconciliation-only marker before disabling retries. A later tab
+ * can then finish canonical reconciliation without ever resending the
+ * mutation whose terminal outcome is already known.
+ */
+export interface TerminalReconciliationOutboxOp {
+  disposition: "drop" | "silent_drop";
+  kind: "terminal_reconciliation";
+  operation: MutationOutboxOp;
+  status?: number;
+}
+
+export type OutboxOp = MutationOutboxOp | TerminalReconciliationOutboxOp;
 
 export type OutboxEntry = DurableOutboxEntry<OutboxOp>;
 
@@ -83,6 +244,10 @@ export type OutboxEntry = DurableOutboxEntry<OutboxOp>;
 const DISABLE_KEY = "hanji.outbox.disabled";
 // At-rest sealing kill switch (shared with the record cache).
 const ENCRYPTION_DISABLE_KEY = "hanji.encryption.disabled";
+// Anonymous cross-tab invalidation only. The durable outbox remains the
+// authority; this marker carries no user id, entry key, or mutation payload.
+const OUTBOX_CHANGE_SIGNAL_KEY = "hanji.outbox.changed";
+const OUTBOX_CHANGE_COLLECTION_MS = 25;
 
 let current: { promise: Promise<DurableOutbox<OutboxOp> | null>; userId: string } | null = null;
 // FIFO chain so mirror writes/acks hit IndexedDB in call order (an ack issued
@@ -91,22 +256,38 @@ let chain: Promise<void> = Promise.resolve();
 let warnedOnce = false;
 
 type OutboxPendingListener = (userId: string, pendingHint: number) => void;
-const pendingHintKeys = new Map<string, Set<string>>();
+type OutboxChangeListener = () => void;
+const pendingHintKeys = new Map<string, Map<string, number>>();
 const pendingListeners = new Set<OutboxPendingListener>();
+const outboxChangeListeners = new Set<OutboxChangeListener>();
+let pendingHintVersion = 0;
+let outboxChangeSignalVersion = 0;
+let outboxChangeSignalTimer: ReturnType<typeof setTimeout> | undefined;
+let outboxChangeStorageListenerInstalled = false;
 
 function emitPendingHint(userId: string) {
   const pendingHint = pendingHintKeys.get(userId)?.size ?? 0;
   for (const listener of pendingListeners) listener(userId, pendingHint);
 }
 
-function markPendingHint(userId: string, entryKey: string, pending: boolean) {
-  if (!userId) return;
-  const keys = pendingHintKeys.get(userId) ?? new Set<string>();
-  if (pending) keys.add(entryKey);
-  else keys.delete(entryKey);
+function markPendingHint(
+  userId: string,
+  entryKey: string,
+  pending: boolean,
+  expectedVersion?: number
+) {
+  if (!userId) return undefined;
+  const keys = pendingHintKeys.get(userId) ?? new Map<string, number>();
+  if (pending) {
+    pendingHintVersion += 1;
+    keys.set(entryKey, pendingHintVersion);
+  } else if (expectedVersion === undefined || keys.get(entryKey) === expectedVersion) {
+    keys.delete(entryKey);
+  }
   if (keys.size) pendingHintKeys.set(userId, keys);
   else pendingHintKeys.delete(userId);
   emitPendingHint(userId);
+  return pending ? pendingHintVersion : undefined;
 }
 
 /**
@@ -118,6 +299,47 @@ function markPendingHint(userId: string, entryKey: string, pending: boolean) {
 export function subscribeOutboxPending(listener: OutboxPendingListener) {
   pendingListeners.add(listener);
   return () => pendingListeners.delete(listener);
+}
+
+function ensureOutboxChangeStorageListener() {
+  if (outboxChangeStorageListenerInstalled || typeof window === "undefined") return;
+  outboxChangeStorageListenerInstalled = true;
+  window.addEventListener("storage", (event) => {
+    if (event.key !== OUTBOX_CHANGE_SIGNAL_KEY) return;
+    for (const listener of outboxChangeListeners) listener();
+  });
+}
+
+/**
+ * Cross-tab durable-state invalidation for read-only observers such as the
+ * sync badge. Same-tab callers already receive the exact pending-hint signal;
+ * another tab receives this only after the durable mutation settles and then
+ * reads its own current user's authoritative outbox.
+ */
+export function subscribeOutboxChanges(listener: OutboxChangeListener) {
+  ensureOutboxChangeStorageListener();
+  outboxChangeListeners.add(listener);
+  return () => outboxChangeListeners.delete(listener);
+}
+
+function scheduleOutboxChangeSignal() {
+  if (typeof window === "undefined" || outboxChangeSignalTimer) return;
+  outboxChangeSignalTimer = setTimeout(() => {
+    outboxChangeSignalTimer = undefined;
+    outboxChangeSignalVersion += 1;
+    try {
+      const nonce = typeof window.crypto?.randomUUID === "function"
+        ? window.crypto.randomUUID()
+        : `${Date.now()}:${Math.random()}`;
+      window.localStorage.setItem(
+        OUTBOX_CHANGE_SIGNAL_KEY,
+        `${nonce}:${outboxChangeSignalVersion}`,
+      );
+    } catch {
+      // Same-tab hints and the visible-tab reconciliation boundary remain
+      // available when localStorage is blocked or full.
+    }
+  }, OUTBOX_CHANGE_COLLECTION_MS);
 }
 
 export function outboxPendingHintCount(userId: string) {
@@ -258,11 +480,13 @@ function isQuotaError(error: unknown): boolean {
   );
 }
 
-function enqueue(task: (outbox: DurableOutbox<OutboxOp>) => Promise<void>, userId: string) {
-  chain = chain
-    .then(async () => {
+function enqueue(
+  task: (outbox: DurableOutbox<OutboxOp>) => Promise<void>,
+  userId: string
+): Promise<boolean> {
+  const run = chain.then(async () => {
       const outbox = await getOutbox(userId);
-      if (!outbox) return;
+      if (!outbox) return true;
       try {
         await task(outbox);
       } catch (error) {
@@ -273,20 +497,42 @@ function enqueue(task: (outbox: DurableOutbox<OutboxOp>) => Promise<void>, userI
         await recordCacheClear(userId).catch(() => {});
         await task(outbox);
       }
-    })
-    .catch(warn);
+      return true;
+    });
+  const observed = run.catch((error) => {
+    warn(error);
+    return false;
+  });
+  chain = observed.then(() => undefined);
+  return observed;
 }
 
-/** Durably mirror (upsert) one queued mutation. Fire-and-forget, ordered. */
-export function outboxSet(userId: string, entryKey: string, op: OutboxOp) {
+/** Durably mirror (upsert) one queued mutation, ordered with earlier writes. */
+export function outboxSet(
+  userId: string,
+  entryKey: string,
+  op: OutboxOp
+): Promise<void> {
   markPendingHint(userId, entryKey, true);
-  enqueue((outbox) => withOutboxLock(userId, () => outbox.set(entryKey, op)), userId);
+  return enqueue(
+    (outbox) => withOutboxLock(userId, () => outbox.set(entryKey, op)),
+    userId
+  ).then((persisted) => {
+    if (persisted) scheduleOutboxChangeSignal();
+  });
 }
 
 /** Remove a mirrored mutation once it is acked or terminally dropped. */
-export function outboxAck(userId: string, entryKey: string) {
-  markPendingHint(userId, entryKey, false);
-  enqueue((outbox) => withOutboxLock(userId, () => outbox.ack(entryKey)), userId);
+export function outboxAck(userId: string, entryKey: string): Promise<void> {
+  const expectedVersion = pendingHintKeys.get(userId)?.get(entryKey);
+  return enqueue(
+    (outbox) => withOutboxLock(userId, () => outbox.ack(entryKey)),
+    userId
+  ).then((acknowledged) => {
+    if (!acknowledged) return;
+    markPendingHint(userId, entryKey, false, expectedVersion);
+    scheduleOutboxChangeSignal();
+  });
 }
 
 /**
@@ -340,6 +586,11 @@ export async function outboxClear(userId: string) {
         await clearLegacyOutboxStorage(userId);
       });
     });
+    // The eager zero hint above can race its own pre-clear reconciliation.
+    // Emit once more only after durable storage is empty so this tab cannot
+    // retain the old entry count now that there is no recurring poll.
+    emitPendingHint(userId);
+    scheduleOutboxChangeSignal();
   } catch (error) {
     warn(error);
   }
@@ -390,6 +641,11 @@ export function resetOutboxForTests() {
   chain = Promise.resolve();
   warnedOnce = false;
   pendingHintKeys.clear();
+  pendingHintVersion = 0;
+  if (outboxChangeSignalTimer) clearTimeout(outboxChangeSignalTimer);
+  outboxChangeSignalTimer = undefined;
+  outboxChangeSignalVersion = 0;
+  outboxChangeListeners.clear();
 }
 
 /** Await all queued mirror writes — test hook for deterministic assertions. */

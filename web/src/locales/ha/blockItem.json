@@ -176,7 +176,9 @@
     "video": "Bidiyo",
     "videoCaption": "Takin bidiyo",
     "videoEmptyHint": "Loda fayil ɗin bidiyo, liƙa hanyar haɗin kai tsaye, ko yi amfani da hanyar haɗin YouTube, Vimeo, ko Loom.",
-    "videoLink": "Hanyar haɗin bidiyo"
+    "videoLink": "Hanyar haɗin bidiyo",
+    "audioPlaybackFailed": "Wannan sauti ba za a iya kunna shi ba. Maye gurbinsa ko buɗe ainihin fayil ɗin.",
+    "videoPlaybackFailed": "Wannan bidiyo ba za a iya kunna shi ba. Maye gurbinsa ko buɗe ainihin fayil ɗin."
   },
   "bookmark": {
     "copy": "Kwafi bookmark link",

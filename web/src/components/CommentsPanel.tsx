@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 import { useTranslation } from "react-i18next";
 
-import { searchOrganizationPeopleRemote } from "@/lib/edgebase";
+import { scheduleOrganizationPeopleTypeahead } from "@/lib/typeaheadSearch";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { motionSafeScrollBehavior } from "@/lib/motion";
 import { isolateBodyForModal, trapModalTab } from "@/lib/modalFocus";
@@ -356,7 +356,7 @@ export function CommentsPanel({
   const close = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
-    void loadComments(pageId);
+    void loadComments(pageId).catch(() => {});
   }, [loadComments, pageId]);
 
   useEffect(() => {
@@ -450,24 +450,17 @@ export function CommentsPanel({
       setSearchedPeople({ key: "", people: [] });
       return;
     }
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      searchOrganizationPeopleRemote({
+    return scheduleOrganizationPeopleTypeahead({
         organizationId,
         query: draftMentionQuery,
         limit: 8,
-      })
-        .then((result) => {
-          if (!cancelled) setSearchedPeople({ key: draftMentionQuery, people: result.people ?? [] });
-        })
-        .catch(() => {
-          if (!cancelled) setSearchedPeople({ key: draftMentionQuery, people: [] });
-        });
-    }, 120);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      }, {
+        onResult: (result) => setSearchedPeople({
+          key: draftMentionQuery,
+          people: result.people ?? [],
+        }),
+        onError: () => setSearchedPeople({ key: draftMentionQuery, people: [] }),
+      });
   }, [draftMentionQuery, draftMentionRange, organization?.id]);
 
   const draftMentionPeople = useMemo(() => {
@@ -489,24 +482,17 @@ export function CommentsPanel({
       setReplySearchedPeople({ key: "", people: [] });
       return;
     }
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      searchOrganizationPeopleRemote({
+    return scheduleOrganizationPeopleTypeahead({
         organizationId,
         query: replyMentionQuery,
         limit: 8,
-      })
-        .then((result) => {
-          if (!cancelled) setReplySearchedPeople({ key: replyMentionQuery, people: result.people ?? [] });
-        })
-        .catch(() => {
-          if (!cancelled) setReplySearchedPeople({ key: replyMentionQuery, people: [] });
-        });
-    }, 120);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      }, {
+        onResult: (result) => setReplySearchedPeople({
+          key: replyMentionQuery,
+          people: result.people ?? [],
+        }),
+        onError: () => setReplySearchedPeople({ key: replyMentionQuery, people: [] }),
+      });
   }, [organization?.id, replyingId, replyMentionQuery, replyMentionRange]);
 
   const replyMentionPeople = useMemo(() => {

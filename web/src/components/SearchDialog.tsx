@@ -19,12 +19,15 @@ import { canCreateWorkspacePage } from "@/lib/permissions";
 import type { Block, Page } from "@/lib/types";
 import { searchBlocksRemote } from "@/lib/edgebase";
 import { searchCachedBlockHits } from "@/lib/localSearch";
+import { canonicalTextRanges } from "@/lib/textMatch";
 import { useStore } from "@/lib/store";
 import { useTranslation } from "react-i18next";
 import { relativeEditedLabel, relativeTimeLabels } from "@/lib/relativeTime";
 import { Plus, Search, StarFilled } from "./icons";
 import { PageIconGlyph } from "./PageIcon";
+import { VerificationBadge } from "./VerificationBadge";
 import styles from "./SearchDialog.module.css";
+import { foldNfcText } from "../../../shared/database/natural-order.mjs";
 
 const LIST_NAVIGATION_KEYS = ["ArrowDown", "ArrowUp", "Home", "End", "PageDown", "PageUp"];
 const RECENT_SEARCH_KEY = "hanji:quick-find:recent-searches";
@@ -83,7 +86,7 @@ function readRecentSearches() {
     const next: string[] = [];
     for (const item of parsed) {
       const query = normalizedSearchQuery(String(item));
-      const key = query.toLowerCase();
+      const key = foldNfcText(query);
       if (!query || seen.has(key)) continue;
       seen.add(key);
       next.push(query);
@@ -105,9 +108,10 @@ function writeRecentSearches(searches: string[]) {
 }
 
 function withRecentSearch(searches: string[], query: string) {
+  const queryKey = foldNfcText(query);
   return [
     query,
-    ...searches.filter((item) => item.toLowerCase() !== query.toLowerCase()),
+    ...searches.filter((item) => foldNfcText(item) !== queryKey),
   ].slice(0, RECENT_SEARCH_LIMIT);
 }
 
@@ -117,6 +121,17 @@ function blockPlainText(block: Block) {
     block.content?.rich?.map((span) => span.text).join("") ??
     ""
   ).trim();
+}
+
+function isRemoteSearchNetworkError(error: unknown) {
+  if (error instanceof TypeError) return true;
+  if (!error || typeof error !== "object") return false;
+  const record = error as Record<string, unknown>;
+  return record.code === 0 || record.status === 0 || record.slug === "network-error";
+}
+
+function yieldRemoteSearch() {
+  return new Promise<void>((resolve) => window.setTimeout(resolve, 0));
 }
 
 function timeValue(page: Page) {
@@ -133,8 +148,8 @@ function editedLabel(page: Page) {
 
 function score(page: Page, path: string, query: string) {
   if (!query) return page.isFavorite ? 0 : 10;
-  const title = labelOf(page).toLowerCase();
-  const haystack = `${title} ${path.toLowerCase()}`;
+  const title = foldNfcText(labelOf(page));
+  const haystack = `${title} ${foldNfcText(path)}`;
   if (title === query) return 0;
   if (title.startsWith(query)) return 1;
   if (title.includes(query)) return 2;
@@ -151,25 +166,28 @@ function hitKey(hit: SearchHit) {
   return hit.kind === "page" ? `page:${hit.page.id}` : `block:${hit.page.id}:${hit.block.id}`;
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function HighlightedText({ text, query }: { text: string; query: string }) {
   const needle = query.trim();
   if (!needle) return <>{text}</>;
-
-  const pattern = new RegExp(`(${escapeRegExp(needle)})`, "ig");
-  const parts = text.split(pattern);
+  const ranges = canonicalTextRanges(text, needle);
+  if (!ranges.length) return <>{text}</>;
+  const parts: Array<{ text: string; match: boolean }> = [];
+  let cursor = 0;
+  for (const range of ranges) {
+    if (range.start > cursor) parts.push({ text: text.slice(cursor, range.start), match: false });
+    parts.push({ text: text.slice(range.start, range.end), match: true });
+    cursor = range.end;
+  }
+  if (cursor < text.length) parts.push({ text: text.slice(cursor), match: false });
   return (
     <>
       {parts.map((part, index) =>
-        part.toLowerCase() === needle.toLowerCase() ? (
-          <mark key={`${part}-${index}`} className={styles.match}>
-            {part}
+        part.match ? (
+          <mark key={`${part.text}-${index}`} className={styles.match}>
+            {part.text}
           </mark>
         ) : (
-          part
+          part.text
         )
       )}
     </>
@@ -222,9 +240,14 @@ export function SearchDialog() {
   );
 
   const localPageHits = useMemo<SearchHit[]>(() => {
-    const q = query.trim().toLowerCase();
+    const workspaceId = workspace?.id?.trim();
+    if (!workspaceId) return [];
+    const q = foldNfcText(query.trim());
     return Object.values(pagesById)
-      .filter((page) => !page.inTrash)
+      .filter(
+        (page) =>
+          !page.inTrash && page.workspaceId === workspaceId
+      )
       .map((page) => {
         const path = pagePath(page, pagesById);
         return { kind: "page" as const, page, path, score: score(page, path, q) };
@@ -245,14 +268,17 @@ export function SearchDialog() {
         return timeValue(b.page) - timeValue(a.page) || a.page.position - b.page.position;
       })
       .slice(0, MAX_RESULTS);
-  }, [pagesById, query, recentOrder]);
+  }, [pagesById, query, recentOrder, workspace?.id]);
 
   const hits = useMemo<SearchHit[]>(() => {
     if (!query.trim()) return localPageHits;
 
     const pageHitIds = new Set(localPageHits.map((hit) => hit.page.id));
     const blockResults: SearchHit[] = bodyHits
-      .filter((hit) => !hit.page.inTrash)
+      .filter(
+        (hit) =>
+          !hit.page.inTrash && !!workspace?.id && hit.page.workspaceId === workspace.id
+      )
       .map((hit, index) => ({
         kind: "block" as const,
         page: hit.page,
@@ -274,7 +300,7 @@ export function SearchDialog() {
         return timeValue(b.page) - timeValue(a.page);
       })
       .slice(0, MAX_RESULTS);
-  }, [bodyHits, localPageHits, pagesById, query]);
+  }, [bodyHits, localPageHits, pagesById, query, workspace?.id]);
 
   const sections = useMemo<SearchSection[]>(() => {
     const q = query.trim();
@@ -341,7 +367,7 @@ export function SearchDialog() {
     ? Object.values(pagesById).some(
         (page) =>
           !page.inTrash &&
-          labelOf(page).trim().toLowerCase() === trimmedQuery.toLowerCase()
+          foldNfcText(labelOf(page).trim()) === foldNfcText(trimmedQuery)
       )
     : false;
   const showCreate = canCreateRootPage && trimmedQuery.length > 0 && !exactPageMatch;
@@ -551,6 +577,12 @@ export function SearchDialog() {
     if (!open || q.length < REMOTE_SEARCH_MIN_LENGTH) {
       return;
     }
+    const workspaceId = workspace?.id?.trim() ?? "";
+    if (!workspaceId) {
+      setBodyHits([]);
+      setSearchingBody(false);
+      return;
+    }
 
     // Debounce the remote dispatch so fast typing doesn't fire a request per
     // keystroke; the cleanup below also discards stale in-flight responses
@@ -558,53 +590,89 @@ export function SearchDialog() {
     // `useStore.getState()` at response time so unrelated store updates don't
     // re-run the search.
     let cancelled = false;
+    const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      const currentPages = useStore.getState().pagesById;
-      searchBlocksRemote(q, 20)
-        .then((res) => {
+      const applyCachedHits = async () => {
+        try {
+          const localHits = await searchCachedBlockHits(userId ?? "", q, 8);
           if (cancelled) return;
-          const seen = new Set<string>();
+          const currentPages = useStore.getState().pagesById;
           const next: BodyHit[] = [];
-          for (const block of res.blocks) {
-            const page = currentPages[block.pageId];
-            if (!page || page.inTrash || seen.has(block.id)) continue;
-            const preview = blockPlainText(block);
+          for (const hit of localHits) {
+            const page = currentPages[hit.pageId];
+            if (!page || page.inTrash || (workspaceId && page.workspaceId !== workspaceId)) continue;
+            const preview = blockPlainText(hit.block);
             if (!preview) continue;
-            seen.add(block.id);
-            next.push({ page, block, preview });
-            if (next.length >= 8) break;
+            next.push({ page, block: hit.block, preview });
           }
           setBodyHits(next);
-        })
-        .catch(async () => {
-          // Server search unreachable (offline): fall back to the local record
-          // cache so quick-find still surfaces block content (local-first §P3).
-          try {
-            const localHits = await searchCachedBlockHits(userId ?? "", q, 8);
-            if (cancelled) return;
-            const next: BodyHit[] = [];
-            for (const hit of localHits) {
-              const page = currentPages[hit.pageId];
-              if (!page || page.inTrash) continue;
-              const preview = blockPlainText(hit.block);
-              if (!preview) continue;
-              next.push({ page, block: hit.block, preview });
+        } catch {
+          if (!cancelled) setBodyHits([]);
+        }
+      };
+      const finishSearch = () => {
+        if (!cancelled) setSearchingBody(false);
+      };
+
+      const runRemoteSearch = async () => {
+        const seenBlocks = new Set<string>();
+        const seenCursors = new Set<string>();
+        const remotePages = new Map<string, Page>();
+        const next: BodyHit[] = [];
+        let sourceCursor: string | undefined;
+        let completedRequest = false;
+        try {
+          while (!cancelled && next.length < 8) {
+            const res = await searchBlocksRemote(q, 20, workspaceId, {
+              ...(sourceCursor ? { sourceCursor } : {}),
+              signal: controller.signal,
+            });
+            completedRequest = true;
+            for (const page of res.pages ?? []) {
+              if (page.workspaceId === workspaceId) remotePages.set(page.id, page);
             }
-            setBodyHits(next);
-          } catch {
-            if (!cancelled) setBodyHits([]);
+            const currentPages = useStore.getState().pagesById;
+            for (const block of res.blocks) {
+              if (seenBlocks.has(block.id)) continue;
+              const page = remotePages.get(block.pageId) ?? currentPages[block.pageId];
+              if (!page || page.inTrash || page.workspaceId !== workspaceId) continue;
+              const preview = blockPlainText(block);
+              if (!preview) continue;
+              seenBlocks.add(block.id);
+              next.push({ page, block, preview });
+              if (next.length >= 8) break;
+            }
+            if (cancelled) return;
+            setBodyHits([...next]);
+            if (next.length >= 8 || res.hasMore !== true) return;
+            if (!res.nextCursor || seenCursors.has(res.nextCursor)) {
+              throw new Error("Block search continuation did not advance.");
+            }
+            seenCursors.add(res.nextCursor);
+            sourceCursor = res.nextCursor;
+            await yieldRemoteSearch();
           }
-        })
-        .finally(() => {
-          if (!cancelled) setSearchingBody(false);
-        });
+        } catch (error) {
+          // Only a transport failure before any server result may fall back to
+          // the local record cache. A later failure preserves the verified
+          // prefix instead of replacing it with a misleading local snapshot.
+          if (!completedRequest && isRemoteSearchNetworkError(error)) {
+            await applyCachedHits();
+          } else if (!cancelled) {
+            setBodyHits([...next]);
+          }
+        }
+      };
+
+      void runRemoteSearch().finally(finishSearch);
     }, REMOTE_SEARCH_DEBOUNCE_MS);
 
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
+      controller.abort();
     };
-  }, [open, query, userId]);
+  }, [open, query, userId, workspace?.id]);
 
   if (!open) return null;
 
@@ -690,6 +758,7 @@ export function SearchDialog() {
                         <span className={styles.resultTitle}>
                           <HighlightedText text={labelOf(hit.page)} query={query} />
                           {hit.page.isFavorite && <StarFilled size={12} aria-hidden="true" />}
+                          <VerificationBadge page={hit.page} />
                           {hit.kind === "block" && (
                             <span className={styles.resultBadge}>{t("searchDialog:inPage")}</span>
                           )}

@@ -1,0 +1,17 @@
+{
+  "navigation": "사이트 탐색",
+  "search": "이 사이트 검색",
+  "clearSearch": "검색어 지우기",
+  "noResults": "페이지를 찾을 수 없습니다",
+  "breadcrumbs": "경로",
+  "madeWithHanji": "Hanji로 제작",
+  "unavailable": "이 사이트를 사용할 수 없습니다.",
+  "outsideSite": "이 페이지는 게시된 사이트 범위에 포함되지 않습니다.",
+  "tryAgain": "다시 시도",
+  "errors": {
+    "not-found": "사이트 게시가 해제되었거나 주소가 변경되었을 수 있습니다.",
+    "rate-limited": "사이트 요청이 너무 많습니다. 잠시 후 다시 시도하세요.",
+    "offline": "네트워크 연결을 확인한 뒤 사이트를 다시 열어 보세요.",
+    "unavailable": "지금은 Hanji에서 이 사이트를 열 수 없습니다. 잠시 후 다시 시도하세요."
+  }
+}

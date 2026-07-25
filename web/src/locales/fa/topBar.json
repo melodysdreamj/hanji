@@ -38,7 +38,7 @@
   "moveTo": "انتقال به",
   "exporting": "در حال صادر کردن…",
   "exportAsMarkdown": "خروجی به عنوان Markdown",
-  "exportAsHanji": "خروجی به عنوان فایل Hanji",
+  "exportAsHanji": "خروجی Hanji JSON (فایل‌ها مستثنی شده)",
   "importing": "در حال وارد کردن…",
   "importMarkdown": "وارد کردن مارک‌داون",
   "unlockPage": "باز کردن قفل صفحه",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "دسترسی به‌روزرسانی نشد",
     "removedFromAccessList": "از فهرست دسترسی حذف شد",
     "couldntRemoveAccess": "دسترسی حذف نشد",
-    "couldntLoadAccessList": "فهرست دسترسی بارگیری نشد"
+    "couldntLoadAccessList": "فهرست دسترسی بارگیری نشد",
+    "couldntExportHanjiArchive": "خروجی بایگانی Hanji انجام نشد.",
+    "exportedHanjiArchive": "بایگانی Hanji با فایل‌ها صادر شد."
   },
   "user": "کاربر",
   "whoHasAccess": "دسترسی‌ها",
   "workspace": "فضای کاری",
   "workspaceCount_one": "{{count}} فضای کاری",
   "workspaceCount_other": "{{count}} فضای کاری",
-  "you": "شما"
+  "you": "شما",
+  "exportAsHanjiArchive": "خروجی بایگانی Hanji (فایل‌ها شامل شده)",
+  "turnIntoWiki": "تبدیل به ویکی",
+  "undoWiki": "لغو ویکی",
+  "wikiCreated": "صفحه به ویکی تبدیل شد",
+  "wikiPageSettings": "تنظیمات صفحه ویکی",
+  "wikiUndone": "ویکی حذف شد؛ محتوای صفحه حفظ شد",
+  "wikiUpdateFailed": "به‌روزرسانی ویکی انجام نشد"
 }

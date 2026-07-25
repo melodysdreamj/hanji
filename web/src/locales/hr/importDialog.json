@@ -247,7 +247,9 @@
     "runningHint": "Držite ovu karticu preglednika otvorenom dok uvoz traje.",
     "noJobHint": "Prvo započnite otkrivanje iz koraka Opseg.",
     "applyLocksHint": "Primjena zapisuje pronađene stavke u ovaj radni prostor.",
-    "browserRunnerWarning": "Ovaj uvoz se izvodi u ovoj kartici preglednika. Držite karticu otvorenom dok ne završi. Zatvaranje ili osvježavanje kartice pauzira obradu; ponovno otvaranje Hanji nastavlja od spremljenog napretka."
+    "browserRunnerWarning": "Ovaj uvoz se izvodi u ovoj kartici preglednika. Držite karticu otvorenom dok ne završi. Zatvaranje ili osvježavanje kartice pauzira obradu; ponovno otvaranje Hanji nastavlja od spremljenog napretka.",
+    "serverRunnerStatus": "Hanji obrađuje ovaj uvoz na poslužitelju. Zatvaranje ili ponovno učitavanje ove kartice neće ga zaustaviti.",
+    "serverRunningHint": "Uvoz se nastavlja u pozadini. Možete zatvoriti ovu karticu."
   },
   "installer": {
     "elapsed": "Proteklo",
@@ -281,9 +283,9 @@
     "title": "Uvoz iz Hanjija",
     "fromFile": "Iz datoteke",
     "fromLive": "S aktivne instance",
-    "choose": "Odaberite .hanji.json datoteku.",
+    "choose": "Odaberite .hanji.json ili .hanji.zip datoteku",
     "chooseButton": "Odaberi datoteku",
-    "fileHint": "Izvezite stranicu, bazu podataka ili radni prostor iz drugog Hanjija, a zatim ga uvezite ovdje. Relacije, rollupovi, formule, prikazi i predlošci se zadržavaju. Privici nisu uključeni.",
+    "fileHint": "Koristite .hanji.json samo za strukturu (datoteke su isključene) ili .hanji.zip za prijenos bez gubitaka (datoteke su uključene). Relacije, rollupovi, formule, prikazi i predlošci su sačuvani.",
     "selected": "Odabrano: {{name}}",
     "importButton": "Uvezi",
     "importing": "Uvoz...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "neobavezno",
     "fetch": "Dohvati izvoz",
     "fetching": "Dohvaćanje...",
-    "liveHint": "Povucite radni prostor izravno s drugog pokrenutog Hanjija (npr. Docker dev instance). Udaljeni poslužitelj mora dopuštati zahtjeve s ove adrese.",
+    "liveHint": "Povucite radni prostor izravno s drugog pokrenutog Hanji (npr. Docker dev instance). Datoteke su isključene. Udaljeni mora dopustiti zahtjeve s ove adrese.",
     "review": "Spremno za uvoz: {{summary}}",
     "placeholderNote": "Neki privici su ostavljeni kao placeholders.",
     "importedItems_one": "Uvezena {{count}} stavka.",
@@ -302,9 +304,15 @@
     "cantRead": "Nije moguće pročitati Hanji datoteku.",
     "cantImport": "Nije moguće uvesti Hanji datoteku.",
     "needFile": "Prvo odaberite Hanji datoteku.",
-    "needRemote": "Unesite URL udaljenog Hanjija i ID radnog prostora."
+    "needRemote": "Unesite URL udaljenog Hanjija i ID radnog prostora.",
+    "filesExcluded": "Datoteke isključene.",
+    "filesIncluded": "Datoteke uključene."
   },
   "cantStartOAuth": "Nije moguće pokrenuti Notion vezu.",
   "connectWithNotion": "Poveži s Notionom",
-  "oauthConfiguredHint": "Ovaj poslužitelj ima konfiguriranu Notion OAuth integraciju. Token postavka i dalje dostupna za samostalno hostane veze."
+  "oauthConfiguredHint": "Ovaj poslužitelj ima konfiguriranu Notion OAuth integraciju. Token postavka i dalje dostupna za samostalno hostane veze.",
+  "terminal": {
+    "cancelled": "Uvoz je otkazan. Možete ga sigurno ponovno pokrenuti kad ste spremni.",
+    "failed": "Uvoz se sigurno zaustavio prije nego što je završio. Provjerite vezu i pokušajte ponovno. Tehnički detalji i identifikatori su skriveni."
+  }
 }

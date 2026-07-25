@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} обратная ссылка",
-    "count_other": "{{count}} обратных ссылок"
+    "count_other": "{{count}} обратных ссылок",
+    "partial_one": "{{count}}+ обратная ссылка",
+    "partial_other": "{{count}}+ обратных ссылок"
   },
   "header": {
     "title": "Связанные упоминания"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} упоминание",
     "mention_other": "{{count}} упоминаний",
     "link_one": "{{count}} ссылка",
-    "link_other": "{{count}} ссылок"
+    "link_other": "{{count}} ссылок",
+    "loaded": "Загружено: {{summary}}"
   },
   "kind": {
     "mention": "Упоминание",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Ещё {{count}} обратная ссылка",
-    "count_other": "Ещё {{count}} обратных ссылок"
+    "count_other": "Ещё {{count}} обратных ссылок",
+    "load": "Загрузить ещё обратные ссылки",
+    "loading": "Загрузка обратных ссылок…",
+    "search": "Поиск обратных ссылок"
   }
 }

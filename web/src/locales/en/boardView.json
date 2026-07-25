@@ -13,7 +13,7 @@
   "groupName": "Group name",
   "groupOptions": "{{groupName}} group options",
   "groupThisBoard": "Group this board",
-  "groupThisBoardDesc": "Add a Select or Status property to create columns.",
+  "groupThisBoardDesc": "Add or choose a Select, Status, Person, or Multi-select property to create columns.",
   "newGroup": "New group",
   "newGroupIn": "New {{groupName}} group in {{dbTitle}}",
   "newPage": "New",

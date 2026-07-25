@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Video-onderskrif",
     "videoEmptyHint": "Laai 'n video-lêer op, plak 'n direkte skakel, of gebruik 'n YouTube-, Vimeo- of Loom-skakel.",
-    "videoLink": "Video-skakel"
+    "videoLink": "Video-skakel",
+    "audioPlaybackFailed": "Hierdie oudio kon nie gespeel word nie. Vervang dit of maak die oorspronklike lêer oop.",
+    "videoPlaybackFailed": "Hierdie video kon nie gespeel word nie. Vervang dit of maak die oorspronklike lêer oop."
   },
   "bookmark": {
     "copy": "Kopieer boekmerkskakel",

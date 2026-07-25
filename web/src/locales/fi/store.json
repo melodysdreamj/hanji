@@ -1,6 +1,6 @@
 {
   "blockConflictKeepMine": "Käytä omaa versiotani",
-  "blockConflictSave": "Tätä lohkoa muokattiin toisella laitteella, joten offline-muutostasi ei otettu käyttöön.",
+  "blockConflictSave": "Jonossa oleva muokkaus on ristiriidassa palvelimen uusimman version kanssa, joten sitä ei voitu yhdistää automaattisesti.",
   "blockMoveCommentsSkipped": "Lohko siirtyi, mutta sen kommentteja ei voitu siirtää sen mukana.",
   "databaseLockedSave": "Tämä tietokanta on lukittu, joten muutoksiasi ei voitu tallentaa.",
   "databaseRowsLoadFailed": "Tietokannan rivejä ei voitu ladata. Yritä uudelleen hetken kuluttua.",
@@ -9,5 +9,6 @@
   "pageLockedSave": "Tämä sivu on lukittu, joten muutoksiasi ei voitu tallentaa.",
   "pageMissingSave": "Sivua ei löytynyt, joten muutoksiasi ei voitu tallentaa.",
   "saveFailed": "Muutoksiasi ei voitu tallentaa.",
-  "sessionExpired": "Istuntosi on vanhentunut tai pyyntöä ei voitu tunnistaa. Yritä uudelleen."
+  "sessionExpired": "Istuntosi on vanhentunut tai pyyntöä ei voitu tunnistaa. Yritä uudelleen.",
+  "conflictSave": "Tämä sisältö muuttui ennen tallennuksen valmistumista, joten muokkaustasi ei voitu tallentaa."
 }

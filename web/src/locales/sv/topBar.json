@@ -38,7 +38,7 @@
   "moveTo": "Flytta till",
   "exporting": "Exporterar…",
   "exportAsMarkdown": "Exportera som Markdown",
-  "exportAsHanji": "Exportera som Hanji-fil",
+  "exportAsHanji": "Exportera Hanji JSON (filer exkluderade)",
   "importing": "Importerar…",
   "importMarkdown": "Importera Markdown",
   "unlockPage": "Lås upp sidan",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Kunde inte uppdatera åtkomst",
     "removedFromAccessList": "Borttagen från åtkomstlistan",
     "couldntRemoveAccess": "Kunde inte ta bort åtkomst",
-    "couldntLoadAccessList": "Kunde inte läsa in åtkomstlistan"
+    "couldntLoadAccessList": "Kunde inte läsa in åtkomstlistan",
+    "couldntExportHanjiArchive": "Kunde inte exportera Hanji-arkiv.",
+    "exportedHanjiArchive": "Exporterade ett Hanji-arkiv med filer."
   },
   "user": "Användare",
   "whoHasAccess": "Vem har åtkomst",
   "workspace": "Arbetsyta",
   "workspaceCount_one": "{{count}} arbetsyta",
   "workspaceCount_other": "{{count}} arbetsytor",
-  "you": "Du"
+  "you": "Du",
+  "exportAsHanjiArchive": "Exportera Hanji-arkiv (filer inkluderade)",
+  "turnIntoWiki": "Gör om till wiki",
+  "undoWiki": "Ångra wiki",
+  "wikiCreated": "Omvandlade sidan till en wiki",
+  "wikiPageSettings": "Wiki-sidinställningar",
+  "wikiUndone": "Wiki borttagen; sidans innehåll bevarades",
+  "wikiUpdateFailed": "Kunde inte uppdatera wikin"
 }

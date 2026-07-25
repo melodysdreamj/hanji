@@ -1420,6 +1420,28 @@
   white-space: nowrap;
 }
 
+.domainVerification {
+  display: grid !important;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.domainVerification code {
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  color: var(--text-default);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.domainVerification em {
+  color: var(--text-red);
+  font-size: 11px;
+  font-style: normal;
+}
+
 .domainText strong {
   color: var(--text-default);
   font-size: 13px;
@@ -1866,7 +1888,314 @@
   color: var(--text-tertiary);
 }
 
+.enterprisePanel {
+  gap: 18px;
+}
+
+.sectionSubtitle {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.enterpriseStatusGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.enterpriseStatusCard {
+  min-height: 78px;
+  padding: 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 9px;
+  background: var(--bg-hover);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.enterpriseStatusCard[data-ready="true"] {
+  border-color: rgba(15, 157, 88, 0.42);
+  background: rgba(15, 157, 88, 0.08);
+}
+
+.enterpriseStatusCard > span,
+.enterpriseStatusCard > strong {
+  font-size: 12px;
+}
+
+.enterpriseStatusCard > span,
+.enterpriseForm > p,
+.enterpriseFootnote,
+.enterpriseSection > small {
+  color: var(--text-secondary);
+}
+
+.enterpriseSections {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.enterpriseSection {
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  background: var(--bg-app);
+  overflow: clip;
+}
+
+.enterpriseSection > summary {
+  min-height: 48px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.enterpriseSection > summary::-webkit-details-marker {
+  display: none;
+}
+
+.enterpriseSection > summary::before {
+  content: "›";
+  color: var(--text-secondary);
+  transition: transform 120ms ease;
+}
+
+.enterpriseSection[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.enterpriseSection > summary > span {
+  flex: 1;
+}
+
+.enterpriseSection > summary > strong {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.enterpriseSection[open] > summary {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.enterpriseForm {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.enterpriseForm > p,
+.enterpriseForm > h4,
+.enterpriseForm > .enterpriseCallout,
+.enterpriseForm > .enterpriseChecks,
+.enterpriseForm > button,
+.enterpriseForm > .enterpriseCheck {
+  grid-column: 1 / -1;
+}
+
+.enterpriseForm > p,
+.enterpriseForm > h4 {
+  margin: 0;
+}
+
+.enterpriseForm > p,
+.enterpriseFootnote,
+.enterpriseSection > small {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.enterpriseForm > label,
+.enterpriseInlineForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.enterpriseForm input,
+.enterpriseForm select,
+.enterpriseForm textarea,
+.enterpriseInlineForm input,
+.enterpriseInlineForm select {
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+  color: var(--text-default);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.enterpriseForm textarea {
+  resize: vertical;
+}
+
+.enterpriseForm input:focus-visible,
+.enterpriseForm select:focus-visible,
+.enterpriseForm textarea:focus-visible,
+.enterpriseInlineForm input:focus-visible {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.16);
+  outline: none;
+}
+
+.enterpriseCheck {
+  flex-direction: row !important;
+  align-items: center;
+  color: var(--text-default) !important;
+}
+
+.enterpriseCheck input {
+  width: 16px;
+  min-height: 16px;
+  margin: 0;
+}
+
+.enterpriseChecks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.enterpriseCallout,
+.enterpriseSecret {
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.enterpriseSecret {
+  margin: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.enterpriseSecret strong {
+  grid-column: 1 / -1;
+}
+
+.enterpriseSecret code {
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.enterpriseInlineForm {
+  padding: 12px 14px;
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  border-top: 1px solid var(--border-default);
+}
+
+.enterpriseInlineForm > input,
+.enterpriseInlineForm > label {
+  flex: 1;
+}
+
+.enterpriseList {
+  border-top: 1px solid var(--border-default);
+}
+
+.enterpriseList:empty {
+  display: none;
+}
+
+.enterpriseList > div {
+  min-height: 50px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.enterpriseList > div + div {
+  border-top: 1px solid var(--border-default);
+}
+
+.enterpriseList span {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.enterpriseList small,
+.enterpriseList em {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-style: normal;
+  overflow-wrap: anywhere;
+}
+
+.enterpriseClientActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.enterpriseClientActions input {
+  min-width: 140px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius);
+  background: var(--bg-app);
+  color: var(--text-default);
+  font: inherit;
+}
+
+.enterpriseSection > small,
+.enterpriseFootnote {
+  display: block;
+  padding: 10px 14px;
+}
+
 @media (max-width: 767px) {
+  .enterpriseForm,
+  .enterpriseChecks {
+    grid-template-columns: 1fr;
+  }
+
+  .enterpriseInlineForm {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .enterpriseList > div,
+  .enterpriseClientActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .enterpriseClientActions input {
+    min-width: 0;
+  }
+
+  .enterpriseStatusGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .dialog {
     width: 100vw;
     height: 100vh;

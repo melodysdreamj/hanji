@@ -247,7 +247,9 @@
     "runningHint": "Import ishlayotganda ushbu brauzer yorligʻini ochiq qoldiring.",
     "noJobHint": "Avval qamrov bosqichidan kashfiyotni boshlang.",
     "applyLocksHint": "Qoʻllash topilgan elementlarni ushbu ish maydoniga yozadi.",
-    "browserRunnerWarning": "Bu import ushbu brauzer yorligʻida ishlamoqda. Yakunlanmaguncha yorliqni ochiq qoldiring. Yorliqni yopish yoki qayta yuklash qayta ishlashni to'xtatadi; Hanji-ni qayta ochish saqlangan progressdan davom etadi."
+    "browserRunnerWarning": "Bu import ushbu brauzer yorligʻida ishlamoqda. Yakunlanmaguncha yorliqni ochiq qoldiring. Yorliqni yopish yoki qayta yuklash qayta ishlashni to'xtatadi; Hanji-ni qayta ochish saqlangan progressdan davom etadi.",
+    "serverRunnerStatus": "Hanji bu importni serverda qayta ishlamoqda. Bu yorliqni yopish yoki qayta yuklash uni to'xtatmaydi.",
+    "serverRunningHint": "Import fonda davom etmoqda. Bu yorliqni yopishingiz mumkin."
   },
   "installer": {
     "elapsed": "O‘tgan",
@@ -281,9 +283,9 @@
     "title": "Hanji’dan import qilish",
     "fromFile": "Fayldan",
     "fromLive": "Jonli nusxadan",
-    "choose": ".hanji.json faylini tanlang",
+    "choose": ".hanji.json yoki .hanji.zip faylini tanlang",
     "chooseButton": "Fayl tanlash",
-    "fileHint": "Boshqa Hanji’dan sahifa, ma’lumotlar bazasi yoki ish maydonini eksport qiling va bu erga import qiling. Aloqalar, yig‘indilar, formulalar, ko‘rinishlar va shablonlar saqlanadi. Ilova fayllar kiritilmaydi.",
+    "fileHint": "Faqat tuzilma uchun .hanji.json dan (fayllar chiqarib tashlanadi) yoki yo'qotishsiz uzatish uchun .hanji.zip dan foydalaning (fayllar kiritiladi). Munosabatlar, rolluplar, formulalar, ko'rinishlar va shablonlar saqlanadi.",
     "selected": "Tanlangan: {{name}}",
     "importButton": "Import",
     "importing": "Import qilinmoqda...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "ixtiyoriy",
     "fetch": "Eksportni olish",
     "fetching": "Yuklanmoqda...",
-    "liveHint": "Ishlayotgan boshqa Hanji’dan (masalan, Docker dev instansiyasi) ish maydonini to‘g‘ridan-to‘g‘ri tortib oling. Uzoq server bu manzildan so‘rovlarga ruxsat berishi kerak.",
+    "liveHint": "Ish maydonini boshqa ishlayotgan Hanji (masalan, Docker dev nusxasi) dan to'g'ridan-to'g'ri tortib oling. Fayllar chiqariladi. Uzoq manba bu manzildan so'rovlarni qabul qilishi kerak.",
     "review": "Importga tayyor: {{summary}}",
     "placeholderNote": "Ba’zi ilova fayllar o‘rnini bosuvchilar sifatida qoldirildi.",
     "importedItems_one": "Hanji faylidan {{count}} ta element import qilindi.",
@@ -302,9 +304,15 @@
     "cantRead": "Hanji faylini o'qib bo'lmadi.",
     "cantImport": "Hanji faylini import qilib bo'lmadi.",
     "needFile": "Avval Hanji faylini tanlang.",
-    "needRemote": "Uzoq Hanji URL manzilini va ish maydoni ID’sini kiriting."
+    "needRemote": "Uzoq Hanji URL manzilini va ish maydoni ID’sini kiriting.",
+    "filesExcluded": "Fayllar chiqarildi.",
+    "filesIncluded": "Fayllar kiritildi."
   },
   "cantStartOAuth": "Notion ulanishini boshlab bo‘lmadi.",
   "connectWithNotion": "Notion bilan ulanish",
-  "oauthConfiguredHint": "Bu serverda Notion OAuth integratsiyasi sozlangan. Token sozlamasi o'z-o'ziga ulanishlari uchun mavjud."
+  "oauthConfiguredHint": "Bu serverda Notion OAuth integratsiyasi sozlangan. Token sozlamasi o'z-o'ziga ulanishlari uchun mavjud.",
+  "terminal": {
+    "cancelled": "Import bekor qilindi. Tayyor bo'lganingizda xavfsiz qayta boshlashingiz mumkin.",
+    "failed": "Import yakunlanishidan oldin xavfsiz to'xtatildi. Ulanishni tekshirib, qayta urinib ko'ring. Texnik tafsilotlar va identifikatorlar bu yerda yashirilgan."
+  }
 }

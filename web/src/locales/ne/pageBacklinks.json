@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} ब्याकलिङ्क",
-    "count_other": "{{count}} ब्याकलिङ्कहरू"
+    "count_other": "{{count}} ब्याकलिङ्कहरू",
+    "partial_one": "{{count}}+ ब्याकलिङ्क",
+    "partial_other": "{{count}}+ ब्याकलिङ्कहरू"
   },
   "header": {
     "title": "लिङ्क गरिएका उल्लेखहरू"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} उल्लेख",
     "mention_other": "{{count}} उल्लेखहरू",
     "link_one": "{{count}} लिङ्क",
-    "link_other": "{{count}} लिङ्कहरू"
+    "link_other": "{{count}} लिङ्कहरू",
+    "loaded": "लोड: {{summary}}"
   },
   "kind": {
     "mention": "उल्लेख",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} थप ब्याकलिङ्क",
-    "count_other": "{{count}} थप ब्याकलिङ्कहरू"
+    "count_other": "{{count}} थप ब्याकलिङ्कहरू",
+    "load": "थप ब्याकलिङ्क लोड गर्नुहोस्",
+    "loading": "ब्याकलिङ्क लोड गर्दै…",
+    "search": "ब्याकलिङ्क खोजी"
   }
 }

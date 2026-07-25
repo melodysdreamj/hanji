@@ -38,7 +38,7 @@
   "moveTo": "Премести в",
   "exporting": "Експортиране…",
   "exportAsMarkdown": "Експорт като Markdown",
-  "exportAsHanji": "Експорт като Hanji файл",
+  "exportAsHanji": "Експортиране на Hanji JSON (без файлове)",
   "importing": "Импортиране…",
   "importMarkdown": "Импортиране на Markdown",
   "unlockPage": "Отключване на страница",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Не можа да се актуализира достъпът",
     "removedFromAccessList": "Премахнато от списъка за достъп",
     "couldntRemoveAccess": "Не можа да се премахне достъпът",
-    "couldntLoadAccessList": "Не можа да се зареди списъкът за достъп"
+    "couldntLoadAccessList": "Не можа да се зареди списъкът за достъп",
+    "couldntExportHanjiArchive": "Неуспешно експортиране на Hanji архив.",
+    "exportedHanjiArchive": "Експортиран Hanji архив с файлове."
   },
   "user": "Потребител",
   "whoHasAccess": "Кой има достъп",
   "workspace": "Работно пространство",
   "workspaceCount_one": "{{count}} работно пространство",
   "workspaceCount_other": "{{count}} работни пространства",
-  "you": "Вие"
+  "you": "Вие",
+  "exportAsHanjiArchive": "Експортиране на Hanji архив (с файлове)",
+  "turnIntoWiki": "Превърни в уики",
+  "undoWiki": "Отмени уики",
+  "wikiCreated": "Страницата е превърната в уики",
+  "wikiPageSettings": "Настройки на уики страница",
+  "wikiUndone": "Уикито е премахнато; съдържанието е запазено.",
+  "wikiUpdateFailed": "Неуспешно актуализиране на уикито."
 }

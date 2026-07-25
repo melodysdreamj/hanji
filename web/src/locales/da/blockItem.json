@@ -233,7 +233,9 @@
     "video": "Video",
     "videoCaption": "Videoundertekst",
     "videoEmptyHint": "Upload en videofil, indsæt et direkte link, eller brug et YouTube-, Vimeo- eller Loom-link.",
-    "videoLink": "Videolink"
+    "videoLink": "Videolink",
+    "audioPlaybackFailed": "Denne lyd kunne ikke afspilles. Erstat den eller åbn den originale fil.",
+    "videoPlaybackFailed": "Denne video kunne ikke afspilles. Erstat den eller åbn den originale fil."
   },
   "mention": {
     "closeMenu": "Luk omtalemenu",

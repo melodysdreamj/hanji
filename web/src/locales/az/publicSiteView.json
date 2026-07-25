@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Keçid izi",
+  "clearSearch": "Axtarışı təmizlə",
+  "errors": {
+    "not-found": "Bu sayt dərcdən götürülmüş və ya ünvanı dəyişmiş ola bilər.",
+    "offline": "Bağlantınızı yoxlayın, sonra saytı yenidən açmağa çalışın.",
+    "rate-limited": "Bu sayt çox sayda sorğu alır. Bir an gözləyin və yenidən cəhd edin.",
+    "unavailable": "Hanji hazırda bu saytı aça bilmir. Bir dəqiqədən sonra yenidən cəhd edin."
+  },
+  "madeWithHanji": "Hanji ilə hazırlanmışdır",
+  "navigation": "Sayt naviqasiyası",
+  "noResults": "Səhifə tapılmadı",
+  "outsideSite": "Bu səhifə dərc edilmiş saytın hissəsi deyil.",
+  "search": "Bu saytı axtar",
+  "tryAgain": "Yenidən cəhd edin",
+  "unavailable": "Bu sayt mövcud deyil."
+}

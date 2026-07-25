@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} تحديثات حديثة",
     "unreadOfTotal": "{{unread}} غير مقروءة من أصل {{total}} تحديثات",
     "updateType": "نوع التحديث",
-    "updates": "التحديثات",
-    "modeUpdates": "التحديثات",
-    "modeChats": "الدردشات",
-    "inboxMode": "وضع صندوق الوارد"
+    "updates": "التحديثات"
   },
   "time": {
     "justNow": "الآن",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} نسخ",
     "versionsAgo": "منذ {{count}} نسخ",
     "versionsAhead": "بعد {{count}} نسخ",
-    "versionsAria": "النسخ"
+    "versionsAria": "النسخ",
+    "emptyBlock": "كتلة فارغة",
+    "emptyPreview": "لا يحتوي هذا الإصدار على محتوى صفحة.",
+    "previewAria": "معاينة إصدار الصفحة للقراءة فقط",
+    "previewingCurrent": "عرض الصفحة الحالية",
+    "previewingSnapshot": "عرض إصدار سابق",
+    "previewOnlyHint": "اختيار إصدار يعرضه فقط. تتغير الصفحة الحالية فقط بعد الاستعادة.",
+    "restoreThisVersion": "استعادة",
+    "restoring": "جارٍ الاستعادة...",
+    "versionHistory": "سجل الإصدارات"
   },
   "badges": {
     "comment": "تعليق",
@@ -67,7 +73,8 @@
     "referenceMention": "إشارة إلى {{title}} · {{preview}}",
     "referenceLink": "مرتبط بـ {{title}} · {{preview}}",
     "unreadDot": "غير مقروء",
-    "workspaceUpdate": "تحديث مساحة العمل"
+    "workspaceUpdate": "تحديث مساحة العمل",
+    "bySelf": "بواسطتك"
   },
   "empty": {
     "allCaughtUp": "أنت على اطلاع كامل.",

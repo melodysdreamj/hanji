@@ -87,6 +87,24 @@ export function textSpansEqual(a?: readonly TextSpan[], b?: readonly TextSpan[])
   return true;
 }
 
+/**
+ * Returns true when every character from `candidate` still exists in order in
+ * `merged`, allowing a collaborator's concurrent insertions between them.
+ * This is intentionally stricter than a bag-of-characters check but less
+ * restrictive than substring matching, which rejects valid same-caret CRDT
+ * merges when a peer's insertion is ordered immediately before ours.
+ */
+export function textIsOrderedSubsequence(candidate: string, merged: string): boolean {
+  if (!candidate) return true;
+  let candidateIndex = 0;
+  for (let mergedIndex = 0; mergedIndex < merged.length; mergedIndex += 1) {
+    if (merged[mergedIndex] !== candidate[candidateIndex]) continue;
+    candidateIndex += 1;
+    if (candidateIndex === candidate.length) return true;
+  }
+  return false;
+}
+
 export function sanitizeTextSpans(value: unknown): TextSpan[] | undefined {
   if (!Array.isArray(value)) return undefined;
   return value

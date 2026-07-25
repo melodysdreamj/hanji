@@ -1,7 +1,11 @@
 import { defineFunction } from '@edge-base/shared';
 import { errorStatus } from '../lib/error-status';
-import { hanjiHeader } from '../lib/hanji-compat';
-import { assertNoActiveLegalHoldForPermanentDelete } from '../lib/enterprise-controls';
+import { hanjiEnvValue, hanjiHeader } from '../lib/hanji-compat';
+import {
+  assertNoActiveLegalHoldForPermanentDelete,
+  assertValidMcpGovernancePolicy,
+  auditRetentionScalarPatch,
+} from '../lib/enterprise-controls';
 import { bumpOrganizationPolicyVersion } from '../lib/org-policy-version';
 import {
   MAX_RAW_TRANSACT_OPS,
@@ -12,16 +16,23 @@ import {
   type AdminDbAccessor,
 } from '../lib/workspace-db';
 import { actorPagePermissions, pageAccessRole } from '../lib/page-access';
+import {
+  handleTeamspaceMutation,
+  TEAMSPACE_MUTATION_ACTIONS,
+} from '../lib/teamspace-mutation';
 import { defaultWorkspaceLocale, seedDefaultWorkspacePages } from '../lib/default-workspace-pages';
 import { deleteStoredUploadsBeforeMetadata } from '../lib/permanent-file-delete';
 import { upsertNotification as upsertBoundedNotification } from '../lib/notifications';
+import { domainVerificationRecord, verifyDomainTxtRecord } from '../lib/domain-verification';
 import {
+  fileOperationConflict,
   markFileDeletionPending,
   withFileWorkspaceLease,
   type FileWorkspaceLeaseGuard,
 } from '../lib/file-operation-lock';
 import {
   getInstanceSettings,
+  parseMemberAddPolicy,
   parseSignupPolicy,
   upsertInstanceSettings,
   type InstanceSettings,
@@ -32,6 +43,7 @@ import {
   listAll,
   requireString,
   getExisting,
+  isTransactionConflictError,
   nowIso,
   type TableQuery,
   type TransactDb,
@@ -55,6 +67,8 @@ interface Organization {
   name: string;
   icon?: string | null;
   ownerId?: string;
+  governanceVersion?: number | null;
+  ssoEnforcementEpoch?: number | null;
   workspaceCreationPolicy?: string;
   domainSignupPolicy?: string;
   sharingPolicy?: Record<string, unknown> | null;
@@ -75,6 +89,7 @@ interface OrganizationMember {
   createdBy?: string;
   deactivatedAt?: string | null;
   deactivatedBy?: string | null;
+  ssoEnforcementEpoch?: number | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -120,6 +135,10 @@ interface OrganizationDomain {
   organizationId: string;
   domain: string;
   status?: string;
+  verificationMethod?: string | null;
+  verificationToken?: string | null;
+  verificationCheckedAt?: string | null;
+  verificationError?: string | null;
   createdBy?: string;
   verifiedAt?: string | null;
   verifiedBy?: string | null;
@@ -145,13 +164,88 @@ interface OrganizationEnterpriseControls {
   ssoConfig?: Record<string, unknown> | null;
   scimConfig?: Record<string, unknown> | null;
   auditPolicy?: Record<string, unknown> | null;
+  auditRetentionDays?: number | null;
+  auditRetentionPolicyValid?: boolean | null;
+  auditRetentionPolicyError?: string | null;
   dataResidencyPolicy?: Record<string, unknown> | null;
   dlpPolicy?: Record<string, unknown> | null;
   legalPolicy?: Record<string, unknown> | null;
   billingProfile?: Record<string, unknown> | null;
+  mcpGovernancePolicy?: Record<string, unknown> | null;
+  version?: number | null;
   updatedBy?: string | null;
   createdAt?: string;
   updatedAt?: string;
+}
+
+interface OrganizationSsoTransition {
+  id: string;
+  organizationId: string;
+  pendingOrganizationId?: string | null;
+  actorId: string;
+  controlsId: string;
+  controlsVersion: number;
+  controlsVersionWasMissing: boolean;
+  requestHash: string;
+  mutationId: string;
+  desiredPatch: Partial<OrganizationEnterpriseControls>;
+  desiredMetadata: Record<string, unknown>;
+  previousEpoch: number;
+  previousEpochWasMissing: boolean;
+  desiredEpoch: number;
+  status: 'pending' | 'active' | 'superseded';
+  version: number;
+  scanGeneration: number;
+  scanPage: number;
+  passDiscovered: number;
+  passIncomplete: number;
+  stablePasses: number;
+  leaseToken?: string | null;
+  leaseExpiresAt?: string | null;
+  lastError?: string | null;
+  lastErrorAt?: string | null;
+  activatedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface OrganizationSsoRevocationReceipt {
+  id: string;
+  organizationId: string;
+  transitionId: string;
+  organizationMemberId: string;
+  userId: string;
+  scanGeneration: number;
+  status: 'pending' | 'complete' | 'superseded';
+  attemptCount: number;
+  lastAttemptAt?: string | null;
+  lastError?: string | null;
+  completedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface OrganizationPolicyVersion {
+  id: string;
+  organizationId: string;
+  version?: number | null;
+}
+
+interface OrganizationApprovedMcpClient {
+  clientId: string;
+  name: string;
+  approvedAt: string;
+  approvedBy: string;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+
+interface OrganizationMcpWorkspacePolicy {
+  workspaceId: string;
+  enabled: boolean;
+  approvedClients: OrganizationApprovedMcpClient[];
+  updatedAt?: string | null;
+  updatedBy?: string | null;
 }
 
 interface OrganizationScimToken {
@@ -192,6 +286,20 @@ interface OrganizationAuditExport {
   format?: string;
   filter?: Record<string, unknown> | null;
   eventCount?: number;
+  content?: string | null;
+  createdBy?: string | null;
+  completedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface OrganizationDiscoveryExport {
+  id: string;
+  organizationId: string;
+  status?: string;
+  format?: string;
+  filter?: Record<string, unknown> | null;
+  itemCount?: number;
   content?: string | null;
   createdBy?: string | null;
   completedAt?: string | null;
@@ -285,12 +393,18 @@ interface Page {
   inTrash?: boolean;
   createdBy?: string | null;
   lastEditedBy?: string | null;
+  properties?: Record<string, unknown> | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface Block {
   id: string;
   pageId: string;
   createdBy?: string | null;
+  content?: Record<string, unknown> | null;
+  plainText?: string | null;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -298,6 +412,8 @@ interface Comment {
   id: string;
   pageId: string;
   authorId: string;
+  body?: string | null;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -308,6 +424,12 @@ interface FileUpload {
   key?: string | null;
   status?: string | null;
   createdBy?: string | null;
+  name?: string | null;
+  contentType?: string | null;
+  size?: number | null;
+  pageId?: string | null;
+  databaseId?: string | null;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -329,6 +451,12 @@ interface DbTemplate {
 interface ShareLink {
   id: string;
   pageId: string;
+  workspaceId: string;
+}
+
+interface FormLink {
+  id: string;
+  databaseId: string;
   workspaceId: string;
 }
 
@@ -362,6 +490,8 @@ interface NotionImportConnectionRecord {
 interface NotionImportJobRecord {
   id: string;
   workspaceId: string;
+  status?: string;
+  progress?: { currentStatus?: unknown } | null;
 }
 
 interface NotionImportItemRecord {
@@ -466,6 +596,7 @@ interface AuthAdminRef {
     users: Record<string, unknown>[];
     cursor?: string;
   }>;
+  revokeAllSessions?(userId: string): Promise<void>;
 }
 
 interface FunctionContext {
@@ -473,6 +604,7 @@ interface FunctionContext {
   request?: Request;
   email?: EmailSender;
   storage?: FunctionStorageProxy;
+  env?: Record<string, unknown>;
   admin: {
     db(namespace: string): DbRef;
     auth?: AuthAdminRef;
@@ -623,15 +755,6 @@ async function requestJson(request?: Request): Promise<Record<string, unknown>> 
   } catch {
     return {};
   }
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 function newToken() {
@@ -813,9 +936,26 @@ function stripNullish(record: Record<string, unknown>) {
 
 function sanitizeSsoConfig(value: unknown) {
   const input = optionalRecord(value, 'ssoConfig');
+  const providerType = parseEnum(input.providerType, ['saml', 'oidc'], 'saml', 'ssoConfig.providerType');
+  const providerName = boundedText(input.providerName, 'ssoConfig.providerName', 120)
+    ?? (providerType === 'oidc' ? 'oidc:enterprise' : null);
+  const issuer = boundedText(input.issuer, 'ssoConfig.issuer', 500);
+  const enabled = optionalBoolean(input.enabled);
+  if (enabled === true) {
+    if (providerType !== 'oidc') {
+      throw new Error('Live SSO enforcement currently requires an OIDC provider.');
+    }
+    if (!providerName || !/^oidc:[A-Za-z0-9._-]+$/.test(providerName)) {
+      throw new Error('ssoConfig.providerName must use the oidc:name format.');
+    }
+    if (!issuer || !/^https:\/\//i.test(issuer)) {
+      throw new Error('ssoConfig.issuer must be an HTTPS URL before enabling SSO.');
+    }
+  }
   return stripNullish({
-    enabled: optionalBoolean(input.enabled),
-    providerType: parseEnum(input.providerType, ['saml', 'oidc'], 'saml', 'ssoConfig.providerType'),
+    enabled,
+    providerType,
+    providerName,
     enforcement: parseEnum(
       input.enforcement,
       ['optional', 'required_for_verified_domains', 'required_for_all_members'],
@@ -824,7 +964,7 @@ function sanitizeSsoConfig(value: unknown) {
     ),
     loginUrl: boundedText(input.loginUrl, 'ssoConfig.loginUrl', 500),
     entityId: boundedText(input.entityId, 'ssoConfig.entityId', 500),
-    issuer: boundedText(input.issuer, 'ssoConfig.issuer', 500),
+    issuer,
     metadataUrl: boundedText(input.metadataUrl, 'ssoConfig.metadataUrl', 500),
     certificateFingerprint: boundedText(input.certificateFingerprint, 'ssoConfig.certificateFingerprint', 200),
     clientId: boundedText(input.clientId, 'ssoConfig.clientId', 300),
@@ -832,6 +972,47 @@ function sanitizeSsoConfig(value: unknown) {
     scopes: stringList(input.scopes, 'ssoConfig.scopes', 20, 80),
     attributeMapping: optionalRecord(input.attributeMapping, 'ssoConfig.attributeMapping'),
   });
+}
+
+function assertSsoRuntimeConfigured(
+  config: Record<string, unknown>,
+  env?: Record<string, unknown>,
+) {
+  if (config.enabled !== true) return;
+  const providerName = typeof config.providerName === 'string' ? config.providerName : '';
+  const prefix = providerName.toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+  const configuredProviders = (
+    hanjiEnvValue(env, 'HANJI_AUTH_OAUTH_PROVIDERS', 'EDGEBASE_AUTH_ALLOWED_OAUTH_PROVIDERS') ?? ''
+  ).split(',').map((provider) => provider.trim()).filter(Boolean);
+  const clientId = hanjiEnvValue(
+    env,
+    `HANJI_OAUTH_${prefix}_CLIENT_ID`,
+    `EDGEBASE_OAUTH_${prefix}_CLIENT_ID`,
+    `${prefix}_CLIENT_ID`,
+  );
+  const clientSecret = hanjiEnvValue(
+    env,
+    `HANJI_OAUTH_${prefix}_CLIENT_SECRET`,
+    `EDGEBASE_OAUTH_${prefix}_CLIENT_SECRET`,
+    `${prefix}_CLIENT_SECRET`,
+  );
+  const issuer = hanjiEnvValue(
+    env,
+    `HANJI_OAUTH_${prefix}_ISSUER`,
+    `EDGEBASE_OAUTH_${prefix}_ISSUER`,
+    `${prefix}_ISSUER`,
+  );
+  if (!configuredProviders.includes(providerName) || !clientId || !clientSecret || !issuer) {
+    throw new Error(
+      `SSO runtime provider ${providerName} is not configured. Add it to HANJI_AUTH_OAUTH_PROVIDERS and configure its client ID, client secret, and issuer environment values.`,
+    );
+  }
+  if (typeof config.issuer === 'string' && config.issuer !== issuer) {
+    throw new Error('The saved SSO issuer must match the runtime OIDC issuer.');
+  }
+  if (typeof config.clientId === 'string' && config.clientId && config.clientId !== clientId) {
+    throw new Error('The saved SSO client ID must match the runtime OIDC client ID.');
+  }
 }
 
 function sanitizeScimConfig(value: unknown) {
@@ -863,22 +1044,43 @@ function sanitizeAuditPolicy(value: unknown) {
   });
 }
 
-function sanitizeDataResidencyPolicy(value: unknown) {
+function sanitizeDataResidencyPolicy(
+  value: unknown,
+  env?: Record<string, unknown>,
+) {
   const input = optionalRecord(value, 'dataResidencyPolicy');
+  const primaryRegion = parseEnum(
+    input.primaryRegion,
+    ['global', 'us', 'eu', 'kr', 'apac'],
+    'global',
+    'dataResidencyPolicy.primaryRegion',
+  );
+  const enforcementMode = parseEnum(
+    input.enforcementMode,
+    ['metadata_only', 'strict'],
+    'metadata_only',
+    'dataResidencyPolicy.enforcementMode',
+  );
+  const databaseRegion = hanjiEnvValue(env, 'HANJI_DATA_REGION', 'EDGEBASE_DATA_REGION')?.toLowerCase();
+  const storageRegion = hanjiEnvValue(env, 'HANJI_STORAGE_REGION', 'EDGEBASE_STORAGE_REGION')?.toLowerCase();
+  if (enforcementMode === 'strict') {
+    if (primaryRegion === 'global') {
+      throw new Error('Strict data residency requires a non-global primary region.');
+    }
+    if (databaseRegion !== primaryRegion || storageRegion !== primaryRegion) {
+      throw new Error(
+        `Strict data residency requires HANJI_DATA_REGION and HANJI_STORAGE_REGION to both be ${primaryRegion}.`,
+      );
+    }
+  }
   return stripNullish({
-    primaryRegion: parseEnum(
-      input.primaryRegion,
-      ['global', 'us', 'eu', 'kr', 'apac'],
-      'global',
-      'dataResidencyPolicy.primaryRegion',
-    ),
+    primaryRegion,
     allowedRegions: stringList(input.allowedRegions, 'dataResidencyPolicy.allowedRegions', 10, 40),
-    enforcementMode: parseEnum(
-      input.enforcementMode,
-      ['metadata_only', 'strict'],
-      'metadata_only',
-      'dataResidencyPolicy.enforcementMode',
-    ),
+    enforcementMode,
+    attestationStatus: enforcementMode === 'strict' ? 'operator_attested' : 'not_required',
+    attestedDatabaseRegion: databaseRegion ?? null,
+    attestedStorageRegion: storageRegion ?? null,
+    attestedAt: enforcementMode === 'strict' ? nowIso() : null,
     notes: boundedText(input.notes, 'dataResidencyPolicy.notes', 500),
   });
 }
@@ -887,6 +1089,12 @@ function sanitizeDlpPolicy(value: unknown) {
   const input = optionalRecord(value, 'dlpPolicy');
   return stripNullish({
     enabled: optionalBoolean(input.enabled),
+    contentScanMode: parseEnum(
+      input.contentScanMode,
+      ['off', 'block'],
+      'block',
+      'dlpPolicy.contentScanMode',
+    ),
     blockPublicSharing: optionalBoolean(input.blockPublicSharing),
     blockExternalSharing: optionalBoolean(input.blockExternalSharing),
     blockFileDownloads: optionalBoolean(input.blockFileDownloads),
@@ -1038,16 +1246,6 @@ function sortInvitations(items: WorkspaceInvitation[]) {
         String(a.email).localeCompare(String(b.email)) ||
         a.id.localeCompare(b.id),
     );
-}
-
-function urlOrigin(value: unknown) {
-  if (typeof value !== 'string' || !value.trim()) return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.origin : null;
-  } catch {
-    return null;
-  }
 }
 
 function sortWorkspaces(items: Workspace[]) {
@@ -1459,7 +1657,7 @@ async function recordOrganizationAudit(
   db: DbRef,
   event: Omit<OrganizationAuditEvent, 'id'>,
 ) {
-  await bestEffort('workspace-mutation db.table<OrganizationAuditEven', db.table<OrganizationAuditEvent>('organization_audit_events').insert(event));
+  await db.table<OrganizationAuditEvent>('organization_audit_events').insert(event);
 }
 
 async function recordWorkspaceAudit(
@@ -1839,13 +2037,17 @@ async function organizationForWorkspace(
 
 function defaultEnterpriseControls(organizationId: string): Partial<OrganizationEnterpriseControls> {
   return {
+    id: organizationId,
     organizationId,
     ssoConfig: { enabled: false, providerType: 'saml', enforcement: 'optional' },
     scimConfig: { enabled: false, provisioningMode: 'manual', deprovisionAction: 'deactivate' },
     auditPolicy: { retentionDays: 365, exportFormat: 'jsonl' },
+    auditRetentionDays: 365,
+    auditRetentionPolicyValid: true,
     dataResidencyPolicy: { primaryRegion: 'global', allowedRegions: ['global'], enforcementMode: 'metadata_only' },
     dlpPolicy: {
       enabled: false,
+      contentScanMode: 'block',
       blockPublicSharing: false,
       blockExternalSharing: false,
       blockFileDownloads: false,
@@ -1854,21 +2056,55 @@ function defaultEnterpriseControls(organizationId: string): Partial<Organization
     },
     legalPolicy: { defaultHoldScope: 'organization', requireReason: true },
     billingProfile: { contractStatus: 'draft' },
+    mcpGovernancePolicy: { workspacePolicies: [] },
+    version: 0,
   };
 }
 
+function uniqueEnterpriseControls(records: OrganizationEnterpriseControls[]) {
+  if (records.length > 1) {
+    throw Object.assign(
+      new Error('Organization enterprise controls are not uniquely configured.'),
+      { status: 409 },
+    );
+  }
+  return records[0] ?? null;
+}
+
 async function enterpriseControlsForOrganization(db: DbRef, organizationId: string) {
-  const controls = await listAll(
-    db.table<OrganizationEnterpriseControls>('organization_enterprise_controls').where(
+  const table = db.table<OrganizationEnterpriseControls>('organization_enterprise_controls');
+  const existing = uniqueEnterpriseControls(await listAll(
+    table.where(
       'organizationId',
       '==',
       organizationId,
     ),
-  );
-  if (controls[0]) return controls[0];
-  return await db.table<OrganizationEnterpriseControls>('organization_enterprise_controls').insert(
-    defaultEnterpriseControls(organizationId),
-  );
+  ));
+  if (existing) return existing;
+
+  try {
+    await db.transact([
+      {
+        table: 'organization_enterprise_controls',
+        op: 'expect',
+        where: [['organizationId', '==', organizationId]],
+        exists: false,
+      },
+      {
+        table: 'organization_enterprise_controls',
+        op: 'insert',
+        data: defaultEnterpriseControls(organizationId) as Record<string, unknown>,
+      },
+    ]);
+  } catch (error) {
+    if (!isTransactionConflictError(error)) throw error;
+  }
+
+  const created = uniqueEnterpriseControls(await listAll(
+    table.where('organizationId', '==', organizationId),
+  ));
+  if (!created) throw new Error('Organization enterprise controls could not be initialized.');
+  return created;
 }
 
 function redactScimToken(token: OrganizationScimToken): OrganizationScimToken {
@@ -1889,12 +2125,17 @@ async function organizationEnterpriseDirectory(
   const canAudit = organizationAdminRoles.has(actorRole);
   const [
     enterpriseControls,
+    enterpriseSsoTransition,
     scimTokens,
     legalHolds,
     auditExports,
+    discoveryExports,
     billingRecords,
   ] = await Promise.all([
     enterpriseControlsForOrganization(db, organizationId),
+    canSecurity
+      ? latestSsoTransition(db, organizationId)
+      : Promise.resolve(null),
     canSecurity
       ? listAll(db.table<OrganizationScimToken>('organization_scim_tokens').where('organizationId', '==', organizationId))
       : Promise.resolve([]),
@@ -1904,15 +2145,24 @@ async function organizationEnterpriseDirectory(
     canAudit
       ? listAll(db.table<OrganizationAuditExport>('organization_audit_exports').where('organizationId', '==', organizationId))
       : Promise.resolve([]),
+    canSecurity
+      ? listAll(db.table<OrganizationDiscoveryExport>('organization_discovery_exports').where('organizationId', '==', organizationId))
+      : Promise.resolve([]),
     canBilling
       ? listAll(db.table<OrganizationBillingRecord>('organization_billing_records').where('organizationId', '==', organizationId))
       : Promise.resolve([]),
   ]);
   return {
     enterpriseControls,
+    enterpriseSsoTransition: transitionPublicState(enterpriseSsoTransition),
     organizationScimTokens: sortOrganizationScimTokens(scimTokens).map(redactScimToken),
     organizationLegalHolds: sortOrganizationLegalHolds(legalHolds),
     organizationAuditExports: sortOrganizationAuditExports(auditExports).slice(0, 20),
+    organizationDiscoveryExports: discoveryExports
+      .slice()
+      .sort((a, b) => String(b.completedAt ?? b.createdAt ?? '').localeCompare(String(a.completedAt ?? a.createdAt ?? '')))
+      .slice(0, 20)
+      .map(redactDiscoveryExport),
     organizationBillingRecords: sortOrganizationBillingRecords(billingRecords),
   };
 }
@@ -1945,7 +2195,9 @@ async function organizationDirectory(
   const organizationGroups = await organizationGroupsForDirectory(db, organizationId, organizationMembers);
   const organizationDomains = sortOrganizationDomains(
     await listAll(db.table<OrganizationDomain>('organization_domains').where('organizationId', '==', organizationId)),
-  );
+  ).map((domain) => domain.verificationToken
+    ? { ...domain, ...domainVerificationRecord(domain.domain, domain.verificationToken) }
+    : domain);
   const organizationProfiles = await organizationProfilesForDirectory(db, organizationMembers, workspaces);
   let organizationAuditEvents: OrganizationAuditEvent[] = [];
   let organizationAuditFilter: Record<string, unknown> | null = null;
@@ -1972,6 +2224,17 @@ async function organizationDirectory(
     organizationAuditEvents = organizationAuditEvents.slice(0, auditLimit);
   }
   const enterpriseDirectory = await organizationEnterpriseDirectory(db, organizationId, actorRole);
+  assertSsoEpochAuthorized(
+    organization,
+    currentOrganizationMember,
+    enterpriseDirectory.enterpriseControls,
+    new Set(
+      organizationDomains
+        .filter((domain) => (domain.status ?? 'pending') === 'verified')
+        .map((domain) => normalizeOrganizationDomain(domain.domain))
+        .filter((domain): domain is string => !!domain),
+    ),
+  );
   return {
     organization,
     instanceSettings: await getInstanceSettings(db),
@@ -2358,6 +2621,33 @@ async function sha256Hex(value: string) {
     .join('');
 }
 
+function stableJsonValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableJsonValue);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.keys(value as Record<string, unknown>)
+      .sort()
+      .map((key) => [key, stableJsonValue((value as Record<string, unknown>)[key])]),
+  );
+}
+
+function stableJson(value: unknown) {
+  return JSON.stringify(stableJsonValue(value));
+}
+
+function sameStableValue(left: unknown, right: unknown) {
+  return stableJson(left) === stableJson(right);
+}
+
+async function deterministicUuid(value: string) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  const bytes = new Uint8Array(digest).slice(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x50;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 function findScimToken(tokens: OrganizationScimToken[], body: Record<string, unknown>) {
   const id = optionalString(body.scimTokenId ?? body.tokenId ?? body.id, 'scimTokenId');
   if (!id) return null;
@@ -2409,64 +2699,1517 @@ function sanitizeBillingRecordInput(body: Record<string, unknown>, actorId: stri
   });
 }
 
-async function updateOrganizationEnterpriseControls(db: DbRef, body: Record<string, unknown>, actorId: string) {
+function organizationApprovedMcpClients(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((value): OrganizationApprovedMcpClient[] => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+    const record = value as Record<string, unknown>;
+    if (typeof record.clientId !== 'string' || !record.clientId) return [];
+    return [{
+      ...record,
+      clientId: record.clientId,
+      name: typeof record.name === 'string' && record.name.trim() ? record.name.trim() : record.clientId,
+      approvedAt: typeof record.approvedAt === 'string' ? record.approvedAt : '',
+      approvedBy: typeof record.approvedBy === 'string' ? record.approvedBy : '',
+      updatedAt: typeof record.updatedAt === 'string' ? record.updatedAt : null,
+      updatedBy: typeof record.updatedBy === 'string' ? record.updatedBy : null,
+    }];
+  });
+}
+
+function organizationMcpWorkspacePolicies(controls: OrganizationEnterpriseControls) {
+  const policy = controls.mcpGovernancePolicy;
+  if (!policy || !Array.isArray(policy.workspacePolicies)) return [];
+  return policy.workspacePolicies.flatMap((value): OrganizationMcpWorkspacePolicy[] => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+    const record = value as Record<string, unknown>;
+    if (typeof record.workspaceId !== 'string' || !record.workspaceId) return [];
+    return [{
+      ...record,
+      workspaceId: record.workspaceId,
+      enabled: record.enabled === true,
+      approvedClients: organizationApprovedMcpClients(record.approvedClients),
+      updatedAt: typeof record.updatedAt === 'string' ? record.updatedAt : null,
+      updatedBy: typeof record.updatedBy === 'string' ? record.updatedBy : null,
+    }];
+  });
+}
+
+function requiredMcpClientId(body: Record<string, unknown>) {
+  const clientId = requireString(body.clientId ?? body.client_id, 'clientId').trim();
+  if (clientId.length > 500) throw new Error('clientId must be at most 500 characters.');
+  if (/\s/.test(clientId)) throw new Error('clientId must not contain whitespace.');
+  return clientId;
+}
+
+async function organizationPolicyVersionForGovernance(db: DbRef, organizationId: string) {
+  const rows = await listAll(
+    db.table<OrganizationPolicyVersion>('organization_policy_versions')
+      .where('organizationId', '==', organizationId),
+  );
+  if (rows.length > 1) {
+    throw Object.assign(
+      new Error('Organization policy version is not uniquely configured.'),
+      { status: 409 },
+    );
+  }
+  const current = rows[0] ?? null;
+  if (
+    current?.version !== null
+    && current?.version !== undefined
+    && (!Number.isSafeInteger(current.version) || current.version < 0)
+  ) {
+    throw Object.assign(new Error('Organization policy version is malformed.'), { status: 409 });
+  }
+  return current;
+}
+
+async function governancePolicyVersionPlan(db: DbRef, organizationId: string) {
+  const current = await organizationPolicyVersionForGovernance(db, organizationId);
+  const currentVersion = current?.version ?? 0;
+  return {
+    guard: current
+      ? {
+          table: 'organization_policy_versions',
+          op: 'expect',
+          id: current.id,
+          where: [
+            ['organizationId', '==', organizationId],
+            ['version', '==', current.version ?? null],
+          ],
+          exists: true,
+        } satisfies TransactOperation
+      : {
+          table: 'organization_policy_versions',
+          op: 'expect',
+          id: organizationId,
+          where: [['organizationId', '==', organizationId]],
+          exists: false,
+        } satisfies TransactOperation,
+    write: current
+      ? {
+          table: 'organization_policy_versions',
+          op: 'update',
+          id: current.id,
+          data: { version: currentVersion + 1 },
+        } satisfies TransactOperation
+      : {
+          table: 'organization_policy_versions',
+          op: 'insert',
+          data: { id: organizationId, organizationId, version: 1 },
+        } satisfies TransactOperation,
+    nextVersion: currentVersion + 1,
+  };
+}
+
+function governanceControlsVersion(controls: OrganizationEnterpriseControls) {
+  if (controls.version === null || controls.version === undefined) {
+    return { expected: null, value: 0 } as const;
+  }
+  if (!Number.isSafeInteger(controls.version) || controls.version < 0) {
+    throw Object.assign(new Error('Organization enterprise controls version is malformed.'), { status: 409 });
+  }
+  return { expected: controls.version, value: controls.version } as const;
+}
+
+function governanceOrganizationFence(organization: Organization) {
+  const hasVersion = Number.isSafeInteger(organization.governanceVersion)
+    && Number(organization.governanceVersion) >= 0;
+  if (
+    !hasVersion
+    && organization.governanceVersion !== null
+    && organization.governanceVersion !== undefined
+  ) {
+    throw Object.assign(new Error('Organization governance version is malformed.'), { status: 409 });
+  }
+  const version = hasVersion ? Number(organization.governanceVersion) : 0;
+  return {
+    guard: {
+      table: 'organizations',
+      op: 'expect',
+      id: organization.id,
+      where: [['governanceVersion', '==', hasVersion ? version : null]],
+      exists: true,
+    } satisfies TransactOperation,
+    write: {
+      table: 'organizations',
+      op: 'update',
+      id: organization.id,
+      data: { governanceVersion: version + 1 },
+    } satisfies TransactOperation,
+    nextVersion: version + 1,
+  };
+}
+
+type GovernanceActorGuard = Extract<TransactOperation, { op: 'expect' }>;
+
+interface GovernanceMutationReceipt {
+  id: string;
+  requestHash: string;
+  mutationId: string;
+  existing: OrganizationAuditEvent | null;
+}
+
+async function governanceMutationReceipt(
+  db: DbRef,
+  body: Record<string, unknown>,
+  organizationId: string,
+  actorId: string,
+  action: string,
+  request: unknown,
+): Promise<GovernanceMutationReceipt> {
+  const requestHash = await sha256Hex(stableJson(request));
+  const supplied = optionalString(body.mutationId, 'mutationId');
+  if (supplied && supplied.length > 200) throw new Error('mutationId must be at most 200 characters.');
+  const mutationId = supplied ?? `content:${requestHash}`;
+  const id = await deterministicUuid(
+    `${organizationId}|${actorId}|${action}|${mutationId}`,
+  );
+  const existing = await getExisting(
+    db.table<OrganizationAuditEvent>('organization_audit_events'),
+    id,
+  );
+  if (existing) {
+    const metadata = existing.metadata ?? {};
+    if (
+      existing.organizationId !== organizationId
+      || existing.actorId !== actorId
+      || existing.action !== action
+      || metadata.governanceMutationId !== mutationId
+      || metadata.requestHash !== requestHash
+    ) {
+      throw Object.assign(new Error('mutationId was already used with a different governance request.'), { status: 409 });
+    }
+  }
+  return { id, requestHash, mutationId, existing };
+}
+
+function governanceReceiptMetadata(
+  receipt: GovernanceMutationReceipt,
+  metadata: Record<string, unknown>,
+) {
+  return {
+    ...metadata,
+    governanceMutationId: receipt.mutationId,
+    requestHash: receipt.requestHash,
+  };
+}
+
+function governanceActorGuard(
+  ctx: Awaited<ReturnType<typeof organizationAdminContext>>,
+  organizationId: string,
+  actorId: string,
+): GovernanceActorGuard {
+  if (ctx.organization.ownerId === actorId) {
+    return {
+      table: 'organizations',
+      op: 'expect',
+      id: organizationId,
+      where: [['ownerId', '==', actorId]],
+      exists: true,
+    };
+  }
+  const member = ctx.currentOrganizationMember;
+  if (!member) throw new Error('Organization security admin access required.');
+  return {
+    table: 'organization_members',
+    op: 'expect',
+    id: member.id,
+    where: [
+      ['organizationId', '==', organizationId],
+      ['userId', '==', actorId],
+      ['role', '==', ctx.actorRole],
+      ['status', '==', member.status ?? null],
+    ],
+    exists: true,
+  };
+}
+
+async function governanceActorGuardIsCurrent(db: DbRef, guard: GovernanceActorGuard) {
+  if (!guard.id) return false;
+  const row = await getExisting(db.table<Record<string, unknown>>(guard.table), guard.id);
+  if (!row) return false;
+  return (guard.where ?? []).every(([field, , expected]) => {
+    const actual = row[field];
+    return expected === null
+      ? actual === null || actual === undefined
+      : actual === expected;
+  });
+}
+
+async function throwGovernanceTransactionConflict(
+  db: DbRef,
+  error: unknown,
+  actorGuard: GovernanceActorGuard,
+  actorAccessMessage: string,
+  targetConflictMessage: string,
+): Promise<never> {
+  if (!isTransactionConflictError(error)) throw error;
+  if (!(await governanceActorGuardIsCurrent(db, actorGuard))) {
+    throw Object.assign(new Error(actorAccessMessage), { status: 403 });
+  }
+  throw Object.assign(new Error(targetConflictMessage), { status: 409 });
+}
+
+const SSO_REQUIRED_MESSAGE =
+  'Your organization requires single sign-on. Continue with the organization SSO provider.';
+const SSO_REVOCATION_PAGE_SIZE = 100;
+const SSO_REVOCATION_CONCURRENCY = 6;
+const SSO_TRANSITION_LEASE_MS = 15 * 60 * 1_000;
+
+function requiredSsoConfig(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const config = value as Record<string, unknown>;
+  if (config.enabled !== true || config.enforcement === 'optional') return null;
+  return config;
+}
+
+function ssoEpoch(value: unknown, field: string) {
+  if (value === null || value === undefined) return 0;
+  if (!Number.isSafeInteger(value) || Number(value) < 0) {
+    throw Object.assign(new Error(`${field} is malformed.`), { status: 409 });
+  }
+  return Number(value);
+}
+
+function memberMatchesRequiredSso(
+  config: Record<string, unknown>,
+  member: OrganizationMember,
+  verifiedDomains: Set<string>,
+) {
+  if ((member.status ?? 'active') !== 'active' || member.role === 'guest' || !member.userId) {
+    return false;
+  }
+  if (config.enforcement === 'required_for_all_members') return true;
+  if (config.enforcement !== 'required_for_verified_domains') return false;
+  const email = normalizeEmail(member.email);
+  return !!email && verifiedDomains.has(email.slice(email.lastIndexOf('@') + 1));
+}
+
+async function verifiedSsoDomains(db: DbRef, organizationId: string) {
+  const domains = await listAll(
+    db.table<OrganizationDomain>('organization_domains').where('organizationId', '==', organizationId),
+  );
+  return new Set(
+    domains
+      .filter((domain) => (domain.status ?? 'pending') === 'verified')
+      .map((domain) => normalizeOrganizationDomain(domain.domain))
+      .filter((domain): domain is string => !!domain),
+  );
+}
+
+function transitionPublicState(transition: OrganizationSsoTransition | null) {
+  if (!transition) return null;
+  return {
+    id: transition.id,
+    status: transition.status,
+    desiredEpoch: transition.desiredEpoch,
+    scanGeneration: transition.scanGeneration,
+    scanPage: transition.scanPage,
+    passDiscovered: transition.passDiscovered,
+    passIncomplete: transition.passIncomplete,
+    stablePasses: transition.stablePasses,
+    lastError: transition.lastError ?? null,
+    lastErrorAt: transition.lastErrorAt ?? null,
+    activatedAt: transition.activatedAt ?? null,
+  };
+}
+
+async function latestSsoTransition(db: DbRef, organizationId: string) {
+  const rows = await listAll(
+    db.table<OrganizationSsoTransition>('organization_sso_transitions')
+      .where('organizationId', '==', organizationId),
+    { maxItems: 1_000, pageSize: 100, label: 'Organization SSO transitions' },
+  );
+  return rows
+    .slice()
+    .sort((left, right) => String(right.createdAt ?? '').localeCompare(String(left.createdAt ?? '')))[0]
+    ?? null;
+}
+
+function assertSsoEpochAuthorized(
+  organization: Organization,
+  member: OrganizationMember,
+  controls: OrganizationEnterpriseControls,
+  verifiedDomains: Set<string>,
+) {
+  const config = requiredSsoConfig(controls.ssoConfig);
+  if (!config || !memberMatchesRequiredSso(config, member, verifiedDomains)) return;
+  const effectiveEpoch = ssoEpoch(
+    organization.ssoEnforcementEpoch,
+    'Organization SSO enforcement epoch',
+  );
+  if (
+    effectiveEpoch > 0
+    && ssoEpoch(member.ssoEnforcementEpoch, 'Organization member SSO enforcement epoch')
+      === effectiveEpoch
+  ) return;
+  throw Object.assign(new Error(SSO_REQUIRED_MESSAGE), { status: 403 });
+}
+
+async function mapWithConcurrency<T, R>(
+  values: T[],
+  concurrency: number,
+  worker: (value: T) => Promise<R>,
+) {
+  const output = new Array<R>(values.length);
+  let cursor = 0;
+  const lanes = Array.from({ length: Math.min(concurrency, values.length) }, async () => {
+    while (cursor < values.length) {
+      const index = cursor;
+      cursor += 1;
+      output[index] = await worker(values[index]);
+    }
+  });
+  await Promise.all(lanes);
+  return output;
+}
+
+async function createOrReadSsoReceipt(
+  db: DbRef,
+  transition: OrganizationSsoTransition,
+  member: OrganizationMember,
+) {
+  const id = await deterministicUuid(`${transition.id}|member|${member.id}`);
+  let existing = await getExisting(
+    db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts'),
+    id,
+  );
+  let created = false;
+  if (!existing) {
+    const now = nowIso();
+    try {
+      await db.transact([
+        {
+          table: 'organization_sso_revocation_receipts',
+          op: 'expect',
+          id,
+          exists: false,
+        },
+        {
+          table: 'organization_sso_revocation_receipts',
+          op: 'insert',
+          data: {
+            id,
+            organizationId: transition.organizationId,
+            transitionId: transition.id,
+            organizationMemberId: member.id,
+            userId: member.userId,
+            scanGeneration: transition.scanGeneration,
+            status: 'pending',
+            attemptCount: 0,
+            lastAttemptAt: null,
+            lastError: null,
+            completedAt: null,
+            createdAt: now,
+            updatedAt: now,
+          },
+        },
+      ]);
+      created = true;
+    } catch (error) {
+      if (!isTransactionConflictError(error)) throw error;
+    }
+    existing = await getExisting(
+      db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts'),
+      id,
+    );
+  }
+  if (
+    !existing
+    || existing.organizationId !== transition.organizationId
+    || existing.transitionId !== transition.id
+    || existing.organizationMemberId !== member.id
+    || existing.userId !== member.userId
+  ) {
+    throw Object.assign(new Error('Organization SSO revocation receipt is inconsistent.'), { status: 409 });
+  }
+  return { receipt: existing, created };
+}
+
+async function revokeMemberForSsoTransition(
+  db: DbRef,
+  authAdmin: AuthAdminRef,
+  transition: OrganizationSsoTransition,
+  member: OrganizationMember,
+) {
+  const initialReceipt = await createOrReadSsoReceipt(db, transition, member);
+  let receipt = initialReceipt.receipt;
+  const { created } = initialReceipt;
+  if (
+    receipt.status === 'complete'
+    && ssoEpoch(member.ssoEnforcementEpoch, 'Organization member SSO enforcement epoch')
+      === transition.desiredEpoch
+  ) {
+    return { created, incomplete: false, error: null as string | null };
+  }
+  const attemptedAt = nowIso();
+  const attemptCount = Math.max(0, Number(receipt.attemptCount) || 0) + 1;
+  try {
+    await db.transact([
+      {
+        table: 'organization_sso_revocation_receipts',
+        op: 'expect',
+        id: receipt.id,
+        where: [
+          ['transitionId', '==', transition.id],
+          ['organizationMemberId', '==', member.id],
+          ['userId', '==', member.userId],
+          ['status', '==', receipt.status],
+          ['attemptCount', '==', receipt.attemptCount],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_sso_revocation_receipts',
+        op: 'update',
+        id: receipt.id,
+        data: {
+          status: 'pending',
+          scanGeneration: transition.scanGeneration,
+          attemptCount,
+          lastAttemptAt: attemptedAt,
+          lastError: null,
+          updatedAt: attemptedAt,
+        },
+      },
+    ]);
+  } catch (error) {
+    if (!isTransactionConflictError(error)) throw error;
+    receipt = await getExisting(
+      db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts'),
+      receipt.id,
+    ) ?? receipt;
+    if (receipt.status === 'complete') {
+      return { created, incomplete: false, error: null as string | null };
+    }
+    return { created, incomplete: true, error: 'The revocation receipt changed concurrently.' };
+  }
+
+  try {
+    await authAdmin.revokeAllSessions!(member.userId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message.slice(0, 500) : 'Session revocation failed.';
+    await db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts')
+      .update(receipt.id, { lastError: message, updatedAt: nowIso() });
+    return { created, incomplete: true, error: message };
+  }
+
+  const completedAt = nowIso();
+  try {
+    await db.transact([
+      {
+        table: 'organization_sso_revocation_receipts',
+        op: 'expect',
+        id: receipt.id,
+        where: [
+          ['transitionId', '==', transition.id],
+          ['status', '==', 'pending'],
+          ['attemptCount', '==', attemptCount],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_members',
+        op: 'expect',
+        id: member.id,
+        where: [
+          ['organizationId', '==', transition.organizationId],
+          ['userId', '==', member.userId],
+          ['role', '==', member.role],
+          ['status', '==', member.status ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_members',
+        op: 'update',
+        id: member.id,
+        data: { ssoEnforcementEpoch: transition.desiredEpoch, updatedAt: completedAt },
+      },
+      {
+        table: 'organization_sso_revocation_receipts',
+        op: 'update',
+        id: receipt.id,
+        data: {
+          status: 'complete',
+          scanGeneration: transition.scanGeneration,
+          lastError: null,
+          completedAt,
+          updatedAt: completedAt,
+        },
+      },
+    ]);
+    return { created, incomplete: false, error: null as string | null };
+  } catch (error) {
+    if (!isTransactionConflictError(error)) throw error;
+    const current = await getExisting(
+      db.table<OrganizationMember>('organization_members'),
+      member.id,
+    );
+    if (
+      !current
+      || current.organizationId !== transition.organizationId
+      || (current.status ?? 'active') !== 'active'
+      || current.role === 'guest'
+      || current.userId !== member.userId
+    ) {
+      await db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts')
+        .update(receipt.id, {
+          status: 'superseded',
+          lastError: null,
+          completedAt,
+          updatedAt: completedAt,
+        });
+      return { created, incomplete: false, error: null as string | null };
+    }
+    const message = 'Organization membership changed while its SSO revocation settled.';
+    await db.table<OrganizationSsoRevocationReceipt>('organization_sso_revocation_receipts')
+      .update(receipt.id, { lastError: message, updatedAt: completedAt });
+    return { created, incomplete: true, error: message };
+  }
+}
+
+function assertMatchingSsoTransition(
+  transition: OrganizationSsoTransition,
+  organizationId: string,
+  actorId: string,
+  controls: OrganizationEnterpriseControls,
+  receipt: GovernanceMutationReceipt,
+  patch: Partial<OrganizationEnterpriseControls>,
+) {
+  if (
+    transition.organizationId !== organizationId
+    || transition.actorId !== actorId
+    || transition.controlsId !== controls.id
+    || transition.requestHash !== receipt.requestHash
+    || transition.mutationId !== receipt.mutationId
+    || !sameStableValue(transition.desiredPatch, patch)
+  ) {
+    throw Object.assign(
+      new Error('mutationId was already used with a different organization SSO transition.'),
+      { status: 409 },
+    );
+  }
+}
+
+async function createOrReadRequiredSsoTransition(
+  db: DbRef,
+  ctx: Awaited<ReturnType<typeof organizationAdminContext>>,
+  controls: OrganizationEnterpriseControls,
+  controlsVersion: ReturnType<typeof governanceControlsVersion>,
+  actorId: string,
+  receipt: GovernanceMutationReceipt,
+  patch: Partial<OrganizationEnterpriseControls>,
+  metadata: Record<string, unknown>,
+) {
+  const organizationId = ctx.organization.id;
+  const id = await deterministicUuid(`${receipt.id}|required-sso-transition`);
+  let transition = await getExisting(
+    db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+    id,
+  );
+  if (transition) {
+    assertMatchingSsoTransition(transition, organizationId, actorId, controls, receipt, patch);
+    return transition;
+  }
+  const otherPending = (await listAll(
+    db.table<OrganizationSsoTransition>('organization_sso_transitions')
+      .where('pendingOrganizationId', '==', organizationId),
+    { maxItems: 2, pageSize: 2, label: 'Pending organization SSO transition' },
+  )).find((candidate) => candidate.status === 'pending');
+  if (otherPending) {
+    throw Object.assign(
+      new Error('Another required SSO transition is already pending for this organization.'),
+      { status: 409 },
+    );
+  }
+
+  const organizationFence = governanceOrganizationFence(ctx.organization);
+  const actorGuard = governanceActorGuard(ctx, organizationId, actorId);
+  const previousEpochWasMissing = ctx.organization.ssoEnforcementEpoch == null;
+  const previousEpoch = ssoEpoch(
+    ctx.organization.ssoEnforcementEpoch,
+    'Organization SSO enforcement epoch',
+  );
+  const now = nowIso();
+  const data: OrganizationSsoTransition = {
+    id,
+    organizationId,
+    pendingOrganizationId: organizationId,
+    actorId,
+    controlsId: controls.id,
+    controlsVersion: controlsVersion.value,
+    controlsVersionWasMissing: controls.version == null,
+    requestHash: receipt.requestHash,
+    mutationId: receipt.mutationId,
+    desiredPatch: stableJsonValue(patch) as Partial<OrganizationEnterpriseControls>,
+    desiredMetadata: stableJsonValue(metadata) as Record<string, unknown>,
+    previousEpoch,
+    previousEpochWasMissing,
+    desiredEpoch: previousEpoch + 1,
+    status: 'pending',
+    version: 0,
+    scanGeneration: 1,
+    scanPage: 1,
+    passDiscovered: 0,
+    passIncomplete: 0,
+    stablePasses: 0,
+    leaseToken: null,
+    leaseExpiresAt: null,
+    lastError: null,
+    lastErrorAt: null,
+    activatedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  try {
+    await db.transact([
+      organizationFence.guard,
+      actorGuard,
+      {
+        table: 'organization_enterprise_controls',
+        op: 'expect',
+        id: controls.id,
+        where: [
+          ['organizationId', '==', organizationId],
+          ['version', '==', controlsVersion.expected],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_sso_transitions',
+        op: 'expect',
+        id,
+        exists: false,
+      },
+      {
+        table: 'organization_sso_transitions',
+        op: 'insert',
+        data: data as unknown as Record<string, unknown>,
+      },
+    ]);
+  } catch (error) {
+    if (!isTransactionConflictError(error)) throw error;
+  }
+  transition = await getExisting(
+    db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+    id,
+  );
+  if (!transition) {
+    const pending = (await listAll(
+      db.table<OrganizationSsoTransition>('organization_sso_transitions')
+        .where('pendingOrganizationId', '==', organizationId),
+      { maxItems: 2, pageSize: 2, label: 'Pending organization SSO transition' },
+    )).find((candidate) => candidate.status === 'pending');
+    if (pending) {
+      throw Object.assign(
+        new Error('Another required SSO transition is already pending for this organization.'),
+        { status: 409 },
+      );
+    }
+    await throwGovernanceTransactionConflict(
+      db,
+      Object.assign(new Error('Organization SSO transition changed concurrently.'), { status: 409 }),
+      actorGuard,
+      'Organization security admin access required.',
+      'Organization enterprise controls changed concurrently. Retry the request.',
+    );
+  }
+  assertMatchingSsoTransition(transition!, organizationId, actorId, controls, receipt, patch);
+  return transition!;
+}
+
+async function claimSsoTransition(
+  db: DbRef,
+  transition: OrganizationSsoTransition,
+) {
+  if (transition.status !== 'pending') return transition;
+  const leaseExpiry = transition.leaseExpiresAt ? Date.parse(transition.leaseExpiresAt) : 0;
+  if (Number.isFinite(leaseExpiry) && leaseExpiry > Date.now()) return null;
+  const leaseToken = crypto.randomUUID();
+  const leaseExpiresAt = new Date(Date.now() + SSO_TRANSITION_LEASE_MS).toISOString();
+  const now = nowIso();
+  try {
+    await db.transact([
+      {
+        table: 'organization_sso_transitions',
+        op: 'expect',
+        id: transition.id,
+        where: [
+          ['organizationId', '==', transition.organizationId],
+          ['status', '==', 'pending'],
+          ['version', '==', transition.version],
+          ['leaseToken', '==', transition.leaseToken ?? null],
+          ['leaseExpiresAt', '==', transition.leaseExpiresAt ?? null],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_sso_transitions',
+        op: 'update',
+        id: transition.id,
+        data: {
+          leaseToken,
+          leaseExpiresAt,
+          version: transition.version + 1,
+          updatedAt: now,
+        },
+      },
+    ]);
+    return {
+      ...transition,
+      leaseToken,
+      leaseExpiresAt,
+      version: transition.version + 1,
+      updatedAt: now,
+    };
+  } catch (error) {
+    if (!isTransactionConflictError(error)) throw error;
+    return null;
+  }
+}
+
+async function checkpointSsoTransition(
+  db: DbRef,
+  transition: OrganizationSsoTransition,
+  patch: Partial<OrganizationSsoTransition>,
+  releaseLease = false,
+) {
+  const now = nowIso();
+  const next = {
+    ...patch,
+    ...(releaseLease
+      ? { leaseToken: null, leaseExpiresAt: null }
+      : { leaseExpiresAt: new Date(Date.now() + SSO_TRANSITION_LEASE_MS).toISOString() }),
+    version: transition.version + 1,
+    updatedAt: now,
+  };
+  await db.transact([
+    {
+      table: 'organization_sso_transitions',
+      op: 'expect',
+      id: transition.id,
+      where: [
+        ['organizationId', '==', transition.organizationId],
+        ['status', '==', 'pending'],
+        ['version', '==', transition.version],
+        ['leaseToken', '==', transition.leaseToken ?? null],
+      ],
+      exists: true,
+    },
+    {
+      table: 'organization_sso_transitions',
+      op: 'update',
+      id: transition.id,
+      data: next as Record<string, unknown>,
+    },
+  ]);
+  return { ...transition, ...next } as OrganizationSsoTransition;
+}
+
+async function markSsoTransitionSuperseded(
+  db: DbRef,
+  transition: OrganizationSsoTransition,
+  message: string,
+) {
+  const now = nowIso();
+  try {
+    await db.transact([
+      {
+        table: 'organization_sso_transitions',
+        op: 'expect',
+        id: transition.id,
+        where: [
+          ['organizationId', '==', transition.organizationId],
+          ['status', '==', 'pending'],
+          ['version', '==', transition.version],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_sso_transitions',
+        op: 'update',
+        id: transition.id,
+        data: {
+          pendingOrganizationId: null,
+          status: 'superseded',
+          version: transition.version + 1,
+          leaseToken: null,
+          leaseExpiresAt: null,
+          lastError: message,
+          lastErrorAt: now,
+          updatedAt: now,
+        },
+      },
+    ]);
+  } catch {
+    // A competing finalizer owns the terminal state. Its row is re-read by
+    // the caller; never overwrite it with an unguarded diagnostic update.
+  }
+}
+
+async function activateRequiredSsoTransition(
+  db: DbRef,
+  body: Record<string, unknown>,
+  transitionInput: OrganizationSsoTransition,
+  receipt: GovernanceMutationReceipt,
+) {
+  let transition = transitionInput;
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const existingAudit = await getExisting(
+      db.table<OrganizationAuditEvent>('organization_audit_events'),
+      receipt.id,
+    );
+    if (existingAudit) return transition;
+    const ctx = await organizationAdminContext(db, transition.organizationId, transition.actorId);
+    assertOrganizationSecurityAdmin(ctx.actorRole);
+    const controls = await enterpriseControlsForOrganization(db, transition.organizationId);
+    const currentControlsVersion = governanceControlsVersion(controls);
+    const expectedControlsVersion = transition.controlsVersionWasMissing
+      ? null
+      : transition.controlsVersion;
+    if (
+      controls.id !== transition.controlsId
+      || currentControlsVersion.expected !== expectedControlsVersion
+    ) {
+      const message = 'Organization enterprise controls changed before required SSO activation.';
+      await markSsoTransitionSuperseded(db, transition, message);
+      throw Object.assign(new Error(`${message} Retry the request.`), { status: 409 });
+    }
+    const currentEpoch = ssoEpoch(
+      ctx.organization.ssoEnforcementEpoch,
+      'Organization SSO enforcement epoch',
+    );
+    const expectedEpoch = transition.previousEpochWasMissing ? null : transition.previousEpoch;
+    if (
+      currentEpoch !== transition.previousEpoch
+      || (ctx.organization.ssoEnforcementEpoch ?? null) !== expectedEpoch
+    ) {
+      const message = 'Organization SSO enforcement epoch changed before activation.';
+      await markSsoTransitionSuperseded(db, transition, message);
+      throw Object.assign(new Error(`${message} Retry the request.`), { status: 409 });
+    }
+    const organizationFence = governanceOrganizationFence(ctx.organization);
+    const organizationGuard = {
+      ...organizationFence.guard,
+      where: [
+        ...(organizationFence.guard.where ?? []),
+        ['ssoEnforcementEpoch', '==', expectedEpoch],
+      ],
+    } satisfies TransactOperation;
+    const organizationWrite = {
+      ...organizationFence.write,
+      data: {
+        ...organizationFence.write.data,
+        ssoEnforcementEpoch: transition.desiredEpoch,
+      },
+    } satisfies TransactOperation;
+    const actorGuard = governanceActorGuard(
+      ctx,
+      transition.organizationId,
+      transition.actorId,
+    );
+    const policyVersion = await governancePolicyVersionPlan(db, transition.organizationId);
+    const now = nowIso();
+    try {
+      await db.transact([
+        organizationGuard,
+        organizationWrite,
+        actorGuard,
+        {
+          table: 'organization_enterprise_controls',
+          op: 'expect',
+          id: controls.id,
+          where: [
+            ['organizationId', '==', transition.organizationId],
+            ['version', '==', expectedControlsVersion],
+          ],
+          exists: true,
+        },
+        {
+          table: 'organization_sso_transitions',
+          op: 'expect',
+          id: transition.id,
+          where: [
+            ['organizationId', '==', transition.organizationId],
+            ['status', '==', 'pending'],
+            ['version', '==', transition.version],
+            ['leaseToken', '==', transition.leaseToken ?? null],
+            ['requestHash', '==', transition.requestHash],
+          ],
+          exists: true,
+        },
+        policyVersion.guard,
+        {
+          table: 'organization_enterprise_controls',
+          op: 'update',
+          id: controls.id,
+          data: {
+            ...transition.desiredPatch,
+            version: transition.controlsVersion + 1,
+            updatedBy: transition.actorId,
+            updatedAt: now,
+          },
+        },
+        policyVersion.write,
+        {
+          table: 'organization_sso_transitions',
+          op: 'update',
+          id: transition.id,
+          data: {
+            pendingOrganizationId: null,
+            status: 'active',
+            version: transition.version + 1,
+            leaseToken: null,
+            leaseExpiresAt: null,
+            lastError: null,
+            lastErrorAt: null,
+            activatedAt: now,
+            updatedAt: now,
+          },
+        },
+        {
+          table: 'organization_audit_events',
+          op: 'insert',
+          data: {
+            id: receipt.id,
+            organizationId: transition.organizationId,
+            workspaceId: null,
+            actorId: transition.actorId,
+            action: 'organization_enterprise_controls.update',
+            targetType: 'organization_enterprise_controls',
+            targetId: controls.id,
+            metadata: governanceReceiptMetadata(receipt, {
+              ...transition.desiredMetadata,
+              ssoTransitionId: transition.id,
+              ssoEnforcementEpoch: transition.desiredEpoch,
+            }),
+            occurredAt: now,
+          },
+        },
+      ]);
+      return {
+        ...transition,
+        pendingOrganizationId: null,
+        status: 'active',
+        version: transition.version + 1,
+        leaseToken: null,
+        leaseExpiresAt: null,
+        activatedAt: now,
+        updatedAt: now,
+      } as OrganizationSsoTransition;
+    } catch (error) {
+      if (!isTransactionConflictError(error)) throw error;
+      const recovered = await governanceMutationReceipt(
+        db,
+        body,
+        transition.organizationId,
+        transition.actorId,
+        'organization_enterprise_controls.update',
+        stableJsonValue(transition.desiredPatch),
+      );
+      if (recovered.existing) {
+        return await getExisting(
+          db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+          transition.id,
+        ) ?? transition;
+      }
+      if (!(await governanceActorGuardIsCurrent(db, actorGuard))) {
+        throw Object.assign(new Error('Organization security admin access required.'), { status: 403 });
+      }
+      const latest = await getExisting(
+        db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+        transition.id,
+      );
+      if (!latest) throw Object.assign(new Error('Organization SSO transition was removed.'), { status: 409 });
+      if (latest.status === 'active') return latest;
+      if (latest.status !== 'pending') {
+        throw Object.assign(new Error('Organization SSO transition is no longer pending.'), { status: 409 });
+      }
+      transition = latest;
+    }
+  }
+  throw Object.assign(
+    new Error('Organization SSO activation changed concurrently. Retry the request.'),
+    { status: 409 },
+  );
+}
+
+async function drainRequiredSsoTransition(
+  db: DbRef,
+  authAdmin: AuthAdminRef,
+  body: Record<string, unknown>,
+  transitionInput: OrganizationSsoTransition,
+  receipt: GovernanceMutationReceipt,
+) {
+  const claimed = await claimSsoTransition(db, transitionInput);
+  if (!claimed) {
+    return await getExisting(
+      db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+      transitionInput.id,
+    ) ?? transitionInput;
+  }
+  let transition = claimed;
+  const desiredConfig = requiredSsoConfig(transition.desiredPatch.ssoConfig);
+  if (!desiredConfig) {
+    throw Object.assign(new Error('Required SSO transition has no required SSO policy.'), { status: 409 });
+  }
+  try {
+    for (;;) {
+      const verifiedDomains = await verifiedSsoDomains(db, transition.organizationId);
+      const page = await db.table<OrganizationMember>('organization_members')
+        .where('organizationId', '==', transition.organizationId)
+        .page(transition.scanPage)
+        .limit(SSO_REVOCATION_PAGE_SIZE)
+        .getList();
+      const members = (page.items ?? []).filter((member) => (
+        memberMatchesRequiredSso(desiredConfig, member, verifiedDomains)
+      ));
+      const results = await mapWithConcurrency(
+        members,
+        SSO_REVOCATION_CONCURRENCY,
+        (member) => revokeMemberForSsoTransition(db, authAdmin, transition, member),
+      );
+      const discovered = transition.passDiscovered
+        + results.filter((result) => result.created).length;
+      const incomplete = transition.passIncomplete
+        + results.filter((result) => result.incomplete).length;
+      const lastError = results.find((result) => result.error)?.error ?? null;
+
+      if (page.hasMore === true) {
+        transition = await checkpointSsoTransition(db, transition, {
+          scanPage: transition.scanPage + 1,
+          passDiscovered: discovered,
+          passIncomplete: incomplete,
+          ...(lastError ? { lastError, lastErrorAt: nowIso() } : {}),
+        });
+        continue;
+      }
+
+      if (incomplete > 0) {
+        return await checkpointSsoTransition(db, transition, {
+          scanGeneration: transition.scanGeneration + 1,
+          scanPage: 1,
+          passDiscovered: 0,
+          passIncomplete: 0,
+          stablePasses: 0,
+          lastError: lastError ?? `${incomplete} member session revocation(s) remain pending.`,
+          lastErrorAt: nowIso(),
+        }, true);
+      }
+
+      if (discovered > 0) {
+        transition = await checkpointSsoTransition(db, transition, {
+          scanGeneration: transition.scanGeneration + 1,
+          scanPage: 1,
+          passDiscovered: 0,
+          passIncomplete: 0,
+          stablePasses: 0,
+          lastError: null,
+          lastErrorAt: null,
+        });
+        continue;
+      }
+
+      transition = await checkpointSsoTransition(db, transition, {
+        stablePasses: transition.stablePasses + 1,
+        passDiscovered: 0,
+        passIncomplete: 0,
+        lastError: null,
+        lastErrorAt: null,
+      });
+      return activateRequiredSsoTransition(db, body, transition, receipt);
+    }
+  } catch (error) {
+    if (isTransactionConflictError(error)) {
+      return await getExisting(
+        db.table<OrganizationSsoTransition>('organization_sso_transitions'),
+        transition.id,
+      ) ?? transition;
+    }
+    try {
+      await checkpointSsoTransition(db, transition, {
+        lastError: error instanceof Error ? error.message.slice(0, 500) : 'SSO transition failed.',
+        lastErrorAt: nowIso(),
+      }, true);
+    } catch {
+      // The durable cursor/receipts already contain the last settled boundary.
+    }
+    throw error;
+  }
+}
+
+async function mutateOrganizationMcpGovernance(
+  db: DbRef,
+  body: Record<string, unknown>,
+  actorId: string,
+  operation: 'set_enabled' | 'approve' | 'remove' | 'rename',
+) {
+  const organizationId = requireString(body.organizationId, 'organizationId');
+  const workspaceId = requireString(body.workspaceId, 'workspaceId');
+  let ctx = await organizationAdminContext(db, organizationId, actorId);
+  assertOrganizationSecurityAdmin(ctx.actorRole);
+  const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
+  if (!workspace || workspace.organizationId !== organizationId) {
+    throw new Error('Workspace does not belong to this organization.');
+  }
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    if (attempt > 0) {
+      ctx = await organizationAdminContext(db, organizationId, actorId);
+      assertOrganizationSecurityAdmin(ctx.actorRole);
+    }
+    const controls = await enterpriseControlsForOrganization(db, organizationId);
+    const currentPolicy = controls.mcpGovernancePolicy ?? { workspacePolicies: [] };
+    assertValidMcpGovernancePolicy(currentPolicy);
+    const workspacePolicies = organizationMcpWorkspacePolicies(controls);
+    const currentWorkspacePolicy = workspacePolicies.find((policy) => policy.workspaceId === workspaceId);
+    let enabled = currentWorkspacePolicy?.enabled === true;
+    let approvedClients = currentWorkspacePolicy?.approvedClients ?? [];
+    let clientId: string | null = null;
+    let clientName: string | null = null;
+    let auditAction = '';
+    let idempotentNoop = false;
+    const now = nowIso();
+
+    if (operation === 'set_enabled') {
+      const nextEnabled = parseOptionalBoolean(body.enabled, 'enabled');
+      if (nextEnabled === undefined) throw new Error('enabled must be a boolean.');
+      idempotentNoop = enabled === nextEnabled;
+      enabled = nextEnabled;
+      auditAction = enabled
+        ? 'organization_mcp_governance.enable'
+        : 'organization_mcp_governance.disable';
+    } else {
+      clientId = requiredMcpClientId(body);
+      const index = approvedClients.findIndex((client) => client.clientId === clientId);
+      if (operation === 'approve') {
+        clientName = boundedText(body.name ?? body.clientName, 'name', 200) ?? clientId;
+        if (index >= 0) {
+          if (approvedClients[index].name !== clientName) {
+            throw new Error('MCP client is already approved. Rename it explicitly.');
+          }
+          idempotentNoop = true;
+        } else {
+          approvedClients = [...approvedClients, {
+            clientId,
+            name: clientName,
+            approvedAt: now,
+            approvedBy: actorId,
+            updatedAt: now,
+            updatedBy: actorId,
+          }];
+        }
+        auditAction = 'organization_mcp_governance.approve';
+      } else if (operation === 'remove') {
+        if (index < 0) {
+          idempotentNoop = true;
+        } else {
+          clientName = approvedClients[index].name;
+          approvedClients = approvedClients.filter((client) => client.clientId !== clientId);
+        }
+        auditAction = 'organization_mcp_governance.remove';
+      } else {
+        if (index < 0) throw new Error('Approved MCP client was not found.');
+        clientName = boundedText(body.name ?? body.clientName, 'name', 200);
+        if (!clientName) throw new Error('name is required.');
+        if (approvedClients[index].name === clientName) {
+          idempotentNoop = true;
+        } else {
+          approvedClients = approvedClients.map((client) => client.clientId === clientId
+            ? { ...client, name: clientName!, updatedAt: now, updatedBy: actorId }
+            : client);
+        }
+        auditAction = 'organization_mcp_governance.rename';
+      }
+    }
+
+    const controlsVersion = governanceControlsVersion(controls);
+    const organizationFence = governanceOrganizationFence(ctx.organization);
+    const actorGuard = governanceActorGuard(ctx, organizationId, actorId);
+    const controlsGuard: TransactOperation = {
+      table: 'organization_enterprise_controls',
+      op: 'expect',
+      id: controls.id,
+      where: [
+        ['organizationId', '==', organizationId],
+        ['version', '==', controlsVersion.expected],
+      ],
+      exists: true,
+    };
+
+    if (idempotentNoop) {
+      try {
+        await db.transact([organizationFence.guard, actorGuard, controlsGuard]);
+        return organizationDirectory(db, organizationId, actorId);
+      } catch (error) {
+        if (!isTransactionConflictError(error)) throw error;
+        continue;
+      }
+    }
+
+    const nextWorkspacePolicy: OrganizationMcpWorkspacePolicy = {
+      ...(currentWorkspacePolicy ?? {}),
+      workspaceId,
+      enabled,
+      approvedClients,
+      updatedAt: now,
+      updatedBy: actorId,
+    };
+    const nextWorkspacePolicies = currentWorkspacePolicy
+      ? workspacePolicies.map((policy) => policy.workspaceId === workspaceId ? nextWorkspacePolicy : policy)
+      : [...workspacePolicies, nextWorkspacePolicy];
+    const mcpGovernancePolicy = { ...currentPolicy, workspacePolicies: nextWorkspacePolicies };
+    const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+    const auditId = crypto.randomUUID();
+    try {
+      await db.transact([
+        organizationFence.guard,
+        organizationFence.write,
+        actorGuard,
+        controlsGuard,
+        policyVersion.guard,
+        {
+          table: 'organization_enterprise_controls',
+          op: 'update',
+          id: controls.id,
+          data: {
+            mcpGovernancePolicy,
+            ...auditRetentionScalarPatch(controls.auditPolicy),
+            version: controlsVersion.value + 1,
+            updatedBy: actorId,
+            updatedAt: now,
+          },
+        },
+        policyVersion.write,
+        {
+          table: 'organization_audit_events',
+          op: 'insert',
+          data: {
+            id: auditId,
+            organizationId,
+            workspaceId,
+            actorId,
+            action: auditAction,
+            targetType: clientId ? 'mcp_oauth_client' : 'workspace',
+            targetId: clientId ?? workspaceId,
+            metadata: {
+              workspaceId,
+              enabled,
+              clientId,
+              clientName,
+              approvedClientCount: approvedClients.length,
+            },
+            occurredAt: now,
+          },
+        },
+      ]);
+      return organizationDirectory(db, organizationId, actorId);
+    } catch (error) {
+      if (!isTransactionConflictError(error)) throw error;
+    }
+  }
+
+  throw Object.assign(
+    new Error('Organization MCP governance changed concurrently. Retry the request.'),
+    { status: 409 },
+  );
+}
+
+async function updateOrganizationEnterpriseControls(
+  db: DbRef,
+  authAdmin: AuthAdminRef | undefined,
+  env: Record<string, unknown> | undefined,
+  body: Record<string, unknown>,
+  actorId: string,
+) {
   const organizationId = requireString(body.organizationId, 'organizationId');
   const ctx = await organizationAdminContext(db, organizationId, actorId);
   const controls = await enterpriseControlsForOrganization(db, organizationId);
   const patch: Partial<OrganizationEnterpriseControls> = {};
   const metadata: Record<string, unknown> = {};
+  let requiresSecurityAdmin = false;
+  let requiresBillingAdmin = false;
 
   if ('ssoConfig' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
     patch.ssoConfig = sanitizeSsoConfig(body.ssoConfig);
+    assertSsoRuntimeConfigured(patch.ssoConfig, env);
     metadata.ssoConfig = patch.ssoConfig;
   }
   if ('scimConfig' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
     patch.scimConfig = sanitizeScimConfig(body.scimConfig);
     metadata.scimConfig = patch.scimConfig;
   }
   if ('auditPolicy' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
     patch.auditPolicy = sanitizeAuditPolicy(body.auditPolicy);
     metadata.auditPolicy = patch.auditPolicy;
   }
   if ('dataResidencyPolicy' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
-    patch.dataResidencyPolicy = sanitizeDataResidencyPolicy(body.dataResidencyPolicy);
+    patch.dataResidencyPolicy = sanitizeDataResidencyPolicy(body.dataResidencyPolicy, env);
     metadata.dataResidencyPolicy = patch.dataResidencyPolicy;
   }
   if ('dlpPolicy' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
     patch.dlpPolicy = sanitizeDlpPolicy(body.dlpPolicy);
     metadata.dlpPolicy = patch.dlpPolicy;
   }
   if ('legalPolicy' in body) {
+    requiresSecurityAdmin = true;
     assertOrganizationSecurityAdmin(ctx.actorRole);
     patch.legalPolicy = sanitizeLegalPolicy(body.legalPolicy);
     metadata.legalPolicy = patch.legalPolicy;
   }
   if ('billingProfile' in body) {
+    requiresBillingAdmin = true;
     assertOrganizationBillingAdmin(ctx.actorRole);
     patch.billingProfile = sanitizeBillingProfile(body.billingProfile);
     metadata.billingProfile = patch.billingProfile;
   }
 
   if (!Object.keys(patch).length) return organizationDirectory(db, organizationId, actorId);
+  // Normalize the destructive-retention authority into bounded scalars on
+  // every controls write. This also safely backfills a legacy row when an
+  // administrator next changes any controls surface; malformed legacy data is
+  // marked invalid so maintenance fails closed without loading the JSON.
+  Object.assign(patch, auditRetentionScalarPatch(patch.auditPolicy ?? controls.auditPolicy));
+  const nextSsoConfig = patch.ssoConfig ?? controls.ssoConfig ?? {};
+  const shouldRevokeSessions = 'ssoConfig' in body
+    && nextSsoConfig.enabled === true
+    && nextSsoConfig.enforcement !== 'optional'
+    && !sameStableValue(controls.ssoConfig ?? null, nextSsoConfig);
+  if (shouldRevokeSessions && !authAdmin?.revokeAllSessions) {
+    throw new Error('Session revocation is required before enforcing organization SSO.');
+  }
+  const controlsVersion = governanceControlsVersion(controls);
+  const organizationFence = governanceOrganizationFence(ctx.organization);
+  const actorGuard = governanceActorGuard(ctx, organizationId, actorId);
+  const controlsGuard: TransactOperation = {
+    table: 'organization_enterprise_controls',
+    op: 'expect',
+    id: controls.id,
+    where: [
+      ['organizationId', '==', organizationId],
+      ['version', '==', controlsVersion.expected],
+    ],
+    exists: true,
+  };
+  const receiptRequest = stableJsonValue(patch);
+  const receipt = await governanceMutationReceipt(
+    db,
+    body,
+    organizationId,
+    actorId,
+    'organization_enterprise_controls.update',
+    receiptRequest,
+  );
+  if (receipt.existing) return organizationDirectory(db, organizationId, actorId);
+  const exactNoop = Object.entries(patch).every(([key, value]) => (
+    sameStableValue(controls[key as keyof OrganizationEnterpriseControls], value)
+  ));
+  if (exactNoop) {
+    try {
+      await db.transact([organizationFence.guard, actorGuard, controlsGuard]);
+      return organizationDirectory(db, organizationId, actorId);
+    } catch (error) {
+      const actorAccessMessage = requiresSecurityAdmin && !requiresBillingAdmin
+        ? 'Organization security admin access required.'
+        : requiresBillingAdmin && !requiresSecurityAdmin
+          ? 'Organization billing admin access required.'
+          : 'Organization admin access required.';
+      await throwGovernanceTransactionConflict(
+        db,
+        error,
+        actorGuard,
+        actorAccessMessage,
+        'Organization enterprise controls changed concurrently. Retry the request.',
+      );
+    }
+  }
+  if (shouldRevokeSessions) {
+    const transition = await createOrReadRequiredSsoTransition(
+      db,
+      ctx,
+      controls,
+      controlsVersion,
+      actorId,
+      receipt,
+      patch,
+      metadata,
+    );
+    if (transition.status === 'pending') {
+      await drainRequiredSsoTransition(db, authAdmin!, body, transition, receipt);
+    }
+    return organizationDirectory(db, organizationId, actorId);
+  }
   const now = nowIso();
   patch.updatedBy = actorId;
   patch.updatedAt = now;
-  await db.table<OrganizationEnterpriseControls>('organization_enterprise_controls').update(controls.id, patch);
-  await recordOrganizationAudit(db, {
-    organizationId,
-    workspaceId: null,
-    actorId,
-    action: 'organization_enterprise_controls.update',
-    targetType: 'organization_enterprise_controls',
-    targetId: controls.id,
-    metadata,
-    occurredAt: now,
-  });
+  const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+  try {
+    await db.transact([
+      organizationFence.guard,
+      organizationFence.write,
+      actorGuard,
+      controlsGuard,
+      policyVersion.guard,
+      {
+        table: 'organization_enterprise_controls',
+        op: 'update',
+        id: controls.id,
+        data: { ...patch, version: controlsVersion.value + 1 },
+      },
+      policyVersion.write,
+      {
+        table: 'organization_audit_events',
+        op: 'insert',
+        data: {
+          id: receipt.id,
+          organizationId,
+          workspaceId: null,
+          actorId,
+          action: 'organization_enterprise_controls.update',
+          targetType: 'organization_enterprise_controls',
+          targetId: controls.id,
+          metadata: governanceReceiptMetadata(receipt, metadata),
+          occurredAt: now,
+        },
+      },
+    ]);
+  } catch (error) {
+    if (isTransactionConflictError(error)) {
+      const recovered = await governanceMutationReceipt(
+        db,
+        body,
+        organizationId,
+        actorId,
+        'organization_enterprise_controls.update',
+        receiptRequest,
+      );
+      if (recovered.existing) return organizationDirectory(db, organizationId, actorId);
+    }
+    const actorAccessMessage = requiresSecurityAdmin && !requiresBillingAdmin
+      ? 'Organization security admin access required.'
+      : requiresBillingAdmin && !requiresSecurityAdmin
+        ? 'Organization billing admin access required.'
+        : 'Organization admin access required.';
+    await throwGovernanceTransactionConflict(
+      db,
+      error,
+      actorGuard,
+      actorAccessMessage,
+      'Organization enterprise controls changed concurrently. Retry the request.',
+    );
+  }
   return organizationDirectory(db, organizationId, actorId);
 }
 
@@ -2549,27 +4292,111 @@ async function createOrganizationLegalHold(db: DbRef, body: Record<string, unkno
   if ((controls.legalPolicy?.requireReason ?? true) && !reason) {
     throw new Error('Legal hold reason is required.');
   }
-  const now = nowIso();
-  const hold = await db.table<OrganizationLegalHold>('organization_legal_holds').insert({
+  const scope = sanitizeLegalHoldScope(body.scope);
+  const receiptRequest = { name, reason, scope };
+  const receipt = await governanceMutationReceipt(
+    db,
+    body,
     organizationId,
-    name,
-    status: 'active',
-    reason,
-    scope: sanitizeLegalHoldScope(body.scope),
-    createdBy: actorId,
-    createdAt: now,
-    updatedAt: now,
-  });
-  await recordOrganizationAudit(db, {
-    organizationId,
-    workspaceId: null,
     actorId,
-    action: 'organization_legal_hold.create',
-    targetType: 'organization_legal_hold',
-    targetId: hold.id,
-    metadata: { name: hold.name, scope: hold.scope },
-    occurredAt: now,
-  });
+    'organization_legal_hold.create',
+    receiptRequest,
+  );
+  const holdId = await deterministicUuid(`${receipt.id}|legal-hold`);
+  if (receipt.existing) {
+    const existing = await getExisting(
+      db.table<OrganizationLegalHold>('organization_legal_holds'),
+      holdId,
+    );
+    if (existing?.organizationId === organizationId) {
+      return organizationDirectory(db, organizationId, actorId);
+    }
+    throw Object.assign(new Error('Legal-hold mutation receipt is missing its target.'), { status: 409 });
+  }
+  const now = nowIso();
+  const organizationFence = governanceOrganizationFence(ctx.organization);
+  const actorGuard = governanceActorGuard(ctx, organizationId, actorId);
+  const controlsVersion = governanceControlsVersion(controls);
+  const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+  try {
+    await db.transact([
+      organizationFence.guard,
+      organizationFence.write,
+      actorGuard,
+      {
+        table: 'organization_enterprise_controls',
+        op: 'expect',
+        id: controls.id,
+        where: [
+          ['organizationId', '==', organizationId],
+          ['version', '==', controlsVersion.expected],
+        ],
+        exists: true,
+      },
+      {
+        table: 'organization_legal_holds',
+        op: 'expect',
+        id: holdId,
+        exists: false,
+      },
+      policyVersion.guard,
+      {
+        table: 'organization_legal_holds',
+        op: 'insert',
+        data: {
+          id: holdId,
+          organizationId,
+          name,
+          status: 'active',
+          reason,
+          scope,
+          createdBy: actorId,
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      policyVersion.write,
+      {
+        table: 'organization_audit_events',
+        op: 'insert',
+        data: {
+          id: receipt.id,
+          organizationId,
+          workspaceId: null,
+          actorId,
+          action: 'organization_legal_hold.create',
+          targetType: 'organization_legal_hold',
+          targetId: holdId,
+          metadata: governanceReceiptMetadata(receipt, { name, scope }),
+          occurredAt: now,
+        },
+      },
+    ]);
+  } catch (error) {
+    if (isTransactionConflictError(error)) {
+      const recovered = await governanceMutationReceipt(
+        db,
+        body,
+        organizationId,
+        actorId,
+        'organization_legal_hold.create',
+        receiptRequest,
+      );
+      const recoveredHold = recovered.existing
+        ? await getExisting(db.table<OrganizationLegalHold>('organization_legal_holds'), holdId)
+        : null;
+      if (recovered.existing && recoveredHold?.organizationId === organizationId) {
+        return organizationDirectory(db, organizationId, actorId);
+      }
+    }
+    await throwGovernanceTransactionConflict(
+      db,
+      error,
+      actorGuard,
+      'Organization security admin access required.',
+      'Organization legal policy changed concurrently. Retry the request.',
+    );
+  }
   return organizationDirectory(db, organizationId, actorId);
 }
 
@@ -2582,23 +4409,95 @@ async function releaseOrganizationLegalHold(db: DbRef, body: Record<string, unkn
   );
   const hold = findLegalHold(holds, body);
   if (!hold) throw new Error('Legal hold was not found.');
-  const now = nowIso();
-  await db.table<OrganizationLegalHold>('organization_legal_holds').update(hold.id, {
-    status: 'released',
-    releasedAt: now,
-    releasedBy: actorId,
-    updatedAt: now,
-  });
-  await recordOrganizationAudit(db, {
+  const receiptRequest = { legalHoldId: hold.id };
+  const receipt = await governanceMutationReceipt(
+    db,
+    body,
     organizationId,
-    workspaceId: null,
     actorId,
-    action: 'organization_legal_hold.release',
-    targetType: 'organization_legal_hold',
-    targetId: hold.id,
-    metadata: { name: hold.name },
-    occurredAt: now,
-  });
+    'organization_legal_hold.release',
+    receiptRequest,
+  );
+  if (receipt.existing && (hold.status ?? 'active') === 'released') {
+    return organizationDirectory(db, organizationId, actorId);
+  }
+  if ((hold.status ?? 'active') !== 'active') {
+    throw Object.assign(new Error('Legal hold is not active.'), { status: 409 });
+  }
+  const now = nowIso();
+  const organizationFence = governanceOrganizationFence(ctx.organization);
+  const actorGuard = governanceActorGuard(ctx, organizationId, actorId);
+  const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+  try {
+    await db.transact([
+      organizationFence.guard,
+      organizationFence.write,
+      actorGuard,
+      {
+        table: 'organization_legal_holds',
+        op: 'expect',
+        id: hold.id,
+        where: [
+          ['organizationId', '==', organizationId],
+          ['status', '==', hold.status ?? null],
+        ],
+        exists: true,
+      },
+      policyVersion.guard,
+      {
+        table: 'organization_legal_holds',
+        op: 'update',
+        id: hold.id,
+        data: {
+          status: 'released',
+          releasedAt: now,
+          releasedBy: actorId,
+          updatedAt: now,
+        },
+      },
+      policyVersion.write,
+      {
+        table: 'organization_audit_events',
+        op: 'insert',
+        data: {
+          id: receipt.id,
+          organizationId,
+          workspaceId: null,
+          actorId,
+          action: 'organization_legal_hold.release',
+          targetType: 'organization_legal_hold',
+          targetId: hold.id,
+          metadata: governanceReceiptMetadata(receipt, { name: hold.name }),
+          occurredAt: now,
+        },
+      },
+    ]);
+  } catch (error) {
+    if (isTransactionConflictError(error)) {
+      const recovered = await governanceMutationReceipt(
+        db,
+        body,
+        organizationId,
+        actorId,
+        'organization_legal_hold.release',
+        receiptRequest,
+      );
+      const latest = await getExisting(
+        db.table<OrganizationLegalHold>('organization_legal_holds'),
+        hold.id,
+      );
+      if (recovered.existing && latest?.status === 'released') {
+        return organizationDirectory(db, organizationId, actorId);
+      }
+    }
+    await throwGovernanceTransactionConflict(
+      db,
+      error,
+      actorGuard,
+      'Organization security admin access required.',
+      'Legal hold changed concurrently. Retry the request.',
+    );
+  }
   return organizationDirectory(db, organizationId, actorId);
 }
 
@@ -2619,6 +4518,213 @@ function auditExportRows(events: OrganizationAuditEvent[], format: string) {
       .join('\n');
   }
   return events.map((event) => JSON.stringify(event)).join('\n');
+}
+
+function redactDiscoveryExport(discoveryExport: OrganizationDiscoveryExport) {
+  return { ...discoveryExport, content: undefined };
+}
+
+interface DiscoveryItem {
+  type: 'page' | 'block' | 'comment' | 'file';
+  id: string;
+  organizationId: string;
+  workspaceId: string;
+  workspaceName: string;
+  pageId?: string | null;
+  custodianUserIds: string[];
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  content: Record<string, unknown>;
+}
+
+function discoveryItemMatches(
+  item: DiscoveryItem,
+  query: string | null,
+  userIds: Set<string>,
+  since: string | null,
+  until: string | null,
+) {
+  if (userIds.size > 0 && !item.custodianUserIds.some((userId) => userIds.has(userId))) return false;
+  const occurredAt = item.updatedAt ?? item.createdAt ?? null;
+  if (since && (!occurredAt || occurredAt < since)) return false;
+  if (until && (!occurredAt || occurredAt > until)) return false;
+  if (!query) return true;
+  return JSON.stringify(item.content).normalize('NFKC').toLocaleLowerCase('en-US').includes(query);
+}
+
+function discoveryExportRows(items: DiscoveryItem[], format: string) {
+  if (format === 'json') return JSON.stringify(items, null, 2);
+  return items.map((item) => JSON.stringify(item)).join('\n');
+}
+
+async function exportOrganizationDiscovery(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+) {
+  const organizationId = requireString(body.organizationId, 'organizationId');
+  const ctx = await organizationAdminContext(db, organizationId, actorId);
+  assertOrganizationSecurityAdmin(ctx.actorRole);
+  const queryValue = boundedText(body.query, 'query', 300);
+  const query = queryValue?.normalize('NFKC').toLocaleLowerCase('en-US') ?? null;
+  const userIds = new Set(stringList(body.userIds, 'userIds', 500, 200));
+  const requestedWorkspaceIds = new Set(stringList(body.workspaceIds, 'workspaceIds', 200, 200));
+  const since = optionalIsoDateString(body.since, 'since');
+  const until = optionalIsoDateString(body.until, 'until');
+  const includeTrashed = body.includeTrashed !== false;
+  const format = parseEnum(body.format, ['jsonl', 'json'], 'jsonl', 'format');
+  const workspaces = ctx.workspaces.filter((workspace) =>
+    requestedWorkspaceIds.size === 0 || requestedWorkspaceIds.has(workspace.id));
+  if (requestedWorkspaceIds.size > 0 && workspaces.length !== requestedWorkspaceIds.size) {
+    throw new Error('Every discovery workspace must belong to the organization.');
+  }
+
+  const items: DiscoveryItem[] = [];
+  const push = (item: DiscoveryItem) => {
+    if (!discoveryItemMatches(item, query, userIds, since, until)) return;
+    if (items.length >= 20_000) {
+      throw Object.assign(new Error('Discovery export limit exceeded (20000 items).'), { status: 413 });
+    }
+    items.push(item);
+  };
+
+  for (const workspace of workspaces) {
+    const contentDb = boundedDb(admin, workspace.id);
+    const [pages, blocks, comments, uploads] = await Promise.all([
+      listAll(contentDb.table<Page>('pages').where('workspaceId', '==', workspace.id), {
+        maxItems: 20_000,
+        allowLargeMaterialization: true,
+        label: `Discovery pages for ${workspace.id}`,
+      }),
+      listAll(contentDb.table<Block>('blocks'), {
+        maxItems: 20_000,
+        allowLargeMaterialization: true,
+        label: `Discovery blocks for ${workspace.id}`,
+      }),
+      listAll(contentDb.table<Comment>('comments'), {
+        maxItems: 20_000,
+        allowLargeMaterialization: true,
+        label: `Discovery comments for ${workspace.id}`,
+      }),
+      listAll(contentDb.table<FileUpload>('file_uploads').where('workspaceId', '==', workspace.id), {
+        maxItems: 20_000,
+        allowLargeMaterialization: true,
+        label: `Discovery files for ${workspace.id}`,
+      }),
+    ]);
+    const pagesById = new Map(pages.map((page) => [page.id, page]));
+    for (const page of pages) {
+      if (!includeTrashed && page.inTrash) continue;
+      push({
+        type: 'page',
+        id: page.id,
+        organizationId,
+        workspaceId: workspace.id,
+        workspaceName: workspace.name,
+        pageId: page.id,
+        custodianUserIds: [page.createdBy, page.lastEditedBy].filter((id): id is string => Boolean(id)),
+        createdAt: page.createdAt,
+        updatedAt: page.updatedAt,
+        content: {
+          title: page.title ?? '',
+          kind: page.kind ?? 'page',
+          inTrash: page.inTrash === true,
+          properties: page.properties ?? {},
+        },
+      });
+    }
+    for (const block of blocks) {
+      const page = pagesById.get(block.pageId);
+      if (!page || (!includeTrashed && page.inTrash)) continue;
+      push({
+        type: 'block',
+        id: block.id,
+        organizationId,
+        workspaceId: workspace.id,
+        workspaceName: workspace.name,
+        pageId: block.pageId,
+        custodianUserIds: [block.createdBy].filter((id): id is string => Boolean(id)),
+        createdAt: block.createdAt,
+        updatedAt: block.updatedAt,
+        content: { plainText: block.plainText ?? '', block: block.content ?? {} },
+      });
+    }
+    for (const comment of comments) {
+      const page = pagesById.get(comment.pageId);
+      if (!page || (!includeTrashed && page.inTrash)) continue;
+      push({
+        type: 'comment',
+        id: comment.id,
+        organizationId,
+        workspaceId: workspace.id,
+        workspaceName: workspace.name,
+        pageId: comment.pageId,
+        custodianUserIds: [comment.authorId].filter(Boolean),
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        content: { body: comment.body ?? '' },
+      });
+    }
+    for (const upload of uploads) {
+      push({
+        type: 'file',
+        id: upload.id,
+        organizationId,
+        workspaceId: workspace.id,
+        workspaceName: workspace.name,
+        pageId: upload.pageId ?? upload.databaseId ?? null,
+        custodianUserIds: [upload.createdBy].filter((id): id is string => Boolean(id)),
+        createdAt: upload.createdAt,
+        updatedAt: upload.updatedAt,
+        content: {
+          name: upload.name ?? '',
+          contentType: upload.contentType ?? null,
+          size: upload.size ?? null,
+          status: upload.status ?? null,
+        },
+      });
+    }
+  }
+
+  const content = discoveryExportRows(items, format);
+  if (new TextEncoder().encode(content).byteLength > 8 * 1024 * 1024) {
+    throw Object.assign(new Error('Discovery export content limit exceeded (8 MiB).'), { status: 413 });
+  }
+  const now = nowIso();
+  const discoveryExport = await db.table<OrganizationDiscoveryExport>('organization_discovery_exports').insert({
+    organizationId,
+    status: 'completed',
+    format,
+    filter: {
+      query: queryValue,
+      userIds: [...userIds],
+      workspaceIds: workspaces.map((workspace) => workspace.id),
+      since,
+      until,
+      includeTrashed,
+    },
+    itemCount: items.length,
+    content,
+    createdBy: actorId,
+    completedAt: now,
+    createdAt: now,
+    updatedAt: now,
+  });
+  await recordOrganizationAudit(db, {
+    organizationId,
+    workspaceId: null,
+    actorId,
+    action: 'organization_discovery.export',
+    targetType: 'organization_discovery_export',
+    targetId: discoveryExport.id,
+    metadata: { itemCount: items.length, format, workspaceCount: workspaces.length },
+    occurredAt: now,
+  });
+  return {
+    ...(await organizationDirectory(db, organizationId, actorId)),
+    discoveryExport,
+  };
 }
 
 async function exportOrganizationAuditEvents(db: DbRef, body: Record<string, unknown>, actorId: string) {
@@ -3188,7 +5294,12 @@ async function updateOrganizationGroup(db: DbRef, body: Record<string, unknown>,
   return organizationDirectory(db, organizationId, actorId);
 }
 
-async function deleteOrganizationGroup(db: DbRef, body: Record<string, unknown>, actorId: string) {
+async function deleteOrganizationGroup(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+) {
   const organizationId = requireString(body.organizationId, 'organizationId');
   const ctx = await organizationAdminContext(db, organizationId, actorId);
   assertOrganizationPeopleAdmin(ctx.actorRole);
@@ -3196,6 +5307,33 @@ async function deleteOrganizationGroup(db: DbRef, body: Record<string, unknown>,
   if (!group) throw new Error('Organization group was not found.');
   const groupMembersTable = db.table<OrganizationGroupMember>('organization_group_members');
   const groupMembers = await listAll(groupMembersTable.where('groupId', '==', group.id));
+  for (const workspace of ctx.workspaces) {
+    const workspaceContentDb = boundedDb(admin, workspace.id);
+    const permissions = await listAll(
+      workspaceContentDb
+        .table<PagePermission>('page_permissions')
+        .where('workspaceId', '==', workspace.id),
+    );
+    const permissionOps = permissions
+      .filter((permission) => (
+        permission.principalType === 'group' &&
+        (
+          permission.principalId === group.id ||
+          (!permission.principalId && permission.label?.trim().toLowerCase() === group.name.trim().toLowerCase())
+        )
+      ))
+      .map((permission): TransactOperation => ({
+        table: 'page_permissions',
+        op: 'delete',
+        id: permission.id,
+      }));
+    for (let index = 0; index < permissionOps.length; index += MAX_RAW_TRANSACT_OPS) {
+      await runOrganizationTransact(
+        workspaceContentDb,
+        permissionOps.slice(index, index + MAX_RAW_TRANSACT_OPS),
+      );
+    }
+  }
   for (const member of groupMembers) await bestEffort('workspace-mutation groupMembersTable.delete', groupMembersTable.delete(member.id));
   await db.table<OrganizationGroup>('organization_groups').delete(group.id);
   await recordOrganizationAudit(db, {
@@ -3213,28 +5351,63 @@ async function deleteOrganizationGroup(db: DbRef, body: Record<string, unknown>,
 
 async function addOrganizationGroupMember(db: DbRef, body: Record<string, unknown>, actorId: string) {
   const organizationId = requireString(body.organizationId, 'organizationId');
-  const ctx = await organizationAdminContext(db, organizationId, actorId);
-  assertOrganizationPeopleAdmin(ctx.actorRole);
-  const group = findOrganizationGroup(ctx.organizationGroups, body);
-  if (!group) throw new Error('Organization group was not found.');
-  const target = findOrganizationMember(ctx.organizationMembers, body);
-  if (!target) throw new Error('Organization member was not found.');
-  if ((target.status ?? 'active') !== 'active') {
-    throw new Error('Only active organization members can be added to groups.');
+  let membership: OrganizationGroupMember | null = null;
+  let groupName = '';
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const ctx = await organizationAdminContext(db, organizationId, actorId);
+    assertOrganizationPeopleAdmin(ctx.actorRole);
+    const group = findOrganizationGroup(ctx.organizationGroups, body);
+    if (!group) throw new Error('Organization group was not found.');
+    const target = findOrganizationMember(ctx.organizationMembers, body);
+    if (!target) throw new Error('Organization member was not found.');
+    if ((target.status ?? 'active') !== 'active') {
+      throw new Error('Only active organization members can be added to groups.');
+    }
+    const existing = group.members.find((member) => member.organizationMemberId === target.id);
+    if (existing) return organizationDirectory(db, organizationId, actorId);
+    const now = nowIso();
+    const id = crypto.randomUUID();
+    const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+    const data = {
+      id,
+      organizationId,
+      groupId: group.id,
+      organizationMemberId: target.id,
+      userId: target.userId,
+      role: 'member',
+      createdBy: actorId,
+      createdAt: now,
+      updatedAt: now,
+    };
+    try {
+      await db.transact([
+        governanceActorGuard(ctx, organizationId, actorId),
+        policyVersion.guard,
+        {
+          table: 'organization_group_members',
+          op: 'expect',
+          where: [
+            ['groupId', '==', group.id],
+            ['organizationMemberId', '==', target.id],
+          ],
+          exists: false,
+        },
+        { table: 'organization_group_members', op: 'insert', data },
+        policyVersion.write,
+      ]);
+      membership = data;
+      groupName = group.name;
+      break;
+    } catch (error) {
+      if (!isTransactionConflictError(error)) throw error;
+    }
   }
-  const existing = group.members.find((member) => member.organizationMemberId === target.id);
-  if (existing) return organizationDirectory(db, organizationId, actorId);
-  const now = nowIso();
-  const membership = await db.table<OrganizationGroupMember>('organization_group_members').insert({
-    organizationId,
-    groupId: group.id,
-    organizationMemberId: target.id,
-    userId: target.userId,
-    role: 'member',
-    createdBy: actorId,
-    createdAt: now,
-    updatedAt: now,
-  });
+  if (!membership) {
+    throw Object.assign(
+      new Error('Organization group membership changed concurrently. Retry the request.'),
+      { status: 409 },
+    );
+  }
   await recordOrganizationAudit(db, {
     organizationId,
     workspaceId: null,
@@ -3242,29 +5415,75 @@ async function addOrganizationGroupMember(db: DbRef, body: Record<string, unknow
     action: 'organization_group_member.add',
     targetType: 'organization_group_member',
     targetId: membership.id,
-    metadata: { groupId: group.id, groupName: group.name, userId: target.userId },
-    occurredAt: now,
+    metadata: {
+      groupId: membership.groupId,
+      groupName,
+      userId: membership.userId,
+    },
+    occurredAt: membership.createdAt ?? nowIso(),
   });
   return organizationDirectory(db, organizationId, actorId);
 }
 
 async function removeOrganizationGroupMember(db: DbRef, body: Record<string, unknown>, actorId: string) {
   const organizationId = requireString(body.organizationId, 'organizationId');
-  const ctx = await organizationAdminContext(db, organizationId, actorId);
-  assertOrganizationPeopleAdmin(ctx.actorRole);
-  const group = findOrganizationGroup(ctx.organizationGroups, body);
-  if (!group) throw new Error('Organization group was not found.');
-  const target = findOrganizationGroupMember(group, body);
-  if (!target) throw new Error('Organization group member was not found.');
-  await db.table<OrganizationGroupMember>('organization_group_members').delete(target.id);
+  let removed: OrganizationGroupDirectoryMember | null = null;
+  let removedGroup: OrganizationGroupDirectory | null = null;
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const ctx = await organizationAdminContext(db, organizationId, actorId);
+    assertOrganizationPeopleAdmin(ctx.actorRole);
+    const group = findOrganizationGroup(ctx.organizationGroups, body);
+    if (!group) throw new Error('Organization group was not found.');
+    const target = findOrganizationGroupMember(group, body);
+    if (!target) {
+      if (attempt === 0) throw new Error('Organization group member was not found.');
+      return organizationDirectory(db, organizationId, actorId);
+    }
+    const policyVersion = await governancePolicyVersionPlan(db, organizationId);
+    try {
+      await db.transact([
+        governanceActorGuard(ctx, organizationId, actorId),
+        policyVersion.guard,
+        {
+          table: 'organization_group_members',
+          op: 'expect',
+          id: target.id,
+          where: [
+            ['organizationId', '==', organizationId],
+            ['groupId', '==', group.id],
+            ['organizationMemberId', '==', target.organizationMemberId],
+            ['userId', '==', target.userId],
+          ],
+          exists: true,
+        },
+        { table: 'organization_group_members', op: 'delete', id: target.id },
+        policyVersion.write,
+      ]);
+      removed = target;
+      removedGroup = group;
+      break;
+    } catch (error) {
+      if (!isTransactionConflictError(error)) throw error;
+    }
+  }
+  if (!removed || !removedGroup) {
+    throw Object.assign(
+      new Error('Organization group membership changed concurrently. Retry the request.'),
+      { status: 409 },
+    );
+  }
   await recordOrganizationAudit(db, {
     organizationId,
     workspaceId: null,
     actorId,
     action: 'organization_group_member.remove',
     targetType: 'organization_group_member',
-    targetId: target.id,
-    metadata: { groupId: group.id, groupName: group.name, userId: target.userId },
+    targetId: removed.id,
+    metadata: {
+      groupId: removedGroup.id,
+      groupName: removedGroup.name,
+      userId: removed.userId,
+    },
     occurredAt: nowIso(),
   });
   return organizationDirectory(db, organizationId, actorId);
@@ -3288,6 +5507,8 @@ async function addOrganizationDomain(db: DbRef, body: Record<string, unknown>, a
     organizationId,
     domain,
     status: 'pending',
+    verificationMethod: 'dns_txt',
+    verificationToken: `verify_${newToken()}${newToken().slice(0, 8)}`,
     createdBy: actorId,
     createdAt: now,
     updatedAt: now,
@@ -3312,11 +5533,28 @@ async function verifyOrganizationDomain(db: DbRef, body: Record<string, unknown>
   const target = findOrganizationDomain(ctx.organizationDomains ?? [], body);
   if (!target) throw new Error('Organization domain was not found.');
   if ((target.status ?? 'pending') === 'verified') return ctx;
+  if (!target.verificationToken) {
+    throw new Error('This domain predates DNS verification. Remove it and add it again to issue a TXT challenge.');
+  }
   const now = nowIso();
+  const verification = await verifyDomainTxtRecord(target.domain, target.verificationToken);
+  if (!verification.verified) {
+    await db.table<OrganizationDomain>('organization_domains').update(target.id, {
+      verificationCheckedAt: now,
+      verificationError: verification.reason ?? 'The expected TXT value was not found.',
+      updatedAt: now,
+    });
+    throw new Error(
+      `${verification.reason ?? 'Domain verification failed'} Add ${verification.recordName} with value ${verification.recordValue}.`,
+    );
+  }
   const domain = await db.table<OrganizationDomain>('organization_domains').update(target.id, {
     status: 'verified',
+    verificationCheckedAt: now,
+    verificationError: null,
     verifiedAt: now,
     verifiedBy: actorId,
+    updatedAt: now,
   });
   await recordOrganizationAudit(db, {
     organizationId,
@@ -3989,21 +6227,95 @@ async function deleteWorkspaceUnderLease(
   const ctx = await workspaceContext(db, id, actorId);
   assertWorkspaceAdmin(ctx.currentRole);
   const contentReadDb = boundedDb(admin, id);
+  const teamspacesTable = contentReadDb.table<{ id: string; workspaceId: string }>('teamspaces');
+  const teamspaceMembersTable = contentReadDb.table<{ id: string; workspaceId: string }>('teamspace_members');
+  const teamspaceJoinRequestsTable = contentReadDb.table<{ id: string; workspaceId: string }>('teamspace_join_requests');
+  const teamspaceSettingsTable = contentReadDb.table<{ id: string; workspaceId: string }>('teamspace_settings');
+  const organizationAuditOutboxTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'organization_audit_outbox',
+  );
   const pagesTable = contentReadDb.table<Page>('pages');
   const blocksTable = contentReadDb.table<Block>('blocks');
   const commentsTable = contentReadDb.table<Comment>('comments');
   const permissionsTable = contentReadDb.table<PagePermission>('page_permissions');
+  const searchGroupAuthoritiesTable = contentReadDb.table<{ id: string; workspaceId: string }>('search_group_authorities');
+  const searchGroupMembershipsTable = contentReadDb.table<{ id: string; workspaceId: string }>('search_group_memberships');
+  const searchGroupMembershipSnapshotsTable = contentReadDb.table<{ id: string; workspaceId: string }>('search_group_membership_snapshots');
   const shareLinksTable = contentReadDb.table<ShareLink>('share_links');
+  const formLinksTable = contentReadDb.table<FormLink>('form_links');
   const propertiesTable = contentReadDb.table<DbProperty>('db_properties');
   const viewsTable = contentReadDb.table<DbView>('db_views');
   const templatesTable = contentReadDb.table<DbTemplate>('db_templates');
   const operationsTable = contentReadDb.table<CollaborationOperation>('collaboration_operations');
   const collaborationDocumentsTable = contentReadDb.table<CollaborationDocument>('collaboration_documents');
   const indexTable = contentReadDb.table<DbPropertyIndex>('db_property_indexes');
+  const databaseAutomationsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automations',
+  );
+  const databaseAutomationEventsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automation_events',
+  );
+  const databaseAutomationEventWorkersTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automation_event_workers',
+  );
+  const databaseAutomationScheduleWorkersTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automation_schedule_workers',
+  );
+  const databaseAutomationDeliveriesTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automation_deliveries',
+  );
+  const databaseAutomationDeliveryWorkersTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_automation_delivery_workers',
+  );
+  const dependencyEdgesTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_edges',
+  );
+  const taskFeatureConfigReceiptsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_task_feature_config_receipts',
+  );
+  const taskFeatureDisableJobsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_task_feature_disable_jobs',
+  );
+  const dependencyValidationJobsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_validation_jobs',
+  );
+  const dependencyValidationItemsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_validation_items',
+  );
+  const dependencyMutationReceiptsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_mutation_receipts',
+  );
+  const dependencyDateShiftJobsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_date_shift_jobs',
+  );
+  const dependencyDateShiftItemsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_date_shift_items',
+  );
+  const dependencyDateShiftReceiptsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_dependency_date_shift_receipts',
+  );
+  const hierarchyMovesTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_hierarchy_moves',
+  );
+  const hierarchyMoveReceiptsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_hierarchy_move_receipts',
+  );
+  const hierarchyLifecycleJobsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_hierarchy_lifecycle_jobs',
+  );
+  const hierarchyLifecycleItemsTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_hierarchy_lifecycle_items',
+  );
+  const hierarchyRelationUpdatesTable = contentReadDb.table<{ id: string; workspaceId: string }>(
+    'database_hierarchy_relation_updates',
+  );
   const uploadsTable = contentReadDb.table<FileUpload>('file_uploads');
+  const nativeArchiveImportsTable = contentReadDb.table<{ id: string; workspaceId: string }>('native_archive_imports');
   const notificationsTable = db.table<NotificationRecord>('notifications');
   const fileMaintenanceRunsTable = db.table<FileMaintenanceRun>('file_maintenance_runs');
+  const fileMaintenanceQueueTable = db.table<{ id: string; workspaceId: string }>('file_maintenance_queue');
   const pageWorkspaceIndexesTable = db.table<{ id: string; workspaceId: string }>('page_workspace_index');
+  const formLinkIndexesTable = db.table<{ id: string; workspaceId: string }>('form_link_index');
   const workspace = ctx.workspace;
   const pages = await listAll(pagesTable.where('workspaceId', '==', id));
   const pageIds = pages.map((page) => page.id);
@@ -4013,40 +6325,116 @@ async function deleteWorkspaceUnderLease(
     if (confirmedName !== workspace.name) {
       throw new Error('Type the workspace name to delete this workspace.');
     }
-    await assertNoActiveLegalHoldForPermanentDelete(db, id, pageIds);
+    const custodianUserIds = Array.from(new Set(pages.flatMap((page) =>
+      [page.createdBy, page.lastEditedBy].filter((userId): userId is string => Boolean(userId)),
+    )));
+    await assertNoActiveLegalHoldForPermanentDelete(db, id, pageIds, custodianUserIds);
+  }
+  const notionImportArtifacts = await collectWorkspaceNotionImportArtifacts(contentReadDb, id);
+  const activeNotionImportJobs = notionImportArtifacts.jobs.filter((job) =>
+    job.status === 'queued' ||
+    job.status === 'discovering' ||
+    job.progress?.currentStatus === 'running'
+  );
+  if (activeNotionImportJobs.length > 0) {
+    throw fileOperationConflict('Cancel active Notion imports before deleting this workspace.');
   }
   await markFileDeletionPending(db, id);
 
   const [
+    teamspaces,
+    teamspaceMembers,
+    teamspaceJoinRequests,
+    teamspaceSettings,
+    organizationAuditOutbox,
     blocks,
     comments,
     operations,
     collaborationDocuments,
     permissions,
+    searchGroupAuthorities,
+    searchGroupMemberships,
+    searchGroupMembershipSnapshots,
     shareLinks,
+    formLinks,
     properties,
     views,
     templates,
     indexRows,
+    databaseAutomations,
+    databaseAutomationEvents,
+    databaseAutomationEventWorkers,
+    databaseAutomationScheduleWorkers,
+    databaseAutomationDeliveries,
+    databaseAutomationDeliveryWorkers,
+    dependencyEdges,
+    taskFeatureConfigReceipts,
+    taskFeatureDisableJobs,
+    dependencyValidationJobs,
+    dependencyValidationItems,
+    dependencyMutationReceipts,
+    dependencyDateShiftJobs,
+    dependencyDateShiftItems,
+    dependencyDateShiftReceipts,
+    hierarchyMoves,
+    hierarchyMoveReceipts,
+    hierarchyLifecycleJobs,
+    hierarchyLifecycleItems,
+    hierarchyRelationUpdates,
     uploads,
+    nativeArchiveImports,
     notifications,
     fileMaintenanceRuns,
+    fileMaintenanceQueue,
     pageWorkspaceIndexes,
+    formLinkIndexes,
   ] = await Promise.all([
+    listAll(teamspacesTable.where('workspaceId', '==', id)),
+    listAll(teamspaceMembersTable.where('workspaceId', '==', id)),
+    listAll(teamspaceJoinRequestsTable.where('workspaceId', '==', id)),
+    listAll(teamspaceSettingsTable.where('workspaceId', '==', id)),
+    listAll(organizationAuditOutboxTable.where('workspaceId', '==', id)),
     listByIds(blocksTable, 'pageId', pageIds),
     listByIds(commentsTable, 'pageId', pageIds),
     listByIds(operationsTable, 'pageId', pageIds),
     listByIds(collaborationDocumentsTable, 'pageId', pageIds),
     listAll(permissionsTable.where('workspaceId', '==', id)),
+    listAll(searchGroupAuthoritiesTable.where('workspaceId', '==', id)),
+    listAll(searchGroupMembershipsTable.where('workspaceId', '==', id)),
+    listAll(searchGroupMembershipSnapshotsTable.where('workspaceId', '==', id)),
     listAll(shareLinksTable.where('workspaceId', '==', id)),
+    listAll(formLinksTable.where('workspaceId', '==', id)),
     listByIds(propertiesTable, 'databaseId', databaseIds),
     listByIds(viewsTable, 'databaseId', databaseIds),
     listByIds(templatesTable, 'databaseId', databaseIds),
     listAll(indexTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationsTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationEventsTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationEventWorkersTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationScheduleWorkersTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationDeliveriesTable.where('workspaceId', '==', id)),
+    listAll(databaseAutomationDeliveryWorkersTable.where('workspaceId', '==', id)),
+    listAll(dependencyEdgesTable.where('workspaceId', '==', id)),
+    listAll(taskFeatureConfigReceiptsTable.where('workspaceId', '==', id)),
+    listAll(taskFeatureDisableJobsTable.where('workspaceId', '==', id)),
+    listAll(dependencyValidationJobsTable.where('workspaceId', '==', id)),
+    listAll(dependencyValidationItemsTable.where('workspaceId', '==', id)),
+    listAll(dependencyMutationReceiptsTable.where('workspaceId', '==', id)),
+    listAll(dependencyDateShiftJobsTable.where('workspaceId', '==', id)),
+    listAll(dependencyDateShiftItemsTable.where('workspaceId', '==', id)),
+    listAll(dependencyDateShiftReceiptsTable.where('workspaceId', '==', id)),
+    listAll(hierarchyMovesTable.where('workspaceId', '==', id)),
+    listAll(hierarchyMoveReceiptsTable.where('workspaceId', '==', id)),
+    listAll(hierarchyLifecycleJobsTable.where('workspaceId', '==', id)),
+    listAll(hierarchyLifecycleItemsTable.where('workspaceId', '==', id)),
+    listAll(hierarchyRelationUpdatesTable.where('workspaceId', '==', id)),
     listAll(uploadsTable.where('workspaceId', '==', id)),
+    listAll(nativeArchiveImportsTable.where('workspaceId', '==', id)),
     listAll(notificationsTable.where('workspaceId', '==', id)),
     listAll(fileMaintenanceRunsTable.where('workspaceId', '==', id)),
+    getExisting(fileMaintenanceQueueTable, id),
     listAll(pageWorkspaceIndexesTable.where('workspaceId', '==', id)),
+    listAll(formLinkIndexesTable.where('workspaceId', '==', id)),
   ]);
   await deleteStoredUploadsBeforeMetadata({
     admin,
@@ -4058,7 +6446,6 @@ async function deleteWorkspaceUnderLease(
     excludePageIds: pageIds,
     excludeWorkspaceMetadata: true,
   });
-  const notionImportArtifacts = await collectWorkspaceNotionImportArtifacts(contentReadDb, id);
   const notionImportCleanup = {
     connections: notionImportArtifacts.connections.length,
     jobs: notionImportArtifacts.jobs.length,
@@ -4075,31 +6462,115 @@ async function deleteWorkspaceUnderLease(
   // visible and retryable; stage 1 re-lists and is idempotent. At the DO
   // split, stage 2 additionally gains a leading `deleting` tombstone update.
   const contentOps: TransactOperation[] = [
+    ...teamspaceJoinRequests.map((item): TransactOperation => ({
+      table: 'teamspace_join_requests', op: 'delete', id: item.id,
+    })),
+    ...teamspaceMembers.map((item): TransactOperation => ({
+      table: 'teamspace_members', op: 'delete', id: item.id,
+    })),
+    ...teamspaceSettings.map((item): TransactOperation => ({
+      table: 'teamspace_settings', op: 'delete', id: item.id,
+    })),
+    ...organizationAuditOutbox.map((item): TransactOperation => ({
+      table: 'organization_audit_outbox', op: 'delete', id: item.id,
+    })),
     ...indexRows.map((item): TransactOperation => ({ table: 'db_property_indexes', op: 'delete', id: item.id })),
+    ...databaseAutomationDeliveries.map((item): TransactOperation => ({
+      table: 'database_automation_deliveries', op: 'delete', id: item.id,
+    })),
+    ...databaseAutomations.map((item): TransactOperation => ({
+      table: 'database_automations', op: 'delete', id: item.id,
+    })),
+    ...databaseAutomationEvents.map((item): TransactOperation => ({
+      table: 'database_automation_events', op: 'delete', id: item.id,
+    })),
+    ...databaseAutomationEventWorkers.map((item): TransactOperation => ({
+      table: 'database_automation_event_workers', op: 'delete', id: item.id,
+    })),
+    ...databaseAutomationScheduleWorkers.map((item): TransactOperation => ({
+      table: 'database_automation_schedule_workers', op: 'delete', id: item.id,
+    })),
+    ...databaseAutomationDeliveryWorkers.map((item): TransactOperation => ({
+      table: 'database_automation_delivery_workers', op: 'delete', id: item.id,
+    })),
+    ...dependencyEdges.map((item): TransactOperation => ({
+      table: 'database_dependency_edges', op: 'delete', id: item.id,
+    })),
+    ...taskFeatureDisableJobs.map((item): TransactOperation => ({
+      table: 'database_task_feature_disable_jobs', op: 'delete', id: item.id,
+    })),
+    ...taskFeatureConfigReceipts.map((item): TransactOperation => ({
+      table: 'database_task_feature_config_receipts', op: 'delete', id: item.id,
+    })),
+    ...dependencyValidationItems.map((item): TransactOperation => ({
+      table: 'database_dependency_validation_items', op: 'delete', id: item.id,
+    })),
+    ...dependencyValidationJobs.map((item): TransactOperation => ({
+      table: 'database_dependency_validation_jobs', op: 'delete', id: item.id,
+    })),
+    ...dependencyMutationReceipts.map((item): TransactOperation => ({
+      table: 'database_dependency_mutation_receipts', op: 'delete', id: item.id,
+    })),
+    ...dependencyDateShiftItems.map((item): TransactOperation => ({
+      table: 'database_dependency_date_shift_items', op: 'delete', id: item.id,
+    })),
+    ...dependencyDateShiftJobs.map((item): TransactOperation => ({
+      table: 'database_dependency_date_shift_jobs', op: 'delete', id: item.id,
+    })),
+    ...dependencyDateShiftReceipts.map((item): TransactOperation => ({
+      table: 'database_dependency_date_shift_receipts', op: 'delete', id: item.id,
+    })),
+    ...hierarchyMoves.map((item): TransactOperation => ({
+      table: 'database_hierarchy_moves', op: 'delete', id: item.id,
+    })),
+    ...hierarchyMoveReceipts.map((item): TransactOperation => ({
+      table: 'database_hierarchy_move_receipts', op: 'delete', id: item.id,
+    })),
+    ...hierarchyLifecycleItems.map((item): TransactOperation => ({
+      table: 'database_hierarchy_lifecycle_items', op: 'delete', id: item.id,
+    })),
+    ...hierarchyRelationUpdates.map((item): TransactOperation => ({
+      table: 'database_hierarchy_relation_updates', op: 'delete', id: item.id,
+    })),
+    ...hierarchyLifecycleJobs.map((item): TransactOperation => ({
+      table: 'database_hierarchy_lifecycle_jobs', op: 'delete', id: item.id,
+    })),
     ...collaborationDocuments.map((item): TransactOperation => ({ table: 'collaboration_documents', op: 'delete', id: item.id })),
     ...operations.map((item): TransactOperation => ({ table: 'collaboration_operations', op: 'delete', id: item.id })),
     ...blocks.map((item): TransactOperation => ({ table: 'blocks', op: 'delete', id: item.id })),
     ...comments.map((item): TransactOperation => ({ table: 'comments', op: 'delete', id: item.id })),
     ...permissions.map((item): TransactOperation => ({ table: 'page_permissions', op: 'delete', id: item.id })),
+    ...searchGroupMemberships.map((item): TransactOperation => ({ table: 'search_group_memberships', op: 'delete', id: item.id })),
+    ...searchGroupMembershipSnapshots.map((item): TransactOperation => ({ table: 'search_group_membership_snapshots', op: 'delete', id: item.id })),
+    ...searchGroupAuthorities.map((item): TransactOperation => ({ table: 'search_group_authorities', op: 'delete', id: item.id })),
     ...shareLinks.map((item): TransactOperation => ({ table: 'share_links', op: 'delete', id: item.id })),
+    ...formLinks.map((item): TransactOperation => ({ table: 'form_links', op: 'delete', id: item.id })),
     ...templates.map((item): TransactOperation => ({ table: 'db_templates', op: 'delete', id: item.id })),
     ...views.map((item): TransactOperation => ({ table: 'db_views', op: 'delete', id: item.id })),
     ...properties.map((item): TransactOperation => ({ table: 'db_properties', op: 'delete', id: item.id })),
     ...uploads.map((item): TransactOperation => ({ table: 'file_uploads', op: 'delete', id: item.id })),
+    ...nativeArchiveImports.map((item): TransactOperation => ({ table: 'native_archive_imports', op: 'delete', id: item.id })),
     ...notionImportArtifacts.items.map((item): TransactOperation => ({ table: 'notion_import_items', op: 'delete', id: item.id })),
     ...notionImportArtifacts.mappings.map((item): TransactOperation => ({ table: 'notion_import_mappings', op: 'delete', id: item.id })),
     ...notionImportArtifacts.locks.map((item): TransactOperation => ({ table: 'notion_import_apply_locks', op: 'delete', id: item.id })),
     ...notionImportArtifacts.jobs.map((item): TransactOperation => ({ table: 'notion_import_jobs', op: 'delete', id: item.id })),
     ...notionImportArtifacts.connections.map((item): TransactOperation => ({ table: 'notion_import_connections', op: 'delete', id: item.id })),
     ...pageIds.map((pageId): TransactOperation => ({ table: 'pages', op: 'delete', id: pageId })),
+    ...teamspaces.map((item): TransactOperation => ({ table: 'teamspaces', op: 'delete', id: item.id })),
   ];
   const retryPrincipal = ctx.members.find((member) => member.userId === actorId) ?? null;
   const centralCleanupOps: TransactOperation[] = [
     ...pageWorkspaceIndexes.map((item): TransactOperation => ({
       table: 'page_workspace_index', op: 'delete', id: item.id,
     })),
+    ...formLinkIndexes.map((item): TransactOperation => ({
+      table: 'form_link_index', op: 'delete', id: item.id,
+    })),
     ...notifications.map((item): TransactOperation => ({ table: 'notifications', op: 'delete', id: item.id })),
     ...fileMaintenanceRuns.map((item): TransactOperation => ({ table: 'file_maintenance_runs', op: 'delete', id: item.id })),
+    ...(fileMaintenanceQueue
+      ? [{ table: 'file_maintenance_queue', op: 'delete' as const, id: fileMaintenanceQueue.id }]
+      : []),
     ...ctx.invitations.map((invitation): TransactOperation => ({ table: 'workspace_invitations', op: 'delete', id: invitation.id })),
     ...ctx.members
       .filter((member) => member.id !== retryPrincipal?.id)
@@ -4173,7 +6644,10 @@ async function deleteWorkspaceUnderLease(
         deletedMembers: ctx.members.length,
         deletedInvitations: ctx.invitations.length,
         deletedFileUploads: uploads.length,
+        deletedNativeArchiveImports: nativeArchiveImports.length,
         deletedShareLinks: shareLinks.length,
+        deletedFormLinks: formLinks.length,
+        deletedFormLinkIndexes: formLinkIndexes.length,
         deletedPageWorkspaceIndexes: pageWorkspaceIndexes.length,
         notionImportCleanup,
       },
@@ -4189,7 +6663,10 @@ async function deleteWorkspaceUnderLease(
     cleanup: {
       notionImport: notionImportCleanup,
       fileUploads: uploads.length,
+      nativeArchiveImports: nativeArchiveImports.length,
       shareLinks: shareLinks.length,
+      formLinks: formLinks.length,
+      formLinkIndexes: formLinkIndexes.length,
       pageWorkspaceIndexes: pageWorkspaceIndexes.length,
       databaseProperties: properties.length,
       databaseViews: views.length,
@@ -4290,6 +6767,13 @@ async function inviteMember(
     ? ctx.members.find((member) => member.userId === userId) ?? null
     : emailMember;
   assertCanManageRole(ctx.currentRole, existing, role, actorId, ctx.workspace);
+
+  if (!existing) {
+    const settings = await getInstanceSettings(db);
+    if (parseMemberAddPolicy(settings.memberAddPolicy, 'enabled') !== 'enabled') {
+      throw new Error('Workspace member additions are disabled by instance policy.');
+    }
+  }
 
   if (!userId && existing) {
     await assertOrganizationInviteAllowed(db, ctx.workspace, email, role);
@@ -4541,7 +7025,7 @@ async function recordMcpClientAction(
 }
 
 export const POST = defineFunction(async (context) => {
-  const { auth, admin, request, storage } = context as FunctionContext;
+  const { auth, admin, request, storage, env } = context as FunctionContext;
   if (!auth?.id) return jsonError(401, 'Authentication required.');
 
   const body = await requestJson(request);
@@ -4549,6 +7033,14 @@ export const POST = defineFunction(async (context) => {
   const db = admin.db('app');
 
   try {
+    if (TEAMSPACE_MUTATION_ACTIONS.has(action)) {
+      const workspaceId = requireString(body.workspaceId, 'workspaceId');
+      return await handleTeamspaceMutation({
+        db: boundedDb(admin, workspaceId),
+        actorId: auth.id,
+        body,
+      });
+    }
     switch (action) {
       case 'list':
       case 'workspaces':
@@ -4575,17 +7067,27 @@ export const POST = defineFunction(async (context) => {
       case 'updateOrganizationSettings':
         return await withPolicyVersionBump(db, body, () => updateOrganizationSettings(db, body, auth.id));
       case 'updateOrganizationEnterpriseControls':
-        return await withPolicyVersionBump(db, body, () => updateOrganizationEnterpriseControls(db, body, auth.id));
+        return await updateOrganizationEnterpriseControls(db, admin.auth, env, body, auth.id);
+      case 'setOrganizationMcpGovernanceEnabled':
+        return await mutateOrganizationMcpGovernance(db, body, auth.id, 'set_enabled');
+      case 'approveOrganizationMcpClient':
+        return await mutateOrganizationMcpGovernance(db, body, auth.id, 'approve');
+      case 'removeOrganizationMcpClient':
+        return await mutateOrganizationMcpGovernance(db, body, auth.id, 'remove');
+      case 'renameOrganizationMcpClient':
+        return await mutateOrganizationMcpGovernance(db, body, auth.id, 'rename');
       case 'createOrganizationScimToken':
         return await createOrganizationScimToken(db, body, auth.id);
       case 'revokeOrganizationScimToken':
         return await revokeOrganizationScimToken(db, body, auth.id);
       case 'createOrganizationLegalHold':
-        return await withPolicyVersionBump(db, body, () => createOrganizationLegalHold(db, body, auth.id));
+        return await createOrganizationLegalHold(db, body, auth.id);
       case 'releaseOrganizationLegalHold':
-        return await withPolicyVersionBump(db, body, () => releaseOrganizationLegalHold(db, body, auth.id));
+        return await releaseOrganizationLegalHold(db, body, auth.id);
       case 'exportOrganizationAuditEvents':
         return await exportOrganizationAuditEvents(db, body, auth.id);
+      case 'exportOrganizationDiscovery':
+        return await exportOrganizationDiscovery(db, admin, body, auth.id);
       case 'upsertOrganizationBillingRecord':
         return await upsertOrganizationBillingRecord(db, body, auth.id);
       case 'deleteOrganizationBillingRecord':
@@ -4605,7 +7107,7 @@ export const POST = defineFunction(async (context) => {
       case 'updateOrganizationGroup':
         return await updateOrganizationGroup(db, body, auth.id);
       case 'deleteOrganizationGroup':
-        return await deleteOrganizationGroup(db, body, auth.id);
+        return await deleteOrganizationGroup(db, admin, body, auth.id);
       case 'addOrganizationGroupMember':
         return await addOrganizationGroupMember(db, body, auth.id);
       case 'removeOrganizationGroupMember':
@@ -4659,10 +7161,29 @@ export const POST = defineFunction(async (context) => {
     const { status, message } = errorStatus(error, [
       { status: 409, needles: ['already in use'] },
       { status: 404, needles: ['not found'] },
-      { status: 400, needles: ['Disable domain-restricted signup'] },
+      {
+        status: 400,
+        needles: [
+          'Disable domain-restricted signup',
+          'DNS verification',
+          'DNS resolver',
+          'TXT value',
+          'TXT challenge',
+          'Verify an organization domain',
+          'SSO runtime provider',
+          'Strict data residency',
+          'HANJI_DATA_REGION',
+        ],
+      },
       {
         status: 403,
-        needles: ['access required', 'Forbidden', 'can create workspaces', 'disabled by organization policy'],
+        needles: [
+          'access required',
+          'Forbidden',
+          'can create workspaces',
+          'disabled by organization policy',
+          'disabled by instance policy',
+        ],
       },
     ]);
     return jsonError(status, message);

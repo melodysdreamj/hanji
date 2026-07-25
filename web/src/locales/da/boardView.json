@@ -16,7 +16,7 @@
   "groupName": "Gruppenavn",
   "groupOptions": "{{groupName}} gruppeindstillinger",
   "groupThisBoard": "Gruppér dette board",
-  "groupThisBoardDesc": "Tilføj en Vælg- eller Status-egenskab for at oprette kolonner.",
+  "groupThisBoardDesc": "Tilføj eller vælg en egenskab af typen Vælg, Status, Person eller Multi-vælg for at oprette kolonner.",
   "newGroup": "Ny gruppe",
   "newGroupIn": "Ny {{groupName}} gruppe i {{dbTitle}}",
   "newPage": "Ny",

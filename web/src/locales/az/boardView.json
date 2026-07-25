@@ -13,7 +13,7 @@
   "groupName": "Qrup adı",
   "groupOptions": "{{groupName}} qrup seçimləri",
   "groupThisBoard": "Bu lövhəni qrupla",
-  "groupThisBoardDesc": "Sütunlar yaratmaq üçün Seçim və ya Status xüsusiyyəti əlavə edin.",
+  "groupThisBoardDesc": "Sütunlar yaratmaq üçün Seçim, Status, Şəxs və ya Çoxseçimli xassə əlavə edin və ya seçin.",
   "newGroup": "Yeni qrup",
   "newGroupIn": "{{dbTitle}}-də yeni {{groupName}} qrupu",
   "newPage": "Yeni",

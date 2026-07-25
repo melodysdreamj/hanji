@@ -9,7 +9,7 @@
     "duplicate": "Duplikovat",
     "editIcon": "Upravit ikonu",
     "editProperties": "Upravit vlastnosti",
-    "exportAsHanjiFile": "Exportovat jako soubor Hanji",
+    "exportAsHanjiFile": "Exportovat Hanji JSON (bez souborů)",
     "exportAsMarkdown": "Exportovat jako Markdown",
     "fullPage": "Celá stránka",
     "importing": "Importování...",
@@ -26,7 +26,8 @@
     "sidePeek": "Boční náhled",
     "undo": "Zpět",
     "unlockPage": "Odemknout stránku",
-    "verifyPage": "Ověřit stránku"
+    "verifyPage": "Ověřit stránku",
+    "exportAsHanjiArchive": "Exportovat Hanji archiv (včetně souborů)"
   },
   "aria": {
     "backlinksDisplay": "Zobrazení zpětných odkazů",
@@ -100,7 +101,9 @@
     "pageVerified": "Stránka ověřena",
     "removedFromFavorites": "Odstraněno z oblíbených",
     "restoredPage": "Stránka obnovena",
-    "verificationRemoved": "Ověření odstraněno"
+    "verificationRemoved": "Ověření odstraněno",
+    "couldntExportHanjiArchive": "Hanji archiv se nepodařilo exportovat.",
+    "exportedHanjiArchive": "Exportován Hanji archiv včetně souborů."
   },
   "untitledDatabaseRow": "nepojmenovaný řádek databáze"
 }

@@ -8,16 +8,22 @@
   },
   "more": {
     "count_one": "{{count}} další zpětný odkaz",
-    "count_other": "{{count}} dalších zpětných odkazů"
+    "count_other": "{{count}} dalších zpětných odkazů",
+    "load": "Načíst další zpětné odkazy",
+    "loading": "Načítání zpětných odkazů…",
+    "search": "Hledat zpětné odkazy"
   },
   "summary": {
     "link_one": "{{count}} odkaz",
     "link_other": "{{count}} odkazů",
     "mention_one": "{{count}} zmínka",
-    "mention_other": "{{count}} zmínek"
+    "mention_other": "{{count}} zmínek",
+    "loaded": "Načteno: {{summary}}"
   },
   "toggle": {
     "count_one": "{{count}} zpětný odkaz",
-    "count_other": "{{count}} zpětných odkazů"
+    "count_other": "{{count}} zpětných odkazů",
+    "partial_one": "{{count}}+ zpětný odkaz",
+    "partial_other": "{{count}}+ zpětné odkazy"
   }
 }

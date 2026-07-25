@@ -7,7 +7,8 @@
   "pageMissingSave": "Strani ni bilo mogoče najti, zato vaših sprememb ni bilo mogoče shraniti.",
   "saveFailed": "Vaših sprememb ni bilo mogoče shraniti.",
   "sessionExpired": "Vaša seja je potekla ali zahteve ni bilo mogoče overiti. Poskusite znova.",
-  "blockConflictSave": "Ta blok je bil urejen na drugi napravi, zato vaša sprememba brez povezave ni bila uporabljena.",
+  "blockConflictSave": "Čakajoče urejanje se prekriva z najnovejšo različico na strežniku, zato ga ni bilo mogoče samodejno združiti.",
   "blockConflictKeepMine": "Uporabi mojo različico",
-  "blockMoveCommentsSkipped": "Blok se je premaknil, vendar njegovih komentarjev ni bilo mogoče premakniti z njim."
+  "blockMoveCommentsSkipped": "Blok se je premaknil, vendar njegovih komentarjev ni bilo mogoče premakniti z njim.",
+  "conflictSave": "Ta vsebina se je spremenila, preden je bilo shranjevanje končano, zato vašega urejanja ni bilo mogoče shraniti."
 }

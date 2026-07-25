@@ -13,7 +13,7 @@
   "groupName": "Gruppnamn",
   "groupOptions": "{{groupName}} gruppalternativ",
   "groupThisBoard": "Gruppera denna tavla",
-  "groupThisBoardDesc": "Lägg till en Välj- eller Status-egenskap för att skapa kolumner.",
+  "groupThisBoardDesc": "Lägg till eller välj en egenskap av typen Urval, Status, Person eller Flerval för att skapa kolumner.",
   "newGroup": "Ny grupp",
   "newGroupIn": "Ny {{groupName}} grupp i {{dbTitle}}",
   "newPage": "Ny sida",

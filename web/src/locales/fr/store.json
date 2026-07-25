@@ -7,7 +7,8 @@
   "pageMissingSave": "La page est introuvable, vos modifications n'ont donc pas pu être enregistrées.",
   "saveFailed": "Vos modifications n'ont pas pu être enregistrées.",
   "sessionExpired": "Votre session a expiré ou la demande n'a pas pu être authentifiée. Veuillez réessayer.",
-  "blockConflictSave": "Ce bloc a été modifié sur un autre appareil, votre modification hors ligne n'a donc pas été appliquée.",
+  "blockConflictSave": "Une modification en attente chevauche la dernière version du serveur et n'a pas pu être fusionnée automatiquement.",
   "blockConflictKeepMine": "Appliquer ma version",
-  "blockMoveCommentsSkipped": "Le bloc a été déplacé, mais ses commentaires n'ont pas pu être déplacés avec lui."
+  "blockMoveCommentsSkipped": "Le bloc a été déplacé, mais ses commentaires n'ont pas pu être déplacés avec lui.",
+  "conflictSave": "Ce contenu a changé avant la fin de l'enregistrement, votre modification n'a donc pas pu être sauvegardée."
 }

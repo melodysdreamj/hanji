@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Deschide meniul spațiului de lucru",
   "closeWorkspaceMenu": "Închideți meniul spațiului de lucru",
   "workspaceMenu": "Meniu spațiu de lucru",
-  "exportWorkspace": "Exportează spațiul de lucru",
+  "exportWorkspace": "Exportă spațiu de lucru JSON (fără fișiere)",
   "exportedWorkspace": "Spațiu de lucru exportat ca fișier Hanji.",
   "exportedWorkspaceWithPlaceholders": "Spațiu de lucru exportat ca fișier Hanji — atașamentele au fost lăsate ca substituenți.",
   "couldntExportWorkspace": "Nu s-a putut exporta spațiul de lucru.",
@@ -76,5 +76,12 @@
     "later": "Poate mai târziu",
     "note": "Puteți începe oricând mai târziu din Import în bara laterală.",
     "title": "Aduceți spațiul de lucru Notion în Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Adaugă pagină în {{name}}",
+  "couldntExportWorkspaceArchive": "Nu s-a putut exporta arhiva spațiului de lucru.",
+  "exportedWorkspaceArchive": "Arhivă spațiu de lucru exportată cu fișiere.",
+  "exportWorkspaceArchive": "Exportă arhivă spațiu de lucru (cu fișiere)",
+  "joinTeamspaces": "Alătură-te spațiilor de echipă",
+  "keyboardShortcuts": "Scurtături de tastatură",
+  "teamspacePages": "Pagini {{name}}"
 }

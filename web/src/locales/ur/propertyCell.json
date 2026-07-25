@@ -92,5 +92,8 @@
     "ج",
     "ہ"
   ],
-  "you": "آپ"
+  "you": "آپ",
+  "buttonExecutionFailed": "بٹن نہیں چل سکا۔",
+  "loadingMoreRelations": "مزید روابط لوڈ ہو رہے ہیں...",
+  "loadMoreRelations": "مزید روابط لوڈ کریں"
 }

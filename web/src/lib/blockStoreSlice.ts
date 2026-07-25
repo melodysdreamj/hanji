@@ -1,9 +1,12 @@
 import type { StoreApi } from "zustand";
 import type {
   Block,
-  CollaborationBlockStructureBlock,
   Comment,
 } from "./types";
+import {
+  buttonResultRequiresConfirmation,
+  type ExecutePageButtonResult,
+} from "./edgebase";
 import type {
   AppState,
   BlockStoreRuntime,
@@ -11,6 +14,16 @@ import type {
   BlockHistoryEntry,
   BlockStructureHistoryOperation,
 } from "./store";
+import {
+  applyDefinitiveReadDenial,
+  applyLatestRead,
+  beginReadApplication,
+  invalidateReadApplication,
+  readApplicationIsLatest,
+  readApplicationKey,
+} from "./readApplicationGuard";
+import { contentForNewBlock } from "./blockDefaults";
+import { prepareButtonPageResultAdoption } from "./buttonResultAdoption";
 
 type BlockStoreActions = Pick<
   AppState,
@@ -22,7 +35,6 @@ type BlockStoreActions = Pick<
   | "persistBlockCreateBatch"
   | "updateBlock"
   | "applyRemoteBlockText"
-  | "applyRemoteBlockStructure"
   | "deleteBlock"
   | "moveBlockToPage"
   | "copyBlockToPage"
@@ -30,7 +42,62 @@ type BlockStoreActions = Pick<
   | "captureBlockHistory"
   | "undoBlockChange"
   | "redoBlockChange"
+  | "runPageButton"
+  | "discardPageButtonExecution"
 >;
+
+const deferredBlockCreateIds = new Set<string>();
+const BLOCK_LOCATION_CACHE_LIMIT = 4_096;
+
+function debugBlockReadBlocks(blocks: Block[]) {
+  return blocks.slice(0, 500).map((block) => ({
+    id: block.id,
+    lastMutationId: block.lastMutationId ?? null,
+    plainText: block.plainText?.slice(0, 500) ?? null,
+    updatedAt: block.updatedAt ?? null,
+  }));
+}
+
+function debugBlockReadOutbox(entries: unknown[]) {
+  return entries.slice(0, 100).map((entry) => {
+    const value = entry && typeof entry === "object"
+      ? (entry as { value?: Record<string, unknown> }).value
+      : undefined;
+    const operation = value?.operation && typeof value.operation === "object"
+      ? value.operation as Record<string, unknown>
+      : undefined;
+    return {
+      id: value?.id ?? operation?.id ?? null,
+      kind: value?.kind ?? null,
+      operationKind: operation?.kind ?? null,
+    };
+  });
+}
+
+function recordBlockReadDebug(entry: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  try {
+    if (window.localStorage.getItem("hanji.debugPresence") !== "1") return;
+    const debugWindow = window as Window & {
+      __hanjiBlockReadDebug?: Array<Record<string, unknown>>;
+    };
+    const entries = debugWindow.__hanjiBlockReadDebug ?? [];
+    entries.push({ at: new Date().toISOString(), ...entry });
+    debugWindow.__hanjiBlockReadDebug = entries.slice(-40);
+  } catch {
+    // Debug-only observation must never affect block loading.
+  }
+}
+
+export function resetDeferredBlockCreates() {
+  deferredBlockCreateIds.clear();
+}
+
+export function clearDeferredBlockCreatesForPage(pageId: string, blocks: Block[]) {
+  for (const block of blocks) {
+    if (block.pageId === pageId) deferredBlockCreateIds.delete(block.id);
+  }
+}
 
 export function createBlockStoreActions(
   set: StoreApi<AppState>["setState"],
@@ -41,18 +108,24 @@ export function createBlockStoreActions(
     EMPTY_BLOCK_LIST,
     HISTORY_LIMIT,
     MERGE_WINDOW_MS,
+    blockStructureInvalidation,
     blockLoadPromises,
-    blockTimers,
+    blockStructureSources,
     blocksCacheFresh,
     byCreated,
     bySortPos,
+    applyEmbeddedDatabaseSnapshots,
+    cacheCurrentComments,
     cacheReplaceTable,
     cacheSetMeta,
+    canEditPageInState,
     cancelPendingBlock,
     childBlocksCache,
     cloneBlocks,
     consumeLinkedTwin,
     durableRemoteCall,
+    ensureAuth,
+    executePageButtonRemote,
     firstDroppedDurableCall,
     flushBlock,
     getPageBlocksRemote,
@@ -71,24 +144,31 @@ export function createBlockStoreActions(
     overlayOutboxOnBlocks,
     pendingBlock,
     pendingBlockBase,
+    pendingBlockCreate,
+    pendingBlockExpectedMutationId,
+    pendingBlockMutationId,
     pendingBlockPage,
+    inFlightBlockMutationId,
     pendingPageLikeCreateHas,
     permanentDeleteIds,
+    persistErrorStatus,
     persistBlockCreate,
     persistBlockDelete,
     persistBlockSnapshot,
     persistBlockStructureOperation,
     positionBetween,
+    publishBlockStructureMutation,
+    publishDatabaseRowsMutation,
     publishCommentsMutation,
     reconcilePersistedBlockMutation,
-    recordBlockStructureOperation,
     recordCacheMeta,
     recordCacheTables,
-    reloadBlocksFromServer,
     remapBlockContent,
     remoteBlockWithOptimisticOverlay,
+    remotePageWithOptimisticOverlay,
     removeBlocksFromPages,
     serializeBlockHistory,
+    scheduleBlockBatch,
     snapshotsEqual,
     spansToPlainText,
     stampBlocksCached,
@@ -98,6 +178,95 @@ export function createBlockStoreActions(
     touchPageForBlockChange,
     upsertBlocksIntoPages,
   } = runtime;
+
+  type BlockLocation = { index: number; pageId: string };
+  const recentBlockLocations = new Map<string, BlockLocation>();
+  const pageButtonExecutionPromises = new Map<string, Promise<ExecutePageButtonResult | undefined>>();
+  const pageButtonRetryIds = new Map<string, string>();
+  const PAGE_BUTTON_RETRY_LIMIT = 256;
+
+  function rememberBlockLocation(id: string, location: BlockLocation) {
+    recentBlockLocations.delete(id);
+    recentBlockLocations.set(id, location);
+    if (recentBlockLocations.size <= BLOCK_LOCATION_CACHE_LIMIT) return;
+    const oldestId = recentBlockLocations.keys().next().value;
+    if (typeof oldestId === "string") recentBlockLocations.delete(oldestId);
+  }
+
+  function resolveBlockLocation(id: string, preferredPageId?: string): BlockLocation | undefined {
+    const blocksByPage = get().blocksByPage;
+    const cached = recentBlockLocations.get(id);
+    if (cached && blocksByPage[cached.pageId]?.[cached.index]?.id === id) {
+      rememberBlockLocation(id, cached);
+      return cached;
+    }
+    recentBlockLocations.delete(id);
+
+    if (preferredPageId) {
+      const preferredIndex = (blocksByPage[preferredPageId] ?? []).findIndex(
+        (block) => block.id === id,
+      );
+      if (preferredIndex >= 0) {
+        const location = { index: preferredIndex, pageId: preferredPageId };
+        rememberBlockLocation(id, location);
+        return location;
+      }
+    }
+
+    for (const [pageId, blocks] of Object.entries(blocksByPage)) {
+      if (pageId === preferredPageId) continue;
+      const index = blocks.findIndex((block) => block.id === id);
+      if (index < 0) continue;
+      const location = { index, pageId };
+      rememberBlockLocation(id, location);
+      return location;
+    }
+    return undefined;
+  }
+
+  function structuralSource(blocks: Block[]) {
+    return blockStructureSources.get(blocks) ?? blocks;
+  }
+
+  function replaceProjectedBlock(
+    blocks: Block[],
+    previousBlock: Block,
+    nextBlock: Block,
+  ): Block[] | undefined {
+    const index = blocks.findIndex((block) => block.id === previousBlock.id);
+    if (index < 0) return undefined;
+    const next = blocks.slice();
+    next[index] = nextBlock;
+    return next;
+  }
+
+  function advanceContentOnlyProjections(
+    pageId: string,
+    previousSource: Block[],
+    nextSource: Block[],
+    previousBlock: Block,
+    nextBlock: Block,
+  ) {
+    const source = structuralSource(previousSource);
+    blockStructureSources.set(nextSource, source);
+
+    if (previousBlock.parentId == null) {
+      const cached = topLevelBlocksCache.get(pageId);
+      if (cached?.source === source) {
+        const result = replaceProjectedBlock(cached.result, previousBlock, nextBlock);
+        if (result) topLevelBlocksCache.set(pageId, { source, result });
+        else topLevelBlocksCache.delete(pageId);
+      }
+      return;
+    }
+
+    const key = `${pageId}:${previousBlock.parentId}`;
+    const cached = childBlocksCache.get(key);
+    if (cached?.source !== source) return;
+    const result = replaceProjectedBlock(cached.result, previousBlock, nextBlock);
+    if (result) childBlocksCache.set(key, { source, result });
+    else childBlocksCache.delete(key);
+  }
 
   return {
 // ── blocks ──────────────────────────────────────────────────────────
@@ -119,51 +288,133 @@ export function createBlockStoreActions(
       // (conflict recovery) skips both the cache render and the fresh-skip.
       const hydrated = force ? false : await hydrateBlocksFromCache(pageId);
       if (hydrated && (await blocksCacheFresh(pageId))) return;
+      // A cache-only load has no remote response to order and must not retire
+      // an already-started forced reconciliation generation. Acquire the
+      // application token only when this lane will actually issue a read.
+      const readToken = beginReadApplication(readApplicationKey.blocks(pageId));
       try {
-        const blocks = (await getPageBlocksRemote(pageId)).blocks
-          .map(remoteBlockWithOptimisticOverlay)
-          .sort(bySortPos);
-        if (
-          loadUserId && permanentDeleteIds(loadUserId).has(pageId)
-        ) return;
-        const entries = loadUserId ? await outboxAllEntries(loadUserId) : [];
-        const projectedBlocks = overlayOutboxOnBlocks(entries, pageId, blocks);
-        set((s) => {
-          const fetchedIds = new Set(projectedBlocks.map((block) => block.id));
-          const currentBlocks = overlayOutboxOnBlocks(
-            entries,
-            pageId,
-            s.blocksByPage[pageId] ?? []
-          );
-          const optimisticBlocks = currentBlocks.filter(
-            (block) => !fetchedIds.has(block.id)
-          );
-          // Overlay still-pending debounced edits so a patch typed between the
-          // cache render and this refresh isn't visually reverted.
-          const withPending = projectedBlocks.map((block) => {
-            const pending = pendingBlock.get(block.id);
-            return pending && Object.keys(pending).length ? { ...block, ...pending } : block;
-          });
-          return {
-            blocksByPage: {
-              ...s.blocksByPage,
-              [pageId]: [...withPending, ...optimisticBlocks].sort(bySortPos),
-            },
-            loadedBlockPages: new Set(s.loadedBlockPages).add(pageId),
-          };
+        const result = await getPageBlocksRemote(pageId);
+        recordBlockReadDebug({
+          event: "response",
+          force,
+          pageId,
+          remote: debugBlockReadBlocks(result.blocks),
+          state: debugBlockReadBlocks(get().blocksByPage[pageId] ?? []),
         });
-        cacheReplaceTable(
-          outboxUserId(),
-          recordCacheTables.blocks(pageId),
-          blocks.map((block) => ({ id: block.id, value: block }))
-        );
-        stampBlocksCached(outboxUserId(), pageId);
-        cacheSetMeta(
-          outboxUserId(),
-          recordCacheMeta.blocksStamp(pageId),
-          get().pagesById[pageId]?.updatedAt ?? ""
-        );
+        const applicationTurnAccepted = await applyLatestRead(readToken, async () => {
+          if (
+            loadUserId && permanentDeleteIds(loadUserId).has(pageId)
+          ) return;
+          const entries = loadUserId ? await outboxAllEntries(loadUserId) : [];
+          if (
+            loadUserId && permanentDeleteIds(loadUserId).has(pageId)
+          ) return;
+          // Projection intentionally waits until after the async outbox read.
+          // A local write can be accepted during that await; its application
+          // barrier makes this token stale, so never apply or cache the older
+          // server snapshot and never let it clear a newer optimistic overlay.
+          if (!readApplicationIsLatest(readToken)) {
+            recordBlockReadDebug({
+              event: "stale_after_outbox",
+              force,
+              outbox: debugBlockReadOutbox(entries),
+              pageId,
+              remote: debugBlockReadBlocks(result.blocks),
+              state: debugBlockReadBlocks(get().blocksByPage[pageId] ?? []),
+            });
+            return;
+          }
+          const blocks = result.blocks
+            .map(remoteBlockWithOptimisticOverlay)
+            .sort(bySortPos);
+          const projectedBlocks = overlayOutboxOnBlocks(entries, pageId, blocks);
+          const currentDeferredBlocks = (get().blocksByPage[pageId] ?? []).filter(
+            (block) => deferredBlockCreateIds.has(block.id),
+          );
+          set((s) => {
+            const fetchedIds = new Set(projectedBlocks.map((block) => block.id));
+            const currentBlocks = overlayOutboxOnBlocks(
+              entries,
+              pageId,
+              s.blocksByPage[pageId] ?? []
+            );
+            const optimisticBlocks = currentBlocks.filter(
+              (block) =>
+                !fetchedIds.has(block.id) &&
+                (pendingBlockCreate.has(block.id) ||
+                  pendingBlock.has(block.id) ||
+                  optimisticBlockOverlays.has(block.id) ||
+                  (projectedBlocks.length === 0 && deferredBlockCreateIds.has(block.id)))
+            );
+            // Overlay still-pending debounced edits so a patch typed between the
+            // cache render and this refresh isn't visually reverted.
+            const withPending = projectedBlocks.map((block) => {
+              const pending = pendingBlock.get(block.id);
+              return pending && Object.keys(pending).length ? { ...block, ...pending } : block;
+            });
+            return {
+              blocksByPage: {
+                ...s.blocksByPage,
+                [pageId]: [...withPending, ...optimisticBlocks].sort(bySortPos),
+              },
+              loadedBlockPages: new Set(s.loadedBlockPages).add(pageId),
+            };
+          });
+          recordBlockReadDebug({
+            event: "applied",
+            force,
+            outbox: debugBlockReadOutbox(entries),
+            pageId,
+            remote: debugBlockReadBlocks(result.blocks),
+            state: debugBlockReadBlocks(get().blocksByPage[pageId] ?? []),
+          });
+          if (projectedBlocks.length > 0) {
+            clearDeferredBlockCreatesForPage(pageId, currentDeferredBlocks);
+          }
+          await Promise.all([
+            applyEmbeddedDatabaseSnapshots(result.embeddedDatabases ?? [], readToken),
+            cacheReplaceTable(
+              outboxUserId(),
+              recordCacheTables.blocks(pageId),
+              blocks.map((block) => ({ id: block.id, value: block }))
+            ),
+            stampBlocksCached(outboxUserId(), pageId),
+            cacheSetMeta(
+              outboxUserId(),
+              recordCacheMeta.blocksStamp(pageId),
+              get().pagesById[pageId]?.updatedAt ?? ""
+            ),
+          ]);
+        });
+        if (!applicationTurnAccepted) {
+          recordBlockReadDebug({
+            event: "application_turn_rejected",
+            force,
+            pageId,
+            remote: debugBlockReadBlocks(result.blocks),
+            state: debugBlockReadBlocks(get().blocksByPage[pageId] ?? []),
+          });
+        }
       } catch (error) {
+        const status = persistErrorStatus(error);
+        if (status === 401 || status === 403 || status === 404) {
+          await applyDefinitiveReadDenial(readToken, async () => {
+            const cacheUserId = outboxUserId();
+            await Promise.all([
+              cacheReplaceTable(cacheUserId, recordCacheTables.blocks(pageId), []),
+              cacheSetMeta(cacheUserId, recordCacheMeta.blocksStamp(pageId), ""),
+            ]);
+            clearDeferredBlockCreatesForPage(pageId, get().blocksByPage[pageId] ?? []);
+            set((state) => {
+              const blocksByPage = { ...state.blocksByPage };
+              delete blocksByPage[pageId];
+              const loadedBlockPages = new Set(state.loadedBlockPages);
+              loadedBlockPages.delete(pageId);
+              return { blocksByPage, loadedBlockPages };
+            });
+          });
+          throw error;
+        }
         // Offline with a cached render: the cache stands and queued edits
         // keep retrying; without a cache the caller sees the failure.
         if (!hydrated) throw error;
@@ -175,31 +426,127 @@ export function createBlockStoreActions(
     return promise;
   },
 
+  async runPageButton(pageId, blockId, confirmationToken) {
+    const key = `${pageId}\u001f${blockId}`;
+    const active = pageButtonExecutionPromises.get(key);
+    if (active) return active;
+
+    const run = (async () => {
+      if (!get().userId) await ensureAuth();
+      const beforeFlush = get().pagesById[pageId];
+      const sourceBeforeFlush = (get().blocksByPage[pageId] ?? []).find((block) => block.id === blockId);
+      if (!beforeFlush || !sourceBeforeFlush || sourceBeforeFlush.type !== "button") return undefined;
+      if (!canEditPageInState(get(), beforeFlush)) {
+        get().notify(storeMessages().editAccessDeniedSave, "default");
+        return undefined;
+      }
+      if (beforeFlush.isLocked) {
+        get().notify(storeMessages().pageLockedSave, "default");
+        return undefined;
+      }
+      await flushBlock(blockId);
+      const page = get().pagesById[pageId];
+      const source = (get().blocksByPage[pageId] ?? []).find((block) => block.id === blockId);
+      if (!page || !source || source.type !== "button") return undefined;
+
+      let executionId = pageButtonRetryIds.get(key);
+      if (!executionId) {
+        executionId = newId();
+        pageButtonRetryIds.set(key, executionId);
+        while (pageButtonRetryIds.size > PAGE_BUTTON_RETRY_LIMIT) {
+          const oldest = pageButtonRetryIds.keys().next().value as string | undefined;
+          if (!oldest) break;
+          pageButtonRetryIds.delete(oldest);
+        }
+      }
+      try {
+        const result = await executePageButtonRemote({
+          workspaceId: page.workspaceId,
+          pageId,
+          blockId,
+          executionId,
+          ...(confirmationToken ? { confirmationToken } : {}),
+        });
+        if (buttonResultRequiresConfirmation(result)) return result;
+        pageButtonRetryIds.delete(key);
+        const pageAdoption = prepareButtonPageResultAdoption(
+          result,
+          remotePageWithOptimisticOverlay,
+        );
+        set((state) => {
+          return {
+            blocksByPage: upsertBlocksIntoPages(state.blocksByPage, result.insertedBlocks),
+            ...pageAdoption.apply(state),
+          };
+        });
+        if (result.insertedBlocks.length > 0) {
+          publishBlockStructureMutation(
+            pageId,
+            "page-button-execute",
+            result.insertedBlocks.map((block) => block.id),
+          );
+        }
+        for (const mutation of pageAdoption.mutations) {
+          publishDatabaseRowsMutation(
+            mutation.databaseId,
+            mutation.reason,
+            mutation.rowIds,
+          );
+        }
+        return {
+          ...result,
+          createdPages: pageAdoption.createdPages,
+          updatedPages: pageAdoption.updatedPages,
+        };
+      } catch (error) {
+        const status = persistErrorStatus(error);
+        if (status !== undefined && status >= 400 && status < 500 && status !== 429) {
+          pageButtonRetryIds.delete(key);
+        }
+        throw error;
+      }
+    })();
+    pageButtonExecutionPromises.set(key, run);
+    try {
+      return await run;
+    } finally {
+      if (pageButtonExecutionPromises.get(key) === run) {
+        pageButtonExecutionPromises.delete(key);
+      }
+    }
+  },
+
+  discardPageButtonExecution(pageId, blockId) {
+    pageButtonRetryIds.delete(`${pageId}\u001f${blockId}`);
+  },
+
   topLevelBlocks(pageId) {
-    // Memoized on the page's block-array identity: repeated calls between
-    // store writes return the SAME array, so useShallow subscribers don't
-    // re-render the whole editor for unrelated store changes.
+    // Content-only writes retain structural source identity and advance only
+    // the affected projection. Membership/order changes use a fresh identity.
     const source = get().blocksByPage[pageId] ?? EMPTY_BLOCK_LIST;
+    const projectionSource = structuralSource(source);
     const cached = topLevelBlocksCache.get(pageId);
-    if (cached && cached.source === source) return cached.result;
+    if (cached && cached.source === projectionSource) return cached.result;
     const result = source.filter((b) => b.parentId == null).sort(bySortPos);
-    topLevelBlocksCache.set(pageId, { source, result });
+    topLevelBlocksCache.set(pageId, { source: projectionSource, result });
     return result;
   },
 
   childBlocks(pageId, parentId) {
     const source = get().blocksByPage[pageId] ?? EMPTY_BLOCK_LIST;
+    const projectionSource = structuralSource(source);
     const key = `${pageId}:${parentId}`;
     const cached = childBlocksCache.get(key);
-    if (cached && cached.source === source) return cached.result;
+    if (cached && cached.source === projectionSource) return cached.result;
     const result = source.filter((b) => b.parentId === parentId).sort(bySortPos);
-    childBlocksCache.set(key, { source, result });
+    childBlocksCache.set(key, { source: projectionSource, result });
     return result;
   },
 
   addBlockLocal(opts) {
     const id = newId();
-    const content = opts.content ?? { rich: [] };
+    const type = opts.type ?? "paragraph";
+    const content = contentForNewBlock(type, opts.content);
     const now = nowIso();
     const block: Block = {
       id,
@@ -207,11 +554,12 @@ export function createBlockStoreActions(
       updatedAt: now,
       pageId: opts.pageId,
       parentId: opts.parentId ?? null,
-      type: opts.type ?? "paragraph",
+      type,
       content,
       plainText: opts.plainText ?? spansToPlainText(content.rich),
       position: opts.position,
       createdBy: get().userId,
+      lastEditedBy: get().userId,
     };
     if (opts.history !== false) {
       get().captureBlockStructureHistory(opts.pageId, {
@@ -221,6 +569,10 @@ export function createBlockStoreActions(
         after: [structureBlockSnapshot(block)],
       });
     }
+    invalidateReadApplication(
+      readApplicationKey.blocks(opts.pageId),
+      `block_add_local:${id}`,
+    );
     set((s) => ({
       blocksByPage: {
         ...s.blocksByPage,
@@ -230,8 +582,12 @@ export function createBlockStoreActions(
       },
     }));
     if (!isTemplateEditorPageId(opts.pageId)) {
-      touchPageForBlockChange(get().updatePage, opts.pageId);
-      if (opts.persist !== false) persistBlockCreate(block);
+      if (opts.deferPersistUntilMutation === true) {
+        deferredBlockCreateIds.add(block.id);
+      } else {
+        touchPageForBlockChange(get().updatePage, opts.pageId);
+        if (opts.persist !== false) persistBlockCreate(block);
+      }
     }
     return block;
   },
@@ -247,50 +603,51 @@ export function createBlockStoreActions(
     if (blocks.length === 0) return;
     const persistable = blocks.filter((block) => !isTemplateEditorPageId(block.pageId));
     if (persistable.length === 0) return;
+    for (const block of persistable) deferredBlockCreateIds.delete(block.id);
+    const ids = new Set(persistable.map((block) => block.id));
+    const pageIds = Array.from(new Set(persistable.map((block) => block.pageId)));
+    const invalidation = blockStructureInvalidation(pageIds, ids);
     // `durableRemoteCall` mirrors the full batch (including generated ids and
     // parent ids) before attempting the network call. A transient failure can
     // therefore replay the same graph after a crash/reload without losing a
     // child or racing it ahead of its parent.
-    const call = await durableRemoteCall("createBlocksRemote", [persistable]);
+    const call = await durableRemoteCall(
+      "createBlocksRemote",
+      [persistable],
+      undefined,
+      invalidation,
+      undefined,
+      () => {
+        for (const id of ids) cancelPendingBlock(id);
+        set((s) => {
+          const blocksByPage = { ...s.blocksByPage };
+          for (const pageId of pageIds) {
+            blocksByPage[pageId] = (blocksByPage[pageId] ?? []).filter(
+              (block) => !ids.has(block.id)
+            );
+          }
+          return { blocksByPage };
+        });
+      }
+    );
     if (call.status === "ok") {
       const persisted = Array.isArray(call.result) ? call.result as Block[] : persistable;
       await Promise.all(
         persisted.map((block) => reconcilePersistedBlockMutation(block.id, block, block.pageId))
       );
     }
-    if (call.status === "dropped") {
-      const ids = new Set(persistable.map((block) => block.id));
-      const pageIds = Array.from(new Set(persistable.map((block) => block.pageId)));
-      for (const id of ids) cancelPendingBlock(id);
-      set((s) => {
-        const blocksByPage = { ...s.blocksByPage };
-        for (const pageId of pageIds) {
-          blocksByPage[pageId] = (blocksByPage[pageId] ?? []).filter(
-            (block) => !ids.has(block.id)
-          );
-        }
-        return { blocksByPage };
-      });
-      await Promise.all(
-        pageIds.map((pageId) => reloadBlocksFromServer(pageId).catch(() => {}))
-      );
-    }
   },
 
   updateBlock(id, patch, opts) {
-    let pageId = "";
     const current = get().blocksByPage;
-    for (const pid of Object.keys(current)) {
-      if (current[pid].some((b) => b.id === id)) {
-        pageId = pid;
-        break;
-      }
-    }
-    if (!pageId) return;
+    const location = resolveBlockLocation(id, opts?.pageId);
+    if (!location) return;
+    const { pageId } = location;
+    const currentBlock = current[pageId]?.[location.index];
+    if (!currentBlock || currentBlock.id !== id) return;
     if (get().pagesById[pageId]?.isLocked) return;
     if (opts?.history !== false) {
-      const currentBlock = current[pageId]?.find((b) => b.id === id);
-      if (currentBlock && isStructureOnlyPatch(patch)) {
+      if (isStructureOnlyPatch(patch)) {
         const nextBlock = structureBlockSnapshot({
           ...currentBlock,
           ...patch,
@@ -309,21 +666,73 @@ export function createBlockStoreActions(
     }
     const nextPatch: Partial<Block> = { ...patch };
     if (!("updatedAt" in nextPatch)) nextPatch.updatedAt = nowIso();
+    if (!("lastEditedBy" in nextPatch)) nextPatch.lastEditedBy = get().userId;
+    invalidateReadApplication(
+      readApplicationKey.blocks(pageId),
+      `block_update_local:${id}`,
+    );
     set((s) => {
+      const source = s.blocksByPage[pageId] ?? [];
+      const resolvedIndex = source[location.index]?.id === id
+        ? location.index
+        : source.findIndex((block) => block.id === id);
+      if (resolvedIndex < 0) {
+        recentBlockLocations.delete(id);
+        return {};
+      }
       const next = { ...s.blocksByPage };
-      const idx = next[pageId].findIndex((b) => b.id === id);
-      const arr = next[pageId].slice();
-      arr[idx] = { ...arr[idx], ...nextPatch };
-      next[pageId] = arr.sort(bySortPos);
+      const previousBlock = source[resolvedIndex];
+      const updatedBlock = { ...previousBlock, ...nextPatch };
+      const arr = source.slice();
+      arr[resolvedIndex] = updatedBlock;
+      const structureChanged =
+        previousBlock.id !== updatedBlock.id ||
+        previousBlock.pageId !== updatedBlock.pageId ||
+        (previousBlock.parentId ?? null) !== (updatedBlock.parentId ?? null) ||
+        previousBlock.position !== updatedBlock.position;
+      if (previousBlock.position !== updatedBlock.position) arr.sort(bySortPos);
+      if (!structureChanged) {
+        advanceContentOnlyProjections(pageId, source, arr, previousBlock, updatedBlock);
+      }
+      next[pageId] = arr;
+      if (updatedBlock.id !== id) recentBlockLocations.delete(id);
+      const updatedIndex = previousBlock.position === updatedBlock.position
+        ? resolvedIndex
+        : arr.findIndex((block) => block.id === updatedBlock.id);
+      if (updatedIndex >= 0) {
+        rememberBlockLocation(updatedBlock.id, { index: updatedIndex, pageId });
+      }
       return { blocksByPage: next };
     });
     if (isTemplateEditorPageId(pageId)) return;
+    if (deferredBlockCreateIds.delete(id)) {
+      const materialized = get().blocksByPage[pageId]?.find((block) => block.id === id);
+      if (materialized) persistBlockCreate(materialized, { touchPage: true });
+      return;
+    }
     if (!pendingBlock.has(id)) {
       // First patch of this burst: remember the last server-known stamp so an
       // offline replay can detect that another device changed the block since.
-      const base = current[pageId]?.find((b) => b.id === id)?.updatedAt;
-      if (base) pendingBlockBase.set(id, base);
-      else pendingBlockBase.delete(id);
+      const inFlightMutationId = inFlightBlockMutationId.get(id);
+      if (inFlightMutationId) {
+        // Keep the pre-flight server stamp as an alternate base. On refresh,
+        // the server accepts the newer snapshot whether the in-flight write
+        // never landed (timestamp still matches) or landed without its ack
+        // (the prior mutation receipt matches).
+        pendingBlockExpectedMutationId.set(id, inFlightMutationId);
+        if (!pendingBlockBase.has(id)) {
+          const base = currentBlock?.updatedAt;
+          if (base) pendingBlockBase.set(id, base);
+        }
+      } else {
+        const base = currentBlock?.updatedAt;
+        if (base) pendingBlockBase.set(id, base);
+        else pendingBlockBase.delete(id);
+        const baseMutationId = currentBlock?.lastMutationId;
+        if (baseMutationId) pendingBlockExpectedMutationId.set(id, baseMutationId);
+        else pendingBlockExpectedMutationId.delete(id);
+      }
+      pendingBlockMutationId.set(id, newId());
     }
     pendingBlock.set(id, { ...(pendingBlock.get(id) ?? {}), ...nextPatch });
     optimisticBlockOverlays.set(id, {
@@ -332,109 +741,76 @@ export function createBlockStoreActions(
     });
     if (pageId) pendingBlockPage.set(id, pageId);
     mirrorPendingBlock(id);
-    touchPageForBlockChange(get().updatePage, pageId, opts);
+    // Text snapshots already carry their own updatedAt and are the canonical
+    // durable write. A separate debounced page touch doubles the slow-NAS
+    // request load for every typing burst without preserving any extra input.
+    if (!opts?.debounce) touchPageForBlockChange(get().updatePage, pageId, opts);
     if (opts?.debounce) {
-      const t = blockTimers.get(id);
-      if (t) clearTimeout(t);
-      blockTimers.set(id, setTimeout(() => void flushBlock(id), 400));
+      const debounceMs = typeof opts.debounceMs === "number" && Number.isFinite(opts.debounceMs)
+        ? Math.max(0, opts.debounceMs)
+        : undefined;
+      scheduleBlockBatch(pageId, debounceMs);
     } else {
       void flushBlock(id);
     }
   },
 
   applyRemoteBlockText(id, patch) {
-    let pageId = "";
-    const current = get().blocksByPage;
-    for (const pid of Object.keys(current)) {
-      if (current[pid].some((b) => b.id === id)) {
-        pageId = pid;
-        break;
-      }
-    }
-    if (!pageId) return;
+    const location = resolveBlockLocation(id);
+    if (!location) return;
+    const { pageId } = location;
     if (get().pagesById[pageId]?.isLocked) return;
-    cancelPendingBlock(id);
+
+    // Collaboration timestamps order room/document snapshots; they are not a
+    // revision of the canonical block row. Keeping one on Block.updatedAt
+    // makes the next ordinary outbox generation send a base the server has
+    // never stored and falsely reject the same user's edit with 409.
+    const textPatch: Pick<Partial<Block>, "content" | "plainText"> = {};
+    if (patch.content !== undefined) textPatch.content = patch.content;
+    if (patch.plainText !== undefined) textPatch.plainText = patch.plainText;
+
+    // A safe CRDT merge received while this tab already owns a canonical
+    // generation updates that same bounded generation. It must not cancel the
+    // durable outbox entry, change its captured server base, or mint a second
+    // mutation receipt.
+    const pending = pendingBlock.get(id);
+    if (pending) {
+      pendingBlock.set(id, { ...pending, ...textPatch });
+      optimisticBlockOverlays.set(id, {
+        ...(optimisticBlockOverlays.get(id) ?? {}),
+        ...textPatch,
+      });
+      mirrorPendingBlock(id);
+    }
 
     set((s) => {
       const list = s.blocksByPage[pageId] ?? [];
-      const idx = list.findIndex((b) => b.id === id);
+      const idx = list[location.index]?.id === id
+        ? location.index
+        : list.findIndex((block) => block.id === id);
       if (idx < 0) return {};
       const arr = list.slice();
-      arr[idx] = { ...arr[idx], ...patch };
+      const previousBlock = arr[idx];
+      const nextBlock = { ...previousBlock, ...textPatch, ...(pendingBlock.get(id) ?? {}) };
+      arr[idx] = nextBlock;
+      const structureChanged =
+        previousBlock.id !== nextBlock.id ||
+        previousBlock.pageId !== nextBlock.pageId ||
+        (previousBlock.parentId ?? null) !== (nextBlock.parentId ?? null) ||
+        previousBlock.position !== nextBlock.position;
+      if (previousBlock.position !== nextBlock.position) arr.sort(bySortPos);
+      if (!structureChanged) {
+        advanceContentOnlyProjections(pageId, list, arr, previousBlock, nextBlock);
+      }
+      const nextIndex = previousBlock.position === nextBlock.position
+        ? idx
+        : arr.findIndex((block) => block.id === nextBlock.id);
+      if (nextIndex >= 0) rememberBlockLocation(nextBlock.id, { index: nextIndex, pageId });
       return {
         blocksByPage: {
           ...s.blocksByPage,
-          [pageId]: arr.sort(bySortPos),
+          [pageId]: arr,
         },
-      };
-    });
-  },
-
-  // Forward-apply a collaborator's structure operation (indent/move/create/
-  // delete/restore) from the op log. Same target semantics as a local redo of
-  // the operation; never captures local history and never persists — the
-  // origin client already did.
-  applyRemoteBlockStructure(pageId, operation) {
-    if (get().pagesById[pageId]?.isLocked) return;
-    const loaded = get().blocksByPage[pageId];
-    // Blocks not loaded yet: loadBlocks will fetch server truth including this
-    // change, so applying a partial snapshot here would only fight it.
-    if (!loaded) return;
-
-    const toBlock = (payload: CollaborationBlockStructureBlock): Block =>
-      structureBlockSnapshot({
-        id: payload.id,
-        pageId: payload.pageId,
-        parentId: payload.parentId ?? null,
-        type: (payload.type ?? "paragraph") as Block["type"],
-        content: (payload.content ?? {}) as Block["content"],
-        plainText: payload.plainText ?? "",
-        position: payload.position,
-        createdBy: payload.createdBy,
-        createdAt: payload.createdAt,
-        updatedAt: payload.updatedAt,
-      } as Block);
-
-    const target = historyOperationTarget(
-      {
-        action: operation.action,
-        pageId,
-        blockIds: operation.blockIds,
-        before: (operation.before ?? []).map(toBlock),
-        after: (operation.after ?? []).map(toBlock),
-        occurredAt: "",
-      },
-      "redo"
-    );
-
-    const byId = new Map(loaded.map((block) => [block.id, block]));
-    const removeIds = new Set(
-      target.remove.filter((block) => block.pageId === pageId).map((block) => block.id)
-    );
-    const upsert = target.upsert.filter((block) => {
-      // Op-log records are scoped to this page; ignore anything else.
-      if (block.pageId !== pageId) return false;
-      const current = byId.get(block.id);
-      // A structural patch (move/indent) for a block we don't have would
-      // resurrect it from a stale snapshot — skip; create/restore may insert.
-      if (target.structuralOnly && !current) return false;
-      // Don't let an older remote snapshot undo a newer local change.
-      const localAt = Date.parse(current?.updatedAt ?? "");
-      const remoteAt = Date.parse(block.updatedAt ?? "");
-      if (Number.isFinite(localAt) && Number.isFinite(remoteAt) && remoteAt < localAt) {
-        return false;
-      }
-      return true;
-    });
-    if (removeIds.size === 0 && upsert.length === 0) return;
-
-    for (const id of removeIds) cancelPendingBlock(id);
-    set((s) => {
-      const removed = removeBlocksFromPages(s.blocksByPage, removeIds);
-      return {
-        blocksByPage: upsertBlocksIntoPages(removed, upsert, {
-          structuralOnly: target.structuralOnly,
-        }),
       };
     });
   },
@@ -468,17 +844,26 @@ export function createBlockStoreActions(
       }, opts?.history ?? "push");
     }
     for (const blockId of toRemove) cancelPendingBlock(blockId);
+    const durableIds = Array.from(toRemove).filter(
+      (blockId) => !deferredBlockCreateIds.delete(blockId),
+    );
     if (pageId) {
+      invalidateReadApplication(
+        readApplicationKey.blocks(pageId),
+        `block_delete_local:${Array.from(toRemove).sort().join(",")}`,
+      );
       set((s) => ({
         blocksByPage: {
           ...s.blocksByPage,
           [pageId]: (s.blocksByPage[pageId] ?? []).filter((b) => !toRemove.has(b.id)),
         },
       }));
-      if (!isTemplateEditorPageId(pageId)) touchPageForBlockChange(get().updatePage, pageId);
+      if (!isTemplateEditorPageId(pageId) && durableIds.length > 0) {
+        touchPageForBlockChange(get().updatePage, pageId);
+      }
     }
-    if (pageId && !isTemplateEditorPageId(pageId)) {
-      await persistBlockDelete(Array.from(toRemove), pageId);
+    if (pageId && !isTemplateEditorPageId(pageId) && durableIds.length > 0) {
+      await persistBlockDelete(durableIds, pageId);
     }
   },
 
@@ -546,6 +931,7 @@ export function createBlockStoreActions(
     const targetHistoryBefore = get().blockHistoryByPage[targetPageId];
     set((s) => {
       const entryFor = (pageId: string, otherPageId: string): BlockHistoryEntry => ({
+        actorId: get().userId,
         blocks: cloneBlocks(s.blocksByPage[pageId] ?? []),
         operations: [moveOperation],
         at: linkedAt,
@@ -565,57 +951,73 @@ export function createBlockStoreActions(
       };
     });
 
+    const optimisticSourceBlocks = sourceBlocks.filter(
+      (block) => !movingIds.has(block.id)
+    );
+    const optimisticTargetBlocks = [
+      ...targetBlocks.filter((block) => !movingIds.has(block.id)),
+      ...updatedBlocks,
+    ].sort(bySortPos);
+
     // Apply the move locally BEFORE any network round-trip so an offline move
     // still lands (and the history entries above never dangle unapplied).
     set((s) => ({
       blocksByPage: {
         ...s.blocksByPage,
-        [sourcePageId]: (s.blocksByPage[sourcePageId] ?? []).filter(
-          (block) => !movingIds.has(block.id)
-        ),
-        [targetPageId]: [
-          ...(s.blocksByPage[targetPageId] ?? []).filter((block) => !movingIds.has(block.id)),
-          ...updatedBlocks,
-        ].sort(bySortPos),
+        [sourcePageId]: optimisticSourceBlocks,
+        [targetPageId]: optimisticTargetBlocks,
       },
       loadedBlockPages: new Set(s.loadedBlockPages).add(targetPageId),
     }));
     touchPageForBlockChange(get().updatePage, sourcePageId);
     touchPageForBlockChange(get().updatePage, targetPageId);
+    const sourceHistoryAfter = get().blockHistoryByPage[sourcePageId];
+    const targetHistoryAfter = get().blockHistoryByPage[targetPageId];
 
     const movedRoot = updatedBlocks.find((block) => block.id === id)!;
-    const blocksPersist = await durableRemoteCall("updateBlockRemote", [
-      movedRoot.id,
-      {
-        pageId: movedRoot.pageId,
-        parentId: movedRoot.parentId,
-        position: movedRoot.position,
-      } as Partial<Block>,
-      targetPageId,
-    ]);
+    const blocksPersist = await durableRemoteCall(
+      "updateBlockRemote",
+      [
+        movedRoot.id,
+        {
+          pageId: movedRoot.pageId,
+          parentId: movedRoot.parentId,
+          position: movedRoot.position,
+        } as Partial<Block>,
+        targetPageId,
+      ],
+      undefined,
+      blockStructureInvalidation([sourcePageId, targetPageId], movingIds),
+      undefined,
+      () => {
+        set((s) => {
+          const blockHistoryByPage = { ...s.blockHistoryByPage };
+          if (s.blockHistoryByPage[sourcePageId] === sourceHistoryAfter) {
+            if (sourceHistoryBefore) blockHistoryByPage[sourcePageId] = sourceHistoryBefore;
+            else delete blockHistoryByPage[sourcePageId];
+          }
+          if (s.blockHistoryByPage[targetPageId] === targetHistoryAfter) {
+            if (targetHistoryBefore) blockHistoryByPage[targetPageId] = targetHistoryBefore;
+            else delete blockHistoryByPage[targetPageId];
+          }
+          return {
+            blocksByPage: {
+              ...s.blocksByPage,
+              ...(snapshotsEqual(s.blocksByPage[sourcePageId] ?? [], optimisticSourceBlocks)
+                ? { [sourcePageId]: sourceBlocks }
+                : {}),
+              ...(snapshotsEqual(s.blocksByPage[targetPageId] ?? [], optimisticTargetBlocks)
+                ? { [targetPageId]: targetBlocks }
+                : {}),
+            },
+            blockHistoryByPage,
+          };
+        });
+      }
+    );
     if (blocksPersist.status === "dropped") {
-      set((s) => {
-        const blockHistoryByPage = { ...s.blockHistoryByPage };
-        if (sourceHistoryBefore) blockHistoryByPage[sourcePageId] = sourceHistoryBefore;
-        else delete blockHistoryByPage[sourcePageId];
-        if (targetHistoryBefore) blockHistoryByPage[targetPageId] = targetHistoryBefore;
-        else delete blockHistoryByPage[targetPageId];
-        return {
-          blocksByPage: {
-            ...s.blocksByPage,
-            [sourcePageId]: sourceBlocks,
-            [targetPageId]: targetBlocks,
-          },
-          blockHistoryByPage,
-        };
-      });
-      await Promise.all([
-        reloadBlocksFromServer(sourcePageId).catch(() => {}),
-        reloadBlocksFromServer(targetPageId).catch(() => {}),
-      ]);
       throw blocksPersist.error;
     }
-
     // Comment migration is best-effort AFTER the move: a failed fetch (e.g.
     // offline) skips it with a toast instead of blocking the move or leaving
     // a stray history entry for a move that never applied.
@@ -628,6 +1030,8 @@ export function createBlockStoreActions(
       get().notify(storeMessages().blockMoveCommentsSkipped, "error");
       return;
     }
+    const sourceCommentsBefore = get().commentsByPage[sourcePageId];
+    const targetCommentsBefore = get().commentsByPage[targetPageId];
     set((s) => {
       const commentsByPage = { ...s.commentsByPage };
       if (commentsByPage[sourcePageId]) {
@@ -642,6 +1046,12 @@ export function createBlockStoreActions(
       }
       return { commentsByPage };
     });
+    const sourceCommentsAfter = get().commentsByPage[sourcePageId];
+    const targetCommentsAfter = get().commentsByPage[targetPageId];
+    void Promise.all([
+      cacheCurrentComments(sourcePageId),
+      cacheCurrentComments(targetPageId),
+    ]);
 
     // No comments on the moved blocks means no secondary write. When there is
     // one, a terminal drop is a partial operation: reconcile both comment
@@ -653,12 +1063,27 @@ export function createBlockStoreActions(
           patch: { pageId: targetPageId } as Partial<Comment>,
         })),
         targetPageId,
-      ]);
-      if (commentsCall.status === "dropped") {
+      ], undefined, undefined, {
+        commentPageIds: [sourcePageId, targetPageId],
+      }, async () => {
+        set((s) => {
+          const commentsByPage = { ...s.commentsByPage };
+          if (s.commentsByPage[sourcePageId] === sourceCommentsAfter) {
+            if (sourceCommentsBefore) commentsByPage[sourcePageId] = sourceCommentsBefore;
+            else delete commentsByPage[sourcePageId];
+          }
+          if (s.commentsByPage[targetPageId] === targetCommentsAfter) {
+            if (targetCommentsBefore) commentsByPage[targetPageId] = targetCommentsBefore;
+            else delete commentsByPage[targetPageId];
+          }
+          return { commentsByPage };
+        });
         await Promise.all([
-          get().loadComments(sourcePageId, { force: true }).catch(() => {}),
-          get().loadComments(targetPageId, { force: true }).catch(() => {}),
+          cacheCurrentComments(sourcePageId),
+          cacheCurrentComments(targetPageId),
         ]);
+      });
+      if (commentsCall.status === "dropped") {
         throw commentsCall.error;
       }
       if (commentsCall.status === "ok") {
@@ -730,24 +1155,34 @@ export function createBlockStoreActions(
 	    }));
 	    touchPageForBlockChange(get().updatePage, targetPageId);
 
-	    const call = await durableRemoteCall("createBlocksRemote", [newBlocks]);
+	    const copiedIds = new Set(newBlocks.map((block) => block.id));
+	    const historyAfter = get().blockHistoryByPage[targetPageId];
+	    const call = await durableRemoteCall(
+        "createBlocksRemote",
+        [newBlocks],
+        undefined,
+        blockStructureInvalidation([targetPageId], copiedIds),
+        undefined,
+        () => {
+          set((s) => {
+            const blockHistoryByPage = { ...s.blockHistoryByPage };
+            if (s.blockHistoryByPage[targetPageId] === historyAfter) {
+              if (historyBefore) blockHistoryByPage[targetPageId] = historyBefore;
+              else delete blockHistoryByPage[targetPageId];
+            }
+            return {
+              blocksByPage: {
+                ...s.blocksByPage,
+                [targetPageId]: (s.blocksByPage[targetPageId] ?? []).filter(
+                  (block) => !copiedIds.has(block.id)
+                ),
+              },
+              blockHistoryByPage,
+            };
+          });
+        }
+      );
     if (call.status === "dropped") {
-      const copiedIds = new Set(newBlocks.map((block) => block.id));
-      set((s) => {
-        const blockHistoryByPage = { ...s.blockHistoryByPage };
-        if (historyBefore) blockHistoryByPage[targetPageId] = historyBefore;
-        else delete blockHistoryByPage[targetPageId];
-        return {
-          blocksByPage: {
-            ...s.blocksByPage,
-            [targetPageId]: (s.blocksByPage[targetPageId] ?? []).filter(
-              (block) => !copiedIds.has(block.id)
-            ),
-          },
-          blockHistoryByPage,
-        };
-      });
-      await reloadBlocksFromServer(targetPageId).catch(() => {});
       return undefined;
     }
     return newBlocks.find((block) => block.parentId == null);
@@ -788,9 +1223,10 @@ export function createBlockStoreActions(
             before: last.operations?.[0]?.before ?? entryOperation.before,
           }],
           at: now,
+          actorId: get().userId,
         })
       : existing.past
-          .concat({ blocks: snapshot, operations: [entryOperation], at: now, mode })
+          .concat({ actorId: get().userId, blocks: snapshot, operations: [entryOperation], at: now, mode })
           .slice(-HISTORY_LIMIT);
     set((s) => ({
       blockHistoryByPage: {
@@ -798,20 +1234,15 @@ export function createBlockStoreActions(
         [pageId]: { past, future: [] },
       },
     }));
-    if (!isTemplateEditorPageId(entryOperation.pageId)) {
-      recordBlockStructureOperation(entryOperation);
-    }
   },
 
   captureBlockHistory(pageId, mode = "push") {
-    const snapshot = cloneBlocks(get().blocksByPage[pageId] ?? []);
     const existing = get().blockHistoryByPage[pageId] ?? { past: [], future: [] };
     const last = existing.past[existing.past.length - 1];
     const now = Date.now();
-    if (last && snapshotsEqual(last.blocks, snapshot)) return;
 
     if (mode === "merge" && last?.mode === "merge" && now - last.at < MERGE_WINDOW_MS) {
-      const past = existing.past.slice(0, -1).concat({ ...last, at: now });
+      const past = existing.past.slice(0, -1).concat({ ...last, actorId: get().userId, at: now });
       set((s) => ({
         blockHistoryByPage: {
           ...s.blockHistoryByPage,
@@ -821,8 +1252,14 @@ export function createBlockStoreActions(
       return;
     }
 
+    // A compatible text burst already owns the complete pre-burst snapshot in
+    // `last`; later characters only extend that generation's time boundary.
+    // Materialize the page only when a new undo generation can actually start.
+    const snapshot = cloneBlocks(get().blocksByPage[pageId] ?? []);
+    if (last && snapshotsEqual(last.blocks, snapshot)) return;
+
     const past = existing.past
-      .concat({ blocks: snapshot, at: now, mode })
+      .concat({ actorId: get().userId, blocks: snapshot, at: now, mode })
       .slice(-HISTORY_LIMIT);
     set((s) => ({
       blockHistoryByPage: {
@@ -842,24 +1279,20 @@ export function createBlockStoreActions(
       const entry = history?.past.at(-1);
       if (!entry) return false;
       if (entry.operations?.length) {
-        const affectedPageIds = new Set<string>([
-          pageId,
-          ...(entry.link ? [entry.link.pageId] : []),
-          ...entry.operations.flatMap((operation) => [
-            operation.pageId,
-            ...operation.before.map((block) => block.pageId),
-            ...operation.after.map((block) => block.pageId),
-          ]),
-        ]);
-        const blocksBefore = new Map(
-          Array.from(affectedPageIds, (affectedPageId) => [
-            affectedPageId,
-            cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
-          ])
-        );
         for (const operation of [...entry.operations].reverse()) {
           const target = historyOperationTarget(operation, "undo");
           const removeIds = new Set(target.remove.map((block) => block.id));
+          const operationPageIds = new Set([
+            operation.pageId,
+            ...operation.before.map((block) => block.pageId),
+            ...operation.after.map((block) => block.pageId),
+          ]);
+          const blocksBefore = new Map(
+            Array.from(operationPageIds, (affectedPageId) => [
+              affectedPageId,
+              cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
+            ])
+          );
           for (const blockId of removeIds) cancelPendingBlock(blockId);
           for (const block of target.upsert) cancelPendingBlock(block.id);
           set((s) => {
@@ -870,25 +1303,33 @@ export function createBlockStoreActions(
               }),
             };
           });
+          const blocksAfter = new Map(
+            Array.from(operationPageIds, (affectedPageId) => [
+              affectedPageId,
+              cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
+            ])
+          );
           if (!isTemplateEditorPageId(operation.pageId)) {
             touchPageForBlockChange(get().updatePage, operation.pageId);
-            const calls = await persistBlockStructureOperation(operation, "undo");
-            if (firstDroppedDurableCall(calls)) {
+            const calls = await persistBlockStructureOperation(operation, "undo", () => {
               set((s) => {
                 const blocksByPage = { ...s.blocksByPage };
                 for (const [affectedPageId, blocks] of blocksBefore) {
-                  blocksByPage[affectedPageId] = blocks;
+                  if (
+                    snapshotsEqual(
+                      s.blocksByPage[affectedPageId] ?? [],
+                      blocksAfter.get(affectedPageId) ?? []
+                    )
+                  ) {
+                    blocksByPage[affectedPageId] = blocks;
+                  }
                 }
                 return { blocksByPage };
               });
-              await Promise.all(
-                Array.from(affectedPageIds, (affectedPageId) =>
-                  reloadBlocksFromServer(affectedPageId).catch(() => {})
-                )
-              );
+            });
+            if (firstDroppedDurableCall(calls)) {
               return false;
             }
-            recordBlockStructureOperation(operation, "inverse");
           }
         }
         set((s) => ({
@@ -923,20 +1364,28 @@ export function createBlockStoreActions(
           [pageId]: {
             past: history.past.slice(0, -1),
             future: history.future
-              .concat({ blocks: current, at: Date.now(), mode: "push" })
+              .concat({ actorId: get().userId, blocks: current, at: Date.now(), mode: "push" })
               .slice(-HISTORY_LIMIT),
           },
         },
       }));
       if (!isTemplateEditorPageId(pageId)) {
         touchPageForBlockChange(get().updatePage, pageId);
-        const calls = await persistBlockSnapshot(pageId, current, restored);
-        if (firstDroppedDurableCall(calls)) {
+        const historyAfter = get().blockHistoryByPage[pageId];
+        const calls = await persistBlockSnapshot(pageId, current, restored, () => {
           set((s) => ({
-            blocksByPage: { ...s.blocksByPage, [pageId]: current },
-            blockHistoryByPage: { ...s.blockHistoryByPage, [pageId]: history },
+            blocksByPage: {
+              ...s.blocksByPage,
+              ...(snapshotsEqual(s.blocksByPage[pageId] ?? [], restored)
+                ? { [pageId]: current }
+                : {}),
+            },
+            blockHistoryByPage: s.blockHistoryByPage[pageId] === historyAfter
+              ? { ...s.blockHistoryByPage, [pageId]: history }
+              : s.blockHistoryByPage,
           }));
-          await reloadBlocksFromServer(pageId).catch(() => {});
+        });
+        if (firstDroppedDurableCall(calls)) {
           return false;
         }
       }
@@ -953,24 +1402,20 @@ export function createBlockStoreActions(
       const entry = history?.future.at(-1);
       if (!entry) return false;
       if (entry.operations?.length) {
-        const affectedPageIds = new Set<string>([
-          pageId,
-          ...(entry.link ? [entry.link.pageId] : []),
-          ...entry.operations.flatMap((operation) => [
-            operation.pageId,
-            ...operation.before.map((block) => block.pageId),
-            ...operation.after.map((block) => block.pageId),
-          ]),
-        ]);
-        const blocksBefore = new Map(
-          Array.from(affectedPageIds, (affectedPageId) => [
-            affectedPageId,
-            cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
-          ])
-        );
         for (const operation of entry.operations) {
           const target = historyOperationTarget(operation, "redo");
           const removeIds = new Set(target.remove.map((block) => block.id));
+          const operationPageIds = new Set([
+            operation.pageId,
+            ...operation.before.map((block) => block.pageId),
+            ...operation.after.map((block) => block.pageId),
+          ]);
+          const blocksBefore = new Map(
+            Array.from(operationPageIds, (affectedPageId) => [
+              affectedPageId,
+              cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
+            ])
+          );
           for (const blockId of removeIds) cancelPendingBlock(blockId);
           for (const block of target.upsert) cancelPendingBlock(block.id);
           set((s) => {
@@ -981,25 +1426,33 @@ export function createBlockStoreActions(
               }),
             };
           });
+          const blocksAfter = new Map(
+            Array.from(operationPageIds, (affectedPageId) => [
+              affectedPageId,
+              cloneBlocks(get().blocksByPage[affectedPageId] ?? []),
+            ])
+          );
           if (!isTemplateEditorPageId(operation.pageId)) {
             touchPageForBlockChange(get().updatePage, operation.pageId);
-            const calls = await persistBlockStructureOperation(operation, "redo");
-            if (firstDroppedDurableCall(calls)) {
+            const calls = await persistBlockStructureOperation(operation, "redo", () => {
               set((s) => {
                 const blocksByPage = { ...s.blocksByPage };
                 for (const [affectedPageId, blocks] of blocksBefore) {
-                  blocksByPage[affectedPageId] = blocks;
+                  if (
+                    snapshotsEqual(
+                      s.blocksByPage[affectedPageId] ?? [],
+                      blocksAfter.get(affectedPageId) ?? []
+                    )
+                  ) {
+                    blocksByPage[affectedPageId] = blocks;
+                  }
                 }
                 return { blocksByPage };
               });
-              await Promise.all(
-                Array.from(affectedPageIds, (affectedPageId) =>
-                  reloadBlocksFromServer(affectedPageId).catch(() => {})
-                )
-              );
+            });
+            if (firstDroppedDurableCall(calls)) {
               return false;
             }
-            recordBlockStructureOperation(operation);
           }
         }
         set((s) => ({
@@ -1032,7 +1485,7 @@ export function createBlockStoreActions(
           ...s.blockHistoryByPage,
           [pageId]: {
             past: history.past
-              .concat({ blocks: current, at: Date.now(), mode: "push" })
+              .concat({ actorId: get().userId, blocks: current, at: Date.now(), mode: "push" })
               .slice(-HISTORY_LIMIT),
             future: history.future.slice(0, -1),
           },
@@ -1040,13 +1493,21 @@ export function createBlockStoreActions(
       }));
       if (!isTemplateEditorPageId(pageId)) {
         touchPageForBlockChange(get().updatePage, pageId);
-        const calls = await persistBlockSnapshot(pageId, current, restored);
-        if (firstDroppedDurableCall(calls)) {
+        const historyAfter = get().blockHistoryByPage[pageId];
+        const calls = await persistBlockSnapshot(pageId, current, restored, () => {
           set((s) => ({
-            blocksByPage: { ...s.blocksByPage, [pageId]: current },
-            blockHistoryByPage: { ...s.blockHistoryByPage, [pageId]: history },
+            blocksByPage: {
+              ...s.blocksByPage,
+              ...(snapshotsEqual(s.blocksByPage[pageId] ?? [], restored)
+                ? { [pageId]: current }
+                : {}),
+            },
+            blockHistoryByPage: s.blockHistoryByPage[pageId] === historyAfter
+              ? { ...s.blockHistoryByPage, [pageId]: history }
+              : s.blockHistoryByPage,
           }));
-          await reloadBlocksFromServer(pageId).catch(() => {});
+        });
+        if (firstDroppedDurableCall(calls)) {
           return false;
         }
       }

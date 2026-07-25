@@ -13,7 +13,7 @@
   "groupName": "Nama kumpulan",
   "groupOptions": "Pilihan kumpulan {{groupName}}",
   "groupThisBoard": "Kumpulkan papan ini",
-  "groupThisBoardDesc": "Tambah sifat Pilih atau Status untuk mencipta lajur.",
+  "groupThisBoardDesc": "Tambah atau pilih sifat Pilih, Status, Orang, atau Pilihan Berbilang untuk membuat lajur.",
   "newGroup": "Kumpulan baharu",
   "newGroupIn": "Kumpulan {{groupName}} baharu dalam {{dbTitle}}",
   "newPage": "Baharu",

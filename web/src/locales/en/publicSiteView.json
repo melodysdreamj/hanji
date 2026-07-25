@@ -1,0 +1,17 @@
+{
+  "navigation": "Site navigation",
+  "search": "Search this site",
+  "clearSearch": "Clear search",
+  "noResults": "No pages found",
+  "breadcrumbs": "Breadcrumbs",
+  "madeWithHanji": "Made with Hanji",
+  "unavailable": "This site is unavailable.",
+  "outsideSite": "The page is not part of this published site.",
+  "tryAgain": "Try again",
+  "errors": {
+    "not-found": "This site may have been unpublished or its address may have changed.",
+    "rate-limited": "This site is receiving too many requests. Wait a moment and try again.",
+    "offline": "Check your connection, then try opening the site again.",
+    "unavailable": "Hanji could not open this site right now. Try again in a moment."
+  }
+}

@@ -92,5 +92,8 @@
     "Jum",
     "Asa"
   ],
-  "you": "Kai"
+  "you": "Kai",
+  "buttonExecutionFailed": "An kasa aiwatar da maɓallin.",
+  "loadingMoreRelations": "Ana loda ƙarin alaƙa...",
+  "loadMoreRelations": "Loda ƙarin alaƙa"
 }

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Добавяне на коментар",
+    "addLink": "Добавяне на връзка",
+    "blockColor": "Приложи последния използван цвят",
+    "bold": "Удебелен",
+    "copyPageLink": "Копирай връзка на страница",
+    "findInPage": "Търси на тази страница",
+    "inlineCode": "Инлайн код",
+    "italic": "Курсив",
+    "moveBlock": "Премести блок",
+    "moveBlockDown": "Премести блок надолу",
+    "moveBlockUp": "Премести блок нагоре",
+    "movePage": "Премести текущата страница",
+    "navigateBack": "Назад",
+    "navigateForward": "Напред",
+    "newPage": "Нова страница",
+    "openBlockMenu": "Отвори действия на блок",
+    "openKeyboardShortcuts": "Отвори клавишни комбинации",
+    "openParentPage": "Отвори родителска страница",
+    "quickFind": "Бързо търсене",
+    "strikethrough": "Зачеркване",
+    "toggleAllToggles": "Разгъни или свий всички тогъли",
+    "toggleSidebar": "Превключи страничната лента",
+    "toggleTheme": "Превключи тъмен режим",
+    "underline": "Подчертаване"
+  },
+  "categories": {
+    "createStyle": "Създаване и стил",
+    "editMove": "Редактиране и преместване",
+    "popular": "Популярни"
+  },
+  "categoriesLabel": "Категории клавишни комбинации",
+  "close": "Затвори",
+  "closeBackdrop": "Затвори клавишните комбинации",
+  "empty": "Няма намерени клавишни комбинации",
+  "keysFor": "Клавиши за {{action}}",
+  "or": "или",
+  "searchLabel": "Търсене на клавишни комбинации",
+  "searchPlaceholder": "Търсене на комбинации…",
+  "searchResults": "Резултати от търсенето",
+  "searchTerms": {
+    "toggleTheme": "тема светла тъмна изглед"
+  },
+  "title": "Клавишни комбинации"
+}

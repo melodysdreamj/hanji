@@ -12,10 +12,11 @@ import type { Block, Comment } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import { nextCover } from "@/lib/covers";
 import { isComposingKeyEvent } from "@/lib/keyboard";
-import { isPageVerified } from "@/lib/pageVerification";
 import { EmojiPicker } from "./EmojiPicker";
 import { PageIconGlyph } from "./PageIcon";
 import { PageBacklinks } from "./PageBacklinks";
+import { VerificationBadge } from "./VerificationBadge";
+import { WikiPageSettingsDialog } from "./WikiView";
 import {
   focusEditable,
   isCaretAtEnd,
@@ -123,6 +124,7 @@ export function PageHeader({
   const titleRef = useRef<HTMLElement>(null);
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [wikiSettingsOpen, setWikiSettingsOpen] = useState(false);
   const pageKind = page?.kind;
   const { t } = useTranslation(["pageHeader", "common"]);
 
@@ -184,8 +186,7 @@ export function PageHeader({
   if (!page) return null;
   const pageCommentsDisplay = page.pageCommentsDisplay ?? "default";
   const hasIcon = page.iconType !== "none" && !!page.icon;
-  const pageVerified = isPageVerified(page);
-  const showHeaderVerificationControl = !readOnly;
+  const showHeaderVerificationControl = !readOnly && !!page.wikiRootId;
   // Offer the comment affordance only when the backend will accept a comment
   // (canComment) — but still let a view-only user open the panel to *read*
   // existing threads. When they can't comment and there are none, hide it.
@@ -258,25 +259,6 @@ export function PageHeader({
         notify(t("pageHeader:restoredIcon"), "success");
       },
     });
-  }
-
-  function toggleVerification() {
-    if (readOnly) return;
-    updatePage(
-      pageId,
-      pageVerified
-        ? {
-            verifiedAt: null,
-            verifiedBy: null,
-            verificationExpiresAt: null,
-          }
-        : {
-            verifiedAt: new Date().toISOString(),
-            verifiedBy: userId || "local-user",
-            verificationExpiresAt: null,
-          }
-    );
-    notify(pageVerified ? t("pageHeader:verificationRemoved") : t("pageHeader:pageVerified"), "success");
   }
 
   function titleText() {
@@ -490,12 +472,12 @@ export function PageHeader({
             <button
               type="button"
               className={styles.ctrlBtn}
-              aria-label={pageVerified ? t("pageHeader:removeVerification") : t("pageHeader:verifyPage")}
+              aria-label={t("pageHeader:verifyPage")}
               data-page-header-control
-              onClick={toggleVerification}
+              onClick={() => setWikiSettingsOpen(true)}
             >
               <CheckIcon size={15} aria-hidden="true" />
-              <span>{pageVerified ? t("pageHeader:removeVerification") : t("pageHeader:addVerification")}</span>
+              <span>{t("pageHeader:addVerification")}</span>
             </button>
           )}
           {showHeaderCommentControl && (
@@ -554,32 +536,35 @@ export function PageHeader({
         </div>
       )}
 
-      <h1
-        className={styles.titleHeading}
-        aria-label={page.title.trim() || t("pageHeader:untitled")}
-      >
-        <span
-          ref={(el) => {
-            titleRef.current = el;
-            registerEditable(`title:${pageId}`, el);
-          }}
-          className={styles.title}
-          contentEditable={!readOnly}
-          role="textbox"
-          tabIndex={0}
-          aria-label={t("pageHeader:pageTitle")}
-          aria-readonly={readOnly}
-          aria-multiline="false"
-          aria-placeholder={t("pageHeader:untitled")}
-          suppressContentEditableWarning
-          data-placeholder={t("pageHeader:untitled")}
-          data-empty={isTitleEmpty(page.title) ? "true" : "false"}
-          spellCheck={false}
-          onInput={readOnly ? undefined : syncTitle}
-          onPaste={readOnly ? undefined : onTitlePaste}
-          onKeyDown={onTitleKeyDown}
-        />
-      </h1>
+      <div className={styles.titleRow}>
+        <h1
+          className={styles.titleHeading}
+          aria-label={page.title.trim() || t("pageHeader:untitled")}
+        >
+          <span
+            ref={(el) => {
+              titleRef.current = el;
+              registerEditable(`title:${pageId}`, el);
+            }}
+            className={styles.title}
+            contentEditable={!readOnly}
+            role="textbox"
+            tabIndex={0}
+            aria-label={t("pageHeader:pageTitle")}
+            aria-readonly={readOnly}
+            aria-multiline="false"
+            aria-placeholder={t("pageHeader:untitled")}
+            suppressContentEditableWarning
+            data-placeholder={t("pageHeader:untitled")}
+            data-empty={isTitleEmpty(page.title) ? "true" : "false"}
+            spellCheck={false}
+            onInput={readOnly ? undefined : syncTitle}
+            onPaste={readOnly ? undefined : onTitlePaste}
+            onKeyDown={onTitleKeyDown}
+          />
+        </h1>
+        <VerificationBadge page={page} />
+      </div>
       {!publicReadOnly && <PageBacklinks pageId={pageId} display={page.backlinksDisplay ?? "default"} />}
       {!publicReadOnly && pageCommentsDisplay === "expanded" && (
         <section className={styles.pageComments} aria-label={t("pageHeader:pageComments")}>
@@ -624,6 +609,14 @@ export function PageHeader({
             </div>
           )}
         </section>
+      )}
+      {wikiSettingsOpen && (
+        <WikiPageSettingsDialog
+          page={page}
+          initialOwners={[]}
+          onClose={() => setWikiSettingsOpen(false)}
+          onSaved={() => {}}
+        />
       )}
     </div>
   );

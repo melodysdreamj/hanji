@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "ആശ്രിതത്വങ്ങൾ:",
     "hint": "ഒരു ബന്ധ പ്രോപ്പർട്ടി ചേർക്കുക",
-    "relationPropertyAriaLabel": "ആശ്രിതത്വ ബന്ധ പ്രോപ്പർട്ടി"
+    "relationPropertyAriaLabel": "ആശ്രിതത്വ ബന്ധ പ്രോപ്പർട്ടി",
+    "makeDependOn": "{{title}} {{predecessor}} -നെ ആശ്രയിച്ചിരിക്കുക",
+    "startFrom": "{{title}} -ൽ നിന്ന് ആശ്രയത്വം ആരംഭിക്കുക"
   },
   "toolbar": {
     "today": "ഇന്ന്",

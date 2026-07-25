@@ -7,7 +7,9 @@
   "dependencies": {
     "hint": "dodaj właściwość relacji",
     "label": "Zależności:",
-    "relationPropertyAriaLabel": "Właściwość relacji zależności"
+    "relationPropertyAriaLabel": "Właściwość relacji zależności",
+    "makeDependOn": "Uzależnij {{title}} od {{predecessor}}",
+    "startFrom": "Rozpocznij zależność od {{title}}"
   },
   "empty": {
     "description": "Widoki osi czasu wymagają właściwości daty początkowej, aby wyświetlać strony w czasie.",

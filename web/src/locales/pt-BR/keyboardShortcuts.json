@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Adicionar comentário",
+    "addLink": "Adicionar link",
+    "blockColor": "Aplicar última cor usada",
+    "bold": "Negrito",
+    "copyPageLink": "Copiar link da página",
+    "findInPage": "Localizar nesta página",
+    "inlineCode": "Código em linha",
+    "italic": "Itálico",
+    "moveBlock": "Mover bloco para outra página",
+    "moveBlockDown": "Mover bloco para baixo",
+    "moveBlockUp": "Mover bloco para cima",
+    "movePage": "Mover página atual",
+    "navigateBack": "Voltar",
+    "navigateForward": "Avançar",
+    "newPage": "Nova página",
+    "openBlockMenu": "Abrir ações do bloco",
+    "openKeyboardShortcuts": "Abrir atalhos do teclado",
+    "openParentPage": "Abrir página pai",
+    "quickFind": "Busca rápida",
+    "strikethrough": "Tachado",
+    "toggleAllToggles": "Expandir ou recolher todos os alternadores",
+    "toggleSidebar": "Alternar barra lateral",
+    "toggleTheme": "Alternar modo escuro",
+    "underline": "Sublinhado"
+  },
+  "categories": {
+    "createStyle": "Criação e estilo",
+    "editMove": "Editar e mover",
+    "popular": "Populares"
+  },
+  "categoriesLabel": "Categorias de atalhos",
+  "close": "Fechar",
+  "closeBackdrop": "Fechar atalhos do teclado",
+  "empty": "Nenhum atalho encontrado",
+  "keysFor": "Teclas para {{action}}",
+  "or": "ou",
+  "searchLabel": "Pesquisar atalhos de teclado",
+  "searchPlaceholder": "Pesquisar atalhos…",
+  "searchResults": "Resultados da pesquisa",
+  "searchTerms": {
+    "toggleTheme": "tema claro escuro aparência"
+  },
+  "title": "Atalhos de teclado"
+}

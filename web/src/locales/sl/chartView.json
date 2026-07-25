@@ -4,7 +4,22 @@
     "sum": "Vsota",
     "average": "Povprečje",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Preverjeno",
+    "count_values": "Število vrednosti",
+    "date_range": "Časovni obseg",
+    "earliest_date": "Najzgodnejši datum",
+    "empty": "Število praznih",
+    "latest_date": "Najpoznejši datum",
+    "median": "Mediana",
+    "not_empty": "Število nepraznih",
+    "percent_checked": "Odstotek preverjenih",
+    "percent_empty": "Odstotek praznih",
+    "percent_not_empty": "Odstotek nepraznih",
+    "percent_unchecked": "Odstotek nepreverjenih",
+    "range": "Razpon",
+    "unchecked": "Nepreverjeno",
+    "unique": "Število edinstvenih"
   },
   "chartAria": "Grafikon {{name}}",
   "chartType": "Vrsta grafikona",
@@ -27,5 +42,9 @@
   "untitledProperty": "Neimenovano",
   "valueProperty": "Vrednostna lastnost",
   "xAxis": "X-os",
-  "yAxis": "Y-os"
+  "yAxis": "Y-os",
+  "dateRangeDays": "{{count}} dni",
+  "missingProperty": "shranjena lastnost",
+  "unsupportedAggregateDesc": "{{aggregate}} ni mogoče izračunati iz lastnosti {{property}}. Izberite združljivo lastnost ali izračun.",
+  "unsupportedAggregateTitle": "Ta izračun grafikona ni na voljo."
 }

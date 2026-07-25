@@ -38,7 +38,7 @@
   "moveTo": "স্থানান্তর করুন",
   "exporting": "রপ্তানি করা হচ্ছে...",
   "exportAsMarkdown": "মার্কডাউন হিসাবে রপ্তানি করুন",
-  "exportAsHanji": "Hanji ফাইল হিসাবে রপ্তানি করুন",
+  "exportAsHanji": "Hanji JSON এক্সপোর্ট (ফাইল বাদে)",
   "importing": "ইম্পোর্ট করা হচ্ছে...",
   "importMarkdown": "মার্কডাউন ইম্পোর্ট করুন",
   "unlockPage": "পৃষ্ঠা আনলক করুন",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "অ্যাক্সেস আপডেট করা যায়নি",
     "removedFromAccessList": "অ্যাক্সেস তালিকা থেকে সরানো হয়েছে",
     "couldntRemoveAccess": "অ্যাক্সেস সরানো যায়নি",
-    "couldntLoadAccessList": "অ্যাক্সেস তালিকা লোড করা যায়নি"
+    "couldntLoadAccessList": "অ্যাক্সেস তালিকা লোড করা যায়নি",
+    "couldntExportHanjiArchive": "Hanji আর্কাইভ এক্সপোর্ট করা যায়নি।",
+    "exportedHanjiArchive": "ফাইলসহ একটি Hanji আর্কাইভ এক্সপোর্ট করা হয়েছে।"
   },
   "user": "ব্যবহারকারী",
   "whoHasAccess": "কার অ্যাক্সেস আছে",
   "workspace": "ওয়ার্কস্পেস",
   "workspaceCount_one": "{{count}} ওয়ার্কস্পেস",
   "workspaceCount_other": "{{count}} ওয়ার্কস্পেস",
-  "you": "আপনি"
+  "you": "আপনি",
+  "exportAsHanjiArchive": "Hanji আর্কাইভ এক্সপোর্ট (ফাইল সহ)",
+  "turnIntoWiki": "উইকিতে রূপান্তর করুন",
+  "undoWiki": "উইকি সরান",
+  "wikiCreated": "পৃষ্ঠাটি উইকিতে রূপান্তরিত হয়েছে",
+  "wikiPageSettings": "উইকি পৃষ্ঠা সেটিংস",
+  "wikiUndone": "উইকি সরানো হয়েছে; পৃষ্ঠার বিষয়বস্তু সংরক্ষিত হয়েছে",
+  "wikiUpdateFailed": "উইকি আপডেট করা যায়নি"
 }

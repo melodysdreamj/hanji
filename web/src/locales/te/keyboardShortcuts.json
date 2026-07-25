@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "వ్యాఖ్య జోడించు",
+    "addLink": "లింక్ జోడించు",
+    "blockColor": "చివరి రంగు వర్తించు",
+    "bold": "బోల్డ్",
+    "copyPageLink": "పేజీ లింక్ కాపీ",
+    "findInPage": "ఈ పేజీలో వెతకండి",
+    "inlineCode": "ఇన్లైన్ కోడ్",
+    "italic": "ఇటాలిక్",
+    "moveBlock": "బ్లాక్ను మరొక పేజీకి తరలించు",
+    "moveBlockDown": "బ్లాక్ను కిందకు తరలించు",
+    "moveBlockUp": "బ్లాక్ను పైకి తరలించు",
+    "movePage": "ప్రస్తుత పేజీని తరలించు",
+    "navigateBack": "వెనక్కి వెళ్ళు",
+    "navigateForward": "ముందుకు వెళ్ళు",
+    "newPage": "కొత్త పేజీ",
+    "openBlockMenu": "బ్లాక్ చర్యలు తెరవండి",
+    "openKeyboardShortcuts": "కీబోర్డ్ సత్వరమార్గాలు తెరవండి",
+    "openParentPage": "మాతృ పేజీని తెరవండి",
+    "quickFind": "శీఘ్ర శోధన",
+    "strikethrough": "స్ట్రైక్త్రూ",
+    "toggleAllToggles": "అన్ని టాగుల్లను విస్తరించు లేదా కుదించు",
+    "toggleSidebar": "సైడ్బార్ టాగుల్ చేయి",
+    "toggleTheme": "డార్క్ మోడ్ టాగుల్ చేయి",
+    "underline": "అండర్లైన్"
+  },
+  "categories": {
+    "createStyle": "సృష్టించు & స్టైల్",
+    "editMove": "సవరించు & తరలించు",
+    "popular": "ప్రముఖ"
+  },
+  "categoriesLabel": "సత్వరమార్గ వర్గాలు",
+  "close": "మూసివేయి",
+  "closeBackdrop": "కీబోర్డ్ సత్వరమార్గాలు మూసివేయి",
+  "empty": "సత్వరమార్గాలు కనుగొనబడలేదు",
+  "keysFor": "{{action}} కీలు",
+  "or": "లేదా",
+  "searchLabel": "కీబోర్డ్ షార్ట్కట్ల శోధన",
+  "searchPlaceholder": "షార్ట్కట్లు శోధించు…",
+  "searchResults": "శోధన ఫలితాలు",
+  "searchTerms": {
+    "toggleTheme": "థీమ్ లైట్ డార్క్ స్వరూపం"
+  },
+  "title": "కీబోర్డ్ షార్ట్కట్లు"
+}

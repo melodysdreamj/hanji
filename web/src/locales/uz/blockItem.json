@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Video taglavhasi",
     "videoEmptyHint": "Video faylni yuklang, to‘g‘ridan-to‘g‘ri havolani joylashtiring yoki YouTube, Vimeo yoki Loom havolasidan foydalaning.",
-    "videoLink": "Video havola"
+    "videoLink": "Video havola",
+    "audioPlaybackFailed": "Bu audioni ijro etib bo‘lmadi. Uni almashtiring yoki asl faylni oching.",
+    "videoPlaybackFailed": "Bu videoni ijro etib bo‘lmadi. Uni almashtiring yoki asl faylni oching."
   },
   "bookmark": {
     "copy": "Xatcho‘p havolasini nusxalash",

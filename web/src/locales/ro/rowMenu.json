@@ -35,7 +35,7 @@
     "rename": "Redenumește",
     "addPageInside": "Adaugă pagină în interior",
     "exportAsMarkdown": "Exportă ca Markdown",
-    "exportAsHanjiFile": "Exportă ca fișier Hanji",
+    "exportAsHanjiFile": "Exportă Hanji JSON (fișiere excluse)",
     "importMarkdown": "Importă Markdown",
     "importing": "Se importă...",
     "unlockPage": "Deblochează pagina",
@@ -44,7 +44,8 @@
     "removeVerification": "Elimină verificarea",
     "verifyPage": "Verifică pagina",
     "customizePage": "Personalizează pagina",
-    "undo": "Anulează"
+    "undo": "Anulează",
+    "exportAsHanjiArchive": "Exportă arhivă Hanji (inclusiv fișiere)"
   },
   "customize": {
     "summaryDefault": "Implicit",
@@ -101,6 +102,8 @@
     "movedToTrash": "Mutată în Coș",
     "restoredPage": "Pagină restaurată",
     "couldntRestorePage": "Nu s-a putut restaura pagina",
-    "couldntMoveToTrash": "Nu s-a putut muta în Coș"
+    "couldntMoveToTrash": "Nu s-a putut muta în Coș",
+    "couldntExportHanjiArchive": "Nu s-a putut exporta arhiva Hanji.",
+    "exportedHanjiArchive": "Arhivă Hanji exportată cu fișiere."
   }
 }

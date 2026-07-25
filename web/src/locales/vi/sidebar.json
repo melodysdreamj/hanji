@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Mở menu workspace",
   "closeWorkspaceMenu": "Đóng menu workspace",
   "workspaceMenu": "Menu không gian làm việc",
-  "exportWorkspace": "Xuất workspace",
+  "exportWorkspace": "Xuất JSON không gian làm việc (không kèm tệp)",
   "exportedWorkspace": "Đã xuất workspace dưới dạng tệp Hanji.",
   "exportedWorkspaceWithPlaceholders": "Đã xuất workspace dưới dạng tệp Hanji — tệp đính kèm được giữ làm chỗ giữ chỗ.",
   "couldntExportWorkspace": "Không thể xuất workspace.",
@@ -76,5 +76,12 @@
     "later": "Để sau",
     "note": "Bạn có thể bắt đầu việc này sau từ mục Nhập trong thanh bên.",
     "title": "Nhập không gian làm việc Notion của bạn vào Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Thêm trang vào {{name}}",
+  "couldntExportWorkspaceArchive": "Không thể xuất kho lưu trữ không gian làm việc.",
+  "exportedWorkspaceArchive": "Đã xuất kho lưu trữ không gian làm việc kèm tệp.",
+  "exportWorkspaceArchive": "Xuất kho lưu trữ không gian làm việc (kèm tệp)",
+  "joinTeamspaces": "Tham gia teamspace",
+  "keyboardShortcuts": "Phím tắt",
+  "teamspacePages": "Trang của {{name}}"
 }

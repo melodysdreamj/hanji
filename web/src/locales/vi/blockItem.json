@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Chú thích video",
     "videoEmptyHint": "Tải tệp video lên, dán liên kết trực tiếp hoặc dùng liên kết YouTube, Vimeo, hay Loom.",
-    "videoLink": "Liên kết video"
+    "videoLink": "Liên kết video",
+    "audioPlaybackFailed": "Không thể phát âm thanh này. Hãy thay thế hoặc mở tệp gốc.",
+    "videoPlaybackFailed": "Không thể phát video này. Hãy thay thế hoặc mở tệp gốc."
   },
   "bookmark": {
     "copy": "Sao chép liên kết bookmark",

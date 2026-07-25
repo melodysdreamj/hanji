@@ -92,5 +92,8 @@
     "C",
     "Ş"
   ],
-  "you": "Siz"
+  "you": "Siz",
+  "buttonExecutionFailed": "Düymə işlədilə bilmədi.",
+  "loadingMoreRelations": "Daha çox əlaqə yüklənir...",
+  "loadMoreRelations": "Daha çox əlaqə yüklə"
 }

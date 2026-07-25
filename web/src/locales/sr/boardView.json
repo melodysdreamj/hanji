@@ -13,7 +13,7 @@
   "groupName": "Naziv grupe",
   "groupOptions": "Opcije grupe {{groupName}}",
   "groupThisBoard": "Grupiraj ovu tablu",
-  "groupThisBoardDesc": "Dodajte svojstvo Select ili Status da biste kreirali kolone.",
+  "groupThisBoardDesc": "Dodajte ili izaberite svojstvo Select, Status, Osoba ili Višestruki izbor da biste kreirali kolone.",
   "newGroup": "Nova grupa",
   "newGroupIn": "Nova grupa {{groupName}} u {{dbTitle}}",
   "newPage": "Nova",

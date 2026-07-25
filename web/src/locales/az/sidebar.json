@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "İş sahəsi menyusunu aç",
   "closeWorkspaceMenu": "İş sahəsi menyusunu bağla",
   "workspaceMenu": "İş Məkanı menyusu",
-  "exportWorkspace": "İş sahəsini ixrac et",
+  "exportWorkspace": "İş sahəsi JSON-unu ixrac et (fayllar olmadan)",
   "exportedWorkspace": "İş sahəsi Hanji faylı kimi ixrac edildi.",
   "exportedWorkspaceWithPlaceholders": "İş sahəsi Hanji faylı kimi ixrac edildi — əlavələr yer tutucular kimi qaldı.",
   "couldntExportWorkspace": "İş sahəsi ixrac edilə bilmədi.",
@@ -76,5 +76,12 @@
     "later": "Sonra",
     "note": "Bunu daha sonra yan paneldəki İdxal bölməsindən başlada bilərsiniz.",
     "title": "Notion iş sahənizi Hanji-yə idxal etmək istəyirsiniz?"
-  }
+  },
+  "addPageToTeamspace": "{{name}}-ə səhifə əlavə et",
+  "couldntExportWorkspaceArchive": "İş sahəsi arxivini ixrac etmək mümkün olmadı.",
+  "exportedWorkspaceArchive": "İş sahəsi arxivini fayllarla ixrac etdi.",
+  "exportWorkspaceArchive": "İş sahəsi arxivini ixrac et (fayllar daxil olmaqla)",
+  "joinTeamspaces": "Teamspace-lərə qoşul",
+  "keyboardShortcuts": "Klaviatura qısa yolları",
+  "teamspacePages": "{{name}} səhifələri"
 }

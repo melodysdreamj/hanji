@@ -134,6 +134,42 @@ async function pruneReadNotificationsOverCap(
   }
 }
 
+function sameNotificationValue(left: unknown, right: unknown): boolean {
+  if (left === right) return true;
+  if (left === null || right === null || left === undefined || right === undefined) return false;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return Array.isArray(left)
+      && Array.isArray(right)
+      && left.length === right.length
+      && left.every((value, index) => sameNotificationValue(value, right[index]));
+  }
+  if (typeof left !== 'object' || typeof right !== 'object') return false;
+  const leftRecord = left as Record<string, unknown>;
+  const rightRecord = right as Record<string, unknown>;
+  const leftKeys = Object.keys(leftRecord).filter((key) => leftRecord[key] !== undefined).sort();
+  const rightKeys = Object.keys(rightRecord).filter((key) => rightRecord[key] !== undefined).sort();
+  return leftKeys.length === rightKeys.length
+    && leftKeys.every(
+      (key, index) => key === rightKeys[index]
+        && sameNotificationValue(leftRecord[key], rightRecord[key]),
+    );
+}
+
+/**
+ * Compare the fields a notification update would actually write. Undefined
+ * values are omitted by the wire/database layer, while JSON metadata is
+ * compared structurally so object key order cannot manufacture a write.
+ */
+export function notificationPatchMatches(
+  current: NotificationRecord,
+  patch: Partial<NotificationRecord>,
+): boolean {
+  const currentRecord = current as unknown as Record<string, unknown>;
+  return Object.entries(patch).every(
+    ([key, value]) => value === undefined || sameNotificationValue(currentRecord[key], value),
+  );
+}
+
 export async function upsertNotification(
   db: DbRef,
   record: Omit<NotificationRecord, 'id'>,
@@ -156,10 +192,12 @@ export async function upsertNotification(
     (item) => item.userId === record.userId && item.activityKey === record.activityKey,
   );
   if (current) {
-    const updated = await notifications.update(current.id, {
+    const patch = {
       ...record,
       readAt: current.readAt ?? null,
-    });
+    };
+    if (notificationPatchMatches(current, patch)) return current;
+    const updated = await notifications.update(current.id, patch);
     try {
       await assertNotificationTargetAvailable(db, record);
     } catch (error) {

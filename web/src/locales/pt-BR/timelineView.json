@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Dependências:",
     "hint": "adicione uma propriedade de relação",
-    "relationPropertyAriaLabel": "Propriedade de relação de dependência"
+    "relationPropertyAriaLabel": "Propriedade de relação de dependência",
+    "makeDependOn": "Tornar {{title}} dependente de {{predecessor}}",
+    "startFrom": "Iniciar dependência de {{title}}"
   },
   "toolbar": {
     "today": "Hoje",

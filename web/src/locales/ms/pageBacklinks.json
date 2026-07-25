@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} pautan balik",
-    "count_other": "{{count}} pautan balik"
+    "count_other": "{{count}} pautan balik",
+    "partial_one": "{{count}}+ pautan balik",
+    "partial_other": "{{count}}+ pautan balik"
   },
   "header": {
     "title": "Sebutan yang dipautkan"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} sebutan",
     "mention_other": "{{count}} sebutan",
     "link_one": "{{count}} pautan",
-    "link_other": "{{count}} pautan"
+    "link_other": "{{count}} pautan",
+    "loaded": "Dimuatkan: {{summary}}"
   },
   "kind": {
     "mention": "Sebutan",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} lagi pautan balik",
-    "count_other": "{{count}} lagi pautan balik"
+    "count_other": "{{count}} lagi pautan balik",
+    "load": "Muatkan lebih banyak pautan balik",
+    "loading": "Memuatkan pautan balik…",
+    "search": "Cari pautan balik"
   }
 }

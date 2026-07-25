@@ -13,7 +13,7 @@
   "groupName": "የቡድን ስም",
   "groupOptions": "{{groupName}} የቡድን አማራጮች",
   "groupThisBoard": "ይህን ቦርድ ቡድን አድርግ",
-  "groupThisBoardDesc": "አምዶች ለመፍጠር የምረጥ ወይም የሁኔታ ንብረት ያክሉ።",
+  "groupThisBoardDesc": "አምዶችን ለመፍጠር ምረጥ፣ ሁኔታ፣ ሰው ወይም ብዙ ምረጫ ንብረት ያክሉ ወይም ይምረጡ።",
   "newGroup": "አዲስ ቡድን",
   "newGroupIn": "አዲስ የ{{groupName}} ቡድን በ{{dbTitle}}",
   "newPage": "አዲስ",

@@ -31,10 +31,12 @@ function tokenizeFormula(input) {
       tokens.push({ type: "string", value });
       continue;
     }
-    if (/[0-9.]/.test(ch)) {
+    if (/[0-9]/.test(ch) || (ch === "." && /[0-9]/.test(input[i + 1] ?? ""))) {
       let value = ch;
+      let seenDot = ch === ".";
       i += 1;
-      while (i < input.length && /[0-9.]/.test(input[i])) {
+      while (i < input.length && (/[0-9]/.test(input[i]) || (input[i] === "." && !seenDot))) {
+        if (input[i] === ".") seenDot = true;
         value += input[i];
         i += 1;
       }
@@ -67,6 +69,16 @@ function tokenizeFormula(input) {
       i += 1;
       continue;
     }
+    if (ch === "[" || ch === "]") {
+      tokens.push({ type: "bracket", value: ch });
+      i += 1;
+      continue;
+    }
+    if (ch === ".") {
+      tokens.push({ type: "dot", value: ch });
+      i += 1;
+      continue;
+    }
     if (ch === ",") {
       tokens.push({ type: "comma", value: ch });
       i += 1;
@@ -77,28 +89,106 @@ function tokenizeFormula(input) {
   return tokens;
 }
 
+const MAX_FORMULA_LIST_ITEMS = 1_000;
+const MAX_FORMULA_LIST_DEPTH = 10;
+const MAX_FORMULA_VALUE_TEXT = 100 * 1024;
+
+function isFormulaReference(value) {
+  return !!value
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && (value.kind === "page" || value.kind === "person")
+    && typeof value.id === "string"
+    && typeof value.name === "string";
+}
+
+function formulaReferenceText(value) {
+  return value.name || value.id;
+}
+
 function formulaToNumber(value) {
-  const n = Number(value ?? 0);
+  const n = Number(formulaToText(value ?? 0));
   return Number.isFinite(n) ? n : 0;
 }
 
 function formulaToText(value) {
   if (value == null) return "";
+  if (Array.isArray(value)) return value.map((item) => formulaToText(item)).join(",");
+  if (isFormulaReference(value)) return formulaReferenceText(value);
   return String(value);
 }
 
 function formulaToBoolean(value) {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value !== 0;
-  return value !== null && value !== "";
+  if (Array.isArray(value)) return value.length > 0;
+  if (isFormulaReference(value)) return true;
+  return value !== null && value !== undefined && value !== "";
+}
+
+function formulaValueBudget(value) {
+  let itemCount = 0;
+  let textCount = 0;
+
+  const visit = (current, depth) => {
+    if (depth > MAX_FORMULA_LIST_DEPTH) {
+      throw new Error(`Formula lists may be nested at most ${MAX_FORMULA_LIST_DEPTH} levels`);
+    }
+    if (Array.isArray(current)) {
+      itemCount += current.length;
+      if (itemCount > MAX_FORMULA_LIST_ITEMS) {
+        throw new Error(`Formula lists may contain at most ${MAX_FORMULA_LIST_ITEMS} items`);
+      }
+      for (const item of current) visit(item, depth + 1);
+      return;
+    }
+    if (typeof current === "string") textCount += current.length;
+    else if (isFormulaReference(current)) textCount += current.id.length + current.name.length;
+    if (textCount > MAX_FORMULA_VALUE_TEXT) {
+      throw new Error(`Formula values may contain at most ${MAX_FORMULA_VALUE_TEXT} text characters`);
+    }
+  };
+
+  visit(value, 0);
+  return value;
+}
+
+function listValue(values) {
+  return formulaValueBudget(values);
+}
+
+function requireList(value, functionName) {
+  if (!Array.isArray(value)) throw new Error(`${functionName} requires a list`);
+  return value;
+}
+
+function sameFormulaValue(left, right) {
+  if (isFormulaReference(left) && isFormulaReference(right)) {
+    return left.kind === right.kind && left.id === right.id;
+  }
+  return formulaToText(left) === formulaToText(right);
 }
 
 function formulaNumbers(values) {
   return values.map((value) => formulaToNumber(value));
 }
 
+function strictListNumbers(value) {
+  const values = requireList(value, "Numeric list functions");
+  if (values.some((item) => typeof item !== "number" || !Number.isFinite(item))) {
+    throw new Error("Numeric list functions require only numbers");
+  }
+  return values;
+}
+
+function reducerNumbers(values) {
+  return values.length === 1 && Array.isArray(values[0])
+    ? strictListNumbers(values[0])
+    : formulaNumbers(values);
+}
+
 function formulaMedian(values) {
-  const numbers = formulaNumbers(values).sort((a, b) => a - b);
+  const numbers = reducerNumbers(values).slice().sort((a, b) => a - b);
   if (!numbers.length) return 0;
   const middle = Math.floor(numbers.length / 2);
   return numbers.length % 2 === 1 ? numbers[middle] : (numbers[middle - 1] + numbers[middle]) / 2;
@@ -344,6 +434,8 @@ function formulaFormatDate(value, formatValue) {
 
 export function formatFormulaValue(value) {
   if (value == null || value === "") return "";
+  if (Array.isArray(value)) return value.map((item) => formatFormulaValue(item)).join(", ");
+  if (isFormulaReference(value)) return formulaReferenceText(value);
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") return compactNumber(value);
   return String(value);
@@ -357,8 +449,8 @@ class FormulaParser {
     this.index = 0;
   }
 
-  peek() {
-    return this.tokens[this.index];
+  peek(offset = 0) {
+    return this.tokens[this.index + offset];
   }
 
   match(type, value) {
@@ -369,14 +461,16 @@ class FormulaParser {
   }
 
   parse() {
-    return this.equality();
+    const value = this.equality();
+    if (this.index < this.tokens.length) throw new Error("Unexpected formula token");
+    return formulaValueBudget(value);
   }
 
   equality() {
     let left = this.comparison();
     while (true) {
-      if (this.match("operator", "==")) left = formulaToText(left) === formulaToText(this.comparison());
-      else if (this.match("operator", "!=")) left = formulaToText(left) !== formulaToText(this.comparison());
+      if (this.match("operator", "==")) left = sameFormulaValue(left, this.comparison());
+      else if (this.match("operator", "!=")) left = !sameFormulaValue(left, this.comparison());
       else return left;
     }
   }
@@ -398,7 +492,12 @@ class FormulaParser {
       if (this.match("operator", "+")) {
         const right = this.factor();
         left =
-          typeof left === "string" || typeof right === "string"
+          typeof left === "string"
+          || typeof right === "string"
+          || Array.isArray(left)
+          || Array.isArray(right)
+          || isFormulaReference(left)
+          || isFormulaReference(right)
             ? `${formulaToText(left)}${formulaToText(right)}`
             : formulaToNumber(left) + formulaToNumber(right);
       } else if (this.match("operator", "-")) {
@@ -428,101 +527,151 @@ class FormulaParser {
     return this.primary();
   }
 
-  variableName() {
-    const token = this.match("identifier") ?? this.match("string");
-    return token?.value ?? "";
-  }
-
-  bindVariable(name, value, bindings) {
-    if (!name) return;
-    bindings.push([name, this.variables.get(name), this.variables.has(name)]);
-    this.variables.set(name, value);
-  }
-
-  restoreVariables(bindings) {
-    for (let index = bindings.length - 1; index >= 0; index -= 1) {
-      const [name, value, hadValue] = bindings[index];
-      if (hadValue) this.variables.set(name, value ?? null);
-      else this.variables.delete(name);
-    }
-  }
-
-  looksLikeVariableBinding() {
-    const first = this.peek();
-    const second = this.tokens[this.index + 1];
-    return !!first && (first.type === "identifier" || first.type === "string") && second?.type === "comma";
-  }
-
-  letCall(multiple) {
-    const bindings = [];
-    try {
-      if (!multiple) {
-        const name = this.variableName();
-        this.match("comma");
-        const value = this.equality();
-        this.match("comma");
-        this.bindVariable(name, value, bindings);
-        const result = this.equality();
-        this.match("paren", ")");
-        return result;
-      }
-
-      while (this.looksLikeVariableBinding()) {
-        const name = this.variableName();
-        this.match("comma");
-        const value = this.equality();
-        this.bindVariable(name, value, bindings);
-        if (!this.match("comma")) {
-          this.match("paren", ")");
-          return "";
-        }
-        if (!this.looksLikeVariableBinding()) {
-          const result = this.equality();
-          this.match("paren", ")");
-          return result;
-        }
-      }
-
-      const result = this.equality();
-      this.match("paren", ")");
-      return result;
-    } finally {
-      this.restoreVariables(bindings);
-    }
-  }
-
   primary() {
+    let value;
     const number = this.match("number");
-    if (number) return Number(number.value);
-    const string = this.match("string");
-    if (string) return string.value;
-    const identifier = this.match("identifier");
-    if (identifier) {
-      const name = identifier.value;
-      if (this.match("paren", "(")) {
-        if (name === "let") return this.letCall(false);
-        if (name === "lets") return this.letCall(true);
-        const args = [];
-        if (!this.match("paren", ")")) {
+    if (number) value = Number(number.value);
+    else {
+      const string = this.match("string");
+      if (string) value = string.value;
+      else if (this.match("bracket", "[")) {
+        const items = [];
+        if (!this.match("bracket", "]")) {
           do {
-            args.push(this.equality());
+            items.push(this.equality());
           } while (this.match("comma"));
-          this.match("paren", ")");
+          if (!this.match("bracket", "]")) throw new Error("Formula list is not closed");
         }
-        return this.call(name, args);
+        value = listValue(items);
+      } else {
+        const identifier = this.match("identifier");
+        if (identifier) value = this.identifierValue(identifier.value);
+        else if (this.match("paren", "(")) {
+          value = this.equality();
+          if (!this.match("paren", ")")) throw new Error("Formula parentheses are not balanced");
+        } else {
+          value = "";
+        }
       }
-      if (name === "true") return true;
-      if (name === "false") return false;
-      if (name === "null") return null;
-      if (this.variables.has(name)) return this.variables.get(name) ?? "";
-      return "";
     }
-    if (this.match("paren", "(")) {
-      const value = this.equality();
-      this.match("paren", ")");
-      return value;
-    }
+    return this.postfix(formulaValueBudget(value));
+  }
+
+  identifierValue(name) {
+    if (this.match("paren", "(")) return this.callTokens(name, this.takeCallArguments());
+    if (name === "true") return true;
+    if (name === "false") return false;
+    if (name === "null") return null;
+    if (this.variables.has(name)) return this.variables.get(name) ?? "";
     return "";
+  }
+
+  postfix(initial) {
+    let value = initial;
+    while (this.match("dot", ".")) {
+      const method = this.match("identifier");
+      if (!method) throw new Error("Formula method name is missing");
+      const args = this.match("paren", "(") ? this.takeCallArguments() : [];
+      value = formulaValueBudget(this.callTokens(method.value, args, value));
+    }
+    return value;
+  }
+
+  takeCallArguments() {
+    const args = [];
+    let current = [];
+    let parenDepth = 0;
+    let bracketDepth = 0;
+    while (this.index < this.tokens.length) {
+      const token = this.tokens[this.index];
+      this.index += 1;
+      if (token.type === "paren" && token.value === "(") {
+        parenDepth += 1;
+        current.push(token);
+        continue;
+      }
+      if (token.type === "paren" && token.value === ")") {
+        if (parenDepth === 0 && bracketDepth === 0) {
+          if (current.length > 0 || args.length > 0) args.push(current);
+          return args;
+        }
+        parenDepth -= 1;
+        current.push(token);
+        continue;
+      }
+      if (token.type === "bracket" && token.value === "[") bracketDepth += 1;
+      if (token.type === "bracket" && token.value === "]") bracketDepth -= 1;
+      if (token.type === "comma" && parenDepth === 0 && bracketDepth === 0) {
+        args.push(current);
+        current = [];
+        continue;
+      }
+      current.push(token);
+    }
+    throw new Error("Formula parentheses are not balanced");
+  }
+
+  evaluateTokens(tokens, variables = this.variables) {
+    return new FormulaParser(tokens, this.resolveProp, new Map(variables)).parse();
+  }
+
+  tokenVariableName(tokens) {
+    if (tokens.length !== 1) return "";
+    const token = tokens[0];
+    if (token.type !== "identifier" && token.type !== "string") return "";
+    return /^[A-Za-z_][A-Za-z0-9_]*$/.test(token.value) ? token.value : "";
+  }
+
+  letTokens(args, multiple) {
+    const variables = new Map(this.variables);
+    if (!multiple) {
+      if (args.length < 3) return "";
+      const name = this.tokenVariableName(args[0]);
+      if (!name) return "";
+      variables.set(name, this.evaluateTokens(args[1], variables));
+      return this.evaluateTokens(args[2], variables);
+    }
+    if (args.length < 3 || args.length % 2 === 0) return "";
+    for (let index = 0; index + 1 < args.length - 1; index += 2) {
+      const name = this.tokenVariableName(args[index]);
+      if (!name) return "";
+      variables.set(name, this.evaluateTokens(args[index + 1], variables));
+    }
+    return this.evaluateTokens(args[args.length - 1], variables);
+  }
+
+  higherOrder(name, value, expression) {
+    const items = requireList(value, name);
+    const evaluate = (item, index) => {
+      const variables = new Map(this.variables);
+      variables.set("current", item);
+      variables.set("index", index);
+      return this.evaluateTokens(expression, variables);
+    };
+    if (name === "map") return listValue(items.map(evaluate));
+    if (name === "filter") return listValue(items.filter((item, index) => formulaToBoolean(evaluate(item, index))));
+    if (name === "find") {
+      const index = items.findIndex((item, itemIndex) => formulaToBoolean(evaluate(item, itemIndex)));
+      return index < 0 ? "" : items[index];
+    }
+    if (name === "findIndex") return items.findIndex((item, index) => formulaToBoolean(evaluate(item, index)));
+    if (name === "some") return items.some((item, index) => formulaToBoolean(evaluate(item, index)));
+    return items.every((item, index) => formulaToBoolean(evaluate(item, index)));
+  }
+
+  callTokens(name, args, receiver) {
+    if (receiver !== undefined && name === "prop") {
+      throw new Error("prop() cannot be called as a method");
+    }
+    if (receiver === undefined && name === "let") return this.letTokens(args, false);
+    if (receiver === undefined && name === "lets") return this.letTokens(args, true);
+    if (["map", "filter", "find", "findIndex", "some", "every"].includes(name)) {
+      const value = receiver ?? this.evaluateTokens(args[0] ?? []);
+      const expression = args[receiver === undefined ? 1 : 0] ?? [];
+      return this.higherOrder(name, value, expression);
+    }
+    const values = args.map((tokens) => this.evaluateTokens(tokens));
+    return this.call(name, receiver === undefined ? values : [receiver, ...values]);
   }
 
   call(name, args) {
@@ -537,8 +686,13 @@ class FormulaParser {
         }
         return args.length % 2 === 1 ? (args[args.length - 1] ?? "") : "";
       }
-      case "concat":
+      case "concat": {
+        if (args.some(Array.isArray)) {
+          const values = args.flatMap((value) => (Array.isArray(value) ? value : [value]));
+          return listValue(values);
+        }
         return args.map(formulaToText).join("");
+      }
       case "repeat":
         return formulaRepeat(args[0], args[1]);
       case "format":
@@ -557,14 +711,20 @@ class FormulaParser {
         return formulaToNumber(args[0] ?? null) % formulaToNumber(args[1] ?? null);
       case "pow":
         return Math.pow(formulaToNumber(args[0] ?? null), formulaToNumber(args[1] ?? null));
-      case "min":
-        return args.length ? Math.min(...formulaNumbers(args)) : 0;
-      case "max":
-        return args.length ? Math.max(...formulaNumbers(args)) : 0;
+      case "min": {
+        const values = reducerNumbers(args);
+        return values.length ? Math.min(...values) : 0;
+      }
+      case "max": {
+        const values = reducerNumbers(args);
+        return values.length ? Math.max(...values) : 0;
+      }
       case "sum":
-        return formulaNumbers(args).reduce((sum, value) => sum + value, 0);
-      case "mean":
-        return args.length ? formulaNumbers(args).reduce((sum, value) => sum + value, 0) / args.length : 0;
+        return reducerNumbers(args).reduce((sum, value) => sum + value, 0);
+      case "mean": {
+        const values = reducerNumbers(args);
+        return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+      }
       case "median":
         return formulaMedian(args);
       case "sqrt":
@@ -654,17 +814,69 @@ class FormulaParser {
       case "abs":
         return Math.abs(formulaToNumber(args[0]));
       case "empty":
-        return args[0] == null || args[0] === "" || args[0] === 0;
+        return Array.isArray(args[0])
+          ? args[0].length === 0
+          : args[0] == null || args[0] === "" || args[0] === 0;
       case "contains":
         return formulaToText(args[0]).toLowerCase().includes(formulaToText(args[1]).toLowerCase());
       case "length":
-        return formulaToText(args[0]).length;
+        return Array.isArray(args[0]) ? args[0].length : formulaToText(args[0]).length;
       case "not":
         return !formulaToBoolean(args[0]);
       case "and":
         return args.every(formulaToBoolean);
       case "or":
         return args.some(formulaToBoolean);
+      case "at": {
+        const values = requireList(args[0], "at");
+        const index = Math.trunc(formulaToNumber(args[1] ?? 0));
+        return index >= 0 && index < values.length ? values[index] : "";
+      }
+      case "first": {
+        const values = requireList(args[0], "first");
+        return values.length ? values[0] : "";
+      }
+      case "last": {
+        const values = requireList(args[0], "last");
+        return values.length ? values[values.length - 1] : "";
+      }
+      case "slice": {
+        const values = requireList(args[0], "slice");
+        const start = Math.trunc(formulaToNumber(args[1] ?? 0));
+        const end = args[2] === undefined ? undefined : Math.trunc(formulaToNumber(args[2]));
+        return listValue(values.slice(start, end));
+      }
+      case "sort": {
+        const values = requireList(args[0], "sort").slice();
+        values.sort((left, right) => {
+          if (typeof left === "number" && typeof right === "number") return left - right;
+          const a = formulaToText(left);
+          const b = formulaToText(right);
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        return listValue(values);
+      }
+      case "reverse":
+        return listValue(requireList(args[0], "reverse").slice().reverse());
+      case "join":
+        return requireList(args[0], "join").map((value) => formulaToText(value)).join(formulaToText(args[1] ?? ""));
+      case "split":
+        return listValue(formulaToText(args[0] ?? "").split(formulaToText(args[1] ?? "")));
+      case "unique": {
+        const values = [];
+        for (const value of requireList(args[0], "unique")) {
+          if (!values.some((candidate) => sameFormulaValue(candidate, value))) values.push(value);
+        }
+        return listValue(values);
+      }
+      case "includes":
+        return requireList(args[0], "includes").some((value) => sameFormulaValue(value, args[1] ?? null));
+      case "flat":
+        return listValue(requireList(args[0], "flat").flatMap((value) => (Array.isArray(value) ? value : [value])));
+      case "name":
+        return isFormulaReference(args[0]) ? formulaReferenceText(args[0]) : formulaToText(args[0] ?? "");
+      case "id":
+        return isFormulaReference(args[0]) ? args[0].id : "";
       default:
         return "";
     }
@@ -672,5 +884,11 @@ class FormulaParser {
 }
 
 export function evaluateFormulaExpression(expression, resolveProperty) {
-  return new FormulaParser(tokenizeFormula(expression), resolveProperty).parse();
+  const trimmed = expression.trim();
+  if (!trimmed) return "";
+  try {
+    return new FormulaParser(tokenizeFormula(trimmed), resolveProperty).parse();
+  } catch {
+    return "";
+  }
 }

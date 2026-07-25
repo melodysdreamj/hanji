@@ -38,7 +38,7 @@
   "moveTo": "Presunúť do",
   "exporting": "Exportuje sa…",
   "exportAsMarkdown": "Exportovať ako Markdown",
-  "exportAsHanji": "Exportovať ako súbor Hanji",
+  "exportAsHanji": "Exportovať Hanji JSON (súbory vylúčené)",
   "importing": "Importuje sa…",
   "importMarkdown": "Importovať Markdown",
   "unlockPage": "Odomknúť stránku",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Nepodarilo sa aktualizovať prístup",
     "removedFromAccessList": "Odstránené zo zoznamu prístupov",
     "couldntRemoveAccess": "Nepodarilo sa odobrať prístup",
-    "couldntLoadAccessList": "Nepodarilo sa načítať zoznam prístupu"
+    "couldntLoadAccessList": "Nepodarilo sa načítať zoznam prístupu",
+    "couldntExportHanjiArchive": "Nepodarilo sa exportovať Hanji archív.",
+    "exportedHanjiArchive": "Exportovaný Hanji archív so súbormi."
   },
   "user": "Používateľ",
   "whoHasAccess": "Kto má prístup",
   "workspace": "Pracovný priestor",
   "workspaceCount_one": "{{count}} pracovný priestor",
   "workspaceCount_other": "{{count}} pracovné priestory",
-  "you": "Vy"
+  "you": "Vy",
+  "exportAsHanjiArchive": "Exportovať Hanji archív (súbory zahrnuté)",
+  "turnIntoWiki": "Premeniť na wiki",
+  "undoWiki": "Zrušiť wiki",
+  "wikiCreated": "Stránka premenená na wiki",
+  "wikiPageSettings": "Nastavenia wiki stránky",
+  "wikiUndone": "Wiki odstránené; obsah stránky zachovaný",
+  "wikiUpdateFailed": "Nepodarilo sa aktualizovať wiki"
 }

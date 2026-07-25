@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "የስራ ቦታ ምናሌን ክፈት",
   "closeWorkspaceMenu": "የስራ ቦታ ምናሌን ዝጋ",
   "workspaceMenu": "የስራ ቦታ ሜኑ",
-  "exportWorkspace": "የስራ ቦታ አስወጣ",
+  "exportWorkspace": "የስራ ቦታ JSON ማስተላለፍ (ፋይሎች ሳይካተቱ)",
   "exportedWorkspace": "የስራ ቦታ እንደ ሃንጂ ፋይል አስወጥቷል",
   "exportedWorkspaceWithPlaceholders": "የስራ ቦታ እንደ ሃንጂ ፋይል አስወጥቷል — አባሪዎች እንደ ቦታ ያዢዎች ቀርተዋል",
   "couldntExportWorkspace": "የስራ ቦታን ወደ ውጭ መላክ አልተቻለም።",
@@ -76,5 +76,12 @@
     "later": "ምናልባት በኋላ",
     "note": "ሁልጊዜ ይህን በኋላ ከጎን አሞሌው አስመጣ መጀመር ይችላሉ።",
     "title": "የ Notion ዎርክስፔስዎን ወደ Hanji ያስመጡ?"
-  }
+  },
+  "addPageToTeamspace": "ገጽ ወደ {{name}} ጨምር",
+  "couldntExportWorkspaceArchive": "የስራ ቦታ ማህደር ማስተላለፍ አልተቻለም።",
+  "exportedWorkspaceArchive": "የስራ ቦታ ማህደር ከፋይሎች ጋር ተላልፏል።",
+  "exportWorkspaceArchive": "የስራ ቦታ ማህደር ማስተላለፍ (ፋይሎች የተካተቱ)",
+  "joinTeamspaces": "ቡድን ቦታዎችን ቀላቀል",
+  "keyboardShortcuts": "የቁልፍ ሰሌዳ አቋራጮች",
+  "teamspacePages": "{{name}} ገፆች"
 }

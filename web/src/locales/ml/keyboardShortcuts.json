@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "അഭിപ്രായം ചേർക്കുക",
+    "addLink": "ലിങ്ക് ചേർക്കുക",
+    "blockColor": "അവസാന നിറം പ്രയോഗിക്കുക",
+    "bold": "ബോൾഡ്",
+    "copyPageLink": "പേജ് ലിങ്ക് പകർത്തുക",
+    "findInPage": "ഈ പേജിൽ തിരയുക",
+    "inlineCode": "ഇൻലൈൻ കോഡ്",
+    "italic": "ഇറ്റാലിക്",
+    "moveBlock": "ബ്ലോക്ക് മറ്റൊരു പേജിലേക്ക് നീക്കുക",
+    "moveBlockDown": "ബ്ലോക്ക് താഴേക്ക് നീക്കുക",
+    "moveBlockUp": "ബ്ലോക്ക് മുകളിലേക്ക് നീക്കുക",
+    "movePage": "നിലവിലെ പേജ് നീക്കുക",
+    "navigateBack": "പിന്നോട്ട് പോകുക",
+    "navigateForward": "മുന്നോട്ട് പോകുക",
+    "newPage": "പുതിയ പേജ്",
+    "openBlockMenu": "ബ്ലോക്ക് പ്രവർത്തനങ്ങൾ തുറക്കുക",
+    "openKeyboardShortcuts": "കീബോർഡ് കുറുക്കുവഴികൾ തുറക്കുക",
+    "openParentPage": "മാതൃ പേജ് തുറക്കുക",
+    "quickFind": "ദ്രുത തിരയൽ",
+    "strikethrough": "സ്ട്രൈക്ത്രൂ",
+    "toggleAllToggles": "എല്ലാ ടോഗിളുകളും വികസിപ്പിക്കുക/ചുരുക്കുക",
+    "toggleSidebar": "സൈഡ്ബാർ മാറ്റുക",
+    "toggleTheme": "ഡാർക്ക് മോഡ് മാറ്റുക",
+    "underline": "അണ്ടർലൈൻ"
+  },
+  "categories": {
+    "createStyle": "സൃഷ്ടിക്കുക & ശൈലി",
+    "editMove": "എഡിറ്റ് & നീക്കുക",
+    "popular": "ജനപ്രിയം"
+  },
+  "categoriesLabel": "കുറുക്കുവഴി വിഭാഗങ്ങൾ",
+  "close": "അടയ്ക്കുക",
+  "closeBackdrop": "കീബോർഡ് കുറുക്കുവഴികൾ അടയ്ക്കുക",
+  "empty": "കുറുക്കുവഴികളൊന്നും കണ്ടെത്തിയില്ല",
+  "keysFor": "{{action}} നുള്ള കീകൾ",
+  "or": "അഥവാ",
+  "searchLabel": "കീബോർഡ് കുറുക്കുവഴികൾ തിരയുക",
+  "searchPlaceholder": "കുറുക്കുവഴികൾ തിരയുക...",
+  "searchResults": "തിരച്ചിൽ ഫലങ്ങൾ",
+  "searchTerms": {
+    "toggleTheme": "തീം ലൈറ്റ് ഡാർക്ക് രൂപം"
+  },
+  "title": "കീബോർഡ് കുറുക്കുവഴികൾ"
+}

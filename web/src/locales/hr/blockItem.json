@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Video opis",
     "videoEmptyHint": "Prenesi video datoteku, zalijepi izravnu poveznicu ili upotrijebi YouTube, Vimeo ili Loom poveznicu.",
-    "videoLink": "Video poveznica"
+    "videoLink": "Video poveznica",
+    "audioPlaybackFailed": "Ovu audio datoteku nije moguće reproducirati. Zamijenite je ili otvorite izvornu datoteku.",
+    "videoPlaybackFailed": "Ovu video datoteku nije moguće reproducirati. Zamijenite je ili otvorite izvornu datoteku."
   },
   "bookmark": {
     "copy": "Kopiraj poveznicu bookmarka",

@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Qapalı",
+    "open": "Açıq",
+    "private": "Özəl"
+  },
+  "add": "Əlavə et",
+  "approve": "Təsdiqlə",
+  "archive": "Teamspace-i arxivlə",
+  "available": "Qoşulmaq üçün mövcuddur",
+  "choosePrincipal": "Bir şəxs və ya qrup seçin",
+  "create": "Teamspace yarat",
+  "deny": "Rədd et",
+  "error": {
+    "action": "Teamspace əməliyyatı tamamlana bilmədi.",
+    "load": "Teamspace təfərrüatları yüklənə bilmədi."
+  },
+  "fields": {
+    "access": "Giriş",
+    "description": "Təsvir",
+    "icon": "İkon",
+    "memberRole": "Üzv səhifəsinə giriş",
+    "membersCanEditSidebar": "Üzvlər səhifələri əlavə edə və sıralaya bilər",
+    "membersCanInvite": "Üzvlər insanları dəvət edə bilər",
+    "name": "Ad",
+    "openRole": "Açıq ziyarətçi səhifəsinə giriş"
+  },
+  "governance": "Komanda sahəsi tənzimləmələri",
+  "join": "Qoşul",
+  "joined": "Komanda sahələriniz",
+  "loadMore": "Daha çox yüklə",
+  "manage": "İdarə et",
+  "member": "Üzv",
+  "members": "Üzvlər",
+  "noneArchived": "Arxivləşdirilmiş komanda sahəsi yoxdur.",
+  "noneAvailable": "Başqa əlçatan komanda sahəsi yoxdur.",
+  "noneJoined": "Hələ heç bir komanda sahəsinə qoşulmamısınız.",
+  "noRequests": "Gözləyən sorğu yoxdur.",
+  "notice": {
+    "approved": "Sorğu təsdiqləndi.",
+    "archived": "Komanda sahəsi arxivləşdirildi.",
+    "created": "Komanda sahəsi yaradıldı.",
+    "defaultSet": "Defolt komanda sahəsi yeniləndi.",
+    "denied": "Sorğu rədd edildi.",
+    "joined": "Komanda sahəsinə qoşuldunuz.",
+    "memberAdded": "Üzv əlavə edildi.",
+    "memberRemoved": "Üzv çıxarıldı.",
+    "memberUpdated": "Üzv rolu yeniləndi.",
+    "policySaved": "Komanda sahəsi yaratma siyasəti yeniləndi.",
+    "requested": "Giriş tələb olundu.",
+    "restored": "Komanda sahəsi bərpa edildi.",
+    "saved": "Komanda sahəsi yeniləndi."
+  },
+  "notOwner": "Yalnız teamspace sahibi və ya workspace administratoru bu teamspace-i idarə edə bilər.",
+  "open": "Aç",
+  "owner": "Sahib",
+  "ownersOnlyCreate": "Yalnız workspace sahibləri teamspace yarada bilər.",
+  "remove": "Sil",
+  "replacement": "Default-u əvəz etmək üçün seçin",
+  "request": "Giriş tələb et",
+  "requestPending": "Tələb gözləyir",
+  "requests": "Giriş tələbləri",
+  "restore": "Bərpa et",
+  "roles": {
+    "comment": "Şərh edə bilər",
+    "edit": "Redaktə edə bilər",
+    "full_access": "Tam giriş",
+    "view": "Görə bilər"
+  },
+  "save": "Dəyişiklikləri saxla",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Default teamspace et",
+  "subtitle": "Paylaşılan işi təşkil edin və kimin tapa biləcəyini və ya qoşula biləcəyini idarə edin.",
+  "tabs": {
+    "archived": "Arxivləşdirilmiş",
+    "browse": "Gözdən keçir",
+    "create": "Yeni teamspace",
+    "label": "Teamspace görünüşləri",
+    "manage": "İdarə et"
+  },
+  "title": "Teamspaces"
+}

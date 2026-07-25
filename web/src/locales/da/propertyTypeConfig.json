@@ -58,7 +58,14 @@
     "range": "Interval",
     "show_original": "Vis original",
     "sum": "Sum",
-    "unchecked": "Ikke markeret"
+    "unchecked": "Ikke markeret",
+    "count": "Tæl alle",
+    "count_per_group": "Antal per gruppe",
+    "empty": "Antal tomme",
+    "not_empty": "Antal ikke tomme",
+    "percent_per_group": "Procent per gruppe",
+    "show_unique": "Vis unikke værdier",
+    "unique": "Antal unikke værdier"
   },
   "showOnDatabase": "Vis på {{name}}",
   "undo": "Fortryd",

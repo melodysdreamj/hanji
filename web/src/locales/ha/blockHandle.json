@@ -88,5 +88,38 @@
     "hoursAgo": "An gyara {{hours}} h baya",
     "daysAgo": "An gyara {{days}} kw baya",
     "on": "An gyara ran {{date}}"
+  },
+  "align": {
+    "center": "Tsakiya",
+    "choose": "Zaɓi daidaita hoto",
+    "left": "Hagu",
+    "right": "Dama"
+  },
+  "altText": {
+    "help": "Rubutun madadin yana taimaka wa masu karanta allo su fahimci hoton.",
+    "label": "Bayani",
+    "placeholder": "Bayyana hoton",
+    "remove": "Cire",
+    "save": "Ajiye",
+    "title": "Rubutun madadin"
+  },
+  "imageLink": {
+    "invalid": "Shigar da adireshin http:// ko https:// cikakke.",
+    "label": "Buɗe wannan URL idan an danna hoton",
+    "remove": "Cire",
+    "save": "Ajiye",
+    "title": "Mahaɗin hoto"
+  },
+  "media": {
+    "addImageLink": "Ƙara mahaɗi",
+    "align": "Daidaita",
+    "altText": "Rubutun madadin",
+    "copySourceLink": "Kwafi mahaɗin asali",
+    "download": "Zazzage",
+    "editImageLink": "Gyara mahaɗi",
+    "fullScreen": "Cikakken allo",
+    "openLink": "Buɗe mahaɗi",
+    "replace": "Sauya",
+    "viewOriginal": "Duba asali"
   }
 }

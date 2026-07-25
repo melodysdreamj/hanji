@@ -24,7 +24,7 @@
   "dismissInviteCard": "Zavřít kartu člena",
   "exportedWorkspace": "Pracovní prostor exportován jako soubor Hanji.",
   "exportedWorkspaceWithPlaceholders": "Pracovní prostor exportován jako soubor Hanji – přílohy zůstaly jako zástupné symboly.",
-  "exportWorkspace": "Exportovat pracovní prostor",
+  "exportWorkspace": "Exportovat pracovní prostor JSON (bez souborů)",
   "favoritePages": "Oblíbené stránky",
   "favorites": "Oblíbené",
   "home": "Domů",
@@ -76,5 +76,12 @@
     "later": "Později",
     "note": "Tuto akci můžete kdykoli spustit později z Importu v postranním panelu.",
     "title": "Importovat váš pracovní prostor Notion do Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Přidat stránku do {{name}}",
+  "couldntExportWorkspaceArchive": "Archiv pracovního prostoru se nepodařilo exportovat.",
+  "exportedWorkspaceArchive": "Exportován archiv pracovního prostoru včetně souborů.",
+  "exportWorkspaceArchive": "Exportovat archiv pracovního prostoru (včetně souborů)",
+  "joinTeamspaces": "Připojit se k týmovým prostorům",
+  "keyboardShortcuts": "Klávesové zkratky",
+  "teamspacePages": "Stránky {{name}}"
 }

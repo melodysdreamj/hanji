@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Videobijschrift",
     "videoEmptyHint": "Upload een videobestand, plak een directe link, of gebruik een YouTube-, Vimeo- of Loom-link.",
-    "videoLink": "Videolink"
+    "videoLink": "Videolink",
+    "audioPlaybackFailed": "Deze audio kan niet worden afgespeeld. Vervang het of open het originele bestand.",
+    "videoPlaybackFailed": "Deze video kan niet worden afgespeeld. Vervang het of open het originele bestand."
   },
   "bookmark": {
     "copy": "Kopieer bladwijzerlink",

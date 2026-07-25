@@ -233,7 +233,9 @@
     "video": "Video",
     "videoCaption": "Videokuvateksti",
     "videoEmptyHint": "Lataa videotiedosto, liitä suora linkki tai käytä YouTube-, Vimeo- tai Loom-linkkiä.",
-    "videoLink": "Videolinkki"
+    "videoLink": "Videolinkki",
+    "audioPlaybackFailed": "Tätä ääntä ei voitu toistaa. Korvaa se tai avaa alkuperäinen tiedosto.",
+    "videoPlaybackFailed": "Tätä videota ei voitu toistaa. Korvaa se tai avaa alkuperäinen tiedosto."
   },
   "mention": {
     "closeMenu": "Sulje mainintavalikko",

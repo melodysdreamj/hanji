@@ -92,5 +92,8 @@
     "P",
     "S"
   ],
-  "you": "Vi"
+  "you": "Vi",
+  "buttonExecutionFailed": "Nije moguće pokrenuti dugme.",
+  "loadingMoreRelations": "Učitavanje dodatnih veza...",
+  "loadMoreRelations": "Učitaj još veza"
 }

@@ -8,6 +8,7 @@ import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
 import { sharedPageErrorKind, type SharedPageErrorKind } from "@/lib/sharedPageErrors";
 import { useStore } from "@/lib/store";
 import { PageView } from "./PageView";
+import { SharedPageLoading } from "./SharedPageLoading";
 import { TopBar } from "./TopBar";
 import styles from "./PageView.module.css";
 
@@ -51,23 +52,7 @@ export function SharedPageView({ token }: { token: string }) {
   }, [applySharedPageSnapshot, retryKey, token]);
 
   if (state.status === "loading") {
-    return (
-      <>
-        <TopBar title={t("sharedPageView:title")} />
-        <div className={styles.scroll}>
-          <div
-            className={styles.sharedLoading}
-            aria-busy="true"
-            aria-label={t("sharedPageView:loading")}
-            role="status"
-          >
-            <span className={styles.sharedLoadingTitle} />
-            <span className={styles.sharedLoadingLine} />
-            <span className={`${styles.sharedLoadingLine} ${styles.sharedLoadingLineShort}`} />
-          </div>
-        </div>
-      </>
-    );
+    return <SharedPageLoading />;
   }
 
   if (state.status === "error") {

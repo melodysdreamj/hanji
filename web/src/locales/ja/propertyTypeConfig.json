@@ -51,7 +51,14 @@
     "range": "範囲",
     "earliest_date": "最も早い日付",
     "latest_date": "最も遅い日付",
-    "date_range": "日付範囲"
+    "date_range": "日付範囲",
+    "count": "すべてカウント",
+    "count_per_group": "グループ別カウント",
+    "empty": "空の数",
+    "not_empty": "空でない数",
+    "percent_per_group": "グループ別割合",
+    "show_unique": "ユニーク値を表示",
+    "unique": "ユニーク値の数"
   },
   "undo": "元に戻す",
   "untitled": "無題",

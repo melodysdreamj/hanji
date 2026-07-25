@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Yopiq",
+    "open": "Ochiq",
+    "private": "Xususiy"
+  },
+  "add": "Qo‘shish",
+  "approve": "Tasdiqlash",
+  "archive": "Teamspace-ni arxivlash",
+  "available": "Qo‘shilish mumkin",
+  "choosePrincipal": "Shaxs yoki guruhni tanlang",
+  "create": "Teamspace yaratish",
+  "deny": "Rad etish",
+  "error": {
+    "action": "Teamspace amalini bajarib bo‘lmadi.",
+    "load": "Teamspace ma'lumotlarini yuklab bo‘lmadi."
+  },
+  "fields": {
+    "access": "Kirish",
+    "description": "Tavsif",
+    "icon": "Belgi",
+    "memberRole": "A'zo sahifa kirishi",
+    "membersCanEditSidebar": "A'zolar sahifa qo‘shishi va tartiblashi mumkin",
+    "membersCanInvite": "A'zolar taklif qilishi mumkin",
+    "name": "Nomi",
+    "openRole": "Ochiq mehmon sahifa kirishi"
+  },
+  "governance": "Teamspace sozlamalari",
+  "join": "Qo‘shilish",
+  "joined": "Mening teamspacelarim",
+  "loadMore": "Ko‘proq yuklash",
+  "manage": "Boshqarish",
+  "member": "A'zo",
+  "members": "A'zolar",
+  "noneArchived": "Arxivlangan teamspace yo‘q.",
+  "noneAvailable": "Boshqa mavjud teamspacelar yo‘q.",
+  "noneJoined": "Hali hech qanday teamspacega qo‘shilmagansiz.",
+  "noRequests": "Kutilayotgan so‘rov yo‘q.",
+  "notice": {
+    "approved": "So‘rov tasdiqlandi.",
+    "archived": "Teamspace arxivlandi.",
+    "created": "Teamspace yaratildi.",
+    "defaultSet": "Standart teamspace yangilandi.",
+    "denied": "So‘rov rad etildi.",
+    "joined": "Teamspacega qo‘shildingiz.",
+    "memberAdded": "A'zo qo‘shildi.",
+    "memberRemoved": "A'zo olib tashlandi.",
+    "memberUpdated": "A'zo roli yangilandi.",
+    "policySaved": "Teamspace yaratish siyosati yangilandi.",
+    "requested": "Kirish so‘raldi.",
+    "restored": "Teamspace qayta tiklandi.",
+    "saved": "Teamspace yangilandi."
+  },
+  "notOwner": "Faqat teamspace egasi yoki workspace administratori bu teamspace-ni boshqarishi mumkin.",
+  "open": "Och",
+  "owner": "Ega",
+  "ownersOnlyCreate": "Faqat workspace egalari teamspace yaratishi mumkin",
+  "remove": "Olib tashlash",
+  "replacement": "O‘rniga boshqa standartni tanlang",
+  "request": "Kirish so‘rovi",
+  "requestPending": "So‘rov kutilmoqda",
+  "requests": "Kirish so‘rovlari",
+  "restore": "Qayta tiklash",
+  "roles": {
+    "comment": "Izoh bera oladi",
+    "edit": "Tahrir qila oladi",
+    "full_access": "To‘liq kirish",
+    "view": "Ko‘ra oladi"
+  },
+  "save": "O‘zgarishlarni saqlash",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Standart teamspace qilish",
+  "subtitle": "Umumiy ishlarni tartibga soling va kim uni topishi yoki qo‘shilishi mumkinligini boshqaring.",
+  "tabs": {
+    "archived": "Arxivlangan",
+    "browse": "Ko‘rib chiqish",
+    "create": "Yangi teamspace",
+    "label": "Teamspace ko‘rinishlari",
+    "manage": "Boshqarish"
+  },
+  "title": "Teamspaces"
+}

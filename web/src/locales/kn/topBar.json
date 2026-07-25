@@ -38,7 +38,7 @@
   "moveTo": "ಗೆ ಸರಿಸಿ",
   "exporting": "ರಫ್ತು ಮಾಡಲಾಗುತ್ತಿದೆ…",
   "exportAsMarkdown": "Markdown ಆಗಿ ರಫ್ತು ಮಾಡಿ",
-  "exportAsHanji": "Hanji ಫೈಲ್ ಆಗಿ ರಫ್ತು ಮಾಡಿ",
+  "exportAsHanji": "Hanji JSON ರಫ್ತು (ಫೈಲ್ಗಳನ್ನು ಹೊರತುಪಡಿಸಿ)",
   "importing": "ಆಮದು ಮಾಡಲಾಗುತ್ತಿದೆ…",
   "importMarkdown": "ಮಾರ್ಕ್ಡೌನ್ ಆಮದು ಮಾಡಿ",
   "unlockPage": "ಪುಟ ಅನ್ಲಾಕ್ ಮಾಡಿ",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ಪ್ರವೇಶ ನವೀಕರಿಸಲಾಗಲಿಲ್ಲ",
     "removedFromAccessList": "ಪ್ರವೇಶ ಪಟ್ಟಿಯಿಂದ ತೆಗೆದುಹಾಕಿದೆ",
     "couldntRemoveAccess": "ಪ್ರವೇಶ ತೆಗೆದುಹಾಕಲಾಗಲಿಲ್ಲ",
-    "couldntLoadAccessList": "ಪ್ರವೇಶ ಪಟ್ಟಿ ಲೋಡ್ ಆಗಲಿಲ್ಲ"
+    "couldntLoadAccessList": "ಪ್ರವೇಶ ಪಟ್ಟಿ ಲೋಡ್ ಆಗಲಿಲ್ಲ",
+    "couldntExportHanjiArchive": "Hanji ಆರ್ಕೈವ್ ಅನ್ನು ರಫ್ತು ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.",
+    "exportedHanjiArchive": "ಫೈಲ್ಗಳೊಂದಿಗೆ Hanji ಆರ್ಕೈವ್ ರಫ್ತು ಮಾಡಲಾಗಿದೆ."
   },
   "user": "ಬಳಕೆದಾರ",
   "whoHasAccess": "ಪ್ರವೇಶ ಹೊಂದಿರುವವರು",
   "workspace": "ಕಾರ್ಯಸ್ಥಳ",
   "workspaceCount_one": "{{count}} ಕಾರ್ಯಸ್ಥಳ",
   "workspaceCount_other": "{{count}} ಕಾರ್ಯಸ್ಥಳಗಳು",
-  "you": "ನೀವು"
+  "you": "ನೀವು",
+  "exportAsHanjiArchive": "Hanji ಆರ್ಕೈವ್ ರಫ್ತು (ಫೈಲ್ಗಳನ್ನು ಒಳಗೊಂಡಂತೆ)",
+  "turnIntoWiki": "ವಿಕಿಯಾಗಿ ಪರಿವರ್ತಿಸಿ",
+  "undoWiki": "ವಿಕಿ ರದ್ದುಗೊಳಿಸಿ",
+  "wikiCreated": "ಪುಟವನ್ನು ವಿಕಿಯಾಗಿ ಪರಿವರ್ತಿಸಲಾಗಿದೆ",
+  "wikiPageSettings": "ವಿಕಿ ಪುಟ ಸೆಟ್ಟಿಂಗ್ಗಳು",
+  "wikiUndone": "ವಿಕಿಯನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ; ಪುಟದ ವಿಷಯವನ್ನು ಉಳಿಸಲಾಗಿದೆ",
+  "wikiUpdateFailed": "ವಿಕಿಯನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
 }

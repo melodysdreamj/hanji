@@ -92,5 +92,8 @@
     "F",
     "L"
   ],
-  "you": "Du"
+  "you": "Du",
+  "buttonExecutionFailed": "Kunne ikke kjøre knappen.",
+  "loadingMoreRelations": "Laster flere relasjoner...",
+  "loadMoreRelations": "Last inn flere relasjoner"
 }

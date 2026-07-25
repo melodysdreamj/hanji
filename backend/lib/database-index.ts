@@ -273,8 +273,13 @@ export function indexedDisplayText(index: DbPropertyIndex | undefined, propertyT
   return undefined;
 }
 
-function indexRecordForProperty(row: DatabaseIndexPage, prop: DatabaseIndexProperty): DbPropertyIndexWrite {
+export function databasePropertyIndexRecord(
+  row: DatabaseIndexPage,
+  prop: DatabaseIndexProperty,
+  id?: string,
+): DbPropertyIndexWrite {
   return {
+    ...(id ? { id } : {}),
     workspaceId: row.workspaceId,
     databaseId: prop.databaseId,
     rowId: row.id,
@@ -331,15 +336,19 @@ export async function upsertDatabaseRowIndexes(
   const databaseProps = props.filter((prop) => prop.databaseId === row.parentId);
   const validPropertyIds = new Set(databaseProps.map((prop) => prop.id));
   const existing = await listAll(table.where('rowId', '==', row.id));
-  const existingByPropertyId = new Map(existing.map((index) => [index.propertyId, index]));
+  const existingByPropertyId = new Map(
+    existing
+      .filter((index) => index.databaseId === row.parentId)
+      .map((index) => [index.propertyId, index]),
+  );
   await Promise.all(
     existing
-      .filter((index) => index.databaseId === row.parentId && !validPropertyIds.has(index.propertyId))
+      .filter((index) => index.databaseId !== row.parentId || !validPropertyIds.has(index.propertyId))
       .map((index) => bestEffort('database-index table.delete', table.delete(index.id))),
   );
   return await Promise.all(
     databaseProps.map((prop) =>
-      upsertIndex(table, indexRecordForProperty(row, prop), existingByPropertyId.get(prop.id))
+      upsertIndex(table, databasePropertyIndexRecord(row, prop), existingByPropertyId.get(prop.id))
     ),
   );
 }
@@ -384,7 +393,7 @@ export async function ensureDatabasePropertyIndexes(
         index.rowUpdatedAt !== row.updatedAt ||
         index.propertyUpdatedAt !== prop.updatedAt;
       if (!stale) continue;
-      const record = await upsertIndex(table, indexRecordForProperty(row, prop), index);
+      const record = await upsertIndex(table, databasePropertyIndexRecord(row, prop), index);
       indexByKey.set(databasePropertyIndexKey(row.id, prop.id), record);
       changed = true;
     }

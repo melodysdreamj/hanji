@@ -4,7 +4,22 @@
     "sum": "Som",
     "average": "Gemiddeld",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Gemerk",
+    "count_values": "Tel waardes",
+    "date_range": "Datumreeks",
+    "earliest_date": "Vroegste datum",
+    "empty": "Tel leeg",
+    "latest_date": "Laaste datum",
+    "median": "Mediaan",
+    "not_empty": "Tel nie leeg",
+    "percent_checked": "Persentasie gemerk",
+    "percent_empty": "Persentasie leeg",
+    "percent_not_empty": "Persentasie nie leeg",
+    "percent_unchecked": "Persentasie ongemerk",
+    "range": "Bereik",
+    "unchecked": "Ongemerk",
+    "unique": "Tel unieke waardes"
   },
   "chartAria": "{{name}} grafiek",
   "chartType": "Grafiektipe",
@@ -27,5 +42,9 @@
   "untitledProperty": "Ongetiteld",
   "valueProperty": "Waarde-eienskap",
   "xAxis": "X-as",
-  "yAxis": "Y-as"
+  "yAxis": "Y-as",
+  "dateRangeDays": "{{count}} dae",
+  "missingProperty": "die gestoorde eienskap",
+  "unsupportedAggregateDesc": "{{aggregate}} kan nie van {{property}} bereken word nie. Kies 'n versoenbare eienskap of berekening.",
+  "unsupportedAggregateTitle": "Hierdie grafiekberekening is nie beskikbaar nie"
 }

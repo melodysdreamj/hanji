@@ -51,7 +51,14 @@
     "range": "Bereich",
     "earliest_date": "Frühestes Datum",
     "latest_date": "Spätestes Datum",
-    "date_range": "Datumsbereich"
+    "date_range": "Datumsbereich",
+    "count": "Alle zählen",
+    "count_per_group": "Anzahl pro Gruppe",
+    "empty": "Anzahl leer",
+    "not_empty": "Anzahl nicht leer",
+    "percent_per_group": "Prozentsatz pro Gruppe",
+    "show_unique": "Eindeutige Werte anzeigen",
+    "unique": "Anzahl eindeutig"
   },
   "undo": "Rückgängig",
   "untitled": "Unbenannt",

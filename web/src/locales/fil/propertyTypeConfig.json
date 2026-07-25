@@ -51,7 +51,14 @@
     "range": "Saklaw",
     "earliest_date": "Pinakamaagang petsa",
     "latest_date": "Pinakahuling petsa",
-    "date_range": "Saklaw ng petsa"
+    "date_range": "Saklaw ng petsa",
+    "count": "Bilang lahat",
+    "count_per_group": "Bilang bawat grupo",
+    "empty": "Bilang ng walang laman",
+    "not_empty": "Bilang ng hindi walang laman",
+    "percent_per_group": "Porsyento bawat grupo",
+    "show_unique": "Ipakita ang mga natatanging halaga",
+    "unique": "Bilang ng mga natatanging halaga"
   },
   "undo": "I-undo",
   "untitled": "Walang Pamagat",

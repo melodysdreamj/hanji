@@ -8,16 +8,22 @@
   },
   "more": {
     "count_one": "Jeszcze {{count}} backlink",
-    "count_other": "Jeszcze {{count}} backlinków"
+    "count_other": "Jeszcze {{count}} backlinków",
+    "load": "Wczytaj więcej linków zwrotnych",
+    "loading": "Wczytywanie linków zwrotnych…",
+    "search": "Szukaj linków zwrotnych"
   },
   "summary": {
     "link_one": "{{count}} link",
     "link_other": "{{count}} linków",
     "mention_one": "{{count}} wzmianka",
-    "mention_other": "{{count}} wzmianek"
+    "mention_other": "{{count}} wzmianek",
+    "loaded": "Wczytano: {{summary}}"
   },
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinków"
+    "count_other": "{{count}} backlinków",
+    "partial_one": "{{count}}+ link zwrotny",
+    "partial_other": "{{count}}+ linków zwrotnych"
   }
 }

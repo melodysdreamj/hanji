@@ -16,13 +16,19 @@ import { useShallow } from "zustand/react/shallow";
 import { useRouter } from "@/lib/router";
 import { copyText } from "@/lib/clipboard";
 import {
+  convertWikiRemote,
+  fetchRuntimeConfigRemote,
   getPageAccessRemote,
   invitePageAccessRemote,
   removePagePermissionRemote,
-  searchOrganizationPeopleRemote,
+  publishSiteRemote,
   setPageWebSharingRemote,
+  unpublishSiteRemote,
   updatePagePermissionRemote,
+  undoWikiRemote,
+  validateSiteDomainRemote,
 } from "@/lib/edgebase";
+import { scheduleOrganizationPeopleTypeahead } from "@/lib/typeaheadSearch";
 import { useTranslation } from "react-i18next";
 import { i18next } from "@/i18n";
 import { activeDateLocale, activeNumberLocale } from "@/lib/i18n";
@@ -30,7 +36,7 @@ import { isSyntheticNotionImportRootPage } from "@/lib/importedNotionUi";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import { isPageVerified } from "@/lib/pageVerification";
-import { canEditPage } from "@/lib/permissions";
+import { canEditPage, canManagePage } from "@/lib/permissions";
 import type {
   BacklinksDisplay,
   Block,
@@ -42,6 +48,7 @@ import type {
   SharePrincipalType,
   ShareLink,
   ShareRole,
+  SiteConfig,
 } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import { absolutePageUrl, openPageInNewTab, pageHref } from "@/lib/navigation";
@@ -53,6 +60,7 @@ import {
   warmPageOfflineScope,
 } from "@/lib/store";
 import { actorLabel } from "./database/people";
+import { WikiPageSettingsDialog } from "./WikiView";
 import {
   ChevronDown,
   ChevronRight,
@@ -233,6 +241,7 @@ function buildTopbarLabels(t: TranslateFn) {
     exporting: t("topBar:exporting"),
     exportAsMarkdown: t("topBar:exportAsMarkdown"),
     exportAsHanji: t("topBar:exportAsHanji"),
+    exportAsHanjiArchive: t("topBar:exportAsHanjiArchive"),
     importing: t("topBar:importing"),
     importMarkdown: t("topBar:importMarkdown"),
     unlockPage: t("topBar:unlockPage"),
@@ -324,6 +333,8 @@ function buildTopbarLabels(t: TranslateFn) {
       exportedHanji: t("topBar:toast.exportedHanji"),
       exportedHanjiWithPlaceholders: t("topBar:toast.exportedHanjiWithPlaceholders"),
       couldntExportHanji: t("topBar:toast.couldntExportHanji"),
+      exportedHanjiArchive: t("topBar:toast.exportedHanjiArchive"),
+      couldntExportHanjiArchive: t("topBar:toast.couldntExportHanjiArchive"),
       importedBlocks: (count: number) => t("topBar:toast.importedBlocks", { count }),
       nothingToImport: t("topBar:toast.nothingToImport"),
       couldntImportMarkdown: t("topBar:toast.couldntImportMarkdown"),
@@ -484,6 +495,7 @@ export function TopBar({
   const [exportingFor, setExportingFor] = useState<string | null>(null);
   const [importingFor, setImportingFor] = useState<string | null>(null);
   const [duplicatingFor, setDuplicatingFor] = useState<string | null>(null);
+  const [wikiSettingsFor, setWikiSettingsFor] = useState<string | null>(null);
   const [offlinePinned, setOfflinePinned] = useState(false);
   const [crumbMenuStyle, setCrumbMenuStyle] = useState<CSSProperties | undefined>();
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -530,6 +542,20 @@ export function TopBar({
       })
     );
   });
+  const canManageThisPage = useStore((s) => {
+    const current = pageId ? s.pagesById[pageId] : undefined;
+    return (
+      !!current &&
+      canManagePage({
+        page: current,
+        pagesById: s.pagesById,
+        pageRoles: s.pageRolesById,
+        workspace: s.workspace,
+        currentMember: s.currentMember,
+        userId: s.userId,
+      })
+    );
+  });
 
   function canEditTarget(target: Page) {
     if (target.id === page?.id) return canEditThisPage;
@@ -537,6 +563,12 @@ export function TopBar({
     // walk inside canEditPage, so don't subscribe to it.
     const pagesById = useStore.getState().pagesById;
     return canEditPage({ page: target, pagesById, pageRoles, workspace, currentMember, userId });
+  }
+
+  function canManageTarget(target: Page) {
+    if (target.id === page?.id) return canManageThisPage;
+    const pagesById = useStore.getState().pagesById;
+    return canManagePage({ page: target, pagesById, pageRoles, workspace, currentMember, userId });
   }
 
   // Offline pin (local-first Phase 3): pinned pages are exempt from record
@@ -621,27 +653,35 @@ export function TopBar({
     );
   }
 
-  function togglePageVerification(target: Page) {
-    if (!canEditTarget(target)) {
+  function openWikiSettings(target: Page) {
+    if (!target.wikiRootId) return;
+    setWikiSettingsFor(target.id);
+  }
+
+  async function toggleWiki(target: Page) {
+    if (!canManageTarget(target)) {
       notify(labels.toast.pageAccessRequired, "default");
       return;
     }
-    const verified = isPageVerified(target);
-    updatePage(
-      target.id,
-      verified
-        ? {
-            verifiedAt: null,
-            verifiedBy: null,
-            verificationExpiresAt: null,
-          }
-        : {
-            verifiedAt: new Date().toISOString(),
-            verifiedBy: userId || "local-user",
-            verificationExpiresAt: null,
-          }
-    );
-    notify(verified ? labels.toast.verificationRemoved : labels.toast.pageVerified, "success");
+    try {
+      const result = target.isWiki && target.wikiRootId === target.id
+        ? await undoWikiRemote(target.id)
+        : await convertWikiRemote(target.id);
+      for (const changed of result.pages) {
+        useStore.getState().applyRemotePagePatch(changed.id, changed);
+      }
+      if (result.root) useStore.getState().applyRemotePagePatch(result.root.id, result.root);
+      notify(
+        target.isWiki && target.wikiRootId === target.id
+          ? t("topBar:wikiUndone")
+          : t("topBar:wikiCreated"),
+        "success",
+      );
+    } catch (error) {
+      notify(error instanceof Error ? error.message : t("topBar:wikiUpdateFailed"), "error");
+    } finally {
+      closeMenus();
+    }
   }
 
   async function togglePageFavorite(target: Page) {
@@ -742,6 +782,19 @@ export function TopBar({
       );
     } catch {
       notify(labels.toast.couldntExportHanji, "error");
+    } finally {
+      setExportingFor((current) => (current === target.id ? null : current));
+    }
+  }
+
+  async function exportNativeArchive(target: Page) {
+    setExportingFor(target.id);
+    try {
+      const { exportPageAsNativeArchive } = await import("./nativeExport");
+      await exportPageAsNativeArchive(target);
+      notify(labels.toast.exportedHanjiArchive, "success");
+    } catch {
+      notify(labels.toast.couldntExportHanjiArchive, "error");
     } finally {
       setExportingFor((current) => (current === target.id ? null : current));
     }
@@ -983,14 +1036,13 @@ export function TopBar({
       <div className={styles.right}>
         {page && (
           <>
-            {pageVerified && (
+            {pageVerified && !!page.wikiRootId && (
               <button
                 type="button"
                 className={styles.verifiedPill}
                 title={labels.removeVerificationFor(pageTitle)}
                 aria-label={labels.removeVerificationFor(pageTitle)}
-                disabled={!canEditThisPage}
-                onClick={() => togglePageVerification(page)}
+                onClick={() => openWikiSettings(page)}
               >
                 <CheckIcon size={14} />
                 <span>{labels.verified}</span>
@@ -1301,6 +1353,7 @@ export function TopBar({
                   type="button"
                   className={styles.menuItem}
                   data-menu-item
+                  data-native-export
                   role="menuitem"
                   disabled={exportingFor === page.id}
                   onClick={() => {
@@ -1311,6 +1364,22 @@ export function TopBar({
                   <Download size={16} aria-hidden="true" />
                   <span>{exportingFor === page.id ? labels.exporting : labels.exportAsHanji}</span>
                   <span className={styles.itemHint}>.hanji.json</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.menuItem}
+                  data-menu-item
+                  data-native-export
+                  role="menuitem"
+                  disabled={exportingFor === page.id}
+                  onClick={() => {
+                    void exportNativeArchive(page);
+                    closeMenus();
+                  }}
+                >
+                  <Download size={16} aria-hidden="true" />
+                  <span>{exportingFor === page.id ? labels.exporting : labels.exportAsHanjiArchive}</span>
+                  <span className={styles.itemHint}>.hanji.zip</span>
                 </button>
                 <button
                   type="button"
@@ -1363,21 +1432,38 @@ export function TopBar({
                   <ClockIcon size={16} aria-hidden="true" />
                   <span>{labels.pageHistory}</span>
                 </button>
-                <button
-                  type="button"
-                  className={styles.menuItem}
-                  data-menu-item
-                  role="menuitemcheckbox"
-                  aria-checked={pageVerified}
-                  disabled={!canEditThisPage}
-                  onClick={() => {
-                    togglePageVerification(page);
-                    closeMenus();
-                  }}
-                >
-                  <CheckIcon size={16} aria-hidden="true" />
-                  <span>{pageVerified ? labels.removeVerification : labels.verifyPage}</span>
-                </button>
+                {page.kind === "page" && (!page.wikiRootId || page.isWiki) && (
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    data-menu-item
+                    role="menuitem"
+                    disabled={!canManageThisPage}
+                    onClick={() => void toggleWiki(page)}
+                  >
+                    <span aria-hidden="true">◇</span>
+                    <span>
+                      {page.isWiki && page.wikiRootId === page.id
+                        ? t("topBar:undoWiki")
+                        : t("topBar:turnIntoWiki")}
+                    </span>
+                  </button>
+                )}
+                {!!page.wikiRootId && (
+                  <button
+                    type="button"
+                    className={styles.menuItem}
+                    data-menu-item
+                    role="menuitem"
+                    onClick={() => {
+                      openWikiSettings(page);
+                      closeMenus();
+                    }}
+                  >
+                    <CheckIcon size={16} aria-hidden="true" />
+                    <span>{t("topBar:wikiPageSettings")}</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   className={styles.menuItem}
@@ -1579,6 +1665,14 @@ export function TopBar({
                 />
               )}
             </Suspense>
+            {wikiSettingsFor === page.id && (
+              <WikiPageSettingsDialog
+                page={page}
+                initialOwners={[]}
+                onClose={() => setWikiSettingsFor(null)}
+                onSaved={() => {}}
+              />
+            )}
           </>
         )}
       </div>
@@ -1674,6 +1768,28 @@ function shareLinkHref(shareLink: ShareLink | null) {
   return new URL(`/share/${encodeURIComponent(shareLink.token)}`, window.location.origin).toString();
 }
 
+function defaultSiteSlug(page: Page) {
+  const titleSlug = pageDisplayTitle(page)
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/g, "");
+  if (titleSlug) return titleSlug;
+  const idPart = page.id.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 16);
+  return `page-${idPart || "home"}`;
+}
+
+function siteHref(site: SiteConfig | null, customDomainsEnabled: boolean) {
+  if (!site?.published) return "";
+  if (typeof window === "undefined") return `/site/${encodeURIComponent(site.slug)}`;
+  if (customDomainsEnabled && site.domainStatus === "validated" && site.customHostname) {
+    return `https://${site.customHostname}/`;
+  }
+  return new URL(`/site/${encodeURIComponent(site.slug)}`, window.location.origin).toString();
+}
+
 function expiryOptionFromLink(shareLink: ShareLink | null): ShareExpiryOption {
   if (!shareLink?.expiresAt) return "never";
   const expiresAt = new Date(shareLink.expiresAt).getTime();
@@ -1736,8 +1852,14 @@ function ShareMenu({
   const shareMenuRef = useRef<HTMLDivElement>(null);
   const inviteInputRef = useRef<HTMLInputElement>(null);
   const workspace = useStore((s) => s.workspace);
+  const userId = useStore((s) => s.userId);
+  const accessOwner = useStore((s) => {
+    const ownerId = s.workspace?.ownerId || page.createdBy;
+    return ownerId ? s.workspaceMembers.find((member) => member.userId === ownerId) : undefined;
+  });
   const organization = useStore((s) => s.organization);
   const organizationGroups = useStore((s) => s.organizationGroups);
+  const pagesById = useStore((s) => s.pagesById);
   const applyRemotePage = useStore((s) => s.applyRemotePage);
   const notify = useStore((s) => s.notify);
   const [inviteDraft, setInviteDraft] = useState("");
@@ -1747,6 +1869,22 @@ function ShareMenu({
   const [invitePermissionOpen, setInvitePermissionOpen] = useState(false);
   const [invites, setInvites] = useState<ShareInvite[]>([]);
   const [shareLink, setShareLink] = useState<ShareLink | null>(null);
+  const [site, setSite] = useState<SiteConfig | null>(null);
+  const [siteSlug, setSiteSlug] = useState(() => defaultSiteSlug(page));
+  const [siteTitle, setSiteTitle] = useState(() => pageDisplayTitle(page));
+  const [siteDescription, setSiteDescription] = useState("");
+  const [siteTheme, setSiteTheme] = useState<SiteConfig["theme"]>("system");
+  const [siteBreadcrumbs, setSiteBreadcrumbs] = useState(true);
+  const [siteSearch, setSiteSearch] = useState(true);
+  const [siteBranding, setSiteBranding] = useState(true);
+  const [siteNavigationPageIds, setSiteNavigationPageIds] = useState<string[]>([page.id]);
+  const [siteCustomHostname, setSiteCustomHostname] = useState("");
+  const [siteBusy, setSiteBusy] = useState(false);
+  const [siteDomainReason, setSiteDomainReason] = useState("");
+  const [customDomains, setCustomDomains] = useState({
+    enabled: false,
+    cnameTarget: "",
+  });
   const [expiryOption, setExpiryOption] = useState<ShareExpiryOption>("never");
   const [activeShareTab, setActiveShareTab] = useState<"share" | "publish">("share");
   const [inviteMenuFor, setInviteMenuFor] = useState<string | null>(null);
@@ -1754,14 +1892,26 @@ function ShareMenu({
   const [accessLoaded, setAccessLoaded] = useState(false);
   const [accessLoadFailed, setAccessLoadFailed] = useState(false);
   const [canManageAccess, setCanManageAccess] = useState(false);
-  const { t } = useTranslation(["topBar", "common"]);
+  const [remoteAccessOwner, setRemoteAccessOwner] = useState<{
+    displayName?: string | null;
+    isCurrent: boolean;
+  } | null>(null);
+  const { t } = useTranslation(["topBar", "common", "siteBuilder"]);
   const labels = topbarLabels(t);
-  const accountLabel = labels.fullAccess;
-  const userInitial = (workspace?.name.trim().slice(0, 1).toUpperCase() || "Y");
+  const accessOwnerId = workspace?.ownerId || page.createdBy;
+  const accessOwnerName =
+    remoteAccessOwner?.displayName?.trim() ||
+    accessOwner?.displayName?.trim() ||
+    accessOwner?.email?.trim() ||
+    labels.member;
+  const accessOwnerIsCurrent = remoteAccessOwner?.isCurrent ?? (accessOwnerId === userId);
+  const accessOwnerLabel = accessOwnerIsCurrent ? labels.you : accessOwnerName;
+  const accessOwnerInitial = inviteInitial(accessOwnerName);
   const shareControlsDisabled = accessBusy || !accessLoaded || !canManageAccess;
   const canInvite = inviteDraft.trim().length > 0 && !shareControlsDisabled;
   const pageTitle = pageDisplayTitle(page);
   const publicHref = shareLinkHref(shareLink);
+  const publishedSiteHref = siteHref(site, customDomains.enabled);
   const shareToWeb = !!page.isPublic && (!shareLink || (shareLink.enabled && !shareLinkExpired(shareLink)));
   const inviteQuery = inviteDraft.trim();
   const filteredInviteGroups = organizationGroups
@@ -1792,6 +1942,19 @@ function ShareMenu({
       );
     })
     .slice(0, 4);
+  const siteNavigationCandidates = Object.values(pagesById)
+    .filter((candidate) => {
+      if (candidate.inTrash) return false;
+      let current: Page | undefined = candidate;
+      const visited = new Set<string>();
+      while (current && !visited.has(current.id)) {
+        if (current.id === page.id) return true;
+        visited.add(current.id);
+        current = current.parentId ? pagesById[current.parentId] : undefined;
+      }
+      return false;
+    })
+    .sort((left, right) => left.position - right.position || left.id.localeCompare(right.id));
 
   function principalForInvite(label: string): SharePrincipalDraft {
     if (
@@ -1836,9 +1999,23 @@ function ShareMenu({
         if (cancelled) return;
         applyRemotePage(result.page);
         setShareLink(result.shareLink ?? null);
+        const loadedSite = result.site ?? null;
+        setSite(loadedSite);
+        if (loadedSite) {
+          setSiteSlug(loadedSite.slug);
+          setSiteTitle(loadedSite.title);
+          setSiteDescription(loadedSite.description ?? "");
+          setSiteTheme(loadedSite.theme);
+          setSiteBreadcrumbs(loadedSite.showBreadcrumbs);
+          setSiteSearch(loadedSite.showSearch);
+          setSiteBranding(loadedSite.showBranding);
+          setSiteNavigationPageIds(loadedSite.navigationPageIds);
+          setSiteCustomHostname(loadedSite.customHostname ?? "");
+        }
         setExpiryOption(expiryOptionFromLink(result.shareLink ?? null));
         setInvites(result.permissions ?? []);
         setCanManageAccess(!!result.canManage);
+        setRemoteAccessOwner(result.accessOwner ?? null);
         setAccessLoadFailed(false);
       })
       .catch(() => {
@@ -1863,31 +2040,34 @@ function ShareMenu({
 
   useEffect(() => {
     let cancelled = false;
+    void fetchRuntimeConfigRemote().then((config) => {
+      if (!cancelled) {
+        setCustomDomains(config.customDomains ?? {
+          enabled: false,
+          cnameTarget: "",
+        });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const organizationId = organization?.id;
     const query = inviteDraft.trim();
     if (!organizationId || !canManageAccess || query.length < 1) {
       setPeopleSuggestions([]);
-      return () => {
-        cancelled = true;
-      };
+      return;
     }
-    const timer = window.setTimeout(() => {
-      searchOrganizationPeopleRemote({
+    return scheduleOrganizationPeopleTypeahead({
         organizationId,
         query,
         limit: 6,
-      })
-        .then((result) => {
-          if (!cancelled) setPeopleSuggestions(result.people ?? []);
-        })
-        .catch(() => {
-          if (!cancelled) setPeopleSuggestions([]);
-        });
-    }, 120);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      }, {
+        onResult: (result) => setPeopleSuggestions(result.people ?? []),
+        onError: () => setPeopleSuggestions([]),
+      });
   }, [canManageAccess, inviteDraft, organization?.id]);
 
   async function toggleWebSharing() {
@@ -1939,6 +2119,92 @@ function ShareMenu({
       notify(labels.toast.couldntUpdateWebLink, "error");
     } finally {
       setAccessBusy(false);
+    }
+  }
+
+  function toggleSiteNavigationPage(pageId: string) {
+    setSiteNavigationPageIds((current) => {
+      if (current.includes(pageId)) return current.filter((id) => id !== pageId);
+      if (current.length >= 12) {
+        notify(t("siteBuilder:navigationLimit"), "default");
+        return current;
+      }
+      return [...current, pageId];
+    });
+  }
+
+  async function savePublishedSite() {
+    const normalizedSlug = siteSlug.trim().toLowerCase();
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalizedSlug) || normalizedSlug.length > 60) {
+      notify(t("siteBuilder:invalidSlug"), "error");
+      return;
+    }
+    if (!siteTitle.trim()) {
+      notify(t("siteBuilder:titleRequired"), "error");
+      return;
+    }
+    setSiteBusy(true);
+    setSiteDomainReason("");
+    try {
+      const result = await publishSiteRemote({
+        pageId: page.id,
+        slug: normalizedSlug,
+        customHostname: customDomains.enabled
+          ? siteCustomHostname.trim() || null
+          : null,
+        config: {
+          title: siteTitle.trim(),
+          description: siteDescription.trim(),
+          theme: siteTheme,
+          showBreadcrumbs: siteBreadcrumbs,
+          showSearch: siteSearch,
+          showBranding: siteBranding,
+          navigationPageIds: siteNavigationPageIds,
+        },
+      });
+      setSite(result.site);
+      setSiteSlug(result.site.slug);
+      setSiteCustomHostname(result.site.customHostname ?? "");
+      applyRemotePage(result.page);
+      setShareLink(result.shareLink ?? null);
+      notify(site?.published ? t("siteBuilder:updated") : t("siteBuilder:published"), "success");
+    } catch {
+      notify(t("siteBuilder:publishFailed"), "error");
+    } finally {
+      setSiteBusy(false);
+    }
+  }
+
+  async function stopPublishedSite() {
+    setSiteBusy(true);
+    try {
+      const result = await unpublishSiteRemote(page.id);
+      setSite(result.site);
+      applyRemotePage(result.page);
+      setShareLink(result.shareLink ?? null);
+      notify(t("siteBuilder:unpublished"), "success");
+    } catch {
+      notify(t("siteBuilder:unpublishFailed"), "error");
+    } finally {
+      setSiteBusy(false);
+    }
+  }
+
+  async function verifyPublishedSiteDomain() {
+    setSiteBusy(true);
+    setSiteDomainReason("");
+    try {
+      const result = await validateSiteDomainRemote(page.id);
+      setSite(result.site);
+      if (result.verified) {
+        notify(t("siteBuilder:domainVerified"), "success");
+      } else {
+        setSiteDomainReason(result.verification?.reason ?? t("siteBuilder:domainPending"));
+      }
+    } catch {
+      notify(t("siteBuilder:domainCheckFailed"), "error");
+    } finally {
+      setSiteBusy(false);
     }
   }
 
@@ -2090,6 +2356,8 @@ function ShareMenu({
       ref={shareMenuRef}
       className={styles.shareMenu}
       data-share-menu="true"
+      data-access-loaded={accessLoaded ? "true" : "false"}
+      data-can-manage={canManageAccess ? "true" : "false"}
       role="dialog"
       aria-label={labels.shareDialog(pageDisplayTitle(page))}
       onPointerDownCapture={(e) => closePermissionMenusUnless(e.target)}
@@ -2241,11 +2509,11 @@ function ShareMenu({
             </div>
           )}
           <div className={styles.shareSectionLabel}>{labels.whoHasAccess}</div>
-          <div className={styles.shareRow}>
-            <span className={styles.shareAvatar}>{userInitial}</span>
+          <div className={styles.shareRow} data-share-access-owner="true">
+            <span className={styles.shareAvatar}>{accessOwnerInitial}</span>
             <span className={styles.shareText}>
-              <span>{labels.you}</span>
-              <span>{accountLabel}</span>
+              <span data-share-access-owner-name="true">{accessOwnerLabel}</span>
+              <span>{labels.fullAccess}</span>
             </span>
             <span className={styles.sharePermission}>{labels.fullAccess}</span>
           </div>
@@ -2300,38 +2568,9 @@ function ShareMenu({
               </span>
             </div>
           ))}
-          <div className={styles.shareAccessRow}>
-            <span className={styles.shareAccessIcon}>
-              {shareToWeb ? (
-                <GlobeIcon size={15} aria-hidden="true" />
-              ) : (
-                <LockIcon size={15} aria-hidden="true" />
-              )}
-            </span>
-            <span>
-              <span>{shareToWeb ? labels.anyoneWithLink : labels.privateAccess}</span>
-              <span>{shareToWeb ? labels.canView : workspace?.name ?? labels.workspace}</span>
-            </span>
-          </div>
-          <div className={styles.menuDivider} />
-          <div className={styles.copyLinks}>
-            <button
-              type="button"
-              className={styles.copyLink}
-              data-menu-item
-              onClick={() => onCopy("page")}
-            >
-              <LinkIcon size={16} aria-hidden="true" />
-              <span>{copiedPageLink ? labels.copiedPageLink : labels.copyPageLinkButton}</span>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.sharePanel} data-share-panel="publish" role="tabpanel">
           <button
             type="button"
             className={styles.shareWebRow}
-            data-menu-item
             role="switch"
             aria-checked={shareToWeb}
             aria-label={shareToWeb ? labels.disableWebSharing(pageTitle) : labels.enableWebSharing(pageTitle)}
@@ -2339,19 +2578,21 @@ function ShareMenu({
             onClick={() => void toggleWebSharing()}
           >
             <span className={styles.shareAccessIcon}>
-              <GlobeIcon size={15} aria-hidden="true" />
+              {shareToWeb ? (
+                <GlobeIcon size={15} aria-hidden="true" />
+              ) : (
+                <LockIcon size={15} aria-hidden="true" />
+              )}
             </span>
             <span className={styles.shareWebText}>
-              <span>{labels.shareToWeb}</span>
-              <span>{shareToWeb ? labels.on : labels.off}</span>
+              <span>{shareToWeb ? labels.anyoneWithLink : labels.privateAccess}</span>
+              <span>{shareToWeb ? labels.canView : workspace?.name ?? labels.workspace}</span>
             </span>
             <span className={styles.shareSwitch} data-on={shareToWeb ? "true" : undefined} aria-hidden="true" />
           </button>
           {shareToWeb && (
             <label className={styles.shareExpiryRow}>
-              <span className={styles.shareAccessIcon}>
-                <ClockIcon size={15} aria-hidden="true" />
-              </span>
+              <span className={styles.shareAccessIcon}><ClockIcon size={15} aria-hidden="true" /></span>
               <span className={styles.shareExpiryText}>
                 <span>{labels.linkExpires}</span>
                 <span>{shareExpiryLabel(shareLink, labels)}</span>
@@ -2363,27 +2604,12 @@ function ShareMenu({
                 onChange={(event) => void updateShareExpiry(event.currentTarget.value as ShareExpiryOption)}
               >
                 {SHARE_EXPIRY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {shareExpiryOptionLabel(option, labels)}
-                  </option>
+                  <option key={option} value={option}>{shareExpiryOptionLabel(option, labels)}</option>
                 ))}
                 {expiryOption === "custom" && <option value="custom">{labels.customExpiration}</option>}
               </select>
             </label>
           )}
-          <div className={styles.shareAccessRow}>
-            <span className={styles.shareAccessIcon}>
-              {shareToWeb ? (
-                <GlobeIcon size={15} aria-hidden="true" />
-              ) : (
-                <LockIcon size={15} aria-hidden="true" />
-              )}
-            </span>
-            <span>
-              <span>{shareToWeb ? labels.anyoneWithLink : labels.privateAccess}</span>
-              <span>{shareToWeb ? labels.canView : workspace?.name ?? labels.workspace}</span>
-            </span>
-          </div>
           <div className={styles.menuDivider} />
           <div className={styles.copyLinks}>
             {shareToWeb && (
@@ -2406,6 +2632,109 @@ function ShareMenu({
             >
               <LinkIcon size={16} aria-hidden="true" />
               <span>{copiedPageLink ? labels.copiedPageLink : labels.copyPageLinkButton}</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.sharePanel} data-share-panel="publish" role="tabpanel">
+          <div className={styles.siteBuilderIntro}>
+            <span className={styles.shareAccessIcon}><GlobeIcon size={15} aria-hidden="true" /></span>
+            <span>
+              <strong>{site?.published ? t("siteBuilder:publishedTitle") : t("siteBuilder:unpublishedTitle")}</strong>
+              <span>{t("siteBuilder:description")}</span>
+            </span>
+          </div>
+          <div className={styles.siteBuilderFields}>
+            <label>
+              <span>{t("siteBuilder:title")}</span>
+              <input value={siteTitle} maxLength={200} disabled={siteBusy} onChange={(event) => setSiteTitle(event.currentTarget.value)} />
+            </label>
+            <label>
+              <span>{t("siteBuilder:siteDescription")}</span>
+              <textarea value={siteDescription} maxLength={2000} disabled={siteBusy} onChange={(event) => setSiteDescription(event.currentTarget.value)} />
+            </label>
+            <label>
+              <span>{t("siteBuilder:address")}</span>
+              <span className={styles.siteBuilderAddress}>
+                <span>/site/</span>
+                <input value={siteSlug} maxLength={60} disabled={siteBusy} onChange={(event) => setSiteSlug(event.currentTarget.value)} />
+              </span>
+            </label>
+            {customDomains.enabled && (
+              <label>
+                <span>{t("siteBuilder:customDomain")}</span>
+                <input
+                  value={siteCustomHostname}
+                  maxLength={253}
+                  disabled={siteBusy}
+                  placeholder={t("siteBuilder:customDomainPlaceholder")}
+                  onChange={(event) => setSiteCustomHostname(event.currentTarget.value)}
+                />
+              </label>
+            )}
+            <label>
+              <span>{t("siteBuilder:theme")}</span>
+              <select value={siteTheme} disabled={siteBusy} onChange={(event) => setSiteTheme(event.currentTarget.value as SiteConfig["theme"])}>
+                <option value="system">{t("siteBuilder:themeSystem")}</option>
+                <option value="light">{t("siteBuilder:themeLight")}</option>
+                <option value="dark">{t("siteBuilder:themeDark")}</option>
+              </select>
+            </label>
+          </div>
+          <div className={styles.siteBuilderToggles}>
+            {([
+              ["breadcrumbs", siteBreadcrumbs, setSiteBreadcrumbs],
+              ["search", siteSearch, setSiteSearch],
+              ["branding", siteBranding, setSiteBranding],
+            ] as const).map(([key, checked, setter]) => (
+              <label key={key}>
+                <input type="checkbox" checked={checked} disabled={siteBusy} onChange={(event) => setter(event.currentTarget.checked)} />
+                <span>{t(`siteBuilder:${key}`)}</span>
+              </label>
+            ))}
+          </div>
+          <details className={styles.siteBuilderNavigation}>
+            <summary>{t("siteBuilder:navigation", { count: siteNavigationPageIds.length })}</summary>
+            <div>
+              {siteNavigationCandidates.map((candidate) => (
+                <label key={candidate.id}>
+                  <input
+                    type="checkbox"
+                    checked={siteNavigationPageIds.includes(candidate.id)}
+                    disabled={siteBusy}
+                    onChange={() => toggleSiteNavigationPage(candidate.id)}
+                  />
+                  <span>{pageDisplayTitle(candidate)}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+          {customDomains.enabled && site?.published && site.customHostname && site.domainStatus !== "validated" && (
+            <div className={styles.siteDomainSetup}>
+              <strong>{t("siteBuilder:domainSetup")}</strong>
+              <span>{t("siteBuilder:domainSetupHelp")}</span>
+              <code>CNAME {site.customHostname} → {customDomains.cnameTarget}</code>
+              <code>TXT _hanji-verification.{site.customHostname} → hanji-verification={site.domainVerificationToken}</code>
+              {siteDomainReason && <span role="status">{siteDomainReason}</span>}
+              <button type="button" disabled={siteBusy} onClick={() => void verifyPublishedSiteDomain()}>
+                {t("siteBuilder:verifyDomain")}
+              </button>
+            </div>
+          )}
+          <div className={styles.siteBuilderActions}>
+            {site?.published && (
+              <button type="button" disabled={siteBusy} onClick={() => void stopPublishedSite()}>
+                {t("siteBuilder:unpublish")}
+              </button>
+            )}
+            {site?.published && (
+              <button type="button" disabled={!publishedSiteHref} onClick={() => onCopy("web", publishedSiteHref)}>
+                <LinkIcon size={15} aria-hidden="true" />
+                {copiedWebLink ? t("siteBuilder:copied") : t("siteBuilder:copySiteLink")}
+              </button>
+            )}
+            <button type="button" className={styles.siteBuilderPrimary} disabled={shareControlsDisabled || siteBusy} onClick={() => void savePublishedSite()}>
+              {siteBusy ? t("siteBuilder:saving") : site?.published ? t("siteBuilder:update") : t("siteBuilder:publish")}
             </button>
           </div>
         </div>

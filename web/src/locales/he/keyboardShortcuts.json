@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "הוסף תגובה",
+    "addLink": "הוסף קישור",
+    "blockColor": "החל צבע אחרון",
+    "bold": "מודגש",
+    "copyPageLink": "העתק קישור לדף",
+    "findInPage": "חפש בדף זה",
+    "inlineCode": "קוד מוטבע",
+    "italic": "נטוי",
+    "moveBlock": "העבר בלוק לדף אחר",
+    "moveBlockDown": "העבר בלוק למטה",
+    "moveBlockUp": "העבר בלוק למעלה",
+    "movePage": "העבר דף נוכחי",
+    "navigateBack": "חזור",
+    "navigateForward": "קדימה",
+    "newPage": "דף חדש",
+    "openBlockMenu": "פתח פעולות בלוק",
+    "openKeyboardShortcuts": "פתח קיצורי מקלדת",
+    "openParentPage": "פתח דף אב",
+    "quickFind": "חיפוש מהיר",
+    "strikethrough": "קו חוצה",
+    "toggleAllToggles": "הרחב/כווץ את כל הטוגלים",
+    "toggleSidebar": "החלף סרגל צד",
+    "toggleTheme": "החלף מצב כהה",
+    "underline": "קו תחתון"
+  },
+  "categories": {
+    "createStyle": "יצירה ועיצוב",
+    "editMove": "עריכה והעברה",
+    "popular": "פופולרי"
+  },
+  "categoriesLabel": "קטגוריות קיצורים",
+  "close": "סגור",
+  "closeBackdrop": "סגור קיצורי מקלדת",
+  "empty": "לא נמצאו קיצורים",
+  "keysFor": "מקשים עבור {{action}}",
+  "or": "או",
+  "searchLabel": "חפש קיצורי מקלדת",
+  "searchPlaceholder": "חפש קיצורי דרך…",
+  "searchResults": "תוצאות חיפוש",
+  "searchTerms": {
+    "toggleTheme": "עיצוב בהיר כהה מראה"
+  },
+  "title": "קיצורי מקלדת"
+}

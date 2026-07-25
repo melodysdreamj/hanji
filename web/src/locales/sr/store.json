@@ -7,7 +7,8 @@
   "pageMissingSave": "Stranica nije pronađena, pa vaše izmene nisu mogle biti sačuvane.",
   "saveFailed": "Vaše izmene nisu mogle biti sačuvane.",
   "sessionExpired": "Sesija je istekla ili zahtev nije mogao biti autentifikovan. Pokušajte ponovo.",
-  "blockConflictSave": "Ovaj blok je izmenjen na drugom uređaju, pa vaša izmena van mreže nije primenjena.",
+  "blockConflictSave": "Čekana izmena se preklapa sa najnovijom verzijom servera, pa nije mogla automatski da se spoji.",
   "blockConflictKeepMine": "Primeni moju verziju",
-  "blockMoveCommentsSkipped": "Blok je pomeren, ali njegovi komentari nisu mogli biti premešteni s njim."
+  "blockMoveCommentsSkipped": "Blok je pomeren, ali njegovi komentari nisu mogli biti premešteni s njim.",
+  "conflictSave": "Izmena nije sačuvana jer se sadržaj promenio pre završetka čuvanja."
 }

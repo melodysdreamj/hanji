@@ -35,7 +35,7 @@
     "rename": "ប្តូរឈ្មោះ",
     "addPageInside": "បន្ថែមទំព័រខាងក្នុង",
     "exportAsMarkdown": "នាំចេញជា Markdown",
-    "exportAsHanjiFile": "នាំចេញជាឯកសារ Hanji",
+    "exportAsHanjiFile": "នាំចេញ Hanji JSON (មិនរួមបញ្ចូលឯកសារ)",
     "importMarkdown": "នាំចូល Markdown",
     "importing": "កំពុងនាំចូល...",
     "unlockPage": "ដោះសោទំព័រ",
@@ -44,7 +44,8 @@
     "removeVerification": "ដកការផ្ទៀងផ្ទាត់",
     "verifyPage": "ផ្ទៀងផ្ទាត់ទំព័រ",
     "customizePage": "ប្ដូរទំព័រតាមបំណង",
-    "undo": "មិនធ្វើវិញ"
+    "undo": "មិនធ្វើវិញ",
+    "exportAsHanjiArchive": "នាំចេញ Hanji archive (រួមបញ្ចូលឯកសារ)"
   },
   "customize": {
     "summaryDefault": "លំនាំដើម",
@@ -101,6 +102,8 @@
     "movedToTrash": "បានផ្លាស់ទីទៅធុងសំរាម",
     "restoredPage": "បានស្តារទំព័រ",
     "couldntRestorePage": "មិនអាចស្ដារទំព័របានទេ",
-    "couldntMoveToTrash": "មិនអាចផ្លាស់ទីទៅធុងសំរាមបានទេ"
+    "couldntMoveToTrash": "មិនអាចផ្លាស់ទីទៅធុងសំរាមបានទេ",
+    "couldntExportHanjiArchive": "មិនអាចនាំចេញបណ្ណសារ Hanji បានទេ",
+    "exportedHanjiArchive": "បាននាំចេញបណ្ណសារ Hanji ជាមួយឯកសារ"
   }
 }

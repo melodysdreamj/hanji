@@ -26,11 +26,8 @@
   },
   "header": {
     "closeUpdates": "Sulje päivitykset",
-    "inboxMode": "Saapuneet-tila",
     "markAllRead": "Merkitse kaikki luetuksi",
     "markAllReadAria": "Merkitse kaikki päivitykset luetuiksi",
-    "modeChats": "Keskustelut",
-    "modeUpdates": "Päivitykset",
     "pageHistory": "Sivuhistoria",
     "recentUpdates_one": "{{count}} viimeisin päivitys",
     "recentUpdates_other": "{{count}} viimeisintä päivitystä",
@@ -46,7 +43,8 @@
     "referenceLink": "Linkitetty {{title}} · {{preview}}",
     "referenceMention": "Mainittu {{title}} · {{preview}}",
     "unreadDot": "Lukematon",
-    "workspaceUpdate": "Työtilan päivitys"
+    "workspaceUpdate": "Työtilan päivitys",
+    "bySelf": "Sinä"
   },
   "time": {
     "justNow": "Juuri nyt",
@@ -74,6 +72,15 @@
     "versionCount_other": "{{count}} versiota",
     "versionsAgo": "{{count}} versiota sitten",
     "versionsAhead": "{{count}} versiota edellä",
-    "versionsAria": "Versiot"
+    "versionsAria": "Versiot",
+    "emptyBlock": "Tyhjä lohko",
+    "emptyPreview": "Tässä versiossa ei ole sivun sisältöä.",
+    "previewAria": "Sivun version esikatselu, vain luku",
+    "previewingCurrent": "Katsot nykyistä sivua",
+    "previewingSnapshot": "Katsot aiempaa versiota",
+    "previewOnlyHint": "Version valinta näyttää vain esikatselun. Nykyinen sivu muuttuu vasta palauttamisen jälkeen.",
+    "restoreThisVersion": "Palauta",
+    "restoring": "Palautetaan...",
+    "versionHistory": "Versiohistoria"
   }
 }

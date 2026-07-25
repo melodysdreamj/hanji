@@ -35,7 +35,7 @@
     "rename": "নাম পরিবর্তন করুন",
     "addPageInside": "ভিতরে পৃষ্ঠা যোগ করুন",
     "exportAsMarkdown": "মার্কডাউন হিসেবে রপ্তানি করুন",
-    "exportAsHanjiFile": "Hanji ফাইল হিসেবে রপ্তানি করুন",
+    "exportAsHanjiFile": "Hanji JSON এক্সপোর্ট (ফাইল ছাড়া)",
     "importMarkdown": "মার্কডাউন আমদানি",
     "importing": "আমদানি করা হচ্ছে...",
     "unlockPage": "পৃষ্ঠা আনলক করুন",
@@ -44,7 +44,8 @@
     "removeVerification": "যাচাইকরণ সরান",
     "verifyPage": "পৃষ্ঠা যাচাই করুন",
     "customizePage": "পৃষ্ঠা কাস্টমাইজ করুন",
-    "undo": "পূর্বাবস্থায় ফিরান"
+    "undo": "পূর্বাবস্থায় ফিরান",
+    "exportAsHanjiArchive": "Hanji আর্কাইভ এক্সপোর্ট (ফাইল সহ)"
   },
   "customize": {
     "summaryDefault": "ডিফল্ট",
@@ -101,6 +102,8 @@
     "movedToTrash": "ট্র্যাশে সরানো হয়েছে",
     "restoredPage": "পৃষ্ঠা পুনরুদ্ধার করা হয়েছে",
     "couldntRestorePage": "পৃষ্ঠা পুনরুদ্ধার করা যায়নি",
-    "couldntMoveToTrash": "ট্র্যাশে সরানো যায়নি"
+    "couldntMoveToTrash": "ট্র্যাশে সরানো যায়নি",
+    "couldntExportHanjiArchive": "Hanji আর্কাইভ এক্সপোর্ট করা যায়নি।",
+    "exportedHanjiArchive": "ফাইলসহ Hanji আর্কাইভ এক্সপোর্ট করা হয়েছে।"
   }
 }

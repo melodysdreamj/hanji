@@ -51,7 +51,14 @@
     "range": "بازه",
     "earliest_date": "اولین تاریخ",
     "latest_date": "آخرین تاریخ",
-    "date_range": "بازه تاریخ"
+    "date_range": "بازه تاریخ",
+    "count": "شمارش همه",
+    "count_per_group": "تعداد هر گروه",
+    "empty": "تعداد خالی",
+    "not_empty": "تعداد غیر خالی",
+    "percent_per_group": "درصد هر گروه",
+    "show_unique": "نمایش مقادیر یکتا",
+    "unique": "تعداد مقادیر یکتا"
   },
   "undo": "واگردانی",
   "untitled": "بدون عنوان",

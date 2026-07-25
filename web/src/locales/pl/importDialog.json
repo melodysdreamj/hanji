@@ -59,18 +59,18 @@
   "hanji": {
     "cantImport": "Nie można zaimportować pliku Hanji.",
     "cantRead": "Nie można odczytać pliku Hanji.",
-    "choose": "Wybierz plik .hanji.json",
+    "choose": "Wybierz plik .hanji.json lub .hanji.zip",
     "chooseButton": "Wybierz plik",
     "fetch": "Pobierz eksport",
     "fetching": "Pobieranie...",
-    "fileHint": "Wyeksportuj stronę, bazę danych lub przestrzeń roboczą z innego Hanji, a następnie zaimportuj ją tutaj. Relacje, podsumowania, formuły, widoki i szablony są zachowywane. Załączniki nie są dołączane.",
+    "fileHint": "Użyj .hanji.json tylko dla struktury (pliki wyłączone) lub .hanji.zip do bezstratnego transferu (pliki dołączone). Relacje, podsumowania, formuły, widoki i szablony są zachowane.",
     "fromFile": "Z pliku",
     "fromLive": "Z aktywnej instancji",
     "importButton": "Importuj",
     "importedItems_one": "Zaimportowano {{count}} element z pliku Hanji.",
     "importedItems_other": "Zaimportowano {{count}} elementów z pliku Hanji.",
     "importing": "Importowanie...",
-    "liveHint": "Pobierz przestrzeń roboczą bezpośrednio z innego działającego Hanji (np. instancji Docker dev). Zdalny serwer musi zezwalać na żądania z tego adresu.",
+    "liveHint": "Pobierz obszar roboczy bezpośrednio z innego działającego Hanji (np. instancji Docker dev). Pliki są wyłączone. Zdalny musi zezwalać na żądania z tego adresu.",
     "needFile": "Najpierw wybierz plik Hanji.",
     "needRemote": "Wprowadź zdalny adres URL Hanji i identyfikator przestrzeni roboczej.",
     "placeholderNote": "Niektóre załączniki pozostały jako zastępniki.",
@@ -82,7 +82,9 @@
     "review": "Gotowe do importu: {{summary}}",
     "selected": "Wybrano: {{name}}",
     "tab": "Hanji",
-    "title": "Import z Hanji"
+    "title": "Import z Hanji",
+    "filesExcluded": "Pliki wyłączone.",
+    "filesIncluded": "Pliki dołączone."
   },
   "importApplied": "Import z Notion został zastosowany.",
   "importCancelled": "Import z Notion został anulowany.",
@@ -305,6 +307,12 @@
       "Odkryj",
       "Zastosuj"
     ],
-    "stepsAria": "Kroki importu z Notion"
+    "stepsAria": "Kroki importu z Notion",
+    "serverRunnerStatus": "Hanji przetwarza ten import na serwerze. Zamknięcie lub odświeżenie tej zakładki go nie wstrzyma.",
+    "serverRunningHint": "Import jest kontynuowany w tle. Możesz zamknąć tę zakładkę."
+  },
+  "terminal": {
+    "cancelled": "Import został anulowany. Możesz go bezpiecznie rozpocząć ponownie, gdy będziesz gotowy.",
+    "failed": "Import zatrzymał się bezpiecznie przed zakończeniem. Sprawdź połączenie i spróbuj ponownie. Szczegóły techniczne i identyfikatory są tutaj ukryte."
   }
 }

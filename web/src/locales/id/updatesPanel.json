@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} pembaruan terbaru",
     "unreadOfTotal": "{{unread}} belum dibaca dari {{total}} pembaruan",
     "updateType": "Jenis pembaruan",
-    "updates": "Pembaruan",
-    "modeUpdates": "Pembaruan",
-    "modeChats": "Obrolan",
-    "inboxMode": "Mode Inbox"
+    "updates": "Pembaruan"
   },
   "time": {
     "justNow": "Baru saja",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} versi",
     "versionsAgo": "{{count}} versi lalu",
     "versionsAhead": "{{count}} versi ke depan",
-    "versionsAria": "Versi"
+    "versionsAria": "Versi",
+    "emptyBlock": "Blok kosong",
+    "emptyPreview": "Versi ini tidak memiliki konten halaman.",
+    "previewAria": "Pratinjau versi halaman hanya-baca",
+    "previewingCurrent": "Melihat halaman saat ini",
+    "previewingSnapshot": "Melihat versi sebelumnya",
+    "previewOnlyHint": "Memilih versi hanya menampilkan pratinjau. Halaman saat ini baru berubah setelah Pulihkan.",
+    "restoreThisVersion": "Pulihkan",
+    "restoring": "Memulihkan...",
+    "versionHistory": "Riwayat versi"
   },
   "badges": {
     "comment": "Komentar",
@@ -67,7 +73,8 @@
     "referenceMention": "Menyebutkan {{title}} · {{preview}}",
     "referenceLink": "Ditautkan ke {{title}} · {{preview}}",
     "unreadDot": "Belum dibaca",
-    "workspaceUpdate": "Pembaruan Workspace"
+    "workspaceUpdate": "Pembaruan Workspace",
+    "bySelf": "Anda"
   },
   "empty": {
     "allCaughtUp": "Semua sudah dibaca.",

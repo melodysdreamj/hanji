@@ -4,7 +4,22 @@
     "sum": "যোগফল",
     "average": "গড়",
     "min": "সর্বনিম্ন",
-    "max": "সর্বোচ্চ"
+    "max": "সর্বোচ্চ",
+    "checked": "চেক করা",
+    "count_values": "মান সংখ্যা",
+    "date_range": "তারিখ পরিসর",
+    "earliest_date": "সর্বপ্রথম তারিখ",
+    "empty": "খালি গণনা",
+    "latest_date": "সর্বশেষ তারিখ",
+    "median": "মধ্যমা",
+    "not_empty": "অখালি গণনা",
+    "percent_checked": "চেক করা শতাংশ",
+    "percent_empty": "খালি শতাংশ",
+    "percent_not_empty": "অখালি শতাংশ",
+    "percent_unchecked": "আনচেকড শতাংশ",
+    "range": "পরিসর",
+    "unchecked": "আনচেকড",
+    "unique": "স্বতন্ত্র মান গণনা"
   },
   "chartAria": "{{name}} চার্ট",
   "chartType": "চার্টের ধরন",
@@ -27,5 +42,9 @@
   "untitledProperty": "শিরোনামহীন",
   "valueProperty": "মান বৈশিষ্ট্য",
   "xAxis": "X-অক্ষ",
-  "yAxis": "Y-অক্ষ"
+  "yAxis": "Y-অক্ষ",
+  "dateRangeDays": "{{count}} দিন",
+  "missingProperty": "সংরক্ষিত বৈশিষ্ট্য",
+  "unsupportedAggregateDesc": "{{property}} থেকে {{aggregate}} গণনা করা যাচ্ছে না। একটি সামঞ্জস্যপূর্ণ বৈশিষ্ট্য বা গণনা চয়ন করুন।",
+  "unsupportedAggregateTitle": "এই চার্ট গণনা উপলব্ধ নয়"
 }

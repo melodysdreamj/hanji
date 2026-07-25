@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "依存関係:",
     "hint": "リレーションプロパティを追加",
-    "relationPropertyAriaLabel": "依存関係のリレーションプロパティ"
+    "relationPropertyAriaLabel": "依存関係のリレーションプロパティ",
+    "makeDependOn": "{{title}}を{{predecessor}}に依存させる",
+    "startFrom": "{{title}}から依存関係を開始"
   },
   "toolbar": {
     "today": "今日",

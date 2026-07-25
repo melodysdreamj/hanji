@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Fermé",
+    "open": "Ouvert",
+    "private": "Privé"
+  },
+  "add": "Ajouter",
+  "approve": "Approuver",
+  "archive": "Archiver le teamspace",
+  "available": "Disponible pour rejoindre",
+  "choosePrincipal": "Choisir une personne ou un groupe",
+  "create": "Créer un teamspace",
+  "deny": "Refuser",
+  "error": {
+    "action": "Impossible de terminer cette action de teamspace.",
+    "load": "Impossible de charger les détails du teamspace."
+  },
+  "fields": {
+    "access": "Accès",
+    "description": "Description",
+    "icon": "Icône",
+    "memberRole": "Accès aux pages des membres",
+    "membersCanEditSidebar": "Les membres peuvent ajouter et réorganiser les pages",
+    "membersCanInvite": "Les membres peuvent inviter",
+    "name": "Nom",
+    "openRole": "Accès des visiteurs aux pages"
+  },
+  "governance": "Paramètres du teamspace",
+  "join": "Rejoindre",
+  "joined": "Mes teamspaces",
+  "loadMore": "Charger plus",
+  "manage": "Gérer",
+  "member": "Membre",
+  "members": "Membres",
+  "noneArchived": "Aucun teamspace archivé.",
+  "noneAvailable": "Aucun autre teamspace disponible.",
+  "noneJoined": "Vous n'avez encore rejoint aucun teamspace.",
+  "noRequests": "Aucune demande en attente.",
+  "notice": {
+    "approved": "Demande approuvée.",
+    "archived": "Teamspace archivé.",
+    "created": "Teamspace créé.",
+    "defaultSet": "Teamspace par défaut mis à jour.",
+    "denied": "Demande refusée.",
+    "joined": "Teamspace rejoint.",
+    "memberAdded": "Membre ajouté.",
+    "memberRemoved": "Membre supprimé.",
+    "memberUpdated": "Rôle du membre mis à jour.",
+    "policySaved": "Politique de création de teamspace mise à jour.",
+    "requested": "Accès demandé.",
+    "restored": "Teamspace restauré.",
+    "saved": "Teamspace mis à jour."
+  },
+  "notOwner": "Seul le propriétaire de l'espace d'équipe ou l'administrateur de l'espace de travail peut gérer cet espace d'équipe.",
+  "open": "Ouvrir",
+  "owner": "Propriétaire",
+  "ownersOnlyCreate": "Seuls les propriétaires de l'espace de travail peuvent créer des espaces d'équipe",
+  "remove": "Supprimer",
+  "replacement": "Choisir un espace d'équipe par défaut de remplacement",
+  "request": "Demander l'accès",
+  "requestPending": "Demande en attente",
+  "requests": "Demandes d'accès",
+  "restore": "Restaurer",
+  "roles": {
+    "comment": "Peut commenter",
+    "edit": "Peut modifier",
+    "full_access": "Accès complet",
+    "view": "Peut consulter"
+  },
+  "save": "Enregistrer les modifications",
+  "selectTeamspace": "Espace d'équipe",
+  "setDefault": "Définir comme espace d'équipe par défaut",
+  "subtitle": "Organisez le travail partagé et contrôlez qui peut le découvrir ou le rejoindre.",
+  "tabs": {
+    "archived": "Archivés",
+    "browse": "Parcourir",
+    "create": "Nouvel espace d'équipe",
+    "label": "Vues de l'espace d'équipe",
+    "manage": "Gérer"
+  },
+  "title": "Espaces d'équipe"
+}

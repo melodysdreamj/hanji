@@ -6,5 +6,6 @@
   "unreachable": "Không thể kết nối máy chủ",
   "unreachablePending_one": "Không thể kết nối máy chủ · {{count}} thay đổi đang chờ",
   "unreachablePending_other": "Không thể kết nối máy chủ · {{count}} thay đổi đang chờ",
-  "retryHint": "Nhấp để thử lại ngay"
+  "retryHint": "Nhấp để thử lại ngay",
+  "confirmed": "Đã lưu lên máy chủ"
 }

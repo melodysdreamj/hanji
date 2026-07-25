@@ -176,7 +176,9 @@
     "video": "Vídeo",
     "videoCaption": "Legenda do vídeo",
     "videoEmptyHint": "Carregue um ficheiro de vídeo, cole uma ligação direta ou use uma ligação do YouTube, Vimeo ou Loom.",
-    "videoLink": "Ligação de vídeo"
+    "videoLink": "Ligação de vídeo",
+    "audioPlaybackFailed": "Não foi possível reproduzir este áudio. Substitua-o ou abra o ficheiro original.",
+    "videoPlaybackFailed": "Não foi possível reproduzir este vídeo. Substitua-o ou abra o ficheiro original."
   },
   "bookmark": {
     "copy": "Copiar link do marcador",

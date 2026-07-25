@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Suljettu",
+    "open": "Avoin",
+    "private": "Yksityinen"
+  },
+  "add": "Lisää",
+  "approve": "Hyväksy",
+  "archive": "Arkistoi työtila",
+  "available": "Avoin liittymiselle",
+  "choosePrincipal": "Valitse henkilö tai ryhmä",
+  "create": "Luo työtila",
+  "deny": "Hylkää",
+  "error": {
+    "action": "Työtilan toimintoa ei voitu suorittaa.",
+    "load": "Työtilan tietojen lataaminen epäonnistui."
+  },
+  "fields": {
+    "access": "Pääsy",
+    "description": "Kuvaus",
+    "icon": "Kuvake",
+    "memberRole": "Jäsenen sivujen käyttöoikeus",
+    "membersCanEditSidebar": "Jäsenet voivat lisätä ja järjestää sivuja",
+    "membersCanInvite": "Jäsenet voivat kutsua ihmisiä",
+    "name": "Nimi",
+    "openRole": "Julkisen vierailijan sivujen käyttöoikeus"
+  },
+  "governance": "Tiimitilan asetukset",
+  "join": "Liity",
+  "joined": "Omat tiimitilat",
+  "loadMore": "Näytä lisää",
+  "manage": "Hallinnoi",
+  "member": "Jäsen",
+  "members": "Jäsenet",
+  "noneArchived": "Ei arkistoituja tiimitiloja.",
+  "noneAvailable": "Muita tiimitiloja ei ole saatavilla.",
+  "noneJoined": "Et ole vielä liittynyt mihinkään tiimitilaan.",
+  "noRequests": "Ei odottavia pyyntöjä.",
+  "notice": {
+    "approved": "Pyyntö hyväksytty.",
+    "archived": "Tiimitila arkistoitu.",
+    "created": "Tiimitila luotu.",
+    "defaultSet": "Oletustiimitila päivitetty.",
+    "denied": "Pyyntö hylätty.",
+    "joined": "Tiimitilaan liitytty.",
+    "memberAdded": "Jäsen lisätty.",
+    "memberRemoved": "Jäsen poistettu.",
+    "memberUpdated": "Jäsenen rooli päivitetty.",
+    "policySaved": "Tiimitilan luontikäytäntö päivitetty.",
+    "requested": "Pääsyä pyydetty.",
+    "restored": "Tiimitila palautettu.",
+    "saved": "Tiimitila päivitetty."
+  },
+  "notOwner": "Vain tiimitilan omistaja tai työtilan ylläpitäjä voi hallita tätä tiimitilaa.",
+  "open": "Avaa",
+  "owner": "Omistaja",
+  "ownersOnlyCreate": "Vain työtilan omistajat voivat luoda tiimitiloja",
+  "remove": "Poista",
+  "replacement": "Valitse korvaava oletustiimitila",
+  "request": "Pyydä pääsyä",
+  "requestPending": "Pyyntö odottaa",
+  "requests": "Pääsypyynnöt",
+  "restore": "Palauta",
+  "roles": {
+    "comment": "Voi kommentoida",
+    "edit": "Voi muokata",
+    "full_access": "Täysi käyttöoikeus",
+    "view": "Voi katsella"
+  },
+  "save": "Tallenna muutokset",
+  "selectTeamspace": "Tiimitila",
+  "setDefault": "Aseta oletustiimitilaksi",
+  "subtitle": "Järjestä jaetut työt ja hallitse, kuka voi löytää tai liittyä siihen.",
+  "tabs": {
+    "archived": "Arkistoidut",
+    "browse": "Selaa",
+    "create": "Uusi tiimitila",
+    "label": "Tiimitilan näkymät",
+    "manage": "Hallitse"
+  },
+  "title": "Tiimitilat"
+}

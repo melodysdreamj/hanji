@@ -176,7 +176,9 @@
     "video": "视频",
     "videoCaption": "视频字幕",
     "videoEmptyHint": "上传视频文件、粘贴直接链接或使用 YouTube、Vimeo、Loom 链接。",
-    "videoLink": "视频链接"
+    "videoLink": "视频链接",
+    "audioPlaybackFailed": "无法播放此音频。请替换它或打开原始文件。",
+    "videoPlaybackFailed": "无法播放此视频。请替换它或打开原始文件。"
   },
   "bookmark": {
     "copy": "复制书签链接",

@@ -55,6 +55,19 @@ project-owned EdgeBase/Wrangler/workerd processes and refuses to run until they
 stop. If an automatic rollback reports any failure, keep the runtime stopped
 and restore the snapshot before retrying.
 
+Apply mode installs a private mode-0600 write-ahead journal at
+`.edgebase/hanji-local-namespace-migration.json` before its first change. The
+journal stores relative path metadata and environment-file generation hashes,
+never environment values. Discovery count, individual environment-file size,
+and journal size are bounded; apply refuses an oversized plan before its first
+change. If the process or host stops between filesystem operations, keep the
+runtime stopped and rerun the same
+`--apply --backup-confirmed` command; it reconciles the recorded in-flight
+operation and resumes the exact plan. Dry-run deliberately refuses to alter an
+interrupted journal. If journal validation reports corrupt, escaping, or
+ambiguous state, restore the complete snapshot instead of deleting the marker
+or reconstructing the plan by hand.
+
 The setup command also refuses pre-Hanji variable names inherited from the
 current shell. Rename or unset those variables first; setup reports names only
 and never prints their values.
@@ -266,7 +279,7 @@ Strict releases use exact lowercase `HANJI_AUTH_OAUTH_PROVIDERS=off` when
 social sign-in is disabled, which clears retained provider enablement.
 
 Register this exact provider callback for each enabled provider (replace the
-placeholder with the canonical `HANJI_APP_ORIGIN` and provider name):
+placeholder with the canonical `HANJI_AUTH_ORIGIN` and provider name):
 
 ```text
 https://app.example.com/api/auth/oauth/<provider>/callback

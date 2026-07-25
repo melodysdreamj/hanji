@@ -88,5 +88,38 @@
     "hoursAgo": "Modificato {{hours}}h fa",
     "daysAgo": "Modificato {{days}}g fa",
     "on": "Modificato il {{date}}"
+  },
+  "align": {
+    "center": "Centro",
+    "choose": "Scegli allineamento immagine",
+    "left": "Sinistra",
+    "right": "Destra"
+  },
+  "altText": {
+    "help": "Il testo alternativo aiuta le persone che usano screen reader a comprendere l'immagine.",
+    "label": "Descrizione",
+    "placeholder": "Descrivi l'immagine",
+    "remove": "Rimuovi",
+    "save": "Salva",
+    "title": "Testo alternativo"
+  },
+  "imageLink": {
+    "invalid": "Inserisci un URL completo http:// o https://",
+    "label": "Apri questo URL al clic sull'immagine",
+    "remove": "Rimuovi",
+    "save": "Salva",
+    "title": "Link immagine"
+  },
+  "media": {
+    "addImageLink": "Aggiungi link",
+    "align": "Allinea",
+    "altText": "Testo alternativo",
+    "copySourceLink": "Copia link sorgente",
+    "download": "Scarica",
+    "editImageLink": "Modifica link",
+    "fullScreen": "Schermo intero",
+    "openLink": "Apri link",
+    "replace": "Sostituisci",
+    "viewOriginal": "Vedi originale"
   }
 }

@@ -1,19 +1,24 @@
 {
   "toggle": {
-    "count_other": "백링크 {{count}}개"
+    "count_other": "백링크 {{count}}개",
+    "partial_other": "백링크 {{count}}개 이상"
   },
   "header": {
     "title": "링크된 멘션"
   },
   "summary": {
     "mention_other": "멘션 {{count}}개",
-    "link_other": "링크 {{count}}개"
+    "link_other": "링크 {{count}}개",
+    "loaded": "불러옴: {{summary}}"
   },
   "kind": {
     "mention": "멘션",
     "link": "링크"
   },
   "more": {
-    "count_other": "백링크 {{count}}개 더 보기"
+    "count_other": "백링크 {{count}}개 더 보기",
+    "load": "백링크 더 불러오기",
+    "loading": "백링크 불러오는 중…",
+    "search": "백링크 검색"
   }
 }

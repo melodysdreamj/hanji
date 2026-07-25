@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Breadcrumb",
+  "clearSearch": "Cancella ricerca",
+  "errors": {
+    "not-found": "Questo sito potrebbe essere stato rimosso o il suo indirizzo potrebbe essere cambiato.",
+    "offline": "Controlla la connessione, poi riprova ad aprire il sito.",
+    "rate-limited": "Questo sito sta ricevendo troppe richieste. Attendi un momento e riprova.",
+    "unavailable": "Hanji non può aprire questo sito in questo momento. Riprova tra poco."
+  },
+  "madeWithHanji": "Realizzato con Hanji",
+  "navigation": "Navigazione del sito",
+  "noResults": "Nessuna pagina trovata",
+  "outsideSite": "La pagina non fa parte di questo sito pubblicato.",
+  "search": "Cerca in questo sito",
+  "tryAgain": "Riprova",
+  "unavailable": "Questo sito non è disponibile."
+}

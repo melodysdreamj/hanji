@@ -38,7 +38,7 @@
   "moveTo": "ખસેડો",
   "exporting": "નિકાસ કરી રહ્યાં…",
   "exportAsMarkdown": "માર્કડાઉન તરીકે નિકાસ કરો",
-  "exportAsHanji": "Hanji ફાઇલ તરીકે નિકાસ કરો",
+  "exportAsHanji": "Hanji JSON એક્સપોર્ટ કરો (ફાઇલો સિવાય)",
   "importing": "આયાત કરી રહ્યાં…",
   "importMarkdown": "માર્કડાઉન આયાત કરો",
   "unlockPage": "પેજ અનલૉક કરો",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "એક્સેસ અપડેટ કરી શકાયું નહીં",
     "removedFromAccessList": "એક્સેસ સૂચિમાંથી દૂર કરાયું",
     "couldntRemoveAccess": "એક્સેસ દૂર કરી શકાયું નહીં",
-    "couldntLoadAccessList": "એક્સેસ યાદી લોડ કરી શકાયું નહીં"
+    "couldntLoadAccessList": "એક્સેસ યાદી લોડ કરી શકાયું નહીં",
+    "couldntExportHanjiArchive": "Hanji આર્કાઇવ એક્સપોર્ટ કરી શકાયું નહીં.",
+    "exportedHanjiArchive": "Hanji આર્કાઇવ ફાઇલો સાથે એક્સપોર્ટ કર્યું."
   },
   "user": "વપરાશકર્તા",
   "whoHasAccess": "એક્સેસ કોની પાસે છે",
   "workspace": "કાર્યક્ષેત્ર",
   "workspaceCount_one": "{{count}} કાર્યક્ષેત્ર",
   "workspaceCount_other": "{{count}} કાર્યક્ષેત્રો",
-  "you": "તમે"
+  "you": "તમે",
+  "exportAsHanjiArchive": "Hanji આર્કાઇવ એક્સપોર્ટ કરો (ફાઇલો સમાવિષ્ટ)",
+  "turnIntoWiki": "વિકિમાં ફેરવો",
+  "undoWiki": "વિકિ પૂર્વવત્ કરો",
+  "wikiCreated": "પૃષ્ઠને વિકિમાં ફેરવ્યું",
+  "wikiPageSettings": "વિકિ પૃષ્ઠ સેટિંગ્સ",
+  "wikiUndone": "વિકિ દૂર કર્યું; પૃષ્ઠ સામગ્રી સાચવી રાખી",
+  "wikiUpdateFailed": "વિકિ અપડેટ કરી શકાયું નથી"
 }

@@ -9,6 +9,7 @@ import {
 } from '../lib/hanji-compat';
 import {
   getInstanceSettings,
+  parseMemberAddPolicy,
   parseSignupPolicy,
   upsertInstanceSettings,
   type InstanceSettings,
@@ -20,6 +21,7 @@ import {
   requireString,
   type ListAllOptions,
   type TableQuery,
+  type TransactOperation,
 } from '../lib/table-utils';
 import type {
   DbRef,
@@ -464,8 +466,11 @@ const SNAPSHOT_TABLES = [
   'comments',
   'page_permissions',
   'share_links',
+  'form_links',
   'file_uploads',
   'file_maintenance_runs',
+  'file_maintenance_queue',
+  'file_maintenance_sweep_state',
   'notifications',
   'notion_import_jobs',
   'notion_import_items',
@@ -956,7 +961,11 @@ async function buildInstanceAdminResult(
 
 async function updateSignupPolicy(context: FunctionContext, body: Record<string, unknown>) {
   const { db, authAdmin, actorId } = await requireInstanceAdmin(context);
-  const signupPolicy = parseSignupPolicy(body.signupPolicy, 'public');
+  const signupPolicyInput = requireString(body.signupPolicy, 'signupPolicy').toLowerCase();
+  if (signupPolicyInput !== 'public' && signupPolicyInput !== 'closed') {
+    throw new Error('Signup policy is invalid.');
+  }
+  const signupPolicy = parseSignupPolicy(signupPolicyInput);
   const settings = await upsertInstanceSettings(db, { signupPolicy, updatedBy: actorId });
   await recordInstanceAudit(db, {
     actorId,
@@ -964,6 +973,20 @@ async function updateSignupPolicy(context: FunctionContext, body: Record<string,
     targetType: 'instance_settings',
     targetId: 'global',
     metadata: { signupPolicy },
+  });
+  return buildInstanceAdminResult(db, authAdmin, settings, body, context);
+}
+
+async function updateMemberAddPolicy(context: FunctionContext, body: Record<string, unknown>) {
+  const { db, authAdmin, actorId } = await requireInstanceAdmin(context);
+  const memberAddPolicy = parseMemberAddPolicy(requireString(body.memberAddPolicy, 'memberAddPolicy'));
+  const settings = await upsertInstanceSettings(db, { memberAddPolicy, updatedBy: actorId });
+  await recordInstanceAudit(db, {
+    actorId,
+    action: 'instance.member_add_policy.update',
+    targetType: 'instance_settings',
+    targetId: 'global',
+    metadata: { memberAddPolicy },
   });
   return buildInstanceAdminResult(db, authAdmin, settings, body, context);
 }
@@ -987,12 +1010,121 @@ async function setUserDisabled(context: FunctionContext, body: Record<string, un
   return buildInstanceAdminResult(db, authAdmin, settings, body, context);
 }
 
+interface SyntheticUserCleanup {
+  workspaceMembers: WorkspaceMember[];
+  organizationMembers: OrganizationMember[];
+  emptyOwnedOrganizations: OrganizationRecord[];
+}
+
+// instance-admin uses the central DB directly, so one raw delete is one server
+// transact operation. Keep every cleanup request within EdgeBase's hard cap and
+// delete organization roots only after all membership leaves are durable. A
+// failed chunk can then be retried from a fresh snapshot without resurrecting
+// or orphaning an organization.
+const INSTANCE_ADMIN_MAX_TRANSACT_OPS = 500;
+
+async function deleteSyntheticUserArtifacts(db: DbRef, cleanup: SyntheticUserCleanup) {
+  const groups: TransactOperation[][] = [
+    cleanup.workspaceMembers.map((member) => ({
+      table: 'workspace_members',
+      op: 'delete',
+      id: member.id,
+    })),
+    cleanup.organizationMembers.map((member) => ({
+      table: 'organization_members',
+      op: 'delete',
+      id: member.id,
+    })),
+    cleanup.emptyOwnedOrganizations.map((organization) => ({
+      table: 'organizations',
+      op: 'delete',
+      id: organization.id,
+    })),
+  ];
+  for (const operations of groups) {
+    for (let offset = 0; offset < operations.length; offset += INSTANCE_ADMIN_MAX_TRANSACT_OPS) {
+      const chunk = operations.slice(offset, offset + INSTANCE_ADMIN_MAX_TRANSACT_OPS);
+      // The loop cannot produce an empty slice. Keeping the guard explicit
+      // protects this cleanup if its grouping strategy changes later.
+      if (chunk.length > 0) await db.transact(chunk);
+    }
+  }
+}
+
+function isMissingAuthUserError(error: unknown) {
+  if (isNotFoundError(error)) return true;
+  if (!(error instanceof Error)) return false;
+  const explicitStatus = Number((error as Error & { status?: unknown; code?: unknown }).status
+    ?? (error as Error & { status?: unknown; code?: unknown }).code);
+  if (Number.isInteger(explicitStatus)) return false;
+  // App Functions' in-process auth admin currently throws these plain Errors
+  // without a 404 status. Keep the fallback deliberately narrow so an auth DB
+  // outage is never mistaken for an already-completed deletion.
+  return /^User not found(?::|\.|$)/.test(error.message)
+    || /^admin\.auth\.(?:getUser|deleteUser) failed: user not found\.?$/.test(error.message);
+}
+
+async function getAuthUserIfPresent(
+  authAdmin: NonNullable<FunctionContext['admin']['auth']>,
+  userId: string,
+) {
+  try {
+    return await authAdmin.getUser(userId);
+  } catch (error) {
+    if (isMissingAuthUserError(error)) return null;
+    throw error;
+  }
+}
+
+async function deleteAuthUserIfPresent(
+  authAdmin: NonNullable<FunctionContext['admin']['auth']>,
+  userId: string,
+) {
+  try {
+    await authAdmin.deleteUser(userId);
+  } catch (error) {
+    if (!isMissingAuthUserError(error)) throw error;
+  }
+}
+
 async function deleteUser(context: FunctionContext, body: Record<string, unknown>) {
   const { db, authAdmin, settings, actorId } = await requireInstanceAdmin(context);
   const targetUserId = requireString(body.userId, 'userId');
   if (targetUserId === actorId) throw new Error('You cannot delete your own instance account.');
-  const target = await authAdmin.getUser(targetUserId).catch(() => null);
-  await authAdmin.deleteUser(targetUserId);
+  const target = await getAuthUserIfPresent(authAdmin, targetUserId);
+  let syntheticCleanup: SyntheticUserCleanup | null = null;
+  if (body.cleanupEmptyOwnedOrganizations === true) {
+    const [workspaceMembers, organizationMembers, organizations, workspaces] = await Promise.all([
+      listTableAll(db.table<WorkspaceMember>('workspace_members')),
+      listTableAll(db.table<OrganizationMember>('organization_members')),
+      listTableAll(db.table<OrganizationRecord>('organizations')),
+      listTableAll(db.table<Workspace>('workspaces')),
+    ]);
+    const targetWorkspaceMembers = workspaceMembers.filter((member) => member.userId === targetUserId);
+    const targetOrganizationMembers = organizationMembers.filter((member) => member.userId === targetUserId);
+    const ownedOrganizations = organizations.filter((organization) => organization.ownerId === targetUserId);
+    const blockedOwnedOrganizations = ownedOrganizations.filter((organization) =>
+      workspaces.some((workspace) => workspace.organizationId === organization.id) ||
+      organizationMembers.some((member) =>
+        member.organizationId === organization.id && member.userId !== targetUserId
+      )
+    );
+    if (blockedOwnedOrganizations.length > 0) {
+      throw new Error('Delete or transfer owned organization content before deleting this synthetic user.');
+    }
+    syntheticCleanup = {
+      workspaceMembers: targetWorkspaceMembers,
+      organizationMembers: targetOrganizationMembers,
+      emptyOwnedOrganizations: ownedOrganizations,
+    };
+  }
+  // Auth deletion happens first. If a later DB chunk fails, the next request
+  // treats the now-missing auth user as an already-completed step and resumes
+  // the remaining idempotent artifact deletes.
+  await deleteAuthUserIfPresent(authAdmin, targetUserId);
+  if (syntheticCleanup) {
+    await deleteSyntheticUserArtifacts(db, syntheticCleanup);
+  }
   const admins = instanceAdminIds(settings).filter((id) => id !== targetUserId);
   const nextSettings = admins.length === instanceAdminIds(settings).length
     ? settings
@@ -1005,6 +1137,12 @@ async function deleteUser(context: FunctionContext, body: Record<string, unknown
     targetLabel: target ? userEmail(target) ?? userDisplayName(target) ?? targetUserId : targetUserId,
     metadata: { removedInstanceAdmin: admins.length !== instanceAdminIds(settings).length },
   });
+  // Automated cleanup only needs durable acknowledgement. Rebuilding the
+  // complete instance dashboard after the user has already been deleted can
+  // scan every workspace/content table and time out, turning a committed
+  // deletion into an ambiguous client-side failure. The default UI contract
+  // remains unchanged unless the caller explicitly opts into this compact ack.
+  if (body.compactResult === true) return { deletedUserId: targetUserId };
   return buildInstanceAdminResult(db, authAdmin, nextSettings, body, context);
 }
 
@@ -1195,6 +1333,8 @@ export const POST = defineFunction(async (rawContext: unknown) => {
         return await getInstanceAdmin(context, body);
       case 'updateSignupPolicy':
         return await updateSignupPolicy(context, body);
+      case 'updateMemberAddPolicy':
+        return await updateMemberAddPolicy(context, body);
       case 'setUserDisabled':
         return await setUserDisabled(context, body);
       case 'deleteUser':

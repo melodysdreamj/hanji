@@ -35,7 +35,7 @@
     "rename": "Átnevezés",
     "addPageInside": "Aloldal hozzáadása",
     "exportAsMarkdown": "Exportálás Markdownként",
-    "exportAsHanjiFile": "Exportálás Hanji fájlként",
+    "exportAsHanjiFile": "Hanji JSON exportálása (fájlok nélkül)",
     "importMarkdown": "Markdown importálása",
     "importing": "Importálás...",
     "unlockPage": "Oldal feloldása",
@@ -44,7 +44,8 @@
     "removeVerification": "Ellenőrzés eltávolítása",
     "verifyPage": "Oldal ellenőrzése",
     "customizePage": "Oldal testreszabása",
-    "undo": "Visszavonás"
+    "undo": "Visszavonás",
+    "exportAsHanjiArchive": "Hanji archívum exportálása (fájlokkal együtt)"
   },
   "customize": {
     "summaryDefault": "Alapértelmezett",
@@ -101,6 +102,8 @@
     "movedToTrash": "Áthelyezve a kukába",
     "restoredPage": "Oldal visszaállítva",
     "couldntRestorePage": "Nem sikerült az oldal visszaállítása",
-    "couldntMoveToTrash": "Nem sikerült a kukába helyezés"
+    "couldntMoveToTrash": "Nem sikerült a kukába helyezés",
+    "couldntExportHanjiArchive": "Nem sikerült exportálni a Hanji archívumot.",
+    "exportedHanjiArchive": "Hanji archívum exportálva fájlokkal."
   }
 }

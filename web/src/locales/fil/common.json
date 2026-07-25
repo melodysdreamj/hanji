@@ -8,7 +8,8 @@
     "delete": "Tanggalin",
     "clearAll": "I-clear lahat",
     "done": "Tapos",
-    "add": "Idagdag"
+    "add": "Idagdag",
+    "reportIssue": "Iulat ang isyu"
   },
   "labels": {
     "untitled": "Walang pamagat"

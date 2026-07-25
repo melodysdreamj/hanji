@@ -92,5 +92,8 @@
     "ו",
     "ש"
   ],
-  "you": "אני"
+  "you": "אני",
+  "buttonExecutionFailed": "לא ניתן היה להריץ את הכפתור.",
+  "loadingMoreRelations": "טוען קשרים נוספים...",
+  "loadMoreRelations": "טען קשרים נוספים"
 }

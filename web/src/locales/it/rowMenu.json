@@ -35,7 +35,7 @@
     "rename": "Rinomina",
     "addPageInside": "Aggiungi pagina all'interno",
     "exportAsMarkdown": "Esporta come Markdown",
-    "exportAsHanjiFile": "Esporta come file Hanji",
+    "exportAsHanjiFile": "Esporta Hanji JSON (file esclusi)",
     "importMarkdown": "Importa Markdown",
     "importing": "Importazione...",
     "unlockPage": "Sblocca pagina",
@@ -44,7 +44,8 @@
     "removeVerification": "Rimuovi verifica",
     "verifyPage": "Verifica pagina",
     "customizePage": "Personalizza pagina",
-    "undo": "Annulla"
+    "undo": "Annulla",
+    "exportAsHanjiArchive": "Esporta archivio Hanji (file inclusi)"
   },
   "customize": {
     "summaryDefault": "Predefinito",
@@ -101,6 +102,8 @@
     "movedToTrash": "Spostato nel Cestino",
     "restoredPage": "Pagina ripristinata",
     "couldntRestorePage": "Impossibile ripristinare la pagina",
-    "couldntMoveToTrash": "Impossibile spostare nel Cestino"
+    "couldntMoveToTrash": "Impossibile spostare nel Cestino",
+    "couldntExportHanjiArchive": "Impossibile esportare l'archivio Hanji.",
+    "exportedHanjiArchive": "Esportato un archivio Hanji con file."
   }
 }

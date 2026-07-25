@@ -92,5 +92,8 @@
     "Cmt",
     "Paz"
   ],
-  "you": "Sen"
+  "you": "Sen",
+  "buttonExecutionFailed": "Buton çalıştırılamadı.",
+  "loadingMoreRelations": "Daha fazla ilişki yükleniyor...",
+  "loadMoreRelations": "Daha fazla ilişki yükle"
 }

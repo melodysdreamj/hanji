@@ -124,6 +124,15 @@ export function isHanjiUriProtocol(protocol: string) {
   return protocol === HANJI_URI_PROTOCOL || protocol === LEGACY_HANJI_URI_PROTOCOL;
 }
 
+/** Normalize an older internal URI on read; current serializers emit Hanji only. */
+export function normalizeLegacyHanjiUri(value: unknown) {
+  if (typeof value !== 'string') return value;
+  const legacyUriPrefix = `${LEGACY_HANJI_URI_PROTOCOL}//`;
+  return value.toLowerCase().startsWith(legacyUriPrefix)
+    ? `${HANJI_URI_PROTOCOL}//${value.slice(legacyUriPrefix.length)}`
+    : value;
+}
+
 /** Accept an older native document on import; exporters use HANJI_NATIVE_FORMAT. */
 export function isHanjiNativeFormat(value: unknown) {
   return value === HANJI_NATIVE_FORMAT || value === LEGACY_HANJI_NATIVE_FORMAT;
@@ -150,6 +159,16 @@ export function hasHanjiImportedRowContextFilterMarker(value: unknown) {
     || record[LEGACY_IMPORTED_ROW_CONTEXT_FILTER_MARKER] === true;
 }
 
+/** Remove either persisted row-context marker without leaking legacy names outside this boundary. */
+export function withoutHanjiImportedRowContextFilterMarkers(
+  value: Record<string, unknown>,
+) {
+  const next = { ...value };
+  delete next[HANJI_IMPORTED_ROW_CONTEXT_FILTER_MARKER];
+  delete next[LEGACY_IMPORTED_ROW_CONTEXT_FILTER_MARKER];
+  return next;
+}
+
 const HANJI_NATIVE_URI_FIELDS = new Set(['href', 'link', 'uri', 'url']);
 
 function normalizeLegacyHanjiNativeString(value: string, propertyName: string, depth: number) {
@@ -160,10 +179,7 @@ function normalizeLegacyHanjiNativeString(value: string, propertyName: string, d
     return HANJI_CURRENT_PAGE_FILTER_KIND;
   }
   if (!HANJI_NATIVE_URI_FIELDS.has(propertyName)) return value;
-  const legacyUriPrefix = `${LEGACY_HANJI_URI_PROTOCOL}//`;
-  return value.toLowerCase().startsWith(legacyUriPrefix)
-    ? `${HANJI_URI_PROTOCOL}//${value.slice(legacyUriPrefix.length)}`
-    : value;
+  return normalizeLegacyHanjiUri(value);
 }
 
 /**

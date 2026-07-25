@@ -51,7 +51,14 @@
     "range": "טווח",
     "earliest_date": "תאריך מוקדם ביותר",
     "latest_date": "תאריך מאוחר ביותר",
-    "date_range": "טווח תאריכים"
+    "date_range": "טווח תאריכים",
+    "count": "ספור הכול",
+    "count_per_group": "ספירה לקבוצה",
+    "empty": "ספירת ריקים",
+    "not_empty": "ספירת לא ריקים",
+    "percent_per_group": "אחוז לקבוצה",
+    "show_unique": "הצגת ערכים ייחודיים",
+    "unique": "ספירת ערכים ייחודיים"
   },
   "undo": "בטל",
   "untitled": "ללא כותרת",

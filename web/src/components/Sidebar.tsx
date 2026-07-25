@@ -4,6 +4,7 @@ import {
   lazy,
   Suspense,
   type KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -12,6 +13,12 @@ import {
 import { useParams, usePathname, useRouter, useSearchParams } from "@/lib/router";
 import { useShallow } from "zustand/react/shallow";
 import { positionBetween } from "@/lib/ids";
+import { isNewPageShortcut } from "@/lib/keyboard";
+import {
+  detectKeyboardShortcutPlatform,
+  matchesKeyboardShortcut,
+  shortcutCompactLabel,
+} from "@/lib/keyboardShortcuts";
 import { useTranslation } from "react-i18next";
 import {
   isHanjiStarterWelcomePage,
@@ -25,10 +32,9 @@ import { resolveTheme, useTheme } from "@/lib/theme";
 import { clearDurableOutboxOnSignOut, useStore } from "@/lib/store";
 import {
   claimNotionImportOnboardingRemote,
-  listNotificationsRemote,
   signOutRemote,
 } from "@/lib/edgebase";
-import type { Block, Page } from "@/lib/types";
+import type { Block, Page, Teamspace } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
 import type { WorkspaceCreateChoice } from "./WorkspaceCreateDialog";
 import type { NotionImportActivitySummary } from "./ImportDialog";
@@ -39,6 +45,7 @@ import { LegalNotice } from "./LegalNotice";
 import { WorkspaceIconGlyph } from "./PageIcon";
 import { PageTreeItem } from "./PageTreeItem";
 import { SidebarSponsorRoll } from "./SidebarSponsorRoll";
+import { useSidebarUnreadRefresh } from "./useSidebarUnreadRefresh";
 import {
   CheckIcon,
   ChevronDown,
@@ -47,6 +54,7 @@ import {
   DotsHorizontal,
   FileText,
   Home,
+  KeyboardIcon,
   LibraryIcon,
   Download,
   LogOutIcon,
@@ -82,6 +90,16 @@ const TemplatesDialog = lazy(() =>
 );
 const UpdatesPanel = lazy(() =>
   import("./UpdatesPanel").then(({ UpdatesPanel }) => ({ default: UpdatesPanel }))
+);
+const KeyboardShortcutsDialog = lazy(() =>
+  import("./KeyboardShortcutsDialog").then(({ KeyboardShortcutsDialog }) => ({
+    default: KeyboardShortcutsDialog,
+  }))
+);
+const TeamspaceDialog = lazy(() =>
+  import("./TeamspaceDialog").then(({ TeamspaceDialog }) => ({
+    default: TeamspaceDialog,
+  }))
 );
 
 type SidebarSection = "favorites" | "shared" | "private";
@@ -151,6 +169,13 @@ function pageHasDescendant(pagesById: Record<string, Page>, rootId: string, targ
   return false;
 }
 
+function canCreateTeamspacePage(teamspace: Teamspace) {
+  if (teamspace.role === "owner") return true;
+  if (teamspace.role !== "member" || teamspace.membersCanEditSidebar === false) return false;
+  const role = teamspace.memberPageRole;
+  return role === "edit" || role === "full_access";
+}
+
 export function Sidebar({
   collapsed,
   onResizeStart,
@@ -192,10 +217,13 @@ export function Sidebar({
   const [notionOnboardingOpen, setNotionOnboardingOpen] = useState(false);
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const [workspaceCreateOpen, setWorkspaceCreateOpen] = useState(false);
+  const [teamspaceDialogOpen, setTeamspaceDialogOpen] = useState(false);
+  const [keyboardShortcutsOpen, setKeyboardShortcutsOpen] = useState(false);
   // Creation flows that import land the ImportDialog on the matching tab.
   const [importInitialTab, setImportInitialTab] = useState<"notion" | "hanji" | undefined>(undefined);
   const [switchingWorkspaceId, setSwitchingWorkspaceId] = useState<string | null>(null);
   const [creatingPage, setCreatingPage] = useState(false);
+  const creatingPageRef = useRef(false);
   const [privateShowAll, setPrivateShowAll] = useState(false);
   const [privateSectionMenuOpen, setPrivateSectionMenuOpen] = useState(false);
   const [rootDropActive, setRootDropActive] = useState(false);
@@ -205,6 +233,7 @@ export function Sidebar({
   );
   const workspaceButtonRef = useRef<HTMLButtonElement>(null);
   const workspaceMenuRef = useRef<HTMLDivElement>(null);
+  const keyboardShortcutsRestoreFocusRef = useRef<HTMLElement | null>(null);
   const asideRef = useRef<HTMLElement>(null);
   const mobileRestoreFocusRef = useRef<HTMLElement | null>(null);
   const notionOnboardingCheckedWorkspaceIdsRef = useRef(new Set<string>());
@@ -214,6 +243,9 @@ export function Sidebar({
   const organization = useStore((s) => s.organization);
   const currentOrganizationMember = useStore((s) => s.currentOrganizationMember);
   const currentMember = useStore((s) => s.currentMember);
+  const teamspaces = useStore((s) => s.teamspaces);
+  const discoverableTeamspaces = useStore((s) => s.discoverableTeamspaces);
+  const activeDataScope = useStore((s) => s.activeDataScope);
   const isInstanceAdmin = useStore((s) => s.isInstanceAdmin);
   const userId = useStore((s) => s.userId);
   const roots = useStore(useShallow((s) => s.childPages(null)));
@@ -246,72 +278,14 @@ export function Sidebar({
   const createWorkspace = useStore((s) => s.createWorkspace);
   const switchWorkspace = useStore((s) => s.switchWorkspace);
 
-  // Inbox unread dot. There is no realtime notification push yet, so the dot
-  // refreshes on workspace change, when the tab regains focus/visibility
-  // (throttled), and when the inbox closes after reading. Server list/read
-  // state stays authoritative.
-  useEffect(() => {
-    const workspaceId = workspace?.id;
-    if (!workspaceId) return;
-    let mounted = true;
-    let lastRefresh = 0;
-    const refresh = (force = false) => {
-      if (document.visibilityState === "hidden") return;
-      const now = Date.now();
-      if (!force && now - lastRefresh < 30_000) return;
-      lastRefresh = now;
-      listNotificationsRemote({ workspaceId, limit: 1, includeRead: false })
-        .then((result) => {
-          if (mounted) setInboxUnread((result.unreadCount ?? 0) > 0);
-        })
-        .catch(() => {});
-    };
-    refresh(true);
-    const onFocus = () => refresh();
-    const onVisible = () => {
-      if (document.visibilityState === "visible") refresh();
-    };
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisible);
-    return () => {
-      mounted = false;
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
-  }, [workspace?.id]);
-
-  // Closing the inbox re-checks the dot immediately (items were likely read).
-  useEffect(() => {
-    const workspaceId = workspace?.id;
-    if (updatesOpen || !workspaceId) return;
-    listNotificationsRemote({ workspaceId, limit: 1, includeRead: false })
-      .then((result) => setInboxUnread((result.unreadCount ?? 0) > 0))
-      .catch(() => {});
-  }, [updatesOpen, workspace?.id]);
-
-  // Optimistic read-state signal from the Updates panel: mark-all-read clears
-  // the dot immediately (the server write can lag behind the close-time
-  // refetch above), then a delayed refetch reconfirms against the server.
-  useEffect(() => {
-    const workspaceId = workspace?.id;
-    if (!workspaceId) return;
-    let timer: number | undefined;
-    const onReadChanged = (event: Event) => {
-      const detail = (event as CustomEvent<{ allRead?: boolean }>).detail;
-      if (detail?.allRead) setInboxUnread(false);
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        listNotificationsRemote({ workspaceId, limit: 1, includeRead: false })
-          .then((result) => setInboxUnread((result.unreadCount ?? 0) > 0))
-          .catch(() => {});
-      }, 2000);
-    };
-    window.addEventListener("hanji:updates-read-changed", onReadChanged);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("hanji:updates-read-changed", onReadChanged);
-    };
-  }, [workspace?.id]);
+  // One coordinator owns all same-key unread probes. Ordinary focus/visibility
+  // refreshes single-flight, while close/read mutations reserve one trailing
+  // post-settlement generation so an older response cannot restore a stale dot.
+  useSidebarUnreadRefresh({
+    workspaceId: workspace?.id,
+    updatesOpen,
+    onUnreadChange: setInboxUnread,
+  });
 
   // Mount the inline inbox when it opens (desktop sidebar or mobile drawer); on
   // close, keep it mounted and flag it exiting so its slide-out animation can play
@@ -344,6 +318,23 @@ export function Sidebar({
       : typeof params?.databaseId === "string"
         ? params.databaseId
       : undefined;
+  const activeTeamspaceId = useMemo(() => {
+    if (!activePageId) return undefined;
+    const visited = new Set<string>();
+    let page = pagesById[activePageId];
+    while (page && !visited.has(page.id)) {
+      visited.add(page.id);
+      if (page.parentType === "workspace" && page.teamspaceId) return page.teamspaceId;
+      if (!page.parentId || page.parentType === "workspace") break;
+      page = pagesById[page.parentId];
+    }
+    return undefined;
+  }, [activePageId, pagesById]);
+  const activeTeamspace = useMemo(
+    () => [...teamspaces, ...discoverableTeamspaces]
+      .find((teamspace) => teamspace.id === activeTeamspaceId),
+    [activeTeamspaceId, discoverableTeamspaces, teamspaces],
+  );
   const organizationRole =
     organization?.ownerId === userId ? "owner" : currentOrganizationMember?.role;
   const workspaceCreationPolicy =
@@ -354,8 +345,20 @@ export function Sidebar({
     organizationRole === "admin" ||
     (workspaceCreationPolicy === "members" && organizationRole === "member");
   const workspaceRole = workspaceMemberShareRole({ workspace, currentMember, userId });
+  const hasFreshWorkspaceMembership =
+    activeDataScope?.kind === "workspace" &&
+    activeDataScope.workspaceId === workspace?.id &&
+    activeDataScope.membershipAuthority === "fresh";
+  const canUseWorkspaceImports = hasFreshWorkspaceMembership && Boolean(workspaceRole);
+  const canUseTeamspaces = hasFreshWorkspaceMembership && (
+    currentMember?.role === "owner"
+    || currentMember?.role === "admin"
+    || currentMember?.role === "member"
+  );
   const canCreateRootPage = canCreateWorkspacePage({ workspace, currentMember, userId });
-  const canUseFooterNewPage = canCreateRootPage;
+  const canUseFooterNewPage = activeTeamspace
+    ? canCreateTeamspacePage(activeTeamspace)
+    : canCreateRootPage;
   const canManageWorkspaceSettings =
     workspaceRole === "full_access" || organizationRole === "owner" || organizationRole === "admin";
   const canOpenAdminConsole =
@@ -368,9 +371,20 @@ export function Sidebar({
   const canOpenServerConsole = isInstanceAdmin;
 
   useEffect(() => {
+    const importAuthoritySettled =
+      hasFreshWorkspaceMembership || activeDataScope?.kind === "public_share";
+    if (!importAuthoritySettled || canUseWorkspaceImports) return;
+    setImportOpen(false);
+    setImportInitialTab(undefined);
+    setNotionImportActivity(null);
+    setNotionOnboardingOpen(false);
+  }, [activeDataScope?.kind, canUseWorkspaceImports, hasFreshWorkspaceMembership]);
+
+  useEffect(() => {
     const workspaceId = workspace?.id;
     if (
       !workspaceId ||
+      !canUseWorkspaceImports ||
       !isInstanceAdmin ||
       !canManageWorkspaceSettings ||
       notionOAuthCallback ||
@@ -397,6 +411,7 @@ export function Sidebar({
     };
   }, [
     canManageWorkspaceSettings,
+    canUseWorkspaceImports,
     importOpen,
     isInstanceAdmin,
     notionOAuthCallback,
@@ -424,6 +439,9 @@ export function Sidebar({
   const privateCollapsed = collapsedSections.has("private");
   const resolvedTheme = resolveTheme(themePref);
   const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
+  const shortcutPlatform = useMemo(() => detectKeyboardShortcutPlatform(), []);
+  const keyboardShortcutsHint = shortcutCompactLabel("openKeyboardShortcuts", shortcutPlatform);
+  const newPageShortcutHint = shortcutCompactLabel("newPage", shortcutPlatform);
   const hasSyntheticImportRoot = useMemo(
     () => roots.some((page) => isSyntheticNotionImportRootPage(page)),
     [roots],
@@ -476,6 +494,7 @@ export function Sidebar({
   const privateRootPages = useMemo(
     () => {
       const directRoots = roots.filter((page) => {
+        if (page.teamspaceId) return false;
         if (privateTreeHiddenPageIds.has(page.id)) return false;
         if (hasSyntheticImportRoot && isHanjiStarterWelcomePage(page)) return false;
         return !(
@@ -509,6 +528,16 @@ export function Sidebar({
       syntheticImportRootIds,
     ],
   );
+  const teamspaceRootPages = useMemo(() => {
+    const rootsByTeamspace = new Map<string, Page[]>();
+    for (const teamspace of teamspaces) rootsByTeamspace.set(teamspace.id, []);
+    for (const page of roots) {
+      if (!page.teamspaceId || page.inTrash) continue;
+      const teamspaceRoots = rootsByTeamspace.get(page.teamspaceId);
+      if (teamspaceRoots) teamspaceRoots.push(page);
+    }
+    return rootsByTeamspace;
+  }, [roots, teamspaces]);
   const privateActiveIndex = activePageId
     ? privateRootPages.findIndex((page) => page.id === activePageId)
     : -1;
@@ -537,9 +566,12 @@ export function Sidebar({
     closeWorkspaceMenu: t("sidebar:closeWorkspaceMenu"),
     workspaceMenu: t("sidebar:workspaceMenu"),
     exportWorkspace: t("sidebar:exportWorkspace"),
+    exportWorkspaceArchive: t("sidebar:exportWorkspaceArchive"),
     exportedWorkspace: t("sidebar:exportedWorkspace"),
     exportedWorkspaceWithPlaceholders: t("sidebar:exportedWorkspaceWithPlaceholders"),
     couldntExportWorkspace: t("sidebar:couldntExportWorkspace"),
+    exportedWorkspaceArchive: t("sidebar:exportedWorkspaceArchive"),
+    couldntExportWorkspaceArchive: t("sidebar:couldntExportWorkspaceArchive"),
     darkMode: t("sidebar:darkMode"),
     lightMode: t("sidebar:lightMode"),
     couldntSwitchWorkspace: t("sidebar:couldntSwitchWorkspace"),
@@ -572,6 +604,9 @@ export function Sidebar({
     importProgress: (percent: number) => t("sidebar:importProgress", { percent }),
     inbox: t("sidebar:inbox"),
     inboxUnread: t("sidebar:inboxUnread"),
+    joinTeamspaces: t("sidebar:joinTeamspaces"),
+    teamspacePages: (name: string) => t("sidebar:teamspacePages", { name }),
+    addPageToTeamspace: (name: string) => t("sidebar:addPageToTeamspace", { name }),
     newPage: t("sidebar:newPage"),
     openPrivateLibrary: t("sidebar:openPrivateLibrary"),
     openPrivateOptions: t("sidebar:openPrivateOptions"),
@@ -580,6 +615,7 @@ export function Sidebar({
     privatePages: t("sidebar:privatePages"),
     privateOptions: t("sidebar:privateOptions"),
     quickFind: t("sidebar:quickFind"),
+    keyboardShortcuts: t("sidebar:keyboardShortcuts"),
     shared: t("sidebar:shared"),
     sharedPages: t("sidebar:sharedPages"),
     showFewerPrivatePages: t("sidebar:showFewerPrivatePages"),
@@ -615,6 +651,13 @@ export function Sidebar({
     }
   }
 
+  function openKeyboardShortcuts(restoreFocusTo?: HTMLElement | null) {
+    keyboardShortcutsRestoreFocusRef.current = restoreFocusTo ?? (
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
+    );
+    setKeyboardShortcutsOpen(true);
+  }
+
   function openInbox() {
     // The inbox swaps the sidebar content in place (Notion-style) on both desktop
     // and the mobile drawer. Read the current store value at click time rather
@@ -632,7 +675,7 @@ export function Sidebar({
     return params ? `/account?${params}` : "/account";
   }
 
-  function workspaceConsoleHref(section?: "workspace" | "members" | "domains" | "sharing" | "usage") {
+  function workspaceConsoleHref(section?: "workspace" | "members" | "teamspaces" | "domains" | "sharing" | "usage") {
     const params = new URLSearchParams({ admin: "workspace" });
     if (section) params.set("section", section);
     return `/settings?${params.toString()}`;
@@ -658,7 +701,9 @@ export function Sidebar({
     try {
       await clearDurableOutboxOnSignOut();
     } finally {
-      window.location.assign("/");
+      // Reset the private route without reloading over the sign-in form that
+      // the local-first auth event has already rendered.
+      router.replace("/");
     }
   }
 
@@ -758,7 +803,7 @@ export function Sidebar({
     setImportOpen(true);
   }
 
-  function setSectionCollapsed(section: SidebarSection, nextCollapsed: boolean) {
+  const setSectionCollapsed = useCallback((section: SidebarSection, nextCollapsed: boolean) => {
     setCollapsedSections((current) => {
       const next = new Set(current);
       if (nextCollapsed) next.add(section);
@@ -766,7 +811,7 @@ export function Sidebar({
       writeCollapsedSections(next);
       return next;
     });
-  }
+  }, []);
 
   function toggleSection(section: SidebarSection) {
     setSectionCollapsed(section, !collapsedSections.has(section));
@@ -776,28 +821,55 @@ export function Sidebar({
     setPrivateSectionMenuOpen(false);
   }
 
-  async function newRootPage() {
-    if (creatingPage) return;
-    if (!canCreateRootPage) {
+  const createRootPageAt = useCallback(async (teamspace?: Teamspace) => {
+    if (creatingPageRef.current) return;
+    const canCreate = teamspace ? canCreateTeamspacePage(teamspace) : canCreateRootPage;
+    if (!canCreate) {
       notify(labels.pageAccessRequired, "default");
       return;
     }
-    setSectionCollapsed("private", false);
+    creatingPageRef.current = true;
+    if (!teamspace) setSectionCollapsed("private", false);
     setCreatingPage(true);
     try {
-      const last = privateRootPages[privateRootPages.length - 1];
+      const targetRoots = teamspace
+        ? teamspaceRootPages.get(teamspace.id) ?? []
+        : privateRootPages;
+      const last = targetRoots[targetRoots.length - 1];
       const page = await createPage({
         parentId: null,
         parentType: "workspace",
+        ...(teamspace ? { teamspaceId: teamspace.id } : {}),
         afterPosition: last?.position,
       });
       router.push(pageHref(page.id));
     } catch (error) {
       notify(error instanceof Error ? error.message : labels.couldntCreatePage, "error");
     } finally {
+      creatingPageRef.current = false;
       setCreatingPage(false);
     }
-  }
+  }, [
+    canCreateRootPage,
+    createPage,
+    labels.couldntCreatePage,
+    labels.pageAccessRequired,
+    notify,
+    privateRootPages,
+    router,
+    setSectionCollapsed,
+    teamspaceRootPages,
+  ]);
+
+  const newPrivateRootPage = useCallback(
+    () => createRootPageAt(),
+    [createRootPageAt],
+  );
+
+  const newRootPage = useCallback(
+    () => createRootPageAt(activeTeamspace),
+    [activeTeamspace, createRootPageAt],
+  );
 
   function openWorkspaceHome() {
     if (mobile && open) onToggle();
@@ -1017,7 +1089,35 @@ export function Sidebar({
   }
 
   const interactive = open && !collapsed;
-  const topLevelDialogOpen = templatesOpen || importOpen || workspaceCreateOpen;
+  const topLevelDialogOpen =
+    templatesOpen ||
+    notionOnboardingOpen ||
+    (canUseWorkspaceImports && importOpen) ||
+    workspaceCreateOpen ||
+    teamspaceDialogOpen ||
+    keyboardShortcutsOpen;
+
+  useEffect(() => {
+    function onKeyboardShortcutsShortcut(event: KeyboardEvent) {
+      if (topLevelDialogOpen || !matchesKeyboardShortcut("openKeyboardShortcuts", event)) return;
+      event.preventDefault();
+      keyboardShortcutsRestoreFocusRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setKeyboardShortcutsOpen(true);
+    }
+    window.addEventListener("keydown", onKeyboardShortcutsShortcut);
+    return () => window.removeEventListener("keydown", onKeyboardShortcutsShortcut);
+  }, [topLevelDialogOpen]);
+
+  useEffect(() => {
+    function onNewPageShortcut(event: KeyboardEvent) {
+      if (topLevelDialogOpen || !isNewPageShortcut(event)) return;
+      event.preventDefault();
+      void newRootPage();
+    }
+    window.addEventListener("keydown", onNewPageShortcut);
+    return () => window.removeEventListener("keydown", onNewPageShortcut);
+  }, [newRootPage, topLevelDialogOpen]);
 
   useEffect(() => {
     if (!topLevelDialogOpen) return;
@@ -1235,19 +1335,21 @@ export function Sidebar({
                   <FileText size={16} aria-hidden="true" />
                   <span>{labels.templates}</span>
                 </button>
-                <button
-                  type="button"
-                  className={styles.workspaceMenuItem}
-                  data-workspace-menu-item
-                  role="menuitem"
-                  onClick={() => {
-                    closeWorkspaceMenu(false);
-                    setImportOpen(true);
-                  }}
-                >
-                  <Upload size={16} aria-hidden="true" />
-                  <span>{labels.import}</span>
-                </button>
+                {canUseWorkspaceImports ? (
+                  <button
+                    type="button"
+                    className={styles.workspaceMenuItem}
+                    data-workspace-menu-item
+                    role="menuitem"
+                    onClick={() => {
+                      closeWorkspaceMenu(false);
+                      setImportOpen(true);
+                    }}
+                  >
+                    <Upload size={16} aria-hidden="true" />
+                    <span>{labels.import}</span>
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className={styles.workspaceMenuItem}
@@ -1284,11 +1386,53 @@ export function Sidebar({
                   role="menuitem"
                   onClick={() => {
                     closeWorkspaceMenu(false);
+                    if (!workspace?.id) return;
+                    const targetId = workspace.id;
+                    const targetName = workspace.name;
+                    void (async () => {
+                      try {
+                        const { exportWorkspaceAsNativeArchive } = await import("./nativeExport");
+                        await exportWorkspaceAsNativeArchive(targetId, targetName);
+                        notify(labels.exportedWorkspaceArchive, "success");
+                      } catch {
+                        notify(labels.couldntExportWorkspaceArchive, "error");
+                      }
+                    })();
+                  }}
+                >
+                  <Download size={16} aria-hidden="true" />
+                  <span>{labels.exportWorkspaceArchive}</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.workspaceMenuItem}
+                  data-workspace-menu-item
+                  role="menuitem"
+                  onClick={() => {
+                    closeWorkspaceMenu(false);
                     router.push("/trash");
                   }}
                 >
                   <Trash size={16} aria-hidden="true" />
                   <span>{labels.trash}</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.workspaceMenuItem}
+                  data-workspace-menu-item
+                  data-shortcut-id="openKeyboardShortcuts"
+                  role="menuitem"
+                  onClick={() => {
+                    const restoreFocusTo = workspaceButtonRef.current;
+                    closeWorkspaceMenu(false);
+                    openKeyboardShortcuts(restoreFocusTo);
+                  }}
+                >
+                  <KeyboardIcon size={16} aria-hidden="true" />
+                  <span>{labels.keyboardShortcuts}</span>
+                  <kbd className={styles.workspaceMenuShortcut} aria-hidden="true">
+                    {keyboardShortcutsHint}
+                  </kbd>
                 </button>
                 <div className={styles.workspaceMenuDivider} />
                 <button
@@ -1427,6 +1571,70 @@ export function Sidebar({
             </section>
           )}
 
+          {teamspaces.map((teamspace) => {
+            const teamspaceRoots = teamspaceRootPages.get(teamspace.id) ?? [];
+            const canCreate = canCreateTeamspacePage(teamspace);
+            return (
+              <section
+                key={teamspace.id}
+                className={styles.section}
+                data-sidebar-teamspace={teamspace.id}
+              >
+                <div className={styles.sectionLabel}>
+                  <div className={styles.teamspaceTitle}>
+                    <span className={styles.teamspaceIcon} aria-hidden="true">
+                      {teamspace.icon || "🧭"}
+                    </span>
+                    <span className={styles.sectionTitle}>{teamspace.name}</span>
+                  </div>
+                  <div className={styles.sectionActions} data-open="true">
+                    <button
+                      type="button"
+                      className={`${styles.sectionAction} ${styles.sectionAdd}`}
+                      aria-label={labels.addPageToTeamspace(teamspace.name)}
+                      disabled={creatingPage || !canCreate}
+                      onClick={() => void createRootPageAt(teamspace)}
+                    >
+                      <Plus size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className={styles.tree}
+                  role="tree"
+                  aria-label={labels.teamspacePages(teamspace.name)}
+                >
+                  {teamspaceRoots.map((page, index) => (
+                    <PageTreeItem
+                      key={page.id}
+                      pageId={page.id}
+                      depth={0}
+                      index={index}
+                      setSize={teamspaceRoots.length}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+
+          {canUseTeamspaces && (
+            <button
+              type="button"
+              className={styles.teamspaceBrowseButton}
+              onClick={() => setTeamspaceDialogOpen(true)}
+              aria-expanded={teamspaceDialogOpen}
+            >
+              <Plus size={15} aria-hidden="true" />
+              <span>{labels.joinTeamspaces}</span>
+              {discoverableTeamspaces.length > 0 ? (
+                <span className={styles.teamspaceBrowseCount} aria-hidden="true">
+                  {discoverableTeamspaces.length}
+                </span>
+              ) : null}
+            </button>
+          )}
+
           <section className={styles.section}>
             <div className={styles.sectionLabel}>
               <button
@@ -1467,7 +1675,7 @@ export function Sidebar({
                   className={`${styles.sectionAction} ${styles.sectionAdd}`}
                   aria-label={labels.addPrivatePage}
                   disabled={creatingPage || !canCreateRootPage}
-                  onClick={newRootPage}
+                  onClick={newPrivateRootPage}
                 >
                   <Plus size={16} aria-hidden="true" />
                 </button>
@@ -1497,24 +1705,26 @@ export function Sidebar({
                     disabled={creatingPage || !canCreateRootPage}
                     onClick={() => {
                       closePrivateSectionMenu();
-                      void newRootPage();
+                      void newPrivateRootPage();
                     }}
                   >
                     <Plus size={15} aria-hidden="true" />
                     <span>{labels.newPage}</span>
                   </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    className={styles.sectionMenuItem}
-                    onClick={() => {
-                      closePrivateSectionMenu();
-                      setImportOpen(true);
-                    }}
-                  >
-                    <Upload size={15} aria-hidden="true" />
-                    <span>{labels.import}</span>
-                  </button>
+                  {canUseWorkspaceImports ? (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className={styles.sectionMenuItem}
+                      onClick={() => {
+                        closePrivateSectionMenu();
+                        setImportOpen(true);
+                      }}
+                    >
+                      <Upload size={15} aria-hidden="true" />
+                      <span>{labels.import}</span>
+                    </button>
+                  ) : null}
                 </div>
               )}
             </div>
@@ -1566,7 +1776,7 @@ export function Sidebar({
                     className={styles.emptyTreeAction}
                     aria-label={labels.createFirstPrivatePage}
                     disabled={creatingPage || !canCreateRootPage}
-                    onClick={newRootPage}
+                    onClick={newPrivateRootPage}
                   >
                     <Plus size={15} aria-hidden="true" />
                     <span>{creatingPage ? labels.creating : labels.newPage}</span>
@@ -1625,29 +1835,35 @@ export function Sidebar({
             <FileText size={17} />
             <span className={styles.actionLabel}>{labels.templates}</span>
           </button>
-          <button
-            type="button"
-            className={styles.actionRow}
-            onClick={() => setImportOpen(true)}
-            data-sidebar-footer-action
-            data-import-running={notionImportActivity ? "true" : undefined}
-            aria-label={
-              notionImportActivity
-                ? labels.importProgress(notionImportActivity.percent)
-                : undefined
-            }
-          >
-            <Upload size={17} />
-            <span className={styles.actionLabel}>
-              {notionImportActivity ? labels.importInProgress : labels.import}
-            </span>
-            {notionImportActivity ? (
-              <span className={styles.importProgress} data-import-progress aria-hidden="true">
-                <span className={styles.importProgressDot} />
-                {notionImportActivity.percent}%
+          {canUseWorkspaceImports ? (
+            <button
+              type="button"
+              className={styles.actionRow}
+              onClick={() => setImportOpen(true)}
+              data-sidebar-footer-action
+              data-import-running={notionImportActivity ? "true" : undefined}
+              aria-label={
+                notionImportActivity
+                  ? notionImportActivity.percent === undefined
+                    ? labels.importInProgress
+                    : labels.importProgress(notionImportActivity.percent)
+                  : undefined
+              }
+            >
+              <Upload size={17} />
+              <span className={styles.actionLabel}>
+                {notionImportActivity ? labels.importInProgress : labels.import}
               </span>
-            ) : null}
-          </button>
+              {notionImportActivity ? (
+                <span className={styles.importProgress} data-import-progress aria-hidden="true">
+                  <span className={styles.importProgressDot} />
+                  {notionImportActivity.percent === undefined
+                    ? null
+                    : `${notionImportActivity.percent}%`}
+                </span>
+              ) : null}
+            </button>
+          ) : null}
           <button
             type="button"
             className={styles.actionRow}
@@ -1666,7 +1882,7 @@ export function Sidebar({
           >
             <Plus size={16} />
             <span className={styles.actionLabel}>{creatingPage ? labels.creating : labels.newPage}</span>
-            <kbd className={styles.shortcutHint} aria-hidden="true">⌘N</kbd>
+            <kbd className={styles.shortcutHint} aria-hidden="true">{newPageShortcutHint}</kbd>
           </button>
           <SidebarSponsorRoll />
           <LegalNotice inline alignStart />
@@ -1705,12 +1921,26 @@ export function Sidebar({
             render crash degrades to the boundary's visible fallback instead of
             unmounting the whole app (these sit outside the route ErrorBoundary),
             and closing + reopening mounts a fresh boundary with clean state. */}
+        {keyboardShortcutsOpen && (
+          <ErrorBoundary scope="keyboard-shortcuts-dialog">
+            <KeyboardShortcutsDialog
+              platform={shortcutPlatform}
+              restoreFocusTo={keyboardShortcutsRestoreFocusRef.current}
+              onClose={() => setKeyboardShortcutsOpen(false)}
+            />
+          </ErrorBoundary>
+        )}
         {templatesOpen && (
           <ErrorBoundary scope="templates-dialog">
             <TemplatesDialog onClose={() => setTemplatesOpen(false)} />
           </ErrorBoundary>
         )}
-        {notionOnboardingOpen && (
+        {teamspaceDialogOpen && (
+          <ErrorBoundary scope="teamspace-dialog">
+            <TeamspaceDialog onClose={() => setTeamspaceDialogOpen(false)} />
+          </ErrorBoundary>
+        )}
+        {canUseWorkspaceImports && notionOnboardingOpen && (
           <ErrorBoundary scope="notion-import-onboarding-dialog">
             <NotionImportOnboardingDialog
               onImport={openNotionImportFromOnboarding}
@@ -1718,17 +1948,19 @@ export function Sidebar({
             />
           </ErrorBoundary>
         )}
-        <ErrorBoundary scope="import-dialog">
-          <ImportDialog
-            open={importOpen}
-            initialTab={importInitialTab}
-            onActivityChange={setNotionImportActivity}
-            onClose={() => {
-              setImportOpen(false);
-              setImportInitialTab(undefined);
-            }}
-          />
-        </ErrorBoundary>
+        {canUseWorkspaceImports ? (
+          <ErrorBoundary scope="import-dialog">
+            <ImportDialog
+              open={importOpen}
+              initialTab={importInitialTab}
+              onActivityChange={setNotionImportActivity}
+              onClose={() => {
+                setImportOpen(false);
+                setImportInitialTab(undefined);
+              }}
+            />
+          </ErrorBoundary>
+        ) : null}
         {workspaceCreateOpen && (
           <ErrorBoundary scope="workspace-create-dialog">
             <WorkspaceCreateDialog

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Munkaterület menü megnyitása",
   "closeWorkspaceMenu": "Munkaterület menü bezárása",
   "workspaceMenu": "Munkaterület menü",
-  "exportWorkspace": "Munkaterület exportálása",
+  "exportWorkspace": "Munkaterület JSON exportálása (fájlok nélkül)",
   "exportedWorkspace": "Munkaterület Hanji fájlként exportálva.",
   "exportedWorkspaceWithPlaceholders": "Munkaterület Hanji fájlként exportálva – a mellékletek helyőrzőként maradtak.",
   "couldntExportWorkspace": "Nem sikerült a munkaterület exportálása.",
@@ -76,5 +76,12 @@
     "later": "Talán később",
     "note": "Ezt később is elindíthatod az oldalsáv Importálás menüjéből.",
     "title": "Áthozod a Notion-munkaterületedet a Hanjira?"
-  }
+  },
+  "addPageToTeamspace": "Oldal hozzáadása ide: {{name}}",
+  "couldntExportWorkspaceArchive": "Nem sikerült exportálni a munkaterület-archívumot.",
+  "exportedWorkspaceArchive": "Munkaterület-archívum exportálva fájlokkal.",
+  "exportWorkspaceArchive": "Munkaterület-archívum exportálása (fájlokkal)",
+  "joinTeamspaces": "Csatlakozás csapatterületekhez",
+  "keyboardShortcuts": "Billentyűparancsok",
+  "teamspacePages": "{{name}} oldalai"
 }

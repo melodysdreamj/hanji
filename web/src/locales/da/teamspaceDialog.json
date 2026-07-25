@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Lukket",
+    "open": "Åben",
+    "private": "Privat"
+  },
+  "add": "Tilføj",
+  "approve": "Godkend",
+  "archive": "Arkiver teamspace",
+  "available": "Tilgængelig at deltage",
+  "choosePrincipal": "Vælg en person eller gruppe",
+  "create": "Opret teamspace",
+  "deny": "Afvis",
+  "error": {
+    "action": "Kunne ikke fuldføre den teamspace-handling.",
+    "load": "Kunne ikke indlæse teamspace-detaljer."
+  },
+  "fields": {
+    "access": "Adgang",
+    "description": "Beskrivelse",
+    "icon": "Ikon",
+    "memberRole": "Medlemmers sideadgang",
+    "membersCanEditSidebar": "Medlemmer kan tilføje og omarrangere sider",
+    "membersCanInvite": "Medlemmer kan invitere personer",
+    "name": "Navn",
+    "openRole": "Åbne besøgendes sideadgang"
+  },
+  "governance": "Teamspace-indstillinger",
+  "join": "Deltag",
+  "joined": "Dine teamspaces",
+  "loadMore": "Indlæs mere",
+  "manage": "Administrer",
+  "member": "Medlem",
+  "members": "Medlemmer",
+  "noneArchived": "Der er ingen arkiverede teamspaces.",
+  "noneAvailable": "Der er ingen andre tilgængelige teamspaces.",
+  "noneJoined": "Du er ikke med i nogen teamspaces endnu.",
+  "noRequests": "Der er ingen afventende anmodninger.",
+  "notice": {
+    "approved": "Anmodning godkendt.",
+    "archived": "Teamspace arkiveret.",
+    "created": "Teamspace oprettet.",
+    "defaultSet": "Standard teamspace opdateret.",
+    "denied": "Anmodning afvist.",
+    "joined": "Deltaget i teamspace.",
+    "memberAdded": "Medlem tilføjet.",
+    "memberRemoved": "Medlem fjernet.",
+    "memberUpdated": "Medlemsrolle opdateret.",
+    "policySaved": "Teamspace-oprettelsespolitik opdateret.",
+    "requested": "Adgang anmodet.",
+    "restored": "Teamspace gendannet.",
+    "saved": "Teamspace opdateret."
+  },
+  "notOwner": "Kun en teamspace-ejer eller workspace-administrator kan administrere dette teamspace.",
+  "open": "Åbn",
+  "owner": "Ejer",
+  "ownersOnlyCreate": "Kun workspace-ejere kan oprette teamspaces",
+  "remove": "Fjern",
+  "replacement": "Vælg et nyt standard teamspace",
+  "request": "Anmod om adgang",
+  "requestPending": "Anmodning afventer",
+  "requests": "Adgangsanmodninger",
+  "restore": "Gendan",
+  "roles": {
+    "comment": "Kan kommentere",
+    "edit": "Kan redigere",
+    "full_access": "Fuld adgang",
+    "view": "Kan se"
+  },
+  "save": "Gem ændringer",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Sæt som standard teamspace",
+  "subtitle": "Organiser fælles arbejde og kontrollér, hvem der kan opdage eller deltage.",
+  "tabs": {
+    "archived": "Arkiveret",
+    "browse": "Gennemse",
+    "create": "Nyt teamspace",
+    "label": "Teamspace-visninger",
+    "manage": "Administrer"
+  },
+  "title": "Teamspaces"
+}

@@ -6,9 +6,6 @@ services:
     environment:
       PORT: "8787"
       LOCAL_PROTOCOL: http
-      HANJI_APP_ORIGIN: http://localhost:${HANJI_SIM_PORT:-18787}
-      HANJI_PASSKEY_RP_ID: localhost
-      HANJI_PASSKEY_ORIGINS: http://localhost:${HANJI_SIM_PORT:-18787}
       HANJI_MASTER_EMAIL: ${HANJI_SIM_MASTER_EMAIL:-master@hanji.local}
       HANJI_MASTER_PASSWORD: ${HANJI_SIM_MASTER_PASSWORD:-HanjiMaster!2026}
     volumes:
@@ -17,6 +14,11 @@ services:
     mem_limit: ${HANJI_SIM_MEMORY:-1536m}
     pids_limit: ${HANJI_SIM_PIDS:-256}
     restart: unless-stopped
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   toxiproxy:
     image: ghcr.io/shopify/toxiproxy:2.12.0

@@ -38,7 +38,7 @@
   "moveTo": "Áthelyezés",
   "exporting": "Exportálás…",
   "exportAsMarkdown": "Exportálás Markdownként",
-  "exportAsHanji": "Exportálás Hanji fájlként",
+  "exportAsHanji": "Hanji JSON exportálása (fájlok nélkül)",
   "importing": "Importálás…",
   "importMarkdown": "Markdown importálása",
   "unlockPage": "Oldal feloldása",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Nem sikerült a hozzáférés frissítése.",
     "removedFromAccessList": "Eltávolítva a hozzáférési listáról",
     "couldntRemoveAccess": "Nem sikerült a hozzáférés eltávolítása.",
-    "couldntLoadAccessList": "Nem sikerült a hozzáférési lista betöltése."
+    "couldntLoadAccessList": "Nem sikerült a hozzáférési lista betöltése.",
+    "couldntExportHanjiArchive": "Nem sikerült exportálni a Hanji archívumot.",
+    "exportedHanjiArchive": "Hanji archívum exportálva fájlokkal."
   },
   "user": "Felhasználó",
   "whoHasAccess": "Kinek van hozzáférése",
   "workspace": "Munkaterület",
   "workspaceCount_one": "{{count}} munkaterület",
   "workspaceCount_other": "{{count}} munkaterület",
-  "you": "Te"
+  "you": "Te",
+  "exportAsHanjiArchive": "Hanji archívum exportálása (fájlokkal együtt)",
+  "turnIntoWiki": "Wikivé alakítás",
+  "undoWiki": "Wiki visszavonása",
+  "wikiCreated": "Oldal wikivé alakítva",
+  "wikiPageSettings": "Wiki oldal beállításai",
+  "wikiUndone": "Wiki eltávolítva; az oldal tartalma megmaradt",
+  "wikiUpdateFailed": "Nem sikerült frissíteni a wikit"
 }

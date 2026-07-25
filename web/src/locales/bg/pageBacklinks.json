@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} обратна връзка",
-    "count_other": "{{count}} обратни връзки"
+    "count_other": "{{count}} обратни връзки",
+    "partial_one": "{{count}}+ обратна връзка",
+    "partial_other": "{{count}}+ обратни връзки"
   },
   "header": {
     "title": "Свързани споменавания"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} споменаване",
     "mention_other": "{{count}} споменавания",
     "link_one": "{{count}} линк",
-    "link_other": "{{count}} линка"
+    "link_other": "{{count}} линка",
+    "loaded": "Заредено: {{summary}}"
   },
   "kind": {
     "mention": "Споменаване",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Още {{count}} обратна връзка",
-    "count_other": "Още {{count}} обратни връзки"
+    "count_other": "Още {{count}} обратни връзки",
+    "load": "Зареждане на още обратни връзки",
+    "loading": "Зареждане на обратни връзки…",
+    "search": "Търсене на обратни връзки"
   }
 }

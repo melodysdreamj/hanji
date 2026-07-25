@@ -92,5 +92,8 @@
     "શ",
     "શ"
   ],
-  "you": "તમે"
+  "you": "તમે",
+  "buttonExecutionFailed": "બટન ચલાવી શકાયું નહીં.",
+  "loadingMoreRelations": "વધુ સંબંધો લોડ થાય છે...",
+  "loadMoreRelations": "વધુ સંબંધો લોડ કરો"
 }

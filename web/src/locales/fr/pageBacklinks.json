@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlinks"
+    "count_other": "{{count}} backlinks",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlinks"
   },
   "header": {
     "title": "Mentions liées"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} mention",
     "mention_other": "{{count}} mentions",
     "link_one": "{{count}} lien",
-    "link_other": "{{count}} liens"
+    "link_other": "{{count}} liens",
+    "loaded": "Chargé : {{summary}}"
   },
   "kind": {
     "mention": "Mention",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} backlink supplémentaire",
-    "count_other": "{{count}} backlinks supplémentaires"
+    "count_other": "{{count}} backlinks supplémentaires",
+    "load": "Charger plus de backlinks",
+    "loading": "Chargement des backlinks…",
+    "search": "Rechercher des backlinks"
   }
 }

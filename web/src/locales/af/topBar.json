@@ -38,7 +38,7 @@
   "moveTo": "Skuif na",
   "exporting": "Uitvoer…",
   "exportAsMarkdown": "Voer uit as Markdown",
-  "exportAsHanji": "Voer uit as Hanji-lêer",
+  "exportAsHanji": "Voer Hanji JSON uit (lêers uitgesluit)",
   "importing": "Invoer…",
   "importMarkdown": "Invoer Markdown",
   "unlockPage": "Ontsluit bladsy",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Kon nie toegang opdateer nie",
     "removedFromAccessList": "Verwyder uit toegangslys",
     "couldntRemoveAccess": "Kon nie toegang verwyder nie",
-    "couldntLoadAccessList": "Kon nie toegangslys laai nie"
+    "couldntLoadAccessList": "Kon nie toegangslys laai nie",
+    "couldntExportHanjiArchive": "Kon nie Hanji-argief uitvoer nie.",
+    "exportedHanjiArchive": "Het 'n Hanji-argief met lêers uitgevoer."
   },
   "user": "Gebruiker",
   "whoHasAccess": "Wie het toegang",
   "workspace": "Werkruimte",
   "workspaceCount_one": "{{count}} werkruimte",
   "workspaceCount_other": "{{count}} werkruimtes",
-  "you": "Jy"
+  "you": "Jy",
+  "exportAsHanjiArchive": "Voer Hanji-argief uit (lêers ingesluit)",
+  "turnIntoWiki": "Skakel om na wiki",
+  "undoWiki": "Ontdoen wiki",
+  "wikiCreated": "Bladsy in wiki omskep",
+  "wikiPageSettings": "Wiki-bladsyinstellings",
+  "wikiUndone": "Wiki verwyder; bladsyinhoud behou",
+  "wikiUpdateFailed": "Kon nie wiki bywerk nie"
 }

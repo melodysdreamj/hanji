@@ -13,7 +13,7 @@
   "groupName": "အုပ်စုအမည်",
   "groupOptions": "{{groupName}} အုပ်စုရွေးချယ်စရာများ",
   "groupThisBoard": "ဤဘုတ်ကို အုပ်စုဖွဲ့ပါ",
-  "groupThisBoardDesc": "ကော်လံများဖန်တီးရန် ရွေးချယ်မှု သို့မဟုတ် အခြေအနေ ဂုဏ်သတ္တိထည့်ပါ။",
+  "groupThisBoardDesc": "ကော်လံများဖန်တီးရန် Select၊ Status၊ Person သို့မဟုတ် Multi-select ပိုင်ဆိုင်မှုကို ထည့်ပါ သို့မဟုတ် ရွေးပါ။",
   "newGroup": "အုပ်စုအသစ်",
   "newGroupIn": "{{dbTitle}} တွင် {{groupName}} အုပ်စုအသစ် ထည့်ပြီးပါပြီ",
   "newPage": "အသစ်",

@@ -15,10 +15,7 @@
     "recentUpdates_other": "Son {{count}} güncelleme",
     "unreadOfTotal": "{{total}} güncellemeden {{unread}} okunmamış",
     "updateType": "Güncelleme türü",
-    "updates": "Güncellemeler",
-    "modeUpdates": "Güncellemeler",
-    "modeChats": "Sohbetler",
-    "inboxMode": "Gelen kutusu modu"
+    "updates": "Güncellemeler"
   },
   "time": {
     "justNow": "Az önce",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} sürüm",
     "versionsAgo": "{{count}} sürüm önce",
     "versionsAhead": "{{count}} sürüm ileride",
-    "versionsAria": "Sürümler"
+    "versionsAria": "Sürümler",
+    "emptyBlock": "Boş blok",
+    "emptyPreview": "Bu sürümde sayfa içeriği bulunmuyor.",
+    "previewAria": "Salt okunur sayfa sürümü önizlemesi",
+    "previewingCurrent": "Mevcut sayfa görüntüleniyor",
+    "previewingSnapshot": "Geçmiş sürüm görüntüleniyor",
+    "previewOnlyHint": "Sürüm seçmek yalnızca önizleme yapar. Mevcut sayfa ancak Geri Yükle'den sonra değişir.",
+    "restoreThisVersion": "Geri Yükle",
+    "restoring": "Geri yükleniyor...",
+    "versionHistory": "Sürüm geçmişi"
   },
   "badges": {
     "comment": "Yorum",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} bahsetmesi · {{preview}}",
     "referenceLink": "{{title}} bağlantısı · {{preview}}",
     "unreadDot": "Okunmadı",
-    "workspaceUpdate": "Çalışma alanı güncellemesi"
+    "workspaceUpdate": "Çalışma alanı güncellemesi",
+    "bySelf": "Siz"
   },
   "empty": {
     "allCaughtUp": "Tüm güncellemeleri gördün.",

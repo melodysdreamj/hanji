@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { copyText } from "@/lib/clipboard";
+import { contentForBlockTypeChange } from "@/lib/blockDefaults";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { pageIdFromPageHref } from "@/lib/pageLinks";
 import { pageDisplayTitle } from "@/lib/pageTitle";
@@ -89,7 +90,7 @@ function textContentForTurnInto(block?: Block): BlockContent {
 }
 
 function turnIntoPatch(block: Block | undefined, type: BlockType): Partial<Block> {
-  const content = textContentForTurnInto(block);
+  const content = contentForBlockTypeChange(textContentForTurnInto(block), block, type);
   if (type === "to_do") content.checked = false;
   if (type === "callout") content.icon = block?.content?.icon ?? "💡";
   return {

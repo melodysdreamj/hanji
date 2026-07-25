@@ -38,7 +38,7 @@
   "moveTo": "येथे हलवा",
   "exporting": "निर्यात करत आहे…",
   "exportAsMarkdown": "मार्कडाउन म्हणून निर्यात करा",
-  "exportAsHanji": "Hanji फाइल म्हणून निर्यात करा",
+  "exportAsHanji": "Hanji JSON निर्यात करा (फाइल्स वगळल्या)",
   "importing": "आयात करत आहे…",
   "importMarkdown": "मार्कडाउन आयात करा",
   "unlockPage": "पृष्ठ अनलॉक करा",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "प्रवेश अद्यतनित करता आला नाही",
     "removedFromAccessList": "प्रवेश यादीतून काढले",
     "couldntRemoveAccess": "प्रवेश काढता आला नाही",
-    "couldntLoadAccessList": "प्रवेश यादी लोड करता आली नाही"
+    "couldntLoadAccessList": "प्रवेश यादी लोड करता आली नाही",
+    "couldntExportHanjiArchive": "Hanji संग्रह निर्यात करता आला नाही.",
+    "exportedHanjiArchive": "फाइल्ससह Hanji संग्रह निर्यात केला."
   },
   "user": "वापरकर्ता",
   "whoHasAccess": "कोणाला प्रवेश आहे",
   "workspace": "कार्यक्षेत्र",
   "workspaceCount_one": "{{count}} कार्यक्षेत्र",
   "workspaceCount_other": "{{count}} कार्यक्षेत्रे",
-  "you": "आपण"
+  "you": "आपण",
+  "exportAsHanjiArchive": "Hanji संग्रह निर्यात करा (फाइल्स समाविष्ट)",
+  "turnIntoWiki": "विकी बनवा",
+  "undoWiki": "विकी पूर्ववत करा",
+  "wikiCreated": "पेज विकी बनवले",
+  "wikiPageSettings": "विकी पेज सेटिंग्ज",
+  "wikiUndone": "विकी काढले; पेजची सामग्री ठेवली",
+  "wikiUpdateFailed": "विकी अपडेट करता आले नाही"
 }

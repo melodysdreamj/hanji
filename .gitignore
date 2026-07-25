@@ -47,11 +47,28 @@ edgebase.d.ts
 /docs/edgebase-first-roadmap.md
 /docs/notion-feature-matrix.md
 /docs/visual-parity-audit.md
+/docs/user-scenarios.md
 /docs/license-and-monetization.md
 /docs/private-repo-setup.md
+/docs/issues/
 /docs/workspace-do-migration.md
 /docs/local-first-roadmap.md
 /docs/native-export-import-plan.md
+
+# Private verification assets are tracked by .git-private at these unchanged
+# working-tree paths. Public releases contain product source only.
+/backend/tests/
+/backend/vitest.config.ts
+/web/tests/
+/web/vitest.config.ts
+/mcp/tests/
+/mcp/scripts/*smoke*.mjs
+/scripts/
+**/*.test.*
+**/*.spec.*
+/.github/workflows/ci.yml
+/.github/workflows/cla.yml
+/.github/workflows/docs.yml
 
 # Package manager and runtime logs
 npm-debug.log*
@@ -76,3 +93,7 @@ pnpm-debug.log*
 # VitePress docs site build output
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
+
+# Local deployment artifacts (large, never committed)
+hanji-deploy@*.tar
+hanji-deploy@*.tar/

@@ -1,4 +1,14 @@
-export type FormulaValue = string | number | boolean | null;
+export type FormulaReference = {
+  kind: "page" | "person";
+  id: string;
+  name: string;
+};
+
+export type FormulaValue = string | number | boolean | null | FormulaReference | FormulaValue[];
+
+export const MAX_FORMULA_LIST_ITEMS = 1_000;
+export const MAX_FORMULA_LIST_DEPTH = 10;
+export const MAX_FORMULA_VALUE_TEXT = 100 * 1024;
 
 export type FormulaTokenType =
   | "number"
@@ -6,6 +16,8 @@ export type FormulaTokenType =
   | "identifier"
   | "operator"
   | "paren"
+  | "bracket"
+  | "dot"
   | "comma";
 
 export type FormulaToken = {
@@ -81,9 +93,28 @@ export const FORMULA_FUNCTIONS = new Set([
   "not",
   "and",
   "or",
+  "at",
+  "first",
+  "last",
+  "slice",
+  "sort",
+  "reverse",
+  "join",
+  "split",
+  "unique",
+  "includes",
+  "find",
+  "findIndex",
+  "filter",
+  "some",
+  "every",
+  "map",
+  "flat",
+  "name",
+  "id",
 ]);
 
-export const FORMULA_LITERALS = new Set(["true", "false", "null"]);
+export const FORMULA_LITERALS = new Set(["true", "false", "null", "current", "index"]);
 
 export function tokenizeFormula(input: string): FormulaToken[] {
   const tokens: FormulaToken[] = [];
@@ -111,10 +142,12 @@ export function tokenizeFormula(input: string): FormulaToken[] {
       tokens.push({ type: "string", value });
       continue;
     }
-    if (/[0-9.]/.test(ch)) {
+    if (/[0-9]/.test(ch) || (ch === "." && /[0-9]/.test(input[i + 1] ?? ""))) {
       let value = ch;
+      let seenDot = ch === ".";
       i += 1;
-      while (i < input.length && /[0-9.]/.test(input[i])) {
+      while (i < input.length && (/[0-9]/.test(input[i]) || (input[i] === "." && !seenDot))) {
+        if (input[i] === ".") seenDot = true;
         value += input[i];
         i += 1;
       }
@@ -147,6 +180,16 @@ export function tokenizeFormula(input: string): FormulaToken[] {
       i += 1;
       continue;
     }
+    if (ch === "[" || ch === "]") {
+      tokens.push({ type: "bracket", value: ch });
+      i += 1;
+      continue;
+    }
+    if (ch === ".") {
+      tokens.push({ type: "dot", value: ch });
+      i += 1;
+      continue;
+    }
     if (ch === ",") {
       tokens.push({ type: "comma", value: ch });
       i += 1;
@@ -157,28 +200,102 @@ export function tokenizeFormula(input: string): FormulaToken[] {
   return tokens;
 }
 
+export function isFormulaReference(value: FormulaValue | undefined): value is FormulaReference {
+  return !!value
+    && typeof value === "object"
+    && !Array.isArray(value)
+    && (value.kind === "page" || value.kind === "person")
+    && typeof value.id === "string"
+    && typeof value.name === "string";
+}
+
+function formulaReferenceText(value: FormulaReference) {
+  return value.name || value.id;
+}
+
 function toNumber(value: FormulaValue | undefined) {
-  const n = Number(value ?? 0);
+  const n = Number(toText(value ?? 0));
   return Number.isFinite(n) ? n : 0;
 }
 
-function toText(value: FormulaValue | undefined) {
+function toText(value: FormulaValue | undefined): string {
   if (value == null) return "";
+  if (Array.isArray(value)) return value.map((item) => toText(item)).join(",");
+  if (isFormulaReference(value)) return formulaReferenceText(value);
   return String(value);
 }
 
 function toBoolean(value: FormulaValue | undefined) {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value !== 0;
+  if (Array.isArray(value)) return value.length > 0;
+  if (isFormulaReference(value)) return true;
   return value !== null && value !== undefined && value !== "";
+}
+
+function formulaValueBudget(value: FormulaValue) {
+  let itemCount = 0;
+  let textCount = 0;
+
+  const visit = (current: FormulaValue, depth: number) => {
+    if (depth > MAX_FORMULA_LIST_DEPTH) {
+      throw new Error(`Formula lists may be nested at most ${MAX_FORMULA_LIST_DEPTH} levels`);
+    }
+    if (Array.isArray(current)) {
+      itemCount += current.length;
+      if (itemCount > MAX_FORMULA_LIST_ITEMS) {
+        throw new Error(`Formula lists may contain at most ${MAX_FORMULA_LIST_ITEMS} items`);
+      }
+      for (const item of current) visit(item, depth + 1);
+      return;
+    }
+    if (typeof current === "string") textCount += current.length;
+    else if (isFormulaReference(current)) textCount += current.id.length + current.name.length;
+    if (textCount > MAX_FORMULA_VALUE_TEXT) {
+      throw new Error(`Formula values may contain at most ${MAX_FORMULA_VALUE_TEXT} text characters`);
+    }
+  };
+
+  visit(value, 0);
+  return value;
+}
+
+function listValue(values: FormulaValue[]) {
+  return formulaValueBudget(values) as FormulaValue[];
+}
+
+function requireList(value: FormulaValue | undefined, functionName: string) {
+  if (!Array.isArray(value)) throw new Error(`${functionName} requires a list`);
+  return value;
+}
+
+function sameFormulaValue(left: FormulaValue, right: FormulaValue) {
+  if (isFormulaReference(left) && isFormulaReference(right)) {
+    return left.kind === right.kind && left.id === right.id;
+  }
+  return toText(left) === toText(right);
 }
 
 function numberValues(values: FormulaValue[]) {
   return values.map((value) => toNumber(value));
 }
 
+function strictListNumbers(value: FormulaValue | undefined) {
+  const values = requireList(value, "Numeric list functions");
+  if (values.some((item) => typeof item !== "number" || !Number.isFinite(item))) {
+    throw new Error("Numeric list functions require only numbers");
+  }
+  return values as number[];
+}
+
+function reducerNumbers(values: FormulaValue[]) {
+  return values.length === 1 && Array.isArray(values[0])
+    ? strictListNumbers(values[0])
+    : numberValues(values);
+}
+
 function medianValue(values: FormulaValue[]) {
-  const numbers = numberValues(values).sort((a, b) => a - b);
+  const numbers = reducerNumbers(values).slice().sort((a, b) => a - b);
   if (!numbers.length) return 0;
   const middle = Math.floor(numbers.length / 2);
   return numbers.length % 2 === 1 ? numbers[middle] : (numbers[middle - 1] + numbers[middle]) / 2;
@@ -423,31 +540,41 @@ function formatDateValue(value: FormulaValue | undefined, formatValue?: FormulaV
 }
 
 function add(a: FormulaValue, b: FormulaValue): FormulaValue {
-  if (typeof a === "string" || typeof b === "string") return `${toText(a)}${toText(b)}`;
+  if (
+    typeof a === "string"
+    || typeof b === "string"
+    || Array.isArray(a)
+    || Array.isArray(b)
+    || isFormulaReference(a)
+    || isFormulaReference(b)
+  ) return `${toText(a)}${toText(b)}`;
   return toNumber(a) + toNumber(b);
 }
 
 function callArguments(tokens: FormulaToken[], openIndex: number): FormulaToken[][] {
   const args: FormulaToken[][] = [];
   let current: FormulaToken[] = [];
-  let depth = 0;
+  let parenDepth = 0;
+  let bracketDepth = 0;
   for (let index = openIndex + 1; index < tokens.length; index += 1) {
     const token = tokens[index];
     if (token.type === "paren" && token.value === "(") {
-      depth += 1;
+      parenDepth += 1;
       current.push(token);
       continue;
     }
     if (token.type === "paren" && token.value === ")") {
-      if (depth === 0) {
-        args.push(current);
+      if (parenDepth === 0 && bracketDepth === 0) {
+        if (current.length > 0 || args.length > 0) args.push(current);
         return args;
       }
-      depth -= 1;
+      parenDepth -= 1;
       current.push(token);
       continue;
     }
-    if (token.type === "comma" && depth === 0) {
+    if (token.type === "bracket" && token.value === "[") bracketDepth += 1;
+    if (token.type === "bracket" && token.value === "]") bracketDepth -= 1;
+    if (token.type === "comma" && parenDepth === 0 && bracketDepth === 0) {
       args.push(current);
       current = [];
       continue;
@@ -483,6 +610,19 @@ export function formulaVariableNames(tokens: FormulaToken[]) {
   return variables;
 }
 
+export function formulaPropertyReferences(input: string | FormulaToken[]) {
+  const tokens = typeof input === "string" ? tokenizeFormula(input) : input;
+  const refs = new Set<string>();
+  tokens.forEach((token, index) => {
+    if (token.type !== "identifier" || token.value !== "prop") return;
+    if (tokens[index - 1]?.type === "dot") return;
+    if (tokens[index + 1]?.type !== "paren" || tokens[index + 1]?.value !== "(") return;
+    const property = tokens[index + 2];
+    if (property?.type === "string" && property.value) refs.add(property.value);
+  });
+  return refs;
+}
+
 export interface FormulaEvaluationOptions {
   now?: () => Date;
 }
@@ -498,11 +638,13 @@ class Parser {
   ) {}
 
   parse(): FormulaValue {
-    return this.equality();
+    const value = this.equality();
+    if (this.index < this.tokens.length) throw new Error("Unexpected formula token");
+    return formulaValueBudget(value);
   }
 
-  private peek() {
-    return this.tokens[this.index];
+  private peek(offset = 0) {
+    return this.tokens[this.index + offset];
   }
 
   private match(type: FormulaTokenType, value?: string) {
@@ -515,8 +657,8 @@ class Parser {
   private equality(): FormulaValue {
     let left = this.comparison();
     while (true) {
-      if (this.match("operator", "==")) left = toText(left) === toText(this.comparison());
-      else if (this.match("operator", "!=")) left = toText(left) !== toText(this.comparison());
+      if (this.match("operator", "==")) left = sameFormulaValue(left, this.comparison());
+      else if (this.match("operator", "!=")) left = !sameFormulaValue(left, this.comparison());
       else return left;
     }
   }
@@ -562,105 +704,166 @@ class Parser {
     return this.primary();
   }
 
-  private variableName(): string {
-    const token = this.match("identifier") ?? this.match("string");
-    return token?.value ?? "";
-  }
-
-  private bindVariable(
-    name: string,
-    value: FormulaValue,
-    bindings: Array<[string, FormulaValue | undefined, boolean]>,
-  ) {
-    if (!name) return;
-    bindings.push([name, this.variables.get(name), this.variables.has(name)]);
-    this.variables.set(name, value);
-  }
-
-  private restoreVariables(bindings: Array<[string, FormulaValue | undefined, boolean]>) {
-    for (let index = bindings.length - 1; index >= 0; index -= 1) {
-      const [name, value, hadValue] = bindings[index];
-      if (hadValue) this.variables.set(name, value ?? null);
-      else this.variables.delete(name);
-    }
-  }
-
-  private looksLikeVariableBinding() {
-    const first = this.peek();
-    const second = this.tokens[this.index + 1];
-    return !!first && (first.type === "identifier" || first.type === "string") && second?.type === "comma";
-  }
-
-  private letCall(multiple: boolean): FormulaValue {
-    const bindings: Array<[string, FormulaValue | undefined, boolean]> = [];
-    try {
-      if (!multiple) {
-        const name = this.variableName();
-        this.match("comma");
-        const value = this.equality();
-        this.match("comma");
-        this.bindVariable(name, value, bindings);
-        const result = this.equality();
-        this.match("paren", ")");
-        return result;
-      }
-
-      while (this.looksLikeVariableBinding()) {
-        const name = this.variableName();
-        this.match("comma");
-        const value = this.equality();
-        this.bindVariable(name, value, bindings);
-        if (!this.match("comma")) {
-          this.match("paren", ")");
-          return "";
-        }
-        if (!this.looksLikeVariableBinding()) {
-          const result = this.equality();
-          this.match("paren", ")");
-          return result;
-        }
-      }
-
-      const result = this.equality();
-      this.match("paren", ")");
-      return result;
-    } finally {
-      this.restoreVariables(bindings);
-    }
-  }
-
   private primary(): FormulaValue {
+    let value: FormulaValue;
     const number = this.match("number");
-    if (number) return Number(number.value);
-    const string = this.match("string");
-    if (string) return string.value;
-    const identifier = this.match("identifier");
-    if (identifier) {
-      const name = identifier.value;
-      if (this.match("paren", "(")) {
-        if (name === "let") return this.letCall(false);
-        if (name === "lets") return this.letCall(true);
-        const args: FormulaValue[] = [];
-        if (!this.match("paren", ")")) {
+    if (number) value = Number(number.value);
+    else {
+      const string = this.match("string");
+      if (string) value = string.value;
+      else if (this.match("bracket", "[")) {
+        const items: FormulaValue[] = [];
+        if (!this.match("bracket", "]")) {
           do {
-            args.push(this.equality());
+            items.push(this.equality());
           } while (this.match("comma"));
-          this.match("paren", ")");
+          if (!this.match("bracket", "]")) throw new Error("Formula list is not closed");
         }
-        return this.call(name, args);
+        value = listValue(items);
+      } else {
+        const identifier = this.match("identifier");
+        if (identifier) value = this.identifierValue(identifier.value);
+        else if (this.match("paren", "(")) {
+          value = this.equality();
+          if (!this.match("paren", ")")) throw new Error("Formula parentheses are not balanced");
+        } else {
+          value = "";
+        }
       }
-      if (name === "true") return true;
-      if (name === "false") return false;
-      if (name === "null") return null;
-      if (this.variables.has(name)) return this.variables.get(name) ?? "";
-      return "";
     }
+    return this.postfix(formulaValueBudget(value));
+  }
+
+  private identifierValue(name: string): FormulaValue {
     if (this.match("paren", "(")) {
-      const value = this.equality();
-      this.match("paren", ")");
-      return value;
+      return this.callTokens(name, this.takeCallArguments());
     }
+    if (name === "true") return true;
+    if (name === "false") return false;
+    if (name === "null") return null;
+    if (this.variables.has(name)) return this.variables.get(name) ?? "";
     return "";
+  }
+
+  private postfix(initial: FormulaValue): FormulaValue {
+    let value = initial;
+    while (this.match("dot", ".")) {
+      const method = this.match("identifier");
+      if (!method) throw new Error("Formula method name is missing");
+      const args = this.match("paren", "(") ? this.takeCallArguments() : [];
+      value = formulaValueBudget(this.callTokens(method.value, args, value));
+    }
+    return value;
+  }
+
+  private takeCallArguments() {
+    const args: FormulaToken[][] = [];
+    let current: FormulaToken[] = [];
+    let parenDepth = 0;
+    let bracketDepth = 0;
+    while (this.index < this.tokens.length) {
+      const token = this.tokens[this.index];
+      this.index += 1;
+      if (token.type === "paren" && token.value === "(") {
+        parenDepth += 1;
+        current.push(token);
+        continue;
+      }
+      if (token.type === "paren" && token.value === ")") {
+        if (parenDepth === 0 && bracketDepth === 0) {
+          if (current.length > 0 || args.length > 0) args.push(current);
+          return args;
+        }
+        parenDepth -= 1;
+        current.push(token);
+        continue;
+      }
+      if (token.type === "bracket" && token.value === "[") bracketDepth += 1;
+      if (token.type === "bracket" && token.value === "]") bracketDepth -= 1;
+      if (token.type === "comma" && parenDepth === 0 && bracketDepth === 0) {
+        args.push(current);
+        current = [];
+        continue;
+      }
+      current.push(token);
+    }
+    throw new Error("Formula parentheses are not balanced");
+  }
+
+  private evaluateTokens(tokens: FormulaToken[], variables = this.variables) {
+    return new Parser(
+      tokens,
+      this.resolveProp,
+      this.options,
+      new Map(variables),
+    ).parse();
+  }
+
+  private tokenVariableName(tokens: FormulaToken[]) {
+    if (tokens.length !== 1) return "";
+    const token = tokens[0];
+    if (token.type !== "identifier" && token.type !== "string") return "";
+    return /^[A-Za-z_][A-Za-z0-9_]*$/.test(token.value) ? token.value : "";
+  }
+
+  private letTokens(args: FormulaToken[][], multiple: boolean): FormulaValue {
+    const variables = new Map(this.variables);
+    if (!multiple) {
+      if (args.length < 3) return "";
+      const name = this.tokenVariableName(args[0]);
+      if (!name) return "";
+      variables.set(name, this.evaluateTokens(args[1], variables));
+      return this.evaluateTokens(args[2], variables);
+    }
+    if (args.length < 3 || args.length % 2 === 0) return "";
+    for (let index = 0; index + 1 < args.length - 1; index += 2) {
+      const name = this.tokenVariableName(args[index]);
+      if (!name) return "";
+      variables.set(name, this.evaluateTokens(args[index + 1], variables));
+    }
+    return this.evaluateTokens(args[args.length - 1], variables);
+  }
+
+  private higherOrder(
+    name: "map" | "filter" | "find" | "findIndex" | "some" | "every",
+    value: FormulaValue,
+    expression: FormulaToken[],
+  ): FormulaValue {
+    const items = requireList(value, name);
+    const evaluate = (item: FormulaValue, index: number) => {
+      const variables = new Map(this.variables);
+      variables.set("current", item);
+      variables.set("index", index);
+      return this.evaluateTokens(expression, variables);
+    };
+    if (name === "map") return listValue(items.map(evaluate));
+    if (name === "filter") return listValue(items.filter((item, index) => toBoolean(evaluate(item, index))));
+    if (name === "find") {
+      const index = items.findIndex((item, itemIndex) => toBoolean(evaluate(item, itemIndex)));
+      return index < 0 ? "" : items[index];
+    }
+    if (name === "findIndex") return items.findIndex((item, index) => toBoolean(evaluate(item, index)));
+    if (name === "some") return items.some((item, index) => toBoolean(evaluate(item, index)));
+    return items.every((item, index) => toBoolean(evaluate(item, index)));
+  }
+
+  private callTokens(name: string, args: FormulaToken[][], receiver?: FormulaValue): FormulaValue {
+    if (receiver !== undefined && name === "prop") {
+      throw new Error("prop() cannot be called as a method");
+    }
+    if (receiver === undefined && name === "let") return this.letTokens(args, false);
+    if (receiver === undefined && name === "lets") return this.letTokens(args, true);
+    if (["map", "filter", "find", "findIndex", "some", "every"].includes(name)) {
+      const value = receiver ?? this.evaluateTokens(args[0] ?? []);
+      const expression = args[receiver === undefined ? 1 : 0] ?? [];
+      return this.higherOrder(
+        name as "map" | "filter" | "find" | "findIndex" | "some" | "every",
+        value,
+        expression,
+      );
+    }
+    const values = args.map((tokens) => this.evaluateTokens(tokens));
+    return this.call(name, receiver === undefined ? values : [receiver, ...values]);
   }
 
   private currentDate() {
@@ -679,8 +882,13 @@ class Parser {
         }
         return args.length % 2 === 1 ? (args[args.length - 1] ?? "") : "";
       }
-      case "concat":
+      case "concat": {
+        if (args.some(Array.isArray)) {
+          const values = args.flatMap((value) => (Array.isArray(value) ? value : [value]));
+          return listValue(values);
+        }
         return args.map(toText).join("");
+      }
       case "repeat":
         return repeatValue(args[0], args[1]);
       case "format":
@@ -699,14 +907,20 @@ class Parser {
         return toNumber(args[0] ?? null) % toNumber(args[1] ?? null);
       case "pow":
         return Math.pow(toNumber(args[0] ?? null), toNumber(args[1] ?? null));
-      case "min":
-        return args.length ? Math.min(...numberValues(args)) : 0;
-      case "max":
-        return args.length ? Math.max(...numberValues(args)) : 0;
+      case "min": {
+        const values = reducerNumbers(args);
+        return values.length ? Math.min(...values) : 0;
+      }
+      case "max": {
+        const values = reducerNumbers(args);
+        return values.length ? Math.max(...values) : 0;
+      }
       case "sum":
-        return numberValues(args).reduce((sum, value) => sum + value, 0);
-      case "mean":
-        return args.length ? numberValues(args).reduce((sum, value) => sum + value, 0) / args.length : 0;
+        return reducerNumbers(args).reduce((sum, value) => sum + value, 0);
+      case "mean": {
+        const values = reducerNumbers(args);
+        return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+      }
       case "median":
         return medianValue(args);
       case "sqrt":
@@ -776,7 +990,6 @@ class Parser {
       case "month":
         return datePartValue(args[0], "month");
       case "day":
-        return datePartValue(args[0], "day");
       case "date":
         return datePartValue(args[0], "day");
       case "week": {
@@ -796,17 +1009,69 @@ class Parser {
       case "abs":
         return Math.abs(toNumber(args[0] ?? null));
       case "empty":
-        return args[0] == null || args[0] === "" || args[0] === 0;
+        return Array.isArray(args[0])
+          ? args[0].length === 0
+          : args[0] == null || args[0] === "" || args[0] === 0;
       case "contains":
         return toText(args[0] ?? "").toLowerCase().includes(toText(args[1] ?? "").toLowerCase());
       case "length":
-        return toText(args[0] ?? "").length;
+        return Array.isArray(args[0]) ? args[0].length : toText(args[0] ?? "").length;
       case "not":
         return !toBoolean(args[0] ?? null);
       case "and":
         return args.every(toBoolean);
       case "or":
         return args.some(toBoolean);
+      case "at": {
+        const values = requireList(args[0], "at");
+        const index = Math.trunc(toNumber(args[1] ?? 0));
+        return index >= 0 && index < values.length ? values[index] : "";
+      }
+      case "first": {
+        const values = requireList(args[0], "first");
+        return values.length ? values[0] : "";
+      }
+      case "last": {
+        const values = requireList(args[0], "last");
+        return values.length ? values[values.length - 1] : "";
+      }
+      case "slice": {
+        const values = requireList(args[0], "slice");
+        const start = Math.trunc(toNumber(args[1] ?? 0));
+        const end = args[2] === undefined ? undefined : Math.trunc(toNumber(args[2]));
+        return listValue(values.slice(start, end));
+      }
+      case "sort": {
+        const values = requireList(args[0], "sort").slice();
+        values.sort((left, right) => {
+          if (typeof left === "number" && typeof right === "number") return left - right;
+          const a = toText(left);
+          const b = toText(right);
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        return listValue(values);
+      }
+      case "reverse":
+        return listValue(requireList(args[0], "reverse").slice().reverse());
+      case "join":
+        return requireList(args[0], "join").map((value) => toText(value)).join(toText(args[1] ?? ""));
+      case "split":
+        return listValue(toText(args[0] ?? "").split(toText(args[1] ?? "")));
+      case "unique": {
+        const values: FormulaValue[] = [];
+        for (const value of requireList(args[0], "unique")) {
+          if (!values.some((candidate) => sameFormulaValue(candidate, value))) values.push(value);
+        }
+        return listValue(values);
+      }
+      case "includes":
+        return requireList(args[0], "includes").some((value) => sameFormulaValue(value, args[1] ?? null));
+      case "flat":
+        return listValue(requireList(args[0], "flat").flatMap((value) => (Array.isArray(value) ? value : [value])));
+      case "name":
+        return isFormulaReference(args[0]) ? formulaReferenceText(args[0]) : toText(args[0] ?? "");
+      case "id":
+        return isFormulaReference(args[0]) ? args[0].id : "";
       default:
         return "";
     }
@@ -818,17 +1083,35 @@ export function evaluateFormulaExpression(
   resolveProp: (name: string) => FormulaValue,
   options: FormulaEvaluationOptions = {},
 ): FormulaValue {
+  return evaluateFormulaExpressionResult(expression, resolveProp, options).value;
+}
+
+export type FormulaEvaluationResult = {
+  value: FormulaValue;
+  error?: string;
+};
+
+export function evaluateFormulaExpressionResult(
+  expression: string,
+  resolveProp: (name: string) => FormulaValue,
+  options: FormulaEvaluationOptions = {},
+): FormulaEvaluationResult {
   const trimmed = expression.trim();
-  if (!trimmed) return "";
+  if (!trimmed) return { value: "" };
   try {
-    return new Parser(tokenizeFormula(trimmed), resolveProp, options).parse();
-  } catch {
-    return "";
+    return { value: new Parser(tokenizeFormula(trimmed), resolveProp, options).parse() };
+  } catch (error) {
+    return {
+      value: "",
+      error: error instanceof Error ? error.message : "Formula evaluation failed",
+    };
   }
 }
 
-export function formatFormulaValue(value: FormulaValue) {
+export function formatFormulaValue(value: FormulaValue): string {
   if (value == null || value === "") return "";
+  if (Array.isArray(value)) return value.map((item) => formatFormulaValue(item)).join(", ");
+  if (isFormulaReference(value)) return formulaReferenceText(value);
   if (typeof value === "boolean") return value ? "true" : "false";
   if (typeof value === "number") {
     if (!Number.isFinite(value)) return "";

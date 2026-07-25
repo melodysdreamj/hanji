@@ -1,0 +1,46 @@
+{
+  "title": "Keyboard shortcuts",
+  "close": "Close",
+  "closeBackdrop": "Close keyboard shortcuts",
+  "searchLabel": "Search keyboard shortcuts",
+  "searchPlaceholder": "Search shortcuts…",
+  "categoriesLabel": "Shortcut categories",
+  "searchResults": "Search results",
+  "empty": "No shortcuts found",
+  "or": "or",
+  "keysFor": "Keys for {{action}}",
+  "categories": {
+    "popular": "Popular",
+    "createStyle": "Create & style",
+    "editMove": "Edit & move"
+  },
+  "searchTerms": {
+    "toggleTheme": "theme light dark appearance"
+  },
+  "actions": {
+    "openKeyboardShortcuts": "Open keyboard shortcuts",
+    "newPage": "New page",
+    "quickFind": "Quick Find",
+    "findInPage": "Find on this page",
+    "copyPageLink": "Copy page link",
+    "navigateBack": "Go back",
+    "navigateForward": "Go forward",
+    "toggleTheme": "Toggle dark mode",
+    "openParentPage": "Open parent page",
+    "movePage": "Move current page",
+    "toggleSidebar": "Toggle sidebar",
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strikethrough": "Strikethrough",
+    "inlineCode": "Inline code",
+    "addLink": "Add link",
+    "addComment": "Add comment",
+    "moveBlock": "Move block to another page",
+    "moveBlockUp": "Move block up",
+    "moveBlockDown": "Move block down",
+    "blockColor": "Apply last used color",
+    "openBlockMenu": "Open block actions",
+    "toggleAllToggles": "Expand or collapse all toggles"
+  }
+}

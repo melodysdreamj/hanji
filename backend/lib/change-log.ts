@@ -23,7 +23,7 @@ export interface ChangeFeed {
   complete: boolean;
   latestAt: string;
   entryCountSince: number;
-  /** Any page_permissions mutation since — visibility may have shifted. */
+  /** Any page/Teamspace authority mutation since — visibility may have shifted. */
   permissionsTouched: boolean;
   deletedPageIds: string[];
   /** Databases whose rows/schema changed since; undefined = unknown (capped). */
@@ -112,7 +112,12 @@ export async function readChangeFeed(
     complete: true,
     latestAt,
     entryCountSince: recent.length,
-    permissionsTouched: recent.some((entry) => entry.tbl === 'page_permissions'),
+    permissionsTouched: recent.some((entry) => (
+      entry.tbl === 'page_permissions'
+      || entry.tbl === 'teamspaces'
+      || entry.tbl === 'teamspace_members'
+      || entry.tbl === 'teamspace_settings'
+    )),
     deletedPageIds,
     changedDatabaseIds: dbScopes.size <= SCOPE_HINT_CAP ? [...dbScopes] : undefined,
     changedBlockPageIds: blockPageScopes.size <= SCOPE_HINT_CAP ? [...blockPageScopes] : undefined,

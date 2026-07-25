@@ -1,13 +1,14 @@
 import { defineFunction } from '@edge-base/shared';
 import { errorStatus } from '../lib/error-status';
+import { assertOrganizationDlpContent } from '../lib/enterprise-controls';
 import { MAX_RAW_TRANSACT_OPS, boundedDbFromPageHint, boundedDbFromWorkspaceHint, ensurePageWorkspaceIndex, type AdminDbAccessor } from '../lib/workspace-db';
 import {
   ensureDatabasePropertyIndexes,
   upsertDatabaseIndexesForRows,
 } from '../lib/database-index';
 import {
+  assertMinimumWorkspaceAccessRole as sharedAssertMinimumWorkspaceAccessRole,
   pageAccessRole as sharedPageAccessRole,
-  workspaceAccessRole as sharedWorkspaceAccessRole,
 } from '../lib/page-access';
 
 import {
@@ -25,6 +26,8 @@ import type { ShareRole } from '../lib/page-access';
 import { pageAccessRoleRanks as roleRanks } from '../lib/page-access';
 import {
   assertFileTargetsNotDeleting,
+  requireExclusiveFileWorkspaceLease,
+  withDatabaseFileWorkspaceLease,
   withFileWorkspaceLease,
 } from '../lib/file-operation-lock';
 import {
@@ -35,6 +38,17 @@ import {
   storedFileReferencesChanged,
   updateWithFileReferenceLifecycle,
 } from '../lib/file-reference-lifecycle';
+import { normalizeDatabaseViewStorageRecord } from '../lib/database-view-types';
+import { isDatabasePropertyType } from '../lib/database-property-types';
+import { assertDatabaseButtonConfiguration } from '../lib/automation-actions';
+import { ROLLUP_FUNCTIONS } from '../../shared/database/rollup-core';
+import { FORMULA_FUNCTIONS, FORMULA_LITERALS } from '../../shared/database/formula-core';
+import { isHanjiBoardMainGroupPropertyType } from '../../shared/board-group-types.mjs';
+import {
+  resolveImportedLinkedDatabaseTargets,
+  type ImportedLinkedDatabaseDb,
+  type ImportedLinkedDatabasePage,
+} from '../lib/imported-linked-database';
 
 type DatabaseTable = 'db_properties' | 'db_views' | 'db_templates';
 type PageParentType = 'workspace' | 'page' | 'database';
@@ -49,6 +63,12 @@ interface Page {
   title?: string;
   icon?: string;
   iconType?: 'none' | 'emoji' | 'image';
+  cover?: string;
+  notionIcon?: Record<string, unknown> | null;
+  notionCover?: Record<string, unknown> | null;
+  databaseFeatures?: Record<string, unknown> | null;
+  databaseFeaturesRevision?: number;
+  subitemParentId?: string;
   font?: 'default' | 'serif' | 'mono';
   smallText?: boolean;
   fullWidth?: boolean;
@@ -60,6 +80,7 @@ interface Page {
   isFavorite?: boolean;
   inTrash?: boolean;
   position?: number;
+  notionImportJobId?: string | null;
   createdBy?: string;
   lastEditedBy?: string;
   createdAt?: string;
@@ -127,122 +148,24 @@ interface FunctionContext {
 }
 
 const tableNames = new Set<DatabaseTable>(['db_properties', 'db_views', 'db_templates']);
+const databaseRecordMutationActions = new Set([
+  'insert',
+  'insertMany',
+  'update',
+  'updateMany',
+  'delete',
+  'deleteMany',
+]);
+const DATABASE_MUTATION_IN_VALUE_LIMIT = 100;
 const optionPropertyTypes = new Set(['select', 'multi_select', 'status']);
-const propertyTypes = new Set([
-  'title',
-  'rich_text',
-  'number',
-  'select',
-  'multi_select',
-  'status',
-  'date',
-  'person',
-  'checkbox',
-  'url',
-  'email',
-  'phone',
-  'files',
-  'created_time',
-  'last_edited_time',
-  'created_by',
-  'last_edited_by',
-  'relation',
-  'rollup',
-  'formula',
-  'unique_id',
-]);
-const rollupFunctions = new Set([
-  'show_original',
-  'count_all',
-  'count_values',
-  'count_unique',
-  'count_empty',
-  'percent_empty',
-  'percent_not_empty',
-  'checked',
-  'unchecked',
-  'percent_checked',
-  'percent_unchecked',
-  'sum',
-  'average',
-  'median',
-  'min',
-  'max',
-  'range',
-  'earliest_date',
-  'latest_date',
-  'date_range',
-]);
-const formulaFunctions = new Set([
-  'prop',
-  'if',
-  'ifs',
-  'let',
-  'lets',
-  'concat',
-  'repeat',
-  'format',
-  'toNumber',
-  'add',
-  'subtract',
-  'multiply',
-  'divide',
-  'mod',
-  'pow',
-  'min',
-  'max',
-  'sum',
-  'mean',
-  'median',
-  'sqrt',
-  'cbrt',
-  'exp',
-  'ln',
-  'log10',
-  'log2',
-  'sign',
-  'pi',
-  'e',
-  'lower',
-  'upper',
-  'trim',
-  'startsWith',
-  'endsWith',
-  'substring',
-  'replace',
-  'replaceAll',
-  'test',
-  'now',
-  'today',
-  'dateAdd',
-  'dateSubtract',
-  'dateBetween',
-  'dateRange',
-  'parseDate',
-  'dateStart',
-  'dateEnd',
-  'timestamp',
-  'fromTimestamp',
-  'formatDate',
-  'year',
-  'month',
-  'day',
-  'date',
-  'week',
-  'hour',
-  'minute',
-  'round',
-  'floor',
-  'ceil',
-  'abs',
-  'empty',
-  'contains',
-  'length',
-  'not',
-  'and',
-  'or',
-]);
-const formulaLiterals = new Set(['true', 'false', 'null']);
+const scalarTextPropertyTypes = new Set(['rich_text', 'url', 'email', 'phone']);
+const scalarOptionPropertyTypes = new Set(['select', 'status']);
+// Accept the complete 2026-03-11 Notion enum plus the three persisted Hanji
+// aliases. Storage is intentionally not rewritten: old databases continue to
+// round-trip their original config while evaluators canonicalize semantics.
+const rollupFunctions = new Set<string>(ROLLUP_FUNCTIONS);
+const formulaFunctions = new Set<string>(FORMULA_FUNCTIONS);
+const formulaLiterals = new Set<string>(FORMULA_LITERALS);
 const starterViewTypes = new Set<StarterViewType>([
   'table',
   'board',
@@ -529,18 +452,6 @@ async function getExistingRow<T>(tableRef: TableRef<T>, id: string): Promise<T |
   }
 }
 
-// Role resolution is canonical in lib/page-access; these wrappers only pin
-// this function's "missing workspace is an error" contract.
-async function workspaceRole(db: DbRef, workspaceId: string, actorId: string): Promise<ShareRole | undefined> {
-  return sharedWorkspaceAccessRole(db, workspaceId, actorId, { requireWorkspace: true });
-}
-
-async function assertWorkspaceEdit(db: DbRef, workspaceId: string, actorId: string) {
-  const role = await workspaceRole(db, workspaceId, actorId);
-  if (role && roleRanks[role] >= roleRanks.edit) return role;
-  throw new Error('Workspace access required.');
-}
-
 async function pageRole(db: DbRef, page: Page, actorId: string, actorEmail?: string | null): Promise<ShareRole | undefined> {
   return sharedPageAccessRole(db, page, actorId, undefined, actorEmail, { requireWorkspace: true });
 }
@@ -551,20 +462,164 @@ async function assertCanEditPage(db: DbRef, page: Page, actorId: string, actorEm
   throw new Error('Page access required.');
 }
 
+async function assertDatabasePageWritable(
+  db: DbRef,
+  page: Page,
+  actorId: string,
+  actorEmail?: string | null,
+) {
+  if (page.kind !== 'database') throw new Error('Page is not a database.');
+  if (page.inTrash) throw new Error('Database is in trash.');
+  await assertCanEditPage(db, page, actorId, actorEmail);
+  if (page.isLocked) throw new Error('Database is locked.');
+  return page;
+}
+
 async function assertDatabaseWritable(
   db: DbRef,
   pages: TableRef<Page>,
   databaseId: string,
   actorId: string,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
+  const known = knownWritableDatabases?.get(databaseId);
+  if (known) return known;
   const page = await getExistingRow(pages, databaseId);
   if (!page) throw new Error('Database was not found.');
-  if (page.kind !== 'database') throw new Error('Page is not a database.');
-  if (page.inTrash) throw new Error('Database is in trash.');
-  await assertCanEditPage(db, page, actorId, actorEmail);
-  if (page.isLocked) throw new Error('Database is locked.');
-  return page;
+  return assertDatabasePageWritable(db, page, actorId, actorEmail);
+}
+
+type DatabaseIdSlot = {
+  databaseId: string;
+  purpose: 'write' | 'reference';
+  set(databaseId: string): void;
+};
+
+function databaseIdSlot(
+  record: Record<string, unknown>,
+  key: string,
+  purpose: DatabaseIdSlot['purpose'],
+): DatabaseIdSlot | undefined {
+  const databaseId = optionalString(record[key]);
+  if (!databaseId) return undefined;
+  return {
+    databaseId,
+    purpose,
+    set(value) {
+      record[key] = value;
+    },
+  };
+}
+
+function databaseMutationOwnerSlots(body: Record<string, unknown>, action: string) {
+  const slots: DatabaseIdSlot[] = [];
+  const add = (slot: DatabaseIdSlot | undefined) => {
+    if (slot) slots.push(slot);
+  };
+  const addRelationTarget = (value: unknown) => {
+    if (!isRecord(value)) return;
+    add(databaseIdSlot(value, 'relationDatabaseId', 'reference'));
+    if (isRecord(value.config)) {
+      add(databaseIdSlot(value.config, 'relationDatabaseId', 'reference'));
+    }
+  };
+  const addWriteRecord = (value: unknown) => {
+    if (!isRecord(value)) return;
+    add(databaseIdSlot(value, 'databaseId', 'write'));
+    addRelationTarget(value);
+  };
+
+  if (action === 'createDatabase' && Array.isArray(body.properties)) {
+    for (const property of body.properties) addRelationTarget(property);
+  }
+  if (action === 'configureTaskFeature') {
+    add(databaseIdSlot(body, 'databaseId', 'write'));
+  }
+  if (action === 'insert') addWriteRecord(body.record);
+  if (action === 'insertMany' && Array.isArray(body.records)) {
+    for (const record of body.records) addWriteRecord(record);
+  }
+  if (action === 'update' || action === 'delete' || action === 'deleteMany') {
+    add(databaseIdSlot(body, 'databaseId', 'write'));
+    if (action === 'update') addRelationTarget(body.patch);
+  }
+  if (action === 'updateMany') {
+    add(databaseIdSlot(body, 'databaseId', 'write'));
+    if (Array.isArray(body.updates)) {
+      for (const update of body.updates) {
+        if (!isRecord(update)) continue;
+        add(databaseIdSlot(update, 'databaseId', 'write'));
+        addRelationTarget(update.patch);
+      }
+    }
+  }
+  return slots;
+}
+
+async function normalizeDatabaseMutationTargets(
+  db: DbRef,
+  pages: TableRef<Page>,
+  body: Record<string, unknown>,
+  action: string,
+  actorId: string,
+  actorEmail?: string | null,
+) {
+  const slots = databaseMutationOwnerSlots(body, action);
+  const requestedIds = Array.from(new Set(slots.map((slot) => slot.databaseId)));
+  if (requestedIds.length === 0) return new Map<string, Page>();
+  if (requestedIds.length > MAX_RAW_TRANSACT_OPS) {
+    throw Object.assign(
+      new Error(`Database mutation target limit exceeded (${MAX_RAW_TRANSACT_OPS} databases).`),
+      { status: 413 },
+    );
+  }
+
+  const requestedPages: Page[] = [];
+  const seenRequestedPageIds = new Set<string>();
+  for (let index = 0; index < requestedIds.length; index += DATABASE_MUTATION_IN_VALUE_LIMIT) {
+    const chunk = requestedIds.slice(index, index + DATABASE_MUTATION_IN_VALUE_LIMIT);
+    const loaded = await listAll(
+      pages.where('id', 'in', chunk),
+      {
+        maxItems: chunk.length,
+        pageSize: chunk.length,
+        label: 'Database mutation requested pages',
+      },
+    );
+    for (const page of loaded) {
+      if (seenRequestedPageIds.has(page.id)) {
+        throw Object.assign(
+          new Error('Database mutation lookup returned duplicate rows across disjoint id batches.'),
+          { status: 409 },
+        );
+      }
+      seenRequestedPageIds.add(page.id);
+      requestedPages.push(page);
+    }
+  }
+  const targetByRequestedId = await resolveImportedLinkedDatabaseTargets(
+    db as unknown as ImportedLinkedDatabaseDb,
+    requestedPages as ImportedLinkedDatabasePage[],
+  );
+  const writableRequestedIds = new Set(
+    slots.filter((slot) => slot.purpose === 'write').map((slot) => slot.databaseId),
+  );
+  const pagesToAuthorize = Array.from(new Map(
+    requestedPages
+      .filter((page) => writableRequestedIds.has(page.id))
+      .flatMap((page) => [page, targetByRequestedId.get(page.id) ?? page])
+      .map((page) => [page.id, page]),
+  ).values());
+  await Promise.all(
+    pagesToAuthorize.map((page) => assertDatabasePageWritable(db, page, actorId, actorEmail)),
+  );
+  const knownWritableDatabases = new Map(pagesToAuthorize.map((page) => [page.id, page]));
+  for (const slot of slots) {
+    const target = targetByRequestedId.get(slot.databaseId);
+    if (target) slot.set(target.id);
+  }
+  return knownWritableDatabases;
 }
 
 async function propertiesForDatabase(
@@ -583,6 +638,820 @@ function relationTargetDatabaseId(prop: DbProperty) {
 function configString(config: Record<string, unknown> | undefined, key: string) {
   const value = config?.[key];
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
+}
+
+type DatabaseTaskFeature = 'subitems' | 'dependencies';
+
+type TaskFeaturePropertyInput = {
+  id: string;
+  name: string;
+};
+
+function taskFeaturePropertyInput(body: Record<string, unknown>, key: string): TaskFeaturePropertyInput {
+  const input = recordInput(body[key], key);
+  return {
+    id: requireString(input.id, `${key}.id`),
+    name: requireString(input.name, `${key}.name`),
+  };
+}
+
+function databaseTaskFeatureConfig(page: Page) {
+  return isRecord(page.databaseFeatures)
+    ? structuredClone(page.databaseFeatures)
+    : {};
+}
+
+function featureBinding(value: unknown) {
+  return isRecord(value) ? value : undefined;
+}
+
+function dependencyDateMode(binding: Record<string, unknown> | undefined) {
+  return binding?.dateMode === 'separate' ? 'separate' : 'range';
+}
+
+function dependencyDateSettingsChanged(
+  current: Record<string, unknown>,
+  next: Record<string, unknown>,
+) {
+  const currentMode = dependencyDateMode(current);
+  const nextMode = dependencyDateMode(next);
+  return currentMode !== nextMode
+    || (nextMode === 'range'
+      ? current.datePropertyId !== next.datePropertyId
+      : current.startDatePropertyId !== next.startDatePropertyId
+        || current.endDatePropertyId !== next.endDatePropertyId)
+    || current.shiftMode !== next.shiftMode
+    || current.avoidWeekends !== next.avoidWeekends;
+}
+
+function subitemAdvancedSettingsChanged(
+  current: Record<string, unknown>,
+  next: Record<string, unknown>,
+) {
+  return current.nestedPropertyId !== next.nestedPropertyId
+    || current.showToggleOnTitle !== next.showToggleOnTitle;
+}
+
+function featureRelationProperty(
+  databaseId: string,
+  input: TaskFeaturePropertyInput,
+  role: string,
+  relatedPropertyId: string,
+  position: number,
+): DbProperty {
+  const stamp = nowIso();
+  return {
+    id: input.id,
+    databaseId,
+    name: input.name,
+    type: 'relation',
+    config: {
+      relationDatabaseId: databaseId,
+      relatedPropertyId,
+      databaseFeatureRole: role,
+    },
+    position,
+    createdAt: stamp,
+    updatedAt: stamp,
+  };
+}
+
+function exactFeatureRelation(
+  property: DbProperty | null,
+  databaseId: string,
+  propertyId: string,
+  relatedPropertyId: string,
+  role: string,
+) {
+  return !!property
+    && property.id === propertyId
+    && property.databaseId === databaseId
+    && property.type === 'relation'
+    && relationTargetDatabaseId(property) === databaseId
+    && configString(property.config, 'relatedPropertyId') === relatedPropertyId
+    && configString(property.config, 'databaseFeatureRole') === role;
+}
+
+type TaskFeaturePropertyDisposition = 'keep' | 'remove';
+
+interface DatabaseTaskFeatureConfigReceipt {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  feature: DatabaseTaskFeature;
+  operationId: string;
+  requestHash: string;
+  requestedBy: string;
+  status: 'pending' | 'completed';
+  result: Record<string, unknown>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface DatabaseTaskFeatureDisableJob {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  feature: DatabaseTaskFeature;
+  operationId: string;
+  requestHash: string;
+  requestedBy: string;
+  phase: 'subitems' | 'dependencies';
+  dataKey?: string;
+  cursorPosition: number;
+  cursorId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+const TASK_FEATURE_DISABLE_ROW_WINDOW = 8;
+const TASK_FEATURE_DISABLE_EDGE_WINDOW = 32;
+
+function taskFeatureDisableRequest(body: Record<string, unknown>, feature: DatabaseTaskFeature) {
+  const operationId = requireString(body.operationId, 'operationId');
+  if (operationId.length > 256) throw new Error('operationId is too long.');
+  const expectedDatabaseFeaturesRevision = Number(body.expectedDatabaseFeaturesRevision);
+  const expectedBindingRevision = Number(body.expectedBindingRevision);
+  if (!Number.isSafeInteger(expectedDatabaseFeaturesRevision) || expectedDatabaseFeaturesRevision < 1) {
+    throw new Error('expectedDatabaseFeaturesRevision must be a positive integer.');
+  }
+  if (!Number.isSafeInteger(expectedBindingRevision) || expectedBindingRevision < 1) {
+    throw new Error('expectedBindingRevision must be a positive integer.');
+  }
+  const primaryPropertyId = requireString(body.primaryPropertyId, 'primaryPropertyId');
+  const secondaryPropertyId = requireString(body.secondaryPropertyId, 'secondaryPropertyId');
+  const disposition = requireString(body.propertyDisposition, 'propertyDisposition');
+  if (disposition !== 'keep' && disposition !== 'remove') {
+    throw new Error('propertyDisposition must be keep or remove.');
+  }
+  const requestHash = JSON.stringify({
+    feature,
+    expectedDatabaseFeaturesRevision,
+    expectedBindingRevision,
+    primaryPropertyId,
+    secondaryPropertyId,
+    disposition,
+  });
+  return {
+    operationId,
+    expectedDatabaseFeaturesRevision,
+    expectedBindingRevision,
+    primaryPropertyId,
+    secondaryPropertyId,
+    disposition: disposition as TaskFeaturePropertyDisposition,
+    requestHash,
+  };
+}
+
+function preservedTaskFeatureBindings(
+  features: Record<string, unknown>,
+  feature: DatabaseTaskFeature,
+) {
+  const preserved = featureBinding(features.preservedTaskFeatures);
+  const bindings = preserved?.[feature];
+  return Array.isArray(bindings)
+    ? bindings.filter((binding): binding is Record<string, unknown> => isRecord(binding))
+    : [];
+}
+
+function taskFeatureDisableJobExpectation(job: DatabaseTaskFeatureDisableJob): TransactOperation {
+  return {
+    table: 'database_task_feature_disable_jobs',
+    op: 'expect',
+    id: job.id,
+    where: [
+      ['databaseId', '==', job.databaseId],
+      ['feature', '==', job.feature],
+      ['operationId', '==', job.operationId],
+      ['requestHash', '==', job.requestHash],
+      ['requestedBy', '==', job.requestedBy],
+      ['phase', '==', job.phase],
+      ['cursorPosition', '==', job.cursorPosition],
+      ['cursorId', '==', job.cursorId],
+    ],
+    exists: true,
+  };
+}
+
+async function completeTaskFeatureDisableJob(
+  db: DbRef,
+  receipt: DatabaseTaskFeatureConfigReceipt,
+  job: DatabaseTaskFeatureDisableJob,
+) {
+  const result = { ...receipt.result, status: 'completed' };
+  await db.transact([
+    taskFeatureDisableJobExpectation(job),
+    {
+      table: 'database_task_feature_config_receipts',
+      op: 'expect',
+      id: receipt.id,
+      where: [['status', '==', 'pending'], ['requestHash', '==', receipt.requestHash]],
+      exists: true,
+    },
+    { table: 'database_task_feature_disable_jobs', op: 'delete', id: job.id },
+    {
+      table: 'database_task_feature_config_receipts',
+      op: 'update',
+      id: receipt.id,
+      data: { status: 'completed', result, updatedAt: nowIso() },
+    },
+  ]);
+  return { ...result, replayed: false };
+}
+
+function compareTaskFeatureDisableRow(
+  row: Page,
+  boundary: { position?: number; id: string },
+) {
+  return (row.position ?? 0) - (boundary.position ?? 0) || row.id.localeCompare(boundary.id);
+}
+
+async function drainTaskFeatureDisableJob(
+  db: DbRef,
+  pages: TableRef<Page>,
+  receipt: DatabaseTaskFeatureConfigReceipt,
+  job: DatabaseTaskFeatureDisableJob,
+) {
+  if (job.feature === 'subitems') {
+    const after = { position: job.cursorPosition, id: job.cursorId };
+    const read = async (extra: Array<[string, string, unknown]>) => {
+      let query: TableQuery<Page> = pages
+        .where('parentId', '==', job.databaseId)
+        .where!('parentType', '==', 'database');
+      if (typeof query.orderBy !== 'function' || typeof query.where !== 'function') {
+        throw Object.assign(new Error('Sub-item turn-off requires bounded row keysets.'), { status: 500 });
+      }
+      query = query.orderBy!('position', 'asc').orderBy!('id', 'asc');
+      for (const [field, operator, value] of extra) query = query.where!(field, operator, value);
+      if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+      return (await query.limit(TASK_FEATURE_DISABLE_ROW_WINDOW + 1).getList()).items ?? [];
+    };
+    const candidates = job.cursorId
+      ? (await Promise.all([
+          read([['position', '>', job.cursorPosition]]),
+          read([['position', '==', job.cursorPosition], ['id', '>', job.cursorId]]),
+        ])).flat()
+      : await read([]);
+    const rows = Array.from(new Map(candidates
+      .filter((row) => (
+        row.parentId === job.databaseId
+        && row.parentType === 'database'
+        && (!job.cursorId || compareTaskFeatureDisableRow(row, after) > 0)
+      ))
+      .map((row) => [row.id, row])).values())
+      .sort((left, right) => compareTaskFeatureDisableRow(left, right));
+    const window = rows.slice(0, TASK_FEATURE_DISABLE_ROW_WINDOW);
+    if (window.length === 0) return completeTaskFeatureDisableJob(db, receipt, job);
+    const boundary = window.at(-1)!;
+    await db.transact([
+      taskFeatureDisableJobExpectation(job),
+      ...window.flatMap((row): TransactOperation[] => [
+        {
+          table: 'pages', op: 'expect', id: row.id,
+          where: [['parentId', '==', job.databaseId], ['parentType', '==', 'database']], exists: true,
+        },
+        {
+          table: 'pages', op: 'update', id: row.id,
+          data: { subitemParentId: '', subitemChildCount: 0, updatedAt: nowIso() },
+        },
+      ]),
+      {
+        table: 'database_task_feature_disable_jobs', op: 'update', id: job.id,
+        data: { cursorPosition: boundary.position ?? 0, cursorId: boundary.id, updatedAt: nowIso() },
+      },
+    ]);
+    return { ...receipt.result, status: 'pending', replayed: false };
+  }
+
+  let query: TableQuery<{ id: string; databaseId: string; dataKey?: string }> = db
+    .table<{ id: string; databaseId: string; dataKey?: string }>('database_dependency_edges')
+    .where('databaseId', '==', job.databaseId);
+  if (typeof query.where !== 'function' || typeof query.orderBy !== 'function') {
+    throw Object.assign(new Error('Dependency turn-off requires bounded edge keysets.'), { status: 500 });
+  }
+  if (job.dataKey) query = query.where!('dataKey', '==', job.dataKey);
+  if (job.cursorId) query = query.where!('id', '>', job.cursorId);
+  query = query.orderBy!('id', 'asc');
+  if (typeof query.includeTotal === 'function') query = query.includeTotal(false);
+  const edges = (await query.limit(TASK_FEATURE_DISABLE_EDGE_WINDOW).getList()).items ?? [];
+  if (edges.length === 0) return completeTaskFeatureDisableJob(db, receipt, job);
+  const boundary = edges.at(-1)!;
+  await db.transact([
+    taskFeatureDisableJobExpectation(job),
+    ...edges.map((edge): TransactOperation => ({
+      table: 'database_dependency_edges', op: 'delete', id: edge.id,
+    })),
+    {
+      table: 'database_task_feature_disable_jobs', op: 'update', id: job.id,
+      data: { cursorId: boundary.id, updatedAt: nowIso() },
+    },
+  ]);
+  return { ...receipt.result, status: 'pending', replayed: false };
+}
+
+async function turnOffTaskFeature(
+  db: DbRef,
+  pages: TableRef<Page>,
+  database: Page,
+  body: Record<string, unknown>,
+  feature: DatabaseTaskFeature,
+  actorId: string,
+) {
+  const request = taskFeatureDisableRequest(body, feature);
+  const receipts = db.table<DatabaseTaskFeatureConfigReceipt>('database_task_feature_config_receipts');
+  const existingReceipt = await getExisting(receipts, request.operationId);
+  if (existingReceipt) {
+    if (
+      existingReceipt.databaseId !== database.id
+      || existingReceipt.feature !== feature
+      || existingReceipt.requestHash !== request.requestHash
+      || existingReceipt.requestedBy !== actorId
+    ) {
+      throw Object.assign(new Error('Task-feature operation id was reused for another request.'), { status: 409 });
+    }
+    if (existingReceipt.status === 'completed') {
+      return { ...existingReceipt.result, replayed: true };
+    }
+    const job = await getExisting(
+      db.table<DatabaseTaskFeatureDisableJob>('database_task_feature_disable_jobs'),
+      request.operationId,
+    );
+    if (!job) throw Object.assign(new Error('Task-feature cleanup state is missing.'), { status: 409 });
+    return drainTaskFeatureDisableJob(db, pages, existingReceipt, job);
+  }
+
+  const currentFeatures = databaseTaskFeatureConfig(database);
+  const currentBinding = featureBinding(currentFeatures[feature]);
+  if (currentBinding?.enabled !== true) {
+    throw Object.assign(new Error(`The ${feature} feature is not enabled.`), { status: 409 });
+  }
+  const bindingRevision = Number(currentBinding.revision);
+  const databaseRevision = Number(database.databaseFeaturesRevision ?? 0);
+  if (
+    databaseRevision !== request.expectedDatabaseFeaturesRevision
+    || bindingRevision !== request.expectedBindingRevision
+  ) {
+    throw Object.assign(new Error('Task-feature settings changed before turn-off.'), { status: 409 });
+  }
+  const bindingIds = feature === 'subitems'
+    ? [currentBinding.parentPropertyId, currentBinding.childrenPropertyId]
+    : [currentBinding.predecessorPropertyId, currentBinding.successorPropertyId];
+  if (
+    bindingIds[0] !== request.primaryPropertyId
+    || bindingIds[1] !== request.secondaryPropertyId
+  ) {
+    throw Object.assign(new Error('Task-feature property binding changed before turn-off.'), { status: 409 });
+  }
+  if (feature === 'dependencies') await assertNoActiveDependencyDateShift(db, database);
+  const propertiesTable = db.table<DbProperty>('db_properties');
+  const [primary, secondary] = await Promise.all([
+    getExisting(propertiesTable, request.primaryPropertyId),
+    getExisting(propertiesTable, request.secondaryPropertyId),
+  ]);
+  const roles = feature === 'subitems'
+    ? ['subitem_parent', 'subitem_children']
+    : ['dependency_predecessor', 'dependency_successor'];
+  if (
+    !exactFeatureRelation(
+      primary, database.id, request.primaryPropertyId, request.secondaryPropertyId, roles[0]!,
+    )
+    || !exactFeatureRelation(
+      secondary, database.id, request.secondaryPropertyId, request.primaryPropertyId, roles[1]!,
+    )
+  ) {
+    throw Object.assign(new Error('Task-feature property binding is inconsistent.'), { status: 409 });
+  }
+
+  const nextFeatures = structuredClone(currentFeatures);
+  delete nextFeatures[feature];
+  const updatedAt = nowIso();
+  const nextDatabase = {
+    ...database,
+    databaseFeatures: nextFeatures,
+    databaseFeaturesRevision: databaseRevision + 1,
+    lastEditedBy: actorId,
+    updatedAt,
+  };
+  const baseResult: Record<string, unknown> = {
+    database: nextDatabase,
+    operationId: request.operationId,
+    properties: [],
+    removedPropertyIds: request.disposition === 'remove'
+      ? [request.primaryPropertyId, request.secondaryPropertyId]
+      : [],
+    status: 'completed',
+  };
+  const receipt: DatabaseTaskFeatureConfigReceipt = {
+    id: request.operationId,
+    workspaceId: database.workspaceId,
+    databaseId: database.id,
+    feature,
+    operationId: request.operationId,
+    requestHash: request.requestHash,
+    requestedBy: actorId,
+    status: 'completed',
+    result: baseResult,
+    createdAt: updatedAt,
+    updatedAt,
+  };
+
+  if (request.disposition === 'keep') {
+    const preservedRolePrefix = feature === 'subitems' ? 'preserved_subitem' : 'preserved_dependency';
+    const keptPrimary: DbProperty = {
+      ...primary!,
+      config: { ...primary!.config, databaseFeatureRole: `${preservedRolePrefix}_${feature === 'subitems' ? 'parent' : 'predecessor'}` },
+      updatedAt,
+    };
+    const keptSecondary: DbProperty = {
+      ...secondary!,
+      config: { ...secondary!.config, databaseFeatureRole: `${preservedRolePrefix}_${feature === 'subitems' ? 'children' : 'successor'}` },
+      updatedAt,
+    };
+    const preserved = featureBinding(nextFeatures.preservedTaskFeatures) ?? {};
+    const currentPreserved = preservedTaskFeatureBindings(nextFeatures, feature);
+    nextFeatures.preservedTaskFeatures = {
+      ...preserved,
+      [feature]: [...currentPreserved, { ...currentBinding, enabled: false }],
+    };
+    nextDatabase.databaseFeatures = nextFeatures;
+    baseResult.database = nextDatabase;
+    baseResult.properties = [keptPrimary, keptSecondary];
+    receipt.result = baseResult;
+    await db.transact([
+      {
+        table: 'pages', op: 'expect', id: database.id,
+        where: [['databaseFeaturesRevision', '==', databaseRevision]], exists: true,
+      },
+      { table: 'db_properties', op: 'expect', id: primary!.id, exists: true },
+      { table: 'db_properties', op: 'expect', id: secondary!.id, exists: true },
+      { table: 'db_properties', op: 'update', id: keptPrimary.id, data: keptPrimary as unknown as Record<string, unknown> },
+      { table: 'db_properties', op: 'update', id: keptSecondary.id, data: keptSecondary as unknown as Record<string, unknown> },
+      {
+        table: 'pages', op: 'update', id: database.id,
+        data: {
+          databaseFeatures: nextFeatures,
+          databaseFeaturesRevision: databaseRevision + 1,
+          lastEditedBy: actorId,
+          updatedAt,
+        },
+      },
+      { table: 'database_task_feature_config_receipts', op: 'insert', data: receipt as unknown as Record<string, unknown> },
+    ]);
+    return { ...baseResult, replayed: false };
+  }
+
+  const preservedBindings = preservedTaskFeatureBindings(nextFeatures, feature);
+  const needsCleanup = feature === 'dependencies' || preservedBindings.length === 0;
+  const job: DatabaseTaskFeatureDisableJob | null = needsCleanup ? {
+    id: request.operationId,
+    workspaceId: database.workspaceId,
+    databaseId: database.id,
+    feature,
+    operationId: request.operationId,
+    requestHash: request.requestHash,
+    requestedBy: actorId,
+    phase: feature,
+    ...(feature === 'dependencies' && configString(currentBinding, 'dataKey')
+      ? { dataKey: configString(currentBinding, 'dataKey') }
+      : {}),
+    cursorPosition: 0,
+    cursorId: '',
+    createdAt: updatedAt,
+    updatedAt,
+  } : null;
+  if (job) {
+    receipt.status = 'pending';
+    baseResult.status = 'pending';
+    receipt.result = baseResult;
+  }
+  await db.transact([
+    {
+      table: 'pages', op: 'expect', id: database.id,
+      where: [['databaseFeaturesRevision', '==', databaseRevision]], exists: true,
+    },
+    { table: 'db_properties', op: 'expect', id: primary!.id, exists: true },
+    { table: 'db_properties', op: 'expect', id: secondary!.id, exists: true },
+    { table: 'db_properties', op: 'delete', id: primary!.id },
+    { table: 'db_properties', op: 'delete', id: secondary!.id },
+    {
+      table: 'pages', op: 'update', id: database.id,
+      data: {
+        databaseFeatures: nextFeatures,
+        databaseFeaturesRevision: databaseRevision + 1,
+        lastEditedBy: actorId,
+        updatedAt,
+      },
+    },
+    ...(job ? [{
+      table: 'database_task_feature_disable_jobs', op: 'insert', data: job as unknown as Record<string, unknown>,
+    } satisfies TransactOperation] : []),
+    { table: 'database_task_feature_config_receipts', op: 'insert', data: receipt as unknown as Record<string, unknown> },
+  ]);
+  return { ...baseResult, replayed: false };
+}
+
+async function assertNoActiveDependencyDateShift(
+  db: DbRef,
+  databases: Page | readonly Page[],
+) {
+  const candidates = Array.isArray(databases) ? databases : [databases];
+  const ids = Array.from(new Set(candidates
+    .filter((database) => (
+      featureBinding(featureBinding(database.databaseFeatures)?.dependencies)?.enabled === true
+    ))
+    .map((database) => database.id)));
+  if (ids.length === 0) return;
+  const table = db.table<{ id: string; databaseId: string }>('database_dependency_date_shift_jobs');
+  for (let index = 0; index < ids.length; index += DATABASE_MUTATION_IN_VALUE_LIMIT) {
+    const chunk = ids.slice(index, index + DATABASE_MUTATION_IN_VALUE_LIMIT);
+    const query = chunk.length === 1
+      ? table.where('databaseId', '==', chunk[0]!)
+      : table.where('databaseId', 'in', chunk);
+    const active = await query.limit(chunk.length).getList();
+    if ((active.items ?? []).length > 0) {
+      throw Object.assign(new Error('A dependency date shift is in progress.'), { status: 409 });
+    }
+  }
+}
+
+async function configureTaskFeature(
+  db: DbRef,
+  pages: TableRef<Page>,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail: string | null | undefined,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
+) {
+  const databaseId = requireString(body.databaseId, 'databaseId');
+  const database = await assertDatabaseWritable(
+    db,
+    pages,
+    databaseId,
+    actorId,
+    actorEmail,
+    knownWritableDatabases,
+  );
+  const feature = requireString(body.feature, 'feature') as DatabaseTaskFeature;
+  if (feature !== 'subitems' && feature !== 'dependencies') {
+    throw new Error('feature must be subitems or dependencies.');
+  }
+  if (body.enabled === false) {
+    return turnOffTaskFeature(db, pages, database, body, feature, actorId);
+  }
+  if (body.enabled !== true) throw new Error('enabled must be true or false.');
+
+  const pendingDisable = await db
+    .table<DatabaseTaskFeatureDisableJob>('database_task_feature_disable_jobs')
+    .where('databaseId', '==', database.id)
+    .where!('feature', '==', feature)
+    .limit(1)
+    .getList();
+  if ((pendingDisable.items ?? []).length > 0) {
+    throw Object.assign(new Error(`The ${feature} feature is still being turned off.`), { status: 409 });
+  }
+
+  const propertiesTable = db.table<DbProperty>('db_properties');
+  const currentFeatures = databaseTaskFeatureConfig(database);
+  const currentBinding = featureBinding(currentFeatures[feature]);
+  let firstInput: TaskFeaturePropertyInput;
+  let secondInput: TaskFeaturePropertyInput;
+  let firstRole: string;
+  let secondRole: string;
+  let binding: Record<string, unknown>;
+
+  if (feature === 'subitems') {
+    firstInput = taskFeaturePropertyInput(body, 'parentProperty');
+    secondInput = taskFeaturePropertyInput(body, 'childrenProperty');
+    firstRole = 'subitem_parent';
+    secondRole = 'subitem_children';
+    const nestedPropertyId = body.nestedPropertyId === undefined
+      ? configString(currentBinding, 'nestedPropertyId') ?? secondInput.id
+      : requireString(body.nestedPropertyId, 'nestedPropertyId');
+    if (nestedPropertyId !== firstInput.id && nestedPropertyId !== secondInput.id) {
+      throw Object.assign(
+        new Error('Sub-item nested property must be one of the feature-owned relation properties.'),
+        { status: 409 },
+      );
+    }
+    if (body.showToggleOnTitle !== undefined && typeof body.showToggleOnTitle !== 'boolean') {
+      throw new Error('showToggleOnTitle must be a boolean.');
+    }
+    binding = {
+      enabled: true,
+      parentPropertyId: firstInput.id,
+      childrenPropertyId: secondInput.id,
+      nestedPropertyId,
+      showToggleOnTitle: body.showToggleOnTitle === undefined
+        ? currentBinding?.showToggleOnTitle !== false
+        : body.showToggleOnTitle,
+      revision: Number(currentBinding?.revision ?? 0) + 1,
+    };
+  } else {
+    firstInput = taskFeaturePropertyInput(body, 'predecessorProperty');
+    secondInput = taskFeaturePropertyInput(body, 'successorProperty');
+    firstRole = 'dependency_predecessor';
+    secondRole = 'dependency_successor';
+    const dateMode = body.dateMode === undefined
+      ? 'range'
+      : requireString(body.dateMode, 'dateMode');
+    if (dateMode !== 'range' && dateMode !== 'separate') {
+      throw new Error('dateMode must be range or separate.');
+    }
+    let dateBinding: Record<string, unknown>;
+    if (dateMode === 'range') {
+      const datePropertyId = requireString(body.datePropertyId, 'datePropertyId');
+      const dateProperty = await getExisting(propertiesTable, datePropertyId);
+      if (!dateProperty || dateProperty.databaseId !== databaseId || dateProperty.type !== 'date') {
+        throw Object.assign(
+          new Error('Dependency date property must be a date property on this database.'),
+          { status: 409 },
+        );
+      }
+      dateBinding = { dateMode, datePropertyId };
+    } else {
+      const startDatePropertyId = requireString(body.startDatePropertyId, 'startDatePropertyId');
+      const endDatePropertyId = requireString(body.endDatePropertyId, 'endDatePropertyId');
+      if (startDatePropertyId === endDatePropertyId) {
+        throw Object.assign(
+          new Error('Dependency start and end date properties must be distinct.'),
+          { status: 409 },
+        );
+      }
+      const [startProperty, endProperty] = await Promise.all([
+        getExisting(propertiesTable, startDatePropertyId),
+        getExisting(propertiesTable, endDatePropertyId),
+      ]);
+      if (
+        !startProperty
+        || startProperty.databaseId !== databaseId
+        || startProperty.type !== 'date'
+        || !endProperty
+        || endProperty.databaseId !== databaseId
+        || endProperty.type !== 'date'
+      ) {
+        throw Object.assign(
+          new Error('Dependency start and end properties must be date properties on this database.'),
+          { status: 409 },
+        );
+      }
+      dateBinding = { dateMode, startDatePropertyId, endDatePropertyId };
+    }
+    const shiftMode = requireString(body.shiftMode, 'shiftMode');
+    if (!['overlap', 'maintain_spacing', 'none'].includes(shiftMode)) {
+      throw new Error('shiftMode must be overlap, maintain_spacing, or none.');
+    }
+    binding = {
+      enabled: true,
+      predecessorPropertyId: firstInput.id,
+      successorPropertyId: secondInput.id,
+      ...dateBinding,
+      shiftMode,
+      avoidWeekends: body.avoidWeekends === true,
+      dataKey: configString(currentBinding, 'dataKey')
+        ?? `${firstInput.id}:${secondInput.id}`,
+      revision: Number(currentBinding?.revision ?? 0) + 1,
+    };
+  }
+
+  if (firstInput.id === secondInput.id) {
+    throw Object.assign(
+      new Error('Task feature relation property ids must be distinct.'),
+      { status: 409 },
+    );
+  }
+
+  const expectedBindingIds = feature === 'subitems'
+    ? [currentBinding?.parentPropertyId, currentBinding?.childrenPropertyId]
+    : [currentBinding?.predecessorPropertyId, currentBinding?.successorPropertyId];
+  if (currentBinding?.enabled === true) {
+    if (expectedBindingIds[0] !== firstInput.id || expectedBindingIds[1] !== secondInput.id) {
+      throw Object.assign(
+        new Error(`The ${feature} feature is already bound to different properties.`),
+        { status: 409 },
+      );
+    }
+    const [first, second] = await Promise.all([
+      getExisting(propertiesTable, firstInput.id),
+      getExisting(propertiesTable, secondInput.id),
+    ]);
+    if (
+      !exactFeatureRelation(first, databaseId, firstInput.id, secondInput.id, firstRole)
+      || !exactFeatureRelation(second, databaseId, secondInput.id, firstInput.id, secondRole)
+    ) {
+      throw Object.assign(
+        new Error(`The ${feature} feature property binding is inconsistent.`),
+        { status: 409 },
+      );
+    }
+    const settingsChanged = feature === 'subitems'
+      ? subitemAdvancedSettingsChanged(currentBinding, binding)
+      : dependencyDateSettingsChanged(currentBinding, binding);
+    if (settingsChanged) {
+      if (feature === 'dependencies') await assertNoActiveDependencyDateShift(db, database);
+      const currentRevision = Number(database.databaseFeaturesRevision ?? 0);
+      const nextFeatures = { ...currentFeatures, [feature]: binding };
+      const updatedAt = nowIso();
+      await db.transact([
+        {
+          table: 'pages',
+          op: 'expect',
+          id: database.id,
+          where: [['databaseFeaturesRevision', '==', currentRevision]],
+          exists: true,
+        },
+        {
+          table: 'pages',
+          op: 'update',
+          id: database.id,
+          data: {
+            databaseFeatures: nextFeatures,
+            databaseFeaturesRevision: currentRevision + 1,
+            lastEditedBy: actorId,
+            updatedAt,
+          },
+        },
+      ]);
+      return {
+        database: {
+          ...database,
+          databaseFeatures: nextFeatures,
+          databaseFeaturesRevision: currentRevision + 1,
+          lastEditedBy: actorId,
+          updatedAt,
+        },
+        properties: [first, second],
+        replayed: false,
+      };
+    }
+    return { database, properties: [first, second], replayed: true };
+  }
+
+  const [existingFirst, existingSecond] = await Promise.all([
+    getExisting(propertiesTable, firstInput.id),
+    getExisting(propertiesTable, secondInput.id),
+  ]);
+  if (existingFirst || existingSecond) {
+    throw Object.assign(
+      new Error('Task feature relation property id is already in use.'),
+      { status: 409 },
+    );
+  }
+
+  const featurePositionOffset = feature === 'subitems' ? 1 : 3;
+  const first = featureRelationProperty(
+    databaseId,
+    firstInput,
+    firstRole,
+    secondInput.id,
+    1_000_000 + featurePositionOffset,
+  );
+  const second = featureRelationProperty(
+    databaseId,
+    secondInput,
+    secondRole,
+    firstInput.id,
+    1_000_001 + featurePositionOffset,
+  );
+  await validatePropertyRecord(pages, propertiesTable, database, first, [first, second]);
+  await validatePropertyRecord(pages, propertiesTable, database, second, [first, second]);
+
+  const currentRevision = Number(database.databaseFeaturesRevision ?? 0);
+  const nextFeatures = { ...currentFeatures, [feature]: binding };
+  const updatedAt = nowIso();
+  await db.transact([
+    {
+      table: 'pages',
+      op: 'expect',
+      id: database.id,
+      where: [['databaseFeaturesRevision', '==', currentRevision]],
+      exists: true,
+    },
+    { table: 'db_properties', op: 'insert', data: first as unknown as Record<string, unknown> },
+    { table: 'db_properties', op: 'insert', data: second as unknown as Record<string, unknown> },
+    {
+      table: 'pages',
+      op: 'update',
+      id: database.id,
+      data: {
+        databaseFeatures: nextFeatures,
+        databaseFeaturesRevision: currentRevision + 1,
+        lastEditedBy: actorId,
+        updatedAt,
+      },
+    },
+  ]);
+
+  return {
+    database: {
+      ...database,
+      databaseFeatures: nextFeatures,
+      databaseFeaturesRevision: currentRevision + 1,
+      lastEditedBy: actorId,
+      updatedAt,
+    },
+    properties: [first, second],
+    replayed: false,
+  };
 }
 
 function skipFormulaString(expression: string, index: number) {
@@ -620,6 +1489,7 @@ function formulaCallArgs(expression: string, openIndex: number) {
   const args: string[] = [];
   let start = openIndex + 1;
   let depth = 0;
+  let listDepth = 0;
   let i = openIndex + 1;
 
   while (i < expression.length) {
@@ -633,8 +1503,19 @@ function formulaCallArgs(expression: string, openIndex: number) {
       i += 1;
       continue;
     }
+    if (ch === '[') {
+      listDepth += 1;
+      i += 1;
+      continue;
+    }
+    if (ch === ']') {
+      listDepth -= 1;
+      if (listDepth < 0) throw new Error('Formula list brackets are not balanced.');
+      i += 1;
+      continue;
+    }
     if (ch === ')') {
-      if (depth === 0) {
+      if (depth === 0 && listDepth === 0) {
         args.push(expression.slice(start, i).trim());
         return { args, end: i + 1 };
       }
@@ -642,7 +1523,7 @@ function formulaCallArgs(expression: string, openIndex: number) {
       i += 1;
       continue;
     }
-    if (ch === ',' && depth === 0) {
+    if (ch === ',' && depth === 0 && listDepth === 0) {
       args.push(expression.slice(start, i).trim());
       start = i + 1;
     }
@@ -706,6 +1587,7 @@ function formulaPropRefs(expression: string) {
   const refs: string[] = [];
   const variables = formulaVariables(expression);
   let depth = 0;
+  let listDepth = 0;
   let i = 0;
 
   while (i < expression.length) {
@@ -729,6 +1611,17 @@ function formulaPropRefs(expression: string) {
       i += 1;
       continue;
     }
+    if (ch === '[') {
+      listDepth += 1;
+      i += 1;
+      continue;
+    }
+    if (ch === ']') {
+      listDepth -= 1;
+      if (listDepth < 0) throw new Error('Formula list brackets are not balanced.');
+      i += 1;
+      continue;
+    }
     if (/[A-Za-z_]/.test(ch)) {
       const start = i;
       i += 1;
@@ -739,6 +1632,9 @@ function formulaPropRefs(expression: string) {
       if (expression[next] === '(') {
         if (!formulaFunctions.has(name)) throw new Error(`Unsupported formula function: ${name}.`);
         if (name === 'prop') {
+          let previous = start - 1;
+          while (previous >= 0 && /\s/.test(expression[previous])) previous -= 1;
+          if (expression[previous] === '.') throw new Error('Formula prop() cannot be called as a method.');
           let arg = next + 1;
           while (arg < expression.length && /\s/.test(expression[arg])) arg += 1;
           if (expression[arg] !== '"' && expression[arg] !== "'") {
@@ -755,6 +1651,7 @@ function formulaPropRefs(expression: string) {
   }
 
   if (depth !== 0) throw new Error('Formula parentheses are not balanced.');
+  if (listDepth !== 0) throw new Error('Formula list brackets are not balanced.');
   return refs;
 }
 
@@ -854,7 +1751,7 @@ async function validatePropertyRecord(
   prop: DbProperty,
   sourcePropsOverride?: DbProperty[],
 ) {
-  if (!propertyTypes.has(prop.type)) {
+  if (!isDatabasePropertyType(prop.type)) {
     throw new Error(`Unsupported database property type: ${prop.type}.`);
   }
   if (prop.databaseId !== database.id) {
@@ -873,6 +1770,9 @@ async function validatePropertyRecord(
   }
   if (prop.type === 'formula') {
     assertFormulaConfig(prop, sourceProps);
+  }
+  if (prop.type === 'button') {
+    assertDatabaseButtonConfiguration(prop as unknown as import('../lib/app-types').DbProperty, sourceProps as unknown as import('../lib/app-types').DbProperty[]);
   }
 }
 
@@ -907,7 +1807,14 @@ function propertyOptionIds(prop: DbProperty) {
 }
 
 function assertNoPropertyOptionRemoval(current: DbProperty, next: DbProperty) {
-  if (current.type !== next.type || !optionPropertyTypes.has(current.type)) return;
+  const sameOptionValueFamily =
+    scalarOptionPropertyTypes.has(current.type)
+    && scalarOptionPropertyTypes.has(next.type);
+  if (
+    !optionPropertyTypes.has(current.type)
+    || !optionPropertyTypes.has(next.type)
+    || (current.type !== next.type && !sameOptionValueFamily)
+  ) return;
   const currentIds = propertyOptionIds(current);
   const nextIds = propertyOptionIds(next);
   for (const id of currentIds) {
@@ -917,6 +1824,29 @@ function assertNoPropertyOptionRemoval(current: DbProperty, next: DbProperty) {
       { status: 409 },
     );
   }
+}
+
+function assertPropertyTypeChangeStorageCompatible(current: DbProperty, next: DbProperty) {
+  if (current.type === next.type || !isDatabasePropertyType(next.type)) return;
+  if (current.type === 'files' || next.type === 'files') {
+    throw Object.assign(
+      new Error('Files properties cannot change type; delete and recreate the property instead.'),
+      { status: 409 },
+    );
+  }
+  const sharesScalarTextStorage =
+    scalarTextPropertyTypes.has(current.type)
+    && scalarTextPropertyTypes.has(next.type);
+  const sharesScalarOptionStorage =
+    scalarOptionPropertyTypes.has(current.type)
+    && scalarOptionPropertyTypes.has(next.type);
+  if (sharesScalarTextStorage || sharesScalarOptionStorage) return;
+  throw Object.assign(
+    new Error(
+      `Changing a database property from ${current.type} to ${next.type} requires a server-owned value migration.`,
+    ),
+    { status: 409 },
+  );
 }
 
 function collectFilterPropertyReferences(value: unknown, out: Set<string>) {
@@ -985,6 +1915,10 @@ async function validateSchemaDependentRecord(
   );
   const propertyIds = new Set(schema.map((property) => property.id));
   if (table === 'db_views') {
+    // Validate the official type/config discriminator independently from UI
+    // rendering support. Compatibility-only view types retain their exact
+    // type and configuration instead of being downgraded to a table.
+    normalizeDatabaseViewStorageRecord(record as unknown as Record<string, unknown>);
     for (const propertyId of viewPropertyReferences((record as DbView).config)) {
       if (!propertyIds.has(propertyId)) {
         throw Object.assign(
@@ -1052,7 +1986,7 @@ function optionFromInput(value: unknown, index: number, labels: StarterDatabaseL
   if (value && typeof value === 'object' && !Array.isArray(value)) {
     const option = value as Record<string, unknown>;
     const name = typeof option.name === 'string' && option.name.trim() ? option.name.trim() : fallbackName;
-    return {
+    const normalized: Record<string, unknown> = {
       id: typeof option.id === 'string' && option.id.trim() ? option.id.trim() : newId(),
       name,
       color:
@@ -1060,6 +1994,17 @@ function optionFromInput(value: unknown, index: number, labels: StarterDatabaseL
           ? option.color.trim()
           : optionColors[index % optionColors.length],
     };
+    // Notion's current select/status schema requires option descriptions in
+    // responses, and status options retain their canonical group. Preserve
+    // those compatibility fields without making product-native callers send
+    // them.
+    if (option.description === null || typeof option.description === 'string') {
+      normalized.description = option.description;
+    }
+    if (typeof option.group === 'string' && option.group.trim()) {
+      normalized.group = option.group.trim();
+    }
+    return normalized;
   }
   const name = typeof value === 'string' && value.trim() ? value.trim() : fallbackName;
   return { id: newId(), name, color: optionColors[index % optionColors.length] };
@@ -1283,7 +2228,7 @@ function customDatabaseProperties(
     names.add(nameKey);
 
     const type = typeof input.type === 'string' && input.type.trim() ? input.type.trim() : 'rich_text';
-    if (!propertyTypes.has(type)) throw new Error(`Unsupported database property type: ${type}.`);
+    if (!isDatabasePropertyType(type)) throw new Error(`Unsupported database property type: ${type}.`);
     if (type === 'title') titleCount += 1;
     if (titleCount > 1) throw new Error('A database can only have one title property.');
 
@@ -1334,7 +2279,7 @@ function starterDatabaseSchema(
   };
 
   if (viewType === 'board') {
-    const groupProp = properties.find((prop) => prop.type === 'status' || prop.type === 'select');
+    const groupProp = properties.find((prop) => isHanjiBoardMainGroupPropertyType(prop.type));
     if (groupProp) config.groupBy = groupProp.id;
   }
 
@@ -1397,7 +2342,13 @@ async function resolveDatabaseParent(
   } else {
     if (parentId) throw new Error('Workspace-level databases cannot have a parent page id.');
     if (!workspaceId) throw new Error('workspaceId is required.');
-    await assertWorkspaceEdit(db, workspaceId, actorId);
+    await sharedAssertMinimumWorkspaceAccessRole(
+      db,
+      workspaceId,
+      actorId,
+      'edit',
+      { requireWorkspace: true },
+    );
   }
 
   return { workspaceId, parentId, parentType };
@@ -1495,6 +2446,12 @@ async function createDatabase(
     title: typeof body.title === 'string' ? body.title.trim() : '',
     icon: typeof body.icon === 'string' ? body.icon : '',
     iconType: typeof body.iconType === 'string' ? (body.iconType as Page['iconType']) : 'none',
+    notionIcon: body.notionIcon && typeof body.notionIcon === 'object'
+      ? JSON.parse(JSON.stringify(body.notionIcon)) as Record<string, unknown>
+      : null,
+    notionCover: body.notionCover && typeof body.notionCover === 'object'
+      ? JSON.parse(JSON.stringify(body.notionCover)) as Record<string, unknown>
+      : null,
     font: 'default',
     smallText: false,
     fullWidth: false,
@@ -1525,7 +2482,7 @@ async function createDatabase(
     updatedAt: recordStamp,
   }));
   const stampedView = { ...view, createdAt: recordStamp, updatedAt: recordStamp };
-  const rowCount = body.seedRows === false ? 0 : 3;
+  const rowCount = body.seedRows === true ? 3 : 0;
   const insertedRows = Array.from(
     { length: rowCount },
     (_, index) => starterDatabaseRow(page, index + 1, actorId),
@@ -1556,14 +2513,44 @@ async function createDatabase(
   if (operations.length > MAX_RAW_TRANSACT_OPS) {
     throw Object.assign(new Error('Database starter content is too large for an atomic creation.'), { status: 413 });
   }
-  // Page, schema, view, and starter rows become visible together. A worker
-  // interruption can no longer strand a page-only or schema-less database.
-  await db.transact(operations);
+  // Page, schema, view, and any explicitly requested starter rows become
+  // visible together. A worker interruption can no longer strand a page-only
+  // or schema-less database.
+  const transaction = await db.transact(operations);
+  const committedInsert = <T extends { id: string }>(
+    resultIndex: number,
+    expectedId: string,
+    label: string,
+  ): T => {
+    const inserted = transaction.results[resultIndex]?.inserted;
+    if (
+      !inserted
+      || typeof inserted !== 'object'
+      || Array.isArray(inserted)
+      || (inserted as { id?: unknown }).id !== expectedId
+    ) {
+      throw new Error(`Database create transaction did not return the committed ${label}.`);
+    }
+    return inserted as T;
+  };
+  const committedPage = committedInsert<Page>(0, page.id, 'page');
+  const propertyResultOffset = 1;
+  const committedProperties = stampedProperties.map((property, index) =>
+    committedInsert<DbProperty>(
+      propertyResultOffset + index,
+      property.id,
+      'property',
+    ));
+  const viewResultIndex = propertyResultOffset + stampedProperties.length;
+  const committedView = committedInsert<DbView>(viewResultIndex, stampedView.id, 'view');
+  const rowResultOffset = viewResultIndex + 1;
+  const committedRows = insertedRows.map((row, index) =>
+    committedInsert<Page>(rowResultOffset + index, row.id, 'starter row'));
 
   // Central routing lives outside the content DO. Repair is idempotent and
   // bounded; keep the fully committed database usable through workspace hints
   // even if the secondary index is temporarily unavailable.
-  for (const createdPage of [page, ...insertedRows]) {
+  for (const createdPage of [committedPage, ...committedRows]) {
     await bestEffort(
       'database-mutation ensurePageWorkspaceIndex after atomic createDatabase',
       ensurePageWorkspaceIndex(admin, createdPage.id, createdPage.workspaceId),
@@ -1571,15 +2558,15 @@ async function createDatabase(
   }
   await bestEffort(
     'database-mutation upsertDatabaseIndexesForRows after atomic createDatabase',
-    upsertDatabaseIndexesForRows(db, insertedRows),
+    upsertDatabaseIndexesForRows(db, committedRows),
   );
 
   return {
-    page,
-    properties: stampedProperties,
-    views: [stampedView],
+    page: committedPage,
+    properties: committedProperties,
+    views: [committedView],
     templates: [],
-    rows: insertedRows,
+    rows: committedRows,
   };
 }
 
@@ -1594,6 +2581,7 @@ async function prepareInsertRecords(
   records: Record<string, unknown>[],
   actorId: string,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ): Promise<DatabaseRecord[]> {
   const databases = new Map<string, Page>();
   const prepared: DatabaseRecord[] = [];
@@ -1602,10 +2590,20 @@ async function prepareInsertRecords(
     const databaseId = databaseIdFromRecord(table, record);
     let database = databases.get(databaseId);
     if (!database) {
-      database = await assertDatabaseWritable(db, pages, databaseId, actorId, actorEmail);
+      database = await assertDatabaseWritable(
+        db,
+        pages,
+        databaseId,
+        actorId,
+        actorEmail,
+        knownWritableDatabases,
+      );
       databases.set(databaseId, database);
     }
-    const cleaned = cleanRecord<DatabaseRecord>(record) as DatabaseRecord;
+    const rawCleaned = cleanRecord<DatabaseRecord>(record) as DatabaseRecord;
+    const cleaned = (table === 'db_views'
+      ? normalizeDatabaseViewStorageRecord(rawCleaned as unknown as Record<string, unknown>)
+      : rawCleaned) as unknown as DatabaseRecord;
     const rawId = (cleaned as { id?: unknown }).id;
     const id = rawId === undefined ? newId() : requireString(rawId, 'id');
     (cleaned as DatabaseRecord & { id: string }).id = id;
@@ -1656,8 +2654,17 @@ async function insertRecord<T extends DatabaseRecord>(
   record: Record<string, unknown>,
   actorId: string,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
-  const [cleaned] = await prepareInsertRecords(db, pages, table, [record], actorId, actorEmail);
+  const [cleaned] = await prepareInsertRecords(
+    db,
+    pages,
+    table,
+    [record],
+    actorId,
+    actorEmail,
+    knownWritableDatabases,
+  );
   if (table === 'db_properties') {
     const property = cleaned as DbProperty;
     const database = await assertDatabaseWritable(
@@ -1685,12 +2692,14 @@ async function insertRecord<T extends DatabaseRecord>(
         { status: 409 },
       );
     }
-    return withFileWorkspaceLease(
+    return withDatabaseFileWorkspaceLease(
       db,
       database.workspaceId,
+      database.id,
       actorId,
       'database-property-insert',
       async (lease) => {
+        requireExclusiveFileWorkspaceLease(lease, property.type === 'relation');
         await lease.assertOwned();
         const racedMarker = await matchingDatabasePropertyDeleteMarker(
           db,
@@ -1767,9 +2776,10 @@ async function insertRecord<T extends DatabaseRecord>(
     actorId,
     actorEmail,
   );
-  return withFileWorkspaceLease(
+  return withDatabaseFileWorkspaceLease(
     db,
     database.workspaceId,
+    database.id,
     actorId,
     'database-schema-dependent-insert',
     async (lease) => {
@@ -1789,9 +2799,18 @@ async function insertRecordsAtomically(
   records: Record<string, unknown>[],
   actorId: string,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
   if (records.length === 0) return [];
-  const prepared = await prepareInsertRecords(db, pages, table, records, actorId, actorEmail);
+  const prepared = await prepareInsertRecords(
+    db,
+    pages,
+    table,
+    records,
+    actorId,
+    actorEmail,
+    knownWritableDatabases,
+  );
   if (prepared.length > MAX_RAW_TRANSACT_OPS) {
     throw Object.assign(
       new Error('Atomic database batch is too large; submit fewer records.'),
@@ -1972,16 +2991,31 @@ async function updateRecord<T extends DatabaseRecord>(
   actorId: string,
   expectedDatabaseId?: string | null,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
   const tableRef = getTable<T>(db, table);
   const existing = await getExisting(tableRef, id);
   if (!existing) throw new Error('Database record was not found.');
   assertExpectedDatabase(existing, expectedDatabaseId);
-  const database = await assertDatabaseWritable(db, pages, existing.databaseId, actorId, actorEmail);
+  const database = await assertDatabaseWritable(
+    db,
+    pages,
+    existing.databaseId,
+    actorId,
+    actorEmail,
+    knownWritableDatabases,
+  );
   const cleaned = cleanPatch(table, patch) as Partial<T>;
-  return withFileWorkspaceLease(
+  if (table === 'db_properties') {
+    assertPropertyTypeChangeStorageCompatible(
+      existing as unknown as DbProperty,
+      { ...existing, ...cleaned } as unknown as DbProperty,
+    );
+  }
+  return withDatabaseFileWorkspaceLease(
     db,
     database.workspaceId,
+    database.id,
     actorId,
     'database-schema-dependent-update',
     async (lease) => {
@@ -1989,25 +3023,27 @@ async function updateRecord<T extends DatabaseRecord>(
       const fresh = await getExisting(tableRef, id);
       if (!fresh) throw new Error('Database record was not found.');
       assertExpectedDatabase(fresh, expectedDatabaseId);
-      if (
-        table === 'db_properties'
-        && 'type' in cleaned
-        && (fresh as unknown as DbProperty).type !== (cleaned as unknown as DbProperty).type
-        && (
-          (fresh as unknown as DbProperty).type === 'files'
-          || (cleaned as unknown as DbProperty).type === 'files'
-        )
-      ) {
-        throw Object.assign(
-          new Error('Files properties cannot change type; delete and recreate the property instead.'),
-          { status: 409 },
-        );
+      const rawNext = { ...fresh, ...cleaned } as DatabaseRecord;
+      const next = (table === 'db_views'
+        ? normalizeDatabaseViewStorageRecord(rawNext as unknown as Record<string, unknown>)
+        : rawNext) as unknown as DatabaseRecord;
+      if (table === 'db_views') {
+        if ('type' in cleaned) (cleaned as Record<string, unknown>).type = (next as DbView).type;
+        if ('config' in cleaned) (cleaned as Record<string, unknown>).config = (next as DbView).config;
       }
-      const next = { ...fresh, ...cleaned } as DatabaseRecord;
       if (table === 'db_properties') {
+        assertPropertyTypeChangeStorageCompatible(
+          fresh as unknown as DbProperty,
+          next as DbProperty,
+        );
         assertNoPropertyOptionRemoval(
           fresh as unknown as DbProperty,
           next as DbProperty,
+        );
+        requireExclusiveFileWorkspaceLease(
+          lease,
+          (fresh as unknown as DbProperty).type === 'relation'
+            || (next as DbProperty).type === 'relation',
         );
       }
       await validateRecord(db, pages, table, database, next);
@@ -2019,6 +3055,7 @@ async function updateRecord<T extends DatabaseRecord>(
           templateFileReferences(currentTemplate, filePropertyIds),
           templateFileReferences(nextTemplate, filePropertyIds),
         )) {
+          requireExclusiveFileWorkspaceLease(lease, true);
           await assertFileTargetsNotDeleting(db, database.workspaceId, [database.id]);
           return updateWithFileReferenceLifecycle(db, {
             table: 'db_templates',
@@ -2061,6 +3098,7 @@ async function updateRecordsAtomically(
   updates: Array<{ id: string; patch: Record<string, unknown>; databaseId?: string | null }>,
   actorId: string,
   actorEmail?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
   if (updates.length === 0) return [];
   const tableRef = getTable<DatabaseRecord>(db, table);
@@ -2075,22 +3113,32 @@ async function updateRecordsAtomically(
     assertExpectedDatabase(existing, update.databaseId);
     let database = databases.get(existing.databaseId);
     if (!database) {
-      database = await assertDatabaseWritable(db, pages, existing.databaseId, actorId, actorEmail);
+      database = await assertDatabaseWritable(
+        db,
+        pages,
+        existing.databaseId,
+        actorId,
+        actorEmail,
+        knownWritableDatabases,
+      );
       databases.set(existing.databaseId, database);
     }
     const patch = cleanPatch(table, update.patch);
-    if (
-      table === 'db_properties'
-      && 'type' in patch
-      && (existing as DbProperty).type !== (patch as DbProperty).type
-      && ((existing as DbProperty).type === 'files' || (patch as DbProperty).type === 'files')
-    ) {
-      throw Object.assign(
-        new Error('Files properties cannot change type; delete and recreate the property instead.'),
-        { status: 409 },
+    const rawRecord = { ...existing, ...patch } as DatabaseRecord;
+    const record = (table === 'db_views'
+      ? normalizeDatabaseViewStorageRecord(rawRecord as unknown as Record<string, unknown>)
+      : rawRecord) as unknown as DatabaseRecord;
+    if (table === 'db_views') {
+      if ('type' in patch) (patch as Record<string, unknown>).type = (record as DbView).type;
+      if ('config' in patch) (patch as Record<string, unknown>).config = (record as DbView).config;
+    }
+    if (table === 'db_properties') {
+      assertPropertyTypeChangeStorageCompatible(
+        existing as DbProperty,
+        record as DbProperty,
       );
     }
-    prepared.push({ existing, patch, record: { ...existing, ...patch } as DatabaseRecord });
+    prepared.push({ existing, patch, record });
   }
   if (prepared.length * 2 > MAX_RAW_TRANSACT_OPS) {
     throw Object.assign(
@@ -2218,6 +3266,10 @@ async function updateRecordsAtomically(
         if (!current) throw new Error('Database record was not found.');
         const next = { ...current, ...item.patch } as DatabaseRecord;
         if (table === 'db_properties') {
+          assertPropertyTypeChangeStorageCompatible(
+            current as DbProperty,
+            next as DbProperty,
+          );
           assertNoPropertyOptionRemoval(
             current as DbProperty,
             next as DbProperty,
@@ -2710,6 +3762,7 @@ async function deleteRecordsAtomically(
   expectedDatabaseId?: string | null,
   actorEmail?: string | null,
   workspaceIdHint?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
   if (ids.length === 0) return [];
   if (table === 'db_properties') {
@@ -2725,6 +3778,7 @@ async function deleteRecordsAtomically(
       expectedDatabaseId,
       actorEmail,
       workspaceIdHint,
+      knownWritableDatabases,
     );
     return [result.deletedId];
   }
@@ -2740,7 +3794,14 @@ async function deleteRecordsAtomically(
     const existing = await getExisting(tableRef, id);
     if (!existing) continue;
     assertExpectedDatabase(existing, expectedDatabaseId);
-    const database = await assertDatabaseWritable(db, pages, existing.databaseId, actorId, actorEmail);
+    const database = await assertDatabaseWritable(
+      db,
+      pages,
+      existing.databaseId,
+      actorId,
+      actorEmail,
+      knownWritableDatabases,
+    );
     writableDatabases.set(database.id, database);
     existingIds.push(id);
     existingRecords.push(existing);
@@ -2813,6 +3874,7 @@ async function deleteRecord<T extends DatabaseRecord>(
   expectedDatabaseId?: string | null,
   actorEmail?: string | null,
   workspaceIdHint?: string | null,
+  knownWritableDatabases?: ReadonlyMap<string, Page>,
 ) {
   const tableRef = getTable<T>(db, table);
   const existing = await getExisting(tableRef, id);
@@ -2841,6 +3903,7 @@ async function deleteRecord<T extends DatabaseRecord>(
         databaseId,
         actorId,
         actorEmail,
+        knownWritableDatabases,
       );
       const recoveryMarker = marker ?? await matchingDatabasePropertyDeleteMarker(
         db, writableDatabase.workspaceId, id, databaseId,
@@ -2863,6 +3926,7 @@ async function deleteRecord<T extends DatabaseRecord>(
       property.databaseId,
       actorId,
       actorEmail,
+      knownWritableDatabases,
     );
 
     return withFileWorkspaceLease(
@@ -2943,7 +4007,14 @@ async function deleteRecord<T extends DatabaseRecord>(
   }
   if (!existing) return { deletedId: id };
   assertExpectedDatabase(existing, expectedDatabaseId);
-  await assertDatabaseWritable(db, pages, existing.databaseId, actorId, actorEmail);
+  await assertDatabaseWritable(
+    db,
+    pages,
+    existing.databaseId,
+    actorId,
+    actorEmail,
+    knownWritableDatabases,
+  );
   if (table === 'db_templates') {
     const template = existing as unknown as DbTemplate;
     const database = await assertDatabaseWritable(db, pages, template.databaseId, actorId, actorEmail);
@@ -3174,10 +4245,47 @@ export const POST = defineFunction({
           (Array.isArray(body.records) ? (body.records[0] as { databaseId?: unknown } | undefined) : undefined)
             ?.databaseId,
         );
+    if (['createDatabase', 'insert', 'insertMany', 'update', 'updateMany'].includes(action)) {
+      await assertOrganizationDlpContent(db, body);
+    }
+    // Preserve the original parse-before-resource-validation behavior now that
+    // generic actions share a canonical-owner preflight.
+    if (databaseRecordMutationActions.has(action)) parseTable(body.table);
     const pages = db.table<Page>('pages');
+    const knownWritableDatabases = await normalizeDatabaseMutationTargets(
+      db,
+      pages,
+      body,
+      action,
+      auth.id,
+      actorEmail,
+    );
+    if (action !== 'configureTaskFeature' && knownWritableDatabases.size > 0) {
+      await assertNoActiveDependencyDateShift(db, Array.from(knownWritableDatabases.values()));
+    }
     switch (action) {
       case 'createDatabase':
         return await createDatabase(db, admin, pages, body, auth.id, actorEmail, request?.url);
+      case 'configureTaskFeature': {
+        const databaseId = requireString(body.databaseId, 'databaseId');
+        const knownDatabase = knownWritableDatabases.get(databaseId);
+        if (!knownDatabase) throw new Error('Database was not found.');
+        return await withDatabaseFileWorkspaceLease(
+          db,
+          knownDatabase.workspaceId,
+          databaseId,
+          auth.id,
+          'database-task-feature-configure',
+          (lease) => lease.assertOwned().then(() => configureTaskFeature(
+            db,
+            pages,
+            body,
+            auth.id,
+            actorEmail,
+            knownWritableDatabases,
+          )),
+        );
+      }
       case 'insert': {
         const table = parseTable(body.table);
         const record =
@@ -3186,7 +4294,15 @@ export const POST = defineFunction({
             : {};
         let inserted: DatabaseRecord;
         try {
-          inserted = await insertRecord(db, pages, table, record, auth.id, actorEmail);
+          inserted = await insertRecord(
+            db,
+            pages,
+            table,
+            record,
+            auth.id,
+            actorEmail,
+            knownWritableDatabases,
+          );
         } catch (error) {
           const explicitStatus = error && typeof error === 'object'
             ? Number((error as { status?: unknown; code?: unknown }).status
@@ -3215,7 +4331,15 @@ export const POST = defineFunction({
         const table = parseTable(body.table);
         const rawRecords = Array.isArray(body.records) ? body.records : [];
         const records = rawRecords.map((record, index) => recordInput(record, `records[${index}]`));
-        const insertedMany = await insertRecordsAtomically(db, pages, table, records, auth.id, actorEmail);
+        const insertedMany = await insertRecordsAtomically(
+          db,
+          pages,
+          table,
+          records,
+          auth.id,
+          actorEmail,
+          knownWritableDatabases,
+        );
         if (table === 'db_properties') {
           for (const inserted of insertedMany) {
             await bestEffort(
@@ -3248,7 +4372,17 @@ export const POST = defineFunction({
         const previousReciprocalId = (beforeUpdate ? relationReciprocalId(beforeUpdate) : '')
           || optionalString(body.previousRelatedPropertyId)
           || '';
-        const updated = await updateRecord(db, pages, table, id, patch, auth.id, optionalString(body.databaseId), actorEmail);
+        const updated = await updateRecord(
+          db,
+          pages,
+          table,
+          id,
+          patch,
+          auth.id,
+          optionalString(body.databaseId),
+          actorEmail,
+          knownWritableDatabases,
+        );
         if (table === 'db_properties') {
           const updatedProp = updated as unknown as DbProperty;
           const nextReciprocalId = relationReciprocalId(updatedProp);
@@ -3279,7 +4413,17 @@ export const POST = defineFunction({
             databaseId: optionalString(update.databaseId) ?? optionalString(body.databaseId),
           };
         });
-        return { records: await updateRecordsAtomically(db, pages, table, updates, auth.id, actorEmail) };
+        return {
+          records: await updateRecordsAtomically(
+            db,
+            pages,
+            table,
+            updates,
+            auth.id,
+            actorEmail,
+            knownWritableDatabases,
+          ),
+        };
       }
       case 'delete': {
         const table = parseTable(body.table);
@@ -3306,6 +4450,7 @@ export const POST = defineFunction({
           optionalString(body.databaseId),
           actorEmail,
           optionalString(body.workspaceId),
+          knownWritableDatabases,
         );
         if (previousRelatedPropertyId) {
           const sourceProperty = deletingProperty ?? {
@@ -3340,6 +4485,7 @@ export const POST = defineFunction({
             optionalString(body.databaseId),
             actorEmail,
             optionalString(body.workspaceId),
+            knownWritableDatabases,
           ),
         };
       }

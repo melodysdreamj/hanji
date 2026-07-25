@@ -6,5 +6,6 @@
   "unreachable": "Server nedostupný",
   "unreachablePending_one": "Server nedostupný · {{count}} zmena čaká",
   "unreachablePending_other": "Server nedostupný · {{count}} zmien čaká",
-  "retryHint": "Kliknutím znova skúsiť"
+  "retryHint": "Kliknutím znova skúsiť",
+  "confirmed": "Uložené na server"
 }

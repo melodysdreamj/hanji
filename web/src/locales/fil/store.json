@@ -7,7 +7,8 @@
   "pageMissingSave": "Hindi mahanap ang page, kaya hindi nai-save ang iyong mga pagbabago.",
   "saveFailed": "Hindi nai-save ang iyong mga pagbabago.",
   "sessionExpired": "Nag-expire ang iyong session o hindi napatunayan ang request. Pakisubukan muli.",
-  "blockConflictSave": "Ang block na ito ay na-edit sa ibang device, kaya hindi na-apply ang iyong offline na pagbabago.",
+  "blockConflictSave": "Ang isang nakapila na pag-edit ay nag-overlap sa pinakabagong bersyon ng server, kaya hindi ito awtomatikong na-merge.",
   "blockConflictKeepMine": "Ilapat ang aking bersyon",
-  "blockMoveCommentsSkipped": "Nailipat ang block, ngunit hindi nailipat ang mga komento nito kasama nito."
+  "blockMoveCommentsSkipped": "Nailipat ang block, ngunit hindi nailipat ang mga komento nito kasama nito.",
+  "conflictSave": "Nagbago ang nilalaman bago natapos ang pag-save, kaya hindi na-save ang iyong pag-edit."
 }

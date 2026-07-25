@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "ਵਰਕਸਪੇਸ ਮੀਨੂ ਖੋਲ੍ਹੋ",
   "closeWorkspaceMenu": "ਵਰਕਸਪੇਸ ਮੀਨੂ ਬੰਦ ਕਰੋ",
   "workspaceMenu": "ਵਰਕਸਪੇਸ ਮੀਨੂ",
-  "exportWorkspace": "ਵਰਕਸਪੇਸ ਨਿਰਯਾਤ ਕਰੋ",
+  "exportWorkspace": "ਵਰਕਸਪੇਸ JSON ਨਿਰਯਾਤ ਕਰੋ (ਫ਼ਾਈਲਾਂ ਸ਼ਾਮਲ ਨਹੀਂ)",
   "exportedWorkspace": "Hanji ਫਾਈਲ ਵਜੋਂ ਵਰਕਸਪੇਸ ਨਿਰਯਾਤ ਕੀਤਾ।",
   "exportedWorkspaceWithPlaceholders": "Hanji ਫਾਈਲ ਵਜੋਂ ਵਰਕਸਪੇਸ ਨਿਰਯਾਤ ਕੀਤਾ — ਅਟੈਚਮੈਂਟ ਪਲੇਸਹੋਲਡਰ ਵਜੋਂ ਛੱਡੇ ਗਏ।",
   "couldntExportWorkspace": "ਵਰਕਸਪੇਸ ਐਕਸਪੋਰਟ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ।",
@@ -76,5 +76,12 @@
     "later": "ਬਾਅਦ ਵਿੱਚ",
     "note": "ਤੁਸੀਂ ਹਮੇਸ਼ਾਂ ਇਸਨੂੰ ਬਾਅਦ ਵਿੱਚ ਸਾਈਡਬਾਰ ਵਿੱਚ 'ਆਯਾਤ' ਤੋਂ ਸ਼ੁਰੂ ਕਰ ਸਕਦੇ ਹੋ।",
     "title": "Notion ਵਰਕਸਪੇਸ Hanji 'ਤੇ ਲਿਆਓ?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} ਵਿੱਚ ਪੰਨਾ ਜੋੜੋ",
+  "couldntExportWorkspaceArchive": "ਵਰਕਸਪੇਸ ਅਰਕਾਈਵ ਨਿਰਯਾਤ ਨਹੀਂ ਕਰ ਸਕਿਆ।",
+  "exportedWorkspaceArchive": "ਵਰਕਸਪੇਸ ਅਰਕਾਈਵ ਫ਼ਾਈਲਾਂ ਸਮੇਤ ਨਿਰਯਾਤ ਕੀਤਾ।",
+  "exportWorkspaceArchive": "ਵਰਕਸਪੇਸ ਅਰਕਾਈਵ ਨਿਰਯਾਤ ਕਰੋ (ਫ਼ਾਈਲਾਂ ਸਮੇਤ)",
+  "joinTeamspaces": "ਟੀਮਸਪੇਸਾਂ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",
+  "keyboardShortcuts": "ਕੀਬੋਰਡ ਸ਼ਾਰਟਕੱਟ",
+  "teamspacePages": "{{name}} ਪੰਨੇ"
 }

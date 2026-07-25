@@ -3,6 +3,7 @@ import { i18next } from "@/i18n";
 import { newId } from "./ids";
 import { activePersistentGeneratedLabels } from "./persistentGeneratedLabels";
 import type { DbProperty, DbView, PropertyType, ViewConfig, ViewType } from "./types";
+import { isHanjiBoardMainGroupPropertyType } from "../../../shared/board-group-types.mjs";
 
 export type StarterDatabaseViewType = Extract<
   ViewType,
@@ -80,8 +81,8 @@ export function optimisticStarterDatabaseSchema(
     visibleProperties: properties.map((property) => property.id),
   };
   if (viewType === "board") {
-    config.groupBy = properties.find(
-      (property) => property.type === "status" || property.type === "select"
+    config.groupBy = properties.find((property) =>
+      isHanjiBoardMainGroupPropertyType(property.type)
     )?.id;
   }
   const dateProperty = properties.find((property) => property.type === "date");

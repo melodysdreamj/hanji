@@ -14,6 +14,11 @@ type BlockTextUndoSession = {
   text: import("yjs").Text;
   undoManager: import("yjs").UndoManager;
   updatedAt: string;
+  // Last rich value explicitly captured as a local edit. A later remote merge
+  // may advance `text` beyond this value while the debounced publisher still
+  // holds the captured snapshot; matching it lets the publisher recognize a
+  // stale caller without confusing a late joiner's uncaptured first edit.
+  lastCapturedLocalRich?: TextSpan[];
   // Whether this session's base is safe to SHARE with peers. See the invariant
   // near `markBlockTextCollaborationPristine`. A session is base-safe when it was
   // hydrated from authoritative durable state, or seeded from empty content, or
@@ -26,7 +31,8 @@ type BlockTextUndoSession = {
 };
 
 export type BlockTextUndoResult = {
-  operation: CollaborationCrdtUpdateOperation;
+  /** Omitted when the local undo session has no proven shared CRDT base. */
+  operation?: CollaborationCrdtUpdateOperation;
   plainText: string;
   rich: TextSpan[];
   updatedAt: string;
@@ -478,6 +484,9 @@ function updateBlockTextUndoSession(
   }, origin);
   session.lastRich = cloneRichText(nextRich);
   session.updatedAt = updatedAt;
+  if (origin === session.localOrigin) {
+    session.lastCapturedLocalRich = cloneRichText(nextRich);
+  }
 }
 
 function queueBlockTextUndoSessionWrite<T>(blockId: string, write: () => Promise<T>) {
@@ -518,7 +527,13 @@ async function blockTextUndoResult(
   session.lastRich = cloneRichText(rich);
   session.updatedAt = updatedAt;
   return {
-    operation: encodeBlockTextCrdtUpdate(Y, session.doc, blockId),
+    // Local undo and the canonical block snapshot remain valid without a
+    // shared CRDT base. Publishing this whole document while baseSafe=false
+    // would re-encode grown peer text under the reserved base client and can
+    // duplicate it on merge, so the live CRDT leg is deliberately absent.
+    operation: session.baseSafe
+      ? encodeBlockTextCrdtUpdate(Y, session.doc, blockId)
+      : undefined,
     plainText: spansToPlainText(rich),
     rich,
     updatedAt,
@@ -754,8 +769,32 @@ export async function createBlockTextCrdtUpdateFromUndoSession({
   // operation log; once the block is primed (durable state fetched or its
   // absence confirmed) a later edit encodes cleanly.
   if (!session.baseSafe) return undefined;
-  if (!sameRichText(session.lastRich, normalizeRichText(rich)) || session.updatedAt !== updatedAt) {
-    updateBlockTextUndoSession(session, blockId, rich, updatedAt, session.remoteOrigin);
+  const normalizedRich = normalizeRichText(rich);
+  if (
+    session.lastCapturedLocalRich &&
+    sameRichText(session.lastCapturedLocalRich, normalizedRich)
+  ) {
+    // Pending writes and incoming peer updates may have merged into this
+    // session while the debounced caller snapshot waited behind the queue. If
+    // the caller is exactly the last locally CAPTURED value, preserve the live
+    // merged Y.Text instead of emitting deletions for peer characters.
+    blockTextUndoSessionState(
+      blockId,
+      session,
+      normalizedRich,
+      session.updatedAt || updatedAt,
+    );
+  } else {
+    // A late joiner's first edit can call this encoder directly after durable
+    // hydration, without captureBlockTextLocalEdit. It is a real new edit, not
+    // a stale pending snapshot, so reconcile it into the hydrated document.
+    updateBlockTextUndoSession(
+      session,
+      blockId,
+      normalizedRich,
+      updatedAt,
+      session.localOrigin,
+    );
   }
   return encodeBlockTextCrdtUpdate(Y, session.doc, blockId);
 }

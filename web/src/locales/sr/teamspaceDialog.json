@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Zatvoreno",
+    "open": "Otvoreno",
+    "private": "Privatno"
+  },
+  "add": "Dodaj",
+  "approve": "Odobri",
+  "archive": "Arhiviraj timski prostor",
+  "available": "Dostupno za pridruživanje",
+  "choosePrincipal": "Izaberi osobu ili grupu",
+  "create": "Kreiraj timski prostor",
+  "deny": "Odbij",
+  "error": {
+    "action": "Nije moguće izvršiti tu radnju u timskom prostoru.",
+    "load": "Nije moguće učitati detalje timskog prostora."
+  },
+  "fields": {
+    "access": "Pristup",
+    "description": "Opis",
+    "icon": "Ikona",
+    "memberRole": "Pristup stranicama za članove",
+    "membersCanEditSidebar": "Članovi mogu da dodaju i preuređuju stranice",
+    "membersCanInvite": "Članovi mogu da pozivaju",
+    "name": "Naziv",
+    "openRole": "Pristup stranicama za posetioce"
+  },
+  "governance": "Podešavanja teamspace-a",
+  "join": "Pridruži se",
+  "joined": "Moji teamspace-ovi",
+  "loadMore": "Učitaj više",
+  "manage": "Upravljaj",
+  "member": "Član",
+  "members": "Članovi",
+  "noneArchived": "Nema arhiviranih teamspace-ova.",
+  "noneAvailable": "Nema drugih dostupnih teamspace-ova.",
+  "noneJoined": "Još se niste pridružili nijednom teamspace-u.",
+  "noRequests": "Nema zahteva na čekanju.",
+  "notice": {
+    "approved": "Zahtev odobren.",
+    "archived": "Teamspace arhiviran.",
+    "created": "Teamspace kreiran.",
+    "defaultSet": "Podrazumevani teamspace ažuriran.",
+    "denied": "Zahtev odbijen.",
+    "joined": "Pridružen teamspace-u.",
+    "memberAdded": "Član dodat.",
+    "memberRemoved": "Član uklonjen.",
+    "memberUpdated": "Uloga člana ažurirana.",
+    "policySaved": "Pravilo kreiranja teamspace-a ažurirano.",
+    "requested": "Pristup zatražen.",
+    "restored": "Teamspace obnovljen.",
+    "saved": "Teamspace ažuriran."
+  },
+  "notOwner": "Samo vlasnik timskog prostora ili administrator radnog prostora može upravljati ovim timskim prostorom.",
+  "open": "Otvori",
+  "owner": "Vlasnik",
+  "ownersOnlyCreate": "Samo vlasnici radnih prostora mogu kreirati timske prostore.",
+  "remove": "Ukloni",
+  "replacement": "Izaberite zamenski podrazumevani timski prostor",
+  "request": "Zatraži pristup",
+  "requestPending": "Zahtev na čekanju",
+  "requests": "Zahtevi za pristup",
+  "restore": "Vrati",
+  "roles": {
+    "comment": "Može da komentariše",
+    "edit": "Može da uređuje",
+    "full_access": "Potpuni pristup",
+    "view": "Može da vidi"
+  },
+  "save": "Sačuvaj izmene",
+  "selectTeamspace": "Timski prostor",
+  "setDefault": "Postavi kao podrazumevani timski prostor",
+  "subtitle": "Organizujte zajednički rad i kontrolišite ko može da ga otkrije ili mu se pridruži.",
+  "tabs": {
+    "archived": "Arhivirano",
+    "browse": "Pregledaj",
+    "create": "Novi timski prostor",
+    "label": "Prikazi timskih prostora",
+    "manage": "Upravljaj"
+  },
+  "title": "Timski prostori"
+}

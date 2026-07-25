@@ -35,7 +35,7 @@
     "rename": "Nomini o'zgartirish",
     "addPageInside": "Ichiga sahifa qo'shish",
     "exportAsMarkdown": "Markdown sifatida eksport qilish",
-    "exportAsHanjiFile": "Hanji fayli sifatida eksport qilish",
+    "exportAsHanjiFile": "Hanji JSONni eksport qilish (fayllarsiz)",
     "importMarkdown": "Markdown import qilish",
     "importing": "Import qilinmoqda...",
     "unlockPage": "Sahifani qulfdan chiqarish",
@@ -44,7 +44,8 @@
     "removeVerification": "Tasdiqni olib tashlash",
     "verifyPage": "Sahifani tasdiqlash",
     "customizePage": "Sahifani sozlash",
-    "undo": "Bekor qilish"
+    "undo": "Bekor qilish",
+    "exportAsHanjiArchive": "Hanji arxivini eksport qilish (fayllar bilan)"
   },
   "customize": {
     "summaryDefault": "Standart",
@@ -101,6 +102,8 @@
     "movedToTrash": "Axlat qutisiga koçirildi",
     "restoredPage": "Sahifa tiklandi",
     "couldntRestorePage": "Sahifani tiklash imkoni boʻlmadi",
-    "couldntMoveToTrash": "Axlat qutisiga koʻchirish imkoni boʻlmadi"
+    "couldntMoveToTrash": "Axlat qutisiga koʻchirish imkoni boʻlmadi",
+    "couldntExportHanjiArchive": "Hanji arxivini eksport qilib bo‘lmadi.",
+    "exportedHanjiArchive": "Fayllar bilan Hanji arxivi eksport qilindi."
   }
 }

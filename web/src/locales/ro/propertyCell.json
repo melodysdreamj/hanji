@@ -92,5 +92,8 @@
     "Vi",
     "Sâ"
   ],
-  "you": "Tu"
+  "you": "Tu",
+  "buttonExecutionFailed": "Nu s-a putut executa butonul.",
+  "loadingMoreRelations": "Se încarcă mai multe relații...",
+  "loadMoreRelations": "Încarcă mai multe relații"
 }

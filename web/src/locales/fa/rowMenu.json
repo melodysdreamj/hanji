@@ -35,7 +35,7 @@
     "rename": "تغییر نام",
     "addPageInside": "افزودن صفحه به داخل",
     "exportAsMarkdown": "خروجی به صورت Markdown",
-    "exportAsHanjiFile": "خروجی به صورت فایل Hanji",
+    "exportAsHanjiFile": "خروجی JSON Hanji (بدون فایل‌ها)",
     "importMarkdown": "وارد کردن مارک‌داون",
     "importing": "در حال وارد کردن...",
     "unlockPage": "باز کردن قفل صفحه",
@@ -44,7 +44,8 @@
     "removeVerification": "حذف تأیید",
     "verifyPage": "تأیید صفحه",
     "customizePage": "شخصی‌سازی صفحه",
-    "undo": "بازگردانی"
+    "undo": "بازگردانی",
+    "exportAsHanjiArchive": "خروجی بایگانی Hanji (به همراه فایل‌ها)"
   },
   "customize": {
     "summaryDefault": "پیش‌فرض",
@@ -101,6 +102,8 @@
     "movedToTrash": "به سطل زباله منتقل شد",
     "restoredPage": "صفحه بازیابی شد",
     "couldntRestorePage": "بازیابی صفحه انجام نشد.",
-    "couldntMoveToTrash": "انتقال به زباله‌دان انجام نشد."
+    "couldntMoveToTrash": "انتقال به زباله‌دان انجام نشد.",
+    "couldntExportHanjiArchive": "صادرات آرشیو Hanji ممکن نشد.",
+    "exportedHanjiArchive": "آرشیو Hanji به همراه فایل‌ها صادر شد."
   }
 }

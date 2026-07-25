@@ -1,7 +1,6 @@
 import { activeDateLocale } from "@/lib/i18n";
+import { differenceInCalendarDays } from "@/lib/calendarDay";
 import { i18next } from "@/i18n";
-
-const DAY_MS = 86_400_000;
 
 function startOfLocalDay(date: Date) {
   const next = new Date(date);
@@ -30,7 +29,7 @@ export function dateMentionLabel(value: string, now = new Date()) {
   const date = parseLocalIsoDate(value);
   if (!date) return value;
   const today = startOfLocalDay(now);
-  const diff = Math.round((date.getTime() - today.getTime()) / DAY_MS);
+  const diff = differenceInCalendarDays(date, today);
   if (diff === 0) return i18next.t("dateMentions:today");
   if (diff === 1) return i18next.t("dateMentions:tomorrow");
   if (diff === -1) return i18next.t("dateMentions:yesterday");

@@ -13,7 +13,7 @@
   "groupName": "Jina la kikundi",
   "groupOptions": "Chaguo za kikundi {{groupName}}",
   "groupThisBoard": "Panga bodi hii",
-  "groupThisBoardDesc": "Ongeza sifa ya Select au Status ili kuunda safu.",
+  "groupThisBoardDesc": "Ongeza au chagua sifa ya Select, Status, Person, au Multi-select kuunda safuwima.",
   "newGroup": "Kikundi kipya",
   "newGroupIn": "Kikundi kipya {{groupName}} katika {{dbTitle}}",
   "newPage": "Mpya",

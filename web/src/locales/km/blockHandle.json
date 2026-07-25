@@ -88,5 +88,38 @@
     "hoursAgo": "បានកែ {{hours}} ម៉ោងមុន",
     "daysAgo": "បានកែ {{days}} ថ្ងៃមុន",
     "on": "បានកែ {{date}}"
+  },
+  "align": {
+    "center": "កណ្តាល",
+    "choose": "ជ្រើសរើសការតម្រឹមរូបភាព",
+    "left": "ឆ្វេង",
+    "right": "ស្ដាំ"
+  },
+  "altText": {
+    "help": "អត្ថបទជំនួសជួយអ្នកប្រើប្រាស់អ្នកអានអេក្រង់ឱ្យយល់អំពីរូបភាព។",
+    "label": "ការពិពណ៌នា",
+    "placeholder": "ពិពណ៌នាអំពីរូបភាព",
+    "remove": "លុប",
+    "save": "រក្សាទុក",
+    "title": "អត្ថបទជំនួស"
+  },
+  "imageLink": {
+    "invalid": "បញ្ចូល URL http:// ឬ https:// ពេញលេញ។",
+    "label": "បើក URL នេះនៅពេលចុចលើរូបភាព",
+    "remove": "លុប",
+    "save": "រក្សាទុក",
+    "title": "តំណរូបភាព"
+  },
+  "media": {
+    "addImageLink": "បន្ថែមតំណ",
+    "align": "តម្រឹម",
+    "altText": "អត្ថបទជំនួស",
+    "copySourceLink": "ចម្លងតំណប្រភព",
+    "download": "ទាញយក",
+    "editImageLink": "កែសម្រួលតំណ",
+    "fullScreen": "ពេញអេក្រង់",
+    "openLink": "បើកតំណ",
+    "replace": "ជំនួស",
+    "viewOriginal": "មើលដើម"
   }
 }

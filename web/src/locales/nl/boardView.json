@@ -13,7 +13,7 @@
   "groupName": "Groepsnaam",
   "groupOptions": "{{groupName}} groepopties",
   "groupThisBoard": "Groep dit board",
-  "groupThisBoardDesc": "Voeg een Select- of Status-eigenschap toe om kolommen te maken.",
+  "groupThisBoardDesc": "Voeg een Selectie-, Status-, Persoon- of Meervoudige selectie-eigenschap toe of kies er een om kolommen te maken.",
   "newGroup": "Nieuwe groep",
   "newGroupIn": "Nieuwe {{groupName}} groep in {{dbTitle}}",
   "newPage": "Nieuw",

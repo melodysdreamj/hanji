@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}}টি ব্যাকলিঙ্ক",
-    "count_other": "{{count}}টি ব্যাকলিঙ্ক"
+    "count_other": "{{count}}টি ব্যাকলিঙ্ক",
+    "partial_one": "{{count}}+ ব্যাকলিংক",
+    "partial_other": "{{count}}+ ব্যাকলিংক"
   },
   "header": {
     "title": "লিঙ্কযুক্ত মেনশন"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}}টি মেনশন",
     "mention_other": "{{count}}টি মেনশন",
     "link_one": "{{count}}টি লিঙ্ক",
-    "link_other": "{{count}}টি লিঙ্ক"
+    "link_other": "{{count}}টি লিঙ্ক",
+    "loaded": "লোড করা হয়েছে: {{summary}}"
   },
   "kind": {
     "mention": "মেনশন",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "আরও {{count}}টি ব্যাকলিঙ্ক",
-    "count_other": "আরও {{count}}টি ব্যাকলিঙ্ক"
+    "count_other": "আরও {{count}}টি ব্যাকলিঙ্ক",
+    "load": "আরও ব্যাকলিংক লোড করুন",
+    "loading": "ব্যাকলিংক লোড হচ্ছে…",
+    "search": "ব্যাকলিংক খুঁজুন"
   }
 }

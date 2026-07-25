@@ -35,7 +35,7 @@
     "rename": "Đổi tên",
     "addPageInside": "Thêm trang bên trong",
     "exportAsMarkdown": "Xuất dưới dạng Markdown",
-    "exportAsHanjiFile": "Xuất thành tệp Hanji",
+    "exportAsHanjiFile": "Xuất Hanji JSON (không bao gồm tệp)",
     "importMarkdown": "Nhập Markdown",
     "importing": "Đang nhập...",
     "unlockPage": "Mở khóa trang",
@@ -44,7 +44,8 @@
     "removeVerification": "Xóa xác thực",
     "verifyPage": "Xác thực trang",
     "customizePage": "Tùy chỉnh trang",
-    "undo": "Hoàn tác"
+    "undo": "Hoàn tác",
+    "exportAsHanjiArchive": "Xuất Hanji archive (bao gồm tệp)"
   },
   "customize": {
     "summaryDefault": "Mặc định",
@@ -101,6 +102,8 @@
     "movedToTrash": "Đã chuyển vào Thùng rác",
     "restoredPage": "Đã phục hồi trang",
     "couldntRestorePage": "Không thể khôi phục trang",
-    "couldntMoveToTrash": "Không thể chuyển vào Thùng rác"
+    "couldntMoveToTrash": "Không thể chuyển vào Thùng rác",
+    "couldntExportHanjiArchive": "Không thể xuất kho lưu trữ Hanji.",
+    "exportedHanjiArchive": "Đã xuất kho lưu trữ Hanji kèm tệp."
   }
 }

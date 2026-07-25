@@ -88,5 +88,38 @@
     "hoursAgo": "最後編輯於 {{hours}} 小時前",
     "daysAgo": "最後編輯於 {{days}} 天前",
     "on": "最後編輯於 {{date}}"
+  },
+  "align": {
+    "center": "置中",
+    "choose": "選擇圖片對齊",
+    "left": "左",
+    "right": "右"
+  },
+  "altText": {
+    "help": "替代文字有助於使用螢幕閱讀器的人理解圖片。",
+    "label": "說明",
+    "placeholder": "描述圖片",
+    "remove": "移除",
+    "save": "儲存",
+    "title": "替代文字"
+  },
+  "imageLink": {
+    "invalid": "請輸入完整的 http:// 或 https:// 網址。",
+    "label": "點擊圖片時開啟此網址",
+    "remove": "移除",
+    "save": "儲存",
+    "title": "圖片連結"
+  },
+  "media": {
+    "addImageLink": "新增連結",
+    "align": "對齊",
+    "altText": "替代文字",
+    "copySourceLink": "複製原始連結",
+    "download": "下載",
+    "editImageLink": "編輯連結",
+    "fullScreen": "全螢幕",
+    "openLink": "開啟連結",
+    "replace": "取代",
+    "viewOriginal": "檢視原始"
   }
 }

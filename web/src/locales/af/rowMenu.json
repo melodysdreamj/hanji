@@ -35,7 +35,7 @@
     "rename": "Hernoem",
     "addPageInside": "Voeg bladsy binne",
     "exportAsMarkdown": "Voer uit as Markdown",
-    "exportAsHanjiFile": "Voer uit as Hanji-lêer",
+    "exportAsHanjiFile": "Voer Hanji JSON uit (lêers uitgesluit)",
     "importMarkdown": "Invoer Markdown",
     "importing": "Invoer...",
     "unlockPage": "Ontsluit bladsy",
@@ -44,7 +44,8 @@
     "removeVerification": "Verwyder verifikasie",
     "verifyPage": "Verifieer bladsy",
     "customizePage": "Pas bladsy aan",
-    "undo": "Ongedaan maak"
+    "undo": "Ongedaan maak",
+    "exportAsHanjiArchive": "Voer Hanji-argief uit (lêers ingesluit)"
   },
   "customize": {
     "summaryDefault": "Verstek",
@@ -101,6 +102,8 @@
     "movedToTrash": "Na asblik geskuif",
     "restoredPage": "Bladsy herstel",
     "couldntRestorePage": "Kon nie bladsy herstel nie",
-    "couldntMoveToTrash": "Kon nie na asblik skuif nie"
+    "couldntMoveToTrash": "Kon nie na asblik skuif nie",
+    "couldntExportHanjiArchive": "Kon nie Hanji-argief uitvoer nie.",
+    "exportedHanjiArchive": "Hanji-argief met lêers uitgevoer."
   }
 }

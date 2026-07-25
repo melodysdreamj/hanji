@@ -4,7 +4,22 @@
     "sum": "बेरीज",
     "average": "सरासरी",
     "min": "किमान",
-    "max": "कमाल"
+    "max": "कमाल",
+    "checked": "चेक केलेले",
+    "count_values": "मूल्यांची संख्या",
+    "date_range": "तारीख श्रेणी",
+    "earliest_date": "सर्वात जुनी तारीख",
+    "empty": "रिक्तांची संख्या",
+    "latest_date": "सर्वात नवीन तारीख",
+    "median": "मध्यक",
+    "not_empty": "अरिक्तांची संख्या",
+    "percent_checked": "चेक केलेल्यांची टक्केवारी",
+    "percent_empty": "रिक्तांची टक्केवारी",
+    "percent_not_empty": "अरिक्तांची टक्केवारी",
+    "percent_unchecked": "चेक न केलेल्यांची टक्केवारी",
+    "range": "श्रेणी",
+    "unchecked": "चेक न केलेले",
+    "unique": "अद्वितीय मूल्यांची संख्या"
   },
   "chartAria": "{{name}} चार्ट",
   "chartType": "चार्ट प्रकार",
@@ -27,5 +42,9 @@
   "untitledProperty": "शीर्षकहीन",
   "valueProperty": "मूल्य गुणधर्म",
   "xAxis": "X-अक्ष",
-  "yAxis": "Y-अक्ष"
+  "yAxis": "Y-अक्ष",
+  "dateRangeDays": "{{count}} दिवस",
+  "missingProperty": "साठवलेला गुणधर्म",
+  "unsupportedAggregateDesc": "{{aggregate}} हे {{property}} पासून मोजता येत नाही. सुसंगत गुणधर्म किंवा गणना निवडा.",
+  "unsupportedAggregateTitle": "ही चार्ट गणना उपलब्ध नाही"
 }

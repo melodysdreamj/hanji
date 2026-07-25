@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Murupolku",
+  "clearSearch": "Tyhjennä haku",
+  "errors": {
+    "not-found": "Tämä sivusto on saatettu poistaa julkaisusta tai sen osoite on muuttunut.",
+    "offline": "Tarkista verkkoyhteytesi ja yritä avata sivusto uudelleen.",
+    "rate-limited": "Tälle sivustolle tulee liikaa pyyntöjä. Odota hetki ja yritä uudelleen.",
+    "unavailable": "Hanji ei voinut avata tätä sivustoa nyt. Yritä uudelleen hetken päästä."
+  },
+  "madeWithHanji": "Tehty Hanjilla",
+  "navigation": "Sivuston navigointi",
+  "noResults": "Sivuja ei löytynyt",
+  "outsideSite": "Tämä sivu ei kuulu tähän julkaistuun sivustoon.",
+  "search": "Hae tältä sivustolta",
+  "tryAgain": "Yritä uudelleen",
+  "unavailable": "Tämä sivusto ei ole käytettävissä."
+}

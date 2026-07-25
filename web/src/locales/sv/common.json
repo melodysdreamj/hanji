@@ -8,7 +8,8 @@
     "delete": "Ta bort",
     "clearAll": "Rensa alla",
     "done": "Klar",
-    "add": "Lägg till"
+    "add": "Lägg till",
+    "reportIssue": "Rapportera problem"
   },
   "labels": {
     "untitled": "Namnlös"

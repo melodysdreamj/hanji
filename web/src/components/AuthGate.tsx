@@ -32,7 +32,8 @@ import {
   verifyMfaTotpRemote,
 } from "@/lib/edgebase";
 import { useTranslation } from "react-i18next";
-import { isPublicSharePath, usePathname, useRouter } from "@/lib/router";
+import { isPublicFormPath, isPublicSharePath, isPublicSitePath, usePathname, useRouter } from "@/lib/router";
+import { classifyPublicSiteHost, usePublicSiteHost } from "@/lib/publicSiteHost";
 import {
   browserLanguage,
   cacheLanguagePreference,
@@ -42,6 +43,7 @@ import {
 } from "@/i18n";
 import { LANGUAGE_OPTIONS } from "@/i18n/languages";
 import { markAppInteractiveForOfflineWarm } from "@/lib/appInteractive";
+import type { InitialAuthRestore } from "@/lib/appStartup";
 import { loginRoll } from "@/lib/builtWith";
 import { useCreditRoll } from "@/lib/useCreditRoll";
 import { CreditLine } from "./CreditLine";
@@ -298,11 +300,22 @@ export function authErrorMessage(error: unknown) {
   return labels.signInFailed;
 }
 
-export function AuthGate({ children }: { children: React.ReactNode }) {
+export function AuthGate({
+  children,
+  initialAuthRestore,
+}: {
+  children: React.ReactNode;
+  initialAuthRestore?: InitialAuthRestore;
+}) {
   const { t } = useTranslation(["authGate", "common"]);
   const pathname = usePathname();
   const router = useRouter();
-  const publicShareRoute = isPublicSharePath(pathname);
+  const siteHost = usePublicSiteHost();
+  const publicContentRoute = isPublicSharePath(pathname)
+    || isPublicSitePath(pathname)
+    || (siteHost.custom && pathname === "/");
+  const hostClassificationPending = pathname === "/" && !siteHost.ready;
+  const publicFormRoute = isPublicFormPath(pathname);
   const magicLinkRoute = pathname === "/auth/magic-link";
   const oauthCallbackRoute = pathname === "/auth/callback";
   const passwordResetRoute = pathname === "/auth/reset-password";
@@ -311,31 +324,41 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const authActionRoute = passwordResetRoute || verifyEmailRoute || verifyEmailChangeRoute;
   const [setupToken] = useState(consumeSetupToken);
   const [cachedUserIdAtMount] = useState(() =>
-    publicShareRoute || authActionRoute ? "" : currentSessionUserIdHint()
+    publicContentRoute || hostClassificationPending || authActionRoute ? "" : currentSessionUserIdHint()
   );
+  // StrictMode's paired initial effects join this same owner. Clear the slot
+  // only after settlement so a later route re-entry or auth-state event must
+  // perform a fresh authority check instead of replaying a boot-time result.
+  const initialAuthRestoreRef = useRef(initialAuthRestore);
   const [step, setStep] = useState<AuthStep>(() =>
-    publicShareRoute || cachedUserIdAtMount ? "signed-in" : "checking"
+    publicContentRoute || cachedUserIdAtMount ? "signed-in" : "checking"
   );
+  // `currentUser` is not reactive by itself. A warm cache can mount while the
+  // SDK has only its non-authoritative cookie-session hint, so retain one
+  // render revision that advances when that background validation establishes
+  // an in-memory principal without changing the already-signed-in UI step.
+  const [, setAuthPrincipalRevision] = useState(0);
+  const verifiedPrincipalUserId = currentUserId();
 
   useEffect(() => {
     // An anonymous sign-in/setup surface is also a completed interactive boot.
     // Signed-in boots wait for AppShell's cache hydration instead, and public
     // shares wait for their authoritative snapshot.
-    if (!publicShareRoute && step !== "checking" && step !== "signed-in") {
+    if (!publicContentRoute && step !== "checking" && step !== "signed-in") {
       markAppInteractiveForOfflineWarm();
     }
-  }, [publicShareRoute, step]);
+  }, [publicContentRoute, step]);
 
   useEffect(() => {
     // A stale non-secret session hint can start the first paint with that
     // account's cached language while the cookie is being revalidated. Once
     // the server establishes that this is a signed-out surface, switch back to
     // the browser locale without deleting the account-scoped cache.
-    if (!publicShareRoute && step !== "checking" && step !== "signed-in") {
+    if (!publicContentRoute && step !== "checking" && step !== "signed-in") {
       const language = browserLanguage();
       if (language !== i18next.resolvedLanguage) void i18next.changeLanguage(language);
     }
-  }, [publicShareRoute, step]);
+  }, [publicContentRoute, step]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -388,6 +411,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   // listing an unstable function in its deps (which would churn the effect).
   const recordAuthAttemptRef = useRef(recordAuthAttempt);
   const explicitAuthInFlightRef = useRef(0);
+  // A signed-out auth event is expected while the instance has no first
+  // administrator. Once the bootstrap endpoint selects a setup surface, that
+  // server authority must outlive later empty SDK emissions; otherwise the
+  // setup form flashes and is replaced by ordinary signup, which the server
+  // correctly fences until setup completes.
+  const setupSurfaceAuthoritativeRef = useRef(false);
   // Seed this synchronously for local-first boot. Child effects may start the
   // cookie refresh before this component's passive effects run; the SDK's
   // positive refresh event must not bounce an already-rendering cached user
@@ -398,20 +427,34 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    if (step === "signed-in" && !publicShareRoute) {
+    if (step === "signed-in" && !publicContentRoute) {
       const verifiedUserId = currentUserId();
       if (verifiedUserId) validatedAuthUserIdRef.current = verifiedUserId;
     }
-  }, [publicShareRoute, step]);
+  }, [publicContentRoute, step]);
 
   useEffect(() => {
     let mounted = true;
     fetchRuntimeConfigRemote()
       .then((config) => {
-        if (mounted) setOAuthProviders(oauthProviderOptions(config.oauthProviders));
+        if (mounted) {
+          const customDomains = config.customDomains ?? {
+            enabled: false,
+            cnameTarget: "",
+          };
+          classifyPublicSiteHost(
+            customDomains.enabled
+              ? (config.appHostname || customDomains.cnameTarget)
+              : "",
+          );
+          setOAuthProviders(oauthProviderOptions(config.oauthProviders));
+        }
       })
       .catch(() => {
-        if (mounted) setOAuthProviders([]);
+        if (mounted) {
+          classifyPublicSiteHost("");
+          setOAuthProviders([]);
+        }
       });
     return () => {
       mounted = false;
@@ -437,7 +480,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }, [localBootstrapCandidate]);
 
   useEffect(() => {
-    if (publicShareRoute || authActionRoute) return;
+    if (publicContentRoute || hostClassificationPending || authActionRoute) return;
     let active = true;
     let validationGeneration = 0;
     let initialEmission = true;
@@ -450,7 +493,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         return;
       }
       if (!userId) {
+        if (setupSurfaceAuthoritativeRef.current) return;
         validatedAuthUserIdRef.current = "";
+        setPasswordMode("signin");
         setError(null);
         setBusy(false);
         validationGeneration += 1;
@@ -463,7 +508,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       // Routine refreshes can report the already-validated principal again.
       // Keeping the gate mounted avoids a full-screen checking flash and makes
       // the listener resilient to SDKs that emit token freshness as auth state.
-      if (userId === validatedAuthUserIdRef.current) return;
+      if (userId === validatedAuthUserIdRef.current) {
+        setAuthPrincipalRevision((revision) => revision + 1);
+        return;
+      }
 
       setError(null);
       setBusy(false);
@@ -483,6 +531,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         .then((restoredUserId) => {
           if (!active || generation !== validationGeneration) return;
           validatedAuthUserIdRef.current = restoredUserId;
+          setAuthPrincipalRevision((revision) => revision + 1);
           setStep(restoredUserId ? "signed-in" : "email");
         })
         .catch((err) => {
@@ -502,10 +551,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       validationGeneration += 1;
       unsubscribe();
     };
-  }, [authActionRoute, publicShareRoute]);
+  }, [authActionRoute, hostClassificationPending, publicContentRoute]);
 
   useEffect(() => {
-    if (publicShareRoute) {
+    if (hostClassificationPending) return;
+    if (publicContentRoute) {
       setStep("signed-in");
       return;
     }
@@ -651,11 +701,15 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     // A definitive server denial below still wins and removes private UI.
     if (!cachedUserIdAtMount) setStep("checking");
     (async () => {
+      const entryAuthRestore = initialAuthRestoreRef.current;
       try {
-        const userId = await restoreAuthSessionRemote().catch(() => "");
+        const userId = await (
+          entryAuthRestore?.promise ?? restoreAuthSessionRemote().catch(() => "")
+        );
         if (!mounted) return;
         if (userId) {
           validatedAuthUserIdRef.current = userId;
+          setAuthPrincipalRevision((revision) => revision + 1);
           setStep("signed-in");
           return;
         }
@@ -675,17 +729,23 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         const status = await fetchInstanceBootstrapRemote(setupToken || undefined);
         if (!mounted) return;
         if (status?.setupAvailable) {
+          setupSurfaceAuthoritativeRef.current = true;
           setPasswordMode("signup");
           setStep("setup");
           return;
         }
         if (status && setupToken) forgetSetupToken();
         if (status?.setupBlocked) {
+          setupSurfaceAuthoritativeRef.current = true;
           setStep("setup-blocked");
           return;
         }
+        setupSurfaceAuthoritativeRef.current = false;
         setStep("email");
       } finally {
+        if (entryAuthRestore && initialAuthRestoreRef.current === entryAuthRestore) {
+          initialAuthRestoreRef.current = undefined;
+        }
         explicitAuthInFlightRef.current = Math.max(0, explicitAuthInFlightRef.current - 1);
       }
     })();
@@ -694,10 +754,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     };
   }, [
     cachedUserIdAtMount,
+    initialAuthRestore,
     magicLinkRoute,
     oauthCallbackRoute,
     passwordResetRoute,
-    publicShareRoute,
+    hostClassificationPending,
+    publicContentRoute,
     router,
     setupToken,
     t,
@@ -795,9 +857,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       }
       setSetupPasswordConfirm("");
       setPassword("");
+      setupSurfaceAuthoritativeRef.current = false;
       setStep("signed-in");
     } catch (err) {
       if (setupCompleted) {
+        setupSurfaceAuthoritativeRef.current = false;
         setPasswordMode("signin");
         setStep("email");
         setError(t("authGate:setupAlreadyComplete"));
@@ -808,8 +872,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         : undefined;
       if (status === 409) {
         const current = await fetchInstanceBootstrapRemote(setupToken || undefined);
-        if (!current?.setupAvailable) setStep("email");
-        if (!current?.setupAvailable) forgetSetupToken();
+        if (!current?.setupAvailable) {
+          setupSurfaceAuthoritativeRef.current = false;
+          setStep("email");
+          forgetSetupToken();
+        }
         setError(t("authGate:setupAlreadyComplete"));
       } else {
         setError(t("authGate:setupFailed"));
@@ -959,8 +1026,26 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     }
   }
 
-  if (publicShareRoute) return <>{children}</>;
+  // Public-web forms render without a sign-in gate. Unlike shared pages, their
+  // background auth restore stays active so workspace-only forms can reuse a
+  // valid same-origin cookie before retrying a 401 definition request.
+  if (hostClassificationPending) return <ProductLoadingScreen source="auth" />;
+  if (publicContentRoute || publicFormRoute) return <>{children}</>;
   if (step === "signed-in") {
+    // The hint selects only the matching account-scoped cache; it grants no
+    // remote authority. Keep that already-authorized local surface mounted
+    // while cookie refresh is pending, but do not start account-policy reads
+    // until the SDK has a verified in-memory principal. A definitive denial
+    // clears the hint and the route effect replaces this surface immediately.
+    if (!verifiedPrincipalUserId) {
+      if (
+        cachedUserIdAtMount &&
+        currentSessionUserIdHint() === cachedUserIdAtMount
+      ) {
+        return <>{children}</>;
+      }
+      return <ProductLoadingScreen source="auth" />;
+    }
     return (
       <MustChangePasswordGate>
         <LanguagePreferenceGate>{children}</LanguagePreferenceGate>
@@ -1297,6 +1382,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
  */
 function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation(["authGate", "common"]);
+  const anonymous = currentUserIsAnonymous();
   const [state, setState] = useState<"checking" | "required" | "clear">("checking");
   const [currentPassword, setCurrentPassword] = useState("");
   const [nextPassword, setNextPassword] = useState("");
@@ -1305,6 +1391,10 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (anonymous) {
+      setState("clear");
+      return;
+    }
     let mounted = true;
     fetchMustChangePasswordRemote()
       .then((required) => {
@@ -1318,19 +1408,12 @@ function MustChangePasswordGate({ children }: { children: React.ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [anonymous]);
 
   // The flag is account hygiene, not access control. Keep a returning user's
-  // local workspace visible while the probe runs; replace it only when the
-  // server positively reports that a password change is required.
-  const cachedLanguageUserId = currentUserId() || currentSessionUserIdHint();
-  if (
-    state === "checking"
-    && !currentUserIsAnonymous()
-    && !hasCachedLanguagePreference(cachedLanguageUserId)
-  ) {
-    return <ProductLoadingScreen source="auth" />;
-  }
+  // local workspace visible while the probe runs. Rendering the nested
+  // language gate also starts its compatible account-state consumer in the
+  // same effect pass, so both join the shared in-flight read.
   if (state !== "required") return <>{children}</>;
 
   async function submit(event: FormEvent<HTMLFormElement>) {

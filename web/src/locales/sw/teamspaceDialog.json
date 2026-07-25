@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Imefungwa",
+    "open": "Wazi",
+    "private": "Faragha"
+  },
+  "add": "Ongeza",
+  "approve": "Idhinisha",
+  "archive": "Hifadhi teamspace",
+  "available": "Inapatikana kujiunga",
+  "choosePrincipal": "Chagua mtu au kikundi",
+  "create": "Unda teamspace",
+  "deny": "Kataa",
+  "error": {
+    "action": "Haikuweza kukamilisha kitendo hicho cha teamspace.",
+    "load": "Haikuweza kupakia maelezo ya teamspace."
+  },
+  "fields": {
+    "access": "Ufikiaji",
+    "description": "Maelezo",
+    "icon": "Aikoni",
+    "memberRole": "Ufikiaji ukurasa wa mwanachama",
+    "membersCanEditSidebar": "Wanachama wanaweza kuongeza na kupanga upya kurasa",
+    "membersCanInvite": "Wanachama wanaweza kualika watu",
+    "name": "Jina",
+    "openRole": "Ufikiaji ukurasa kwa wageni"
+  },
+  "governance": "Mipangilio ya timspasi",
+  "join": "Jiunge",
+  "joined": "Timspasi zako",
+  "loadMore": "Pakia zaidi",
+  "manage": "Dhibiti",
+  "member": "Mwanachama",
+  "members": "Wanachama",
+  "noneArchived": "Hakuna timspasi zilizohifadhiwa.",
+  "noneAvailable": "Hakuna timspasi nyingine zinazopatikana.",
+  "noneJoined": "Hujajiunga na timspasi zozote bado.",
+  "noRequests": "Hakuna maombi yanayosubiri.",
+  "notice": {
+    "approved": "Ombi limekubaliwa.",
+    "archived": "Timspasi imehifadhiwa.",
+    "created": "Timspasi imeundwa.",
+    "defaultSet": "Timspasi chaguo-msingi imesasishwa.",
+    "denied": "Ombi limekataliwa.",
+    "joined": "Timspasi imejiungwa.",
+    "memberAdded": "Mwanachama ameongezwa.",
+    "memberRemoved": "Mwanachama ameondolewa.",
+    "memberUpdated": "Wajibu wa mwanachama umesasishwa.",
+    "policySaved": "Sera ya kuunda timspasi imesasishwa.",
+    "requested": "Ufikiaji umeombwa.",
+    "restored": "Timspasi imerejeshwa.",
+    "saved": "Timspasi imesasishwa."
+  },
+  "notOwner": "Mmiliki wa teamspace au msimamizi wa workspace pekee anaweza kusimamia teamspace hii.",
+  "open": "Fungua",
+  "owner": "Mmiliki",
+  "ownersOnlyCreate": "Wamiliki wa workspace pekee wanaweza kuunda teamspace.",
+  "remove": "Ondoa",
+  "replacement": "Chagua teamspace msingi mbadala",
+  "request": "Omba ufikiaji",
+  "requestPending": "Ombi linasubiri",
+  "requests": "Maombi ya ufikiaji",
+  "restore": "Rejesha",
+  "roles": {
+    "comment": "Anaweza kutoa maoni",
+    "edit": "Anaweza kuhariri",
+    "full_access": "Ufikiaji kamili",
+    "view": "Anaweza kutazama"
+  },
+  "save": "Hifadhi mabadiliko",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Weka kama teamspace msingi",
+  "subtitle": "Panga kazi iliyoshirikiwa na kudhibiti ni nani anayeweza kuigundua au kujiunga nayo.",
+  "tabs": {
+    "archived": "Zilizowekwa kumbukumbu",
+    "browse": "Vinjari",
+    "create": "Teamspace mpya",
+    "label": "Mwonekano wa teamspace",
+    "manage": "Simamia"
+  },
+  "title": "Teamspace"
+}

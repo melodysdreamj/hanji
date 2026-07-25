@@ -38,7 +38,7 @@
   "moveTo": "ផ្លាស់ទីទៅ",
   "exporting": "កំពុងនាំចេញ…",
   "exportAsMarkdown": "នាំចេញជា Markdown",
-  "exportAsHanji": "នាំចេញជាឯកសារ Hanji",
+  "exportAsHanji": "នាំចេញ Hanji JSON (មិនរាប់បញ្ចូលឯកសារ)",
   "importing": "កំពុងនាំចូល…",
   "importMarkdown": "នាំចូល Markdown",
   "unlockPage": "ដោះសោទំព័រ",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "មិនអាចធ្វើបច្ចុប្បន្នភាពសិទ្ធិចូលប្រើបានទេ",
     "removedFromAccessList": "បានដកចេញពីបញ្ជីចូលប្រើ",
     "couldntRemoveAccess": "មិនអាចដកសិទ្ធិចូលប្រើបានទេ",
-    "couldntLoadAccessList": "មិនអាចផ្ទុកបញ្ជីចូលប្រើបានទេ"
+    "couldntLoadAccessList": "មិនអាចផ្ទុកបញ្ជីចូលប្រើបានទេ",
+    "couldntExportHanjiArchive": "មិនអាចនាំចេញបណ្ណសារ Hanji បានទេ។",
+    "exportedHanjiArchive": "បាននាំចេញបណ្ណសារ Hanji ជាមួយឯកសារ។"
   },
   "user": "អ្នកប្រើប្រាស់",
   "whoHasAccess": "អ្នកណាអាចចូលប្រើបាន",
   "workspace": "លំហការងារ",
   "workspaceCount_one": "{{count}} លំហការងារ",
   "workspaceCount_other": "{{count}} លំហការងារ",
-  "you": "អ្នក"
+  "you": "អ្នក",
+  "exportAsHanjiArchive": "នាំចេញបណ្ណសារ Hanji (រាប់បញ្ចូលឯកសារ)",
+  "turnIntoWiki": "ប្តូរទៅជាវិគី",
+  "undoWiki": "ដកវិគី",
+  "wikiCreated": "បានប្តូរទំព័រទៅជាវិគី",
+  "wikiPageSettings": "ការកំណត់ទំព័រវិគី",
+  "wikiUndone": "បានដកវិគីចេញ មាតិកាទំព័រត្រូវបានរក្សាទុក",
+  "wikiUpdateFailed": "មិនអាចធ្វើបច្ចុប្បន្នភាពវិគីបានទេ"
 }

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} baya-haɗi",
-    "count_other": "{{count}} baya-haɗi"
+    "count_other": "{{count}} baya-haɗi",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ backlinks"
   },
   "header": {
     "title": "Ambaton da aka haɗa"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} ambato",
     "mention_other": "{{count}} ambato",
     "link_one": "{{count}} haɗi",
-    "link_other": "{{count}} haɗi"
+    "link_other": "{{count}} haɗi",
+    "loaded": "An loda: {{summary}}"
   },
   "kind": {
     "mention": "Ambato",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} ƙarin baya-haɗi",
-    "count_other": "{{count}} ƙarin baya-haɗi"
+    "count_other": "{{count}} ƙarin baya-haɗi",
+    "load": "Loda ƙarin backlinks",
+    "loading": "Ana loda backlinks...",
+    "search": "Nemo backlinks"
   }
 }

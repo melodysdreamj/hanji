@@ -8,7 +8,8 @@
     "delete": "Sil",
     "clearAll": "Hamısını təmizlə",
     "done": "Hazır",
-    "add": "Əlavə et"
+    "add": "Əlavə et",
+    "reportIssue": "Problemi bildir"
   },
   "labels": {
     "untitled": "Başlıqsız"

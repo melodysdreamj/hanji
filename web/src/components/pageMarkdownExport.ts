@@ -2,7 +2,10 @@ import { pageDisplayTitle } from "@/lib/pageTitle";
 import { activePersistentGeneratedLabels } from "@/lib/persistentGeneratedLabels";
 import type { Page } from "@/lib/types";
 import { useStore } from "@/lib/store";
-import { getDatabaseRowsRemote } from "@/lib/edgebase";
+import {
+  getDatabaseRowsRemote,
+  isDatabaseStructuralRowMarker,
+} from "@/lib/edgebase";
 import { displayPropertyValue } from "./database/rollup";
 import { blockTreeMarkdown } from "./editor/blockMarkdown";
 
@@ -55,7 +58,9 @@ export async function exportPageAsMarkdown(page: Page) {
   if (page.kind === "database") {
     const props = latest.dbProperties(page.id);
     const rowsResult = await getDatabaseRowsRemote(page.id, { includeComputed: true });
-    const rows = rowsResult.rows ?? [];
+    const rows = (rowsResult.rows ?? []).filter(
+      (row): row is Page => !isDatabaseStructuralRowMarker(row),
+    );
     const pagesById = {
       ...latest.pagesById,
       ...Object.fromEntries(rows.map((row) => [row.id, row])),

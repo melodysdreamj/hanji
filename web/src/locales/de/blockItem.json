@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Videounterschrift",
     "videoEmptyHint": "Videodatei hochladen, direkten Link einfügen oder YouTube-, Vimeo- oder Loom-Link verwenden.",
-    "videoLink": "Videolink"
+    "videoLink": "Videolink",
+    "audioPlaybackFailed": "Diese Audiodatei konnte nicht abgespielt werden. Ersetze sie oder öffne die Originaldatei.",
+    "videoPlaybackFailed": "Dieses Video konnte nicht abgespielt werden. Ersetze es oder öffne die Originaldatei."
   },
   "bookmark": {
     "copy": "Lesezeichen-Link kopieren",

@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Öppna arbetsytemeny",
   "closeWorkspaceMenu": "Stäng workspace-menyn",
   "workspaceMenu": "Arbetsytemeny",
-  "exportWorkspace": "Exportera arbetsyta",
+  "exportWorkspace": "Exportera arbetsyta-JSON (utan filer)",
   "exportedWorkspace": "Exporterade arbetsyta som en Hanji-fil.",
   "exportedWorkspaceWithPlaceholders": "Exporterade arbetsyta som en Hanji-fil — bilagor lämnades som platshållare.",
   "couldntExportWorkspace": "Kunde inte exportera workspace.",
@@ -76,5 +76,12 @@
     "later": "Kanske senare",
     "note": "Du kan alltid starta detta senare via Importera i sidofältet.",
     "title": "Flytta din Notion-arbetsyta till Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Lägg till sida i {{name}}",
+  "couldntExportWorkspaceArchive": "Kunde inte exportera workspace-arkivet.",
+  "exportedWorkspaceArchive": "Exporterade ett arbetsytearkiv med filer.",
+  "exportWorkspaceArchive": "Exportera arbetsytearkiv (med filer)",
+  "joinTeamspaces": "Anslut till teamspaces",
+  "keyboardShortcuts": "Kortkommandon",
+  "teamspacePages": "{{name}} sidor"
 }

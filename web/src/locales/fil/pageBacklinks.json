@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} backlink",
-    "count_other": "{{count}} backlink"
+    "count_other": "{{count}} backlink",
+    "partial_one": "{{count}}+ backlink",
+    "partial_other": "{{count}}+ mga backlink"
   },
   "header": {
     "title": "Mga banggit na naka-link"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} mention",
     "mention_other": "{{count}} mention",
     "link_one": "{{count}} link",
-    "link_other": "{{count}} link"
+    "link_other": "{{count}} link",
+    "loaded": "Na-load: {{summary}}"
   },
   "kind": {
     "mention": "Mention",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} pang backlink",
-    "count_other": "{{count}} pang backlink"
+    "count_other": "{{count}} pang backlink",
+    "load": "Mag-load pa ng mga backlink",
+    "loading": "Naglo-load ng mga backlink…",
+    "search": "Maghanap ng mga backlink"
   }
 }

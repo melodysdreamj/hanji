@@ -7,7 +7,8 @@
   "pageMissingSave": "Səhifə tapıla bilmədiyi üçün dəyişiklikləriniz yadda saxlanıla bilmədi.",
   "saveFailed": "Dəyişiklikləriniz yadda saxlanıla bilmədi.",
   "sessionExpired": "Sessiyanızın vaxtı bitdi və ya sorğu doğrulanmadı. Zəhmət olmasa, yenidən cəhd edin.",
-  "blockConflictSave": "Bu blok başqa cihazda redaktə edildiyi üçün oflayn dəyişikliyiniz tətbiq edilmədi.",
+  "blockConflictSave": "Gözləmədə olan dəyişiklik serverin son versiyası ilə üst-üstə düşdüyü üçün avtomatik birləşdirilə bilmədi.",
   "blockConflictKeepMine": "Öz versiyamı tətbiq et",
-  "blockMoveCommentsSkipped": "Blok köçürüldü, amma şərhləri onunla köçürülə bilmədi."
+  "blockMoveCommentsSkipped": "Blok köçürüldü, amma şərhləri onunla köçürülə bilmədi.",
+  "conflictSave": "Saxlanma tamamlanmazdan əvvəl məzmun dəyişdiyi üçün redaktə saxlanıla bilmədi."
 }

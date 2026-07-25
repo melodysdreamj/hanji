@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "အလုပ်နေရာ မီနူး ဖွင့်ပါ",
   "closeWorkspaceMenu": "လုပ်ငန်းခွင်မီနူးကို ပိတ်ပါ",
   "workspaceMenu": "လုပ်ငန်းနေရာ မီနူး",
-  "exportWorkspace": "အလုပ်နေရာ ထုတ်ယူပါ",
+  "exportWorkspace": "Workspace JSON ထုတ်ယူ (ဖိုင်များမပါ)",
   "exportedWorkspace": "အလုပ်နေရာကို Hanji ဖိုင်အဖြစ် ထုတ်ယူပြီးပါပြီ။",
   "exportedWorkspaceWithPlaceholders": "အလုပ်နေရာကို Hanji ဖိုင်အဖြစ် ထုတ်ယူပြီးပါပြီ — ပူးတွဲပါဖိုင်များကို နေရာခံအဖြစ် ထားရှိခဲ့ပါသည်။",
   "couldntExportWorkspace": "လုပ်ငန်းခွင်ကို ထုတ်ယူမရပါ။",
@@ -76,5 +76,12 @@
     "later": "နောက်မှ",
     "note": "ဤလုပ်ဆောင်ချက်ကို နောက်မှ ဘေးဘားရှိ Import မှ စတင်နိုင်ပါသည်။",
     "title": "သင့် Notion workspace ကို Hanji သို့ ယူဆောင်လာမလား။"
-  }
+  },
+  "addPageToTeamspace": "{{name}} သို့ စာမျက်နှာထည့်ပါ",
+  "couldntExportWorkspaceArchive": "Workspace archive ကို ထုတ်ယူ၍မရခဲ့ပါ။",
+  "exportedWorkspaceArchive": "Workspace archive ကို ဖိုင်များနှင့်အတူ ထုတ်ယူပြီးပါပြီ။",
+  "exportWorkspaceArchive": "Workspace archive ထုတ်ယူ (ဖိုင်များပါဝင်)",
+  "joinTeamspaces": "Teamspaces များသို့ ပါဝင်ပါ",
+  "keyboardShortcuts": "ကီးဘုတ်ဖြတ်လမ်းများ",
+  "teamspacePages": "{{name}} စာမျက်နှာများ"
 }

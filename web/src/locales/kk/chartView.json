@@ -4,7 +4,22 @@
     "sum": "Қосынды",
     "average": "Орташа",
     "min": "Мин",
-    "max": "Макс"
+    "max": "Макс",
+    "checked": "Белгіленген",
+    "count_values": "Мәндер саны",
+    "date_range": "Күн аралығы",
+    "earliest_date": "Ең ерте күні",
+    "empty": "Бос мәндер саны",
+    "latest_date": "Ең кеш күні",
+    "median": "Медиана",
+    "not_empty": "Бос емес мәндер саны",
+    "percent_checked": "Белгіленген пайызы",
+    "percent_empty": "Бос пайызы",
+    "percent_not_empty": "Бос емес пайызы",
+    "percent_unchecked": "Белгіленбеген пайызы",
+    "range": "Аралық",
+    "unchecked": "Белгіленбеген",
+    "unique": "Бірегей мәндер саны"
   },
   "chartAria": "{{name}} диаграммасы",
   "chartType": "Диаграмма түрі",
@@ -27,5 +42,9 @@
   "untitledProperty": "Атаусыз",
   "valueProperty": "Мән қасиеті",
   "xAxis": "X осі",
-  "yAxis": "Y осі"
+  "yAxis": "Y осі",
+  "dateRangeDays": "{{count}} күн",
+  "missingProperty": "сақталған қасиет",
+  "unsupportedAggregateDesc": "{{aggregate}} {{property}} қасиетінен есептелмейді. Үйлесімді қасиетті немесе есептеуді таңдаңыз.",
+  "unsupportedAggregateTitle": "Бұл диаграмма есептеуі қолжетімді емес"
 }

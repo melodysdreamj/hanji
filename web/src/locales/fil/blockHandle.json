@@ -88,5 +88,38 @@
     "hoursAgo": "Huling na-edit {{hours}} oras nakalipas",
     "daysAgo": "Huling na-edit {{days}} araw nakalipas",
     "on": "Huling na-edit {{date}}"
+  },
+  "align": {
+    "center": "Gitna",
+    "choose": "Pumili ng pagkakahanay ng larawan",
+    "left": "Kaliwa",
+    "right": "Kanan"
+  },
+  "altText": {
+    "help": "Ang alt text ay tumutulong sa mga taong gumagamit ng screen reader na maunawaan ang larawan.",
+    "label": "Paglalarawan",
+    "placeholder": "Ilarawan ang larawan",
+    "remove": "Alisin",
+    "save": "I-save",
+    "title": "Alt text"
+  },
+  "imageLink": {
+    "invalid": "Maglagay ng buong http:// o https:// URL.",
+    "label": "Buksan ang URL na ito kapag na-click ang larawan",
+    "remove": "Alisin",
+    "save": "I-save",
+    "title": "Link ng larawan"
+  },
+  "media": {
+    "addImageLink": "Magdagdag ng link",
+    "align": "I-align",
+    "altText": "Alt text",
+    "copySourceLink": "Kopyahin ang source link",
+    "download": "I-download",
+    "editImageLink": "I-edit ang link",
+    "fullScreen": "Full screen",
+    "openLink": "Buksan ang link",
+    "replace": "Palitan",
+    "viewOriginal": "Tingnan ang orihinal"
   }
 }

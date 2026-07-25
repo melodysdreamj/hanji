@@ -92,5 +92,8 @@
     "P",
     "S"
   ],
-  "you": "Ty"
+  "you": "Ty",
+  "buttonExecutionFailed": "Nie udało się uruchomić przycisku.",
+  "loadingMoreRelations": "Wczytywanie kolejnych relacji...",
+  "loadMoreRelations": "Wczytaj więcej relacji"
 }

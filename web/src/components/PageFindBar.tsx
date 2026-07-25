@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { motionSafeScrollBehavior } from "@/lib/motion";
+import { canonicalTextRanges } from "@/lib/textMatch";
 import { ArrowDown, ArrowUp, Search, X } from "./icons";
 import styles from "./PageView.module.css";
 
@@ -107,20 +108,16 @@ function searchableTextNodes(root: HTMLElement) {
 }
 
 function pageFindMatches(root: HTMLElement, query: string): FindMatch[] {
-  const needle = query.toLowerCase();
-  if (!needle) return [];
+  if (!query) return [];
   const matches: FindMatch[] = [];
 
   for (const node of searchableTextNodes(root)) {
     const text = node.nodeValue ?? "";
-    const haystack = text.toLowerCase();
-    let index = haystack.indexOf(needle);
-    while (index >= 0) {
+    for (const match of canonicalTextRanges(text, query)) {
       const range = document.createRange();
-      range.setStart(node, index);
-      range.setEnd(node, index + query.length);
+      range.setStart(node, match.start);
+      range.setEnd(node, match.end);
       matches.push({ range });
-      index = haystack.indexOf(needle, index + Math.max(needle.length, 1));
     }
   }
 

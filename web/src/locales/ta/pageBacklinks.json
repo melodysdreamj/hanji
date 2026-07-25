@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} பேக்லிங்க்",
-    "count_other": "{{count}} பேக்லிங்க்குகள்"
+    "count_other": "{{count}} பேக்லிங்க்குகள்",
+    "partial_one": "{{count}}+ பின்இணைப்பு",
+    "partial_other": "{{count}}+ பின்இணைப்புகள்"
   },
   "header": {
     "title": "இணைக்கப்பட்ட குறிப்புகள்"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} குறிப்பு",
     "mention_other": "{{count}} குறிப்புகள்",
     "link_one": "{{count}} இணைப்பு",
-    "link_other": "{{count}} இணைப்புகள்"
+    "link_other": "{{count}} இணைப்புகள்",
+    "loaded": "ஏற்றப்பட்டது: {{summary}}"
   },
   "kind": {
     "mention": "குறிப்பு",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} பேக்லிங்க் மேலும்",
-    "count_other": "{{count}} பேக்லிங்க்குகள் மேலும்"
+    "count_other": "{{count}} பேக்லிங்க்குகள் மேலும்",
+    "load": "மேலும் பின்இணைப்புகளை ஏற்று",
+    "loading": "பின்இணைப்புகளை ஏற்றுகிறது...",
+    "search": "பின்இணைப்பு தேடல்"
   }
 }

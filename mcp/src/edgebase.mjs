@@ -37,6 +37,22 @@ const READ_ACTIONS_BY_FUNCTION = new Map([
     "exportWorkspaceMarkdown",
   ])],
   ["/functions/notion-import", new Set(["listConnections", "list", "get"])],
+  ["/functions/v1/blocks/meeting_notes/query", null],
+]);
+
+// Only these exact backend actions prove that `dryRun: true` returns before
+// product writes. A caller-supplied flag is never sufficient audit authority.
+const DRY_RUN_ACTIONS_BY_FUNCTION = new Map([
+  ["/functions/page-mutation", new Set(["update", "move"])],
+  ["/functions/database-row-mutation", new Set([
+    "update",
+    "move",
+    "moveToDatabase",
+    "movePageToDatabase",
+    "moveToPage",
+    "moveToWorkspace",
+  ])],
+  ["/functions/file-mutation", new Set(["cleanupExpired"])],
 ]);
 
 // Cached auth/session state. `tokenPromise`/`workspacePromise` single-flight
@@ -326,8 +342,9 @@ const WORKSPACE_ADMIN_ACTIONS = new Set([
   "removeMember",
 ]);
 
-function scopesForOperation(path, body) {
+export function scopesForOperation(path, body) {
   const action = actionOf(body);
+  if (/^\/functions\/v1\/users(?:\/|$)/.test(path)) return ["workspace"];
   if (path === "/functions/workspace-mutation") {
     if (action === "recordMcpClientAction" || action === "list") return [];
     if (ORGANIZATION_ADMIN_ACTIONS.has(action)) return ["organization_admin"];
@@ -345,6 +362,7 @@ function scopesForOperation(path, body) {
     return ["pages"];
   }
   if (path === "/functions/comment-mutation") return ["comments"];
+  if (path === "/functions/v1/file_uploads") return ["files"];
   if (path === "/functions/database-mutation" || path === "/functions/database-row-mutation") return ["databases"];
   if (path === "/functions/share-mutation") return ["sharing"];
   if (path === "/functions/file-mutation") return ["files"];
@@ -373,6 +391,33 @@ function assertAllowedScopes(path, body, policy) {
     throw new Error(
       `MCP access policy denied scope ${denied.join(", ")} for this operation. ` +
         `This MCP client is narrowed by scoped consent.`,
+    );
+  }
+}
+
+function notionMoveScopeFamily(page) {
+  return page?.kind === "database" || page?.parentType === "database" ? "databases" : "pages";
+}
+
+function notionMoveScopeAllowed(family, scopes) {
+  return scopeAllowed(family, scopes)
+    || scopes.has(`${family}:write`)
+    || scopes.has(`${family}_write`);
+}
+
+function assertNotionMovePolicyScopes(page, parent, parentType, policy = configuredMcpPolicy()) {
+  if (!policy.scopes.size) return;
+  const scopes = new Set(Array.from(policy.scopes).map(normalizeScope).filter(Boolean));
+  if (scopes.has("*") || scopes.has("all")) return;
+  const required = new Set([notionMoveScopeFamily(page)]);
+  if (page?.parentType === "database" && parentType !== "database") required.add("pages");
+  if (page?.parentType !== "database" && parentType === "database") required.add("databases");
+  if (parent) required.add(notionMoveScopeFamily(parent));
+  const denied = Array.from(required).filter((family) => !notionMoveScopeAllowed(family, scopes));
+  if (denied.length) {
+    throw new Error(
+      `MCP access policy denied scope ${denied.join(", ")} for this move. ` +
+        "Moves require every source, resulting, and destination content family.",
     );
   }
 }
@@ -411,7 +456,7 @@ function collectStringIds(value, keys, out = new Set()) {
 }
 
 export function collectPolicyIds(path, body) {
-  const workspaceIds = collectStringIds(body, ["workspaceId", "targetWorkspaceId"]);
+  const workspaceIds = collectStringIds(body, ["workspaceId", "targetWorkspaceId", "workspace_id"]);
   const pageIds = collectStringIds(body, ["pageId", "parentPageId"]);
   const databaseIds = collectStringIds(body, ["databaseId"]);
 
@@ -476,8 +521,12 @@ export function collectPolicyIds(path, body) {
   }
   if (path === "/functions/database-row-mutation") {
     if (typeof body?.databaseId === "string") databaseIds.add(body.databaseId);
-    if (typeof body?.id === "string") pageIds.add(body.id);
-    if (typeof body?.rowId === "string") pageIds.add(body.rowId);
+    if (typeof body?.sourceDatabaseId === "string") databaseIds.add(body.sourceDatabaseId);
+    if (typeof body?.targetDatabaseId === "string") databaseIds.add(body.targetDatabaseId);
+    if (typeof body?.dataSourceId === "string") databaseIds.add(body.dataSourceId);
+    if (typeof body?.targetPageId === "string") pageIds.add(body.targetPageId);
+    if (typeof body?.id === "string" && typeof body?.sourceDatabaseId !== "string") pageIds.add(body.id);
+    if (typeof body?.rowId === "string" && typeof body?.sourceDatabaseId !== "string") pageIds.add(body.rowId);
     // A move's target sibling is read (its position — and its title in the
     // response), so it must sit inside the allowlist like the moved row.
     if (typeof body?.targetId === "string") pageIds.add(body.targetId);
@@ -563,12 +612,25 @@ function filterBlocksByMcpPolicy(blocks, policy = configuredMcpPolicy()) {
   );
 }
 
+function searchRequiredAncestorIds(options, policy = configuredMcpPolicy()) {
+  const configuredIds = Array.from(new Set([
+    ...policy.allowedPageIds,
+    ...policy.allowedDatabaseIds,
+  ]));
+  const requestedIds = Array.isArray(options?.requiredAncestorIds)
+    ? Array.from(new Set(options.requiredAncestorIds.map(String).map((id) => id.trim()).filter(Boolean)))
+    : [];
+  if (requestedIds.length && configuredIds.length) {
+    assertAllowedPageResourceIds(new Set(requestedIds), policy);
+  }
+  return requestedIds.length ? requestedIds : configuredIds;
+}
+
 /**
  * @param {string} path
  * @param {{ method?: string, body?: any }} [options]
  */
-function assertMcpAccessPolicy(path, { method = "GET", body } = {}) {
-  const policy = configuredMcpPolicy();
+function assertMcpAccessPolicy(path, { method = "GET", body } = {}, policy = configuredMcpPolicy()) {
   if (policy.readOnly && !isReadOnlyAllowedOperation(path, method, body)) {
     throw new Error("MCP access policy is read-only for this client.");
   }
@@ -589,8 +651,9 @@ function assertMcpAccessPolicy(path, { method = "GET", body } = {}) {
   }
 }
 
-function shouldRecordMcpAudit(path, method, body) {
+export function shouldRecordMcpAudit(path, method, body) {
   if (path === "/functions/workspace-mutation" && actionOf(body) === "recordMcpClientAction") return false;
+  if (body?.dryRun === true && DRY_RUN_ACTIONS_BY_FUNCTION.get(path)?.has(actionOf(body))) return false;
   return method !== "GET" && !isReadOnlyAllowedOperation(path, method, body);
 }
 
@@ -824,14 +887,26 @@ function invalidateToken(staleToken) {
 
 /**
  * @param {string} path
- * @param {{ method?: string, body?: any, query?: Record<string, any>, audit?: boolean }} [options]
+ * @param {{ method?: string, body?: any, query?: Record<string, any>, audit?: boolean, policyInput?: Record<string, any> }} [options]
  */
-async function api(path, { method = "GET", body, query, audit = true } = {}) {
+async function api(path, { method = "GET", body, query, audit = true, policyInput } = {}) {
+  const policy = configuredMcpPolicy();
+  if (envToken() && policy.allowedWorkspaceIds.size === 0) {
+    throw new Error(
+      "A configured MCP access token requires a non-empty workspace allowlist. " +
+        "Set HANJI_MCP_ALLOWED_WORKSPACE_IDS or allowedWorkspaceIds in HANJI_MCP_POLICY_FILE.",
+    );
+  }
+  const policyBody = policyInput === undefined
+    ? body
+    : {
+        ...(body && typeof body === "object" && !Array.isArray(body) ? body : {}),
+        ...policyInput,
+      };
+  assertMcpAccessPolicy(path, { method, body: policyBody }, policy);
   const bearer = await ensureToken();
-  assertMcpAccessPolicy(path, { method, body });
   let url = `${BASE}/api${path}`;
   if (query) url += "?" + new URLSearchParams(query).toString();
-  const policy = configuredMcpPolicy();
   const client = mcpClientMetadata(policy);
   // Build the request from the token value ensureToken() RETURNED (not the
   // module variable read later) so a concurrent re-auth cannot swap identities
@@ -885,6 +960,8 @@ async function api(path, { method = "GET", body, query, audit = true } = {}) {
   if (r.status === 204) return null;
   const result = await r.json();
   if (audit && shouldRecordMcpAudit(path, method, body)) {
+    // Keep this target-specific write isolated per completed product request:
+    // an audit failure must never replay or hide the successful mutation.
     await recordMcpClientAction(path, method, body, result, client).catch((error) => {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`WARN MCP client audit failed: ${message}`);
@@ -945,6 +1022,68 @@ async function ensureWorkspace() {
   return workspacePromise;
 }
 
+async function pageQueryWorkspaceId(workspaceId) {
+  if (typeof workspaceId === "string" && workspaceId.trim()) return workspaceId.trim();
+  const workspace = await ensureWorkspace();
+  if (typeof workspace?.id !== "string" || !workspace.id.trim()) {
+    throw new Error("A workspace id is required for page query routing.");
+  }
+  return workspace.id.trim();
+}
+
+const MCP_SEARCH_DRAIN_MAX_WINDOWS = 10;
+
+async function drainWorkspaceSearch(client, query, opts, itemsKey, pageMethodName) {
+  const {
+    sourceCursor: initialSourceCursor,
+    limit: rawLimit,
+    ...baseOptions
+  } = opts ?? {};
+  const limit = rawLimit === undefined ? 20 : Number(rawLimit);
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+    throw new Error('MCP workspace search limit must be an integer between 1 and 100.');
+  }
+  let sourceCursor = typeof initialSourceCursor === 'string' && initialSourceCursor
+    ? initialSourceCursor
+    : null;
+  const seen = new Set(sourceCursor ? [sourceCursor] : []);
+  const accepted = [];
+
+  for (let window = 0; window < MCP_SEARCH_DRAIN_MAX_WINDOWS; window += 1) {
+    const response = await client[pageMethodName](query, {
+      ...baseOptions,
+      limit: limit - accepted.length,
+      ...(sourceCursor ? { sourceCursor } : {}),
+    });
+    const items = response?.[itemsKey];
+    if (!Array.isArray(items) || items.length > limit - accepted.length) {
+      throw new Error('MCP workspace search source response was malformed.');
+    }
+    accepted.push(...items);
+    if (accepted.length >= limit) return accepted;
+    if (typeof response?.hasMore !== 'boolean') {
+      throw new Error('MCP workspace search source pagination was malformed.');
+    }
+    if (!response.hasMore) return accepted;
+    const nextCursor = response.nextCursor;
+    if (
+      typeof nextCursor !== 'string'
+      || !nextCursor
+      || nextCursor.length > 16 * 1024
+      || nextCursor === sourceCursor
+      || seen.has(nextCursor)
+    ) {
+      throw new Error('MCP workspace search source pagination did not advance.');
+    }
+    seen.add(nextCursor);
+    sourceCursor = nextCursor;
+  }
+
+  throw new Error(
+    'MCP workspace search exceeded its bounded continuation budget before completion.',
+  );
+}
+
 function notionImportOptions(input) {
   return typeof input === "string" ? { jobId: input } : { ...(input ?? {}) };
 }
@@ -973,10 +1112,10 @@ export const eb = {
 
   async listTable(table, query = {}) {
     if (table === "pages") {
-      if (!query.workspaceId) await ensureWorkspace();
+      const workspaceId = await pageQueryWorkspaceId(query.workspaceId);
       const res = await api("/functions/page-query", {
         method: "POST",
-        body: { action: "pages", ...query },
+        body: { action: "pages", ...query, workspaceId },
       });
       return filterPagesByMcpPolicy(res?.pages ?? []);
     }
@@ -1110,24 +1249,21 @@ export const eb = {
   },
   async search(table, q) {
     if (table === "pages") {
-      await ensureWorkspace();
-      const res = await api("/functions/page-query", {
-        method: "POST",
-        body: { action: "searchPages", query: q },
-      });
-      return filterPagesByMcpPolicy(res?.pages ?? []);
+      const workspaceId = await pageQueryWorkspaceId();
+      return this.searchPages(q, { workspaceId });
     }
     if (table === "blocks") {
-      const res = await api("/functions/page-query", {
-        method: "POST",
-        body: { action: "searchBlocks", query: q },
-      });
-      return filterBlocksByMcpPolicy(res?.blocks ?? []);
+      const workspaceId = await pageQueryWorkspaceId();
+      return this.searchBlocks(q, { workspaceId });
     }
     return rawTableUnsupported("search", table);
   },
 
   // ── domain helpers ──────────────────────────────────────────────
+  async currentUser() {
+    const result = await api("/auth/me", { audit: false });
+    return result?.user ?? result;
+  },
   async workspace() {
     return ensureWorkspace();
   },
@@ -1263,6 +1399,34 @@ export const eb = {
       body: { action: "members", workspaceId: workspace.id },
     });
   },
+  /**
+   * @param {{
+   *   workspaceId?: string,
+   *   userId?: string,
+   *   query?: string,
+   *   startCursor?: string,
+   *   pageSize?: number,
+   * }} [options]
+   */
+  async notionUsers(options = {}) {
+    const { workspaceId, userId, query, startCursor, pageSize } = options;
+    const selectedWorkspaceId = typeof workspaceId === "string" ? workspaceId.trim() : "";
+    if (!selectedWorkspaceId) throw new Error("A workspace id is required for Notion user routing.");
+    const selectedUserId = typeof userId === "string" ? userId.trim() : "";
+    const path = selectedUserId
+      ? `/functions/v1/users/${encodeURIComponent(selectedUserId === "self" ? "me" : selectedUserId)}`
+      : "/functions/v1/users";
+    return api(path, {
+      method: "GET",
+      query: {
+        workspace_id: selectedWorkspaceId,
+        ...(typeof query === "string" && query.trim() ? { query: query.trim() } : {}),
+        ...(typeof startCursor === "string" && startCursor.trim() ? { start_cursor: startCursor.trim() } : {}),
+        ...(Number.isFinite(pageSize) ? { page_size: String(Math.floor(pageSize)) } : {}),
+      },
+      policyInput: { workspaceId: selectedWorkspaceId },
+    });
+  },
   async addWorkspaceMember(opts = {}) {
     const workspace = opts.workspaceId ? { id: opts.workspaceId } : await ensureWorkspace();
     return api("/functions/workspace-mutation", {
@@ -1323,6 +1487,68 @@ export const eb = {
       method: "POST",
       body: { action: "move", id: rowId, targetId, side },
     });
+  },
+  async moveNotionPage(page, opts = {}) {
+    if (!page?.id || !page?.workspaceId) throw new Error("Move source page is required.");
+    const parentType = opts.parentType ?? (opts.parentId ? "page" : "workspace");
+    const parentId = parentType === "workspace" ? null : opts.parentId;
+    if (parentType !== "workspace" && parentType !== "page" && parentType !== "database") {
+      throw new Error("Move parentType must be workspace, page, or database.");
+    }
+    if (parentType === "workspace" && parentId) throw new Error("Workspace moves must omit parentId.");
+    if (parentType !== "workspace" && !parentId) throw new Error(`${parentType} moves require parentId.`);
+    if (typeof opts.position !== "number" || !Number.isFinite(opts.position)) {
+      throw new Error("Move position must be a finite number.");
+    }
+    assertNotionMovePolicyScopes(page, opts.parent ?? null, parentType);
+
+    const common = {
+      id: page.id,
+      workspaceId: page.workspaceId,
+      position: opts.position,
+      dryRun: opts.dryRun === true,
+    };
+    let result;
+    if (page.parentType === "database" && page.parentId) {
+      const source = { ...common, sourceDatabaseId: page.parentId };
+      if (parentType === "database") {
+        result = await api("/functions/database-row-mutation", {
+          method: "POST",
+          body: page.parentId === parentId
+            ? { ...source, action: "update", patch: { position: opts.position } }
+            : { ...source, action: "moveToDatabase", targetDatabaseId: parentId },
+        });
+      } else {
+        result = await api("/functions/database-row-mutation", {
+          method: "POST",
+          body: parentType === "workspace"
+            ? { ...source, action: "moveToWorkspace", targetParentType: "workspace" }
+            : { ...source, action: "moveToPage", targetParentType: "page", targetPageId: parentId },
+        });
+      }
+    } else if (parentType === "database") {
+      if (page.kind === "database") throw new Error("Only regular pages can be moved into a data source.");
+      result = await api("/functions/database-row-mutation", {
+        method: "POST",
+        body: { ...common, action: "movePageToDatabase", targetDatabaseId: parentId },
+      });
+    } else {
+      result = await api("/functions/page-mutation", {
+        method: "POST",
+        body: {
+          ...common,
+          action: "move",
+          patch: { parentId, parentType, position: opts.position },
+        },
+      });
+    }
+    return {
+      page: result?.page ?? result?.row ?? page,
+      parentId,
+      parentType,
+      position: opts.position,
+      dryRun: opts.dryRun === true,
+    };
   },
   async trashDatabaseRow(rowId) {
     return api("/functions/database-row-mutation", {
@@ -1398,37 +1624,121 @@ export const eb = {
     });
   },
   async pageProjection(opts = {}) {
-    if (!opts.workspaceId) await ensureWorkspace();
+    const workspaceId = await pageQueryWorkspaceId(opts.workspaceId);
     const res = await api("/functions/page-query", {
       method: "POST",
-      body: { action: "pages", ...opts },
+      body: { action: "pages", ...opts, workspaceId },
     });
     return filterPagesByMcpPolicy(res?.pages ?? []);
   },
   async searchPages(query, opts = {}) {
-    if (!opts.workspaceId) await ensureWorkspace();
+    return drainWorkspaceSearch(this, query, opts, 'pages', 'searchPagesPage');
+  },
+  async searchPagesPage(query, opts = {}) {
+    const workspaceId = await pageQueryWorkspaceId(opts.workspaceId);
+    const requiredAncestorIds = searchRequiredAncestorIds(opts);
     const res = await api("/functions/page-query", {
       method: "POST",
-      body: { action: "searchPages", query, ...opts },
+      body: {
+        action: "searchPages",
+        query,
+        ...opts,
+        workspaceId,
+        ...(requiredAncestorIds.length ? { requiredAncestorIds } : {}),
+        includePaginationMeta: true,
+      },
     });
-    return filterPagesByMcpPolicy(res?.pages ?? []);
+    const rawPages = Array.isArray(res?.pages) ? res.pages : [];
+    const accepted = requiredAncestorIds.length
+      ? rawPages
+      : rawPages.filter((page) => pageMatchesMcpPolicy(page));
+    return {
+      ...res,
+      pages: accepted,
+    };
   },
   async searchBlocks(query, opts = {}) {
-    if (!opts.workspaceId) await ensureWorkspace();
+    return drainWorkspaceSearch(this, query, opts, 'blocks', 'searchBlocksPage');
+  },
+  async searchBlocksPage(query, opts = {}) {
+    const workspaceId = await pageQueryWorkspaceId(opts.workspaceId);
+    const requiredAncestorIds = searchRequiredAncestorIds(opts);
     const res = await api("/functions/page-query", {
       method: "POST",
-      body: { action: "searchBlocks", query, ...opts },
+      body: {
+        action: "searchBlocks",
+        query,
+        ...opts,
+        workspaceId,
+        ...(requiredAncestorIds.length ? { requiredAncestorIds } : {}),
+        includePaginationMeta: true,
+        dedupePages: true,
+        excludeMetadataMatches: true,
+        includePages: true,
+      },
     });
-    return filterBlocksByMcpPolicy(res?.blocks ?? []);
+    const rawBlocks = Array.isArray(res?.blocks) ? res.blocks : [];
+    const accepted = requiredAncestorIds.length
+      ? rawBlocks
+      : rawBlocks.filter((block) => filterBlocksByMcpPolicy([block]).length === 1);
+    const acceptedPageIds = new Set(accepted.map((block) => block?.pageId).filter(Boolean));
+    const sourcePages = Array.isArray(res?.pages) ? res.pages : [];
+    const pages = (requiredAncestorIds.length ? sourcePages : filterPagesByMcpPolicy(sourcePages))
+      .filter((page) => acceptedPageIds.has(page.id));
+    return {
+      ...res,
+      blocks: accepted,
+      pages,
+    };
+  },
+  async notionMeetingNotes(input = {}) {
+    const policy = configuredMcpPolicy();
+    if (policy.scopes.size) {
+      const scopes = new Set(Array.from(policy.scopes).map(normalizeScope).filter(Boolean));
+      if (
+        !scopes.has("*") &&
+        !scopes.has("all") &&
+        !scopeAllowed("pages", scopes) &&
+        !scopeAllowed("databases", scopes)
+      ) {
+        throw new Error("MCP access policy denied pages/databases scope for meeting notes.");
+      }
+    }
+    return api("/functions/v1/blocks/meeting_notes/query", {
+      method: "POST",
+      body: {
+        ...input,
+        allowed_page_ids: Array.from(policy.allowedPageIds),
+        allowed_database_ids: Array.from(policy.allowedDatabaseIds),
+      },
+    });
   },
   async databaseRows(databaseId, opts = {}) {
+    const res = await this.databaseRowsPage(databaseId, opts);
+    return res.rows;
+  },
+  async databaseRowsPage(databaseId, opts = {}) {
     const res = await api("/functions/page-query", {
       method: "POST",
-      body: { action: "databaseRows", databaseId, ...opts },
+      body: {
+        action: "databaseRows",
+        databaseId,
+        ...opts,
+        includeSearchRevision: true,
+      },
     });
-    const rows = res?.rows ?? [];
-    if (!res?.computed) return rows;
-    return rows.map((row) => ({ ...row, __computed: res.computed[row.id] ?? {} }));
+    const rawRows = Array.isArray(res?.rows) ? res.rows : [];
+    const rows = res?.computed
+      ? rawRows.map((row) => ({ ...row, __computed: res.computed[row.id] ?? {} }))
+      : rawRows;
+    const sourceOffset = Number.isSafeInteger(res?.offset)
+      ? res.offset
+      : Number.isSafeInteger(opts.offset) ? opts.offset : 0;
+    return {
+      ...res,
+      rows,
+      rowOffsets: rows.map((_row, index) => sourceOffset + index),
+    };
   },
   async listFiles(opts = {}) {
     const res = await api("/functions/file-mutation", {
@@ -1441,6 +1751,12 @@ export const eb = {
     return api("/functions/file-mutation", {
       method: "POST",
       body: { action: "prepareUpload", ...opts },
+    });
+  },
+  async createNotionFileUpload(opts = {}) {
+    return api("/functions/v1/file_uploads", {
+      method: "POST",
+      body: opts,
     });
   },
   async completeFileUpload(opts = {}) {
@@ -1769,7 +2085,7 @@ function markdownInlineCode(text) {
   return `${fence}${padded}${fence}`;
 }
 
-function parseInlineMarkdown(text) {
+export function parseInlineMarkdown(text) {
   if (!text) return [];
   const out = [];
   let i = 0;

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Kebergantungan:",
     "hint": "tambah sifat hubungan",
-    "relationPropertyAriaLabel": "Sifat hubungan kebergantungan"
+    "relationPropertyAriaLabel": "Sifat hubungan kebergantungan",
+    "makeDependOn": "Jadikan {{title}} bergantung pada {{predecessor}}",
+    "startFrom": "Mulakan kebergantungan dari {{title}}"
   },
   "toolbar": {
     "today": "Hari ini",

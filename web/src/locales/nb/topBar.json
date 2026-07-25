@@ -36,7 +36,7 @@
   "enableWebSharing": "Slå på nettdeling for {{pageTitle}}",
   "expired": "Utløpt",
   "expiresAt": "Utløper {{formatted}}",
-  "exportAsHanji": "Eksporter som Hanji-fil",
+  "exportAsHanji": "Eksporter Hanji JSON (uten filer)",
   "exportAsMarkdown": "Eksporter som Markdown",
   "exporting": "Eksporterer…",
   "fontDefault": "Standard",
@@ -138,7 +138,9 @@
     "updatedWebLinkExpiration": "Oppdaterte utløp for webkobling",
     "verificationRemoved": "Verifisering fjernet",
     "webSharingDisabled": "Webdeling deaktivert",
-    "webSharingEnabled": "Webdeling aktivert"
+    "webSharingEnabled": "Webdeling aktivert",
+    "couldntExportHanjiArchive": "Kunne ikke eksportere Hanji-arkiv.",
+    "exportedHanjiArchive": "Eksporterte et Hanji-arkiv med filer."
   },
   "todayAt": "I dag kl. {{time}}",
   "undo": "Angre",
@@ -153,5 +155,12 @@
   "workspaceCount_one": "{{count}} arbeidsområde",
   "workspaceCount_other": "{{count}} arbeidsområder",
   "yesterdayAt": "I går kl. {{time}}",
-  "you": "Du"
+  "you": "Du",
+  "exportAsHanjiArchive": "Eksporter Hanji-arkiv (med filer)",
+  "turnIntoWiki": "Gjør om til wiki",
+  "undoWiki": "Angre wiki",
+  "wikiCreated": "Siden ble gjort om til en wiki",
+  "wikiPageSettings": "Wiki-sideinnstillinger",
+  "wikiUndone": "Wiki fjernet; sideinnholdet ble bevart",
+  "wikiUpdateFailed": "Kunne ikke oppdatere wikien"
 }

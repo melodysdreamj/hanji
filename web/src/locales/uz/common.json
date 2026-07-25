@@ -8,7 +8,8 @@
     "delete": "O‘chirish",
     "clearAll": "Hammasini tozalash",
     "done": "Tayyor",
-    "add": "Qo‘shish"
+    "add": "Qo‘shish",
+    "reportIssue": "Xatolikni xabar qilish"
   },
   "labels": {
     "untitled": "Nomsiz"

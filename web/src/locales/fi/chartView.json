@@ -4,7 +4,22 @@
     "count": "Määrä",
     "max": "Maksimi",
     "min": "Minimi",
-    "sum": "Summa"
+    "sum": "Summa",
+    "checked": "Valittu",
+    "count_values": "Arvojen määrä",
+    "date_range": "Päivämääräväli",
+    "earliest_date": "Aikaisin päivämäärä",
+    "empty": "Tyhjien määrä",
+    "latest_date": "Viimeisin päivämäärä",
+    "median": "Mediaani",
+    "not_empty": "Ei-tyhjien määrä",
+    "percent_checked": "Valittujen prosenttiosuus",
+    "percent_empty": "Tyhjien prosenttiosuus",
+    "percent_not_empty": "Ei-tyhjien prosenttiosuus",
+    "percent_unchecked": "Valitsemattomien prosenttiosuus",
+    "range": "Vaihteluväli",
+    "unchecked": "Valitsematon",
+    "unique": "Yksilöllisten arvojen määrä"
   },
   "chartAria": "{{name}} kaavio",
   "chartType": "Kaavion tyyppi",
@@ -27,5 +42,9 @@
   "untitledProperty": "Nimeämätön",
   "valueProperty": "Arvo-ominaisuus",
   "xAxis": "X-akseli",
-  "yAxis": "Y-akseli"
+  "yAxis": "Y-akseli",
+  "dateRangeDays": "{{count}} päivää",
+  "missingProperty": "tallennettu ominaisuus",
+  "unsupportedAggregateDesc": "{{aggregate}} ei voida laskea ominaisuudesta {{property}}. Valitse yhteensopiva ominaisuus tai laskutoimitus.",
+  "unsupportedAggregateTitle": "Tämä laskutoimitus ei ole käytettävissä"
 }

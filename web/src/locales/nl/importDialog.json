@@ -247,7 +247,9 @@
     "runningHint": "Houd dit browsertabblad geopend tijdens het importeren.",
     "noJobHint": "Start de ontdekking vanuit de stap 'Bereik'.",
     "applyLocksHint": "Toepassen schrijft de gevonden items naar deze werkruimte.",
-    "browserRunnerWarning": "Deze import wordt uitgevoerd in dit browsertabblad. Houd het tabblad open totdat het is voltooid. Het sluiten of herladen van het tabblad onderbreekt de verwerking; het opnieuw openen van Hanji hervat vanaf de opgeslagen voortgang."
+    "browserRunnerWarning": "Deze import wordt uitgevoerd in dit browsertabblad. Houd het tabblad open totdat het is voltooid. Het sluiten of herladen van het tabblad onderbreekt de verwerking; het opnieuw openen van Hanji hervat vanaf de opgeslagen voortgang.",
+    "serverRunnerStatus": "Hanji verwerkt deze import op de server. Het sluiten of herladen van dit tabblad pauzeert het niet.",
+    "serverRunningHint": "De import gaat op de achtergrond verder. Je kunt dit tabblad sluiten."
   },
   "installer": {
     "elapsed": "Verstreken",
@@ -281,9 +283,9 @@
     "title": "Importeren uit Hanji",
     "fromFile": "Vanuit een bestand",
     "fromLive": "Vanuit een live-instantie",
-    "choose": "Kies een .hanji.json-bestand",
+    "choose": "Kies een .hanji.json- of .hanji.zip-bestand",
     "chooseButton": "Kies bestand",
-    "fileHint": "Exporteer een pagina, database of werkruimte uit een andere Hanji en importeer deze hier. Relaties, rollups, formules, weergaven en sjablonen blijven behouden. Bijlagen worden niet meegenomen.",
+    "fileHint": "Gebruik .hanji.json voor alleen de structuur (bestanden uitgesloten) of .hanji.zip voor een verliesvrije overdracht (bestanden inbegrepen). Relaties, rollups, formules, weergaven en sjablonen blijven behouden.",
     "selected": "Geselecteerd: {{name}}",
     "importButton": "Importeren",
     "importing": "Importeren...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "optioneel",
     "fetch": "Export ophalen",
     "fetching": "Ophalen...",
-    "liveHint": "Haal een werkruimte rechtstreeks op uit een andere actieve Hanji (bijvoorbeeld een Docker dev-instantie). De remote instantie moet verzoeken van dit adres toestaan.",
+    "liveHint": "Haal een werkruimte rechtstreeks op van een andere actieve Hanji (bijvoorbeeld een Docker dev-instantie). Bestanden worden uitgesloten. De externe moet verzoeken van dit adres toestaan.",
     "review": "Klaar om te importeren: {{summary}}",
     "placeholderNote": "Sommige bijlagen zijn als placeholder achtergelaten.",
     "importedItems_one": "{{count}} item geïmporteerd uit het Hanji-bestand.",
@@ -302,9 +304,15 @@
     "cantRead": "Kon het Hanji-bestand niet lezen.",
     "cantImport": "Kon het Hanji-bestand niet importeren.",
     "needFile": "Selecteer eerst een Hanji-bestand.",
-    "needRemote": "Voer de remote Hanji-URL en werkruimte-id in."
+    "needRemote": "Voer de remote Hanji-URL en werkruimte-id in.",
+    "filesExcluded": "Bestanden uitgesloten.",
+    "filesIncluded": "Bestanden inbegrepen."
   },
   "connectWithNotion": "Verbinden met Notion",
   "oauthConfiguredHint": "Deze server heeft een Notion OAuth-integratie geconfigureerd. Token-instelling blijft beschikbaar voor zelfgehoste verbindingen.",
-  "cantStartOAuth": "Notion-verbinding kon niet worden gestart."
+  "cantStartOAuth": "Notion-verbinding kon niet worden gestart.",
+  "terminal": {
+    "cancelled": "De import is geannuleerd. Je kunt het veilig opnieuw starten wanneer je klaar bent.",
+    "failed": "De import is veilig gestopt voordat het kon worden voltooid. Controleer de verbinding en probeer het opnieuw. Technische details en identificatoren worden hier niet weergegeven."
+  }
 }

@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { searchOrganizationPeopleRemote } from "@/lib/edgebase";
+import { scheduleOrganizationPeopleTypeahead } from "@/lib/typeaheadSearch";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { pagePath, pagePathOrWorkspaceRoot } from "@/lib/pagePath";
 import {
@@ -24,6 +24,7 @@ import type { BlockType, OrganizationProfile, Page } from "@/lib/types";
 import { personLabel } from "../database/people";
 import { CalendarIcon, Database, Plus } from "../icons";
 import { pageIconText } from "../PageIcon";
+import { VerificationBadge } from "../VerificationBadge";
 import type { BlockDef } from "./blocks";
 import { blockItemLabels, blockItemText } from "./blockItemLabels";
 import { localDateForOffset, localIsoDate } from "./mentionCalendarModel";
@@ -77,6 +78,7 @@ export type MentionItem =
       description: string;
       icon: string;
       pageId: string;
+      page: Page;
     }
   | {
       kind: "create_page";
@@ -92,27 +94,48 @@ function belowAnchorMenuPosition(
   width: number,
   height: number,
   gap = 8
-) {
+): Pick<CSSProperties, "bottom" | "left" | "maxHeight" | "top"> {
   const availableWidth = Math.max(0, window.innerWidth - MENU_VIEWPORT_MARGIN * 2);
   const menuWidth = Math.min(width, availableWidth);
+  const viewportHeight = Math.max(0, window.innerHeight - MENU_VIEWPORT_MARGIN * 2);
+  const desiredHeight = Math.min(height, viewportHeight);
   const belowTop = anchor.bottom + gap;
+  const aboveBottom = anchor.top - gap;
   const viewportBottom = window.innerHeight - MENU_VIEWPORT_MARGIN;
   const availableBelow = Math.max(0, viewportBottom - belowTop);
+  const availableAbove = Math.max(0, aboveBottom - MENU_VIEWPORT_MARGIN);
+  const placeAbove = availableBelow < desiredHeight && availableAbove > availableBelow;
+  const availableOnSide = placeAbove ? availableAbove : availableBelow;
+  const minimumUsableHeight = Math.min(96, desiredHeight);
   const maxHeight = Math.max(
-    96,
-    Math.min(height, availableBelow || height, Math.max(0, window.innerHeight - MENU_VIEWPORT_MARGIN * 2))
+    minimumUsableHeight,
+    Math.min(desiredHeight, availableOnSide)
+  );
+  const maximumStart = Math.max(MENU_VIEWPORT_MARGIN, viewportBottom - maxHeight);
+  const left = Math.max(
+    MENU_VIEWPORT_MARGIN,
+    Math.min(anchor.left, window.innerWidth - menuWidth - MENU_VIEWPORT_MARGIN)
   );
 
-  return {
-    left: Math.max(
+  if (placeAbove) {
+    const desiredBottom = window.innerHeight - aboveBottom;
+    const maximumBottom = Math.max(
       MENU_VIEWPORT_MARGIN,
-      Math.min(anchor.left, window.innerWidth - menuWidth - MENU_VIEWPORT_MARGIN)
-    ),
+      window.innerHeight - MENU_VIEWPORT_MARGIN - maxHeight
+    );
+    return {
+      bottom: Math.max(MENU_VIEWPORT_MARGIN, Math.min(desiredBottom, maximumBottom)),
+      left,
+      maxHeight,
+      top: "auto",
+    };
+  }
+
+  return {
+    bottom: "auto",
+    left,
     maxHeight,
-    top:
-      availableBelow >= 96
-        ? belowTop
-        : Math.max(MENU_VIEWPORT_MARGIN, Math.min(belowTop, viewportBottom - maxHeight)),
+    top: Math.max(MENU_VIEWPORT_MARGIN, Math.min(belowTop, maximumStart)),
   };
 }
 
@@ -257,24 +280,14 @@ export function MentionMenu({
       setSearchedPeople({ key: "", people: [] });
       return;
     }
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      searchOrganizationPeopleRemote({
+    return scheduleOrganizationPeopleTypeahead({
         organizationId: organization.id,
         query: q,
         limit: 8,
-      })
-        .then((result) => {
-          if (!cancelled) setSearchedPeople({ key: q, people: result.people ?? [] });
-        })
-        .catch(() => {
-          if (!cancelled) setSearchedPeople({ key: q, people: [] });
-        });
-    }, 120);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      }, {
+        onResult: (result) => setSearchedPeople({ key: q, people: result.people ?? [] }),
+        onError: () => setSearchedPeople({ key: q, people: [] }),
+      });
   }, [mode, organization?.id, q]);
 
   const results = useMemo(() => {
@@ -388,6 +401,7 @@ export function MentionMenu({
                   description,
                   icon: pageIcon(page),
                   pageId: page.id,
+                  page,
                 },
                 index,
                 rank: mentionSearchRank(label, description, q),
@@ -577,7 +591,10 @@ export function MentionMenu({
                     )}
                   </span>
                   <span className={styles.slashText}>
-                    <span className={styles.slashName}>{item.label}</span>
+                    <span className={styles.slashName}>
+                      {item.label}
+                      {item.kind === "page" && <VerificationBadge page={item.page} compact />}
+                    </span>
                     <span className={styles.slashDesc}>{item.description}</span>
                   </span>
                 </button>

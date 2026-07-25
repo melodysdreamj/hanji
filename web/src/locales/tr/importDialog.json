@@ -247,7 +247,9 @@
     "runningHint": "İçe aktarma devam ederken bu tarayıcı sekmesini açık tutun.",
     "noJobHint": "Keşfi önce Kapsam adımından başlatın.",
     "applyLocksHint": "Uygulama, bulunan öğeleri bu çalışma alanına yazar.",
-    "browserRunnerWarning": "Bu içe aktarma işlemi bu tarayıcı sekmesinde çalışıyor. Tamamlanana kadar sekmeyi açık tutun. Sekmeyi kapatmak veya yenilemek işlemi duraklatır; Hanji'yi tekrar açtığınızda kaydedilen noktadan devam eder."
+    "browserRunnerWarning": "Bu içe aktarma işlemi bu tarayıcı sekmesinde çalışıyor. Tamamlanana kadar sekmeyi açık tutun. Sekmeyi kapatmak veya yenilemek işlemi duraklatır; Hanji'yi tekrar açtığınızda kaydedilen noktadan devam eder.",
+    "serverRunnerStatus": "Hanji bu içe aktarmayı sunucuda işliyor. Bu sekmeyi kapatmak veya yeniden yüklemek işlemi duraklatmaz.",
+    "serverRunningHint": "İçe aktarma arka planda devam ediyor. Bu sekmeyi kapatabilirsiniz."
   },
   "installer": {
     "elapsed": "Geçen süre",
@@ -281,9 +283,9 @@
     "title": "Hanji'den içe aktar",
     "fromFile": "Dosyadan",
     "fromLive": "Canlı bir örnekten",
-    "choose": ".hanji.json dosyası seçin",
+    "choose": ".hanji.json veya .hanji.zip dosyası seçin",
     "chooseButton": "Dosya seç",
-    "fileHint": "Başka bir Hanji'den bir sayfa, veritabanı veya çalışma alanı dışa aktarın, ardından buraya aktarın. İlişkiler, rolluplar, formüller, görünümler ve şablonlar korunur. Ekler dahil değildir.",
+    "fileHint": "Yalnızca yapı için .hanji.json (dosyalar hariç) veya kayıpsız aktarım için .hanji.zip (dosyalar dahil) kullanın. İlişkiler, rolluplar, formüller, görünümler ve şablonlar korunur.",
     "selected": "Seçildi: {{name}}",
     "importButton": "İçe Aktar",
     "importing": "İçe aktarılıyor...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "isteğe bağlı",
     "fetch": "Dışa aktarmayı getir",
     "fetching": "Getiriliyor...",
-    "liveHint": "Çalışan başka bir Hanji'den (örneğin bir Docker dev örneği) doğrudan bir çalışma alanı çekin. Uzak kaynak, bu adresten gelen isteklere izin vermelidir.",
+    "liveHint": "Çalışan başka bir Hanji'den (örneğin bir Docker geliştirme örneği) doğrudan bir çalışma alanı çekin. Dosyalar hariçtir. Uzak sunucu, bu adresten gelen isteklere izin vermelidir.",
     "review": "İçe aktarılmaya hazır: {{summary}}",
     "placeholderNote": "Bazı ekler yer tutucu olarak bırakıldı.",
     "importedItems_one": "Hanji dosyasından {{count}} öğe içe aktarıldı.",
@@ -302,9 +304,15 @@
     "cantRead": "Hanji dosyası okunamadı.",
     "cantImport": "Hanji dosyası içe aktarılamadı.",
     "needFile": "Önce bir Hanji dosyası seçin.",
-    "needRemote": "Uzak Hanji URL'sini ve çalışma alanı kimliğini girin."
+    "needRemote": "Uzak Hanji URL'sini ve çalışma alanı kimliğini girin.",
+    "filesExcluded": "Dosyalar hariç.",
+    "filesIncluded": "Dosyalar dahil."
   },
   "cantStartOAuth": "Notion bağlantısı başlatılamadı.",
   "connectWithNotion": "Notion ile bağlan",
-  "oauthConfiguredHint": "Bu sunucuda bir Notion OAuth entegrasyonu yapılandırılmıştır. Kendi sunucunuzda barındırma bağlantıları için token kurulumu kullanılabilir."
+  "oauthConfiguredHint": "Bu sunucuda bir Notion OAuth entegrasyonu yapılandırılmıştır. Kendi sunucunuzda barındırma bağlantıları için token kurulumu kullanılabilir.",
+  "terminal": {
+    "cancelled": "İçe aktarma iptal edildi. Hazır olduğunuzda yeniden başlatabilirsiniz.",
+    "failed": "İçe aktarma tamamlanmadan güvenli bir şekilde durduruldu. Bağlantıyı kontrol edip tekrar deneyin. Teknik ayrıntılar ve tanımlayıcılar burada gizlidir."
+  }
 }

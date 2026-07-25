@@ -6,5 +6,6 @@
   "unreachable": "Hindi maabot ang server",
   "unreachablePending_one": "Hindi maabot ang server · {{count}} na pagbabago ang nakabinbin",
   "unreachablePending_other": "Hindi maabot ang server · {{count}} na pagbabago ang nakabinbin",
-  "retryHint": "I-click upang subukan muli ngayon"
+  "retryHint": "I-click upang subukan muli ngayon",
+  "confirmed": "Na-save sa server"
 }

@@ -88,5 +88,38 @@
     "hoursAgo": "آخرین ویرایش {{hours}} ساعت پیش",
     "daysAgo": "آخرین ویرایش {{days}} روز پیش",
     "on": "آخرین ویرایش {{date}}"
+  },
+  "align": {
+    "center": "وسط",
+    "choose": "انتخاب تراز تصویر",
+    "left": "چپ",
+    "right": "راست"
+  },
+  "altText": {
+    "help": "متن جایگزین به کاربران صفحه‌خوان کمک می‌کند تصویر را درک کنند.",
+    "label": "توضیحات",
+    "placeholder": "تصویر را توصیف کنید",
+    "remove": "حذف",
+    "save": "ذخیره",
+    "title": "متن جایگزین"
+  },
+  "imageLink": {
+    "invalid": "یک URL کامل با http:// یا https:// وارد کنید.",
+    "label": "با کلیک روی تصویر این URL باز شود",
+    "remove": "حذف",
+    "save": "ذخیره",
+    "title": "پیوند تصویر"
+  },
+  "media": {
+    "addImageLink": "افزودن پیوند",
+    "align": "تراز",
+    "altText": "متن جایگزین",
+    "copySourceLink": "کپی پیوند منبع",
+    "download": "دانلود",
+    "editImageLink": "ویرایش پیوند",
+    "fullScreen": "تمام صفحه",
+    "openLink": "باز کردن پیوند",
+    "replace": "جایگزینی",
+    "viewOriginal": "نمایش اصلی"
   }
 }

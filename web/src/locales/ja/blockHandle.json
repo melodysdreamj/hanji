@@ -88,5 +88,38 @@
     "hoursAgo": "最終編集 {{hours}}時間前",
     "daysAgo": "最終編集 {{days}}日前",
     "on": "最終編集 {{date}}"
+  },
+  "align": {
+    "center": "中央",
+    "choose": "画像の配置を選択",
+    "left": "左",
+    "right": "右"
+  },
+  "altText": {
+    "help": "代替テキストは、スクリーンリーダー利用者が画像を理解するのに役立ちます。",
+    "label": "説明",
+    "placeholder": "画像の説明を入力",
+    "remove": "削除",
+    "save": "保存",
+    "title": "代替テキスト"
+  },
+  "imageLink": {
+    "invalid": "http:// または https:// で始まる完全なURLを入力してください。",
+    "label": "画像をクリックしたときに開くURL",
+    "remove": "削除",
+    "save": "保存",
+    "title": "画像リンク"
+  },
+  "media": {
+    "addImageLink": "リンク追加",
+    "align": "配置",
+    "altText": "代替テキスト",
+    "copySourceLink": "ソースリンクをコピー",
+    "download": "ダウンロード",
+    "editImageLink": "リンク編集",
+    "fullScreen": "全画面",
+    "openLink": "リンクを開く",
+    "replace": "置き換え",
+    "viewOriginal": "オリジナルを表示"
   }
 }

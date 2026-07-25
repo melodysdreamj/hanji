@@ -247,7 +247,9 @@
     "runningHint": "Gardez cet onglet ouvert pendant l'importation.",
     "noJobHint": "Commencez d'abord par l'étape Portée.",
     "applyLocksHint": "L'application écrit les éléments découverts dans cet espace de travail.",
-    "browserRunnerWarning": "L'importation s'exécute dans cet onglet. Gardez-le ouvert jusqu'à la fin. Fermer ou recharger l'onglet suspend le traitement ; rouvrir Hanji reprend depuis la progression sauvegardée."
+    "browserRunnerWarning": "L'importation s'exécute dans cet onglet. Gardez-le ouvert jusqu'à la fin. Fermer ou recharger l'onglet suspend le traitement ; rouvrir Hanji reprend depuis la progression sauvegardée.",
+    "serverRunnerStatus": "Hanji traite cette importation sur le serveur. Fermer ou recharger cet onglet ne la mettra pas en pause.",
+    "serverRunningHint": "L'importation se poursuit en arrière-plan. Vous pouvez fermer cet onglet."
   },
   "installer": {
     "elapsed": "Écoulé",
@@ -281,9 +283,9 @@
     "title": "Importation depuis Hanji",
     "fromFile": "Depuis un fichier",
     "fromLive": "Depuis une instance active",
-    "choose": "Choisir un fichier .hanji.json",
+    "choose": "Choisir un fichier .hanji.json ou .hanji.zip",
     "chooseButton": "Choisir le fichier",
-    "fileHint": "Exportez une page, une base de données ou un espace de travail depuis un autre Hanji, puis importez-le ici. Les relations, les rollups, les formules, les vues et les modèles sont conservés. Les pièces jointes ne sont pas incluses.",
+    "fileHint": "Utilisez .hanji.json pour la structure uniquement (fichiers exclus), ou .hanji.zip pour un transfert sans perte (fichiers inclus). Les relations, cumuls, formules, vues et modèles sont conservés.",
     "selected": "Sélectionné : {{name}}",
     "importButton": "Importer",
     "importing": "Importation...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "optionnel",
     "fetch": "Récupérer l'export",
     "fetching": "Récupération...",
-    "liveHint": "Importez un espace de travail directement depuis un autre Hanji en cours d'exécution (par exemple une instance de développement Docker). Le serveur distant doit autoriser les requêtes en provenance de cette adresse.",
+    "liveHint": "Importez un espace de travail directement depuis une autre instance Hanji en cours d'exécution (par exemple une instance Docker de développement). Les fichiers sont exclus. Le serveur distant doit autoriser les requêtes depuis cette adresse.",
     "review": "Prêt à importer : {{summary}}",
     "placeholderNote": "Certaines pièces jointes ont été laissées comme espaces réservés.",
     "importedItems_one": "{{count}} élément importé du fichier Hanji.",
@@ -302,9 +304,15 @@
     "cantRead": "Impossible de lire le fichier Hanji.",
     "cantImport": "Impossible d'importer le fichier Hanji.",
     "needFile": "Sélectionnez d'abord un fichier Hanji.",
-    "needRemote": "Saisissez l'URL du Hanji distant et l'ID de l'espace de travail."
+    "needRemote": "Saisissez l'URL du Hanji distant et l'ID de l'espace de travail.",
+    "filesExcluded": "Fichiers exclus.",
+    "filesIncluded": "Fichiers inclus."
   },
   "connectWithNotion": "Se connecter avec Notion",
   "oauthConfiguredHint": "Ce serveur dispose d'une intégration OAuth Notion configurée. La configuration par jeton reste disponible pour les connexions auto-hébergées.",
-  "cantStartOAuth": "Impossible de démarrer la connexion Notion."
+  "cantStartOAuth": "Impossible de démarrer la connexion Notion.",
+  "terminal": {
+    "cancelled": "L'importation a été annulée. Vous pouvez la recommencer en toute sécurité quand vous êtes prêt.",
+    "failed": "L'importation s'est arrêtée en toute sécurité avant la fin. Vérifiez la connexion et réessayez. Les détails techniques et les identifiants sont masqués."
+  }
 }

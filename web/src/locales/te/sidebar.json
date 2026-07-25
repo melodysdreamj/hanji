@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "వర్క్‌స్పేస్ మెనూని తెరవండి",
   "closeWorkspaceMenu": "వర్క్‌స్పేస్ మెనూను మూసివేయండి",
   "workspaceMenu": "వర్క్‌స్పేస్ మెను",
-  "exportWorkspace": "వర్క్‌స్పేస్‌ను ఎగుమతి చేయండి",
+  "exportWorkspace": "వర్క్స్పేస్ JSON ఎగుమతి (ఫైల్లు లేకుండా)",
   "exportedWorkspace": "వర్క్‌స్పేస్‌ను Hanji ఫైల్‌గా ఎగుమతి చేశారు.",
   "exportedWorkspaceWithPlaceholders": "వర్క్‌స్పేస్‌ను Hanji ఫైల్‌గా ఎగుమతి చేశారు — అటాచ్మెంట్లు ప్లేస్హోల్డర్లుగా మిగిల్చబడ్డాయి.",
   "couldntExportWorkspace": "వర్క్‌స్పేస్‌ను ఎగుమతి చేయలేకపోయింది.",
@@ -76,5 +76,12 @@
     "later": "తర్వాత",
     "note": "మీరు తర్వాత సైడ్‌బార్‌లోని దిగుమతి నుండి దీన్ని ప్రారంభించవచ్చు.",
     "title": "మీ Notion వర్క్‌స్పేస్‌ను Hanjiకు దిగుమతి చేయాలనుకుంటున్నారా?"
-  }
+  },
+  "addPageToTeamspace": "{{name}}కు పేజీ జోడించు",
+  "couldntExportWorkspaceArchive": "వర్క్స్పేస్ ఆర్కైవ్ ఎగుమతి చేయలేకపోయింది.",
+  "exportedWorkspaceArchive": "వర్క్స్పేస్ ఆర్కైవ్ ఫైల్లతో ఎగుమతి చేయబడింది.",
+  "exportWorkspaceArchive": "వర్క్స్పేస్ ఆర్కైవ్ ఎగుమతి (ఫైల్లతో)",
+  "joinTeamspaces": "టీమ్స్పేస్‌లలో చేరండి",
+  "keyboardShortcuts": "కీబోర్డ్ సత్వరమార్గాలు",
+  "teamspacePages": "{{name}} పేజీలు"
 }

@@ -247,7 +247,9 @@
     "runningHint": "İdxal işləyərkən bu brauzer nişanını açıq saxlayın.",
     "noJobHint": "Kəşfə ilk olaraq Əhatə dairəsi addımından başlayın.",
     "applyLocksHint": "Tətbiq etmək aşkar edilmiş elementləri bu iş məkanına yazır.",
-    "browserRunnerWarning": "Bu idxal bu brauzer nişanında işləyir. Tamamlanana qədər nişanı açıq saxlayın. Nişanı bağlamaq və ya yeniləmək emalı dayandırır; Hanji-ni yenidən açdıqda qeyd edilmiş yerdən davam edir."
+    "browserRunnerWarning": "Bu idxal bu brauzer nişanında işləyir. Tamamlanana qədər nişanı açıq saxlayın. Nişanı bağlamaq və ya yeniləmək emalı dayandırır; Hanji-ni yenidən açdıqda qeyd edilmiş yerdən davam edir.",
+    "serverRunnerStatus": "Hanji bu idxalı serverdə emal edir. Bu tabı bağlamaq və ya yeniləmək onu dayandırmayacaq.",
+    "serverRunningHint": "İdxal arxa planda davam edir. Bu tabı bağlaya bilərsiniz."
   },
   "installer": {
     "elapsed": "Keçən vaxt",
@@ -281,9 +283,9 @@
     "title": "Hanji-dən idxal",
     "fromFile": "Fayldan",
     "fromLive": "Canlı instansiyadan",
-    "choose": ".hanji.json faylı seçin",
+    "choose": ".hanji.json və ya .hanji.zip faylı seçin",
     "chooseButton": "Fayl seçin",
-    "fileHint": "Başqa bir Hanji-dən səhifə, verilənlər bazası və ya iş məkanını ixrac edin, sonra buraya idxal edin. Münasibətlər, rolluplar, düsturlar, görünüşlər və şablonlar qorunur. Əlavələr daxil deyil.",
+    "fileHint": ".hanji.json yalnız struktur üçündür (fayllar daxil deyil), .hanji.zip isə itkisiz ötürmə üçündür (fayllar daxildir). Əlaqələr, rolluplar, düsturlar, görünüşlər və şablonlar qorunur.",
     "selected": "Seçilmiş: {{name}}",
     "importButton": "İdxal et",
     "importing": "İdxal edilir...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "istəyə bağlı",
     "fetch": "İxracı gətir",
     "fetching": "Gətirilir...",
-    "liveHint": "İşləyən başqa bir Hanji-dən (məsələn, Docker dev instansiyası) birbaşa iş məkanını çəkin. Uzaq bu ünvandan sorğulara icazə verməlidir.",
+    "liveHint": "İş məkanını birbaşa başqa işləyən Hanji-dən (məsələn, Docker dev nümunəsi) çəkin. Fayllar daxil deyil. Uzaq server bu ünvandan sorğulara icazə verməlidir.",
     "review": "İdxal etməyə hazırdır: {{summary}}",
     "placeholderNote": "Bəzi əlavələr yer tutucu olaraq qaldı.",
     "importedItems_one": "Hanji faylından {{count}} maddə idxal edildi.",
@@ -302,9 +304,15 @@
     "cantRead": "Hanji faylı oxuna bilmədi.",
     "cantImport": "Hanji faylı idxal oluna bilmədi.",
     "needFile": "Əvvəlcə Hanji faylı seçin.",
-    "needRemote": "Uzaq Hanji URL-ni və iş məkanı ID-ni daxil edin."
+    "needRemote": "Uzaq Hanji URL-ni və iş məkanı ID-ni daxil edin.",
+    "filesExcluded": "Fayllar daxil deyil.",
+    "filesIncluded": "Fayllar daxildir."
   },
   "cantStartOAuth": "Notion əlaqəsi başladıla bilmədi.",
   "connectWithNotion": "Notion ilə qoşul",
-  "oauthConfiguredHint": "Bu serverdə Notion OAuth inteqrasiyası konfiqurasiya edilib. Token quraşdırması self-hosted bağlantılar üçün mövcuddur."
+  "oauthConfiguredHint": "Bu serverdə Notion OAuth inteqrasiyası konfiqurasiya edilib. Token quraşdırması self-hosted bağlantılar üçün mövcuddur.",
+  "terminal": {
+    "cancelled": "İdxal ləğv edildi. Hazır olduğunuzda təkrar başlada bilərsiniz.",
+    "failed": "İdxal tamamlanmadan təhlükəsiz dayandırıldı. Bağlantını yoxlayın və yenidən cəhd edin. Texniki detallar burda gizlənib."
+  }
 }

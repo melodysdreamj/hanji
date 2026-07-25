@@ -13,7 +13,7 @@
   "groupName": "Gruppenname",
   "groupOptions": "{{groupName}} Gruppenoptionen",
   "groupThisBoard": "Board gruppieren",
-  "groupThisBoardDesc": "Fügen Sie eine Auswahl- oder Status-Eigenschaft hinzu, um Spalten zu erstellen.",
+  "groupThisBoardDesc": "Füge eine Auswahl-, Status-, Personen- oder Mehrfachauswahl-Eigenschaft hinzu oder wähle sie aus, um Spalten zu erstellen.",
   "newGroup": "Neue Gruppe",
   "newGroupIn": "Neue {{groupName}}-Gruppe in {{dbTitle}}",
   "newPage": "Neu",

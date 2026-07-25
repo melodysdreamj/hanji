@@ -26,11 +26,8 @@
   },
   "header": {
     "closeUpdates": "Luk opdateringer",
-    "inboxMode": "Indbakketilstand",
     "markAllRead": "Markér alle som læst",
     "markAllReadAria": "Markér alle opdateringer som læst",
-    "modeChats": "Chats",
-    "modeUpdates": "Opdateringer",
     "pageHistory": "Sidehistorik",
     "recentUpdates_one": "{{count}} nylig opdatering",
     "recentUpdates_other": "{{count}} nylige opdateringer",
@@ -46,7 +43,8 @@
     "referenceLink": "Linket til {{title}} · {{preview}}",
     "referenceMention": "Omtalte {{title}} · {{preview}}",
     "unreadDot": "Ulæst",
-    "workspaceUpdate": "Arbejdsområdeopdatering"
+    "workspaceUpdate": "Arbejdsområdeopdatering",
+    "bySelf": "af dig"
   },
   "time": {
     "justNow": "Lige nu",
@@ -74,6 +72,15 @@
     "versionCount_other": "{{count}} versioner",
     "versionsAgo": "{{count}} versioner siden",
     "versionsAhead": "{{count}} versioner foran",
-    "versionsAria": "Versioner"
+    "versionsAria": "Versioner",
+    "emptyBlock": "Tom blok",
+    "emptyPreview": "Denne version har intet sideindhold.",
+    "previewAria": "Skrivebeskyttet forhåndsvisning af sideversion",
+    "previewingCurrent": "Ser nuværende side",
+    "previewingSnapshot": "Ser tidligere version",
+    "previewOnlyHint": "Valg af en version viser kun en forhåndsvisning. Den aktuelle side ændres først efter gendannelse.",
+    "restoreThisVersion": "Gendan",
+    "restoring": "Gendanner...",
+    "versionHistory": "Versionshistorik"
   }
 }

@@ -13,7 +13,7 @@
   "groupName": "Názov skupiny",
   "groupOptions": "Možnosti skupiny {{groupName}}",
   "groupThisBoard": "Zoskupiť túto dosku",
-  "groupThisBoardDesc": "Pridajte vlastnosť Výber alebo Stav na vytvorenie stĺpcov.",
+  "groupThisBoardDesc": "Pridajte alebo vyberte vlastnosť typu Výber, Stav, Osoba alebo Viacnásobný výber na vytvorenie stĺpcov.",
   "newGroup": "Nová skupina",
   "newGroupIn": "Nová skupina {{groupName}} v {{dbTitle}}",
   "newPage": "Nová",

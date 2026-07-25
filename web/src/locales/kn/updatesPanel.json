@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} ಇತ್ತೀಚಿನ ಅಪ್ಡೇಟ್ಗಳು",
     "unreadOfTotal": "{{total}} ಅಪ್ಡೇಟ್ಗಳಲ್ಲಿ {{unread}} ಓದದಿದ್ದು",
     "updateType": "ಅಪ್ಡೇಟ್ ಪ್ರಕಾರ",
-    "updates": "ಅಪ್ಡೇಟ್ಗಳು",
-    "modeUpdates": "ಅಪ್ಡೇಟ್ಗಳು",
-    "modeChats": "ಚಾಟ್ಗಳು",
-    "inboxMode": "ಇನ್ಬಾಕ್ಸ್ ಮೋಡ್"
+    "updates": "ಅಪ್ಡೇಟ್ಗಳು"
   },
   "time": {
     "justNow": "ಈಗಷ್ಟೇ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} ಆವೃತ್ತಿಗಳು",
     "versionsAgo": "{{count}} ಆವೃತ್ತಿಗಳ ಹಿಂದೆ",
     "versionsAhead": "{{count}} ಆವೃತ್ತಿಗಳ ಮುಂದೆ",
-    "versionsAria": "ಆವೃತ್ತಿಗಳು"
+    "versionsAria": "ಆವೃತ್ತಿಗಳು",
+    "emptyBlock": "ಖಾಲಿ ಬ್ಲಾಕ್",
+    "emptyPreview": "ಈ ಆವೃತ್ತಿಯಲ್ಲಿ ಪುಟದ ವಿಷಯವಿಲ್ಲ.",
+    "previewAria": "ಓದಲು-ಮಾತ್ರ ಪುಟ ಆವೃತ್ತಿ ಪೂರ್ವವೀಕ್ಷಣೆ",
+    "previewingCurrent": "ಪ್ರಸ್ತುತ ಪುಟವನ್ನು ವೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ",
+    "previewingSnapshot": "ಹಿಂದಿನ ಆವೃತ್ತಿಯನ್ನು ವೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ",
+    "previewOnlyHint": "ಆವೃತ್ತಿಯನ್ನು ಆಯ್ಕೆ ಮಾಡುವುದರಿಂದ ಅದರ ಪೂರ್ವವೀಕ್ಷಣೆ ಮಾತ್ರ ಕಾಣಿಸುತ್ತದೆ. ಪುನಃಸ್ಥಾಪಿಸಿದ ನಂತರವೇ ಪ್ರಸ್ತುತ ಪುಟ ಬದಲಾಗುತ್ತದೆ.",
+    "restoreThisVersion": "ಪುನಃಸ್ಥಾಪಿಸು",
+    "restoring": "ಪುನಃಸ್ಥಾಪಿಸಲಾಗುತ್ತಿದೆ...",
+    "versionHistory": "ಆವೃತ್ತಿ ಇತಿಹಾಸ"
   },
   "badges": {
     "comment": "ಕಾಮೆಂಟ್",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} ಮೆನ್ಷನ್ · {{preview}}",
     "referenceLink": "{{title}} ಲಿಂಕ್ · {{preview}}",
     "unreadDot": "ಓದದ",
-    "workspaceUpdate": "ಕಾರ್ಯಕ್ಷೇತ್ರ ಅಪ್ಡೇಟ್"
+    "workspaceUpdate": "ಕಾರ್ಯಕ್ಷೇತ್ರ ಅಪ್ಡೇಟ್",
+    "bySelf": "ನಿಮ್ಮಿಂದ"
   },
   "empty": {
     "allCaughtUp": "ನೀವು ಎಲ್ಲವನ್ನೂ ನೋಡಿದ್ದೀರಿ.",

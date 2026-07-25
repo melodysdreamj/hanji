@@ -38,7 +38,7 @@
   "moveTo": "نقل إلى",
   "exporting": "جار التصدير…",
   "exportAsMarkdown": "تصدير كـ Markdown",
-  "exportAsHanji": "تصدير كملف Hanji",
+  "exportAsHanji": "تصدير Hanji JSON (بدون ملفات)",
   "importing": "جار الاستيراد…",
   "importMarkdown": "استيراد Markdown",
   "unlockPage": "إلغاء قفل الصفحة",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "تعذر تحديث حق الوصول",
     "removedFromAccessList": "تمت الإزالة من قائمة الوصول",
     "couldntRemoveAccess": "تعذر إزالة حق الوصول",
-    "couldntLoadAccessList": "تعذر تحميل قائمة الوصول"
+    "couldntLoadAccessList": "تعذر تحميل قائمة الوصول",
+    "couldntExportHanjiArchive": "تعذر تصدير أرشيف Hanji.",
+    "exportedHanjiArchive": "تم تصدير أرشيف Hanji مع الملفات."
   },
   "user": "مستخدم",
   "whoHasAccess": "من لديه وصول",
   "workspace": "مساحة العمل",
   "workspaceCount_one": "{{count}} مساحة عمل",
   "workspaceCount_other": "{{count}} مساحات عمل",
-  "you": "أنا"
+  "you": "أنا",
+  "exportAsHanjiArchive": "تصدير أرشيف Hanji (مع الملفات)",
+  "turnIntoWiki": "تحويل إلى ويكي",
+  "undoWiki": "إلغاء الويكي",
+  "wikiCreated": "تم تحويل الصفحة إلى ويكي",
+  "wikiPageSettings": "إعدادات صفحة الويكي",
+  "wikiUndone": "تمت إزالة الويكي مع الحفاظ على المحتوى",
+  "wikiUpdateFailed": "تعذر تحديث الويكي"
 }

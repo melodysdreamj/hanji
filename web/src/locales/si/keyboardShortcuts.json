@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "අදහස් දැක්වීමක් එක් කරන්න",
+    "addLink": "සබැඳියක් එක් කරන්න",
+    "blockColor": "අවසන් වර්ණය යොදන්න",
+    "bold": "තද",
+    "copyPageLink": "පිටු සබැඳිය පිටපත් කරන්න",
+    "findInPage": "මෙම පිටුවේ සොයන්න",
+    "inlineCode": "ඉන්ලයින් කේතය",
+    "italic": "ඇල",
+    "moveBlock": "බ්ලොක් එක වෙනත් පිටුවකට ගෙන යන්න",
+    "moveBlockDown": "බ්ලොක් එක පහළට ගෙන යන්න",
+    "moveBlockUp": "බ්ලොක් එක ඉහළට ගෙන යන්න",
+    "movePage": "වත්මන් පිටුව ගෙන යන්න",
+    "navigateBack": "ආපසු යන්න",
+    "navigateForward": "ඉදිරියට යන්න",
+    "newPage": "නව පිටුව",
+    "openBlockMenu": "බ්ලොක් ක්‍රියා විවෘත කරන්න",
+    "openKeyboardShortcuts": "යතුරුපුවරු කෙටිමං විවෘත කරන්න",
+    "openParentPage": "මව් පිටුව විවෘත කරන්න",
+    "quickFind": "ඉක්මන් සෙවුම",
+    "strikethrough": "විකට රේඛාව",
+    "toggleAllToggles": "සියලු ටොගල් පුළුල් කරන්න හෝ හකුළන්න",
+    "toggleSidebar": "පැති තීරුව මාරු කරන්න",
+    "toggleTheme": "අඳුරු ප්‍රකාරය මාරු කරන්න",
+    "underline": "යටි ඉරි ගන්වන්න"
+  },
+  "categories": {
+    "createStyle": "නිර්මාණය සහ ශෛලිය",
+    "editMove": "සංස්කරණය සහ ගෙනයාම",
+    "popular": "ජනප්‍රිය"
+  },
+  "categoriesLabel": "කෙටිමං කාණ්ඩ",
+  "close": "වසන්න",
+  "closeBackdrop": "යතුරුපුවරු කෙටිමං වසන්න",
+  "empty": "කෙටිමං හමු නොවීය",
+  "keysFor": "{{action}} සඳහා යතුරු",
+  "or": "හෝ",
+  "searchLabel": "යතුරුපුවරු කෙටිමං සොයන්න",
+  "searchPlaceholder": "කෙටිමං සොයන්න…",
+  "searchResults": "සෙවුම් ප්‍රතිඵල",
+  "searchTerms": {
+    "toggleTheme": "තේමාව ආලෝක අඳුරු පෙනුම"
+  },
+  "title": "යතුරුපුවරු කෙටිමං"
+}

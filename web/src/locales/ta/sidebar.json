@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "பணியிட மெனுவைத் திற",
   "closeWorkspaceMenu": "பணியிட மெனுவை மூடு",
   "workspaceMenu": "பணியிட மெனு",
-  "exportWorkspace": "பணியிடத்தை ஏற்றுமதி செய்",
+  "exportWorkspace": "பணியிட JSON ஏற்றுமதி (கோப்புகள் தவிர்த்து)",
   "exportedWorkspace": "பணியிடத்தை Hanji கோப்பாக ஏற்றுமதி செய்தது.",
   "exportedWorkspaceWithPlaceholders": "பணியிடத்தை Hanji கோப்பாக ஏற்றுமதி செய்தது — இணைப்புகள் இடையகங்களாக விடப்பட்டன.",
   "couldntExportWorkspace": "பணியிடத்தை ஏற்றுமதி செய்ய முடியவில்லை.",
@@ -76,5 +76,12 @@
     "later": "பின்னர்",
     "note": "இதை சைட்பாரில் உள்ள இறக்குமதியிலிருந்து பின்னர் எப்போதும் தொடங்கலாம்.",
     "title": "உங்கள் Notion பணியிடத்தை Hanjiக்கு இறக்குமதி செய்கிறீர்களா?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} இல் பக்கத்தைச் சேர்",
+  "couldntExportWorkspaceArchive": "பணியிட காப்பகத்தை ஏற்றுமதி செய்ய முடியவில்லை.",
+  "exportedWorkspaceArchive": "கோப்புகளுடன் பணியிட காப்பகத்தை ஏற்றுமதி செய்தது.",
+  "exportWorkspaceArchive": "பணியிட காப்பக ஏற்றுமதி (கோப்புகள் உட்பட)",
+  "joinTeamspaces": "குழு இடங்களில் சேர்",
+  "keyboardShortcuts": "விசைப்பலகை குறுக்குவழிகள்",
+  "teamspacePages": "{{name}} பக்கங்கள்"
 }

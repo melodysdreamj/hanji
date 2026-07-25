@@ -58,7 +58,14 @@
     "range": "Rozsah",
     "show_original": "Zobrazit původní",
     "sum": "Součet",
-    "unchecked": "Nezaškrtnuto"
+    "unchecked": "Nezaškrtnuto",
+    "count": "Počet všech",
+    "count_per_group": "Počet na skupinu",
+    "empty": "Počet prázdných",
+    "not_empty": "Počet neprázdných",
+    "percent_per_group": "Procento na skupinu",
+    "show_unique": "Zobrazit unikátní hodnoty",
+    "unique": "Počet unikátních hodnot"
   },
   "showOnDatabase": "Zobrazit na {{name}}",
   "undo": "Zpět",

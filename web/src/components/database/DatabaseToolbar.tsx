@@ -21,6 +21,7 @@ import {
   type DbProperty,
   type DbTemplate,
   type DbView,
+  type DatabaseSubtaskViewConfig,
   type FilterGroup,
   type Page,
   type PropertyType,
@@ -70,6 +71,8 @@ import { RowProperties } from "./RowProperties";
 import { NotionSelect } from "./NotionSelect";
 import { PropertyTypeConfig } from "./PropertyTypeConfig";
 import { PropertyTypeIcon } from "./PropertyTypeIcon";
+import { DatabaseAutomationPanel } from "./DatabaseAutomationPanel";
+import { isBoardMainGroupProperty } from "./boardGrouping";
 import {
   CARD_PREVIEW_NONE,
   CARD_PREVIEW_PAGE,
@@ -132,6 +135,12 @@ import {
 } from "./databaseViewShared";
 type ToolbarMenu =
   | "settings"
+  | "automations"
+  | "additionalSettings"
+  | "subitemsSettings"
+  | "subitemsAdvancedSettings"
+  | "dependenciesSettings"
+  | "taskFeatureTurnOffConfirmation"
   | "layout"
   | "group"
   | "properties"
@@ -141,7 +150,15 @@ type ToolbarMenu =
   | "templates";
 
 function toolbarMenuWidth(menu: ToolbarMenu) {
-  if (menu === "settings") return 276;
+  if (
+    menu === "settings"
+    || menu === "automations"
+    || menu === "additionalSettings"
+    || menu === "subitemsSettings"
+    || menu === "subitemsAdvancedSettings"
+    || menu === "dependenciesSettings"
+    || menu === "taskFeatureTurnOffConfirmation"
+  ) return 300;
   if (menu === "layout") return 560;
   if (menu === "group") return 320;
   if (menu === "properties") return 360;
@@ -199,8 +216,10 @@ export function DatabaseToolbar({
   onOpenRow?: (pageId: string) => void;
 }) {
   const props = useStore(useShallow((s) => s.dbProperties(dbId)));
+  const databaseViews = useStore(useShallow((s) => s.dbViews(dbId)));
   const templates = useStore(useShallow((s) => s.dbTemplates(dbId)));
   const pagesById = useStore(useShallow((s) => s.pagesById));
+  const configureDatabaseTaskFeature = useStore((s) => s.configureDatabaseTaskFeature);
   const updateView = useStore((s) => s.updateView);
   const addProperty = useStore((s) => s.addProperty);
   const updateProperty = useStore((s) => s.updateProperty);
@@ -225,6 +244,24 @@ export function DatabaseToolbar({
   const [draggingPropertyId, setDraggingPropertyId] = useState<string | null>(null);
   const [dragOverPropertyId, setDragOverPropertyId] = useState<string | null>(null);
   const [dragOverPropertySide, setDragOverPropertySide] = useState<"before" | "after">("before");
+  const [subitemsActivationBusy, setSubitemsActivationBusy] = useState(false);
+  const subitemsActivationBusyRef = useRef(false);
+  const [subitemNestedPropertyId, setSubitemNestedPropertyId] = useState("");
+  const [subitemShowToggleOnTitle, setSubitemShowToggleOnTitle] = useState(true);
+  const [dependencyActivationBusy, setDependencyActivationBusy] = useState(false);
+  const dependencyActivationBusyRef = useRef(false);
+  const [dependencyDatePropertyId, setDependencyDatePropertyId] = useState("");
+  const [dependencySeparateDates, setDependencySeparateDates] = useState(false);
+  const [dependencyStartDatePropertyId, setDependencyStartDatePropertyId] = useState("");
+  const [dependencyEndDatePropertyId, setDependencyEndDatePropertyId] = useState("");
+  const [dependencyShiftMode, setDependencyShiftMode] = useState<
+    "overlap" | "maintain_spacing" | "none"
+  >("overlap");
+  const [dependencyAvoidWeekends, setDependencyAvoidWeekends] = useState(true);
+  const [turnOffFeature, setTurnOffFeature] = useState<"dependencies" | "subitems">("subitems");
+  const [turnOffPropertyDisposition, setTurnOffPropertyDisposition] = useState<"keep" | "remove">(
+    "remove"
+  );
   const toolbarRootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const toolbarMenuRef = useRef<HTMLDivElement>(null);
@@ -272,8 +309,57 @@ export function DatabaseToolbar({
   const isTimelineView = view.type === "timeline";
   const isBoardView = view.type === "board";
   const dateProps = props.filter((prop) => prop.type === "date");
+  const subitemsBinding = pagesById[dbId]?.databaseFeatures?.subitems;
+  const subitemsEnabled = subitemsBinding?.enabled === true;
+  const configuredSubitemNestedPropertyId = subitemsBinding?.nestedPropertyId;
+  const currentSubitemNestedPropertyId =
+    configuredSubitemNestedPropertyId
+    && (configuredSubitemNestedPropertyId === subitemsBinding?.parentPropertyId
+      || configuredSubitemNestedPropertyId === subitemsBinding?.childrenPropertyId)
+      ? configuredSubitemNestedPropertyId
+      : subitemsBinding?.childrenPropertyId ?? "";
+  const currentSubitemShowToggleOnTitle = subitemsBinding?.showToggleOnTitle !== false;
+  const isRowSubitemView =
+    view.type === "table" || view.type === "list" || view.type === "timeline";
+  const isCardSubitemView =
+    view.type === "board" || view.type === "calendar" || view.type === "gallery";
+  const subitemViewSettingsVisible =
+    subitemsEnabled && (isRowSubitemView || isCardSubitemView);
+  const subitemDisplayMode =
+    view.config?.subtasks?.displayMode === "flattened" ? "flattened" : "show";
+  const subitemFilterScope = isCardSubitemView
+    ? "parents"
+    : view.config?.subtasks?.filterScope ?? "parents_and_subitems";
+  const subitemDisplayOptions = isCardSubitemView
+    ? [
+        { value: "show", label: databaseViewLabels().cardProperty },
+        { value: "flattened", label: databaseViewLabels().flattenedList },
+      ]
+    : [
+        { value: "show", label: databaseViewLabels().nestedInToggle },
+        { value: "flattened", label: databaseViewLabels().flattenedList },
+      ];
+  const dependenciesBinding = pagesById[dbId]?.databaseFeatures?.dependencies;
+  const dependenciesEnabled = dependenciesBinding?.enabled === true;
+  const dependencyDateBindingUnchanged = dependencySeparateDates
+    ? dependenciesBinding?.dateMode === "separate"
+      && dependencyStartDatePropertyId === dependenciesBinding.startDatePropertyId
+      && dependencyEndDatePropertyId === dependenciesBinding.endDatePropertyId
+    : dependenciesBinding?.dateMode !== "separate"
+      && dependencyDatePropertyId === dependenciesBinding?.datePropertyId;
+  const dependencySettingsUnchanged = dependenciesEnabled
+    && dependencyDateBindingUnchanged
+    && dependencyShiftMode === dependenciesBinding.shiftMode
+    && dependencyAvoidWeekends === dependenciesBinding.avoidWeekends;
+  const dependencyDateBindingValid = dependencySeparateDates
+    ? Boolean(
+        dependencyStartDatePropertyId
+        && dependencyEndDatePropertyId
+        && dependencyStartDatePropertyId !== dependencyEndDatePropertyId
+      )
+    : Boolean(dependencyDatePropertyId);
   const coverProps = props.filter(isCoverProperty);
-  const groupProps = props.filter((prop) => prop.type === "select" || prop.type === "status");
+  const groupProps = props.filter(isBoardMainGroupProperty);
   const activeGroupProp =
     groupProps.find((prop) => prop.id === view.config?.groupBy) ?? groupProps[0];
   const activeTimelineStartId =
@@ -320,6 +406,7 @@ export function DatabaseToolbar({
     !!view.config?.timelineZoom ||
     !!view.config?.timelineShowTable ||
     !!view.config?.timelineLoadLimit ||
+    !!view.config?.subtasks ||
     !!view.config?.openPageIn ||
     !!view.config?.rowHeight ||
     !!view.config?.initialLoadLimit;
@@ -346,10 +433,215 @@ export function DatabaseToolbar({
     updateView(view.id, { config: { ...view.config, ...config } });
   }
 
+  function updateSubitemViewConfig(
+    patch: Partial<Pick<DatabaseSubtaskViewConfig, "displayMode" | "filterScope">>
+  ) {
+    if (readOnly || !subitemsEnabled || !subitemsBinding) return;
+    const current = view.config?.subtasks;
+    updateConfig({
+      subtasks: {
+        displayMode: patch.displayMode ?? current?.displayMode ?? "show",
+        filterScope: isCardSubitemView
+          ? "parents"
+          : patch.filterScope ?? current?.filterScope ?? "parents_and_subitems",
+        propertyId: currentSubitemNestedPropertyId,
+        toggleColumnId: currentSubitemShowToggleOnTitle
+          ? titlePropertyId ?? currentSubitemNestedPropertyId
+          : currentSubitemNestedPropertyId,
+      },
+    });
+  }
+
   function updateViewType(type: ViewType) {
     if (readOnly) return;
     if (type === view.type) return;
     updateView(view.id, { type });
+  }
+
+  useEffect(() => {
+    subitemsActivationBusyRef.current = false;
+    setSubitemsActivationBusy(false);
+  }, [subitemsBinding?.revision, subitemsEnabled]);
+
+  useEffect(() => {
+    dependencyActivationBusyRef.current = false;
+    setDependencyActivationBusy(false);
+  }, [dependenciesBinding?.revision, dependenciesEnabled]);
+
+  async function activateSubitems() {
+    if (readOnly || subitemsEnabled || subitemsActivationBusyRef.current) return;
+    subitemsActivationBusyRef.current = true;
+    setSubitemsActivationBusy(true);
+    try {
+      const status = await configureDatabaseTaskFeature({
+        childrenPropertyName: databaseViewLabels().subitemPropertyName,
+        databaseId: dbId,
+        feature: "subitems",
+        parentPropertyName: databaseViewLabels().parentItemPropertyName,
+      });
+      if (status !== "queued") {
+        subitemsActivationBusyRef.current = false;
+        setSubitemsActivationBusy(false);
+      }
+    } catch {
+      subitemsActivationBusyRef.current = false;
+      setSubitemsActivationBusy(false);
+    }
+  }
+
+  function openSubitemAdvancedSettings() {
+    if (!subitemsBinding) return;
+    setSubitemNestedPropertyId(currentSubitemNestedPropertyId);
+    setSubitemShowToggleOnTitle(currentSubitemShowToggleOnTitle);
+    openRelatedToolbarMenu("subitemsAdvancedSettings");
+  }
+
+  const subitemAdvancedSettingsUnchanged =
+    subitemNestedPropertyId === currentSubitemNestedPropertyId
+    && subitemShowToggleOnTitle === currentSubitemShowToggleOnTitle;
+
+  async function saveSubitemAdvancedSettings() {
+    if (
+      readOnly
+      || !subitemsBinding
+      || !subitemsEnabled
+      || subitemsActivationBusyRef.current
+      || subitemAdvancedSettingsUnchanged
+    ) return;
+    subitemsActivationBusyRef.current = true;
+    setSubitemsActivationBusy(true);
+    try {
+      const status = await configureDatabaseTaskFeature({
+        childrenPropertyName: databaseViewLabels().subitemPropertyName,
+        databaseId: dbId,
+        feature: "subitems",
+        nestedPropertyId: subitemNestedPropertyId,
+        parentPropertyName: databaseViewLabels().parentItemPropertyName,
+        showToggleOnTitle: subitemShowToggleOnTitle,
+      });
+      if (status !== "queued") {
+        subitemsActivationBusyRef.current = false;
+        setSubitemsActivationBusy(false);
+      }
+    } catch {
+      subitemsActivationBusyRef.current = false;
+      setSubitemsActivationBusy(false);
+    }
+  }
+
+  function openDependenciesSettings() {
+    const storedSeparateDates = dependenciesBinding?.dateMode === "separate";
+    const storedDatePropertyId = storedSeparateDates
+      ? dependenciesBinding.startDatePropertyId
+      : (dependenciesBinding?.datePropertyId ?? "");
+    const nextDatePropertyId = dateProps.some((property) => property.id === storedDatePropertyId)
+      ? storedDatePropertyId
+      : (dateProps[0]?.id ?? "");
+    const storedEndDatePropertyId = storedSeparateDates
+      ? dependenciesBinding.endDatePropertyId
+      : "";
+    const nextEndDatePropertyId = dateProps.some(
+      (property) => property.id === storedEndDatePropertyId && property.id !== nextDatePropertyId
+    )
+      ? storedEndDatePropertyId
+      : (dateProps.find((property) => property.id !== nextDatePropertyId)?.id ?? "");
+    setDependencyDatePropertyId(
+      nextDatePropertyId
+    );
+    setDependencySeparateDates(storedSeparateDates);
+    setDependencyStartDatePropertyId(nextDatePropertyId);
+    setDependencyEndDatePropertyId(nextEndDatePropertyId);
+    setDependencyShiftMode(dependenciesBinding?.shiftMode ?? "overlap");
+    setDependencyAvoidWeekends(dependenciesBinding?.avoidWeekends ?? true);
+    openRelatedToolbarMenu("dependenciesSettings");
+  }
+
+  function setDependencyDateMode(separateDates: boolean) {
+    if (separateDates) {
+      const startDatePropertyId = dateProps.some(
+        (property) => property.id === dependencyDatePropertyId
+      )
+        ? dependencyDatePropertyId
+        : (dateProps[0]?.id ?? "");
+      const endDatePropertyId = dateProps.some(
+        (property) => property.id === dependencyEndDatePropertyId
+          && property.id !== startDatePropertyId
+      )
+        ? dependencyEndDatePropertyId
+        : (dateProps.find((property) => property.id !== startDatePropertyId)?.id ?? "");
+      setDependencyStartDatePropertyId(startDatePropertyId);
+      setDependencyEndDatePropertyId(endDatePropertyId);
+    } else {
+      setDependencyDatePropertyId(dependencyStartDatePropertyId || dateProps[0]?.id || "");
+    }
+    setDependencySeparateDates(separateDates);
+  }
+
+  async function activateDependencies() {
+    if (readOnly || !dependencyDateBindingValid || dependencyActivationBusyRef.current) return;
+    dependencyActivationBusyRef.current = true;
+    setDependencyActivationBusy(true);
+    try {
+      const dateBinding = dependencySeparateDates
+        ? {
+            dateMode: "separate" as const,
+            endDatePropertyId: dependencyEndDatePropertyId,
+            startDatePropertyId: dependencyStartDatePropertyId,
+          }
+        : { datePropertyId: dependencyDatePropertyId };
+      const status = await configureDatabaseTaskFeature({
+        avoidWeekends: dependencyAvoidWeekends,
+        databaseId: dbId,
+        ...dateBinding,
+        feature: "dependencies",
+        predecessorPropertyName: databaseViewLabels().blockedByPropertyName,
+        shiftMode: dependencyShiftMode,
+        successorPropertyName: databaseViewLabels().blockingPropertyName,
+      });
+      if (status !== "queued") {
+        dependencyActivationBusyRef.current = false;
+        setDependencyActivationBusy(false);
+      }
+    } catch {
+      dependencyActivationBusyRef.current = false;
+      setDependencyActivationBusy(false);
+    }
+  }
+
+  function openTaskFeatureTurnOff(feature: "dependencies" | "subitems") {
+    if (readOnly) return;
+    setTurnOffFeature(feature);
+    setTurnOffPropertyDisposition("remove");
+    openRelatedToolbarMenu("taskFeatureTurnOffConfirmation");
+  }
+
+  async function confirmTaskFeatureTurnOff() {
+    const isSubitems = turnOffFeature === "subitems";
+    const busyRef = isSubitems ? subitemsActivationBusyRef : dependencyActivationBusyRef;
+    const setBusy = isSubitems ? setSubitemsActivationBusy : setDependencyActivationBusy;
+    if (
+      readOnly
+      || busyRef.current
+      || (isSubitems ? !subitemsEnabled : !dependenciesEnabled)
+    ) return;
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      const status = await configureDatabaseTaskFeature({
+        databaseId: dbId,
+        enabled: false,
+        feature: turnOffFeature,
+        propertyDisposition: turnOffPropertyDisposition,
+      });
+      if (status !== "queued") {
+        busyRef.current = false;
+        setBusy(false);
+      }
+      openRelatedToolbarMenu("additionalSettings");
+    } catch {
+      busyRef.current = false;
+      setBusy(false);
+    }
   }
 
   // Single immutable writer for the whole filter tree. Clears the legacy flat
@@ -1282,6 +1574,56 @@ export function DatabaseToolbar({
                       ))}
                     </div>
                   </div>
+                  {subitemViewSettingsVisible && (
+                    <>
+                      <div className={styles.layoutSectionDivider} />
+                      <label className={styles.layoutRow}>
+                        <span>{databaseViewLabels().subitemsDisplay}</span>
+                        <NotionSelect
+                          ariaLabel={databaseViewLabels().subitemsDisplay}
+                          value={subitemDisplayMode}
+                          options={subitemDisplayOptions}
+                          onChange={(value) =>
+                            updateSubitemViewConfig({
+                              displayMode: value === "flattened" ? "flattened" : "show",
+                            })
+                          }
+                        />
+                      </label>
+                      {isRowSubitemView ? (
+                        <label className={styles.layoutRow}>
+                          <span>{databaseViewLabels().subitemFilter}</span>
+                          <NotionSelect
+                            ariaLabel={databaseViewLabels().subitemFilter}
+                            value={subitemFilterScope}
+                            options={[
+                              { value: "parents", label: databaseViewLabels().parentsOnly },
+                              {
+                                value: "parents_and_subitems",
+                                label: databaseViewLabels().parentsAndSubitems,
+                              },
+                              { value: "subitems", label: databaseViewLabels().subitemsOnly },
+                            ]}
+                            onChange={(value) =>
+                              updateSubitemViewConfig({
+                                filterScope: value as DatabaseSubtaskViewConfig["filterScope"],
+                              })
+                            }
+                          />
+                        </label>
+                      ) : (
+                        <div className={styles.layoutRow}>
+                          <span>{databaseViewLabels().subitemFilter}</span>
+                          <span
+                            className={styles.layoutStaticValue}
+                            data-subitem-filter-fixed
+                          >
+                            {databaseViewLabels().parentsOnly}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
                   {view.type === "table" && (
                     <>
                       <div className={styles.layoutRow}>
@@ -1545,7 +1887,7 @@ export function DatabaseToolbar({
             >
               {compactImportedInline ? (
                 <>
-                  <StatusIcon size={14} aria-hidden="true" />
+                  <PropertyTypeIcon type={activeGroupProp?.type ?? "status"} size={14} />
                   <span className={styles.toolbarLabel}>
                     {databaseViewLabels().group}{activeGroupProp ? `: ${activeGroupProp.name}` : ""}
                   </span>
@@ -1584,11 +1926,7 @@ export function DatabaseToolbar({
                           onClick={() => updateConfig({ groupBy: prop.id })}
                         >
                           <span className={styles.groupGlyph}>
-                            {prop.type === "status" ? (
-                              <StatusIcon size={14} />
-                            ) : (
-                              <SelectIcon size={14} />
-                            )}
+                            <PropertyTypeIcon type={prop.type} size={14} />
                           </span>
                           <span>{prop.name}</span>
                           {activeGroupProp?.id === prop.id && (
@@ -2093,7 +2431,6 @@ export function DatabaseToolbar({
           </button>
         )}
         {compactImportedInline && (
-          <>
             <button
               type="button"
               className={`${styles.toolbarBtn} ${styles.iconToolbarBtn}`}
@@ -2106,6 +2443,7 @@ export function DatabaseToolbar({
               <OpenInNew size={14} aria-hidden="true" />
               <span className={styles.toolbarLabel}>{databaseViewLabels().openAsPageShort}</span>
             </button>
+        )}
             <button
               type="button"
               className={`${styles.toolbarBtn} ${styles.iconToolbarBtn}`}
@@ -2225,7 +2563,7 @@ export function DatabaseToolbar({
                       <span />
                       <ChevronRight size={14} aria-hidden="true" />
                     </button>
-                    <button type="button" disabled>
+                    <button type="button" onClick={() => openRelatedToolbarMenu("automations")}>
                       <StatusIcon size={14} aria-hidden="true" />
                       <span>{databaseViewLabels().automations}</span>
                       <span />
@@ -2237,7 +2575,10 @@ export function DatabaseToolbar({
                       <span />
                       <ChevronRight size={14} aria-hidden="true" />
                     </button>
-                    <button type="button" disabled>
+                    <button
+                      type="button"
+                      onClick={() => openRelatedToolbarMenu("additionalSettings")}
+                    >
                       <Plus size={14} aria-hidden="true" />
                       <span>{databaseViewLabels().moreSettings}</span>
                       <span />
@@ -2247,8 +2588,472 @@ export function DatabaseToolbar({
                 </div>
                 </>
               )}
-          </>
-        )}
+            {open === "automations" && pagesById[dbId]?.workspaceId &&
+              renderToolbarMenuLayer(
+                <DatabaseAutomationPanel
+                  databaseId={dbId}
+                  workspaceId={pagesById[dbId].workspaceId}
+                  properties={props}
+                  views={databaseViews}
+                  onClose={() => closeToolbarMenu(true)}
+                />
+              )}
+            {open === "additionalSettings" &&
+              renderToolbarMenuLayer(
+                <>
+                  <button
+                    type="button"
+                    className={styles.menuBackdrop}
+                    onClick={() => closeToolbarMenu(true)}
+                    tabIndex={-1}
+                    aria-label={databaseViewLabels().closeViewSettings}
+                  />
+                  <div
+                    ref={toolbarMenuRef}
+                    className={`${styles.toolbarMenu} ${styles.viewSettingsMenu} ${styles.taskFeatureMenu}`}
+                    style={toolbarMenuStyle}
+                    role="dialog"
+                    aria-label={databaseViewLabels().additionalSettings}
+                    onKeyDown={onToolbarMenuKeyDown}
+                  >
+                    <div className={styles.toolbarMenuHead}>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().backToViewSettings}
+                        onClick={() => openRelatedToolbarMenu("settings")}
+                      >
+                        <ArrowLeft size={13} aria-hidden="true" />
+                      </button>
+                      <div className={styles.toolbarMenuLabel}>
+                        {databaseViewLabels().additionalSettings}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().closeViewSettings}
+                        onClick={() => closeToolbarMenu(true)}
+                      >
+                        <X size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className={styles.viewSettingsList}>
+                      <button
+                        type="button"
+                        onClick={() => openRelatedToolbarMenu("subitemsSettings")}
+                      >
+                        <DoubleChevronRight size={14} aria-hidden="true" />
+                        <span>{databaseViewLabels().subitems}</span>
+                        <span>{subitemsEnabled ? databaseViewLabels().taskFeatureOn : ""}</span>
+                        <ChevronRight size={14} aria-hidden="true" />
+                      </button>
+                      <button type="button" onClick={openDependenciesSettings}>
+                        <LinkIcon size={14} aria-hidden="true" />
+                        <span>{databaseViewLabels().dependencies}</span>
+                        <span>{dependenciesEnabled ? databaseViewLabels().taskFeatureOn : ""}</span>
+                        <ChevronRight size={14} aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            {open === "subitemsSettings" &&
+              renderToolbarMenuLayer(
+                <>
+                  <button
+                    type="button"
+                    className={styles.menuBackdrop}
+                    onClick={() => closeToolbarMenu(true)}
+                    tabIndex={-1}
+                    aria-label={databaseViewLabels().closeViewSettings}
+                  />
+                  <div
+                    ref={toolbarMenuRef}
+                    className={`${styles.toolbarMenu} ${styles.viewSettingsMenu} ${styles.taskFeatureMenu}`}
+                    style={toolbarMenuStyle}
+                    role="dialog"
+                    aria-label={databaseViewLabels().subitems}
+                    aria-busy={subitemsActivationBusy}
+                    onKeyDown={onToolbarMenuKeyDown}
+                  >
+                    <div className={styles.toolbarMenuHead}>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().additionalSettings}
+                        onClick={() => openRelatedToolbarMenu("additionalSettings")}
+                      >
+                        <ArrowLeft size={13} aria-hidden="true" />
+                      </button>
+                      <div className={styles.toolbarMenuLabel}>{databaseViewLabels().subitems}</div>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().closeViewSettings}
+                        onClick={() => closeToolbarMenu(true)}
+                      >
+                        <X size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className={styles.taskFeatureBody}>
+                      <p>{databaseViewLabels().subitemsDescription}</p>
+                      <div className={styles.subitemsPreview} aria-hidden="true">
+                        <div><ChevronDown size={13} /><span>{databaseViewLabels().parentItemPropertyName}</span></div>
+                        <div><span /> <span>{databaseViewLabels().subitemPropertyName}</span></div>
+                        <div><span /> <span>{databaseViewLabels().subitemPropertyName}</span></div>
+                      </div>
+                      {subitemsEnabled && (
+                        <button
+                          type="button"
+                          className={styles.taskFeatureSecondary}
+                          onClick={openSubitemAdvancedSettings}
+                        >
+                          <span>{databaseViewLabels().advancedSettings}</span>
+                          <ChevronRight size={14} aria-hidden="true" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.taskFeaturePrimary}
+                        disabled={subitemsActivationBusy}
+                        onClick={() => {
+                          if (subitemsEnabled) openTaskFeatureTurnOff("subitems");
+                          else void activateSubitems();
+                        }}
+                      >
+                        {subitemsEnabled
+                          ? databaseViewLabels().turnOffSubitems
+                          : databaseViewLabels().turnOnSubitems}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            {open === "subitemsAdvancedSettings" &&
+              renderToolbarMenuLayer(
+                <>
+                  <button
+                    type="button"
+                    className={styles.menuBackdrop}
+                    onClick={() => closeToolbarMenu(true)}
+                    tabIndex={-1}
+                    aria-label={databaseViewLabels().closeViewSettings}
+                  />
+                  <div
+                    ref={toolbarMenuRef}
+                    className={`${styles.toolbarMenu} ${styles.viewSettingsMenu} ${styles.taskFeatureMenu}`}
+                    style={toolbarMenuStyle}
+                    role="dialog"
+                    aria-label={databaseViewLabels().advancedSubitemSettings}
+                    aria-busy={subitemsActivationBusy}
+                    onKeyDown={onToolbarMenuKeyDown}
+                  >
+                    <div className={styles.toolbarMenuHead}>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().subitems}
+                        onClick={() => openRelatedToolbarMenu("subitemsSettings")}
+                      >
+                        <ArrowLeft size={13} aria-hidden="true" />
+                      </button>
+                      <div className={styles.toolbarMenuLabel}>
+                        {databaseViewLabels().advancedSettings}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().closeViewSettings}
+                        onClick={() => closeToolbarMenu(true)}
+                      >
+                        <X size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className={styles.taskFeatureBody}>
+                      <label className={styles.taskFeatureSelect}>
+                        <span>{databaseViewLabels().property}</span>
+                        <select
+                          aria-label={databaseViewLabels().property}
+                          value={subitemNestedPropertyId}
+                          onChange={(event) => setSubitemNestedPropertyId(event.currentTarget.value)}
+                        >
+                          <option value={subitemsBinding?.childrenPropertyId ?? ""}>
+                            {props.find((property) => property.id === subitemsBinding?.childrenPropertyId)?.name
+                              ?? databaseViewLabels().subitemPropertyName}
+                          </option>
+                          <option value={subitemsBinding?.parentPropertyId ?? ""}>
+                            {props.find((property) => property.id === subitemsBinding?.parentPropertyId)?.name
+                              ?? databaseViewLabels().parentItemPropertyName}
+                          </option>
+                        </select>
+                      </label>
+                      <label className={styles.taskFeatureCheckbox}>
+                        <strong>{databaseViewLabels().showNestingToggleOnTitle}</strong>
+                        <input
+                          type="checkbox"
+                          aria-label={databaseViewLabels().showNestingToggleOnTitle}
+                          checked={subitemShowToggleOnTitle}
+                          onChange={(event) => setSubitemShowToggleOnTitle(event.currentTarget.checked)}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className={styles.taskFeaturePrimary}
+                        disabled={subitemsActivationBusy || subitemAdvancedSettingsUnchanged}
+                        onClick={() => void saveSubitemAdvancedSettings()}
+                      >
+                        {databaseViewLabels().saveChanges}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            {open === "dependenciesSettings" &&
+              renderToolbarMenuLayer(
+                <>
+                  <button
+                    type="button"
+                    className={styles.menuBackdrop}
+                    onClick={() => closeToolbarMenu(true)}
+                    tabIndex={-1}
+                    aria-label={databaseViewLabels().closeViewSettings}
+                  />
+                  <div
+                    ref={toolbarMenuRef}
+                    className={`${styles.toolbarMenu} ${styles.viewSettingsMenu} ${styles.taskFeatureMenu}`}
+                    style={toolbarMenuStyle}
+                    role="dialog"
+                    aria-label={databaseViewLabels().dependencies}
+                    aria-busy={dependencyActivationBusy}
+                    onKeyDown={onToolbarMenuKeyDown}
+                  >
+                    <div className={styles.toolbarMenuHead}>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().additionalSettings}
+                        onClick={() => openRelatedToolbarMenu("additionalSettings")}
+                      >
+                        <ArrowLeft size={13} aria-hidden="true" />
+                      </button>
+                      <div className={styles.toolbarMenuLabel}>{databaseViewLabels().dependencies}</div>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().closeViewSettings}
+                        onClick={() => closeToolbarMenu(true)}
+                      >
+                        <X size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className={styles.taskFeatureBody}>
+                      <p>{databaseViewLabels().dependenciesDescription}</p>
+                      <fieldset className={styles.dependencyShiftOptions}>
+                        <legend>{databaseViewLabels().automaticDateShifting}</legend>
+                        {([
+                          ["overlap", databaseViewLabels().dependencyShiftOverlap],
+                          ["maintain_spacing", databaseViewLabels().dependencyShiftMaintain],
+                          ["none", databaseViewLabels().dependencyShiftNone],
+                        ] as const).map(([value, label]) => (
+                          <label key={value}>
+                            <input
+                              type="radio"
+                              name={`dependency-shift-${dbId}`}
+                              value={value}
+                              checked={dependencyShiftMode === value}
+                              onChange={() => setDependencyShiftMode(value)}
+                            />
+                            <span>{label}</span>
+                          </label>
+                        ))}
+                      </fieldset>
+                      <label className={styles.taskFeatureCheckbox}>
+                        <span>
+                          <strong>{databaseViewLabels().avoidWeekends}</strong>
+                          <small>{databaseViewLabels().avoidWeekendsDescription}</small>
+                        </span>
+                        <input
+                          type="checkbox"
+                          aria-label={databaseViewLabels().avoidWeekends}
+                          checked={dependencyAvoidWeekends}
+                          onChange={(event) => setDependencyAvoidWeekends(event.currentTarget.checked)}
+                        />
+                      </label>
+                      {dateProps.length >= 2 && (
+                        <label className={styles.taskFeatureCheckbox}>
+                          <strong>{databaseViewLabels().separateStartEndDates}</strong>
+                          <input
+                            type="checkbox"
+                            aria-label={databaseViewLabels().separateStartEndDates}
+                            checked={dependencySeparateDates}
+                            onChange={(event) => setDependencyDateMode(event.currentTarget.checked)}
+                          />
+                        </label>
+                      )}
+                      {dependencySeparateDates ? (
+                        <>
+                          <label className={styles.taskFeatureSelect}>
+                            <span>{databaseViewLabels().startDate}</span>
+                            <select
+                              aria-label={databaseViewLabels().startDate}
+                              value={dependencyStartDatePropertyId}
+                              onChange={(event) => setDependencyStartDatePropertyId(event.currentTarget.value)}
+                            >
+                              {dateProps.map((property) => (
+                                <option
+                                  key={property.id}
+                                  value={property.id}
+                                  disabled={property.id === dependencyEndDatePropertyId}
+                                >
+                                  {property.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className={styles.taskFeatureSelect}>
+                            <span>{databaseViewLabels().endDate}</span>
+                            <select
+                              aria-label={databaseViewLabels().endDate}
+                              value={dependencyEndDatePropertyId}
+                              onChange={(event) => setDependencyEndDatePropertyId(event.currentTarget.value)}
+                            >
+                              {dateProps.map((property) => (
+                                <option
+                                  key={property.id}
+                                  value={property.id}
+                                  disabled={property.id === dependencyStartDatePropertyId}
+                                >
+                                  {property.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        </>
+                      ) : (
+                        <label className={styles.taskFeatureSelect}>
+                          <span>{databaseViewLabels().moveBasedOn}</span>
+                          <select
+                            aria-label={databaseViewLabels().moveBasedOn}
+                            value={dependencyDatePropertyId}
+                            onChange={(event) => setDependencyDatePropertyId(event.currentTarget.value)}
+                          >
+                            {dateProps.length === 0 && (
+                              <option value="">{databaseViewLabels().noDateProperty}</option>
+                            )}
+                            {dateProps.map((property) => (
+                              <option key={property.id} value={property.id}>{property.name}</option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.taskFeaturePrimary}
+                        disabled={
+                          !dependencyDateBindingValid
+                          || dependencyActivationBusy
+                          || dependencySettingsUnchanged
+                        }
+                        onClick={() => void activateDependencies()}
+                      >
+                        {dependenciesEnabled
+                          ? databaseViewLabels().saveDependencySettings
+                          : databaseViewLabels().turnOnDependencies}
+                      </button>
+                      {dependenciesEnabled && (
+                        <button
+                          type="button"
+                          className={styles.taskFeatureSecondary}
+                          disabled={dependencyActivationBusy}
+                          onClick={() => openTaskFeatureTurnOff("dependencies")}
+                        >
+                          <span>{databaseViewLabels().turnOffDependencies}</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            {open === "taskFeatureTurnOffConfirmation" &&
+              renderToolbarMenuLayer(
+                <>
+                  <button
+                    type="button"
+                    className={styles.menuBackdrop}
+                    onClick={() => openRelatedToolbarMenu(
+                      turnOffFeature === "subitems" ? "subitemsSettings" : "dependenciesSettings"
+                    )}
+                    tabIndex={-1}
+                    aria-label={databaseViewLabels().cancel}
+                  />
+                  <div
+                    ref={toolbarMenuRef}
+                    className={`${styles.toolbarMenu} ${styles.viewSettingsMenu} ${styles.taskFeatureMenu}`}
+                    style={toolbarMenuStyle}
+                    role="dialog"
+                    aria-label={turnOffFeature === "subitems"
+                      ? databaseViewLabels().turnOffSubitems
+                      : databaseViewLabels().turnOffDependencies}
+                    aria-busy={turnOffFeature === "subitems"
+                      ? subitemsActivationBusy
+                      : dependencyActivationBusy}
+                    onKeyDown={onToolbarMenuKeyDown}
+                  >
+                    <div className={styles.toolbarMenuHead}>
+                      <span />
+                      <div className={styles.toolbarMenuLabel}>
+                        {turnOffFeature === "subitems"
+                          ? databaseViewLabels().turnOffSubitems
+                          : databaseViewLabels().turnOffDependencies}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.toolbarMenuClear}
+                        aria-label={databaseViewLabels().cancel}
+                        onClick={() => openRelatedToolbarMenu(
+                          turnOffFeature === "subitems" ? "subitemsSettings" : "dependenciesSettings"
+                        )}
+                      >
+                        <X size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className={styles.taskFeatureBody}>
+                      <fieldset className={styles.dependencyShiftOptions}>
+                        <label>
+                          <input
+                            type="radio"
+                            name={`turn-off-disposition-${dbId}`}
+                            value="remove"
+                            checked={turnOffPropertyDisposition === "remove"}
+                            onChange={() => setTurnOffPropertyDisposition("remove")}
+                          />
+                          <span>{databaseViewLabels().removeProperties}</span>
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name={`turn-off-disposition-${dbId}`}
+                            value="keep"
+                            checked={turnOffPropertyDisposition === "keep"}
+                            onChange={() => setTurnOffPropertyDisposition("keep")}
+                          />
+                          <span>{databaseViewLabels().keepProperties}</span>
+                        </label>
+                      </fieldset>
+                      <button
+                        type="button"
+                        className={styles.taskFeatureDanger}
+                        disabled={turnOffFeature === "subitems"
+                          ? subitemsActivationBusy
+                          : dependencyActivationBusy}
+                        onClick={() => void confirmTaskFeatureTurnOff()}
+                      >
+                        {databaseViewLabels().turnOff}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
       </div>
       <div className={styles.dbToolbarSpacer} />
       {!readOnly && (

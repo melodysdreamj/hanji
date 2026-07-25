@@ -51,7 +51,14 @@
     "range": "Oraliq",
     "earliest_date": "Eng erta sana",
     "latest_date": "Eng kech sana",
-    "date_range": "Sana oralig'i"
+    "date_range": "Sana oralig'i",
+    "count": "Hammasini sanash",
+    "count_per_group": "Guruh bo'yicha soni",
+    "empty": "Bo'sh qiymatlar soni",
+    "not_empty": "Bo'sh bo'lmagan qiymatlar soni",
+    "percent_per_group": "Guruh bo'yicha foizi",
+    "show_unique": "Noyob qiymatlarni ko'rsatish",
+    "unique": "Noyob qiymatlar soni"
   },
   "undo": "Ortga qaytarish",
   "untitled": "Nomsiz",

@@ -13,7 +13,7 @@
   "groupName": "Numele grupului",
   "groupOptions": "Opțiunile grupului {{groupName}}",
   "groupThisBoard": "Grupează acest panou",
-  "groupThisBoardDesc": "Adaugă o proprietate Selectare sau Stare pentru a crea coloane.",
+  "groupThisBoardDesc": "Adăugați sau alegeți o proprietate de tip Select, Status, Persoană sau Multi-select pentru a crea coloane.",
   "newGroup": "Grup nou",
   "newGroupIn": "Grup nou {{groupName}} în {{dbTitle}}",
   "newPage": "Nou",

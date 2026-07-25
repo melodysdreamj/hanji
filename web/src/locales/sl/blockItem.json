@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Video napis",
     "videoEmptyHint": "Naložite video datoteko, prilepite neposredno povezavo ali uporabite povezavo YouTube, Vimeo ali Loom.",
-    "videoLink": "Povezava do videa"
+    "videoLink": "Povezava do videa",
+    "audioPlaybackFailed": "Tega zvoka ni bilo mogoče predvajati. Zamenjajte ga ali odprite izvirno datoteko.",
+    "videoPlaybackFailed": "Tega videa ni bilo mogoče predvajati. Zamenjajte ga ali odprite izvirno datoteko."
   },
   "bookmark": {
     "copy": "Kopiraj povezavo zaznamka",

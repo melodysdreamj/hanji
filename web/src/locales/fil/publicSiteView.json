@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Breadcrumbs",
+  "clearSearch": "I-clear ang paghahanap",
+  "errors": {
+    "not-found": "Maaaring na-unpublish ang site na ito o nagbago ang address nito.",
+    "offline": "Suriin ang iyong koneksyon, at subukang buksan muli ang site.",
+    "rate-limited": "Masyadong maraming request ang site na ito. Maghintay at subukan muli.",
+    "unavailable": "Hindi mabuksan ng Hanji ang site na ito ngayon. Subukan muli sa ilang sandali."
+  },
+  "madeWithHanji": "Gawa gamit ang Hanji",
+  "navigation": "Pag-navigate sa site",
+  "noResults": "Walang nakitang page",
+  "outsideSite": "Ang page ay hindi bahagi ng naka-publish na site.",
+  "search": "Maghanap sa site na ito",
+  "tryAgain": "Subukan muli",
+  "unavailable": "Hindi available ang site na ito."
+}

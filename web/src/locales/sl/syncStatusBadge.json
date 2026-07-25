@@ -6,5 +6,6 @@
   "unreachable": "Strežnik ni dosegljiv",
   "unreachablePending_one": "Strežnik ni dosegljiv · {{count}} sprememba čaka",
   "unreachablePending_other": "Strežnik ni dosegljiv · {{count}} spremembe čakajo",
-  "retryHint": "Kliknite za ponoven poskus"
+  "retryHint": "Kliknite za ponoven poskus",
+  "confirmed": "Shranjeno na strežnik"
 }

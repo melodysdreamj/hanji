@@ -7,7 +7,8 @@
   "pageMissingSave": "De pagina kon niet worden gevonden, dus je wijzigingen konden niet worden opgeslagen.",
   "saveFailed": "Je wijzigingen konden niet worden opgeslagen.",
   "sessionExpired": "Je sessie is verlopen of de aanvraag kon niet worden geverifieerd. Probeer het opnieuw.",
-  "blockConflictSave": "Dit blok is op een ander apparaat bewerkt, zodat je offline wijziging niet is toegepast.",
+  "blockConflictSave": "Een wachtende bewerking overlapt de nieuwste serverversie en kon niet automatisch worden samengevoegd.",
   "blockConflictKeepMine": "Mijn versie toepassen",
-  "blockMoveCommentsSkipped": "Het blok is verplaatst, maar de reacties konden niet worden meeverplaatst."
+  "blockMoveCommentsSkipped": "Het blok is verplaatst, maar de reacties konden niet worden meeverplaatst.",
+  "conflictSave": "Deze inhoud is gewijzigd voordat het opslaan was voltooid, dus uw bewerking kon niet worden opgeslagen."
 }

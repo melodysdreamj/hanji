@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Жұмыс кеңістігі мәзірін ашу",
   "closeWorkspaceMenu": "Жұмыс кеңістігі мәзірін жабу",
   "workspaceMenu": "Жұмыс кеңістігі мәзірі",
-  "exportWorkspace": "Жұмыс кеңістігін экспорттау",
+  "exportWorkspace": "Жұмыс кеңістігін JSON ретінде экспорттау (файлдарсыз)",
   "exportedWorkspace": "Жұмыс кеңістігі Hanji файлы ретінде экспортталды",
   "exportedWorkspaceWithPlaceholders": "Жұмыс кеңістігі Hanji файлы ретінде экспортталды — тіркемелер орынбасар ретінде қалды",
   "couldntExportWorkspace": "Жұмыс кеңістігін экспорттау мүмкін болмады.",
@@ -76,5 +76,12 @@
     "later": "Кейінірек",
     "note": "Кейінірек бүйірлік тақтадағы 'Импорт' арқылы әрқашан бастай аласыз.",
     "title": "Notion жұмыс кеңістігіңізді Hanji-ге импорттағыңыз келе ме?"
-  }
+  },
+  "addPageToTeamspace": "{{name}} бетін қосу",
+  "couldntExportWorkspaceArchive": "Жұмыс кеңістігі мұрағатын экспорттау мүмкін болмады.",
+  "exportedWorkspaceArchive": "Файлдары бар жұмыс кеңістігі мұрағаты экспортталды.",
+  "exportWorkspaceArchive": "Жұмыс кеңістігі мұрағатын экспорттау (файлдармен)",
+  "joinTeamspaces": "Командалық кеңістіктерге қосылу",
+  "keyboardShortcuts": "Пернетақта пернелер тіркесімі",
+  "teamspacePages": "{{name}} беттері"
 }

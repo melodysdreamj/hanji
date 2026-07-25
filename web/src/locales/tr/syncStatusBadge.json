@@ -6,5 +6,6 @@
   "unreachable": "Sunucuya ulaşılamıyor",
   "unreachablePending_one": "Sunucuya ulaşılamıyor · {{count}} değişiklik bekliyor",
   "unreachablePending_other": "Sunucuya ulaşılamıyor · {{count}} değişiklik bekliyor",
-  "retryHint": "Şimdi tekrar denemek için tıklayın"
+  "retryHint": "Şimdi tekrar denemek için tıklayın",
+  "confirmed": "Sunucuya kaydedildi"
 }

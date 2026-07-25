@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Voeg kommentaar by",
+    "addLink": "Voeg skakel by",
+    "blockColor": "Pas laas gebruikte kleur toe",
+    "bold": "Vet",
+    "copyPageLink": "Kopieer bladsyskakel",
+    "findInPage": "Vind op hierdie bladsy",
+    "inlineCode": "Inlynkode",
+    "italic": "Kursief",
+    "moveBlock": "Skuif blok na ander bladsy",
+    "moveBlockDown": "Skuif blok af",
+    "moveBlockUp": "Skuif blok op",
+    "movePage": "Skuif huidige bladsy",
+    "navigateBack": "Gaan terug",
+    "navigateForward": "Gaan vorentoe",
+    "newPage": "Nuwe bladsy",
+    "openBlockMenu": "Maak blok aksies oop",
+    "openKeyboardShortcuts": "Maak sleutelbordkortpaaie oop",
+    "openParentPage": "Maak ouerbladsy oop",
+    "quickFind": "Vinnige Soek",
+    "strikethrough": "Deurhaal",
+    "toggleAllToggles": "Vou alle wisselaars uit of in",
+    "toggleSidebar": "Wissel systaaf",
+    "toggleTheme": "Wissel donkermodus",
+    "underline": "Onderstreep"
+  },
+  "categories": {
+    "createStyle": "Skep en styl",
+    "editMove": "Wysig en skuif",
+    "popular": "Gewild"
+  },
+  "categoriesLabel": "Kortpadkategorieë",
+  "close": "Sluit",
+  "closeBackdrop": "Sluit sleutelbordkortpaaie",
+  "empty": "Geen kortpaaie gevind nie",
+  "keysFor": "Sleutels vir {{action}}",
+  "or": "of",
+  "searchLabel": "Soek sleutelbordkortpaaie",
+  "searchPlaceholder": "Soek kortpaaie…",
+  "searchResults": "Soekresultate",
+  "searchTerms": {
+    "toggleTheme": "tema lig donker voorkoms"
+  },
+  "title": "Sleutelbordkortpaaie"
+}

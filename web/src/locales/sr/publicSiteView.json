@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Putanja navigacije",
+  "clearSearch": "Obriši pretragu",
+  "errors": {
+    "not-found": "Ovaj sajt možda više nije objavljen ili mu je promenjena adresa.",
+    "offline": "Proverite vezu, a zatim pokušajte ponovo da otvorite sajt.",
+    "rate-limited": "Ovaj sajt prima previše zahteva. Sačekajte trenutak i pokušajte ponovo.",
+    "unavailable": "Hanji trenutno ne može da otvori ovaj sajt. Pokušajte ponovo za trenutak."
+  },
+  "madeWithHanji": "Napravljeno sa Hanjijem",
+  "navigation": "Navigacija sajta",
+  "noResults": "Nema pronađenih stranica",
+  "outsideSite": "Stranica nije deo ovog objavljenog sajta.",
+  "search": "Pretraži ovaj sajt",
+  "tryAgain": "Pokušaj ponovo",
+  "unavailable": "Ovaj sajt nije dostupan."
+}

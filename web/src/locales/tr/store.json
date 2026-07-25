@@ -7,7 +7,8 @@
   "pageMissingSave": "Sayfa bulunamadı, bu nedenle değişiklikleriniz kaydedilemedi.",
   "saveFailed": "Değişiklikleriniz kaydedilemedi.",
   "sessionExpired": "Oturumunuz sona erdi veya istek doğrulanamadı. Lütfen tekrar deneyin.",
-  "blockConflictSave": "Bu blok başka bir cihazda düzenlendi, bu nedenle çevrimdışı değişikliğiniz uygulanamadı.",
+  "blockConflictSave": "Bekleyen bir düzenleme, sunucudaki en son sürümle çakıştığı için otomatik olarak birleştirilemedi.",
   "blockConflictKeepMine": "Kendi sürümümü uygula",
-  "blockMoveCommentsSkipped": "Blok taşındı, ancak yorumları onunla birlikte taşınamadı."
+  "blockMoveCommentsSkipped": "Blok taşındı, ancak yorumları onunla birlikte taşınamadı.",
+  "conflictSave": "Bu içerik kayıt tamamlanmadan değiştiği için düzenlemeniz kaydedilemedi."
 }

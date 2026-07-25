@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} עדכונים אחרונים",
     "unreadOfTotal": "{{unread}} לא נקראים מתוך {{total}} עדכונים",
     "updateType": "סוג עדכון",
-    "updates": "עדכונים",
-    "modeUpdates": "עדכונים",
-    "modeChats": "שיחות",
-    "inboxMode": "מצב תיבת נכנס"
+    "updates": "עדכונים"
   },
   "time": {
     "justNow": "זה עתה",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} גרסאות",
     "versionsAgo": "לפני {{count}} גרסאות",
     "versionsAhead": "{{count}} גרסאות קדימה",
-    "versionsAria": "גרסאות"
+    "versionsAria": "גרסאות",
+    "emptyBlock": "בלוק ריק",
+    "emptyPreview": "גרסה זו אינה מכילה תוכן עמוד.",
+    "previewAria": "תצוגה מקדימה של גרסת עמוד לקריאה בלבד",
+    "previewingCurrent": "צפייה בעמוד הנוכחי",
+    "previewingSnapshot": "צפייה בגרסה קודמת",
+    "previewOnlyHint": "בחירת גרסה מציגה תצוגה מקדימה בלבד. העמוד הנוכחי ישתנה רק לאחר שחזור.",
+    "restoreThisVersion": "שחזר",
+    "restoring": "משחזר...",
+    "versionHistory": "היסטוריית גרסאות"
   },
   "badges": {
     "comment": "תגובה",
@@ -67,7 +73,8 @@
     "referenceMention": "איזכור {{title}} · {{preview}}",
     "referenceLink": "מקושר ל{{title}} · {{preview}}",
     "unreadDot": "לא נקרא",
-    "workspaceUpdate": "עדכון סביבת עבודה"
+    "workspaceUpdate": "עדכון סביבת עבודה",
+    "bySelf": "על ידך"
   },
   "empty": {
     "allCaughtUp": "הכל מעודכן.",

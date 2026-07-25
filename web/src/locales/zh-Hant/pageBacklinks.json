@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} 個反向連結",
-    "count_other": "{{count}} 個反向連結"
+    "count_other": "{{count}} 個反向連結",
+    "partial_one": "{{count}}+ 反向鏈接",
+    "partial_other": "{{count}}+ 反向鏈接"
   },
   "header": {
     "title": "連結的提及"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} 個提及",
     "mention_other": "{{count}} 個提及",
     "link_one": "{{count}} 個連結",
-    "link_other": "{{count}} 個連結"
+    "link_other": "{{count}} 個連結",
+    "loaded": "已載入：{{summary}}"
   },
   "kind": {
     "mention": "提及",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "再 {{count}} 個反向連結",
-    "count_other": "再 {{count}} 個反向連結"
+    "count_other": "再 {{count}} 個反向連結",
+    "load": "載入更多反向鏈接",
+    "loading": "正在載入反向鏈接…",
+    "search": "搜尋反向鏈接"
   }
 }

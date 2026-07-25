@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "යැපුම්:",
     "hint": "සම්බන්ධතා ගුණාංගයක් එක් කරන්න",
-    "relationPropertyAriaLabel": "යැපුම් සම්බන්ධතා ගුණාංගය"
+    "relationPropertyAriaLabel": "යැපුම් සම්බන්ධතා ගුණාංගය",
+    "makeDependOn": "{{title}} {{predecessor}} මත රඳා පවතින ලෙස සකසන්න",
+    "startFrom": "{{title}} වෙතින් යැපීම ආරම්භ කරන්න"
   },
   "toolbar": {
     "today": "අද",

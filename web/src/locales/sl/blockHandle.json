@@ -88,5 +88,38 @@
     "hoursAgo": "Nazadnje urejeno pred {{hours}}h",
     "daysAgo": "Nazadnje urejeno pred {{days}}d",
     "on": "Nazadnje urejeno {{date}}"
+  },
+  "align": {
+    "center": "Sredina",
+    "choose": "Izberite poravnavo slike",
+    "left": "Levo",
+    "right": "Desno"
+  },
+  "altText": {
+    "help": "Nadomestno besedilo pomaga uporabnikom bralnikov zaslona razumeti sliko.",
+    "label": "Opis",
+    "placeholder": "Opišite sliko",
+    "remove": "Odstrani",
+    "save": "Shrani",
+    "title": "Nadomestno besedilo"
+  },
+  "imageLink": {
+    "invalid": "Vnesite celoten http:// ali https:// naslov URL.",
+    "label": "Ob kliku na sliko odpri ta URL",
+    "remove": "Odstrani",
+    "save": "Shrani",
+    "title": "Povezava do slike"
+  },
+  "media": {
+    "addImageLink": "Dodaj povezavo",
+    "align": "Poravnava",
+    "altText": "Nadomestno besedilo",
+    "copySourceLink": "Kopiraj izvorno povezavo",
+    "download": "Prenesi",
+    "editImageLink": "Uredi povezavo",
+    "fullScreen": "Celozaslonski",
+    "openLink": "Odpri povezavo",
+    "replace": "Zamenjaj",
+    "viewOriginal": "Poglej izvirnik"
   }
 }

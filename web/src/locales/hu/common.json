@@ -8,7 +8,8 @@
     "delete": "Törlés",
     "clearAll": "Összes törlése",
     "done": "Kész",
-    "add": "Hozzáadás"
+    "add": "Hozzáadás",
+    "reportIssue": "Hiba jelentése"
   },
   "labels": {
     "untitled": "Cím nélküli"

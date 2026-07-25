@@ -92,5 +92,8 @@
     "Sa",
     "So"
   ],
-  "you": "Du"
+  "you": "Du",
+  "buttonExecutionFailed": "Button konnte nicht ausgeführt werden.",
+  "loadingMoreRelations": "Weitere Relationen werden geladen…",
+  "loadMoreRelations": "Weitere Relationen laden"
 }

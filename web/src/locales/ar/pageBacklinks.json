@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} رابط خلفي",
-    "count_other": "{{count}} روابط خلفية"
+    "count_other": "{{count}} روابط خلفية",
+    "partial_one": "{{count}}+ رابط خلفي",
+    "partial_other": "{{count}}+ روابط خلفية"
   },
   "header": {
     "title": "الإشارات المرتبطة"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} إشارة",
     "mention_other": "{{count}} إشارات",
     "link_one": "{{count}} رابط",
-    "link_other": "{{count}} روابط"
+    "link_other": "{{count}} روابط",
+    "loaded": "تم التحميل: {{summary}}"
   },
   "kind": {
     "mention": "إشارة",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} رابط خلفي إضافي",
-    "count_other": "{{count}} روابط خلفية إضافية"
+    "count_other": "{{count}} روابط خلفية إضافية",
+    "load": "تحميل المزيد من الروابط الخلفية",
+    "loading": "جارٍ تحميل الروابط الخلفية…",
+    "search": "البحث عن روابط خلفية"
   }
 }

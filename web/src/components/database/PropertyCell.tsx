@@ -18,11 +18,21 @@ import { useTranslation } from "react-i18next";
 import { clampedPopoverLeft, clampedPopoverWidth } from "@/lib/popoverGeometry";
 import { useShallow } from "zustand/react/shallow";
 import { i18next } from "@/i18n";
-import { searchOrganizationPeopleRemote } from "@/lib/edgebase";
-import { storageKeyFromUrl, useWorkspaceFileUrl } from "@/lib/fileUrls";
+import { scheduleOrganizationPeopleTypeahead } from "@/lib/typeaheadSearch";
+import {
+  resolveWorkspaceFileUrl,
+  storageKeyFromUrl,
+  useWorkspaceFileUrl,
+} from "@/lib/fileUrls";
 import { activeDateLocale } from "@/lib/i18n";
 import { isComposingKeyEvent } from "@/lib/keyboard";
 import { pageHref } from "@/lib/navigation";
+import { useRouter } from "@/lib/router";
+import {
+  buttonResultRequiresConfirmation,
+  type ButtonConfirmationChallenge,
+} from "@/lib/edgebase";
+import { dispatchButtonClientOutcomes } from "@/lib/buttonExecution";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import type {
   DbProperty,
@@ -33,12 +43,10 @@ import type {
 } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { newId } from "@/lib/ids";
-import {
-  createWorkspaceFileDownloadUrl,
-  uploadWorkspaceFile,
-} from "@/lib/storage";
+import { uploadWorkspaceFile } from "@/lib/storage";
 import type { UploadProgress } from "@/lib/storage";
 import { safeStoredFileUrl } from "@/lib/urls";
+import { ButtonConfirmationDialog } from "../automation/ButtonConfirmationDialog";
 import { chipStyle, COLOR_NAMES, type ColorName, nextColor } from "./colors";
 import {
   addDays,
@@ -67,7 +75,6 @@ import {
 import { formatNumberValue, numberFormatForProperty } from "./numberFormat";
 import { normalizePersonIds, personInitials, personLabel } from "./people";
 import { evaluateRollup, secondHopDatabaseId, valueAsIds } from "./rollup";
-import { useRouter } from "@/lib/router";
 import {
   CheckIcon,
   DotsHorizontal,
@@ -82,6 +89,7 @@ import {
 import { PageIconGlyph } from "../PageIcon";
 import { backendComputedText } from "./computed";
 import { AttachmentOpenLink } from "./AttachmentOpenLink";
+import { dataTransferHasFiles, droppedFiles } from "../editor/fileDrop";
 import styles from "./database.module.css";
 
 const SELECT_OPTION_DRAG = "application/x-hanji-select-option";
@@ -217,9 +225,16 @@ function PropertyCellImpl({
     else setRowProperty(row.id, prop.id, v, { debounce: false });
   };
 
+  const setTextValue = (v: string) => {
+    if (prop.type === "title") updatePage(row.id, { title: v }, { debounce: true });
+    else setRowProperty(row.id, prop.id, v, { debounce: true });
+  };
+
   const value = getValue(row, prop);
 
   switch (prop.type) {
+    case "button":
+      return <DatabaseButtonCell row={row} prop={prop} />;
     case "checkbox":
       return (
         <span className={styles.cellCheck}>
@@ -291,11 +306,71 @@ function PropertyCellImpl({
           prop={prop}
           value={value}
           autoFocus={autoFocus}
-          onCommit={setValue}
+          onInput={setTextValue}
           presentation={presentation}
         />
       );
   }
+}
+
+function DatabaseButtonCell({ row, prop }: { row: Page; prop: DbProperty }) {
+  const { t } = useTranslation(["propertyCell", "common"]);
+  const router = useRouter();
+  const runDatabaseButton = useStore((state) => state.runDatabaseButton);
+  const discardDatabaseButtonExecution = useStore((state) => state.discardDatabaseButtonExecution);
+  const notify = useStore((state) => state.notify);
+  const [running, setRunning] = useState(false);
+  const [challenge, setChallenge] = useState<ButtonConfirmationChallenge | null>(null);
+  const document = prop.config?.button;
+  const label = document?.label?.trim() || prop.name;
+  const configured = document?.version === 1 && Array.isArray(document.actions) && document.actions.length > 0;
+
+  async function execute(confirmationToken?: string) {
+    if (!configured || running) return;
+    setRunning(true);
+    try {
+      const result = await runDatabaseButton(row.id, prop.id, confirmationToken);
+      if (!result) return;
+      if (buttonResultRequiresConfirmation(result)) {
+        setChallenge(result);
+        return;
+      }
+      setChallenge(null);
+      dispatchButtonClientOutcomes(result.clientOutcomes ?? [], {
+        navigate: router.push,
+      });
+    } catch {
+      notify(t("propertyCell:buttonExecutionFailed"), "error");
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className={styles.databaseButtonCell}
+        aria-busy={running || undefined}
+        disabled={!configured || running}
+        onClick={() => void execute()}
+      >
+        <Plus size={14} aria-hidden="true" />
+        <span>{label}</span>
+      </button>
+      {challenge && (
+        <ButtonConfirmationDialog
+          challenge={challenge}
+          busy={running}
+          onCancel={() => {
+            discardDatabaseButtonExecution(row.id, prop.id);
+            setChallenge(null);
+          }}
+          onConfirm={() => void execute(challenge.confirmationToken)}
+        />
+      )}
+    </>
+  );
 }
 
 function linkHref(type: DbProperty["type"], value: string): string | null {
@@ -316,14 +391,14 @@ function TextCell({
   prop,
   value,
   autoFocus,
-  onCommit,
+  onInput,
   presentation = "default",
 }: {
   row: Page;
   prop: DbProperty;
   value: unknown;
   autoFocus?: boolean;
-  onCommit: (v: string) => void;
+  onInput: (v: string) => void;
   presentation?: "default" | "rowDetail";
 }) {
   const { t } = useTranslation(["propertyCell", "common"]);
@@ -337,16 +412,47 @@ function TextCell({
   const hasRowIcon = row.iconType !== "none" && !!row.icon;
 
   const dirtyRef = useRef(false);
-  // Reflect external changes (a collaborator edit or an undo) to the cell value
-  // while the user hasn't typed, so a later blur can't clobber the newer value
-  // with this cell's stale snapshot.
+  const deferredInitialRef = useRef<string | undefined>(undefined);
+  const composingRef = useRef(false);
+  const trailingCompositionValueRef = useRef<string | null>(null);
+  // Reflect external changes while idle. Once this focused editor has typed,
+  // its value is already in the durable page lane; keep the visible draft
+  // stable until editing ends instead of replacing it mid-keystroke.
   useEffect(() => {
-    if (dirtyRef.current) return;
+    if (dirtyRef.current) {
+      deferredInitialRef.current = initial;
+      return;
+    }
+    deferredInitialRef.current = undefined;
     setText(initial);
   }, [initial]);
   function handleInput(next: string) {
     dirtyRef.current = true;
     setText(next);
+    if (composingRef.current) {
+      return;
+    }
+    const trailingCompositionValue = trailingCompositionValueRef.current;
+    if (trailingCompositionValue !== null) {
+      trailingCompositionValueRef.current = null;
+      if (trailingCompositionValue === next) return;
+    }
+    onInput(next);
+  }
+
+  function startComposition() {
+    composingRef.current = true;
+    trailingCompositionValueRef.current = null;
+  }
+
+  function finishComposition(next: string) {
+    composingRef.current = false;
+    dirtyRef.current = true;
+    setText(next);
+    onInput(next);
+    // Chromium/WebKit may emit one byte-identical input after compositionend.
+    // Suppress only that echo; the next genuinely different input proceeds.
+    trailingCompositionValueRef.current = next;
   }
 
   useEffect(() => {
@@ -365,9 +471,12 @@ function TextCell({
     el.style.height = `${Math.max(31, el.scrollHeight)}px`;
   }, [isRowDetailText, text]);
 
-  function commit() {
-    if (dirtyRef.current && text !== initial) onCommit(text);
+  function finishEditing() {
+    composingRef.current = false;
     dirtyRef.current = false;
+    const deferredInitial = deferredInitialRef.current;
+    deferredInitialRef.current = undefined;
+    if (deferredInitial !== undefined) setText(deferredInitial);
     setEditing(false);
   }
 
@@ -424,14 +533,15 @@ function TextCell({
           placeholder=""
           value={text}
           onChange={(e) => handleInput(e.target.value)}
-          onBlur={commit}
+          onCompositionStart={startComposition}
+          onCompositionEnd={(e) => finishComposition(e.currentTarget.value)}
+          onBlur={finishEditing}
           onKeyDown={(e) => {
             if (isComposingKeyEvent(e)) return;
             if (e.key === "Enter") {
               (e.target as HTMLInputElement).blur();
             } else if (e.key === "Escape") {
-              setText(initial);
-              setEditing(false);
+              (e.target as HTMLInputElement).blur();
             }
           }}
         />
@@ -450,14 +560,15 @@ function TextCell({
         placeholder=""
         value={text}
         onChange={(e) => handleInput(e.target.value)}
-        onBlur={commit}
+        onCompositionStart={startComposition}
+        onCompositionEnd={(e) => finishComposition(e.currentTarget.value)}
+        onBlur={finishEditing}
         onKeyDown={(e) => {
           if (isComposingKeyEvent(e)) return;
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
             (e.target as HTMLTextAreaElement).blur();
           } else if (e.key === "Escape") {
-            setText(initial);
-            setEditing(false);
+            (e.target as HTMLTextAreaElement).blur();
           }
         }}
       />
@@ -474,14 +585,15 @@ function TextCell({
       placeholder=""
       value={text}
       onChange={(e) => handleInput(e.target.value)}
-      onBlur={commit}
+      onCompositionStart={startComposition}
+      onCompositionEnd={(e) => finishComposition(e.currentTarget.value)}
+      onBlur={finishEditing}
       onKeyDown={(e) => {
         if (isComposingKeyEvent(e)) return;
         if (e.key === "Enter") {
           (e.target as HTMLInputElement).blur();
         } else if (e.key === "Escape") {
-          setText(initial);
-          setEditing(false);
+          (e.target as HTMLInputElement).blur();
         }
       }}
     />
@@ -590,24 +702,17 @@ function PersonCell({ row, prop }: { row: Page; prop: DbProperty }) {
       setSearchedPeople({ key: "", people: [] });
       return;
     }
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      searchOrganizationPeopleRemote({
+    return scheduleOrganizationPeopleTypeahead({
         organizationId: organization.id,
         query: searchKey,
         limit: 12,
-      })
-        .then((result) => {
-          if (!cancelled) setSearchedPeople({ key: searchKey, people: result.people ?? [] });
-        })
-        .catch(() => {
-          if (!cancelled) setSearchedPeople({ key: searchKey, people: [] });
-        });
-    }, 120);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      }, {
+        onResult: (result) => setSearchedPeople({
+          key: searchKey,
+          people: result.people ?? [],
+        }),
+        onError: () => setSearchedPeople({ key: searchKey, people: [] }),
+      });
   }, [open, organization?.id, searchKey]);
 
   const peopleOptions = useMemo(() => {
@@ -1124,9 +1229,14 @@ async function uploadFileAttachment(
   prop: DbProperty,
   onProgress?: (progress: UploadProgress) => void
 ): Promise<FileAttachment> {
+  const resolvedDatabaseId = useStore.getState().pagesById[prop.databaseId]
+    ?.properties?.notionLinkedDatabaseResolvedId;
   const uploaded = await uploadWorkspaceFile(file, "database/files", {
     pageId: row.id,
-    databaseId: prop.databaseId,
+    databaseId:
+      typeof resolvedDatabaseId === "string" && resolvedDatabaseId.trim()
+        ? resolvedDatabaseId
+        : prop.databaseId,
     propertyId: prop.id,
   }, { onProgress });
   return {
@@ -1160,7 +1270,7 @@ async function resolvedFileActionUrl(file: FileAttachment) {
   const key = storedWorkspaceFileKey(file);
   if (key) {
     try {
-      return (await createWorkspaceFileDownloadUrl({ key })).url;
+      return await resolveWorkspaceFileUrl(key);
     } catch {
       // Fall back to the stored URL below when signing fails.
     }
@@ -1234,6 +1344,7 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
   const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const [fileDropActive, setFileDropActive] = useState(false);
   const [deletingFileIds, setDeletingFileIds] = useState<Set<string>>(() => new Set());
   const deletingFileIdsRef = useRef<Set<string>>(new Set());
   const [uploadProgress, setUploadProgress] = useState<
@@ -1287,7 +1398,7 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
     }
   }
 
-  async function addUploads(list: FileList | null) {
+  async function addUploads(list: FileList | readonly File[] | null) {
     const selected = Array.from(list ?? []);
     if (selected.length === 0) return;
     setUploadError("");
@@ -1383,17 +1494,51 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
   }
 
   function openMenu() {
+    if (!open) setAddOpen(files.length === 0);
     setOpen(true);
   }
 
   function closeMenu(restoreFocus = false) {
     setOpen(false);
     setAddOpen(false);
+    setFileDropActive(false);
     setFileMenuId(null);
     setRenamingFileId(null);
     if (restoreFocus) {
       window.requestAnimationFrame(() => triggerRef.current?.focus());
     }
+  }
+
+  function handleFileDragEnter(e: ReactDragEvent<HTMLDivElement>) {
+    if (uploading || !dataTransferHasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+    setFileDropActive(true);
+  }
+
+  function handleFileDragOver(e: ReactDragEvent<HTMLDivElement>) {
+    if (uploading || !dataTransferHasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+    if (!fileDropActive) setFileDropActive(true);
+  }
+
+  function handleFileDragLeave(e: ReactDragEvent<HTMLDivElement>) {
+    if (!dataTransferHasFiles(e.dataTransfer)) return;
+    const nextTarget = e.relatedTarget;
+    if (nextTarget instanceof Node && e.currentTarget.contains(nextTarget)) return;
+    setFileDropActive(false);
+  }
+
+  function handleFileDrop(e: ReactDragEvent<HTMLDivElement>) {
+    if (uploading || !dataTransferHasFiles(e.dataTransfer)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setFileDropActive(false);
+    const selected = droppedFiles(e.dataTransfer);
+    if (selected.length > 0) void addUploads(selected);
   }
 
   return (
@@ -1460,6 +1605,16 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
             closeMenu(true);
           }}
         >
+          <div
+            className={styles.filesMenuDropSurface}
+            data-file-drop-zone="true"
+            data-file-drop-active={fileDropActive ? "true" : undefined}
+            aria-busy={uploading}
+            onDragEnter={handleFileDragEnter}
+            onDragOver={handleFileDragOver}
+            onDragLeave={handleFileDragLeave}
+            onDrop={handleFileDrop}
+          >
             <div className={styles.filesMenuHeader}>
               <button
                 type="button"
@@ -1637,6 +1792,7 @@ function FilesCell({ row, prop }: { row: Page; prop: DbProperty }) {
               })}
               {files.length === 0 && <div className={styles.selectEmpty}>{t("propertyCell:noAttachments")}</div>}
             </div>
+          </div>
         </CellMenuPortal>
       )}
     </div>
@@ -1669,6 +1825,7 @@ function RelationCell({
   const pagesById = useStore(useShallow((s) => s.pagesById));
   const hydratedRelationTargetIds = useStore((s) => s.hydratedRelationTargetIds);
   const loadDatabase = useStore((s) => s.loadDatabase);
+  const loadDatabaseDependencyRelation = useStore((s) => s.loadDatabaseDependencyRelation);
   const setRelation = useStore((s) => s.setRelation);
   const addRow = useStore((s) => s.addRow);
   const updatePage = useStore((s) => s.updatePage);
@@ -1680,7 +1837,37 @@ function RelationCell({
 
   const targetDbId = prop.config?.relationDatabaseId ?? prop.databaseId;
   const targetDb = pagesById[targetDbId];
-  const selectedIds = valueAsIds(row.properties?.[prop.id]);
+  const dependencyRole = prop.config?.databaseFeatureRole;
+  const isDependencyRelation = dependencyRole === "dependency_predecessor"
+    || dependencyRole === "dependency_successor"
+    || dependencyRole === "preserved_dependency_predecessor"
+    || dependencyRole === "preserved_dependency_successor";
+  const isSubitemParentRelation = dependencyRole === "subitem_parent"
+    || dependencyRole === "preserved_subitem_parent";
+  const isSubitemChildrenRelation = dependencyRole === "subitem_children"
+    || dependencyRole === "preserved_subitem_children";
+  const isPreservedTaskRelation = dependencyRole === "preserved_dependency_predecessor"
+    || dependencyRole === "preserved_dependency_successor"
+    || dependencyRole === "preserved_subitem_parent"
+    || dependencyRole === "preserved_subitem_children";
+  const dependencyRelation = useStore((s) => (
+    isDependencyRelation ? s.databaseDependencyRelation(row.id, prop.id) : undefined
+  ));
+  const selectedIds = isDependencyRelation
+    ? (dependencyRelation?.relatedRowIds ?? [])
+    : isSubitemParentRelation
+      ? (row.subitemParentId ? [row.subitemParentId] : [])
+      : isSubitemChildrenRelation
+        ? Object.values(pagesById)
+            .filter((candidate) => (
+              candidate.parentType === "database"
+              && candidate.parentId === prop.databaseId
+              && candidate.subitemParentId === row.id
+              && !candidate.inTrash
+            ))
+            .sort((left, right) => left.position - right.position || left.id.localeCompare(right.id))
+            .map((candidate) => candidate.id)
+    : valueAsIds(row.properties?.[prop.id]);
   const selectedSet = new Set(selectedIds);
   const selectedPages = selectedIds
     .map((id) => pagesById[id])
@@ -1706,7 +1893,9 @@ function RelationCell({
   );
   const exact = candidates.some((page) => pageDisplayTitle(page).toLowerCase() === query);
   const canCreate = q.trim().length > 0 && !exact && targetDb?.kind === "database";
-  const itemCount = filtered.length + (canCreate ? 1 : 0);
+  const canLoadMore = isDependencyRelation && dependencyRelation?.hasMore === true;
+  const loadMoreIndex = filtered.length + (canCreate ? 1 : 0);
+  const itemCount = loadMoreIndex + (canLoadMore ? 1 : 0);
   const active = itemCount === 0 ? -1 : Math.min(activeIndex, itemCount - 1);
   const listId = `relation-list-${prop.id}-${row.id}`;
 
@@ -1714,8 +1903,18 @@ function RelationCell({
     // A self-relation already shares this database's active row query. Loading
     // the default query here makes every relation cell fight the visible view
     // query, alternating requests forever and leaving reload skeletons stuck.
-    if (targetDbId && targetDbId !== prop.databaseId) void loadDatabase(targetDbId);
-  }, [loadDatabase, prop.databaseId, targetDbId]);
+    // Closed cells need only the target schema; the current databaseRows
+    // response already carries the selected relation pages. Fetch candidate
+    // rows only when the user actually opens the relation picker.
+    if (!isDependencyRelation && targetDbId && targetDbId !== prop.databaseId) {
+      void loadDatabase(targetDbId, { rows: open });
+    }
+  }, [isDependencyRelation, loadDatabase, open, prop.databaseId, targetDbId]);
+
+  useEffect(() => {
+    if (!isDependencyRelation) return;
+    void loadDatabaseDependencyRelation(row.id, prop.id);
+  }, [isDependencyRelation, loadDatabaseDependencyRelation, prop.id, row.id]);
 
   useEffect(() => {
     if (!open) return;
@@ -1725,7 +1924,8 @@ function RelationCell({
   }, [active, open, filtered.length, canCreate]);
 
   function commit(ids: string[]) {
-    setRelation(row.id, prop, ids);
+    if (isPreservedTaskRelation) return;
+    void setRelation(row.id, prop, ids);
   }
 
   function toggle(id: string) {
@@ -1746,6 +1946,7 @@ function RelationCell({
   }
 
   function openMenu() {
+    if (isPreservedTaskRelation) return;
     setOpen(true);
   }
 
@@ -1792,7 +1993,13 @@ function RelationCell({
       toggle(page.id);
       return;
     }
-    if (canCreate) void createRelatedPage();
+    if (canCreate && active === filtered.length) {
+      void createRelatedPage();
+      return;
+    }
+    if (canLoadMore && active === loadMoreIndex && !dependencyRelation?.loadingMore) {
+      void loadDatabaseDependencyRelation(row.id, prop.id, { append: true });
+    }
   }
 
   function onSearchKeyDown(e: ReactKeyboardEvent<HTMLInputElement>) {
@@ -1883,16 +2090,18 @@ function RelationCell({
             >
               {pageDisplayTitle(page)}
             </a>
-            <button
-              type="button"
-              aria-label={t("propertyCell:remove", { name: pageDisplayTitle(page) })}
-              onClick={(e) => {
-                e.stopPropagation();
-                commit(selectedIds.filter((id) => id !== page.id));
-              }}
-            >
-              <X size={10} aria-hidden="true" />
-            </button>
+            {!isPreservedTaskRelation && (
+              <button
+                type="button"
+                aria-label={t("propertyCell:remove", { name: pageDisplayTitle(page) })}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  commit(selectedIds.filter((id) => id !== page.id));
+                }}
+              >
+                <X size={10} aria-hidden="true" />
+              </button>
+            )}
           </span>
         ))}
         {pendingSelectedCount > 0 && (
@@ -1912,17 +2121,19 @@ function RelationCell({
           </span>
         )}
         {selectedIds.length === 0 && <span className={styles.cellEmpty}>&nbsp;</span>}
-        <button
-          ref={triggerRef}
-          type="button"
-          className={styles.propertyCellEditTrigger}
-          aria-label={t("propertyCell:editRelation", { name: prop.name })}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          onClick={openMenu}
-        >
-          <Plus size={13} aria-hidden="true" />
-        </button>
+        {!isPreservedTaskRelation && (
+          <button
+            ref={triggerRef}
+            type="button"
+            className={styles.propertyCellEditTrigger}
+            aria-label={t("propertyCell:editRelation", { name: prop.name })}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            onClick={openMenu}
+          >
+            <Plus size={13} aria-hidden="true" />
+          </button>
+        )}
       </div>
       {open && (
         <CellMenuPortal
@@ -1975,6 +2186,7 @@ function RelationCell({
                   data-active={index === active ? "true" : undefined}
                   data-relation-index={index}
                   data-selected={selectedSet.has(page.id) ? "true" : undefined}
+                  disabled={isDependencyRelation && dependencyRelation?.loaded !== true}
                   onMouseEnter={() => setActiveIndex(index)}
                   onFocus={() => setActiveIndex(index)}
                   onClick={() => toggle(page.id)}
@@ -1992,7 +2204,9 @@ function RelationCell({
               ))}
               {filtered.length === 0 && !q.trim() && (
                 <div className={styles.selectEmpty}>
-                  {targetDb
+                  {isDependencyRelation && dependencyRelation?.loading
+                    ? t("propertyCell:relationLoading")
+                    : targetDb
                     ? t("propertyCell:noPagesYet")
                     : t("propertyCell:relationDatabaseUnavailable")}
                 </div>
@@ -2010,12 +2224,39 @@ function RelationCell({
                   tabIndex={filtered.length === active ? 0 : -1}
                   data-active={filtered.length === active ? "true" : undefined}
                   data-relation-index={filtered.length}
+                  disabled={isDependencyRelation && dependencyRelation?.loaded !== true}
                   onMouseEnter={() => setActiveIndex(filtered.length)}
                   onFocus={() => setActiveIndex(filtered.length)}
                   onClick={() => void createRelatedPage()}
                 >
                   <Plus size={14} aria-hidden="true" />
                   <span>{t("propertyCell:newRelation", { title: q.trim() })}</span>
+                </button>
+              )}
+              {canLoadMore && (
+                <button
+                  id={optionId(loadMoreIndex)}
+                  type="button"
+                  className={styles.relationCreate}
+                  role="option"
+                  aria-selected={false}
+                  tabIndex={loadMoreIndex === active ? 0 : -1}
+                  data-active={loadMoreIndex === active ? "true" : undefined}
+                  data-relation-index={loadMoreIndex}
+                  disabled={dependencyRelation.loadingMore}
+                  onMouseEnter={() => setActiveIndex(loadMoreIndex)}
+                  onFocus={() => setActiveIndex(loadMoreIndex)}
+                  onClick={() => void loadDatabaseDependencyRelation(
+                    row.id,
+                    prop.id,
+                    { append: true },
+                  )}
+                >
+                  <span>
+                    {dependencyRelation.loadingMore
+                      ? t("propertyCell:loadingMoreRelations")
+                      : t("propertyCell:loadMoreRelations")}
+                  </span>
                 </button>
               )}
             </div>

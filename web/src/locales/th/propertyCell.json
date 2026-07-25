@@ -92,5 +92,8 @@
     "ศ",
     "ส"
   ],
-  "you": "คุณ"
+  "you": "คุณ",
+  "buttonExecutionFailed": "ไม่สามารถเรียกใช้ปุ่มได้",
+  "loadingMoreRelations": "กำลังโหลดความสัมพันธ์เพิ่มเติม...",
+  "loadMoreRelations": "โหลดความสัมพันธ์เพิ่มเติม"
 }

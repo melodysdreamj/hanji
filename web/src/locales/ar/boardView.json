@@ -13,7 +13,7 @@
   "groupName": "اسم المجموعة",
   "groupOptions": "خيارات المجموعة {{groupName}}",
   "groupThisBoard": "تجميع هذه اللوحة",
-  "groupThisBoardDesc": "أضف خاصية تحديد أو حالة لإنشاء أعمدة.",
+  "groupThisBoardDesc": "أضف أو اختر خاصية 'اختيار' أو 'حالة' أو 'شخص' أو 'اختيار متعدد' لإنشاء الأعمدة.",
   "newGroup": "مجموعة جديدة",
   "newGroupIn": "مجموعة {{groupName}} جديدة في {{dbTitle}}",
   "newPage": "جديد",

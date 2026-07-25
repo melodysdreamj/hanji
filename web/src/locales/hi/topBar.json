@@ -38,7 +38,7 @@
   "moveTo": "इसमें ले जाएँ",
   "exporting": "निर्यात हो रहा है…",
   "exportAsMarkdown": "Markdown के रूप में निर्यात करें",
-  "exportAsHanji": "Hanji फ़ाइल के रूप में निर्यात करें",
+  "exportAsHanji": "Hanji JSON निर्यात करें (फ़ाइलें शामिल नहीं)",
   "importing": "आयात हो रहा है…",
   "importMarkdown": "Markdown आयात करें",
   "unlockPage": "पेज अनलॉक करें",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "पहुँच अपडेट नहीं की जा सकी",
     "removedFromAccessList": "पहुंच सूची से हटाया गया",
     "couldntRemoveAccess": "पहुँच हटाई नहीं जा सकी",
-    "couldntLoadAccessList": "पहुँच सूची लोड नहीं की जा सकी"
+    "couldntLoadAccessList": "पहुँच सूची लोड नहीं की जा सकी",
+    "couldntExportHanjiArchive": "Hanji आर्काइव निर्यात नहीं किया जा सका।",
+    "exportedHanjiArchive": "फ़ाइलों सहित Hanji आर्काइव निर्यात किया गया।"
   },
   "user": "उपयोगकर्ता",
   "whoHasAccess": "पहुंच किसे है",
   "workspace": "वर्कस्पेस",
   "workspaceCount_one": "{{count}} वर्कस्पेस",
   "workspaceCount_other": "{{count}} वर्कस्पेस",
-  "you": "आप"
+  "you": "आप",
+  "exportAsHanjiArchive": "Hanji आर्काइव निर्यात करें (फ़ाइलों सहित)",
+  "turnIntoWiki": "विकि में बदलें",
+  "undoWiki": "विकि पूर्ववत करें",
+  "wikiCreated": "पृष्ठ विकि में बदल दिया गया",
+  "wikiPageSettings": "विकि पृष्ठ सेटिंग",
+  "wikiUndone": "विकि हटा दिया गया; पृष्ठ सामग्री सुरक्षित रखी गई",
+  "wikiUpdateFailed": "विकि अपडेट नहीं किया जा सका"
 }

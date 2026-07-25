@@ -8,7 +8,8 @@
     "delete": "Verwijderen",
     "clearAll": "Alles wissen",
     "done": "Klaar",
-    "add": "Toevoegen"
+    "add": "Toevoegen",
+    "reportIssue": "Probleem melden"
   },
   "labels": {
     "untitled": "Naamloos"

@@ -8,7 +8,8 @@
     "delete": "حذف",
     "clearAll": "مسح الكل",
     "done": "تم",
-    "add": "إضافة"
+    "add": "إضافة",
+    "reportIssue": "أبلغ عن مشكلة"
   },
   "labels": {
     "untitled": "بدون عنوان"

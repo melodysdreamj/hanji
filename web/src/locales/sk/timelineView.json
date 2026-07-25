@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Závislosti:",
     "hint": "pridať vlastnosť vzťahu",
-    "relationPropertyAriaLabel": "Vlastnosť vzťahu závislostí"
+    "relationPropertyAriaLabel": "Vlastnosť vzťahu závislostí",
+    "makeDependOn": "Nastaviť, aby {{title}} záviselo od {{predecessor}}",
+    "startFrom": "Spustiť závislosť od {{title}}"
   },
   "toolbar": {
     "today": "Dnes",

@@ -92,5 +92,8 @@
     "J",
     "S"
   ],
-  "you": "Saya"
+  "you": "Saya",
+  "buttonExecutionFailed": "Tidak dapat menjalankan butang.",
+  "loadingMoreRelations": "Memuatkan lebih banyak hubungan...",
+  "loadMoreRelations": "Muatkan lebih banyak hubungan"
 }

@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Tertutup",
+    "open": "Terbuka",
+    "private": "Peribadi"
+  },
+  "add": "Tambah",
+  "approve": "Luluskan",
+  "archive": "Arkibkan ruang pasukan",
+  "available": "Tersedia untuk menyertai",
+  "choosePrincipal": "Pilih orang atau kumpulan",
+  "create": "Cipta ruang pasukan",
+  "deny": "Tolak",
+  "error": {
+    "action": "Tidak dapat melengkapkan tindakan ruang pasukan itu.",
+    "load": "Tidak dapat memuatkan butiran ruang pasukan."
+  },
+  "fields": {
+    "access": "Akses",
+    "description": "Penerangan",
+    "icon": "Ikon",
+    "memberRole": "Akses halaman ahli",
+    "membersCanEditSidebar": "Ahli boleh menambah dan menyusun semula halaman",
+    "membersCanInvite": "Ahli boleh menjemput orang",
+    "name": "Nama",
+    "openRole": "Akses halaman pelawat awam"
+  },
+  "governance": "Tetapan ruang pasukan",
+  "join": "Sertai",
+  "joined": "Ruang pasukan anda",
+  "loadMore": "Muat lagi",
+  "manage": "Urus",
+  "member": "Ahli",
+  "members": "Ahli",
+  "noneArchived": "Tiada ruang pasukan yang diarkibkan.",
+  "noneAvailable": "Tiada ruang pasukan lain yang tersedia.",
+  "noneJoined": "Anda belum menyertai mana-mana ruang pasukan.",
+  "noRequests": "Tiada permintaan yang menunggu.",
+  "notice": {
+    "approved": "Permintaan diluluskan.",
+    "archived": "Ruang pasukan diarkibkan.",
+    "created": "Ruang pasukan dicipta.",
+    "defaultSet": "Ruang pasukan lalai dikemas kini.",
+    "denied": "Permintaan ditolak.",
+    "joined": "Ruang pasukan disertai.",
+    "memberAdded": "Ahli ditambah.",
+    "memberRemoved": "Ahli dikeluarkan.",
+    "memberUpdated": "Peranan ahli dikemas kini.",
+    "policySaved": "Dasar penciptaan ruang pasukan dikemas kini.",
+    "requested": "Akses diminta.",
+    "restored": "Ruang pasukan dipulihkan.",
+    "saved": "Ruang pasukan dikemas kini."
+  },
+  "notOwner": "Hanya pemilik ruang pasukan atau pentadbir ruang kerja boleh mengurus ruang pasukan ini.",
+  "open": "Buka",
+  "owner": "Pemilik",
+  "ownersOnlyCreate": "Hanya pemilik ruang kerja boleh mencipta ruang pasukan",
+  "remove": "Alih keluar",
+  "replacement": "Pilih lalai pengganti",
+  "request": "Minta akses",
+  "requestPending": "Permintaan menunggu",
+  "requests": "Permintaan akses",
+  "restore": "Pulihkan",
+  "roles": {
+    "comment": "Boleh komen",
+    "edit": "Boleh edit",
+    "full_access": "Akses penuh",
+    "view": "Boleh lihat"
+  },
+  "save": "Simpan perubahan",
+  "selectTeamspace": "Ruang Pasukan",
+  "setDefault": "Jadikan ruang pasukan lalai",
+  "subtitle": "Atur kerja berkongsi dan kawal siapa yang boleh menemui atau menyertainya.",
+  "tabs": {
+    "archived": "Diarkibkan",
+    "browse": "Layari",
+    "create": "Ruang pasukan baharu",
+    "label": "Paparan ruang pasukan",
+    "manage": "Urus"
+  },
+  "title": "Ruang Pasukan"
+}

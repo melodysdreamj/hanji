@@ -6,5 +6,6 @@
   "unreachable": "Серверге жету мүмкін емес",
   "unreachablePending_one": "Серверге жету мүмкін емес · {{count}} өзгеріс күтілуде",
   "unreachablePending_other": "Серверге жету мүмкін емес · {{count}} өзгеріс күтілуде",
-  "retryHint": "Қайталау үшін басыңыз"
+  "retryHint": "Қайталау үшін басыңыз",
+  "confirmed": "Серверге сақталды"
 }

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} તાજા અપડેટો",
     "unreadOfTotal": "{{total}} અપડેટોમાંથી {{unread}} અવાંચિત",
     "updateType": "અપડેટ પ્રકાર",
-    "updates": "અપડેટો",
-    "modeUpdates": "અપડેટો",
-    "modeChats": "ચેટ્સ",
-    "inboxMode": "ઇનબોક્સ મોડ"
+    "updates": "અપડેટો"
   },
   "time": {
     "justNow": "હમણાં જ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} વર્ઝનો",
     "versionsAgo": "{{count}} વર્ઝન પહેલાં",
     "versionsAhead": "{{count}} વર્ઝન આગળ",
-    "versionsAria": "વર્ઝનો"
+    "versionsAria": "વર્ઝનો",
+    "emptyBlock": "ખાલી બ્લોક",
+    "emptyPreview": "આ સંસ્કરણમાં પૃષ્ઠ સામગ્રી નથી.",
+    "previewAria": "વાંચનમાત્ર પૃષ્ઠ સંસ્કરણ પૂર્વદર્શન",
+    "previewingCurrent": "વર્તમાન પૃષ્ઠ જોઈ રહ્યા છો",
+    "previewingSnapshot": "ભૂતકાળનું સંસ્કરણ જોઈ રહ્યા છો",
+    "previewOnlyHint": "સંસ્કરણ પસંદ કરવાથી ફક્ત પૂર્વદર્શન થાય છે. વર્તમાન પૃષ્ઠ ફક્ત પુનઃસ્થાપિત કર્યા પછી બદલાય છે.",
+    "restoreThisVersion": "પુનઃસ્થાપિત કરો",
+    "restoring": "પુનઃસ્થાપિત કરી રહ્યા છો...",
+    "versionHistory": "સંસ્કરણ ઇતિહાસ"
   },
   "badges": {
     "comment": "ટિપ્પણી",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} મેન્શન કરેલ · {{preview}}",
     "referenceLink": "{{title}} લિંક કરેલ · {{preview}}",
     "unreadDot": "અનવાંચિત",
-    "workspaceUpdate": "વર્કસ્પેસ અપડેટ"
+    "workspaceUpdate": "વર્કસ્પેસ અપડેટ",
+    "bySelf": "તમારા દ્વારા"
   },
   "empty": {
     "allCaughtUp": "તમે સંપૂર્ણ અદ્યતન છો.",

@@ -51,7 +51,14 @@
     "range": "Bereik",
     "earliest_date": "Vroegste datum",
     "latest_date": "Laatste datum",
-    "date_range": "Datumbereik"
+    "date_range": "Datumbereik",
+    "count": "Alles tellen",
+    "count_per_group": "Aantal per groep",
+    "empty": "Aantal leeg",
+    "not_empty": "Aantal niet leeg",
+    "percent_per_group": "Percentage per groep",
+    "show_unique": "Toon unieke waarden",
+    "unique": "Aantal unieke waarden"
   },
   "undo": "Ongedaan maken",
   "untitled": "Naamloos",

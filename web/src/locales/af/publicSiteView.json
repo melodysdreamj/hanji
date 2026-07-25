@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Broodkrummels",
+  "clearSearch": "Maak soektog skoon",
+  "errors": {
+    "not-found": "Hierdie webwerf is moontlik ongepubliseer of sy adres het verander.",
+    "offline": "Kyk jou verbinding, maak dan die webwerf weer oop.",
+    "rate-limited": "Hierdie webwerf ontvang te veel versoeke. Wag 'n oomblik en probeer weer.",
+    "unavailable": "Hanji kon nie hierdie webwerf nou oopmaak nie. Probeer weer oor 'n oomblik."
+  },
+  "madeWithHanji": "Gemaak met Hanji",
+  "navigation": "Werfnavigasie",
+  "noResults": "Geen bladsye gevind nie.",
+  "outsideSite": "Hierdie bladsy is nie deel van die gepubliseerde webwerf nie.",
+  "search": "Soek hierdie webwerf",
+  "tryAgain": "Probeer weer",
+  "unavailable": "Hierdie webwerf is onbeskikbaar."
+}

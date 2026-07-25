@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "תלות:",
     "hint": "הוסף מאפיין קשר",
-    "relationPropertyAriaLabel": "מאפיין קשר תלות"
+    "relationPropertyAriaLabel": "מאפיין קשר תלות",
+    "makeDependOn": "הפוך {{title}} תלוי ב{{predecessor}}",
+    "startFrom": "התחל תלות מ{{title}}"
   },
   "toolbar": {
     "today": "היום",

@@ -6,10 +6,12 @@ type RouteParams = {
   pageId?: string;
   workspaceSlug?: string;
   shareId?: string;
+  formToken?: string;
+  siteSlug?: string;
   databaseId?: string;
 };
 
-export type RouteKind = "page" | "workspace" | "share" | "database";
+export type RouteKind = "page" | "workspace" | "share" | "form" | "site" | "database";
 
 export type RouteInfo =
   | { kind: "home" }
@@ -19,6 +21,8 @@ export type RouteInfo =
   | { kind: "page"; pageId: string }
   | { kind: "workspace"; workspaceSlug: string }
   | { kind: "share"; shareId: string }
+  | { kind: "form"; formToken: string }
+  | { kind: "site"; siteSlug: string }
   | { kind: "database"; databaseId: string }
   | { kind: "invalid"; routeKind: RouteKind }
   | { kind: "unknown" };
@@ -31,6 +35,8 @@ const SEGMENT_ROUTES: ReadonlyArray<{
   { kind: "page", pattern: /^\/p\/([^/?#]+)\/?$/, prefix: "/p" },
   { kind: "workspace", pattern: /^\/workspace\/([^/?#]+)\/?$/, prefix: "/workspace" },
   { kind: "share", pattern: /^\/share\/([^/?#]+)\/?$/, prefix: "/share" },
+  { kind: "form", pattern: /^\/form\/([^/?#]+)\/?$/, prefix: "/form" },
+  { kind: "site", pattern: /^\/site\/([^/?#]+)\/?$/, prefix: "/site" },
   { kind: "database", pattern: /^\/database\/([^/?#]+)\/?$/, prefix: "/database" },
 ];
 
@@ -62,6 +68,8 @@ export function routeInfoFromPath(pathname: string): RouteInfo {
       if (route.kind === "page") return { kind: "page", pageId: segment };
       if (route.kind === "workspace") return { kind: "workspace", workspaceSlug: segment };
       if (route.kind === "share") return { kind: "share", shareId: segment };
+      if (route.kind === "form") return { kind: "form", formToken: segment };
+      if (route.kind === "site") return { kind: "site", siteSlug: segment };
       return { kind: "database", databaseId: segment };
     }
     if (pathname === route.prefix || pathname.startsWith(`${route.prefix}/`)) {
@@ -74,6 +82,18 @@ export function routeInfoFromPath(pathname: string): RouteInfo {
 
 export function isPublicSharePath(pathname: string) {
   return pathname === "/share" || pathname.startsWith("/share/");
+}
+
+export function isPublicFormPath(pathname: string) {
+  return pathname === "/form" || pathname.startsWith("/form/");
+}
+
+export function isPublicSitePath(pathname: string) {
+  return pathname === "/site" || pathname.startsWith("/site/");
+}
+
+export function isPublicAnonymousPath(pathname: string) {
+  return isPublicSharePath(pathname) || isPublicFormPath(pathname) || isPublicSitePath(pathname);
 }
 
 function getLocationKey() {
@@ -132,6 +152,8 @@ function routeParamsFromPath(pathname: string): RouteParams {
   if (route.kind === "page") return { pageId: route.pageId };
   if (route.kind === "workspace") return { workspaceSlug: route.workspaceSlug };
   if (route.kind === "share") return { shareId: route.shareId };
+  if (route.kind === "form") return { formToken: route.formToken };
+  if (route.kind === "site") return { siteSlug: route.siteSlug };
   if (route.kind === "database") return { databaseId: route.databaseId };
   return {};
 }

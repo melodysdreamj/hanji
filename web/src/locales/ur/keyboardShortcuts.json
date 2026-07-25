@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "تبصرہ شامل کریں",
+    "addLink": "لنک شامل کریں",
+    "blockColor": "آخری رنگ لگائیں",
+    "bold": "موٹا",
+    "copyPageLink": "صفحہ کا لنک کاپی کریں",
+    "findInPage": "صفحے میں تلاش کریں",
+    "inlineCode": "ان لائن کوڈ",
+    "italic": "ترچھا",
+    "moveBlock": "بلاک دوسرے صفحے پر منتقل کریں",
+    "moveBlockDown": "بلاک نیچے منتقل کریں",
+    "moveBlockUp": "بلاک اوپر منتقل کریں",
+    "movePage": "موجودہ صفحہ منتقل کریں",
+    "navigateBack": "واپس جائیں",
+    "navigateForward": "آگے جائیں",
+    "newPage": "نیا صفحہ",
+    "openBlockMenu": "بلاک کارروائیاں کھولیں",
+    "openKeyboardShortcuts": "کی بورڈ شارٹ کٹس کھولیں",
+    "openParentPage": "والد صفحہ کھولیں",
+    "quickFind": "فوری تلاش",
+    "strikethrough": "کاٹا ہوا",
+    "toggleAllToggles": "تمام ٹوگلز کو پھیلائیں یا سمیٹیں",
+    "toggleSidebar": "سائڈبار ٹوگل کریں",
+    "toggleTheme": "ڈارک موڈ ٹوگل کریں",
+    "underline": "زیر خط"
+  },
+  "categories": {
+    "createStyle": "تخلیق اور اسٹائل",
+    "editMove": "ترمیم اور منتقل",
+    "popular": "مقبول"
+  },
+  "categoriesLabel": "شارٹ کٹ زمرے",
+  "close": "بند کریں",
+  "closeBackdrop": "کی بورڈ شارٹ کٹس بند کریں",
+  "empty": "کوئی شارٹ کٹ نہیں ملا",
+  "keysFor": "{{action}} کے لیے کلیدیں",
+  "or": "یا",
+  "searchLabel": "کی بورڈ شارٹ کٹس تلاش کریں",
+  "searchPlaceholder": "شارٹ کٹس تلاش کریں…",
+  "searchResults": "تلاش کے نتائج",
+  "searchTerms": {
+    "toggleTheme": "تھیم لائٹ ڈارک ظاہریت"
+  },
+  "title": "کی بورڈ شارٹ کٹس"
+}

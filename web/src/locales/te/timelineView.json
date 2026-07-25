@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "డిపెండెన్సీలు:",
     "hint": "సంబంధం ప్రాపర్టీని జోడించండి",
-    "relationPropertyAriaLabel": "డిపెండెన్సీ సంబంధం ప్రాపర్టీ"
+    "relationPropertyAriaLabel": "డిపెండెన్సీ సంబంధం ప్రాపర్టీ",
+    "makeDependOn": "{{title}}ను {{predecessor}}పై ఆధారపడేలా చేయండి",
+    "startFrom": "{{title}} నుండి డిపెండెన్సీ ప్రారంభించండి"
   },
   "toolbar": {
     "today": "ఈరోజు",

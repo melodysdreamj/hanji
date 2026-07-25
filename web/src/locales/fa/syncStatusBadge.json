@@ -6,5 +6,6 @@
   "unreachable": "سرور در دسترس نیست",
   "unreachablePending_one": "سرور در دسترس نیست · {{count}} تغییر در انتظار",
   "unreachablePending_other": "سرور در دسترس نیست · {{count}} تغییر در انتظار",
-  "retryHint": "برای تلاش مجدد کلیک کنید"
+  "retryHint": "برای تلاش مجدد کلیک کنید",
+  "confirmed": "ذخیره در سرور"
 }

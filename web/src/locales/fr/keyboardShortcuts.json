@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Ajouter un commentaire",
+    "addLink": "Ajouter un lien",
+    "blockColor": "Appliquer la dernière couleur utilisée",
+    "bold": "Gras",
+    "copyPageLink": "Copier le lien de la page",
+    "findInPage": "Rechercher sur cette page",
+    "inlineCode": "Code en ligne",
+    "italic": "Italique",
+    "moveBlock": "Déplacer le bloc vers une autre page",
+    "moveBlockDown": "Déplacer le bloc vers le bas",
+    "moveBlockUp": "Déplacer le bloc vers le haut",
+    "movePage": "Déplacer la page actuelle",
+    "navigateBack": "Revenir en arrière",
+    "navigateForward": "Avancer",
+    "newPage": "Nouvelle page",
+    "openBlockMenu": "Ouvrir les actions du bloc",
+    "openKeyboardShortcuts": "Ouvrir les raccourcis clavier",
+    "openParentPage": "Ouvrir la page parent",
+    "quickFind": "Recherche rapide",
+    "strikethrough": "Barré",
+    "toggleAllToggles": "Développer ou réduire tous les toggles",
+    "toggleSidebar": "Afficher/masquer la barre latérale",
+    "toggleTheme": "Activer/désactiver le mode sombre",
+    "underline": "Souligné"
+  },
+  "categories": {
+    "createStyle": "Créer et styliser",
+    "editMove": "Éditer et déplacer",
+    "popular": "Populaire"
+  },
+  "categoriesLabel": "Catégories de raccourcis",
+  "close": "Fermer",
+  "closeBackdrop": "Fermer les raccourcis clavier",
+  "empty": "Aucun raccourci trouvé",
+  "keysFor": "Raccourcis pour {{action}}",
+  "or": "ou",
+  "searchLabel": "Rechercher des raccourcis clavier",
+  "searchPlaceholder": "Rechercher des raccourcis…",
+  "searchResults": "Résultats de recherche",
+  "searchTerms": {
+    "toggleTheme": "thème clair sombre apparence"
+  },
+  "title": "Raccourcis clavier"
+}

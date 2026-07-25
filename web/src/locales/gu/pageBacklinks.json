@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} બેકલિંક",
-    "count_other": "{{count}} બેકલિંકો"
+    "count_other": "{{count}} બેકલિંકો",
+    "partial_one": "{{count}}+ બેકલિંક",
+    "partial_other": "{{count}}+ બેકલિંક્સ"
   },
   "header": {
     "title": "લિંક્ડ મેન્શન"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} મેન્શન",
     "mention_other": "{{count}} મેન્શનો",
     "link_one": "{{count}} લિંક",
-    "link_other": "{{count}} લિંકો"
+    "link_other": "{{count}} લિંકો",
+    "loaded": "લોડ કર્યું: {{summary}}"
   },
   "kind": {
     "mention": "મેન્શન",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} વધુ બેકલિંક",
-    "count_other": "{{count}} વધુ બેકલિંકો"
+    "count_other": "{{count}} વધુ બેકલિંકો",
+    "load": "વધુ બેકલિંક્સ લોડ કરો",
+    "loading": "બેકલિંક્સ લોડ થાય છે…",
+    "search": "બેકલિંક્સ શોધો"
   }
 }

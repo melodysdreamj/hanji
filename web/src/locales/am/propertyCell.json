@@ -92,5 +92,8 @@
     "ዓ",
     "ቅ"
   ],
-  "you": "እርስዎ"
+  "you": "እርስዎ",
+  "buttonExecutionFailed": "አዝራሩን ማስኬድ አልተቻለም።",
+  "loadingMoreRelations": "ተጨማሪ ግንኙነቶችን በመጫን ላይ...",
+  "loadMoreRelations": "ተጨማሪ ግንኙነቶችን ጫን"
 }

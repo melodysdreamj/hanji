@@ -8,7 +8,8 @@
     "delete": "Poista",
     "done": "Valmis",
     "save": "Tallenna",
-    "search": "Hae"
+    "search": "Hae",
+    "reportIssue": "Ilmoita ongelmasta"
   },
   "generated": {
     "columnName": "Sarake {{number}}",

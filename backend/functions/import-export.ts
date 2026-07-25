@@ -2,16 +2,30 @@ import { defineFunction } from '@edge-base/shared';
 import { errorStatus } from '../lib/error-status';
 import { HANJI_URI_PROTOCOL, isHanjiUriProtocol } from '../lib/hanji-compat';
 import { boundedDbFromPageHint, boundedDbFromWorkspaceHint, ensurePageWorkspaceIndex, type AdminDbAccessor } from '../lib/workspace-db';
-import { assertOrganizationDlpPolicy } from '../lib/enterprise-controls';
+import { assertOrganizationDlpContent, assertOrganizationDlpPolicy } from '../lib/enterprise-controls';
 import { recordWorkspaceAudit } from '../lib/org-audit';
 import { assertNoUnownedStoredFileReferences } from '../lib/file-reference-lifecycle';
 import {
+  assertFileTargetsNotDeleting,
+  withFileWorkspaceLease,
+} from '../lib/file-operation-lock';
+import { assertSafeStoredFileType, normalizeFileContentType } from '../lib/file-security';
+import {
+  releaseOrganizationStorageBatch,
+  reserveOrganizationStorageBatch,
+  type StorageQuotaReservation,
+} from '../lib/storage-quota';
+import { meetingNoteTranscriptBlockIdsForActor } from '../lib/notion-meeting-notes';
+import {
+  assertMinimumWorkspaceAccessRole as sharedAssertMinimumWorkspaceAccessRole,
   pageAccessRole as sharedPageAccessRole,
   workspaceAccessRole as sharedWorkspaceAccessRole,
 } from '../lib/page-access';
 
 import {
+  ABSOLUTE_LIST_ALL_MAX_ITEMS,
   listAll,
+  listAllTruncated,
   requireString,
   getExisting,
   isNotFoundError,
@@ -32,6 +46,7 @@ import {
   NATIVE_DOCUMENT_LIMITS,
   NATIVE_FORMAT_VERSION,
   propTypeMap,
+  redactNativeExportValue,
   remapNativeDocument,
   sanitizeNativeEntitiesForExport,
   validateNativeEnvelope,
@@ -40,6 +55,21 @@ import {
   type NativeWarning,
   type RelationPair,
 } from '../lib/native-document';
+import {
+  NATIVE_ARCHIVE_LIMITS,
+  NATIVE_ARCHIVE_MIME,
+  buildNativeArchiveDocument,
+  createNativeArchiveStream,
+  nativeArchiveFileName,
+  restoreNativeArchiveFileReferences,
+  sha256HexStream,
+  validateNativeArchiveBundle,
+  type NativeArchiveBinding,
+  type NativeArchiveDocument,
+  type NativeArchiveFileEntry,
+  type NativeArchiveManifest,
+  type NativeArchivePlannedFile,
+} from '../lib/native-archive';
 import type {
   Block as ABlock,
   Comment as AComment,
@@ -73,6 +103,12 @@ export const IMPORT_EXPORT_REQUEST_MAX_BYTES = NATIVE_DOCUMENT_LIMITS.maxBytes +
 export const IMPORT_TEXT_RAW_MAX_BYTES = NATIVE_DOCUMENT_LIMITS.maxBytes;
 const IMPORT_MAX_BLOCKS = NATIVE_DOCUMENT_LIMITS.maxBlocks;
 const IMPORT_CSV_MAX_ROWS = 10_000;
+export const NOTION_MARKDOWN_RECORD_LIMIT = 20_000;
+export const NOTION_MARKDOWN_UNKNOWN_ID_LIMIT = 100;
+const NOTION_MARKDOWN_OMITTED_OVERFLOW_MARKER = '<unknown alt="additional_blocks_omitted"/>';
+const NOTION_MARKDOWN_SCAN_LIMIT =
+  NOTION_MARKDOWN_RECORD_LIMIT + NOTION_MARKDOWN_UNKNOWN_ID_LIMIT;
+const NOTION_MARKDOWN_SUBTREE_SCAN_LIMIT = ABSOLUTE_LIST_ALL_MAX_ITEMS;
 
 function boundedImportText(value: unknown, label: string): string {
   const text = typeof value === 'string' ? value : String(value ?? '');
@@ -138,6 +174,8 @@ interface Workspace {
   icon?: string;
   domain?: string;
   ownerId?: string;
+  organizationId?: string | null;
+  deletionPendingAt?: string | null;
 }
 
 interface Page {
@@ -205,14 +243,24 @@ interface FileUpload {
   scope?: string;
   pageId?: string;
   blockId?: string;
+  commentId?: string;
   databaseId?: string;
   propertyId?: string;
   name?: string;
   contentType?: string;
   size?: number;
   etag?: string;
-  status?: string;
+  status?: 'preparing' | 'pending' | 'uploaded' | 'deleting' | 'deleted' | 'expired' | 'failed';
   url?: string;
+  createdBy?: string;
+  expiresAt?: string | null;
+  completedAt?: string | null;
+  expiredAt?: string | null;
+  deletedAt?: string | null;
+  deletedBy?: string | null;
+  fileImportResult?: unknown;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface TableRef<T> extends TableQuery<T> {
@@ -227,6 +275,8 @@ interface DbRef extends TransactDb {
   table<T>(name: string): TableRef<T>;
 }
 
+type DbTransactOperation = Parameters<DbRef['transact']>[0][number];
+
 interface FunctionStorageProxy {
   bucket?(bucket: string): FunctionStorageProxy;
   head(key: string): Promise<{
@@ -235,14 +285,27 @@ interface FunctionStorageProxy {
     contentType: string;
     etag?: string;
   } | null>;
+  get(key: string): Promise<{
+    key: string;
+    body: ReadableStream<Uint8Array>;
+    size: number;
+    contentType: string;
+    etag?: string;
+  } | null>;
+  delete(key: string): Promise<void>;
   getSignedUrl(key: string, options?: { expiresIn?: number }): Promise<string>;
+  getSignedUploadUrl?(key: string, options: { expiresIn: number; maxBytes: number }): Promise<{
+    url: string;
+    expiresAt: string;
+    maxBytes: number | null;
+  }>;
 }
 
 interface FunctionContext {
   auth: { id: string; email?: string } | null;
   request?: Request;
   admin: {
-    db(namespace: string): DbRef;
+    db(namespace: string, instanceId?: string): DbRef;
   };
   storage?: FunctionStorageProxy;
 }
@@ -361,6 +424,38 @@ export async function mapNativeExportWithConcurrency<T, R>(
   return results;
 }
 
+type NativeArchiveSettled<R> =
+  | { ok: true; value: R }
+  | { ok: false; error: unknown };
+
+async function settleNativeArchiveWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  worker: (item: T, index: number) => Promise<R>,
+): Promise<Array<NativeArchiveSettled<R>>> {
+  return mapNativeExportWithConcurrency(items, concurrency, async (item, index) => {
+    try {
+      return { ok: true as const, value: await worker(item, index) };
+    } catch (error) {
+      return { ok: false as const, error };
+    }
+  });
+}
+
+function nativeArchiveFailureMessage(
+  label: string,
+  failures: Array<{ item: string; error: unknown }>,
+) {
+  const details = failures.map(({ item, error }) => {
+    const message = error instanceof Error ? error.message : String(error);
+    return `${item}: ${message}`;
+  });
+  return Object.assign(
+    new Error(`${label} failed for ${failures.length} item(s): ${details.join('; ')}`),
+    { status: 409 },
+  );
+}
+
 const parentTypes = new Set<PageParentType>(['workspace', 'page', 'database']);
 function jsonError(status: number, message: string) {
   return Response.json({ code: status, message }, { status });
@@ -442,12 +537,6 @@ async function pageRole(db: DbRef, page: Page, actorId: string, actorEmail?: str
   return sharedPageAccessRole(db, page, actorId, undefined, actorEmail, { requireWorkspace: true });
 }
 
-async function assertWorkspaceEdit(db: DbRef, workspaceId: string, actorId: string) {
-  const role = await workspaceRole(db, workspaceId, actorId);
-  if (role && roleRanks[role] >= roleRanks.edit) return;
-  throw new Error('Workspace access required.');
-}
-
 async function getReadableWorkspace(db: DbRef, workspaceId: string, actorId: string) {
   const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
   if (!workspace) throw new Error('Workspace was not found.');
@@ -480,7 +569,13 @@ async function assertWritableParent(
   actorEmail?: string | null,
 ) {
   if (!parentId || parentType === 'workspace') {
-    await assertWorkspaceEdit(db, workspaceId, actorId);
+    await sharedAssertMinimumWorkspaceAccessRole(
+      db,
+      workspaceId,
+      actorId,
+      'edit',
+      { requireWorkspace: true },
+    );
     return;
   }
 
@@ -2143,6 +2238,331 @@ async function pageExportScope(db: DbRef, page: Page) {
   return { pageIds, databaseIds };
 }
 
+const NOTION_MARKDOWN_UNSUPPORTED_BLOCK_TYPES = new Set([
+  'bookmark',
+  'breadcrumb',
+  'embed',
+  'link_preview',
+  'template',
+  'unsupported',
+]);
+
+function xmlText(value: unknown) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function xmlAttribute(value: unknown) {
+  return xmlText(value).replace(/"/g, '&quot;');
+}
+
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function notionBlockUrl(pageId: string, blockId: string) {
+  return `/p/${encodeURIComponent(pageId)}#block-${encodeURIComponent(blockId)}`;
+}
+
+function notionUnknownIdMarkdown(pageId: string, blockId: string, alt: string) {
+  return `<unknown url="${xmlAttribute(notionBlockUrl(pageId, blockId))}" alt="${xmlAttribute(alt)}"/>`;
+}
+
+function notionUnknownMarkdown(block: Block) {
+  return notionUnknownIdMarkdown(block.pageId, block.id, block.type);
+}
+
+function meetingNoteSource(block: Block) {
+  const content = objectRecord(block.content) ?? {};
+  const native = objectRecord(content.meetingNotes ?? content.meeting_notes);
+  if (block.type === 'meeting_notes' && native) {
+    return { payload: native, imported: false, sourceType: 'meeting_notes' as const };
+  }
+  const raw = objectRecord(content.notionBlock);
+  const rawType = asString(raw?.type);
+  if (rawType !== 'meeting_notes' && rawType !== 'transcription') return null;
+  const payload = objectRecord(raw?.[rawType]);
+  return payload
+    ? { payload, imported: true, sourceType: rawType as 'meeting_notes' | 'transcription' }
+    : null;
+}
+
+function sourceNotionBlockId(block: Block) {
+  return asString(objectRecord(objectRecord(block.content)?.notionBlock)?.id);
+}
+
+function meetingTranscriptOwners(blocks: Block[], childrenOf: Map<string, Block[]>) {
+  const localIds = new Set(blocks.map((block) => block.id));
+  const sourceToLocal = new Map<string, string>();
+  for (const block of blocks) {
+    const sourceId = sourceNotionBlockId(block);
+    if (sourceId) sourceToLocal.set(sourceId, block.id);
+  }
+  const ownerByTranscriptBlock = new Map<string, string>();
+  const transcriptRootByMeeting = new Map<string, string>();
+  for (const block of blocks) {
+    const source = meetingNoteSource(block);
+    if (!source) continue;
+    const children = objectRecord(source.payload.children) ?? {};
+    const sourceRootId = asString(children.transcript_block_id ?? children.transcriptBlockId);
+    const rootId = sourceRootId
+      ? sourceToLocal.get(sourceRootId)
+        ?? (localIds.has(sourceRootId) || !source.imported ? sourceRootId : '')
+      : source.sourceType === 'transcription' ? block.id : '';
+    if (!rootId) continue;
+    transcriptRootByMeeting.set(block.id, rootId);
+    const visit = (id: string) => {
+      if (ownerByTranscriptBlock.has(id)) return;
+      ownerByTranscriptBlock.set(id, block.id);
+      for (const child of childrenOf.get(id) ?? []) visit(child.id);
+    };
+    visit(rootId);
+  }
+  return { ownerByTranscriptBlock, transcriptRootByMeeting };
+}
+
+function meetingPlaceholder(block: Block) {
+  const title = (block.plainText ?? '').trim() || 'Meeting notes';
+  return `<meeting-notes url="${xmlAttribute(notionBlockUrl(block.pageId, block.id))}">${xmlText(title)}</meeting-notes>`;
+}
+
+interface NotionMarkdownRenderState {
+  included: number;
+  truncated: boolean;
+  recordOmissionIds: string[];
+  recordOmissionOverflowMarkerEmitted: boolean;
+  permissionIds: string[];
+  missingTranscriptIds: string[];
+  unsupportedIds: string[];
+}
+
+function pushBoundedUnique(values: string[], id: string) {
+  if (values.length >= NOTION_MARKDOWN_UNKNOWN_ID_LIMIT || values.includes(id)) return;
+  values.push(id);
+}
+
+async function authorizedMeetingNoteIds(
+  db: DbRef,
+  page: Page,
+  actorId: string,
+  includeTranscript: boolean,
+  blocks: Block[],
+) {
+  if (!includeTranscript) return new Set<string>();
+  return meetingNoteTranscriptBlockIdsForActor(
+    { db, workspaceId: page.workspaceId, actorId },
+    blocks,
+  );
+}
+
+async function notionMarkdownForBlocks(
+  blocks: Block[],
+  rootBlock: Block | null,
+  context: ExportContext,
+  includeTranscript: boolean,
+  authorizedMeetingIds: Set<string>,
+  scanComplete: boolean,
+) {
+  const sorted = [...blocks].sort(
+    (left, right) => left.position - right.position || left.id.localeCompare(right.id),
+  );
+  const childrenOf = blockChildrenByParent(sorted);
+  const byId = new Map(sorted.map((block) => [block.id, block]));
+  const { ownerByTranscriptBlock: transcriptOwner, transcriptRootByMeeting } =
+    meetingTranscriptOwners(sorted, childrenOf);
+  const state: NotionMarkdownRenderState = {
+    included: 0,
+    truncated: !scanComplete,
+    recordOmissionIds: [],
+    recordOmissionOverflowMarkerEmitted: false,
+    permissionIds: [],
+    missingTranscriptIds: [],
+    unsupportedIds: [],
+  };
+  const visited = new Set<string>();
+
+  const render = async (block: Block, depth: number): Promise<string[]> => {
+    if (visited.has(block.id)) return [];
+    visited.add(block.id);
+    const indent = '  '.repeat(depth);
+    const transcriptMeetingId = transcriptOwner.get(block.id);
+    if (transcriptMeetingId && transcriptMeetingId !== block.id) {
+      const meeting = byId.get(transcriptMeetingId);
+      if (!includeTranscript || !authorizedMeetingIds.has(transcriptMeetingId)) {
+        if (includeTranscript) {
+          state.truncated = true;
+          pushBoundedUnique(state.permissionIds, block.id);
+        }
+        return rootBlock && meeting
+          ? [`${indent}${meetingPlaceholder(meeting)}`]
+          : [];
+      }
+    }
+    if (state.included >= NOTION_MARKDOWN_RECORD_LIMIT) {
+      state.truncated = true;
+      pushBoundedUnique(state.recordOmissionIds, block.id);
+      if (state.recordOmissionIds.includes(block.id)) {
+        return [`${indent}${notionUnknownMarkdown(block)}`];
+      }
+      if (!state.recordOmissionOverflowMarkerEmitted) {
+        state.recordOmissionOverflowMarkerEmitted = true;
+        return [`${indent}${NOTION_MARKDOWN_OMITTED_OVERFLOW_MARKER}`];
+      }
+      return [];
+    }
+    state.included += 1;
+    if (NOTION_MARKDOWN_UNSUPPORTED_BLOCK_TYPES.has(block.type)) {
+      pushBoundedUnique(state.unsupportedIds, block.id);
+      return [`${indent}${notionUnknownMarkdown(block)}`];
+    }
+    const meetingSource = meetingNoteSource(block);
+    if (meetingSource) {
+      if (!includeTranscript || !authorizedMeetingIds.has(block.id)) {
+        if (includeTranscript) {
+          state.truncated = true;
+          pushBoundedUnique(
+            state.permissionIds,
+            transcriptRootByMeeting.get(block.id) ?? block.id,
+          );
+        }
+        return [`${indent}${meetingPlaceholder(block)}`];
+      }
+      const lines = [`${indent}<meeting-notes url="${xmlAttribute(notionBlockUrl(block.pageId, block.id))}">`];
+      const title = (block.plainText ?? '').trim();
+      if (title) lines.push(`${indent}  ${xmlText(title)}`);
+      const directChildren = childrenOf.get(block.id) ?? [];
+      for (const child of directChildren) {
+        lines.push(...await render(child, depth + 1));
+      }
+      const transcriptRootId = transcriptRootByMeeting.get(block.id);
+      if (
+        transcriptRootId
+        && transcriptRootId !== block.id
+        && !directChildren.some((child) => child.id === transcriptRootId)
+      ) {
+        const transcriptRoot = byId.get(transcriptRootId);
+        if (transcriptRoot) {
+          lines.push(...await render(transcriptRoot, depth + 1));
+        } else {
+          state.truncated = true;
+          pushBoundedUnique(state.missingTranscriptIds, transcriptRootId);
+          lines.push(`${indent}  ${notionUnknownIdMarkdown(block.pageId, transcriptRootId, 'transcript')}`);
+        }
+      }
+      lines.push(`${indent}</meeting-notes>`);
+      return lines;
+    }
+    const markdown = await blockMarkdown(block, context);
+    const lines = markdown
+      ? markdown.split('\n').map((line) => `${indent}${line}`)
+      : [];
+    for (const child of childrenOf.get(block.id) ?? []) {
+      lines.push(...await render(child, depth + 1));
+    }
+    return lines;
+  };
+
+  const roots = rootBlock
+    ? [byId.get(rootBlock.id) ?? rootBlock]
+    : sorted.filter((block) => (block.parentId ?? null) === null);
+  const lines: string[] = [];
+  for (const root of roots) lines.push(...await render(root, 0));
+  return {
+    markdown: lines.join('\n'),
+    truncated: state.truncated,
+    unknownBlockIds: Array.from(new Set([
+      ...state.recordOmissionIds,
+      ...state.permissionIds,
+      ...state.missingTranscriptIds,
+      ...state.unsupportedIds,
+    ])).slice(0, NOTION_MARKDOWN_UNKNOWN_ID_LIMIT),
+  };
+}
+
+async function exportNotionPageMarkdown(
+  db: DbRef,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail?: string | null,
+  storage?: FunctionStorageProxy,
+) {
+  const targetId = requireString(body.pageOrBlockId ?? body.pageId ?? body.blockId, 'pageOrBlockId');
+  if (body.includeTranscript !== undefined && typeof body.includeTranscript !== 'boolean') {
+    throw new Error('include_transcript must be a boolean.');
+  }
+  const includeTranscript = body.includeTranscript === true;
+  let page = await getExisting(db.table<Page>('pages'), targetId);
+  let rootBlock: Block | null = null;
+  if (page) {
+    page = await getReadablePage(db, page.id, actorId, actorEmail);
+  } else {
+    rootBlock = await getExisting(db.table<Block>('blocks'), targetId);
+    if (!rootBlock) throw new Error('Page or block was not found.');
+    page = await getReadablePage(db, rootBlock.pageId, actorId, actorEmail);
+  }
+  await assertOrganizationDlpPolicy(
+    db,
+    page.workspaceId,
+    'exports',
+    'Exports are blocked by organization DLP policy.',
+  );
+  const scope = await pageExportScope(db, page);
+  const context = await fileExportContext(db, page.workspaceId, scope.pageIds, scope.databaseIds, storage);
+  const scanLimit = rootBlock
+    ? NOTION_MARKDOWN_SUBTREE_SCAN_LIMIT
+    : NOTION_MARKDOWN_SCAN_LIMIT;
+  const scan = await listAllTruncated(
+    db.table<Block>('blocks').where('pageId', '==', page.id),
+    {
+      maxItems: scanLimit,
+      label: `Notion Markdown page ${page.id}`,
+      allowLargeMaterialization: rootBlock !== null,
+    },
+  );
+  if (rootBlock && !scan.items.some((block) => block.id === rootBlock!.id)) {
+    scan.items.push(rootBlock);
+  }
+  const meetingIds = await authorizedMeetingNoteIds(
+    db,
+    page,
+    actorId,
+    includeTranscript,
+    scan.items,
+  );
+  const rendered = await notionMarkdownForBlocks(
+    scan.items,
+    rootBlock,
+    context,
+    includeTranscript,
+    meetingIds,
+    scan.complete,
+  );
+  await recordWorkspaceAudit(db, {
+    workspaceId: page.workspaceId,
+    actorId,
+    action: 'export.notion_markdown',
+    targetType: rootBlock ? 'block' : page.kind === 'database' ? 'database' : 'page',
+    targetId,
+    metadata: {
+      pageId: page.id,
+      blockId: rootBlock?.id ?? null,
+      includeTranscript,
+      truncated: rendered.truncated,
+      unknownBlockCount: rendered.unknownBlockIds.length,
+    },
+  });
+  return {
+    id: targetId,
+    markdown: rendered.markdown,
+    truncated: rendered.truncated,
+    unknownBlockIds: rendered.unknownBlockIds,
+  };
+}
+
 async function exportPageMarkdown(
   db: DbRef,
   body: Record<string, unknown>,
@@ -2403,6 +2823,7 @@ async function buildNativeEnvelope(
   allPages: APage[],
   scope: NativeScope,
   byteBudget: NativeExportByteBudget,
+  captureRaw?: (document: NativeExportEnvelope) => void,
 ): Promise<NativeExportEnvelope> {
   const warnings: NativeWarning[] = [];
   const rootIds = new Set(scope.rootIds);
@@ -2466,14 +2887,16 @@ async function buildNativeEnvelope(
   ]);
 
   const relationPairs = computeRelationPairs(dbProperties, scope.databaseIds, warnings);
-  const sanitized = sanitizeNativeEntitiesForExport({
+  const rawEntities: NativeEntities = {
     pages: scopedPages,
     blocks: blockGroups.flat(),
     dbProperties,
     dbViews,
     dbTemplates,
     comments: commentGroups.flat(),
-  });
+  };
+  const rawWarnings = [...warnings];
+  const sanitized = sanitizeNativeEntitiesForExport(rawEntities);
   warnings.push(...sanitized.warnings);
   const entities = sanitized.entities;
   const workspaceIcon = typeof workspace.icon === 'string' &&
@@ -2491,10 +2914,25 @@ async function buildNativeEnvelope(
     comments: entities.comments.length,
   };
 
+  const generatedAt = nowIso();
+  captureRaw?.({
+    format: NATIVE_FORMAT,
+    formatVersion: NATIVE_FORMAT_VERSION,
+    generatedAt,
+    app: { name: 'hanji' },
+    scope: { kind: scope.kind, rootIds: scope.rootIds },
+    source: { workspaceId: workspace.id, workspaceName: workspace.name, workspaceIcon },
+    counts,
+    files: { included: false, strippedReferences: 0 },
+    entities: rawEntities,
+    relationPairs,
+    warnings: rawWarnings,
+  });
+
   return validateNativeEnvelope({
     format: NATIVE_FORMAT,
     formatVersion: NATIVE_FORMAT_VERSION,
-    generatedAt: nowIso(),
+    generatedAt,
     app: { name: 'hanji' },
     scope: { kind: scope.kind, rootIds: scope.rootIds },
     source: { workspaceId: workspace.id, workspaceName: workspace.name, workspaceIcon },
@@ -2555,6 +2993,195 @@ async function exportPageNative(db: DbRef, body: Record<string, unknown>, actorI
   return { page: { id: page.id, title: page.title, kind: page.kind }, document, counts: document.counts, warnings: document.warnings };
 }
 
+function nativeArchiveStorageBucket(storage: FunctionStorageProxy | undefined, bucket: string) {
+  if (!storage) return undefined;
+  if (typeof storage.bucket === 'function') return storage.bucket(bucket);
+  return bucket === FILE_BUCKET ? storage : undefined;
+}
+
+function archiveResponseHeaders(filename: string) {
+  return {
+    'cache-control': 'private, no-store',
+    'content-type': NATIVE_ARCHIVE_MIME,
+    'content-disposition': `attachment; filename="hanji-export.hanji.zip"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+    'x-content-type-options': 'nosniff',
+  };
+}
+
+async function nativeArchiveUploadInventory(db: DbRef, workspaceId: string) {
+  return listAll(
+    db.table<FileUpload>('file_uploads').where('workspaceId', '==', workspaceId),
+    {
+      maxItems: NATIVE_ARCHIVE_LIMITS.maxInventoryItems,
+      pageSize: 100,
+      label: 'Native archive upload inventory',
+    },
+  );
+}
+
+async function preflightNativeArchiveFiles(
+  storage: FunctionStorageProxy | undefined,
+  files: NativeArchivePlannedFile[],
+) {
+  const settled = await settleNativeArchiveWithConcurrency(
+    files,
+    NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+    async (file) => {
+      const bucket = file.source.bucket || FILE_BUCKET;
+      const proxy = nativeArchiveStorageBucket(storage, bucket);
+      if (!proxy) throw new Error(`Archive file ${file.entry.name} requires trusted storage access.`);
+      const head = await proxy.head(file.source.key);
+      if (!head) throw Object.assign(new Error(`Archive file ${file.entry.name} was not found.`), { status: 409 });
+      const expectedType = assertSafeStoredFileType(file.entry.name, file.source.contentType);
+      const actualType = assertSafeStoredFileType(file.entry.name, head.contentType);
+      if (
+        !file.source.etag
+        || !head.etag
+        || head.etag !== file.source.etag
+        || head.size !== file.entry.bytes
+        || normalizeFileContentType(actualType) !== normalizeFileContentType(expectedType)
+      ) {
+        throw Object.assign(
+          new Error(`Archive file ${file.entry.name} changed since its metadata was recorded.`),
+          { status: 409 },
+        );
+      }
+      return { file, bucket, etag: head.etag, contentType: actualType };
+    },
+  );
+  const failures = settled.flatMap((result, index) => result.ok ? [] : [{
+    item: files[index].entry.id,
+    error: result.error,
+  }]);
+  if (failures.length > 0) throw nativeArchiveFailureMessage('Native archive export preflight', failures);
+  return settled.map((result) => {
+    if (!result.ok) throw new Error('Native archive export preflight settlement was incomplete.');
+    return result.value;
+  });
+}
+
+async function nativeArchiveResponse(input: {
+  db: DbRef;
+  storage?: FunctionStorageProxy;
+  actorId: string;
+  workspace: Workspace;
+  rawDocument: NativeExportEnvelope;
+  stem: string;
+  auditAction: string;
+  auditTargetType: string;
+  auditTargetId: string;
+}) {
+  const uploads = await nativeArchiveUploadInventory(input.db, input.workspace.id);
+  const planned = buildNativeArchiveDocument(input.rawDocument, uploads);
+  const preflight = await preflightNativeArchiveFiles(input.storage, planned.files);
+  const files = preflight.map(({ file, bucket, etag, contentType }) => ({
+    ...file.entry,
+    contentType,
+    async open() {
+      const proxy = nativeArchiveStorageBucket(input.storage, bucket);
+      if (!proxy) throw new Error(`Archive file ${file.entry.name} requires trusted storage access.`);
+      const stored = await proxy.get(file.source.key);
+      if (!stored) throw new Error(`Archive file ${file.entry.name} disappeared while streaming.`);
+      const actualType = assertSafeStoredFileType(file.entry.name, stored.contentType);
+      if (
+        stored.etag !== etag
+        || stored.size !== file.entry.bytes
+        || normalizeFileContentType(actualType) !== normalizeFileContentType(contentType)
+      ) {
+        throw new Error(`Archive file ${file.entry.name} changed while streaming.`);
+      }
+      return stored.body;
+    },
+  }));
+  await recordWorkspaceAudit(input.db, {
+    workspaceId: input.workspace.id,
+    actorId: input.actorId,
+    action: input.auditAction,
+    targetType: input.auditTargetType,
+    targetId: input.auditTargetId,
+    metadata: {
+      ...planned.document.counts,
+      files: planned.files.length,
+      fileBytes: planned.files.reduce((sum, file) => sum + file.entry.bytes, 0),
+      streaming: true,
+    },
+  });
+  return new Response(createNativeArchiveStream({ document: planned.document, files }), {
+    status: 200,
+    headers: archiveResponseHeaders(nativeArchiveFileName(input.stem)),
+  });
+}
+
+async function exportWorkspaceNativeArchive(
+  db: DbRef,
+  body: Record<string, unknown>,
+  actorId: string,
+  storage?: FunctionStorageProxy,
+) {
+  const workspace = await getReadableWorkspace(db, requireString(body.workspaceId, 'workspaceId'), actorId);
+  await assertOrganizationDlpPolicy(db, workspace.id, 'exports', 'Exports are blocked by organization DLP policy.');
+  const allPages = await listNativeExportRows(
+    db.table<APage>('pages').where('workspaceId', '==', workspace.id),
+    nativeExportBudget(NATIVE_DOCUMENT_LIMITS.maxPages),
+    nativeExportByteBudget(NATIVE_EXPORT_PAGE_SCAN_ESTIMATED_MAX_BYTES),
+    'Pages',
+  );
+  const scope = workspaceScope(allPages);
+  let rawDocument: NativeExportEnvelope | undefined;
+  await buildNativeEnvelope(db, workspace, allPages, scope, nativeExportByteBudget(), (document) => {
+    rawDocument = document;
+  });
+  if (!rawDocument) throw new Error('Archive source collection did not complete.');
+  return nativeArchiveResponse({
+    db,
+    storage,
+    actorId,
+    workspace,
+    rawDocument,
+    stem: workspace.name || 'workspace',
+    auditAction: 'export.workspace_native_archive',
+    auditTargetType: 'workspace',
+    auditTargetId: workspace.id,
+  });
+}
+
+async function exportPageNativeArchive(
+  db: DbRef,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail?: string | null,
+  storage?: FunctionStorageProxy,
+) {
+  const page = await getReadablePage(db, requireString(body.pageId, 'pageId'), actorId, actorEmail);
+  await assertOrganizationDlpPolicy(db, page.workspaceId, 'exports', 'Exports are blocked by organization DLP policy.');
+  const workspace = (await getExisting(db.table<Workspace>('workspaces'), page.workspaceId)) ?? { id: page.workspaceId };
+  const allPages = await listNativeExportRows(
+    db.table<APage>('pages').where('workspaceId', '==', page.workspaceId),
+    nativeExportBudget(NATIVE_DOCUMENT_LIMITS.maxPages),
+    nativeExportByteBudget(NATIVE_EXPORT_PAGE_SCAN_ESTIMATED_MAX_BYTES),
+    'Pages',
+  );
+  const root = allPages.find((candidate) => candidate.id === page.id);
+  if (!root) throw new Error('Page was not found.');
+  const scope = collectSubtreeScope(allPages, root);
+  let rawDocument: NativeExportEnvelope | undefined;
+  await buildNativeEnvelope(db, workspace, allPages, scope, nativeExportByteBudget(), (document) => {
+    rawDocument = document;
+  });
+  if (!rawDocument) throw new Error('Archive source collection did not complete.');
+  return nativeArchiveResponse({
+    db,
+    storage,
+    actorId,
+    workspace,
+    rawDocument,
+    stem: page.title || 'page',
+    auditAction: 'export.page_native_archive',
+    auditTargetType: page.kind === 'database' ? 'database' : 'page',
+    auditTargetId: page.id,
+  });
+}
+
 function normalizeNativeEntities(document: NativeExportEnvelope): NativeEntities {
   const entities = document.entities ?? ({} as NativeEntities);
   return {
@@ -2565,6 +3192,893 @@ function normalizeNativeEntities(document: NativeExportEnvelope): NativeEntities
     dbTemplates: Array.isArray(entities.dbTemplates) ? entities.dbTemplates : [],
     comments: Array.isArray(entities.comments) ? entities.comments : [],
   };
+}
+
+const NATIVE_ARCHIVE_UPLOAD_TTL_SECONDS = 30 * 60;
+const NATIVE_ARCHIVE_UPLOAD_SAFETY_MS = 5 * 60 * 1000;
+
+interface NativeArchiveImportMetadata {
+  kind: 'hanji_archive';
+  batchId: string;
+  fileId: string;
+  sha256: string;
+  documentSha256: string;
+  state: 'preparing' | 'staging' | 'cancelled' | 'imported';
+}
+
+interface NativeArchiveImportResult {
+  rootPageIds: string[];
+  counts: Record<string, number>;
+  warnings: NativeWarning[];
+}
+
+interface NativeArchiveImportBatch {
+  id: string;
+  workspaceId: string;
+  batchId: string;
+  actorId: string;
+  documentSha256: string;
+  fileCount: number;
+  fileBytes: number;
+  parentId?: string | null;
+  parentType: PageParentType;
+  status: 'preparing' | 'staging' | 'imported' | 'cancelled';
+  result?: NativeArchiveImportResult | null;
+  expiresAt?: string | null;
+  completedAt?: string | null;
+  cancelledAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+function nativeArchiveBatchId(value: unknown) {
+  const id = optionalString(value);
+  if (!id || !/^[a-zA-Z0-9_-]{16,96}$/.test(id)) {
+    throw new Error('Native archive batchId must be 16-96 letters, digits, underscores, or hyphens.');
+  }
+  return id;
+}
+
+function nativeArchiveUploadId(batchId: string, fileId: string) {
+  return `archive-${batchId}-${fileId}`;
+}
+
+function nativeArchiveBatchRowId(batchId: string) {
+  return `archive-batch-${batchId}`;
+}
+
+function nativeArchiveUploadKey(workspaceId: string, batchId: string, fileId: string) {
+  return `workspaces/${workspaceId}/archive-import/${batchId}/${fileId}`;
+}
+
+function nativeArchiveStorageUrl(request: Request | undefined, bucket: string, key: string) {
+  const path = `/api/storage/${encodeURIComponent(bucket)}/${key.split('/').map(encodeURIComponent).join('/')}`;
+  return request ? `${new URL(request.url).origin}${path}` : path;
+}
+
+function nativeArchiveMetadata(upload: FileUpload): NativeArchiveImportMetadata | undefined {
+  if (!upload.fileImportResult || typeof upload.fileImportResult !== 'object') return undefined;
+  const value = upload.fileImportResult as Partial<NativeArchiveImportMetadata>;
+  if (
+    value.kind !== 'hanji_archive'
+    || typeof value.batchId !== 'string'
+    || typeof value.fileId !== 'string'
+    || typeof value.sha256 !== 'string'
+    || typeof value.documentSha256 !== 'string'
+    || !['preparing', 'staging', 'cancelled', 'imported'].includes(String(value.state))
+  ) return undefined;
+  return value as NativeArchiveImportMetadata;
+}
+
+function assertNativeArchiveBatch(
+  batch: NativeArchiveImportBatch,
+  input: {
+    workspaceId: string;
+    actorId: string;
+    batchId: string;
+    manifest: NativeArchiveManifest;
+    parentId: string | null;
+    parentType: PageParentType;
+  },
+) {
+  if (
+    batch.id !== nativeArchiveBatchRowId(input.batchId)
+    || batch.workspaceId !== input.workspaceId
+    || batch.actorId !== input.actorId
+    || batch.batchId !== input.batchId
+    || batch.documentSha256 !== input.manifest.document.sha256
+    || batch.fileCount !== input.manifest.files.length
+    || batch.fileBytes !== input.manifest.totals.fileBytes
+    || (batch.parentId ?? null) !== input.parentId
+    || batch.parentType !== input.parentType
+  ) {
+    throw Object.assign(new Error('Native archive batch does not match this import request.'), { status: 409 });
+  }
+  if (!['preparing', 'staging', 'imported', 'cancelled'].includes(batch.status)) {
+    throw Object.assign(new Error('Native archive batch has an invalid state.'), { status: 409 });
+  }
+  if (batch.status === 'imported' && !batch.result) {
+    throw Object.assign(new Error('Native archive batch completion result is missing.'), { status: 409 });
+  }
+  return batch;
+}
+
+function assertNativeArchiveStagingRow(
+  upload: FileUpload,
+  input: {
+    workspaceId: string;
+    actorId: string;
+    batchId: string;
+    file: NativeArchiveFileEntry;
+    documentSha256: string;
+  },
+) {
+  const metadata = nativeArchiveMetadata(upload);
+  if (
+    upload.workspaceId !== input.workspaceId
+    || upload.createdBy !== input.actorId
+    || upload.key !== nativeArchiveUploadKey(input.workspaceId, input.batchId, input.file.id)
+    || upload.bucket !== FILE_BUCKET
+    || upload.name !== input.file.name
+    || normalizeFileContentType(upload.contentType) !== normalizeFileContentType(input.file.contentType)
+    || upload.size !== input.file.bytes
+    || metadata?.batchId !== input.batchId
+    || metadata.fileId !== input.file.id
+    || metadata.sha256 !== input.file.sha256
+    || metadata.documentSha256 !== input.documentSha256
+  ) {
+    throw Object.assign(new Error(`Archive staging row ${input.file.id} does not match the manifest.`), { status: 409 });
+  }
+  if (metadata.state === 'cancelled') {
+    throw Object.assign(new Error(`Archive staging row ${input.file.id} was cancelled.`), { status: 409 });
+  }
+  return metadata;
+}
+
+async function archiveImportBundle(body: Record<string, unknown>) {
+  return validateNativeArchiveBundle(body.document, body.manifest);
+}
+
+async function archiveImportWorkspace(db: DbRef, workspaceId: string) {
+  const workspace = await getExisting(db.table<Workspace>('workspaces'), workspaceId);
+  if (!workspace) throw new Error('Workspace was not found.');
+  if (workspace.deletionPendingAt) throw Object.assign(new Error('Workspace deletion is already in progress.'), { status: 409 });
+  return workspace;
+}
+
+async function prepareNativeArchiveImport(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail: string | null | undefined,
+  storage: FunctionStorageProxy | undefined,
+) {
+  const workspaceId = requireString(body.workspaceId, 'workspaceId');
+  const batchId = nativeArchiveBatchId(body.batchId);
+  const bundle = await archiveImportBundle(body);
+  const parentId = optionalString(body.parentId) ?? null;
+  const parentType = parseParentType(body.parentType, parentId);
+  if (parentType === 'database') throw new Error('Import destination must be a page or the workspace.');
+  await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
+  const workspace = await archiveImportWorkspace(db, workspaceId);
+  await assertOrganizationDlpContent(db, {
+    workspaceId,
+    files: bundle.manifest.files.map((file) => ({ name: file.name, contentType: file.contentType })),
+  });
+  const proxy = nativeArchiveStorageBucket(storage, FILE_BUCKET);
+  if (bundle.manifest.files.length > 0 && !proxy?.getSignedUploadUrl) {
+    throw new Error('Native archive import requires trusted signed-upload storage access.');
+  }
+
+  return withFileWorkspaceLease(db, workspaceId, actorId, 'prepare-native-archive-import', async (lease) => {
+    await lease.assertOwned();
+    await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
+    await assertFileTargetsNotDeleting(db, workspaceId, [parentId]);
+    const uploads = db.table<FileUpload>('file_uploads');
+    const batches = db.table<NativeArchiveImportBatch>('native_archive_imports');
+    const documentSha256 = bundle.manifest.document.sha256;
+    const batchRowId = nativeArchiveBatchRowId(batchId);
+    const priorBatch = await getExisting(batches, batchRowId);
+    const now = nowIso();
+    const provisionalExpiresAt = new Date(
+      Date.now() + NATIVE_ARCHIVE_UPLOAD_TTL_SECONDS * 1000 + NATIVE_ARCHIVE_UPLOAD_SAFETY_MS,
+    ).toISOString();
+    const batch: NativeArchiveImportBatch = priorBatch
+      ? assertNativeArchiveBatch(priorBatch, {
+          workspaceId, actorId, batchId, manifest: bundle.manifest, parentId, parentType,
+        })
+      : {
+          id: batchRowId,
+          workspaceId,
+          batchId,
+          actorId,
+          documentSha256,
+          fileCount: bundle.manifest.files.length,
+          fileBytes: bundle.manifest.totals.fileBytes,
+          parentId,
+          parentType,
+          status: 'preparing',
+          expiresAt: provisionalExpiresAt,
+          createdAt: now,
+          updatedAt: now,
+        };
+    if (batch.status === 'imported') {
+      return { batchId, files: [], completed: batch.result! };
+    }
+    if (batch.status === 'cancelled') {
+      throw Object.assign(new Error('Native archive batch was cancelled.'), { status: 409 });
+    }
+    const existing = await mapNativeExportWithConcurrency(
+      bundle.manifest.files,
+      NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+      async (file) => getExisting(uploads, nativeArchiveUploadId(batchId, file.id)),
+    );
+    const rows: FileUpload[] = [];
+    const newRows: FileUpload[] = [];
+    for (let index = 0; index < bundle.manifest.files.length; index += 1) {
+      const file = bundle.manifest.files[index];
+      const current = existing[index];
+      if (current) {
+        const metadata = assertNativeArchiveStagingRow(current, {
+          workspaceId, actorId, batchId, file, documentSha256,
+        });
+        if (!['preparing', 'staging'].includes(metadata.state) || !['preparing', 'pending'].includes(String(current.status))) {
+          throw Object.assign(new Error(`Archive staging row ${file.id} is no longer reusable.`), { status: 409 });
+        }
+        rows.push(current);
+        continue;
+      }
+      const row: FileUpload = {
+        id: nativeArchiveUploadId(batchId, file.id),
+        workspaceId,
+        bucket: FILE_BUCKET,
+        key: nativeArchiveUploadKey(workspaceId, batchId, file.id),
+        scope: file.scope,
+        name: file.name,
+        contentType: file.contentType,
+        size: file.bytes,
+        status: 'preparing',
+        createdBy: actorId,
+        expiresAt: provisionalExpiresAt,
+        fileImportResult: {
+          kind: 'hanji_archive', batchId, fileId: file.id, sha256: file.sha256,
+          documentSha256, state: 'preparing',
+        } satisfies NativeArchiveImportMetadata,
+        createdAt: now,
+        updatedAt: now,
+      };
+      rows.push(row);
+      newRows.push(row);
+    }
+
+    const createdIds: string[] = [];
+    let createdBatch = false;
+    try {
+      let firstChunk = true;
+      for (let start = 0; firstChunk || start < newRows.length; start += NATIVE_ARCHIVE_LIMITS.transactionChunkItems) {
+        const chunk = newRows.slice(start, start + NATIVE_ARCHIVE_LIMITS.transactionChunkItems);
+        const operations: DbTransactOperation[] = chunk.flatMap((row) => [
+          { table: 'file_uploads', op: 'expect' as const, id: row.id, exists: false },
+          { table: 'file_uploads', op: 'insert' as const, data: { ...row } },
+        ]);
+        if (firstChunk && !priorBatch) {
+          operations.unshift(
+            { table: 'native_archive_imports', op: 'expect' as const, id: batch.id, exists: false },
+            { table: 'native_archive_imports', op: 'insert' as const, data: { ...batch } },
+          );
+        }
+        if (operations.length > 0) await db.transact(operations);
+        if (firstChunk && !priorBatch) createdBatch = true;
+        createdIds.push(...chunk.map((row) => row.id));
+        firstChunk = false;
+      }
+      await reserveOrganizationStorageBatch(
+        admin,
+        workspace,
+        rows.filter((row) => (row.size ?? 0) > 0).map((row) => ({ id: row.id, bytes: row.size ?? 0 })),
+      );
+    } catch (error) {
+      for (let start = 0; start < createdIds.length; start += NATIVE_ARCHIVE_LIMITS.transactionChunkItems) {
+        await db.transact(createdIds.slice(start, start + NATIVE_ARCHIVE_LIMITS.transactionChunkItems).map((id) => ({
+          table: 'file_uploads', op: 'delete' as const, id,
+        }))).catch(() => undefined);
+      }
+      if (createdBatch) await batches.delete(batch.id).catch(() => undefined);
+      throw error;
+    }
+
+    const grants = await mapNativeExportWithConcurrency(
+      rows,
+      NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+      async (row, index) => {
+        try {
+          const grant = await proxy!.getSignedUploadUrl!(row.key, {
+            expiresIn: NATIVE_ARCHIVE_UPLOAD_TTL_SECONDS,
+            maxBytes: Math.max(1, row.size ?? 0),
+          });
+          return { ok: true as const, row, file: bundle.manifest.files[index], grant };
+        } catch (error) {
+          return { ok: false as const, row, file: bundle.manifest.files[index], error };
+        }
+      },
+    );
+    const failed = grants.filter((result) => !result.ok);
+    if (failed.length > 0) {
+      // Some one-time grants may already exist. Keep every row and reservation
+      // quarantined until the exact credential expiry; cleanup can then delete
+      // any replayed bytes without creating untracked storage.
+      let firstChunk = true;
+      for (let start = 0; firstChunk || start < rows.length; start += NATIVE_ARCHIVE_LIMITS.transactionChunkItems) {
+        const chunk = rows.slice(start, start + NATIVE_ARCHIVE_LIMITS.transactionChunkItems);
+        const operations: DbTransactOperation[] = chunk.map((row) => ({
+          table: 'file_uploads',
+          op: 'update' as const,
+          id: row.id,
+          data: { status: 'pending', expiresAt: provisionalExpiresAt, updatedAt: nowIso() },
+        }));
+        if (start + chunk.length >= rows.length) {
+          operations.push({
+            table: 'native_archive_imports',
+            op: 'update' as const,
+            id: batch.id,
+            data: { status: 'staging', expiresAt: provisionalExpiresAt, updatedAt: nowIso() },
+          });
+        }
+        await db.transact(operations).catch(() => undefined);
+        firstChunk = false;
+      }
+      throw new Error(`Native archive upload grant preparation failed for ${failed.length} file(s).`);
+    }
+    let firstChunk = true;
+    for (let start = 0; firstChunk || start < grants.length; start += NATIVE_ARCHIVE_LIMITS.transactionChunkItems) {
+      const chunk = grants.slice(start, start + NATIVE_ARCHIVE_LIMITS.transactionChunkItems);
+      const operations: DbTransactOperation[] = chunk.map((result) => ({
+        table: 'file_uploads',
+        op: 'update' as const,
+        id: result.row.id,
+        data: {
+          status: 'pending',
+          expiresAt: result.ok ? result.grant.expiresAt : provisionalExpiresAt,
+          fileImportResult: {
+            kind: 'hanji_archive', batchId, fileId: result.file.id, sha256: result.file.sha256,
+            documentSha256, state: 'staging',
+          } satisfies NativeArchiveImportMetadata,
+          updatedAt: nowIso(),
+        },
+      }));
+      if (start + chunk.length >= grants.length) {
+        operations.push({
+          table: 'native_archive_imports',
+          op: 'update' as const,
+          id: batch.id,
+          data: { status: 'staging', expiresAt: provisionalExpiresAt, updatedAt: nowIso() },
+        });
+      }
+      await db.transact(operations);
+      firstChunk = false;
+    }
+    return {
+      batchId,
+      files: grants.map((result) => {
+        if (!result.ok) throw new Error('Native archive grant settlement was incomplete.');
+        return {
+          id: result.row.id,
+          fileId: result.file.id,
+          key: result.row.key,
+          uploadUrl: result.grant.url,
+          uploadExpiresAt: result.grant.expiresAt,
+          uploadMaxBytes: result.grant.maxBytes,
+        };
+      }),
+    };
+  });
+}
+
+function sanitizeNativeArchiveEntitiesForImport(entities: NativeEntities) {
+  const warnings: NativeWarning[] = [];
+  const clone = <T>(value: T): T => value == null ? value : JSON.parse(JSON.stringify(value)) as T;
+  const redact = <T>(value: T, entityId: string): T => {
+    const result = redactNativeExportValue(value);
+    if (result.redacted > 0) {
+      warnings.push({ code: 'redacted_sensitive_metadata', entityId, detail: `${result.redacted} field(s)` });
+    }
+    return result.value as T;
+  };
+  const pages = entities.pages.map((page) => {
+    const next = clone(page);
+    delete next.verifiedAt;
+    delete next.verifiedBy;
+    delete next.verificationExpiresAt;
+    delete next.createdBy;
+    delete next.lastEditedBy;
+    delete next.trashedAt;
+    next.isFavorite = false;
+    next.inTrash = false;
+    next.properties = redact(next.properties, page.id);
+    return next;
+  });
+  const blocks = entities.blocks.map((block) => {
+    const next = clone(block);
+    delete next.createdBy;
+    next.content = redact(next.content, block.id);
+    return next;
+  });
+  const dbProperties = entities.dbProperties.map((property) => {
+    const next = clone(property);
+    next.config = redact(next.config, property.id);
+    return next;
+  });
+  const dbViews = entities.dbViews.map((view) => {
+    const next = clone(view);
+    next.config = redact(next.config, view.id);
+    return next;
+  });
+  const dbTemplates = entities.dbTemplates.map((template) => {
+    const next = clone(template);
+    next.properties = redact(next.properties, template.id);
+    next.blocks = redact(next.blocks, template.id);
+    return next;
+  });
+  const comments = entities.comments.map((comment) => {
+    const next = clone(comment);
+    next.authorId = '';
+    next.body = redact(next.body, comment.id);
+    return next;
+  });
+  return { entities: { pages, blocks, dbProperties, dbViews, dbTemplates, comments }, warnings };
+}
+
+async function nativeArchiveStagingRows(
+  db: DbRef,
+  manifest: NativeArchiveManifest,
+  workspaceId: string,
+  actorId: string,
+  batchId: string,
+  captureTrustedRows?: (rows: FileUpload[]) => void,
+) {
+  const uploads = db.table<FileUpload>('file_uploads');
+  const loaded = await settleNativeArchiveWithConcurrency(
+    manifest.files,
+    NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+    async (file) => getExisting(uploads, nativeArchiveUploadId(batchId, file.id)),
+  );
+  const trustedRows: FileUpload[] = [];
+  const orderedRows = new Array<FileUpload>(manifest.files.length);
+  const failures: Array<{ item: string; error: unknown }> = [];
+  for (let index = 0; index < manifest.files.length; index += 1) {
+    const file = manifest.files[index];
+    const result = loaded[index];
+    if (!result.ok) {
+      failures.push({ item: file.id, error: result.error });
+      continue;
+    }
+    const upload = result.value;
+    if (!upload) {
+      failures.push({ item: file.id, error: new Error(`Archive staging row ${file.id} was not found.`) });
+      continue;
+    }
+    try {
+      const metadata = assertNativeArchiveStagingRow(upload, {
+        workspaceId,
+        actorId,
+        batchId,
+        file,
+        documentSha256: manifest.document.sha256,
+      });
+      trustedRows.push(upload);
+      if (upload.status !== 'pending' || metadata.state !== 'staging') {
+        throw new Error(`Archive staging row ${file.id} is not ready.`);
+      }
+      if (upload.expiresAt && new Date(upload.expiresAt).getTime() <= Date.now()) {
+        throw new Error(`Archive staging row ${file.id} has expired.`);
+      }
+      orderedRows[index] = upload;
+    } catch (error) {
+      failures.push({ item: file.id, error });
+    }
+  }
+  captureTrustedRows?.(trustedRows);
+  if (failures.length > 0) throw nativeArchiveFailureMessage('Native archive staging validation', failures);
+  return orderedRows;
+}
+
+interface VerifiedNativeArchiveFile {
+  file: NativeArchiveFileEntry;
+  upload: FileUpload;
+  etag: string;
+  contentType: string;
+}
+
+async function verifyNativeArchiveStagedObjects(
+  storage: FunctionStorageProxy | undefined,
+  manifest: NativeArchiveManifest,
+  rows: FileUpload[],
+) {
+  const settledHeads = await settleNativeArchiveWithConcurrency(
+    rows,
+    NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+    async (upload, index) => {
+      const file = manifest.files[index];
+      const proxy = nativeArchiveStorageBucket(storage, upload.bucket || FILE_BUCKET);
+      if (!proxy) throw new Error('Native archive verification requires trusted storage access.');
+      const head = await proxy.head(upload.key);
+      if (!head?.etag) throw Object.assign(new Error(`Staged archive file ${file.id} was not found.`), { status: 409 });
+      const expectedType = assertSafeStoredFileType(file.name, file.contentType);
+      const actualType = assertSafeStoredFileType(file.name, head.contentType);
+      if (
+        head.size !== file.bytes
+        || normalizeFileContentType(actualType) !== normalizeFileContentType(expectedType)
+      ) {
+        throw Object.assign(new Error(`Staged archive file ${file.id} metadata does not match.`), { status: 409 });
+      }
+      return { file, upload, etag: head.etag, contentType: actualType };
+    },
+  );
+  const headFailures = settledHeads.flatMap((result, index) => result.ok ? [] : [{
+    item: manifest.files[index].id,
+    error: result.error,
+  }]);
+  if (headFailures.length > 0) {
+    throw nativeArchiveFailureMessage('Native archive staged metadata verification', headFailures);
+  }
+  const heads = settledHeads.map((result) => {
+    if (!result.ok) throw new Error('Native archive staged metadata settlement was incomplete.');
+    return result.value;
+  });
+  const settledVerified = await settleNativeArchiveWithConcurrency(
+    heads,
+    NATIVE_ARCHIVE_LIMITS.heavyConcurrency,
+    async (head): Promise<VerifiedNativeArchiveFile> => {
+      const proxy = nativeArchiveStorageBucket(storage, head.upload.bucket || FILE_BUCKET);
+      if (!proxy) throw new Error('Native archive verification requires trusted storage access.');
+      const stored = await proxy.get(head.upload.key);
+      if (!stored?.etag) throw new Error(`Staged archive file ${head.file.id} disappeared during verification.`);
+      const actualType = assertSafeStoredFileType(head.file.name, stored.contentType);
+      if (
+        stored.etag !== head.etag
+        || stored.size !== head.file.bytes
+        || normalizeFileContentType(actualType) !== normalizeFileContentType(head.contentType)
+      ) {
+        throw new Error(`Staged archive file ${head.file.id} changed during verification.`);
+      }
+      const digest = await sha256HexStream(stored.body, head.file.bytes);
+      if (digest !== head.file.sha256) throw new Error(`Staged archive file ${head.file.id} digest does not match.`);
+      return head;
+    },
+  );
+  const verificationFailures = settledVerified.flatMap((result, index) => result.ok ? [] : [{
+    item: heads[index].file.id,
+    error: result.error,
+  }]);
+  if (verificationFailures.length > 0) {
+    throw nativeArchiveFailureMessage('Native archive staged byte verification', verificationFailures);
+  }
+  return settledVerified.map((result) => {
+    if (!result.ok) throw new Error('Native archive staged byte settlement was incomplete.');
+    return result.value;
+  });
+}
+
+function mappedArchiveAssociation(binding: NativeArchiveBinding, idMap: Map<string, string>) {
+  const map = (value: string | undefined, label: string) => {
+    if (!value) return undefined;
+    const target = idMap.get(value);
+    if (!target) throw new Error(`Archive file binding ${binding.fileId} has an unresolved ${label}.`);
+    return target;
+  };
+  return {
+    pageId: map(binding.source.pageId, 'page'),
+    blockId: map(binding.source.blockId, 'block'),
+    databaseId: map(binding.source.databaseId, 'database'),
+    propertyId: map(binding.source.propertyId, 'property'),
+    templateId: map(binding.source.templateId, 'template'),
+    commentId: map(binding.source.commentId, 'comment'),
+  };
+}
+
+async function finalizeNativeArchiveRows(
+  db: DbRef,
+  request: Request | undefined,
+  batch: NativeArchiveImportBatch,
+  manifest: NativeArchiveManifest,
+  verified: VerifiedNativeArchiveFile[],
+  idMap: Map<string, string>,
+  bindings: NativeArchiveBinding[],
+  result: NativeArchiveImportResult,
+) {
+  if (verified.length !== manifest.files.length || bindings.length !== manifest.files.length) {
+    throw new Error('Archive file verification or binding settlement is incomplete.');
+  }
+  const bindingById = new Map(bindings.map((binding) => [binding.fileId, binding]));
+  const verifiedById = new Map(verified.map((item) => [item.file.id, item]));
+  const completedAt = nowIso();
+  const fileOperations = manifest.files.map((file) => {
+    const item = verifiedById.get(file.id);
+    const binding = bindingById.get(file.id);
+    if (!item || !binding) throw new Error(`Archive file ${file.id} settlement is missing.`);
+    return {
+      table: 'file_uploads',
+      op: 'update' as const,
+      id: item.upload.id,
+      data: {
+        status: 'uploaded',
+        scope: file.scope,
+        url: nativeArchiveStorageUrl(request, item.upload.bucket || FILE_BUCKET, item.upload.key),
+        etag: item.etag,
+        ...mappedArchiveAssociation(binding, idMap),
+        completedAt,
+        expiresAt: null,
+        fileImportResult: {
+          kind: 'hanji_archive', batchId: batch.batchId, fileId: file.id, sha256: file.sha256,
+          documentSha256: manifest.document.sha256, state: 'imported',
+        } satisfies NativeArchiveImportMetadata,
+        updatedAt: completedAt,
+      },
+    };
+  });
+  await db.transact([
+    {
+      table: 'native_archive_imports',
+      op: 'expect',
+      id: batch.id,
+      where: [['status', '==', 'staging']],
+      exists: true,
+    },
+    ...fileOperations,
+    {
+      table: 'native_archive_imports',
+      op: 'update',
+      id: batch.id,
+      data: {
+        status: 'imported',
+        result,
+        expiresAt: null,
+        completedAt,
+        updatedAt: completedAt,
+      },
+    },
+  ]);
+}
+
+async function retireNativeArchiveStaging(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  storage: FunctionStorageProxy | undefined,
+  batch: NativeArchiveImportBatch,
+  rows: FileUpload[],
+  actorId: string,
+  canRelease: boolean,
+) {
+  const at = nowIso();
+  // Fence replay/cancel away from imported bytes before object deletion. If
+  // this transition fails, leave every object untouched and surface cleanup
+  // failure instead of retaining a false imported terminal.
+  await db.table<NativeArchiveImportBatch>('native_archive_imports').update(batch.id, {
+    status: 'cancelled',
+    result: null,
+    cancelledAt: at,
+    updatedAt: at,
+  });
+  const deletions = await mapNativeExportWithConcurrency(
+    rows,
+    NATIVE_ARCHIVE_LIMITS.heavyConcurrency,
+    async (row) => {
+      try {
+        const proxy = nativeArchiveStorageBucket(storage, row.bucket || FILE_BUCKET);
+        if (!proxy) throw new Error('Native archive cleanup requires trusted storage access.');
+        await proxy.delete(row.key);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  );
+  const safeToRelease = canRelease && deletions.every(Boolean);
+  if (safeToRelease) {
+    const workspace = await archiveImportWorkspace(db, batch.workspaceId);
+    if (workspace.organizationId) {
+      const reservations: StorageQuotaReservation[] = rows
+        .filter((row) => (row.size ?? 0) > 0)
+        .map((row) => ({
+          id: row.id,
+          organizationId: workspace.organizationId!,
+          workspaceId: workspace.id,
+          bytes: row.size ?? 0,
+        }));
+      await releaseOrganizationStorageBatch(admin, reservations);
+    }
+  }
+  let firstChunk = true;
+  for (let start = 0; firstChunk || start < rows.length; start += NATIVE_ARCHIVE_LIMITS.transactionChunkItems) {
+    const chunk = rows.slice(start, start + NATIVE_ARCHIVE_LIMITS.transactionChunkItems);
+    const operations: DbTransactOperation[] = chunk.map((row) => {
+      const metadata = nativeArchiveMetadata(row);
+      return {
+        table: 'file_uploads',
+        op: 'update' as const,
+        id: row.id,
+        data: safeToRelease
+          ? {
+              status: 'failed',
+              expiresAt: null,
+              expiredAt: at,
+              deletedAt: at,
+              deletedBy: actorId,
+              fileImportResult: metadata ? { ...metadata, state: 'cancelled' } : row.fileImportResult,
+              updatedAt: at,
+            }
+          : {
+              status: 'pending',
+              fileImportResult: metadata ? { ...metadata, state: 'cancelled' } : row.fileImportResult,
+              updatedAt: at,
+            },
+      };
+    });
+    if (safeToRelease && start + chunk.length >= rows.length) {
+      operations.push({
+        table: 'native_archive_imports',
+        op: 'update' as const,
+        id: batch.id,
+        data: { expiresAt: null, updatedAt: at },
+      });
+    }
+    if (operations.length > 0) await db.transact(operations);
+    firstChunk = false;
+  }
+}
+
+async function importNativeArchive(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  actorEmail: string | null | undefined,
+  storage: FunctionStorageProxy | undefined,
+  request: Request | undefined,
+) {
+  const workspaceId = requireString(body.workspaceId, 'workspaceId');
+  const batchId = nativeArchiveBatchId(body.batchId);
+  const bundle = await archiveImportBundle(body);
+  const parentId = optionalString(body.parentId) ?? null;
+  const parentType = parseParentType(body.parentType, parentId);
+  if (parentType === 'database') throw new Error('Import destination must be a page or the workspace.');
+  await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
+  await assertOrganizationDlpContent(db, {
+    workspaceId,
+    files: bundle.manifest.files.map((file) => ({ name: file.name, contentType: file.contentType })),
+  });
+  await archiveImportWorkspace(db, workspaceId);
+
+  return withFileWorkspaceLease(db, workspaceId, actorId, 'import-native-archive', async (lease) => {
+    await lease.assertOwned();
+    await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
+    await assertFileTargetsNotDeleting(db, workspaceId, [parentId]);
+    const batchRow = await getExisting(
+      db.table<NativeArchiveImportBatch>('native_archive_imports'),
+      nativeArchiveBatchRowId(batchId),
+    );
+    if (!batchRow) {
+      throw Object.assign(new Error('Native archive batch was not prepared.'), { status: 409 });
+    }
+    const batch = assertNativeArchiveBatch(batchRow, {
+      workspaceId, actorId, batchId, manifest: bundle.manifest, parentId, parentType,
+    });
+    if (batch.status === 'imported') return batch.result!;
+    if (batch.status === 'cancelled') {
+      throw Object.assign(new Error('Native archive batch was cancelled.'), { status: 409 });
+    }
+    if (batch.status !== 'staging') {
+      throw Object.assign(new Error('Native archive batch is not ready.'), { status: 409 });
+    }
+    let rows: FileUpload[] = [];
+    let allObjectsVerified = bundle.manifest.files.length === 0;
+    try {
+      rows = await nativeArchiveStagingRows(
+        db,
+        bundle.manifest,
+        workspaceId,
+        actorId,
+        batchId,
+        (trustedRows) => { rows = trustedRows; },
+      );
+      const verified = await verifyNativeArchiveStagedObjects(storage, bundle.manifest, rows);
+      allObjectsVerified = true;
+      await lease.renew();
+      await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
+      await assertFileTargetsNotDeleting(db, workspaceId, [parentId]);
+      const targets = new Map(verified.map((item) => [item.file.id, {
+        id: item.upload.id,
+        bucket: item.upload.bucket || FILE_BUCKET,
+        key: item.upload.key,
+        url: nativeArchiveStorageUrl(request, item.upload.bucket || FILE_BUCKET, item.upload.key),
+      }]));
+      return await importNativeDocument(db, admin, body, actorId, actorEmail, {
+        document: bundle.document,
+        prepare() {
+          const restored = restoreNativeArchiveFileReferences(bundle.document.entities, targets);
+          const sanitized = sanitizeNativeArchiveEntitiesForImport(restored.entities);
+          return { entities: sanitized.entities, bindings: restored.bindings, warnings: sanitized.warnings };
+        },
+        finalize: (idMap, bindings, result) => finalizeNativeArchiveRows(
+          db,
+          request,
+          batch,
+          bundle.manifest,
+          verified,
+          idMap,
+          bindings,
+          result,
+        ),
+      });
+    } catch (error) {
+      try {
+        await retireNativeArchiveStaging(
+          db,
+          admin,
+          storage,
+          batch,
+          rows,
+          actorId,
+          allObjectsVerified,
+        );
+      } catch (cleanupError) {
+        throw new NativeImportRollbackError(error, [{
+          entity: 'native archive batch',
+          id: batch.id,
+          error: cleanupError,
+        }]);
+      }
+      throw error;
+    }
+  });
+}
+
+async function cancelNativeArchiveImport(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  body: Record<string, unknown>,
+  actorId: string,
+  storage: FunctionStorageProxy | undefined,
+) {
+  const workspaceId = requireString(body.workspaceId, 'workspaceId');
+  const batchId = nativeArchiveBatchId(body.batchId);
+  const bundle = await archiveImportBundle(body);
+  const parentId = optionalString(body.parentId) ?? null;
+  const parentType = parseParentType(body.parentType, parentId);
+  const batchRow = await getExisting(
+    db.table<NativeArchiveImportBatch>('native_archive_imports'),
+    nativeArchiveBatchRowId(batchId),
+  );
+  if (!batchRow) {
+    throw Object.assign(new Error('Native archive batch was not prepared.'), { status: 409 });
+  }
+  const batch = assertNativeArchiveBatch(batchRow, {
+    workspaceId, actorId, batchId, manifest: bundle.manifest, parentId, parentType,
+  });
+  if (batch.status === 'imported') {
+    return { batchId, cancelled: 0, completed: batch.result! };
+  }
+  if (batch.status === 'cancelled') return { batchId, cancelled: 0 };
+  const uploads = db.table<FileUpload>('file_uploads');
+  const rows = (await mapNativeExportWithConcurrency(
+    bundle.manifest.files,
+    NATIVE_ARCHIVE_LIMITS.metadataConcurrency,
+    async (file) => getExisting(uploads, nativeArchiveUploadId(batchId, file.id)),
+  )).filter((row): row is FileUpload => !!row);
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    const file = bundle.manifest.files.find((candidate) => nativeArchiveUploadId(batchId, candidate.id) === row.id);
+    if (!file) throw Object.assign(new Error('Archive staging row is outside the manifest.'), { status: 409 });
+    const metadata = assertNativeArchiveStagingRow(row, {
+      workspaceId, actorId, batchId, file, documentSha256: bundle.manifest.document.sha256,
+    });
+    if (!['preparing', 'staging'].includes(metadata.state) || !['preparing', 'pending'].includes(String(row.status))) {
+      throw Object.assign(new Error(`Archive staging row ${file.id} is not cancellable.`), { status: 409 });
+    }
+  }
+  await retireNativeArchiveStaging(db, admin, storage, batch, rows, actorId, false);
+  return { batchId, cancelled: rows.length };
 }
 
 /**
@@ -2608,22 +4122,39 @@ export function nativeImportPagesParentFirst<T extends Pick<APage, 'id' | 'paren
   return ordered;
 }
 
+interface NativeArchiveImportHooks {
+  document: NativeArchiveDocument;
+  prepare(): {
+    entities: NativeEntities;
+    bindings: NativeArchiveBinding[];
+    warnings: NativeWarning[];
+  };
+  finalize(
+    idMap: Map<string, string>,
+    bindings: NativeArchiveBinding[],
+    result: NativeArchiveImportResult,
+  ): Promise<void>;
+}
+
 async function importNativeDocument(
   db: DbRef,
   admin: AdminDbAccessor,
   body: Record<string, unknown>,
   actorId: string,
   actorEmail?: string | null,
+  archive?: NativeArchiveImportHooks,
 ) {
   const workspaceId = requireString(body.workspaceId, 'workspaceId');
-  const document = validateNativeEnvelope(body.document);
+  const document = archive?.document ?? validateNativeEnvelope(body.document);
   const parentId = optionalString(body.parentId) ?? null;
   const parentType = parseParentType(body.parentType, parentId);
   if (parentType === 'database') throw new Error('Import destination must be a page or the workspace.');
   await assertWritableParent(db, workspaceId, parentId, parentType, 'page', actorId, actorEmail);
 
-  const sanitized = sanitizeNativeEntitiesForExport(normalizeNativeEntities(document));
-  const entities = sanitized.entities;
+  const sanitized = archive
+    ? { entities: archive.document.entities, warnings: [] as NativeWarning[], strippedReferences: 0 }
+    : sanitizeNativeEntitiesForExport(normalizeNativeEntities(document as NativeExportEnvelope));
+  let entities = sanitized.entities;
   const idMap = new Map<string, string>();
   const register = (id: unknown) => {
     if (typeof id === 'string' && id && !idMap.has(id)) idMap.set(id, newId());
@@ -2634,6 +4165,14 @@ async function importNativeDocument(
   for (const view of entities.dbViews) register(view.id);
   for (const template of entities.dbTemplates) register(template.id);
   for (const comment of entities.comments) register(comment.id);
+
+  let archiveBindings: NativeArchiveBinding[] = [];
+  if (archive) {
+    const prepared = archive.prepare();
+    entities = prepared.entities;
+    archiveBindings = prepared.bindings;
+    sanitized.warnings.push(...prepared.warnings);
+  }
 
   const remapped = remapNativeDocument(entities, idMap, {
     propTypeByOldId: propTypeMap(entities.dbProperties),
@@ -2676,6 +4215,24 @@ async function importNativeDocument(
   const pageWorkspaceIndexTable = admin
     .db('app')
     .table<{ id: string; workspaceId: string }>('page_workspace_index');
+  const nativeImportResult = (): NativeArchiveImportResult => ({
+    rootPageIds: rootPages.map((page) => page.id),
+    counts: {
+      pages: insertedPages.filter((page) => page.kind === 'page').length,
+      databases: insertedPages.filter((page) => page.kind === 'database').length,
+      blocks: created.blocks.length,
+      dbProperties: created.props.length,
+      dbViews: created.views.length,
+      dbTemplates: created.templates.length,
+      comments: created.comments.length,
+    },
+    warnings: [
+      ...(Array.isArray(document.warnings) ? document.warnings : []),
+      ...sanitized.warnings,
+      ...remapped.warnings,
+    ],
+  });
+  let archiveResult: NativeArchiveImportResult | undefined;
 
   try {
     for (const page of importPages) {
@@ -2750,6 +4307,28 @@ async function importNativeDocument(
         propsByDb.get(databaseId) ?? [],
       );
     }
+    if (archive) {
+      const result = nativeImportResult();
+      await archive.finalize(idMap, archiveBindings, result);
+      await recordWorkspaceAudit(db, {
+        workspaceId,
+        actorId,
+        action: 'import.native_archive',
+        targetType: parentType === 'workspace' ? 'workspace' : 'page',
+        targetId: parentId ?? workspaceId,
+        metadata: {
+          pages: created.pages.length,
+          blocks: created.blocks.length,
+          dbProperties: created.props.length,
+          dbViews: created.views.length,
+          dbTemplates: created.templates.length,
+          comments: created.comments.length,
+          files: archiveBindings.length,
+          warnings: sanitized.warnings.length + remapped.warnings.length,
+        },
+      });
+      archiveResult = result;
+    }
   } catch (error) {
     const cleanupFailures: Array<{ entity: string; id: string; error: unknown }> = [];
     const deleteCreated = async (
@@ -2793,40 +4372,26 @@ async function importNativeDocument(
     throw error;
   }
 
-  await recordWorkspaceAudit(db, {
-    workspaceId,
-    actorId,
-    action: 'import.native',
-    targetType: parentType === 'workspace' ? 'workspace' : 'page',
-    targetId: parentId ?? workspaceId,
-    metadata: {
-      pages: created.pages.length,
-      blocks: created.blocks.length,
-      dbProperties: created.props.length,
-      dbViews: created.views.length,
-      dbTemplates: created.templates.length,
-      comments: created.comments.length,
-      warnings: sanitized.warnings.length + remapped.warnings.length,
-    },
-  });
+  if (!archive) {
+    await recordWorkspaceAudit(db, {
+      workspaceId,
+      actorId,
+      action: 'import.native',
+      targetType: parentType === 'workspace' ? 'workspace' : 'page',
+      targetId: parentId ?? workspaceId,
+      metadata: {
+        pages: created.pages.length,
+        blocks: created.blocks.length,
+        dbProperties: created.props.length,
+        dbViews: created.views.length,
+        dbTemplates: created.templates.length,
+        comments: created.comments.length,
+        warnings: sanitized.warnings.length + remapped.warnings.length,
+      },
+    });
+  }
 
-  return {
-    rootPageIds: rootPages.map((page) => page.id),
-    counts: {
-      pages: insertedPages.filter((page) => page.kind === 'page').length,
-      databases: insertedPages.filter((page) => page.kind === 'database').length,
-      blocks: created.blocks.length,
-      dbProperties: created.props.length,
-      dbViews: created.views.length,
-      dbTemplates: created.templates.length,
-      comments: created.comments.length,
-    },
-    warnings: [
-      ...(Array.isArray(document.warnings) ? document.warnings : []),
-      ...sanitized.warnings,
-      ...remapped.warnings,
-    ],
-  };
+  return archiveResult ?? nativeImportResult();
 }
 
 export const POST = defineFunction({
@@ -2854,6 +4419,8 @@ export const POST = defineFunction({
         return await importCsvDatabase(db, admin, body, auth.id, actorEmail);
       case 'exportPageMarkdown':
         return await exportPageMarkdown(db, body, auth.id, actorEmail, storage);
+      case 'exportNotionPageMarkdown':
+        return await exportNotionPageMarkdown(db, body, auth.id, actorEmail, storage);
       case 'exportDatabaseCsv':
         return await exportDatabaseCsv(db, body, auth.id, actorEmail, storage);
       case 'exportWorkspaceMarkdown':
@@ -2862,6 +4429,16 @@ export const POST = defineFunction({
         return await exportWorkspaceNative(db, body, auth.id);
       case 'exportPageNative':
         return await exportPageNative(db, body, auth.id, actorEmail);
+      case 'exportWorkspaceNativeArchive':
+        return await exportWorkspaceNativeArchive(db, body, auth.id, storage);
+      case 'exportPageNativeArchive':
+        return await exportPageNativeArchive(db, body, auth.id, actorEmail, storage);
+      case 'prepareNativeArchiveImport':
+        return await prepareNativeArchiveImport(db, admin, body, auth.id, actorEmail, storage);
+      case 'importNativeArchive':
+        return await importNativeArchive(db, admin, body, auth.id, actorEmail, storage, request);
+      case 'cancelNativeArchiveImport':
+        return await cancelNativeArchiveImport(db, admin, body, auth.id, storage);
       case 'importNative':
         return await importNativeDocument(db, admin, body, auth.id, actorEmail);
       default:
@@ -2881,7 +4458,7 @@ export const POST = defineFunction({
       { status: 409, needles: ['already exists', 'changed since'] },
       {
         status: 400,
-        needles: ['Invalid Hanji export', 'is required', 'must be', 'must have', 'Unsupported', 'Unknown'],
+        needles: ['Invalid Hanji export', 'Invalid Hanji archive', 'is required', 'must be', 'must have', 'Unsupported', 'Unknown'],
       },
     ], 500);
     return jsonError(status, message);

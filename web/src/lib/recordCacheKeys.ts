@@ -18,6 +18,7 @@ export function hashRecordCacheKey(input: string): string {
 
 export const recordCacheTables = {
   blocks: (pageId: string) => `blocks:${pageId}`,
+  comments: (pageId: string) => `comments:${pageId}`,
   databaseProperties: (databaseId: string) => `props:${databaseId}`,
   databaseTemplates: (databaseId: string) => `templates:${databaseId}`,
   databaseViews: (databaseId: string) => `views:${databaseId}`,
@@ -30,6 +31,7 @@ export const recordCacheTables = {
 export const recordCacheMeta = {
   blocksStamp: (pageId: string) => `blocksStamp:${pageId}`,
   bootstrap: (bootstrapKey: string) => `bootstrap:${bootstrapKey}`,
+  commentsCachedAt: (pageId: string) => `commentsCachedAt:${pageId}`,
   databaseMetadataStamp: (databaseId: string) => `dbMetaStamp:${databaseId}`,
   databaseRowQuery: (databaseId: string, suffix: string) =>
     `rows:${databaseId}:${suffix}`,

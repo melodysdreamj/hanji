@@ -1,7 +1,15 @@
-import { getAllBlocksRemote } from "./edgebase";
+import {
+  blockReferenceKind as sharedBlockReferenceKind,
+  pageReferenceTargets,
+} from "../../../shared/page-references.mjs";
+import {
+  getPageBacklinksRemote,
+  type BlocksResult,
+  type PageBacklinksRemoteOptions,
+} from "./edgebase";
+import { normalizeLegacyHanjiUri } from "./legacyNamespace";
 import { pagePath } from "./pagePath";
 import { pageDisplayTitle } from "./pageTitle";
-import { pageIdFromPageHref } from "./pageLinks";
 import type { Block, Page, TextSpan } from "./types";
 
 export interface PageReferenceHit {
@@ -13,8 +21,26 @@ export interface PageReferenceHit {
   path: string;
 }
 
-export async function listAllBlocks(): Promise<Block[]> {
-  return (await getAllBlocksRemote()).blocks;
+const pageBacklinksInflight = new Map<string, Promise<BlocksResult>>();
+
+export async function listPageBacklinks(
+  targetPageId: string,
+  limit: number,
+  workspaceId: string,
+  options: PageBacklinksRemoteOptions = {}
+): Promise<BlocksResult> {
+  const key = JSON.stringify([workspaceId, targetPageId, limit, options.sourceCursor ?? null]);
+  const existing = pageBacklinksInflight.get(key);
+  if (existing) return existing;
+  const request = options.sourceCursor
+    ? getPageBacklinksRemote(targetPageId, limit, workspaceId, options)
+    : getPageBacklinksRemote(targetPageId, limit, workspaceId);
+  pageBacklinksInflight.set(key, request);
+  try {
+    return await request;
+  } finally {
+    if (pageBacklinksInflight.get(key) === request) pageBacklinksInflight.delete(key);
+  }
 }
 
 export function pageTitle(page: Page) {
@@ -27,41 +53,10 @@ function richText(spans: TextSpan[] | undefined) {
   return (spans ?? []).map((span) => span.text).join("").trim();
 }
 
-function mentionedPageIds(spans: TextSpan[] | undefined) {
-  return (spans ?? [])
-    .filter((span) => span.mention === "page" && span.pageId)
-    .map((span) => span.pageId as string);
-}
-
-function linkedPageIds(spans: TextSpan[] | undefined) {
-  return (spans ?? []).flatMap((span) => {
-    const pageId = pageIdFromPageHref(span.link);
-    return pageId ? [pageId] : [];
-  });
-}
-
-function blockReferenceTargets(block: Block) {
-  const targets: Array<{ pageId: string; kind: PageReferenceHit["kind"] }> = [
-    ...mentionedPageIds(block.content?.rich).map((pageId) => ({ pageId, kind: "mention" as const })),
-    ...mentionedPageIds(block.content?.caption).map((pageId) => ({ pageId, kind: "mention" as const })),
-    ...linkedPageIds(block.content?.rich).map((pageId) => ({ pageId, kind: "link" as const })),
-    ...linkedPageIds(block.content?.caption).map((pageId) => ({ pageId, kind: "link" as const })),
-  ];
-  if (block.type === "link_to_page" && block.content?.childPageId) {
-    targets.push({ pageId: block.content.childPageId, kind: "link" });
-  }
-
-  const seen = new Set<string>();
-  return targets.filter((target) => {
-    const key = `${target.kind}:${target.pageId}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
 export function blockReferenceKind(block: Block, pageId: string): PageReferenceHit["kind"] | null {
-  return blockReferenceTargets(block).find((target) => target.pageId === pageId)?.kind ?? null;
+  return sharedBlockReferenceKind(block, pageId, (href) =>
+    typeof href === "string" ? normalizeLegacyHanjiUri(href) : href
+  );
 }
 
 export function blockReferencePreview(block: Block, kind: PageReferenceHit["kind"]) {
@@ -92,7 +87,9 @@ export function pageReferenceHits(
     .flatMap((block) => {
       const page = pagesById[block.pageId];
       if (!page || page.inTrash) return [];
-      return blockReferenceTargets(block)
+      return pageReferenceTargets(block, (href) =>
+        typeof href === "string" ? normalizeLegacyHanjiUri(href) : href
+      )
         .filter((target) => !opts.targetPageId || target.pageId === opts.targetPageId)
         .map((target) => {
           const targetPage = pagesById[target.pageId];

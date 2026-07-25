@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import { copyText } from "@/lib/clipboard";
 import { fetchUrlMetadataRemote } from "@/lib/edgebase";
 import { isComposingKeyEvent } from "@/lib/keyboard";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
 import { absolutePageUrl, pageHref } from "@/lib/navigation";
 import { pagePathOrWorkspaceRoot } from "@/lib/pagePath";
 import { pageIdFromPageHref } from "@/lib/pageLinks";
@@ -102,6 +103,8 @@ export function TextBlock({
   const compositionEnterGuardUntilRef = useRef(0);
   const compositionEnterFrameRef = useRef<number | null>(null);
   const pendingCompositionParagraphInputRef = useRef<"insertParagraph" | "insertLineBreak" | null>(null);
+  const pendingCompositionInputRef = useRef(false);
+  const trailingCompositionInputSignatureRef = useRef<string | null>(null);
   const lastCompositionTextRef = useRef("");
   const codeCaptionRef = useRef<HTMLDivElement>(null);
   const linkRangeRef = useRef<Range | null>(null);
@@ -1152,12 +1155,7 @@ export function TextBlock({
     }
   }
 
-  function onInput() {
-    const el = ref.current;
-    if (!el) return;
-    setPastedUrlMenu(null);
-    el.dataset.empty = String((el.textContent ?? "").length === 0);
-    const spans = htmlToSpans(el);
+  function commitEditableInput(el: HTMLDivElement, spans: TextSpan[]) {
     if (pagePlaceholder && spansToPlainText(spans).length > 0) {
       onPagePlaceholderInput?.();
     }
@@ -1166,6 +1164,37 @@ export function TextBlock({
     maybeSlash();
     maybeMention();
     publishEditableAwareness();
+  }
+
+  function onInput() {
+    const el = ref.current;
+    if (!el) return;
+    setPastedUrlMenu(null);
+    el.dataset.empty = String((el.textContent ?? "").length === 0);
+    const spans = htmlToSpans(el);
+    if (composingRef.current) {
+      // The contenteditable already renders the browser/IME-owned intermediate
+      // value. Keep it out of Zustand, durable persistence, realtime snapshots,
+      // and the Yjs undo session until compositionend supplies one semantic
+      // commit. Awareness may still publish the local caret.
+      pendingCompositionInputRef.current = true;
+      publishEditableAwareness();
+      return;
+    }
+
+    const trailingSignature = trailingCompositionInputSignatureRef.current;
+    if (trailingSignature !== null) {
+      trailingCompositionInputSignatureRef.current = null;
+      // Chromium/WebKit may emit one final input after compositionend even
+      // though the committed DOM was already observable there. Suppress only
+      // that byte-equivalent echo; a genuinely newer input continues normally.
+      if (trailingSignature === JSON.stringify(spans)) {
+        publishEditableAwareness();
+        return;
+      }
+    }
+
+    commitEditableInput(el, spans);
   }
 
   function cancelPendingCompositionEnterFrame() {
@@ -1266,6 +1295,8 @@ export function TextBlock({
     compositionEnterShiftRef.current = false;
     compositionEnterGuardUntilRef.current = 0;
     pendingCompositionParagraphInputRef.current = null;
+    pendingCompositionInputRef.current = false;
+    trailingCompositionInputSignatureRef.current = null;
     lastCompositionTextRef.current = "";
   }
 
@@ -1273,6 +1304,12 @@ export function TextBlock({
     composingRef.current = false;
     if (ref.current) delete ref.current.dataset.composing;
     lastCompositionTextRef.current = e.data ?? "";
+    if (pendingCompositionInputRef.current && ref.current) {
+      pendingCompositionInputRef.current = false;
+      const spans = htmlToSpans(ref.current);
+      commitEditableInput(ref.current, spans);
+      trailingCompositionInputSignatureRef.current = JSON.stringify(spans);
+    }
     if (!composingEnterRef.current) {
       compositionEnterGuardUntilRef.current = 0;
       return;
@@ -1386,7 +1423,11 @@ export function TextBlock({
       return true;
     }
 
-    const autoLinkShortcut = findTypedAutoLinkShortcut(beforeCaret);
+    const slashQuery = beforeCaret.match(SLASH_RE)?.[1];
+    const autoLinkShortcut =
+      slashQuery !== undefined && matchBlocks(slashQuery).length > 0
+        ? null
+        : findTypedAutoLinkShortcut(beforeCaret);
     if (autoLinkShortcut) {
       const [head, fromUrlStart] = splitSpans(spans, autoLinkShortcut.start);
       const [urlText, fromUrlEnd] = splitSpans(fromUrlStart, autoLinkShortcut.urlLength);
@@ -1502,9 +1543,20 @@ export function TextBlock({
   }
 
   function closeDatabasePicker(restoreFocus = true) {
+    const focusOwnerAtClose = document.activeElement;
     setDatabasePicker(null);
     if (!restoreFocus) return;
     window.requestAnimationFrame(() => {
+      const currentFocusOwner = document.activeElement;
+      if (
+        currentFocusOwner instanceof HTMLElement &&
+        currentFocusOwner.isConnected &&
+        currentFocusOwner !== document.body &&
+        currentFocusOwner !== document.documentElement &&
+        currentFocusOwner !== focusOwnerAtClose
+      ) {
+        return;
+      }
       ref.current?.focus({ preventScroll: true });
     });
   }
@@ -2047,7 +2099,7 @@ export function TextBlock({
 
     // Inline formatting shortcuts.
     if ((e.metaKey || e.ctrlKey) && !e.altKey) {
-      if (e.shiftKey && e.key.toLowerCase() === "p") {
+      if (matchesKeyboardShortcut("moveBlock", e)) {
         e.preventDefault();
         setSlash({ open: false, query: "" });
         setMention({ open: false, query: "" });
@@ -2059,7 +2111,7 @@ export function TextBlock({
         ops.openMoveDialog(block.id);
         return;
       }
-      if (e.shiftKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+      if (matchesKeyboardShortcut("moveBlockUp", e) || matchesKeyboardShortcut("moveBlockDown", e)) {
         e.preventDefault();
         setSlash({ open: false, query: "" });
         setMention({ open: false, query: "" });
@@ -2069,19 +2121,22 @@ export function TextBlock({
         closePageEditor(false);
         closePastedUrlMenu(false);
         const caret = caretOffset(el);
-        const moved = ops.moveSelectedBlock(block.id, e.key === "ArrowUp" ? "up" : "down");
+        const moved = ops.moveSelectedBlock(
+          block.id,
+          matchesKeyboardShortcut("moveBlockUp", e) ? "up" : "down",
+        );
         if (moved) {
           ops.selectBlock(null);
           requestAnimationFrame(() => focusEditableSettled(block.id, caret));
         }
         return;
       }
-      if (e.shiftKey && e.key.toLowerCase() === "h") {
+      if (matchesKeyboardShortcut("blockColor", e)) {
         e.preventDefault();
         applyLastColorShortcut();
         return;
       }
-      if (e.shiftKey && e.key.toLowerCase() === "m") {
+      if (matchesKeyboardShortcut("addComment", e)) {
         e.preventDefault();
         openCommentShortcut();
         return;
@@ -2103,13 +2158,10 @@ export function TextBlock({
         }
         return;
       }
-      if (e.shiftKey) {
-        const k = e.key.toLowerCase();
-        if (k === "s" || k === "x") {
-          e.preventDefault();
-          applyMark("strikethrough");
-          return;
-        }
+      if (matchesKeyboardShortcut("strikethrough", e)) {
+        e.preventDefault();
+        applyMark("strikethrough");
+        return;
       }
       if (e.key === "Enter") {
         if (block.type === "to_do") {
@@ -2128,7 +2180,7 @@ export function TextBlock({
         }
         return;
       }
-      if (!e.shiftKey && (e.key === "/" || e.code === "Slash")) {
+      if (matchesKeyboardShortcut("openBlockMenu", e)) {
         e.preventDefault();
         setSlash({ open: false, query: "" });
         setMention({ open: false, query: "" });
@@ -2141,17 +2193,15 @@ export function TextBlock({
         ops.openBlockActionMenu(block.id);
         return;
       }
-      const k = e.key.toLowerCase();
-      const map: Record<string, Parameters<typeof applyMark>[0]> = {
-        b: "bold",
-        i: "italic",
-        u: "underline",
-        e: "code",
-        k: "link",
-      };
-      if (map[k]) {
+      const markShortcut: Parameters<typeof applyMark>[0] | undefined =
+        matchesKeyboardShortcut("bold", e) ? "bold" :
+          matchesKeyboardShortcut("italic", e) ? "italic" :
+            matchesKeyboardShortcut("underline", e) ? "underline" :
+              matchesKeyboardShortcut("inlineCode", e) ? "code" :
+                matchesKeyboardShortcut("addLink", e) ? "link" : undefined;
+      if (markShortcut) {
         e.preventDefault();
-        applyMark(map[k]);
+        applyMark(markShortcut);
         return;
       }
     }

@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "バックリンク {{count}}件",
-    "count_other": "バックリンク {{count}}件"
+    "count_other": "バックリンク {{count}}件",
+    "partial_one": "バックリンク {{count}}個以上",
+    "partial_other": "バックリンク {{count}}個以上"
   },
   "header": {
     "title": "リンクされたメンション"
@@ -10,7 +12,8 @@
     "mention_one": "メンション {{count}}件",
     "mention_other": "メンション {{count}}件",
     "link_one": "リンク {{count}}件",
-    "link_other": "リンク {{count}}件"
+    "link_other": "リンク {{count}}件",
+    "loaded": "読み込み完了: {{summary}}"
   },
   "kind": {
     "mention": "メンション",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "さらに{{count}}件のバックリンク",
-    "count_other": "さらに{{count}}件のバックリンク"
+    "count_other": "さらに{{count}}件のバックリンク",
+    "load": "さらにバックリンクを読み込む",
+    "loading": "バックリンクを読み込み中…",
+    "search": "バックリンクを検索"
   }
 }

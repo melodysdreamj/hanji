@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Dependensi:",
     "hint": "tambahkan properti relasi",
-    "relationPropertyAriaLabel": "Properti relasi dependensi"
+    "relationPropertyAriaLabel": "Properti relasi dependensi",
+    "makeDependOn": "Buat {{title}} bergantung pada {{predecessor}}",
+    "startFrom": "Mulai dependensi dari {{title}}"
   },
   "toolbar": {
     "today": "Hari ini",

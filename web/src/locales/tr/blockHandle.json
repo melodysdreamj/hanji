@@ -88,5 +88,38 @@
     "hoursAgo": "Son düzenleme {{hours}} saat önce",
     "daysAgo": "Son düzenleme {{days}} gün önce",
     "on": "Son düzenleme {{date}}"
+  },
+  "align": {
+    "center": "Orta",
+    "choose": "Görsel hizalaması seç",
+    "left": "Sol",
+    "right": "Sağ"
+  },
+  "altText": {
+    "help": "Alternatif metin, ekran okuyucu kullanan kişilerin görseli anlamasına yardımcı olur.",
+    "label": "Açıklama",
+    "placeholder": "Görseli tanımlayın",
+    "remove": "Kaldır",
+    "save": "Kaydet",
+    "title": "Alternatif metin"
+  },
+  "imageLink": {
+    "invalid": "Tam bir http:// veya https:// URL'si girin.",
+    "label": "Görsele tıklandığında bu URL'yi aç",
+    "remove": "Kaldır",
+    "save": "Kaydet",
+    "title": "Görsel bağlantısı"
+  },
+  "media": {
+    "addImageLink": "Bağlantı ekle",
+    "align": "Hizala",
+    "altText": "Alternatif metin",
+    "copySourceLink": "Kaynak bağlantısını kopyala",
+    "download": "İndir",
+    "editImageLink": "Bağlantıyı düzenle",
+    "fullScreen": "Tam ekran",
+    "openLink": "Bağlantıyı aç",
+    "replace": "Değiştir",
+    "viewOriginal": "Orijinali görüntüle"
   }
 }

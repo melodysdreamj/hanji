@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "अवलंबन:",
     "hint": "संबंध गुणधर्म जोडा",
-    "relationPropertyAriaLabel": "अवलंबन संबंध गुणधर्म"
+    "relationPropertyAriaLabel": "अवलंबन संबंध गुणधर्म",
+    "makeDependOn": "{{title}} हे {{predecessor}} वर अवलंबून ठेवा",
+    "startFrom": "{{title}} पासून अवलंबित्व सुरू करा"
   },
   "toolbar": {
     "today": "आज",

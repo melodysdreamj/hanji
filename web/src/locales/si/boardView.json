@@ -13,7 +13,7 @@
   "groupName": "කණ්ඩායම් නම",
   "groupOptions": "{{groupName}} කණ්ඩායම් විකල්ප",
   "groupThisBoard": "මෙම පුවරුව කණ්ඩායම් කරන්න",
-  "groupThisBoardDesc": "තීරු සෑදීමට Select හෝ Status ගුණාංගයක් එක් කරන්න.",
+  "groupThisBoardDesc": "තීරු සෑදීමට තේරීම, තත්වය, පුද්ගලයා හෝ බහු-තේරීම ගුණාංගයක් එක් කරන්න හෝ තෝරන්න.",
   "newGroup": "නව කණ්ඩායම",
   "newGroupIn": "{{dbTitle}} හි නව {{groupName}} කණ්ඩායම",
   "newPage": "නව",

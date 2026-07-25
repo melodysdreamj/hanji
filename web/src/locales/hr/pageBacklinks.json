@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} povratna poveznica",
-    "count_other": "{{count}} povratnih poveznica"
+    "count_other": "{{count}} povratnih poveznica",
+    "partial_one": "{{count}}+ povratna poveznica",
+    "partial_other": "{{count}}+ povratnih poveznica"
   },
   "header": {
     "title": "Povezani spomeni"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} spomen",
     "mention_other": "{{count}} spomena",
     "link_one": "{{count}} poveznica",
-    "link_other": "{{count}} poveznica"
+    "link_other": "{{count}} poveznica",
+    "loaded": "Učitano: {{summary}}"
   },
   "kind": {
     "mention": "Spomen",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Još {{count}} povratna poveznica",
-    "count_other": "Još {{count}} povratnih poveznica"
+    "count_other": "Još {{count}} povratnih poveznica",
+    "load": "Učitaj više povratnih poveznica",
+    "loading": "Učitavanje povratnih poveznica…",
+    "search": "Traži povratne poveznice"
   }
 }

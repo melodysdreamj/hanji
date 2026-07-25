@@ -1,0 +1,126 @@
+.root {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.card {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--border-color, rgba(55, 53, 47, 0.12));
+  border-radius: 8px;
+  background: var(--bg-primary, #fff);
+}
+
+.card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card header button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+}
+
+.card input,
+.card select,
+.card textarea {
+  width: 100%;
+  min-height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color, rgba(55, 53, 47, 0.18));
+  border-radius: 6px;
+  padding: 6px 8px;
+  background: var(--bg-primary, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+.card textarea {
+  min-height: 56px;
+  resize: vertical;
+}
+
+.card p {
+  margin: 0;
+  color: var(--text-secondary, rgba(55, 53, 47, 0.65));
+  font-size: 12px;
+}
+
+.checkLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.valueRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.checkLabel input {
+  width: auto;
+  min-height: 0;
+}
+
+.addWrap {
+  position: relative;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 34px;
+  border: 1px dashed var(--border-color, rgba(55, 53, 47, 0.2));
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+}
+
+.menu {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  max-height: 280px;
+  margin-top: 5px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color, rgba(55, 53, 47, 0.15));
+  border-radius: 8px;
+  padding: 5px;
+  background: var(--bg-primary, #fff);
+  box-shadow: 0 8px 24px rgba(15, 15, 15, 0.16);
+}
+
+.menu button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 5px;
+  padding: 6px 9px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.menu button:hover,
+.menu button:focus-visible {
+  background: var(--bg-hover, rgba(55, 53, 47, 0.08));
+}

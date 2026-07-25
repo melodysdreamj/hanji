@@ -51,7 +51,14 @@
     "range": "Rentang",
     "earliest_date": "Tanggal paling awal",
     "latest_date": "Tanggal paling akhir",
-    "date_range": "Rentang tanggal"
+    "date_range": "Rentang tanggal",
+    "count": "Hitung semua",
+    "count_per_group": "Jumlah per grup",
+    "empty": "Jumlah kosong",
+    "not_empty": "Jumlah tidak kosong",
+    "percent_per_group": "Persen per grup",
+    "show_unique": "Tampilkan nilai unik",
+    "unique": "Jumlah nilai unik"
   },
   "undo": "Urungkan",
   "untitled": "Tanpa judul",

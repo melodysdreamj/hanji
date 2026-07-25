@@ -2,6 +2,7 @@ import { defineFunction } from '@edge-base/shared';
 import { boundedDb, boundedDbFromPageHint, boundedDbFromWorkspaceHint, type AdminDbAccessor } from '../lib/workspace-db';
 import {
   assertNoActiveLegalHoldForPermanentDelete,
+  assertOrganizationDlpContent,
   assertOrganizationDlpPolicy,
 } from '../lib/enterprise-controls';
 import { assertNotDeactivatedWorkspaceAccess } from '../lib/org-access';
@@ -19,8 +20,14 @@ import {
 } from '../lib/file-reference-lifecycle';
 import { assertPreservableStoredUpload } from '../lib/permanent-file-delete';
 import {
+  fetchPublicResource,
+  normalizePublicUrl,
+  readResponseBytesWithLimit,
+} from '../lib/ssrf-guard';
+import {
   releaseOrganizationStorage,
   reserveOrganizationStorage,
+  resizeOrganizationStorageReservation,
   type StorageQuotaReservation,
 } from '../lib/storage-quota';
 import {
@@ -40,18 +47,24 @@ import {
 } from '../lib/table-utils';
 import type { ShareRole } from '../lib/page-access';
 import { pageAccessRoleRanks as roleRanks } from '../lib/page-access';
+import { nextNotionImportTerminalSweep } from '../lib/notion-import-terminal-sweep';
 
 const FILE_BUCKET = 'files';
 const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024;
 const MAX_FILE_SIZE_LABEL = '5 GB';
+const NOTION_SINGLE_PART_MAX_BYTES = 20 * 1024 * 1024;
+const NOTION_UNKNOWN_LENGTH_IMPORT_MAX_BYTES = 20 * 1024 * 1024;
+const NOTION_MAX_MULTIPART_PARTS = 10_000;
+const NOTION_UPLOAD_TTL_MS = 60 * 60 * 1000;
 const UPLOAD_GRANT_TTL_MS = 30 * 60 * 1000;
 const UPLOAD_GRANT_SAFETY_MS = 5 * 60 * 1000;
+const NOTION_TERMINAL_OBJECT_RESWEEP_DELAY_MS = 60 * 60 * 1000;
 // Hard cap on caller-requested signed-download TTLs. Without it, `expiresIn`
 // like "3650d" mints an effectively permanent URL, defeating the point of a
 // time-limited signature.
 const MAX_SIGNED_URL_TTL_SECONDS = 7 * 24 * 60 * 60;
 type PageParentType = 'workspace' | 'page' | 'database';
-type FileUploadStatus = 'preparing' | 'pending' | 'uploaded' | 'deleting' | 'deleted' | 'expired';
+type FileUploadStatus = 'preparing' | 'pending' | 'uploaded' | 'deleting' | 'deleted' | 'expired' | 'failed';
 
 const allowedScopes = new Set([
   'uploads',
@@ -146,8 +159,48 @@ interface FileUpload {
   deletedAt?: string | null;
   deletedBy?: string | null;
   deletionPreviousStatus?: 'preparing' | 'pending' | 'uploaded' | null;
+  mode?: 'single_part' | 'multi_part' | 'external_url';
+  numberOfPartsTotal?: number;
+  numberOfPartsSent?: number;
+  multipartUploadId?: string | null;
+  multipartParts?: Array<{ partNumber: number; etag: string; size: number }>;
+  externalUrl?: string | null;
+  fileImportResult?: unknown;
+  notionImportJobId?: string | null;
+  notionImportSnapshotRevision?: string | null;
+  notionImportSlotKey?: string | null;
+  notionImportTerminalSweepAfter?: string | null;
+  notionImportTerminalSweepCompletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
+}
+
+interface NotionImportJobCheckpointState {
+  id: string;
+  status?: string;
+  itemSnapshotRevision?: string | null;
+}
+
+async function activeNotionImportCheckpoint(db: DbRef, upload: FileUpload) {
+  if (!upload.notionImportJobId || !upload.notionImportSnapshotRevision) return false;
+  const job = await getExisting(
+    db.table<NotionImportJobCheckpointState>('notion_import_jobs'),
+    upload.notionImportJobId,
+  );
+  return job?.status === 'ready'
+    && job.itemSnapshotRevision === upload.notionImportSnapshotRevision;
+}
+
+function dueNotionImportTerminalSweep(upload: FileUpload, now: number) {
+  const sweepAfter = Date.parse(upload.notionImportTerminalSweepAfter ?? '');
+  return (
+    (upload.status === 'expired' || upload.status === 'deleted')
+    && !!upload.notionImportJobId
+    && !!upload.notionImportSnapshotRevision
+    && upload.key.includes('/notion-import/')
+    && Number.isFinite(sweepAfter)
+    && sweepAfter <= now
+  );
 }
 
 interface FileMaintenanceRun {
@@ -197,13 +250,34 @@ interface FunctionStorageProxy {
     key: string,
     options?: { expiresIn?: number; maxBytes?: number | null },
   ): Promise<{ url: string; expiresAt: string; maxBytes: number | null }>;
+  put(
+    key: string,
+    value: ReadableStream | ArrayBuffer | string,
+    options?: { contentType?: string; customMetadata?: Record<string, string> },
+  ): Promise<void>;
+  createMultipartUpload?(
+    key: string,
+    options?: { contentType?: string; customMetadata?: Record<string, string> },
+  ): Promise<{ uploadId: string; key: string }>;
+  uploadMultipartPart?(
+    key: string,
+    uploadId: string,
+    partNumber: number,
+    value: ReadableStream | ArrayBuffer | string,
+  ): Promise<{ partNumber: number; etag: string }>;
+  completeMultipartUpload?(
+    key: string,
+    uploadId: string,
+    parts: Array<{ partNumber: number; etag: string }>,
+  ): Promise<{ key: string; size: number; etag: string; contentType: string }>;
+  abortMultipartUpload?(key: string, uploadId: string): Promise<void>;
 }
 
 interface FunctionContext {
   auth: { id: string; email?: string } | null;
   request?: Request;
   admin: {
-    db(namespace: string): DbRef;
+    db(namespace: string, instanceId?: string): DbRef;
   };
   storage?: FunctionStorageProxy;
 }
@@ -330,6 +404,18 @@ async function deleteStoredFile(
   await proxy.delete(key);
 }
 
+async function abortMultipartUpload(
+  storage: FunctionStorageProxy | undefined,
+  upload: FileUpload,
+) {
+  if (!upload.multipartUploadId) return;
+  const proxy = storageBucket(storage, upload.bucket || FILE_BUCKET);
+  if (!proxy?.abortMultipartUpload) {
+    throw new Error('Multipart upload cancellation requires trusted storage access.');
+  }
+  await proxy.abortMultipartUpload(upload.key, upload.multipartUploadId);
+}
+
 async function createSignedDownloadUrl(
   storage: FunctionStorageProxy | undefined,
   bucket: string,
@@ -387,6 +473,9 @@ async function expirePendingUpload(
   storage?: FunctionStorageProxy,
 ) {
   if (upload.status !== 'pending' && upload.status !== 'preparing') return upload;
+  if (upload.multipartUploadId) {
+    await abortMultipartUpload(storage, upload);
+  }
   if (!isUploadGrantExpired(upload)) {
     // A signed upload URL remains usable until its exact EdgeBase expiry. An
     // early metadata retirement would let a replay recreate an untracked key.
@@ -404,6 +493,16 @@ async function expirePendingUpload(
     expiredAt: nowIso(),
     deletedAt: nowIso(),
     deletedBy: actorId,
+    ...(upload.notionImportJobId
+      && upload.notionImportSnapshotRevision
+      && upload.key.includes('/notion-import/')
+      ? {
+          notionImportTerminalSweepAfter: new Date(
+            Date.now() + NOTION_TERMINAL_OBJECT_RESWEEP_DELAY_MS,
+          ).toISOString(),
+          notionImportTerminalSweepCompletedAt: null,
+        }
+      : {}),
   });
   return expired;
 }
@@ -679,7 +778,7 @@ function parseLimit(value: unknown, fallback = 200, max = 1000) {
 function normalizeStatus(value: unknown) {
   if (typeof value !== 'string' || !value.trim()) return undefined;
   const status = value.trim();
-  if (!['preparing', 'pending', 'uploaded', 'deleting', 'deleted', 'expired'].includes(status)) {
+  if (!['preparing', 'pending', 'uploaded', 'deleting', 'deleted', 'expired', 'failed'].includes(status)) {
     throw new Error('status is invalid.');
   }
   return status as FileUploadStatus;
@@ -1007,6 +1106,574 @@ async function prepareUpload(
   });
 }
 
+function notionUploadMode(value: unknown): NonNullable<FileUpload['mode']> {
+  const mode = optionalString(value) ?? 'single_part';
+  if (mode !== 'single_part' && mode !== 'multi_part' && mode !== 'external_url') {
+    throw new Error('mode must be single_part, multi_part, or external_url.');
+  }
+  return mode;
+}
+
+function notionMultipartPartCount(value: unknown) {
+  const nested = value && typeof value === 'object'
+    ? (value as { total?: unknown }).total
+    : value;
+  const count = Number(nested);
+  if (!Number.isInteger(count) || count < 1 || count > NOTION_MAX_MULTIPART_PARTS) {
+    throw new Error(`number_of_parts must be an integer between 1 and ${NOTION_MAX_MULTIPART_PARTS}.`);
+  }
+  return count;
+}
+
+function externalImportName(rawUrl: string) {
+  try {
+    const pathname = new URL(rawUrl).pathname;
+    const last = pathname.split('/').filter(Boolean).pop();
+    return last ? decodeURIComponent(last) : 'Untitled';
+  } catch {
+    return 'Untitled';
+  }
+}
+
+function notionFileRoutingBody(body: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...body,
+    workspaceId: body.workspaceId ?? body.workspace_id,
+    pageId: body.pageId ?? body.page_id,
+    blockId: body.blockId ?? body.block_id,
+    databaseId: body.databaseId ?? body.database_id ?? body.data_source_id,
+    propertyId: body.propertyId ?? body.property_id,
+    templateId: body.templateId ?? body.template_id,
+  };
+}
+
+async function notionFileDb(context: FunctionContext, body: Record<string, unknown>) {
+  const routed = notionFileRoutingBody(body);
+  const workspaceId = optionalString(routed.workspaceId);
+  if (workspaceId) return boundedDbFromWorkspaceHint(context.admin, workspaceId) as unknown as DbRef;
+  return boundedDbFromPageHint(
+    context.admin,
+    routed.pageId,
+    routed.databaseId,
+  ) as Promise<DbRef>;
+}
+
+function responseLength(response: Response) {
+  const raw = response.headers.get('content-length');
+  if (!raw) return undefined;
+  const size = Number(raw);
+  if (!Number.isInteger(size) || size <= 0) return undefined;
+  return size;
+}
+
+function exactLengthBody(body: ReadableStream<Uint8Array>, expectedBytes: number) {
+  let bytes = 0;
+  return body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      bytes += chunk.byteLength;
+      if (bytes > expectedBytes || bytes > MAX_FILE_SIZE) {
+        throw new Error('External file size did not match Content-Length.');
+      }
+      controller.enqueue(chunk);
+    },
+    flush() {
+      if (bytes !== expectedBytes) {
+        throw new Error('External file size did not match Content-Length.');
+      }
+    },
+  }));
+}
+
+async function reserveNotionUploadBytes(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  upload: FileUpload,
+  bytes: number,
+) {
+  const workspace = await workspaceById(db, upload.workspaceId);
+  if (fileSize(upload) > 0) {
+    return resizeOrganizationStorageReservation(admin, workspace, upload.id, bytes);
+  }
+  return reserveOrganizationStorage(admin, workspace, upload.id, bytes);
+}
+
+async function restoreNotionUploadReservation(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  upload: FileUpload,
+  previousBytes: number,
+  currentReservation: StorageQuotaReservation | null,
+) {
+  const workspace = await workspaceById(db, upload.workspaceId);
+  if (!workspace.organizationId) return;
+  if (previousBytes > 0) {
+    await resizeOrganizationStorageReservation(admin, workspace, upload.id, previousBytes);
+    return;
+  }
+  await releaseOrganizationStorage(admin, currentReservation);
+}
+
+async function failNotionUpload(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  uploads: TableRef<FileUpload>,
+  upload: FileUpload,
+  actorId: string,
+  storage: FunctionStorageProxy | undefined,
+  message: string,
+) {
+  if (upload.multipartUploadId) {
+    await abortMultipartUpload(storage, upload);
+  }
+  await deleteStoredFile(storage, upload.bucket || FILE_BUCKET, upload.key);
+  const failed = await uploads.update(upload.id, {
+    status: 'failed',
+    expiresAt: null,
+    expiredAt: nowIso(),
+    fileImportResult: {
+      type: 'error',
+      error: { message: message.slice(0, 500) },
+    },
+    updatedAt: nowIso(),
+  });
+  await releaseUploadStorageReservation(db, admin, failed);
+  return failed;
+}
+
+async function finalizeNotionStoredUpload(
+  uploads: TableRef<FileUpload>,
+  upload: FileUpload,
+  storage: FunctionStorageProxy | undefined,
+  request: Request | undefined,
+) {
+  const stored = await assertStoredFileExists(
+    storage,
+    request,
+    upload.bucket || FILE_BUCKET,
+    upload.key,
+  );
+  if (stored.size !== fileSize(upload)) {
+    throw new Error('Uploaded file size does not match the received bytes.');
+  }
+  const expectedContentType = assertSafeStoredFileType(upload.name, upload.contentType);
+  const actualContentType = assertSafeStoredFileType(upload.name, stored.contentType);
+  if (actualContentType !== expectedContentType) {
+    throw new Error('Uploaded file content type does not match the received file.');
+  }
+  const completedAt = nowIso();
+  return uploads.update(upload.id, {
+    status: 'uploaded',
+    url: stored.url ?? upload.url,
+    etag: stored.etag,
+    completedAt,
+    expiresAt: null,
+    multipartUploadId: null,
+    numberOfPartsSent: upload.numberOfPartsTotal ?? 1,
+    fileImportResult: upload.mode === 'external_url'
+      ? { imported_time: completedAt, type: 'success', success: {} }
+      : upload.fileImportResult,
+    updatedAt: completedAt,
+  });
+}
+
+async function importExternalNotionFile(
+  db: DbRef,
+  admin: AdminDbAccessor,
+  uploads: TableRef<FileUpload>,
+  upload: FileUpload,
+  actorId: string,
+  storage: FunctionStorageProxy | undefined,
+  request: Request | undefined,
+) {
+  const proxy = storageBucket(storage, upload.bucket || FILE_BUCKET);
+  if (!proxy) throw new Error('External file import requires trusted storage access.');
+  const sourceUrl = normalizePublicUrl(upload.externalUrl);
+  if (!sourceUrl || new URL(sourceUrl).protocol !== 'https:') {
+    throw new Error('external_url must be a public HTTPS URL.');
+  }
+  const response = await fetchPublicResource(sourceUrl, {
+    signal: AbortSignal.timeout(60_000),
+  });
+  if (!response.ok) throw new Error(`External file returned HTTP ${response.status}.`);
+  const declaredLength = responseLength(response);
+  if (declaredLength && declaredLength > MAX_FILE_SIZE) {
+    throw new Error(`File is too large. The current upload limit is ${MAX_FILE_SIZE_LABEL}.`);
+  }
+  const fetchedType = assertSafeStoredFileType(
+    upload.name,
+    response.headers.get('content-type') || upload.contentType,
+  );
+  const expectedType = normalizeFileContentType(upload.contentType);
+  if (expectedType !== 'application/octet-stream' && fetchedType !== expectedType) {
+    throw new Error('External file content type does not match content_type.');
+  }
+  let bytes: ArrayBuffer | ReadableStream<Uint8Array>;
+  let size: number;
+  if (declaredLength && response.body) {
+    size = declaredLength;
+    bytes = exactLengthBody(response.body, declaredLength);
+  } else {
+    const buffered = await readResponseBytesWithLimit(response, NOTION_UNKNOWN_LENGTH_IMPORT_MAX_BYTES);
+    if (buffered.byteLength <= 0) throw new Error('External file was empty.');
+    size = buffered.byteLength;
+    bytes = Uint8Array.from(buffered).buffer;
+  }
+  if (size <= 0) throw new Error('External file was empty.');
+  const reservation = await reserveNotionUploadBytes(db, admin, upload, size);
+  let current = await uploads.update(upload.id, {
+    size,
+    contentType: fetchedType,
+    status: 'pending',
+    updatedAt: nowIso(),
+  });
+  try {
+    await proxy.put(current.key, bytes, {
+      contentType: fetchedType,
+      customMetadata: { uploadId: current.id, workspaceId: current.workspaceId, source: 'external_url' },
+    });
+    current = await finalizeNotionStoredUpload(uploads, current, storage, request);
+    return current;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'External file import failed.';
+    try {
+      await failNotionUpload(db, admin, uploads, current, actorId, storage, message);
+    } catch {
+      await restoreNotionUploadReservation(db, admin, current, 0, reservation).catch(() => {});
+    }
+    throw error;
+  }
+}
+
+export async function createNotionFileUpload(
+  rawContext: unknown,
+  rawBody: Record<string, unknown>,
+) {
+  const context = rawContext as FunctionContext;
+  const { auth, admin, request, storage } = context;
+  if (!auth?.id) throw new Error('Authentication required.');
+  const body = notionFileRoutingBody(rawBody);
+  const db = await notionFileDb(context, body);
+  const initialTarget = await resolveUploadTarget(db, body, auth.id, 'edit', auth.email);
+  const workspace = initialTarget.workspaceId
+    ? await workspaceById(db, initialTarget.workspaceId)
+    : await resolveWorkspace(db, body, auth.id);
+  if (!initialTarget.workspaceId) await assertWorkspaceRole(db, workspace, auth.id, 'edit');
+  const mode = notionUploadMode(body.mode);
+  const externalUrl = mode === 'external_url'
+    ? requireString(body.externalUrl ?? body.external_url, 'external_url')
+    : undefined;
+  const providedName = optionalString(body.name ?? body.filename);
+  if (mode === 'multi_part' && !providedName) throw new Error('filename is required for multi_part uploads.');
+  const name = normalizeFileName(providedName ?? (externalUrl ? externalImportName(externalUrl) : 'Untitled'));
+  const contentType = assertSafeStoredFileType(
+    name,
+    body.contentType ?? body.content_type ?? 'application/octet-stream',
+  );
+  const numberOfPartsTotal = mode === 'multi_part'
+    ? notionMultipartPartCount(body.numberOfParts ?? body.number_of_parts)
+    : 1;
+
+  await assertOrganizationDlpContent(db, {
+    ...body,
+    workspaceId: workspace.id,
+    name,
+    contentType,
+    externalUrl,
+  });
+
+  return withFileWorkspaceLease(db, workspace.id, auth.id, 'notion-create-file-upload', async (lease) => {
+    await lease.assertOwned();
+    const target = await resolveUploadTarget(db, body, auth.id, 'edit', auth.email);
+    if (target.workspaceId && target.workspaceId !== workspace.id) {
+      throw new Error('Target file is outside the requested workspace.');
+    }
+    await assertFileTargetsNotDeleting(db, workspace.id, [target.pageId, target.databaseId]);
+    const uploads = db.table<FileUpload>('file_uploads');
+    const id = optionalString(body.id) ?? newId();
+    const scope = normalizeScope(body.scope);
+    const key = `workspaces/${workspace.id}/${scope}/${id}-${cleanSegment(name)}${extensionFromName(name)}`;
+    let upload = await uploads.insert({
+      id,
+      workspaceId: workspace.id,
+      bucket: FILE_BUCKET,
+      key,
+      scope,
+      pageId: target.pageId,
+      blockId: target.blockId,
+      databaseId: target.databaseId,
+      propertyId: target.propertyId,
+      templateId: target.templateId,
+      name,
+      contentType,
+      size: 0,
+      status: 'preparing',
+      mode,
+      numberOfPartsTotal,
+      numberOfPartsSent: 0,
+      multipartParts: [],
+      externalUrl,
+      createdBy: auth.id,
+      expiresAt: new Date(Date.now() + NOTION_UPLOAD_TTL_MS).toISOString(),
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    });
+    try {
+      if (mode === 'multi_part') {
+        const proxy = storageBucket(storage, FILE_BUCKET);
+        if (!proxy?.createMultipartUpload) {
+          throw new Error('Multipart uploads require trusted storage access.');
+        }
+        const multipart = await proxy.createMultipartUpload(key, {
+          contentType,
+          customMetadata: { uploadId: id, workspaceId: workspace.id },
+        });
+        upload = await uploads.update(id, {
+          status: 'pending',
+          multipartUploadId: multipart.uploadId,
+          updatedAt: nowIso(),
+        });
+        return { upload };
+      }
+      if (mode === 'external_url') {
+        upload = await uploads.update(id, { status: 'pending', updatedAt: nowIso() });
+        return { upload: await importExternalNotionFile(db, admin, uploads, upload, auth.id, storage, request) };
+      }
+      upload = await uploads.update(id, { status: 'pending', updatedAt: nowIso() });
+      return { upload };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'File upload creation failed.';
+      if (upload.status !== 'failed') {
+        await failNotionUpload(db, admin, uploads, upload, auth.id, storage, message).catch(() => {});
+      }
+      throw error;
+    }
+  });
+}
+
+export interface NotionFilePartInput {
+  workspaceId: string;
+  bytes: ArrayBuffer;
+  filename?: string;
+  contentType?: string;
+  partNumber?: number;
+}
+
+export async function sendNotionFileUpload(
+  rawContext: unknown,
+  id: string,
+  input: NotionFilePartInput,
+) {
+  const context = rawContext as FunctionContext;
+  const { auth, admin, request, storage } = context;
+  if (!auth?.id) throw new Error('Authentication required.');
+  const db = await notionFileDb(context, { workspaceId: input.workspaceId });
+  const uploads = db.table<FileUpload>('file_uploads');
+  const initial = await getExisting(uploads, id);
+  if (!initial) throw new Error('File upload was not found.');
+  return withFileWorkspaceLease(db, initial.workspaceId, auth.id, 'notion-send-file-upload', async (lease) => {
+    await lease.assertOwned();
+    let upload = await getExisting(uploads, id);
+    if (!upload) throw new Error('File upload was not found.');
+    if (upload.createdBy && upload.createdBy !== auth.id) throw new Error('File upload was created by a different user.');
+    await assertUploadAccess(db, upload, auth.id, 'edit', auth.email);
+    await assertFileTargetsNotDeleting(db, upload.workspaceId, [upload.pageId, upload.databaseId]);
+    await assertOrganizationDlpContent(db, {
+      workspaceId: upload.workspaceId,
+      name: input.filename ?? upload.name,
+      contentType: input.contentType ?? upload.contentType,
+    });
+    if (upload.status === 'uploaded') return { upload };
+    if (upload.status !== 'pending') throw new Error('File upload is no longer active.');
+    if (isUploadGrantExpired(upload)) {
+      await expirePendingUpload(db, admin, uploads, upload, auth.id, storage);
+      throw new Error('File upload has expired.');
+    }
+    if (upload.mode === 'external_url') throw new Error('external_url uploads do not accept file parts.');
+    const bytes = input.bytes;
+    const size = bytes.byteLength;
+    if (size <= 0) throw new Error('Uploaded file was empty.');
+    if (size > NOTION_SINGLE_PART_MAX_BYTES) {
+      throw new Error('Each file upload part must be 20 MB or smaller.');
+    }
+    const name = normalizeFileName(input.filename || upload.name);
+    const actualContentType = assertSafeStoredFileType(name, input.contentType || upload.contentType);
+    const declaredContentType = normalizeFileContentType(upload.contentType);
+    if (declaredContentType !== 'application/octet-stream' && actualContentType !== declaredContentType) {
+      throw new Error('Uploaded file content type does not match content_type.');
+    }
+    if ((upload.mode ?? 'single_part') === 'single_part') {
+      if (input.partNumber != null && input.partNumber !== 1) {
+        throw new Error('part_number is only supported for multi_part uploads.');
+      }
+      const proxy = storageBucket(storage, upload.bucket || FILE_BUCKET);
+      if (!proxy) throw new Error('File upload requires trusted storage access.');
+      const reservation = await reserveNotionUploadBytes(db, admin, upload, size);
+      upload = await uploads.update(upload.id, {
+        name,
+        contentType: actualContentType,
+        size,
+        numberOfPartsSent: 1,
+        updatedAt: nowIso(),
+      });
+      try {
+        await proxy.put(upload.key, bytes, {
+          contentType: actualContentType,
+          customMetadata: { uploadId: upload.id, workspaceId: upload.workspaceId },
+        });
+        return { upload: await finalizeNotionStoredUpload(uploads, upload, storage, request) };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'File upload failed.';
+        try {
+          await failNotionUpload(db, admin, uploads, upload, auth.id, storage, message);
+        } catch {
+          await restoreNotionUploadReservation(db, admin, upload, 0, reservation).catch(() => {});
+        }
+        throw error;
+      }
+    }
+
+    if (!upload.multipartUploadId) throw new Error('Multipart upload session was not found.');
+    const total = upload.numberOfPartsTotal ?? 0;
+    const partNumber = input.partNumber;
+    if (!Number.isInteger(partNumber) || (partNumber as number) < 1 || (partNumber as number) > total) {
+      throw new Error(`part_number must be an integer between 1 and ${total}.`);
+    }
+    const previousParts = [...(upload.multipartParts ?? [])];
+    const previousPart = previousParts.find((part) => part.partNumber === partNumber);
+    const previousSize = fileSize(upload);
+    const nextSize = previousSize - (previousPart?.size ?? 0) + size;
+    if (nextSize > MAX_FILE_SIZE) {
+      throw new Error(`File is too large. The current upload limit is ${MAX_FILE_SIZE_LABEL}.`);
+    }
+    const proxy = storageBucket(storage, upload.bucket || FILE_BUCKET);
+    if (!proxy?.uploadMultipartPart) throw new Error('Multipart uploads require trusted storage access.');
+    const reservation = await reserveNotionUploadBytes(db, admin, upload, nextSize);
+    let storedPart: { partNumber: number; etag: string };
+    try {
+      storedPart = await proxy.uploadMultipartPart(
+        upload.key,
+        upload.multipartUploadId,
+        partNumber as number,
+        bytes,
+      );
+    } catch (error) {
+      await restoreNotionUploadReservation(db, admin, upload, previousSize, reservation);
+      throw error;
+    }
+    const nextParts = previousParts
+      .filter((part) => part.partNumber !== partNumber)
+      .concat({ partNumber: partNumber as number, etag: storedPart.etag, size })
+      .sort((a, b) => a.partNumber - b.partNumber);
+    try {
+      upload = await uploads.update(upload.id, {
+        name,
+        contentType: actualContentType,
+        size: nextSize,
+        multipartParts: nextParts,
+        numberOfPartsSent: nextParts.length,
+        updatedAt: nowIso(),
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Multipart metadata update failed.';
+      try {
+        await failNotionUpload(
+          db,
+          admin,
+          uploads,
+          { ...upload, size: nextSize, multipartParts: nextParts },
+          auth.id,
+          storage,
+          message,
+        );
+      } catch {
+        await restoreNotionUploadReservation(
+          db,
+          admin,
+          upload,
+          previousSize,
+          reservation,
+        ).catch(() => {});
+      }
+      throw error;
+    }
+    return { upload };
+  });
+}
+
+export async function completeNotionFileUpload(
+  rawContext: unknown,
+  id: string,
+  workspaceId: string,
+) {
+  const context = rawContext as FunctionContext;
+  const { auth, admin, request, storage } = context;
+  if (!auth?.id) throw new Error('Authentication required.');
+  const db = await notionFileDb(context, { workspaceId });
+  const uploads = db.table<FileUpload>('file_uploads');
+  const initial = await getExisting(uploads, id);
+  if (!initial) throw new Error('File upload was not found.');
+  return withFileWorkspaceLease(db, initial.workspaceId, auth.id, 'notion-complete-file-upload', async (lease) => {
+    await lease.assertOwned();
+    let upload = await getExisting(uploads, id);
+    if (!upload) throw new Error('File upload was not found.');
+    if (upload.createdBy && upload.createdBy !== auth.id) throw new Error('File upload was created by a different user.');
+    await assertUploadAccess(db, upload, auth.id, 'edit', auth.email);
+    await assertOrganizationDlpContent(db, {
+      workspaceId: upload.workspaceId,
+      name: upload.name,
+      contentType: upload.contentType,
+      externalUrl: upload.externalUrl,
+    });
+    if (upload.status === 'uploaded') return { upload };
+    if (upload.status !== 'pending') throw new Error('File upload is no longer active.');
+    if ((upload.mode ?? 'single_part') === 'single_part') {
+      throw new Error('The single_part file has not been sent yet.');
+    }
+    if (upload.mode === 'external_url') throw new Error('External file import has not completed.');
+    const total = upload.numberOfPartsTotal ?? 0;
+    const parts = [...(upload.multipartParts ?? [])].sort((a, b) => a.partNumber - b.partNumber);
+    if (parts.length !== total || parts.some((part, index) => part.partNumber !== index + 1)) {
+      throw new Error(`All ${total} file parts must be sent before completion.`);
+    }
+    const proxy = storageBucket(storage, upload.bucket || FILE_BUCKET);
+    if (!proxy?.completeMultipartUpload) throw new Error('Multipart uploads require trusted storage access.');
+    try {
+      const alreadyStored = await proxy.head(upload.key);
+      if (!alreadyStored) {
+        await proxy.completeMultipartUpload(
+          upload.key,
+          requireString(upload.multipartUploadId, 'multipartUploadId'),
+          parts.map(({ partNumber, etag }) => ({ partNumber, etag })),
+        );
+      }
+      upload = await finalizeNotionStoredUpload(uploads, upload, storage, request);
+      return { upload };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Multipart completion failed.';
+      await failNotionUpload(db, admin, uploads, upload, auth.id, storage, message).catch(() => {});
+      throw error;
+    }
+  });
+}
+
+export async function deleteNotionFileUpload(
+  rawContext: unknown,
+  id: string,
+  workspaceId: string,
+) {
+  const context = rawContext as FunctionContext;
+  if (!context.auth?.id) throw new Error('Authentication required.');
+  const db = await notionFileDb(context, { workspaceId });
+  return deleteUpload(
+    db,
+    context.admin,
+    { id, workspaceId },
+    context.auth.id,
+    context.auth.email,
+    context.storage,
+  );
+}
+
 async function completeUpload(
   db: DbRef,
   admin: AdminDbAccessor,
@@ -1249,6 +1916,7 @@ async function deleteUpload(
       db,
       upload.workspaceId,
       [upload.pageId, upload.databaseId].filter((id): id is string => typeof id === 'string' && id.length > 0),
+      upload.createdBy ? [upload.createdBy] : [],
     );
     const referenceSnapshot = await workspaceFileReferenceSnapshot(db, upload.workspaceId);
     if (await fileUploadStillReferenced(db, upload, referenceSnapshot)) {
@@ -1256,9 +1924,12 @@ async function deleteUpload(
     }
     const grantExpiry = typeof upload.expiresAt === 'string' ? Date.parse(upload.expiresAt) : Number.NaN;
     if (
-      hasUnsettledLegacyUploadGrant(upload)
-      || (Number.isFinite(grantExpiry) && grantExpiry > Date.now())
-      || ((!upload.expiresAt || !Number.isFinite(grantExpiry)) && (upload.status === 'preparing' || upload.status === 'pending'))
+      !upload.mode
+      && (
+        hasUnsettledLegacyUploadGrant(upload)
+        || (Number.isFinite(grantExpiry) && grantExpiry > Date.now())
+        || ((!upload.expiresAt || !Number.isFinite(grantExpiry)) && (upload.status === 'preparing' || upload.status === 'pending'))
+      )
     ) {
       throw fileOperationConflict('File deletion is waiting for the active upload grant to expire.');
     }
@@ -1266,6 +1937,7 @@ async function deleteUpload(
     // Re-delete even an already-retired row to repair legacy best-effort
     // paths. Object deletion and quota settlement must both succeed before
     // metadata stops advertising a retryable active state.
+    if (upload.multipartUploadId) await abortMultipartUpload(storage, upload);
     await deleteStoredFile(storage, upload.bucket || FILE_BUCKET, upload.key);
     await releaseUploadStorageReservation(db, admin, upload);
     await lease.renew();
@@ -1382,14 +2054,33 @@ async function cleanupExpiredUploads(
   const dryRun = parseBoolean(body.dryRun);
   const now = Date.now();
 
-  const pending = (await listAll(uploads.where('workspaceId', '==', workspace.id)))
-    .filter(
-      (upload) =>
+  const candidates = (await listAll(uploads.where('workspaceId', '==', workspace.id)))
+    .filter((upload) => (
+      (
         (upload.status === 'pending' || upload.status === 'preparing')
-        && isUploadGrantExpired(upload, now),
-    )
-    .sort((a, b) => String(a.expiresAt ?? '').localeCompare(String(b.expiresAt ?? '')))
-    .slice(0, limit);
+        && isUploadGrantExpired(upload, now)
+      )
+      // A lost Notion copy worker can finish writing its unique key after a
+      // different worker observed HEAD-miss and terminalized the checkpoint.
+      // Preserve the tombstone metadata and idempotently re-delete that key on
+      // later maintenance runs so a worker death cannot leave untracked bytes.
+      || dueNotionImportTerminalSweep(upload, now)
+    ))
+    .sort((a, b) => String(
+      a.notionImportTerminalSweepAfter ?? a.expiresAt ?? '',
+    ).localeCompare(String(
+      b.notionImportTerminalSweepAfter ?? b.expiresAt ?? '',
+    )));
+
+  const pending: FileUpload[] = [];
+  for (const upload of candidates) {
+    // A ready import deliberately owns unattached pre-copy checkpoints. A
+    // paused job may remain idle longer than the generic 24-hour orphan TTL;
+    // only the import apply/cancel path may retire its active revision.
+    if (!dueNotionImportTerminalSweep(upload, now) && await activeNotionImportCheckpoint(db, upload)) continue;
+    pending.push(upload);
+    if (pending.length >= limit) break;
+  }
 
   const accessible: FileUpload[] = [];
   for (const upload of pending) {
@@ -1415,7 +2106,15 @@ async function cleanupExpiredUploads(
       for (const candidate of accessible) {
         await lease.renew();
         const upload = await uploads.getOne(candidate.id).catch(() => null);
-        if (!upload || (upload.status !== 'pending' && upload.status !== 'preparing') || !isUploadGrantExpired(upload, now)) {
+        if (!upload) {
+          continue;
+        }
+        if (dueNotionImportTerminalSweep(upload, now)) {
+          await deleteStoredFile(storage, upload.bucket || FILE_BUCKET, upload.key);
+          cleaned.push(await uploads.update(upload.id, nextNotionImportTerminalSweep(upload, now)));
+          continue;
+        }
+        if ((upload.status !== 'pending' && upload.status !== 'preparing') || !isUploadGrantExpired(upload, now)) {
           continue;
         }
         cleaned.push(await expirePendingUpload(db, admin, uploads, upload, actorId, storage));
@@ -1482,6 +2181,9 @@ export const POST = defineFunction(async (context) => {
           : keyWorkspaceId
             ? boundedDbFromWorkspaceHint(admin, keyWorkspaceId)
             : await boundedDbFromPageHint(admin, body.pageId, body.databaseId);
+    if (action === 'prepareUpload' || action === 'completeUpload') {
+      await assertOrganizationDlpContent(db, body);
+    }
     switch (action) {
       case 'prepareUpload':
         return await prepareUpload(db, admin, body, auth.id, actorEmail, storage);

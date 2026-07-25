@@ -4,7 +4,22 @@
     "sum": "Jumlah",
     "average": "Purata",
     "min": "Min",
-    "max": "Maks"
+    "max": "Maks",
+    "checked": "Ditanda",
+    "count_values": "Kira nilai",
+    "date_range": "Julat tarikh",
+    "earliest_date": "Tarikh terawal",
+    "empty": "Kira kosong",
+    "latest_date": "Tarikh terkini",
+    "median": "Median",
+    "not_empty": "Kira tidak kosong",
+    "percent_checked": "Peratus ditanda",
+    "percent_empty": "Peratus kosong",
+    "percent_not_empty": "Peratus tidak kosong",
+    "percent_unchecked": "Peratus tidak ditanda",
+    "range": "Julat",
+    "unchecked": "Tidak ditanda",
+    "unique": "Kira nilai unik"
   },
   "chartAria": "Carta {{name}}",
   "chartType": "Jenis carta",
@@ -27,5 +42,9 @@
   "untitledProperty": "Tanpa tajuk",
   "valueProperty": "Properti nilai",
   "xAxis": "Paksi X",
-  "yAxis": "Paksi Y"
+  "yAxis": "Paksi Y",
+  "dateRangeDays": "{{count}} hari",
+  "missingProperty": "sifat yang disimpan",
+  "unsupportedAggregateDesc": "{{aggregate}} tidak boleh dikira daripada {{property}}. Pilih sifat atau pengiraan yang serasi.",
+  "unsupportedAggregateTitle": "Pengiraan carta ini tidak tersedia"
 }

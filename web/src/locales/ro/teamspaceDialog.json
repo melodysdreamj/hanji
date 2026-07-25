@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "Închis",
+    "open": "Deschis",
+    "private": "Privat"
+  },
+  "add": "Adaugă",
+  "approve": "Aprobă",
+  "archive": "Arhivează spațiul de echipă",
+  "available": "Disponibil pentru participare",
+  "choosePrincipal": "Alege o persoană sau un grup",
+  "create": "Creează spațiul de echipă",
+  "deny": "Respinge",
+  "error": {
+    "action": "Nu s-a putut finaliza acea acțiune a spațiului de echipă.",
+    "load": "Detaliile spațiului de echipă nu au putut fi încărcate."
+  },
+  "fields": {
+    "access": "Acces",
+    "description": "Descriere",
+    "icon": "Pictogramă",
+    "memberRole": "Acces membru la pagini",
+    "membersCanEditSidebar": "Membrii pot adăuga și reordona pagini",
+    "membersCanInvite": "Membrii pot invita persoane",
+    "name": "Nume",
+    "openRole": "Acces vizitator la pagini"
+  },
+  "governance": "Setări spațiu de echipă",
+  "join": "Alătură-te",
+  "joined": "Spațiile tale de echipă",
+  "loadMore": "Încarcă mai multe",
+  "manage": "Gestionează",
+  "member": "Membru",
+  "members": "Membri",
+  "noneArchived": "Nu există spații de echipă arhivate.",
+  "noneAvailable": "Nu există alte spații de echipă disponibile.",
+  "noneJoined": "Nu te-ai alăturat încă niciunui spațiu de echipă.",
+  "noRequests": "Nu există cereri în așteptare.",
+  "notice": {
+    "approved": "Cerere aprobată.",
+    "archived": "Spațiu de echipă arhivat.",
+    "created": "Spațiu de echipă creat.",
+    "defaultSet": "Spațiu de echipă implicit actualizat.",
+    "denied": "Cerere respinsă.",
+    "joined": "Spațiu de echipă alăturat.",
+    "memberAdded": "Membru adăugat.",
+    "memberRemoved": "Membru eliminat.",
+    "memberUpdated": "Rol membru actualizat.",
+    "policySaved": "Politica de creare a spațiului de echipă actualizată.",
+    "requested": "Acces solicitat.",
+    "restored": "Spațiu de echipă restaurat.",
+    "saved": "Spațiu de echipă actualizat."
+  },
+  "notOwner": "Doar proprietarul unui teamspace sau administratorul workspace-ului poate gestiona acest teamspace.",
+  "open": "Deschide",
+  "owner": "Proprietar",
+  "ownersOnlyCreate": "Doar proprietarii workspace-ului pot crea teamspaces",
+  "remove": "Eliminare",
+  "replacement": "Alege un înlocuitor implicit",
+  "request": "Solicită acces",
+  "requestPending": "Solicitare în așteptare",
+  "requests": "Solicitări de acces",
+  "restore": "Restaurare",
+  "roles": {
+    "comment": "Poate comenta",
+    "edit": "Poate edita",
+    "full_access": "Acces complet",
+    "view": "Poate vizualiza"
+  },
+  "save": "Salvează modificările",
+  "selectTeamspace": "Teamspace",
+  "setDefault": "Setează ca teamspace implicit",
+  "subtitle": "Organizează munca partajată și controlează cine poate descoperi sau se alătura.",
+  "tabs": {
+    "archived": "Arhivate",
+    "browse": "Răsfoire",
+    "create": "Teamspace nou",
+    "label": "Vizualizări teamspace",
+    "manage": "Gestionare"
+  },
+  "title": "Teamspaces"
+}

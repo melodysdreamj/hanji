@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Đường dẫn",
+  "clearSearch": "Xóa tìm kiếm",
+  "errors": {
+    "not-found": "Trang web này có thể đã được hủy xuất bản hoặc địa chỉ của nó đã thay đổi.",
+    "offline": "Kiểm tra kết nối của bạn, sau đó thử mở lại trang.",
+    "rate-limited": "Trang web này đang nhận quá nhiều yêu cầu. Đợi một lát và thử lại.",
+    "unavailable": "Hanji không thể mở trang web này ngay bây giờ. Hãy thử lại sau một lát."
+  },
+  "madeWithHanji": "Tạo bằng Hanji",
+  "navigation": "Điều hướng",
+  "noResults": "Không tìm thấy trang nào",
+  "outsideSite": "Trang này không thuộc về trang web đã xuất bản.",
+  "search": "Tìm trang web này",
+  "tryAgain": "Thử lại",
+  "unavailable": "Trang web này không khả dụng."
+}

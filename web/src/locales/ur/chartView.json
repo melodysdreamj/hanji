@@ -4,7 +4,22 @@
     "sum": "کل",
     "average": "اوسط",
     "min": "کم سے کم",
-    "max": "زیادہ سے زیادہ"
+    "max": "زیادہ سے زیادہ",
+    "checked": "چیک شدہ",
+    "count_values": "اقدار کی گنتی",
+    "date_range": "تاریخ کی حد",
+    "earliest_date": "ابتدائی تاریخ",
+    "empty": "خالی کی گنتی",
+    "latest_date": "تازہ ترین تاریخ",
+    "median": "میڈین",
+    "not_empty": "غیر خالی کی گنتی",
+    "percent_checked": "چیک شدہ فی صد",
+    "percent_empty": "خالی فی صد",
+    "percent_not_empty": "غیر خالی فی صد",
+    "percent_unchecked": "غیر چیک شدہ فی صد",
+    "range": "حد",
+    "unchecked": "غیر چیک شدہ",
+    "unique": "منفرد اقدار کی گنتی"
   },
   "chartAria": "{{name}} چارٹ",
   "chartType": "چارٹ کی قسم",
@@ -27,5 +42,9 @@
   "untitledProperty": "بغیر عنوان",
   "valueProperty": "قدر پراپرٹی",
   "xAxis": "X-محور",
-  "yAxis": "Y-محور"
+  "yAxis": "Y-محور",
+  "dateRangeDays": "{{count}} دن",
+  "missingProperty": "محفوظ کردہ پراپرٹی",
+  "unsupportedAggregateDesc": "{{aggregate}} کا حساب {{property}} سے نہیں لگایا جا سکتا۔ مطابقت رکھنے والی پراپرٹی یا حساب منتخب کریں۔",
+  "unsupportedAggregateTitle": "یہ چارٹ حساب دستیاب نہیں ہے"
 }

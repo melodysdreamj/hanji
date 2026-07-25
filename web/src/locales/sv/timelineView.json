@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Beroenden:",
     "hint": "lägg till en relationsegenskap",
-    "relationPropertyAriaLabel": "Relationsegenskap för beroende"
+    "relationPropertyAriaLabel": "Relationsegenskap för beroende",
+    "makeDependOn": "Gör {{title}} beroende av {{predecessor}}",
+    "startFrom": "Starta beroende från {{title}}"
   },
   "toolbar": {
     "today": "Idag",

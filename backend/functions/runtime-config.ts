@@ -6,6 +6,7 @@ import {
   hanjiEnvValue,
 } from '../lib/hanji-compat';
 import { normalizePublicUrl } from '../lib/ssrf-guard';
+import { customDomainCapability } from '../lib/custom-domain-config';
 
 const UPSTREAM_REPOSITORY_URL = 'https://github.com/melodysdreamj/hanji';
 const UPSTREAM_LICENSE_URL = `${UPSTREAM_REPOSITORY_URL}/blob/main/LICENSE`;
@@ -28,6 +29,28 @@ function oauthEnvName(provider: string, field: 'CLIENT_ID' | 'CLIENT_SECRET') {
  * server cannot complete.
  */
 export function publicOAuthProviders(env: Record<string, unknown> | undefined) {
+  const configuredOrigin = hanjiEnvValue(
+    env,
+    'HANJI_AUTH_ORIGIN',
+    'HANJI_APP_ORIGIN',
+  );
+  if (!configuredOrigin) return [];
+  try {
+    const origin = new URL(configuredOrigin);
+    if (
+      !['http:', 'https:'].includes(origin.protocol)
+      || origin.username
+      || origin.password
+      || origin.origin !== configuredOrigin
+      || origin.pathname !== '/'
+      || origin.search
+      || origin.hash
+    ) {
+      return [];
+    }
+  } catch {
+    return [];
+  }
   const providers = hanjiEnvListWithOffSentinel(
     env,
     'HANJI_AUTH_OAUTH_PROVIDERS',
@@ -142,6 +165,18 @@ function requestHostname(request?: Request) {
   }
 }
 
+export function publicAppHostname(env: Record<string, unknown> | undefined) {
+  const value = hanjiEnvValue(env, 'HANJI_APP_ORIGIN');
+  if (!value) return '';
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return '';
+    return url.hostname.toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
 export const GET = defineFunction(async (rawContext: unknown) => {
   const context = rawContext as FunctionContext;
   const localOrigin = isLocalHostname(requestHostname(context.request));
@@ -156,6 +191,8 @@ export const GET = defineFunction(async (rawContext: unknown) => {
       allowAnonymousBootstrap: localOrigin && devGuestEnabled,
       oauthProviders: publicOAuthProviders(context.env),
       notionOAuthConfigured: publicNotionOAuthConfigured(context.env),
+      appHostname: publicAppHostname(context.env),
+      customDomains: customDomainCapability(context.env),
       legal: publicLegalUrls(context.env),
     },
     // This response also carries a request-origin-sensitive dev bootstrap bit;

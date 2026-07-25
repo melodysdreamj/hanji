@@ -1,6 +1,6 @@
 import { MAX_RAW_TRANSACT_OPS } from './workspace-db';
 import { getExisting, listAll, nowIso, type TransactOperation } from './table-utils';
-import type { DbProperty, DbRef, FileUpload } from './app-types';
+import type { Block, DbProperty, DbRef, DbTemplate, FileUpload, Page } from './app-types';
 
 const FILE_BUCKET = 'files';
 const FILE_REFERENCE_STRING_FIELDS = new Set([
@@ -31,6 +31,8 @@ const STRUCTURED_FILE_LOCATOR_FIELDS = new Set([
   'fileKey',
   'storageKey',
 ]);
+const EXPLICIT_UPLOAD_ID_FIELDS = ['uploadId', 'fileUploadId', 'notionFileUploadId'] as const;
+const NOTION_COMPAT_UPLOAD_ID_FIELD = 'notionFileUploadId';
 const LOCAL_STORAGE_SENTINEL = new URL('http://hanji.local');
 const MAX_WORKSPACE_REFERENCE_ROWS = 100_000;
 
@@ -168,13 +170,37 @@ function referenceTokens(
     return out;
   }
   const record = value as Record<string, unknown>;
-  for (const field of ['uploadId', 'fileUploadId']) {
+  for (const field of EXPLICIT_UPLOAD_ID_FIELDS) {
     const id = optionalString(record[field]);
     if (id) out.add(`id:${id}`);
   }
   for (const [childField, child] of Object.entries(record)) {
     referenceTokens(child, out, seen, childField, explicitFileContext);
   }
+  seen.delete(value);
+  return out;
+}
+
+function notionCompatUploadIds(
+  value: unknown,
+  out = new Set<string>(),
+  seen = new Set<object>(),
+) {
+  if (!value || typeof value !== 'object' || seen.has(value)) return out;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    for (const item of value) notionCompatUploadIds(item, out, seen);
+    seen.delete(value);
+    return out;
+  }
+  const record = value as Record<string, unknown>;
+  // Current compat values use the dedicated alias. Preserve the exact legacy
+  // property shape emitted before that alias existed without making a plain
+  // native `fileUploadId` reusable across owners.
+  const id = optionalString(record[NOTION_COMPAT_UPLOAD_ID_FIELD])
+    || (record.notionFileSource === 'file' ? optionalString(record.fileUploadId) : undefined);
+  if (id) out.add(id);
+  for (const child of Object.values(record)) notionCompatUploadIds(child, out, seen);
   seen.delete(value);
   return out;
 }
@@ -226,7 +252,7 @@ function structuredFileLocatorGroups(
   const record = value as Record<string, unknown>;
   const locators: StructuredFileLocator[] = [];
   let hasExplicitUploadId = false;
-  for (const field of ['uploadId', 'fileUploadId']) {
+  for (const field of EXPLICIT_UPLOAD_ID_FIELDS) {
     const id = optionalString(record[field]);
     if (id) {
       hasExplicitUploadId = true;
@@ -255,6 +281,7 @@ function structuredFileLocatorGroups(
   const identityLocatorCount = locators.filter((locator) => (
     locator.field === 'uploadId'
     || locator.field === 'fileUploadId'
+    || locator.field === NOTION_COMPAT_UPLOAD_ID_FIELD
     || locator.field === 'id'
     || STRUCTURED_FILE_LOCATOR_FIELDS.has(locator.field)
   )).length;
@@ -351,6 +378,7 @@ function transitionOperations(
               deletedAt: null,
               deletedBy: null,
               deletionPreviousStatus: null,
+              orphanReferenceCheckedAt: restoredStatus === 'uploaded' ? timestamp : null,
               updatedAt: timestamp,
             },
     },
@@ -417,9 +445,48 @@ export async function fileReferenceTransitionOperations<
         input.association.legacy.filter,
       )
     : [];
-  const uploads = Array.from(
-    new Map([...primaryUploads, ...legacyUploads].map((upload) => [upload.id, upload])).values(),
+  const currentCompatUploadIds = notionCompatUploadIds(input.currentReferences);
+  const nextCompatUploadIds = notionCompatUploadIds(input.nextReferences);
+  const reusableCompatUploadIds = new Set([
+    ...currentCompatUploadIds,
+    ...nextCompatUploadIds,
+  ]);
+  if (reusableCompatUploadIds.size > MAX_RAW_TRANSACT_OPS) {
+    throw Object.assign(
+      new Error('Too many Notion-compatible file uploads changed in one mutation.'),
+      { status: 413 },
+    );
+  }
+  // Notion File Upload IDs are reusable across content owners. Keep them out
+  // of the single-owner attach/detach state machine, but point-read every
+  // distinct changed ID once so the shared scanner, mutation planner, and
+  // cleanup snapshot agree on the same explicit identity vocabulary.
+  const reusableCompatUploads = await Promise.all(
+    Array.from(reusableCompatUploadIds, (id) => getExisting(db.table<FileUpload>('file_uploads'), id)),
   );
+  const reusableCompatUploadsById = new Map(
+    reusableCompatUploads.filter((upload): upload is FileUpload => !!upload).map((upload) => [upload.id, upload]),
+  );
+  const targetWorkspaceId = optionalString(
+    (input.current as unknown as Record<string, unknown>).workspaceId,
+  );
+  for (const id of nextCompatUploadIds) {
+    const upload = reusableCompatUploadsById.get(id);
+    if (
+      !upload
+      || (targetWorkspaceId && upload.workspaceId !== targetWorkspaceId)
+      || (upload.createdBy && upload.createdBy !== input.actorId)
+    ) {
+      throw lifecycleConflict(
+        'Stored file metadata is missing or belongs to another target; upload the file again.',
+      );
+    }
+  }
+  const uploadsById = new Map(
+    [...primaryUploads, ...legacyUploads].map((upload) => [upload.id, upload]),
+  );
+  for (const upload of reusableCompatUploadsById.values()) uploadsById.set(upload.id, upload);
+  const uploads = Array.from(uploadsById.values());
   const legacyUploadIds = new Set(legacyUploads.map((upload) => upload.id));
   for (const locators of structuredFileLocatorGroups(input.nextReferences)) {
     let matchingIds: Set<string> | undefined;
@@ -433,6 +500,7 @@ export async function fileReferenceTransitionOperations<
       if (
         locator.field === 'uploadId'
         || locator.field === 'fileUploadId'
+        || locator.field === NOTION_COMPAT_UPLOAD_ID_FIELD
         || Array.from(locator.tokens).some((token) => !token.startsWith('url:'))
         || locatorMatches.size > 0
       ) {
@@ -503,6 +571,15 @@ export async function fileReferenceTransitionOperations<
   for (const upload of uploads) {
     const before = referencesUpload(currentTokens, upload);
     const after = referencesUpload(nextTokens, upload);
+    if (reusableCompatUploadIds.has(upload.id)) {
+      // Official file-upload IDs remain reusable after one owner detaches.
+      // A legacy row already entering reversible deletion may still be rescued
+      // by a live compatibility reference, but detach never retires it.
+      if (after && upload.status === 'deleting') {
+        transitions.push(...transitionOperations(upload, 'restore', input.actorId));
+      }
+      continue;
+    }
     if (
       after
       && legacyUploadIds.has(upload.id)
@@ -639,6 +716,257 @@ export interface WorkspaceFileReferenceOwner {
 export interface WorkspaceFileReferenceSnapshotOptions {
   excludePageIds?: Iterable<string>;
   excludeWorkspaceMetadata?: boolean;
+  preloadedPages?: Iterable<Pick<
+    Page,
+    | 'id'
+    | 'workspaceId'
+    | 'parentId'
+    | 'parentType'
+    | 'icon'
+    | 'cover'
+    | 'notionIcon'
+    | 'notionCover'
+    | 'properties'
+  >>;
+  preloadedFileProperties?: Iterable<Pick<DbProperty, 'id' | 'databaseId' | 'type'>>;
+}
+
+export type TargetedFileUploadAssociation = 'exact' | 'legacy_or_ambiguous';
+
+export interface TargetedFileUploadReferenceOwners {
+  association: TargetedFileUploadAssociation;
+  owners: WorkspaceFileReferenceOwner[];
+}
+
+function legacyOrAmbiguousTargetedOwners(): TargetedFileUploadReferenceOwners {
+  return { association: 'legacy_or_ambiguous', owners: [] };
+}
+
+function hasExactNotionImportFileProvenance(upload: FileUpload) {
+  const workspaceId = optionalString(upload.workspaceId);
+  const jobId = optionalString(upload.notionImportJobId);
+  const revision = optionalString(upload.notionImportSnapshotRevision);
+  const slotKey = optionalString(upload.notionImportSlotKey);
+  const key = optionalString(upload.key);
+  if (!workspaceId || !jobId || !revision || !slotKey || !key) return false;
+  if ((optionalString(upload.bucket) ?? FILE_BUCKET) !== FILE_BUCKET) return false;
+  return key.startsWith(`workspaces/${workspaceId}/notion-import/${jobId}/`);
+}
+
+function targetedPageReferenceOwner(
+  page: Pick<
+    Page,
+    | 'id'
+    | 'parentId'
+    | 'parentType'
+    | 'icon'
+    | 'cover'
+    | 'notionIcon'
+    | 'notionCover'
+    | 'properties'
+  >,
+  filePropertyIds: Iterable<string>,
+): WorkspaceFileReferenceOwner {
+  return {
+    kind: 'page',
+    pageId: page.id,
+    databaseId:
+      page.parentType === 'database' && typeof page.parentId === 'string'
+        ? page.parentId
+        : undefined,
+    tokens: referenceTokens({
+      icon: page.icon,
+      cover: page.cover,
+      notionIcon: page.notionIcon,
+      notionCover: page.notionCover,
+      properties: page.properties,
+      schemaFileProperties: schemaFilePropertyReferences(page.properties, filePropertyIds),
+    }),
+  };
+}
+
+function targetedBlockReferenceOwner(
+  block: Pick<Block, 'id' | 'pageId' | 'content'>,
+): WorkspaceFileReferenceOwner {
+  return {
+    kind: 'block',
+    pageId: block.pageId,
+    blockId: block.id,
+    tokens: referenceTokens(block.content),
+  };
+}
+
+function targetedTemplateReferenceOwner(
+  template: Pick<DbTemplate, 'id' | 'databaseId' | 'icon' | 'properties' | 'blocks'>,
+  filePropertyIds: Iterable<string>,
+): WorkspaceFileReferenceOwner {
+  return {
+    kind: 'template',
+    databaseId: template.databaseId,
+    templateId: template.id,
+    tokens: referenceTokens({
+      icon: template.icon,
+      properties: template.properties,
+      schemaFileProperties: schemaFilePropertyReferences(template.properties, filePropertyIds),
+      blocks: template.blocks,
+    }),
+  };
+}
+
+function untypedPropertiesMayReferenceUpload(properties: unknown, upload: FileUpload) {
+  if (!properties || typeof properties !== 'object' || Array.isArray(properties)) return false;
+  return referencesUpload(
+    referenceTokens(schemaFilePropertyReferences(
+      properties,
+      Object.keys(properties as Record<string, unknown>),
+    )),
+    upload,
+  );
+}
+
+/**
+ * Resolve a terminal Notion-import upload through only its exact scalar owner
+ * tuple. The normal pre-copy checkpoint has no product owner yet, but its
+ * immutable job/revision/slot/key provenance still makes that ownerless state
+ * exact. Once an owner tuple exists, every hop is a bounded get-by-id: the
+ * exact page or block/template, its required parent page/database, and an
+ * exact files-property schema when one is part of the tuple.
+ *
+ * `legacy_or_ambiguous` is deliberately fail-closed. Callers must use their
+ * separately bounded legacy workspace-snapshot lane instead of treating an
+ * empty owner list as proof that the bytes are orphaned.
+ */
+export async function targetedFileUploadReferenceOwners(
+  contentDb: DbRef,
+  upload: FileUpload,
+): Promise<TargetedFileUploadReferenceOwners> {
+  if (!hasExactNotionImportFileProvenance(upload)) {
+    return legacyOrAmbiguousTargetedOwners();
+  }
+
+  const pageId = optionalString(upload.pageId);
+  const blockId = optionalString(upload.blockId);
+  const databaseId = optionalString(upload.databaseId);
+  const propertyId = optionalString(upload.propertyId);
+  const templateId = optionalString(upload.templateId);
+
+  // A fully copied pre-apply checkpoint is intentionally ownerless. Exact
+  // immutable provenance distinguishes it from an old or partially migrated
+  // row, so terminal maintenance can retire it without a workspace scan.
+  if (!pageId && !blockId && !databaseId && !propertyId && !templateId) {
+    return { association: 'exact', owners: [] };
+  }
+
+  if (blockId) {
+    if (!pageId || templateId || propertyId) return legacyOrAmbiguousTargetedOwners();
+    const [block, page, database] = await Promise.all([
+      getExisting(contentDb.table<Block>('blocks'), blockId),
+      getExisting(contentDb.table<Page>('pages'), pageId),
+      databaseId
+        ? getExisting(contentDb.table<Page>('pages'), databaseId)
+        : Promise.resolve(undefined),
+    ]);
+    if (
+      !block
+      || !page
+      || block.pageId !== pageId
+      || page.workspaceId !== upload.workspaceId
+    ) return legacyOrAmbiguousTargetedOwners();
+    if (databaseId && (
+      page.parentType !== 'database'
+      || page.parentId !== databaseId
+      || !database
+      || database.kind !== 'database'
+      || database.workspaceId !== upload.workspaceId
+    )) return legacyOrAmbiguousTargetedOwners();
+
+    const owner = targetedBlockReferenceOwner(block);
+    return {
+      association: 'exact',
+      owners: referencesUpload(owner.tokens, upload) ? [owner] : [],
+    };
+  }
+
+  if (templateId) {
+    if (pageId || !databaseId) return legacyOrAmbiguousTargetedOwners();
+    const [template, database, property] = await Promise.all([
+      getExisting(contentDb.table<DbTemplate>('db_templates'), templateId),
+      getExisting(contentDb.table<Page>('pages'), databaseId),
+      propertyId
+        ? getExisting(contentDb.table<DbProperty>('db_properties'), propertyId)
+        : Promise.resolve(undefined),
+    ]);
+    if (
+      !template
+      || !database
+      || template.databaseId !== databaseId
+      || database.kind !== 'database'
+      || database.workspaceId !== upload.workspaceId
+      || (propertyId && (
+        !property
+        || property.databaseId !== databaseId
+        || property.type !== 'files'
+      ))
+    ) return legacyOrAmbiguousTargetedOwners();
+
+    const owner = targetedTemplateReferenceOwner(template, propertyId ? [propertyId] : []);
+    if (referencesUpload(owner.tokens, upload)) {
+      return { association: 'exact', owners: [owner] };
+    }
+    if (untypedPropertiesMayReferenceUpload(template.properties, upload)) {
+      return legacyOrAmbiguousTargetedOwners();
+    }
+    return { association: 'exact', owners: [] };
+  }
+
+  if (pageId) {
+    if (propertyId && !databaseId) return legacyOrAmbiguousTargetedOwners();
+    const [page, database, property] = await Promise.all([
+      getExisting(contentDb.table<Page>('pages'), pageId),
+      databaseId
+        ? getExisting(contentDb.table<Page>('pages'), databaseId)
+        : Promise.resolve(undefined),
+      propertyId
+        ? getExisting(contentDb.table<DbProperty>('db_properties'), propertyId)
+        : Promise.resolve(undefined),
+    ]);
+    if (!page || page.workspaceId !== upload.workspaceId) {
+      return legacyOrAmbiguousTargetedOwners();
+    }
+    if (databaseId && (
+      page.parentType !== 'database'
+      || page.parentId !== databaseId
+      || !database
+      || database.kind !== 'database'
+      || database.workspaceId !== upload.workspaceId
+    )) return legacyOrAmbiguousTargetedOwners();
+    if (propertyId && (
+      !property
+      || property.databaseId !== databaseId
+      || property.type !== 'files'
+    )) return legacyOrAmbiguousTargetedOwners();
+
+    const filePropertyIds = propertyId
+      ? [propertyId]
+      : page.parentType === 'database'
+        ? []
+        : page.properties && typeof page.properties === 'object' && !Array.isArray(page.properties)
+          ? Object.keys(page.properties)
+          : [];
+    const owner = targetedPageReferenceOwner(page, filePropertyIds);
+    if (referencesUpload(owner.tokens, upload)) {
+      return { association: 'exact', owners: [owner] };
+    }
+    if (
+      page.parentType === 'database'
+      && untypedPropertiesMayReferenceUpload(page.properties, upload)
+    ) return legacyOrAmbiguousTargetedOwners();
+    return { association: 'exact', owners: [] };
+  }
+
+  // A database/property-only tuple cannot identify one page, block, or
+  // template owner. It is either a partially published row or legacy data.
+  return legacyOrAmbiguousTargetedOwners();
 }
 
 /**
@@ -654,23 +982,30 @@ export async function workspaceFileReferenceSnapshot(
   options: WorkspaceFileReferenceSnapshotOptions = {},
 ): Promise<WorkspaceFileReferenceSnapshot> {
   const excludedPageIds = new Set(options.excludePageIds ?? []);
-  const pages = (await listAll(
-    contentDb.table<{
-      id: string;
-      workspaceId?: string;
-      parentId?: string | null;
-      parentType?: string;
-      icon?: unknown;
-      cover?: unknown;
-      properties?: unknown;
-    }>('pages')
-      .where('workspaceId', '==', workspaceId),
-    {
-      label: `Stored-file page references for workspace ${workspaceId}`,
-      maxItems: MAX_WORKSPACE_REFERENCE_ROWS,
-      allowLargeMaterialization: true,
-    },
-  )).filter((page) => !excludedPageIds.has(page.id));
+  const pageSnapshot = options.preloadedPages
+    ? Array.from(options.preloadedPages)
+    : await listAll(
+        contentDb.table<{
+          id: string;
+          workspaceId?: string;
+          parentId?: string | null;
+          parentType?: string;
+          icon?: unknown;
+          cover?: unknown;
+          notionIcon?: unknown;
+          notionCover?: unknown;
+          properties?: unknown;
+        }>('pages')
+          .where('workspaceId', '==', workspaceId),
+        {
+          label: `Stored-file page references for workspace ${workspaceId}`,
+          maxItems: MAX_WORKSPACE_REFERENCE_ROWS,
+          allowLargeMaterialization: true,
+        },
+      );
+  const pages = pageSnapshot.filter((page) => (
+    page.workspaceId === workspaceId && !excludedPageIds.has(page.id)
+  ));
   const pageIds = new Set(pages.map((page) => page.id));
   const blocks = (await listAll(
     contentDb.table<{ id: string; pageId?: string; content?: unknown }>('blocks'),
@@ -694,15 +1029,17 @@ export async function workspaceFileReferenceSnapshot(
       allowLargeMaterialization: true,
     },
   )).filter((template) => typeof template.databaseId === 'string' && pageIds.has(template.databaseId));
-  const fileProperties = await listAll(
-    contentDb.table<Pick<DbProperty, 'id' | 'databaseId' | 'type'>>('db_properties')
-      .where('type', '==', 'files'),
-    {
-      label: `Stored-file property schemas for workspace ${workspaceId}`,
-      maxItems: MAX_WORKSPACE_REFERENCE_ROWS,
-      allowLargeMaterialization: true,
-    },
-  );
+  const fileProperties = options.preloadedFileProperties
+    ? Array.from(options.preloadedFileProperties).filter((property) => property.type === 'files')
+    : await listAll(
+        contentDb.table<Pick<DbProperty, 'id' | 'databaseId' | 'type'>>('db_properties')
+          .where('type', '==', 'files'),
+        {
+          label: `Stored-file property schemas for workspace ${workspaceId}`,
+          maxItems: MAX_WORKSPACE_REFERENCE_ROWS,
+          allowLargeMaterialization: true,
+        },
+      );
   const filePropertyIdsByDatabase = new Map<string, Set<string>>();
   for (const property of fileProperties) {
     if (!pageIds.has(property.databaseId)) continue;
@@ -739,6 +1076,8 @@ export async function workspaceFileReferenceSnapshot(
       tokens: referenceTokens({
         icon: page.icon,
         cover: page.cover,
+        notionIcon: page.notionIcon,
+        notionCover: page.notionCover,
         properties: page.properties,
         schemaFileProperties: schemaFilePropertyReferences(
           page.properties,

@@ -92,5 +92,8 @@
     "శు",
     "శ"
   ],
-  "you": "మీరు"
+  "you": "మీరు",
+  "buttonExecutionFailed": "బటన్ను అమలు చేయలేకపోయింది.",
+  "loadingMoreRelations": "మరిన్ని సంబంధాలు లోడ్ అవుతున్నాయి...",
+  "loadMoreRelations": "మరిన్ని సంబంధాలు లోడ్ చేయి"
 }

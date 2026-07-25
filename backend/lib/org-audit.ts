@@ -1,4 +1,4 @@
-import { bestEffort, getExisting, nowIso } from './table-utils';
+import { getExisting, nowIso } from './table-utils';
 
 interface TableRef<T> {
   getOne(id: string): Promise<T | null>;
@@ -30,10 +30,7 @@ export async function recordOrganizationAudit(
   db: DbRef,
   event: Omit<OrganizationAuditEvent, 'id'>,
 ) {
-  return bestEffort(
-    `organization audit event ${event.action}`,
-    db.table<OrganizationAuditEvent>('organization_audit_events').insert(event),
-  );
+  await db.table<OrganizationAuditEvent>('organization_audit_events').insert(event);
 }
 
 export async function recordWorkspaceAudit(

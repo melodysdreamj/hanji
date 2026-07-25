@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} బ్యాక్లింక్",
-    "count_other": "{{count}} బ్యాక్లింక్లు"
+    "count_other": "{{count}} బ్యాక్లింక్లు",
+    "partial_one": "{{count}}+ బ్యాక్లింక్",
+    "partial_other": "{{count}}+ బ్యాక్లింక్లు"
   },
   "header": {
     "title": "లింక్ చేయబడిన మెన్షన్లు"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} మెన్షన్",
     "mention_other": "{{count}} మెన్షన్లు",
     "link_one": "{{count}} లింక్",
-    "link_other": "{{count}} లింక్లు"
+    "link_other": "{{count}} లింక్లు",
+    "loaded": "లోడ్ అయ్యింది: {{summary}}"
   },
   "kind": {
     "mention": "మెన్షన్",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} అదనపు బ్యాక్లింక్",
-    "count_other": "{{count}} అదనపు బ్యాక్లింక్లు"
+    "count_other": "{{count}} అదనపు బ్యాక్లింక్లు",
+    "load": "మరిన్ని బ్యాక్లింక్లు లోడ్ చేయి",
+    "loading": "బ్యాక్లింక్లు లోడ్ అవుతున్నాయి…",
+    "search": "బ్యాక్లింక్ల కోసం శోధించు"
   }
 }

@@ -88,5 +88,38 @@
     "hoursAgo": "Imehaririwa saa {{hours}} nyuma",
     "daysAgo": "Imehaririwa siku {{days}} nyuma",
     "on": "Imehaririwa {{date}}"
+  },
+  "align": {
+    "center": "Katikati",
+    "choose": "Chagua mpangilio wa picha",
+    "left": "Kushoto",
+    "right": "Kulia"
+  },
+  "altText": {
+    "help": "Maelezo mbadala husaidia watu wanaotumia visoma skrini kuelewa picha.",
+    "label": "Maelezo",
+    "placeholder": "Elezea picha",
+    "remove": "Ondoa",
+    "save": "Hifadhi",
+    "title": "Maelezo mbadala"
+  },
+  "imageLink": {
+    "invalid": "Weka anwani kamili ya http:// au https:// URL.",
+    "label": "Fungua URL hii picha inapobofywa",
+    "remove": "Ondoa",
+    "save": "Hifadhi",
+    "title": "Kiungo cha picha"
+  },
+  "media": {
+    "addImageLink": "Ongeza kiungo",
+    "align": "Pangilia",
+    "altText": "Maelezo mbadala",
+    "copySourceLink": "Nakili kiungo chanzo",
+    "download": "Pakua",
+    "editImageLink": "Hariri kiungo",
+    "fullScreen": "Skrini kamili",
+    "openLink": "Fungua kiungo",
+    "replace": "Badilisha",
+    "viewOriginal": "Tazama asili"
   }
 }

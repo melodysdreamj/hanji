@@ -3,6 +3,8 @@ import { safeUrl } from "./richtext";
 import { parsePastedMarkdown, type PastedBlock } from "./markdownPaste";
 import type { BlockType, TextSpan } from "@/lib/types";
 import { spansToPlainText } from "@/lib/types";
+import { contentForNewBlock } from "@/lib/blockDefaults";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
 
 export function shortcutBlockType(e: ReactKeyboardEvent<HTMLElement>): BlockType | null {
   if (!(e.metaKey || e.ctrlKey)) return null;
@@ -34,16 +36,11 @@ export function printableTextKey(e: ReactKeyboardEvent<HTMLElement>) {
 export type BlockTextMark = "bold" | "italic" | "underline" | "strikethrough" | "code";
 
 export function shortcutTextMark(e: ReactKeyboardEvent<HTMLElement>): BlockTextMark | null {
-  if (!(e.metaKey || e.ctrlKey) || e.altKey) return null;
-  const key = e.key.toLowerCase();
-  if (e.shiftKey) {
-    if (key === "s" || key === "x") return "strikethrough";
-    return null;
-  }
-  if (key === "b") return "bold";
-  if (key === "i") return "italic";
-  if (key === "u") return "underline";
-  if (key === "e") return "code";
+  if (matchesKeyboardShortcut("strikethrough", e)) return "strikethrough";
+  if (matchesKeyboardShortcut("bold", e)) return "bold";
+  if (matchesKeyboardShortcut("italic", e)) return "italic";
+  if (matchesKeyboardShortcut("underline", e)) return "underline";
+  if (matchesKeyboardShortcut("inlineCode", e)) return "code";
   return null;
 }
 
@@ -242,7 +239,7 @@ export function typedMarkdownBlockFromText(text: string): PastedBlock | null {
   if (trimmed === "```") {
     return {
       type: "code",
-      content: { rich: [] },
+      content: contentForNewBlock("code"),
       plainText: "",
     };
   }

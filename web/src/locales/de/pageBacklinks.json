@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} Backlink",
-    "count_other": "{{count}} Backlinks"
+    "count_other": "{{count}} Backlinks",
+    "partial_one": "{{count}}+ Backlink",
+    "partial_other": "{{count}}+ Backlinks"
   },
   "header": {
     "title": "Verlinkte Erwähnungen"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} Erwähnung",
     "mention_other": "{{count}} Erwähnungen",
     "link_one": "{{count}} Link",
-    "link_other": "{{count}} Links"
+    "link_other": "{{count}} Links",
+    "loaded": "Geladen: {{summary}}"
   },
   "kind": {
     "mention": "Erwähnung",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "{{count}} weiterer Backlink",
-    "count_other": "{{count}} weitere Backlinks"
+    "count_other": "{{count}} weitere Backlinks",
+    "load": "Weitere Backlinks laden",
+    "loading": "Backlinks werden geladen…",
+    "search": "Nach Backlinks suchen"
   }
 }

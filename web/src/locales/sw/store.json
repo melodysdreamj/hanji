@@ -7,7 +7,8 @@
   "pageMissingSave": "Ukurasa haukuweza kupatikana, kwa hivyo mabadiliko yako hayakuweza kuhifadhiwa.",
   "saveFailed": "Mabadiliko yako hayakuweza kuhifadhiwa.",
   "sessionExpired": "Kikao chako kimeisha au ombi halikuweza kuthibitishwa. Tafadhali jaribu tena.",
-  "blockConflictSave": "Block hili lilibadilishwa kwenye kifaa kingine, kwa hivyo mabadiliko yako ya nje ya mtandao hayakutumika.",
+  "blockConflictSave": "Hariri iliyopangwa inagongana na toleo la hivi karibuni la seva, kwa hivyo haikuweza kuunganishwa kiotomatiki.",
   "blockConflictKeepMine": "Tumia toleo langu",
-  "blockMoveCommentsSkipped": "Block lilihamishwa, lakini maoni yake hayakuweza kuhamishwa pamoja nalo."
+  "blockMoveCommentsSkipped": "Block lilihamishwa, lakini maoni yake hayakuweza kuhamishwa pamoja nalo.",
+  "conflictSave": "Maudhui haya yalibadilishwa kabla ya kuhifadhi kukamilika, kwa hivyo hariri yako haikuweza kuhifadhiwa."
 }

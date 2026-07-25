@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Dodaj komentar",
+    "addLink": "Dodaj vezu",
+    "blockColor": "Primijeni posljednju korištenu boju",
+    "bold": "Podebljano",
+    "copyPageLink": "Kopiraj poveznicu stranice",
+    "findInPage": "Pronađi na ovoj stranici",
+    "inlineCode": "Kôd u retku",
+    "italic": "Kurziv",
+    "moveBlock": "Premjesti blok na drugu stranicu",
+    "moveBlockDown": "Premjesti blok dolje",
+    "moveBlockUp": "Premjesti blok gore",
+    "movePage": "Premjesti trenutnu stranicu",
+    "navigateBack": "Natrag",
+    "navigateForward": "Naprijed",
+    "newPage": "Nova stranica",
+    "openBlockMenu": "Otvori radnje bloka",
+    "openKeyboardShortcuts": "Otvori tipkovničke prečace",
+    "openParentPage": "Otvori nadređenu stranicu",
+    "quickFind": "Brzo pretraživanje",
+    "strikethrough": "Precrtano",
+    "toggleAllToggles": "Proširi ili sažmi sve preklopnike",
+    "toggleSidebar": "Prebaci bočnu traku",
+    "toggleTheme": "Prebaci tamni način",
+    "underline": "Podcrtano"
+  },
+  "categories": {
+    "createStyle": "Stvaranje i stiliziranje",
+    "editMove": "Uređivanje i premještanje",
+    "popular": "Popularno"
+  },
+  "categoriesLabel": "Kategorije prečaca",
+  "close": "Zatvori",
+  "closeBackdrop": "Zatvori tipkovničke prečace",
+  "empty": "Nema pronađenih prečaca",
+  "keysFor": "Tipke za {{action}}",
+  "or": "ili",
+  "searchLabel": "Pretraži tipkovničke prečace",
+  "searchPlaceholder": "Pretraži prečace…",
+  "searchResults": "Rezultati pretraživanja",
+  "searchTerms": {
+    "toggleTheme": "tema svijetla tamna izgled"
+  },
+  "title": "Tipkovnički prečaci"
+}

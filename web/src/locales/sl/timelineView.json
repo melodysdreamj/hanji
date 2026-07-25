@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Odvisnosti:",
     "hint": "dodaj relacijsko lastnost",
-    "relationPropertyAriaLabel": "Relacijska lastnost odvisnosti"
+    "relationPropertyAriaLabel": "Relacijska lastnost odvisnosti",
+    "makeDependOn": "Naj bo {{title}} odvisen od {{predecessor}}",
+    "startFrom": "Začni odvisnost od {{title}}"
   },
   "toolbar": {
     "today": "Danes",

@@ -13,7 +13,9 @@
   "dependencies": {
     "label": "Bog'liqliklar:",
     "hint": "aloqa xususiyatini qo'shing",
-    "relationPropertyAriaLabel": "Bog'liqlik aloqa xususiyati"
+    "relationPropertyAriaLabel": "Bog'liqlik aloqa xususiyati",
+    "makeDependOn": "{{title}} ni {{predecessor}} ga bog‘liq qilish",
+    "startFrom": "{{title}} dan bog‘liqlikni boshlash"
   },
   "toolbar": {
     "today": "Bugun",

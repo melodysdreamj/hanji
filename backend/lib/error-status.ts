@@ -33,10 +33,24 @@ export const STANDARD_ERROR_STATUS_RULES: ErrorStatusRule[] = [
       ' are not balanced',
       ' appears more than once',
       ' can only ',
-      'Invalid ',
+      // Uppercase product prefixes stay deliberately narrow. Bare `Invalid `
+      // and `Cannot ` also match JavaScript engine failures and must not turn
+      // backend bugs into terminal client errors.
+      'Invalid Hanji export',
+      'Invalid relation target',
+      'Invalid rollup function',
       'Duplicate ',
       ' cannot ',
-      'Cannot ',
+      'Cannot add a second title property',
+      'Cannot delete the title property',
+      'Cannot alter the title property type',
+      'Cannot move a page inside itself or one of its descendants',
+      'Cannot append discovery items',
+      'Cannot rediscover a Notion import graph after apply has started',
+      'Cannot duplicate a page inside itself or one of its descendants',
+      'Cannot change read-only database property',
+      'Cannot move a row relative to itself',
+      'Cannot write read-only database property type',
       'Unknown ',
       'Unsupported ',
       'unsupported ',
@@ -64,13 +78,30 @@ export function errorStatus(
   fallback = 500,
 ): { status: number; message: string } {
   const message = error instanceof Error ? error.message : String(error);
-  const result = (status: number) => {
+  const result = (
+    status: number,
+    inferred?: { source: 'message-rule' | 'fallback'; needle?: string },
+  ) => {
     if (status >= 500) {
       console.error('[function-error] internal failure:', error);
       return { status, message: 'Internal server error.' };
     }
+    if (inferred) {
+      console.warn('[function-error] inferred non-500 status from message fallback:', {
+        status,
+        source: inferred.source,
+        ...(inferred.needle ? { needle: inferred.needle } : {}),
+        errorName: error instanceof Error ? error.name : typeof error,
+      });
+    }
     return { status, message };
   };
+  // Built-in engine exceptions are backend defects, not user validation. Keep
+  // them on the generic logged 500 path even if a caller supplies a custom
+  // message rule that would otherwise match their text.
+  if (error instanceof TypeError || error instanceof ReferenceError || error instanceof RangeError) {
+    return result(500);
+  }
   const explicitStatus = error && typeof error === 'object'
     ? Number((error as { status?: unknown; code?: unknown }).status
       ?? (error as { status?: unknown; code?: unknown }).code)
@@ -82,9 +113,10 @@ export function errorStatus(
     ? rules
     : [...rules, ...STANDARD_ERROR_STATUS_RULES];
   for (const rule of effectiveRules) {
-    if (rule.needles.some((needle) => message.includes(needle))) {
-      return result(rule.status);
+    const needle = rule.needles.find((candidate) => message.includes(candidate));
+    if (needle) {
+      return result(rule.status, { source: 'message-rule', needle });
     }
   }
-  return result(fallback);
+  return result(fallback, { source: 'fallback' });
 }

@@ -13,7 +13,7 @@
   "groupName": "Топ аты",
   "groupOptions": "{{groupName}} тобының опциялары",
   "groupThisBoard": "Тақтаны топтау",
-  "groupThisBoardDesc": "Бағандар жасау үшін Таңдау немесе Күй сипатын қосыңыз.",
+  "groupThisBoardDesc": "Бағандарды жасау үшін Таңдау, Күй, Адам немесе Көп таңдау қасиетін қосыңыз немесе таңдаңыз.",
   "newGroup": "Жаңа топ",
   "newGroupIn": "{{dbTitle}} ішінде жаңа {{groupName}} тобы",
   "newPage": "Жаңа бет",

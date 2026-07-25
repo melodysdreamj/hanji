@@ -88,5 +88,38 @@
     "hoursAgo": "Naposledy upravené pred {{hours}} h",
     "daysAgo": "Naposledy upravené pred {{days}} d",
     "on": "Naposledy upravené {{date}}"
+  },
+  "align": {
+    "center": "Stred",
+    "choose": "Vybrať zarovnanie obrázka",
+    "left": "Vľavo",
+    "right": "Vpravo"
+  },
+  "altText": {
+    "help": "Alternatívny text pomáha používateľom čítačiek obrazovky porozumieť obrázku.",
+    "label": "Popis",
+    "placeholder": "Popíšte obrázok",
+    "remove": "Odstrániť",
+    "save": "Uložiť",
+    "title": "Alternatívny text"
+  },
+  "imageLink": {
+    "invalid": "Zadajte úplnú http:// alebo https:// URL adresu.",
+    "label": "Otvoriť túto URL po kliknutí na obrázok",
+    "remove": "Odstrániť",
+    "save": "Uložiť",
+    "title": "Odkaz na obrázok"
+  },
+  "media": {
+    "addImageLink": "Pridať odkaz",
+    "align": "Zarovnať",
+    "altText": "Alternatívny text",
+    "copySourceLink": "Kopírovať zdrojový odkaz",
+    "download": "Stiahnuť",
+    "editImageLink": "Upraviť odkaz",
+    "fullScreen": "Celá obrazovka",
+    "openLink": "Otvoriť odkaz",
+    "replace": "Nahradiť",
+    "viewOriginal": "Zobraziť originál"
   }
 }

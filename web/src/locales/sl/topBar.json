@@ -38,7 +38,7 @@
   "moveTo": "Premakni v",
   "exporting": "Izvoz…",
   "exportAsMarkdown": "Izvozi kot Markdown",
-  "exportAsHanji": "Izvozi kot Hanji datoteko",
+  "exportAsHanji": "Izvozi Hanji JSON (datoteke izključene)",
   "importing": "Uvažanje…",
   "importMarkdown": "Uvozi Markdown",
   "unlockPage": "Odkleni stran",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Dostopa ni bilo mogoče posodobiti",
     "removedFromAccessList": "Odstranjeno s seznama dostopa",
     "couldntRemoveAccess": "Dostopa ni bilo mogoče odstraniti",
-    "couldntLoadAccessList": "Seznama dostopa ni bilo mogoče naložiti"
+    "couldntLoadAccessList": "Seznama dostopa ni bilo mogoče naložiti",
+    "couldntExportHanjiArchive": "Ni bilo mogoče izvoziti Hanji arhiva.",
+    "exportedHanjiArchive": "Izvozili ste Hanji arhiv z datotekami."
   },
   "user": "Uporabnik",
   "whoHasAccess": "Kdo ima dostop",
   "workspace": "Delovni prostor",
   "workspaceCount_one": "{{count}} delovni prostor",
   "workspaceCount_other": "{{count}} delovnih prostorov",
-  "you": "Ti"
+  "you": "Ti",
+  "exportAsHanjiArchive": "Izvozi Hanji arhiv (datoteke vključene)",
+  "turnIntoWiki": "Spremeni v wiki",
+  "undoWiki": "Razveljavi wiki",
+  "wikiCreated": "Stran spremenjena v wiki",
+  "wikiPageSettings": "Nastavitve wiki strani",
+  "wikiUndone": "Wiki odstranjen; vsebina strani ohranjena",
+  "wikiUpdateFailed": "Wiki ni bilo mogoče posodobiti"
 }

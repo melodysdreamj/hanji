@@ -24,7 +24,7 @@
   "dismissInviteCard": "Hylkää jäsenkortti",
   "exportedWorkspace": "Työtila viety Hanji-tiedostoksi.",
   "exportedWorkspaceWithPlaceholders": "Työtila viety Hanji-tiedostoksi — liitteet jätettiin paikkamerkkeinä.",
-  "exportWorkspace": "Vie työtila",
+  "exportWorkspace": "Vie työtila JSON (ei tiedostoja)",
   "favoritePages": "Suosikkisivut",
   "favorites": "Suosikit",
   "home": "Koti",
@@ -76,5 +76,12 @@
     "later": "Ehkä myöhemmin",
     "note": "Voit aina aloittaa tämän myöhemmin sivupalkin Tuo-toiminnolla.",
     "title": "Tuo Notion-työtilasi Hanjiin?"
-  }
+  },
+  "addPageToTeamspace": "Lisää sivu {{name}}lle",
+  "couldntExportWorkspaceArchive": "Työtila-arkiston vienti epäonnistui.",
+  "exportedWorkspaceArchive": "Työtila-arkisto viety tiedostoineen.",
+  "exportWorkspaceArchive": "Vie työtila-arkisto (tiedostot mukana)",
+  "joinTeamspaces": "Liity tiimitiloihin",
+  "keyboardShortcuts": "Pikanäppäimet",
+  "teamspacePages": "{{name}} sivut"
 }

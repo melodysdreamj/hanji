@@ -18,11 +18,16 @@ interface ShareLinkIndex extends PageWorkspaceIndex {
   pageId: string;
 }
 
+interface FormLinkIndex extends PageWorkspaceIndex {
+  databaseId: string;
+}
+
 export interface PermanentRoutingIndexPlan {
   db: DbRef;
   pageWorkspaceIndexes: PageWorkspaceIndex[];
   permissionIndexes: PagePermissionIndex[];
   shareLinkIndexes: ShareLinkIndex[];
+  formLinkIndexes: FormLinkIndex[];
 }
 
 /**
@@ -42,7 +47,7 @@ export async function collectPermanentRoutingIndexPlan(
     maxItems: MAX_CENTRAL_WORKSPACE_INDEX_ROWS,
     allowLargeMaterialization: true,
   });
-  const [pageWorkspaceIndexes, permissionIndexes, shareLinkIndexes] = await Promise.all([
+  const [pageWorkspaceIndexes, permissionIndexes, shareLinkIndexes, formLinkIndexes] = await Promise.all([
     listAll(
       db.table<PageWorkspaceIndex>('page_workspace_index').where('workspaceId', '==', workspaceId),
       listOptions(`Page routing indexes for permanent delete in ${workspaceId}`),
@@ -55,8 +60,12 @@ export async function collectPermanentRoutingIndexPlan(
       db.table<ShareLinkIndex>('share_link_index').where('workspaceId', '==', workspaceId),
       listOptions(`Share routing indexes for permanent delete in ${workspaceId}`),
     ).then((rows) => rows.filter((row) => pageIdSet.has(row.pageId))),
+    listAll(
+      db.table<FormLinkIndex>('form_link_index').where('workspaceId', '==', workspaceId),
+      listOptions(`Form routing indexes for permanent delete in ${workspaceId}`),
+    ).then((rows) => rows.filter((row) => pageIdSet.has(row.databaseId))),
   ]);
-  return { db, pageWorkspaceIndexes, permissionIndexes, shareLinkIndexes };
+  return { db, pageWorkspaceIndexes, permissionIndexes, shareLinkIndexes, formLinkIndexes };
 }
 
 export async function deletePermanentRoutingIndexes(
@@ -70,6 +79,9 @@ export async function deletePermanentRoutingIndexes(
     ...plan.shareLinkIndexes.map((row): TransactOperation => ({
       table: 'share_link_index', op: 'delete', id: row.id,
     })),
+    ...plan.formLinkIndexes.map((row): TransactOperation => ({
+      table: 'form_link_index', op: 'delete', id: row.id,
+    })),
     ...plan.pageWorkspaceIndexes.map((row): TransactOperation => ({
       table: 'page_workspace_index', op: 'delete', id: row.id,
     })),
@@ -82,5 +94,6 @@ export async function deletePermanentRoutingIndexes(
     pageWorkspaceIndexes: plan.pageWorkspaceIndexes.length,
     permissionIndexes: plan.permissionIndexes.length,
     shareLinkIndexes: plan.shareLinkIndexes.length,
+    formLinkIndexes: plan.formLinkIndexes.length,
   };
 }

@@ -247,7 +247,9 @@
     "runningHint": "Počas importu nechajte túto kartu prehliadača otvorenú.",
     "noJobHint": "Najprv spustite objavovanie z kroku Rozsah.",
     "applyLocksHint": "Aplikovaním sa zapíšu objavené položky do tohto pracovného priestoru.",
-    "browserRunnerWarning": "Tento import prebieha na tejto karte prehliadača. Kartu nechajte otvorenú, kým sa import nedokončí. Zatvorením alebo obnovením karty sa spracovanie pozastaví; opätovným otvorením Hanji sa pokračuje od uloženého priebehu."
+    "browserRunnerWarning": "Tento import prebieha na tejto karte prehliadača. Kartu nechajte otvorenú, kým sa import nedokončí. Zatvorením alebo obnovením karty sa spracovanie pozastaví; opätovným otvorením Hanji sa pokračuje od uloženého priebehu.",
+    "serverRunnerStatus": "Hanji spracúva tento import na serveri. Zatvorenie alebo obnovenie tejto karty ho nepozastaví.",
+    "serverRunningHint": "Import pokračuje na pozadí. Túto kartu môžete zavrieť."
   },
   "installer": {
     "elapsed": "Uplynulý čas",
@@ -281,9 +283,9 @@
     "title": "Import z Hanji",
     "fromFile": "Zo súboru",
     "fromLive": "Z bežiacej inštancie",
-    "choose": "Vyberte súbor .hanji.json",
+    "choose": "Vyberte súbor .hanji.json alebo .hanji.zip",
     "chooseButton": "Vybrať súbor",
-    "fileHint": "Exportujte stránku, databázu alebo pracovný priestor z iného Hanji a potom ho importujte sem. Vzťahy, súhrny, vzorce, zobrazenia a šablóny sa zachovávajú. Prílohy nie sú zahrnuté.",
+    "fileHint": "Použite .hanji.json len pre štruktúru (súbory sú vylúčené) alebo .hanji.zip pre bezstratový prenos (súbory sú zahrnuté). Vzťahy, rollupy, vzorce, zobrazenia a šablóny sú zachované.",
     "selected": "Vybrané: {{name}}",
     "importButton": "Importovať",
     "importing": "Importuje sa...",
@@ -294,7 +296,7 @@
     "remoteTokenOptional": "voliteľné",
     "fetch": "Získať export",
     "fetching": "Načítava sa...",
-    "liveHint": "Pritiahnite pracovný priestor priamo z iného bežiaceho Hanji (napríklad Docker dev inštancie). Vzdialený server musí povoľovať požiadavky z tejto adresy.",
+    "liveHint": "Stiahnuť pracovný priestor priamo z iného spusteného Hanji (napríklad Docker dev inštancie). Súbory sú vylúčené. Vzdialený musí povoliť požiadavky z tejto adresy.",
     "review": "Pripravené na import: {{summary}}",
     "placeholderNote": "Niektoré prílohy boli ponechané ako zástupné symboly.",
     "importedItems_one": "Importovaná {{count}} položka z Hanji súboru.",
@@ -302,9 +304,15 @@
     "cantRead": "Nepodarilo sa čítať súbor Hanji.",
     "cantImport": "Nepodarilo sa importovať súbor Hanji.",
     "needFile": "Najprv vyberte Hanji súbor.",
-    "needRemote": "Zadajte URL vzdialeného Hanji a ID pracovného priestoru."
+    "needRemote": "Zadajte URL vzdialeného Hanji a ID pracovného priestoru.",
+    "filesExcluded": "Súbory sú vylúčené.",
+    "filesIncluded": "Súbory sú zahrnuté."
   },
   "connectWithNotion": "Pripojiť cez Notion",
   "oauthConfiguredHint": "Tento server má nakonfigurovanú Notion OAuth integráciu. Nastavenie tokenu zostáva k dispozícii pre self-hosted pripojenia.",
-  "cantStartOAuth": "Nepodarilo sa spustiť pripojenie k Notionu."
+  "cantStartOAuth": "Nepodarilo sa spustiť pripojenie k Notionu.",
+  "terminal": {
+    "cancelled": "Import bol zrušený. Keď budete pripravení, môžete ho bezpečne spustiť znova.",
+    "failed": "Import sa bezpečne zastavil pred dokončením. Skontrolujte pripojenie a skúste to znova. Technické podrobnosti a identifikátory sú tu skryté."
+  }
 }

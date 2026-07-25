@@ -35,7 +35,7 @@
     "rename": "名前を変更",
     "addPageInside": "内部にページを追加",
     "exportAsMarkdown": "Markdownとしてエクスポート",
-    "exportAsHanjiFile": "Hanjiファイルとしてエクスポート",
+    "exportAsHanjiFile": "Hanji JSONをエクスポート（ファイル除く）",
     "importMarkdown": "Markdownをインポート",
     "importing": "インポート中...",
     "unlockPage": "ページのロックを解除",
@@ -44,7 +44,8 @@
     "removeVerification": "認証を削除",
     "verifyPage": "ページを認証",
     "customizePage": "ページをカスタマイズ",
-    "undo": "元に戻す"
+    "undo": "元に戻す",
+    "exportAsHanjiArchive": "Hanjiアーカイブをエクスポート（ファイル含む）"
   },
   "customize": {
     "summaryDefault": "デフォルト",
@@ -101,6 +102,8 @@
     "movedToTrash": "ゴミ箱に移動しました",
     "restoredPage": "ページを復元しました",
     "couldntRestorePage": "ページを復元できませんでした",
-    "couldntMoveToTrash": "ゴミ箱に移動できませんでした"
+    "couldntMoveToTrash": "ゴミ箱に移動できませんでした",
+    "couldntExportHanjiArchive": "Hanjiアーカイブをエクスポートできませんでした。",
+    "exportedHanjiArchive": "ファイルを含むHanjiアーカイブをエクスポートしました。"
   }
 }

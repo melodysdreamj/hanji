@@ -6,5 +6,6 @@
   "unreachable": "Server əlçatmaz",
   "unreachablePending_one": "Server əlçatmaz · {{count}} dəyişiklik gözləyir",
   "unreachablePending_other": "Server əlçatmaz · {{count}} dəyişiklik gözləyir",
-  "retryHint": "Yenidən cəhd etmək üçün klikləyin"
+  "retryHint": "Yenidən cəhd etmək üçün klikləyin",
+  "confirmed": "Serverə qeyd edildi"
 }

@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} حالیہ اپ ڈیٹس",
     "unreadOfTotal": "{{total}} اپ ڈیٹس میں سے {{unread}} نہ پڑھے",
     "updateType": "اپ ڈیٹ کی قسم",
-    "updates": "اپ ڈیٹس",
-    "modeUpdates": "اپ ڈیٹس",
-    "modeChats": "چیٹس",
-    "inboxMode": "ان باکس موڈ"
+    "updates": "اپ ڈیٹس"
   },
   "time": {
     "justNow": "ابھی",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} ورژن",
     "versionsAgo": "{{count}} ورژن پہلے",
     "versionsAhead": "{{count}} ورژن آگے",
-    "versionsAria": "ورژنز"
+    "versionsAria": "ورژنز",
+    "emptyBlock": "خالی بلاک",
+    "emptyPreview": "اس ورژن میں کوئی صفحہ مواد نہیں ہے۔",
+    "previewAria": "صرف پڑھنے کے لیے صفحہ ورژن پیش نظارہ",
+    "previewingCurrent": "موجودہ صفحہ دیکھ رہے ہیں",
+    "previewingSnapshot": "گزشتہ ورژن دیکھ رہے ہیں",
+    "previewOnlyHint": "ورژن منتخب کرنے سے صرف پیش نظارہ ہوتا ہے۔ موجودہ صفحہ صرف بحال کرنے کے بعد تبدیل ہوتا ہے۔",
+    "restoreThisVersion": "بحال کریں",
+    "restoring": "بحال ہو رہا ہے...",
+    "versionHistory": "ورژن کی تاریخ"
   },
   "badges": {
     "comment": "تبصرہ",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} کا تذکرہ · {{preview}}",
     "referenceLink": "{{title}} کا لنک · {{preview}}",
     "unreadDot": "نہ پڑھا",
-    "workspaceUpdate": "ورکسپیس اپ ڈیٹ"
+    "workspaceUpdate": "ورکسپیس اپ ڈیٹ",
+    "bySelf": "آپ کے ذریعے"
   },
   "empty": {
     "allCaughtUp": "تمام دیکھ لیا گیا",

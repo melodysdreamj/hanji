@@ -1,7 +1,9 @@
 {
   "toggle": {
     "count_one": "{{count}} зворотне посилання",
-    "count_other": "{{count}} зворотних посилань"
+    "count_other": "{{count}} зворотних посилань",
+    "partial_one": "{{count}}+ зворотне посилання",
+    "partial_other": "{{count}}+ зворотних посилань"
   },
   "header": {
     "title": "Пов'язані згадки"
@@ -10,7 +12,8 @@
     "mention_one": "{{count}} згадка",
     "mention_other": "{{count}} згадок",
     "link_one": "{{count}} посилання",
-    "link_other": "{{count}} посилань"
+    "link_other": "{{count}} посилань",
+    "loaded": "Завантажено: {{summary}}"
   },
   "kind": {
     "mention": "Згадка",
@@ -18,6 +21,9 @@
   },
   "more": {
     "count_one": "Ще {{count}} зворотне посилання",
-    "count_other": "Ще {{count}} зворотних посилань"
+    "count_other": "Ще {{count}} зворотних посилань",
+    "load": "Завантажити більше зворотних посилань",
+    "loading": "Завантаження зворотних посилань…",
+    "search": "Пошук зворотних посилань"
   }
 }

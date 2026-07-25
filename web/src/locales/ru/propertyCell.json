@@ -92,5 +92,8 @@
     "Пт",
     "Сб"
   ],
-  "you": "Вы"
+  "you": "Вы",
+  "buttonExecutionFailed": "Не удалось выполнить кнопку.",
+  "loadingMoreRelations": "Загрузка дополнительных связей...",
+  "loadMoreRelations": "Загрузить ещё связи"
 }

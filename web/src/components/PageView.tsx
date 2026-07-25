@@ -7,6 +7,10 @@ import { pageFaviconHref, setDocumentChrome } from "@/lib/documentChrome";
 import { syntheticNotionImportRootLandingPage } from "@/lib/importedNotionUi";
 import { motionSafeScrollBehavior } from "@/lib/motion";
 import { pageHref, sharedPageHref } from "@/lib/navigation";
+import {
+  expandRelatedDatabaseMetadataIds,
+  pageDatabaseMetadataRoots,
+} from "@/lib/pageDatabaseReadHints";
 import { pageDisplayTitle } from "@/lib/pageTitle";
 import {
   publishPageAwareness,
@@ -15,10 +19,12 @@ import {
   type PageAwarenessTextRange,
 } from "@/lib/pagePresence";
 import {
+  createPageBlockCatchupCoordinator,
   PAGE_ROOM_MUTATION_RECEIVED_EVENT,
   type PageRoomMutationReceived,
 } from "@/lib/pageRoomEvents";
 import { canCommentPage, canEditPage } from "@/lib/permissions";
+import { matchesKeyboardShortcut } from "@/lib/keyboardShortcuts";
 import { useStore } from "@/lib/store";
 import { TopBar } from "./TopBar";
 import { PageCover } from "./PageCover";
@@ -26,6 +32,7 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { PageHeader } from "./PageHeader";
 import { PagePresence } from "./PagePresence";
 import { PageFindBar, selectedTextForPageFind } from "./PageFindBar";
+import { WikiView } from "./WikiView";
 import styles from "./PageView.module.css";
 
 const Editor = lazy(() => import("./editor/Editor").then(({ Editor }) => ({ default: Editor })));
@@ -47,6 +54,13 @@ const TOGGLE_BLOCK_TYPES = new Set([
   "toggle_heading_2",
   "toggle_heading_3",
 ]);
+
+// One module-level coordinator survives route/component remounts. The map
+// inside it keeps different pages isolated while same-page room/lifecycle
+// bursts share one force read plus at most one queued fresh generation.
+const pageBlockCatchup = createPageBlockCatchupCoordinator((pageId) =>
+  useStore.getState().loadBlocks(pageId, { force: true })
+);
 
 function currentHashTargetId() {
   if (typeof window === "undefined") return "";
@@ -78,16 +92,29 @@ export function PageView({
   pageId,
   publicReadOnly = false,
   sharedToken,
+  hideTopBar = false,
 }: {
   pageId: string;
   publicReadOnly?: boolean;
   sharedToken?: string;
+  hideTopBar?: boolean;
 }) {
   const { t } = useTranslation(["pageView", "common"]);
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const docRef = useRef<HTMLDivElement>(null);
   const page = useStore((s) => s.pagesById[pageId]);
+  const pagesById = useStore((s) => s.pagesById);
+  const hierarchyChildren = useMemo(
+    () =>
+      Object.values(pagesById)
+        .filter(
+          (child) =>
+            !child.inTrash && child.parentType === "page" && child.parentId === pageId,
+        )
+        .sort((left, right) => left.position - right.position || left.id.localeCompare(right.id)),
+    [pageId, pagesById],
+  );
   const rowDatabaseId =
     page?.parentType === "database" && page.parentId ? page.parentId : null;
   const rowDatabaseViews = useStore((s) =>
@@ -98,10 +125,28 @@ export function PageView({
     null;
   const ready = useStore((s) => s.ready);
   const blocksLoaded = useStore((s) => s.loadedBlockPages.has(pageId));
+  const blockPageEntryRef = useRef({
+    loadedAtEntry: blocksLoaded,
+    pageId,
+  });
+  useLayoutEffect(() => {
+    if (blockPageEntryRef.current.pageId === pageId) return;
+    // Capture the new page's state at the committed page-entry boundary. Keep
+    // it stable when that page's ordinary initial load later marks it loaded;
+    // otherwise a slower first room connection would start a duplicate force
+    // read. This layout effect also handles prop-driven A -> B -> A navigation
+    // within one PageView instance without relying on a component remount.
+    blockPageEntryRef.current = { loadedAtEntry: blocksLoaded, pageId };
+  }, [blocksLoaded, pageId]);
   const commentsLoaded = useStore((s) => s.loadedCommentPages.has(pageId));
   const blocks = useStore((s) => s.blocksByPage[pageId] ?? EMPTY_PAGE_BLOCKS);
   const loadBlocks = useStore((s) => s.loadBlocks);
   const loadComments = useStore((s) => s.loadComments);
+  const databaseMetadataRoots = useMemo(
+    () => pageDatabaseMetadataRoots(page, blocks),
+    [blocks, page]
+  );
+  const databaseMetadataRootsKey = databaseMetadataRoots.join("|");
   const recordPageVisit = useStore((s) => s.recordPageVisit);
   const restorePage = useStore((s) => s.restorePage);
   const notify = useStore((s) => s.notify);
@@ -183,6 +228,21 @@ export function PageView({
     return byBlock;
   }, [awarenessList]);
 
+  const requestCanonicalBlockCatchup = useCallback(() => {
+    const state = useStore.getState();
+    const currentPage = state.pagesById[pageId];
+    if (!state.ready || publicReadOnly || !currentPage || currentPage.inTrash) {
+      return Promise.resolve();
+    }
+    return pageBlockCatchup.request(pageId).catch((error: unknown) => {
+      const status = (error as { status?: unknown; code?: unknown } | null)?.status ??
+        (error as { code?: unknown } | null)?.code;
+      if (status === 401 || status === 403 || status === 404) {
+        setBlocksDeniedPageId(pageId);
+      }
+    });
+  }, [pageId, publicReadOnly]);
+
   useEffect(() => {
     function onRoomMutation(event: Event) {
       const detail = (event as CustomEvent<PageRoomMutationReceived>).detail;
@@ -196,15 +256,51 @@ export function PageView({
         return;
       }
       if (detail.kind === "comments_changed") {
-        // Force past the SWR rate limit — the signal means the server HAS
-        // newer comments right now.
-        void useStore.getState().loadComments(pageId, { force: true }).catch(() => {});
+        void useStore.getState().refreshCommentsFromSignal(pageId).catch(() => {});
+        return;
+      }
+      if (detail.kind === "block_structure_changed") {
+        // Room state is only an invalidation signal. Canonical blocks/outbox
+        // remain the sole durable authority, so never apply a peer snapshot or
+        // legacy operation directly here.
+        void requestCanonicalBlockCatchup();
       }
     }
 
     window.addEventListener(PAGE_ROOM_MUTATION_RECEIVED_EVENT, onRoomMutation);
     return () => window.removeEventListener(PAGE_ROOM_MUTATION_RECEIVED_EVENT, onRoomMutation);
-  }, [pageId]);
+  }, [pageId, requestCanonicalBlockCatchup]);
+
+  useEffect(() => {
+    if (!ready || publicReadOnly || !page || page.inTrash) return;
+    const onFocus = () => void requestCanonicalBlockCatchup();
+    const onOnline = () => void requestCanonicalBlockCatchup();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") void requestCanonicalBlockCatchup();
+    };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("online", onOnline);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("online", onOnline);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [page, publicReadOnly, ready, requestCanonicalBlockCatchup]);
+
+  useEffect(() => {
+    if (presence.status !== "connected") return;
+    // A page that was already loaded when this page entry began can have missed
+    // room mutations while another route was active, so its first connection
+    // is a freshness boundary. A fresh-at-entry page stays owned by the
+    // ordinary initial load below even if that read settles before presence.
+    if (
+      blockPageEntryRef.current.pageId === pageId &&
+      blockPageEntryRef.current.loadedAtEntry
+    ) {
+      void requestCanonicalBlockCatchup();
+    }
+  }, [pageId, presence.status, requestCanonicalBlockCatchup]);
   const findRevision = useMemo(
     () =>
       [
@@ -282,6 +378,21 @@ export function PageView({
   }, [ready, page, pageId, loadBlocks, loadComments, publicReadOnly]);
 
   useEffect(() => {
+    if (!ready || publicReadOnly || !page || page.inTrash || !databaseMetadataRootsKey) return;
+    const state = useStore.getState();
+    const databaseIds = expandRelatedDatabaseMetadataIds(
+      databaseMetadataRoots,
+      state.propsByDb
+    );
+    // Register all small schema reads synchronously. The shared page-read
+    // batcher then combines them with comments from the effect above, while
+    // selected-view rows remain on their independent paginated path.
+    for (const databaseId of databaseIds) {
+      void state.loadDatabase(databaseId, { rows: false }).catch(() => {});
+    }
+  }, [databaseMetadataRoots, databaseMetadataRootsKey, page, publicReadOnly, ready]);
+
+  useEffect(() => {
     setBlocksDeniedPageId(null);
   }, [pageId]);
 
@@ -309,9 +420,7 @@ export function PageView({
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.defaultPrevented) return;
-      if (!(e.metaKey || e.ctrlKey) || e.shiftKey || e.altKey) return;
-      if (e.key.toLowerCase() !== "f") return;
+      if (!matchesKeyboardShortcut("findInPage", e)) return;
       if ((!ready && !publicReadOnly) || !page || page.inTrash) return;
       e.preventDefault();
       setFindInitialQuery(selectedTextForPageFind(docRef.current));
@@ -480,13 +589,34 @@ export function PageView({
     );
   }
 
+  const pageEditor = page.kind === "page" ? (
+    <Editor
+      pageId={pageId}
+      hierarchyChildren={hierarchyChildren}
+      readOnly={readOnly}
+      canComment={canComment}
+      publicReadOnly={publicReadOnly}
+      sharedToken={sharedToken}
+      remoteAwareness={presence.awareness}
+      showPageStarter={!rowDatabaseId}
+      emptyBodyPrompt={
+        rowDatabaseId && !publicReadOnly
+          ? t("pageView:emptyBodyPrompt")
+          : undefined
+      }
+      skipRemoteLoad={publicReadOnly}
+    />
+  ) : null;
+
   return (
     <>
-      <TopBar
-        {...(publicReadOnly ? { title: pageDisplayTitle(page) } : { pageId })}
-        presence={presenceEnabled ? presence : undefined}
-        scrolled={topbarScrolled}
-      />
+      {!hideTopBar && (
+        <TopBar
+          {...(publicReadOnly ? { title: pageDisplayTitle(page) } : { pageId })}
+          presence={presenceEnabled ? presence : undefined}
+          scrolled={topbarScrolled}
+        />
+      )}
       <PageFindBar
         focusTick={findFocusTick}
         initialQuery={findInitialQuery}
@@ -514,9 +644,9 @@ export function PageView({
           data-has-root-column-list={hasRootColumnList ? "true" : "false"}
           data-has-inline-database={hasRootInlineDatabase ? "true" : "false"}
         >
-          <PageHeader pageId={pageId} readOnly={readOnly} publicReadOnly={publicReadOnly} canComment={canComment} />
           <ErrorBoundary scope="page-content" key={pageId}>
             <Suspense fallback={<ContentFallback />}>
+            <PageHeader pageId={pageId} readOnly={readOnly} publicReadOnly={publicReadOnly} canComment={canComment} />
             {page.kind === "database" ? (
               <DatabaseView
                 db={page}
@@ -552,22 +682,9 @@ export function PageView({
                     showPropertyControls={false}
                   />
                 )}
-                <Editor
-                  pageId={pageId}
-                  collaborationStatus={presence.status}
-                  readOnly={readOnly}
-                  canComment={canComment}
-                  publicReadOnly={publicReadOnly}
-                  sharedToken={sharedToken}
-                  remoteAwareness={presence.awareness}
-                  showPageStarter={!rowDatabaseId}
-                  emptyBodyPrompt={
-                    rowDatabaseId && !publicReadOnly
-                      ? t("pageView:emptyBodyPrompt")
-                      : undefined
-                  }
-                  skipRemoteLoad={publicReadOnly}
-                />
+                {page.isWiki && page.wikiRootId === page.id && !publicReadOnly ? (
+                  <WikiView root={page}>{pageEditor}</WikiView>
+                ) : pageEditor}
               </>
             )}
             </Suspense>

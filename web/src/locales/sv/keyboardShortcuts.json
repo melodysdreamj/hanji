@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Lägg till kommentar",
+    "addLink": "Lägg till länk",
+    "blockColor": "Använd senast använda färg",
+    "bold": "Fetstil",
+    "copyPageLink": "Kopiera sidlänk",
+    "findInPage": "Sök på sidan",
+    "inlineCode": "Inline-kod",
+    "italic": "Kursiv",
+    "moveBlock": "Flytta block till annan sida",
+    "moveBlockDown": "Flytta block ned",
+    "moveBlockUp": "Flytta block upp",
+    "movePage": "Flytta aktuell sida",
+    "navigateBack": "Gå bakåt",
+    "navigateForward": "Gå framåt",
+    "newPage": "Ny sida",
+    "openBlockMenu": "Öppna blockåtgärder",
+    "openKeyboardShortcuts": "Öppna kortkommandon",
+    "openParentPage": "Öppna överordnad sida",
+    "quickFind": "Snabbsök",
+    "strikethrough": "Genomstrykning",
+    "toggleAllToggles": "Expandera eller komprimera alla togglar",
+    "toggleSidebar": "Växla sidofält",
+    "toggleTheme": "Växla mörkt läge",
+    "underline": "Understrykning"
+  },
+  "categories": {
+    "createStyle": "Skapa & formatera",
+    "editMove": "Redigera & flytta",
+    "popular": "Populära"
+  },
+  "categoriesLabel": "Kortkommandokategorier",
+  "close": "Stäng",
+  "closeBackdrop": "Stäng kortkommandon",
+  "empty": "Inga kortkommandon hittades",
+  "keysFor": "Kortkommandon för {{action}}",
+  "or": "eller",
+  "searchLabel": "Sök kortkommandon",
+  "searchPlaceholder": "Sök kortkommandon…",
+  "searchResults": "Sökresultat",
+  "searchTerms": {
+    "toggleTheme": "tema ljust mörkt utseende"
+  },
+  "title": "Kortkommandon"
+}

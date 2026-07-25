@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "ワークスペースメニューを開く",
   "closeWorkspaceMenu": "ワークスペースメニューを閉じる",
   "workspaceMenu": "ワークスペースメニュー",
-  "exportWorkspace": "ワークスペースをエクスポート",
+  "exportWorkspace": "ワークスペースJSONをエクスポート（ファイル除く）",
   "exportedWorkspace": "ワークスペースをHanjiファイルとしてエクスポートしました",
   "exportedWorkspaceWithPlaceholders": "ワークスペースをHanjiファイルとしてエクスポートしました。添付ファイルはプレースホルダーとして残されました。",
   "couldntExportWorkspace": "ワークスペースをエクスポートできませんでした。",
@@ -76,5 +76,12 @@
     "later": "後で",
     "note": "後でいつでもサイドバーのインポートから開始できます。",
     "title": "NotionデータをHanjiにインポートしますか？"
-  }
+  },
+  "addPageToTeamspace": "{{name}}にページを追加",
+  "couldntExportWorkspaceArchive": "ワークスペースアーカイブをエクスポートできませんでした。",
+  "exportedWorkspaceArchive": "ファイルを含むワークスペースアーカイブをエクスポートしました。",
+  "exportWorkspaceArchive": "ワークスペースアーカイブをエクスポート（ファイル含む）",
+  "joinTeamspaces": "チームスペースに参加",
+  "keyboardShortcuts": "キーボードショートカット",
+  "teamspacePages": "{{name}}のページ"
 }

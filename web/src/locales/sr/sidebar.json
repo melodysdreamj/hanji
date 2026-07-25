@@ -12,7 +12,7 @@
   "openWorkspaceMenu": "Otvori meni radnog prostora",
   "closeWorkspaceMenu": "Zatvori meni radnog prostora",
   "workspaceMenu": "Meni radnog prostora",
-  "exportWorkspace": "Izvezi radni prostor",
+  "exportWorkspace": "Izvezi radni prostor kao JSON (bez datoteka)",
   "exportedWorkspace": "Radni prostor izvezen kao Hanji fajl.",
   "exportedWorkspaceWithPlaceholders": "Radni prostor izvezen kao Hanji fajl — prilozi su ostavljeni kao rezervna mesta.",
   "couldntExportWorkspace": "Izvoz radnog prostora nije uspeo.",
@@ -76,5 +76,12 @@
     "later": "Možda kasnije",
     "note": "Ovo uvek možete pokrenuti kasnije iz opcije Uvoz u bočnoj traci.",
     "title": "Prebacite svoj Notion radni prostor u Hanji?"
-  }
+  },
+  "addPageToTeamspace": "Dodaj stranicu u {{name}}",
+  "couldntExportWorkspaceArchive": "Neuspešno izvoženje arhive radnog prostora.",
+  "exportedWorkspaceArchive": "Izvezena arhiva radnog prostora sa datotekama.",
+  "exportWorkspaceArchive": "Izvezi arhivu radnog prostora (sa datotekama)",
+  "joinTeamspaces": "Pridruži se timskim prostorima",
+  "keyboardShortcuts": "Prečice na tastaturi",
+  "teamspacePages": "{{name}} stranice"
 }

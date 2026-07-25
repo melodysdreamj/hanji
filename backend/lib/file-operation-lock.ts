@@ -1,5 +1,6 @@
 import {
   getExisting,
+  isTransactionConflictError,
   listAll,
   narrowWhere,
   newId,
@@ -11,7 +12,23 @@ import {
 const FILE_OPERATION_LEASE_TTL_MS = 30 * 60 * 1000;
 const FILE_OPERATION_RECOVERY_RETRY_MS = 5 * 60 * 1000;
 const FILE_OPERATION_LEASE_ATTEMPTS = 8;
+const FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS = 64;
 const FILE_OPERATION_LEASE_RETRY_BASE_MS = 25;
+const FILE_OPERATION_LEASE_MAX_RETRY_MS = 200;
+const FILE_OPERATION_LEASE_MAX_CONTENTION_WAIT_MS = 10_000;
+const FILE_OPERATION_SCOPE_ADMISSION_RETRY_BASE_MS = 5;
+const FILE_OPERATION_SCOPE_ADMISSION_MAX_RETRY_MS = 50;
+const FILE_OPERATION_MAX_COMPATIBLE_SCOPES = 64;
+const FILE_OPERATION_MAX_SCOPE_KEY_LENGTH = 240;
+const FILE_OPERATION_SCOPE_REGISTRY_ACTOR = 'system:file-operation-scope-registry';
+const FILE_OPERATION_SCOPE_REGISTRY_OPERATION = 'compatible-scope-registry';
+
+interface CompatibleFileWorkspaceLease {
+  leaseId: string;
+  actorId: string;
+  operation: string;
+  expiresAt: string;
+}
 
 interface FileWorkspaceLock {
   id: string;
@@ -21,11 +38,17 @@ interface FileWorkspaceLock {
   operation: string;
   recoveryData?: unknown;
   expiresAt: string;
+  revisionId?: string;
+  compatibleScopes?: Record<string, CompatibleFileWorkspaceLease>;
 }
 
 export interface FileWorkspaceLease {
   id: string;
   leaseId: string;
+  scopeKey?: string;
+  registryRevisionId?: string;
+  registryExpiresAt?: string;
+  registrySoleOwner?: boolean;
 }
 
 export interface FileWorkspaceLeaseGuard {
@@ -34,6 +57,15 @@ export interface FileWorkspaceLeaseGuard {
   renew(): Promise<void>;
   setRecoveryData(data: unknown): Promise<void>;
   preserveForRecovery(): void;
+}
+
+export class ExclusiveFileWorkspaceLeaseRequired extends Error {}
+
+export function requireExclusiveFileWorkspaceLease(
+  guard: FileWorkspaceLeaseGuard,
+  required: boolean,
+) {
+  if (required && guard.lease.scopeKey) throw new ExclusiveFileWorkspaceLeaseRequired();
 }
 
 interface TableRef<T> extends TableQuery<T> {
@@ -50,6 +82,7 @@ interface FileDeletionFence {
   workspaceId?: string;
   parentId?: string | null;
   parentType?: string;
+  subitemParentId?: string;
   deletionPendingAt?: string | null;
 }
 
@@ -61,7 +94,7 @@ function collectDeletionSubtree(pages: FileDeletionFence[], rootId: string) {
     if (ids.has(id)) continue;
     ids.add(id);
     for (const page of pages) {
-      if (page.parentId === id) pending.push(page.id);
+      if (page.parentId === id || page.subitemParentId === id) pending.push(page.id);
     }
   }
   return ids;
@@ -71,20 +104,140 @@ function sameIds(actual: Set<string>, expected: Set<string>) {
   return actual.size === expected.size && Array.from(expected).every((id) => actual.has(id));
 }
 
-function conflict(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  const code = typeof error === 'object' && error !== null
-    ? (error as { code?: unknown; status?: unknown }).code ?? (error as { status?: unknown }).status
-    : undefined;
-  return code === 409 || /expectation failed|already exists|conflict/i.test(message);
-}
-
 export function fileOperationConflict(message: string): Error & { code: number } {
   return Object.assign(new Error(message), { code: 409 });
 }
 
-function waitForLeaseAttempt(attempt: number) {
-  const delay = Math.min(200, FILE_OPERATION_LEASE_RETRY_BASE_MS * (attempt + 1));
+function stableLeaseRetryJitter(seed: string, attempt: number, range: number) {
+  let hash = 2_166_136_261 ^ attempt;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16_777_619);
+  }
+  return (hash >>> 0) % Math.max(1, range);
+}
+
+function compatibleScopeKey(value: string | undefined) {
+  if (value === undefined) return undefined;
+  const normalized = value.trim();
+  if (!normalized || normalized.length > FILE_OPERATION_MAX_SCOPE_KEY_LENGTH) {
+    throw new Error('File operation scope is invalid.');
+  }
+  return normalized;
+}
+
+export function databaseFileWorkspaceLeaseScope(databaseId: string) {
+  const normalized = databaseId.trim();
+  if (!normalized) throw new Error('Database id is required for a file operation scope.');
+  return compatibleScopeKey(`database:${normalized}`)!;
+}
+
+function parsedCompatibleScopes(lock: FileWorkspaceLock | null) {
+  const value = lock?.compatibleScopes;
+  if (value === undefined || value === null) return new Map<string, CompatibleFileWorkspaceLease>();
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw fileOperationConflict('File operation scope registry is malformed.');
+  }
+  const entries = Object.entries(value);
+  if (entries.length > FILE_OPERATION_MAX_COMPATIBLE_SCOPES) {
+    throw Object.assign(new Error('Too many compatible file operations are active.'), { code: 429 });
+  }
+  const scopes = new Map<string, CompatibleFileWorkspaceLease>();
+  for (const [scopeKey, candidate] of entries) {
+    let normalizedScopeKey: string | undefined;
+    try {
+      normalizedScopeKey = compatibleScopeKey(scopeKey);
+    } catch {
+      throw fileOperationConflict('File operation scope registry is malformed.');
+    }
+    if (
+      normalizedScopeKey !== scopeKey
+      || !candidate
+      || typeof candidate !== 'object'
+      || Array.isArray(candidate)
+    ) {
+      throw fileOperationConflict('File operation scope registry is malformed.');
+    }
+    const entry = candidate as Partial<CompatibleFileWorkspaceLease>;
+    if (
+      typeof entry.leaseId !== 'string'
+      || !entry.leaseId
+      || typeof entry.actorId !== 'string'
+      || !entry.actorId
+      || typeof entry.operation !== 'string'
+      || !entry.operation
+      || typeof entry.expiresAt !== 'string'
+      || !Number.isFinite(Date.parse(entry.expiresAt))
+    ) {
+      throw fileOperationConflict('File operation scope registry is malformed.');
+    }
+    scopes.set(scopeKey, entry as CompatibleFileWorkspaceLease);
+  }
+  return scopes;
+}
+
+function activeCompatibleScopes(lock: FileWorkspaceLock | null, now: number) {
+  return new Map(
+    Array.from(parsedCompatibleScopes(lock))
+      .filter(([, entry]) => Date.parse(entry.expiresAt) > now),
+  );
+}
+
+function fileWorkspaceLockCasWhere(lock: FileWorkspaceLock) {
+  const where: Array<[string, '==', unknown]> = [
+    ['leaseId', '==', lock.leaseId],
+    ['expiresAt', '==', lock.expiresAt],
+  ];
+  if (lock.revisionId !== undefined) where.push(['revisionId', '==', lock.revisionId]);
+  else where.push(['revisionId', '==', null]);
+  return where;
+}
+
+function compatibleScopeRegistryData(
+  workspaceId: string,
+  scopes: ReadonlyMap<string, CompatibleFileWorkspaceLease>,
+) {
+  const revisionId = newId();
+  const expiresAt = Array.from(scopes.values())
+    .map((entry) => entry.expiresAt)
+    .sort()
+    .at(-1);
+  if (!expiresAt) throw new Error('Compatible file operation registry cannot be empty.');
+  return {
+    workspaceId,
+    leaseId: revisionId,
+    actorId: FILE_OPERATION_SCOPE_REGISTRY_ACTOR,
+    operation: FILE_OPERATION_SCOPE_REGISTRY_OPERATION,
+    recoveryData: null,
+    expiresAt,
+    revisionId,
+    compatibleScopes: Object.fromEntries(scopes),
+    updatedAt: nowIso(),
+  };
+}
+
+function activeExclusiveWorkspaceLease(lock: FileWorkspaceLock | null, now: number) {
+  return !!lock
+    && lock.operation !== FILE_OPERATION_SCOPE_REGISTRY_OPERATION
+    && Date.parse(lock.expiresAt) > now;
+}
+
+function waitForLeaseAttempt(
+  attempt: number,
+  leaseId: string,
+  remainingMs = Number.POSITIVE_INFINITY,
+  jittered = false,
+  retryBaseMs = FILE_OPERATION_LEASE_RETRY_BASE_MS,
+  maxRetryMs = FILE_OPERATION_LEASE_MAX_RETRY_MS,
+) {
+  const base = Math.min(
+    maxRetryMs,
+    retryBaseMs * (attempt + 1),
+  );
+  const jitter = jittered
+    ? stableLeaseRetryJitter(leaseId, attempt, Math.ceil(base / 2))
+    : 0;
+  const delay = Math.max(1, Math.min(base + jitter, remainingMs));
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
@@ -204,19 +357,122 @@ export async function acquireFileWorkspaceLease(
   operation: string,
   options: {
     recoverMarkedLease?: boolean | ((recoveryData: unknown) => boolean);
+    contentionWaitMs?: number;
+    scopeKey?: string;
   } = {},
 ) {
   const locks = db.table<FileWorkspaceLock>('file_workspace_locks');
   const leaseId = newId();
-  for (let attempt = 0; attempt < FILE_OPERATION_LEASE_ATTEMPTS; attempt += 1) {
+  const scopeKey = compatibleScopeKey(options.scopeKey);
+  if (scopeKey && options.recoverMarkedLease !== undefined) {
+    throw new Error('Compatible file operation scopes cannot recover workspace operations.');
+  }
+  const extendedContentionWaitMs = options.contentionWaitMs === undefined
+    ? null
+    : Math.min(
+        FILE_OPERATION_LEASE_MAX_CONTENTION_WAIT_MS,
+        Math.max(0, Math.floor(options.contentionWaitMs)),
+      );
+  const startedAt = Date.now();
+  const contentionAttempts = extendedContentionWaitMs === null
+    ? FILE_OPERATION_LEASE_ATTEMPTS
+    : FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS;
+  let contentionAttempt = 0;
+  let compatibleAdmissionAttempt = 0;
+  const retryContention = async () => {
+    const attempt = contentionAttempt;
+    contentionAttempt += 1;
+    if (attempt === contentionAttempts - 1) return false;
+    if (extendedContentionWaitMs === null) {
+      await waitForLeaseAttempt(attempt, leaseId);
+      return true;
+    }
+    const remainingMs = extendedContentionWaitMs - (Date.now() - startedAt);
+    if (remainingMs <= 0) return false;
+    await waitForLeaseAttempt(attempt, leaseId, remainingMs, true);
+    return Date.now() - startedAt < extendedContentionWaitMs;
+  };
+  const retryCompatibleAdmission = async () => {
+    const attempt = compatibleAdmissionAttempt;
+    compatibleAdmissionAttempt += 1;
+    if (attempt === FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS - 1) return false;
+    await waitForLeaseAttempt(
+      attempt,
+      leaseId,
+      Number.POSITIVE_INFINITY,
+      true,
+      FILE_OPERATION_SCOPE_ADMISSION_RETRY_BASE_MS,
+      FILE_OPERATION_SCOPE_ADMISSION_MAX_RETRY_MS,
+    );
+    return true;
+  };
+
+  while (true) {
     const existing = await getExisting(locks, workspaceId);
-    if (existing && Date.parse(existing.expiresAt) > Date.now()) {
-      if (attempt === FILE_OPERATION_LEASE_ATTEMPTS - 1) {
+    const nowMs = Date.now();
+    const compatibleScopes = activeCompatibleScopes(existing, nowMs);
+    const exclusiveActive = activeExclusiveWorkspaceLease(existing, nowMs);
+    const sameScopeActive = scopeKey ? compatibleScopes.has(scopeKey) : false;
+    if (exclusiveActive || sameScopeActive || (!scopeKey && compatibleScopes.size > 0)) {
+      if (!(await retryContention())) {
         throw fileOperationConflict('Another file operation is already in progress for this workspace.');
       }
-      await waitForLeaseAttempt(attempt);
       continue;
     }
+
+    if (scopeKey) {
+      if (existing?.recoveryData != null) {
+        throw fileOperationConflict('A crashed file operation is waiting for recovery in this workspace.');
+      }
+      if (compatibleScopes.size >= FILE_OPERATION_MAX_COMPATIBLE_SCOPES) {
+        throw Object.assign(new Error('Too many compatible file operations are active.'), { code: 429 });
+      }
+      compatibleScopes.set(scopeKey, {
+        leaseId,
+        actorId,
+        operation,
+        expiresAt: new Date(nowMs + FILE_OPERATION_LEASE_TTL_MS).toISOString(),
+      });
+      const data = compatibleScopeRegistryData(workspaceId, compatibleScopes);
+      try {
+        if (existing) {
+          await db.transact([
+            {
+              table: 'file_workspace_locks',
+              op: 'expect',
+              id: existing.id,
+              where: fileWorkspaceLockCasWhere(existing),
+              exists: true,
+            },
+            { table: 'file_workspace_locks', op: 'update', id: existing.id, data },
+          ]);
+        } else {
+          await db.transact([
+            { table: 'file_workspace_locks', op: 'expect', id: workspaceId, exists: false },
+            {
+              table: 'file_workspace_locks',
+              op: 'insert',
+              data: { id: workspaceId, ...data, createdAt: nowIso() },
+            },
+          ]);
+        }
+        return {
+          id: workspaceId,
+          leaseId,
+          scopeKey,
+          registryRevisionId: data.revisionId,
+          registryExpiresAt: data.expiresAt,
+          registrySoleOwner: compatibleScopes.size === 1,
+        };
+      } catch (error) {
+        if (!isTransactionConflictError(error)) throw error;
+        if (!(await retryCompatibleAdmission())) {
+          throw fileOperationConflict('Another file operation is already in progress for this workspace.');
+        }
+        continue;
+      }
+    }
+
     const mayRecoverMarker = existing?.recoveryData != null && (
       options.recoverMarkedLease === true
       || (
@@ -234,7 +490,9 @@ export async function acquireFileWorkspaceLease(
       actorId,
       operation,
       recoveryData: existing?.recoveryData ?? null,
-      expiresAt: new Date(Date.now() + FILE_OPERATION_LEASE_TTL_MS).toISOString(),
+      expiresAt: new Date(nowMs + FILE_OPERATION_LEASE_TTL_MS).toISOString(),
+      revisionId: newId(),
+      compatibleScopes: {},
       updatedAt: now,
     };
     try {
@@ -244,7 +502,7 @@ export async function acquireFileWorkspaceLease(
             table: 'file_workspace_locks',
             op: 'expect',
             id: existing.id,
-            where: [['leaseId', '==', existing.leaseId]],
+            where: fileWorkspaceLockCasWhere(existing),
             exists: true,
           },
           { table: 'file_workspace_locks', op: 'update', id: existing.id, data },
@@ -261,17 +519,88 @@ export async function acquireFileWorkspaceLease(
       }
       return { id: workspaceId, leaseId };
     } catch (error) {
-      if (!conflict(error) || attempt === FILE_OPERATION_LEASE_ATTEMPTS - 1) throw error;
-      await waitForLeaseAttempt(attempt);
+      if (!isTransactionConflictError(error)) throw error;
+      if (!(await retryContention())) {
+        // Never leak an adapter-specific expectation message at the terminal
+        // boundary. The durable conflict is the workspace lease, not its SQL
+        // implementation detail.
+        throw fileOperationConflict('Another file operation is already in progress for this workspace.');
+      }
     }
   }
-  throw fileOperationConflict('Another file operation is already in progress for this workspace.');
 }
 
 export async function releaseFileWorkspaceLease(
   db: DbRef,
   lease: FileWorkspaceLease,
 ) {
+  if (lease.scopeKey) {
+    if (
+      lease.registrySoleOwner
+      && lease.registryRevisionId
+      && lease.registryExpiresAt
+    ) {
+      try {
+        await db.transact([
+          {
+            table: 'file_workspace_locks',
+            op: 'expect',
+            id: lease.id,
+            where: [
+              ['leaseId', '==', lease.registryRevisionId],
+              ['expiresAt', '==', lease.registryExpiresAt],
+              ['revisionId', '==', lease.registryRevisionId],
+            ],
+            exists: true,
+          },
+          { table: 'file_workspace_locks', op: 'delete', id: lease.id },
+        ]);
+        return;
+      } catch (error) {
+        if (!isTransactionConflictError(error)) throw error;
+      }
+    }
+    for (let attempt = 0; attempt < FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS; attempt += 1) {
+      const current = await getExisting(
+        db.table<FileWorkspaceLock>('file_workspace_locks'),
+        lease.id,
+      );
+      const scopes = activeCompatibleScopes(current, Date.now());
+      if (!current || scopes.get(lease.scopeKey)?.leaseId !== lease.leaseId) {
+        throw new Error('Transaction expectation failed: expected a matching file operation scope.');
+      }
+      scopes.delete(lease.scopeKey);
+      try {
+        await db.transact([
+          {
+            table: 'file_workspace_locks',
+            op: 'expect',
+            id: current.id,
+            where: fileWorkspaceLockCasWhere(current),
+            exists: true,
+          },
+          scopes.size === 0
+            ? { table: 'file_workspace_locks', op: 'delete', id: current.id }
+            : {
+                table: 'file_workspace_locks',
+                op: 'update',
+                id: current.id,
+                data: compatibleScopeRegistryData(current.workspaceId, scopes),
+              },
+        ]);
+        return;
+      } catch (error) {
+        if (
+          !isTransactionConflictError(error)
+          || attempt === FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS - 1
+        ) {
+          throw error;
+        }
+        await waitForLeaseAttempt(attempt, lease.leaseId, Number.POSITIVE_INFINITY, true);
+      }
+    }
+    return;
+  }
   await db.transact([
     {
       table: 'file_workspace_locks',
@@ -286,8 +615,16 @@ export async function releaseFileWorkspaceLease(
 
 export async function assertFileWorkspaceLease(db: DbRef, lease: FileWorkspaceLease) {
   const current = await getExisting(db.table<FileWorkspaceLock>('file_workspace_locks'), lease.id);
+  if (lease.scopeKey) {
+    const entry = activeCompatibleScopes(current, Date.now()).get(lease.scopeKey);
+    if (entry?.leaseId !== lease.leaseId) {
+      throw fileOperationConflict('File operation lease ownership was lost.');
+    }
+    return;
+  }
   if (
     !current
+    || current.operation === FILE_OPERATION_SCOPE_REGISTRY_OPERATION
     || current.leaseId !== lease.leaseId
     || !Number.isFinite(Date.parse(current.expiresAt))
     || Date.parse(current.expiresAt) <= Date.now()
@@ -297,6 +634,50 @@ export async function assertFileWorkspaceLease(db: DbRef, lease: FileWorkspaceLe
 }
 
 export async function renewFileWorkspaceLease(db: DbRef, lease: FileWorkspaceLease) {
+  if (lease.scopeKey) {
+    for (let attempt = 0; attempt < FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS; attempt += 1) {
+      const current = await getExisting(
+        db.table<FileWorkspaceLock>('file_workspace_locks'),
+        lease.id,
+      );
+      const scopes = activeCompatibleScopes(current, Date.now());
+      const entry = scopes.get(lease.scopeKey);
+      if (!current || entry?.leaseId !== lease.leaseId) {
+        throw fileOperationConflict('File operation lease ownership was lost.');
+      }
+      scopes.set(lease.scopeKey, {
+        ...entry,
+        expiresAt: new Date(Date.now() + FILE_OPERATION_LEASE_TTL_MS).toISOString(),
+      });
+      try {
+        await db.transact([
+          {
+            table: 'file_workspace_locks',
+            op: 'expect',
+            id: current.id,
+            where: fileWorkspaceLockCasWhere(current),
+            exists: true,
+          },
+          {
+            table: 'file_workspace_locks',
+            op: 'update',
+            id: current.id,
+            data: compatibleScopeRegistryData(current.workspaceId, scopes),
+          },
+        ]);
+        return;
+      } catch (error) {
+        if (
+          !isTransactionConflictError(error)
+          || attempt === FILE_OPERATION_LEASE_EXTENDED_ATTEMPTS - 1
+        ) {
+          throw error;
+        }
+        await waitForLeaseAttempt(attempt, lease.leaseId, Number.POSITIVE_INFINITY, true);
+      }
+    }
+    return;
+  }
   await assertFileWorkspaceLease(db, lease);
   await db.transact([
     {
@@ -320,6 +701,9 @@ export async function setFileWorkspaceLeaseRecoveryData(
   lease: FileWorkspaceLease,
   recoveryData: unknown,
 ) {
+  if (lease.scopeKey) {
+    throw new Error('Compatible file operation scopes cannot carry recovery data.');
+  }
   await assertFileWorkspaceLease(db, lease);
   await db.transact([
     {
@@ -343,6 +727,9 @@ export async function deferFileWorkspaceLeaseRecovery(
   lease: FileWorkspaceLease,
   options: { operation?: string; retryMs?: number } = {},
 ) {
+  if (lease.scopeKey) {
+    throw new Error('Compatible file operation scopes cannot be deferred for recovery.');
+  }
   await db.transact([
     {
       table: 'file_workspace_locks',
@@ -374,8 +761,10 @@ export async function withFileWorkspaceLease<T>(
   run: (guard: FileWorkspaceLeaseGuard) => Promise<T>,
   options: {
     recoverMarkedLease?: boolean | ((recoveryData: unknown) => boolean);
+    contentionWaitMs?: number;
     recoveryOperation?: string;
     recoveryRetryMs?: number;
+    scopeKey?: string;
   } = {},
 ) {
   const lease = await acquireFileWorkspaceLease(
@@ -383,7 +772,11 @@ export async function withFileWorkspaceLease<T>(
     workspaceId,
     actorId,
     operation,
-    { recoverMarkedLease: options.recoverMarkedLease },
+    {
+      recoverMarkedLease: options.recoverMarkedLease,
+      contentionWaitMs: options.contentionWaitMs,
+      scopeKey: options.scopeKey,
+    },
   );
   let preserveForRecovery = false;
   const guard: FileWorkspaceLeaseGuard = {
@@ -410,5 +803,39 @@ export async function withFileWorkspaceLease<T>(
         console.error(`[file-operation] failed to release ${operation} lease:`, error);
       });
     }
+  }
+}
+
+export async function withDatabaseFileWorkspaceLease<T>(
+  db: DbRef,
+  workspaceId: string,
+  databaseId: string,
+  actorId: string,
+  operation: string,
+  run: (guard: FileWorkspaceLeaseGuard) => Promise<T>,
+  options: { contentionWaitMs?: number } = {},
+) {
+  try {
+    return await withFileWorkspaceLease(
+      db,
+      workspaceId,
+      actorId,
+      operation,
+      run,
+      {
+        contentionWaitMs: options.contentionWaitMs,
+        scopeKey: databaseFileWorkspaceLeaseScope(databaseId),
+      },
+    );
+  } catch (error) {
+    if (!(error instanceof ExclusiveFileWorkspaceLeaseRequired)) throw error;
+    return withFileWorkspaceLease(
+      db,
+      workspaceId,
+      actorId,
+      operation,
+      run,
+      { contentionWaitMs: options.contentionWaitMs },
+    );
   }
 }

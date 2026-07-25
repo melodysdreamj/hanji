@@ -88,5 +88,38 @@
     "hoursAgo": "נערך לפני {{hours}} שעות",
     "daysAgo": "נערך לפני {{days}} ימים",
     "on": "נערך ב-{{date}}"
+  },
+  "align": {
+    "center": "מרכז",
+    "choose": "בחר יישור תמונה",
+    "left": "שמאל",
+    "right": "ימין"
+  },
+  "altText": {
+    "help": "טקסט חלופי עוזר לאנשים המשתמשים בקוראי מסך להבין את התמונה.",
+    "label": "תיאור",
+    "placeholder": "תאר את התמונה",
+    "remove": "הסר",
+    "save": "שמור",
+    "title": "טקסט חלופי"
+  },
+  "imageLink": {
+    "invalid": "הזן URL מלא שמתחיל ב-http:// או https://",
+    "label": "פתח URL זה בלחיצה על התמונה",
+    "remove": "הסר",
+    "save": "שמור",
+    "title": "קישור תמונה"
+  },
+  "media": {
+    "addImageLink": "הוסף קישור",
+    "align": "יישור",
+    "altText": "טקסט חלופי",
+    "copySourceLink": "העתק קישור מקור",
+    "download": "הורד",
+    "editImageLink": "ערוך קישור",
+    "fullScreen": "מסך מלא",
+    "openLink": "פתח קישור",
+    "replace": "החלף",
+    "viewOriginal": "צפה במקור"
   }
 }

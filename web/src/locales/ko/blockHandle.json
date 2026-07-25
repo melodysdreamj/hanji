@@ -35,6 +35,39 @@
   "turnMenu": {
     "chooseType": "블록 유형 선택"
   },
+  "media": {
+    "download": "다운로드",
+    "viewOriginal": "원본 보기",
+    "openLink": "링크 열기",
+    "copySourceLink": "원본 링크 복사",
+    "fullScreen": "전체 화면",
+    "align": "정렬",
+    "addImageLink": "링크 추가",
+    "editImageLink": "링크 편집",
+    "altText": "대체 텍스트",
+    "replace": "교체"
+  },
+  "align": {
+    "choose": "이미지 정렬 선택",
+    "left": "왼쪽",
+    "center": "가운데",
+    "right": "오른쪽"
+  },
+  "imageLink": {
+    "title": "이미지 링크",
+    "label": "이미지를 클릭할 때 열 URL",
+    "invalid": "http:// 또는 https://로 시작하는 전체 URL을 입력하세요.",
+    "remove": "제거",
+    "save": "저장"
+  },
+  "altText": {
+    "title": "대체 텍스트",
+    "label": "설명",
+    "placeholder": "이미지를 설명하세요",
+    "help": "대체 텍스트는 화면 읽기 사용자가 이미지를 이해하는 데 도움을 줍니다.",
+    "remove": "제거",
+    "save": "저장"
+  },
   "colorMenu": {
     "textColor": "글자 색",
     "backgroundColor": "배경 색"

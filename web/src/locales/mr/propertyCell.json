@@ -92,5 +92,8 @@
     "शु",
     "श"
   ],
-  "you": "तुम्ही"
+  "you": "तुम्ही",
+  "buttonExecutionFailed": "बटण चालवता आले नाही.",
+  "loadingMoreRelations": "अधिक संबंध लोड होत आहेत...",
+  "loadMoreRelations": "अधिक संबंध लोड करा"
 }

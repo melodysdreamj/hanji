@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Kapsyen video",
     "videoEmptyHint": "Muat naik fail video, tampal pautan terus, atau gunakan pautan YouTube, Vimeo, atau Loom.",
-    "videoLink": "Pautan video"
+    "videoLink": "Pautan video",
+    "audioPlaybackFailed": "Audio ini tidak dapat dimainkan. Gantikannya atau buka fail asal.",
+    "videoPlaybackFailed": "Video ini tidak dapat dimainkan. Gantikannya atau buka fail asal."
   },
   "bookmark": {
     "copy": "Salin pautan penanda buku",

@@ -38,7 +38,7 @@
   "moveTo": "നീക്കുക",
   "exporting": "കയറ്റുമതി ചെയ്യുന്നു…",
   "exportAsMarkdown": "മാർക്ക്ഡൗണായി എക്‌സ്പോർട്ട് ചെയ്യുക",
-  "exportAsHanji": "Hanji ഫയലായി എക്‌സ്പോർട്ട് ചെയ്യുക",
+  "exportAsHanji": "Hanji JSON കയറ്റുമതി ചെയ്യുക (ഫയലുകൾ ഒഴിവാക്കി)",
   "importing": "ഇറക്കുമതി ചെയ്യുന്നു…",
   "importMarkdown": "മാർക്ക്ഡൗൺ ഇറക്കുമതി",
   "unlockPage": "പേജ് അൺലോക്ക് ചെയ്യുക",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "ആക്സസ് അപ്ഡേറ്റ് ചെയ്യാനായില്ല",
     "removedFromAccessList": "ആക്സസ് ലിസ്റ്റിൽ നിന്ന് നീക്കം ചെയ്തു",
     "couldntRemoveAccess": "ആക്സസ് നീക്കം ചെയ്യാനായില്ല",
-    "couldntLoadAccessList": "ആക്സസ് ലിസ്റ്റ് ലോഡ് ചെയ്യാനായില്ല"
+    "couldntLoadAccessList": "ആക്സസ് ലിസ്റ്റ് ലോഡ് ചെയ്യാനായില്ല",
+    "couldntExportHanjiArchive": "Hanji ആർക്കൈവ് കയറ്റുമതി ചെയ്യാൻ കഴിഞ്ഞില്ല.",
+    "exportedHanjiArchive": "ഫയലുകളോടെ Hanji ആർക്കൈവ് കയറ്റുമതി ചെയ്തു."
   },
   "user": "ഉപയോക്താവ്",
   "whoHasAccess": "ആർക്കൊക്കെ ആക്സസ് ഉണ്ട്?",
   "workspace": "വർക്ക്സ്പേസ്",
   "workspaceCount_one": "{{count}} വർക്ക്സ്പേസ്",
   "workspaceCount_other": "{{count}} വർക്ക്സ്പേസുകൾ",
-  "you": "നിങ്ങൾ"
+  "you": "നിങ്ങൾ",
+  "exportAsHanjiArchive": "Hanji ആർക്കൈവ് കയറ്റുമതി ചെയ്യുക (ഫയലുകൾ ഉൾപ്പെടെ)",
+  "turnIntoWiki": "വിക്കിയാക്കുക",
+  "undoWiki": "വിക്കി പിൻവലിക്കുക",
+  "wikiCreated": "പേജ് വിക്കിയാക്കി",
+  "wikiPageSettings": "വിക്കി പേജ് ക്രമീകരണങ്ങൾ",
+  "wikiUndone": "വിക്കി നീക്കം ചെയ്തു; പേജ് ഉള്ളടക്കം നിലനിർത്തി",
+  "wikiUpdateFailed": "വിക്കി അപ്ഡേറ്റ് ചെയ്യാൻ കഴിഞ്ഞില്ല"
 }

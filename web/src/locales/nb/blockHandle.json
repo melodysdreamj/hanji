@@ -88,5 +88,38 @@
   },
   "turnMenu": {
     "chooseType": "Velg blokktype"
+  },
+  "align": {
+    "center": "Sentrert",
+    "choose": "Velg bildejustering",
+    "left": "Venstre",
+    "right": "Høyre"
+  },
+  "altText": {
+    "help": "Alternativ tekst hjelper skjermleserbrukere med å forstå bildet.",
+    "label": "Beskrivelse",
+    "placeholder": "Beskriv bildet",
+    "remove": "Fjern",
+    "save": "Lagre",
+    "title": "Alternativ tekst"
+  },
+  "imageLink": {
+    "invalid": "Skriv inn en fullstendig http:// eller https:// URL.",
+    "label": "Åpne denne URL-en når bildet klikkes",
+    "remove": "Fjern",
+    "save": "Lagre",
+    "title": "Bildelenke"
+  },
+  "media": {
+    "addImageLink": "Legg til lenke",
+    "align": "Juster",
+    "altText": "Alternativ tekst",
+    "copySourceLink": "Kopier kildelenke",
+    "download": "Last ned",
+    "editImageLink": "Rediger lenke",
+    "fullScreen": "Fullskjerm",
+    "openLink": "Åpne lenke",
+    "replace": "Erstatt",
+    "viewOriginal": "Vis original"
   }
 }

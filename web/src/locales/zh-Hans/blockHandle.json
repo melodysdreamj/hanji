@@ -88,5 +88,38 @@
     "hoursAgo": "最后编辑于 {{hours}} 小时前",
     "daysAgo": "最后编辑于 {{days}} 天前",
     "on": "最后编辑于 {{date}}"
+  },
+  "align": {
+    "center": "居中",
+    "choose": "选择图片对齐",
+    "left": "左",
+    "right": "右"
+  },
+  "altText": {
+    "help": "替代文本可帮助使用屏幕阅读器的用户理解图片。",
+    "label": "描述",
+    "placeholder": "描述图片",
+    "remove": "移除",
+    "save": "保存",
+    "title": "替代文本"
+  },
+  "imageLink": {
+    "invalid": "请输入完整的 http:// 或 https:// URL。",
+    "label": "点击图片时打开此URL",
+    "remove": "移除",
+    "save": "保存",
+    "title": "图片链接"
+  },
+  "media": {
+    "addImageLink": "添加链接",
+    "align": "对齐",
+    "altText": "替代文本",
+    "copySourceLink": "复制源链接",
+    "download": "下载",
+    "editImageLink": "编辑链接",
+    "fullScreen": "全屏",
+    "openLink": "打开链接",
+    "replace": "替换",
+    "viewOriginal": "查看原图"
   }
 }

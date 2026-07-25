@@ -10,6 +10,7 @@ import { cacheListTable, listCachedBlockPageIds } from "./recordCache";
 import { recordCacheTables } from "./recordCacheKeys";
 import { useStore } from "./store";
 import type { Block } from "./types";
+import { foldNfcText } from "../../../shared/database/natural-order.mjs";
 
 export interface LocalBlockHit {
   block: Block;
@@ -21,7 +22,7 @@ const MAX_SCANNED_CACHED_PAGES = 50;
 
 function blockMatches(block: Block, q: string): boolean {
   const text = block.plainText ?? "";
-  return !!text && text.toLowerCase().includes(q);
+  return !!text && foldNfcText(text).includes(q);
 }
 
 export async function searchCachedBlockHits(
@@ -29,7 +30,7 @@ export async function searchCachedBlockHits(
   query: string,
   limit: number
 ): Promise<LocalBlockHit[]> {
-  const q = query.trim().toLowerCase();
+  const q = foldNfcText(query.trim());
   if (!q || !userId) return [];
   const hits: LocalBlockHit[] = [];
   const scannedPages = new Set<string>();

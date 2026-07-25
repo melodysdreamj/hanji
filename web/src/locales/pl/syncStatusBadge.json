@@ -6,5 +6,6 @@
   "syncing": "Synchronizacja · {{count}}",
   "unreachable": "Nie można połączyć się z serwerem",
   "unreachablePending_one": "Nie można połączyć się z serwerem · {{count}} oczekująca zmiana",
-  "unreachablePending_other": "Nie można połączyć się z serwerem · {{count}} oczekujących zmian"
+  "unreachablePending_other": "Nie można połączyć się z serwerem · {{count}} oczekujących zmian",
+  "confirmed": "Zapisano na serwerze"
 }

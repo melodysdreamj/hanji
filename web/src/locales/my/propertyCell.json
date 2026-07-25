@@ -92,5 +92,8 @@
     "သောကြာ",
     "စနေ"
   ],
-  "you": "သင်"
+  "you": "သင်",
+  "buttonExecutionFailed": "ခလုတ်ကို မလုပ်ဆောင်နိုင်ခဲ့ပါ။",
+  "loadingMoreRelations": "relationများထပ်တင်နေသည်...",
+  "loadMoreRelations": "relationများထပ်ဖွင့်ရန်"
 }

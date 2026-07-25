@@ -14,15 +14,15 @@
 
   /* Text colors */
   --text-default: rgb(44, 44, 43);
-  --text-secondary: rgb(125, 122, 117);
-  --text-tertiary: rgb(161, 158, 153);
-  --text-placeholder: rgb(145, 142, 137);
+  --text-secondary: rgb(102, 100, 97);
+  --text-tertiary: rgb(112, 110, 107);
+  --text-placeholder: rgb(112, 110, 107);
   --text-on-dark: rgba(255, 255, 255, 0.9);
   /* Compatibility aliases used by component modules. Keep every global
      semantic token defined so an unsupported var() never invalidates an
      entire declaration in either theme. */
   --text-primary: var(--text-default);
-  --text-disabled: var(--text-tertiary);
+  --text-disabled: rgb(161, 158, 153);
 
   /* Surfaces */
   --bg-app: #ffffff;
@@ -104,6 +104,7 @@
   --text-secondary: rgb(184, 181, 175);
   --text-tertiary: rgb(148, 144, 137);
   --text-placeholder: rgb(154, 150, 143);
+  --text-disabled: var(--text-tertiary);
   --text-on-dark: rgb(240, 239, 237);
 
   --bg-app: rgb(25, 25, 25);

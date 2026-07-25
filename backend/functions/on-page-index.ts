@@ -5,7 +5,7 @@
 // so pageId-only entry points can resolve their workspace with one central
 // point read after the flip. Index rows use the page id as their own id.
 import { defineFunction } from '@edge-base/shared';
-import { bestEffort } from '../lib/table-utils';
+import { bestEffort, bestEffortIdempotentDelete } from '../lib/table-utils';
 
 interface TriggerContext {
   data?: {
@@ -73,7 +73,7 @@ export const onPageDelete = defineFunction({
     const ctx = context as TriggerContext;
     const before = ctx.data?.before;
     if (!before?.id) return;
-    await bestEffort(
+    await bestEffortIdempotentDelete(
       'page_workspace_index delete',
       ctx.admin.db('app').table<PageWorkspaceIndex>('page_workspace_index').delete(before.id),
     );

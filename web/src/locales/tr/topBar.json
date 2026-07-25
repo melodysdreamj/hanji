@@ -38,7 +38,7 @@
   "moveTo": "Taşı",
   "exporting": "Dışa aktarılıyor…",
   "exportAsMarkdown": "Markdown olarak dışa aktar",
-  "exportAsHanji": "Hanji dosyası olarak dışa aktar",
+  "exportAsHanji": "Hanji JSON dışa aktar (dosyalar hariç)",
   "importing": "İçe aktarılıyor…",
   "importMarkdown": "Markdown İçe Aktar",
   "unlockPage": "Sayfa kilidini aç",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Erişim güncellenemedi",
     "removedFromAccessList": "Erişim listesinden kaldırıldı",
     "couldntRemoveAccess": "Erişim kaldırılamadı",
-    "couldntLoadAccessList": "Erişim listesi yüklenemedi"
+    "couldntLoadAccessList": "Erişim listesi yüklenemedi",
+    "couldntExportHanjiArchive": "Hanji arşivi dışa aktarılamadı.",
+    "exportedHanjiArchive": "Dosyalarla birlikte bir Hanji arşivi dışa aktarıldı."
   },
   "user": "Kullanıcı",
   "whoHasAccess": "Kimlerin erişimi var",
   "workspace": "Çalışma alanı",
   "workspaceCount_one": "{{count}} çalışma alanı",
   "workspaceCount_other": "{{count}} çalışma alanı",
-  "you": "Sen"
+  "you": "Sen",
+  "exportAsHanjiArchive": "Hanji arşivi dışa aktar (dosyalar dahil)",
+  "turnIntoWiki": "Wiki'ye dönüştür",
+  "undoWiki": "Wiki'yi geri al",
+  "wikiCreated": "Sayfa wiki'ye dönüştürüldü",
+  "wikiPageSettings": "Wiki sayfa ayarları",
+  "wikiUndone": "Wiki kaldırıldı; sayfa içeriği korundu",
+  "wikiUpdateFailed": "Wiki güncellenemedi"
 }

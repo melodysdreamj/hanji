@@ -92,5 +92,8 @@
     "P",
     "S"
   ],
-  "you": "Ti"
+  "you": "Ti",
+  "buttonExecutionFailed": "Nije moguće pokrenuti gumb.",
+  "loadingMoreRelations": "Učitavanje dodatnih odnosa...",
+  "loadMoreRelations": "Učitaj više odnosa"
 }

@@ -38,7 +38,7 @@
   "moveTo": "తరలించు",
   "exporting": "ఎగుమతి చేస్తోంది…",
   "exportAsMarkdown": "Markdown గా ఎగుమతి చేయి",
-  "exportAsHanji": "Hanji ఫైల్‌గా ఎగుమతి చేయి",
+  "exportAsHanji": "Hanji JSON ఎక్స్పోర్ట్ చేయండి (ఫైల్లు మినహా)",
   "importing": "దిగుమతి చేస్తోంది…",
   "importMarkdown": "మార్క్డౌన్ దిగుమతి చేయి",
   "unlockPage": "పేజీ అన్లాక్ చేయండి",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "యాక్సెస్ నవీకరించలేకపోయింది",
     "removedFromAccessList": "యాక్సెస్ జాబితా నుండి తీసివేయబడింది",
     "couldntRemoveAccess": "యాక్సెస్ తీసివేయలేకపోయింది",
-    "couldntLoadAccessList": "యాక్సెస్ జాబితా లోడ్ చేయలేకపోయింది"
+    "couldntLoadAccessList": "యాక్సెస్ జాబితా లోడ్ చేయలేకపోయింది",
+    "couldntExportHanjiArchive": "Hanji ఆర్కైవ్ను ఎక్స్పోర్ట్ చేయలేకపోయింది.",
+    "exportedHanjiArchive": "ఫైల్లతో కూడిన Hanji ఆర్కైవ్ను ఎక్స్పోర్ట్ చేసింది."
   },
   "user": "వినియోగదారు",
   "whoHasAccess": "యాక్సెస్ ఉన్నవారు",
   "workspace": "వర్క్స్పేస్",
   "workspaceCount_one": "{{count}} వర్క్స్పేస్",
   "workspaceCount_other": "{{count}} వర్క్స్పేస్లు",
-  "you": "మీరు"
+  "you": "మీరు",
+  "exportAsHanjiArchive": "Hanji ఆర్కైవ్ ఎక్స్పోర్ట్ చేయండి (ఫైల్లు చేర్చబడ్డాయి)",
+  "turnIntoWiki": "వికీగా మార్చు",
+  "undoWiki": "వికీని తొలగించు",
+  "wikiCreated": "పేజీని వికీగా మార్చారు",
+  "wikiPageSettings": "వికీ పేజీ సెట్టింగ్లు",
+  "wikiUndone": "వికీ తొలగించబడింది; పేజీ కంటెంట్ భద్రపరచబడింది",
+  "wikiUpdateFailed": "వికీని నవీకరించడం సాధ్యపడలేదు"
 }

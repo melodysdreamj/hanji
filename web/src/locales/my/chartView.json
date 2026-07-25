@@ -4,7 +4,22 @@
     "sum": "စုစုပေါင်း",
     "average": "ပျမ်းမျှ",
     "min": "အနည်းဆုံး",
-    "max": "အများဆုံး"
+    "max": "အများဆုံး",
+    "checked": "အမှတ်ခြစ်ထား",
+    "count_values": "တန်ဖိုးအရေအတွက်",
+    "date_range": "ရက်စွဲအကွာအဝေး",
+    "earliest_date": "အစောဆုံးရက်စွဲ",
+    "empty": "ဗလာတန်ဖိုးအရေအတွက်",
+    "latest_date": "နောက်ဆုံးရက်စွဲ",
+    "median": "အလယ်တန်ဖိုး",
+    "not_empty": "မဗလာတန်ဖိုးအရေအတွက်",
+    "percent_checked": "အမှတ်ခြစ်ထားသောရာခိုင်နှုန်း",
+    "percent_empty": "ဗလာရာခိုင်နှုန်း",
+    "percent_not_empty": "မဗလာရာခိုင်နှုန်း",
+    "percent_unchecked": "အမှတ်မခြစ်ထားသောရာခိုင်နှုန်း",
+    "range": "အကွာအဝေး",
+    "unchecked": "အမှတ်မခြစ်ထား",
+    "unique": "ထူးခြားတန်ဖိုးအရေအတွက်"
   },
   "chartAria": "{{name}} ဇယား",
   "chartType": "ဇယားအမျိုးအစား",
@@ -27,5 +42,9 @@
   "untitledProperty": "ခေါင်းစဉ်မဲ့",
   "valueProperty": "တန်ဖိုး အင်္ဂါရပ်",
   "xAxis": "X-ဝင်ရိုး",
-  "yAxis": "Y-ဝင်ရိုး"
+  "yAxis": "Y-ဝင်ရိုး",
+  "dateRangeDays": "{{count}} ရက်",
+  "missingProperty": "သိမ်းဆည်းထားသောပိုင်ဆိုင်မှု",
+  "unsupportedAggregateDesc": "{{aggregate}} သည် {{property}} မှ တွက်ချက်၍မရပါ။ သင့်တော်သော ပိုင်ဆိုင်မှု သို့မဟုတ် တွက်ချက်မှုကို ရွေးပါ။",
+  "unsupportedAggregateTitle": "ဤဇယားတွက်ချက်မှုကို မရနိုင်ပါ"
 }

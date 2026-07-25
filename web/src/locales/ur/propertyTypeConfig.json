@@ -51,7 +51,14 @@
     "range": "رینج",
     "earliest_date": "ابتدائی تاریخ",
     "latest_date": "تازہ ترین تاریخ",
-    "date_range": "تاریخ کی حد"
+    "date_range": "تاریخ کی حد",
+    "count": "سب شمار کریں",
+    "count_per_group": "گروپ کے حساب سے شمار",
+    "empty": "خالی شمار",
+    "not_empty": "غیر خالی شمار",
+    "percent_per_group": "گروپ کے حساب سے فیصد",
+    "show_unique": "منفرد اقدار دکھائیں",
+    "unique": "منفرد اقدار شمار"
   },
   "undo": "واپس کریں",
   "untitled": "بغیر عنوان",

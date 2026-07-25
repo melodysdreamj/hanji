@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Pridať komentár",
+    "addLink": "Pridať odkaz",
+    "blockColor": "Použiť poslednú farbu",
+    "bold": "Tučné",
+    "copyPageLink": "Kopírovať odkaz na stránku",
+    "findInPage": "Hľadať na tejto stránke",
+    "inlineCode": "Vložený kód",
+    "italic": "Kurzíva",
+    "moveBlock": "Presunúť blok na inú stránku",
+    "moveBlockDown": "Presunúť blok nadol",
+    "moveBlockUp": "Presunúť blok nahor",
+    "movePage": "Presunúť aktuálnu stránku",
+    "navigateBack": "Späť",
+    "navigateForward": "Dopredu",
+    "newPage": "Nová stránka",
+    "openBlockMenu": "Otvoriť akcie bloku",
+    "openKeyboardShortcuts": "Otvoriť klávesové skratky",
+    "openParentPage": "Otvoriť nadradenú stránku",
+    "quickFind": "Rýchle vyhľadávanie",
+    "strikethrough": "Prečiarknuté",
+    "toggleAllToggles": "Rozbaliť alebo zbaliť všetky prepínače",
+    "toggleSidebar": "Prepnúť bočný panel",
+    "toggleTheme": "Prepnúť tmavý režim",
+    "underline": "Podčiarknuté"
+  },
+  "categories": {
+    "createStyle": "Vytvoriť a štýlovať",
+    "editMove": "Upraviť a presunúť",
+    "popular": "Populárne"
+  },
+  "categoriesLabel": "Kategórie skratiek",
+  "close": "Zavrieť",
+  "closeBackdrop": "Zavrieť klávesové skratky",
+  "empty": "Nenašli sa žiadne skratky",
+  "keysFor": "Klávesy pre {{action}}",
+  "or": "alebo",
+  "searchLabel": "Hľadať klávesové skratky",
+  "searchPlaceholder": "Hľadať skratky…",
+  "searchResults": "Výsledky vyhľadávania",
+  "searchTerms": {
+    "toggleTheme": "téma svetlá tmavá vzhľad"
+  },
+  "title": "Klávesové skratky"
+}

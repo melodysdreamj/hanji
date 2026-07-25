@@ -8,7 +8,8 @@
     "delete": "ลบ",
     "clearAll": "ล้างทั้งหมด",
     "done": "เสร็จ",
-    "add": "เพิ่ม"
+    "add": "เพิ่ม",
+    "reportIssue": "รายงานปัญหา"
   },
   "labels": {
     "untitled": "ไม่มีชื่อ"

@@ -13,7 +13,7 @@
   "groupName": "Csoport neve",
   "groupOptions": "{{groupName}} csoport opciók",
   "groupThisBoard": "Tábla csoportosítása",
-  "groupThisBoardDesc": "Adj hozzá Választó vagy Állapot tulajdonságot oszlopok létrehozásához.",
+  "groupThisBoardDesc": "Adj hozzá vagy válassz egy Választás, Állapot, Személy vagy Többszörös választás tulajdonságot az oszlopok létrehozásához.",
   "newGroup": "Új csoport",
   "newGroupIn": "Új {{groupName}} csoport a {{dbTitle}} táblában",
   "newPage": "Új",

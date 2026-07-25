@@ -88,5 +88,38 @@
     "hoursAgo": "Ultima editare acum {{hours}} ore",
     "daysAgo": "Ultima editare acum {{days}} zile",
     "on": "Ultima editare {{date}}"
+  },
+  "align": {
+    "center": "Centru",
+    "choose": "Alege alinierea imaginii",
+    "left": "Stânga",
+    "right": "Dreapta"
+  },
+  "altText": {
+    "help": "Textul alternativ ajută persoanele care folosesc cititoare de ecran să înțeleagă imaginea.",
+    "label": "Descriere",
+    "placeholder": "Descrie imaginea",
+    "remove": "Elimină",
+    "save": "Salvează",
+    "title": "Text alternativ"
+  },
+  "imageLink": {
+    "invalid": "Introdu o adresă URL http:// sau https:// completă.",
+    "label": "Deschide URL-ul la clic pe imagine",
+    "remove": "Elimină",
+    "save": "Salvează",
+    "title": "Link imagine"
+  },
+  "media": {
+    "addImageLink": "Adaugă link",
+    "align": "Aliniere",
+    "altText": "Text alternativ",
+    "copySourceLink": "Copiază linkul sursă",
+    "download": "Descarcă",
+    "editImageLink": "Editează linkul",
+    "fullScreen": "Ecran complet",
+    "openLink": "Deschide linkul",
+    "replace": "Înlocuiește",
+    "viewOriginal": "Vezi originalul"
   }
 }

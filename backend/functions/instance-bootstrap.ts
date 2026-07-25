@@ -312,6 +312,7 @@ async function completeWebSetup(
     ? (settings.instanceAdminUserIds as string[])
     : [];
   const completedAt = new Date().toISOString();
+  const authorityVersion = crypto.randomUUID();
   await db.transact([
     {
       table: 'instance_setup',
@@ -329,6 +330,7 @@ async function completeWebSetup(
         masterUserId: userId,
         masterEmail: email,
         updatedBy: userId,
+        authorityVersion,
       },
     },
     {

@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "新增評論",
+    "addLink": "新增連結",
+    "blockColor": "套用上次使用的顏色",
+    "bold": "粗體",
+    "copyPageLink": "複製頁面連結",
+    "findInPage": "在此頁面尋找",
+    "inlineCode": "行內程式碼",
+    "italic": "斜體",
+    "moveBlock": "將區塊移至其他頁面",
+    "moveBlockDown": "將區塊下移",
+    "moveBlockUp": "將區塊上移",
+    "movePage": "移動目前頁面",
+    "navigateBack": "返回",
+    "navigateForward": "前進",
+    "newPage": "新頁面",
+    "openBlockMenu": "開啟區塊操作",
+    "openKeyboardShortcuts": "開啟鍵盤快捷鍵",
+    "openParentPage": "開啟上層頁面",
+    "quickFind": "快速尋找",
+    "strikethrough": "刪除線",
+    "toggleAllToggles": "展開或收起所有切換",
+    "toggleSidebar": "切換側邊欄",
+    "toggleTheme": "切換深色模式",
+    "underline": "底線"
+  },
+  "categories": {
+    "createStyle": "建立與樣式",
+    "editMove": "編輯與移動",
+    "popular": "熱門"
+  },
+  "categoriesLabel": "快捷鍵類別",
+  "close": "關閉",
+  "closeBackdrop": "關閉鍵盤快捷鍵",
+  "empty": "找不到任何快捷鍵",
+  "keysFor": "{{action}} 的快捷鍵",
+  "or": "或",
+  "searchLabel": "搜尋鍵盤快捷鍵",
+  "searchPlaceholder": "搜尋快捷鍵…",
+  "searchResults": "搜尋結果",
+  "searchTerms": {
+    "toggleTheme": "主題 淺色 深色 外觀"
+  },
+  "title": "鍵盤快捷鍵"
+}

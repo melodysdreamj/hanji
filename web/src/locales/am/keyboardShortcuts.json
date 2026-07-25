@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "አስተያየት አክል",
+    "addLink": "አገናኝ አክል",
+    "blockColor": "የመጨረሻ የተጠቀመው ቀለም ተግብር",
+    "bold": "ደማቅ",
+    "copyPageLink": "የገጽ አገናኝ ቅዳ",
+    "findInPage": "በዚህ ገጽ ላይ ፈልግ",
+    "inlineCode": "ኢንላይን ኮድ",
+    "italic": "ሰያፍ",
+    "moveBlock": "ብሎክን ወደ ሌላ ገጽ አንቀሳቅስ",
+    "moveBlockDown": "ብሎክን ወደ ታች አንቀሳቅስ",
+    "moveBlockUp": "ብሎክን ወደ ላይ አንቀሳቅስ",
+    "movePage": "የአሁኑን ገጽ አንቀሳቅስ",
+    "navigateBack": "ወደ ኋላ ሂድ",
+    "navigateForward": "ወደ ፊት ሂድ",
+    "newPage": "አዲስ ገጽ",
+    "openBlockMenu": "የብሎክ ተግባሮችን ክፈት",
+    "openKeyboardShortcuts": "የቁልፍ ሰሌዳ አቋራጮችን ክፈት",
+    "openParentPage": "የወላጅ ገጽን ክፈት",
+    "quickFind": "ፈጣን ፍለጋ",
+    "strikethrough": "ሰርዝ",
+    "toggleAllToggles": "ሁሉንም መቀየሪያዎች ዘርጋ ወይም ሰብስብ",
+    "toggleSidebar": "የጎን አሞሌን ቀይር",
+    "toggleTheme": "የጨለማ ሁነታን ቀይር",
+    "underline": "ከስር መስመር"
+  },
+  "categories": {
+    "createStyle": "ፍጠር እና ቅርጽ",
+    "editMove": "አርትዕ እና አንቀሳቅስ",
+    "popular": "ተወዳጅ"
+  },
+  "categoriesLabel": "የአቋራጭ ምድቦች",
+  "close": "ዝጋ",
+  "closeBackdrop": "የቁልፍ ሰሌዳ አቋራጮችን ዝጋ",
+  "empty": "ምንም አቋራጮች አልተገኙም",
+  "keysFor": "የ{{action}} ቁልፎች",
+  "or": "ወይም",
+  "searchLabel": "የቁልፍ ሰሌዳ አቅራቢያዎች ፍለጋ",
+  "searchPlaceholder": "አቅራቢያዎችን ይፈልጉ…",
+  "searchResults": "የፍለጋ ውጤቶች",
+  "searchTerms": {
+    "toggleTheme": "ቲም ብርሃን ጨለማ መልክ"
+  },
+  "title": "የቁልፍ ሰሌዳ አቅራቢያዎች"
+}

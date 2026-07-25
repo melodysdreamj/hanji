@@ -6,5 +6,6 @@
   "unreachable": "Ba a iya haɗa da sabar",
   "unreachablePending_one": "Ba a iya haɗa da sabar · {{count}} canji yana jira",
   "unreachablePending_other": "Ba a iya haɗa da sabar · {{count}} canje-canje suna jira",
-  "retryHint": "Danna don sake gwadawa yanzu"
+  "retryHint": "Danna don sake gwadawa yanzu",
+  "confirmed": "An adana a sabar"
 }

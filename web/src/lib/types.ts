@@ -1,6 +1,9 @@
 // Domain model — mirrors the EdgeBase `app` block schema (backend/edgebase.config.ts).
 // `id`, `createdAt`, `updatedAt` are injected by EdgeBase on every row.
 
+import type { NotionChartAggregate } from "../../../shared/notion-chart-aggregates.mjs";
+import type { FormulaValue } from "../../../shared/database/formula-core";
+
 export interface Timestamped {
   id: string;
   createdAt?: string;
@@ -8,7 +11,7 @@ export interface Timestamped {
 }
 
 export type ComputedPropertyValue = {
-  value: string | number | boolean | null;
+  value: FormulaValue;
   formatted: string;
 };
 
@@ -18,6 +21,62 @@ export interface Workspace extends Timestamped {
   icon?: string;
   domain?: string;
   ownerId?: string;
+}
+
+export type TeamspaceAccess = "open" | "closed" | "private";
+export type TeamspaceMemberRole = "owner" | "member";
+
+export interface Teamspace extends Timestamped {
+  workspaceId: string;
+  name: string;
+  icon?: string | null;
+  description?: string | null;
+  access: TeamspaceAccess;
+  memberPageRole?: ShareRole;
+  openPageRole?: ShareRole;
+  membersCanInvite?: boolean;
+  membersCanEditSidebar?: boolean;
+  archivedAt?: string | null;
+  archivedBy?: string | null;
+  writeToken?: string | null;
+  joined?: boolean;
+  membershipSource?: "explicit" | "default";
+  role?: TeamspaceMemberRole;
+  canJoin?: boolean;
+  canRequest?: boolean;
+  requestPending?: boolean;
+  isDefault?: boolean;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface TeamspaceSettings extends Timestamped {
+  workspaceId: string;
+  defaultTeamspaceId?: string | null;
+  ownersOnlyCreate?: boolean;
+  lifecycleToken?: string | null;
+  updatedBy?: string | null;
+}
+
+export interface TeamspaceMember extends Timestamped {
+  workspaceId: string;
+  teamspaceId: string;
+  principalType: "user" | "group";
+  principalId: string;
+  workspaceMemberId?: string | null;
+  role: TeamspaceMemberRole;
+  createdBy?: string | null;
+}
+
+export interface TeamspaceJoinRequest extends Timestamped {
+  workspaceId: string;
+  teamspaceId: string;
+  userId: string;
+  workspaceMemberId: string;
+  status: "pending" | "approved" | "denied" | string;
+  createdBy: string;
+  decidedBy?: string | null;
+  decidedAt?: string | null;
 }
 
 export type NotionImportStatus =
@@ -194,10 +253,58 @@ export interface PageLayoutHints {
   hasRootInlineDatabase?: boolean;
 }
 
+export interface DatabaseSubitemsFeature {
+  childrenPropertyId: string;
+  enabled: true;
+  nestedPropertyId?: string;
+  parentPropertyId: string;
+  revision: number;
+  showToggleOnTitle?: boolean;
+}
+
+interface DatabaseDependenciesFeatureBase {
+  avoidWeekends: boolean;
+  dataKey?: string;
+  enabled: true;
+  predecessorPropertyId: string;
+  revision: number;
+  shiftMode: "overlap" | "maintain_spacing" | "none";
+  successorPropertyId: string;
+}
+
+export type DatabaseDependenciesFeature = DatabaseDependenciesFeatureBase & (
+  | {
+      dateMode?: "range";
+      datePropertyId: string;
+    }
+  | {
+      dateMode: "separate";
+      endDatePropertyId: string;
+      startDatePropertyId: string;
+    }
+);
+
+type DisabledDatabaseTaskFeature<T extends { enabled: true }> = T extends unknown
+  ? Omit<T, "enabled"> & { enabled: false }
+  : never;
+
+export interface PreservedDatabaseTaskFeatures {
+  dependencies?: Array<DisabledDatabaseTaskFeature<DatabaseDependenciesFeature>>;
+  subitems?: Array<DisabledDatabaseTaskFeature<DatabaseSubitemsFeature>>;
+}
+
+export interface DatabaseFeatures {
+  dependencies?: DatabaseDependenciesFeature;
+  preservedTaskFeatures?: PreservedDatabaseTaskFeatures;
+  subitems?: DatabaseSubitemsFeature;
+}
+
 export interface Page extends Timestamped {
   workspaceId: string;
   parentId?: string | null;
   parentType: PageParentType;
+  teamspaceId?: string | null;
+  teamspacePermissionMode?: "inherit" | "restricted";
   kind: PageKind;
   title: string;
   icon?: string;
@@ -210,11 +317,22 @@ export interface Page extends Timestamped {
   isLocked?: boolean;
   backlinksDisplay?: BacklinksDisplay;
   pageCommentsDisplay?: PageCommentsDisplay;
+  isWiki?: boolean;
+  wikiRootId?: string | null;
   verifiedAt?: string | null;
   verifiedBy?: string | null;
   verificationExpiresAt?: string | null;
   /** Column values when this page is a row in a database: { [propertyId]: value } */
   properties?: Record<string, unknown>;
+  /** Server-owned database feature bindings. Property names remain presentation-only. */
+  databaseFeatures?: DatabaseFeatures;
+  databaseFeaturesRevision?: number;
+  /** Indexed hierarchy authority for database rows; empty means a root row. */
+  subitemParentId?: string;
+  /** Server-maintained count of live direct children; child IDs remain cursor-loaded. */
+  subitemChildCount?: number;
+  /** Transient restricted-ancestor projection; never persisted as page content. */
+  __structuralPlaceholder?: true;
   /** Backend-computed projection values for read-only formula/rollup properties. */
   __computed?: Record<string, ComputedPropertyValue>;
   /** Transient client-side order from the remote database row query. Never persisted. */
@@ -229,6 +347,17 @@ export interface Page extends Timestamped {
   position: number;
   createdBy?: string;
   lastEditedBy?: string;
+  /** Server receipt for page/row update replay and same-client chaining. */
+  lastMutationId?: string;
+}
+
+export interface PageOwner extends Timestamped {
+  id: string;
+  workspaceId: string;
+  pageId: string;
+  wikiRootId: string;
+  userId: string;
+  createdBy?: string;
 }
 
 // ── Blocks ────────────────────────────────────────────────────────────
@@ -303,6 +432,8 @@ export interface BlockContent {
   fileName?: string; // file
   caption?: TextSpan[]; // image / code caption
   showCaption?: boolean; // media/embed/file caption is explicitly enabled
+  altText?: string; // image accessibility description
+  imageLink?: string; // destination opened when an image is clicked
   align?: "left" | "center" | "right"; // media alignment
   childPageId?: string; // child_page / link_to_page / child_database / inline_database link
   childPageTitle?: string; // imported linked page/database title snapshot
@@ -325,6 +456,7 @@ export interface BlockContent {
   syncedPageId?: string; // synced_block copy source page
   buttonLabel?: string; // button
   buttonTemplate?: ButtonTemplateBlock[]; // button
+  buttonActionDocument?: PageButtonActionDocument; // button shared server action authority
   notionButtonPartial?: boolean; // imported button whose Notion API action/label details were hidden
   notionBlock?: unknown; // imported Notion block metadata used for normalized rendering
 }
@@ -343,6 +475,10 @@ export interface Block extends Timestamped {
   plainText?: string;
   position: number;
   createdBy?: string;
+  /** Server-authenticated actor for the latest persisted edit. */
+  lastEditedBy?: string;
+  /** Server receipt for update replay/idempotency; not user-authored content. */
+  lastMutationId?: string;
 }
 
 // ── Database properties & views ──────────────────────────────────────
@@ -367,20 +503,58 @@ export type PropertyType =
   | "relation"
   | "rollup"
   | "formula"
-  | "unique_id";
+  | "unique_id"
+  | "button"
+  | "location"
+  | "verification"
+  | "last_visited_time"
+  | "place";
 
-export type RollupFunction =
-  | "show_original"
-  | "count_all"
+export type ReadOnlyPropertyType =
+  | "title"
+  | "created_time"
+  | "last_edited_time"
+  | "created_by"
+  | "last_edited_by"
+  | "rollup"
+  | "formula"
+  | "unique_id"
+  | "button"
+  | "location"
+  | "last_visited_time";
+
+export interface PlacePropertyValue {
+  lat: number;
+  lon: number;
+  name?: string | null;
+  address?: string | null;
+  aws_place_id?: string | null;
+  google_place_id?: string | null;
+}
+
+export interface VerificationDateValue {
+  start: string;
+  end?: string | null;
+  time_zone?: string | null;
+}
+
+export type VerificationPropertyValue =
+  | { state: "unverified"; date?: null; verified_by?: null }
+  | {
+      state: "verified" | "expired";
+      date?: VerificationDateValue | null;
+      verified_by?: unknown;
+    };
+
+export type NotionRollupFunction =
+  | "count"
   | "count_values"
-  | "count_unique"
-  | "count_empty"
+  | "empty"
+  | "not_empty"
+  | "unique"
+  | "show_unique"
   | "percent_empty"
   | "percent_not_empty"
-  | "checked"
-  | "unchecked"
-  | "percent_checked"
-  | "percent_unchecked"
   | "sum"
   | "average"
   | "median"
@@ -389,7 +563,18 @@ export type RollupFunction =
   | "range"
   | "earliest_date"
   | "latest_date"
-  | "date_range";
+  | "date_range"
+  | "checked"
+  | "unchecked"
+  | "percent_checked"
+  | "percent_unchecked"
+  | "count_per_group"
+  | "percent_per_group"
+  | "show_original";
+
+/** Read-only compatibility for rollup configs stored before the current API names. */
+export type LegacyRollupFunction = "count_all" | "count_empty" | "count_unique";
+export type RollupFunction = NotionRollupFunction | LegacyRollupFunction;
 
 export interface SelectOption {
   id: string;
@@ -526,6 +711,15 @@ export interface PropertyConfig {
     date?: Record<string, unknown>;
   } & Record<string, unknown>;
   relationDatabaseId?: string;
+  databaseFeatureRole?:
+    | "subitem_parent"
+    | "subitem_children"
+    | "dependency_predecessor"
+    | "dependency_successor"
+    | "preserved_subitem_parent"
+    | "preserved_subitem_children"
+    | "preserved_dependency_predecessor"
+    | "preserved_dependency_successor";
   // Two-way (Notion "Show on …") relation: the id of the paired relation
   // property on the related database. Present ⇒ two-way; absent ⇒ one-way.
   relatedPropertyId?: string;
@@ -537,6 +731,171 @@ export interface PropertyConfig {
   rollupVia?: string; // optional second relation hop for multi-hop rollups
   hideWhenEmpty?: boolean; // row/page property panel display option
   hideInPagePanel?: boolean; // always hide in row/page property panels unless hidden properties are expanded
+  button?: DatabaseButtonActionDocument;
+}
+
+export type AutomationValueExpression =
+  | { kind: "literal"; value: unknown }
+  | { kind: "execution_time" }
+  | { kind: "formula"; expression: string }
+  | { kind: "variable"; name: string }
+  | { kind: "trigger_property"; propertyId: string };
+
+export type AutomationDynamicText = string | AutomationValueExpression;
+
+export interface EditPropertyAutomationAction {
+  id: string;
+  type: "edit_property";
+  target: "trigger_page";
+  propertyId: string;
+  value: AutomationValueExpression;
+}
+
+export interface DatabaseButtonActionDocument {
+  version: 1;
+  label: string;
+  actions: AutomationAction[];
+}
+
+export interface InsertBlocksAutomationAction {
+  id: string;
+  type: "insert_blocks";
+  target: "trigger_page";
+  blocks: ButtonTemplateBlock[];
+}
+
+export interface AddPageAutomationAction {
+  id: string;
+  type: "add_page";
+  target: "database";
+  databaseId: string;
+  title: AutomationDynamicText;
+  properties?: AutomationPropertyChange[];
+  openCreatedPage?: boolean;
+}
+
+export interface AutomationPropertyChange {
+  propertyId: string;
+  value: AutomationValueExpression;
+}
+
+export interface EditPagesAutomationAction {
+  id: string;
+  type: "edit_pages";
+  target: {
+    type: "database";
+    databaseId: string;
+    filter: Record<string, unknown>;
+    limit: number;
+  };
+  changes: AutomationPropertyChange[];
+}
+
+export interface DefineVariablesAutomationAction {
+  id: string;
+  type: "define_variables";
+  variables: Array<{ name: string; value: AutomationValueExpression }>;
+}
+
+export interface SendNotificationAutomationAction {
+  id: string;
+  type: "send_notification";
+  recipientIds: string[];
+  message: string;
+}
+
+export interface SendEmailAutomationAction {
+  id: string;
+  type: "send_email";
+  recipientEmail: string;
+  subject: string;
+  message: string;
+}
+
+export interface SendWebhookAutomationAction {
+  id: string;
+  type: "send_webhook";
+  url: string;
+  body: Record<string, unknown>;
+}
+
+export interface SendSlackAutomationAction {
+  id: string;
+  type: "send_slack";
+  connectionId: string;
+  channelId: string;
+  message: string;
+}
+
+export interface ShowConfirmationAutomationAction {
+  id: string;
+  type: "show_confirmation";
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+}
+
+export interface OpenPageAutomationAction {
+  id: string;
+  type: "open_page";
+  pageId: string;
+}
+
+export interface OpenFormAutomationAction {
+  id: string;
+  type: "open_form";
+  databaseId: string;
+  viewId: string;
+}
+
+export interface OpenUrlAutomationAction {
+  id: string;
+  type: "open_url";
+  url: string;
+}
+
+export type AutomationAction =
+  | EditPropertyAutomationAction
+  | InsertBlocksAutomationAction
+  | AddPageAutomationAction
+  | EditPagesAutomationAction
+  | DefineVariablesAutomationAction
+  | SendNotificationAutomationAction
+  | SendEmailAutomationAction
+  | SendWebhookAutomationAction
+  | SendSlackAutomationAction
+  | ShowConfirmationAutomationAction
+  | OpenPageAutomationAction
+  | OpenFormAutomationAction
+  | OpenUrlAutomationAction;
+
+export interface PageButtonActionDocument {
+  version: 1;
+  label: string;
+  actions: AutomationAction[];
+}
+
+export interface DatabaseAutomationDefinition {
+  id: string;
+  workspaceId: string;
+  databaseId: string;
+  name: string;
+  enabled: boolean;
+  scopeType: "database" | "view";
+  viewId?: string | null;
+  triggerType: "events" | "schedule";
+  trigger: Record<string, unknown>;
+  actionDocument: Record<string, unknown>;
+  nextRunAt?: string | null;
+  status: "active" | "disabled" | "paused";
+  revision: number;
+  pausedAt?: string | null;
+  pausedReason?: string | null;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface DbProperty extends Timestamped {
@@ -555,7 +914,86 @@ export type ViewType =
   | "gallery"
   | "calendar"
   | "timeline"
+  | "form"
   | "chart";
+
+export type FormAudience = "none" | "workspace" | "web";
+export type FormButtonColor = "blue" | "gray" | "green" | "red" | "orange" | "purple";
+
+export interface FormViewQuestion {
+  id: string;
+  propertyId: string;
+  label: string;
+  description: string;
+  required: boolean;
+  hidden: boolean;
+  syncWithPropertyName: boolean;
+  longAnswer?: boolean;
+  optionsDisplay?: "list" | "dropdown";
+  maxSelections?: number;
+  position: number;
+}
+
+export interface FormViewSubmitConfig {
+  buttonLabel: string;
+  confirmationTitle: string;
+  confirmationBody: string;
+  buttonColor: FormButtonColor;
+}
+
+export interface FormViewConfig {
+  version: 1;
+  title: string;
+  description: string;
+  icon: string;
+  cover: string;
+  questions: FormViewQuestion[];
+  submit: FormViewSubmitConfig;
+}
+
+export interface FormLink extends Timestamped {
+  workspaceId: string;
+  databaseId: string;
+  viewId: string;
+  token: string;
+  audience: FormAudience;
+  enabled: boolean;
+  createdBy?: string;
+}
+
+export interface FormPublicProperty {
+  id: string;
+  name: string;
+  description?: string;
+  type: PropertyType;
+  config?: Pick<PropertyConfig, "options">;
+}
+
+export interface FormReferenceOption {
+  id: string;
+  name: string;
+  avatar?: string | null;
+}
+
+export interface FormOptionsResult {
+  propertyId: string;
+  type: "person" | "relation";
+  options: FormReferenceOption[];
+  hasMore: boolean;
+  after: string | null;
+}
+
+export interface FormDefinitionResult {
+  form: FormViewConfig;
+  properties: FormPublicProperty[];
+  revision: string;
+}
+
+export interface FormSubmitResult {
+  rowId: string;
+  replayed: boolean;
+  confirmation: FormViewSubmitConfig;
+}
 
 export type FilterOperator =
   | "equals"
@@ -611,13 +1049,22 @@ export type TableCalculation =
   | "latest_date"
   | "date_range";
 
+export interface DatabaseSubtaskViewConfig {
+  displayMode: "show" | "hidden" | "flattened" | "disabled";
+  filterScope: "parents" | "parents_and_subitems" | "subitems";
+  propertyId: string;
+  toggleColumnId: string;
+}
+
 export interface ViewConfig {
+  type?: ViewType;
   visibleProperties?: string[];
   hiddenProperties?: string[];
   propertyOrder?: string[];
   rowPagePropertyOrder?: string[]; // row peek/full-page property panel order, separate from table column order
   propertyWidths?: Record<string, number>;
   tableCalculations?: Record<string, TableCalculation>;
+  subtasks?: DatabaseSubtaskViewConfig;
   search?: string;
   filters?: ViewFilter[];
   filterConjunction?: "and" | "or";
@@ -644,8 +1091,8 @@ export interface ViewConfig {
   subGroupBy?: string; // second-level grouping (board)
   chartType?: "bar" | "horizontal_bar" | "line" | "donut"; // chart view layout
   chartGroupBy?: string; // chart x-axis / grouping property id
-  chartAggregate?: "count" | "sum" | "average" | "min" | "max"; // chart y-axis aggregation
-  chartAggregateBy?: string; // number property id aggregated for non-count chart aggregations
+  chartAggregate?: NotionChartAggregate; // chart y-axis aggregation
+  chartAggregateBy?: string; // compatible property id aggregated for non-count chart aggregations
   notionViewId?: string; // source Notion view id, when imported from Notion API
   notionType?: string; // original Notion view type, when imported from Notion API
   notionChromeCreatedTime?: string; // peer-created time used only for imported linked DB tab ordering
@@ -665,6 +1112,9 @@ export interface ViewConfig {
   templateLinkedView?: boolean;
   templateLinkedSourceDatabaseId?: string;
   templateLinkedRelationPropertyId?: string;
+  hanjiForm?: FormViewConfig;
+  /** Display snapshot only; `form_links` remains the server authority. */
+  hanjiFormAudience?: FormAudience;
 }
 
 export interface DbView extends Timestamped {
@@ -701,6 +1151,7 @@ export type ShareRole = "view" | "comment" | "edit" | "full_access";
 export type SharePrincipalType = "user" | "email" | "group" | "integration";
 export type WorkspaceCreationPolicy = "owners_admins" | "members";
 export type SignupPolicy = "public" | "closed";
+export type MemberAddPolicy = "enabled" | "disabled";
 export type DomainSignupPolicy = "invite_only" | "verified_domains";
 export type OrganizationMemberRole =
   | "owner"
@@ -739,6 +1190,7 @@ export interface Organization extends Timestamped {
 
 export interface InstanceSettings extends Timestamped {
   signupPolicy?: SignupPolicy | string;
+  memberAddPolicy?: MemberAddPolicy | string;
   instanceAdminUserIds?: string[] | unknown;
   updatedBy?: string | null;
 }
@@ -968,6 +1420,12 @@ export interface OrganizationDomain extends Timestamped {
   organizationId: string;
   domain: string;
   status?: "pending" | "verified" | "rejected" | string;
+  verificationMethod?: "dns_txt" | string;
+  verificationToken?: string | null;
+  verificationCheckedAt?: string | null;
+  verificationError?: string | null;
+  recordName?: string | null;
+  recordValue?: string | null;
   createdBy?: string;
   verifiedAt?: string | null;
   verifiedBy?: string | null;
@@ -993,7 +1451,29 @@ export interface OrganizationEnterpriseControls extends Timestamped {
   dlpPolicy?: Record<string, unknown> | null;
   legalPolicy?: Record<string, unknown> | null;
   billingProfile?: Record<string, unknown> | null;
+  mcpGovernancePolicy?: OrganizationMcpGovernancePolicy | null;
   updatedBy?: string | null;
+}
+
+export interface OrganizationApprovedMcpClient {
+  clientId: string;
+  name: string;
+  approvedAt: string;
+  approvedBy: string;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+
+export interface OrganizationMcpWorkspacePolicy {
+  workspaceId: string;
+  enabled: boolean;
+  approvedClients: OrganizationApprovedMcpClient[];
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+
+export interface OrganizationMcpGovernancePolicy {
+  workspacePolicies: OrganizationMcpWorkspacePolicy[];
 }
 
 export interface OrganizationScimToken extends Timestamped {
@@ -1002,6 +1482,35 @@ export interface OrganizationScimToken extends Timestamped {
   status?: "active" | "revoked" | "expired" | string;
   tokenPrefix?: string | null;
   scopes?: Record<string, unknown> | null;
+  createdBy?: string | null;
+  lastUsedAt?: string | null;
+  expiresAt?: string | null;
+  revokedAt?: string | null;
+  revokedBy?: string | null;
+}
+
+export type NotionAdminCapability =
+  | "legal-hold:read"
+  | "legal-hold:write"
+  | "legal-hold:write-high-impact"
+  | "legal-hold:export"
+  | "workspace:export"
+  | "managed-user-session:write";
+
+export interface OrganizationAdminToken extends Timestamped {
+  organizationId: string;
+  label: string;
+  status?: "active" | "revoked" | "expired" | string;
+  tokenPrefix?: string | null;
+  scopes?: {
+    version?: number;
+    capabilities?: NotionAdminCapability[];
+    resources?: {
+      organizationId?: string;
+      workspaceIds?: string[];
+      legalHoldIds?: string[];
+    };
+  } | null;
   createdBy?: string | null;
   lastUsedAt?: string | null;
   expiresAt?: string | null;
@@ -1031,8 +1540,20 @@ export interface OrganizationAuditExport extends Timestamped {
   completedAt?: string | null;
 }
 
+export interface OrganizationDiscoveryExport extends Timestamped {
+  organizationId: string;
+  status?: "completed" | "failed" | string;
+  format?: "jsonl" | "json" | string;
+  filter?: Record<string, unknown> | null;
+  itemCount?: number;
+  content?: string | null;
+  createdBy?: string | null;
+  completedAt?: string | null;
+}
+
 export interface OrganizationBillingRecord extends Timestamped {
   organizationId: string;
+  externalId?: string | null;
   kind?: "contract" | "subscription" | "invoice" | "credit" | string;
   status?: string;
   title: string;
@@ -1082,6 +1603,27 @@ export interface ShareLink extends Timestamped {
   role: ShareRole;
   expiresAt?: string | null;
   createdBy?: string;
+}
+
+export type SiteTheme = "system" | "light" | "dark";
+export type SiteDomainStatus = "none" | "pending_validation" | "validated";
+
+export interface SiteConfig extends Timestamped {
+  pageId: string;
+  workspaceId?: string;
+  slug: string;
+  published: boolean;
+  title: string;
+  description?: string;
+  theme: SiteTheme;
+  showBreadcrumbs: boolean;
+  showSearch: boolean;
+  showBranding: boolean;
+  navigationPageIds: string[];
+  customHostname?: string | null;
+  domainStatus?: SiteDomainStatus;
+  domainVerificationToken?: string | null;
+  revision: number;
 }
 
 // Convenience: a text-bearing block's plain text from its rich spans.

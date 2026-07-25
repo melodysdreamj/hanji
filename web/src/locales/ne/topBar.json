@@ -38,7 +38,7 @@
   "moveTo": "सार्नुहोस्",
   "exporting": "निर्यात गर्दै…",
   "exportAsMarkdown": "Markdown को रूपमा निर्यात गर्नुहोस्",
-  "exportAsHanji": "Hanji फाइलको रूपमा निर्यात गर्नुहोस्",
+  "exportAsHanji": "Hanji JSON निर्यात गर्नुहोस् (फाइलहरू बाहेक)",
   "importing": "आयात गर्दै…",
   "importMarkdown": "मार्कडाउन आयात गर्नुहोस्",
   "unlockPage": "पृष्ठ अनलक गर्नुहोस्",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "पहुँच अद्यावधिक गर्न सकिएन",
     "removedFromAccessList": "पहुँच सूचीबाट हटाइयो",
     "couldntRemoveAccess": "पहुँच हटाउन सकिएन",
-    "couldntLoadAccessList": "पहुँच सूची लोड गर्न सकिएन"
+    "couldntLoadAccessList": "पहुँच सूची लोड गर्न सकिएन",
+    "couldntExportHanjiArchive": "Hanji अभिलेख निर्यात गर्न सकिएन।",
+    "exportedHanjiArchive": "फाइलहरू सहित Hanji अभिलेख निर्यात गरियो।"
   },
   "user": "प्रयोगकर्ता",
   "whoHasAccess": "पहुँच भएकाहरू",
   "workspace": "कार्यक्षेत्र",
   "workspaceCount_one": "{{count}} कार्यक्षेत्र",
   "workspaceCount_other": "{{count}} कार्यक्षेत्रहरू",
-  "you": "तपाईं"
+  "you": "तपाईं",
+  "exportAsHanjiArchive": "Hanji अभिलेख निर्यात गर्नुहोस् (फाइलहरू सहित)",
+  "turnIntoWiki": "विकि बनाउनुहोस्",
+  "undoWiki": "विकि पूर्ववत गर्नुहोस्",
+  "wikiCreated": "पृष्ठ विकिमा रूपान्तरण गरियो",
+  "wikiPageSettings": "विकि पृष्ठ सेटिङ्हरू",
+  "wikiUndone": "विकि हटाइयो; पृष्ठ सामग्री सुरक्षित रह्यो",
+  "wikiUpdateFailed": "विकि अद्यावधिक गर्न सकिएन"
 }

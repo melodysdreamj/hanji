@@ -92,5 +92,8 @@
     "ស",
     "ស"
   ],
-  "you": "អ្នក"
+  "you": "អ្នក",
+  "buttonExecutionFailed": "មិនអាចដំណើរការប៊ូតុងបានទេ។",
+  "loadingMoreRelations": "កំពុងផ្ទុកទំនាក់ទំនងបន្ថែម...",
+  "loadMoreRelations": "ផ្ទុកទំនាក់ទំនងបន្ថែម"
 }

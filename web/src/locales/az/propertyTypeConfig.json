@@ -51,7 +51,14 @@
     "range": "Aralıq",
     "earliest_date": "Ən erkən tarix",
     "latest_date": "Ən gec tarix",
-    "date_range": "Tarix aralığı"
+    "date_range": "Tarix aralığı",
+    "count": "Hamısını say",
+    "count_per_group": "Qrup başına say",
+    "empty": "Boş sayı",
+    "not_empty": "Boş olmayan sayı",
+    "percent_per_group": "Qrup başına faiz",
+    "show_unique": "Unikal dəyərləri göstər",
+    "unique": "Unikal dəyər sayı"
   },
   "undo": "Geri al",
   "untitled": "Adsız",

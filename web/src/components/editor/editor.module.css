@@ -339,6 +339,26 @@
   flex: 1 1 auto;
   min-width: 0;
 }
+/* Native render virtualization keeps every text block in the DOM for browser
+   find, accessibility, selection, drag/drop, and programmatic focus while
+   letting Chromium/WebKit skip far-offscreen editable layout and paint. The
+   boundary belongs to the body rather than .blockGroup: the group owns the
+   negative-left gutter, drop lines, comments/awareness, and nested children.
+   Dense prose/list rows use the stable 30px default estimate. Structural
+   headings, callouts with body-owned children, and code preview/caption stacks
+   stay outside this generic boundary because they are sparse and commonly
+   variable-height. */
+.blockGroup[data-native-render-virtualized="true"] > .blockRow > .blockBody {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 30px;
+}
+.blockGroup[data-native-render-virtualized="true"]:hover > .blockRow > .blockBody,
+.blockGroup[data-native-render-virtualized="true"]:focus-within > .blockRow > .blockBody,
+.blockGroup[data-native-render-virtualized="true"][data-comment-flash="true"] > .blockRow > .blockBody,
+.blockGroup[data-native-render-virtualized="true"] > .blockRow[data-selected="true"] > .blockBody,
+.blockGroup[data-native-render-virtualized="true"] > .blockRow[data-remote-awareness] > .blockBody {
+  content-visibility: visible;
+}
 .blockCommentPill {
   display: inline-flex;
   align-items: center;
@@ -557,12 +577,18 @@
   position: absolute;
   left: -48px;
   top: 0;
+  bottom: 0;
   display: flex;
-  align-items: center;
-  height: 28px;
+  align-items: flex-start;
+  min-height: 28px;
+  padding-top: 2px;
+  box-sizing: border-box;
   gap: 1px;
   opacity: 0;
-  pointer-events: none;
+  /* The invisible hit target follows the entire row height. This lets a
+     pointer enter the left gutter below the top-aligned buttons on tall text,
+     media, and other blocks without losing the block actions. */
+  pointer-events: auto;
   transition: opacity 0.1s;
 }
 .gutter::after {
@@ -584,10 +610,6 @@
 .gutter:focus-within {
   opacity: 1;
   pointer-events: auto;
-}
-.editor:has(.blockRow:hover) .blockRow:focus-within:not(:hover) > .gutter:not([data-menu-open="true"]):not(:focus-within) {
-  opacity: 0;
-  pointer-events: none;
 }
 .gutterBtn {
   display: flex;
@@ -620,10 +642,26 @@
 
 .blockGroup[data-block-type="inline_database"] > .blockRow > .gutter {
   top: 14px;
+  z-index: 2;
 }
-.blockGroup[data-block-type="inline_database"]:hover > .blockRow > .gutter {
-  opacity: 1;
-  pointer-events: auto;
+
+@media (hover: hover) and (pointer: fine) {
+  /* An inline database is one tall editor block, so the generic block-row
+     :hover state also covers its table rows. Keep the outer block controls
+     scoped to the database title row; table-row hover owns its own gutter. */
+  .blockGroup[data-block-type="inline_database"] > .blockRow:hover > .gutter {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .blockGroup[data-block-type="inline_database"] > .blockRow:has(.inlineDatabaseHeader:hover) > .gutter,
+  .blockGroup[data-block-type="inline_database"] > .blockRow:focus-within > .gutter,
+  .blockGroup[data-block-type="inline_database"] > .blockRow[data-selected="true"] > .gutter,
+  .blockGroup[data-block-type="inline_database"] > .blockRow > .gutter:hover,
+  .blockGroup[data-block-type="inline_database"] > .blockRow > .gutter:focus-within,
+  .blockGroup[data-block-type="inline_database"] > .blockRow > .gutter[data-menu-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 .blockGroup[data-block-type="embed"]:hover > .blockRow > .gutter {
   opacity: 1;
@@ -1444,8 +1482,28 @@
   min-width: 120px;
   min-height: 44px;
 }
+.imageFrame[data-pending="true"] {
+  width: 100%;
+  min-height: 120px;
+  aspect-ratio: 16 / 9;
+}
+.imagePending {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+}
 .imageBlock[data-sized="true"] .imageFrame {
   width: 100%;
+}
+.imageFrame > a[data-block-media-link] {
+  display: block;
+  max-width: 100%;
 }
 .imageFrame img {
   display: block;
@@ -1788,6 +1846,14 @@ iframe.videoPlayer {
   display: block;
   width: 100%;
 }
+.mediaPlaybackError {
+  padding: 9px 10px;
+  border-top: 1px solid color-mix(in srgb, var(--c-red) 28%, var(--border-default));
+  background: color-mix(in srgb, var(--c-red) 8%, var(--bg-app));
+  color: var(--c-red);
+  font-size: 12px;
+  line-height: 1.45;
+}
 .mediaActions {
   position: absolute;
   top: 8px;
@@ -1800,6 +1866,8 @@ iframe.videoPlayer {
 }
 .videoFrame:hover .mediaActions,
 .audioFrame:hover .mediaActions,
+.videoFrame[data-playback-error="true"] .mediaActions,
+.audioFrame[data-playback-error="true"] .mediaActions,
 .mediaActions:focus-within {
   opacity: 1;
   pointer-events: auto;
@@ -2448,12 +2516,9 @@ iframe.videoPlayer {
   outline: none;
 }
 .buttonConfig {
-  position: absolute;
+  position: fixed;
   z-index: 41;
-  top: 36px;
-  left: 0;
-  width: 320px;
-  max-height: min(520px, calc(100vh - 120px));
+  width: min(320px, calc(100vw - 16px));
   overflow-y: auto;
   padding: 10px;
   border-radius: 8px;
@@ -2580,6 +2645,21 @@ iframe.videoPlayer {
   align-items: center;
   flex-wrap: wrap;
   gap: 4px;
+}
+
+.buttonConfigSave {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--accent-color, #2383e2);
+  color: #fff;
+  font-weight: 600;
+}
+
+.buttonConfigSave:disabled {
+  opacity: 0.45;
 }
 .buttonAddTemplate {
   gap: 5px;
@@ -2989,11 +3069,20 @@ iframe.videoPlayer {
   padding: 0;
 }
 .inlineDatabaseHeader {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   max-width: 100%;
   padding-inline: 12px;
+}
+.inlineDatabaseHeader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: 60px;
+  height: 100%;
 }
 .inlineDatabase[data-contained="true"] .inlineDatabaseHeader {
   padding-inline: 0;
@@ -3850,6 +3939,9 @@ input.inlineDatabaseTitle {
   min-width: 0;
 }
 .slashName {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-default);
@@ -4106,6 +4198,73 @@ input.inlineDatabaseTitle {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.blockMenuForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.blockMenuField {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 2px 8px 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.blockMenuField input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  background: var(--bg-app);
+  color: var(--text-default);
+  font-size: 13px;
+  outline: none;
+}
+.blockMenuField input:focus-visible {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px var(--accent-blue);
+}
+.blockMenuField input[aria-invalid="true"] {
+  border-color: var(--c-red);
+}
+.blockMenuFieldHelp,
+.blockMenuFieldError {
+  padding: 0 8px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.blockMenuFieldHelp {
+  color: var(--text-tertiary);
+}
+.blockMenuFieldError {
+  color: var(--c-red);
+}
+.blockMenuFormActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 2px 8px 4px;
+}
+.blockMenuFormActions button {
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background: var(--bg-hover);
+  color: var(--text-default);
+  font-size: 12px;
+}
+.blockMenuFormActions button:hover,
+.blockMenuFormActions button:focus-visible {
+  background: var(--bg-selected);
+  outline: none;
+}
+.blockMenuFormActions button[type="submit"] {
+  background: var(--accent-blue);
+  color: #fff;
 }
 .turnGrid {
   display: grid;

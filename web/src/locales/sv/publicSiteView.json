@@ -1,0 +1,17 @@
+{
+  "breadcrumbs": "Brödsmulor",
+  "clearSearch": "Rensa sökning",
+  "errors": {
+    "not-found": "Den här webbplatsen kan ha avpublicerats eller så har adressen ändrats.",
+    "offline": "Kontrollera din anslutning och försök öppna webbplatsen igen.",
+    "rate-limited": "Den här webbplatsen tar emot för många begäranden. Vänta en stund och försök igen.",
+    "unavailable": "Hanji kunde inte öppna webbplatsen just nu. Försök igen om en stund."
+  },
+  "madeWithHanji": "Skapat med Hanji",
+  "navigation": "Webbplatsnavigering",
+  "noResults": "Inga sidor hittades",
+  "outsideSite": "Sidan är inte en del av denna publicerade webbplats.",
+  "search": "Sök på webbplatsen",
+  "tryAgain": "Försök igen",
+  "unavailable": "Den här webbplatsen är inte tillgänglig."
+}

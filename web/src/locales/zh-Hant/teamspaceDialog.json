@@ -1,0 +1,82 @@
+{
+  "access": {
+    "closed": "關閉",
+    "open": "公開",
+    "private": "私人"
+  },
+  "add": "新增",
+  "approve": "核准",
+  "archive": "封存團隊空間",
+  "available": "可加入",
+  "choosePrincipal": "選擇人員或群組",
+  "create": "建立團隊空間",
+  "deny": "拒絕",
+  "error": {
+    "action": "無法完成該團隊空間操作。",
+    "load": "無法載入團隊空間詳細資訊。"
+  },
+  "fields": {
+    "access": "存取",
+    "description": "說明",
+    "icon": "圖示",
+    "memberRole": "成員頁面存取權限",
+    "membersCanEditSidebar": "成員可新增及重新排序頁面",
+    "membersCanInvite": "成員可邀請人員",
+    "name": "名稱",
+    "openRole": "公開訪客頁面存取權限"
+  },
+  "governance": "團隊空間設定",
+  "join": "加入",
+  "joined": "我的團隊空間",
+  "loadMore": "載入更多",
+  "manage": "管理",
+  "member": "成員",
+  "members": "成員",
+  "noneArchived": "目前沒有已封存的團隊空間。",
+  "noneAvailable": "目前沒有其他可用的團隊空間。",
+  "noneJoined": "您尚未加入任何團隊空間。",
+  "noRequests": "目前沒有待處理的要求。",
+  "notice": {
+    "approved": "要求已核准。",
+    "archived": "團隊空間已封存。",
+    "created": "團隊空間已建立。",
+    "defaultSet": "預設團隊空間已更新。",
+    "denied": "要求已拒絕。",
+    "joined": "已加入團隊空間。",
+    "memberAdded": "成員已新增。",
+    "memberRemoved": "成員已移除。",
+    "memberUpdated": "成員角色已更新。",
+    "policySaved": "團隊空間建立政策已更新。",
+    "requested": "已要求存取權。",
+    "restored": "團隊空間已還原。",
+    "saved": "團隊空間已更新。"
+  },
+  "notOwner": "只有團隊空間擁有者或工作區管理員才能管理此團隊空間。",
+  "open": "開啟",
+  "owner": "擁有者",
+  "ownersOnlyCreate": "只有工作區擁有者才能建立團隊空間",
+  "remove": "移除",
+  "replacement": "選擇替代的預設團隊空間",
+  "request": "請求存取",
+  "requestPending": "請求待核准",
+  "requests": "存取請求",
+  "restore": "還原",
+  "roles": {
+    "comment": "可留言",
+    "edit": "可編輯",
+    "full_access": "完整存取",
+    "view": "可檢視"
+  },
+  "save": "儲存變更",
+  "selectTeamspace": "團隊空間",
+  "setDefault": "設為預設團隊空間",
+  "subtitle": "組織共享工作並控制誰可以發現或加入",
+  "tabs": {
+    "archived": "已封存",
+    "browse": "瀏覽",
+    "create": "新增團隊空間",
+    "label": "團隊空間檢視",
+    "manage": "管理"
+  },
+  "title": "團隊空間"
+}

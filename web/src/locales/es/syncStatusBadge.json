@@ -6,5 +6,6 @@
   "unreachable": "No se puede conectar al servidor",
   "unreachablePending_one": "No se puede conectar al servidor · {{count}} cambio pendiente",
   "unreachablePending_other": "No se puede conectar al servidor · {{count}} cambios pendientes",
-  "retryHint": "Haz clic para reintentar ahora"
+  "retryHint": "Haz clic para reintentar ahora",
+  "confirmed": "Guardado en el servidor"
 }

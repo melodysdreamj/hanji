@@ -1,0 +1,46 @@
+{
+  "actions": {
+    "addComment": "Lisää kommentti",
+    "addLink": "Lisää linkki",
+    "blockColor": "Käytä viimeksi käytettyä väriä",
+    "bold": "Lihavointi",
+    "copyPageLink": "Kopioi sivun linkki",
+    "findInPage": "Etsi tältä sivulta",
+    "inlineCode": "Sisäinen koodi",
+    "italic": "Kursivointi",
+    "moveBlock": "Siirrä lohko toiselle sivulle",
+    "moveBlockDown": "Siirrä lohkoa alas",
+    "moveBlockUp": "Siirrä lohkoa ylös",
+    "movePage": "Siirrä nykyistä sivua",
+    "navigateBack": "Takaisin",
+    "navigateForward": "Eteenpäin",
+    "newPage": "Uusi sivu",
+    "openBlockMenu": "Avaa lohkon toiminnot",
+    "openKeyboardShortcuts": "Avaa pikanäppäimet",
+    "openParentPage": "Avaa yläsivu",
+    "quickFind": "Pikahaku",
+    "strikethrough": "Yliviivaus",
+    "toggleAllToggles": "Laajenna tai tiivistä kaikki taitokset",
+    "toggleSidebar": "Vaihda sivupalkki",
+    "toggleTheme": "Vaihda tumma tila",
+    "underline": "Alleviivaus"
+  },
+  "categories": {
+    "createStyle": "Luonti ja tyyli",
+    "editMove": "Muokkaus ja siirto",
+    "popular": "Suosituimmat"
+  },
+  "categoriesLabel": "Pikanäppäinluokat",
+  "close": "Sulje",
+  "closeBackdrop": "Sulje pikanäppäimet",
+  "empty": "Pikanäppäimiä ei löytynyt",
+  "keysFor": "Pikanäppäimet: {{action}}",
+  "or": "tai",
+  "searchLabel": "Hae pikanäppäimiä",
+  "searchPlaceholder": "Hae pikanäppäimiä…",
+  "searchResults": "Hakutulokset",
+  "searchTerms": {
+    "toggleTheme": "teema vaalea tumma ulkoasu"
+  },
+  "title": "Pikanäppäimet"
+}

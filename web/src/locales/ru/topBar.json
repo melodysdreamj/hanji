@@ -38,7 +38,7 @@
   "moveTo": "Переместить в",
   "exporting": "Экспорт…",
   "exportAsMarkdown": "Экспорт в Markdown",
-  "exportAsHanji": "Экспорт в файл Hanji",
+  "exportAsHanji": "Экспорт Hanji JSON (без файлов)",
   "importing": "Импорт…",
   "importMarkdown": "Импорт Markdown",
   "unlockPage": "Разблокировать страницу",
@@ -146,12 +146,21 @@
     "couldntUpdateAccess": "Не удалось обновить доступ",
     "removedFromAccessList": "Удалено из списка доступа",
     "couldntRemoveAccess": "Не удалось удалить доступ",
-    "couldntLoadAccessList": "Не удалось загрузить список доступа"
+    "couldntLoadAccessList": "Не удалось загрузить список доступа",
+    "couldntExportHanjiArchive": "Не удалось экспортировать архив Hanji.",
+    "exportedHanjiArchive": "Экспортирован архив Hanji с файлами."
   },
   "user": "Пользователь",
   "whoHasAccess": "У кого есть доступ",
   "workspace": "Рабочее пространство",
   "workspaceCount_one": "{{count}} рабочее пространство",
   "workspaceCount_other": "{{count}} рабочих пространств",
-  "you": "Вы"
+  "you": "Вы",
+  "exportAsHanjiArchive": "Экспорт архива Hanji (с файлами)",
+  "turnIntoWiki": "Превратить в вики",
+  "undoWiki": "Отменить вики",
+  "wikiCreated": "Страница превращена в вики",
+  "wikiPageSettings": "Настройки вики-страницы",
+  "wikiUndone": "Вики удалён; содержимое страницы сохранено",
+  "wikiUpdateFailed": "Не удалось обновить вики"
 }

@@ -35,7 +35,7 @@
     "rename": "పేరు మార్చు",
     "addPageInside": "లోపల పేజీ జోడించు",
     "exportAsMarkdown": "మార్క్‌డౌన్‌గా ఎగుమతి చేయి",
-    "exportAsHanjiFile": "Hanji ఫైల్‌గా ఎగుమతి చేయి",
+    "exportAsHanjiFile": "Hanji JSON ఎక్స్‌పోర్ట్ (ఫైల్లు లేకుండా)",
     "importMarkdown": "మార్క్డౌన్ దిగుమతి",
     "importing": "దిగుమతి అవుతోంది...",
     "unlockPage": "పేజీ అన్లాక్",
@@ -44,7 +44,8 @@
     "removeVerification": "ధృవీకరణ తొలగించు",
     "verifyPage": "పేజీ ధృవీకరించు",
     "customizePage": "పేజీ అనుకూలీకరించు",
-    "undo": "రద్దు చేయి"
+    "undo": "రద్దు చేయి",
+    "exportAsHanjiArchive": "Hanji ఆర్కైవ్ ఎక్స్‌పోర్ట్ (ఫైల్లతో సహా)"
   },
   "customize": {
     "summaryDefault": "డిఫాల్ట్",
@@ -101,6 +102,8 @@
     "movedToTrash": "ట్రాష్కు తరలించబడింది",
     "restoredPage": "పేజీ పునరుద్ధరించబడింది",
     "couldntRestorePage": "పేజీని పునరుద్ధరించలేకపోయింది",
-    "couldntMoveToTrash": "ట్రాష్కు తరలించలేకపోయింది"
+    "couldntMoveToTrash": "ట్రాష్కు తరలించలేకపోయింది",
+    "couldntExportHanjiArchive": "Hanji ఆర్కైవ్ ఎగుమతి చేయలేకపోయింది.",
+    "exportedHanjiArchive": "Hanji ఆర్కైవ్ ఫైల్లతో ఎగుమతి చేయబడింది."
   }
 }

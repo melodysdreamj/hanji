@@ -4,7 +4,22 @@
     "sum": "Somma",
     "average": "Media",
     "min": "Minimo",
-    "max": "Massimo"
+    "max": "Massimo",
+    "checked": "Selezionato",
+    "count_values": "Conteggio valori",
+    "date_range": "Intervallo di date",
+    "earliest_date": "Data più antica",
+    "empty": "Conteggio vuoti",
+    "latest_date": "Data più recente",
+    "median": "Mediana",
+    "not_empty": "Conteggio non vuoti",
+    "percent_checked": "Percentuale selezionati",
+    "percent_empty": "Percentuale vuoti",
+    "percent_not_empty": "Percentuale non vuoti",
+    "percent_unchecked": "Percentuale non selezionati",
+    "range": "Intervallo",
+    "unchecked": "Non selezionato",
+    "unique": "Conteggio valori unici"
   },
   "chartAria": "Grafico {{name}}",
   "chartType": "Tipo di grafico",
@@ -27,5 +42,9 @@
   "untitledProperty": "Senza titolo",
   "valueProperty": "Proprietà valore",
   "xAxis": "Asse X",
-  "yAxis": "Asse Y"
+  "yAxis": "Asse Y",
+  "dateRangeDays": "{{count}} giorni",
+  "missingProperty": "la proprietà salvata",
+  "unsupportedAggregateDesc": "{{aggregate}} non può essere calcolato da {{property}}. Scegli una proprietà o un calcolo compatibile.",
+  "unsupportedAggregateTitle": "Questo calcolo del grafico non è disponibile"
 }

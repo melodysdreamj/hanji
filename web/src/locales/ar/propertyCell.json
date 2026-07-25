@@ -92,5 +92,8 @@
     "ج",
     "س"
   ],
-  "you": "أنا"
+  "you": "أنا",
+  "buttonExecutionFailed": "تعذر تشغيل الزر.",
+  "loadingMoreRelations": "جارٍ تحميل المزيد من العلاقات...",
+  "loadMoreRelations": "تحميل المزيد من العلاقات"
 }

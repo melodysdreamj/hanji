@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} aktuelle Updates",
     "unreadOfTotal": "{{unread}} ungelesen von {{total}} Updates",
     "updateType": "Update-Typ",
-    "updates": "Updates",
-    "modeUpdates": "Updates",
-    "modeChats": "Chats",
-    "inboxMode": "Inbox-Modus"
+    "updates": "Updates"
   },
   "time": {
     "justNow": "Gerade eben",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} Versionen",
     "versionsAgo": "vor {{count}} Versionen",
     "versionsAhead": "{{count}} Versionen voraus",
-    "versionsAria": "Versionen"
+    "versionsAria": "Versionen",
+    "emptyBlock": "Leerer Block",
+    "emptyPreview": "Diese Version hat keinen Seiteninhalt.",
+    "previewAria": "Schreibgeschützte Seitenversion-Vorschau",
+    "previewingCurrent": "Aktuelle Seite anzeigen",
+    "previewingSnapshot": "Frühere Version anzeigen",
+    "previewOnlyHint": "Durch Auswahl einer Version wird diese nur in der Vorschau angezeigt. Die aktuelle Seite ändert sich erst nach dem Wiederherstellen.",
+    "restoreThisVersion": "Wiederherstellen",
+    "restoring": "Wiederherstellen...",
+    "versionHistory": "Versionsverlauf"
   },
   "badges": {
     "comment": "Kommentar",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} erwähnt · {{preview}}",
     "referenceLink": "Link zu {{title}} · {{preview}}",
     "unreadDot": "Ungelesen",
-    "workspaceUpdate": "Workspace-Update"
+    "workspaceUpdate": "Workspace-Update",
+    "bySelf": "von dir"
   },
   "empty": {
     "allCaughtUp": "Du bist auf dem neuesten Stand.",

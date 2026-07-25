@@ -92,5 +92,8 @@
     "J",
     "S"
   ],
-  "you": "Anda"
+  "you": "Anda",
+  "buttonExecutionFailed": "Gagal menjalankan tombol.",
+  "loadingMoreRelations": "Memuat lebih banyak relasi...",
+  "loadMoreRelations": "Muat lebih banyak relasi"
 }

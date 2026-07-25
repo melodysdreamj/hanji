@@ -15,10 +15,7 @@
     "recentUpdates_other": "{{count}} സമീപകാല അപ്ഡേറ്റുകൾ",
     "unreadOfTotal": "{{total}} അപ്ഡേറ്റുകളിൽ {{unread}} വായിക്കാത്തത്",
     "updateType": "അപ്ഡേറ്റ് തരം",
-    "updates": "അപ്ഡേറ്റുകൾ",
-    "modeUpdates": "അപ്ഡേറ്റുകൾ",
-    "modeChats": "ചാറ്റുകൾ",
-    "inboxMode": "ഇൻബോക്സ് മോഡ്"
+    "updates": "അപ്ഡേറ്റുകൾ"
   },
   "time": {
     "justNow": "ഇപ്പോൾ",
@@ -46,7 +43,16 @@
     "versionCount_other": "{{count}} പതിപ്പുകൾ",
     "versionsAgo": "{{count}} പതിപ്പുകൾക്ക് മുമ്പ്",
     "versionsAhead": "{{count}} പതിപ്പുകൾ മുന്നിൽ",
-    "versionsAria": "പതിപ്പുകൾ"
+    "versionsAria": "പതിപ്പുകൾ",
+    "emptyBlock": "ശൂന്യ ബ്ലോക്ക്",
+    "emptyPreview": "ഈ പതിപ്പിൽ പേജ് ഉള്ളടക്കമൊന്നുമില്ല.",
+    "previewAria": "വായന മാത്രമുള്ള പേജ് പതിപ്പ് പ്രിവ്യൂ",
+    "previewingCurrent": "നിലവിലെ പേജ് കാണുന്നു",
+    "previewingSnapshot": "മുൻ പതിപ്പ് കാണുന്നു",
+    "previewOnlyHint": "ഒരു പതിപ്പ് തിരഞ്ഞെടുക്കുന്നത് അതിനെ പ്രിവ്യൂ ചെയ്യാൻ മാത്രമാണ്. പുനഃസ്ഥാപിക്കുക കഴിഞ്ഞാൽ മാത്രമേ നിലവിലെ പേജ് മാറുകയുള്ളൂ.",
+    "restoreThisVersion": "പുനഃസ്ഥാപിക്കുക",
+    "restoring": "പുനഃസ്ഥാപിക്കുന്നു...",
+    "versionHistory": "പതിപ്പ് ചരിത്രം"
   },
   "badges": {
     "comment": "കമന്റ്",
@@ -67,7 +73,8 @@
     "referenceMention": "{{title}} മെൻഷൻ · {{preview}}",
     "referenceLink": "{{title}} ലിങ്ക് · {{preview}}",
     "unreadDot": "വായിക്കാത്തത്",
-    "workspaceUpdate": "വർക്ക്സ്പെയ്സ് അപ്ഡേറ്റ്"
+    "workspaceUpdate": "വർക്ക്സ്പെയ്സ് അപ്ഡേറ്റ്",
+    "bySelf": "നിങ്ങൾ"
   },
   "empty": {
     "allCaughtUp": "എല്ലാം കണ്ടു.",

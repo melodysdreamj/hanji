@@ -176,7 +176,9 @@
     "video": "Video",
     "videoCaption": "Caption ng video",
     "videoEmptyHint": "Mag-upload ng video file, mag-paste ng direktang link, o gumamit ng link mula sa YouTube, Vimeo, o Loom.",
-    "videoLink": "Link ng video"
+    "videoLink": "Link ng video",
+    "audioPlaybackFailed": "Hindi mai-play ang audio na ito. Palitan ito o buksan ang orihinal na file.",
+    "videoPlaybackFailed": "Hindi mai-play ang video na ito. Palitan ito o buksan ang orihinal na file."
   },
   "bookmark": {
     "copy": "Kopyahin ang bookmark link",
