@@ -1,9 +1,6 @@
 name: Publish container image
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       tag:
@@ -154,6 +151,8 @@ jobs:
           cmp ghcr-platform.json dockerhub-platform.json
       - name: Generate platform SBOM
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_PLATFORM: ${{ matrix.platform }}
         with:
           scan-type: image
           image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
@@ -162,6 +161,8 @@ jobs:
           exit-code: '0'
       - name: Record all platform HIGH and CRITICAL findings
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_PLATFORM: ${{ matrix.platform }}
         with:
           scan-type: image
           image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
@@ -199,6 +200,8 @@ jobs:
           retention-days: 90
       - name: Block fixable platform HIGH and CRITICAL findings
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_PLATFORM: ${{ matrix.platform }}
         with:
           scan-type: image
           image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}

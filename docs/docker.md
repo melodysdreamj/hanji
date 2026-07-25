@@ -13,7 +13,7 @@ WebSocket settings, use the separate
 Use the immutable release tag:
 
 ```text
-melodysdreamj/hanji:0.2.1-alpha
+melodysdreamj/hanji:0.2.0-alpha.1
 ```
 
 The Docker Hub image supports Linux AMD64 and ARM64. Docker selects the correct
@@ -27,7 +27,7 @@ anonymous client.
 
 ## Docker Desktop or another container UI
 
-1. Pull `melodysdreamj/hanji:0.2.1-alpha` from Docker Hub.
+1. Pull `melodysdreamj/hanji:0.2.0-alpha.1` from Docker Hub.
 2. Create a container and enable automatic restart.
 3. Publish an unused host port to container `8787/TCP`. On a personal computer,
    host port `8787` is the simplest choice.
@@ -83,7 +83,7 @@ This command keeps the service local to the computer and stores all persistent
 state in the named volume `hanji-data`:
 
 ```bash
-HANJI_IMAGE=melodysdreamj/hanji:0.2.1-alpha
+HANJI_IMAGE=melodysdreamj/hanji:0.2.0-alpha.1
 HANJI_MEMORY_LIMIT="$(
   docker run --rm --entrypoint node "$HANJI_IMAGE" \
     /usr/local/bin/hanji-memory-limit.mjs
@@ -137,7 +137,7 @@ operator who has separately confirmed host headroom:
 HANJI_MEMORY_LIMIT=1536m docker run --rm \
   --entrypoint node \
   -e HANJI_MEMORY_LIMIT \
-  melodysdreamj/hanji:0.2.1-alpha \
+  melodysdreamj/hanji:0.2.0-alpha.1 \
   /usr/local/bin/hanji-memory-limit.mjs
 ```
 
@@ -458,7 +458,7 @@ docker run --rm \
   --entrypoint tar \
   -v hanji-data:/data:ro \
   -v "$PWD":/backup \
-  melodysdreamj/hanji:0.2.1-alpha \
+  melodysdreamj/hanji:0.2.0-alpha.1 \
   -C /data -czf /backup/hanji-data-backup.tar.gz .
 ```
 
@@ -471,7 +471,7 @@ docker run --rm \
   --entrypoint tar \
   -v hanji-data-restored:/data \
   -v "$PWD":/backup:ro \
-  melodysdreamj/hanji:0.2.1-alpha \
+  melodysdreamj/hanji:0.2.0-alpha.1 \
   -C /data -xzf /backup/hanji-data-backup.tar.gz
 ```
 
@@ -491,7 +491,7 @@ replaceable container. The named volume remains intact, and recreation also
 applies the bounded logging policy:
 
 ```bash
-HANJI_VERSION=0.2.1-alpha # replace with the new immutable release tag
+HANJI_VERSION=0.2.0-alpha.1 # replace with the new immutable release tag
 docker pull "melodysdreamj/hanji:$HANJI_VERSION"
 HANJI_MEMORY_LIMIT="$(
   docker run --rm --entrypoint node \

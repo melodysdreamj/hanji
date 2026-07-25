@@ -16,7 +16,7 @@ The release image is published to Docker Hub as `melodysdreamj/hanji` and to
 GHCR as `ghcr.io/melodysdreamj/hanji`. The normal Docker/NAS install is:
 
 ```bash
-HANJI_IMAGE=melodysdreamj/hanji:0.2.1-alpha
+HANJI_IMAGE=melodysdreamj/hanji:0.2.0-alpha.1
 HANJI_MEMORY_LIMIT="$(
   docker run --rm --entrypoint node "$HANJI_IMAGE" \
     /usr/local/bin/hanji-memory-limit.mjs
@@ -73,7 +73,7 @@ import-encryption, and MCP OAuth secrets on first start and stores them under
 `/data/.hanji/`; browser setup closes through durable database state rather
 than a persisted terminal code.
 
-**Publication status:** `0.2.1-alpha` is publicly pullable from Docker Hub and
+**Publication status:** `0.2.0-alpha.1` is publicly pullable from Docker Hub and
 GHCR as a multi-platform Linux AMD64/ARM64 image. Use the immutable version tag
 for deployments; `alpha` follows the newest alpha, while `latest` is reserved
 for a future stable release. Each new container release builds every platform
@@ -273,7 +273,7 @@ that starts Hanji also enforces bounded logs:
    project:
 
    ```bash
-   HANJI_IMAGE=melodysdreamj/hanji:0.2.1-alpha
+   HANJI_IMAGE=melodysdreamj/hanji:0.2.0-alpha.1
    docker pull "$HANJI_IMAGE"
    docker run --rm --entrypoint node "$HANJI_IMAGE" \
      /usr/local/bin/hanji-memory-limit.mjs
@@ -294,7 +294,7 @@ that starts Hanji also enforces bounded logs:
 4. In **Container Manager → Project**, create a project and paste this Compose
    configuration into its editor. The Project pulls the immutable Docker Hub
    image automatically. GHCR remains available by replacing the image with
-   `ghcr.io/melodysdreamj/hanji:0.2.1-alpha`. Replace
+   `ghcr.io/melodysdreamj/hanji:0.2.0-alpha.1`. Replace
    `REPLACE_WITH_HANJI_MEMORY_LIMIT` with the exact helper output before
    deployment; leaving the placeholder makes Compose fail rather than launching
    without a finite bound.
@@ -302,7 +302,7 @@ that starts Hanji also enforces bounded logs:
    ```yaml
    services:
      hanji:
-      image: melodysdreamj/hanji:0.2.1-alpha
+      image: melodysdreamj/hanji:0.2.0-alpha.1
        container_name: hanji
        network_mode: host
        environment:
@@ -414,7 +414,7 @@ bounded logging policy.
 ![Synology-style registry screen selecting the Hanji image and version tag](./assets/synology/image-pull.svg)
 
 1. The Project pulls the exact repository `melodysdreamj/hanji`.
-2. Keep the immutable version tag `0.2.1-alpha`. DSM automatically chooses
+2. Keep the immutable version tag `0.2.0-alpha.1`. DSM automatically chooses
    AMD64 or ARM64 for the NAS. Do not use `latest` for this alpha release.
 
 The Project creates the container with host networking, `HOST=127.0.0.1`, and
