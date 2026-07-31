@@ -174,13 +174,13 @@
     "@edge-base/cli": "0.5.0",
     "@edge-base/server": "0.5.0",
     "@edge-base/shared": "0.5.0",
-    "@eslint/js": "^9.39.4",
+    "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^9.39.4",
-    "globals": "^16.5.0",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0",
     "pg": "^8.16.3",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.62.1",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^4.1.9"
   },
   "dependencies": {
