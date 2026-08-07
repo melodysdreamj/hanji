@@ -16,6 +16,6 @@
     "test:namespace": "node --test scripts/verify-hanji-namespace.test.mjs scripts/migrate-hanji-local-namespace.test.mjs"
   },
   "devDependencies": {
-    "vitepress": "2.0.0-alpha.18"
+    "vitepress": "2.0.0-alpha.19"
   }
 }
